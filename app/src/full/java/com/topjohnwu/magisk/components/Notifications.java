@@ -107,7 +107,8 @@ public class Notifications {
         builder.setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(title)
-                .setProgress(0, 0, true);
+                .setProgress(0, 0, true)
+                .setOngoing(true);
         return builder;
     }
 }

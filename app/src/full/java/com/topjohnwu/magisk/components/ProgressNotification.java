@@ -50,14 +50,16 @@ public class ProgressNotification implements DownloadProgressListener {
     public void dlDone() {
         builder.setProgress(0, 0, false)
                 .setContentText(Data.MM().getString(R.string.download_complete))
-                .setSmallIcon(R.drawable.ic_check_circle);
+                .setSmallIcon(R.drawable.ic_check_circle)
+                .setOngoing(false);
         update();
     }
 
     public void dlFail() {
         builder.setProgress(0, 0, false)
                 .setContentText(Data.MM().getString(R.string.download_file_error))
-                .setSmallIcon(R.drawable.ic_cancel);
+                .setSmallIcon(R.drawable.ic_cancel)
+                .setOngoing(false);
         update();
     }
 
