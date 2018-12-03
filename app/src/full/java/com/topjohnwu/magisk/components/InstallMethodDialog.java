@@ -67,7 +67,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
         a.runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
             String filename = Utils.fmt("Magisk-v%s(%d).zip",
                     Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
-            NotificationProgress progress = new NotificationProgress(filename);
+            ProgressNotification progress = new ProgressNotification(filename);
             AndroidNetworking
                     .download(Data.magiskLink, Const.EXTERNAL_PATH.getPath(), filename)
                     .build()
@@ -82,7 +82,9 @@ class InstallMethodDialog extends AlertDialog.Builder {
                         }
 
                         @Override
-                        public void onError(ANError anError) {}
+                        public void onError(ANError anError) {
+                            progress.dlFail();
+                        }
                     });
         });
     }

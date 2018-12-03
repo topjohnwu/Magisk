@@ -7,24 +7,23 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Notifications;
 import com.topjohnwu.magisk.utils.Utils;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-public class NotificationProgress implements DownloadProgressListener {
+public class ProgressNotification implements DownloadProgressListener {
 
     private NotificationManagerCompat mgr;
     private NotificationCompat.Builder builder;
     private long prevTime;
 
-    public NotificationProgress(String title) {
+    public ProgressNotification(String title) {
         MagiskManager mm = Data.MM();
         mgr = NotificationManagerCompat.from(mm);
         builder = Notifications.progress(title);
-        mgr.notify(Const.ID.DOWNLOAD_PROGRESS_ID, builder.build());
         prevTime = System.currentTimeMillis();
+        update();
         Utils.toast(mm.getString(R.string.downloading_toast, title), Toast.LENGTH_SHORT);
     }
 
@@ -45,17 +44,26 @@ public class NotificationProgress implements DownloadProgressListener {
     }
 
     public void update() {
-        mgr.notify(Const.ID.DOWNLOAD_PROGRESS_ID, builder.build());
+        mgr.notify(hashCode(), builder.build());
     }
 
     public void dlDone() {
         builder.setProgress(0, 0, false)
                 .setContentText(Data.MM().getString(R.string.download_complete))
-                .setSmallIcon(R.drawable.ic_check_circle);
+                .setSmallIcon(R.drawable.ic_check_circle)
+                .setOngoing(false);
+        update();
+    }
+
+    public void dlFail() {
+        builder.setProgress(0, 0, false)
+                .setContentText(Data.MM().getString(R.string.download_file_error))
+                .setSmallIcon(R.drawable.ic_cancel)
+                .setOngoing(false);
         update();
     }
 
     public void dismiss() {
-        mgr.cancel(Const.ID.DOWNLOAD_PROGRESS_ID);
+        mgr.cancel(hashCode());
     }
 }

@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
@@ -10,6 +8,7 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.ShellUtils;
@@ -23,6 +22,9 @@ import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.security.SecureRandom;
 import java.util.jar.JarEntry;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 public class PatchAPK {
 
@@ -125,18 +127,16 @@ public class PatchAPK {
         return true;
     }
 
-    public static void hideManager(Activity activity) {
-        ProgressDialog dialog = ProgressDialog.show(activity,
-                activity.getString(R.string.hide_manager_title),
-                activity.getString(R.string.hide_manager_msg));
+    public static void hideManager() {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            MagiskManager mm = Data.MM();
+            NotificationCompat.Builder progress =
+                    Notifications.progress(mm.getString(R.string.hide_manager_title));
+            NotificationManagerCompat mgr = NotificationManagerCompat.from(mm);
+            mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
             boolean b = patchAndHide();
-            Data.mainHandler.post(() -> {
-                dialog.cancel();
-                if (!b) {
-                    Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
-                }
-            });
+            mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
+            if (!b) Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
         });
     }
 }

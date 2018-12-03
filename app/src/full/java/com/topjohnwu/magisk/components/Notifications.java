@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils;
+package com.topjohnwu.magisk.components;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.receivers.GeneralReceiver;
+import com.topjohnwu.magisk.utils.Utils;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -106,7 +107,8 @@ public class Notifications {
         builder.setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(title)
-                .setProgress(0, 0, true);
+                .setProgress(0, 0, true)
+                .setOngoing(true);
         return builder;
     }
 }

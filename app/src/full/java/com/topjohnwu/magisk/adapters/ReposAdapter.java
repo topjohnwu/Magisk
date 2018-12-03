@@ -12,8 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.asyncs.DownloadModule;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
-import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.container.Module;
@@ -105,16 +105,15 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
 
         holder.downloadImage.setOnClickListener(v -> {
             new CustomAlertDialog((BaseActivity) context)
-                    .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
-                    .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.install, (d, i) ->
-                        new ProcessRepoZip((BaseActivity) context, repo, true).exec()
-                    )
-                    .setNeutralButton(R.string.download, (d, i) ->
-                        new ProcessRepoZip((BaseActivity) context, repo, false).exec())
-                    .setNegativeButton(R.string.no_thanks, null)
-                    .show();
+                .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
+                .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
+                .setCancelable(true)
+                .setPositiveButton(R.string.install, (d, i) ->
+                        DownloadModule.exec((BaseActivity) context, repo, true))
+                .setNeutralButton(R.string.download, (d, i) ->
+                        DownloadModule.exec((BaseActivity) context, repo, false))
+                .setNegativeButton(R.string.no_thanks, null)
+                .show();
         });
     }
 
