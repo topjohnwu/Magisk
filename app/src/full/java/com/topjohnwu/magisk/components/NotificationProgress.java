@@ -55,6 +55,13 @@ public class NotificationProgress implements DownloadProgressListener {
         update();
     }
 
+    public void dlFail() {
+        builder.setProgress(0, 0, false)
+                .setContentText(Data.MM().getString(R.string.download_file_error))
+                .setSmallIcon(R.drawable.ic_cancel);
+        update();
+    }
+
     public void dismiss() {
         mgr.cancel(Const.ID.DOWNLOAD_PROGRESS_ID);
     }

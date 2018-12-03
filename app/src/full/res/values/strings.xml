@@ -74,6 +74,7 @@
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Progress Notifications</string>
     <string name="download_complete">Download complete</string>
+    <string name="download_file_error">Error downloading file</string>
     <string name="magisk_update_title">New Magisk Update Available!</string>
     <string name="manager_update_title">New Magisk Manager Update Available!</string>
 
@@ -123,7 +124,6 @@
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
     <string name="setup_title">Additional Setup</string>
     <string name="setup_msg">Running environment setup…</string>
-    <string name="download_file_error">Error downloading file</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
 
