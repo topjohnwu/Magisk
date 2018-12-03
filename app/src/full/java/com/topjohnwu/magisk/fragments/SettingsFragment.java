@@ -77,7 +77,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
         Preference hideManager = findPreference("hide");
         hideManager.setOnPreferenceClickListener(pref -> {
-            PatchAPK.hideManager(requireActivity());
+            PatchAPK.hideManager();
             return true;
         });
         Preference restoreManager = findPreference("restore");
