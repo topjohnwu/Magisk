@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.utils.Notifications;
+import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 

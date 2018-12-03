@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.PatchAPK;
-import com.topjohnwu.magisk.components.NotificationProgress;
+import com.topjohnwu.magisk.components.ProgressNotification;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.utils.JarMap;
 import com.topjohnwu.utils.SignAPK;
@@ -34,7 +34,7 @@ public class DlInstallManager {
     public static void dlInstall(String name, ManagerDownloadListener listener) {
         MagiskManager mm = Data.MM();
         File apk = new File(mm.getFilesDir(), "manager.apk");
-        NotificationProgress progress = new NotificationProgress(name);
+        ProgressNotification progress = new ProgressNotification(name);
         listener.setInstances(apk, progress);
         AndroidNetworking
                 .download(Data.managerLink, apk.getParent(), apk.getName())
@@ -46,14 +46,14 @@ public class DlInstallManager {
 
     public abstract static class ManagerDownloadListener implements DownloadListener {
         private File apk;
-        private NotificationProgress progress;
+        private ProgressNotification progress;
 
-        private void setInstances(File apk, NotificationProgress progress) {
+        private void setInstances(File apk, ProgressNotification progress) {
             this.apk = apk;
             this.progress = progress;
         }
 
-        public abstract void onDownloadComplete(File apk, NotificationProgress progress);
+        public abstract void onDownloadComplete(File apk, ProgressNotification progress);
 
         @Override
         public final void onDownloadComplete() {
@@ -69,7 +69,7 @@ public class DlInstallManager {
     private static class PatchPackageName extends ManagerDownloadListener {
 
         @Override
-        public void onDownloadComplete(File apk, NotificationProgress progress) {
+        public void onDownloadComplete(File apk, ProgressNotification progress) {
             File patched = apk;
             MagiskManager mm = Data.MM();
             if (!mm.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
@@ -95,7 +95,7 @@ public class DlInstallManager {
     private static class RestoreManager extends ManagerDownloadListener {
 
         @Override
-        public void onDownloadComplete(File apk, NotificationProgress progress) {
+        public void onDownloadComplete(File apk, ProgressNotification progress) {
             progress.dismiss();
             Data.exportPrefs();
             if (ShellUtils.fastCmdResult("pm install " + apk))

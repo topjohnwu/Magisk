@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.components.NotificationProgress;
+import com.topjohnwu.magisk.components.ProgressNotification;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
@@ -39,7 +39,7 @@ public class DownloadModule {
 
     private static void dlProcessInstall(Repo repo, boolean install) {
         File output = new File(Const.EXTERNAL_PATH, repo.getDownloadFilename());
-        NotificationProgress progress = new NotificationProgress(output.getName());
+        ProgressNotification progress = new ProgressNotification(output.getName());
         try {
             MagiskManager mm = Data.MM();
             File temp1 = new File(mm.getCacheDir(), "temp.zip");
@@ -96,9 +96,9 @@ public class DownloadModule {
 
         private long totalBytes;
         private long bytesDownloaded;
-        private NotificationProgress progress;
+        private ProgressNotification progress;
 
-        protected ProgressInputStream(InputStream in, long size, NotificationProgress p) {
+        protected ProgressInputStream(InputStream in, long size, ProgressNotification p) {
             super(in);
             totalBytes = size;
             progress = p;

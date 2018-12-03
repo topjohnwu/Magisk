@@ -43,7 +43,7 @@ public class UninstallDialog extends CustomAlertDialog {
         if (!TextUtils.isEmpty(Data.uninstallerLink)) {
             setPositiveButton(R.string.complete_uninstall, (d, i) -> {
                 File zip = new File(activity.getFilesDir(), "uninstaller.zip");
-                NotificationProgress progress = new NotificationProgress(zip.getName());
+                ProgressNotification progress = new ProgressNotification(zip.getName());
                 AndroidNetworking.download(Data.uninstallerLink, zip.getParent(), zip.getName())
                     .build()
                     .setDownloadProgressListener(progress)

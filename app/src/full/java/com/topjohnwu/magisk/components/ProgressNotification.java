@@ -7,19 +7,18 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Notifications;
 import com.topjohnwu.magisk.utils.Utils;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-public class NotificationProgress implements DownloadProgressListener {
+public class ProgressNotification implements DownloadProgressListener {
 
     private NotificationManagerCompat mgr;
     private NotificationCompat.Builder builder;
     private long prevTime;
 
-    public NotificationProgress(String title) {
+    public ProgressNotification(String title) {
         MagiskManager mm = Data.MM();
         mgr = NotificationManagerCompat.from(mm);
         builder = Notifications.progress(title);
