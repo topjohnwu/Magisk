@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.SuRequestActivity;
 import com.topjohnwu.magisk.services.OnBootService;
 import com.topjohnwu.magisk.utils.DlInstallManager;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.SuConnector;
 import com.topjohnwu.superuser.Shell;
 
@@ -28,7 +27,6 @@ public class GeneralReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (action == null)
             return;
-        Logger.debug(action);
         switch (action) {
             case Intent.ACTION_BOOT_COMPLETED:
                 String bootAction = intent.getStringExtra("action");
