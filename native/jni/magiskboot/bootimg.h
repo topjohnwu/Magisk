@@ -207,6 +207,8 @@ static_cast<boot_img_hdr_v1 *>(hdr)->x)
 	hdr_set(recovery_dtbo_size, uint32_t);
 	hdr_get(recovery_dtbo_offset, uint32_t);
 	hdr_set(recovery_dtbo_offset, uint32_t);
+	hdr_get(header_size, uint32_t);
+	hdr_set(header_size, uint32_t);
 
 	uint32_t header_version() {
 		if (IS_PXA)
