@@ -14,5 +14,5 @@ ifdef B_BB
 APP_CFLAGS := -Os
 APP_SHORT_COMMANDS := true
 NDK_TOOLCHAIN_VERSION := 4.9
-APP_PLATFORM := android-21
+APP_PLATFORM := android-22
 endif
