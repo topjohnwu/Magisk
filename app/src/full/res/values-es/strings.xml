@@ -70,6 +70,14 @@
     <string name="app_translators">Traductores</string>
     <string name="support_thread">Hilo de soporte</string>
     <string name="follow_twitter">Sigueme en Twitter</string>
+    
+        <!-- System Components, Notifications -->
+    <string name="update_channel">Actualización de Magisk</string>
+    <string name="progress_channel">Notificaciones de progreso</string>
+    <string name="download_complete">Descarga Completa</string>
+    <string name="download_file_error">Error descargando archivo</string>
+    <string name="magisk_update_title">¡Nueva actualización de Magisk disponible!</string>
+    <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Cerrar</string>
@@ -78,7 +86,6 @@
     <string name="download">Descargar</string>
     <string name="reboot">Reiniciar</string>
     <string name="zip_process_msg">Procesando archivo zip…</string>
-    <string name="magisk_update_title">¡Nueva actualización de Magisk disponible!</string>
     <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
     <string name="release_notes">Notas de lanzamiento</string>
     <string name="repo_cache_cleared">Caché del repositorio limpiada</string>
@@ -87,11 +94,9 @@
     <string name="zip_download_title">Descargando</string>
     <string name="zip_download_msg">Descargando el archivo zip (%1$d%%)…</string>
     <string name="zip_process_title">Procesando</string>
-    <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
     <string name="manager_download_install">Pulse para descargar e instalar</string>
     <string name="dtbo_patched_title">DTBO fue parchado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha parcheado dtbo.img, por favor reinicia</string>
-    <string name="update_channel">Actualización de Magisk</string>
     <string name="flashing">Flasheando</string>
     <string name="hide_manager_title">Ocultando Magisk Manager…</string>
     <string name="hide_manager_msg">Esto podría tomar un tiempo…</string>
@@ -118,9 +123,10 @@
     <string name="env_fix_msg">Su dispositivo requiere una instalación adicional para que Magisk funcione correctamente. Se descargará el zip de instalación de Magisk, desea continuar ahora?</string>
     <string name="setup_title">Configuración Adicional</string>
     <string name="setup_msg">Ejecutando Configuración de Entorno</string>
-    <string name="download_file_error">Error descargando archivo</string>
+    
     <string name="downloading_toast">Descargando %1$s</string>
     <string name="no_rw_storage">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
+   
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -149,6 +155,7 @@
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Soporte para aplicaciones Adblock fuera de la partición system</string>
+    <string name="settings_hosts_toast">Módulo systemless hosts agregado</string>
 
     <string name="settings_su_app_adb">Aplicaciones y ADB</string>
     <string name="settings_su_app">Sólo aplicaciones</string>
