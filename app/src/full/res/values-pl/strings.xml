@@ -127,7 +127,7 @@
     <string name="settings_restore_manager_summary">Przywróć oryginalną paczkę Magisk Manager</string>
     <string name="language">Język</string>
     <string name="system_default">(Domyślny Systemu)</string>
-    <string name="settings_update">Aktualizacja Ustawień</string>
+    <string name="settings_update">Ustawienia Aktualizacji</string>
     <string name="settings_check_update_title">Sprawdź Aktualizację</string>
     <string name="settings_check_update_summary">Regularnie sprawdzaj aktualizacje w tle</string>
     <string name="settings_update_channel_title">Kanał Aktualizacji</string>
