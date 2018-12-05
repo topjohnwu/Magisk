@@ -72,11 +72,11 @@
 	<string name="follow_twitter">Seguimi su Twitter</string>
 	
 	<!-- System Components, Notifications -->
-    	<string name="update_channel">Aggiornamenti Magisk</string>
+	<string name="update_channel">Aggiornamenti Magisk</string>
    	<string name="progress_channel">Notifiche di avanzamento</string>
    	<string name="download_complete">Download completato</string>
 	<string name="download_file_error">Errore nel download del file</string>
-    	<string name="magisk_update_title">È disponibile un nuovo aggiornamento di Magisk!</string>
+	<string name="magisk_update_title">È disponibile un nuovo aggiornamento di Magisk!</string>
    	<string name="manager_update_title">È disponibile un nuovo aggiornamento di Magisk Manager!</string>
 
 	<!--Toasts, Dialogs-->
@@ -85,21 +85,18 @@
 	<string name="repo_install_msg">Vuoi installare %1$s?</string>
 	<string name="download">Download</string>
 	<string name="reboot">Riavvia</string>
-	<string name="magisk_update_title">È disponibile un nuovo aggiornamento di Magisk!</string>
 	<string name="settings_reboot_toast">Riavvia per applicare i cambiamenti.</string>
 	<string name="release_notes">Note di rilascio</string>
 	<string name="repo_cache_cleared">La cache delle repository è stata svuotata</string>
-    	<string name="process_error">Errore di elaborazione</string>
+	<string name="process_error">Errore di elaborazione</string>
 	<string name="internal_storage">Il file zip si trova in:\n[Memoria Interna]%1$s</string>
 	<string name="zip_download_title">Download in corso</string>
 	<string name="zip_download_msg">Download del file zip (%1$d%%) …</string>
 	<string name="zip_process_title">Elaborazione</string>
 	<string name="zip_process_msg">Elaborazione del file zip…</string>
-	<string name="manager_update_title">È disponibile un nuovo aggiornamento di Magisk Manager!</string>
 	<string name="manager_download_install">Premere per scaricare e installare.</string>
 	<string name="dtbo_patched_title">DTBO è stato aggiornato!</string>
 	<string name="dtbo_patched_reboot">Magisk Manager ha aggiornato dtbo.img. Riavvia per completare.</string>
-	<string name="update_channel">Aggiornamenti di Magisk</string>
 	<string name="flashing">Flash in corso…</string>
 	<string name="hide_manager_title">Nascondendo Magisk Manager…</string>
 	<string name="hide_manager_msg">Potrebbe volerci un po\'.</string>
@@ -116,13 +113,13 @@
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar.</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
-    	<string name="restore_img_msg">Ripristino…</string>
-    	<string name="restore_done">Ripristino completato!</string>
+	<string name="restore_img_msg">Ripristino…</string>
+	<string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
    	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS e non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi scaricare un\'estensione (contenente GoogleApiClient) per controllare lo stato di SafetyNet?</string>
 	<string name="su_db_corrupt">Il database SU è corrotto. Vuoi ricrearne uno nuovo?</string>
-    	<string name="setup_done">Configurazione completata.</string>
+	<string name="setup_done">Configurazione completata.</string>
 	<string name="setup_fail">Configurazione fallita.</string>
 	<string name="env_fix_title">Richiedi configurazione aggiuntiva</string>
 	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
@@ -130,7 +127,6 @@
 	<string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
 	<string name="downloading_toast">Download di %1$s</string>
 	<string name="no_rw_storage">Questa funzione non sarà attiva senza l\'autorizzazione di scrittura nella memoria di archiviazione esterna</string>
-	<string name="download_complete">Download completato</string>
 
 
 	<!--Settings Activity -->
