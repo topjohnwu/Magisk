@@ -85,14 +85,14 @@ static char *open_and_init_db(sqlite3 *&db) {
 	int ret = sqlite3_open_v2(MAGISKDB, &db,
 			SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
 	if (ret)
-		return strdup(sqlite3_errstr(ret));
+		return strdup(sqlite3_errmsg(db));
 	int ver, upgrade = 0;
 	char *err;
 	sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, &err);
 	err_ret(err);
 	if (ver > DB_VERSION) {
 		// Don't support downgrading database
-		sqlite3_close_v2(db);
+		sqlite3_close(db);
 		return nullptr;
 	}
 	if (ver < 3) {
