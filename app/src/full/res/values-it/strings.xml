@@ -18,7 +18,7 @@
 	<string name="checking_safetyNet_status">Controllo stato SafetyNet…</string>
 	<string name="safetyNet_check_success">Controllo SafetyNet OK</string>
 	<string name="safetyNet_api_error">Errore API SafetyNet</string>
-    <string name="safetyNet_res_invalid">La risposta non è valida.</string>
+   	<string name="safetyNet_res_invalid">La risposta non è valida.</string>
 
 	<!--Install Fragment-->
 	<string name="advanced_settings_title">Impostazioni avanzate</string>
@@ -70,6 +70,14 @@
 	<string name="app_translators">Traduttori</string>
 	<string name="support_thread">Thread di supporto</string>
 	<string name="follow_twitter">Seguimi su Twitter</string>
+	
+	<!-- System Components, Notifications -->
+    	<string name="update_channel">Aggiornamenti Magisk</string>
+   	<string name="progress_channel">Notifiche di avanzamento</string>
+   	<string name="download_complete">Download completato</string>
+	<string name="download_file_error">Errore nel download del file</string>
+    	<string name="magisk_update_title">È disponibile un nuovo aggiornamento di Magisk!</string>
+   	<string name="manager_update_title">È disponibile un nuovo aggiornamento di Magisk Manager!</string>
 
 	<!--Toasts, Dialogs-->
 	<string name="close">Chiudi</string>
@@ -108,21 +116,21 @@
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar.</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
-    <string name="restore_img_msg">Ripristino…</string>
-    <string name="restore_done">Ripristino completato!</string>
+    	<string name="restore_img_msg">Ripristino…</string>
+    	<string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
    	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS e non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi scaricare un\'estensione (contenente GoogleApiClient) per controllare lo stato di SafetyNet?</string>
 	<string name="su_db_corrupt">Il database SU è corrotto. Vuoi ricrearne uno nuovo?</string>
-    <string name="setup_done">Configurazione completata.</string>
+    	<string name="setup_done">Configurazione completata.</string>
 	<string name="setup_fail">Configurazione fallita.</string>
 	<string name="env_fix_title">Richiedi configurazione aggiuntiva</string>
 	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
 	<string name="setup_title">Configurazione aggiuntiva</string>
 	<string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
-	<string name="download_file_error">Errore nel download del file</string>
 	<string name="downloading_toast">Download di %1$s</string>
 	<string name="no_rw_storage">Questa funzione non sarà attiva senza l\'autorizzazione di scrittura nella memoria di archiviazione esterna</string>
+	<string name="download_complete">Download completato</string>
 
 
 	<!--Settings Activity -->
