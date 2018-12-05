@@ -332,8 +332,7 @@ static void exec_common_script(const char* stage) {
 static void exec_module_script(const char* stage) {
 	for (const char *module : module_list) {
 		snprintf(buf2, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
-		snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, module);
-		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
+		if (access(buf2, F_OK) == -1)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		int pid = exec_command(false, nullptr,
@@ -489,6 +488,34 @@ static bool magisk_env() {
 	return true;
 }
 
+static void collect_modules() {
+	chdir(MOUNTPOINT);
+	DIR *dir = xopendir(".");
+	struct dirent *entry;
+	while ((entry = xreaddir(dir))) {
+		if (entry->d_type == DT_DIR) {
+			if (strcmp(entry->d_name, ".") == 0 ||
+				strcmp(entry->d_name, "..") == 0 ||
+				strcmp(entry->d_name, ".core") == 0 ||
+				strcmp(entry->d_name, "lost+found") == 0)
+				continue;
+			chdir(entry->d_name);
+			if (access("remove", F_OK) == 0) {
+				chdir("..");
+				LOGI("%s: remove\n", entry->d_name);
+				rm_rf(entry->d_name);
+				continue;
+			}
+			unlink("update");
+			if (access("disable", F_OK))
+				module_list.push_back(entry->d_name);
+			chdir("..");
+		}
+	}
+	closedir(dir);
+	chdir("/");
+}
+
 static bool prepare_img() {
 	const char *alt_img[] =
 			{ "/cache/magisk.img", "/data/magisk_merge.img", "/data/adb/magisk_merge.img" };
@@ -526,31 +553,7 @@ static bool prepare_img() {
 	symlink(SECURE_DIR "/post-fs-data.d", LEGACY_CORE "/post-fs-data.d");
 	symlink(SECURE_DIR "/service.d", LEGACY_CORE "/service.d");
 
-	DIR *dir = xopendir(MOUNTPOINT);
-	struct dirent *entry;
-	while ((entry = xreaddir(dir))) {
-		if (entry->d_type == DT_DIR) {
-			if (strcmp(entry->d_name, ".") == 0 ||
-				strcmp(entry->d_name, "..") == 0 ||
-				strcmp(entry->d_name, ".core") == 0 ||
-				strcmp(entry->d_name, "lost+found") == 0)
-				continue;
-			snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
-			chdir(buf);
-			if (access("remove", F_OK) == 0) {
-				chdir("..");
-				rm_rf(buf);
-				continue;
-			}
-			unlink("update");
-			if (access("disable", F_OK) == 0)
-				continue;
-			module_list.push_back(entry->d_name);
-		}
-	}
-	closedir(dir);
-	chdir("/");
-
+	collect_modules();
 	return trim_img(MAINIMG, MOUNTPOINT, magiskloop) == 0;
 }
 
@@ -804,6 +807,10 @@ void post_fs_data(int client) {
 	// Execute module scripts
 	LOGI("* Running module post-fs-data scripts\n");
 	exec_module_script("post-fs-data");
+
+	// Recollect modules
+	module_list.clear(true);
+	collect_modules();
 
 	// Create the system root entry
 	node_entry *sys_root = new node_entry("system", IS_INTER);
