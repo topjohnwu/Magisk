@@ -39,25 +39,6 @@ unsigned get_radio_uid() {
 	return ppwd->pw_uid;
 }
 
-/* Read a whole line from file descriptor */
-ssize_t fdgets(char *buf, const size_t size, int fd) {
-	ssize_t len = 0;
-	buf[0] = '\0';
-	while (len < size - 1) {
-		int ret = read(fd, buf + len, 1);
-		if (ret < 0)
-			return -1;
-		if (ret == 0)
-			break;
-		if (buf[len] == '\0' || buf[len++] == '\n') {
-			buf[len] = '\0';
-			break;
-		}
-	}
-	buf[size - 1] = '\0';
-	return len;
-}
-
 int fork_dont_care() {
 	int pid = xfork();
 	if (pid) {

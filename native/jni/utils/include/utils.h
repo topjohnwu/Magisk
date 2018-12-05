@@ -92,7 +92,6 @@ int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 unsigned get_shell_uid();
 unsigned get_system_uid();
 unsigned get_radio_uid();
-ssize_t fdgets(char *buf, size_t size, int fd);
 int exec_command_sync(const char *argv0, ...);
 int fork_dont_care();
 void gen_rand_str(char *buf, int len);

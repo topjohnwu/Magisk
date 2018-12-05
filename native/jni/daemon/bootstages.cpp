@@ -561,17 +561,19 @@ static void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	while (1) {
 		sleep(5);
-		LOGD("apk_install: attempting to install APK");
-		int apk_res = -1, pid;
-		pid = exec_command(true, &apk_res, nullptr, "/system/bin/pm", "install", "-r", apk, nullptr);
+		LOGD("apk_install: attempting to install APK\n");
+		int fd = -1, pid;
+		pid = exec_command(true, &fd, nullptr, "/system/bin/sh",
+				"/system/bin/pm", "install", "-r", apk, nullptr);
+		FILE *res = fdopen(fd, "r");
 		if (pid != -1) {
-			int err = 0;
-			while (fdgets(buf, PATH_MAX, apk_res) > 0) {
+			bool err = false;
+			while (fgets(buf, PATH_MAX, res)) {
 				LOGD("apk_install: %s", buf);
 				err |= strstr(buf, "Error:") != nullptr;
 			}
 			waitpid(pid, nullptr, 0);
-			close(apk_res);
+			fclose(res);
 			// Keep trying until pm is started
 			if (err)
 				continue;
