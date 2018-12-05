@@ -392,7 +392,7 @@ request_zip_size_check() {
 check_filesystem() {
   curSizeM=`wc -c < $1`
   curSizeM=$((curSizeM / 1048576))
-  local DF=`df -P $2 | grep $2`
+  local DF=`df -Pk $2 | grep $2`
   curUsedM=`echo $DF | awk '{ print int($3 / 1024) }'`
   curFreeM=`echo $DF | awk '{ print int($4 / 1024) }'`
 }
