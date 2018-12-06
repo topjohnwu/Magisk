@@ -139,7 +139,7 @@ get_flags() {
 
 grep_cmdline() {
   local REGEX="s/^$1=//p"
-  sed -E 's/ +/\n/g' /proc/cmdline | sed -n "$REGEX" 2>/dev/null
+  cat /proc/cmdline | tr '[:space:]' '\n' | sed -n "$REGEX" 2>/dev/null
 }
 
 grep_prop() {
