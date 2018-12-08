@@ -170,12 +170,12 @@ def build_binary(args):
 
 	header('* Building binaries: ' + ' '.join(args.target))
 
-	# Force update logging.h timestamp to trigger recompilation for the flags to make a difference
-	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
+	os.utime(os.path.join('native', 'jni', 'include', 'flags.h'))
 
 	# Basic flags
-	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
-		'' if args.release else '-DMAGISK_DEBUG')
+	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={}'.format(config['version'], config['versionCode'])
+	if not args.release:
+		base_flags += ' MAGISK_DEBUG=1'
 
 	if 'magisk' in args.target:
 		# Magisk is special case as it is a dependency of magiskinit
@@ -226,7 +226,7 @@ def build_apk(args, flavor):
 
 	buildType = 'Release' if args.release else 'Debug'
 
-	proc = execv([gradlew, 'app:assemble' + flavor + buildType])
+	proc = execv([gradlew, 'app:assemble' + flavor + buildType, '-PconfigPath=' + os.path.abspath(args.config)])
 	if proc.returncode != 0:
 		error('Build Magisk Manager failed!')
 
@@ -322,7 +322,7 @@ def zip_main(args):
 
 		# End of zipping
 
-	output = os.path.join(config['outdir'], 'Magisk-v{}.zip'.format(config['version']) if config['prettyName'] else 
+	output = os.path.join(config['outdir'], 'Magisk-v{}.zip'.format(config['version']) if config['prettyName'] else
 		'magisk-release.zip' if args.release else 'magisk-debug.zip')
 	sign_zip(unsigned, output, args.release)
 	header('Output: ' + output)
@@ -366,7 +366,7 @@ def zip_uninstaller(args):
 
 		# End of zipping
 
-	output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d')) 
+	output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d'))
 		if config['prettyName'] else 'magisk-uninstaller.zip')
 	sign_zip(unsigned, output, args.release)
 	header('Output: ' + output)

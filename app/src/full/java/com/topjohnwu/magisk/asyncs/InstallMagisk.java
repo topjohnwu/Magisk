@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
@@ -15,7 +14,6 @@ import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.TarEntry;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
@@ -43,6 +41,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
@@ -135,7 +135,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
         if (!ShellUtils.checkSum("MD5", zip, Data.magiskMD5)) {
             console.add("- Downloading zip");
-            HttpURLConnection conn = WebService.mustRequest(Data.magiskLink, null);
+            HttpURLConnection conn = WebService.mustRequest(Data.magiskLink);
             buf = new BufferedInputStream(new ProgressStream(conn), conn.getContentLength());
             buf.mark(conn.getContentLength() + 1);
             try (OutputStream out = new FileOutputStream(zip)) {
@@ -242,7 +242,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         switch (mode) {
             case PATCH_MODE:
                 String fmt = mm.prefs.getString(Const.Key.BOOT_FORMAT, ".img");
-                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + fmt);
+                File dest = new File(Const.EXTERNAL_PATH, "patched_boot" + fmt);
                 dest.getParentFile().mkdirs();
                 OutputStream out;
                 switch (fmt) {

@@ -1,14 +1,14 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.ShellUtils;
@@ -17,25 +17,36 @@ import com.topjohnwu.superuser.io.SuFileOutputStream;
 import com.topjohnwu.utils.JarMap;
 import com.topjohnwu.utils.SignAPK;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.IntBuffer;
 import java.security.SecureRandom;
 import java.util.jar.JarEntry;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
 public class PatchAPK {
+
+    public static final String LOWERALPHA = "abcdefghijklmnopqrstuvwxyz";
+    public static final String UPPERALPHA = LOWERALPHA.toUpperCase();
+    public static final String ALPHA = LOWERALPHA + UPPERALPHA;
+    public static final String DIGITS = "0123456789";
+    public static final String ALPHANUM = ALPHA + DIGITS;
+    public static final String ALPHANUMDOTS = ALPHANUM + "............";
 
     private static String genPackageName(String prefix, int length) {
         StringBuilder builder = new StringBuilder(length);
         builder.append(prefix);
         length -= prefix.length();
         SecureRandom random = new SecureRandom();
-        String base = "abcdefghijklmnopqrstuvwxyz";
-        String alpha = base + base.toUpperCase();
-        String full = alpha + "0123456789..........";
-        char next, prev = '\0';
+        char next, prev = '.';
         for (int i = 0; i < length; ++i) {
-            if (prev == '.' || i == length - 1 || i == 0) {
-                next = alpha.charAt(random.nextInt(alpha.length()));
+            if (prev == '.' || i == length - 1) {
+                next = ALPHA.charAt(random.nextInt(ALPHA.length()));
             } else {
-                next = full.charAt(random.nextInt(full.length()));
+                next = ALPHANUMDOTS.charAt(random.nextInt(ALPHANUMDOTS.length()));
             }
             builder.append(next);
             prev = next;
@@ -43,49 +54,43 @@ public class PatchAPK {
         return builder.toString();
     }
 
-    private static int findOffset(byte buf[], byte pattern[]) {
+    private static boolean findAndPatch(byte xml[], String a, String b) {
+        if (a.length() != b.length())
+            return false;
+        char[] from = a.toCharArray(), to = b.toCharArray();
+        CharBuffer buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer();
         int offset = -1;
-        for (int i = 0; i < buf.length - pattern.length; ++i) {
+        for (int i = 0; i < buf.length() - from.length; ++i) {
             boolean match = true;
-            for (int j = 0; j < pattern.length; ++j) {
-                if (buf[i + j] != pattern[j]) {
+            for (int j = 0; j < from.length; ++j) {
+                if (buf.get(i + j) != from[j]) {
                     match = false;
                     break;
                 }
             }
-            if (match) {
+            // Make sure it is null terminated
+            if (match && buf.get(i + from.length) == '\0') {
                 offset = i;
                 break;
             }
         }
-        return offset;
-    }
-
-    /* It seems that AAPT sometimes generate another type of string format */
-    private static boolean fallbackPatch(byte xml[], String from, String to) {
-
-        byte[] target = new byte[from.length() * 2 + 2];
-        for (int i = 0; i < from.length(); ++i) {
-            target[i * 2] = (byte) from.charAt(i);
-        }
-        int offset = findOffset(xml, target);
         if (offset < 0)
             return false;
-        byte[] dest = new byte[target.length - 2];
-        for (int i = 0; i < to.length(); ++i) {
-            dest[i * 2] = (byte) to.charAt(i);
-        }
-        System.arraycopy(dest, 0, xml, offset, dest.length);
+        buf.position(offset);
+        buf.put(to);
         return true;
     }
 
-    private static boolean findAndPatch(byte xml[], String from, String to) {
-        byte target[] = (from + '\0').getBytes();
-        int offset = findOffset(xml, target);
-        if (offset < 0)
-            return fallbackPatch(xml, from, to);
-        System.arraycopy(to.getBytes(), 0, xml, offset, to.length());
-        return true;
+    private static boolean findAndPatch(byte xml[], int a, int b) {
+        IntBuffer buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
+        int len = xml.length / 4;
+        for (int i = 0; i < len; ++i) {
+            if (buf.get(i) == a) {
+                buf.put(i, b);
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean patchAndHide() {
@@ -93,11 +98,11 @@ public class PatchAPK {
 
         // Generate a new app with random package name
         SuFile repack = new SuFile("/data/local/tmp/repack.apk");
-        String pkg = genPackageName("com.", Const.ORIG_PKG_NAME.length());
+        String pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length());
 
         try {
             JarMap apk = new JarMap(mm.getPackageCodePath());
-            if (!patchPackageID(apk, Const.ORIG_PKG_NAME, pkg))
+            if (!patchPackageID(apk, BuildConfig.APPLICATION_ID, pkg))
                 return false;
             SignAPK.sign(apk, new SuFileOutputStream(repack));
         } catch (Exception e) {
@@ -112,7 +117,7 @@ public class PatchAPK {
 
         mm.mDB.setStrings(Const.Key.SU_MANAGER, pkg);
         Data.exportPrefs();
-        RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
+        RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID, pkg);
 
         return true;
     }
@@ -122,9 +127,9 @@ public class PatchAPK {
             JarEntry je = apk.getJarEntry(Const.ANDROID_MANIFEST);
             byte xml[] = apk.getRawData(je);
 
-            if (!findAndPatch(xml, from, to))
-                return false;
-            if (!findAndPatch(xml, from + ".provider", to + ".provider"))
+            if (!findAndPatch(xml, from, to) ||
+                    !findAndPatch(xml, from + ".provider", to + ".provider") ||
+                    !findAndPatch(xml, R.string.app_name, R.string.re_app_name))
                 return false;
 
             // Write in changes
@@ -136,18 +141,16 @@ public class PatchAPK {
         return true;
     }
 
-    public static void hideManager(Activity activity) {
-        ProgressDialog dialog = ProgressDialog.show(activity,
-                activity.getString(R.string.hide_manager_toast),
-                activity.getString(R.string.hide_manager_toast2));
+    public static void hideManager() {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            MagiskManager mm = Data.MM();
+            NotificationCompat.Builder progress =
+                    Notifications.progress(mm.getString(R.string.hide_manager_title));
+            NotificationManagerCompat mgr = NotificationManagerCompat.from(mm);
+            mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
             boolean b = patchAndHide();
-            Data.mainHandler.post(() -> {
-                dialog.cancel();
-                if (!b) {
-                    Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
-                }
-            });
+            mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
+            if (!b) Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
         });
     }
 }

@@ -1,15 +1,18 @@
 package com.topjohnwu.magisk.components;
 
 import android.content.Intent;
-import android.support.v4.app.Fragment;
 
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Topic;
 
+import androidx.fragment.app.Fragment;
+import butterknife.Unbinder;
+
 public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
     public MagiskManager mm;
+    protected Unbinder unbinder = null;
 
     public BaseFragment() {
         mm = Data.MM();
@@ -28,6 +31,13 @@ public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (unbinder != null)
+            unbinder.unbind();
+    }
+
+    @Override
     public void startActivityForResult(Intent intent, int requestCode) {
         startActivityForResult(intent, requestCode, this::onActivityResult);
     }
@@ -42,6 +52,6 @@ public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
     @Override
     public int[] getSubscribedTopics() {
-        return FlavorActivity.EMPTY_INT_ARRAY;
+        return BaseActivity.EMPTY_INT_ARRAY;
     }
 }

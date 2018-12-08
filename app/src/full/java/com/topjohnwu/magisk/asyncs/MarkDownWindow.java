@@ -1,13 +1,12 @@
 package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.webkit.WebView;
 
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.WebService;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.ShellUtils;
 
 import org.commonmark.node.Node;
@@ -17,6 +16,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class MarkDownWindow extends ParallelTask<Void, Void, String> {
 
@@ -42,7 +43,7 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
         MagiskManager mm = Data.MM();
         String md;
         if (mUrl != null) {
-            md = WebService.getString(mUrl);
+            md = Utils.dlString(mUrl);
         } else {
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 ShellUtils.pump(is, out);

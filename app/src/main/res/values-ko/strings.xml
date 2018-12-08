@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">파일 다운로드 오류</string>
-    <string name="downloading_toast">%1$s 다운로드 중</string>
-    <string name="no_rw_storage">이 기능은 외부 저장소 쓰기 권한 없이는 작동하지 않습니다.</string>
     <string name="no_thanks">아니오, 괜찮습니다</string>
     <string name="yes">예</string>
     <string name="ok">확인</string>

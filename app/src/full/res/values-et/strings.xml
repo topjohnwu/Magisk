@@ -89,10 +89,10 @@
     <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks</string>
     <string name="dtbo_patched_title">DTBO sai paigatud!</string>
     <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img, palun taaskäivita</string>
-    <string name="magisk_updates">Magisk\'i uuendused</string>
+    <string name="update_channel">Magisk\'i uuendused</string>
     <string name="flashing">Välgutamine</string>
-    <string name="hide_manager_toast">Peidan Magisk Manager\'i…</string>
-    <string name="hide_manager_toast2">See võib aega võtta…</string>
+    <string name="hide_manager_title">Peidan Magisk Manager\'i…</string>
+    <string name="hide_manager_msg">See võib aega võtta…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'i peitmine ebaõnnestus…</string>
     <string name="download_zip_only">Laadi ainult ZIP alla</string>
     <string name="patch_boot_file">Paika käivituspildi fail</string>
@@ -115,6 +115,9 @@
     <string name="env_fix_msg">Sinu seade vajab lisaseadistust, et Magisk töötaks korralikult. Laadime alla Magisk\'i seadistus-zip\'i, kas soovid kohe jätkata?</string>
     <string name="setup_title">Lisaseadistus</string>
     <string name="setup_msg">Käivitan keskkonnaseadistust…</string>
+    <string name="download_file_error">Faili allalaadimisel esines viga</string>
+    <string name="downloading_toast">Laadin %1$s alla</string>
+    <string name="no_rw_storage">See funktsioon ei tööta ilma välismälule kirjutamise õiguseta.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Üldine</string>
@@ -139,7 +142,7 @@
     <string name="settings_boot_format_title">Paigatud käivitusväljundi vorming</string>
     <string name="settings_boot_format_summary">Vali väljutatava paigatud käivituspildi vorming.\nVali .img, mida välgutada fastboot/allalaadimisrežiimi kaudu; vali .img.tar, mida välgutada ODIN\'i kaudu.</string>
     <string name="settings_core_only_title">Magisk\'i ainult tuuma režiim</string>
-    <string name="settings_core_only_summary">Luba ainult põhifunktsioonid. MagiskSU, MagiskHide ja süsteemivaba hosts siiski lubatakse, ent mooduleid ei laadita.</string>
+    <string name="settings_core_only_summary">Luba ainult põhifunktsioonid. MagiskSU ja MagiskHide siiski lubatakse, ent mooduleid ei laadita.</string>
     <string name="settings_magiskhide_summary">Peida Magisk erinevate tuvastuste eest</string>
     <string name="settings_hosts_title">Süsteemivaba hosts</string>
     <string name="settings_hosts_summary">Süsteemivaba hosts-tugi reklaamiblokeerijatest rakendustele</string>
@@ -149,8 +152,10 @@
     <string name="settings_su_adb">Ainult ADB</string>
     <string name="settings_su_disable">Keelatud</string>
     <string name="settings_su_request_10">10 sekundit</string>
+    <string name="settings_su_request_15">15 sekundit</string>
     <string name="settings_su_request_20">20 sekundit</string>
     <string name="settings_su_request_30">30 sekundit</string>
+    <string name="settings_su_request_45">45 sekundit</string>
     <string name="settings_su_request_60">60 sekundit</string>
     <string name="superuser_access">Superkasutaja ligipääs</string>
     <string name="auto_response">Automaatne vastus</string>

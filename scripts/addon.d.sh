@@ -34,9 +34,7 @@ initialize() {
   # Load utility functions
   . $MAGISKBIN/util_functions.sh
 
-  APK=/data/adb/magisk.apk
-  [ -f $APK ] || APK=/data/magisk/magisk.apk
-  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
+  find_manager_apk
 }
 
 show_logo() {

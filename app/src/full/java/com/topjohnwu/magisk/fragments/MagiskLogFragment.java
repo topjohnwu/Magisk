@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.fragments;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,11 +14,11 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -28,13 +26,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
+import androidx.annotation.Nullable;
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class MagiskLogFragment extends BaseFragment {
-
-    private Unbinder unbinder;
 
     @BindView(R.id.txtLog) TextView txtLog;
     @BindView(R.id.svLog) ScrollView svLog;
@@ -45,7 +40,7 @@ public class MagiskLogFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_magisk_log, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        unbinder = new MagiskLogFragment_ViewBinding(this, view);
         setHasOptionsMenu(true);
         txtLog.setTextIsSelectable(true);
         return view;
@@ -61,12 +56,6 @@ public class MagiskLogFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         readLogs();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -91,7 +80,7 @@ public class MagiskLogFragment extends BaseFragment {
         }
     }
 
-    public void readLogs() {
+    private void readLogs() {
         Shell.su("cat " + Const.MAGISK_LOG + " | tail -n 5000").submit(result -> {
             progressBar.setVisibility(View.GONE);
             if (result.getOut().isEmpty())
@@ -103,14 +92,14 @@ public class MagiskLogFragment extends BaseFragment {
         });
     }
 
-    public void saveLogs() {
+    private void saveLogs() {
         Calendar now = Calendar.getInstance();
         String filename = Utils.fmt("magisk_log_%04d%02d%02d_%02d%02d%02d.log",
                 now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
                 now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                 now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-        File logFile = new File(Download.EXTERNAL_PATH, filename);
+        File logFile = new File(Const.EXTERNAL_PATH, filename);
         try {
             logFile.createNewFile();
         } catch (IOException e) {
@@ -121,7 +110,7 @@ public class MagiskLogFragment extends BaseFragment {
                         SnackbarMaker.make(txtLog, logFile.getPath(), Snackbar.LENGTH_SHORT).show());
     }
 
-    public void clearLogs() {
+    private void clearLogs() {
         Shell.su("echo -n > " + Const.MAGISK_LOG).submit();
         txtLog.setText(R.string.log_is_empty);
         SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();

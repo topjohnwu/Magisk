@@ -90,10 +90,10 @@
     <string name="manager_download_install">タップでダウンロードしてインストールします</string>
     <string name="dtbo_patched_title">DTBOをパッチしました！</string>
     <string name="dtbo_patched_reboot">Magisk Managerはdtbo.imgをパッチしました。再起動してください</string>
-    <string name="magisk_updates">Magiskの更新</string>
+    <string name="update_channel">Magiskの更新</string>
     <string name="flashing">書き込み中</string>
-    <string name="hide_manager_toast">Magisk Managerを隠しています…</string>
-    <string name="hide_manager_toast2">しばらくお待ちください…</string>
+    <string name="hide_manager_title">Magisk Managerを隠しています…</string>
+    <string name="hide_manager_msg">しばらくお待ちください…</string>
     <string name="hide_manager_fail_toast">Magisk Managerを隠せませんでした…</string>
     <string name="download_zip_only">ZIPのみダウンロード</string>
     <string name="patch_boot_file">Bootイメージのパッチ</string>
@@ -108,6 +108,9 @@
     <string name="proprietary_title">プロプライエタリコードのダウンロード</string>
     <string name="proprietary_notice">Magisk ManagerはFOSSのため、GoogleのプロプライエタリなSafetyNet APIコードを含んでいません。\n\nMagisk ManagerがSafetyNetチェックのための拡張機能 (GoogleApiClientを含む) をダウンロードすることを許可しますか?</string>
     <string name="su_db_corrupt">SUデータベースが壊れています。DBを再生成します</string>
+    <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
+    <string name="downloading_toast">%1$s をダウンロード中</string>
+    <string name="no_rw_storage">この機能は外部ストレージへの書き込み権限がないと動作しません</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">一般</string>
@@ -128,7 +131,7 @@
     <string name="settings_boot_format_title">パッチしたBootの出力形式</string>
     <string name="settings_boot_format_summary">パッチしたBootイメージの出力形式を選択してください。\nfastboot/download modeでインストールするには .img を、ODINでインストールするには .img.tar を選択してください</string>
     <string name="settings_core_only_title">Magisk コアモード</string>
-    <string name="settings_core_only_summary">コア機能のみを有効にします。すべてのモジュールが読み込まれなくなります。 MagiskSU、MagiskHide、systemless hostsは引き続き有効になります</string>
+    <string name="settings_core_only_summary">コア機能のみを有効にします。すべてのモジュールが読み込まれなくなります。 MagiskSU、MagiskHide は引き続き有効になります</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのためのSystemless hostsサポートを有効化します</string>

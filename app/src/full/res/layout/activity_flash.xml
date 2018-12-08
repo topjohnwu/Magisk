@@ -42,7 +42,7 @@
         android:visibility="gone">
 
         <Button
-            android:id="@+id/no_thanks"
+            android:id="@+id/close"
             style="?android:borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_height="50dp"

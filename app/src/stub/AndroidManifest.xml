@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.topjohnwu.magisk">
 
-    <application>
+    <application
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".NoUIActivity"
+            android:name=".MainActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -12,7 +14,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".receivers.BootLauncher">
+        <receiver android:name=".BootLauncher">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.os.Environment;
 import android.os.Process;
 
 import java.io.File;
@@ -9,7 +10,6 @@ import java.util.List;
 public class Const {
 
     public static final String DEBUG_TAG = "MagiskManager";
-    public static final String ORIG_PKG_NAME = BuildConfig.APPLICATION_ID;
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
 
     // APK content
@@ -18,30 +18,27 @@ public class Const {
     public static final String SU_KEYSTORE_KEY = "su_key";
 
     // Paths
-    public static File MAGISK_PATH;
+    public static final String MAGISK_PATH = "/sbin/.magisk/img";
+    public static final File EXTERNAL_PATH;
     public static File MAGISK_DISABLE_FILE;
-    public static File MAGISK_HOST_FILE;
 
     static {
-        /* Prevent crashing on unrooted devices */
-        MAGISK_PATH = MAGISK_DISABLE_FILE = MAGISK_HOST_FILE = new File("xxx");
+        MAGISK_DISABLE_FILE = new File("xxx");
+        EXTERNAL_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        EXTERNAL_PATH.mkdirs();
     }
 
-    public static final String BUSYBOX_PATH = "/sbin/.core/busybox";
+    public static final String BUSYBOX_PATH = "/sbin/.magisk/busybox";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
     public static final String MANAGER_CONFIGS = ".tmp.magisk.config";
 
     // Versions
     public static final int UPDATE_SERVICE_VER = 1;
-
-    public static int MIN_MODULE_VER() {
-        return Data.magiskVersionCode >= MAGISK_VER.REMOVE_LEGACY_LINK ? 1500 : 1400;
-    }
+    public static final int MIN_MODULE_VER = 1500;
 
     /* A list of apps that should not be shown as hide-able */
     public static final List<String> HIDE_BLACKLIST =  Arrays.asList(
-            "android",
             Data.MM().getPackageName(),
             "com.google.android.gms"
     );
@@ -49,15 +46,11 @@ public class Const {
     public static final int USER_ID = Process.myUid() / 100000;
 
     public static final class MAGISK_VER {
-        public static final int UNIFIED = 1300;
-        public static final int FBE_AWARE = 1410;
-        public static final int RESETPROP_PERSIST = 1436;
-        public static final int MANAGER_HIDE = 1440;
-        public static final int HIDDEN_PATH = 1460;
-        public static final int REMOVE_LEGACY_LINK = 1630;
         public static final int SEPOL_REFACTOR = 1640;
         public static final int FIX_ENV = 1650;
         public static final int DBVER_SIX = 17000;
+        public static final int CMDLINE_DB = 17305;
+        public static final int HIDE_STATUS = 17315;
     }
 
     public static class ID {
@@ -70,16 +63,18 @@ public class Const {
         public static final int MAGISK_UPDATE_NOTIFICATION_ID = 4;
         public static final int APK_UPDATE_NOTIFICATION_ID = 5;
         public static final int DTBO_NOTIFICATION_ID = 7;
-        public static final String NOTIFICATION_CHANNEL = "magisk_notification";
+        public static final int HIDE_MANAGER_NOTIFICATION_ID = 8;
+        public static final String UPDATE_NOTIFICATION_CHANNEL = "update";
+        public static final String PROGRESS_NOTIFICATION_CHANNEL = "progress";
     }
 
     public static class Url {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/stable.json";
         public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/beta.json";
-        public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed&page=%d";
+        public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
-        public static final String PAYPAL_URL = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=CC7FZ7526MNGG";
+        public static final String PAYPAL_URL = "https://www.paypal.me/topjohnwu";
         public static final String PATREON_URL = "https://www.patreon.com/topjohnwu";
         public static final String TWITTER_URL = "https://twitter.com/topjohnwu";
         public static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
@@ -101,10 +96,12 @@ public class Const {
 
         // intents
         public static final String OPEN_SECTION = "section";
-        public static final String INTENT_SET_FILENAME = "filename";
+        public static final String INTENT_SET_NAME = "filename";
         public static final String INTENT_SET_LINK = "link";
         public static final String FLASH_ACTION = "action";
         public static final String FLASH_SET_BOOT = "boot";
+        public static final String BROADCAST_MANAGER_UPDATE = "manager_update";
+        public static final String BROADCAST_REBOOT = "reboot";
 
         // others
         public static final String CHECK_UPDATES = "check_update";
@@ -141,9 +138,6 @@ public class Const {
         public static final int NAMESPACE_MODE_ISOLATE = 2;
         public static final int NO_NOTIFICATION = 0;
         public static final int NOTIFICATION_TOAST = 1;
-        public static final int NOTIFY_NORMAL_LOG = 0;
-        public static final int NOTIFY_USER_TOASTS = 1;
-        public static final int NOTIFY_USER_TO_OWNER = 2;
         public static final int SU_PROMPT = 0;
         public static final int SU_AUTO_DENY = 1;
         public static final int SU_AUTO_ALLOW = 2;

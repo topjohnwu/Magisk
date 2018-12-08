@@ -4,10 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
@@ -30,19 +27,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
 
-    private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
+
     @OnClick(R.id.fab)
-    public void selectFile() {
+    void selectFile() {
         runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("application/zip");
@@ -56,7 +55,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_modules, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        unbinder = new ModulesFragment_ViewBinding(this, view);
         setHasOptionsMenu(true);
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
@@ -95,16 +94,10 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Const.ID.FETCH_ZIP && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
-            Intent intent = new Intent(getActivity(), FlashActivity.class);
+            Intent intent = new Intent(getActivity(), Data.classMap.get(FlashActivity.class));
             intent.setData(data.getData()).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
             startActivity(intent);
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -125,7 +118,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
                 Shell.su("/system/bin/reboot bootloader").submit();
                 return true;
             case R.id.reboot_download:
-                Shell.su("/system/bin/reboot download").submit();
+                Shell.su("/system/bin/reboot upgrade").submit();
                 return true;
             default:
                 return false;

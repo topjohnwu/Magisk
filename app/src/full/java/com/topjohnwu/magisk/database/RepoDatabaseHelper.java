@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VER = 3;
+    private static final int DATABASE_VER = 4;
     private static final String TABLE_NAME = "repos";
 
     private SQLiteDatabase mDb;
@@ -29,8 +29,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         mDb = getWritableDatabase();
 
         // Remove outdated repos
-        mDb.delete(TABLE_NAME, "minMagisk<?",
-                new String[] { String.valueOf(Const.MIN_MODULE_VER()) });
+        mDb.delete(TABLE_NAME, "minMagisk<?", new String[] { String.valueOf(Const.MIN_MODULE_VER) });
     }
 
     @Override
@@ -40,21 +39,14 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        try {
-            if (oldVersion < 3) {
-                db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-                db.execSQL(
-                        "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
-                                "(id TEXT, name TEXT, version TEXT, versionCode INT, minMagisk INT, " +
-                                "author TEXT, description TEXT, repo_name TEXT, last_update INT, " +
-                                "PRIMARY KEY(id))");
-                mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
-                oldVersion = 3;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Reset database
-            onDowngrade(db, DATABASE_VER, 0);
+        if (oldVersion != newVersion) {
+            // Nuke old DB and create new table
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
+                            "(id TEXT, name TEXT, version TEXT, versionCode INT, minMagisk INT, " +
+                            "author TEXT, description TEXT, last_update INT, PRIMARY KEY(id))");
+            mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
         }
     }
 
@@ -75,8 +67,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void removeRepo(Repo repo) {
-        mDb.delete(TABLE_NAME, "repo_name=?", new String[] { repo.getRepoName() });
-        notifyAdapter();
+        removeRepo(repo.getId());
     }
 
     public void removeRepo(Iterable<String> list) {
@@ -115,7 +106,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
                 orderBy = "last_update DESC";
         }
         return mDb.query(TABLE_NAME, null, "minMagisk<=? AND minMagisk>=?",
-                new String[] { String.valueOf(Data.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER()) },
+                new String[] { String.valueOf(Data.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER) },
                 null, null, orderBy);
     }
 

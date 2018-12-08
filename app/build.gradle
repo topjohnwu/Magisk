@@ -1,7 +1,8 @@
 apply plugin: 'com.android.application'
 
 def configProps = new Properties()
-configProps.load(new FileInputStream(rootProject.file('config.prop')))
+def configPath = project.hasProperty('configPath') ? project.configPath : rootProject.file('config.prop')
+configProps.load(new FileInputStream(configPath))
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -69,15 +70,23 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.core:core:1.0.1'
     fullImplementation project(':utils')
-    implementation "com.android.support:support-core-utils:${rootProject.ext.supportLibVersion}"
-    fullImplementation "com.android.support:preference-v7:${rootProject.ext.supportLibVersion}"
-    fullImplementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
-    fullImplementation "com.android.support:cardview-v7:${rootProject.ext.supportLibVersion}"
-    fullImplementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
-    fullImplementation 'com.github.topjohnwu:libsu:2.0.1'
+    fullImplementation 'com.amitshekhar.android:android-networking:1.0.2'
+    fullImplementation 'androidx.appcompat:appcompat:1.0.2'
+    fullImplementation "androidx.preference:preference:${rootProject.ext.androidXVersion}"
+    fullImplementation "androidx.recyclerview:recyclerview:${rootProject.ext.androidXVersion}"
+    fullImplementation "androidx.cardview:cardview:${rootProject.ext.androidXVersion}"
+    fullImplementation "com.google.android.material:material:${rootProject.ext.androidXVersion}"
+    fullImplementation 'com.github.topjohnwu:libsu:2.1.2'
     fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
     fullImplementation 'org.kamranzafar:jtar:2.3'
-    fullImplementation 'com.jakewharton:butterknife:8.8.1'
-    fullAnnotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    def butterKnifeVersion = '9.0.0-rc2'
+    if (properties.containsKey('android.injected.invoked.from.ide')) {
+        fullImplementation "com.jakewharton:butterknife-reflect:${butterKnifeVersion}"
+    } else {
+        fullImplementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
+        fullAnnotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    }
 }

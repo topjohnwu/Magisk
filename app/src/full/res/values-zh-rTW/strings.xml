@@ -66,6 +66,9 @@
     <string name="settings_reboot_toast">重啟以完成設定</string>
     <string name="release_notes">發布說明</string>
     <string name="repo_cache_cleared">資源庫暫存已清除</string>
+    <string name="download_file_error">下載文件時出錯</string>
+    <string name="downloading_toast">正在下載 %1$s</string>
+    <string name="no_rw_storage">未授予寫入外部存儲權限，此功能無法正常工作。</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常規</string>
@@ -83,8 +86,10 @@
     <string name="settings_su_adb">僅 ADB</string>
     <string name="settings_su_disable">已禁用</string>
     <string name="settings_su_request_10">10 秒</string>
+    <string name="settings_su_request_15">15 秒</string>
     <string name="settings_su_request_20">20 秒</string>
     <string name="settings_su_request_30">30 秒</string>
+    <string name="settings_su_request_45">45 秒</string>
     <string name="settings_su_request_60">60 秒</string>
     <string name="superuser_access">超級用戶訪問權限</string>
     <string name="auto_response">自動回應</string>
@@ -131,7 +136,7 @@
     <string name="zip_process_title">處理中</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
     <string name="uninstall_magisk_msg">所有模組將會被停用 / 刪除。root會被移除，並有可能在目前資料未加密的情況下被加密</string>
-    <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU、MagiskHide 和 systemless hosts 仍會持續運作</string>
+    <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU 和 MagiskHide 仍會持續運作</string>
     <string name="safetyNet_check_success">SafetyNet 檢查成功</string>
     <string name="safetyNet_res_invalid">回傳值無效</string>
     <string name="multiuser_hint_owner_request">已發送權限請求到擁有者帳戶中。請切換到擁有者帳戶進行准許</string>
@@ -154,11 +159,11 @@
     <string name="settings_ns_isolate">獨立 Namespace</string>
     <string name="settings_ns_requester">繼承 Namespace</string>
     <string name="update">更新 %1$s</string>
-    <string name="magisk_updates">Magisk 更新</string>
+    <string name="update_channel">Magisk 更新</string>
     <string name="system_default">(系統預設)</string>
     <string name="language">語言</string>
     <string name="flashing">正在刷入</string>
-    <string name="hide_manager_toast">正在隱藏 Magisk Manager…</string>
+    <string name="hide_manager_title">正在隱藏 Magisk Manager…</string>
     <string name="hide_manager_fail_toast">隱藏 Magisk Manager 失敗</string>
     <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>
     <string name="settings_update_channel_title">更新頻道</string>
@@ -183,7 +188,7 @@
     <string name="proprietary_notice">Magisk Manager 是一個 100% 開源的程式，因此不會包含 Google 私有所有權的 SafetyNet API 程式碼。\n\n你允許 Magisk Manager 下載一個擴充包 (包含 GoogleApiClient) 以執行 SafetyNet 檢查嗎？</string>
     <string name="dtbo_patched_title">DTBO 已被打上補丁！</string>
     <string name="dtbo_patched_reboot">Magisk Manager 已為 dtbo.img 打上補丁，請立即重新啟動</string>
-    <string name="hide_manager_toast2">這可能會花上一段時間…</string>
+    <string name="hide_manager_msg">這可能會花上一段時間…</string>
     <string name="settings_hide_manager_summary">將 Magisk Manager 以隨機套件名稱重新打包，以達成隱藏效果</string>
     <string name="invalid_update_channel">不合法的更新頻道</string>
     <string name="settings_update_custom">自訂</string>
@@ -219,5 +224,8 @@
     <string name="auth_fingerprint">驗證指紋</string>
     <string name="follow_twitter">追蹤我的 Twitter</string>
     <string name="open_link_failed_toast">沒有應用程式能夠打開此鏈結…</string>
+    <string name="download_complete">下載完成</string>
+    <string name="settings_hosts_toast">已添加 systemless hosts 模組</string>
+    <string name="progress_channel">進度通知</string>
 
 </resources>

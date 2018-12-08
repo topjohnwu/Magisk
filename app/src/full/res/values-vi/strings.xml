@@ -1,6 +1,5 @@
 <resources>
-    <!--Universal-->
-
+	
     <!--Welcome Activity-->
     <string name="modules">Mô-đun</string>
     <string name="downloads">Tải xuống</string>
@@ -8,24 +7,29 @@
     <string name="log">Nhật ký</string>
     <string name="settings">Thiết lập</string>
     <string name="install">Cài đặt</string>
-
+    
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk chưa được cài đặt</string>
-
     <string name="checking_for_updates">Đang kiểm tra cập nhật…</string>
-    <string name="magisk_update_available">Magisk v%1$s available!</string>
+    <string name="magisk_update_available">Magisk v%1$s đã có!</string>
+    <string name="invalid_update_channel">Kênh cập nhật không hợp lệ</string>
     <string name="safetyNet_check_text">Chạm để bắt đầu kiểm tra SafetyNet</string>
     <string name="checking_safetyNet_status">Đang kiểm tra trạng thái SafetyNet…</string>
-
+    <string name="safetyNet_check_success">Kiểm tra SafetyNet thành công</string>
+    <string name="safetyNet_api_error">Lỗi SafetyNet API</string>
+    <string name="safetyNet_res_invalid">Phản hồi không hợp lệ.</string>
+    
     <!--Install Fragment-->
     <string name="advanced_settings_title">Thiết lập nâng cao</string>
     <string name="keep_force_encryption">Giữ bắt buộc mã hoá</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Đã cài đặt phiên bản: %1$s</string>
+    <string name="current_magisk_title">Phiên bản đã cài: %1$s</string>
     <string name="install_magisk_title">Phiên bản mới nhất: %1$s</string>
     <string name="uninstall">Gỡ bỏ</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
-
+    <string name="uninstall_magisk_msg">Tất cả mô-đun sẽ bị vô hiệu/loại bỏ. Root sẽ bị loại bỏ và dữ liệu của bạn có thể bị mã hoá.</string>
+    <string name="update">Cập nhật %1$s</string>
+    
     <!--Module Fragment-->
     <string name="no_info_provided">(Không có thông tin được cung cấp)</string>
     <string name="no_modules_found">Không tìm thấy mô-đun</string>
@@ -35,69 +39,156 @@
     <string name="disable_file_created">Mô-đun sẽ bị vô hiệu ở lần khởi động lại kế tiếp</string>
     <string name="disable_file_removed">Mô-đun sẽ được kích hoạt ở lần khởi động lại kế tiếp</string>
     <string name="author">Tạo bởi %1$s</string>
-
+    <string name="reboot_recovery">Khởi động vào Recovery</string>
+    <string name="reboot_bootloader">Khởi động vào Bootloader</string>
+    <string name="reboot_download">Khởi động vào Download</string>
+    
     <!--Repo Fragment-->
     <string name="update_available">Có cập nhật mới</string>
     <string name="installed">Đã được cài đặt</string>
     <string name="not_installed">Chưa được cài đặt</string>
-
+    <string name="updated_on">Cập nhật vào: %1$s</string>
+    <string name="sorting_order">Thứ tự sắp xếp</string>
+    <string name="sort_by_name">Sắp xếp theo tên</string>
+    <string name="sort_by_update">Sắp xếp theo cập nhật lần cuối</string>
+    
     <!--Log Fragment-->
     <string name="menuSaveLog">Lưu nhật ký</string>
     <string name="menuReload">Tải lại</string>
     <string name="menuClearLog">Xoá nhật ký ngay</string>
     <string name="logs_cleared">Đã xoá nhật ký thành công</string>
     <string name="log_is_empty">Nhật ký trống</string>
-
+    
     <!--About Activity-->
     <string name="about">Thông tin</string>
     <string name="app_changelog">Nhật ký thay đổi của ứng dụng</string>
-    <string name="translators"><![CDATA[<a href="https://github.com/thanhtai2009">thanhtai2009@tekcafe.vn</a>]]></string>
+    <string name="translators">Nguyễn Thanh Tài (thanhtai2009), Nguyễn Trung Hậu (trunghau1712)</string>
     <string name="app_version">Phiên bản ứng dụng</string>
     <string name="app_source_code">Mã nguồn</string>
     <string name="donation">Ủng hộ</string>
     <string name="app_translators">Người dịch ứng dụng</string>
     <string name="support_thread">Chủ đề hỗ trợ</string>
-
+    <string name="follow_twitter">Theo dõi trên Twitter</string>
+    
     <!--Toasts, Dialogs-->
     <string name="close">Đóng</string>
     <string name="repo_install_title">Cài đặt %1$s</string>
     <string name="repo_install_msg">Bạn muốn cài đặt %1$s ?</string>
     <string name="download">Tải xuống</string>
     <string name="reboot">Khởi động lại</string>
-    <string name="zip_process_msg">Đang xử lý tập tin zip …</string>
     <string name="magisk_update_title">Có cập nhật Magisk mới!</string>
     <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
-    <string name="release_notes">Ghi chú phát hành</string>
+    <string name="release_notes">Thay đổi</string>
     <string name="repo_cache_cleared">Đã xoá bộ đệm kho</string>
     <string name="process_error">Lỗi xử lý</string>
     <string name="internal_storage">Tập tin zip được lưu vào:\n[Bộ nhớ trong]%1$s</string>
+    <string name="zip_download_title">Đang tải xuống</string>
+    <string name="zip_download_msg">Đang tải xuống tập tin zip (%1$d%%) …</string>
     <string name="zip_process_title">Đang xử lý</string>
-
+    <string name="zip_process_msg">Đang xử lý tập tin zip …</string>
+    <string name="manager_update_title">Đã có bản cập nhật Magisk Manager mới!</string>
+    <string name="manager_download_install">Nhấn để tải xuống và cài đặt.</string>
+    <string name="dtbo_patched_title">DTBO đã được vá!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager đã vá dtbo.img. Hãy khởi động lại.</string>
+    <string name="update_channel">Cập nhật Magisk</string>
+    <string name="flashing">Đang flash</string>
+    <string name="hide_manager_title">Ẩn Magisk Manager…</string>
+    <string name="hide_manager_msg">Điều này có thể mất chút thời gian.</string>
+    <string name="hide_manager_fail_toast">Ẩn Magisk Manager thất bại.</string>
+    <string name="open_link_failed_toast">Không tìm thấy ứng dụng nào để mở liên kết.</string>
+    <string name="download_zip_only">Chỉ tải xuống tập tin zip</string>
+    <string name="patch_boot_file">Tập tin hình ảnh bản vá khởi động</string>
+    <string name="direct_install">Cài đặt trực tiếp (Được đề xuất)</string>
+    <string name="install_inactive_slot">Cài đặt vào vùng không hoạt động (Sau khi OTA)</string>
+    <string name="warning">Cảnh báo</string>
+    <string name="install_inactive_slot_msg">Thiết bị của bạn sẽ bắt buộc phải khởi động tới vị trí không hoạt động hiện tại sau khi khởi động lại!\nChỉ sử dụng tuỳ chọn này sau khi cập nhật OTA hoàn tất.\nMuốn tiếp tục?</string>
+    <string name="select_method">Chọn phương thức</string>
+    <string name="no_boot_file_patch_support">Phiên bản Magisk không hỗ trợ vá tập tin ảnh khởi động</string>
+    <string name="boot_file_patch_msg">Chọn kết xuất hình ảnh khởi động gốc theo định dạng .img hoặc .img.tar.</string>
+    <string name="complete_uninstall">Xác nhận gỡ bỏ</string>
+    <string name="restore_img">Khôi phục images</string>
+    <string name="restore_img_msg">Đang khôi phục…</string>
+    <string name="restore_done">Đã hoàn tất khôi phục!</string>
+    <string name="restore_fail">Sao lưu gốc không tồn tại!</string>
+    <string name="proprietary_title">Tải xuống mã độc quyền</string>
+    <string name="proprietary_notice">Magisk Manager là FOSS và không chứa mã SafetyNet API độc quyền của Google.\n\nBạn có cho phép Magisk Manager tải xuống tiện ích (có chứa GoogleApiClient) để kiểm tra SafetyNet không?</string>
+    <string name="su_db_corrupt">Cơ sở dữ liệu SU bị hỏng. Sẽ tạo lại một cái mới</string>
+    <string name="setup_done">Thiết lập xong.</string>
+    <string name="setup_fail">Thiết lập thất bại.</string>
+    <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
+    <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Nó sẽ tải xuống tập tin zip để thiết lập Magisk, bạn có muốn tiếp tục không?</string>
+    <string name="setup_title">Thiết lập bổ sung</string>
+    <string name="setup_msg">Đang chạy thiết lập môi trường…</string>
+    <string name="download_file_error">Lỗi tải tập tin</string>
+    <string name="downloading_toast">Đang tải xuống %1$s</string>
+    <string name="no_rw_storage">Tính năng này không hoạt động nếu thiếu quyền ghi vào bộ nhớ ngoài.</string>
+    
     <!--Settings Activity -->
     <string name="settings_general_category">Chung</string>
     <string name="settings_dark_theme_title">Chủ đề tối</string>
     <string name="settings_dark_theme_summary">Dùng chủ đề tối</string>
     <string name="settings_clear_cache_title">Xoá bộ đệm kho</string>
-    <string name="settings_clear_cache_summary">Xoá thông tin truy cập nhật về các kho mô-đun, buộc ứng dụng làm mới trực tuyến</string>
-
+    <string name="settings_clear_cache_summary">Xoá thông tin được lưu trong bộ nhớ cache của các bản thử nghiệm trực tuyến. Điều này buộc ứng dụng phải làm mới trực tuyến.</string>
+    <string name="settings_hide_manager_title">Ẩn Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Đóng gói lại Magisk Manager với tên gói ngẫu nhiên.</string>
+    <string name="settings_restore_manager_title">Khôi phục Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Khôi phục Magisk Manager với gói ban đầu</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="system_default">(Mặc định hệ thống)</string>
+    <string name="settings_update">Cài đặt cập nhật</string>
+    <string name="settings_check_update_title">Kiểm tra cập nhật</string>
+    <string name="settings_check_update_summary">Định kỳ kiểm tra các bản cập nhật trong nền.</string>
+    <string name="settings_update_channel_title">Kênh cập nhật</string>
+    <string name="settings_update_stable">Ổn định</string>
+    <string name="settings_update_beta">Dùng thử</string>
+    <string name="settings_update_custom">Tuỳ chỉnh</string>
+    <string name="settings_update_custom_msg">Chèn URL tuỳ chỉnh</string>
+    <string name="settings_boot_format_title">Định dạng đầu ra được vá cố định</string>
+    <string name="settings_boot_format_summary">Chọn định dạng cho ảnh khởi động để vá đầu ra.\nChọn .img để flash qua chế độ fastboot/download; chọn .img.tar để flash với ODIN.</string>
+    <string name="settings_core_only_title">Chế độ chỉ lõi Magisk</string>
+    <string name="settings_core_only_summary">Chỉ bật các tính năng chính. MagiskSU và MagiskHide sẽ vẫn được kích hoạt, nhưng sẽ không có mô-đun nào được tải.</string>
     <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts hỗ trợ các ứng dụng chặn quảng cáo</string>
-
+    <string name="settings_hosts_toast">Mô-đun được thêm vào systemless hosts</string>
     <string name="settings_su_app_adb">Ứng dụng và ADB</string>
     <string name="settings_su_app">Chỉ ứng dụng</string>
     <string name="settings_su_adb">Chỉ ADB</string>
     <string name="settings_su_disable">Đã vô hiệu</string>
     <string name="settings_su_request_10">10 giây</string>
+    <string name="settings_su_request_15">15 giây</string>
     <string name="settings_su_request_20">20 giây</string>
     <string name="settings_su_request_30">30 giây</string>
+    <string name="settings_su_request_45">45 giây</string>
     <string name="settings_su_request_60">60 giây</string>
     <string name="superuser_access">Truy nhập Superuser</string>
     <string name="auto_response">Tự phản hồi</string>
     <string name="request_timeout">Thời gian chờ yêu cầu</string>
     <string name="superuser_notification">Thông báo Superuser</string>
     <string name="request_timeout_summary">%1$s giây</string>
-
+    <string name="settings_su_reauth_title">Xác thực lại sau khi nâng cấp</string>
+    <string name="settings_su_reauth_summary">Xác thực lại quyền superuser sau khi nâng cấp ứng dụng</string>
+    <string name="settings_su_fingerprint_title">Bật xác thực vân tay</string>
+    <string name="settings_su_fingerprint_summary">Sử dụng quét vân tay để cho phép quyền superuser</string>
+    <string name="auth_fingerprint">Xác thực vân tay</string>
+    <string name="multiuser_mode">Chế độ đa người dùng</string>
+    <string name="settings_owner_only">Chỉ chủ sở hữu thiết bị</string>
+    <string name="settings_owner_manage">Chủ sở hữu thiết bị được quản lý</string>
+    <string name="settings_user_independent">Người dùng độc lập</string>
+    <string name="owner_only_summary">Chỉ chủ sở hữu mới có quyền truy cập root.</string>
+    <string name="owner_manage_summary">Chỉ chủ sở hữu mới có thể quản lý quyền truy cập root và nhận lời nhắc yêu cầu.</string>
+    <string name="user_indepenent_summary">Mỗi người dùng có các quy tắc root riêng của mình.</string>
+    <string name="multiuser_hint_owner_request">Yêu cầu đã được gửi tới chủ sở hữu thiết bị. Vui lòng chuyển sang chủ sở hữu và cấp quyền truy cập cần thiết.</string>
+    <string name="mount_namespace_mode">Chế độ không gian tên gắn kết</string>
+    <string name="settings_ns_global">Không gian tên chung</string>
+    <string name="settings_ns_requester">Không gian tên kế thừa</string>
+    <string name="settings_ns_isolate">Không gian tên độc lập</string>
+    <string name="global_summary">Tất cả các phiên root sử dụng không gian tên gắn kết chung.</string>
+    <string name="requester_summary">Các phiên root sẽ kế thừa không gian tên của người yêu cầu.</string>
+    <string name="isolate_summary">Mỗi phiên root sẽ có không gian tên riêng biệt.</string>
+    <string name="android_o_not_support">Không hỗ trợ Android 8.0+.</string>
+    <string name="disable_fingerprint">Không có dấu vân tay nào được thiết lập hoặc thiết bị không hỗ trợ.</string>
+    
     <!--Superuser-->
     <string name="su_request_title">Yêu cầu Superuser</string>
     <string name="deny_with_str">Từ chối%1$s</string>
@@ -125,10 +216,10 @@
     <string name="su_revoke_msg">Xác nhận thu hồi quyền của %1$s?</string>
     <string name="toast">Thông báo ngắn</string>
     <string name="none">Không có</string>
-
+    <string name="auth_fail">Xác thực thất bại</string>
+    
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Target UID:\u0020</string>
-    <string name="command">Command:\u0020</string>
-
+    <string name="target_uid">Mục UID:\u0020</string>
+    <string name="command">Điều khiển:\u0020</string>
 </resources>

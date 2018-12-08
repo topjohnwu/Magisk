@@ -3,28 +3,10 @@
 
 #include <stdint.h>
 
-#include "vector.h"
+#include "Vector.h"
+#include "CharArray.h"
 
-typedef struct cpio_entry {
-	// uint32_t ino;
-	uint32_t mode;
-	uint32_t uid;
-	uint32_t gid;
-	// uint32_t nlink;
-	// uint32_t mtime;
-	uint32_t filesize;
-	// uint32_t devmajor;
-	// uint32_t devminor;
-	// uint32_t rdevmajor;
-	// uint32_t rdevminor;
-	// uint32_t namesize;
-	// uint32_t check;
-	char *filename;
-	void *data;
-	int remove;
-} cpio_entry;
-
-typedef struct cpio_newc_header {
+struct cpio_newc_header {
 	char magic[6];
 	char ino[8];
 	char mode[8];
@@ -39,22 +21,50 @@ typedef struct cpio_newc_header {
 	char rdevminor[8];
 	char namesize[8];
 	char check[8];
-} cpio_newc_header;
+} __attribute__((packed));
 
-// Basic cpio functions
-void cpio_free(cpio_entry *e);
-int cpio_find(struct vector *v, const char *entry);
-int cpio_cmp(const void *a, const void *b);
-void parse_cpio(struct vector *v, const char *filename);
-void dump_cpio(struct vector *v, const char *filename);
-void cpio_vec_insert(struct vector *v, cpio_entry *n);
-void cpio_vec_destroy(struct vector *v);
-void cpio_rm(struct vector *v, int recursive, const char *entry);
-void cpio_mkdir(struct vector *v, mode_t mode, const char *entry);
-void cpio_ln(struct vector *v, const char *target, const char *entry);
-void cpio_add(struct vector *v, mode_t mode, const char *entry, const char *filename);
-int cpio_mv(struct vector *v, const char *from, const char *to);
-int cpio_extract(struct vector *v, const char *entry, const char *filename);
-void cpio_extract_all(struct vector *v);
+struct cpio_entry {
+	// uint32_t ino;
+	uint32_t mode = 0;
+	uint32_t uid = 0;
+	uint32_t gid = 0;
+	// uint32_t nlink;
+	// uint32_t mtime;
+	uint32_t filesize = 0;
+	// uint32_t devmajor;
+	// uint32_t devminor;
+	// uint32_t rdevmajor;
+	// uint32_t rdevminor;
+	// uint32_t namesize;
+	// uint32_t check;
+//	char *filename = nullptr;
+	CharArray filename;
+	void *data = nullptr;
+
+	cpio_entry() {}
+	cpio_entry(int fd, cpio_newc_header &header);
+	~cpio_entry();
+};
+
+class cpio {
+public:
+	cpio(const char *filename);
+	~cpio();
+	void dump(const char *file);
+	int find(const char *name);
+	void insert(cpio_entry *e);
+	void rm(const char *name, bool r = false);
+	void makedir(mode_t mode, const char *name);
+	void ln(const char *target, const char *name);
+	void add(mode_t mode, const char *name, const char *file);
+	void insert(Vector<cpio_entry *> &arr);
+	bool mv(const char *from, const char *to);
+	void extract();
+	bool extract(const char *name, const char *file);
+	void sort();
+
+protected:
+	Vector<cpio_entry *> arr;
+};
 
 #endif

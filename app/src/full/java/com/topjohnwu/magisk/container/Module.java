@@ -11,19 +11,19 @@ public class Module extends BaseModule {
     public Module(String path) {
 
         try {
-            parseProps(Shell.Sync.su("dos2unix <  " + path + "/module.prop"));
+            parseProps(Shell.su("dos2unix <  " + path + "/module.prop").exec().getOut());
         } catch (NumberFormatException ignored) {}
 
         mRemoveFile = new SuFile(path, "remove");
         mDisableFile = new SuFile(path, "disable");
         mUpdateFile = new SuFile(path, "update");
 
-        if (getId() == null) {
+        if (getId().isEmpty()) {
             int sep = path.lastIndexOf('/');
             setId(path.substring(sep + 1));
         }
 
-        if (getName() == null) {
+        if (getName().isEmpty()) {
             setName(getId());
         }
 
@@ -33,13 +33,11 @@ public class Module extends BaseModule {
     }
 
     public void createDisableFile() {
-        mEnable = false;
-        mDisableFile.createNewFile();
+        mEnable = !mDisableFile.createNewFile();
     }
 
     public void removeDisableFile() {
-        mEnable = true;
-        mDisableFile.delete();
+        mEnable = mDisableFile.delete();
     }
 
     public boolean isEnabled() {
@@ -47,13 +45,11 @@ public class Module extends BaseModule {
     }
 
     public void createRemoveFile() {
-        mRemove = true;
-        mRemoveFile.createNewFile();
+        mRemove = mRemoveFile.createNewFile();
     }
 
     public void deleteRemoveFile() {
-        mRemove = false;
-        mRemoveFile.delete();
+        mRemove = !mRemoveFile.delete();
     }
 
     public boolean willBeRemoved() {

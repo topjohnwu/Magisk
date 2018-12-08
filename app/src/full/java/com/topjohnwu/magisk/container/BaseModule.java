@@ -1,27 +1,33 @@
 package com.topjohnwu.magisk.container;
 
-
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+
 public abstract class BaseModule implements Comparable<BaseModule> {
 
-    private String mId = null, mName, mVersion, mAuthor, mDescription;
+    private String mId, mName, mVersion, mAuthor, mDescription;
     private int mVersionCode = -1, minMagiskVersion = -1;
 
-    protected BaseModule() {}
+    protected BaseModule() {
+        mId = mName = mVersion = mAuthor = mDescription = "";
+    }
 
     protected BaseModule(Cursor c) {
-        mId = c.getString(c.getColumnIndex("id"));
-        mName = c.getString(c.getColumnIndex("name"));
-        mVersion = c.getString(c.getColumnIndex("version"));
+        mId = nonNull(c.getString(c.getColumnIndex("id")));
+        mName = nonNull(c.getString(c.getColumnIndex("name")));
+        mVersion = nonNull(c.getString(c.getColumnIndex("version")));
         mVersionCode = c.getInt(c.getColumnIndex("versionCode"));
-        mAuthor = c.getString(c.getColumnIndex("author"));
-        mDescription = c.getString(c.getColumnIndex("description"));
+        mAuthor = nonNull(c.getString(c.getColumnIndex("author")));
+        mDescription = nonNull(c.getString(c.getColumnIndex("description")));
         minMagiskVersion = c.getInt(c.getColumnIndex("minMagisk"));
+    }
+
+    private String nonNull(String s) {
+        return s == null ? "" : s;
     }
 
     public ContentValues getContentValues() {

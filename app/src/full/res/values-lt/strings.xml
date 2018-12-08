@@ -1,5 +1,5 @@
 <resources>
-    
+
     <!--Welcome Activity-->
     <string name="modules">Papildiniai</string>
     <string name="downloads">Papildinių parduotuvė</string>
@@ -51,7 +51,7 @@
     <string name="sorting_order">Išdėliojimo tvarka</string>
     <string name="sort_by_name">Išdėlioti pagal pavadinimą (A-Z)</string>
     <string name="sort_by_update">Išdėlioti pagal atnaujinimo datą (Naujausi-Seniausi)</string>
-    
+
     <!--Log Fragment-->
     <string name="menuSaveLog">Išsaugoti įvykių sąrašą</string>
     <string name="menuReload">Įvykių sąrašo atnaujinmas</string>
@@ -89,16 +89,16 @@
     <string name="manager_download_install">Paspauskite, kad atsisiųstumėte ir instaliuotumėte</string>
     <string name="dtbo_patched_title">DTBO buvo ištaisytas!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ištaisė dtbo.img, prašome perkrauti telefoną</string>
-    <string name="magisk_updates">Magisk Atnaujinimai</string>
+    <string name="update_channel">Magisk Atnaujinimai</string>
     <string name="flashing">Instaliuojama</string>
-    <string name="hide_manager_toast">Magisk Manager paslėpiamas…</string>
-    <string name="hide_manager_toast2">Tai užtruks sekundėlę…</string>
+    <string name="hide_manager_title">Magisk Manager paslėpiamas…</string>
+    <string name="hide_manager_msg">Tai užtruks sekundėlę…</string>
     <string name="hide_manager_fail_toast">Magisk Manager paslėpimas žlugo…</string>
     <string name="download_zip_only">Atsisiųsti zip failą</string>
     <string name="patch_boot_file">Ištaisyti boot failą</string>
     <string name="direct_install">Tiesioginis instaliavimas (Rekomenduojamas)</string>
     <string name="select_method">Pasirinkite metodą</string>
-    <string name="no_boot_file_patch_support">Pasirinkta Magisk versija nepalaiko pakeitimų boot faile</string>    
+    <string name="no_boot_file_patch_support">Pasirinkta Magisk versija nepalaiko pakeitimų boot faile</string>
     <string name="boot_file_patch_msg">Pasirinkti boot failą .img ar .img.tar formate</string>
     <string name="complete_uninstall">Pilnas pašalinimas</string>
     <string name="restore_img">Atstatyti boot failą</string>
@@ -112,8 +112,11 @@
     <string name="setup_fail">Pasiruošimas nesėkmingas</string>
     <string name="env_fix_title">Reikalingas papildomas pasiruošimas</string>
     <string name="env_fix_msg">Kad Magisk veiktų tinkamai, jūsų įrenginiui reikia papildomo paruošimo. Tai atsisiųs papildomą Magisk zip failą, ar norite tęsti?</string>
-    <string name="setup_title">Papildomas pasiruošimas</string>    
+    <string name="setup_title">Papildomas pasiruošimas</string>
     <string name="setup_msg">Paruošiama aplinka…</string>
+    <string name="download_file_error">Atsisiunčiant failą įvyko klaida</string>
+    <string name="downloading_toast">Atsisiunčiamas %1$s</string>
+    <string name="no_rw_storage">Ši funkija neveiks be prieigos prie saugyklos</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Pagrininiai</string>
@@ -138,7 +141,7 @@
     <string name="settings_boot_format_title">Boot failo formatas</string>
     <string name="settings_boot_format_summary">Pasirinkti boot failo formatą.\n.img naudojamas įdiegimui per fastboot/download; .img.tar naudojamas įdiegimui per ODIN</string>
     <string name="settings_core_only_title">Pagrindinis Magisk režimas</string>
-    <string name="settings_core_only_summary">Įgalinti tik pagrindines funkcijas, išjungti visus papildinius. MagiskSU, Magisk Hide ir Sistemos pedejėjai liks įgalinti</string>
+    <string name="settings_core_only_summary">Įgalinti tik pagrindines funkcijas, išjungti visus papildinius. MagiskSU ir Magisk Hide liks įgalinti</string>
     <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>
     <string name="settings_hosts_title">Sistemos padejėjai</string>
     <string name="settings_hosts_summary">Įgalinti sistemos padejėjus Adblock programėlėms</string>
@@ -148,8 +151,10 @@
     <string name="settings_su_adb">Tik ADB</string>
     <string name="settings_su_disable">Išjungta</string>
     <string name="settings_su_request_10">10 sekundžių</string>
+    <string name="settings_su_request_15">15 sekundžių</string>
     <string name="settings_su_request_20">20 sekundžių</string>
     <string name="settings_su_request_30">30 sekundžių</string>
+    <string name="settings_su_request_45">45 sekundžių</string>
     <string name="settings_su_request_60">60 sekundžių</string>
     <string name="superuser_access">Supervartotojo prieiga</string>
     <string name="auto_response">Automatinis atsakymas</string>
@@ -160,7 +165,7 @@
     <string name="settings_su_reauth_summary">Pakartotinai patvirtinti supervartotojo leidimus po programėlės atnaujinimo</string>
     <string name="settings_su_fingerprint_title">Įgalinti patvirtinimą piršto antspaudu</string>
     <string name="settings_su_fingerprint_summary">Naudoti piršto antspaudą supervartotojo leidimo prašymų atsakymui</string>
-    
+
     <string name="multiuser_mode">Daugialypio vartotojo režimas</string>
     <string name="settings_owner_only">Tik įrenginio savininkas</string>
     <string name="settings_owner_manage">Įrenginio savininko valdomas</string>
@@ -179,7 +184,7 @@
     <string name="isolate_summary">Kiekviena root sesija turi savo izoliuotą vardų sritį</string>
     <string name="android_o_not_support">Įrenginiai su Android 8.0+ nepalaiko šio nustatymo</string>
     <string name="disable_fingerprint">Jūsų įrenginyje nebuvo surasta pirštų antspaudų arba jūsų įrenginys neturi pirštų antspaudų skaitytuvo</string>
-    
+
     <!--Superuser-->
     <string name="su_request_title">Supervartotojo prašymas</string>
     <string name="deny_with_str">Atmesti%1$s</string>
@@ -208,7 +213,7 @@
     <string name="toast">Išmesti</string>
     <string name="none">Nėra</string>
     <string name="auth_fail">Patvirtinimas žlugo</string>
-    
+
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Target UID:\u0020</string>

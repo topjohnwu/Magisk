@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -13,8 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.asyncs.DownloadModule;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
-import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.container.Module;
@@ -25,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, ReposAdapter.RepoHolder> {
 
@@ -89,11 +88,16 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         Repo repo = repoPairs.get(section).second.get(position);
         Context context = holder.itemView.getContext();
 
-        holder.title.setText(repo.getName());
-        holder.versionName.setText(repo.getVersion());
+        String name = repo.getName();
+        String version = repo.getVersion();
         String author = repo.getAuthor();
-        holder.author.setText(TextUtils.isEmpty(author) ? null : context.getString(R.string.author, author));
-        holder.description.setText(repo.getDescription());
+        String description = repo.getDescription();
+        String noInfo = context.getString(R.string.no_info_provided);
+
+        holder.title.setText(TextUtils.isEmpty(name) ? noInfo : name);
+        holder.versionName.setText(TextUtils.isEmpty(version) ? noInfo : version);
+        holder.author.setText(TextUtils.isEmpty(author) ? noInfo : context.getString(R.string.author, author));
+        holder.description.setText(TextUtils.isEmpty(description) ? noInfo : description);
         holder.updateTime.setText(context.getString(R.string.updated_on, repo.getLastUpdateString()));
 
         holder.infoLayout.setOnClickListener(v ->
@@ -101,16 +105,15 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
 
         holder.downloadImage.setOnClickListener(v -> {
             new CustomAlertDialog((BaseActivity) context)
-                    .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
-                    .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.install, (d, i) ->
-                        new ProcessRepoZip((BaseActivity) context, repo, true).exec()
-                    )
-                    .setNeutralButton(R.string.download, (d, i) ->
-                        new ProcessRepoZip((BaseActivity) context, repo, false).exec())
-                    .setNegativeButton(R.string.no_thanks, null)
-                    .show();
+                .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
+                .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
+                .setCancelable(true)
+                .setPositiveButton(R.string.install, (d, i) ->
+                        DownloadModule.exec((BaseActivity) context, repo, true))
+                .setNeutralButton(R.string.download, (d, i) ->
+                        DownloadModule.exec((BaseActivity) context, repo, false))
+                .setNegativeButton(R.string.no_thanks, null)
+                .show();
         });
     }
 
@@ -165,7 +168,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
 
         SectionHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            new ReposAdapter$SectionHolder_ViewBinding(this, itemView);
         }
     }
 
@@ -181,7 +184,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
 
         RepoHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            new ReposAdapter$RepoHolder_ViewBinding(this, itemView);
         }
 
     }

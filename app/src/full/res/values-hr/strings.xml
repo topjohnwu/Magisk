@@ -81,9 +81,9 @@
     <string name="zip_process_msg">Obrada zip datoteke …</string>
     <string name="manager_update_title">Dostupno je novo ažuriranje Magisk Manager aplikacije!</string>
     <string name="manager_download_install">Pritisnite za preuzimanje i instalaciju</string>
-    <string name="magisk_updates">Magisk ažuriranja</string>
+    <string name="update_channel">Magisk ažuriranja</string>
     <string name="flashing">Apliciranje</string>
-    <string name="hide_manager_toast">Skrivanje Magisk Manager aplikacije…</string>
+    <string name="hide_manager_title">Skrivanje Magisk Manager aplikacije…</string>
     <string name="hide_manager_fail_toast">Skrivanje Magisk Manager nije uspjelo</string>
     <string name="download_zip_only">Preuzmi samo zip</string>
     <string name="patch_boot_file">Zakrpa datoteke za podizanje sustava</string>
@@ -96,6 +96,9 @@
     <string name="restore_fail">Stock backup does not exist!</string>
     <string name="proprietary_title">Preuzmite vlasnički kod</string>
     <string name="proprietary_notice">Magisk Manager je FOSS aplikacija te ne sadrži Googleov SafetyNet API kod.\n\nDopuštate li Magisk Manager aplikaciji da preuzme proširenje (sadrži GoogleApiClient) za SafetyNet provjere?</string>
+    <string name="download_file_error">Pogreška prilikom preuzimanja datoteke</string>
+    <string name="downloading_toast">Preuzimanje %1$s</string>
+    <string name="no_rw_storage">Ova značajka neće raditi bez dopuštenja za korištenje vanjske pohrane.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Općenito</string>
@@ -115,7 +118,7 @@
     <string name="settings_boot_format_summary">Odaberite izlazni format datoteke za podizanje sustava nakon zakrpe.\nOdaberite .img da biste aplicirali putem brzog pokretanja(fastboota)/preuzimanja(downloada); odaberite .img.tar da biste aplicirali putem ODIN-a.</string>
 
     <string name="settings_core_only_title">Samo Magisk Core način rada</string>
-    <string name="settings_core_only_summary">Omogućite samo osnovne značajke, svi se moduli neće učitati. MagiskSU, MagiskHide i systemless hostovi će i dalje biti omogućeni</string>
+    <string name="settings_core_only_summary">Omogućite samo osnovne značajke, svi se moduli neće učitati. MagiskSU i MagiskHide će i dalje biti omogućeni</string>
     <string name="settings_magiskhide_summary">Sakrij Magisk od raznih detekcija</string>
     <string name="settings_hosts_title">Systemless hostovi</string>
     <string name="settings_hosts_summary">Systemless hostovi podržavaju Adblock aplikacije</string>
@@ -125,8 +128,10 @@
     <string name="settings_su_adb">Samo ADB</string>
     <string name="settings_su_disable">Onemogućeno</string>
     <string name="settings_su_request_10">10 sekundi</string>
+    <string name="settings_su_request_15">15 sekundi</string>
     <string name="settings_su_request_20">20 sekundi</string>
     <string name="settings_su_request_30">30 sekundi</string>
+    <string name="settings_su_request_45">45 sekundi</string>
     <string name="settings_su_request_60">60 sekundi</string>
     <string name="superuser_access">Superuser pristup</string>
     <string name="auto_response">Automatski odgovor</string>

@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.fragments;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,24 +14,24 @@ import com.topjohnwu.magisk.container.Policy;
 
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class SuperuserFragment extends BaseFragment {
 
-    private Unbinder unbinder;
-    private PackageManager pm;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
+
+    private PackageManager pm;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_superuser, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        unbinder = new SuperuserFragment_ViewBinding(this, view);
 
-        pm = getActivity().getPackageManager();
+        pm = requireActivity().getPackageManager();
         return view;
     }
 
@@ -49,14 +47,8 @@ public class SuperuserFragment extends BaseFragment {
         displayPolicyList();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
     private void displayPolicyList() {
-        List<Policy> policyList = mm.mDB.getPolicyList(pm);
+        List<Policy> policyList = mm.mDB.getPolicyList();
 
         if (policyList.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);

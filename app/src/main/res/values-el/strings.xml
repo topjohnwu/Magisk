@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
-    <string name="downloading_toast">Κατέβασμα %1$s</string>
-    <string name="no_rw_storage">Η λειτουργία αυτή δεν θα δουλέψει χωρίς την άδεια εγγραφής στον εξωτερικό χώρο αποθηκεύσης.</string>
     <string name="no_thanks">Όχι ευχαριστώ</string>
     <string name="yes">Ναι</string>
     <string name="ok">OK</string>

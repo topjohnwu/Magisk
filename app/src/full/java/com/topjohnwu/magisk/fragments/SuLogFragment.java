@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,16 +13,15 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.SuLogAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class SuLogFragment extends BaseFragment {
 
     @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
-    private Unbinder unbinder;
     private SuLogAdapter adapter;
 
     @Override
@@ -44,7 +41,7 @@ public class SuLogFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_su_log, container, false);
-        unbinder = ButterKnife.bind(this, v);
+        unbinder = new SuLogFragment_ViewBinding(this, v);
         adapter = new SuLogAdapter(mm.mDB);
         recyclerView.setAdapter(adapter);
 
@@ -78,11 +75,5 @@ public class SuLogFragment extends BaseFragment {
             default:
                 return true;
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 }

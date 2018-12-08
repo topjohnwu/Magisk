@@ -3,17 +3,11 @@ package com.topjohnwu.magisk;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.material.navigation.NavigationView;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.fragments.LogFragment;
 import com.topjohnwu.magisk.fragments.MagiskFragment;
@@ -24,10 +18,16 @@ import com.topjohnwu.magisk.fragments.SettingsFragment;
 import com.topjohnwu.magisk.fragments.SuperuserFragment;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, Topic.Subscriber {
@@ -36,9 +36,9 @@ public class MainActivity extends BaseActivity
     private int mDrawerItem;
     private static boolean fromShortcut = false;
 
-    @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.toolbar) public Toolbar toolbar;
-    @BindView(R.id.nav_view) public NavigationView navigationView;
+    @BindView(R.id.drawer_layout) DrawerLayout drawer;
+    @BindView(R.id.nav_view) NavigationView navigationView;
 
     private float toolbarElevation;
 
@@ -50,13 +50,13 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         if (!mm.hasInit) {
-            startActivity(new Intent(this, SplashActivity.class));
+            startActivity(new Intent(this, Data.classMap.get(SplashActivity.class)));
             finish();
         }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        new MainActivity_ViewBinding(this);
 
         setSupportActionBar(toolbar);
 
@@ -113,11 +113,6 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public int[] getSubscribedTopics() {
-        return new int[] {Topic.RELOAD_ACTIVITY};
-    }
-
-    @Override
     public void onPublish(int topic, Object[] result) {
         recreate();
     }
@@ -125,14 +120,12 @@ public class MainActivity extends BaseActivity
     public void checkHideSection() {
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(Shell.rootAccess() &&
-                Data.magiskVersionCode >= Const.MAGISK_VER.UNIFIED &&
                 mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Data.magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(Download.checkNetworkStatus(this)
                 && Shell.rootAccess() && Data.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
-        menu.findItem(R.id.superuser).setVisible(Shell.rootAccess() &&
-                !(Const.USER_ID > 0 && Data.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));
+        menu.findItem(R.id.superuser).setVisible(Utils.showSuperUser());
     }
 
     public void navigate(String item) {
@@ -196,11 +189,11 @@ public class MainActivity extends BaseActivity
                 displayFragment(new SettingsFragment(), true);
                 break;
             case R.id.app_about:
-                startActivity(new Intent(this, AboutActivity.class));
+                startActivity(new Intent(this, Data.classMap.get(AboutActivity.class)));
                 mDrawerItem = bak;
                 break;
             case R.id.donation:
-                startActivity(new Intent(this, DonationActivity.class));
+                startActivity(new Intent(this, Data.classMap.get(DonationActivity.class)));
                 mDrawerItem = bak;
                 break;
         }

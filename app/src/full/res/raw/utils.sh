@@ -6,7 +6,7 @@ db_sepatch() {
 
 db_clean() {
   local USERID=$1
-  local DIR="/sbin/.core/db-${USERID}"
+  local DIR="/sbin/.magisk/db-${USERID}"
   umount -l /data/user*/*/*/databases/su.db $DIR $DIR/*
   rm -rf $DIR
   [ "$USERID" = "*" ] && rm -fv /data/adb/magisk.db*
@@ -26,7 +26,7 @@ db_restore() {
 db_setup() {
   local USER=$1
   local USERID=$(($USER / 100000))
-  local DIR=/sbin/.core/db-${USERID}
+  local DIR=/sbin/.magisk/db-${USERID}
   mkdir -p $DIR
   touch $DIR/magisk.db
   mount -o bind /data/adb/magisk.db $DIR/magisk.db
@@ -49,8 +49,8 @@ fix_env() {
   sh update-binary extract
   rm -f update-binary magisk.apk
   cd /
-  rm -rf /sbin/.core/busybox/*
-  /sbin/.core/mirror/bin/busybox --install -s /sbin/.core/busybox
+  rm -rf /sbin/.magisk/busybox/*
+  /sbin/.magisk/mirror/bin/busybox --install -s /sbin/.magisk/busybox
 }
 
 direct_install() {
@@ -79,8 +79,8 @@ mm_patch_dtbo() {
 }
 
 restore_imgs() {
-  local SHA1=`cat /.backup/.sha1`
-  [ -z $SHA1 ] && local SHA1=`grep_prop #STOCKSHA1`
+  local SHA1=`grep_prop SHA1 /sbin/.magisk/config`
+  [ -z $SHA1 ] && local SHA1=`cat /.backup/.sha1`
   [ -z $SHA1 ] && return 1
   local STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
   local STOCKDTBO=/data/stock_dtbo.img.gz
@@ -108,4 +108,37 @@ post_ota() {
   echo '${0%/*}/../bootctl mark-boot-successful;rm -f ${0%/*}/../bootctl $0' > post-fs-data.d/post_ota.sh
   chmod 755 post-fs-data.d/post_ota.sh
   cd /
+}
+
+add_hosts_module() {
+  # Do not touch existing hosts module
+  [ -d /sbin/.magisk/img/hosts ] && return
+  cd /sbin/.magisk/img
+  mkdir -p hosts/system/etc
+  cat << EOF > hosts/module.prop
+id=hosts
+name=Systemless Hosts
+version=1.0
+versionCode=1
+author=Magisk Manager
+description=Magisk Manager built-in systemless hosts module
+minMagisk=17000
+EOF
+  if [ -f .core/hosts ]; then
+    # Migrate old hosts file to new module
+    mv -f .core/hosts hosts/system/etc/hosts
+  else
+    cp -f /system/etc/hosts hosts/system/etc/hosts
+  fi
+  magisk --clone-attr /system/etc/hosts hosts/system/etc/hosts
+  touch hosts/update
+  touch hosts/auto_mount
+  cd /
+}
+
+rm_launch() {
+  db_clean $1
+  pm uninstall $2
+  monkey -p $3 1
+  exit
 }

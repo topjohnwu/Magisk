@@ -2,11 +2,6 @@ package com.topjohnwu.magisk.components;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.annotation.StyleRes;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -15,8 +10,12 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.annotation.StyleRes;
+import androidx.appcompat.app.AlertDialog;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class CustomAlertDialog extends AlertDialog.Builder {
 
@@ -37,7 +36,7 @@ public class CustomAlertDialog extends AlertDialog.Builder {
         @BindView(R.id.neutral) public Button neutral;
 
         ViewHolder(View v) {
-            ButterKnife.bind(this, v);
+            new CustomAlertDialog$ViewHolder_ViewBinding(this, v);
             messageView.setVisibility(View.GONE);
             negative.setVisibility(View.GONE);
             positive.setVisibility(View.GONE);

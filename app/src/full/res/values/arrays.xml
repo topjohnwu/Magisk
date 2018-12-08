@@ -25,15 +25,19 @@
 
     <string-array name="request_timeout">
         <item>@string/settings_su_request_10</item>
+        <item>@string/settings_su_request_15</item>
         <item>@string/settings_su_request_20</item>
         <item>@string/settings_su_request_30</item>
+        <item>@string/settings_su_request_45</item>
         <item>@string/settings_su_request_60</item>
     </string-array>
 
     <string-array name="request_timeout_value">
         <item>10</item>
+        <item>15</item>
         <item>20</item>
         <item>30</item>
+        <item>45</item>
         <item>60</item>
     </string-array>
 

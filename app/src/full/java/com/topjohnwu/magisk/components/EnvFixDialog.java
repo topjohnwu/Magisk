@@ -1,10 +1,11 @@
 package com.topjohnwu.magisk.components;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
+
+import androidx.annotation.NonNull;
 
 public class EnvFixDialog extends CustomAlertDialog {
 

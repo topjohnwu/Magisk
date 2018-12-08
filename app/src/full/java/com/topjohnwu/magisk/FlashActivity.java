@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +15,6 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
@@ -31,8 +28,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class FlashActivity extends BaseActivity {
@@ -44,11 +42,6 @@ public class FlashActivity extends BaseActivity {
     @BindView(R.id.scrollView) ScrollView sv;
 
     private List<String> logs;
-
-    @OnClick(R.id.no_thanks)
-    void dismiss() {
-        finish();
-    }
 
     @OnClick(R.id.reboot)
     void reboot() {
@@ -65,7 +58,7 @@ public class FlashActivity extends BaseActivity {
                     now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                     now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-            File logFile = new File(Download.EXTERNAL_PATH, filename);
+            File logFile = new File(Const.EXTERNAL_PATH, filename);
             try (FileWriter writer = new FileWriter(logFile)) {
                 for (String s : logs) {
                     writer.write(s);
@@ -88,7 +81,8 @@ public class FlashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flash);
-        ButterKnife.bind(this);
+        new FlashActivity_ViewBinding(this);
+
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -143,6 +137,12 @@ public class FlashActivity extends BaseActivity {
                         intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec();
                 break;
         }
+    }
+
+    @OnClick(R.id.close)
+    @Override
+    public void finish() {
+        super.finish();
     }
 
     @Override

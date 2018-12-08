@@ -2,10 +2,6 @@ package com.topjohnwu.magisk.fragments;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,13 +22,14 @@ import com.topjohnwu.magisk.utils.Topic;
 
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class ReposFragment extends BaseFragment implements Topic.Subscriber {
 
-    private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -49,7 +46,7 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_repos, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        unbinder = new ReposFragment_ViewBinding(this, view);
 
         mSwipeRefreshLayout.setRefreshing(true);
         recyclerView.setVisibility(View.GONE);
@@ -123,6 +120,5 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     public void onDestroyView() {
         super.onDestroyView();
         mm.repoDB.unregisterAdapter();
-        unbinder.unbind();
     }
 }

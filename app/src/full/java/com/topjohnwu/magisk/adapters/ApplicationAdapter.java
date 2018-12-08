@@ -3,11 +3,7 @@ package com.topjohnwu.magisk.adapters;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +15,8 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -28,8 +24,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ViewHolder> {
 
@@ -53,25 +50,12 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         return new ViewHolder(v);
     }
 
-    private String getLabel(ApplicationInfo info) {
-        if (info.labelRes > 0) {
-            try {
-                Resources res = pm.getResourcesForApplication(info);
-                Configuration config = new Configuration();
-                config.setLocale(LocaleManager.locale);
-                res.updateConfiguration(config, res.getDisplayMetrics());
-                return res.getString(info.labelRes);
-            } catch (PackageManager.NameNotFoundException ignored) { /* Impossible */ }
-        }
-        return info.loadLabel(pm).toString();
-    }
-
     private void loadApps() {
         fullList = pm.getInstalledApplications(0);
         hideList = Shell.su("magiskhide --ls").exec().getOut();
         for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
             ApplicationInfo info = i.next();
-            if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled) {
+            if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled || info.uid == 1000) {
                 i.remove();
             }
         }
@@ -79,7 +63,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             boolean ah = hideList.contains(a.packageName);
             boolean bh = hideList.contains(b.packageName);
             if (ah == bh) {
-                return getLabel(a).toLowerCase().compareTo(getLabel(b).toLowerCase());
+                return Utils.getAppLabel(a, pm).toLowerCase()
+                        .compareTo(Utils.getAppLabel(b, pm).toLowerCase());
             } else if (ah) {
                 return -1;
             } else {
@@ -94,7 +79,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         ApplicationInfo info = showList.get(position);
 
         holder.appIcon.setImageDrawable(info.loadIcon(pm));
-        holder.appName.setText(getLabel(info));
+        holder.appName.setText(Utils.getAppLabel(info, pm));
         holder.appPackage.setText(info.packageName);
 
         holder.checkBox.setOnCheckedChangeListener(null);
@@ -132,11 +117,11 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            new ApplicationAdapter$ViewHolder_ViewBinding(this, itemView);
         }
     }
 
-    private class ApplicationFilter extends Filter {
+    class ApplicationFilter extends Filter {
 
         private boolean lowercaseContains(String s, CharSequence filter) {
             return !TextUtils.isEmpty(s) && s.toLowerCase().contains(filter);
@@ -150,7 +135,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
                 showList = new ArrayList<>();
                 String filter = constraint.toString().toLowerCase();
                 for (ApplicationInfo info : fullList) {
-                    if (lowercaseContains(getLabel(info), filter)
+                    if (lowercaseContains(Utils.getAppLabel(info, pm), filter)
                             || lowercaseContains(info.packageName, filter)) {
                         showList.add(info);
                     }

@@ -21,3 +21,6 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class com.topjohnwu.snet.Snet { *; }
+
+-repackageclasses ''
+-allowaccessmodification

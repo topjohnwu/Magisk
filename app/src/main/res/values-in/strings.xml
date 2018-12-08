@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Kesalahan mengunduh file</string>
-    <string name="downloading_toast">Mengunduh %1$s</string>
-    <string name="no_rw_storage">Fitur ini tidak akan bekerja tanpa izin untuk menulis ke penyimpanan eksternal.</string>
     <string name="no_thanks">Tidak, terima kasih</string>
     <string name="yes">Ya</string>
     <string name="ok">OK</string>

@@ -71,6 +71,9 @@
     <string name="process_error">처리 오류</string>
     <string name="internal_storage">zip 파일이 다음 위치에 저장됨:\n[내부 저장소]%1$s</string>
     <string name="zip_process_title">처리 중</string>
+    <string name="download_file_error">파일 다운로드 오류</string>
+    <string name="downloading_toast">%1$s 다운로드 중</string>
+    <string name="no_rw_storage">이 기능은 외부 저장소 쓰기 권한 없이는 작동하지 않습니다.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">일반</string>
@@ -80,7 +83,7 @@
     <string name="settings_clear_cache_summary">온라인 저장소에 대해 캐시된 정보를 지우고, 온라인에서 정보를 강제로 새로 고칩니다.</string>
 
     <string name="settings_core_only_title">Magisk 핵심 기능 모드</string>
-    <string name="settings_core_only_summary">핵심 기능만 사용합니다. 모든 모듈은 로드하지 않습니다. MagiskSU, MagiskHide 및 systemless hosts 는 계속 사용할 수 있습니다.</string>
+    <string name="settings_core_only_summary">핵심 기능만 사용합니다. 모든 모듈은 로드하지 않습니다. MagiskSU 및 MagiskHide 는 계속 사용할 수 있습니다.</string>
     <string name="settings_magiskhide_summary">다양한 감지로부터 Magisk를 숨깁니다.</string>
     <string name="settings_hosts_title">systemless hosts</string>
     <string name="settings_hosts_summary">광고 차단 앱에서 사용하는 systemless hosts를 지원합니다.</string>

@@ -47,6 +47,7 @@ mount_partitions
 find_boot_image
 find_dtbo_image
 
+check_data
 get_flags
 
 [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
@@ -71,8 +72,6 @@ remove_system_su
 ##########################################################################################
 
 ui_print "- Constructing environment"
-
-check_data
 
 if $DATA; then
   MAGISKBIN=/data/magisk

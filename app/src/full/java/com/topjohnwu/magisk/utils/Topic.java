@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-import android.support.annotation.IntDef;
-
 import com.topjohnwu.magisk.Data;
 
 import java.lang.annotation.Retention;
@@ -9,23 +7,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashSet;
 import java.util.Set;
 
+import androidx.annotation.IntDef;
+
 public class Topic {
 
     public static final int MAGISK_HIDE_DONE = 0;
-    public static final int RELOAD_ACTIVITY = 1;
-    public static final int MODULE_LOAD_DONE = 2;
-    public static final int REPO_LOAD_DONE = 3;
-    public static final int UPDATE_CHECK_DONE = 4;
-    public static final int SNET_CHECK_DONE = 5;
-    public static final int LOCALE_FETCH_DONE = 6;
+    public static final int MODULE_LOAD_DONE = 1;
+    public static final int REPO_LOAD_DONE = 2;
+    public static final int UPDATE_CHECK_DONE = 3;
+    public static final int SNET_CHECK_DONE = 4;
+    public static final int LOCALE_FETCH_DONE = 5;
 
-    @IntDef({MAGISK_HIDE_DONE, RELOAD_ACTIVITY, MODULE_LOAD_DONE, REPO_LOAD_DONE,
+    @IntDef({MAGISK_HIDE_DONE, MODULE_LOAD_DONE, REPO_LOAD_DONE,
             UPDATE_CHECK_DONE, SNET_CHECK_DONE, LOCALE_FETCH_DONE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface TopicID {}
 
     // We will not dynamically add topics, so use arrays instead of hash tables
-    private static Store[] topicList = new Store[7];
+    private static Store[] topicList = new Store[6];
 
     public static void subscribe(Subscriber sub, @TopicID int... topics) {
         for (int topic : topics) {

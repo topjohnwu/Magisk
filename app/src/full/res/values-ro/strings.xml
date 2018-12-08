@@ -27,7 +27,7 @@
     <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
     <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate. Accesul la Root va fi eliminat și potențial se vor cripta datele dacă nu sunt în prezent criptate</string>
     <string name="update">Actualizare %1$s</string>
-  
+
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nu sunt furnizate informații)</string>
@@ -63,6 +63,7 @@
     <string name="donation">Donaţie</string>
     <string name="app_translators">Traducători</string>
     <string name="support_thread">Pagina de suport</string>
+    <string name="follow_twitter">Urmăriți-mă pe Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Închide</string>
@@ -84,14 +85,18 @@
     <string name="manager_download_install">Apăsați pentru a descărca și instala</string>
     <string name="dtbo_patched_title">DTBO a fost modificat!</string>
     <string name="dtbo_patched_reboot">Magisk Manager a modificat dtbo.img, reporniţi</string>
-    <string name="magisk_updates">Actualizări Magisk</string>
+    <string name="update_channel">Actualizări Magisk</string>
     <string name="flashing">Flashing</string>
-    <string name="hide_manager_toast">Ascundere Magisk Manager…</string>
-    <string name="hide_manager_toast2">Ar putea dura ceva timp…</string>
+    <string name="hide_manager_title">Ascundere Magisk Manager…</string>
+    <string name="hide_manager_msg">Ar putea dura ceva timp…</string>
     <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eşuat</string>
+    <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul…</string>
     <string name="download_zip_only">Doar descărcare fişier Zip</string>
     <string name="patch_boot_file">Modificare fişier imagine Boot</string>
     <string name="direct_install">Instalare directă (Recomandat)</string>
+    <string name="install_inactive_slot">Instalare în slotul inactiv (După OTA)</string>
+    <string name="warning">Avertizare</string>
+    <string name="install_inactive_slot_msg">Dispozitivul dvs. va fi forțat să se încarce în slotul inactiv actual după repornire!\nUtilizați această opțiune numai după finalizarea OTA.\nContinuați?</string>
     <string name="select_method">Selectaţi metoda</string>
     <string name="no_boot_file_patch_support">Versiunea Magisk nu acceptă modificarea imaginii de Boot</string>
     <string name="boot_file_patch_msg">Selectaţi formatul .img sau .img.tar pentru imaginea de Boot stoc</string>
@@ -101,6 +106,9 @@
     <string name="proprietary_title">Descărcare cod proprietar</string>
     <string name="proprietary_notice">Magisk Manager este FOSS așa că nu conține codul API SafetyNet de la Google.\n\nPermiteți ca Magisk Manager să descarce o extensie (conține GoogleApiClient) pentru verificările SafetyNet?</string>
     <string name="su_db_corrupt">Baza de date SU este defectă, va fi creată o bază nouă</string>
+    <string name="download_file_error">Eroare la descărcarea fișierului</string>
+    <string name="downloading_toast">Descărcare %1$s</string>
+    <string name="no_rw_storage">Această caracteristică nu va funcționa fără permisiunea de a scrie pe memoria externă.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -125,7 +133,7 @@
     <string name="settings_boot_format_title">Formatul Boot-ului modificat</string>
     <string name="settings_boot_format_summary">Selectați formatul fișierului imaginii de Boot modificată.\nAlegeţi .img pentru flash prin modul fastboot/download; alegeţi .img.tar pentru flash prin ODIN.</string>
     <string name="settings_core_only_title">Mod de bază</string>
-    <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU, MagiskHide şi systemless hosts vor fi în continuare activate</string>
+    <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU şi MagiskHide vor fi în continuare activate</string>
     <string name="settings_magiskhide_summary">Ascundeţi Magisk de la diferite detectări</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts suport pentru aplicațiile Adblock</string>
@@ -135,8 +143,10 @@
     <string name="settings_su_adb">Doar ADB</string>
     <string name="settings_su_disable">Dezactivat</string>
     <string name="settings_su_request_10">10 secunde</string>
+    <string name="settings_su_request_15">15 de secunde</string>
     <string name="settings_su_request_20">20 de secunde</string>
     <string name="settings_su_request_30">30 de secunde</string>
+    <string name="settings_su_request_45">45 de secunde</string>
     <string name="settings_su_request_60">60 de secunde</string>
     <string name="superuser_access">Acces Superuser</string>
     <string name="auto_response">Răspuns automat</string>
@@ -147,7 +157,8 @@
     <string name="settings_su_reauth_summary">Reautentificare permisiuni pentru superuser după o actualizare a aplicației</string>
     <string name="settings_su_fingerprint_title">Activați autentificarea cu amprenta digitală</string>
     <string name="settings_su_fingerprint_summary">Utilizați scanerul de amprentă pentru a permite solicitările superuser</string>
- 
+    <string name="auth_fingerprint">Autentificare amprentă digitală</string>
+
     <string name="multiuser_mode">Mod Multiutilizator</string>
     <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
     <string name="settings_owner_manage">Gestionat de proprietarul dispozitivului</string>

@@ -5,11 +5,6 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,20 +36,22 @@ import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.cardview.widget.CardView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindColor;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 public class MagiskFragment extends BaseFragment
         implements SwipeRefreshLayout.OnRefreshListener, ExpandableView, Topic.Subscriber {
 
     private Container expandableContainer = new Container();
-    private Unbinder unbinder;
     private static boolean shownDialog = false;
 
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.swipeRefreshLayout) public SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.core_only_notice) CardView coreOnlyNotice;
 
@@ -85,7 +82,7 @@ public class MagiskFragment extends BaseFragment
     @BindColor(R.color.red500) int colorBad;
     @BindColor(R.color.green500) int colorOK;
     @BindColor(R.color.yellow500) int colorWarn;
-    @BindColor(R.color.grey500) int colorNeutral;
+    @BindColor(R.color.green500) int colorNeutral;
     @BindColor(R.color.blue500) int colorInfo;
 
     @OnClick(R.id.safetyNet_title)
@@ -136,7 +133,7 @@ public class MagiskFragment extends BaseFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_magisk, container, false);
-        unbinder = ButterKnife.bind(this, v);
+        unbinder = new MagiskFragment_ViewBinding(this, v);
         requireActivity().setTitle(R.string.magisk);
 
         expandableContainer.expandLayout = expandLayout;
@@ -197,12 +194,6 @@ public class MagiskFragment extends BaseFragment
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
     public Container getContainer() {
         return expandableContainer;
     }
@@ -223,11 +214,10 @@ public class MagiskFragment extends BaseFragment
 
         boolean hasNetwork = Download.checkNetworkStatus(mm);
         boolean hasRoot = Shell.rootAccess();
-        boolean isUpToDate = Data.magiskVersionCode > Const.MAGISK_VER.UNIFIED;
 
         magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
-        uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
+        uninstallButton.setVisibility(hasRoot ? View.VISIBLE : View.GONE);
         coreOnlyNotice.setVisibility(mm.prefs.getBoolean(Const.Key.COREONLY, false) ? View.VISIBLE : View.GONE);
 
         int image, color;
