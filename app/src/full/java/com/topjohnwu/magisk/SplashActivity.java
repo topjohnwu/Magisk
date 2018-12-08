@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.LocaleManager;
-import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -31,7 +30,7 @@ public class SplashActivity extends BaseActivity {
             try {
                 // We are the manager, remove com.topjohnwu.magisk as it could be malware
                 getPackageManager().getApplicationInfo(BuildConfig.APPLICATION_ID, 0);
-                RootUtils.uninstallPkg(BuildConfig.APPLICATION_ID);
+                Shell.su("pm uninstall " + BuildConfig.APPLICATION_ID).submit();
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
 

@@ -10,7 +10,6 @@ import java.util.List;
 public class Const {
 
     public static final String DEBUG_TAG = "MagiskManager";
-    public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
 
     // APK content
     public static final String ANDROID_MANIFEST = "AndroidManifest.xml";
@@ -47,11 +46,7 @@ public class Const {
     public static final int USER_ID = Process.myUid() / 100000;
 
     public static final class MAGISK_VER {
-        public static final int SEPOL_REFACTOR = 1640;
-        public static final int FIX_ENV = 1650;
-        public static final int DBVER_SIX = 17000;
-        public static final int CMDLINE_DB = 17305;
-        public static final int HIDE_STATUS = 17315;
+        /* Currently no backwards compatibility needed */
     }
 
     public static class ID {

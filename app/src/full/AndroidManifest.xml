@@ -53,15 +53,6 @@
             android:taskAffinity="internal.superuser"
             android:theme="@style/SuRequest" />
 
-        <activity
-            android:name=".superuser.RequestActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:taskAffinity="internal.superuser"
-            android:theme="@style/AppTheme.Translucent" />
-
-        <receiver android:name=".superuser.SuReceiver" />
-
         <!-- Receiver -->
 
         <receiver android:name="a.h">

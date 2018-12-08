@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.LocalSocket;
+import android.net.LocalSocketAddress;
 import android.os.Bundle;
 import android.os.Process;
 import android.text.TextUtils;
@@ -24,12 +25,13 @@ import java.util.Date;
 
 public abstract class SuConnector {
 
-    protected LocalSocket socket = new LocalSocket();
+    private LocalSocket socket;
     protected DataOutputStream out;
     protected DataInputStream in;
 
     public SuConnector(String name) throws IOException {
-        connect(name);
+        socket = new LocalSocket();
+        socket.connect(new LocalSocketAddress(name, LocalSocketAddress.Namespace.ABSTRACT));
         out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
     }
@@ -66,11 +68,9 @@ public abstract class SuConnector {
         } catch (IOException ignored) { }
     }
 
-    public abstract void connect(String name) throws IOException;
-
     protected abstract void onResponse() throws IOException;
 
-    public static void handleLogs(Intent intent, int version) {
+    public static void handleLogs(Intent intent) {
 
         int fromUid = intent.getIntExtra("from.uid", -1);
         if (fromUid < 0) return;
@@ -97,24 +97,9 @@ public abstract class SuConnector {
             notify = policy.notification;
         }
 
-        if (version == 1) {
-            String action = intent.getStringExtra("action");
-            if (action == null) return;
-            switch (action) {
-                case "allow":
-                    policy.policy = Policy.ALLOW;
-                    break;
-                case "deny":
-                    policy.policy = Policy.DENY;
-                    break;
-                default:
-                    return;
-            }
-        } else {
-            policy.policy = data.getInt("policy", -1);
-            if (policy.policy < 0)
-                return;
-        }
+        policy.policy = data.getInt("policy", -1);
+        if (policy.policy < 0)
+            return;
 
         if (notify)
             handleNotify(policy);

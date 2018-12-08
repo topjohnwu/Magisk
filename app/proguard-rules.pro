@@ -24,6 +24,7 @@
 
 # Snet extention
 -keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
+-keepclassmembers class com.topjohnwu.magisk.utils.BootSigner { *; }
 
 # Fast Android Networking Library
 -dontwarn okhttp3.**

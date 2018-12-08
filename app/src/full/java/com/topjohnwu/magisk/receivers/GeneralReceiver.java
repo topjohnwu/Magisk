@@ -36,12 +36,11 @@ public class GeneralReceiver extends BroadcastReceiver {
                     case "request":
                         Intent i = new Intent(mm, Data.classMap.get(SuRequestActivity.class))
                                 .putExtra("socket", intent.getStringExtra("socket"))
-                                .putExtra("version", 2)
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mm.startActivity(i);
                         break;
                     case "log":
-                        SuConnector.handleLogs(intent, 2);
+                        SuConnector.handleLogs(intent);
                         break;
                     case "notify":
                         SuConnector.handleNotify(intent);
