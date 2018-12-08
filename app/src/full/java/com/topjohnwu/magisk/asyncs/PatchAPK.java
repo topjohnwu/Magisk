@@ -12,11 +12,12 @@ import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.ShellUtils;
-import com.topjohnwu.superuser.io.SuFile;
-import com.topjohnwu.superuser.io.SuFileOutputStream;
 import com.topjohnwu.utils.JarMap;
 import com.topjohnwu.utils.SignAPK;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
@@ -97,23 +98,22 @@ public class PatchAPK {
         MagiskManager mm = Data.MM();
 
         // Generate a new app with random package name
-        SuFile repack = new SuFile("/data/local/tmp/repack.apk");
+        File repack = new File(mm.getFilesDir(), "patched.apk");
         String pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length());
 
         try {
             JarMap apk = new JarMap(mm.getPackageCodePath());
-            if (!patchPackageID(apk, BuildConfig.APPLICATION_ID, pkg))
+            if (!patch(apk, pkg))
                 return false;
-            SignAPK.sign(apk, new SuFileOutputStream(repack));
+            SignAPK.sign(apk, new BufferedOutputStream(new FileOutputStream(repack)));
         } catch (Exception e) {
             return false;
         }
 
         // Install the application
+        repack.setReadable(true, false);
         if (!ShellUtils.fastCmdResult("pm install " + repack))
-            return false;
-
-        repack.delete();
+            return false;;
 
         mm.mDB.setStrings(Const.Key.SU_MANAGER, pkg);
         Data.exportPrefs();
@@ -122,13 +122,13 @@ public class PatchAPK {
         return true;
     }
 
-    public static boolean patchPackageID(JarMap apk, String from, String to) {
+    public static boolean patch(JarMap apk, String pkg) {
         try {
             JarEntry je = apk.getJarEntry(Const.ANDROID_MANIFEST);
             byte xml[] = apk.getRawData(je);
 
-            if (!findAndPatch(xml, from, to) ||
-                    !findAndPatch(xml, from + ".provider", to + ".provider") ||
+            if (!findAndPatch(xml, BuildConfig.APPLICATION_ID, pkg) ||
+                    !findAndPatch(xml, BuildConfig.APPLICATION_ID + ".provider", pkg + ".provider") ||
                     !findAndPatch(xml, R.string.app_name, R.string.re_app_name))
                 return false;
 
