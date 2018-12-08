@@ -36,6 +36,7 @@ public class Const {
     // Versions
     public static final int UPDATE_SERVICE_VER = 1;
     public static final int MIN_MODULE_VER = 1500;
+    public static final int SNET_EXT_VER = 12;
 
     /* A list of apps that should not be shown as hide-able */
     public static final List<String> HIDE_BLACKLIST =  Arrays.asList(
@@ -79,6 +80,7 @@ public class Const {
         public static final String TWITTER_URL = "https://twitter.com/topjohnwu";
         public static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
         public static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk";
+        public static final String SNET_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/b66b1a914978e5f4c4bbfd74a59f4ad371bac107/snet.apk";
     }
 
 

@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.Topic;
@@ -32,7 +33,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Void> {
     private void dlSnet() throws Exception {
         Shell.sh("rm -rf " + dexPath.getParent()).exec();
         dexPath.getParentFile().mkdir();
-        HttpURLConnection conn = WebService.mustRequest(Data.snetLink);
+        HttpURLConnection conn = WebService.mustRequest(Const.Url.SNET_URL);
         try (
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(dexPath));
                 InputStream in = new BufferedInputStream(conn.getInputStream())) {
@@ -51,7 +52,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Void> {
                 .invoke(null, ISafetyNetHelper.class, dexPath.getPath(), getActivity(),
                         (ISafetyNetHelper.Callback) code ->
                                 Topic.publish(false, Topic.SNET_CHECK_DONE, code));
-        if (helper.getVersion() < Data.snetVersionCode) {
+        if (helper.getVersion() < Const.SNET_EXT_VER) {
             throw new Exception();
         }
     }
