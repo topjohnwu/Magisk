@@ -93,11 +93,9 @@ public class MagiskDB {
         rawSQL("DELETE FROM %s WHERE package_name=\"%s\"", POLICY_TABLE, pkg);
     }
 
-
     public void deletePolicy(int uid) {
         rawSQL("DELETE FROM %s WHERE uid=%d", POLICY_TABLE, uid);
     }
-
 
     public Policy getPolicy(int uid) {
         List<ContentValues> res =
@@ -112,11 +110,9 @@ public class MagiskDB {
         return null;
     }
 
-
     public void updatePolicy(Policy policy) {
         rawSQL("REPLACE INTO %s %s", POLICY_TABLE, toSQL(policy.getContentValues()));
     }
-
 
     public List<Policy> getPolicyList() {
         List<Policy> list = new ArrayList<>();
@@ -130,7 +126,6 @@ public class MagiskDB {
         Collections.sort(list);
         return list;
     }
-
 
     public List<List<SuLogEntry>> getLogs() {
         List<List<SuLogEntry>> ret = new ArrayList<>();
@@ -149,16 +144,13 @@ public class MagiskDB {
         return ret;
     }
 
-
     public void addLog(SuLogEntry log) {
         rawSQL("INSERT INTO %s %s", LOG_TABLE, toSQL(log.getContentValues()));
     }
 
-
     public void clearLogs() {
         rawSQL("DELETE FROM %s", LOG_TABLE);
     }
-
 
     public void setSettings(String key, int value) {
         ContentValues data = new ContentValues();
@@ -167,14 +159,12 @@ public class MagiskDB {
         rawSQL("REPLACE INTO %s %s", SETTINGS_TABLE, toSQL(data));
     }
 
-
     public int getSettings(String key, int defaultValue) {
         List<ContentValues> res = SQL("SELECT value FROM %s WHERE key=\"%s\"", SETTINGS_TABLE, key);
         if (res.isEmpty())
             return defaultValue;
         return res.get(0).getAsInteger("value");
     }
-
 
     public void setStrings(String key, String value) {
         if (value == null) {
@@ -186,7 +176,6 @@ public class MagiskDB {
         data.put("value", value);
         rawSQL("REPLACE INTO %s %s", STRINGS_TABLE, toSQL(data));
     }
-
 
     public String getStrings(String key, String defaultValue) {
         List<ContentValues> res = SQL("SELECT value FROM %s WHERE key=\"%s\"", STRINGS_TABLE, key);
