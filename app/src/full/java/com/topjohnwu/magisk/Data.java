@@ -47,8 +47,6 @@ public class Data {
     public static String managerLink;
     public static String managerNoteLink;
     public static String uninstallerLink;
-    public static int snetVersionCode;
-    public static String snetLink;
 
     // Install flags
     public static boolean keepVerity = false;
@@ -85,12 +83,7 @@ public class Data {
         try {
             magiskVersionString = ShellUtils.fastCmd("magisk -v").split(":")[0];
             magiskVersionCode = Integer.parseInt(ShellUtils.fastCmd("magisk -V"));
-            if (magiskVersionCode >= Const.MAGISK_VER.HIDE_STATUS) {
-                magiskHide = Shell.su("magiskhide --status").exec().isSuccess();
-            } else {
-                String s = ShellUtils.fastCmd(("resetprop -p ") + Const.MAGISKHIDE_PROP);
-                magiskHide = s.isEmpty() || Integer.parseInt(s) != 0;
-            }
+            magiskHide = Shell.su("magiskhide --status").exec().isSuccess();
         } catch (NumberFormatException ignored) {}
     }
 

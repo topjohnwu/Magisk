@@ -440,6 +440,10 @@ void repack(const char* orig_image, const char* out_image) {
 	// Print new image info
 	boot.print_hdr();
 
+	// Try to fix the header
+	if (boot.header_version() && boot.header_size() == 0)
+		boot.header_size(sizeof(boot_img_hdr));
+
 	// Main header
 	memcpy(boot.map_addr + header_off, boot.hdr, boot.hdr_size());
 

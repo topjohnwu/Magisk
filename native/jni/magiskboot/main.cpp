@@ -39,6 +39,8 @@ static void usage(char *arg0) {
 		"    Do cpio commands to <incpio> (modifications are done directly)\n"
 		"    Each command is a single argument, use quotes if necessary\n"
 		"    Supported commands:\n"
+		"      exists ENTRY\n"
+		"        Return 0 if ENTRY exists, else return 1\n"
 		"      rm [-r] ENTRY\n"
 		"        Remove ENTRY, specify [-r] to remove recursively\n"
 		"      mkdir MODE ENTRY\n"

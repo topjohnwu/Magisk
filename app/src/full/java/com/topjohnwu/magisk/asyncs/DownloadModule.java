@@ -9,12 +9,10 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.ProgressNotification;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.WebService;
-import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.BufferedInputStream;
@@ -42,21 +40,12 @@ public class DownloadModule {
         ProgressNotification progress = new ProgressNotification(output.getName());
         try {
             MagiskManager mm = Data.MM();
-            File temp1 = new File(mm.getCacheDir(), "temp.zip");
-
             HttpURLConnection conn = WebService.mustRequest(repo.getZipUrl());
             ProgressInputStream pis = new ProgressInputStream(conn.getInputStream(),
                     conn.getContentLength(), progress);
             removeTopFolder(new BufferedInputStream(pis),
-                    new BufferedOutputStream(new FileOutputStream(temp1)));
+                    new BufferedOutputStream(new FileOutputStream(output)));
             conn.disconnect();
-            progress.getNotification()
-                    .setProgress(0, 0, true)
-                    .setContentTitle(mm.getString(R.string.zip_process_msg))
-                    .setContentText("");
-            progress.update();
-            ZipUtils.signZip(temp1, output);
-            temp1.delete();
             if (install) {
                 progress.dismiss();
                 Intent intent = new Intent(mm, Data.classMap.get(FlashActivity.class));

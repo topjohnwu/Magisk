@@ -81,14 +81,14 @@ public class DlInstallManager {
                 patched = new File(apk.getParent(), "patched.apk");
                 try {
                     JarMap jarMap = new JarMap(apk);
-                    PatchAPK.patchPackageID(jarMap, BuildConfig.APPLICATION_ID, mm.getPackageName());
+                    PatchAPK.patch(jarMap, mm.getPackageName());
                     SignAPK.sign(jarMap, new BufferedOutputStream(new FileOutputStream(patched)));
                 } catch (Exception e) {
                     return;
                 }
             }
-            progress.dismiss();
             APKInstall.install(mm, patched);
+            progress.dismiss();
         }
     }
 
@@ -96,10 +96,18 @@ public class DlInstallManager {
 
         @Override
         public void onDownloadComplete(File apk, ProgressNotification progress) {
-            progress.dismiss();
+            MagiskManager mm = Data.MM();
+            progress.getNotification()
+                    .setProgress(0, 0, true)
+                    .setContentTitle(mm.getString(R.string.restore_img_msg))
+                    .setContentText("");
+            progress.update();
             Data.exportPrefs();
+            // Make it world readable
+            apk.setReadable(true, false);
             if (ShellUtils.fastCmdResult("pm install " + apk))
-                RootUtils.rmAndLaunch(Data.MM().getPackageName(), BuildConfig.APPLICATION_ID);
+                RootUtils.rmAndLaunch(mm.getPackageName(), BuildConfig.APPLICATION_ID);
+            progress.dismiss();
         }
     }
 }

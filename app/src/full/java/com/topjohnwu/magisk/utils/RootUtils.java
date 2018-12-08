@@ -21,10 +21,6 @@ public class RootUtils extends Shell.Initializer {
         BusyBox.BB_PATH = new File(Const.BUSYBOX_PATH);
     }
 
-    public static void uninstallPkg(String pkg) {
-        Shell.su("db_clean " + Const.USER_ID, "pm uninstall " + pkg).exec();
-    }
-
     public static void rmAndLaunch(String rm, String launch) {
         Shell.su(Utils.fmt("(rm_launch %d %s %s)&", Const.USER_ID, rm, launch)).exec();
     }
@@ -33,9 +29,6 @@ public class RootUtils extends Shell.Initializer {
     public boolean onInit(Context context, @NonNull Shell shell) {
         Shell.Job job = shell.newJob();
         if (shell.isRoot()) {
-            if (!new SuFile("/sbin/.magisk").exists())
-                job.add("ln -s /sbin/.core /sbin/.magisk");
-
             job.add(context.getResources().openRawResource(R.raw.util_functions))
                 .add(context.getResources().openRawResource(R.raw.utils));
             Const.MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk");

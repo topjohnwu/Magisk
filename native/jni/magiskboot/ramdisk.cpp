@@ -230,7 +230,9 @@ int cpio_commands(int argc, char *argv[]) {
 			char *sha1 = cpio.sha1();
 			if (sha1) printf("%s\n", sha1);
 			return 0;
-		} else if (cmdc >= 2 && strcmp(cmdv[0], "backup") == 0) {
+		} else if (cmdc == 2 && strcmp(cmdv[0], "exists") == 0) {
+			exit(cpio.find(cmdv[1]) < 0);
+		} else if (cmdc == 2 && strcmp(cmdv[0], "backup") == 0) {
 			cpio.backup(cmdv[1]);
 		} else if (cmdc >= 2 && strcmp(cmdv[0], "rm") == 0) {
 			bool r = cmdc > 2 && strcmp(cmdv[1], "-r") == 0;

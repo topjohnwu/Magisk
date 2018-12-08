@@ -69,13 +69,20 @@
     <string name="support_thread">Thread dukungan</string>
     <string name="follow_twitter">Ikuti saya di Twitter</string>
 
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Pembaruan Magisk</string>
+    <string name="progress_channel">Notifikasi Kemajuan</string>
+    <string name="download_complete">Unduhan selesai</string>
+    <string name="download_file_error">Kesalahan mengunduh file</string>
+    <string name="magisk_update_title">Pembaruan Magisk Baru Tersedia!</string>
+    <string name="manager_update_title">Pembaruan Magisk Manager Baru Tersedia!</string>
+
     <!--Toasts, Dialogs-->
     <string name="close">Tutup</string>
     <string name="repo_install_title">Pasang %1$s</string>
     <string name="repo_install_msg">Apakah Anda ingin memasang %1$s sekarang?</string>
     <string name="download">Unduh</string>
     <string name="reboot">Reboot</string>
-    <string name="magisk_update_title">Pembaruan Magisk Tersedia!</string>
     <string name="settings_reboot_toast">Reboot untuk menerapkan pengaturan.</string>
     <string name="release_notes">Catatan rilis</string>
     <string name="repo_cache_cleared">Cache repo dibersihkan</string>
@@ -85,14 +92,12 @@
     <string name="zip_download_msg">Mengunduh file zip (%1$d%%) …</string>
     <string name="zip_process_title">Memproses</string>
     <string name="zip_process_msg">Memproses file zip…</string>
-    <string name="manager_update_title">Pembaruan Magisk Manager Tersedia!</string>
     <string name="manager_download_install">Tekan untuk unduh dan pasang.</string>
     <string name="dtbo_patched_title">DTBO telah ditambal!</string>
     <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silahkan reboot.</string>
-    <string name="update_channel">Pembaruan Magisk</string>
     <string name="flashing">Flashing</string>
     <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
-    <string name="hide_manager_msg">Ini mungkin membutuhkan beberapa saat.</string>
+    <string name="hide_manager_msg">Ini mungkin membutuhkan waktu beberapa saat.</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager.</string>
     <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan.</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
@@ -104,8 +109,8 @@
     <string name="select_method">Pilih Metode</string>
     <string name="no_boot_file_patch_support">Versi target Magisk tidak mendukung penambalan file boot image</string>
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar.</string>
-    <string name="restore_img">Pulihkan Image</string>
     <string name="complete_uninstall">Copot Total</string>
+    <string name="restore_img">Pulihkan Image</string>
     <string name="restore_img_msg">Memulihkan…</string>
     <string name="restore_done">Pemulihan selesai!</string>
     <string name="restore_fail">Cadangan stock tidak ada!</string>
@@ -118,7 +123,6 @@
     <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
     <string name="setup_title">Penyiapan Tambahan</string>
     <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
-    <string name="download_file_error">Kesalahan mengunduh file</string>
     <string name="downloading_toast">Mengunduh %1$s</string>
     <string name="no_rw_storage">Fitur ini tidak akan bekerja tanpa izin untuk menulis ke penyimpanan eksternal.</string>
 
@@ -149,6 +153,7 @@
     <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai bentuk pendeteksian.</string>
     <string name="settings_hosts_title">Host tanpa sistem</string>
     <string name="settings_hosts_summary">Dukungan host tanpa sistem untuk apl pemblokir iklan.</string>
+    <string name="settings_hosts_toast">Ditambahkan modul host tanpa sistem</string>
 
     <string name="settings_su_app_adb">Apl dan ADB</string>
     <string name="settings_su_app">Apl saja</string>
@@ -223,5 +228,4 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">UID target:\u0020</string>
     <string name="command">Perintah:\u0020</string>
-
 </resources>

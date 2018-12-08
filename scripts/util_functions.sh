@@ -139,7 +139,7 @@ get_flags() {
 
 grep_cmdline() {
   local REGEX="s/^$1=//p"
-  sed -E 's/ +/\n/g' /proc/cmdline | sed -n "$REGEX" 2>/dev/null
+  cat /proc/cmdline | tr '[:space:]' '\n' | sed -n "$REGEX" 2>/dev/null
 }
 
 grep_prop() {
@@ -153,7 +153,7 @@ grep_prop() {
 getvar() {
   local VARNAME=$1
   local VALUE=
-  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /data/.magisk /cache/.magisk /system/.magisk`
+  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /.backup/.magisk /data/.magisk /cache/.magisk`
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 
@@ -392,7 +392,7 @@ request_zip_size_check() {
 check_filesystem() {
   curSizeM=`wc -c < $1`
   curSizeM=$((curSizeM / 1048576))
-  local DF=`df -P $2 | grep $2`
+  local DF=`df -Pk $2 | grep $2`
   curUsedM=`echo $DF | awk '{ print int($3 / 1024) }'`
   curFreeM=`echo $DF | awk '{ print int($4 / 1024) }'`
 }

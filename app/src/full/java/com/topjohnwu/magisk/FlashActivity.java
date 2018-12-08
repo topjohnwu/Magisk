@@ -15,7 +15,6 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
@@ -160,7 +159,7 @@ public class FlashActivity extends BaseActivity {
         protected void onPostExecute(Integer result) {
             if (result == 1) {
                 Data.mainHandler.postDelayed(() ->
-                        RootUtils.uninstallPkg(getActivity().getPackageName()), 3000);
+                        Shell.su("pm uninstall " + getActivity().getPackageName()).exec(), 3000);
             } else {
                 super.onPostExecute(result);
             }

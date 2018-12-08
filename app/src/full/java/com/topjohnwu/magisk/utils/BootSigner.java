@@ -9,7 +9,6 @@ import androidx.annotation.Keep;
 
 public class BootSigner {
 
-    @Keep
     public static void main(String[] args) throws Exception {
         if (args.length > 0 && "-verify".equals(args[0])) {
             String certPath = "";

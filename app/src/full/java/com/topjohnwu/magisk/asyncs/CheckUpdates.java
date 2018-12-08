@@ -1,13 +1,13 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.os.AsyncTask;
-
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,51 +42,54 @@ public class CheckUpdates {
         }
     }
 
-    public static void fetchUpdates() {
-        String jsonStr = "";
+    public static void check(Runnable cb) {
+        String url;
         switch (Data.updateChannel) {
             case Const.Value.STABLE_CHANNEL:
-                jsonStr = Utils.dlString(Const.Url.STABLE_URL);
+                url = Const.Url.STABLE_URL;
                 break;
             case Const.Value.BETA_CHANNEL:
-                jsonStr = Utils.dlString(Const.Url.BETA_URL);
+                url = Const.Url.BETA_URL;
                 break;
             case Const.Value.CUSTOM_CHANNEL:
-                jsonStr = Utils.dlString(Data.MM().prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
+                url = Data.MM().prefs.getString(Const.Key.CUSTOM_CHANNEL, "");
                 break;
+            default:
+                return;
         }
-
-        JSONObject json;
-        try {
-            json = new JSONObject(jsonStr);
-        } catch (JSONException e) {
-            return;
-        }
-
-        JSONObject magisk = getJson(json, "magisk");
-        Data.remoteMagiskVersionString = getString(magisk, "version", null);
-        Data.remoteMagiskVersionCode = getInt(magisk, "versionCode", -1);
-        Data.magiskLink = getString(magisk, "link", null);
-        Data.magiskNoteLink = getString(magisk, "note", null);
-        Data.magiskMD5 = getString(magisk, "md5", null);
-
-        JSONObject manager = getJson(json, "app");
-        Data.remoteManagerVersionString = getString(manager, "version", null);
-        Data.remoteManagerVersionCode = getInt(manager, "versionCode", -1);
-        Data.managerLink = getString(manager, "link", null);
-        Data.managerNoteLink = getString(manager, "note", null);
-
-        JSONObject uninstaller = getJson(json, "uninstaller");
-        Data.uninstallerLink = getString(uninstaller, "link", null);
-
-        JSONObject snet = getJson(json, "snet");
-        Data.snetVersionCode = getInt(snet, "versionCode", -1);
-        Data.snetLink = getString(snet, "link", null);
+        AndroidNetworking.get(url).build().getAsJSONObject(new UpdateListener(cb));
     }
 
-    public static void check(Runnable cb) {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
-            fetchUpdates();
+    public static void check() {
+        check(null);
+    }
+
+    private static class UpdateListener implements JSONObjectRequestListener {
+
+        private Runnable cb;
+
+        UpdateListener(Runnable callback) {
+            cb = callback;
+        }
+
+        @Override
+        public void onResponse(JSONObject json) {
+            JSONObject magisk = getJson(json, "magisk");
+            Data.remoteMagiskVersionString = getString(magisk, "version", null);
+            Data.remoteMagiskVersionCode = getInt(magisk, "versionCode", -1);
+            Data.magiskLink = getString(magisk, "link", null);
+            Data.magiskNoteLink = getString(magisk, "note", null);
+            Data.magiskMD5 = getString(magisk, "md5", null);
+
+            JSONObject manager = getJson(json, "app");
+            Data.remoteManagerVersionString = getString(manager, "version", null);
+            Data.remoteManagerVersionCode = getInt(manager, "versionCode", -1);
+            Data.managerLink = getString(manager, "link", null);
+            Data.managerNoteLink = getString(manager, "note", null);
+
+            JSONObject uninstaller = getJson(json, "uninstaller");
+            Data.uninstallerLink = getString(uninstaller, "link", null);
+
             if (cb != null) {
                 if (BuildConfig.VERSION_CODE < Data.remoteManagerVersionCode) {
                     Notifications.managerUpdate();
@@ -96,10 +99,9 @@ public class CheckUpdates {
                 cb.run();
             }
             Topic.publish(Topic.UPDATE_CHECK_DONE);
-        });
-    }
+        }
 
-    public static void check() {
-        check(null);
+        @Override
+        public void onError(ANError anError) {}
     }
 }

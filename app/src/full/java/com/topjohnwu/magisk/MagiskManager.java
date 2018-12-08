@@ -20,8 +20,8 @@ public class MagiskManager extends ContainerApp {
 
     // Global resources
     public SharedPreferences prefs;
-    public MagiskDB mDB;
     public RepoDatabaseHelper repoDB;
+    public MagiskDB mDB;
 
     public MagiskManager() {
         Data.weakApp = new WeakReference<>(this);
@@ -37,8 +37,8 @@ public class MagiskManager extends ContainerApp {
         Shell.Config.setTimeout(2);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mDB = MagiskDB.getInstance();
         repoDB = new RepoDatabaseHelper(this);
+        mDB = new MagiskDB(this);
 
         LocaleManager.setLocale(this);
         Data.loadConfig();

@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.components;
 import android.widget.Toast;
 
 import com.androidnetworking.interfaces.DownloadProgressListener;
-import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;

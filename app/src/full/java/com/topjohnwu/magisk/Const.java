@@ -10,7 +10,6 @@ import java.util.List;
 public class Const {
 
     public static final String DEBUG_TAG = "MagiskManager";
-    public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
 
     // APK content
     public static final String ANDROID_MANIFEST = "AndroidManifest.xml";
@@ -36,6 +35,7 @@ public class Const {
     // Versions
     public static final int UPDATE_SERVICE_VER = 1;
     public static final int MIN_MODULE_VER = 1500;
+    public static final int SNET_EXT_VER = 12;
 
     /* A list of apps that should not be shown as hide-able */
     public static final List<String> HIDE_BLACKLIST =  Arrays.asList(
@@ -46,11 +46,7 @@ public class Const {
     public static final int USER_ID = Process.myUid() / 100000;
 
     public static final class MAGISK_VER {
-        public static final int SEPOL_REFACTOR = 1640;
-        public static final int FIX_ENV = 1650;
-        public static final int DBVER_SIX = 17000;
-        public static final int CMDLINE_DB = 17305;
-        public static final int HIDE_STATUS = 17315;
+        /* Currently no backwards compatibility needed */
     }
 
     public static class ID {
@@ -79,6 +75,7 @@ public class Const {
         public static final String TWITTER_URL = "https://twitter.com/topjohnwu";
         public static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
         public static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk";
+        public static final String SNET_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/b66b1a914978e5f4c4bbfd74a59f4ad371bac107/snet.apk";
     }
 
 

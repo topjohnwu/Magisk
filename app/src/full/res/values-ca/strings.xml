@@ -91,7 +91,7 @@
     <string name="dtbo_patched_title">DTBO ha estat arranjat</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img, per favor reinicia el dispositiu</string>
     <string name="update_channel">Actualització de Magisk</string>
-    <string name="flashing">Flashejat</string>
+    <string name="flashing">Instal·lant</string>
     <string name="hide_manager_title">Amagant Magisk Manager…</string>
     <string name="hide_manager_msg">Això pot tardar un temps…</string>
     <string name="hide_manager_fail_toast">L’amagament de Magisk Manager ha fallat…</string>

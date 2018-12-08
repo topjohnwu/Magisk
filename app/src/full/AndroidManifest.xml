@@ -21,7 +21,6 @@
             android:exported="true" />
         <activity
             android:name="a.c"
-            android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:theme="@style/SplashTheme">
@@ -53,15 +52,6 @@
             android:launchMode="singleTask"
             android:taskAffinity="internal.superuser"
             android:theme="@style/SuRequest" />
-
-        <activity
-            android:name=".superuser.RequestActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:taskAffinity="internal.superuser"
-            android:theme="@style/AppTheme.Translucent" />
-
-        <receiver android:name=".superuser.SuReceiver" />
 
         <!-- Receiver -->
 
