@@ -92,6 +92,10 @@ public class UpdateRepos {
                 req.addHeaders(Const.Key.IF_NONE_MATCH, etag);
         }
         ANResponse<JSONArray> res = req.build().executeForJSONArray();
+        // Network drop
+        if (res.getOkHttpResponse() == null)
+            return false;
+        // JSON not updated
         if (res.getOkHttpResponse().code() == HttpURLConnection.HTTP_NOT_MODIFIED)
             return false;
         // Current page is the last page
