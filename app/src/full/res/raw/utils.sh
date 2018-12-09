@@ -100,6 +100,6 @@ EOF
 rm_launch() {
   db_clean $1
   pm uninstall $2
-  monkey -p $3 1
+  am start -n ${3}/a.c
   exit
 }
