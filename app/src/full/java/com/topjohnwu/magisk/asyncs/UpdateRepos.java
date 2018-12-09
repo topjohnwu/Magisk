@@ -94,7 +94,7 @@ public class UpdateRepos {
         ANResponse<JSONArray> res = req.build().executeForJSONArray();
         // Network drop
         if (res.getOkHttpResponse() == null)
-            return false;
+            return true;
         // JSON not updated
         if (res.getOkHttpResponse().code() == HttpURLConnection.HTTP_NOT_MODIFIED)
             return false;
