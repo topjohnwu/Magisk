@@ -1,5 +1,5 @@
 # Magisk Documentations
-(Updated on 2018.10.16)
+(Updated on 2018.12.9)
 
 - [Tutorials](tutorials.md)
     - [OTA Installation](tutorials.md#ota-installation)

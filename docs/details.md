@@ -1,7 +1,7 @@
 # Magisk Details
 ## File Structure
 ### Paths in "sbin tmpfs overlay"
-sbin tmpfs overlay is the key to hiding Magisk from detection. All Magisk binaries, applets, mirrors, mountpoints, loop devices, and other trivial stuffs are all located in the `tmpfs` mounted on `/sbin`. MagiskHide can just simply unmount `/sbin` and the bind mounts into `/system` and `/vendor` to hide all modifications easily. 
+sbin tmpfs overlay is the key to hiding Magisk from detection. All Magisk binaries, applets, mirrors, mountpoints, loop devices, and other trivial stuffs are all located in the `tmpfs` mounted on `/sbin`. MagiskHide can just simply unmount `/sbin` and the bind mounts into `/system` and `/vendor` to hide all modifications easily.
 
 ```
 # The actual Magisk binary
@@ -14,7 +14,7 @@ sbin tmpfs overlay is the key to hiding Magisk from detection. All Magisk binari
 # are all in PATH for apps and shell to access them
 
 # Other crazy stuffs are stored in this directory
-MAGISKTMP=/sbin/.core
+MAGISKTMP=/sbin/.magisk
 
 # Magisk BusyBox path
 BBPATH=$MAGISKTMP/busybox
@@ -58,7 +58,13 @@ The solution of both situations above is to use `/data/magisk` when `/data/adb` 
 ```
 SECURE_DIR=/data/adb
 
-# Magisk image, storing modules and scripts
+# Folder storing scripts that should be executed in post-fs-data mode
+POSTFSDATA_DIR=$SECURE_DIR/post-fs-data.d
+
+# Folder storing scripts that should be executed in service mode
+SERVICE_DIR=$SECURE_DIR/service.d
+
+# Magisk image, storing modules
 MAINIMG=$SECURE_DIR/magisk.img
 
 # The image to store updated modules when installing
@@ -82,21 +88,7 @@ SIMPLEMOUNT=$SECURE_DIR/magisk_simple
 ```
 
 ### Paths in `$MAINIMG`
-Each folder in `$MAINIMG` is a Magisk module, except the folder `.core` which stores files that are unrelated to any modules.
-
-```
-# The directory storing all non-module files
-COREDIR=$MOUNTPATH/.core
-
-# MagiskHide hidelist
-HIDELIST=$COREDIR/hidelist
-
-# Folder storing scripts that should be executed in post-fs-data mode
-POSTFSDATA_DIR=$COREDIR/post-fs-data.d
-
-# Folder storing scripts that should be executed in service mode
-SERVICE_DIR=$COREDIR/service.d
-```
+Each folder in `$MAINIMG` is a Magisk module. There used to be a folder `.core`, which is no longer used since v18.0.
 
 ### Final Words
 The file structure of Magisk is designed in a weird and overly complicated way. But all of these quirks are done to properly support hiding modifications from detection. These design choices are mostly what makes Magisk difficult to implement properly and maintain.

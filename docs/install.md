@@ -86,7 +86,7 @@ chmod 755 /sbin
 chcon u:object_r:magisk_file:s0 /sbin
 
 # Add files to /sbin
-./magiskpolicy -x magisk /sbin/magisk
+./magiskinit -x magisk /sbin/magisk
 cp -a magiskpolicy /sbin
 /sbin/magisk --install /sbin
 
