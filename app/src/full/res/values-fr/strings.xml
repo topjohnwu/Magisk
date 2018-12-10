@@ -124,7 +124,7 @@
     <string name="env_fix_msg">Votre appareil a besoin d\'une configuration supplémentaire pour que Magisk fonctionne correctement. Il téléchargera le zip d\'installation de Magisk, voulez-vous procéder maintenant ?</string>
     <string name="setup_title">Installation Additionnel</string>
     <string name="setup_msg">Démarrer l\'installation de l\'environnement…</string>
-    <string name="downloading_toast">Téléchargement à %1$s</string>
+    <string name="downloading_toast">Téléchargement de %1$s</string>
     <string name="no_rw_storage">Cette fonctionnalité ne marchera pas sans la permission d\'écriture sur le stockage externe.</string>
 
     <!--Settings Activity -->
