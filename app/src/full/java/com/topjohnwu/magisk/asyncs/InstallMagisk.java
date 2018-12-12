@@ -15,8 +15,9 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
+import com.topjohnwu.net.DownloadProgressListener;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.internal.NOPList;
@@ -34,15 +35,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.List;
-
-import androidx.annotation.NonNull;
 
 public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
@@ -86,68 +83,39 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         }
     }
 
-    private class ProgressStream extends FilterInputStream {
+    class ProgressLog implements DownloadProgressListener {
 
         private int prev = -1;
-        private int progress = 0;
-        private int total;
+        private int location;
 
-        private ProgressStream(HttpURLConnection conn) throws IOException {
-            super(conn.getInputStream());
-            total = conn.getContentLength();
-            console.add("... 0%");
-        }
-
-        private void update(int step) {
-            progress += step;
-            int curr = (int) (100 * (double) progress / total);
+        @Override
+        public void onProgress(long bytesDownloaded, long totalBytes) {
+            if (prev < 0) {
+                location = console.size();
+                console.add("... 0%");
+            }
+            int curr = (int) (100 * bytesDownloaded / totalBytes);
             if (prev != curr) {
                 prev = curr;
-                console.set(console.size() - 1, "... " + prev + "%");
+                console.set(location, "... " + prev + "%");
             }
-        }
-
-        @Override
-        public int read() throws IOException {
-            int b = super.read();
-            if (b > 0)
-                update(1);
-            return b;
-        }
-
-        @Override
-        public int read(@NonNull byte[] b) throws IOException {
-            return read(b, 0, b.length);
-        }
-
-        @Override
-        public int read(@NonNull byte[] b, int off, int len) throws IOException {
-            int step = super.read(b, off, len);
-            if (step > 0)
-                update(step);
-            return step;
         }
     }
 
     private void extractFiles(String arch) throws IOException {
         File zip = new File(mm.getFilesDir(), "magisk.zip");
-        BufferedInputStream buf;
 
         if (!ShellUtils.checkSum("MD5", zip, Data.magiskMD5)) {
             console.add("- Downloading zip");
-            HttpURLConnection conn = WebService.mustRequest(Data.magiskLink);
-            buf = new BufferedInputStream(new ProgressStream(conn), conn.getContentLength());
-            buf.mark(conn.getContentLength() + 1);
-            try (OutputStream out = new FileOutputStream(zip)) {
-                ShellUtils.pump(buf, out);
-            }
-            buf.reset();
-            conn.disconnect();
+            Networking.get(Data.magiskLink)
+                    .setDownloadProgressListener(new ProgressLog())
+                    .execForFile(zip);
         } else {
             console.add("- Existing zip found");
-            buf = new BufferedInputStream(new FileInputStream(zip), (int) zip.length());
-            buf.mark((int) zip.length() + 1);
         }
+
+        BufferedInputStream buf = new BufferedInputStream(new FileInputStream(zip), (int) zip.length());
+        buf.mark((int) zip.length() + 1);
 
         console.add("- Extracting files");
         try (InputStream in = buf) {

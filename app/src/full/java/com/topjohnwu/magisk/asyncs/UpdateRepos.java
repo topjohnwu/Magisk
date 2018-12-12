@@ -3,15 +3,15 @@ package com.topjohnwu.magisk.asyncs;
 import android.database.Cursor;
 import android.os.AsyncTask;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.common.ANRequest;
-import com.androidnetworking.common.ANResponse;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.net.Networking;
+import com.topjohnwu.net.Request;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,22 +84,23 @@ public class UpdateRepos {
      * first page is updated to determine whether the online repo database is changed
      */
     private boolean loadPage(int page) {
-        ANRequest.GetRequestBuilder req = AndroidNetworking.get(Const.Url.REPO_URL)
-                .addQueryParameter("page", String.valueOf(page + 1));
+        Request req = Networking.get(Utils.fmt(Const.Url.REPO_URL, page + 1));
         if (page == 0) {
             String etag = mm.prefs.getString(Const.Key.ETAG_KEY, null);
             if (etag != null)
                 req.addHeaders(Const.Key.IF_NONE_MATCH, etag);
         }
-        ANResponse<JSONArray> res = req.build().executeForJSONArray();
-        // Network drop
-        if (res.getOkHttpResponse() == null)
-            return true;
+        Request.Result<JSONArray> res = req.execForJSONArray();
         // JSON not updated
-        if (res.getOkHttpResponse().code() == HttpURLConnection.HTTP_NOT_MODIFIED)
+        if (res.getCode() == HttpURLConnection.HTTP_NOT_MODIFIED)
             return false;
+        // Network error
+        if (res.getResult() == null) {
+            cached.clear();
+            return true;
+        }
         // Current page is the last page
-        if (res.getResult() == null || res.getResult().length() == 0)
+        if (res.getResult().length() == 0)
             return true;
 
         try {
@@ -111,14 +112,14 @@ public class UpdateRepos {
 
         // Update ETAG
         if (page == 0) {
-            String etag = res.getOkHttpResponse().header(Const.Key.ETAG_KEY);
+            String etag = res.getConnection().getHeaderField(Const.Key.ETAG_KEY);
             if (etag != null) {
                 etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
                 mm.prefs.edit().putString(Const.Key.ETAG_KEY, etag).apply();
             }
         }
 
-        String links = res.getOkHttpResponse().header(Const.Key.LINK_KEY);
+        String links = res.getConnection().getHeaderField(Const.Key.LINK_KEY);
         return links == null || !links.contains("next") || loadPage(page + 1);
     }
 

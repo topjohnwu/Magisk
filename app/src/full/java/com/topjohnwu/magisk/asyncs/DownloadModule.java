@@ -12,18 +12,15 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.ProgressNotification;
 import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.magisk.utils.WebService;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.ShellUtils;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -40,12 +37,10 @@ public class DownloadModule {
         ProgressNotification progress = new ProgressNotification(output.getName());
         try {
             MagiskManager mm = Data.MM();
-            HttpURLConnection conn = WebService.mustRequest(repo.getZipUrl());
-            ProgressInputStream pis = new ProgressInputStream(conn.getInputStream(),
-                    conn.getContentLength(), progress);
-            removeTopFolder(new BufferedInputStream(pis),
-                    new BufferedOutputStream(new FileOutputStream(output)));
-            conn.disconnect();
+            InputStream in = Networking.get(repo.getZipUrl())
+                    .setDownloadProgressListener(progress)
+                    .execForInputStream().getResult();
+            removeTopFolder(in, new BufferedOutputStream(new FileOutputStream(output)));
             if (install) {
                 progress.dismiss();
                 Intent intent = new Intent(mm, Data.classMap.get(FlashActivity.class));
@@ -81,45 +76,4 @@ public class DownloadModule {
         }
     }
 
-    private static class ProgressInputStream extends FilterInputStream {
-
-        private long totalBytes;
-        private long bytesDownloaded;
-        private ProgressNotification progress;
-
-        protected ProgressInputStream(InputStream in, long size, ProgressNotification p) {
-            super(in);
-            totalBytes = size;
-            progress = p;
-        }
-
-        private void updateProgress() {
-            progress.onProgress(bytesDownloaded, totalBytes);
-        }
-
-        @Override
-        public int read() throws IOException {
-            int b = super.read();
-            if (b >= 0) {
-                bytesDownloaded++;
-                updateProgress();
-            }
-            return b;
-        }
-
-        @Override
-        public int read(byte[] b) throws IOException {
-            return read(b, 0, b.length);
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            int sz = super.read(b, off, len);
-            if (sz > 0) {
-                bytesDownloaded += sz;
-                updateProgress();
-            }
-            return sz;
-        }
-    }
 }

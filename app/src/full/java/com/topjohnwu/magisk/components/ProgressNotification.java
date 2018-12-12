@@ -2,17 +2,16 @@ package com.topjohnwu.magisk.components;
 
 import android.widget.Toast;
 
-import com.androidnetworking.interfaces.DownloadProgressListener;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.net.DownloadProgressListener;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 public class ProgressNotification implements DownloadProgressListener {
-
     private NotificationManagerCompat mgr;
     private NotificationCompat.Builder builder;
     private long prevTime;

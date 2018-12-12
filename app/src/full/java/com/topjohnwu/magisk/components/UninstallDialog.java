@@ -7,14 +7,12 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.DownloadListener;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
@@ -44,25 +42,17 @@ public class UninstallDialog extends CustomAlertDialog {
             setPositiveButton(R.string.complete_uninstall, (d, i) -> {
                 File zip = new File(activity.getFilesDir(), "uninstaller.zip");
                 ProgressNotification progress = new ProgressNotification(zip.getName());
-                AndroidNetworking.download(Data.uninstallerLink, zip.getParent(), zip.getName())
-                    .build()
+                Networking.get(Data.uninstallerLink)
                     .setDownloadProgressListener(progress)
-                    .startDownload(new DownloadListener() {
-                        @Override
-                        public void onDownloadComplete() {
-                            progress.dismiss();
-                            Intent intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .setData(Uri.fromFile(zip))
-                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL);
-                            activity.startActivity(intent);
-                        }
-
-                        @Override
-                        public void onError(ANError anError) {
-                            progress.dlFail();
-                        }
-                    });
+                    .setErrorHandler(((conn, e) -> progress.dlFail()))
+                    .getAsFile(f -> {
+                        progress.dismiss();
+                        Intent intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .setData(Uri.fromFile(f))
+                                .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL);
+                        activity.startActivity(intent);
+                    }, zip);
             });
         }
     }

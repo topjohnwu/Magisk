@@ -5,16 +5,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.DownloadListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.net.Networking;
 
+import java.io.File;
 import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
@@ -67,25 +66,17 @@ class InstallMethodDialog extends AlertDialog.Builder {
         a.runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
             String filename = Utils.fmt("Magisk-v%s(%d).zip",
                     Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
+            File zip = new File(Const.EXTERNAL_PATH, filename);
             ProgressNotification progress = new ProgressNotification(filename);
-            AndroidNetworking
-                    .download(Data.magiskLink, Const.EXTERNAL_PATH.getPath(), filename)
-                    .build()
+            Networking.get(Data.magiskLink)
                     .setDownloadProgressListener(progress)
-                    .startDownload(new DownloadListener() {
-                        @Override
-                        public void onDownloadComplete() {
-                            progress.dlDone();
-                            SnackbarMaker.make(a,
+                    .setErrorHandler(((conn, e) -> progress.dlFail()))
+                    .getAsFile(f -> {
+                        progress.dlDone();
+                        SnackbarMaker.make(a,
                                 a.getString(R.string.internal_storage, "/Download/" + filename),
                                 Snackbar.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onError(ANError anError) {
-                            progress.dlFail();
-                        }
-                    });
+                    }, zip);
         });
     }
 

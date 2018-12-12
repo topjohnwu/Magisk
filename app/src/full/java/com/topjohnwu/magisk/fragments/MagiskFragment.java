@@ -20,8 +20,8 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
+import com.topjohnwu.magisk.asyncs.SafetyNet;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
@@ -91,10 +91,10 @@ public class MagiskFragment extends BaseFragment
             safetyNetProgress.setVisibility(View.VISIBLE);
             safetyNetRefreshIcon.setVisibility(View.GONE);
             safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-            new CheckSafetyNet(requireActivity()).exec();
+            SafetyNet.check(requireActivity());
             collapse();
         };
-        if (!CheckSafetyNet.dexPath.exists()) {
+        if (!SafetyNet.EXT_APK.exists()) {
             // Show dialog
             new CustomAlertDialog(requireActivity())
                     .setTitle(R.string.proprietary_title)

@@ -16,7 +16,6 @@ import android.os.AsyncTask;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
-import com.androidnetworking.AndroidNetworking;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
@@ -24,6 +23,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
 import com.topjohnwu.magisk.services.UpdateCheckService;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
@@ -152,7 +152,7 @@ public class Utils {
     }
 
     public static String dlString(String url) {
-        String s = (String) AndroidNetworking.get(url).build().executeForString().getResult();
+        String s = Networking.get(url).execForString().getResult();
         return s == null ? "" : s;
     }
 }

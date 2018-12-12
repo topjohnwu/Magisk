@@ -1,13 +1,12 @@
 package com.topjohnwu.magisk.asyncs;
 
-import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.net.Networking;
+import com.topjohnwu.net.ResponseListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,14 +56,14 @@ public class CheckUpdates {
             default:
                 return;
         }
-        AndroidNetworking.get(url).build().getAsJSONObject(new UpdateListener(cb));
+        Networking.get(url).getAsJSONObject(new UpdateListener(cb));
     }
 
     public static void check() {
         check(null);
     }
 
-    private static class UpdateListener implements JSONObjectRequestListener {
+    private static class UpdateListener implements ResponseListener<JSONObject> {
 
         private Runnable cb;
 
@@ -100,8 +99,5 @@ public class CheckUpdates {
             }
             Topic.publish(Topic.UPDATE_CHECK_DONE);
         }
-
-        @Override
-        public void onError(ANError anError) {}
     }
 }
