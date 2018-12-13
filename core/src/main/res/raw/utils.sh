@@ -63,9 +63,9 @@ restore_imgs() {
 post_ota() {
   cd $1
   chmod 755 bootctl
-  ../../../../../app/src/full/res/raw/bootctl hal-info || return
-  [ `../../../../../app/src/full/res/raw/bootctl get-current-slot` -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
-  ../../../../../app/src/full/res/raw/bootctl set-active-boot-slot $SLOT_NUM
+  ./bootctl hal-info || return
+  [ `./bootctl get-current-slot` -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
+  ./bootctl set-active-boot-slot $SLOT_NUM
   echo '${0%/*}/../bootctl mark-boot-successful;rm -f ${0%/*}/../bootctl $0' > post-fs-data.d/post_ota.sh
   chmod 755 post-fs-data.d/post_ota.sh
   cd /

@@ -23,7 +23,7 @@ import java.util.Map;
 public class MagiskDB {
 
     private static final String POLICY_TABLE = "policies";
-    private static final String LOG_TABLE = "err";
+    private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
     private static final String STRINGS_TABLE = "strings";
 

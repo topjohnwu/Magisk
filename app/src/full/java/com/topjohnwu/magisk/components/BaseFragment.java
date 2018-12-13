@@ -10,12 +10,8 @@ import butterknife.Unbinder;
 
 public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
-    public App app;
+    public App app = App.self;
     protected Unbinder unbinder = null;
-
-    public BaseFragment() {
-        app = App.self;
-    }
 
     @Override
     public void onResume() {
