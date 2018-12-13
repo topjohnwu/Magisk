@@ -9,12 +9,13 @@ import android.os.Process;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.container.Policy;
+import com.topjohnwu.core.container.SuLogEntry;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.container.Policy;
-import com.topjohnwu.magisk.container.SuLogEntry;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -76,8 +77,8 @@ public abstract class SuConnector {
         if (fromUid < 0) return;
         if (fromUid == Process.myUid()) return;
 
-        MagiskManager mm = Data.MM();
-        PackageManager pm = mm.getPackageManager();
+        App app = App.self;
+        PackageManager pm = app.getPackageManager();
         Policy policy;
 
         boolean notify;
@@ -91,7 +92,7 @@ public abstract class SuConnector {
             }
         } else {
             // Doesn't report whether notify or not, check database ourselves
-            policy = mm.mDB.getPolicy(fromUid);
+            policy = app.mDB.getPolicy(fromUid);
             if (policy == null)
                 return;
             notify = policy.notification;
@@ -116,24 +117,22 @@ public abstract class SuConnector {
         log.fromPid = pid;
         log.command = command;
         log.date = new Date();
-        mm.mDB.addLog(log);
+        app.mDB.addLog(log);
     }
 
     private static void handleNotify(Policy policy) {
-        MagiskManager mm = Data.MM();
-        String message = mm.getString(policy.policy == Policy.ALLOW ?
+        String message = App.self.getString(policy.policy == Policy.ALLOW ?
                 R.string.su_allow_toast : R.string.su_deny_toast, policy.appName);
         if (policy.notification && Data.suNotificationType == Const.Value.NOTIFICATION_TOAST)
             Utils.toast(message, Toast.LENGTH_SHORT);
     }
 
     public static void handleNotify(Intent intent) {
-        MagiskManager mm = Data.MM();
         int fromUid = intent.getIntExtra("from.uid", -1);
         if (fromUid < 0) return;
         if (fromUid == Process.myUid()) return;
         try {
-            Policy policy = new Policy(fromUid, mm.getPackageManager());
+            Policy policy = new Policy(fromUid, App.self.getPackageManager());
             policy.policy = intent.getIntExtra("policy", -1);
             if (policy.policy >= 0)
                 handleNotify(policy);

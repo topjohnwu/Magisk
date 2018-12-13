@@ -1,16 +1,16 @@
 package com.topjohnwu.magisk.components;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 
 import java.io.File;
@@ -33,7 +33,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     downloadOnly(activity);
                     break;
                 case 2:
-                    intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                    intent = new Intent(activity, ClassMap.get(FlashActivity.class))
                             .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
                     activity.startActivity(intent);
                     break;
@@ -48,13 +48,13 @@ class InstallMethodDialog extends AlertDialog.Builder {
     private void patchBoot(BaseActivity a) {
         Utils.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
-        a.runWithPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, () ->
+        a.runWithExternalRW(() ->
                 a.startActivityForResult(intent, Const.ID.SELECT_BOOT,
                         (requestCode, resultCode, data) -> {
                             if (requestCode == Const.ID.SELECT_BOOT &&
                                     resultCode == Activity.RESULT_OK && data != null) {
-                                Intent i = new Intent(a, Data.classMap.get(FlashActivity.class))
-                                        .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
+                                Intent i = new Intent(a, ClassMap.get(FlashActivity.class))
+                                        .setData(data.getData())
                                         .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
                                 a.startActivity(i);
                             }
@@ -63,7 +63,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
     }
 
     private void downloadOnly(BaseActivity a) {
-        a.runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
+        a.runWithExternalRW(() -> {
             String filename = Utils.fmt("Magisk-v%s(%d).zip",
                     Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
             File zip = new File(Const.EXTERNAL_PATH, filename);
@@ -86,7 +86,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                 .setMessage(R.string.install_inactive_slot_msg)
                 .setCancelable(true)
                 .setPositiveButton(R.string.yes, (d, i) -> {
-                    Intent intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                    Intent intent = new Intent(activity, ClassMap.get(FlashActivity.class))
                             .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
                     activity.startActivity(intent);
                 })

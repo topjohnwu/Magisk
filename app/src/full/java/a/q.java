@@ -1,7 +1,7 @@
 package a;
 
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.core.App;
 
-public class q extends MagiskManager {
+public class q extends App {
     /* stub */
 }

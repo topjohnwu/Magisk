@@ -6,12 +6,6 @@ import android.net.NetworkInfo;
 
 public class Download {
 
-    public static String getLegalFilename(CharSequence filename) {
-        return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
-                .replace("$", "").replace("`", "").replace("*", "").replace("/", "_")
-                .replace("#", "").replace("@", "").replace("\\", "_");
-    }
-
     public static boolean checkNetworkStatus(Context context) {
         ConnectivityManager manager = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);

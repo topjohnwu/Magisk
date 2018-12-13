@@ -15,11 +15,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.topjohnwu.magisk.Const;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.io.File;

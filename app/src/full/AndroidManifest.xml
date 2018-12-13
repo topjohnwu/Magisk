@@ -40,9 +40,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor"
             android:theme="@style/AppTheme.StatusBar" />
-        <activity
-            android:name="a.g"
-            android:theme="@style/AppTheme.Translucent" />
 
         <!-- Superuser -->
 

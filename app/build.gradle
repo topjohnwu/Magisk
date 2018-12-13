@@ -73,6 +73,7 @@ dependencies {
     implementation 'androidx.core:core:1.0.1'
     implementation project(':net')
     fullImplementation project(':utils')
+    fullImplementation project(':core')
     fullImplementation 'androidx.appcompat:appcompat:1.0.2'
     fullImplementation "androidx.preference:preference:${rootProject.ext.androidXVersion}"
     fullImplementation "androidx.recyclerview:recyclerview:${rootProject.ext.androidXVersion}"

@@ -4,12 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.SuRequestActivity;
 import com.topjohnwu.magisk.services.OnBootService;
-import com.topjohnwu.magisk.utils.DlInstallManager;
+import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.SuConnector;
 import com.topjohnwu.superuser.Shell;
 
@@ -21,7 +22,7 @@ public class GeneralReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        MagiskManager mm = Data.MM();
+        App app = App.self;
         if (intent == null)
             return;
         String action = intent.getAction();
@@ -34,10 +35,10 @@ public class GeneralReceiver extends BroadcastReceiver {
                     bootAction = "boot";
                 switch (bootAction) {
                     case "request":
-                        Intent i = new Intent(mm, Data.classMap.get(SuRequestActivity.class))
+                        Intent i = new Intent(app, ClassMap.get(SuRequestActivity.class))
                                 .putExtra("socket", intent.getStringExtra("socket"))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mm.startActivity(i);
+                        app.startActivity(i);
                         break;
                     case "log":
                         SuConnector.handleLogs(intent);
@@ -48,24 +49,24 @@ public class GeneralReceiver extends BroadcastReceiver {
                     case "boot":
                     default:
                         /* The actual on-boot trigger */
-                        OnBootService.enqueueWork(mm);
+                        OnBootService.enqueueWork(app);
                         break;
                 }
                 break;
             case Intent.ACTION_PACKAGE_REPLACED:
                 // This will only work pre-O
-                if (mm.prefs.getBoolean(Const.Key.SU_REAUTH, false)) {
-                    mm.mDB.deletePolicy(getPkg(intent));
+                if (app.prefs.getBoolean(Const.Key.SU_REAUTH, false)) {
+                    app.mDB.deletePolicy(getPkg(intent));
                 }
                 break;
             case Intent.ACTION_PACKAGE_FULLY_REMOVED:
                 String pkg = getPkg(intent);
-                mm.mDB.deletePolicy(pkg);
+                app.mDB.deletePolicy(pkg);
                 Shell.su("magiskhide --rm " + pkg).submit();
                 break;
             case Const.Key.BROADCAST_MANAGER_UPDATE:
                 Data.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK);
-                DlInstallManager.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME));
+                DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME));
                 break;
             case Const.Key.BROADCAST_REBOOT:
                 Shell.su("/system/bin/reboot").submit();

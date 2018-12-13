@@ -10,19 +10,20 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.tasks.CheckUpdates;
+import com.topjohnwu.core.utils.LocaleManager;
+import com.topjohnwu.core.utils.Topic;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.BuildConfig;
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.asyncs.CheckUpdates;
-import com.topjohnwu.magisk.asyncs.PatchAPK;
-import com.topjohnwu.magisk.utils.DlInstallManager;
+import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.Download;
+import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
-import com.topjohnwu.magisk.utils.LocaleManager;
-import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.PatchAPK;
 import com.topjohnwu.superuser.Shell;
 
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener,
         Topic.Subscriber, Topic.AutoSubscriber {
 
-    private MagiskManager mm;
+    private App app = App.self;
 
     private ListPreference updateChannel, autoRes, suNotification,
             requestTimeout, rootConfig, multiuserConfig, nsConfig;
@@ -52,10 +53,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
     private boolean showSuperuser;
 
     private void prefsSync() {
-        rootState = mm.mDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
-        namespaceState = mm.mDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
+        rootState = app.mDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
+        namespaceState = app.mDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
         showSuperuser = Utils.showSuperUser();
-        mm.prefs.edit()
+        app.prefs.edit()
                 .putString(Const.Key.ROOT_ACCESS, String.valueOf(rootState))
                 .putString(Const.Key.SU_MNT_NS, String.valueOf(namespaceState))
                 .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(Data.multiuserState))
@@ -65,7 +66,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        mm = Data.MM();
         prefsSync();
 
         setPreferencesFromResource(R.xml.app_settings, rootKey);
@@ -82,12 +82,12 @@ public class SettingsFragment extends PreferenceFragmentCompat
         });
         Preference restoreManager = findPreference("restore");
         restoreManager.setOnPreferenceClickListener(pref -> {
-            DlInstallManager.restore();
+            DownloadApp.restore();
             return true;
         });
         findPreference("clear").setOnPreferenceClickListener(pref -> {
-            mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
-            mm.repoDB.clearRepo();
+            app.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
+            app.repoDB.clearRepo();
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
         });
@@ -114,17 +114,17 @@ public class SettingsFragment extends PreferenceFragmentCompat
             if (channel == Const.Value.CUSTOM_CHANNEL) {
                 View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                 EditText url = v.findViewById(R.id.custom_url);
-                url.setText(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
+                url.setText(app.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                 new AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
                         .setPositiveButton(R.string.ok, (d, i) ->
-                                mm.prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
+                                app.prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
                                         url.getText().toString()).apply())
                         .setNegativeButton(R.string.close, (d, i) ->
-                                mm.prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
+                                app.prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
                         .setOnCancelListener(d ->
-                                mm.prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
+                                app.prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
                         .show();
             }
             return true;
@@ -152,10 +152,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
         }
 
         if (Shell.rootAccess() && Const.USER_ID == 0) {
-            if (mm.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+            if (app.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
                 generalCatagory.removePreference(restoreManager);
             } else {
-                if (!Download.checkNetworkStatus(mm))
+                if (!Download.checkNetworkStatus(app))
                     generalCatagory.removePreference(restoreManager);
                 generalCatagory.removePreference(hideManager);
             }
@@ -191,7 +191,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mm.prefs.registerOnSharedPreferenceChangeListener(this);
+        app.prefs.registerOnSharedPreferenceChangeListener(this);
         Topic.subscribe(this);
         requireActivity().setTitle(R.string.settings);
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -199,7 +199,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void onDestroyView() {
-        mm.prefs.unregisterOnSharedPreferenceChangeListener(this);
+        app.prefs.unregisterOnSharedPreferenceChangeListener(this);
         Topic.unsubscribe(this);
         super.onDestroyView();
     }
@@ -210,7 +210,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
             case Const.Key.ROOT_ACCESS:
             case Const.Key.SU_MULTIUSER_MODE:
             case Const.Key.SU_MNT_NS:
-                mm.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
+                app.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
                 break;
         }
         switch (key) {
@@ -244,7 +244,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 }
                 break;
             case Const.Key.LOCALE:
-                LocaleManager.setLocale(mm);
+                LocaleManager.setLocale(app);
                 requireActivity().recreate();
                 break;
             case Const.Key.UPDATE_CHANNEL:
@@ -252,7 +252,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 CheckUpdates.check();
                 break;
             case Const.Key.CHECK_UPDATES:
-                Utils.setupUpdateCheck();
+                AppUtils.setupUpdateCheck();
                 break;
         }
         Data.loadConfig();
@@ -268,7 +268,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 ((SwitchPreference) preference).setChecked(!checked);
                 FingerprintHelper.showAuthDialog(requireActivity(), () -> {
                     ((SwitchPreference) preference).setChecked(checked);
-                    mm.mDB.setSettings(key, checked ? 1 : 0);
+                    app.mDB.setSettings(key, checked ? 1 : 0);
                 });
                 break;
         }
@@ -286,7 +286,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 .getStringArray(R.array.su_notification)[Data.suNotificationType]);
         requestTimeout.setSummary(
                 getString(R.string.request_timeout_summary,
-                        mm.prefs.getString(Const.Key.SU_REQUEST_TIMEOUT, "10")));
+                        app.prefs.getString(Const.Key.SU_REQUEST_TIMEOUT, "10")));
         multiuserConfig.setSummary(getResources()
                 .getStringArray(R.array.multiuser_summary)[Data.multiuserState]);
         nsConfig.setSummary(getResources()

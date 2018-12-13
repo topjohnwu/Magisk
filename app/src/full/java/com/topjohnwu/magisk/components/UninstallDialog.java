@@ -7,11 +7,12 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
@@ -47,7 +48,7 @@ public class UninstallDialog extends CustomAlertDialog {
                     .setErrorHandler(((conn, e) -> progress.dlFail()))
                     .getAsFile(f -> {
                         progress.dismiss();
-                        Intent intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                        Intent intent = new Intent(activity, ClassMap.get(FlashActivity.class))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 .setData(Uri.fromFile(f))
                                 .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL);

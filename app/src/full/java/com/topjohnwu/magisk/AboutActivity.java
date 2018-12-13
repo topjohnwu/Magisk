@@ -5,10 +5,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.topjohnwu.magisk.asyncs.MarkDownWindow;
+import com.topjohnwu.core.Const;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.components.MarkDownWindow;
+import com.topjohnwu.magisk.utils.AppUtils;
 
 import java.util.Locale;
 
@@ -62,9 +63,9 @@ public class AboutActivity extends BaseActivity {
             appTranslators.setSummary(translators);
         }
 
-        appSourceCode.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.SOURCE_CODE_URL)));
-        supportThread.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.XDA_THREAD)));
-        twitter.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.TWITTER_URL)));
+        appSourceCode.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.SOURCE_CODE_URL)));
+        supportThread.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.XDA_THREAD)));
+        twitter.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.TWITTER_URL)));
 
         setFloating();
     }

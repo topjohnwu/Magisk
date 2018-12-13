@@ -11,14 +11,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.topjohnwu.core.container.Module;
+import com.topjohnwu.core.container.Repo;
+import com.topjohnwu.core.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.asyncs.DownloadModule;
-import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
-import com.topjohnwu.magisk.container.Module;
-import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.magisk.database.RepoDatabaseHelper;
+import com.topjohnwu.magisk.components.MarkDownWindow;
+import com.topjohnwu.magisk.utils.DownloadModule;
 
 import java.util.ArrayList;
 import java.util.List;

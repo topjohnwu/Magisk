@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk;
 
-import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,18 +11,22 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.asyncs.FlashZip;
-import com.topjohnwu.magisk.asyncs.InstallMagisk;
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.tasks.FlashZip;
+import com.topjohnwu.core.tasks.MagiskInstaller;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,7 +43,7 @@ public class FlashActivity extends BaseActivity {
     @BindView(R.id.reboot) public Button reboot;
     @BindView(R.id.scrollView) ScrollView sv;
 
-    private List<String> logs;
+    private List<String> console, logs;
 
     @OnClick(R.id.reboot)
     void reboot() {
@@ -49,7 +52,7 @@ public class FlashActivity extends BaseActivity {
 
     @OnClick(R.id.save_logs)
     void saveLogs() {
-        runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
+        runWithExternalRW(() -> {
             Calendar now = Calendar.getInstance();
             String filename = String.format(Locale.US,
                     "magisk_install_log_%04d%02d%02d_%02d%02d%02d.log",
@@ -69,6 +72,17 @@ public class FlashActivity extends BaseActivity {
             }
             Utils.toast(logFile.getPath(), Toast.LENGTH_LONG);
         });
+    }
+
+    @OnClick(R.id.close)
+    @Override
+    public void finish() {
+        super.finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Prevent user accidentally press back button
     }
 
     @Override
@@ -92,77 +106,155 @@ public class FlashActivity extends BaseActivity {
         if (!Shell.rootAccess())
             reboot.setVisibility(View.GONE);
 
-        logs = new ArrayList<>();
-        CallbackList<String> console = new CallbackList<String>(new ArrayList<>()) {
+        logs = Collections.synchronizedList(new ArrayList<>());
+        console = new ConsoleList();
 
-            private void updateUI() {
-                flashLogs.setText(TextUtils.join("\n", this));
-                sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
-            }
-
-            @Override
-            public void onAddElement(String s) {
-                logs.add(s);
-                updateUI();
-            }
-
-            @Override
-            public String set(int i, String s) {
-                String ret = super.set(i, s);
-                Data.mainHandler.post(this::updateUI);
-                return ret;
-            }
-        };
-
-        // We must receive a Uri of the target zip
         Intent intent = getIntent();
         Uri uri = intent.getData();
 
         switch (intent.getStringExtra(Const.Key.FLASH_ACTION)) {
             case Const.Value.FLASH_ZIP:
-                new FlashZip(this, uri, console, logs).exec();
+                new FlashModule(uri).exec();
                 break;
             case Const.Value.UNINSTALL:
-                new UninstallMagisk(this, uri, console, logs).exec();
+                new Uninstall(uri).exec();
                 break;
             case Const.Value.FLASH_MAGISK:
-                new InstallMagisk(this, console, logs, InstallMagisk.DIRECT_MODE).exec();
+                new DirectInstall().exec();
                 break;
             case Const.Value.FLASH_INACTIVE_SLOT:
-                new InstallMagisk(this, console, logs, InstallMagisk.SECOND_SLOT_MODE).exec();
+                new SecondSlot().exec();
                 break;
             case Const.Value.PATCH_BOOT:
-                new InstallMagisk(this, console, logs,
-                        intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec();
+                new PatchBoot(uri).exec();
                 break;
         }
     }
 
-    @OnClick(R.id.close)
-    @Override
-    public void finish() {
-        super.finish();
-    }
+    private class ConsoleList extends CallbackList<String> {
 
-    @Override
-    public void onBackPressed() {
-        // Prevent user accidentally press back button
-    }
+        ConsoleList() {
+            super(new ArrayList<>());
+        }
 
-    private static class UninstallMagisk extends FlashZip {
-
-        private UninstallMagisk(BaseActivity context, Uri uri, List<String> console, List<String> logs) {
-            super(context, uri, console, logs);
+        private void updateUI() {
+            flashLogs.setText(TextUtils.join("\n", this));
+            sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
         }
 
         @Override
-        protected void onPostExecute(Integer result) {
-            if (result == 1) {
-                Data.mainHandler.postDelayed(() ->
-                        Shell.su("pm uninstall " + getActivity().getPackageName()).exec(), 3000);
-            } else {
-                super.onPostExecute(result);
-            }
+        public void onAddElement(String s) {
+            logs.add(s);
+            updateUI();
+        }
+
+        @Override
+        public String set(int i, String s) {
+            String ret = super.set(i, s);
+            App.mainHandler.post(this::updateUI);
+            return ret;
         }
     }
+
+    private class FlashModule extends FlashZip {
+
+        FlashModule(Uri uri) {
+            super(uri, console, logs);
+        }
+
+        @Override
+        protected void onResult(boolean success) {
+            if (success) {
+                Utils.loadModules();
+            } else {
+                console.add("! Installation failed");
+                reboot.setVisibility(View.GONE);
+            }
+            buttonPanel.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class Uninstall extends FlashModule {
+
+        Uninstall(Uri uri) {
+            super(uri);
+        }
+
+        @Override
+        protected void onResult(boolean success) {
+            if (success)
+                App.mainHandler.postDelayed(Shell.su("pm uninstall " + getPackageName())::exec, 3000);
+            else
+                super.onResult(false);
+        }
+    }
+
+    private abstract class BaseInstaller extends MagiskInstaller {
+        BaseInstaller() {
+            super(console, logs);
+        }
+
+        @Override
+        protected void onResult(boolean success) {
+            if (success) {
+                console.add("- All done!");
+            } else {
+                Shell.sh("rm -rf " + installDir).submit();
+                console.add("! Installation failed");
+                reboot.setVisibility(View.GONE);
+            }
+            buttonPanel.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class DirectInstall extends BaseInstaller {
+
+        @Override
+        protected boolean operations() {
+            console.add("- Detecting target image");
+            srcBoot = ShellUtils.fastCmd("find_boot_image", "echo \"$BOOTIMAGE\"");
+            if (srcBoot.isEmpty()) {
+                console.add("! Unable to detect target image");
+                return false;
+            }
+            return extractZip() && patchBoot() && flashBoot();
+        }
+    }
+
+    private class SecondSlot extends BaseInstaller {
+
+        @Override
+        protected boolean operations() {
+            String slot = ShellUtils.fastCmd("echo $SLOT");
+            String target = (TextUtils.equals(slot, "_a") ? "_b" : "_a");
+            console.add("- Target slot: " + target);
+            console.add("- Detecting target image");
+            srcBoot = ShellUtils.fastCmd(
+                    "SLOT=" + target,
+                    "find_boot_image",
+                    "SLOT=" + slot,
+                    "echo \"$BOOTIMAGE\""
+            );
+            if (srcBoot.isEmpty()) {
+                console.add("! Unable to detect target image");
+                return false;
+            }
+            return extractZip() && patchBoot() && flashBoot() && postOTA();
+        }
+    }
+
+    private class PatchBoot extends BaseInstaller {
+
+        private Uri uri;
+
+        PatchBoot(Uri u) {
+            uri = u;
+        }
+
+        @Override
+        protected boolean operations() {
+            return copyBoot(uri) && extractZip() && patchBoot() && storeBoot();
+        }
+    }
+
 }
