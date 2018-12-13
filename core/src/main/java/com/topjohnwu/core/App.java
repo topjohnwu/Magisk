@@ -2,6 +2,7 @@ package com.topjohnwu.core;
 
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -24,6 +25,8 @@ public class App extends ContainerApp {
     public MagiskDB mDB;
     public RepoDatabaseHelper repoDB;
 
+    private Resources mResource;
+
     public App() {
         self = this;
     }
@@ -43,6 +46,15 @@ public class App extends ContainerApp {
 
         LocaleManager.setLocale(this);
         Data.loadConfig();
+    }
+
+    @Override
+    public Resources getResources() {
+        return mResource;
+    }
+
+    public void setResources(Resources res) {
+        mResource = res;
     }
 
     @Override

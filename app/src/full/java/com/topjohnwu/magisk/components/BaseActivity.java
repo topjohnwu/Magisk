@@ -31,7 +31,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
     static int[] EMPTY_INT_ARRAY = new int[0];
 
     private ActivityResultListener activityResultListener;
-    public App app;
+    public App app = App.self;
 
     @Override
     public int[] getSubscribedTopics() {
@@ -49,7 +49,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
         Configuration config = base.getResources().getConfiguration();
         config.setLocale(LocaleManager.locale);
         applyOverrideConfiguration(config);
-        app = App.self;
     }
 
     @Override

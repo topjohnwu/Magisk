@@ -1,11 +1,13 @@
 package com.topjohnwu.core.utils;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.AsyncTask;
+import android.os.Build;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
+import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,28 +22,59 @@ public class LocaleManager {
     public final static Locale defaultLocale = Locale.getDefault();
     public static List<Locale> locales;
 
+    public static Locale forLanguageTag(String tag) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            return Locale.forLanguageTag(tag);
+        } else {
+            String[] tok = tag.split("-");
+            if (tok.length == 0) {
+                return new Locale("");
+            }
+            String language;
+            switch (tok[0]) {
+                case "und":
+                    language = ""; // Undefined
+                    break;
+                case "fil":
+                    language = "tl"; // Filipino
+                    break;
+                default:
+                    language = tok[0];
+            }
+            if ((language.length() != 2 && language.length() != 3))
+                return new Locale("");
+            if (tok.length == 1)
+                return new Locale(language);
+            String country = tok[1];
+            if (country.length() != 2 && country.length() != 3)
+                return new Locale(language);
+            return new Locale(language, country);
+        }
+    }
+
     public static void setLocale(App app) {
         String localeConfig = app.prefs.getString(Const.Key.LOCALE, "");
         if (localeConfig.isEmpty()) {
             locale = defaultLocale;
         } else {
-            locale = Locale.forLanguageTag(localeConfig);
+            locale = forLanguageTag(localeConfig);
         }
         Locale.setDefault(locale);
-        Resources res = app.getResources();
-        Configuration config = res.getConfiguration();
+        app.setResources(getLocaleContext(locale).getResources());
+    }
+
+    public static Context getLocaleContext(Locale locale) {
+        Configuration config = new Configuration(App.self.getBaseContext().getResources().getConfiguration());
         config.setLocale(locale);
-        res.updateConfiguration(config, res.getDisplayMetrics());
+        return App.self.createConfigurationContext(config);
     }
 
     public static String getString(Locale locale, @StringRes int id) {
-        Configuration config = new Configuration();
-        config.setLocale(locale);
-        return App.self.createConfigurationContext(config).getString(id);
+        return getLocaleContext(locale).getString(id);
     }
 
     public static void loadAvailableLocales(@StringRes int compareId) {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        Shell.EXECUTOR.execute(() -> {
             locales = new ArrayList<>();
             HashSet<String> set = new HashSet<>();
             Resources res = App.self.getResources();
@@ -60,7 +93,7 @@ public class LocaleManager {
 
             // Other locales
             for (String s : res.getAssets().getLocales()) {
-                locale = Locale.forLanguageTag(s);
+                locale = forLanguageTag(s);
                 if (set.add(getString(locale, compareId))) {
                     locales.add(locale);
                 }

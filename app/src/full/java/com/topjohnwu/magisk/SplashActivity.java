@@ -24,6 +24,9 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Dynamic detect all locales
+        LocaleManager.loadAvailableLocales(R.string.app_changelog);
+
         String pkg = app.mDB.getStrings(Const.Key.SU_MANAGER, null);
         if (pkg != null && getPackageName().equals(BuildConfig.APPLICATION_ID)) {
             app.mDB.setStrings(Const.Key.SU_MANAGER, null);
@@ -46,9 +49,6 @@ public class SplashActivity extends BaseActivity {
         }
 
         Data.importPrefs();
-
-        // Dynamic detect all locales
-        LocaleManager.loadAvailableLocales(R.string.download_file_error);
 
         // Create notification channel on Android O
         Notifications.setup(this);
