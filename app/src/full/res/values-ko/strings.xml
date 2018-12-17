@@ -93,8 +93,10 @@
     <string name="settings_su_adb">ADB만</string>
     <string name="settings_su_disable">사용 안 함</string>
     <string name="settings_su_request_10">10초</string>
+    <string name="settings_su_request_15">15초</string>
     <string name="settings_su_request_20">20초</string>
     <string name="settings_su_request_30">30초</string>
+    <string name="settings_su_request_45">45초</string>
     <string name="settings_su_request_60">60초</string>
     <string name="superuser_access">슈퍼유저 액세스</string>
     <string name="auto_response">자동 응답</string>
