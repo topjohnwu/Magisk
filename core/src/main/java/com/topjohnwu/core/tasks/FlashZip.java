@@ -70,12 +70,14 @@ public abstract class FlashZip {
 
     public void exec() {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
-            boolean success = false;
             try {
-                success = flash();
-            } catch (IOException ignored) {}
-            Shell.su("cd /", "rm -rf " + tmpFile.getParent() + " " + Const.TMP_FOLDER_PATH).submit();
-            onResult(success);
+                boolean success = flash();
+                Shell.su("cd /", "rm -rf " + tmpFile.getParent() + " " + Const.TMP_FOLDER_PATH).submit();
+                App.mainHandler.post(() -> onResult(success));
+            } catch (IOException ignored) {
+                Shell.su("cd /", "rm -rf " + tmpFile.getParent() + " " + Const.TMP_FOLDER_PATH).submit();
+                App.mainHandler.post(() -> onResult(false));
+            }
         });
     }
 
