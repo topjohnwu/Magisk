@@ -101,7 +101,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         holder.updateTime.setText(context.getString(R.string.updated_on, repo.getLastUpdateString()));
 
         holder.infoLayout.setOnClickListener(v ->
-                new MarkDownWindow((BaseActivity) context, null, repo.getDetailUrl()).exec());
+                MarkDownWindow.show((BaseActivity) context, null, repo.getDetailUrl()));
 
         holder.downloadImage.setOnClickListener(v -> {
             new CustomAlertDialog((BaseActivity) context)

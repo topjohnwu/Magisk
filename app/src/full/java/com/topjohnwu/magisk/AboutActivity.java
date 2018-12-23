@@ -52,8 +52,8 @@ public class AboutActivity extends BaseActivity {
                 BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, getPackageName()));
 
         appChangelog.setOnClickListener(v -> {
-            new MarkDownWindow(this, getString(R.string.app_changelog),
-                    getResources().openRawResource(R.raw.changelog)).exec();
+            MarkDownWindow.show(this, getString(R.string.app_changelog),
+                    getResources().openRawResource(R.raw.changelog));
         });
 
         String translators = getString(R.string.translators);

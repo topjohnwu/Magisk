@@ -41,7 +41,7 @@ public class MagiskInstallDialog extends CustomAlertDialog {
                     // Open forum links in browser
                     AppUtils.openLink(a, Uri.parse(Data.magiskNoteLink));
                 } else {
-                    new MarkDownWindow(a, null, Data.magiskNoteLink).exec();
+                    MarkDownWindow.show(a, null, Data.magiskNoteLink);
                 }
             });
         }

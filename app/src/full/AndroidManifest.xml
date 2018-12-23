@@ -11,6 +11,7 @@
     <application
         android:name="a.q"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
 
         <!-- Activities -->

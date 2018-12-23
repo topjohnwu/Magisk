@@ -26,6 +26,9 @@
 -keepclassmembers class com.topjohnwu.core.utils.ISafetyNetHelper { *; }
 -keepclassmembers class com.topjohnwu.core.utils.BootSigner { *; }
 
+# SVG
+-dontwarn com.caverock.androidsvg.SVGAndroidRenderer
+
 # Strip logging
 -assumenosideeffects class com.topjohnwu.core.utils.Logger {
   public *** debug(...);
