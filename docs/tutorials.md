@@ -67,7 +67,8 @@ Let's start with SafetyNet.
 
 - Check SafetyNet status with Magisk Manager. Google banned the usage of old APIs, and many "SafetyNet Detection" apps you used were never updated and thus cannot provide correct information. **Trust the SafetyNet check included in Magisk Manager!**
 - Start clean: my advice is always the easy route - **use stock ROMs**. If you prefer custom ROMs, choose stable, official builds from well-reputed teams.
-- If you cannot even pass **basicIntegrity**, there are some serious issues! Even though in theory Magisk Modules can be hidden by MagiskHide, you should first try enabling *Core-Only Mode* and see if it makes any difference. If it still doesn't pass, the ROM you're using is the problem. If it passes, experiment and narrow down the problematic module(s).
+- If you cannot even pass **basicIntegrity**, there are some serious issues! Even though in theory Magisk Modules can be hidden by MagiskHide, you should first make sure that you didn't turn logger buffer size off. If it doesn't pass try enabling *Core-Only Mode* and see if it makes any difference. If it still doesn't pass, the ROM you're using is the problem. If it passes, experiment and narrow down the problematic module(s).
+
 
 <p align="center"><img src="images/core_only.png" width="250"/></p>
 
