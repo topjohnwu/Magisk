@@ -1,5 +1,6 @@
 package com.topjohnwu.core;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -32,8 +33,9 @@ public class App extends ContainerApp {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        mResource = base.getResources();
 
         Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER);
         Shell.Config.verboseLogging(BuildConfig.DEBUG);
