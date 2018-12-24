@@ -54,7 +54,7 @@ static bool mnt_system = false;
 static bool mnt_vendor = false;
 
 struct cmdline {
-	bool skip_initramfs;
+	bool early_boot;
 	char slot[3];
 	char dt_dir[128];
 };
@@ -75,6 +75,10 @@ static void parse_cmdline(struct cmdline *cmd) {
 	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
+
+	bool skip_initramfs = false, kirin = false;
+	int enter_recovery = 0;
+
 	for (char *tok = strtok(cmdline, " "); tok; tok = strtok(nullptr, " ")) {
 		if (strncmp(tok, "androidboot.slot_suffix", 23) == 0) {
 			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
@@ -82,16 +86,21 @@ static void parse_cmdline(struct cmdline *cmd) {
 			cmd->slot[0] = '_';
 			sscanf(tok, "androidboot.slot=%c", cmd->slot + 1);
 		} else if (strcmp(tok, "skip_initramfs") == 0) {
-			cmd->skip_initramfs = true;
+			skip_initramfs = true;
 		} else if (strncmp(tok, "androidboot.android_dt_dir", 26) == 0) {
 			sscanf(tok, "androidboot.android_dt_dir=%s", cmd->dt_dir);
+		} else if (strncmp(tok, "enter_recovery", 14) == 0) {
+			sscanf(tok, "enter_recovery=%d", &enter_recovery);
+		} else if (strncmp(tok, "androidboot.hardware", 20) == 0) {
+			kirin = strstr(tok, "kirin") != nullptr;
 		}
 	}
+	cmd->early_boot = skip_initramfs || (kirin && enter_recovery);
 
 	if (cmd->dt_dir[0] == '\0')
 		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
 
-	LOGD("cmdline: skip_initramfs[%d] slot[%s] dt_dir[%s]\n", cmd->skip_initramfs, cmd->slot, cmd->dt_dir);
+	LOGD("cmdline: early_boot[%d] slot[%s] dt_dir[%s]\n", cmd->early_boot, cmd->slot, cmd->dt_dir);
 }
 
 static void parse_device(struct device *dev, const char *uevent) {
@@ -377,7 +386,7 @@ int main(int argc, char *argv[]) {
 
 	root = open("/", O_RDONLY | O_CLOEXEC);
 
-	if (cmd.skip_initramfs) {
+	if (cmd.early_boot) {
 		// Clear rootfs
 		const char *excl[] = { "overlay", ".backup", "proc", "sys", "init.bak", nullptr };
 		excl_list = excl;
@@ -389,7 +398,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Do not go further if system_root device is booting as recovery
-	if (!cmd.skip_initramfs && access("/sbin/recovery", F_OK) == 0) {
+	if (!cmd.early_boot && access("/sbin/recovery", F_OK) == 0) {
 		// Remove Magisk traces
 		rm_rf("/.backup");
 		exec_init(argv);
@@ -402,7 +411,7 @@ int main(int argc, char *argv[]) {
 	struct device dev;
 	char partname[32];
 
-	if (cmd.skip_initramfs) {
+	if (cmd.early_boot) {
 		sprintf(partname, "system%s", cmd.slot);
 		setup_block(&dev, partname);
 		xmkdir("/system_root", 0755);
