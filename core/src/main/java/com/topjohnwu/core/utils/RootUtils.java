@@ -42,6 +42,7 @@ public class RootUtils extends Shell.Initializer {
 
         Data.keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
         Data.keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
+        Data.recovery = Boolean.parseBoolean(ShellUtils.fastCmd("echo $RECOVERYMODE"));
         return true;
     }
 }

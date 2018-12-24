@@ -46,7 +46,7 @@ public class FlashActivity extends BaseActivity {
 
     @OnClick(R.id.reboot)
     void reboot() {
-        Shell.su("/system/bin/reboot").submit();
+        Utils.reboot();
     }
 
     @OnClick(R.id.save_logs)
@@ -74,9 +74,8 @@ public class FlashActivity extends BaseActivity {
     }
 
     @OnClick(R.id.close)
-    @Override
-    public void finish() {
-        super.finish();
+    public void close() {
+        finish();
     }
 
     @Override

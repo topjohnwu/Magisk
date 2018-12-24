@@ -122,4 +122,8 @@ public class Utils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
                 App.self.createDeviceProtectedStorageContext() : App.self;
     }
+
+    public static void reboot() {
+        Shell.su("/system/bin/reboot" + (Data.recovery ? " recovery" : "")).submit();
+    }
 }

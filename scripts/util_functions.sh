@@ -116,6 +116,7 @@ get_flags() {
   # override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
+  getvar RECOVERYMODE
   if [ -z $KEEPVERITY ]; then
     if $SYSTEM_ROOT; then
       KEEPVERITY=true
@@ -135,6 +136,7 @@ get_flags() {
       KEEPFORCEENCRYPT=false
     fi
   fi
+  [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
 
 grep_cmdline() {
@@ -153,7 +155,7 @@ grep_prop() {
 getvar() {
   local VARNAME=$1
   local VALUE=
-  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /.backup/.magisk /data/.magisk /cache/.magisk`
+  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /data/.magisk /cache/.magisk`
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 

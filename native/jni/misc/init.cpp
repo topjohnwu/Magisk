@@ -95,7 +95,16 @@ static void parse_cmdline(struct cmdline *cmd) {
 			kirin = strstr(tok, "kirin") != nullptr;
 		}
 	}
-	cmd->early_boot = skip_initramfs || (kirin && enter_recovery);
+
+	if (kirin && enter_recovery) {
+		// Inform that we are actually booting as recovery
+		FILE *f = fopen("/.backup/.magisk", "a");
+		fprintf(f, "RECOVERYMODE=true\n");
+		fclose(f);
+		cmd->early_boot = true;
+	}
+
+	cmd->early_boot |= skip_initramfs;
 
 	if (cmd->dt_dir[0] == '\0')
 		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);

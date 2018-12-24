@@ -37,6 +37,7 @@ public class Data {
     // Install flags
     public static boolean keepVerity = false;
     public static boolean keepEnc = false;
+    public static boolean recovery = false;
 
     // Configs
     public static boolean isDarkTheme;

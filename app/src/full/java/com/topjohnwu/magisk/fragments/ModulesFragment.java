@@ -109,7 +109,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.reboot:
-                Shell.su("/system/bin/reboot").submit();
+                Utils.reboot();
                 return true;
             case R.id.reboot_recovery:
                 Shell.su("/system/bin/reboot recovery").submit();
@@ -118,7 +118,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
                 Shell.su("/system/bin/reboot bootloader").submit();
                 return true;
             case R.id.reboot_download:
-                Shell.su("/system/bin/reboot upgrade").submit();
+                Shell.su("/system/bin/reboot download").submit();
                 return true;
             default:
                 return false;
