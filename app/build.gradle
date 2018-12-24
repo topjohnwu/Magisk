@@ -84,7 +84,7 @@ dependencies {
     fullImplementation 'ru.noties:markwon:2.0.1'
     fullImplementation 'com.caverock:androidsvg-aar:1.3'
 
-    def butterKnifeVersion = '9.0.0-rc2'
+    def butterKnifeVersion = '9.0.0-rc3'
     if (properties.containsKey('android.injected.invoked.from.ide')) {
         fullImplementation "com.jakewharton:butterknife-reflect:${butterKnifeVersion}"
     } else {
