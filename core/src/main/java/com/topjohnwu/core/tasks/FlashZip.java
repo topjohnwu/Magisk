@@ -75,7 +75,8 @@ public abstract class FlashZip {
                 success = flash();
             } catch (IOException ignored) {}
             Shell.su("cd /", "rm -rf " + tmpFile.getParent() + " " + Const.TMP_FOLDER_PATH).submit();
-            onResult(success);
+            boolean finalSuccess = success;
+            App.mainHandler.post(() -> onResult(finalSuccess));
         });
     }
 
