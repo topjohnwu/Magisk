@@ -19,7 +19,6 @@ import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -211,13 +210,7 @@ public class FlashActivity extends BaseActivity {
 
         @Override
         protected boolean operations() {
-            console.add("- Detecting target image");
-            srcBoot = ShellUtils.fastCmd("find_boot_image", "echo \"$BOOTIMAGE\"");
-            if (srcBoot.isEmpty()) {
-                console.add("! Unable to detect target image");
-                return false;
-            }
-            return extractZip() && patchBoot() && flashBoot();
+            return findImage() && extractZip() && patchBoot() && flashBoot();
         }
     }
 
@@ -225,21 +218,7 @@ public class FlashActivity extends BaseActivity {
 
         @Override
         protected boolean operations() {
-            String slot = ShellUtils.fastCmd("echo $SLOT");
-            String target = (TextUtils.equals(slot, "_a") ? "_b" : "_a");
-            console.add("- Target slot: " + target);
-            console.add("- Detecting target image");
-            srcBoot = ShellUtils.fastCmd(
-                    "SLOT=" + target,
-                    "find_boot_image",
-                    "SLOT=" + slot,
-                    "echo \"$BOOTIMAGE\""
-            );
-            if (srcBoot.isEmpty()) {
-                console.add("! Unable to detect target image");
-                return false;
-            }
-            return extractZip() && patchBoot() && flashBoot() && postOTA();
+            return findSecondaryImage() && extractZip() && patchBoot() && flashBoot() && postOTA();
         }
     }
 

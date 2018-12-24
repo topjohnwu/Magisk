@@ -79,6 +79,34 @@ public abstract class MagiskInstaller {
         installDir.mkdirs();
     }
 
+    protected boolean findImage() {
+        console.add("- Detecting target image");
+        srcBoot = ShellUtils.fastCmd("find_boot_image", "echo \"$BOOTIMAGE\"");
+        if (srcBoot.isEmpty()) {
+            console.add("! Unable to detect target image");
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean findSecondaryImage() {
+        String slot = ShellUtils.fastCmd("echo $SLOT");
+        String target = (TextUtils.equals(slot, "_a") ? "_b" : "_a");
+        console.add("- Target slot: " + target);
+        console.add("- Detecting target image");
+        srcBoot = ShellUtils.fastCmd(
+                "SLOT=" + target,
+                "find_boot_image",
+                "SLOT=" + slot,
+                "echo \"$BOOTIMAGE\""
+        );
+        if (srcBoot.isEmpty()) {
+            console.add("! Unable to detect target image");
+            return false;
+        }
+        return true;
+    }
+
     protected boolean extractZip() {
         String arch;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
