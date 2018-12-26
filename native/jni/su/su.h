@@ -30,12 +30,15 @@ public:
 
 	/* These should be guarded with global cache lock */
 	int ref;
-	int life;
+	time_t timestamp;
 
 	su_info(unsigned uid);
 	~su_info();
 	void lock();
 	void unlock();
+	bool isFresh();
+	void newRef();
+	void deRef();
 
 private:
 	pthread_mutex_t _lock;  /* Internal lock */
