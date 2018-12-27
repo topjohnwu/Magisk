@@ -75,10 +75,6 @@
             android:name="a.j"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name="a.k"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!-- Hardcode GMS version -->
         <meta-data

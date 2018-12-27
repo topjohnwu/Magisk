@@ -5,6 +5,7 @@ import com.topjohnwu.core.Const;
 import com.topjohnwu.core.Data;
 import com.topjohnwu.core.utils.Topic;
 import com.topjohnwu.net.Networking;
+import com.topjohnwu.net.Request;
 import com.topjohnwu.net.ResponseListener;
 
 import org.json.JSONException;
@@ -40,26 +41,31 @@ public class CheckUpdates {
         }
     }
 
-    public static void check(Runnable cb) {
+    private static Request getRequest() {
         String url;
         switch (Data.updateChannel) {
-            case Const.Value.STABLE_CHANNEL:
-                url = Const.Url.STABLE_URL;
-                break;
             case Const.Value.BETA_CHANNEL:
                 url = Const.Url.BETA_URL;
                 break;
             case Const.Value.CUSTOM_CHANNEL:
                 url = App.self.prefs.getString(Const.Key.CUSTOM_CHANNEL, "");
                 break;
+            case Const.Value.STABLE_CHANNEL:
             default:
-                return;
+                url = Const.Url.STABLE_URL;
+                break;
         }
-        Networking.get(url).getAsJSONObject(new UpdateListener(cb));
+        return Networking.get(url);
     }
 
     public static void check() {
-        check(null);
+        getRequest().getAsJSONObject(new UpdateListener(null));
+    }
+
+    public static void checkNow(Runnable cb) {
+        JSONObject json = getRequest().execForJSONObject().getResult();
+        if (json != null)
+            new UpdateListener(cb).onResponse(json);
     }
 
     private static class UpdateListener implements ResponseListener<JSONObject> {

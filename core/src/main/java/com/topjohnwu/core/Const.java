@@ -62,6 +62,7 @@ public class Const {
         public static final int HIDE_MANAGER_NOTIFICATION_ID = 8;
         public static final String UPDATE_NOTIFICATION_CHANNEL = "update";
         public static final String PROGRESS_NOTIFICATION_CHANNEL = "progress";
+        public static final String CHECK_MAGISK_UPDATE_WORKER_ID = "magisk_update";
     }
 
     public static class Url {

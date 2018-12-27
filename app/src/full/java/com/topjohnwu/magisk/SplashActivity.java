@@ -42,8 +42,6 @@ public class SplashActivity extends BaseActivity {
 
         // Magisk working as expected
         if (Shell.rootAccess() && Data.magiskVersionCode > 0) {
-            // Update check service
-            AppUtils.setupUpdateCheck();
             // Load modules
             Utils.loadModules();
         }
@@ -52,6 +50,9 @@ public class SplashActivity extends BaseActivity {
 
         // Create notification channel on Android O
         Notifications.setup(this);
+
+        // Schedule periodic update checks
+        AppUtils.scheduleUpdateCheck();
 
         // Setup shortcuts
         sendBroadcast(new Intent(this, ClassMap.get(ShortcutReceiver.class)));

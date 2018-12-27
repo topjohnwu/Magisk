@@ -252,7 +252,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 CheckUpdates.check();
                 break;
             case Const.Key.CHECK_UPDATES:
-                AppUtils.setupUpdateCheck();
+                AppUtils.scheduleUpdateCheck();
                 break;
         }
         Data.loadConfig();

@@ -20,15 +20,15 @@ public class ClassMap {
         classMap.put(AboutActivity.class, a.d.class);
         classMap.put(DonationActivity.class, a.e.class);
         classMap.put(FlashActivity.class, a.f.class);
+        classMap.put(UpdateCheckService.class, a.g.class);
         classMap.put(GeneralReceiver.class, a.h.class);
         classMap.put(ShortcutReceiver.class, a.i.class);
         classMap.put(OnBootService.class, a.j.class);
-        classMap.put(UpdateCheckService.class, a.k.class);
         classMap.put(AboutCardRow.class, a.l.class);
         classMap.put(SuRequestActivity.class, a.m.class);
     }
     
-    public static Class get(Class c) {
+    public static <T> Class<T> get(Class c) {
         return classMap.get(c);
     }
 }

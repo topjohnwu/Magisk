@@ -1,8 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,25 +12,29 @@ import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 
+import java.util.concurrent.TimeUnit;
+
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
 public class AppUtils {
 
-    public static void setupUpdateCheck() {
-        App app = App.self;
-        JobScheduler scheduler = (JobScheduler) app.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-        if (app.prefs.getBoolean(Const.Key.CHECK_UPDATES, true)) {
-            if (scheduler.getAllPendingJobs().isEmpty() ||
-                    Const.UPDATE_SERVICE_VER > app.prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1)) {
-                ComponentName service = new ComponentName(app, ClassMap.get(UpdateCheckService.class));
-                JobInfo info = new JobInfo.Builder(Const.ID.UPDATE_SERVICE_ID, service)
-                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                        .setPersisted(true)
-                        .setPeriodic(8 * 60 * 60 * 1000)
-                        .build();
-                scheduler.schedule(info);
-            }
+    public static void scheduleUpdateCheck() {
+        if (App.self.prefs.getBoolean(Const.Key.CHECK_UPDATES, true)) {
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+            PeriodicWorkRequest request = new PeriodicWorkRequest
+                    .Builder(ClassMap.get(UpdateCheckService.class), 12, TimeUnit.HOURS)
+                    .setConstraints(constraints)
+                    .build();
+            WorkManager.getInstance().enqueueUniquePeriodicWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID,
+                    ExistingPeriodicWorkPolicy.REPLACE, request);
         } else {
-            scheduler.cancel(Const.UPDATE_SERVICE_VER);
+            WorkManager.getInstance().cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID);
         }
     }
 
