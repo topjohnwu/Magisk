@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -75,7 +76,9 @@ public class MainActivity extends BaseActivity
             }
         };
 
-        toolbarElevation = toolbar.getElevation();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbarElevation = toolbar.getElevation();
+        }
 
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -208,6 +211,8 @@ public class MainActivity extends BaseActivity
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .replace(R.id.content_frame, navFragment)
                 .commitNow();
-        toolbar.setElevation(setElevation ? toolbarElevation : 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbar.setElevation(setElevation ? toolbarElevation : 0);
+        }
     }
 }

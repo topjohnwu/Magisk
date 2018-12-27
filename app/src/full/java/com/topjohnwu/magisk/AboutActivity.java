@@ -30,7 +30,7 @@ public class AboutActivity extends BaseActivity {
 
     @Override
     public int getDarkTheme() {
-        return R.style.AppTheme_StatusBar_Dark;
+        return R.style.AppTheme_NoDrawer_Dark;
     }
 
     @Override

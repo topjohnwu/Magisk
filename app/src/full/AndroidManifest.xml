@@ -32,15 +32,15 @@
         </activity>
         <activity
             android:name="a.d"
-            android:theme="@style/AppTheme.StatusBar" />
+            android:theme="@style/AppTheme.NoDrawer" />
         <activity
             android:name="a.e"
-            android:theme="@style/AppTheme.StatusBar"/>
+            android:theme="@style/AppTheme.NoDrawer"/>
         <activity
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor"
-            android:theme="@style/AppTheme.StatusBar" />
+            android:theme="@style/AppTheme.NoDrawer" />
 
         <!-- Superuser -->
 

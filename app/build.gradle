@@ -9,6 +9,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
+        minSdkVersion 17
         applicationId "com.topjohnwu.magisk"
         targetSdkVersion rootProject.ext.compileSdkVersion
         vectorDrawables.useSupportLibrary = true
@@ -41,7 +42,6 @@ android {
 
     productFlavors {
         full {
-            minSdkVersion 21
             versionName configProps['appVersion']
             versionCode configProps['appVersionCode'] as Integer
             javaCompileOptions {
@@ -51,7 +51,6 @@ android {
             }
         }
         stub {
-            minSdkVersion 17
             versionCode 1
             versionName "stub"
         }

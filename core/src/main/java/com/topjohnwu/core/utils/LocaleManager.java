@@ -52,6 +52,40 @@ public class LocaleManager {
         }
     }
 
+    public static String toLanguageTag(Locale loc) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            return loc.toLanguageTag();
+        } else {
+            String language = loc.getLanguage();
+            String country = loc.getCountry();
+            String variant = loc.getVariant();
+            if (language.isEmpty() || !language.matches("\\p{Alpha}{2,8}")) {
+                language = "und";       // Follow the Locale#toLanguageTag() implementation
+            } else if (language.equals("iw")) {
+                language = "he";        // correct deprecated "Hebrew"
+            } else if (language.equals("in")) {
+                language = "id";        // correct deprecated "Indonesian"
+            } else if (language.equals("ji")) {
+                language = "yi";        // correct deprecated "Yiddish"
+            }
+            // ensure valid country code, if not well formed, it's omitted
+            if (!country.matches("\\p{Alpha}{2}|\\p{Digit}{3}")) {
+                country = "";
+            }
+
+            // variant subtags that begin with a letter must be at least 5 characters long
+            if (!variant.matches("\\p{Alnum}{5,8}|\\p{Digit}\\p{Alnum}{3}")) {
+                variant = "";
+            }
+            StringBuilder tag = new StringBuilder(language);
+            if (!country.isEmpty())
+                tag.append('-').append(country);
+            if (!variant.isEmpty())
+                tag.append('-').append(variant);
+            return tag.toString();
+        }
+    }
+
     public static void setLocale(App app) {
         String localeConfig = app.prefs.getString(Const.Key.LOCALE, "");
         if (localeConfig.isEmpty()) {

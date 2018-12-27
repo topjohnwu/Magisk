@@ -22,7 +22,7 @@ public class w<T extends DelegateWorker> extends Worker {
         try {
             base = ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
                     .getActualTypeArguments()[0]).newInstance();
-        } catch (IllegalAccessException | InstantiationException ignored) {}
+        } catch (Exception ignored) {}
     }
 
     @NonNull

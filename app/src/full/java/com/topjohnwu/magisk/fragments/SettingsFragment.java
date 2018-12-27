@@ -37,7 +37,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroupAdapter;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.PreferenceViewHolder;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SettingsFragment extends PreferenceFragmentCompat
@@ -105,8 +105,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
         suNotification = (ListPreference) findPreference(Const.Key.SU_NOTIFICATION);
         multiuserConfig = (ListPreference) findPreference(Const.Key.SU_MULTIUSER_MODE);
         nsConfig = (ListPreference) findPreference(Const.Key.SU_MNT_NS);
-        SwitchPreference reauth = (SwitchPreference) findPreference(Const.Key.SU_REAUTH);
-        SwitchPreference fingerprint = (SwitchPreference) findPreference(Const.Key.SU_FINGERPRINT);
+        SwitchPreferenceCompat reauth = (SwitchPreferenceCompat) findPreference(Const.Key.SU_REAUTH);
+        SwitchPreferenceCompat fingerprint = (SwitchPreferenceCompat) findPreference(Const.Key.SU_FINGERPRINT);
 
         updateChannel.setOnPreferenceChangeListener((p, o) -> {
             String prev =String.valueOf(Data.updateChannel);
@@ -182,7 +182,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         int i = 1;
         for (Locale locale : LocaleManager.locales) {
             entries[i] = locale.getDisplayName(locale);
-            entryValues[i++] = locale.toLanguageTag();
+            entryValues[i++] = LocaleManager.toLanguageTag(locale);
         }
         lp.setEntries(entries);
         lp.setEntryValues(entryValues);
@@ -264,10 +264,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
         String key = preference.getKey();
         switch (key) {
             case Const.Key.SU_FINGERPRINT:
-                boolean checked = ((SwitchPreference) preference).isChecked();
-                ((SwitchPreference) preference).setChecked(!checked);
+                boolean checked = ((SwitchPreferenceCompat) preference).isChecked();
+                ((SwitchPreferenceCompat) preference).setChecked(!checked);
                 FingerprintHelper.showAuthDialog(requireActivity(), () -> {
-                    ((SwitchPreference) preference).setChecked(checked);
+                    ((SwitchPreferenceCompat) preference).setChecked(checked);
                     app.mDB.setSettings(key, checked ? 1 : 0);
                 });
                 break;
