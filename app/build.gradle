@@ -10,8 +10,8 @@ android {
 
     defaultConfig {
         applicationId "com.topjohnwu.magisk"
-        minSdkVersion 21
         targetSdkVersion rootProject.ext.compileSdkVersion
+        vectorDrawables.useSupportLibrary = true
     }
 
     signingConfigs {
@@ -41,6 +41,7 @@ android {
 
     productFlavors {
         full {
+            minSdkVersion 21
             versionName configProps['appVersion']
             versionCode configProps['appVersionCode'] as Integer
             javaCompileOptions {
@@ -50,6 +51,7 @@ android {
             }
         }
         stub {
+            minSdkVersion 17
             versionCode 1
             versionName "stub"
         }

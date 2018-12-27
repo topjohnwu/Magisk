@@ -12,6 +12,7 @@ import com.topjohnwu.core.database.MagiskDB;
 import com.topjohnwu.core.database.RepoDatabaseHelper;
 import com.topjohnwu.core.utils.LocaleManager;
 import com.topjohnwu.core.utils.RootUtils;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 
@@ -46,6 +47,7 @@ public class App extends ContainerApp {
         mDB = new MagiskDB(this);
         repoDB = new RepoDatabaseHelper(this);
 
+        Networking.init(this);
         LocaleManager.setLocale(this);
         Data.loadConfig();
     }

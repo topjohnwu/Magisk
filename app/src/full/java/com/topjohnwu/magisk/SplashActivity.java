@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.utils.AppUtils;
-import com.topjohnwu.magisk.utils.Download;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 public class SplashActivity extends BaseActivity {
@@ -56,7 +56,7 @@ public class SplashActivity extends BaseActivity {
         // Setup shortcuts
         sendBroadcast(new Intent(this, ClassMap.get(ShortcutReceiver.class)));
 
-        if (Download.checkNetworkStatus(this)) {
+        if (Networking.checkNetworkStatus(this)) {
             // Fire update check
             CheckUpdates.check();
             // Repo update check

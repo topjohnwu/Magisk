@@ -20,10 +20,10 @@ import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.AppUtils;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.PatchAPK;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 import java.io.IOException;
@@ -155,7 +155,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
             if (app.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
                 generalCatagory.removePreference(restoreManager);
             } else {
-                if (!Download.checkNetworkStatus(app))
+                if (!Networking.checkNetworkStatus(app))
                     generalCatagory.removePreference(restoreManager);
                 generalCatagory.removePreference(hideManager);
             }

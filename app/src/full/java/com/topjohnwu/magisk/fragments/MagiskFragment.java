@@ -32,7 +32,7 @@ import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.MagiskInstallDialog;
 import com.topjohnwu.magisk.components.ManagerInstallDialog;
 import com.topjohnwu.magisk.components.UninstallDialog;
-import com.topjohnwu.magisk.utils.Download;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 
@@ -169,7 +169,7 @@ public class MagiskFragment extends BaseFragment
         shownDialog = false;
 
         // Trigger state check
-        if (Download.checkNetworkStatus(app)) {
+        if (Networking.checkNetworkStatus(app)) {
             CheckUpdates.check();
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
@@ -212,7 +212,7 @@ public class MagiskFragment extends BaseFragment
     private void updateUI() {
         ((MainActivity) requireActivity()).checkHideSection();
 
-        boolean hasNetwork = Download.checkNetworkStatus(app);
+        boolean hasNetwork = Networking.checkNetworkStatus(app);
         boolean hasRoot = Shell.rootAccess();
 
         magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);

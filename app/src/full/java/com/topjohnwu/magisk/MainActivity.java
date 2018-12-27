@@ -20,7 +20,7 @@ import com.topjohnwu.magisk.fragments.ModulesFragment;
 import com.topjohnwu.magisk.fragments.ReposFragment;
 import com.topjohnwu.magisk.fragments.SettingsFragment;
 import com.topjohnwu.magisk.fragments.SuperuserFragment;
-import com.topjohnwu.magisk.utils.Download;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 import androidx.annotation.NonNull;
@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity
         menu.findItem(R.id.magiskhide).setVisible(Shell.rootAccess() &&
                 app.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Data.magiskVersionCode >= 0);
-        menu.findItem(R.id.downloads).setVisible(Download.checkNetworkStatus(this)
+        menu.findItem(R.id.downloads).setVisible(Networking.checkNetworkStatus(this)
                 && Shell.rootAccess() && Data.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Utils.showSuperUser());

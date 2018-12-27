@@ -6,7 +6,6 @@ import android.app.Application;
 import android.os.Bundle;
 
 import com.topjohnwu.magisk.utils.APKInstall;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
 
@@ -32,7 +31,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Download.checkNetworkStatus(this)) {
+        Networking.init(this);
+        if (Networking.checkNetworkStatus(this)) {
             Networking.get(URL)
                     .setErrorHandler(((conn, e) -> finish()))
                     .getAsJSONObject(new JSONLoader());
