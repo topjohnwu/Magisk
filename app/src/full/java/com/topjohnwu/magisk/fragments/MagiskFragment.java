@@ -111,8 +111,6 @@ public class MagiskFragment extends BaseFragment
 
     @OnClick(R.id.install_button)
     void install() {
-        shownDialog = true;
-
         // Show Manager update first
         if (Data.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
             new ManagerInstallDialog((BaseActivity) requireActivity()).show();
@@ -267,13 +265,9 @@ public class MagiskFragment extends BaseFragment
         magiskUpdateProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
 
-        if (!shownDialog) {
-            if (Data.remoteMagiskVersionCode > Data.magiskVersionCode
-                    || Data.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
-                install();
-            } else if (!ShellUtils.fastCmdResult("env_check")) {
-                new EnvFixDialog(requireActivity()).show();
-            }
+        if (!shownDialog && !ShellUtils.fastCmdResult("env_check")) {
+            shownDialog = true;
+            new EnvFixDialog(requireActivity()).show();
         }
     }
 
