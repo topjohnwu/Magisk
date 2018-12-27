@@ -39,10 +39,10 @@
                         android:padding="16dp">
 
                         <ImageView
+                            app:srcCompat="@drawable/ic_logo"
                             android:layout_width="72dp"
                             android:layout_height="match_parent"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/ic_logo"/>
+                            android:layout_gravity="center_vertical" />
 
                         <TextView
                             android:layout_width="wrap_content"

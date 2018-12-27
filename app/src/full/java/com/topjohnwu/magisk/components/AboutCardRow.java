@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 
+import androidx.appcompat.content.res.AppCompatResources;
 import butterknife.BindView;
 
 /**
@@ -54,14 +55,10 @@ public class AboutCardRow extends LinearLayout {
         new AboutCardRow_ViewBinding(this, this);
 
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
-        String title;
-        Drawable icon;
-        try {
-            title = a.getString(R.styleable.AboutCardRow_text);
-            icon = a.getDrawable(R.styleable.AboutCardRow_icon);
-        } finally {
-            a.recycle();
-        }
+        String title = a.getString(R.styleable.AboutCardRow_text);
+        Drawable icon = AppCompatResources.getDrawable(context,
+                a.getResourceId(R.styleable.AboutCardRow_icon, R.drawable.ic_magisk));
+        a.recycle();
         mTitle.setText(title);
         mIcon.setImageDrawable(icon);
     }

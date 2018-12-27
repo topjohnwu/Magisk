@@ -125,6 +125,7 @@ public class SuRequestActivity extends BaseActivity {
         appIcon.setImageDrawable(policy.info.loadIcon(pm));
         appNameView.setText(policy.appName);
         packageNameView.setText(policy.packageName);
+        warning.setCompoundDrawablesRelativeWithIntrinsicBounds(getDrawable(R.drawable.ic_warning), null, null, null);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.allow_timeout, android.R.layout.simple_spinner_item);
