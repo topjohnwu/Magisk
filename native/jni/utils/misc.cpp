@@ -194,7 +194,7 @@ int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
 
 	execve(argv[0], (char **) argv, environ);
 	PLOGE("execve %s", argv[0]);
-	return -1;
+	exit(-1);
 }
 
 static int v_exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
