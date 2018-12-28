@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
@@ -144,9 +144,9 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.package_name) TextView packageName;
         @BindView(R.id.app_icon) ImageView appIcon;
-        @BindView(R.id.master_switch) Switch masterSwitch;
-        @BindView(R.id.notification_switch) Switch notificationSwitch;
-        @BindView(R.id.logging_switch) Switch loggingSwitch;
+        @BindView(R.id.master_switch) SwitchCompat masterSwitch;
+        @BindView(R.id.notification_switch) SwitchCompat notificationSwitch;
+        @BindView(R.id.logging_switch) SwitchCompat loggingSwitch;
         @BindView(R.id.expand_layout) ViewGroup expandLayout;
 
         @BindView(R.id.delete) ImageView delete;

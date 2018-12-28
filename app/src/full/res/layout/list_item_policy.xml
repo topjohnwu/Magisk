@@ -67,7 +67,7 @@
 
             </LinearLayout>
 
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/master_switch"
@@ -105,7 +105,7 @@
                     android:tint="@color/icon_grey"
                     android:layout_marginEnd="10dp" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/notification_switch"
@@ -132,7 +132,7 @@
                     android:tint="@color/icon_grey"
                     android:layout_marginEnd="10dp" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/logging_switch"

@@ -17,9 +17,10 @@
 #include "utils.h"
 #include "su.h"
 
-#define AM_PATH "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am"
+#define AM_PATH  "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am"
+#define RECEIVER "a.h"
 
-static const char *get_command(const struct su_request *to) {
+static inline const char *get_command(const struct su_request *to) {
 	if (to->command[0])
 		return to->command;
 	if (to->shell[0])
@@ -71,10 +72,13 @@ void app_log(struct su_context *ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
+	char component[128];
+	sprintf(component, "%s/" RECEIVER, ctx->info->str[SU_MANAGER]);
+
 	const char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-p", ctx->info->str[SU_MANAGER],
+		"-n", component,
 		"-f", "0x00000020",
 		"--user", user,
 		"--es", "action", "log",
@@ -101,10 +105,13 @@ void app_notify(struct su_context *ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
+	char component[128];
+	sprintf(component, "%s/" RECEIVER, ctx->info->str[SU_MANAGER]);
+
 	const char *cmd[] = {
 			AM_PATH, "broadcast",
 			"-a", "android.intent.action.BOOT_COMPLETED",
-			"-p", ctx->info->str[SU_MANAGER],
+			"-n", component,
 			"-f", "0x00000020",
 			"--user", user,
 			"--es", "action", "notify",
@@ -118,10 +125,12 @@ void app_notify(struct su_context *ctx) {
 void app_connect(const char *socket, struct su_info *info) {
 	char user[8];
 	setup_user(user, info);
+	char component[128];
+	sprintf(component, "%s/" RECEIVER, info->str[SU_MANAGER]);
 	const char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-p", info->str[SU_MANAGER],
+		"-n", component,
 		"-f", "0x00000020",
 		"--user", user,
 		"--es", "action", "request",
