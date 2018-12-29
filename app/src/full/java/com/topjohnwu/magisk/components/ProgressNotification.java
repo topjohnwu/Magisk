@@ -9,16 +9,14 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.net.DownloadProgressListener;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 public class ProgressNotification implements DownloadProgressListener {
-    private NotificationManagerCompat mgr;
+
     private NotificationCompat.Builder builder;
     private Notification notification;
     private long prevTime;
 
     public ProgressNotification(String title) {
-        mgr = NotificationManagerCompat.from(App.self);
         builder = Notifications.progress(title);
         prevTime = System.currentTimeMillis();
         update();
@@ -47,13 +45,13 @@ public class ProgressNotification implements DownloadProgressListener {
 
     public void update() {
         notification = builder.build();
-        mgr.notify(hashCode(), notification);
+        Notifications.mgr.notify(hashCode(), notification);
     }
 
     private void lastUpdate() {
         notification = builder.build();
-        mgr.cancel(hashCode());
-        mgr.notify(notification.hashCode(), notification);
+        Notifications.mgr.cancel(hashCode());
+        Notifications.mgr.notify(notification.hashCode(), notification);
     }
 
     public void dlDone() {
@@ -73,6 +71,6 @@ public class ProgressNotification implements DownloadProgressListener {
     }
 
     public void dismiss() {
-        mgr.cancel(hashCode());
+        Notifications.mgr.cancel(hashCode());
     }
 }

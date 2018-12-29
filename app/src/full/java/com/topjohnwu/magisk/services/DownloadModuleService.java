@@ -72,7 +72,6 @@ public class DownloadModuleService extends Service {
                         .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
                 startActivity(intent);
             } else {
-                progress.getNotificationBuilder().setContentTitle(output.getName());
                 progress.dlDone();
             }
         } catch (Exception e) {

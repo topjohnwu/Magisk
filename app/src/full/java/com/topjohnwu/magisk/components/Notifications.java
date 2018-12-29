@@ -22,6 +22,8 @@ import androidx.core.app.TaskStackBuilder;
 
 public class Notifications {
 
+    public static NotificationManagerCompat mgr = NotificationManagerCompat.from(App.self);
+
     public static void setup(Context c) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager mgr = c.getSystemService(NotificationManager.class);
@@ -55,7 +57,6 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
-        NotificationManagerCompat mgr = NotificationManagerCompat.from(app);
         mgr.notify(Const.ID.MAGISK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
@@ -79,7 +80,6 @@ public class Notifications {
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
-        NotificationManagerCompat mgr = NotificationManagerCompat.from(app);
         mgr.notify(Const.ID.APK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
@@ -98,7 +98,6 @@ public class Notifications {
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .addAction(R.drawable.ic_refresh, app.getString(R.string.reboot), pendingIntent);
 
-        NotificationManagerCompat mgr = NotificationManagerCompat.from(app);
         mgr.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build());
     }
 
