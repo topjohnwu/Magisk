@@ -109,7 +109,7 @@ def sign_zip(unsigned, output, release):
 
 	if not os.path.exists(zipsigner):
 		header('* Building ' + signer_name)
-		proc = execv([gradlew, 'utils:shadowJar'])
+		proc = execv([gradlew, 'utils:shadowJar', '-PconfigPath=' + os.path.abspath(args.config)])
 		if proc.returncode != 0:
 			error('Build {} failed!'.format(signer_name))
 
