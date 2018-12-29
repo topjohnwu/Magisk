@@ -4,7 +4,6 @@ import com.topjohnwu.core.App;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.receivers.GeneralReceiver;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
-import com.topjohnwu.magisk.services.OnBootService;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 
 import java.util.HashMap;
@@ -23,7 +22,6 @@ public class ClassMap {
         classMap.put(UpdateCheckService.class, a.g.class);
         classMap.put(GeneralReceiver.class, a.h.class);
         classMap.put(ShortcutReceiver.class, a.i.class);
-        classMap.put(OnBootService.class, a.j.class);
         classMap.put(AboutCardRow.class, a.l.class);
         classMap.put(SuRequestActivity.class, a.m.class);
     }
