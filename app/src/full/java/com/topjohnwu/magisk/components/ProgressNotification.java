@@ -59,7 +59,7 @@ public class ProgressNotification implements DownloadProgressListener {
     public void dlDone() {
         builder.setProgress(0, 0, false)
                 .setContentText(App.self.getString(R.string.download_complete))
-                .setSmallIcon(R.drawable.ic_check_circle)
+                .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setOngoing(false);
         lastUpdate();
     }
@@ -67,7 +67,7 @@ public class ProgressNotification implements DownloadProgressListener {
     public void dlFail() {
         builder.setProgress(0, 0, false)
                 .setContentText(App.self.getString(R.string.download_file_error))
-                .setSmallIcon(R.drawable.ic_cancel)
+                .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setOngoing(false);
         lastUpdate();
     }
