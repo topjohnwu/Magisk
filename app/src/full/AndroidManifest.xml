@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name="a.q"
@@ -70,6 +70,8 @@
         </receiver>
 
         <!-- Service -->
+
+        <service android:name="a.j"/>
 
         <!-- Hardcode GMS version -->
         <meta-data

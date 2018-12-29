@@ -1,17 +1,20 @@
-package com.topjohnwu.magisk.utils;
+package com.topjohnwu.magisk.services;
 
+import android.app.Service;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.IBinder;
+import android.widget.Toast;
 
-import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
 import com.topjohnwu.core.container.Repo;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.FlashActivity;
-import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.ProgressNotification;
 import com.topjohnwu.net.Networking;
+import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.BufferedOutputStream;
@@ -24,16 +27,38 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class DownloadModule {
+import androidx.annotation.Nullable;
 
-    public static void exec(BaseActivity activity, Repo repo, boolean install) {
-        activity.runWithExternalRW(() -> AsyncTask.THREAD_POOL_EXECUTOR.execute(
-                () -> dlProcessInstall(repo, install)));
+public class DownloadModuleService extends Service {
+
+    private boolean running = false;
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
-    private static void dlProcessInstall(Repo repo, boolean install) {
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (flags == 0 && running) {
+            Utils.toast(R.string.dl_one_module, Toast.LENGTH_LONG);
+        } else {
+            running = true;
+            Shell.EXECUTOR.execute(() -> {
+                Repo repo = intent.getParcelableExtra("repo");
+                boolean install = intent.getBooleanExtra("install", false);
+                dlProcessInstall(repo, install);
+                stopSelf();
+            });
+        }
+        return START_REDELIVER_INTENT;
+    }
+
+    private void dlProcessInstall(Repo repo, boolean install) {
         File output = new File(Const.EXTERNAL_PATH, repo.getDownloadFilename());
         ProgressNotification progress = new ProgressNotification(output.getName());
+        startForeground(progress.hashCode(), progress.getNotification());
         try {
             InputStream in = Networking.get(repo.getZipUrl())
                     .setDownloadProgressListener(progress)
@@ -41,13 +66,13 @@ public class DownloadModule {
             removeTopFolder(in, new BufferedOutputStream(new FileOutputStream(output)));
             if (install) {
                 progress.dismiss();
-                Intent intent = new Intent(App.self, ClassMap.get(FlashActivity.class));
+                Intent intent = new Intent(this, ClassMap.get(FlashActivity.class));
                 intent.setData(Uri.fromFile(output))
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
-                App.self.startActivity(intent);
+                startActivity(intent);
             } else {
-                progress.getNotification().setContentTitle(output.getName());
+                progress.getNotificationBuilder().setContentTitle(output.getName());
                 progress.dlDone();
             }
         } catch (Exception e) {
@@ -56,7 +81,7 @@ public class DownloadModule {
         }
     }
 
-    private static void removeTopFolder(InputStream in, OutputStream out) throws IOException {
+    private void removeTopFolder(InputStream in, OutputStream out) throws IOException {
         try (ZipInputStream zin = new ZipInputStream(in);
              ZipOutputStream zout = new ZipOutputStream(out)) {
             ZipEntry entry;
@@ -73,5 +98,4 @@ public class DownloadModule {
             }
         }
     }
-
 }

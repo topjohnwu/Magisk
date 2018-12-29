@@ -65,7 +65,7 @@ public class DownloadApp {
             File patched = apk;
             App app = App.self;
             if (!App.self.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
-                progress.getNotification()
+                progress.getNotificationBuilder()
                         .setProgress(0, 0, true)
                         .setContentTitle(app.getString(R.string.hide_manager_title))
                         .setContentText("");
@@ -89,7 +89,7 @@ public class DownloadApp {
         @Override
         public void onDownloadComplete(File apk, ProgressNotification progress) {
             App app = App.self;
-            progress.getNotification()
+            progress.getNotificationBuilder()
                     .setProgress(0, 0, true)
                     .setContentTitle(app.getString(R.string.restore_img_msg))
                     .setContentText("");

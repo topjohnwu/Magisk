@@ -1,5 +1,8 @@
 package com.topjohnwu.core.container;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
@@ -31,6 +34,19 @@ public class Module extends BaseModule {
         mRemove = mRemoveFile.exists();
         mUpdated = mUpdateFile.exists();
     }
+
+    public static final Parcelable.Creator<Module> CREATOR = new Creator<Module>() {
+        /* It won't be used at any place */
+        @Override
+        public Module createFromParcel(Parcel source) {
+            return null;
+        }
+
+        @Override
+        public Module[] newArray(int size) {
+            return null;
+        }
+    };
 
     public void createDisableFile() {
         mEnable = !mDisableFile.createNewFile();

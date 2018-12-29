@@ -2,6 +2,8 @@ package com.topjohnwu.core.container;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.topjohnwu.core.Const;
 import com.topjohnwu.core.utils.Logger;
@@ -21,6 +23,30 @@ public class Repo extends BaseModule {
     public Repo(Cursor c) {
         super(c);
         mLastUpdate = new Date(c.getLong(c.getColumnIndex("last_update")));
+    }
+
+    public Repo(Parcel p) {
+        super(p);
+        mLastUpdate = new Date(p.readLong());
+    }
+
+    public static final Parcelable.Creator<Repo> CREATOR = new Parcelable.Creator<Repo>() {
+
+        @Override
+        public Repo createFromParcel(Parcel source) {
+            return new Repo(source);
+        }
+
+        @Override
+        public Repo[] newArray(int size) {
+            return new Repo[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeLong(mLastUpdate.getTime());
     }
 
     public void update() throws IllegalRepoException {

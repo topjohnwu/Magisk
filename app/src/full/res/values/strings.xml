@@ -126,6 +126,7 @@
     <string name="setup_msg">Running environment setup…</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
+    <string name="dl_one_module">Download one module at a time.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

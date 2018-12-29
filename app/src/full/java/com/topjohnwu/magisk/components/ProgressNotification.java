@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.components;
 
+import android.app.Notification;
 import android.widget.Toast;
 
 import com.topjohnwu.core.App;
@@ -13,6 +14,7 @@ import androidx.core.app.NotificationManagerCompat;
 public class ProgressNotification implements DownloadProgressListener {
     private NotificationManagerCompat mgr;
     private NotificationCompat.Builder builder;
+    private Notification notification;
     private long prevTime;
 
     public ProgressNotification(String title) {
@@ -35,12 +37,23 @@ public class ProgressNotification implements DownloadProgressListener {
         }
     }
 
-    public NotificationCompat.Builder getNotification() {
+    public NotificationCompat.Builder getNotificationBuilder() {
         return builder;
     }
 
+    public Notification getNotification() {
+        return notification;
+    }
+
     public void update() {
-        mgr.notify(hashCode(), builder.build());
+        notification = builder.build();
+        mgr.notify(hashCode(), notification);
+    }
+
+    private void lastUpdate() {
+        notification = builder.build();
+        mgr.cancel(hashCode());
+        mgr.notify(notification.hashCode(), notification);
     }
 
     public void dlDone() {
@@ -48,7 +61,7 @@ public class ProgressNotification implements DownloadProgressListener {
                 .setContentText(App.self.getString(R.string.download_complete))
                 .setSmallIcon(R.drawable.ic_check_circle)
                 .setOngoing(false);
-        update();
+        lastUpdate();
     }
 
     public void dlFail() {
@@ -56,7 +69,7 @@ public class ProgressNotification implements DownloadProgressListener {
                 .setContentText(App.self.getString(R.string.download_file_error))
                 .setSmallIcon(R.drawable.ic_cancel)
                 .setOngoing(false);
-        update();
+        lastUpdate();
     }
 
     public void dismiss() {

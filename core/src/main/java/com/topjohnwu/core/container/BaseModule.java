@@ -2,12 +2,14 @@ package com.topjohnwu.core.container;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 
-public abstract class BaseModule implements Comparable<BaseModule> {
+public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
 
     private String mId, mName, mVersion, mAuthor, mDescription;
     private int mVersionCode = -1, minMagiskVersion = -1;
@@ -24,6 +26,37 @@ public abstract class BaseModule implements Comparable<BaseModule> {
         mAuthor = nonNull(c.getString(c.getColumnIndex("author")));
         mDescription = nonNull(c.getString(c.getColumnIndex("description")));
         minMagiskVersion = c.getInt(c.getColumnIndex("minMagisk"));
+    }
+
+    protected BaseModule(Parcel p) {
+        mId = p.readString();
+        mName = p.readString();
+        mVersion = p.readString();
+        mAuthor = p.readString();
+        mDescription = p.readString();
+        mVersionCode = p.readInt();
+        minMagiskVersion = p.readInt();
+    }
+
+    @Override
+    public int compareTo(@NonNull BaseModule module) {
+        return this.getName().toLowerCase().compareTo(module.getName().toLowerCase());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeString(mName);
+        dest.writeString(mVersion);
+        dest.writeString(mAuthor);
+        dest.writeString(mDescription);
+        dest.writeInt(mVersionCode);
+        dest.writeInt(minMagiskVersion);
     }
 
     private String nonNull(String s) {
@@ -118,10 +151,5 @@ public abstract class BaseModule implements Comparable<BaseModule> {
 
     public int getMinMagiskVersion() {
         return minMagiskVersion;
-    }
-
-    @Override
-    public int compareTo(@NonNull BaseModule module) {
-        return this.getName().toLowerCase().compareTo(module.getName().toLowerCase());
     }
 }

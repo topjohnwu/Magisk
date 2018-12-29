@@ -1,7 +1,9 @@
 package com.topjohnwu.magisk.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -14,11 +16,12 @@ import android.widget.TextView;
 import com.topjohnwu.core.container.Module;
 import com.topjohnwu.core.container.Repo;
 import com.topjohnwu.core.database.RepoDatabaseHelper;
+import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.MarkDownWindow;
-import com.topjohnwu.magisk.utils.DownloadModule;
+import com.topjohnwu.magisk.services.DownloadModuleService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,11 +112,23 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
                 .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
                 .setCancelable(true)
                 .setPositiveButton(R.string.install, (d, i) ->
-                        DownloadModule.exec((BaseActivity) context, repo, true))
+                        startDownload((BaseActivity) context, repo, true))
                 .setNeutralButton(R.string.download, (d, i) ->
-                        DownloadModule.exec((BaseActivity) context, repo, false))
+                        startDownload((BaseActivity) context, repo, false))
                 .setNegativeButton(R.string.no_thanks, null)
                 .show();
+        });
+    }
+
+    private void startDownload(BaseActivity activity, Repo repo, Boolean install) {
+        activity.runWithExternalRW(() -> {
+            Intent intent = new Intent(activity, ClassMap.get(DownloadModuleService.class))
+                    .putExtra("repo", repo).putExtra("install", install);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                activity.startForegroundService(intent);
+            } else {
+                activity.startService(intent);
+            }
         });
     }
 
