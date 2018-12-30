@@ -3,12 +3,9 @@ package com.topjohnwu.magisk;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.topjohnwu.core.App;
@@ -16,6 +13,7 @@ import com.topjohnwu.core.Const;
 import com.topjohnwu.core.tasks.FlashZip;
 import com.topjohnwu.core.tasks.MagiskInstaller;
 import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.adapters.StringListAdapter;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
@@ -29,18 +27,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.OnClick;
 
 public class FlashActivity extends BaseActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.txtLog) TextView flashLogs;
-    @BindView(R.id.button_panel) public LinearLayout buttonPanel;
-    @BindView(R.id.reboot) public Button reboot;
-    @BindView(R.id.scrollView) ScrollView sv;
+    @BindView(R.id.button_panel) LinearLayout buttonPanel;
+    @BindView(R.id.reboot) Button reboot;
+    @BindView(R.id.recyclerView) RecyclerView rv;
+    @BindColor(android.R.color.white) int white;
 
     private List<String> console, logs;
 
@@ -106,6 +107,7 @@ public class FlashActivity extends BaseActivity {
 
         logs = Collections.synchronizedList(new ArrayList<>());
         console = new ConsoleList();
+        rv.setAdapter(new ConsoleAdapter());
 
         Intent intent = getIntent();
         Uri uri = intent.getData();
@@ -129,6 +131,42 @@ public class FlashActivity extends BaseActivity {
         }
     }
 
+    private class ConsoleAdapter extends StringListAdapter<ConsoleAdapter.ViewHolder> {
+
+        ConsoleAdapter() {
+            super(console, true);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            super.onBindViewHolder(holder, position);
+            holder.txt.setTextColor(white);
+        }
+
+        @Override
+        protected int itemLayoutRes() {
+            return R.layout.list_item_console;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder createViewHolder(@NonNull View v) {
+            return new ViewHolder(v);
+        }
+
+        class ViewHolder extends StringListAdapter.ViewHolder {
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+            }
+
+            @Override
+            protected int textViewResId() {
+                return R.id.txt;
+            }
+        }
+    }
+
     private class ConsoleList extends CallbackList<String> {
 
         ConsoleList() {
@@ -136,8 +174,8 @@ public class FlashActivity extends BaseActivity {
         }
 
         private void updateUI() {
-            flashLogs.setText(TextUtils.join("\n", this));
-            sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
+            rv.getAdapter().notifyItemChanged(size() - 1);
+            rv.postDelayed(() -> rv.smoothScrollToPosition(size() - 1), 10);
         }
 
         @Override

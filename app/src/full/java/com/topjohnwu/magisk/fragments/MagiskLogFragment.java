@@ -112,7 +112,7 @@ public class MagiskLogFragment extends BaseFragment {
 
         @Override
         protected int itemLayoutRes() {
-            return R.layout.list_item_magisk_log;
+            return R.layout.list_item_console;
         }
 
         @NonNull
