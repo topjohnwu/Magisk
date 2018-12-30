@@ -138,12 +138,6 @@ public class FlashActivity extends BaseActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            super.onBindViewHolder(holder, position);
-            holder.txt.setTextColor(white);
-        }
-
-        @Override
         protected int itemLayoutRes() {
             return R.layout.list_item_console;
         }
@@ -158,6 +152,7 @@ public class FlashActivity extends BaseActivity {
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
+                txt.setTextColor(white);
             }
 
             @Override
