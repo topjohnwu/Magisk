@@ -126,6 +126,7 @@
     <string name="setup_msg">Démarrer l\'installation de l\'environnement…</string>
     <string name="downloading_toast">Téléchargement de %1$s</string>
     <string name="no_rw_storage">Cette fonctionnalité ne marchera pas sans la permission d\'écriture sur le stockage externe.</string>
+    <string name="dl_one_module">Télécharger un module à la fois.</string> 
 
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
