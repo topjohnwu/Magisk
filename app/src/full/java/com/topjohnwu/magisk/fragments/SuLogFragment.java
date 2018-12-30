@@ -42,7 +42,7 @@ public class SuLogFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_su_log, container, false);
         unbinder = new SuLogFragment_ViewBinding(this, v);
-        adapter = new SuLogAdapter(mm.mDB);
+        adapter = new SuLogAdapter(app.mDB);
         recyclerView.setAdapter(adapter);
 
         updateList();
@@ -69,7 +69,7 @@ public class SuLogFragment extends BaseFragment {
                 updateList();
                 return true;
             case R.id.menu_clear:
-                mm.mDB.clearLogs();
+                app.mDB.clearLogs();
                 updateList();
                 return true;
             default:

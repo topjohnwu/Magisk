@@ -11,14 +11,14 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.container.Module;
+import com.topjohnwu.core.tasks.UpdateRepos;
+import com.topjohnwu.core.utils.Topic;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
-import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.BaseFragment;
-import com.topjohnwu.magisk.container.Module;
-import com.topjohnwu.magisk.utils.Topic;
 
 import java.util.Map;
 
@@ -70,8 +70,8 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     @Override
     public void onPublish(int topic, Object[] result) {
         if (topic == Topic.MODULE_LOAD_DONE) {
-            adapter = new ReposAdapter(mm.repoDB, (Map<String, Module>) result[0]);
-            mm.repoDB.registerAdapter(adapter);
+            adapter = new ReposAdapter(app.repoDB, (Map<String, Module>) result[0]);
+            app.repoDB.registerAdapterCallback(adapter::notifyDBChanged);
             recyclerView.setAdapter(adapter);
             recyclerView.setVisibility(View.VISIBLE);
             emptyRv.setVisibility(View.GONE);
@@ -108,7 +108,7 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
                 .setTitle(R.string.sorting_order)
                 .setSingleChoiceItems(R.array.sorting_orders, Data.repoOrder, (d, which) -> {
                     Data.repoOrder = which;
-                    mm.prefs.edit().putInt(Const.Key.REPO_ORDER, Data.repoOrder).apply();
+                    app.prefs.edit().putInt(Const.Key.REPO_ORDER, Data.repoOrder).apply();
                     adapter.notifyDBChanged();
                     d.dismiss();
                 }).show();
@@ -119,6 +119,6 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mm.repoDB.unregisterAdapter();
+        app.repoDB.unregisterAdapterCallback();
     }
 }

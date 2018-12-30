@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     style="?attr/cardStyle"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -90,7 +91,6 @@
                 android:focusable="false"
                 android:gravity="center"
                 android:padding="@dimen/checkbox_padding"
-                android:src="@drawable/ic_menu_overflow_material"
                 tools:ignore="ContentDescription"/>
 
             <ImageView
@@ -101,7 +101,7 @@
                 android:focusable="false"
                 android:gravity="center"
                 android:padding="@dimen/checkbox_padding"
-                android:src="@drawable/ic_delete"
+                app:srcCompat="@drawable/ic_delete"
                 android:tint="@color/icon_grey"
                 tools:ignore="ContentDescription"/>
 

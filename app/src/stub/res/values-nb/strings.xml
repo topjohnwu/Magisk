@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Oppgrader til den komplette versjonen av Magisk Manager for å fullføre oppsettet. Vil du laste ned og installere?</string>
+    <string name="no_internet_msg">Vennligst koble deg på internettet! Å oppgradere til den komplette versjonen av Magisk Manager er påkrevd.</string>
+</resources>

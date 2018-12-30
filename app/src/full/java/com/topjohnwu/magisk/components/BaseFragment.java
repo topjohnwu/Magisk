@@ -2,21 +2,16 @@ package com.topjohnwu.magisk.components;
 
 import android.content.Intent;
 
-import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.utils.Topic;
 
 import androidx.fragment.app.Fragment;
 import butterknife.Unbinder;
 
 public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
-    public MagiskManager mm;
+    public App app = App.self;
     protected Unbinder unbinder = null;
-
-    public BaseFragment() {
-        mm = Data.MM();
-    }
 
     @Override
     public void onResume() {

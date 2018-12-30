@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.topjohnwu.core.container.Policy;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.PolicyAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
-import com.topjohnwu.magisk.container.Policy;
 
 import java.util.List;
 
@@ -48,13 +48,13 @@ public class SuperuserFragment extends BaseFragment {
     }
 
     private void displayPolicyList() {
-        List<Policy> policyList = mm.mDB.getPolicyList();
+        List<Policy> policyList = app.mDB.getPolicyList();
 
         if (policyList.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            recyclerView.setAdapter(new PolicyAdapter(policyList, mm.mDB, pm));
+            recyclerView.setAdapter(new PolicyAdapter(policyList, app.mDB, pm));
             emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }

@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -8,6 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.material.navigation.NavigationView;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.utils.Topic;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.fragments.LogFragment;
 import com.topjohnwu.magisk.fragments.MagiskFragment;
@@ -16,9 +21,7 @@ import com.topjohnwu.magisk.fragments.ModulesFragment;
 import com.topjohnwu.magisk.fragments.ReposFragment;
 import com.topjohnwu.magisk.fragments.SettingsFragment;
 import com.topjohnwu.magisk.fragments.SuperuserFragment;
-import com.topjohnwu.magisk.utils.Download;
-import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 import androidx.annotation.NonNull;
@@ -49,8 +52,8 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        if (!mm.hasInit) {
-            startActivity(new Intent(this, Data.classMap.get(SplashActivity.class)));
+        if (!app.init) {
+            startActivity(new Intent(this, ClassMap.get(SplashActivity.class)));
             finish();
         }
 
@@ -73,7 +76,9 @@ public class MainActivity extends BaseActivity
             }
         };
 
-        toolbarElevation = toolbar.getElevation();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbarElevation = toolbar.getElevation();
+        }
 
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -120,9 +125,9 @@ public class MainActivity extends BaseActivity
     public void checkHideSection() {
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(Shell.rootAccess() &&
-                mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
+                app.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Data.magiskVersionCode >= 0);
-        menu.findItem(R.id.downloads).setVisible(Download.checkNetworkStatus(this)
+        menu.findItem(R.id.downloads).setVisible(Networking.checkNetworkStatus(this)
                 && Shell.rootAccess() && Data.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Utils.showSuperUser());
@@ -189,11 +194,11 @@ public class MainActivity extends BaseActivity
                 displayFragment(new SettingsFragment(), true);
                 break;
             case R.id.app_about:
-                startActivity(new Intent(this, Data.classMap.get(AboutActivity.class)));
+                startActivity(new Intent(this, ClassMap.get(AboutActivity.class)));
                 mDrawerItem = bak;
                 break;
             case R.id.donation:
-                startActivity(new Intent(this, Data.classMap.get(DonationActivity.class)));
+                startActivity(new Intent(this, ClassMap.get(DonationActivity.class)));
                 mDrawerItem = bak;
                 break;
         }
@@ -206,6 +211,8 @@ public class MainActivity extends BaseActivity
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .replace(R.id.content_frame, navFragment)
                 .commitNow();
-        toolbar.setElevation(setElevation ? toolbarElevation : 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbar.setElevation(setElevation ? toolbarElevation : 0);
+        }
     }
 }

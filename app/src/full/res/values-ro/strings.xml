@@ -1,4 +1,5 @@
 <resources>
+
     <!--Welcome Activity-->
     <string name="modules">Module</string>
     <string name="downloads">Descărcări</string>
@@ -46,6 +47,10 @@
     <string name="update_available">Actualizare disponibilă</string>
     <string name="installed">Instalat</string>
     <string name="not_installed">Nu este instalat</string>
+    <string name="updated_on">Actualizat la: %1$s</string>
+    <string name="sorting_order">Ordine de sortare</string>
+    <string name="sort_by_name">Sortare după nume</string>
+    <string name="sort_by_update">Sortare după ultima actualizare</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Salvare jurnal</string>
@@ -65,28 +70,33 @@
     <string name="support_thread">Pagina de suport</string>
     <string name="follow_twitter">Urmăriți-mă pe Twitter</string>
 
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Actualizări Magisk</string>
+    <string name="progress_channel">Notificări de progres</string>
+    <string name="download_complete">Descărcare finalizată</string>
+    <string name="download_file_error">Eroare la descărcarea fișierului</string>
+    <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
+    <string name="manager_update_title">Actualizare Magisk Manager disponibilă!</string>
+
     <!--Toasts, Dialogs-->
-    <string name="close">Închide</string>
+    <string name="close">Închidere</string>
     <string name="repo_install_title">Instalare %1$s</string>
     <string name="repo_install_msg">Instalaţi %1$s?</string>
     <string name="download">Descărcare</string>
     <string name="reboot">Repornire</string>
-    <string name="magisk_update_title">O nouă actualizare Magisk este disponibilă!</string>
     <string name="settings_reboot_toast">Reporniți pentru a aplica setările</string>
     <string name="release_notes">Note de lansare</string>
-    <string name="repo_cache_cleared">Arhive cache eliminate</string>
+    <string name="repo_cache_cleared">Cache eliminat</string>
     <string name="process_error">Eroare de proces</string>
     <string name="internal_storage">Zip stocat în:\n[Stocare internă]%1$s</string>
     <string name="zip_download_title">Descărcare</string>
     <string name="zip_download_msg">Descărcare fişier zip (%1$d%%)…</string>
     <string name="zip_process_title">Procesare</string>
     <string name="zip_process_msg">Procesare fişier zip…</string>
-    <string name="manager_update_title">O nouă actualizare pentru Magisk Manager este disponibilă!</string>
     <string name="manager_download_install">Apăsați pentru a descărca și instala</string>
     <string name="dtbo_patched_title">DTBO a fost modificat!</string>
     <string name="dtbo_patched_reboot">Magisk Manager a modificat dtbo.img, reporniţi</string>
-    <string name="update_channel">Actualizări Magisk</string>
-    <string name="flashing">Flashing</string>
+    <string name="flashing">Procesare</string>
     <string name="hide_manager_title">Ascundere Magisk Manager…</string>
     <string name="hide_manager_msg">Ar putea dura ceva timp…</string>
     <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eşuat</string>
@@ -101,12 +111,19 @@
     <string name="no_boot_file_patch_support">Versiunea Magisk nu acceptă modificarea imaginii de Boot</string>
     <string name="boot_file_patch_msg">Selectaţi formatul .img sau .img.tar pentru imaginea de Boot stoc</string>
     <string name="complete_uninstall">Dezinstalare totală</string>
+    <string name="restore_img">Restabilire imagini</string>
+    <string name="restore_img_msg">Restabilire…</string>
     <string name="restore_done">Restabilire finalizată!</string>
     <string name="restore_fail">Backup stoc nu există!</string>
     <string name="proprietary_title">Descărcare cod proprietar</string>
     <string name="proprietary_notice">Magisk Manager este FOSS așa că nu conține codul API SafetyNet de la Google.\n\nPermiteți ca Magisk Manager să descarce o extensie (conține GoogleApiClient) pentru verificările SafetyNet?</string>
     <string name="su_db_corrupt">Baza de date SU este defectă, va fi creată o bază nouă</string>
-    <string name="download_file_error">Eroare la descărcarea fișierului</string>
+    <string name="setup_done">Configurare finalizată.</string>
+    <string name="setup_fail">Configurare eșuată.</string>
+    <string name="env_fix_title">Necesită configurare suplimentară</string>
+    <string name="env_fix_msg">Dispozitivul dvs. are nevoie de configurări suplimentare pentru ca Magisk să funcționeze corect. Se va descărca zip-ul de configurare Magisk, doriți să continuați acum?</string>
+    <string name="setup_title">Configurare adițională</string>
+    <string name="setup_msg">Rulare configurare mediu…</string>
     <string name="downloading_toast">Descărcare %1$s</string>
     <string name="no_rw_storage">Această caracteristică nu va funcționa fără permisiunea de a scrie pe memoria externă.</string>
 
@@ -137,6 +154,7 @@
     <string name="settings_magiskhide_summary">Ascundeţi Magisk de la diferite detectări</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts suport pentru aplicațiile Adblock</string>
+    <string name="settings_hosts_toast">Modulul Systemless hosts adăugat</string>
 
     <string name="settings_su_app_adb">Aplicaţii şi ADB</string>
     <string name="settings_su_app">Doar aplicaţii</string>

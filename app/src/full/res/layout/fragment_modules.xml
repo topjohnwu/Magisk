@@ -43,7 +43,7 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_margin="@dimen/fab_padding"
             android:elevation="6dp"
-            android:src="@drawable/ic_add"
+            app:srcCompat="@drawable/ic_add"
             tools:fabSize="normal"
             tools:pressedTranslationZ="12dp" />
 

@@ -15,14 +15,17 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.container.Policy;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.SuConnector;
 
 import java.io.IOException;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import butterknife.BindView;
 
 public class SuRequestActivity extends BaseActivity {
@@ -70,7 +73,7 @@ public class SuRequestActivity extends BaseActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
         PackageManager pm = getPackageManager();
-        mm.mDB.clearOutdated();
+        app.mDB.clearOutdated();
 
         // Get policy
         Intent intent = getIntent();
@@ -84,7 +87,7 @@ public class SuRequestActivity extends BaseActivity {
             };
             Bundle bundle = connector.readSocketInput();
             int uid = Integer.parseInt(bundle.getString("uid"));
-            policy = mm.mDB.getPolicy(uid);
+            policy = app.mDB.getPolicy(uid);
             if (policy == null) {
                 policy = new Policy(uid, pm);
             }
@@ -123,6 +126,8 @@ public class SuRequestActivity extends BaseActivity {
         appIcon.setImageDrawable(policy.info.loadIcon(pm));
         appNameView.setText(policy.appName);
         packageNameView.setText(policy.packageName);
+        warning.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                AppCompatResources.getDrawable(this, R.drawable.ic_warning), null, null, null);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.allow_timeout, android.R.layout.simple_spinner_item);
@@ -212,7 +217,7 @@ public class SuRequestActivity extends BaseActivity {
         policy.policy = action;
         if (time >= 0) {
             policy.until = (time == 0) ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
-            mm.mDB.updatePolicy(policy);
+            app.mDB.updatePolicy(policy);
         }
         handleAction();
     }

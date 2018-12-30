@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.fragments;
 
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +28,9 @@ public class LogFragment extends BaseFragment {
         View v = inflater.inflate(R.layout.fragment_log, container, false);
         unbinder = new LogFragment_ViewBinding(this, v);
 
-        ((MainActivity) requireActivity()).toolbar.setElevation(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ((MainActivity) requireActivity()).toolbar.setElevation(0);
+        }
 
         TabFragmentAdapter adapter = new TabFragmentAdapter(getChildFragmentManager());
 

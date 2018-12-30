@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/su_popup"
     tools:context=".SuRequestActivity"
     android:layout_height="wrap_content"
@@ -82,7 +83,6 @@
         android:id="@+id/warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_warning"
         android:textColor="?android:textColorSecondary"
         android:text="@string/su_warning"
         android:layout_gravity="center_horizontal"
@@ -121,7 +121,7 @@
             android:layout_weight="1"
             android:padding="7dp"
             android:tint="?attr/colorAccent"
-            android:src="@drawable/ic_fingerprint" />
+            app:srcCompat="@drawable/ic_fingerprint" />
     </LinearLayout>
 
 </LinearLayout>

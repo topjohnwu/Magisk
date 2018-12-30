@@ -23,14 +23,14 @@
 -dontwarn javax.naming.**
 
 # Snet extention
--keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
--keepclassmembers class com.topjohnwu.magisk.utils.BootSigner { *; }
+-keepclassmembers class com.topjohnwu.core.utils.ISafetyNetHelper { *; }
+-keepclassmembers class com.topjohnwu.core.utils.BootSigner { *; }
 
-# Fast Android Networking Library
--dontwarn okhttp3.**
+# SVG
+-dontwarn com.caverock.androidsvg.SVGAndroidRenderer
 
 # Strip logging
--assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
+-assumenosideeffects class com.topjohnwu.core.utils.Logger {
   public *** debug(...);
 }
 

@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libsystemproperties
-LOCAL_C_INCLUDES := $(LIBSYSTEMPROPERTIES)
+LOCAL_C_INCLUDES := jni/include $(LIBSYSTEMPROPERTIES)
 LOCAL_SRC_FILES := \
 	context_node.cpp \
 	contexts_serialized.cpp \

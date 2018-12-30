@@ -6,7 +6,7 @@
     android:gravity="center_vertical"
     android:paddingStart="16dp"
     android:textAllCaps="true"
-    android:textColor="?android:colorAccent"
+    android:textColor="?colorAccent"
     android:background="@android:color/transparent"
     android:textSize="16sp"
     android:id="@+id/section_text"

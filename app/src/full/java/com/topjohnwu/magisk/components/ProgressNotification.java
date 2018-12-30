@@ -1,29 +1,26 @@
 package com.topjohnwu.magisk.components;
 
+import android.app.Notification;
 import android.widget.Toast;
 
-import com.androidnetworking.interfaces.DownloadProgressListener;
-import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.net.DownloadProgressListener;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 public class ProgressNotification implements DownloadProgressListener {
 
-    private NotificationManagerCompat mgr;
     private NotificationCompat.Builder builder;
+    private Notification notification;
     private long prevTime;
 
     public ProgressNotification(String title) {
-        MagiskManager mm = Data.MM();
-        mgr = NotificationManagerCompat.from(mm);
         builder = Notifications.progress(title);
         prevTime = System.currentTimeMillis();
         update();
-        Utils.toast(mm.getString(R.string.downloading_toast, title), Toast.LENGTH_SHORT);
+        Utils.toast(App.self.getString(R.string.downloading_toast, title), Toast.LENGTH_SHORT);
     }
 
     @Override
@@ -38,31 +35,42 @@ public class ProgressNotification implements DownloadProgressListener {
         }
     }
 
-    public NotificationCompat.Builder getNotification() {
+    public NotificationCompat.Builder getNotificationBuilder() {
         return builder;
     }
 
+    public Notification getNotification() {
+        return notification;
+    }
+
     public void update() {
-        mgr.notify(hashCode(), builder.build());
+        notification = builder.build();
+        Notifications.mgr.notify(hashCode(), notification);
+    }
+
+    private void lastUpdate() {
+        notification = builder.build();
+        Notifications.mgr.cancel(hashCode());
+        Notifications.mgr.notify(notification.hashCode(), notification);
     }
 
     public void dlDone() {
         builder.setProgress(0, 0, false)
-                .setContentText(Data.MM().getString(R.string.download_complete))
-                .setSmallIcon(R.drawable.ic_check_circle)
+                .setContentText(App.self.getString(R.string.download_complete))
+                .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setOngoing(false);
-        update();
+        lastUpdate();
     }
 
     public void dlFail() {
         builder.setProgress(0, 0, false)
-                .setContentText(Data.MM().getString(R.string.download_file_error))
-                .setSmallIcon(R.drawable.ic_cancel)
+                .setContentText(App.self.getString(R.string.download_file_error))
+                .setSmallIcon(android.R.drawable.stat_notify_error)
                 .setOngoing(false);
-        update();
+        lastUpdate();
     }
 
     public void dismiss() {
-        mgr.cancel(hashCode());
+        Notifications.mgr.cancel(hashCode());
     }
 }

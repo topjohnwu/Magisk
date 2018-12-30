@@ -3,6 +3,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
@@ -68,7 +69,7 @@
             android:layout_height="wrap_content"
             android:focusable="false"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_menu_overflow_material"
+            app:srcCompat="@drawable/ic_menu_overflow_material"
             android:checked="false" />
 
     </LinearLayout>
