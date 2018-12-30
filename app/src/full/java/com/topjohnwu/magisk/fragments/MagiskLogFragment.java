@@ -2,22 +2,18 @@ package com.topjohnwu.magisk.fragments;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.core.Const;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.adapters.MagiskLogAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.superuser.Shell;
@@ -27,14 +23,12 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class MagiskLogFragment extends BaseFragment {
 
-    @BindView(R.id.txtLog) TextView txtLog;
-    @BindView(R.id.svLog) ScrollView svLog;
-    @BindView(R.id.hsvLog) HorizontalScrollView hsvLog;
-    @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.recyclerView) RecyclerView rv;
 
     @Nullable
     @Override
@@ -42,7 +36,6 @@ public class MagiskLogFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_magisk_log, container, false);
         unbinder = new MagiskLogFragment_ViewBinding(this, view);
         setHasOptionsMenu(true);
-        txtLog.setTextIsSelectable(true);
         return view;
     }
 
@@ -82,13 +75,7 @@ public class MagiskLogFragment extends BaseFragment {
 
     private void readLogs() {
         Shell.su("cat " + Const.MAGISK_LOG + " | tail -n 5000").submit(result -> {
-            progressBar.setVisibility(View.GONE);
-            if (result.getOut().isEmpty())
-                txtLog.setText(R.string.log_is_empty);
-            else
-                txtLog.setText(TextUtils.join("\n", result.getOut()));
-            svLog.postDelayed(() -> svLog.fullScroll(ScrollView.FOCUS_DOWN), 100);
-            hsvLog.postDelayed(() -> hsvLog.fullScroll(ScrollView.FOCUS_LEFT), 100);
+            rv.setAdapter(new MagiskLogAdapter(result.getOut()));
         });
     }
 
@@ -107,12 +94,11 @@ public class MagiskLogFragment extends BaseFragment {
         }
         Shell.su("cat " + Const.MAGISK_LOG + " > " + logFile)
                 .submit(result ->
-                        SnackbarMaker.make(txtLog, logFile.getPath(), Snackbar.LENGTH_SHORT).show());
+                        SnackbarMaker.make(rv, logFile.getPath(), Snackbar.LENGTH_SHORT).show());
     }
 
     private void clearLogs() {
         Shell.su("echo -n > " + Const.MAGISK_LOG).submit();
-        txtLog.setText(R.string.log_is_empty);
-        SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
+        SnackbarMaker.make(rv, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
     }
 }
