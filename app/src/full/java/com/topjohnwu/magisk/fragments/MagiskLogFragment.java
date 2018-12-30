@@ -13,7 +13,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.core.Const;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.adapters.MagiskLogAdapter;
+import com.topjohnwu.magisk.adapters.StringListAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.superuser.Shell;
@@ -21,7 +21,9 @@ import com.topjohnwu.superuser.Shell;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -100,5 +102,52 @@ public class MagiskLogFragment extends BaseFragment {
     private void clearLogs() {
         Shell.su("echo -n > " + Const.MAGISK_LOG).submit();
         SnackbarMaker.make(rv, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private static class MagiskLogAdapter extends StringListAdapter<MagiskLogAdapter.ViewHolder> {
+
+        MagiskLogAdapter(List<String> list) {
+            super(list);
+        }
+
+        @Override
+        protected int itemLayoutRes() {
+            return R.layout.list_item_magisk_log;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder createViewHolder(@NonNull View v) {
+            return new ViewHolder(v);
+        }
+
+        @Override
+        protected void onUpdateTextWidth(ViewHolder holder) {
+            super.onUpdateTextWidth(holder);
+            // Find the longest string and update accordingly
+            int max = 0;
+            String maxStr = "";
+            for (String s : mList) {
+                int len = s.length();
+                if (len > max) {
+                    max = len;
+                    maxStr = s;
+                }
+            }
+            holder.txt.setText(maxStr);
+            super.onUpdateTextWidth(holder);
+        }
+
+        public class ViewHolder extends StringListAdapter.ViewHolder {
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+            }
+
+            @Override
+            protected int textViewResId() {
+                return R.id.txt;
+            }
+        }
     }
 }
