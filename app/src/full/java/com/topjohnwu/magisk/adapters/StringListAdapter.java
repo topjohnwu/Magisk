@@ -21,6 +21,7 @@ public abstract class StringListAdapter<VH extends StringListAdapter.ViewHolder>
     private boolean dynamic;
     private int screenWidth;
     private int txtWidth = -1;
+    private int padding;
 
     protected List<String> mList;
 
@@ -53,16 +54,17 @@ public abstract class StringListAdapter<VH extends StringListAdapter.ViewHolder>
 
     protected void onUpdateTextWidth(VH vh) {
         if (txtWidth < 0) {
-            txtWidth = screenWidth;
+            txtWidth = screenWidth - padding;
         } else {
             vh.txt.measure(0, 0);
             int width = vh.txt.getMeasuredWidth();
             if (width > txtWidth) {
                 txtWidth = width;
                 vh.txt.getLayoutParams().width = txtWidth;
-                rv.requestLayout();
             }
         }
+        if (rv.getWidth() != txtWidth + padding)
+            rv.requestLayout();
     }
 
     @Override
@@ -71,6 +73,7 @@ public abstract class StringListAdapter<VH extends StringListAdapter.ViewHolder>
         ((Activity) rv.getContext()).getWindowManager()
                 .getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
+        padding = rv.getPaddingStart() + rv.getPaddingEnd();
         this.rv = rv;
     }
 
