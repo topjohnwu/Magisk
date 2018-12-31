@@ -72,8 +72,7 @@ public class DownloadApp {
                 progress.update();
                 patched = new File(apk.getParent(), "patched.apk");
                 try {
-                    JarMap jarMap = new JarMap(apk);
-                    PatchAPK.patch(jarMap, app.getPackageName());
+                    JarMap jarMap = PatchAPK.patch(apk.getPath(), app.getPackageName());
                     SignAPK.sign(jarMap, new BufferedOutputStream(new FileOutputStream(patched)));
                 } catch (Exception e) {
                     return;
