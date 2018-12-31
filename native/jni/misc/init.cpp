@@ -92,7 +92,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 		} else if (strncmp(tok, "enter_recovery", 14) == 0) {
 			sscanf(tok, "enter_recovery=%d", &enter_recovery);
 		} else if (strncmp(tok, "androidboot.hardware", 20) == 0) {
-			kirin = strstr(tok, "kirin") != nullptr;
+			kirin = strstr(tok, "kirin") || strstr(tok, "hi3660");
 		}
 	}
 
