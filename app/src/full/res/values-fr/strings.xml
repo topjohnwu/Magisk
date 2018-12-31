@@ -121,7 +121,7 @@
     <string name="setup_done">Installation terminée</string>
     <string name="setup_fail">Échec de l\'installation</string>
     <string name="env_fix_title">Installation additionnelle requise</string>
-    <string name="env_fix_msg">Votre appareil a besoin d\’une configuration supplémentaire pour que Magisk fonctionne correctement. Pour cela, il nécessaire de télécharger un fichier ZIP d\’installation de Magisk. Voulez‐vous l\’effectuer immédiatement ?</string>
+    <string name="env_fix_msg">Votre appareil a besoin d\’une configuration supplémentaire pour que Magisk fonctionne correctement. Pour cela, il est nécessaire de télécharger un fichier ZIP d\’installation de Magisk. Voulez‐vous l\’effectuer immédiatement ?</string>
     <string name="setup_title">Installation Additionnelle</string>
     <string name="setup_msg">Démarrer l\’installation de l\’environnement…</string>
     <string name="downloading_toast">Téléchargement de %1$s</string>
