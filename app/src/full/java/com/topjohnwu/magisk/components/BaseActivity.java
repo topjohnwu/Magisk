@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.components;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,30 +9,34 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.NoUIActivity;
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.utils.LocaleManager;
+import com.topjohnwu.core.utils.Topic;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.LocaleManager;
-import com.topjohnwu.magisk.utils.Topic;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 public abstract class BaseActivity extends AppCompatActivity implements Topic.AutoSubscriber {
 
     public static final String INTENT_PERM = "perm_dialog";
+    private static Runnable grantCallback;
 
-    protected static Runnable permissionGrantCallback;
     static int[] EMPTY_INT_ARRAY = new int[0];
 
     private ActivityResultListener activityResultListener;
-    public MagiskManager mm;
+    public App app = App.self;
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
 
     @Override
     public int[] getSubscribedTopics() {
@@ -49,7 +54,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
         Configuration config = base.getResources().getConfiguration();
         config.setLocale(LocaleManager.locale);
         applyOverrideConfiguration(config);
-        mm = Data.MM();
     }
 
     @Override
@@ -84,6 +88,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
         }
     }
 
+    public void runWithExternalRW(Runnable callback) {
+        runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, callback);
+    }
+
+    public void runWithPermission(String[] permissions, Runnable callback) {
+        runWithPermission(this, permissions, callback);
+    }
+
     public static void runWithPermission(Context context, String[] permissions, Runnable callback) {
         boolean granted = true;
         for (String perm : permissions) {
@@ -95,21 +107,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
             callback.run();
         } else {
             // Passed in context should be an activity if not granted, need to show dialog!
-            permissionGrantCallback = callback;
-            if (!(context instanceof BaseActivity)) {
-                // Start NoUIActivity to show dialog
-                Intent intent = new Intent(context, Data.classMap.get(NoUIActivity.class));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(INTENT_PERM, permissions);
-                context.startActivity(intent);
-            } else {
+            if (context instanceof BaseActivity) {
+                grantCallback = callback;
                 ActivityCompat.requestPermissions((BaseActivity) context, permissions, 0);
             }
         }
-    }
-
-    public void runWithPermission(String[] permissions, Runnable callback) {
-        runWithPermission(this, permissions, callback);
     }
 
     @Override
@@ -132,13 +134,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
                 grant = false;
         }
         if (grant) {
-            if (permissionGrantCallback != null) {
-                permissionGrantCallback.run();
+            if (grantCallback != null) {
+                grantCallback.run();
             }
         } else {
             Toast.makeText(this, R.string.no_rw_storage, Toast.LENGTH_LONG).show();
         }
-        permissionGrantCallback = null;
+        grantCallback = null;
     }
 
     public interface ActivityResultListener {

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <signal.h>
 #include <pwd.h>
+#include <time.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -17,8 +18,6 @@
 #include "pts.h"
 #include "selinux.h"
 
-#define TIMEOUT     3
-
 #define LOCK_CACHE()   pthread_mutex_lock(&cache_lock)
 #define UNLOCK_CACHE() pthread_mutex_unlock(&cache_lock)
 
@@ -27,7 +26,7 @@ static su_info *cache;
 
 su_info::su_info(unsigned uid) :
 		uid(uid), access(DEFAULT_SU_ACCESS), _lock(PTHREAD_MUTEX_INITIALIZER),
-		count(0), ref(0), life(0), mgr_st({}) {}
+		count(0), ref(0), timestamp(0), mgr_st({}) {}
 
 su_info::~su_info() {
 	pthread_mutex_destroy(&_lock);
@@ -41,21 +40,24 @@ void su_info::unlock() {
 	pthread_mutex_unlock(&_lock);
 }
 
-static void *info_collector(void *node) {
-	su_info *info = (su_info *) node;
-	while (1) {
-		sleep(1);
-		if (info->life) {
-			LOCK_CACHE();
-			if (--info->life == 0 && cache && info->uid == cache->uid)
-				cache = nullptr;
-			UNLOCK_CACHE();
-		}
-		if (!info->life && !info->ref) {
-			delete info;
-			return nullptr;
-		}
+bool su_info::isFresh() {
+	return time(nullptr) - timestamp < 3;  /* 3 seconds */
+}
+
+void su_info::newRef() {
+	timestamp = time(nullptr);
+	++ref;
+}
+
+void su_info::deRef() {
+	LOCK_CACHE();
+	--ref;
+	if (ref == 0 && !isFresh()) {
+		if (cache == this)
+			cache = nullptr;
+		delete this;
 	}
+	UNLOCK_CACHE();
 }
 
 static void database_check(su_info *info) {
@@ -88,30 +90,18 @@ static void database_check(su_info *info) {
 }
 
 static struct su_info *get_su_info(unsigned uid) {
-	su_info *info;
-	bool cache_miss = false;
+	su_info *info = nullptr;
 
+	// Get from cache or new instance
 	LOCK_CACHE();
-
-	if (cache && cache->uid == uid) {
+	if (cache && cache->uid == uid && cache->isFresh()) {
 		info = cache;
 	} else {
-		cache_miss = true;
-		info = new su_info(uid);
-		cache = info;
+		if (cache && cache->ref == 0)
+			delete cache;
+		cache = info = new su_info(uid);
 	}
-
-	// Update the cache status
-	info->life = TIMEOUT;
-	++info->ref;
-
-	// Start a thread to maintain the cache
-	if (cache_miss) {
-		pthread_t thread;
-		xpthread_create(&thread, nullptr, info_collector, info);
-		pthread_detach(thread);
-	}
-
+	info->newRef();
 	UNLOCK_CACHE();
 
 	LOGD("su: request from uid=[%d] (#%d)\n", info->uid, ++info->count);
@@ -209,6 +199,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	// Fail fast
 	if (info->access.policy == DENY && info->str[SU_MANAGER][0] == '\0') {
 		LOGD("su: fast deny\n");
+		info->deRef();
 		write_int(client, DENY);
 		close(client);
 		return;
@@ -221,8 +212,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	 */
 	int child = xfork();
 	if (child) {
-		// Decrement reference count
-		--info->ref;
+		info->deRef();
 
 		// Wait result
 		LOGD("su: waiting child pid=[%d]\n", child);

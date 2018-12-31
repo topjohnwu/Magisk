@@ -5,10 +5,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.topjohnwu.magisk.asyncs.MarkDownWindow;
+import com.topjohnwu.core.Const;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.components.MarkDownWindow;
+import com.topjohnwu.magisk.utils.AppUtils;
 
 import java.util.Locale;
 
@@ -29,7 +30,7 @@ public class AboutActivity extends BaseActivity {
 
     @Override
     public int getDarkTheme() {
-        return R.style.AppTheme_StatusBar_Dark;
+        return R.style.AppTheme_NoDrawer_Dark;
     }
 
     @Override
@@ -51,8 +52,8 @@ public class AboutActivity extends BaseActivity {
                 BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, getPackageName()));
 
         appChangelog.setOnClickListener(v -> {
-            new MarkDownWindow(this, getString(R.string.app_changelog),
-                    getResources().openRawResource(R.raw.changelog)).exec();
+            MarkDownWindow.show(this, getString(R.string.app_changelog),
+                    getResources().openRawResource(R.raw.changelog));
         });
 
         String translators = getString(R.string.translators);
@@ -62,9 +63,9 @@ public class AboutActivity extends BaseActivity {
             appTranslators.setSummary(translators);
         }
 
-        appSourceCode.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.SOURCE_CODE_URL)));
-        supportThread.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.XDA_THREAD)));
-        twitter.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.TWITTER_URL)));
+        appSourceCode.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.SOURCE_CODE_URL)));
+        supportThread.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.XDA_THREAD)));
+        twitter.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.TWITTER_URL)));
 
         setFloating();
     }

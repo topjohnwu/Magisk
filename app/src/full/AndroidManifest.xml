@@ -6,11 +6,12 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name="a.q"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
 
         <!-- Activities -->
@@ -31,18 +32,15 @@
         </activity>
         <activity
             android:name="a.d"
-            android:theme="@style/AppTheme.StatusBar" />
+            android:theme="@style/AppTheme.NoDrawer" />
         <activity
             android:name="a.e"
-            android:theme="@style/AppTheme.StatusBar"/>
+            android:theme="@style/AppTheme.NoDrawer"/>
         <activity
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor"
-            android:theme="@style/AppTheme.StatusBar" />
-        <activity
-            android:name="a.g"
-            android:theme="@style/AppTheme.Translucent" />
+            android:theme="@style/AppTheme.NoDrawer" />
 
         <!-- Superuser -->
 
@@ -52,15 +50,6 @@
             android:launchMode="singleTask"
             android:taskAffinity="internal.superuser"
             android:theme="@style/SuRequest" />
-
-        <activity
-            android:name=".superuser.RequestActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:taskAffinity="internal.superuser"
-            android:theme="@style/AppTheme.Translucent" />
-
-        <receiver android:name=".superuser.SuReceiver" />
 
         <!-- Receiver -->
 
@@ -82,14 +71,7 @@
 
         <!-- Service -->
 
-        <service
-            android:name="a.j"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name="a.k"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service android:name="a.j"/>
 
         <!-- Hardcode GMS version -->
         <meta-data

@@ -9,9 +9,10 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
+        minSdkVersion 17
         applicationId "com.topjohnwu.magisk"
-        minSdkVersion 21
         targetSdkVersion rootProject.ext.compileSdkVersion
+        vectorDrawables.useSupportLibrary = true
     }
 
     signingConfigs {
@@ -71,18 +72,23 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.core:core:1.0.1'
+    implementation project(':net')
     fullImplementation project(':utils')
-    fullImplementation 'com.amitshekhar.android:android-networking:1.0.2'
+    fullImplementation project(':core')
     fullImplementation 'androidx.appcompat:appcompat:1.0.2'
     fullImplementation "androidx.preference:preference:${rootProject.ext.androidXVersion}"
     fullImplementation "androidx.recyclerview:recyclerview:${rootProject.ext.androidXVersion}"
     fullImplementation "androidx.cardview:cardview:${rootProject.ext.androidXVersion}"
     fullImplementation "com.google.android.material:material:${rootProject.ext.androidXVersion}"
+    fullImplementation 'android.arch.work:work-runtime:1.0.0-beta01'
+    fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    fullImplementation 'androidx.room:room-runtime:2.0.0'
     fullImplementation 'com.github.topjohnwu:libsu:2.1.2'
-    fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
     fullImplementation 'org.kamranzafar:jtar:2.3'
+    fullImplementation 'ru.noties:markwon:2.0.1'
+    fullImplementation 'com.caverock:androidsvg-aar:1.3'
 
-    def butterKnifeVersion = '9.0.0-rc2'
+    def butterKnifeVersion = '9.0.0-rc3'
     if (properties.containsKey('android.injected.invoked.from.ide')) {
         fullImplementation "com.jakewharton:butterknife-reflect:${butterKnifeVersion}"
     } else {

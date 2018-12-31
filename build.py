@@ -242,7 +242,7 @@ def build_apk(args, flavor):
 
 def build_app(args):
 	source = os.path.join('scripts', 'util_functions.sh')
-	target = os.path.join('app', 'src', 'full', 'res', 'raw', 'util_functions.sh')
+	target = os.path.join('core', 'src', 'main', 'res', 'raw', 'util_functions.sh')
 	cp(source, target)
 	build_apk(args, 'Full')
 

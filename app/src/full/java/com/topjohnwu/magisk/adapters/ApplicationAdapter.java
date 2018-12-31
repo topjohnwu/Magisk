@@ -13,10 +13,10 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.Const;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.utils.Topic;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;

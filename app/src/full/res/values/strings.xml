@@ -75,8 +75,8 @@
     <string name="progress_channel">Progress Notifications</string>
     <string name="download_complete">Download complete</string>
     <string name="download_file_error">Error downloading file</string>
-    <string name="magisk_update_title">New Magisk Update Available!</string>
-    <string name="manager_update_title">New Magisk Manager Update Available!</string>
+    <string name="magisk_update_title">Magisk Update Available!</string>
+    <string name="manager_update_title">Magisk Manager Update Available!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Close</string>
@@ -126,6 +126,7 @@
     <string name="setup_msg">Running environment setup…</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
+    <string name="dl_one_module">Download one module at a time.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

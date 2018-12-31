@@ -77,6 +77,7 @@ cpio::cpio(const char *filename) {
 			delete entry;
 			if (trailer)
 				break;
+			continue;
 		}
 		arr.push_back(entry);
 	}

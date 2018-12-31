@@ -16,9 +16,9 @@ import android.security.keystore.KeyProperties;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 
@@ -36,10 +36,9 @@ public abstract class FingerprintHelper {
     private CancellationSignal cancel;
 
     public static boolean useFingerPrint() {
-        MagiskManager mm = Data.MM();
-        boolean fp = mm.mDB.getSettings(Const.Key.SU_FINGERPRINT, 0) != 0;
+        boolean fp = App.self.mDB.getSettings(Const.Key.SU_FINGERPRINT, 0) != 0;
         if (fp && !canUseFingerprint()) {
-            mm.mDB.setSettings(Const.Key.SU_FINGERPRINT, 0);
+            App.self.mDB.setSettings(Const.Key.SU_FINGERPRINT, 0);
             fp = false;
         }
         return fp;
@@ -48,9 +47,8 @@ public abstract class FingerprintHelper {
     public static boolean canUseFingerprint() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return false;
-        MagiskManager mm = Data.MM();
-        KeyguardManager km = mm.getSystemService(KeyguardManager.class);
-        FingerprintManager fm = mm.getSystemService(FingerprintManager.class);
+        KeyguardManager km = App.self.getSystemService(KeyguardManager.class);
+        FingerprintManager fm = App.self.getSystemService(FingerprintManager.class);
         return km.isKeyguardSecure() && fm != null && fm.isHardwareDetected() && fm.hasEnrolledFingerprints();
     }
 
@@ -106,7 +104,7 @@ public abstract class FingerprintHelper {
 
     protected FingerprintHelper() throws Exception {
         KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-        manager = Data.MM().getSystemService(FingerprintManager.class);
+        manager = App.self.getSystemService(FingerprintManager.class);
         cipher = Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
                 + KeyProperties.BLOCK_MODE_CBC + "/"
                 + KeyProperties.ENCRYPTION_PADDING_PKCS7);

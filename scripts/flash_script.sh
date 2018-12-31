@@ -57,7 +57,7 @@ ui_print "- Target image: $BOOTIMAGE"
 # Detect version and architecture
 api_level_arch_detect
 
-[ $API -lt 21 ] && abort "! Magisk is only for Lollipop and above (5.0+) (SDK 21+)"
+[ $API -lt 19 ] && abort "! Magisk is only for KitKat and above (4.4+) (SDK 19+)"
 
 ui_print "- Device platform: $ARCH"
 

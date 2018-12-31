@@ -3,9 +3,10 @@ package com.topjohnwu.magisk;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.topjohnwu.core.Const;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.AppUtils;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -20,7 +21,7 @@ public class DonationActivity extends BaseActivity {
 
     @Override
     public int getDarkTheme() {
-        return R.style.AppTheme_StatusBar_Dark;
+        return R.style.AppTheme_NoDrawer_Dark;
     }
 
     @Override
@@ -38,7 +39,7 @@ public class DonationActivity extends BaseActivity {
             ab.setDisplayHomeAsUpEnabled(true);
         }
 
-        paypal.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.PAYPAL_URL)));
-        patreon.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.PATREON_URL)));
+        paypal.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.PAYPAL_URL)));
+        patreon.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.PATREON_URL)));
     }
 }

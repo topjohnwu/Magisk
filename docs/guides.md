@@ -18,7 +18,7 @@ In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and *
 In Magisk, there are also 2 kinds of scripts: **general scripts** and **module scripts**.
 
 - General Scripts
-    - Placed in `$COREDIR/post-fs-data.d` or `$COREDIR/service.d`
+    - Placed in `$SECURE_DIR/post-fs-data.d` or `$SECURE_DIR/service.d`
     - Only executed if the script is executable (execution permissions, `chmod +x script.sh`)
     - Scripts in `post-fs-data.d` runs in post-fs-data mode, and scripts in `service.d` runs in late_start service mode.
     - Will still be executed when **Core-Only** mode is enabled.

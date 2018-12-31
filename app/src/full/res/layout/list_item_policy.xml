@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     style="?attr/cardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -66,7 +67,7 @@
 
             </LinearLayout>
 
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/master_switch"
@@ -99,12 +100,12 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_notifications"
+                    app:srcCompat="@drawable/ic_notifications"
                     android:layout_gravity="center_vertical"
                     android:tint="@color/icon_grey"
                     android:layout_marginEnd="10dp" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/notification_switch"
@@ -126,12 +127,12 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_bug_report"
+                    app:srcCompat="@drawable/ic_bug_report"
                     android:layout_gravity="center_vertical"
                     android:tint="@color/icon_grey"
                     android:layout_marginEnd="10dp" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/logging_switch"
@@ -147,7 +148,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
-                android:src="@drawable/ic_delete"
+                app:srcCompat="@drawable/ic_delete"
                 android:tint="@color/icon_grey"
                 android:layout_gravity="center" />
 
@@ -157,7 +158,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
-                android:src="@drawable/ic_more"
+                app:srcCompat="@drawable/ic_more"
                 android:tint="@color/icon_grey"
                 android:layout_gravity="center" />
 

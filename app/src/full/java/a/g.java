@@ -1,7 +1,15 @@
 package a;
 
-import com.topjohnwu.magisk.NoUIActivity;
+import android.content.Context;
 
-public class g extends NoUIActivity {
-    /* stub */
+import com.topjohnwu.magisk.services.UpdateCheckService;
+
+import androidx.annotation.NonNull;
+import androidx.work.WorkerParameters;
+
+public class g extends w<UpdateCheckService> {
+    /* Stub */
+    public g(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
 }

@@ -3,10 +3,8 @@ package com.topjohnwu.magisk;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
-import android.net.LocalSocketAddress;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.FileObserver;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -17,14 +15,17 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.container.Policy;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.SuConnector;
 
 import java.io.IOException;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import butterknife.BindView;
 
 public class SuRequestActivity extends BaseActivity {
@@ -42,48 +43,6 @@ public class SuRequestActivity extends BaseActivity {
     private Policy policy;
     private CountDownTimer timer;
     private FingerprintHelper fingerprintHelper;
-
-    class SuConnectorV1 extends SuConnector {
-
-        SuConnectorV1(String name) throws IOException {
-            super(name);
-        }
-
-        @Override
-        public void connect(String name) throws IOException {
-            socket.connect(new LocalSocketAddress(name, LocalSocketAddress.Namespace.FILESYSTEM));
-            new FileObserver(name) {
-                @Override
-                public void onEvent(int fileEvent, String path) {
-                    if (fileEvent == FileObserver.DELETE_SELF) {
-                        finish();
-                    }
-                }
-            }.startWatching();
-        }
-
-        @Override
-        public void onResponse() throws IOException {
-            out.write((policy.policy == Policy.ALLOW ? "socket:ALLOW" : "socket:DENY").getBytes());
-        }
-    }
-
-    class SuConnectorV2 extends SuConnector {
-
-        SuConnectorV2(String name) throws IOException {
-            super(name);
-        }
-
-        @Override
-        public void connect(String name) throws IOException {
-            socket.connect(new LocalSocketAddress(name, LocalSocketAddress.Namespace.ABSTRACT));
-        }
-
-        @Override
-        public void onResponse() throws IOException {
-            out.writeInt(policy.policy);
-        }
-    }
 
     @Override
     public int getDarkTheme() {
@@ -114,17 +73,21 @@ public class SuRequestActivity extends BaseActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
         PackageManager pm = getPackageManager();
-        mm.mDB.clearOutdated();
+        app.mDB.clearOutdated();
 
         // Get policy
         Intent intent = getIntent();
         try {
             String socketName = intent.getStringExtra("socket");
-            connector =  intent.getIntExtra("version", 1) == 1 ?
-                    new SuConnectorV1(socketName) : new SuConnectorV2(socketName);
+            connector = new SuConnector(socketName) {
+                @Override
+                protected void onResponse() throws IOException {
+                    out.writeInt(policy.policy);
+                }
+            };
             Bundle bundle = connector.readSocketInput();
             int uid = Integer.parseInt(bundle.getString("uid"));
-            policy = mm.mDB.getPolicy(uid);
+            policy = app.mDB.getPolicy(uid);
             if (policy == null) {
                 policy = new Policy(uid, pm);
             }
@@ -163,6 +126,8 @@ public class SuRequestActivity extends BaseActivity {
         appIcon.setImageDrawable(policy.info.loadIcon(pm));
         appNameView.setText(policy.appName);
         packageNameView.setText(policy.packageName);
+        warning.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                AppCompatResources.getDrawable(this, R.drawable.ic_warning), null, null, null);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.allow_timeout, android.R.layout.simple_spinner_item);
@@ -252,7 +217,7 @@ public class SuRequestActivity extends BaseActivity {
         policy.policy = action;
         if (time >= 0) {
             policy.until = (time == 0) ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
-            mm.mDB.updatePolicy(policy);
+            app.mDB.updatePolicy(policy);
         }
         handleAction();
     }

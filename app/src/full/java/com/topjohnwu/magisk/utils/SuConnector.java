@@ -3,17 +3,19 @@ package com.topjohnwu.magisk.utils;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.LocalSocket;
+import android.net.LocalSocketAddress;
 import android.os.Bundle;
 import android.os.Process;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.core.App;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.container.Policy;
+import com.topjohnwu.core.container.SuLogEntry;
+import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.container.Policy;
-import com.topjohnwu.magisk.container.SuLogEntry;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -24,12 +26,13 @@ import java.util.Date;
 
 public abstract class SuConnector {
 
-    protected LocalSocket socket = new LocalSocket();
+    private LocalSocket socket;
     protected DataOutputStream out;
     protected DataInputStream in;
 
     public SuConnector(String name) throws IOException {
-        connect(name);
+        socket = new LocalSocket();
+        socket.connect(new LocalSocketAddress(name, LocalSocketAddress.Namespace.ABSTRACT));
         out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
     }
@@ -66,18 +69,16 @@ public abstract class SuConnector {
         } catch (IOException ignored) { }
     }
 
-    public abstract void connect(String name) throws IOException;
-
     protected abstract void onResponse() throws IOException;
 
-    public static void handleLogs(Intent intent, int version) {
+    public static void handleLogs(Intent intent) {
 
         int fromUid = intent.getIntExtra("from.uid", -1);
         if (fromUid < 0) return;
         if (fromUid == Process.myUid()) return;
 
-        MagiskManager mm = Data.MM();
-        PackageManager pm = mm.getPackageManager();
+        App app = App.self;
+        PackageManager pm = app.getPackageManager();
         Policy policy;
 
         boolean notify;
@@ -91,30 +92,15 @@ public abstract class SuConnector {
             }
         } else {
             // Doesn't report whether notify or not, check database ourselves
-            policy = mm.mDB.getPolicy(fromUid);
+            policy = app.mDB.getPolicy(fromUid);
             if (policy == null)
                 return;
             notify = policy.notification;
         }
 
-        if (version == 1) {
-            String action = intent.getStringExtra("action");
-            if (action == null) return;
-            switch (action) {
-                case "allow":
-                    policy.policy = Policy.ALLOW;
-                    break;
-                case "deny":
-                    policy.policy = Policy.DENY;
-                    break;
-                default:
-                    return;
-            }
-        } else {
-            policy.policy = data.getInt("policy", -1);
-            if (policy.policy < 0)
-                return;
-        }
+        policy.policy = data.getInt("policy", -1);
+        if (policy.policy < 0)
+            return;
 
         if (notify)
             handleNotify(policy);
@@ -131,24 +117,22 @@ public abstract class SuConnector {
         log.fromPid = pid;
         log.command = command;
         log.date = new Date();
-        mm.mDB.addLog(log);
+        app.mDB.addLog(log);
     }
 
     private static void handleNotify(Policy policy) {
-        MagiskManager mm = Data.MM();
-        String message = mm.getString(policy.policy == Policy.ALLOW ?
+        String message = App.self.getString(policy.policy == Policy.ALLOW ?
                 R.string.su_allow_toast : R.string.su_deny_toast, policy.appName);
         if (policy.notification && Data.suNotificationType == Const.Value.NOTIFICATION_TOAST)
             Utils.toast(message, Toast.LENGTH_SHORT);
     }
 
     public static void handleNotify(Intent intent) {
-        MagiskManager mm = Data.MM();
         int fromUid = intent.getIntExtra("from.uid", -1);
         if (fromUid < 0) return;
         if (fromUid == Process.myUid()) return;
         try {
-            Policy policy = new Policy(fromUid, mm.getPackageManager());
+            Policy policy = new Policy(fromUid, App.self.getPackageManager());
             policy.policy = intent.getIntExtra("policy", -1);
             if (policy.policy >= 0)
                 handleNotify(policy);
