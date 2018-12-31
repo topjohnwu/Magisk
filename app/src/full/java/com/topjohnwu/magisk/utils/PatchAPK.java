@@ -102,14 +102,8 @@ public class PatchAPK {
         File repack = new File(app.getFilesDir(), "patched.apk");
         String pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length());
 
-        try {
-            JarMap apk;
-            if ((apk = patch(app.getPackageCodePath(), pkg)) == null)
-                return false;
-            SignAPK.sign(apk, new BufferedOutputStream(new FileOutputStream(repack)));
-        } catch (Exception e) {
+        if (!patch(app.getPackageCodePath(), repack.getPath(), pkg))
             return false;
-        }
 
         // Install the application
         repack.setReadable(true, false);
@@ -123,23 +117,24 @@ public class PatchAPK {
         return true;
     }
 
-    public static JarMap patch(String apk, String pkg) {
+    public static boolean patch(String in, String out, String pkg) {
         try {
-            JarMap jar = new JarMap(apk);
+            JarMap jar = new JarMap(in);
             JarEntry je = jar.getJarEntry(Const.ANDROID_MANIFEST);
             byte xml[] = jar.getRawData(je);
 
             if (!findAndPatch(xml, BuildConfig.APPLICATION_ID, pkg) ||
                     !findAndPatch(xml, R.string.app_name, R.string.re_app_name))
-                return null;
+                return false;
 
             // Write in changes
             jar.getOutputStream(je).write(xml);
-            return jar;
+            SignAPK.sign(jar, new BufferedOutputStream(new FileOutputStream(out)));
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
+        return true;
     }
 
     public static void hideManager() {
