@@ -34,7 +34,7 @@ public class DownloadApp {
     }
 
     private static void dlInstall(String name, ManagerDownloadListener listener) {
-        File apk = new File(App.self.getFilesDir(), "manager.apk");
+        File apk = new File(App.self.getCacheDir(), "manager.apk");
         ProgressNotification progress = new ProgressNotification(name);
         listener.setProgressNotification(progress);
         Networking.get(Data.managerLink)

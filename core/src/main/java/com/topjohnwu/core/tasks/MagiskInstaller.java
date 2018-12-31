@@ -118,7 +118,7 @@ public abstract class MagiskInstaller {
 
         console.add("- Device platform: " + Build.CPU_ABI);
 
-        File zip = new File(App.self.getFilesDir(), "magisk.zip");
+        File zip = new File(App.self.getCacheDir(), "magisk.zip");
 
         if (!ShellUtils.checkSum("MD5", zip, Data.magiskMD5)) {
             console.add("- Downloading zip");
