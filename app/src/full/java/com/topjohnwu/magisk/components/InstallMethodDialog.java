@@ -71,12 +71,12 @@ class InstallMethodDialog extends AlertDialog.Builder {
             Networking.get(Data.magiskLink)
                     .setDownloadProgressListener(progress)
                     .setErrorHandler(((conn, e) -> progress.dlFail()))
-                    .getAsFile(f -> {
+                    .getAsFile(zip, f -> {
                         progress.dlDone();
                         SnackbarMaker.make(a,
                                 a.getString(R.string.internal_storage, "/Download/" + filename),
                                 Snackbar.LENGTH_LONG).show();
-                    }, zip);
+                    });
         });
     }
 
