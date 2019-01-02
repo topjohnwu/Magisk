@@ -36,7 +36,7 @@
     <string name="update_file_created">Le module sera mis à jour au prochain redémarrage.</string>
     <string name="remove_file_created">Le module sera supprimé au prochain redémarrage.</string>
     <string name="remove_file_deleted">Le module ne sera pas supprimé au prochain redémarrage.</string>
-    <string name="disable_file_created">Le module sear désactivé au prochain redémarrage.</string>
+    <string name="disable_file_created">Le module sera désactivé au prochain redémarrage.</string>
     <string name="disable_file_removed">Le module sera activé au prochain redémarrage.</string>
     <string name="author">Créé par %1$s</string>
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
