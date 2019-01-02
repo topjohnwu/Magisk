@@ -14,9 +14,9 @@
     <string name="magisk_update_available">Magisk v%1$s est disponible !</string>
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="safetyNet_check_text">Appuyez pour lancer le contrôle SafetyNet.</string>
-    <string name="checking_safetyNet_status">Vérification de l’état SafetyNet…</string>
+    <string name="checking_safetyNet_status">Vérification de l’état de SafetyNet…</string>
     <string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
-    <string name="safetyNet_api_error">Erreur d’API SafetyNet</string>
+    <string name="safetyNet_api_error">Erreur de l’API SafetyNet</string>
     <string name="safetyNet_res_invalid">La réponse est incorrecte.</string>
 
     <!--Install Fragment-->
@@ -33,11 +33,11 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(aucune information transmise)</string>
     <string name="no_modules_found">Aucun module trouvé.</string>
-    <string name="update_file_created">Le module va être mis à jour au prochain redémarrage.</string>
-    <string name="remove_file_created">Le module va être supprimé au prochain redémarrage.</string>
+    <string name="update_file_created">Le module sera mis à jour au prochain redémarrage.</string>
+    <string name="remove_file_created">Le module sera supprimé au prochain redémarrage.</string>
     <string name="remove_file_deleted">Le module ne sera pas supprimé au prochain redémarrage.</string>
-    <string name="disable_file_created">Le module va être désactivé au prochain redémarrage.</string>
-    <string name="disable_file_removed">Le module va être activé au prochain redémarrage.</string>
+    <string name="disable_file_created">Le module sear désactivé au prochain redémarrage.</string>
+    <string name="disable_file_removed">Le module sera activé au prochain redémarrage.</string>
     <string name="author">Créé par %1$s</string>
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
