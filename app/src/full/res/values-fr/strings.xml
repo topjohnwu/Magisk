@@ -1,4 +1,4 @@
-‐<resources>
+<resources>
 
     <!--Welcome Activity-->
     <string name="modules">Modules</string>
@@ -24,7 +24,7 @@
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
     <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Version installée : %1$s</string>
-    <string name="install_magisk_title">Dernière Version : %1$s</string>
+    <string name="install_magisk_title">Dernière version : %1$s</string>
     <string name="uninstall">Désinstaller</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés. Les permissions de super‐utilisateur seront perdues et vos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
@@ -49,8 +49,8 @@
     <string name="not_installed">Non installé</string>
     <string name="updated_on">Mis à jour le : %1$s</string>
     <string name="sorting_order">Mode de tri</string>
-    <string name="sort_by_name">trier par nom</string>
-    <string name="sort_by_update">trier par mise à jour la plus récente</string>
+    <string name="sort_by_name">par nom</string>
+    <string name="sort_by_update">par date décroissante</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Enregistrer le journal</string>
@@ -76,7 +76,7 @@
     <string name="download_complete">Téléchargement terminé</string>
     <string name="download_file_error">Erreur de téléchargement du fichier</string>
     <string name="magisk_update_title">Une mise à jour de Magisk est disponible !</string>
-    <string name="manager_update_title">Une mise à jour du Gestionnaire Magisk est disponible !</string>
+    <string name="manager_update_title">Une mise à jour de Magisk Manager est disponible !</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Fermer</string>
@@ -95,11 +95,11 @@
     <string name="zip_process_msg">Traitement du fichier ZIP…</string>
     <string name="manager_download_install">Appuyez pour le télécharger et l’installer.</string>
     <string name="dtbo_patched_title">DTBO a été modifié !</string>
-    <string name="dtbo_patched_reboot">Le Gestionnaire Magisk vient de modifier dtbo.img, veuillez redémarrer.</string>
+    <string name="dtbo_patched_reboot">Magisk Manager vient de modifier le fichier dtbo.img, veuillez redémarrer.</string>
     <string name="flashing">Installation</string>
-    <string name="hide_manager_title">Masquer le Gestionnaire Magisk…</string>
+    <string name="hide_manager_title">Masquer Magisk Manager…</string>
     <string name="hide_manager_msg">Cela pourrait prendre un certain temps.</string>
-    <string name="hide_manager_fail_toast">Le masquage du Gestionnaire Magisk a échoué.</string>
+    <string name="hide_manager_fail_toast">Le masquage de Magisk Manager a échoué.</string>
     <string name="open_link_failed_toast">Aucune application permettant d’ouvrir le lien n’a été trouvée.</string>
     <string name="download_zip_only">Télécharger le ZIP seulement</string>
     <string name="patch_boot_file">Modifier le fichier d’amorçage</string>
@@ -116,7 +116,7 @@
     <string name="restore_done">Restauration terminée !</string>
     <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
     <string name="proprietary_title">Téléchargement de code propriétaire</string>
-    <string name="proprietary_notice">Magisk Manager est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google.\n\nVoulez‐vous autoriser le Gestionnaire Magisk à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet ?</string>
+    <string name="proprietary_notice">Magisk Manager est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google.\n\nVoulez‐vous autoriser Magisk Manager à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet ?</string>
     <string name="su_db_corrupt">La base de données du super‐utilisateur est corrompue. Une nouvelle base de données va être créée.</string>
     <string name="setup_done">Installation terminée</string>
     <string name="setup_fail">Échec de l’installation</string>
@@ -126,7 +126,7 @@
     <string name="setup_msg">Démarrer l’installation de l’environnement…</string>
     <string name="downloading_toast">Téléchargement de %1$s</string>
     <string name="no_rw_storage">Cette opération ne fonctionnera pas sans la permission d’écriture sur le stockage externe.</string>
-    <string name="dl_one_module">Télécharger un seul module à la fois.</string> 
+    <string name="dl_one_module">Un seul module peut être téléchargé à la fois.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
@@ -134,10 +134,10 @@
     <string name="settings_dark_theme_summary">Activer le thème sombre.</string>
     <string name="settings_clear_cache_title">Effacer le cache du dépôt</string>
     <string name="settings_clear_cache_summary">Effacer les informations de cache pour les dépôts en ligne. Cela force l’application à récupérer ses informations en ligne.</string>
-    <string name="settings_hide_manager_title">Masquer le Gestionnaire Magisk</string>
-    <string name="settings_hide_manager_summary">Réempaqueter le Gestionnaire Magisk avec un nom de paquet aléatoire.</string>
-    <string name="settings_restore_manager_title">Restaurer le Gestionnaire Magisk</string>
-    <string name="settings_restore_manager_summary">Restaurer le Gestionnaire Magisk avec le paquet originel</string>
+    <string name="settings_hide_manager_title">Masquer Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Réempaqueter Magisk Manager avec un nom de paquet aléatoire.</string>
+    <string name="settings_restore_manager_title">Restaurer Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Restaurer Magisk Manager avec son nom de paquet d’origine</string>
     <string name="language">Langue</string>
     <string name="system_default">(système par défaut)</string>
     <string name="settings_update">Mise à jour des réglages</string>
