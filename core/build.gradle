@@ -26,8 +26,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':net')
-    implementation project(':utils')
-    implementation 'com.github.topjohnwu:libsu:2.1.2'
-    implementation 'org.kamranzafar:jtar:2.3'
+    api project(':net')
+    api project(':utils')
+    api 'org.kamranzafar:jtar:2.3'
+
+    def libsuVersion = '2.2.0'
+    api "com.github.topjohnwu.libsu:core:${libsuVersion}"
+    api "com.github.topjohnwu.libsu:io:${libsuVersion}"
 }

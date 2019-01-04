@@ -5,7 +5,6 @@ import android.content.Context;
 import com.topjohnwu.core.Const;
 import com.topjohnwu.core.Data;
 import com.topjohnwu.core.R;
-import com.topjohnwu.superuser.BusyBox;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
@@ -16,10 +15,6 @@ import java.io.InputStream;
 import androidx.annotation.NonNull;
 
 public class RootUtils extends Shell.Initializer {
-
-    static {
-        BusyBox.BB_PATH = new File(Const.BUSYBOX_PATH);
-    }
 
     public static void rmAndLaunch(String rm, String launch) {
         Shell.su(Utils.fmt("(rm_launch %d %s %s)&", Const.USER_ID, rm, launch)).exec();
