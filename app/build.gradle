@@ -73,6 +73,8 @@ dependencies {
     fullImplementation 'android.arch.work:work-runtime:1.0.0-beta01'
     fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     fullImplementation 'androidx.room:room-runtime:2.0.0'
+    
+    implementation 'com.sdsmdg.tastytoast:tastytoast:0.1.1'
 
     def butterKnifeVersion = '10.0.0'
     if (properties.containsKey('android.injected.invoked.from.ide')) {

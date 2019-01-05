@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.components;
 
 import android.app.Notification;
-import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.utils.Utils;
@@ -9,6 +8,8 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.net.DownloadProgressListener;
 
 import androidx.core.app.NotificationCompat;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 public class ProgressNotification implements DownloadProgressListener {
 
@@ -20,7 +21,7 @@ public class ProgressNotification implements DownloadProgressListener {
         builder = Notifications.progress(title);
         prevTime = System.currentTimeMillis();
         update();
-        Utils.toast(App.self.getString(R.string.downloading_toast, title), Toast.LENGTH_SHORT);
+	TastyToast.makeText(getApplicationContext(), App.self.getString(R.string.downloading_toast, title), TastyToast.LENGTH_LONG, TastyToast.INFO);
     }
 
     @Override

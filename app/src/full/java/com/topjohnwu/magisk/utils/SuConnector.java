@@ -7,7 +7,6 @@ import android.net.LocalSocketAddress;
 import android.os.Bundle;
 import android.os.Process;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
@@ -23,6 +22,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 public abstract class SuConnector {
 
@@ -124,7 +125,7 @@ public abstract class SuConnector {
         String message = App.self.getString(policy.policy == Policy.ALLOW ?
                 R.string.su_allow_toast : R.string.su_deny_toast, policy.appName);
         if (policy.notification && Data.suNotificationType == Const.Value.NOTIFICATION_TOAST)
-            Utils.toast(message, Toast.LENGTH_SHORT);
+	    TastyToast.makeText(getApplicationContext(), message, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
     }
 
     public static void handleNotify(Intent intent) {

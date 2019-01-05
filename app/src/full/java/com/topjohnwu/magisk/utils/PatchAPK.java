@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
@@ -28,6 +27,8 @@ import java.util.List;
 import java.util.jar.JarEntry;
 
 import androidx.core.app.NotificationCompat;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 public class PatchAPK {
 
@@ -145,7 +146,7 @@ public class PatchAPK {
             Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
             boolean b = patchAndHide();
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
-            if (!b) Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
+            if (!b) TastyToast.makeText(getApplicationContext(), R.string.hide_manager_fail_toast, TastyToast.LENGTH_LONG, TastyToast.ERROR);	
         });
     }
 }

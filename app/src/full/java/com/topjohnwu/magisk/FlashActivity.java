@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
@@ -34,6 +33,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.OnClick;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 public class FlashActivity extends BaseActivity {
 
@@ -70,7 +71,7 @@ public class FlashActivity extends BaseActivity {
                 e.printStackTrace();
                 return;
             }
-            Utils.toast(logFile.getPath(), Toast.LENGTH_LONG);
+	    TastyToast.makeText(getApplicationContext(), logFile.getPath(), TastyToast.LENGTH_LONG, TastyToast.DEFAULT);
         });
     }
 

@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.topjohnwu.core.Const;
 import com.topjohnwu.core.Data;
@@ -20,6 +19,8 @@ import java.io.File;
 
 import androidx.annotation.NonNull;
 
+import com.sdsmdg.tastytoast.TastyToast;
+
 public class UninstallDialog extends CustomAlertDialog {
 
     public UninstallDialog(@NonNull Activity activity) {
@@ -33,9 +34,9 @@ public class UninstallDialog extends CustomAlertDialog {
             Shell.su("restore_imgs").submit(result -> {
                 dialog.cancel();
                 if (result.isSuccess()) {
-                    Utils.toast(R.string.restore_done, Toast.LENGTH_SHORT);
+		    TastyToast.makeText(getApplicationContext(), R.string.restore_done, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);		
                 } else {
-                    Utils.toast(R.string.restore_fail, Toast.LENGTH_LONG);
+		    TastyToast.makeText(getApplicationContext(), R.string.restore_fail, TastyToast.LENGTH_LONG, TastyToast.ERROR);			
                 }
             });
         });

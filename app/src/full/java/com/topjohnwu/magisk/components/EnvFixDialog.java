@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.components;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.widget.Toast;
 
 import com.topjohnwu.core.tasks.MagiskInstaller;
 import com.topjohnwu.core.utils.Utils;
@@ -11,6 +10,8 @@ import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
 import androidx.annotation.NonNull;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 public class EnvFixDialog extends CustomAlertDialog {
 
@@ -34,7 +35,11 @@ public class EnvFixDialog extends CustomAlertDialog {
                 @Override
                 protected void onResult(boolean success) {
                     pd.dismiss();
-                    Utils.toast(success ? R.string.setup_done : R.string.setup_fail, Toast.LENGTH_LONG);
+					if (success){
+						TastyToast.makeText(getApplicationContext(), R.string.setup_done, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+					}else{
+						TastyToast.makeText(getApplicationContext(), R.string.setup_fail, TastyToast.LENGTH_LONG, TastyToast.ERROR);
+					}
                 }
             }.exec();
         });

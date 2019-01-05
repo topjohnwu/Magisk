@@ -14,7 +14,6 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
 import android.view.Gravity;
-import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
@@ -27,6 +26,8 @@ import java.security.KeyStore;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 @TargetApi(Build.VERSION_CODES.M)
 public abstract class FingerprintHelper {
@@ -97,7 +98,7 @@ public abstract class FingerprintHelper {
             helper.authenticate();
         } catch (Exception e) {
             e.printStackTrace();
-            Utils.toast(R.string.auth_fail, Toast.LENGTH_SHORT);
+	    TastyToast.makeText(getApplicationContext(), R.string.auth_fail, TastyToast.LENGTH_LONG, TastyToast.ERROR);
         }
 
     }

@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
@@ -39,6 +38,8 @@ import androidx.preference.PreferenceScreen;
 import androidx.preference.PreferenceViewHolder;
 import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 public class SettingsFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener,
@@ -88,13 +89,13 @@ public class SettingsFragment extends PreferenceFragmentCompat
         findPreference("clear").setOnPreferenceClickListener(pref -> {
             app.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
             app.repoDB.clearRepo();
-            Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
+	    TastyToast.makeText(getApplicationContext(), R.string.repo_cache_cleared, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
             return true;
         });
         findPreference("hosts").setOnPreferenceClickListener(pref -> {
             Shell.su("add_hosts_module").exec();
             Utils.loadModules();
-            Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT);
+	    TastyToast.makeText(getApplicationContext(), R.string.settings_hosts_toast, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
             return true;
         });
 
@@ -234,7 +235,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 } else {
                     Const.MAGISK_DISABLE_FILE.delete();
                 }
-                Utils.toast(R.string.settings_reboot_toast, Toast.LENGTH_LONG);
+		TastyToast.makeText(getApplicationContext(), R.string.settings_reboot_toast, TastyToast.LENGTH_LONG, TastyToast.INFO);
                 break;
             case Const.Key.MAGISKHIDE:
                 if (prefs.getBoolean(key, false)) {

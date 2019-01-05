@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
@@ -23,6 +22,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 public abstract class BaseActivity extends AppCompatActivity implements Topic.AutoSubscriber {
 
@@ -138,7 +139,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
                 grantCallback.run();
             }
         } else {
-            Toast.makeText(this, R.string.no_rw_storage, Toast.LENGTH_LONG).show();
+            TastyToast.makeText(getApplicationContext(), R.string.no_rw_storage, TastyToast.LENGTH_LONG, TastyToast.ERROR);
         }
         grantCallback = null;
     }

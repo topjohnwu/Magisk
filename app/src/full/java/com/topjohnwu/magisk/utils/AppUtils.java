@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
@@ -19,6 +18,8 @@ import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 public class AppUtils {
 
@@ -44,7 +45,7 @@ public class AppUtils {
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             context.startActivity(intent);
         } else {
-            Utils.toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT);
+	    TastyToast.makeText(getApplicationContext(), R.string.open_link_failed_toast, TastyToast.LENGTH_LONG, TastyToast.ERROR);	
         }
     }
 

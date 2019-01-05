@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.components;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.core.Const;
@@ -17,6 +16,8 @@ import java.io.File;
 import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
+
+import com.sdsmdg.tastytoast.TastyToast;
 
 class InstallMethodDialog extends AlertDialog.Builder {
 
@@ -46,7 +47,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
     }
 
     private void patchBoot(BaseActivity a) {
-        Utils.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
+	TastyToast.makeText(getApplicationContext(), R.string.boot_file_patch_msg, TastyToast.LENGTH_LONG, TastyToast.DEFAULT);
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
         a.runWithExternalRW(() ->
                 a.startActivityForResult(intent, Const.ID.SELECT_BOOT,
