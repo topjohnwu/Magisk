@@ -139,7 +139,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
                 grantCallback.run();
             }
         } else {
-            TastyToast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.no_rw_storage), TastyToast.LENGTH_LONG, TastyToast.ERROR);
+            TastyToast.makeText(getApplicationContext(), app.getString(R.string.no_rw_storage), TastyToast.LENGTH_LONG, TastyToast.ERROR);
         }
         grantCallback = null;
     }

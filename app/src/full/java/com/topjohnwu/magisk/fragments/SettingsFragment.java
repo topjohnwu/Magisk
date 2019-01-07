@@ -89,13 +89,13 @@ public class SettingsFragment extends PreferenceFragmentCompat
         findPreference("clear").setOnPreferenceClickListener(pref -> {
             app.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
             app.repoDB.clearRepo();
-	    TastyToast.makeText(getContext(), getContext().getString(R.string.repo_cache_cleared), TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+	    TastyToast.makeText(app.getApplicationContext(), app.getString(R.string.repo_cache_cleared), TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
             return true;
         });
         findPreference("hosts").setOnPreferenceClickListener(pref -> {
             Shell.su("add_hosts_module").exec();
             Utils.loadModules();
-	    TastyToast.makeText(getContext(), getContext().getString(R.string.settings_hosts_toast), TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+	    TastyToast.makeText(app.getApplicationContext(), app.getString(R.string.settings_hosts_toast), TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
             return true;
         });
 
@@ -235,7 +235,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 } else {
                     Const.MAGISK_DISABLE_FILE.delete();
                 }
-		TastyToast.makeText(getContext(), getContext().getString(R.string.settings_reboot_toast), TastyToast.LENGTH_LONG, TastyToast.INFO);
+		TastyToast.makeText(app.getApplicationContext(), app.getString(R.string.settings_reboot_toast), TastyToast.LENGTH_LONG, TastyToast.INFO);
                 break;
             case Const.Key.MAGISKHIDE:
                 if (prefs.getBoolean(key, false)) {
