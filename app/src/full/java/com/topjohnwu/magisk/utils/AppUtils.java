@@ -45,7 +45,7 @@ public class AppUtils {
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             context.startActivity(intent);
         } else {
-	    TastyToast.makeText(getApplicationContext(), R.string.open_link_failed_toast, TastyToast.LENGTH_LONG, TastyToast.ERROR);	
+	    TastyToast.makeText(context, context.getString(R.string.open_link_failed_toast), TastyToast.LENGTH_LONG, TastyToast.ERROR);	
         }
     }
 

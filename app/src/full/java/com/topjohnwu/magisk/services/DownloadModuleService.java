@@ -43,7 +43,7 @@ public class DownloadModuleService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (flags == 0 && running) {
-	    TastyToast.makeText(getApplicationContext(), R.string.dl_one_module, TastyToast.LENGTH_LONG, TastyToast.WARNING);
+	    TastyToast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.dl_one_module), TastyToast.LENGTH_LONG, TastyToast.WARNING);
         } else {
             running = true;
             Shell.EXECUTOR.execute(() -> {

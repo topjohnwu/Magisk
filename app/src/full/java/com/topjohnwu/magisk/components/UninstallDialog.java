@@ -34,9 +34,9 @@ public class UninstallDialog extends CustomAlertDialog {
             Shell.su("restore_imgs").submit(result -> {
                 dialog.cancel();
                 if (result.isSuccess()) {
-		    TastyToast.makeText(getApplicationContext(), R.string.restore_done, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);		
+		    TastyToast.makeText(activity.getApplicationContext(), activity.getString(R.string.restore_done), TastyToast.LENGTH_LONG, TastyToast.SUCCESS);		
                 } else {
-		    TastyToast.makeText(getApplicationContext(), R.string.restore_fail, TastyToast.LENGTH_LONG, TastyToast.ERROR);			
+		    TastyToast.makeText(activity.getApplicationContext(), activity.getString(R.string.restore_fail), TastyToast.LENGTH_LONG, TastyToast.ERROR);			
                 }
             });
         });

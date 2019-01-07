@@ -98,7 +98,7 @@ public abstract class FingerprintHelper {
             helper.authenticate();
         } catch (Exception e) {
             e.printStackTrace();
-	    TastyToast.makeText(getApplicationContext(), R.string.auth_fail, TastyToast.LENGTH_LONG, TastyToast.ERROR);
+	    TastyToast.makeText(App.self.getApplicationContext(), App.self.getString(R.string.auth_fail), TastyToast.LENGTH_LONG, TastyToast.ERROR);
         }
 
     }

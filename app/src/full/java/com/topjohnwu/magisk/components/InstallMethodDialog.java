@@ -47,7 +47,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
     }
 
     private void patchBoot(BaseActivity a) {
-	TastyToast.makeText(getApplicationContext(), R.string.boot_file_patch_msg, TastyToast.LENGTH_LONG, TastyToast.DEFAULT);
+	TastyToast.makeText(a.getApplicationContext(), a.getString(R.string.boot_file_patch_msg), TastyToast.LENGTH_LONG, TastyToast.DEFAULT);
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
         a.runWithExternalRW(() ->
                 a.startActivityForResult(intent, Const.ID.SELECT_BOOT,

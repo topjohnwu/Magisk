@@ -35,11 +35,11 @@ public class EnvFixDialog extends CustomAlertDialog {
                 @Override
                 protected void onResult(boolean success) {
                     pd.dismiss();
-		    if (success){
-			TastyToast.makeText(getApplicationContext(), R.string.setup_done, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
-		    }else{
-			TastyToast.makeText(getApplicationContext(), R.string.setup_fail, TastyToast.LENGTH_LONG, TastyToast.ERROR);
-		    }
+					if (success){
+						TastyToast.makeText(activity.getApplicationContext(), activity.getString(R.string.setup_done), TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+					}else{
+						TastyToast.makeText(activity.getApplicationContext(), activity.getString(R.string.setup_fail), TastyToast.LENGTH_LONG, TastyToast.ERROR);
+					}
                 }
             }.exec();
         });

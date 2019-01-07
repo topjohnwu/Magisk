@@ -21,7 +21,7 @@ public class ProgressNotification implements DownloadProgressListener {
         builder = Notifications.progress(title);
         prevTime = System.currentTimeMillis();
         update();
-	TastyToast.makeText(getApplicationContext(), App.self.getString(R.string.downloading_toast, title), TastyToast.LENGTH_LONG, TastyToast.INFO);
+	TastyToast.makeText(App.self.getApplicationContext(), App.self.getString(R.string.downloading_toast, title), TastyToast.LENGTH_LONG, TastyToast.INFO);
     }
 
     @Override

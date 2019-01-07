@@ -146,7 +146,7 @@ public class PatchAPK {
             Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
             boolean b = patchAndHide();
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
-            if (!b) TastyToast.makeText(getApplicationContext(), R.string.hide_manager_fail_toast, TastyToast.LENGTH_LONG, TastyToast.ERROR);	
+            if (!b) TastyToast.makeText(App.self.getApplicationContext(), App.self.getString(R.string.hide_manager_fail_toast), TastyToast.LENGTH_LONG, TastyToast.ERROR);	
         });
     }
 }

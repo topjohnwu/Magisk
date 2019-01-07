@@ -125,7 +125,7 @@ public abstract class SuConnector {
         String message = App.self.getString(policy.policy == Policy.ALLOW ?
                 R.string.su_allow_toast : R.string.su_deny_toast, policy.appName);
         if (policy.notification && Data.suNotificationType == Const.Value.NOTIFICATION_TOAST)
-	    TastyToast.makeText(getApplicationContext(), message, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+	    TastyToast.makeText(App.self.getApplicationContext(), message, TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
     }
 
     public static void handleNotify(Intent intent) {
