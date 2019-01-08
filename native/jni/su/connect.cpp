@@ -65,9 +65,7 @@ void app_log(struct su_context *ctx) {
 	setup_user(user, ctx->info);
 
 	char fromUid[8];
-	sprintf(fromUid, "%d",
-			ctx->info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED ?
-			ctx->info->uid % 100000 : ctx->info->uid);
+	sprintf(fromUid, "%d", ctx->info->uid);
 
 	char toUid[8];
 	sprintf(toUid, "%d", ctx->req.uid);

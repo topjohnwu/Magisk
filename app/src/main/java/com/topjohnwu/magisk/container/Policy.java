@@ -24,9 +24,9 @@ public class Policy implements Comparable<Policy>{
         String[] pkgs = pm.getPackagesForUid(uid);
         if (pkgs == null || pkgs.length == 0)
             throw new PackageManager.NameNotFoundException();
-        this.uid = uid;
         packageName = pkgs[0];
-        info = pm.getApplicationInfo(packageName, 0);
+        info = pm.getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES);
+        this.uid = info.uid;
         appName = Utils.getAppLabel(info, pm);
     }
 
@@ -37,7 +37,7 @@ public class Policy implements Comparable<Policy>{
         until = values.getAsInteger("until");
         logging = values.getAsInteger("logging") != 0;
         notification = values.getAsInteger("notification") != 0;
-        info = pm.getApplicationInfo(packageName, 0);
+        info = pm.getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES);
         if (info.uid != uid)
             throw new PackageManager.NameNotFoundException();
         appName = info.loadLabel(pm).toString();
