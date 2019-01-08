@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
     private void dlAPK() {
         Application app = getApplication();
         Networking.get(apkLink)
-                .getAsFile(apk -> APKInstall.install(app, apk), new File(getFilesDir(), "manager.apk"));
+                .getAsFile(new File(getFilesDir(), "manager.apk"), apk -> APKInstall.install(app, apk));
         finish();
     }
 
