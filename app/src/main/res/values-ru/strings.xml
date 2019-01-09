@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Ошибка загрузки файла</string>
-    <string name="downloading_toast">Загрузка %1$s</string>
-    <string name="no_rw_storage">Требуется разрешение на запись во внешнее хранилище.</string>
     <string name="no_thanks">Нет</string>
     <string name="yes">Да</string>
     <string name="ok">OK</string>

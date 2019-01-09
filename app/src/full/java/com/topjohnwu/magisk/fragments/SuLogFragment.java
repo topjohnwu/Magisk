@@ -16,15 +16,12 @@ import com.topjohnwu.magisk.components.BaseFragment;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class SuLogFragment extends BaseFragment {
 
     @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
-    private Unbinder unbinder;
     private SuLogAdapter adapter;
 
     @Override
@@ -44,8 +41,8 @@ public class SuLogFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_su_log, container, false);
-        unbinder = ButterKnife.bind(this, v);
-        adapter = new SuLogAdapter(mm.mDB);
+        unbinder = new SuLogFragment_ViewBinding(this, v);
+        adapter = new SuLogAdapter(app.mDB);
         recyclerView.setAdapter(adapter);
 
         updateList();
@@ -72,17 +69,11 @@ public class SuLogFragment extends BaseFragment {
                 updateList();
                 return true;
             case R.id.menu_clear:
-                mm.mDB.clearLogs();
+                app.mDB.clearLogs();
                 updateList();
                 return true;
             default:
                 return true;
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 }

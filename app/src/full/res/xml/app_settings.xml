@@ -1,10 +1,10 @@
-<PreferenceScreen
+<androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:key="general"
         android:title="@string/settings_general_category">
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:key="dark_theme"
             android:title="@string/settings_dark_theme_title"
             android:summary="@string/settings_dark_theme_summary" />
@@ -35,7 +35,7 @@
         android:key="update"
         android:title="@string/settings_update">
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:key="check_update"
             android:defaultValue="true"
             android:title="@string/settings_check_update_title"
@@ -61,17 +61,17 @@
         android:key="magisk"
         android:title="@string/magisk">
 
-        <CheckBoxPreference
+        <SwitchPreferenceCompat
             android:key="disable"
             android:title="@string/settings_core_only_title"
             android:summary="@string/settings_core_only_summary" />
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:key="magiskhide"
             android:title="@string/magiskhide"
             android:summary="@string/settings_magiskhide_summary" />
 
-        <SwitchPreference
+        <Preference
             android:key="hosts"
             android:title="@string/settings_hosts_title"
             android:summary="@string/settings_hosts_summary" />
@@ -118,16 +118,16 @@
             android:entries="@array/su_notification"
             android:entryValues="@array/value_array" />
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:key="su_fingerprint"
             android:title="@string/settings_su_fingerprint_title"
             android:summary="@string/settings_su_fingerprint_summary"/>
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:key="su_reauth"
             android:title="@string/settings_su_reauth_title"
             android:summary="@string/settings_su_reauth_summary"/>
 
     </PreferenceCategory>
 
-</PreferenceScreen>
+</androidx.preference.PreferenceScreen>

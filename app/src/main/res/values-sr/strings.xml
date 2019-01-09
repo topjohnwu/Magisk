@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Грешка при преузимању фајла</string>
-    <string name="downloading_toast">Преузимање %1$s</string>
-    <string name="no_rw_storage">Ово својство неће радити без дозволе приступу екстерном складишту.</string>
     <string name="no_thanks">Не хвала</string>
     <string name="yes">Да</string>
     <string name="ok">ОК</string>

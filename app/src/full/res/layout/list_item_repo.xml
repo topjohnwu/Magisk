@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     style="?attr/cardStyle"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -83,8 +84,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:background="@drawable/ic_file_download_black"
-            android:backgroundTint="@color/icon_grey"
+            app:srcCompat="@drawable/ic_file_download_black"
+            android:tint="@color/icon_grey"
             android:clickable="true"
             android:foreground="?android:attr/selectableItemBackground"
             android:focusable="false"

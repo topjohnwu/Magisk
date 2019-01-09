@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/repo_sort"
+        android:title=""
         android:icon="@drawable/ic_sort"
         app:showAsAction="always"/>
 

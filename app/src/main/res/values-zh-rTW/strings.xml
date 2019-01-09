@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">下載文件時出錯</string>
-    <string name="downloading_toast">正在下載 %1$s</string>
-    <string name="no_rw_storage">未授予寫入外部存儲權限，此功能無法正常工作。</string>
     <string name="no_thanks">不，謝謝</string>
     <string name="yes">是</string>
     <string name="ok">好</string>

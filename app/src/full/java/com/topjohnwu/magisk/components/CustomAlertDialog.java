@@ -16,7 +16,6 @@ import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class CustomAlertDialog extends AlertDialog.Builder {
 
@@ -37,7 +36,7 @@ public class CustomAlertDialog extends AlertDialog.Builder {
         @BindView(R.id.neutral) public Button neutral;
 
         ViewHolder(View v) {
-            ButterKnife.bind(this, v);
+            new CustomAlertDialog$ViewHolder_ViewBinding(this, v);
             messageView.setVisibility(View.GONE);
             negative.setVisibility(View.GONE);
             positive.setVisibility(View.GONE);

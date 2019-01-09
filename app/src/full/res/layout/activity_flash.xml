@@ -9,28 +9,22 @@
 
     <include layout="@layout/toolbar"/>
 
-    <ScrollView
-        android:id="@+id/scrollView"
+    <HorizontalScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp">
 
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-            <TextView
-                android:id="@+id/txtLog"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:padding="8dp"
-                android:textColor="@android:color/white"
-                android:textSize="10sp" />
-
-        </HorizontalScrollView>
-
-    </ScrollView>
+    </HorizontalScrollView>
 
     <LinearLayout
         android:id="@+id/button_panel"
@@ -42,7 +36,7 @@
         android:visibility="gone">
 
         <Button
-            android:id="@+id/no_thanks"
+            android:id="@+id/close"
             style="?android:borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_height="50dp"

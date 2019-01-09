@@ -10,16 +10,19 @@
 #MAGISK_VERSION_STUB
 
 # Detect whether in boot mode
-ps | grep zygote | grep -qv grep && BOOTMODE=true || BOOTMODE=false
+[ -z $BOOTMODE ] && BOOTMODE=false
+$BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
 $BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
 
 # Presets
+MAGISKTMP=/sbin/.magisk
 [ -z $NVBASE ] && NVBASE=/data/adb
 [ -z $MAGISKBIN ] && MAGISKBIN=$NVBASE/magisk
 [ -z $IMG ] && IMG=$NVBASE/magisk.img
-[ -z $MOUNTPATH ] && MOUNTPATH=/sbin/.core/img
 
-BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
+# Bootsigner related stuff
+BOOTSIGNERCLASS=a.a
+BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
 BOOTSIGNED=false
 
 setup_flashable() {
@@ -65,8 +68,8 @@ find_block() {
   for uevent in /sys/dev/block/*/uevent; do
     local DEVNAME=`grep_prop DEVNAME $uevent`
     local PARTNAME=`grep_prop PARTNAME $uevent`
-    for p in "$@"; do
-      if [ "`toupper $p`" = "`toupper $PARTNAME`" ]; then
+    for BLOCK in "$@"; do
+      if [ "`toupper $BLOCK`" = "`toupper $PARTNAME`" ]; then
         echo /dev/block/$DEVNAME
         return 0
       fi
@@ -91,7 +94,7 @@ mount_partitions() {
     mount -t ext4 -o ro $SYSTEMBLOCK /system
   fi
   [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
-  cat /proc/mounts | grep -E '/dev/root|/system_root' >/dev/null && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+  grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   if [ -f /system/init ]; then
     SYSTEM_ROOT=true
     mkdir /system_root 2>/dev/null
@@ -113,6 +116,7 @@ get_flags() {
   # override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
+  getvar RECOVERYMODE
   if [ -z $KEEPVERITY ]; then
     if $SYSTEM_ROOT; then
       KEEPVERITY=true
@@ -122,18 +126,22 @@ get_flags() {
     fi
   fi
   if [ -z $KEEPFORCEENCRYPT ]; then
-    if [ "`getprop ro.crypto.state`" = "encrypted" ]; then
+    grep ' /data ' /proc/mounts | grep -q 'dm-' && FDE=true || FDE=false
+    [ -d /data/unencrypted ] && FBE=true || FBE=false
+    # No data access means unable to decrypt in recovery
+    if $FDE || $FBE || ! $DATA; then
       KEEPFORCEENCRYPT=true
       ui_print "- Encrypted data detected, keep forceencrypt"
     else
       KEEPFORCEENCRYPT=false
     fi
   fi
+  [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
 
 grep_cmdline() {
   local REGEX="s/^$1=//p"
-  sed -E 's/ +/\n/g' /proc/cmdline | sed -n "$REGEX" 2>/dev/null
+  cat /proc/cmdline | tr '[:space:]' '\n' | sed -n "$REGEX" 2>/dev/null
 }
 
 grep_prop() {
@@ -147,7 +155,7 @@ grep_prop() {
 getvar() {
   local VARNAME=$1
   local VALUE=
-  VALUE=`grep_prop $VARNAME /.backup/.magisk /data/.magisk /cache/.magisk /system/.magisk`
+  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /data/.magisk /cache/.magisk`
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 
@@ -179,9 +187,9 @@ run_migrations() {
 find_boot_image() {
   BOOTIMAGE=
   if [ ! -z $SLOT ]; then
-    BOOTIMAGE=`find_block boot$SLOT ramdisk$SLOT`
+    BOOTIMAGE=`find_block ramdisk$SLOT recovery_ramdisk$SLOT boot$SLOT`
   else
-    BOOTIMAGE=`find_block boot ramdisk boot_a kern-a android_boot kernel lnx bootimg`
+    BOOTIMAGE=`find_block ramdisk recovery_ramdisk boot boot_a kern-a android_boot kernel lnx bootimg`
   fi
   if [ -z $BOOTIMAGE ]; then
     # Lets see what fstabs tells me
@@ -300,9 +308,9 @@ check_data() {
 }
 
 setup_bb() {
-  if [ -x /sbin/.core/busybox/busybox ]; then
+  if [ -x $MAGISKTMP/busybox/busybox ]; then
     # Make sure this path is in the front
-    echo $PATH | grep -q '^/sbin/.core/busybox' || export PATH=/sbin/.core/busybox:$PATH
+    echo $PATH | grep -q "^$MAGISKTMP/busybox" || export PATH=$MAGISKTMP/busybox:$PATH
   elif [ -x $TMPDIR/bin/busybox ]; then
     # Make sure this path is in the front
     echo $PATH | grep -q "^$TMPDIR/bin" || export PATH=$TMPDIR/bin:$PATH
@@ -316,11 +324,11 @@ setup_bb() {
 }
 
 boot_actions() {
-  if [ ! -d /sbin/.core/mirror/bin ]; then
-    mkdir -p /sbin/.core/mirror/bin
-    mount -o bind $MAGISKBIN /sbin/.core/mirror/bin
+  if [ ! -d $MAGISKTMP/mirror/bin ]; then
+    mkdir -p $MAGISKTMP/mirror/bin
+    mount -o bind $MAGISKBIN $MAGISKTMP/mirror/bin
   fi
-  MAGISKBIN=/sbin/.core/mirror/bin
+  MAGISKBIN=$MAGISKTMP/mirror/bin
   setup_bb
 }
 
@@ -386,7 +394,7 @@ request_zip_size_check() {
 check_filesystem() {
   curSizeM=`wc -c < $1`
   curSizeM=$((curSizeM / 1048576))
-  local DF=`df -P $2 | grep $2`
+  local DF=`df -Pk $2 | grep $2`
   curUsedM=`echo $DF | awk '{ print int($3 / 1024) }'`
   curFreeM=`echo $DF | awk '{ print int($4 / 1024) }'`
 }
@@ -426,5 +434,15 @@ unmount_magisk_img() {
   if [ $curSizeM -gt $newSizeM ]; then
     ui_print "- Shrinking $IMG to ${newSizeM}M"
     $MAGISKBIN/magisk imgtool resize $IMG $newSizeM >&2
+  fi
+}
+
+find_manager_apk() {
+  APK=/data/adb/magisk.apk
+  [ -f $APK ] || APK=/data/magisk/magisk.apk
+  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
+  if [ ! -f $APK ]; then
+    DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" | cut -d= -f2`
+    [ -z "$DBAPK" ] || APK=/data/app/$DBAPK*/*.apk
   fi
 }

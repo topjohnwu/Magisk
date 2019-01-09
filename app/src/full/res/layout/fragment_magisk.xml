@@ -41,7 +41,7 @@
                         android:layout_height="25dp"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@+id/core_only"
-                        android:src="@drawable/ic_warning"/>
+                        app:srcCompat="@drawable/ic_warning"/>
 
                     <TextView
                         android:id="@+id/core_only"
@@ -173,7 +173,7 @@
                             android:layout_centerVertical="true"
                             android:layout_margin="15dp"
                             android:layout_toStartOf="@+id/safetyNet_status"
-                            android:src="@drawable/ic_refresh" />
+                            app:srcCompat="@drawable/ic_refresh" />
 
                         <ProgressBar
                             android:id="@+id/safetyNet_check_progress"

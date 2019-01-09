@@ -15,7 +15,7 @@
     <string name="invalid_update_channel">无效的更新通道</string>
     <string name="safetyNet_check_text">点按启动 SafetyNet 检查</string>
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
-    <string name="safetyNet_check_success">SafetyNet 检查成功</string>
+    <string name="safetyNet_check_success">SafetyNet 检查完成</string>
     <string name="safetyNet_api_error">SafetyNet API 错误</string>
     <string name="safetyNet_res_invalid">回传值无效</string>
 
@@ -35,7 +35,7 @@
     <string name="no_modules_found">未找到模块</string>
     <string name="update_file_created">模块将在下次重启后更新</string>
     <string name="remove_file_created">模块将在下次重启后移除</string>
-    <string name="remove_file_deleted">模块将不会在下次重启后移除</string>
+    <string name="remove_file_deleted">模块不会在下次重启后移除</string>
     <string name="disable_file_created">模块将在下次重启后禁用</string>
     <string name="disable_file_removed">模块将在下次重启后启用</string>
     <string name="author">作者：%1$s</string>
@@ -70,13 +70,20 @@
     <string name="support_thread">支持主题</string>
     <string name="follow_twitter">关注我的 Twitter</string>
 
+    <!-- System Components, Notifications -->
+    <string name="update_channel">更新提示</string>
+    <string name="progress_channel">下载进度</string>
+    <string name="download_complete">下载完成</string>
+    <string name="download_file_error">下载文件时出错</string>
+    <string name="magisk_update_title">Magisk 可更新！</string>
+    <string name="manager_update_title">Magisk Manager 可更新！</string>
+
     <!--Toasts, Dialogs-->
     <string name="close">关闭</string>
     <string name="repo_install_title">安装 %1$s</string>
     <string name="repo_install_msg">是否立即安装 %1$s ？</string>
     <string name="download">下载</string>
     <string name="reboot">重启</string>
-    <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="settings_reboot_toast">重启以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
@@ -86,16 +93,14 @@
     <string name="zip_download_msg">正在下载 Zip 文件（%1$d%%）…</string>
     <string name="zip_process_title">正在处理</string>
     <string name="zip_process_msg">正在处理 zip 文件…</string>
-    <string name="manager_update_title">Magisk Manager 有更新！</string>
     <string name="manager_download_install">下载并安装</string>
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
-    <string name="magisk_updates">Magisk 更新</string>
     <string name="flashing">正在刷入</string>
-    <string name="hide_manager_toast">正在隐藏 Magisk Manager…</string>
-    <string name="hide_manager_toast2">这可能需要一点时间…</string>
-    <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败…</string>
-    <string name="open_link_failed_toast">找不到能够打开此链接的应用…</string>
+    <string name="hide_manager_title">正在隐藏 Magisk Manager…</string>
+    <string name="hide_manager_msg">这可能需要一点时间…</string>
+    <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
+    <string name="open_link_failed_toast">找不到能够打开此链接的应用</string>
     <string name="download_zip_only">仅下载 Zip</string>
     <string name="patch_boot_file">修补 Boot 镜像文件</string>
     <string name="direct_install">直接安装（推荐）</string>
@@ -119,6 +124,8 @@
     <string name="env_fix_msg">需要额外的安装才能使 Magisk 正常工作。 将下载 Magisk 安装包，是否继续？</string>
     <string name="setup_title">额外安装</string>
     <string name="setup_msg">运行环境安装中…</string>
+    <string name="downloading_toast">正在下载 %1$s</string>
+    <string name="no_rw_storage">未授予写入内置存储权限，此功能无法正常工作。</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -143,18 +150,21 @@
     <string name="settings_boot_format_title">已修补的 Boot 镜像输出格式</string>
     <string name="settings_boot_format_summary">选择已修补的 Boot 镜像文件输出格式\n若要通过 fastboot/download 模式刷入，请选择 .img 格式；若要通过 Odin 刷入，则选择 .img.tar\n</string>
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
-    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide 和 systemless hosts 仍会持续运作</string>
+    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU 和 MagiskHide 仍会持续运作</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
+    <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>
 
     <string name="settings_su_app_adb">应用和 ADB</string>
     <string name="settings_su_app">仅应用</string>
     <string name="settings_su_adb">仅 ADB</string>
     <string name="settings_su_disable">已禁用</string>
     <string name="settings_su_request_10">10 秒</string>
+    <string name="settings_su_request_15">15 秒</string>
     <string name="settings_su_request_20">20 秒</string>
     <string name="settings_su_request_30">30 秒</string>
+    <string name="settings_su_request_45">45 秒</string>
     <string name="settings_su_request_60">60 秒</string>
     <string name="superuser_access">超级用户访问权限</string>
     <string name="auto_response">自动响应</string>

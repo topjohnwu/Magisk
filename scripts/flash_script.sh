@@ -47,6 +47,7 @@ mount_partitions
 find_boot_image
 find_dtbo_image
 
+check_data
 get_flags
 
 [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
@@ -56,7 +57,7 @@ ui_print "- Target image: $BOOTIMAGE"
 # Detect version and architecture
 api_level_arch_detect
 
-[ $API -lt 21 ] && abort "! Magisk is only for Lollipop and above (5.0+) (SDK 21+)"
+[ $API -lt 19 ] && abort "! Magisk is only for KitKat and above (4.4+) (SDK 19+)"
 
 ui_print "- Device platform: $ARCH"
 
@@ -71,8 +72,6 @@ remove_system_su
 ##########################################################################################
 
 ui_print "- Constructing environment"
-
-check_data
 
 if $DATA; then
   MAGISKBIN=/data/magisk

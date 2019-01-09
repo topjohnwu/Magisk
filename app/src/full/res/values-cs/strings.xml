@@ -73,6 +73,9 @@
     <string name="process_error">Chyba při Zpracování</string>
     <string name="internal_storage">Zip je uchován v:\n[Interním Úložišti]%1$s</string>
     <string name="zip_process_title">Zpracování</string>
+    <string name="download_file_error">Chyba při Stahování souboru</string>
+    <string name="downloading_toast">Stahování %1$s</string>
+    <string name="no_rw_storage">Tato funkce nebude fungovat bez povolení k zápisu na externí úložiště.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Obecné</string>
@@ -90,8 +93,10 @@
     <string name="settings_su_adb">Pouze ADB</string>
     <string name="settings_su_disable">Zakázáno</string>
     <string name="settings_su_request_10">10 sekund</string>
+    <string name="settings_su_request_15">15 sekund</string>
     <string name="settings_su_request_20">20 sekund</string>
     <string name="settings_su_request_30">30 sekund</string>
+    <string name="settings_su_request_45">45 sekund</string>
     <string name="settings_su_request_60">60 sekund</string>
     <string name="superuser_access">Přístup Superuser</string>
     <string name="auto_response">Automatická Reakce</string>

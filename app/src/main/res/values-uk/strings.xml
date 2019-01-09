@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Помилка завантаження файлу</string>
-    <string name="downloading_toast">Завантаження %1$s</string>
-    <string name="no_rw_storage">Ця функція не працюватиме без дозволу на запис у Внутрішнє сховище</string>
     <string name="no_thanks">Ні, дякую</string>
     <string name="yes">Так</string>
     <string name="ok">OK</string>

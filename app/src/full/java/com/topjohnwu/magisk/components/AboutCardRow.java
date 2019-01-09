@@ -28,8 +28,8 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 
+import androidx.appcompat.content.res.AppCompatResources;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * @author dvdandroid
@@ -52,25 +52,19 @@ public class AboutCardRow extends LinearLayout {
     public AboutCardRow(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.info_item_row, this);
-        ButterKnife.bind(this, this);
+        new AboutCardRow_ViewBinding(this, this);
 
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
-        String title;
-        Drawable icon;
-        try {
-            title = a.getString(R.styleable.AboutCardRow_text);
-            icon = a.getDrawable(R.styleable.AboutCardRow_icon);
-        } finally {
-            a.recycle();
-        }
+        String title = a.getString(R.styleable.AboutCardRow_text);
+        Drawable icon = AppCompatResources.getDrawable(context,
+                a.getResourceId(R.styleable.AboutCardRow_icon, R.drawable.ic_magisk));
+        a.recycle();
         mTitle.setText(title);
         mIcon.setImageDrawable(icon);
     }
 
     @Override
     public void setOnClickListener(OnClickListener l) {
-        super.setOnClickListener(l);
-
         mView.setOnClickListener(l);
     }
 

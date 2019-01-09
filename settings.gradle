@@ -1,1 +1,1 @@
-include ':app', ':native', ':utils', ':snet'
+include ':app', ':native', ':utils', ':snet', ':net', ':core'

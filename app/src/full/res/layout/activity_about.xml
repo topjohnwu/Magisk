@@ -39,10 +39,10 @@
                         android:padding="16dp">
 
                         <ImageView
+                            app:srcCompat="@drawable/ic_logo"
                             android:layout_width="72dp"
                             android:layout_height="match_parent"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/ic_logo"/>
+                            android:layout_gravity="center_vertical" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -54,42 +54,42 @@
                             android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
                     </LinearLayout>
 
-                    <com.topjohnwu.magisk.components.AboutCardRow
+                    <a.l
                         android:id="@+id/app_version_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_info_outline"
                         app:text="@string/app_version"/>
 
-                    <com.topjohnwu.magisk.components.AboutCardRow
+                    <a.l
                         android:id="@+id/app_changelog"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_history"
                         app:text="@string/app_changelog"/>
 
-                    <com.topjohnwu.magisk.components.AboutCardRow
+                    <a.l
                         android:id="@+id/app_translators"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_language"
                         app:text="@string/app_translators"/>
 
-                    <com.topjohnwu.magisk.components.AboutCardRow
+                    <a.l
                         android:id="@+id/follow_twitter"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_twitter"
                         app:text="@string/follow_twitter"/>
 
-                    <com.topjohnwu.magisk.components.AboutCardRow
+                    <a.l
                         android:id="@+id/app_source_code"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_github"
                         app:text="@string/app_source_code"/>
 
-                    <com.topjohnwu.magisk.components.AboutCardRow
+                    <a.l
                         android:id="@+id/support_thread"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

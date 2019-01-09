@@ -1,0 +1,34 @@
+#ifndef __NEW__
+#define __NEW__
+
+#include <stddef.h>
+#include <stdlib.h>
+
+extern "C++" {
+
+namespace std {
+	using ::ptrdiff_t;
+	using ::size_t;
+	struct nothrow_t {};
+    extern const nothrow_t nothrow;
+}  // namespace std
+
+void* operator new(std::size_t);
+void* operator new[](std::size_t);
+void  operator delete(void*);
+void  operator delete[](void*);
+void* operator new(std::size_t, const std::nothrow_t&);
+void* operator new[](std::size_t, const std::nothrow_t&);
+void  operator delete(void*, const std::nothrow_t&);
+void  operator delete[](void*, const std::nothrow_t&);
+
+inline void* operator new(std::size_t, void* p) { return p; }
+inline void* operator new[](std::size_t, void* p) { return p; }
+
+// these next two are not really required, since exceptions are off
+inline void  operator delete(void*, void*) { }
+inline void  operator delete[](void*, void*) { }
+
+}  // extern C++
+
+#endif // __NEW__

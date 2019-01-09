@@ -90,10 +90,10 @@
     <string name="manager_download_install">Натисніть, щоб завантажити і встановити</string>
     <string name="dtbo_patched_title">DTBO пропатчено!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчив dtbo.img, будь ласка, перезавантажте пристрій</string>
-    <string name="magisk_updates">Оновлення Magisk</string>
+    <string name="update_channel">Оновлення Magisk</string>
     <string name="flashing">Прошивання</string>
-    <string name="hide_manager_toast">Приховування Magisk Manager…</string>
-    <string name="hide_manager_toast2">Це може зайняти деякий час…</string>
+    <string name="hide_manager_title">Приховування Magisk Manager…</string>
+    <string name="hide_manager_msg">Це може зайняти деякий час…</string>
     <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager…</string>
     <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання…</string>
     <string name="download_zip_only">Тільки завантажити</string>
@@ -119,6 +119,9 @@
     <string name="env_fix_msg">Для правильної роботи Magisk, потрібне додаткове налаштування вашого пристрою. Буде завантажено zip-архів. Розпочати негайно?</string>
     <string name="setup_title">Додаткове налаштування</string>
     <string name="setup_msg">Налаштування робочого середовища…</string>
+    <string name="download_file_error">Помилка завантаження файлу</string>
+    <string name="downloading_toast">Завантаження %1$s</string>
+    <string name="no_rw_storage">Ця функція не працюватиме без дозволу на запис у Внутрішнє сховище</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основні</string>
@@ -143,7 +146,7 @@
     <string name="settings_boot_format_title">Формат пропатченого образу</string>
     <string name="settings_boot_format_summary">Виберіть формат вихідного пропатченого boot образу.\n.img - для прошивання через fastboot/download режим;\n.img.tar - для прошивання через ODIN.</string>
     <string name="settings_core_only_title">Режим ядра Magisk</string>
-    <string name="settings_core_only_summary">Увімкнути тільки можливості ядра, всі модулі не будуть активними. MagiskSU, Magisk Hide і позасистемні хости залишуться увімкненими</string>
+    <string name="settings_core_only_summary">Увімкнути тільки можливості ядра, всі модулі не будуть активними. MagiskSU i Magisk Hide залишуться увімкненими</string>
     <string name="settings_magiskhide_summary">Приховати Magisk від різних перевірок</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для програм блокування реклами</string>
@@ -153,8 +156,10 @@
     <string name="settings_su_adb">ADB</string>
     <string name="settings_su_disable">Вимкнено</string>
     <string name="settings_su_request_10">10 секунд</string>
+    <string name="settings_su_request_15">15 секунд</string>
     <string name="settings_su_request_20">20 секунд</string>
     <string name="settings_su_request_30">30 секунд</string>
+    <string name="settings_su_request_45">45 секунд</string>
     <string name="settings_su_request_60">60 секунд</string>
     <string name="superuser_access">Доступ суперкористувача</string>
     <string name="auto_response">Автоматична відповідь</string>

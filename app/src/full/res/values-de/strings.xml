@@ -90,10 +90,10 @@
     <string name="manager_download_install">Herunterladen und installieren</string>
     <string name="dtbo_patched_title">DTBO wurde gepatched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatched, bitte neustarten</string>
-    <string name="magisk_updates">Magisk Update</string>
+    <string name="update_channel">Magisk Update</string>
     <string name="flashing">Flashing</string>
-    <string name="hide_manager_toast">Verberge Magisk Manager…</string>
-    <string name="hide_manager_toast2">Das könnte einige Zeit dauern...</string>
+    <string name="hide_manager_title">Verberge Magisk Manager…</string>
+    <string name="hide_manager_msg">Das könnte einige Zeit dauern...</string>
     <string name="hide_manager_fail_toast">Verbergen von Magisk Manager fehlgeschlagen…</string>
     <string name="open_link_failed_toast">Es wurde keine Anwendung gefunden, um diesen Link zu öffnen...</string>
     <string name="download_zip_only">Nur Zip-Datei herunterladen</string>
@@ -119,6 +119,9 @@
     <string name="env_fix_msg">Ihr Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip wird heruntergeladen, fortfahren?</string>
     <string name="setup_title">Zusätzliche Einrichtung</string>
     <string name="setup_msg">Umgebungseinrichtung läuft…</string>
+    <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
+    <string name="downloading_toast">Herunterladen von %1$s</string>
+    <string name="no_rw_storage">Dieses Feature funktioniert nicht, ohne die Berechtigung den externen Speicher zu beschreiben.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
@@ -143,7 +146,7 @@
     <string name="settings_boot_format_title">Ausgabeformat des gepatchten Boot-Images</string>
     <string name="settings_boot_format_summary">Wähle das Ausgabeformat des gepatchten Boot-Images.\nWähle .img, um mit \"fastboot/download mode\" zu flashen; wähle .img.tar zum Flashen mit ODIN.</string>
     <string name="settings_core_only_title">Nur Kernfunktionen</string>
-    <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide und Systemless hosts bleiben weiterhin aktiv</string>
+    <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU und Magisk Hide bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
@@ -153,8 +156,10 @@
     <string name="settings_su_adb">Nur ADB</string>
     <string name="settings_su_disable">Deaktiviert</string>
     <string name="settings_su_request_10">10 Sekunden</string>
+    <string name="settings_su_request_15">15 Sekunden</string>
     <string name="settings_su_request_20">20 Sekunden</string>
     <string name="settings_su_request_30">30 Sekunden</string>
+    <string name="settings_su_request_45">45 Sekunden</string>
     <string name="settings_su_request_60">60 Sekunden</string>
     <string name="superuser_access">Superuser-Zugriff</string>
     <string name="auto_response">Automatisch beantworten</string>

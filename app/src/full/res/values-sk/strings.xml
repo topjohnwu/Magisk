@@ -89,10 +89,10 @@
     <string name="manager_download_install">Stlačte pre stiahnutie a inštaláciu</string>
     <string name="dtbo_patched_title">DTBO bol zaplátaný!</string>
     <string name="dtbo_patched_reboot">Magisk Manager zaplátal dtbo.img, prosím, reštartujte</string>
-    <string name="magisk_updates">Aktualizácie Magisk</string>
+    <string name="update_channel">Aktualizácie Magisk</string>
     <string name="flashing">Flashovanie</string>
-    <string name="hide_manager_toast">Pracuje sa na skrytí Magisk Manager…</string>
-    <string name="hide_manager_toast2">Môže to chvíľu trvať…</string>
+    <string name="hide_manager_title">Pracuje sa na skrytí Magisk Manager…</string>
+    <string name="hide_manager_msg">Môže to chvíľu trvať…</string>
     <string name="hide_manager_fail_toast">Skrytie Magisk Manager zlyhalo…</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu…</string>
     <string name="download_zip_only">Stiahnuť iba zip</string>
@@ -142,7 +142,7 @@
     <string name="settings_boot_format_title">Výstupný formát zaplátaného Boot</string>
     <string name="settings_boot_format_summary">Vyberte výstupný formát zaplátaného obrazu boot.\nVyberte .img pre flashovanie cez fastboot/download režim; vyberte .img.tar pre flashovanie cez ODIN.</string>
     <string name="settings_core_only_title">Režim Magisk Core</string>
-    <string name="settings_core_only_summary">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU, MagiskHide a systemless hosts, ale žiadne moduly nebudú zavedené.</string>
+    <string name="settings_core_only_summary">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU a MagiskHide, ale žiadne moduly nebudú zavedené.</string>
     <string name="settings_magiskhide_summary">Ukryť Magisk pre rôznymi detekciami</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Podpora pre aplikácie systemless hosts Adblock</string>
@@ -152,8 +152,10 @@
     <string name="settings_su_adb">Iba ADB</string>
     <string name="settings_su_disable">Zakázané</string>
     <string name="settings_su_request_10">10 sekúnd</string>
+    <string name="settings_su_request_15">15 sekúnd</string>
     <string name="settings_su_request_20">20 sekúnd</string>
     <string name="settings_su_request_30">30 sekúnd</string>
+    <string name="settings_su_request_45">45 sekúnd</string>
     <string name="settings_su_request_60">60 sekúnd</string>
     <string name="superuser_access">Prístup Superuser</string>
     <string name="auto_response">Automatická odpoveď</string>

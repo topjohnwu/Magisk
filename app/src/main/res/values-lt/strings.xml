@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Atsisiunčiant failą įvyko klaida</string>
-    <string name="downloading_toast">Atsisiunčiamas %1$s</string>
-    <string name="no_rw_storage">Ši funkija neveiks be prieigos prie saugyklos</string>
     <string name="no_thanks">Ačiū, nereikia</string>
     <string name="yes">Taip</string>
     <string name="ok">Gerai</string>

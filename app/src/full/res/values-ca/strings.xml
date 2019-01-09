@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Root s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="update">Actualització %1$s</string>
-    
+
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>
     <string name="no_modules_found">No s’han trobat mòduls</string>
@@ -90,10 +90,10 @@
     <string name="manager_download_install">Premi per a descarregar i instal·lar</string>
     <string name="dtbo_patched_title">DTBO ha estat arranjat</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img, per favor reinicia el dispositiu</string>
-    <string name="magisk_updates">Actualització de Magisk</string>
-    <string name="flashing">Flashejat</string>
-    <string name="hide_manager_toast">Amagant Magisk Manager…</string>
-    <string name="hide_manager_toast2">Això pot tardar un temps…</string>
+    <string name="update_channel">Actualització de Magisk</string>
+    <string name="flashing">Instal·lant</string>
+    <string name="hide_manager_title">Amagant Magisk Manager…</string>
+    <string name="hide_manager_msg">Això pot tardar un temps…</string>
     <string name="hide_manager_fail_toast">L’amagament de Magisk Manager ha fallat…</string>
     <string name="open_link_failed_toast">No s’ha trobat cap aplicació per obrir l’enllaç…</string>
     <string name="download_zip_only">Descarregar només l’arxiu ZIP</string>
@@ -117,7 +117,7 @@
     <string name="env_fix_msg">El seu dispositiu requereix d’una instal·lació addicional per tal de que Magisk funcioni correctament. Es descarregarà el zip d’instalació de Magisk, desitja continuar ara?</string>
     <string name="setup_title">Configuració Addicional</string>
     <string name="setup_msg">Executant Configuració d\'Entorn</string>
-    
+
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema obscur</string>
@@ -140,8 +140,8 @@
     <string name="settings_update_custom_msg">Inserta una URL personalitzada</string>
     <string name="settings_boot_format_title">Arranja la imatge d’arrancada segons el tipus de format</string>
     <string name="settings_boot_format_summary">Seleccionar el format de sortida per arranjar la imatge d’arrancada.\nTriï  .img per flashejar mitcançant fastboot/download; triï .img.tar per flashejar amb ODIN.</string>
-    
-    <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU, MagiskHide, y Systemless Hosts seguirán habilitats</string>
+
+    <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU y MagiskHide seguirán habilitats</string>
     <string name="settings_magiskhide_summary">Amagar Magisk de varies deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
@@ -151,8 +151,10 @@
     <string name="settings_su_adb">Només ADB</string>
     <string name="settings_su_disable">Deshabilitat</string>
     <string name="settings_su_request_10">10 segons</string>
+    <string name="settings_su_request_15">15 segons</string>
     <string name="settings_su_request_20">20 segons</string>
     <string name="settings_su_request_30">30 segons</string>
+    <string name="settings_su_request_45">45 segons</string>
     <string name="settings_su_request_60">60 segons</string>
     <string name="superuser_access">Accés de superusuari</string>
     <string name="auto_response">Resposta automàtica</string>
@@ -164,9 +166,9 @@
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
     <string name="settings_su_fingerprint_summary">Utilitza el sensor d’Empremta Dactilar per permetre les sol·licituds de superusuari</string>
     <string name="auth_fingerprint">Autenticar Emprempta Digital</string>
- 
-    
-    <string name="multiuser_mode">Mode Multiusuari</string> 
+
+
+    <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
     <string name="settings_owner_manage">Administrador del Dispositiu</string>
     <string name="settings_user_independent">Usuari Independent</string>
@@ -174,7 +176,7 @@
     <string name="owner_manage_summary"> Només l’administrador pot supervisar l’acces root y rebre sol·licituds d’altres usuaris</string>
     <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles de root </string>
     <string name="multiuser_hint_owner_request">S’ha enviat una sol·licitud a l’administrador del dispositiu. Per favor, canviï a la conta de l’administrador y concedeixi el permís</string>
-    
+
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>
     <string name="settings_ns_requester">Heretar Namespace</string>

@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.adapters;
 
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C extends RecyclerView.ViewHolder>
@@ -9,8 +10,9 @@ public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C exte
 
     private static final int SECTION_TYPE = Integer.MIN_VALUE;
 
+    @NonNull
     @Override
-    final public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    final public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == SECTION_TYPE)
             return onCreateSectionViewHolder(parent);
         return onCreateItemViewHolder(parent, viewType);
@@ -18,7 +20,7 @@ public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C exte
 
     @Override
     @SuppressWarnings("unchecked")
-    final public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    final public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PositionInfo info = getPositionInfo(position);
         if (info.position == -1)
             onBindSectionViewHolder((S) holder, info.section);

@@ -90,10 +90,10 @@
     <string name="manager_download_install">Tik om te downloaden en installeren</string>
     <string name="dtbo_patched_title">DTBO is gepatched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager heeft dtbo.img gepatched, herstarten a.u.b.</string>
-    <string name="magisk_updates">Magisk updates</string>
+    <string name="update_channel">Magisk updates</string>
     <string name="flashing">Flashen</string>
-    <string name="hide_manager_toast">Magisk Manager verbergen…</string>
-    <string name="hide_manager_toast2">Dit kan even duren…</string>
+    <string name="hide_manager_title">Magisk Manager verbergen…</string>
+    <string name="hide_manager_msg">Dit kan even duren…</string>
     <string name="hide_manager_fail_toast">Magisk Manager verbergen mislukt…</string>
     <string name="download_zip_only">Alleen zip downloaden</string>
     <string name="patch_boot_file">Boot image-bestand patchen</string>
@@ -108,6 +108,9 @@
     <string name="proprietary_title">Google\'s code downloaden</string>
     <string name="proprietary_notice">Magisk Manager is FOSS, dus bevat geen SafetyNet API code van Google.\n\nSta je Magisk Manager toe om een extensie te downloaden (bevat GoogleApiClient) voor SafetyNet controles?</string>
     <string name="su_db_corrupt">SU database is corrupt, nieuwe db maken…</string>
+    <string name="download_file_error">Fout tijdens downloaden</string>
+    <string name="downloading_toast">%1$s downloaden</string>
+    <string name="no_rw_storage">Deze functie werkt niet zonder schrijfpermissie voor externe opslag.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Algemeen</string>
@@ -132,7 +135,7 @@
     <string name="settings_boot_format_title">Gepatchte boot uitvoerformaat</string>
     <string name="settings_boot_format_summary">Kies het formaat van de boot image uitvoer.\nKies .img om via fastboot/downloadmodus te flashen; kies .img.tar om via ODIN te flashen.</string>
     <string name="settings_core_only_title">Magisk basismodus</string>
-    <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, en systeemloze hosts blijven ingeschakeld</string>
+    <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU en MagiskHide blijven ingeschakeld</string>
     <string name="settings_magiskhide_summary">Magisk van verschillende detecties verbergen</string>
     <string name="settings_hosts_title">Systeemloze hosts</string>
     <string name="settings_hosts_summary">Systemloze hosts ondersteuning voor Adblock apps</string>
@@ -142,8 +145,10 @@
     <string name="settings_su_adb">Alleen ADB</string>
     <string name="settings_su_disable">Uitgeschakeld</string>
     <string name="settings_su_request_10">10 seconden</string>
+    <string name="settings_su_request_15">15 seconden</string>
     <string name="settings_su_request_20">20 seconden</string>
     <string name="settings_su_request_30">30 seconden</string>
+    <string name="settings_su_request_45">45 seconden</string>
     <string name="settings_su_request_60">60 seconden</string>
     <string name="superuser_access">Superuser toegang</string>
     <string name="auto_response">Automatisch antwoord</string>
@@ -154,7 +159,7 @@
     <string name="settings_su_reauth_summary">Superuser rechten opnieuw opvragen na bijwerken applicatie</string>
     <string name="settings_su_fingerprint_title">Vingerafdruk authenticatie inschakelen</string>
     <string name="settings_su_fingerprint_summary">Vingerafdruk gebruiken om superuser verzoeken toe te staan</string>
-    
+
     <string name="multiuser_mode">Multi-gebruiker modus</string>
     <string name="settings_owner_only">Alleen apparaateigenaar</string>
     <string name="settings_owner_manage">Beheerd door apparaateigenaar</string>

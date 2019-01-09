@@ -15,13 +15,15 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.tasks.CheckUpdates;
+import com.topjohnwu.core.tasks.SafetyNet;
+import com.topjohnwu.core.utils.ISafetyNetHelper;
+import com.topjohnwu.core.utils.Topic;
 import com.topjohnwu.magisk.BuildConfig;
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
-import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
@@ -30,9 +32,7 @@ import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.MagiskInstallDialog;
 import com.topjohnwu.magisk.components.ManagerInstallDialog;
 import com.topjohnwu.magisk.components.UninstallDialog;
-import com.topjohnwu.magisk.utils.Download;
-import com.topjohnwu.magisk.utils.ISafetyNetHelper;
-import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 
@@ -43,18 +43,15 @@ import androidx.cardview.widget.CardView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindColor;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 public class MagiskFragment extends BaseFragment
         implements SwipeRefreshLayout.OnRefreshListener, ExpandableView, Topic.Subscriber {
 
     private Container expandableContainer = new Container();
-    private Unbinder unbinder;
     private static boolean shownDialog = false;
 
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.swipeRefreshLayout) public SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.core_only_notice) CardView coreOnlyNotice;
 
@@ -85,7 +82,7 @@ public class MagiskFragment extends BaseFragment
     @BindColor(R.color.red500) int colorBad;
     @BindColor(R.color.green500) int colorOK;
     @BindColor(R.color.yellow500) int colorWarn;
-    @BindColor(R.color.grey500) int colorNeutral;
+    @BindColor(R.color.green500) int colorNeutral;
     @BindColor(R.color.blue500) int colorInfo;
 
     @OnClick(R.id.safetyNet_title)
@@ -94,10 +91,10 @@ public class MagiskFragment extends BaseFragment
             safetyNetProgress.setVisibility(View.VISIBLE);
             safetyNetRefreshIcon.setVisibility(View.GONE);
             safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-            new CheckSafetyNet(requireActivity()).exec();
+            SafetyNet.check(requireActivity());
             collapse();
         };
-        if (!CheckSafetyNet.dexPath.exists()) {
+        if (!SafetyNet.EXT_APK.exists()) {
             // Show dialog
             new CustomAlertDialog(requireActivity())
                     .setTitle(R.string.proprietary_title)
@@ -114,15 +111,13 @@ public class MagiskFragment extends BaseFragment
 
     @OnClick(R.id.install_button)
     void install() {
-        shownDialog = true;
-
         // Show Manager update first
         if (Data.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
             new ManagerInstallDialog((BaseActivity) requireActivity()).show();
             return;
         }
 
-        ((NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
+        ((NotificationManager) app.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
         new MagiskInstallDialog((BaseActivity) getActivity()).show();
     }
 
@@ -136,7 +131,7 @@ public class MagiskFragment extends BaseFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_magisk, container, false);
-        unbinder = ButterKnife.bind(this, v);
+        unbinder = new MagiskFragment_ViewBinding(this, v);
         requireActivity().setTitle(R.string.magisk);
 
         expandableContainer.expandLayout = expandLayout;
@@ -172,7 +167,7 @@ public class MagiskFragment extends BaseFragment
         shownDialog = false;
 
         // Trigger state check
-        if (Download.checkNetworkStatus(mm)) {
+        if (Networking.checkNetworkStatus(app)) {
             CheckUpdates.check();
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
@@ -197,18 +192,12 @@ public class MagiskFragment extends BaseFragment
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
     public Container getContainer() {
         return expandableContainer;
     }
 
     private boolean hasGms() {
-        PackageManager pm = mm.getPackageManager();
+        PackageManager pm = app.getPackageManager();
         PackageInfo info;
         try {
             info = pm.getPackageInfo("com.google.android.gms", 0);
@@ -221,14 +210,13 @@ public class MagiskFragment extends BaseFragment
     private void updateUI() {
         ((MainActivity) requireActivity()).checkHideSection();
 
-        boolean hasNetwork = Download.checkNetworkStatus(mm);
+        boolean hasNetwork = Networking.checkNetworkStatus(app);
         boolean hasRoot = Shell.rootAccess();
-        boolean isUpToDate = Data.magiskVersionCode > Const.MAGISK_VER.UNIFIED;
 
         magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
-        uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
-        coreOnlyNotice.setVisibility(mm.prefs.getBoolean(Const.Key.COREONLY, false) ? View.VISIBLE : View.GONE);
+        uninstallButton.setVisibility(hasRoot ? View.VISIBLE : View.GONE);
+        coreOnlyNotice.setVisibility(app.prefs.getBoolean(Const.Key.COREONLY, false) ? View.VISIBLE : View.GONE);
 
         int image, color;
 
@@ -277,14 +265,9 @@ public class MagiskFragment extends BaseFragment
         magiskUpdateProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
 
-        if (!shownDialog) {
-            if (Data.remoteMagiskVersionCode > Data.magiskVersionCode
-                    || Data.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
-                install();
-            } else if (Data.remoteMagiskVersionCode >= Const.MAGISK_VER.FIX_ENV &&
-                    !ShellUtils.fastCmdResult("env_check")) {
-                new EnvFixDialog(requireActivity()).show();
-            }
+        if (!shownDialog && !ShellUtils.fastCmdResult("env_check")) {
+            shownDialog = true;
+            new EnvFixDialog(requireActivity()).show();
         }
     }
 

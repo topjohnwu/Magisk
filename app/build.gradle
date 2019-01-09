@@ -5,13 +5,9 @@ def configPath = project.hasProperty('configPath') ? project.configPath : rootPr
 configProps.load(new FileInputStream(configPath))
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-
     defaultConfig {
         applicationId "com.topjohnwu.magisk"
-        minSdkVersion 21
-        targetSdkVersion rootProject.ext.compileSdkVersion
+        vectorDrawables.useSupportLibrary = true
     }
 
     signingConfigs {
@@ -55,34 +51,34 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    dexOptions {
-        preDexLibraries true
-        javaMaxHeapSize "2g"
-    }
     lintOptions {
         disable 'MissingTranslation'
     }
 }
 
-repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    fullImplementation project(':utils')
-    implementation "androidx.core:core:${rootProject.ext.androidXVersion}"
-    fullImplementation "androidx.preference:preference:${rootProject.ext.androidXVersion}"
-    fullImplementation "androidx.recyclerview:recyclerview:${rootProject.ext.androidXVersion}"
-    fullImplementation "androidx.cardview:cardview:${rootProject.ext.androidXVersion}"
-    fullImplementation "com.google.android.material:material:${rootProject.ext.androidXVersion}"
-    fullImplementation 'com.github.topjohnwu:libsu:2.0.2'
-    fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
-    fullImplementation 'org.kamranzafar:jtar:2.3'
-    fullImplementation 'com.jakewharton:butterknife:9.0.0-SNAPSHOT'
-    fullAnnotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-SNAPSHOT'
+    implementation project(':net')
+    fullImplementation project(':core')
+    fullImplementation 'ru.noties:markwon:2.0.1'
+    fullImplementation 'com.caverock:androidsvg-aar:1.3'
+
+    def androidXVersion = "1.0.0"
+    implementation 'androidx.core:core:1.0.1'
+    fullImplementation 'androidx.appcompat:appcompat:1.0.2'
+    fullImplementation "androidx.preference:preference:${androidXVersion}"
+    fullImplementation "androidx.recyclerview:recyclerview:${androidXVersion}"
+    fullImplementation "androidx.cardview:cardview:${androidXVersion}"
+    fullImplementation "com.google.android.material:material:${androidXVersion}"
+    fullImplementation 'android.arch.work:work-runtime:1.0.0-beta01'
+    fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    fullImplementation 'androidx.room:room-runtime:2.0.0'
+
+    def butterKnifeVersion = '10.0.0'
+    if (properties.containsKey('android.injected.invoked.from.ide')) {
+        fullImplementation "com.jakewharton:butterknife-reflect:${butterKnifeVersion}"
+    } else {
+        fullImplementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
+        fullAnnotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    }
 }

@@ -33,10 +33,10 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет информации)</string>
     <string name="no_modules_found">Модули не найдены</string>
-    <string name="update_file_created">Модуль будет обновлен после перезагрузки</string>
-    <string name="remove_file_created">Модуль будет удален после перезагрузки</string>
-    <string name="remove_file_deleted">Модуль не будет удален после перезагрузки</string>
-    <string name="disable_file_created">Модуль будет отключен после перезагрузки</string>
+    <string name="update_file_created">Модуль будет обновлён после перезагрузки</string>
+    <string name="remove_file_created">Модуль будет удалён после перезагрузки</string>
+    <string name="remove_file_deleted">Модуль не будет удалён после перезагрузки</string>
+    <string name="disable_file_created">Модуль будет отключён после перезагрузки</string>
     <string name="disable_file_removed">Модуль будет активирован после перезагрузки</string>
     <string name="author">Автор: %1$s</string>
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
@@ -90,10 +90,10 @@
     <string name="manager_download_install">Нажмите для установки</string>
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
-    <string name="magisk_updates">Обновления Magisk</string>
+    <string name="update_channel">Обновления Magisk</string>
     <string name="flashing">Прошивка…</string>
-    <string name="hide_manager_toast">Скрытие Magisk Manager…</string>
-    <string name="hide_manager_toast2">Может занять некоторое время…</string>
+    <string name="hide_manager_title">Скрытие Magisk Manager…</string>
+    <string name="hide_manager_msg">Может занять некоторое время…</string>
     <string name="hide_manager_fail_toast">Скрытие Magisk Manager неудачно!</string>
     <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки…</string>
     <string name="download_zip_only">Загрузка установочного ZIP</string>
@@ -119,13 +119,16 @@
     <string name="env_fix_msg">Вашему устройству требуется дополнительная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
     <string name="setup_title">Дополнительная установка</string>
     <string name="setup_msg">Настройка рабочей среды…</string>
+    <string name="download_file_error">Ошибка загрузки файла</string>
+    <string name="downloading_toast">Загрузка %1$s</string>
+    <string name="no_rw_storage">Требуется разрешение на запись во внешнее хранилище.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
     <string name="settings_dark_theme_title">Тёмная тема</string>
     <string name="settings_dark_theme_summary">Включить тёмное оформление</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
-    <string name="settings_clear_cache_summary">Очистить сохранённую информацию о репозитории. Будет обновлен принудительно</string>
+    <string name="settings_clear_cache_summary">Очистить сохранённую информацию о репозитории. Будет обновлён принудительно</string>
     <string name="settings_hide_manager_title">Скрытие Magisk Manager</string>
     <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным именем пакета</string>
     <string name="settings_restore_manager_title">Восстановление Magisk Manager</string>
@@ -143,7 +146,7 @@
     <string name="settings_boot_format_title">Тип образа ядра</string>
     <string name="settings_boot_format_summary">Выберите тип патченого образа ядра:\n*.img - для прошивки через fastboot/download режимы\n*.img.tar - для прошивки через ODIN (Samsung)</string>
     <string name="settings_core_only_title">Magisk Core</string>
-    <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU, Magisk Hide и внесистемные хосты останутся активными</string>
+    <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU и Magisk Hide останутся активными</string>
     <string name="settings_magiskhide_summary">Скрывать Magisk от различных проверок</string>
     <string name="settings_hosts_title">Внесистемные хосты</string>
     <string name="settings_hosts_summary">Поддержка внесистемных хостов для приложений, блокирующих рекламу</string>
@@ -151,18 +154,20 @@
     <string name="settings_su_app_adb">Приложения и ADB</string>
     <string name="settings_su_app">Только приложения</string>
     <string name="settings_su_adb">Только ADB</string>
-    <string name="settings_su_disable">Отключен</string>
+    <string name="settings_su_disable">Отключён</string>
     <string name="settings_su_request_10">10 секунд</string>
+    <string name="settings_su_request_15">15 секунд</string>
     <string name="settings_su_request_20">20 секунд</string>
     <string name="settings_su_request_30">30 секунд</string>
+    <string name="settings_su_request_45">45 секунд</string>
     <string name="settings_su_request_60">60 секунд</string>
     <string name="superuser_access">Уровень доступа</string>
     <string name="auto_response">Автоматический ответ</string>
     <string name="request_timeout">Ожидание ответа</string>
-    <string name="superuser_notification">Уведомления Суперпользователя</string>
+    <string name="superuser_notification">Уведомления суперпользователя</string>
     <string name="request_timeout_summary">%1$s секунд</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
-    <string name="settings_su_reauth_summary">Повторный запрос прав Суперпользователя после обновления приложений</string>
+    <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
     <string name="settings_su_fingerprint_title">Биометрическая аутентификация</string>
     <string name="settings_su_fingerprint_summary">Использовать дактилоскопический сканер для обработки запросов Суперпользователя</string>
     <string name="auth_fingerprint">Запрос отпечатка</string>
@@ -180,14 +185,14 @@
     <string name="settings_ns_global">Общее именное пространство</string>
     <string name="settings_ns_requester">Наследуемое именное пространство</string>
     <string name="settings_ns_isolate">Изолированное именное пространство</string>
-    <string name="global_summary">Сессии Суперпользователя используют общее именное пространство</string>
-    <string name="requester_summary">Сессии Суперпользователя наследуют именное пространство запрашивающего</string>
-    <string name="isolate_summary">Сессии Суперпользователя используют изолированные именные пространства</string>
+    <string name="global_summary">Сессии суперпользователя используют общее именное пространство</string>
+    <string name="requester_summary">Сессии суперпользователя наследуют именное пространство запрашивающего</string>
+    <string name="isolate_summary">Сессии суперпользователя используют изолированные именные пространства</string>
     <string name="android_o_not_support">Не поддерживается в Android 8.0+</string>
     <string name="disable_fingerprint">Не поддерживается устройством или не заданы отпечатки</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Запрос прав Суперпользователя</string>
+    <string name="su_request_title">Запрос прав суперпользователя</string>
     <string name="deny_with_str">Отказать %1$s</string>
     <string name="deny">Отказать</string>
     <string name="prompt">Запрос</string>
@@ -199,11 +204,11 @@
     <string name="twentymin">20 мин.</string>
     <string name="thirtymin">30 мин.</string>
     <string name="sixtymin">60 мин.</string>
-    <string name="su_allow_toast">%1$s предоставлены права Суперпользователя</string>
-    <string name="su_deny_toast">%1$s отказано в правах Суперпользователя</string>
+    <string name="su_allow_toast">%1$s предоставлены права суперпользователя</string>
+    <string name="su_deny_toast">%1$s отказано в правах суперпользователя</string>
     <string name="no_apps_found">Приложения не обнаружены</string>
-    <string name="su_snack_grant">%1$s предоставлены права Суперпользователя</string>
-    <string name="su_snack_deny">%1$s отказано в правах Суперпользователя</string>
+    <string name="su_snack_grant">%1$s предоставлены права суперпользователя</string>
+    <string name="su_snack_deny">%1$s отказано в правах суперпользователя</string>
     <string name="su_snack_notif_on">Уведомления для %1$s включены</string>
     <string name="su_snack_notif_off">Уведомления для %1$s отключены</string>
     <string name="su_snack_log_on">Логирование для %1$s включено</string>

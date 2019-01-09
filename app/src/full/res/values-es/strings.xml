@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="update">Actualización %1$s</string>
-    
+
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>
     <string name="no_modules_found">No se encontraron módulos</string>
@@ -70,6 +70,14 @@
     <string name="app_translators">Traductores</string>
     <string name="support_thread">Hilo de soporte</string>
     <string name="follow_twitter">Sigueme en Twitter</string>
+    
+        <!-- System Components, Notifications -->
+    <string name="update_channel">Actualización de Magisk</string>
+    <string name="progress_channel">Notificaciones de progreso</string>
+    <string name="download_complete">Descarga Completa</string>
+    <string name="download_file_error">Error descargando archivo</string>
+    <string name="magisk_update_title">¡Nueva actualización de Magisk disponible!</string>
+    <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Cerrar</string>
@@ -78,7 +86,6 @@
     <string name="download">Descargar</string>
     <string name="reboot">Reiniciar</string>
     <string name="zip_process_msg">Procesando archivo zip…</string>
-    <string name="magisk_update_title">¡Nueva actualización de Magisk disponible!</string>
     <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
     <string name="release_notes">Notas de lanzamiento</string>
     <string name="repo_cache_cleared">Caché del repositorio limpiada</string>
@@ -87,14 +94,12 @@
     <string name="zip_download_title">Descargando</string>
     <string name="zip_download_msg">Descargando el archivo zip (%1$d%%)…</string>
     <string name="zip_process_title">Procesando</string>
-    <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
     <string name="manager_download_install">Pulse para descargar e instalar</string>
     <string name="dtbo_patched_title">DTBO fue parchado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha parcheado dtbo.img, por favor reinicia</string>
-    <string name="magisk_updates">Actualización de Magisk</string>
     <string name="flashing">Flasheando</string>
-    <string name="hide_manager_toast">Ocultando Magisk Manager…</string>
-    <string name="hide_manager_toast2">Esto podría tomar un tiempo…</string>
+    <string name="hide_manager_title">Ocultando Magisk Manager…</string>
+    <string name="hide_manager_msg">Esto podría tomar un tiempo…</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
@@ -119,6 +124,10 @@
     <string name="setup_title">Configuración Adicional</string>
     <string name="setup_msg">Ejecutando Configuración de Entorno</string>
     
+    <string name="downloading_toast">Descargando %1$s</string>
+    <string name="no_rw_storage">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
+   
+
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema oscuro</string>
@@ -141,19 +150,22 @@
     <string name="settings_update_custom_msg">Insertar una URL personalizada</string>
     <string name="settings_boot_format_title">Parchear imagen boot por tipo de formato</string>
     <string name="settings_boot_format_summary">Seleccionar el formato de salida para parchear la imagen boot.\nEscoja .img para flashear mediante fastboot/download mode; escoja .img.tar para flashear con ODIN.</string>
-    
-    <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y Systemless Hosts seguirán habilitados</string>
+
+    <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Soporte para aplicaciones Adblock fuera de la partición system</string>
+    <string name="settings_hosts_toast">Módulo systemless hosts agregado</string>
 
     <string name="settings_su_app_adb">Aplicaciones y ADB</string>
     <string name="settings_su_app">Sólo aplicaciones</string>
     <string name="settings_su_adb">Sólo ADB</string>
     <string name="settings_su_disable">Deshabilitado</string>
     <string name="settings_su_request_10">10 segundos</string>
+    <string name="settings_su_request_15">15 segundos</string>
     <string name="settings_su_request_20">20 segundos</string>
     <string name="settings_su_request_30">30 segundos</string>
+    <string name="settings_su_request_45">45 segundos</string>
     <string name="settings_su_request_60">60 segundos</string>
     <string name="superuser_access">Acceso de superusuario</string>
     <string name="auto_response">Respuesta automática</string>
@@ -165,8 +177,8 @@
     <string name="settings_su_fingerprint_title">Autenticación por Huella Dactilar</string>
     <string name="settings_su_fingerprint_summary">Utilizar el sensor de Huella Dactilar para permitir las solicitudes de superusuario</string>
     <string name="auth_fingerprint">Autenticar Huella Dactilar</string>
-    
-    <string name="multiuser_mode">Modo MultiUsuario</string> 
+
+    <string name="multiuser_mode">Modo MultiUsuario</string>
     <string name="settings_owner_only">Sólo Administrador del Dispositivo</string>
     <string name="settings_owner_manage">Administrador del Dispositivo</string>
     <string name="settings_user_independent">Usuario Independiente</string>
@@ -174,7 +186,7 @@
     <string name="owner_manage_summary">Sólo el administrador puede supervisar el acceso root y recibir solicitudes de otros usuarios</string>
     <string name="user_indepenent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
     <string name="multiuser_hint_owner_request">Se ha enviado una solicitud al administrador del dispositivo. Por favor, cambie a la cuenta del administrador y conceda el permiso</string>
-    
+
     <string name="mount_namespace_mode">Montar Namespace </string>
     <string name="settings_ns_global">Global Namespace</string>
     <string name="settings_ns_requester">Heredar Namespace</string>

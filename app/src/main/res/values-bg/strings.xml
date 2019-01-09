@@ -1,8 +1,5 @@
 <resources>
-    <string name="downloading_toast">Изтегляне на %1$s</string>
-    <string name="download_file_error">Грешка при изтеглянето на файла</string>
-    <string name="no_rw_storage">Тази функция няма да работи без разрешение за запис във външната памет.</string>
-    <string name="no_thanks">Не, благодаря</string>
+    <string name="no_thanks">Не, благодаря.</string>
     <string name="yes">Да</string>
     <string name="ok">OK</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.adapters;
 
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +8,10 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.topjohnwu.core.container.SuLogEntry;
+import com.topjohnwu.core.database.MagiskDB;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.ExpandableView;
-import com.topjohnwu.magisk.container.SuLogEntry;
-import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,30 +20,28 @@ import java.util.Set;
 
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, SuLogAdapter.LogViewHolder> {
 
-    private List<List<Integer>> logEntryList;
+    private List<List<SuLogEntry>> logEntries;
     private Set<Integer> itemExpanded, sectionExpanded;
-    private MagiskDatabaseHelper suDB;
-    private Cursor suLogCursor = null;
+    private MagiskDB suDB;
 
-    public SuLogAdapter(MagiskDatabaseHelper db) {
+    public SuLogAdapter(MagiskDB db) {
         suDB = db;
-        logEntryList = Collections.emptyList();
+        logEntries = Collections.emptyList();
         sectionExpanded = new HashSet<>();
         itemExpanded = new HashSet<>();
     }
 
     @Override
     public int getSectionCount() {
-        return logEntryList.size();
+        return logEntries.size();
     }
 
     @Override
     public int getItemCount(int section) {
-        return sectionExpanded.contains(section) ? logEntryList.get(section).size() : 0;
+        return sectionExpanded.contains(section) ? logEntries.get(section).size() : 0;
     }
 
     @Override
@@ -61,8 +58,7 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
 
     @Override
     public void onBindSectionViewHolder(SectionHolder holder, int section) {
-        suLogCursor.moveToPosition(logEntryList.get(section).get(0));
-        SuLogEntry entry = new SuLogEntry(suLogCursor);
+        SuLogEntry entry = logEntries.get(section).get(0);
         holder.arrow.setRotation(sectionExpanded.contains(section) ? 180 : 0);
         holder.itemView.setOnClickListener(v -> {
             RotateAnimation rotate;
@@ -70,11 +66,11 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
                 holder.arrow.setRotation(0);
                 rotate = new RotateAnimation(180, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                 sectionExpanded.remove(section);
-                notifyItemRangeRemoved(getItemPosition(section, 0), logEntryList.get(section).size());
+                notifyItemRangeRemoved(getItemPosition(section, 0), logEntries.get(section).size());
             } else {
                 rotate = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                 sectionExpanded.add(section);
-                notifyItemRangeInserted(getItemPosition(section, 0), logEntryList.get(section).size());
+                notifyItemRangeInserted(getItemPosition(section, 0), logEntries.get(section).size());
             }
             rotate.setDuration(300);
             rotate.setFillAfter(true);
@@ -85,17 +81,16 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
 
     @Override
     public void onBindItemViewHolder(LogViewHolder holder, int section, int position) {
-        int sqlPosition = logEntryList.get(section).get(position);
-        suLogCursor.moveToPosition(sqlPosition);
-        SuLogEntry entry = new SuLogEntry(suLogCursor);
-        holder.setExpanded(itemExpanded.contains(sqlPosition));
+        SuLogEntry entry = logEntries.get(section).get(position);
+        int realIdx = getItemPosition(section, position);
+        holder.setExpanded(itemExpanded.contains(realIdx));
         holder.itemView.setOnClickListener(view -> {
             if (holder.isExpanded()) {
                 holder.collapse();
-                itemExpanded.remove(sqlPosition);
+                itemExpanded.remove(realIdx);
             } else {
                 holder.expand();
-                itemExpanded.add(sqlPosition);
+                itemExpanded.add(realIdx);
             }
         });
         holder.appName.setText(entry.appName);
@@ -107,10 +102,7 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
     }
 
     public void notifyDBChanged() {
-        if (suLogCursor != null)
-            suLogCursor.close();
-        suLogCursor = suDB.getLogCursor();
-        logEntryList = suDB.getLogStructure();
+        logEntries = suDB.getLogs();
         itemExpanded.clear();
         sectionExpanded.clear();
         sectionExpanded.add(0);
@@ -124,7 +116,7 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
 
         SectionHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            new SuLogAdapter$SectionHolder_ViewBinding(this, itemView);
         }
     }
 
@@ -142,7 +134,7 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
 
         LogViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            new SuLogAdapter$LogViewHolder_ViewBinding(this, itemView);
             container.expandLayout = expandLayout;
             setupExpandable();
         }

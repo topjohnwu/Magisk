@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Fout tijdens downloaden</string>
-    <string name="downloading_toast">%1$s downloaden</string>
-    <string name="no_rw_storage">Deze functie werkt niet zonder schrijfpermissie voor externe opslag.</string>
     <string name="no_thanks">Nee bedankt</string>
     <string name="yes">Ja</string>
     <string name="ok">Oké</string>

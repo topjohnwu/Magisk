@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Fel vid nerladdning av fil</string>
-    <string name="downloading_toast">Laddar ner %1$s</string>
-    <string name="no_rw_storage">Denna funktionen måste ha behörighet att skriva till externt lagringsutrymme.</string>
     <string name="no_thanks">Nej tack</string>
     <string name="yes">Ja</string>
     <string name="ok">OK</string>

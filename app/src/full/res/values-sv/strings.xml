@@ -77,7 +77,10 @@
     <string name="zip_process_title">Arbetar</string>
     <string name="manager_update_title">En uppdatering av Magisk maneger finns tillgänglig!</string>
     <string name="manager_download_install">Tryck för att ladda ner och installera</string>
-    <string name="magisk_updates">Magiska uppdateringar</string>
+    <string name="update_channel">Magiska uppdateringar</string>
+    <string name="download_file_error">Fel vid nerladdning av fil</string>
+    <string name="downloading_toast">Laddar ner %1$s</string>
+    <string name="no_rw_storage">Denna funktionen måste ha behörighet att skriva till externt lagringsutrymme.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allmän</string>
@@ -87,7 +90,7 @@
     <string name="settings_clear_cache_summary">Rensa den lagrade information för online-repos, tvingar appen att uppdatera online</string>
 
     <string name="settings_core_only_title">Endast Magisk kärnläge</string>
-    <string name="settings_core_only_summary">Aktiverar endast kärnfunktioner, alla moduler laddas inte. MagiskSU, MagiskHide och systemless hosts kommer fortfarande att vara aktiverade</string>
+    <string name="settings_core_only_summary">Aktiverar endast kärnfunktioner, alla moduler laddas inte. MagiskSU och MagiskHide kommer fortfarande att vara aktiverade</string>
     <string name="settings_magiskhide_summary">Dölj Magisk från att bli upptäckt</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts-stöd för Adblock-appar</string>
@@ -97,8 +100,10 @@
     <string name="settings_su_adb">Endast ADB</string>
     <string name="settings_su_disable">Inaktiverad</string>
     <string name="settings_su_request_10">10 sekunder</string>
+    <string name="settings_su_request_15">15 sekunder</string>
     <string name="settings_su_request_20">20 sekunder</string>
     <string name="settings_su_request_30">30 sekunder</string>
+    <string name="settings_su_request_45">45 sekunder</string>
     <string name="settings_su_request_60">60 sekunder</string>
     <string name="superuser_access">Superuser-tillgång</string>
     <string name="auto_response">Automatiskt svar</string>

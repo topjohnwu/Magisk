@@ -15,7 +15,6 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECPrivateKeySpec;
@@ -27,8 +26,8 @@ import java.util.Map;
 
 class CryptoUtils {
 
-    private static final Map<String, String> ID_TO_ALG;
-    private static final Map<String, String> ALG_TO_ID;
+    static final Map<String, String> ID_TO_ALG;
+    static final Map<String, String> ALG_TO_ID;
 
     static {
         ID_TO_ALG = new HashMap<>();
@@ -47,7 +46,7 @@ class CryptoUtils {
         ALG_TO_ID.put("SHA512withRSA", PKCSObjectIdentifiers.sha512WithRSAEncryption.getId());
     }
 
-    private static String getSignatureAlgorithm(Key key) throws Exception {
+    static String getSignatureAlgorithm(Key key) throws Exception {
         if ("EC".equals(key.getAlgorithm())) {
             int curveSize;
             KeyFactory factory = KeyFactory.getInstance("EC");
@@ -80,25 +79,6 @@ class CryptoUtils {
             throw new IllegalArgumentException("Unsupported key type " + key.getAlgorithm());
         }
         return new AlgorithmIdentifier(new ASN1ObjectIdentifier(id));
-    }
-
-    static boolean verify(PublicKey key, byte[] input, byte[] signature,
-                          AlgorithmIdentifier algId) throws Exception {
-        String algName = ID_TO_ALG.get(algId.getAlgorithm().getId());
-        if (algName == null) {
-            throw new IllegalArgumentException("Unsupported algorithm " + algId.getAlgorithm());
-        }
-        Signature verifier = Signature.getInstance(algName);
-        verifier.initVerify(key);
-        verifier.update(input);
-        return verifier.verify(signature);
-    }
-
-    static byte[] sign(PrivateKey privateKey, byte[] input) throws Exception {
-        Signature signer = Signature.getInstance(getSignatureAlgorithm(privateKey));
-        signer.initSign(privateKey);
-        signer.update(input);
-        return signer.sign();
     }
 
     static X509Certificate readCertificate(InputStream input)

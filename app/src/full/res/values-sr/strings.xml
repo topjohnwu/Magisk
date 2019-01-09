@@ -83,10 +83,10 @@
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
     <string name="dtbo_patched_title">DTBO је закрпљен!</string>
     <string name="dtbo_patched_reboot">Магиск Менаџер је закрпио dtbo.img, рестартујте телефон</string>
-    <string name="magisk_updates">Магиск Ажурирање</string>
+    <string name="update_channel">Магиск Ажурирање</string>
     <string name="flashing">Флешовање</string>
-    <string name="hide_manager_toast">Сакривам Магиск Менаџер…</string>
-    <string name="hide_manager_toast2">Ово може потрајати…</string>
+    <string name="hide_manager_title">Сакривам Магиск Менаџер…</string>
+    <string name="hide_manager_msg">Ово може потрајати…</string>
     <string name="hide_manager_fail_toast">Скривање Магиск Менаџера неуспешно…</string>
     <string name="download_zip_only">Преузми само Зип</string>
     <string name="patch_boot_file">Закрпи фајл слике покретања</string>
@@ -100,6 +100,9 @@
     <string name="proprietary_title">Преузми Власнички Код</string>
     <string name="proprietary_notice">Магиск Менаџер је \'FOSS\' што значи да не садржи Гуглов власнички код од СигурнаМрежа АПИ.\n\nДа ли дозвољавате да Магиск Менаџер преузме додатак (садржи GoogleApiClient) за СигурнаМрежа провере?</string>
     <string name="su_db_corrupt">СК база података оштећена, креирам нову</string>
+    <string name="download_file_error">Грешка при преузимању фајла</string>
+    <string name="downloading_toast">Преузимање %1$s</string>
+    <string name="no_rw_storage">Ово својство неће радити без дозволе приступу екстерном складишту.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Генерално</string>
@@ -120,7 +123,7 @@
     <string name="settings_boot_format_title">Закрпљено Покретање Излазни Формат</string>
     <string name="settings_boot_format_summary">Изабери формат излазних закрпљених слика покретања.\nИзаберите .img ако флешујете преко fastboot/download режима; Изаберите .img.tar ако флешујете уз ОДИН.</string>
     <string name="settings_core_only_title">Магиск Основни Режим</string>
-    <string name="settings_core_only_summary">Омогућава само основне карактеристике, сви модули неће бити учитани. МагискСК, МагискСакриј, и без-системски домаћини ће бити омогућени</string>
+    <string name="settings_core_only_summary">Омогућава само основне карактеристике, сви модули неће бити учитани. МагискСК и МагискСакриј ће бити омогућени</string>
     <string name="settings_magiskhide_summary">Сакриј Магиск од разних детекција</string>
     <string name="settings_hosts_title">Без-системски домаћини (hosts)</string>
     <string name="settings_hosts_summary">Подршка без-системских домаћина за апликације за блокирање реклама</string>
@@ -130,8 +133,10 @@
     <string name="settings_su_adb">Само АДБ</string>
     <string name="settings_su_disable">Онемогућено</string>
     <string name="settings_su_request_10">10 секунди</string>
+    <string name="settings_su_request_15">15 секунди</string>
     <string name="settings_su_request_20">20 секунди</string>
     <string name="settings_su_request_30">30 секунди</string>
+    <string name="settings_su_request_45">45 секунди</string>
     <string name="settings_su_request_60">60 секунди</string>
     <string name="superuser_access">Приступ Супер-кориснику</string>
     <string name="auto_response">Аутоматски одговор</string>

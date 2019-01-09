@@ -1,5 +1,5 @@
 <resources>
-    
+
     <!--Welcome Activity-->
     <string name="modules">Moduły</string>
     <string name="downloads">Pobieranie</string>
@@ -29,7 +29,7 @@
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
 	<string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte. Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>
     <string name="update">Aktualizacja %1$s</string>
-    
+
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
     <string name="no_modules_found">Nie znaleziono modułów</string>
@@ -42,7 +42,7 @@
     <string name="reboot_recovery">Restart do Recovery</string>
     <string name="reboot_bootloader">Restart do Bootloadera</string>
     <string name="reboot_download">Restart do Download</string>
-    
+
 	<!--Repo Fragment-->
     <string name="update_available">Aktualizacja jest dostępna</string>
     <string name="installed">Zainstalowany</string>
@@ -68,6 +68,15 @@
     <string name="donation">Dotacja</string>
     <string name="app_translators">Tłumacze Aplikacji</string>
     <string name="support_thread">Strona Wsparcia</string>
+	<string name="follow_twitter">Polub mnie na Twitterze</string>
+	
+	<!-- System Components, Notifications -->
+    <string name="update_channel">Aktualizacja Magisk</string>
+    <string name="progress_channel">Powiadomienia o Postępie</string>
+    <string name="download_complete">Pobieranie zakończone</string>
+    <string name="download_file_error">Błąd pobierania pliku</string>
+    <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
+    <string name="manager_update_title">Nowa Wersja Magisk Manager Jest Dostępna!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Zamknij</string>
@@ -75,7 +84,6 @@
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download">Pobierz</string>
     <string name="reboot">Restart</string>
-    <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
     <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
     <string name="release_notes">Zmiany</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
@@ -85,23 +93,26 @@
     <string name="zip_download_msg">Pobieranie pliku zip (%1$d%%) …</string>
 	<string name="zip_process_title">Przetwarzanie</string>
 	<string name="zip_process_msg">Przetwarzanie pliku zip …</string>
-    <string name="manager_update_title">Nowa Wersja Magisk Manager Jest Dostępna!</string>
     <string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
     <string name="dtbo_patched_title">DTBO został wgrany!</string>
     <string name="dtbo_patched_reboot">Magisk Manager wgrał dtbo.img, uruchom ponownie</string>
-    <string name="magisk_updates">Aktualizacja Magisk</string>
     <string name="flashing">Flashowanie</string>
-    <string name="hide_manager_toast">Ukryj Magisk Manager…</string>
-    <string name="hide_manager_toast2">To może chwilę potrwać…</string>
+    <string name="hide_manager_title">Ukryj Magisk Manager…</string>
+    <string name="hide_manager_msg">To może chwilę potrwać…</string>
 	<string name="hide_manager_fail_toast">Błąd Ukrycia Magisk Managera</string>
+	<string name="open_link_failed_toast">Nie znaleziono aplikacji pod linkiem.</string>
     <string name="download_zip_only">Pobierz Tylko Zip</string>
     <string name="patch_boot_file">Patchowanie Pliku Boot Image</string>
     <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
-    <string name="select_method">Wybierz Metodę</string>
+	<string name="install_inactive_slot">Zainstaluj do nieaktywnego Slotu (po OTA)</string>
+    <string name="warning">Uwaga</string>
+    <string name="install_inactive_slot_msg">Urządzenie będzie MUSIAŁO uruchomić się z bieżącego nieaktywnego slotu po restarcie! /\nUżyj tylko tej opcji po zakończeniu OTA.\nKontynuować?</string>
+	<string name="select_method">Wybierz Metodę</string>
     <string name="no_boot_file_patch_support">Wersja docelowa programu Magisk nie obsługuje ładowania pliku boot image</string>
     <string name="boot_file_patch_msg">Wybierz stock boot image w formacie .img lub .img.tar</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_img">Przywróć Obraz</string>
+	<string name="restore_img_msg">Przywracanie…</string>
     <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Stock backup nie istnieje!</string>
     <string name="proprietary_title">Pobierz Kod</string>
@@ -111,7 +122,11 @@
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga Dodatkowej Konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie pliku instalacyjnego Magisk, czy chcesz kontynuować?</string>
-	
+    <string name="setup_title">Dodatkowa konfiguracja</string>
+    <string name="setup_msg">Uruchamianie konfiguracji środowiska…</string>
+	<string name="downloading_toast">Pobieranie %1$s</string>
+    <string name="no_rw_storage">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
+
 	<!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
@@ -124,7 +139,7 @@
     <string name="settings_restore_manager_summary">Przywróć oryginalną paczkę Magisk Manager</string>
     <string name="language">Język</string>
     <string name="system_default">(Domyślny Systemu)</string>
-    <string name="settings_update">Aktualizacja Ustawień</string>
+    <string name="settings_update">Ustawienia Aktualizacji</string>
     <string name="settings_check_update_title">Sprawdź Aktualizację</string>
     <string name="settings_check_update_summary">Regularnie sprawdzaj aktualizacje w tle</string>
     <string name="settings_update_channel_title">Kanał Aktualizacji</string>
@@ -135,18 +150,21 @@
     <string name="settings_boot_format_title">Poprawny format pliku rozruchowego</string>
     <string name="settings_boot_format_summary">Wybierz format pliku boot image.\nWybierz .img dla wgrywania poprzez Fastboot/Download Mode. Wybierz .img.tar dla ODINA.</string>
     <string name="settings_core_only_title">Tylko Podstawowy Tryb Magisk</string>
-    <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU, MagiskHide i systemless hosts nadal będą włączone</string>
+    <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU i MagiskHide nadal będą włączone</string>
     <string name="settings_magiskhide_summary">Włącz Magisk Hide dla wykrytych aplikacji</string>
     <string name="settings_hosts_title">Włącz systemless hosts</string>
     <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
-    
-    <string name="settings_su_app_adb">Aplikacje i ADB</string>
+    <string name="settings_hosts_toast">Dodano systemowy host moduł</string>
+   
+   <string name="settings_su_app_adb">Aplikacje i ADB</string>
     <string name="settings_su_app">Tylko Aplikacje</string>
     <string name="settings_su_adb">Tylko ADB</string>
     <string name="settings_su_disable">Wyłączone</string>
     <string name="settings_su_request_10">10 sekund</string>
+    <string name="settings_su_request_15">15 sekund</string>
     <string name="settings_su_request_20">20 sekund</string>
     <string name="settings_su_request_30">30 sekund</string>
+    <string name="settings_su_request_45">45 sekund</string>
     <string name="settings_su_request_60">60 sekund</string>
     <string name="superuser_access">Dostęp Superuser</string>
     <string name="auto_response">Automatyczna Odpowiedź</string>
@@ -157,8 +175,9 @@
     <string name="settings_su_reauth_summary">Ponowne uwierzytelnianie uprawnienia superużytkownika po aktualizacji aplikacji</string>
     <string name="settings_su_fingerprint_title">Włącz Uwierzytelnienie Odciskiem Palca</string>
     <string name="settings_su_fingerprint_summary">Użyj skanera linii papilarnych, aby zezwolić na żądania supersu</string>
+    <string name="auth_fingerprint">Uwierzytelnianie Odciskiem Palców</string>
     
-    <string name="multiuser_mode">Tryb Multiusera</string>
+	<string name="multiuser_mode">Tryb Multiusera</string>
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie Właścicielami Urządzenia</string>
     <string name="settings_user_independent">Niezależny Użytkownik</string>
@@ -176,7 +195,7 @@
     <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
     <string name="android_o_not_support">Brak wsparcia dla Androida 8.0+</string>
     <string name="disable_fingerprint">Nie ustawiono żadnych odcisków palców lub brak obsługi urządzenia</string>
-		
+
     <!--Superuser-->
     <string name="su_request_title">Prośba o dostęp Superusera</string>
     <string name="deny_with_str">Odmów%1$s</string>

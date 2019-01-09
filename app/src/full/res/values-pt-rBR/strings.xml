@@ -6,7 +6,7 @@
     <string name="downloads">Downloads</string>
     <string name="superuser">Superusuário</string>
     <string name="log">Registro</string>
-    <string name="settings">Definições</string>
+    <string name="settings">Configurações</string>
     <string name="install">Instalar</string>
 
     <!--Status Fragment-->
@@ -21,7 +21,7 @@
     <string name="safetyNet_res_invalid">A resposta é inválida</string>
 
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Definições Avançadas</string>
+    <string name="advanced_settings_title">Configurações Avançadas</string>
     <string name="keep_force_encryption">Preservar criptografia forçada</string>
     <string name="keep_dm_verity">Preservar AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Versão Instalada: %1$s</string>
@@ -34,15 +34,15 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
     <string name="no_modules_found">Nenhum módulo encontrado</string>
-    <string name="update_file_created">Módulo será atualizado na próxima reinicialização</string>
-    <string name="remove_file_created">Módulo será removido na próxima reinicialização</string>
-    <string name="remove_file_deleted">Módulo não será removido na próxima reinicialização</string>
-    <string name="disable_file_created">Módulo será desativado na próxima reinicialização</string>
-    <string name="disable_file_removed">Módulo será ativado na próxima reinicialização</string>
+    <string name="update_file_created">O módulo será atualizado na próxima reinicialização</string>
+    <string name="remove_file_created">O módulo será removido na próxima reinicialização</string>
+    <string name="remove_file_deleted">O módulo não será removido na próxima reinicialização</string>
+    <string name="disable_file_created">O módulo será desativado na próxima reinicialização</string>
+    <string name="disable_file_removed">O módulo será ativado na próxima reinicialização</string>
     <string name="author">Criado por %1$s</string>
-    <string name="reboot_recovery">Reiniciar na Recuperação</string>
-    <string name="reboot_bootloader">Reiniciar no Bootloader</string>
-    <string name="reboot_download">Reiniciar no Download</string>
+    <string name="reboot_recovery">Reiniciar em Recuperação</string>
+    <string name="reboot_bootloader">Reiniciar em Bootloader</string>
+    <string name="reboot_download">Reiniciar em Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Atualização Disponível</string>
@@ -58,7 +58,7 @@
     <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Limpar registro agora</string>
     <string name="logs_cleared">Registro limpo com sucesso</string>
-    <string name="log_is_empty">Registro está vazio</string>
+    <string name="log_is_empty">Registro vazio</string>
 
     <!--About Activity-->
     <string name="about">Sobre</string>
@@ -77,9 +77,9 @@
     <string name="download">Baixar</string>
     <string name="reboot">Reiniciar</string>
     <string name="magisk_update_title">Nova Atualização do Magisk Disponível!</string>
-    <string name="settings_reboot_toast">Reinicie para aplicar as definições</string>
+    <string name="settings_reboot_toast">Reinicie para aplicar as configurações</string>
     <string name="release_notes">Notas de lançamento</string>
-    <string name="repo_cache_cleared">Cache de repositório limpado</string>
+    <string name="repo_cache_cleared">Cache de repositório limpo</string>
     <string name="process_error">Erro de processo</string>
     <string name="internal_storage">O zip está armazenado em:\n[Armazenamento Interno]%1$s</string>
     <string name="zip_download_title">Baixando</string>
@@ -90,10 +90,10 @@
     <string name="manager_download_install">Toque para baixar e instalar</string>
     <string name="dtbo_patched_title">DTBO foi emendado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager emendou dtbo.img, reinicie</string>
-    <string name="magisk_updates">Atualizações do Magisk</string>
+    <string name="update_channel">Atualizações do Magisk</string>
     <string name="flashing">Gravando</string>
-    <string name="hide_manager_toast">Ocultando Magisk Manager…</string>
-    <string name="hide_manager_toast2">Isto pode demorar um pouco…</string>
+    <string name="hide_manager_title">Ocultando Magisk Manager…</string>
+    <string name="hide_manager_msg">Isto pode demorar um pouco…</string>
     <string name="hide_manager_fail_toast">Falha ao ocultar Magisk Manager…</string>
     <string name="download_zip_only">Baixar Zip Apenas</string>
     <string name="patch_boot_file">Emendar Arquivo de Imagem de Inicialização</string>
@@ -105,10 +105,13 @@
     <string name="complete_uninstall">Completar Desinstalação</string>
     <string name="restore_img">Restaurar Imagens</string>
     <string name="restore_done">Restauração concluída!</string>
-    <string name="restore_fail">Backup de fábrica não existe!</string>
-    <string name="proprietary_title">Baixar Código de Propriedade</string>
-    <string name="proprietary_notice">Magisk Manager é FOSS, que não contém o código de propriedade de SafetyNet API da Google.\n\nPermitir ao Magisk Manager baixar uma extensão (que contém a GoogleApiClient) para verificação de SafetyNet?</string>
-    <string name="su_db_corrupt">Banco de dados do SU está corrompido, será recriado novo db</string>
+    <string name="restore_fail">Backup original não existe!</string>
+    <string name="proprietary_title">Baixar Código Proprietário</string>
+    <string name="proprietary_notice">Magisk Manager é FOSS, que não contém o código proprietário da API SafetyNet da Google.\n\nPermitir ao Magisk Manager baixar uma extensão (que contém a GoogleApiClient) para a verificação SafetyNet?</string>
+    <string name="su_db_corrupt">O banco de dados do SU está corrompido, será recriado novo db</string>
+    <string name="download_file_error">Erro ao baixar arquivo</string>
+    <string name="downloading_toast">Baixando %1$s</string>
+    <string name="no_rw_storage">Este recurso não funcionará sem permissão para gravar no armazenamento externo.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Geral</string>
@@ -122,7 +125,7 @@
     <string name="settings_restore_manager_summary">Restaurar Magisk Manager com pacote original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Padrão do Sistema)</string>
-    <string name="settings_update">Definições de Atualizações</string>
+    <string name="settings_update">Configurações de Atualizações</string>
     <string name="settings_check_update_title">Verificar Atualizações</string>
     <string name="settings_check_update_summary">Verificar atualizações em segundo plano periodicamente</string>
     <string name="settings_update_channel_title">Canal de Atualização</string>
@@ -133,7 +136,7 @@
     <string name="settings_boot_format_title">Formato de Saída de Inicialização Emendada</string>
     <string name="settings_boot_format_summary">Selecionar formato de saída de imagem de inicialização emendada.\nEscolha .img para gravar através do modo fastboot/download; escolha .img.tar para gravar com ODIN.</string>
     <string name="settings_core_only_title">Modo Magisk de Núcleo Apenas</string>
-    <string name="settings_core_only_summary">Ativar apenas recursos de núcleo. MagiskSU, MagiskHide e hosts sem sistema ainda serão ativados, mas nenhum módulo será carregado.</string>
+    <string name="settings_core_only_summary">Ativar apenas recursos de núcleo. MagiskSU e MagiskHide ainda serão ativados, mas nenhum módulo será carregado.</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de várias detecções</string>
     <string name="settings_hosts_title">Hosts sem sistema</string>
     <string name="settings_hosts_summary">Suporte de hosts sem sistema para apps de Adblock</string>
@@ -143,8 +146,10 @@
     <string name="settings_su_adb">ADB apenas</string>
     <string name="settings_su_disable">Desativado</string>
     <string name="settings_su_request_10">10 segundos</string>
+    <string name="settings_su_request_15">15 segundos</string>
     <string name="settings_su_request_20">20 segundos</string>
     <string name="settings_su_request_30">30 segundos</string>
+    <string name="settings_su_request_45">45 segundos</string>
     <string name="settings_su_request_60">60 segundos</string>
     <string name="superuser_access">Acesso de Superusuário</string>
     <string name="auto_response">Resposta Automática</string>

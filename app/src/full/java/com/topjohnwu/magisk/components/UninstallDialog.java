@@ -2,21 +2,21 @@ package com.topjohnwu.magisk.components;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
+import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Data;
+import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.FlashActivity;
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
-import com.topjohnwu.magisk.utils.Download;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
+
+import java.io.File;
 
 import androidx.annotation.NonNull;
 
@@ -24,7 +24,6 @@ public class UninstallDialog extends CustomAlertDialog {
 
     public UninstallDialog(@NonNull Activity activity) {
         super(activity);
-        MagiskManager mm = Data.MM();
         setTitle(R.string.uninstall_magisk_title);
         setMessage(R.string.uninstall_magisk_msg);
         setNeutralButton(R.string.restore_img, (d, i) -> {
@@ -41,17 +40,21 @@ public class UninstallDialog extends CustomAlertDialog {
             });
         });
         if (!TextUtils.isEmpty(Data.uninstallerLink)) {
-            setPositiveButton(R.string.complete_uninstall, (d, i) ->
-                    Download.receive(activity, new DownloadReceiver() {
-                        @Override
-                        public void onDownloadDone(Context context, Uri uri) {
-                            Intent intent = new Intent(context, FlashActivity.class)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .setData(uri)
-                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL);
-                            context.startActivity(intent);
-                        }
-                    }, Data.uninstallerLink, "magisk-uninstaller.zip"));
+            setPositiveButton(R.string.complete_uninstall, (d, i) -> {
+                File zip = new File(activity.getFilesDir(), "uninstaller.zip");
+                ProgressNotification progress = new ProgressNotification(zip.getName());
+                Networking.get(Data.uninstallerLink)
+                    .setDownloadProgressListener(progress)
+                    .setErrorHandler(((conn, e) -> progress.dlFail()))
+                    .getAsFile(zip, f -> {
+                        progress.dismiss();
+                        Intent intent = new Intent(activity, ClassMap.get(FlashActivity.class))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .setData(Uri.fromFile(f))
+                                .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL);
+                        activity.startActivity(intent);
+                    });
+            });
         }
     }
 }
