@@ -31,7 +31,7 @@
     <string name="update">Оновити %1$s</string>
 
     <!--Module Fragment-->
-    <string name="no_info_provided">(Немає наданої інформації)</string>
+    <string name="no_info_provided">(немає наданої інформації)</string>
     <string name="no_modules_found">Модулів не знайдено.</string>
     <string name="update_file_created">Модуль оновиться при перезавантаженні.</string>
     <string name="remove_file_created">Модуль видалиться при перезавантаженні.</string>
@@ -62,7 +62,7 @@
     <!--About Activity-->
     <string name="about">Про програму</string>
     <string name="app_changelog">Перелік змін</string>
-    <string name="translators" />
+    <string name="translators">tarasyyyk</string>
     <string name="app_version">Версія</string>
     <string name="app_source_code">Вихідний код</string>
     <string name="donation">Підтримати проект</string>
