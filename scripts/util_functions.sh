@@ -252,7 +252,7 @@ sign_chromeos() {
 }
 
 is_mounted() {
-  cat /proc/mounts | grep -q " `readlink -f $1` " 2>/dev/null
+  grep -q " `readlink -f $1` " /proc/mounts 2>/dev/null
   return $?
 }
 
