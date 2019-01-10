@@ -126,6 +126,7 @@
     <string name="setup_msg">运行环境安装中…</string>
     <string name="downloading_toast">正在下载 %1$s</string>
     <string name="no_rw_storage">未授予写入内置存储权限，此功能无法正常工作。</string>
+    <string name="dl_one_module"一次只能下载一个模块</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
