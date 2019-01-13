@@ -285,7 +285,7 @@ public abstract class MagiskInstaller {
     }
 
     protected boolean postOTA() {
-        SuFile bootctl = new SuFile(Const.MAGISK_PATH + "/.core/bootctl");
+        SuFile bootctl = new SuFile("/data/adb/bootctl");
         try (InputStream in = App.self.getResources().openRawResource(R.raw.bootctl);
              OutputStream out = new SuFileOutputStream(bootctl)) {
             ShellUtils.pump(in, out);
