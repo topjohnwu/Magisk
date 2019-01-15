@@ -405,7 +405,7 @@ mount_snippet() {
 }
 
 mount_magisk_img() {
-  [ -z reqSizeM ] && reqSizeM=0
+  [ -z $reqSizeM ] && reqSizeM=0
   mkdir -p $MOUNTPATH 2>/dev/null
   if [ -f "$IMG" ]; then
     ui_print "- Found $IMG"
