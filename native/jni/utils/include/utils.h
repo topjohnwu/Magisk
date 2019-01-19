@@ -22,6 +22,7 @@ char *strdup2(const char *s, size_t *size = nullptr);
 
 int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv);
 int exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, ...);
+int stime(const time_t *t);
 
 extern "C" {
 #endif
