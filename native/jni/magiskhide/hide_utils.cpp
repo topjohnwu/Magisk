@@ -7,6 +7,7 @@
 #include <libgen.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <utime.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -335,4 +336,11 @@ void auto_start_magiskhide() {
 		}, nullptr);
 		pthread_detach(thread);
 	}
+}
+
+void hide_mod(const char *file) {
+	struct utimbuf new_times;
+	new_times.actime = 0;
+	new_times.modtime = 0;
+	utime(file, &new_times);
 }

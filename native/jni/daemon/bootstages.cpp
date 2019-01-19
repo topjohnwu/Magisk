@@ -31,6 +31,7 @@ char *system_block, *vendor_block, *magiskloop;
 
 static int bind_mount(const char *from, const char *to);
 extern void auto_start_magiskhide();
+extern void hide_mod(const char *file);
 
 /***************
  * Magic Mount *
@@ -636,7 +637,7 @@ void unlock_blocks() {
  ****************/
 
 [[noreturn]] static void unblock_boot_process() {
-	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0770));
 	pthread_exit(nullptr);
 }
 
@@ -710,6 +711,7 @@ void startup() {
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 	link_dir(sbin, root);
 	close(sbin);
+	hide_mod("/sbin");
 
 	// Mount the /sbin tmpfs overlay
 	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
@@ -762,6 +764,7 @@ void startup() {
 
 	close(sbin);
 	close(root);
+	hide_mod("/root");
 
 	// Start post-fs-data mode
 	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", nullptr);
