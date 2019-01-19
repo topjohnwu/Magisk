@@ -2,7 +2,7 @@ APP_ABI := armeabi-v7a x86
 APP_CFLAGS := -Oz -std=gnu11 \
 -DMAGISK_VERSION="${MAGISK_VERSION}" -DMAGISK_VER_CODE=${MAGISK_VER_CODE}
 APP_CPPFLAGS := -std=c++14
-APP_STL := none
+APP_STL := c++_static
 APP_PLATFORM := android-16
 
 ifdef MAGISK_DEBUG
