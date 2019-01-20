@@ -779,7 +779,7 @@ void startup() {
 	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", nullptr);
 }
 
-[[noreturn]] static void core_only() {
+[[noreturn]] static inline void core_only() {
 	auto_start_magiskhide();
 	unblock_boot_process();
 }
@@ -800,6 +800,14 @@ void post_fs_data(int client) {
 
 	start_log_daemon();
 
+	// Run common scripts
+	LOGI("* Running post-fs-data.d scripts\n");
+	exec_common_script("post-fs-data");
+
+	// Core only mode
+	if (access(DISABLEFILE, F_OK) == 0)
+		core_only();
+
 	if (!prepare_img()) {
 		LOGE("* Magisk image mount failed, switch to core-only mode\n");
 		free(magiskloop);
@@ -809,14 +817,6 @@ void post_fs_data(int client) {
 
 	restorecon();
 	chmod(SECURE_DIR, 0700);
-
-	// Run common scripts
-	LOGI("* Running post-fs-data.d scripts\n");
-	exec_common_script("post-fs-data");
-
-	// Core only mode
-	if (access(DISABLEFILE, F_OK) == 0)
-		core_only();
 
 	// Execute module scripts
 	LOGI("* Running module post-fs-data scripts\n");
