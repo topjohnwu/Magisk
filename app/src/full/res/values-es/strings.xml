@@ -126,6 +126,7 @@
     
     <string name="downloading_toast">Descargando %1$s</string>
     <string name="no_rw_storage">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
+    <string name="dl_one_module">Descarga un módulo a la vez.</string>
    
 
     <!--Settings Activity -->

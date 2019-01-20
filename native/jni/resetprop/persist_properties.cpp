@@ -5,12 +5,16 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
+#include <vector>
+
 #include <pb.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
 
 #include "_resetprop.h"
 #include "utils.h"
+
+using namespace std;
 
 /* ***********************************************************************
  * Auto generated header and constant definitions compiled from
@@ -113,7 +117,7 @@ static bool prop_encode(pb_ostream_t *stream, const pb_field_t *field, void * co
 	PersistentProperties_PersistentPropertyRecord prop = {};
 	prop.name.funcs.encode = name_encode;
 	prop.has_value = true;
-	Vector<prop_t> &prop_list = *(Vector<prop_t> *) *arg;
+	auto &prop_list = *(vector<prop_t> *) *arg;
 	for (auto &p : prop_list) {
 		if (!pb_encode_tag_for_field(stream, field))
 			return false;
@@ -160,16 +164,16 @@ static void pb_getprop(read_cb_t *read_cb) {
 	munmap(buf, size);
 }
 
-static void file_getprop(const char *name, char *value) {
-	value[0] = '\0';
+static bool file_getprop(const char *name, char *value) {
 	char path[PATH_MAX];
 	snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
 	int fd = open(path, O_RDONLY | O_CLOEXEC);
 	if (fd < 0)
-		return;
+		return false;
 	LOGD("resetprop: read prop from [%s]\n", path);
-	value[read(fd, value, sizeof(PROP_VALUE_MAX))] = '\0';  // Null terminate the read value
+	value[read(fd, value, PROP_VALUE_MAX)] = '\0';  // Null terminate the read value
 	close(fd);
+	return value[0] != '\0';
 }
 
 void persist_getprop(read_cb_t *read_cb) {
@@ -182,14 +186,13 @@ void persist_getprop(read_cb_t *read_cb) {
 			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 )
 				continue;
 			char value[PROP_VALUE_MAX];
-			file_getprop(entry->d_name, value);
-			if (value[0])
+			if (file_getprop(entry->d_name, value))
 				read_cb->exec(entry->d_name, value);
 		}
 	}
 }
 
-CharArray persist_getprop(const char *name) {
+string persist_getprop(const char *name) {
 	prop_t prop(name);
 	if (use_pb) {
 		read_cb_t read_cb(pb_getprop_cb, &prop);
@@ -199,21 +202,20 @@ CharArray persist_getprop(const char *name) {
 	} else {
 		// Try to read from file
 		char value[PROP_VALUE_MAX];
-		file_getprop(name, value);
-		if (value[0])
+		if (file_getprop(name, value))
 			return value;
 	}
-	return CharArray();
+	return string();
 }
 
 bool persist_deleteprop(const char *name) {
 	if (use_pb) {
-		Vector<prop_t> prop_list;
+		vector<prop_t> prop_list;
 		read_cb_t read_cb(collect_props, &prop_list);
 		persist_getprop(&read_cb);
 
 		for (auto it = prop_list.begin(); it != prop_list.end(); ++it) {
-			if (strcmp((*it).name, name) == 0) {
+			if (strcmp(it->name, name) == 0) {
 				prop_list.erase(it);
 				// Dump the props back
 				PersistentProperties props = PersistentProperties_init_zero;

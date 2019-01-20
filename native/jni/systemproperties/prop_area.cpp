@@ -383,7 +383,8 @@ bool prop_area::del(const char *name) {
   prop_bt* node = find_prop_bt(root_node(), name, false);
   if (!node)
     return false;
-  atomic_store_explicit(&node->prop, 0, memory_order_release);
+  uint_least32_t new_offset = 0;
+  atomic_store_explicit(&node->prop, new_offset, memory_order_release);
   return true;
 }
 

@@ -8,24 +8,20 @@ public class ProgressInputStream extends FilterInputStream {
 
     private long totalBytes;
     private long bytesDownloaded;
+    private DownloadProgressListener progress;
 
-    public ProgressInputStream(InputStream in, long total) {
+    public ProgressInputStream(InputStream in, long total, DownloadProgressListener listener) {
         super(in);
         totalBytes = total;
-    }
-
-    protected void updateProgress(long bytesDownloaded, long totalBytes) {}
-
-    private void update() {
-        Networking.mainHandler.post(() -> updateProgress(bytesDownloaded, totalBytes));
+        progress = listener;
     }
 
     @Override
     public int read() throws IOException {
         int b = super.read();
-        if (b >= 0) {
+        if (totalBytes > 0 && b >= 0) {
             bytesDownloaded++;
-            update();
+            Networking.mainHandler.post(() -> progress.onProgress(bytesDownloaded, totalBytes));
         }
         return b;
     }
@@ -38,9 +34,9 @@ public class ProgressInputStream extends FilterInputStream {
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int sz = super.read(b, off, len);
-        if (sz > 0) {
+        if (totalBytes > 0 && sz > 0) {
             bytesDownloaded += sz;
-            update();
+            Networking.mainHandler.post(() -> progress.onProgress(bytesDownloaded, totalBytes));
         }
         return sz;
     }

@@ -27,7 +27,7 @@ public class Networking {
             conn.setConnectTimeout(CONNECT_TIMEOUT);
             return new Request(conn);
         } catch (IOException e) {
-            return new StubRequest();
+            return new BadRequest(e);
         }
     }
 

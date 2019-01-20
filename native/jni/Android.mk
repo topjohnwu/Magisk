@@ -115,19 +115,6 @@ include $(BUILD_EXECUTABLE)
 
 endif
 
-ifdef B_BXZ
-
-# b64xz
-include $(CLEAR_VARS)
-LOCAL_MODULE := b64xz
-LOCAL_STATIC_LIBRARIES := libxz
-LOCAL_C_INCLUDES := $(EXT_PATH)/include
-LOCAL_SRC_FILES := misc/b64xz.c
-LOCAL_LDFLAGS := -static
-include $(BUILD_EXECUTABLE)
-
-endif
-
 ifdef B_BB
 
 # Busybox

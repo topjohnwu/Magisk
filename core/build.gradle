@@ -1,21 +1,6 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-
-    defaultConfig {
-        minSdkVersion 17
-        targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 1
-        versionName "1.0"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -26,8 +11,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':net')
-    implementation project(':utils')
-    implementation 'com.github.topjohnwu:libsu:2.1.2'
-    implementation 'org.kamranzafar:jtar:2.3'
+    api project(':net')
+    api project(':utils')
+    api 'org.kamranzafar:jtar:2.3'
+
+    def libsuVersion = '2.2.0'
+    api "com.github.topjohnwu.libsu:core:${libsuVersion}"
+    api "com.github.topjohnwu.libsu:io:${libsuVersion}"
 }

@@ -29,19 +29,18 @@ public class App extends ContainerApp {
 
     private Resources mResource;
 
-    public App() {
-        self = this;
+    static {
+        Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER | Shell.FLAG_USE_MAGISK_BUSYBOX);
+        Shell.Config.verboseLogging(BuildConfig.DEBUG);
+        Shell.Config.addInitializers(RootUtils.class);
+        Shell.Config.setTimeout(2);
     }
 
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+        self = this;
         mResource = base.getResources();
-
-        Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER);
-        Shell.Config.verboseLogging(BuildConfig.DEBUG);
-        Shell.Config.setInitializer(RootUtils.class);
-        Shell.Config.setTimeout(2);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = new MagiskDB(this);

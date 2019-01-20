@@ -66,7 +66,7 @@ post_ota() {
   ./bootctl hal-info || return
   [ `./bootctl get-current-slot` -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
   ./bootctl set-active-boot-slot $SLOT_NUM
-  echo '${0%/*}/../bootctl mark-boot-successful;rm -f ${0%/*}/../bootctl $0' > post-fs-data.d/post_ota.sh
+  echo "BCTRL=${1}/bootctl;\$BCTRL mark-boot-successful;rm -f \$BCTRL \$0" > post-fs-data.d/post_ota.sh
   chmod 755 post-fs-data.d/post_ota.sh
   cd /
 }
