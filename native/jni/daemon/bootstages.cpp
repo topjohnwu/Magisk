@@ -32,7 +32,6 @@ static vector<string> module_list;
 static bool seperate_vendor;
 
 char *system_block, *vendor_block, *magiskloop;
-int SDK_INT = -1;
 
 static int bind_mount(const char *from, const char *to);
 extern void auto_start_magiskhide();
@@ -53,7 +52,7 @@ extern void auto_start_magiskhide();
 
 class node_entry {
 public:
-	node_entry(const char *, uint8_t status = 0, uint8_t type = 0);
+	explicit node_entry(const char *, uint8_t status = 0, uint8_t type = 0);
 	~node_entry();
 	void create_module_tree(const char *module);
 	void magic_mount();
@@ -437,15 +436,6 @@ static bool magisk_env() {
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
-	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
-		if (strcmp(key, "ro.build.version.sdk") == 0) {
-			LOGI("* Device API level: %s\n", val);
-			SDK_INT = atoi(val);
-			return false;
-		}
-		return true;
-	});
-
 	LOGI("* Mounting mirrors");
 	auto mounts = file_to_vector("/proc/mounts");
 	bool system_as_root = false;
@@ -497,6 +487,13 @@ static bool magisk_env() {
 	LOGI("* Setting up internal busybox");
 	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, nullptr);
 	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+
+	// Disable/remove magiskhide, resetprop, and modules
+	if (SDK_INT < 19) {
+		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT, 0));
+		unlink("/sbin/resetprop");
+		unlink("/sbin/magiskhide");
+	}
 	return true;
 }
 
