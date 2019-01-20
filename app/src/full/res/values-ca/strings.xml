@@ -1,5 +1,4 @@
 <resources>
-    <!--Universal-->
 
     <!--Welcome Activity-->
     <string name="modules">Mòduls</string>
@@ -66,9 +65,18 @@
     <string name="translators">JoanVC100, QuitusAnbu27</string>
     <string name="app_version">Versió</string>
     <string name="app_source_code">Codi font</string>
-    <string name="donation">Donació</string>
+    <string name="donation">Donació l'\</string>
     <string name="app_translators">Traductors</string>
     <string name="support_thread">Fil de suport</string>
+    <string name="follow_twitter">Segueix-me a Twitter</string>
+    
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Actualització de Magisk</string>
+    <string name="progress_channel">Notificacions de progrés</string>
+    <string name="download_complete">Baixada completada</string>
+    <string name="download_file_error">Error en baixar l\'arxiu</string>
+    <string name="magisk_update_title">Actualització de Magisk disponible!</string>
+    <string name="manager_update_title">Actualització de Magisk Manager disponible!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Tancar</string>
@@ -76,16 +84,16 @@
     <string name="repo_install_msg">Vols instal·lar %1$s ara?</string>
     <string name="download">Baixar</string>
     <string name="reboot">Reiniciar</string>
-    <string name="zip_process_msg">Processant arxiu zip…</string>
-    <string name="magisk_update_title">Nova actualització de Magisk disponible!</string>
     <string name="settings_reboot_toast">Reinicia per aplicar els canvis</string>
     <string name="release_notes">Notes de llançament</string>
     <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
     <string name="process_error">Error de procés</string>
     <string name="internal_storage">El zip està emmagatzemat en:\n[Internal Storage]%1$s</string>
-    <string name="zip_download_title">Baixant</string>
-    <string name="zip_download_msg">Baixant l’arxiu zip (%1$d%%)…</string>
+    <string name="zip_download_title">Baixant arxiu ZIP</string>
+    <string name="zip_process_msg">Processant arxiu zip…</string>
     <string name="zip_process_title">Processant</string>
+    <string name="magisk_update_title">Nova actualització de Magisk disponible!</string>
+    <string name="zip_download_msg">Baixant l’arxiu zip (%1$d%%)…</string>
     <string name="manager_update_title">Nova actualització de Magisk Manager disponible!</string>
     <string name="manager_download_install">Premi per a descarregar i instal·lar</string>
     <string name="dtbo_patched_title">DTBO ha estat arranjat</string>
@@ -117,6 +125,9 @@
     <string name="env_fix_msg">El seu dispositiu requereix d’una instal·lació addicional per tal de que Magisk funcioni correctament. Es descarregarà el zip d’instalació de Magisk, desitja continuar ara?</string>
     <string name="setup_title">Configuració Addicional</string>
     <string name="setup_msg">Executant Configuració d\'Entorn</string>
+    <string name="downloading_toast">Descarregant %1$s</string>
+    <string name="no_rw_storage">Aquesta funció no funcionarà sense permís per escriure al emmagatzament extern.</string>
+    <string name="dl_one_module">Descarrega un mòdul d'\un en un.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -140,11 +151,12 @@
     <string name="settings_update_custom_msg">Inserta una URL personalitzada</string>
     <string name="settings_boot_format_title">Arranja la imatge d’arrancada segons el tipus de format</string>
     <string name="settings_boot_format_summary">Seleccionar el format de sortida per arranjar la imatge d’arrancada.\nTriï  .img per flashejar mitcançant fastboot/download; triï .img.tar per flashejar amb ODIN.</string>
-
+    <string name="settings_core_only_title">Mode nucli de Magisk</string>
     <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU y MagiskHide seguirán habilitats</string>
     <string name="settings_magiskhide_summary">Amagar Magisk de varies deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
+    <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
 
     <string name="settings_su_app_adb">Aplicacions y ADB</string>
     <string name="settings_su_app">Només aplicacions</string>
@@ -222,3 +234,4 @@
     <string name="command">Ordre:\u0020</string>
 
 </resources>
+    <!--Universal-->
