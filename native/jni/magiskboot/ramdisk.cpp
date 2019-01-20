@@ -6,9 +6,11 @@
 #include "cpio.h"
 #include "utils.h"
 
+using namespace std;
+
 class magisk_cpio : public cpio {
 public:
-	magisk_cpio(const char *filename) : cpio(filename) {}
+	explicit magisk_cpio(const char *filename) : cpio(filename) {}
 	void patch(bool keepverity, bool keepforceencrypt);
 	int test();
 	char * sha1();
@@ -23,8 +25,8 @@ void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 		if (!e)
 			continue;
 		bool fstab = (!keepverity || !keepforceencrypt) &&
-				!e->filename.starts_with(".backup") &&
-					 e->filename.contains("fstab") && S_ISREG(e->mode);
+				!str_starts(e->filename, ".backup") &&
+				str_contains(e->filename, "fstab") && S_ISREG(e->mode);
 		if (!keepverity) {
 			if (fstab) {
 				patch_verity(&e->data, &e->filesize, 1);
@@ -98,7 +100,7 @@ char *magisk_cpio::sha1() {
 void magisk_cpio::restore() {
 	for (auto &e : arr) {
 		if (!e) continue;
-		if (e->filename.starts_with(".backup")) {
+		if (str_starts(e->filename, ".backup")) {
 			if (e->filename[7] == '\0') continue;
 			if (e->filename[8] == '.') {
 				if (strcmp(&e->filename[8], ".rmlist") == 0) {
@@ -106,7 +108,7 @@ void magisk_cpio::restore() {
 						rm((char *) e->data + pos, false);
 				}
 			} else {
-				mv(e->filename, e->filename + 8);
+				mv(e->filename.c_str(), &e->filename[8]);
 			}
 		}
 	}
@@ -120,17 +122,15 @@ void magisk_cpio::restore() {
 }
 
 void magisk_cpio::backup(const char *orig) {
-	Vector<cpio_entry*> bak;
+	vector<cpio_entry*> bak;
 	cpio_entry *m, *n, *rem;
 	char buf[PATH_MAX];
 
-	m = new cpio_entry();
-	m->filename = ".backup";
+	m = new cpio_entry(".backup");
 	m->mode = S_IFDIR;
 	bak.push_back(m);
 
-	rem = new cpio_entry();
-	rem->filename = ".backup/.rmlist";
+	rem = new cpio_entry(".backup/.rmlist");
 	rem->mode = S_IFREG;
 
 	magisk_cpio o(orig);
@@ -176,7 +176,7 @@ void magisk_cpio::backup(const char *orig) {
 			// Something new in ramdisk, record in rem
 			++j;
 			rem->data = xrealloc(rem->data, rem->filesize + n->filename.size());
-			memcpy((char *) rem->data + rem->filesize, n->filename, n->filename.size());
+			memcpy((char *) rem->data + rem->filesize, n->filename.c_str(), n->filename.size());
 			rem->filesize += n->filename.size();
 			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", n->filename.c_str());
 		}
@@ -196,7 +196,8 @@ void magisk_cpio::backup(const char *orig) {
 		delete rem;
 
 	if (bak.size() > 1)
-		insert(bak);
+		for (auto item : bak)
+			insert(item);
 }
 
 
@@ -249,11 +250,11 @@ int cpio_commands(int argc, char *argv[]) {
 				return 0;
 			}
 		} else if (cmdc == 3 && strcmp(cmdv[0], "mkdir") == 0) {
-			cpio.makedir(strtoul(cmdv[1], NULL, 8), cmdv[2]);
+			cpio.makedir(strtoul(cmdv[1], nullptr, 8), cmdv[2]);
 		} else if (cmdc == 3 && strcmp(cmdv[0], "ln") == 0) {
 			cpio.ln(cmdv[1], cmdv[2]);
 		} else if (cmdc == 4 && strcmp(cmdv[0], "add") == 0) {
-			cpio.add(strtoul(cmdv[1], NULL, 8), cmdv[2], cmdv[3]);
+			cpio.add(strtoul(cmdv[1], nullptr, 8), cmdv[2], cmdv[3]);
 		} else {
 			return 1;
 		}

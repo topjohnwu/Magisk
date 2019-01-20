@@ -12,14 +12,17 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <vector>
 
 #include "magisk.h"
 #include "utils.h"
 #include "daemon.h"
 #include "flags.h"
 
+using namespace std;
+
 bool log_daemon_started = false;
-static Vector<const char *> log_cmd, clear_cmd;
+static vector<const char *> log_cmd, clear_cmd;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 enum {
@@ -68,7 +71,7 @@ static void *monitor_thread(void *) {
 	sleep(5);
 	int fd;
 	char b;
-	while (1) {
+	while (true) {
 		fd = connect_daemon();
 		write_int(fd, HANDSHAKE);
 		// This should hold unless the daemon is killed
@@ -136,11 +139,7 @@ static void log_daemon() {
 	}
 	chmod("/dev/null", 0666);
 	clear_cmd = log_cmd;
-	log_cmd.push_back("-v");
-	log_cmd.push_back("threadtime");
-	log_cmd.push_back("-s");
-	log_cmd.push_back("am_proc_start");
-	log_cmd.push_back("Magisk");
+	log_cmd.insert(log_cmd.end(), { "-v", "threadtime", "-s", "am_proc_start", "Magisk" });
 #ifdef MAGISK_DEBUG
 	log_cmd.push_back("*:F");
 #endif
@@ -163,7 +162,7 @@ static void log_daemon() {
 	if (xbind(sockfd, (struct sockaddr*) &sun, len))
 		exit(1);
 	xlisten(sockfd, 10);
-	while(1) {
+	while(true) {
 		int fd = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
 		switch(read_int(fd)) {
 			case HIDE_CONNECT:

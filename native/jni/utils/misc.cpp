@@ -11,9 +11,12 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/sysmacros.h>
+#include <vector>
 
 #include "logging.h"
 #include "utils.h"
+
+using namespace std;
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
@@ -199,7 +202,7 @@ int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
 
 static int v_exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
 	// Collect va_list into vector
-	Vector<const char *> args;
+	vector<const char *> args;
 	args.push_back(argv0);
 	for (const char *arg = va_arg(argv, char*); arg; arg = va_arg(argv, char*))
 		args.push_back(arg);

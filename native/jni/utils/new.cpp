@@ -1,6 +1,9 @@
 #include <new>
 #include <stdlib.h>
 
+/* Override libc++ new implementation
+ * to optimize final build size */
+
 void* operator new(std::size_t s) { return malloc(s); }
 void* operator new[](std::size_t s) { return malloc(s); }
 void  operator delete(void *p) { free(p); }

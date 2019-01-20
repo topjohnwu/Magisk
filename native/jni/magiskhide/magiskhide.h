@@ -2,10 +2,10 @@
 #define MAGISK_HIDE_H
 
 #include <pthread.h>
+#include <vector>
+#include <string>
 
 #include "daemon.h"
-#include "Vector.h"
-#include "CharArray.h"
 
 #define TERM_THREAD SIGUSR1
 
@@ -30,7 +30,7 @@ bool init_list();
 
 extern bool hide_enabled;
 extern pthread_mutex_t list_lock;
-extern Vector<CharArray> hide_list;
+extern std::vector<std::string> hide_list;
 
 enum {
 	LAUNCH_MAGISKHIDE,
