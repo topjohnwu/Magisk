@@ -16,11 +16,13 @@
 #include "daemon.h"
 #include "db.h"
 
+using namespace std;
+
 #define SAFETYNET_COMPONENT  "com.google.android.gms/.droidguard.DroidGuardService"
 #define SAFETYNET_PROCESS    "com.google.android.gms.unstable"
 #define TIMESTAMP_REF        "/res"
 
-Vector<CharArray> hide_list;
+vector<string> hide_list;
 pthread_mutex_t list_lock;
 
 static pthread_t proc_monitor_thread;
@@ -57,7 +59,7 @@ void hide_sensitive_props() {
 
 	// Hide all sensitive props
 	for (int i = 0; prop_key[i]; ++i) {
-		CharArray value = getprop(prop_key[i]);
+		auto value = getprop(prop_key[i]);
 		if (!value.empty() && value != prop_value[i])
 			setprop(prop_key[i], prop_value[i], false);
 	}
@@ -120,7 +122,7 @@ static bool proc_name_match(int pid, const char *name) {
 }
 
 static void kill_proc_cb(int pid, void *v) {
-	ps_arg *args = static_cast<ps_arg *>(v);
+	auto args = static_cast<ps_arg *>(v);
 	if (proc_name_match(pid, args->name))
 		kill(pid, SIGTERM);
 	else if (args->uid > 0) {
@@ -185,7 +187,7 @@ int add_list(const char *proc) {
 
 	// Critical region
 	pthread_mutex_lock(&list_lock);
-	hide_list.push_back(proc);
+	hide_list.emplace_back(proc);
 	kill_process(proc);
 	pthread_mutex_unlock(&list_lock);
 
@@ -249,10 +251,9 @@ bool init_list() {
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {
-		Vector<CharArray> tmp;
-		file_to_vector(LEGACY_LIST, tmp);
+		auto tmp = file_to_vector(LEGACY_LIST);
 		for (auto &s : tmp)
-			add_list(s);
+			add_list(s.c_str());
 		unlink(LEGACY_LIST);
 	}
 
@@ -309,7 +310,7 @@ int launch_magiskhide(int client) {
 	// Start monitoring
 	proc_monitor();
 
-	error:
+error:
 	hide_enabled = false;
 	return DAEMON_ERROR;
 }

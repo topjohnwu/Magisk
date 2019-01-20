@@ -5,12 +5,16 @@
 
 #include <stdio.h>
 #include <limits.h>
+#include <vector>
+#include <string>
 
 #include "sepolicy.h"
 #include "magiskpolicy.h"
 #include "magisk.h"
 #include "utils.h"
 #include "flags.h"
+
+using namespace std;
 
 static const char *type_msg_1 =
 "Type 1:\n"
@@ -101,7 +105,7 @@ static const char *type_msg_6 =
 	exit(1);
 }
 
-static int parse_bracket(char *tok, char *&stmt, Vector<const char *> *vec) {
+static int parse_bracket(char *tok, char *&stmt, vector<const char *> *vec) {
 	if (tok == nullptr || tok[0] != '{') {
 		// Not in a bracket
 		vec->push_back(tok);
@@ -143,10 +147,10 @@ static int parse_pattern_1(int action, const char *action_str, char *stmt) {
 
 	int state = 0;
 	char *cur, *cls;
-	Vector<const char*> source, target, permission;
+	vector<const char*> source, target, permission;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
-		Vector<const char *> *vec;
+		vector<const char *> *vec;
 		switch (state) {
 			case 0:
 				vec = &source;
@@ -200,10 +204,10 @@ static int parse_pattern_2(int action, const char *action_str, char *stmt) {
 
 	int state = 0;
 	char *cur, *range;
-	Vector<const char *> source, target, classes;
+	vector<const char *> source, target, classes;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
-		Vector<const char *> *vec;
+		vector<const char *> *vec;
 		switch (state) {
 			case 0:
 				vec = &source;
@@ -216,7 +220,7 @@ static int parse_pattern_2(int action, const char *action_str, char *stmt) {
 				break;
 			case 3:
 				// Currently only support ioctl
-				if (strcmp(cur, "ioctl"))
+				if (strcmp(cur, "ioctl") != 0)
 					return 1;
 				vec = nullptr;
 				break;
@@ -262,7 +266,7 @@ static int parse_pattern_3(int action, const char *action_str, char* stmt) {
 	}
 
 	char *cur;
-	Vector<const char *> domains;
+	vector<const char *> domains;
 	while ((cur = strtok_r(nullptr, " {}", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
 		domains.push_back(cur);
@@ -291,10 +295,10 @@ static int parse_pattern_4(int action, const char *action_str, char *stmt) {
 
 	int state = 0;
 	char *cur;
-	Vector<const char *> classes, attribute;
+	vector<const char *> classes, attribute;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
-		Vector<const char *> *vec;
+		vector<const char *> *vec;
 		switch (state) {
 			case 0:
 				vec = &classes;
@@ -409,7 +413,7 @@ static void parse_statement(char *statement) {
 	char *action, *remain;
 
 	// strtok will modify the origin string, duplicate the statement for error messages
-	CharArray orig(statement);
+	string orig(statement);
 
 	action = strtok_r(statement, " ", &remain);
 	if (remain == nullptr) remain = &action[strlen(action)];

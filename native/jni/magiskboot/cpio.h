@@ -2,9 +2,8 @@
 #define _CPIO_H_
 
 #include <stdint.h>
-
-#include "Vector.h"
-#include "CharArray.h"
+#include <vector>
+#include <string>
 
 struct cpio_newc_header {
 	char magic[6];
@@ -38,17 +37,18 @@ struct cpio_entry {
 	// uint32_t namesize;
 	// uint32_t check;
 //	char *filename = nullptr;
-	CharArray filename;
+	std::string filename;
 	void *data = nullptr;
 
-	cpio_entry() {}
+	cpio_entry() = default;
+	explicit cpio_entry(const char *name) : filename(name) {}
 	cpio_entry(int fd, cpio_newc_header &header);
 	~cpio_entry();
 };
 
 class cpio {
 public:
-	cpio(const char *filename);
+	explicit cpio(const char *filename);
 	~cpio();
 	void dump(const char *file);
 	int find(const char *name);
@@ -57,14 +57,13 @@ public:
 	void makedir(mode_t mode, const char *name);
 	void ln(const char *target, const char *name);
 	void add(mode_t mode, const char *name, const char *file);
-	void insert(Vector<cpio_entry *> &arr);
 	bool mv(const char *from, const char *to);
 	void extract();
 	bool extract(const char *name, const char *file);
 	void sort();
 
 protected:
-	Vector<cpio_entry *> arr;
+	std::vector<cpio_entry *> arr;
 };
 
 #endif

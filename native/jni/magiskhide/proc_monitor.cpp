@@ -15,11 +15,15 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/mount.h>
+#include <vector>
+#include <string>
 
 #include "magisk.h"
 #include "daemon.h"
 #include "utils.h"
 #include "magiskhide.h"
+
+using namespace std;
 
 static int sockfd = -1;
 extern char *system_block, *vendor_block, *magiskloop;
@@ -27,7 +31,7 @@ extern char *system_block, *vendor_block, *magiskloop;
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
 	LOGD("proc_monitor: running cleanup\n");
-	hide_list.clear(true);
+	hide_list.clear();
 	hide_enabled = false;
 	close(sockfd);
 	sockfd = -1;
@@ -64,7 +68,7 @@ static void hide_daemon(int pid) {
 	LOGD("hide_daemon: handling pid=[%d]\n", pid);
 
 	char buffer[4096];
-	Vector<CharArray> mounts;
+	vector<string> mounts;
 
 	manage_selinux();
 	clean_magisk_props();
@@ -75,24 +79,24 @@ static void hide_daemon(int pid) {
 	snprintf(buffer, sizeof(buffer), "/proc/%d", pid);
 	chdir(buffer);
 
-	file_to_vector("mounts", mounts);
+	mounts = file_to_vector("mounts");
 	// Unmount dummy skeletons and /sbin links
 	for (auto &s : mounts) {
-		if (s.contains("tmpfs /system/") || s.contains("tmpfs /vendor/") || s.contains("tmpfs /sbin")) {
-			sscanf(s, "%*s %4096s", buffer);
+		if (str_contains(s, "tmpfs /system/") || str_contains(s, "tmpfs /vendor/") ||
+			str_contains(s, "tmpfs /sbin")) {
+			sscanf(s.c_str(), "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
 	}
-	mounts.clear();
 
 	// Re-read mount infos
-	file_to_vector("mounts", mounts);
+	mounts = file_to_vector("mounts");
 
 	// Unmount everything under /system, /vendor, and loop mounts
 	for (auto &s : mounts) {
-		if ((s.contains(" /system/") || s.contains(" /vendor/")) &&
-			(s.contains(system_block) || s.contains(vendor_block) || s.contains(magiskloop))) {
-			sscanf(s, "%*s %4096s", buffer);
+		if ((str_contains(s, " /system/") || str_contains(s, " /vendor/")) &&
+			(str_contains(s, system_block) || str_contains(s, vendor_block) || str_contains(s, magiskloop))) {
+			sscanf(s.c_str(), "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
 	}
@@ -108,13 +112,12 @@ void proc_monitor() {
 	sigset_t block_set;
 	sigemptyset(&block_set);
 	sigaddset(&block_set, TERM_THREAD);
-	pthread_sigmask(SIG_UNBLOCK, &block_set, NULL);
+	pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
 
 	// Register the cancel signal
-	struct sigaction act;
-	memset(&act, 0, sizeof(act));
+	struct sigaction act{};
 	act.sa_handler = term_thread;
-	sigaction(TERM_THREAD, &act, NULL);
+	sigaction(TERM_THREAD, &act, nullptr);
 
 	if (access("/proc/1/ns/mnt", F_OK) != 0) {
 		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
@@ -155,7 +158,7 @@ void proc_monitor() {
 		bool hide = false;
 		pthread_mutex_lock(&list_lock);
 		for (auto &s : hide_list) {
-			if (strncmp(cpnt, s, s.size() - 1) == 0) {
+			if (strncmp(cpnt, s.c_str(), s.size() - 1) == 0) {
 				hide = true;
 				break;
 			}

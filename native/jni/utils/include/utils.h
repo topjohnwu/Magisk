@@ -13,15 +13,17 @@
 
 #ifdef __cplusplus
 
-#include "Vector.h"
-#include "CharArray.h"
-#include "cpputils.h"
+#include <string>
+#include <vector>
 
-int file_to_vector(const char *filename, Vector<CharArray> &arr);
+#define str_contains(s, ss) ((s).find(ss) != string::npos)
+#define str_starts(s, ss) ((s).compare(0, strlen(ss), ss) == 0)
+
+std::vector<std::string> file_to_vector(const char *filename);
 char *strdup2(const char *s, size_t *size = nullptr);
 
-int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv);
-int exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, ...);
+int exec_array(bool err, int *fd, void (*pre_exec)(), const char **argv);
+int exec_command(bool err, int *fd, void (*cb)(), const char *argv0, ...);
 int stime(const time_t *t);
 
 extern "C" {
@@ -135,7 +137,7 @@ int fgetattr(int fd, struct file_attr *a);
 int setattr(const char *path, struct file_attr *a);
 int setattrat(int dirfd, const char *pathname, struct file_attr *a);
 int fsetattr(int fd, struct file_attr *a);
-void fclone_attr(const int sourcefd, const int targetfd);
+void fclone_attr(int sourcefd, int targetfd);
 void clone_attr(const char *source, const char *target);
 void mmap_ro(const char *filename, void **buf, size_t *size);
 void mmap_rw(const char *filename, void **buf, size_t *size);
