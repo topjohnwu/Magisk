@@ -32,6 +32,7 @@ static vector<string> module_list;
 static bool seperate_vendor;
 
 char *system_block, *vendor_block, *magiskloop;
+int SDK_INT = -1;
 
 static int bind_mount(const char *from, const char *to);
 extern void auto_start_magiskhide();
@@ -436,19 +437,25 @@ static bool magisk_env() {
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
-	auto sdk_prop = getprop("ro.build.version.sdk");
-	int sdk = sdk_prop.empty() ? -1 : atoi(sdk_prop.c_str());
+	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
+		if (strcmp(key, "ro.build.version.sdk") == 0) {
+			LOGI("* Device API level: %s\n", val);
+			SDK_INT = atoi(val);
+			return false;
+		}
+		return true;
+	});
 
 	LOGI("* Mounting mirrors");
 	auto mounts = file_to_vector("/proc/mounts");
 	bool system_as_root = false;
 	for (auto &line : mounts) {
-		if (line.find(" /system_root ") != string::npos) {
+		if (str_contains(line, " /system_root ")) {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			sscanf(line.c_str(), "%s", buf);
 			system_block = strdup2(buf);
 			system_as_root = true;
-		} else if (!system_as_root && line.find(" /system ") != string::npos) {
+		} else if (!system_as_root && str_contains(line, " /system ")) {
 			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
 			system_block = strdup2(buf);
 			xmount(system_block, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
@@ -457,7 +464,7 @@ static bool magisk_env() {
 #else
 			LOGI("mount: %s\n", MIRRDIR "/system");
 #endif
-		} else if (line.find(" /vendor ") != string::npos) {
+		} else if (str_contains(line, " /vendor ")) {
 			seperate_vendor = true;
 			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
 			vendor_block = strdup2(buf);
@@ -468,9 +475,8 @@ static bool magisk_env() {
 #else
 			LOGI("mount: %s\n", MIRRDIR "/vendor");
 #endif
-		} else if (sdk >= 24 &&
-		line.find(" /proc ") != string::npos &&
-		line.find("hidepid=2") == string::npos) {
+		} else if (SDK_INT >= 24 &&
+		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
 			// Enforce hidepid
 			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 		}
@@ -835,7 +841,7 @@ void post_fs_data(int client) {
 		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MOUNTPOINT, module);
 		if (access(buf, F_OK) == 0) {
 			LOGI("%s: loading [system.prop]\n", module);
-			load_prop_file(buf, 0);
+			load_prop_file(buf, false);
 		}
 		// Check whether enable auto_mount
 		snprintf(buf, PATH_MAX, "%s/%s/auto_mount", MOUNTPOINT, module);
