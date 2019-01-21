@@ -170,7 +170,7 @@
     <string name="auto_response">Automatisk tilbakemelding</string>
     <string name="request_timeout">Tidsgrense for tilbakemelding Timeout</string>
     <string name="superuser_notification">Superbruker-notifikasjon</string>
-    <string name="request_timeout_summary">%1$s sekunder</string>
+    <string name="request_timeout_summary">%1$d sekunder</string>
     <string name="settings_su_reauth_title">Autentiser på nytt etter oppdateringer after upgrade</string>
     <string name="settings_su_reauth_summary">Autentiser superbruker-tillatelser på nytt etter at en app har blitt oppdatert</string>
     <string name="settings_su_fingerprint_title">Skru på fingeravtrykksautentisering</string>

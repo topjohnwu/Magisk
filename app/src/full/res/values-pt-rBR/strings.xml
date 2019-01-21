@@ -155,7 +155,7 @@
     <string name="auto_response">Resposta Automática</string>
     <string name="request_timeout">Tempo Limite de Solicitação</string>
     <string name="superuser_notification">Notificação de Superusuário</string>
-    <string name="request_timeout_summary">%1$s segundos</string>
+    <string name="request_timeout_summary">%1$d segundos</string>
     <string name="settings_su_reauth_title">Reautenticar após atualizar</string>
     <string name="settings_su_reauth_summary">Reautenticar permissões de superusuário após um app atualizar</string>
     <string name="settings_su_fingerprint_title">Ativar Autenticação de Impressão Digital</string>

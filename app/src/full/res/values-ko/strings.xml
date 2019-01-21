@@ -102,7 +102,7 @@
     <string name="auto_response">자동 응답</string>
     <string name="request_timeout">요청 시간 제한</string>
     <string name="superuser_notification">슈퍼유저 알림</string>
-    <string name="request_timeout_summary">%1$s초</string>
+    <string name="request_timeout_summary">%1$d초</string>
 
     <!--Superuser-->
     <string name="su_request_title">슈퍼유저 요청</string>

@@ -124,7 +124,7 @@
     <string name="auto_response">Resposta Automática</string>
     <string name="request_timeout">Tempo limite de solicitação</string>
     <string name="superuser_notification">Notificação de root</string>
-    <string name="request_timeout_summary">%1$s segundos</string>
+    <string name="request_timeout_summary">%1$d segundos</string>
     <string name="settings_su_reauth_title">Autenticar novamente após atualizar</string>
     <string name="settings_su_reauth_summary">Autenticar novamente permissões de root após atualizar aplicações</string>
 

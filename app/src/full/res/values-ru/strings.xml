@@ -165,7 +165,7 @@
     <string name="auto_response">Автоматический ответ</string>
     <string name="request_timeout">Ожидание ответа</string>
     <string name="superuser_notification">Уведомления суперпользователя</string>
-    <string name="request_timeout_summary">%1$s секунд</string>
+    <string name="request_timeout_summary">%1$d секунд</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
     <string name="settings_su_fingerprint_title">Биометрическая аутентификация</string>

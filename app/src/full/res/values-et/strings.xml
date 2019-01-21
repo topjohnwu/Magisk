@@ -161,7 +161,7 @@
     <string name="auto_response">Automaatne vastus</string>
     <string name="request_timeout">Taotluse ajalõpp</string>
     <string name="superuser_notification">Superkasutaja teade</string>
-    <string name="request_timeout_summary">%1$s sekundit</string>
+    <string name="request_timeout_summary">%1$d sekundit</string>
     <string name="settings_su_reauth_title">Taas-autendi peale uuendust</string>
     <string name="settings_su_reauth_summary">Taas-autendi superkasutaja õigused peale rakenduse uuendust</string>
     <string name="settings_su_fingerprint_title">Luba sõrmejäljega autentimine</string>

@@ -160,7 +160,7 @@
     <string name="auto_response">Resposta automàtica</string>
     <string name="request_timeout">Temps de petició</string>
     <string name="superuser_notification">Notificació de superusuari</string>
-    <string name="request_timeout_summary">%1$s segons</string>
+    <string name="request_timeout_summary">%1$d segons</string>
     <string name="settings_su_reauth_title">Re-autenticació</string>
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació es actualitzada o reinstal·lada</string>
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>

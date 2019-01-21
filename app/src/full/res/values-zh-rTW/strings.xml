@@ -95,7 +95,7 @@
     <string name="auto_response">自動回應</string>
     <string name="request_timeout">請求逾時</string>
     <string name="superuser_notification">超級用戶通知</string>
-    <string name="request_timeout_summary">%1$s 秒</string>
+    <string name="request_timeout_summary">%1$d 秒</string>
 
     <!--Superuser-->
     <string name="su_request_title">超級用戶請求</string>

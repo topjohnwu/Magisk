@@ -171,7 +171,7 @@
     <string name="auto_response">自动响应</string>
     <string name="request_timeout">请求超时</string>
     <string name="superuser_notification">超级用户通知</string>
-    <string name="request_timeout_summary">%1$s 秒</string>
+    <string name="request_timeout_summary">%1$d 秒</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
     <string name="settings_su_fingerprint_title">启用指纹验证</string>

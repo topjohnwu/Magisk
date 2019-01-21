@@ -102,7 +102,7 @@
     <string name="auto_response">Automatická Reakce</string>
     <string name="request_timeout">Časový limit Požadavku</string>
     <string name="superuser_notification">Oznámení Superuser</string>
-    <string name="request_timeout_summary">%1$s sekund</string>
+    <string name="request_timeout_summary">%1$d sekund</string>
 
     <!--Superuser-->
     <string name="su_request_title">Požadavek Superuser</string>

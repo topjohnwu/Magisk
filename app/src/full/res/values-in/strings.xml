@@ -170,7 +170,7 @@
     <string name="auto_response">Tanggapan Otomatis</string>
     <string name="request_timeout">Batas Waktu Permintaan</string>
     <string name="superuser_notification">Notifikasi Superuser</string>
-    <string name="request_timeout_summary">%1$s detik</string>
+    <string name="request_timeout_summary">%1$d detik</string>
     <string name="settings_su_reauth_title">Otentikasi ulang setelah pembaruan</string>
     <string name="settings_su_reauth_summary">Otentikasi ulang izin superuser setelah pembaruan sebuah aplikasi</string>
     <string name="settings_su_fingerprint_title">Aktifkan Otentikasi Sidik Jari</string>

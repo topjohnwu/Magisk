@@ -251,7 +251,7 @@ public class SettingsFragment extends BasePreferenceFragment implements Topic.Su
             case Config.Key.SU_REQUEST_TIMEOUT:
                 requestTimeout.setSummary(
                         getString(R.string.request_timeout_summary,
-                                app.prefs.getString(Config.Key.SU_REQUEST_TIMEOUT, "10")));
+                                (int) Config.get(Config.Key.SU_REQUEST_TIMEOUT)));
                 break;
             case Config.Key.SU_MULTIUSER_MODE:
                 multiuserConfig.setSummary(getResources()

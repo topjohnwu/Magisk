@@ -165,7 +165,7 @@
     <string name="auto_response">Automatisch beantworten</string>
     <string name="request_timeout">Zeitlimit für Anfrage</string>
     <string name="superuser_notification">Superuser-Benachrichtigung</string>
-    <string name="request_timeout_summary">%1$s Sekunden</string>
+    <string name="request_timeout_summary">%1$d Sekunden</string>
     <string name="settings_su_reauth_title">Nach Aktualisierung erneut authentifizieren</string>
     <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Aktualisierung erneut abfragen</string>
     <string name="settings_su_fingerprint_title">Aktiviere Authentifizierung durch Fingerabdruck</string>

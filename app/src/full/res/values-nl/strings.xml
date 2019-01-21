@@ -154,7 +154,7 @@
     <string name="auto_response">Automatisch antwoord</string>
     <string name="request_timeout">Verzoek time-out</string>
     <string name="superuser_notification">Superuser melding</string>
-    <string name="request_timeout_summary">%1$s seconden</string>
+    <string name="request_timeout_summary">%1$d seconden</string>
     <string name="settings_su_reauth_title">Opnieuw verzoeken na bijwerken</string>
     <string name="settings_su_reauth_summary">Superuser rechten opnieuw opvragen na bijwerken applicatie</string>
     <string name="settings_su_fingerprint_title">Vingerafdruk authenticatie inschakelen</string>

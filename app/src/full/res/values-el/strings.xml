@@ -149,7 +149,7 @@
     <string name="auto_response">Αυτόματη Απόκριση</string>
     <string name="request_timeout">Χρονικό όριο Αιτήματος</string>
     <string name="superuser_notification">Ειδοποίηση Υπερχρήστη</string>
-    <string name="request_timeout_summary">%1$s δευτερόλεπτα</string>
+    <string name="request_timeout_summary">%1$d δευτερόλεπτα</string>
     <string name="settings_su_reauth_title">Επαναπιστοποίηση μετά από αναβάθμιση</string>
     <string name="settings_su_reauth_summary">Επαναπιστοποίηση αδειών υπερχρήστη μετά την αναβάθμιση μίας εφαρμογής</string>
 

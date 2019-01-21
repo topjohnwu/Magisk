@@ -160,7 +160,7 @@
     <string name="auto_response">Automatinis atsakymas</string>
     <string name="request_timeout">Prašymo laikas baigiasi po</string>
     <string name="superuser_notification">Supervartotojo pranešimai</string>
-    <string name="request_timeout_summary">%1$s sekundžių</string>
+    <string name="request_timeout_summary">%1$d sekundžių</string>
     <string name="settings_su_reauth_title">Pakartotinai patvirtinti po atnaujinimo</string>
     <string name="settings_su_reauth_summary">Pakartotinai patvirtinti supervartotojo leidimus po programėlės atnaujinimo</string>
     <string name="settings_su_fingerprint_title">Įgalinti patvirtinimą piršto antspaudu</string>

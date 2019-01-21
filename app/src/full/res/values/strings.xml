@@ -171,7 +171,7 @@
     <string name="auto_response">Automatic Response</string>
     <string name="request_timeout">Request Timeout</string>
     <string name="superuser_notification">Superuser Notification</string>
-    <string name="request_timeout_summary">%1$s seconds</string>
+    <string name="request_timeout_summary">%1$d seconds</string>
     <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
     <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
     <string name="settings_su_fingerprint_title">Enable Fingerprint Authentication</string>

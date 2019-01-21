@@ -171,7 +171,7 @@
     <string name="auto_response">Réponse automatique</string>
     <string name="request_timeout">Délai d’expiration de la demande</string>
     <string name="superuser_notification">Notification super‐utilisateur</string>
-    <string name="request_timeout_summary">%1$s secondes</string>
+    <string name="request_timeout_summary">%1$d secondes</string>
     <string name="settings_su_reauth_title">Authentifier à nouveau après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Authentifier à nouveau les autorisations super‐utilisateur après une mise à jour de l’application</string>
     <string name="settings_su_fingerprint_title">Activer l’authentification par empreinte digitale</string>

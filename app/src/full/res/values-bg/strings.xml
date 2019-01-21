@@ -166,7 +166,7 @@
     <string name="auto_response">Автоматичен отговор</string>
     <string name="request_timeout">Време за запитване</string>
     <string name="superuser_notification">Superuser известие</string>
-    <string name="request_timeout_summary">%1$s секунди</string>
+    <string name="request_timeout_summary">%1$d секунди</string>
     <string name="settings_su_reauth_title">Повторно запитване след актуализация</string>
     <string name="settings_su_reauth_summary">Повторно запитване за Superuser достъп след актуализация на приложенията.</string>
     <string name="settings_su_fingerprint_title">Superuser права само с пръстов отпечатък</string>

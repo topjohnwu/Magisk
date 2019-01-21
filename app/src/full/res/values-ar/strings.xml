@@ -59,7 +59,7 @@
   <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
   <string name="repo_install_title">تثبيت %1$s</string>
   <string name="request_timeout">مهلة الطلب</string>
-  <string name="request_timeout_summary">%1$s ثانية</string>
+  <string name="request_timeout_summary">%1$d ثانية</string>
   <string name="safetyNet_check_success">نجح فحص SafetyNet</string>
   <string name="safetyNet_check_text">انقر لبدء فحص SafetyNet</string>
   <string name="safetyNet_res_invalid">الاستجابة غير صالحه</string>

@@ -142,7 +142,7 @@
     <string name="auto_response">Аутоматски одговор</string>
     <string name="request_timeout">Истек захтева</string>
     <string name="superuser_notification">Нотификације Супер-корисника</string>
-    <string name="request_timeout_summary">%1$s секунди</string>
+    <string name="request_timeout_summary">%1$d секунди</string>
     <string name="settings_su_reauth_title">Поново одобри после ажурирања</string>
     <string name="settings_su_reauth_summary">Поново одобри дозволу Супер-корисника после ажурирања апликације</string>
 

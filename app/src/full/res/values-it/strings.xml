@@ -173,7 +173,7 @@
 	<string name="auto_response">Accesso predefinito</string>
 	<string name="request_timeout">Timeout richiesta</string>
 	<string name="superuser_notification">Notifica Superuser</string>
-	<string name="request_timeout_summary">%1$s secondi</string>
+	<string name="request_timeout_summary">%1$d secondi</string>
 	<string name="settings_su_reauth_title">Riautentica dopo aggiornamento</string>
 	<string name="settings_su_reauth_summary">Riautentica i permessi Superuser dopo un aggiornamento dell\'app</string>
 	<string name="settings_su_fingerprint_title">Abilita autenticazione impronta</string>

@@ -165,7 +165,7 @@
     <string name="auto_response">Tự phản hồi</string>
     <string name="request_timeout">Thời gian chờ yêu cầu</string>
     <string name="superuser_notification">Thông báo Superuser</string>
-    <string name="request_timeout_summary">%1$s giây</string>
+    <string name="request_timeout_summary">%1$d giây</string>
     <string name="settings_su_reauth_title">Xác thực lại sau khi nâng cấp</string>
     <string name="settings_su_reauth_summary">Xác thực lại quyền superuser sau khi nâng cấp ứng dụng</string>
     <string name="settings_su_fingerprint_title">Bật xác thực vân tay</string>

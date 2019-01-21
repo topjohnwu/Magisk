@@ -137,7 +137,7 @@
     <string name="auto_response">Automatski odgovor</string>
     <string name="request_timeout">Vremensko ograničenje zahtjeva</string>
     <string name="superuser_notification">Superuser obavijest</string>
-    <string name="request_timeout_summary">%1$s sekundi</string>
+    <string name="request_timeout_summary">%1$d sekundi</string>
     <string name="settings_su_reauth_title">Ponovno provjerite autentičnost nakon ažuriranja</string>
     <string name="settings_su_reauth_summary">Ponovno provjerite autentičnost Superuser dopuštenja nakon ažuriranja aplikacije</string>
 

@@ -109,7 +109,7 @@
     <string name="auto_response">Automatiskt svar</string>
     <string name="request_timeout">Förfrågnings-timeout</string>
     <string name="superuser_notification">Superuser-avisering</string>
-    <string name="request_timeout_summary">%1$s sekunder</string>
+    <string name="request_timeout_summary">%1$d sekunder</string>
     <string name="settings_su_reauth_title">Återautentisera efter uppdatering</string>
     <string name="settings_su_reauth_summary">Återautentisera superuser-behörigheter efter en applikationsuppdatering</string>
 

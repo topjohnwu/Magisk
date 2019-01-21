@@ -170,7 +170,7 @@
     <string name="auto_response">Răspuns automat</string>
     <string name="request_timeout">Expirare</string>
     <string name="superuser_notification">Notificare Superuser</string>
-    <string name="request_timeout_summary">%1$s secunde</string>
+    <string name="request_timeout_summary">%1$d secunde</string>
     <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
     <string name="settings_su_reauth_summary">Reautentificare permisiuni pentru superuser după o actualizare a aplicației</string>
     <string name="settings_su_fingerprint_title">Activați autentificarea cu amprenta digitală</string>
