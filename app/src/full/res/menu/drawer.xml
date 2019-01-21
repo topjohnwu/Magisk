@@ -64,12 +64,6 @@
             android:icon="@drawable/ic_info_outline"
             android:title="@string/about"/>
 
-        <item
-            android:checkable="false"
-            android:id="@+id/donation"
-            android:icon="@drawable/ic_attach_money"
-            android:title="@string/donation"/>
-
     </group>
 
 </menu>

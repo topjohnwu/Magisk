@@ -1,7 +1,7 @@
 package a;
 
-import com.topjohnwu.magisk.DonationActivity;
+import com.topjohnwu.core.App;
 
-public class e extends DonationActivity {
+public class e extends App {
     /* stub */
 }

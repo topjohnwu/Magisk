@@ -158,9 +158,6 @@ public class MainActivity extends BaseActivity
                 case "about":
                     itemId = R.id.app_about;
                     break;
-                case "donation":
-                    itemId = R.id.donation;
-                    break;
             }
         }
         navigate(itemId);
@@ -195,10 +192,6 @@ public class MainActivity extends BaseActivity
                 break;
             case R.id.app_about:
                 startActivity(new Intent(this, ClassMap.get(AboutActivity.class)));
-                mDrawerItem = bak;
-                break;
-            case R.id.donation:
-                startActivity(new Intent(this, ClassMap.get(DonationActivity.class)));
                 mDrawerItem = bak;
                 break;
         }

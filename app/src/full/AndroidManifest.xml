@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:name="a.q"
+        android:name="a.e"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
@@ -33,9 +33,6 @@
         <activity
             android:name="a.d"
             android:theme="@style/AppTheme.NoDrawer" />
-        <activity
-            android:name="a.e"
-            android:theme="@style/AppTheme.NoDrawer"/>
         <activity
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"

@@ -14,11 +14,10 @@ public class ClassMap {
     private static Map<Class, Class> classMap = new HashMap<>();
 
     static {
-        classMap.put(App.class, a.q.class);
+        classMap.put(App.class, a.e.class);
         classMap.put(MainActivity.class, a.b.class);
         classMap.put(SplashActivity.class, a.c.class);
         classMap.put(AboutActivity.class, a.d.class);
-        classMap.put(DonationActivity.class, a.e.class);
         classMap.put(FlashActivity.class, a.f.class);
         classMap.put(UpdateCheckService.class, a.g.class);
         classMap.put(GeneralReceiver.class, a.h.class);
