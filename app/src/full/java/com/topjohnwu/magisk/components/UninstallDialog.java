@@ -7,8 +7,8 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.FlashActivity;
@@ -39,11 +39,11 @@ public class UninstallDialog extends CustomAlertDialog {
                 }
             });
         });
-        if (!TextUtils.isEmpty(Data.uninstallerLink)) {
+        if (!TextUtils.isEmpty(Config.uninstallerLink)) {
             setPositiveButton(R.string.complete_uninstall, (d, i) -> {
                 File zip = new File(activity.getFilesDir(), "uninstaller.zip");
                 ProgressNotification progress = new ProgressNotification(zip.getName());
-                Networking.get(Data.uninstallerLink)
+                Networking.get(Config.uninstallerLink)
                     .setDownloadProgressListener(progress)
                     .setErrorHandler(((conn, e) -> progress.dlFail()))
                     .getAsFile(zip, f -> {

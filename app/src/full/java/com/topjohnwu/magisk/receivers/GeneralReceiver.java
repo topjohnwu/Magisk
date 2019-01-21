@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 import com.topjohnwu.core.App;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.SuRequestActivity;
 import com.topjohnwu.magisk.components.Notifications;
@@ -66,7 +66,7 @@ public class GeneralReceiver extends BroadcastReceiver {
                 break;
             case Intent.ACTION_PACKAGE_REPLACED:
                 // This will only work pre-O
-                if (app.prefs.getBoolean(Const.Key.SU_REAUTH, false)) {
+                if (Config.get(Config.Key.SU_REAUTH)) {
                     app.mDB.deletePolicy(getPkg(intent));
                 }
                 break;
@@ -76,7 +76,7 @@ public class GeneralReceiver extends BroadcastReceiver {
                 Shell.su("magiskhide --rm " + pkg).submit();
                 break;
             case Const.Key.BROADCAST_MANAGER_UPDATE:
-                Data.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK);
+                Config.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK);
                 DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME));
                 break;
             case Const.Key.BROADCAST_REBOOT:

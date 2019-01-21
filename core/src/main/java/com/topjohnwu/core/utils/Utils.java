@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.container.Module;
 import com.topjohnwu.core.container.ValueSortedMap;
 import com.topjohnwu.net.Networking;
@@ -111,11 +111,9 @@ public class Utils {
     }
 
     public static boolean showSuperUser() {
-        if (Data.multiuserState < 0)
-            Data.multiuserState = App.self.mDB.getSettings(Const.Key.SU_MULTIUSER_MODE,
-                    Const.Value.MULTIUSER_MODE_OWNER_ONLY);
         return Shell.rootAccess() && (Const.USER_ID == 0 ||
-                Data.multiuserState != Const.Value.MULTIUSER_MODE_OWNER_MANAGED);
+                (int) Config.get(Config.Key.SU_MULTIUSER_MODE) !=
+                        Config.Value.MULTIUSER_MODE_OWNER_MANAGED);
     }
 
     public static Context getDEContext() {
@@ -124,6 +122,6 @@ public class Utils {
     }
 
     public static void reboot() {
-        Shell.su("/system/bin/reboot" + (Data.recovery ? " recovery" : "")).submit();
+        Shell.su("/system/bin/reboot" + (Config.recovery ? " recovery" : "")).submit();
     }
 }

@@ -5,8 +5,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
 import com.topjohnwu.core.tasks.CheckUpdates;
 import com.topjohnwu.core.tasks.UpdateRepos;
 import com.topjohnwu.core.utils.LocaleManager;
@@ -27,9 +27,9 @@ public class SplashActivity extends BaseActivity {
         // Dynamic detect all locales
         LocaleManager.loadAvailableLocales(R.string.app_changelog);
 
-        String pkg = app.mDB.getStrings(Const.Key.SU_MANAGER, null);
+        String pkg = Config.get(Config.Key.SU_MANAGER);
         if (pkg != null && getPackageName().equals(BuildConfig.APPLICATION_ID)) {
-            app.mDB.setStrings(Const.Key.SU_MANAGER, null);
+            Config.remove(Config.Key.SU_MANAGER);
             Shell.su("pm uninstall " + pkg).exec();
         }
         if (TextUtils.equals(pkg, getPackageName())) {
@@ -41,12 +41,13 @@ public class SplashActivity extends BaseActivity {
         }
 
         // Magisk working as expected
-        if (Shell.rootAccess() && Data.magiskVersionCode > 0) {
+        if (Shell.rootAccess() && Config.magiskVersionCode > 0) {
             // Load modules
             Utils.loadModules();
         }
 
-        Data.importPrefs();
+        // Set default configs
+        Config.initialize();
 
         // Create notification channel on Android O
         Notifications.setup(this);
@@ -63,9 +64,6 @@ public class SplashActivity extends BaseActivity {
             // Repo update check
             new UpdateRepos().exec();
         }
-
-        // Write back default values
-        Data.writeConfig();
 
         app.init = true;
 

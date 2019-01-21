@@ -6,7 +6,7 @@ import android.content.res.Resources;
 import android.os.Build;
 
 import com.topjohnwu.core.App;
-import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class LocaleManager {
     }
 
     public static void setLocale(App app) {
-        String localeConfig = app.prefs.getString(Const.Key.LOCALE, "");
+        String localeConfig = Config.get(Config.Key.LOCALE);
         if (localeConfig.isEmpty()) {
             locale = defaultLocale;
         } else {

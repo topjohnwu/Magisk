@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.components;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.AppUtils;
@@ -17,7 +17,7 @@ public class MagiskInstallDialog extends CustomAlertDialog {
     public MagiskInstallDialog(BaseActivity a) {
         super(a);
         String filename = Utils.fmt("Magisk-v%s(%d).zip",
-                Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
+                Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode);
         setTitle(a.getString(R.string.repo_install_title, a.getString(R.string.magisk)));
         setMessage(a.getString(R.string.repo_install_msg, filename));
         setCancelable(true);
@@ -35,13 +35,13 @@ public class MagiskInstallDialog extends CustomAlertDialog {
             new InstallMethodDialog(a, options).show();
         });
         setNegativeButton(R.string.no_thanks, null);
-        if (!TextUtils.isEmpty(Data.magiskNoteLink)) {
+        if (!TextUtils.isEmpty(Config.magiskNoteLink)) {
             setNeutralButton(R.string.release_notes, (d, i) -> {
-                if (Data.magiskNoteLink.contains("forum.xda-developers")) {
+                if (Config.magiskNoteLink.contains("forum.xda-developers")) {
                     // Open forum links in browser
-                    AppUtils.openLink(a, Uri.parse(Data.magiskNoteLink));
+                    AppUtils.openLink(a, Uri.parse(Config.magiskNoteLink));
                 } else {
-                    MarkDownWindow.show(a, null, Data.magiskNoteLink);
+                    MarkDownWindow.show(a, null, Config.magiskNoteLink);
                 }
             });
         }

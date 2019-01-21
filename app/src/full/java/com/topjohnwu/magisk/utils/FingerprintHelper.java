@@ -17,6 +17,7 @@ import android.view.Gravity;
 import android.widget.Toast;
 
 import com.topjohnwu.core.App;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
@@ -36,9 +37,9 @@ public abstract class FingerprintHelper {
     private CancellationSignal cancel;
 
     public static boolean useFingerPrint() {
-        boolean fp = App.self.mDB.getSettings(Const.Key.SU_FINGERPRINT, 0) != 0;
+        boolean fp = Config.get(Config.Key.SU_FINGERPRINT);
         if (fp && !canUseFingerprint()) {
-            App.self.mDB.setSettings(Const.Key.SU_FINGERPRINT, 0);
+            Config.set(Config.Key.SU_FINGERPRINT, false);
             fp = false;
         }
         return fp;

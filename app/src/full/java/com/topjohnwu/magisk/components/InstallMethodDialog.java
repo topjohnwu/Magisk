@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.FlashActivity;
@@ -65,10 +65,10 @@ class InstallMethodDialog extends AlertDialog.Builder {
     private void downloadOnly(BaseActivity a) {
         a.runWithExternalRW(() -> {
             String filename = Utils.fmt("Magisk-v%s(%d).zip",
-                    Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
+                    Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode);
             File zip = new File(Const.EXTERNAL_PATH, filename);
             ProgressNotification progress = new ProgressNotification(filename);
-            Networking.get(Data.magiskLink)
+            Networking.get(Config.magiskLink)
                     .setDownloadProgressListener(progress)
                     .setErrorHandler(((conn, e) -> progress.dlFail()))
                     .getAsFile(zip, f -> {

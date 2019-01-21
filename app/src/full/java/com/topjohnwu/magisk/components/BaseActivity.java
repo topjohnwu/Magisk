@@ -10,8 +10,8 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.topjohnwu.core.App;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
 import com.topjohnwu.core.utils.LocaleManager;
 import com.topjohnwu.core.utils.Topic;
 import com.topjohnwu.magisk.R;
@@ -59,7 +59,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Topic.subscribe(this);
-        if (Data.isDarkTheme && getDarkTheme() != -1) {
+        if (getDarkTheme() != -1 && (boolean) Config.get(Config.Key.DARK_THEME)) {
             setTheme(getDarkTheme());
         }
         super.onCreate(savedInstanceState);

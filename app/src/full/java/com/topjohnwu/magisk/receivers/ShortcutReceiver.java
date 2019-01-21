@@ -9,8 +9,8 @@ import android.graphics.drawable.Icon;
 import android.os.Build;
 
 import com.topjohnwu.core.App;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
@@ -45,7 +45,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                     .setRank(0)
                     .build());
         }
-        if (root && app.prefs.getBoolean(Const.Key.MAGISKHIDE, false)) {
+        if (root && (boolean) Config.get(Config.Key.MAGISKHIDE)) {
             shortCuts.add(new ShortcutInfo.Builder(app, "magiskhide")
                     .setShortLabel(app.getString(R.string.magiskhide))
                     .setIntent(new Intent(app, ClassMap.get(SplashActivity.class))
@@ -56,7 +56,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                     .setRank(1)
                     .build());
         }
-        if (!app.prefs.getBoolean(Const.Key.COREONLY, false) && root && Data.magiskVersionCode >= 0) {
+        if (!(boolean) Config.get(Config.Key.COREONLY) && root && Config.magiskVersionCode >= 0) {
             shortCuts.add(new ShortcutInfo.Builder(app, "modules")
                     .setShortLabel(app.getString(R.string.modules))
                     .setIntent(new Intent(app, ClassMap.get(SplashActivity.class))

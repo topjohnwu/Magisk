@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.container.Repo;
 
 import java.util.HashSet;
@@ -43,7 +43,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
                     "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
                             "(id TEXT, name TEXT, version TEXT, versionCode INT, minMagisk INT, " +
                             "author TEXT, description TEXT, last_update INT, PRIMARY KEY(id))");
-            App.self.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
+            Config.remove(Config.Key.ETAG_KEY);
         }
     }
 
@@ -95,15 +95,15 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getRepoCursor() {
         String orderBy = null;
-        switch (Data.repoOrder) {
-            case Const.Value.ORDER_NAME:
+        switch ((int) Config.get(Config.Key.REPO_ORDER)) {
+            case Config.Value.ORDER_NAME:
                 orderBy = "name COLLATE NOCASE";
                 break;
-            case Const.Value.ORDER_DATE:
+            case Config.Value.ORDER_DATE:
                 orderBy = "last_update DESC";
         }
         return mDb.query(TABLE_NAME, null, "minMagisk<=? AND minMagisk>=?",
-                new String[] { String.valueOf(Data.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER) },
+                new String[] { String.valueOf(Config.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER) },
                 null, null, orderBy);
     }
 

@@ -15,8 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.container.Policy;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
@@ -103,14 +102,14 @@ public class SuRequestActivity extends BaseActivity {
             return;
         }
 
-        switch (Data.suResponseType) {
-            case Const.Value.SU_AUTO_DENY:
+        switch ((int) Config.get(Config.Key.SU_AUTO_RESPONSE)) {
+            case Config.Value.SU_AUTO_DENY:
                 handleAction(Policy.DENY, 0);
                 return;
-            case Const.Value.SU_AUTO_ALLOW:
+            case Config.Value.SU_AUTO_ALLOW:
                 handleAction(Policy.ALLOW, 0);
                 return;
-            case Const.Value.SU_PROMPT:
+            case Config.Value.SU_PROMPT:
             default:
         }
 
@@ -134,7 +133,7 @@ public class SuRequestActivity extends BaseActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeout.setAdapter(adapter);
 
-        timer = new CountDownTimer(Data.suRequestTimeout * 1000, 1000) {
+        timer = new CountDownTimer((int) Config.get(Config.Key.SU_REQUEST_TIMEOUT) * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 deny_btn.setText(getString(R.string.deny_with_str, "(" + millisUntilFinished / 1000 + ")"));
@@ -210,7 +209,7 @@ public class SuRequestActivity extends BaseActivity {
     }
 
     private void handleAction(int action) {
-        handleAction(action, Const.Value.timeoutList[timeout.getSelectedItemPosition()]);
+        handleAction(action, Config.Value.TIMEOUT_LIST[timeout.getSelectedItemPosition()]);
     }
 
     private void handleAction(int action, int time) {

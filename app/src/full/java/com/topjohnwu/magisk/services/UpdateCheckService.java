@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.services;
 
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.tasks.CheckUpdates;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.components.Notifications;
@@ -20,9 +20,9 @@ public class UpdateCheckService extends DelegateWorker {
     }
 
     private void onCheckDone() {
-        if (BuildConfig.VERSION_CODE < Data.remoteManagerVersionCode) {
+        if (BuildConfig.VERSION_CODE < Config.remoteManagerVersionCode) {
             Notifications.managerUpdate();
-        } else if (Data.magiskVersionCode < Data.remoteMagiskVersionCode) {
+        } else if (Config.magiskVersionCode < Config.remoteMagiskVersionCode) {
             Notifications.magiskUpdate();
         }
     }

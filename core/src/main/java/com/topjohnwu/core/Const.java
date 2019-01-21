@@ -79,19 +79,10 @@ public class Const {
         public static final String SNET_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/b66b1a914978e5f4c4bbfd74a59f4ad371bac107/snet.apk";
     }
 
-
     public static class Key {
-        // su
-        public static final String ROOT_ACCESS = "root_access";
-        public static final String SU_MULTIUSER_MODE = "multiuser_mode";
-        public static final String SU_MNT_NS = "mnt_ns";
-        public static final String SU_MANAGER = "requester";
-        public static final String SU_REQUEST_TIMEOUT = "su_request_timeout";
-        public static final String SU_AUTO_RESPONSE = "su_auto_response";
-        public static final String SU_NOTIFICATION = "su_notification";
-        public static final String SU_REAUTH = "su_reauth";
-        public static final String SU_FINGERPRINT = "su_fingerprint";
-
+        // others
+        public static final String LINK_KEY = "Link";
+        public static final String IF_NONE_MATCH = "If-None-Match";
         // intents
         public static final String OPEN_SECTION = "section";
         public static final String INTENT_SET_NAME = "filename";
@@ -100,52 +91,15 @@ public class Const {
         public static final String FLASH_SET_BOOT = "boot";
         public static final String BROADCAST_MANAGER_UPDATE = "manager_update";
         public static final String BROADCAST_REBOOT = "reboot";
-
-        // others
-        public static final String CHECK_UPDATES = "check_update";
-        public static final String UPDATE_CHANNEL = "update_channel";
-        public static final String CUSTOM_CHANNEL = "custom_channel";
-        public static final String BOOT_FORMAT = "boot_format";
-        public static final String UPDATE_SERVICE_VER = "update_service_version";
-        public static final String APP_VER = "app_version";
-        public static final String MAGISKHIDE = "magiskhide";
-        public static final String HOSTS = "hosts";
-        public static final String COREONLY = "disable";
-        public static final String LOCALE = "locale";
-        public static final String DARK_THEME = "dark_theme";
-        public static final String ETAG_KEY = "ETag";
-        public static final String LINK_KEY = "Link";
-        public static final String IF_NONE_MATCH = "If-None-Match";
-        public static final String REPO_ORDER = "repo_order";
     }
 
-
     public static class Value {
-        public static final int STABLE_CHANNEL = 0;
-        public static final int BETA_CHANNEL = 1;
-        public static final int CUSTOM_CHANNEL = 2;
-        public static final int ROOT_ACCESS_DISABLED = 0;
-        public static final int ROOT_ACCESS_APPS_ONLY = 1;
-        public static final int ROOT_ACCESS_ADB_ONLY = 2;
-        public static final int ROOT_ACCESS_APPS_AND_ADB = 3;
-        public static final int MULTIUSER_MODE_OWNER_ONLY = 0;
-        public static final int MULTIUSER_MODE_OWNER_MANAGED = 1;
-        public static final int MULTIUSER_MODE_USER = 2;
-        public static final int NAMESPACE_MODE_GLOBAL = 0;
-        public static final int NAMESPACE_MODE_REQUESTER = 1;
-        public static final int NAMESPACE_MODE_ISOLATE = 2;
-        public static final int NO_NOTIFICATION = 0;
-        public static final int NOTIFICATION_TOAST = 1;
-        public static final int SU_PROMPT = 0;
-        public static final int SU_AUTO_DENY = 1;
-        public static final int SU_AUTO_ALLOW = 2;
         public static final String FLASH_ZIP = "flash";
         public static final String PATCH_BOOT = "patch";
         public static final String FLASH_MAGISK = "magisk";
         public static final String FLASH_INACTIVE_SLOT = "slot";
         public static final String UNINSTALL = "uninstall";
-        public static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
-        public static final int ORDER_NAME = 0;
-        public static final int ORDER_DATE = 1;
     }
+
+
 }

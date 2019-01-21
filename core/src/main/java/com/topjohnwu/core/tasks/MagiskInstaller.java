@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.R;
 import com.topjohnwu.core.container.TarEntry;
 import com.topjohnwu.core.utils.Utils;
@@ -120,9 +120,9 @@ public abstract class MagiskInstaller {
 
         File zip = new File(App.self.getCacheDir(), "magisk.zip");
 
-        if (!ShellUtils.checkSum("MD5", zip, Data.magiskMD5)) {
+        if (!ShellUtils.checkSum("MD5", zip, Config.magiskMD5)) {
             console.add("- Downloading zip");
-            Networking.get(Data.magiskLink)
+            Networking.get(Config.magiskLink)
                     .setDownloadProgressListener(new ProgressLog())
                     .execForFile(zip);
         } else {
@@ -217,7 +217,7 @@ public abstract class MagiskInstaller {
         // Patch boot image
         if (!Shell.sh(Utils.fmt("cd %s; KEEPFORCEENCRYPT=%b KEEPVERITY=%b " +
                         "sh update-binary indep boot_patch.sh %s",
-                installDir, Data.keepEnc, Data.keepVerity, srcBoot))
+                installDir, Config.keepEnc, Config.keepVerity, srcBoot))
                 .to(console, logs).exec().isSuccess())
             return false;
 
@@ -245,14 +245,14 @@ public abstract class MagiskInstaller {
         if (!Shell.su(Utils.fmt("direct_install %s %s", installDir, srcBoot))
                 .to(console, logs).exec().isSuccess())
             return false;
-        if (!Data.keepVerity)
+        if (!Config.keepVerity)
             Shell.su("find_dtbo_image", "patch_dtbo_image").to(console, logs).exec();
         return true;
     }
 
     protected boolean storeBoot() {
         File patched = new File(installDir, "new-boot.img");
-        String fmt = App.self.prefs.getString(Const.Key.BOOT_FORMAT, ".img");
+        String fmt = Config.get(Config.Key.BOOT_FORMAT);
         File dest = new File(Const.EXTERNAL_PATH, "patched_boot" + fmt);
         dest.getParentFile().mkdirs();
         OutputStream os;

@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 
 import com.topjohnwu.core.App;
 import com.topjohnwu.core.Const;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.container.Repo;
 import com.topjohnwu.core.utils.Logger;
 import com.topjohnwu.core.utils.Topic;
@@ -81,7 +82,7 @@ public class UpdateRepos {
     private boolean loadPage(int page) {
         Request req = Networking.get(Utils.fmt(Const.Url.REPO_URL, page + 1));
         if (page == 0) {
-            String etag = app.prefs.getString(Const.Key.ETAG_KEY, null);
+            String etag = Config.get(Config.Key.ETAG_KEY);
             if (etag != null)
                 req.addHeaders(Const.Key.IF_NONE_MATCH, etag);
         }
@@ -107,10 +108,10 @@ public class UpdateRepos {
 
         // Update ETAG
         if (page == 0) {
-            String etag = res.getConnection().getHeaderField(Const.Key.ETAG_KEY);
+            String etag = res.getConnection().getHeaderField(Config.Key.ETAG_KEY);
             if (etag != null) {
                 etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
-                app.prefs.edit().putString(Const.Key.ETAG_KEY, etag).apply();
+                Config.set(Config.Key.ETAG_KEY, etag);
             }
         }
 

@@ -11,8 +11,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.container.Module;
 import com.topjohnwu.core.tasks.UpdateRepos;
 import com.topjohnwu.core.utils.Topic;
@@ -106,9 +105,9 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
         if (item.getItemId() == R.id.repo_sort) {
             new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.sorting_order)
-                .setSingleChoiceItems(R.array.sorting_orders, Data.repoOrder, (d, which) -> {
-                    Data.repoOrder = which;
-                    app.prefs.edit().putInt(Const.Key.REPO_ORDER, Data.repoOrder).apply();
+                .setSingleChoiceItems(R.array.sorting_orders,
+                        Config.get(Config.Key.REPO_ORDER), (d, which) -> {
+                    Config.set(Config.Key.REPO_ORDER, which);
                     adapter.notifyDBChanged();
                     d.dismiss();
                 }).show();

@@ -48,7 +48,6 @@ public class App extends ContainerApp {
 
         Networking.init(this);
         LocaleManager.setLocale(this);
-        Data.loadConfig();
     }
 
     @Override

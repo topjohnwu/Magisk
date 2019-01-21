@@ -4,8 +4,8 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.topjohnwu.core.App;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
 import com.topjohnwu.core.utils.RootUtils;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.BuildConfig;
@@ -110,8 +110,8 @@ public class PatchAPK {
         if (!ShellUtils.fastCmdResult("pm install " + repack))
             return false;
 
-        app.mDB.setStrings(Const.Key.SU_MANAGER, pkg);
-        Data.exportPrefs();
+        Config.set(Config.Key.SU_MANAGER, pkg);
+        Config.export();
         RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID, pkg);
 
         return true;

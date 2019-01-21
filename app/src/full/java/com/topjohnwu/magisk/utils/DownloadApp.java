@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.os.AsyncTask;
 
 import com.topjohnwu.core.App;
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.utils.RootUtils;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.BuildConfig;
@@ -25,7 +25,7 @@ public class DownloadApp {
 
     public static void restore() {
         String name = Utils.fmt("MagiskManager v%s(%d)",
-                Data.remoteManagerVersionString, Data.remoteManagerVersionCode);
+                Config.remoteManagerVersionString, Config.remoteManagerVersionCode);
         dlInstall(name, new RestoreManager());
     }
 
@@ -33,7 +33,7 @@ public class DownloadApp {
         File apk = new File(App.self.getCacheDir(), "manager.apk");
         ProgressNotification progress = new ProgressNotification(name);
         listener.progress = progress;
-        Networking.get(Data.managerLink)
+        Networking.get(Config.managerLink)
                 .setExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 .setDownloadProgressListener(progress)
                 .setErrorHandler((conn, e) -> progress.dlFail())
@@ -85,7 +85,7 @@ public class DownloadApp {
                     .setContentTitle(app.getString(R.string.restore_img_msg))
                     .setContentText("");
             progress.update();
-            Data.exportPrefs();
+            Config.export();
             // Make it world readable
             apk.setReadable(true, false);
             if (ShellUtils.fastCmdResult("pm install " + apk))

@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.topjohnwu.core.App;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
 import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
@@ -52,7 +52,7 @@ public class Notifications {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(app, Const.ID.UPDATE_NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk_outline)
                 .setContentTitle(app.getString(R.string.magisk_update_title))
-                .setContentText(app.getString(R.string.magisk_update_available, Data.remoteMagiskVersionString))
+                .setContentText(app.getString(R.string.magisk_update_available, Config.remoteMagiskVersionString))
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
@@ -63,11 +63,11 @@ public class Notifications {
     public static void managerUpdate() {
         App app = App.self;
         String name = Utils.fmt("MagiskManager v%s(%d)",
-                Data.remoteManagerVersionString, Data.remoteManagerVersionCode);
+                Config.remoteManagerVersionString, Config.remoteManagerVersionCode);
 
         Intent intent = new Intent(app, ClassMap.get(GeneralReceiver.class));
         intent.setAction(Const.Key.BROADCAST_MANAGER_UPDATE);
-        intent.putExtra(Const.Key.INTENT_SET_LINK, Data.managerLink);
+        intent.putExtra(Const.Key.INTENT_SET_LINK, Config.managerLink);
         intent.putExtra(Const.Key.INTENT_SET_NAME, name);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(app,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);

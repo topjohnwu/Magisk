@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
+import com.topjohnwu.core.Config;
 import com.topjohnwu.core.container.Policy;
 import com.topjohnwu.core.container.SuLogEntry;
 import com.topjohnwu.core.utils.LocaleManager;
@@ -85,7 +85,7 @@ public class MagiskDB {
                 "DELETE FROM %s WHERE until > 0 AND until < %d;" +
                         "DELETE FROM %s WHERE time < %d",
                 POLICY_TABLE, System.currentTimeMillis() / 1000,
-                LOG_TABLE, System.currentTimeMillis() - Data.suLogTimeout * 86400000
+                LOG_TABLE, System.currentTimeMillis() - Config.suLogTimeout * 86400000
         );
     }
 
