@@ -21,7 +21,7 @@ public class Config {
     // Current status
     public static String magiskVersionString;
     public static int magiskVersionCode = -1;
-    public static boolean magiskHide;
+    private static boolean magiskHide;
 
     // Update Info
     public static String remoteMagiskVersionString;
@@ -203,6 +203,8 @@ public class Config {
                 e.printStackTrace();
             }
             editor.remove(Key.ETAG_KEY);
+            editor.apply();
+            editor = pref.edit();
             config.delete();
         }
 
