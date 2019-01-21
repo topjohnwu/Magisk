@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ public class SuRequestActivity extends BaseActivity {
     private Policy policy;
     private CountDownTimer timer;
     private FingerprintHelper fingerprintHelper;
+    private SharedPreferences timeoutPrefs;
 
     @Override
     public int getDarkTheme() {
@@ -73,6 +75,7 @@ public class SuRequestActivity extends BaseActivity {
 
         PackageManager pm = getPackageManager();
         app.mDB.clearOutdated();
+        timeoutPrefs = getSharedPreferences("su_timeout", 0);
 
         // Get policy
         Intent intent = getIntent();
@@ -132,6 +135,7 @@ public class SuRequestActivity extends BaseActivity {
                 R.array.allow_timeout, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeout.setAdapter(adapter);
+        timeout.setSelection(timeoutPrefs.getInt(policy.packageName, 0));
 
         timer = new CountDownTimer((int) Config.get(Config.Key.SU_REQUEST_TIMEOUT) * 1000, 1000) {
             @Override
@@ -209,7 +213,9 @@ public class SuRequestActivity extends BaseActivity {
     }
 
     private void handleAction(int action) {
-        handleAction(action, Config.Value.TIMEOUT_LIST[timeout.getSelectedItemPosition()]);
+        int pos = timeout.getSelectedItemPosition();
+        timeoutPrefs.edit().putInt(policy.packageName, pos).apply();
+        handleAction(action, Config.Value.TIMEOUT_LIST[pos]);
     }
 
     private void handleAction(int action, int time) {
