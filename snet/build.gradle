@@ -1,13 +1,9 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-
     defaultConfig {
         applicationId "com.topjohnwu.snet"
         minSdkVersion 14
-        targetSdkVersion rootProject.ext.compileSdkVersion
         versionCode 12
         versionName "snet"
     }

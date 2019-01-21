@@ -23,8 +23,9 @@ public class Request {
     private HttpURLConnection conn;
     private Executor executor = null;
     private DownloadProgressListener progress = null;
-    private ErrorHandler err = null;
-    private int code;
+    private int code = -1;
+
+    ErrorHandler err = null;
 
     private interface Requestor<T> {
         T request() throws Exception;
@@ -74,7 +75,7 @@ public class Request {
         return exec(this::getInputStream);
     }
 
-    public void getAsFile(ResponseListener<File> rs, File out) {
+    public void getAsFile(File out, ResponseListener<File> rs) {
         submit(() -> dlFile(out), rs);
     }
 
@@ -110,7 +111,10 @@ public class Request {
         Result<T> res = new Result<>();
         try {
             res.result = req.request();
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            if (err != null)
+                err.onError(conn, e);
+        }
         return res;
     }
 
@@ -135,12 +139,7 @@ public class Request {
         code = conn.getResponseCode();
         InputStream in = conn.getInputStream();
         if (progress != null) {
-            in = new ProgressInputStream(in, conn.getContentLength()) {
-                @Override
-                protected void updateProgress(long bytesDownloaded, long totalBytes) {
-                    progress.onProgress(bytesDownloaded, totalBytes);
-                }
-
+            in = new ProgressInputStream(in, conn.getContentLength(), progress) {
                 @Override
                 public void close() throws IOException {
                     super.close();

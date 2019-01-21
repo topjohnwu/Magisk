@@ -18,7 +18,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.topjohnwu.magisk.provider"
+            android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

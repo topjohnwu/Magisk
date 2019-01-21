@@ -118,7 +118,7 @@ public abstract class MagiskInstaller {
 
         console.add("- Device platform: " + Build.CPU_ABI);
 
-        File zip = new File(App.self.getFilesDir(), "magisk.zip");
+        File zip = new File(App.self.getCacheDir(), "magisk.zip");
 
         if (!ShellUtils.checkSum("MD5", zip, Data.magiskMD5)) {
             console.add("- Downloading zip");
@@ -285,7 +285,7 @@ public abstract class MagiskInstaller {
     }
 
     protected boolean postOTA() {
-        SuFile bootctl = new SuFile(Const.MAGISK_PATH + "/.core/bootctl");
+        SuFile bootctl = new SuFile("/data/adb/bootctl");
         try (InputStream in = App.self.getResources().openRawResource(R.raw.bootctl);
              OutputStream out = new SuFileOutputStream(bootctl)) {
             ShellUtils.pump(in, out);

@@ -46,14 +46,14 @@ public class UninstallDialog extends CustomAlertDialog {
                 Networking.get(Data.uninstallerLink)
                     .setDownloadProgressListener(progress)
                     .setErrorHandler(((conn, e) -> progress.dlFail()))
-                    .getAsFile(f -> {
+                    .getAsFile(zip, f -> {
                         progress.dismiss();
                         Intent intent = new Intent(activity, ClassMap.get(FlashActivity.class))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 .setData(Uri.fromFile(f))
                                 .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL);
                         activity.startActivity(intent);
-                    }, zip);
+                    });
             });
         }
     }

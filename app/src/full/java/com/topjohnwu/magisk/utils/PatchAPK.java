@@ -23,10 +23,11 @@ import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.IntBuffer;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.jar.JarEntry;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 public class PatchAPK {
 
@@ -42,7 +43,7 @@ public class PatchAPK {
         builder.append(prefix);
         length -= prefix.length();
         SecureRandom random = new SecureRandom();
-        char next, prev = '.';
+        char next, prev = prefix.charAt(prefix.length() - 1);
         for (int i = 0; i < length; ++i) {
             if (prev == '.' || i == length - 1) {
                 next = ALPHA.charAt(random.nextInt(ALPHA.length()));
@@ -55,30 +56,30 @@ public class PatchAPK {
         return builder.toString();
     }
 
-    private static boolean findAndPatch(byte xml[], String a, String b) {
-        if (a.length() != b.length())
+    private static boolean findAndPatch(byte xml[], String from, String to) {
+        if (from.length() != to.length())
             return false;
-        char[] from = a.toCharArray(), to = b.toCharArray();
         CharBuffer buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer();
-        int offset = -1;
-        for (int i = 0; i < buf.length() - from.length; ++i) {
+        List<Integer> offList = new ArrayList<>();
+        for (int i = 0; i < buf.length() - from.length(); ++i) {
             boolean match = true;
-            for (int j = 0; j < from.length; ++j) {
-                if (buf.get(i + j) != from[j]) {
+            for (int j = 0; j < from.length(); ++j) {
+                if (buf.get(i + j) != from.charAt(j)) {
                     match = false;
                     break;
                 }
             }
-            // Make sure it is null terminated
-            if (match && buf.get(i + from.length) == '\0') {
-                offset = i;
-                break;
+            if (match) {
+                offList.add(i);
+                i += from.length();
             }
         }
-        if (offset < 0)
+        if (offList.isEmpty())
             return false;
-        buf.position(offset);
-        buf.put(to);
+        for (int off : offList) {
+            buf.position(off);
+            buf.put(to);
+        }
         return true;
     }
 
@@ -101,19 +102,13 @@ public class PatchAPK {
         File repack = new File(app.getFilesDir(), "patched.apk");
         String pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length());
 
-        try {
-            JarMap apk = new JarMap(app.getPackageCodePath());
-            if (!patch(apk, pkg))
-                return false;
-            SignAPK.sign(apk, new BufferedOutputStream(new FileOutputStream(repack)));
-        } catch (Exception e) {
+        if (!patch(app.getPackageCodePath(), repack.getPath(), pkg))
             return false;
-        }
 
         // Install the application
         repack.setReadable(true, false);
         if (!ShellUtils.fastCmdResult("pm install " + repack))
-            return false;;
+            return false;
 
         app.mDB.setStrings(Const.Key.SU_MANAGER, pkg);
         Data.exportPrefs();
@@ -122,18 +117,19 @@ public class PatchAPK {
         return true;
     }
 
-    public static boolean patch(JarMap apk, String pkg) {
+    public static boolean patch(String in, String out, String pkg) {
         try {
-            JarEntry je = apk.getJarEntry(Const.ANDROID_MANIFEST);
-            byte xml[] = apk.getRawData(je);
+            JarMap jar = new JarMap(in);
+            JarEntry je = jar.getJarEntry(Const.ANDROID_MANIFEST);
+            byte xml[] = jar.getRawData(je);
 
             if (!findAndPatch(xml, BuildConfig.APPLICATION_ID, pkg) ||
-                    !findAndPatch(xml, BuildConfig.APPLICATION_ID + ".provider", pkg + ".provider") ||
                     !findAndPatch(xml, R.string.app_name, R.string.re_app_name))
                 return false;
 
             // Write in changes
-            apk.getOutputStream(je).write(xml);
+            jar.getOutputStream(je).write(xml);
+            SignAPK.sign(jar, new BufferedOutputStream(new FileOutputStream(out)));
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -146,10 +142,9 @@ public class PatchAPK {
             App app = App.self;
             NotificationCompat.Builder progress =
                     Notifications.progress(app.getString(R.string.hide_manager_title));
-            NotificationManagerCompat mgr = NotificationManagerCompat.from(app);
-            mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
+            Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
             boolean b = patchAndHide();
-            mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
+            Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
             if (!b) Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
         });
     }

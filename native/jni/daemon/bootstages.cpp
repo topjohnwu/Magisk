@@ -13,6 +13,8 @@
 #include <dirent.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
+#include <vector>
+#include <string>
 
 #include "magisk.h"
 #include "db.h"
@@ -23,8 +25,10 @@
 #include "selinux.h"
 #include "flags.h"
 
+using namespace std;
+
 static char buf[PATH_MAX], buf2[PATH_MAX];
-static Vector<CharArray> module_list;
+static vector<string> module_list;
 static bool seperate_vendor;
 
 char *system_block, *vendor_block, *magiskloop;
@@ -42,13 +46,13 @@ extern void auto_start_magiskhide();
 #define IS_SKEL    0x04    /* mount from skeleton */
 #define IS_MODULE  0x08    /* mount from module */
 
-#define IS_DIR(n)  (n->type == DT_DIR)
-#define IS_LNK(n)  (n->type == DT_LNK)
-#define IS_REG(n)  (n->type == DT_REG)
+#define IS_DIR(n)  ((n)->type == DT_DIR)
+#define IS_LNK(n)  ((n)->type == DT_LNK)
+#define IS_REG(n)  ((n)->type == DT_REG)
 
 class node_entry {
 public:
-	node_entry(const char *, uint8_t status = 0, uint8_t type = 0);
+	explicit node_entry(const char *, uint8_t status = 0, uint8_t type = 0);
 	~node_entry();
 	void create_module_tree(const char *module);
 	void magic_mount();
@@ -56,15 +60,15 @@ public:
 
 private:
 	const char *module;    /* Only used when status & IS_MODULE */
-	const CharArray name;
+	const string name;
 	uint8_t type;
 	uint8_t status;
 	node_entry *parent;
-	Vector<node_entry *> children;
+	vector<node_entry *> children;
 
 	node_entry(const char *, const char *, uint8_t type);
 	bool is_root();
-	CharArray get_path();
+	string get_path();
 	node_entry *insert(node_entry *);
 	void clone_skeleton();
 	int get_path(char *path);
@@ -87,7 +91,7 @@ bool node_entry::is_root() {
 	return parent == nullptr;
 }
 
-CharArray node_entry::get_path() {
+string node_entry::get_path() {
 	get_path(buf);
 	return buf;
 }
@@ -123,7 +127,7 @@ void node_entry::create_module_tree(const char *module) {
 	DIR *dir;
 	struct dirent *entry;
 
-	CharArray full_path = get_path();
+	auto full_path = get_path();
 	snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, full_path.c_str());
 
 	if (!(dir = xopendir(buf)))
@@ -133,7 +137,7 @@ void node_entry::create_module_tree(const char *module) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		// Create new node
-		node_entry *node = new node_entry(module, entry->d_name, entry->d_type);
+		auto node = new node_entry(module, entry->d_name, entry->d_type);
 		snprintf(buf, PATH_MAX, "%s/%s", full_path.c_str(), entry->d_name);
 
 		/*
@@ -185,7 +189,7 @@ void node_entry::clone_skeleton() {
 	struct node_entry *dummy;
 
 	// Clone the structure
-	CharArray full_path = get_path();
+	auto full_path = get_path();
 	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path.c_str());
 	if (!(dir = xopendir(buf)))
 		return;
@@ -200,10 +204,10 @@ void node_entry::clone_skeleton() {
 
 	if (status & IS_SKEL) {
 		file_attr attr;
-		getattr(full_path, &attr);
+		getattr(full_path.c_str(), &attr);
 		LOGI("mnt_tmpfs : %s\n", full_path.c_str());
-		xmount("tmpfs", full_path, "tmpfs", 0, nullptr);
-		setattr(full_path, &attr);
+		xmount("tmpfs", full_path.c_str(), "tmpfs", 0, nullptr);
+		setattr(full_path.c_str(), &attr);
 	}
 
 	for (auto &child : children) {
@@ -254,9 +258,9 @@ void node_entry::clone_skeleton() {
 void node_entry::magic_mount() {
 	if (status & IS_MODULE) {
 		// Mount module item
-		CharArray real_path = get_path();
+		auto real_path = get_path();
 		snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, real_path.c_str());
-		bind_mount(buf, real_path);
+		bind_mount(buf, real_path.c_str());
 	} else if (status & IS_SKEL) {
 		// The node is labeled to be cloned with skeleton, lets do it
 		clone_skeleton();
@@ -330,7 +334,8 @@ static void exec_common_script(const char* stage) {
 }
 
 static void exec_module_script(const char* stage) {
-	for (const char *module : module_list) {
+	for (const auto &m : module_list) {
+		const auto module = m.c_str();
 		snprintf(buf2, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
 		if (access(buf2, F_OK) == -1)
 			continue;
@@ -364,7 +369,7 @@ static void simple_mount(const char *path) {
 		if (access(buf2, F_OK) == -1)
 			continue;
 		if (entry->d_type == DT_DIR) {
-			simple_mount(CharArray(buf2));
+			simple_mount(string(buf2).c_str());
 		} else if (entry->d_type == DT_REG) {
 			// Actual file path
 			snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, buf2);
@@ -431,21 +436,17 @@ static bool magisk_env() {
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
-	CharArray sdk_prop = getprop("ro.build.version.sdk");
-	int sdk = sdk_prop.empty() ? -1 : atoi(sdk_prop);
-
 	LOGI("* Mounting mirrors");
-	Vector<CharArray> mounts;
-	file_to_vector("/proc/mounts", mounts);
+	auto mounts = file_to_vector("/proc/mounts");
 	bool system_as_root = false;
 	for (auto &line : mounts) {
-		if (line.contains(" /system_root ")) {
+		if (str_contains(line, " /system_root ")) {
 			bind_mount("/system_root/system", MIRRDIR "/system");
-			sscanf(line, "%s", buf);
+			sscanf(line.c_str(), "%s", buf);
 			system_block = strdup2(buf);
 			system_as_root = true;
-		} else if (!system_as_root && line.contains(" /system ")) {
-			sscanf(line, "%s %*s %s", buf, buf2);
+		} else if (!system_as_root && str_contains(line, " /system ")) {
+			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
 			system_block = strdup2(buf);
 			xmount(system_block, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
 #ifdef MAGISK_DEBUG
@@ -453,9 +454,9 @@ static bool magisk_env() {
 #else
 			LOGI("mount: %s\n", MIRRDIR "/system");
 #endif
-		} else if (line.contains(" /vendor ")) {
+		} else if (str_contains(line, " /vendor ")) {
 			seperate_vendor = true;
-			sscanf(line, "%s %*s %s", buf, buf2);
+			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
 			vendor_block = strdup2(buf);
 			xmkdir(MIRRDIR "/vendor", 0755);
 			xmount(buf, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
@@ -464,7 +465,8 @@ static bool magisk_env() {
 #else
 			LOGI("mount: %s\n", MIRRDIR "/vendor");
 #endif
-		} else if (sdk >= 24 && line.contains(" /proc ") && !line.contains("hidepid=2")) {
+		} else if (SDK_INT >= 24 &&
+		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
 			// Enforce hidepid
 			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 		}
@@ -485,6 +487,13 @@ static bool magisk_env() {
 	LOGI("* Setting up internal busybox");
 	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, nullptr);
 	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+
+	// Disable/remove magiskhide, resetprop, and modules
+	if (SDK_INT < 19) {
+		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT, 0));
+		unlink("/sbin/resetprop");
+		unlink("/sbin/magiskhide");
+	}
 	return true;
 }
 
@@ -508,7 +517,7 @@ static void collect_modules() {
 			}
 			unlink("update");
 			if (access("disable", F_OK))
-				module_list.push_back(entry->d_name);
+				module_list.emplace_back(entry->d_name);
 			chdir("..");
 		}
 	}
@@ -559,7 +568,7 @@ static bool prepare_img() {
 
 static void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	while (1) {
+	while (true) {
 		sleep(5);
 		LOGD("apk_install: attempting to install APK\n");
 		int fd = -1, pid;
@@ -586,14 +595,14 @@ static void install_apk(const char *apk) {
 static bool check_data() {
 	bool mnt = false;
 	bool data = false;
-	Vector<CharArray> mounts;
-	file_to_vector("/proc/mounts", mounts);
+	auto mounts = file_to_vector("/proc/mounts");
 	for (auto &line : mounts) {
-		if (line.contains(" /data ") && !line.contains("tmpfs"))
+		if (line.find(" /data ") != string::npos &&
+			line.find("tmpfs") == string::npos)
 			mnt = true;
 	}
 	if (mnt) {
-		CharArray crypto = getprop("ro.crypto.state");
+		auto crypto = getprop("ro.crypto.state");
 		if (!crypto.empty()) {
 			if (crypto == "unencrypted") {
 				// Unencrypted, we can directly access data
@@ -767,7 +776,7 @@ void startup() {
 	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", nullptr);
 }
 
-[[noreturn]] static void core_only() {
+[[noreturn]] static inline void core_only() {
 	auto_start_magiskhide();
 	unblock_boot_process();
 }
@@ -788,6 +797,14 @@ void post_fs_data(int client) {
 
 	start_log_daemon();
 
+	// Run common scripts
+	LOGI("* Running post-fs-data.d scripts\n");
+	exec_common_script("post-fs-data");
+
+	// Core only mode
+	if (access(DISABLEFILE, F_OK) == 0)
+		core_only();
+
 	if (!prepare_img()) {
 		LOGE("* Magisk image mount failed, switch to core-only mode\n");
 		free(magiskloop);
@@ -798,24 +815,16 @@ void post_fs_data(int client) {
 	restorecon();
 	chmod(SECURE_DIR, 0700);
 
-	// Run common scripts
-	LOGI("* Running post-fs-data.d scripts\n");
-	exec_common_script("post-fs-data");
-
-	// Core only mode
-	if (access(DISABLEFILE, F_OK) == 0)
-		core_only();
-
 	// Execute module scripts
 	LOGI("* Running module post-fs-data scripts\n");
 	exec_module_script("post-fs-data");
 
 	// Recollect modules
-	module_list.clear(true);
+	module_list.clear();
 	collect_modules();
 
 	// Create the system root entry
-	node_entry *sys_root = new node_entry("system", IS_INTER);
+	auto sys_root = new node_entry("system", IS_INTER);
 
 	// Vendor root entry
 	node_entry *ven_root = nullptr;
@@ -823,12 +832,13 @@ void post_fs_data(int client) {
 	bool has_modules = false;
 
 	LOGI("* Loading modules\n");
-	for (const char *module : module_list) {
+	for (const auto &m : module_list) {
+		const auto module = m.c_str();
 		// Read props
 		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MOUNTPOINT, module);
 		if (access(buf, F_OK) == 0) {
 			LOGI("%s: loading [system.prop]\n", module);
-			load_prop_file(buf, 0);
+			load_prop_file(buf, false);
 		}
 		// Check whether enable auto_mount
 		snprintf(buf, PATH_MAX, "%s/%s/auto_mount", MOUNTPOINT, module);
@@ -911,7 +921,7 @@ core_only:
 	}
 
 	// All boot stage done, cleanup
-	module_list.clear(true);
+	module_list.clear();
 }
 
 void boot_complete(int client) {

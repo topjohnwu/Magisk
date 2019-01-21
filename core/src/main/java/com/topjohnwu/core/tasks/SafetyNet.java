@@ -38,14 +38,14 @@ public class SafetyNet {
         } catch (Exception ignored) {
             Shell.sh("rm -rf " + EXT_APK.getParent()).exec();
             EXT_APK.getParentFile().mkdir();
-            Networking.get(Const.Url.SNET_URL).getAsFile(f -> {
+            Networking.get(Const.Url.SNET_URL).getAsFile(EXT_APK, f -> {
                 try {
                     dyRun(activity);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Topic.publish(false, Topic.SNET_CHECK_DONE, -1);
                 }
-            }, EXT_APK);
+            });
         }
     }
 }

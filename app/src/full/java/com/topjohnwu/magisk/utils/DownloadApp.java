@@ -12,12 +12,10 @@ import com.topjohnwu.magisk.components.ProgressNotification;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
 import com.topjohnwu.superuser.ShellUtils;
-import com.topjohnwu.utils.JarMap;
-import com.topjohnwu.utils.SignAPK;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+
+import dalvik.system.DexClassLoader;
 
 public class DownloadApp {
 
@@ -32,39 +30,27 @@ public class DownloadApp {
     }
 
     private static void dlInstall(String name, ManagerDownloadListener listener) {
-        File apk = new File(App.self.getFilesDir(), "manager.apk");
+        File apk = new File(App.self.getCacheDir(), "manager.apk");
         ProgressNotification progress = new ProgressNotification(name);
-        listener.setProgressNotification(progress);
+        listener.progress = progress;
         Networking.get(Data.managerLink)
                 .setExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 .setDownloadProgressListener(progress)
                 .setErrorHandler((conn, e) -> progress.dlFail())
-                .getAsFile(listener, apk);
+                .getAsFile(apk, listener);
     }
 
-    abstract static class ManagerDownloadListener implements ResponseListener<File> {
+    private abstract static class ManagerDownloadListener implements ResponseListener<File> {
+        ProgressNotification progress;
+    }
 
-        private ProgressNotification progress;
-
-        private void setProgressNotification(ProgressNotification progress) {
-            this.progress = progress;
-        }
-
-        public abstract void onDownloadComplete(File apk, ProgressNotification progress);
+    private static class PatchPackageName extends ManagerDownloadListener {
 
         @Override
         public void onResponse(File apk) {
-            onDownloadComplete(apk, progress);
-        }
-    }
-
-    static class PatchPackageName extends ManagerDownloadListener {
-
-        @Override
-        public void onDownloadComplete(File apk, ProgressNotification progress) {
             File patched = apk;
             App app = App.self;
-            if (!App.self.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+            if (!app.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
                 progress.getNotificationBuilder()
                         .setProgress(0, 0, true)
                         .setContentTitle(app.getString(R.string.hide_manager_title))
@@ -72,11 +58,16 @@ public class DownloadApp {
                 progress.update();
                 patched = new File(apk.getParent(), "patched.apk");
                 try {
-                    JarMap jarMap = new JarMap(apk);
-                    PatchAPK.patch(jarMap, app.getPackageName());
-                    SignAPK.sign(jarMap, new BufferedOutputStream(new FileOutputStream(patched)));
+                    // Try using the new APK to patch itself
+                    ClassLoader loader = new DexClassLoader(apk.getPath(),
+                            apk.getParent(), null, ClassLoader.getSystemClassLoader());
+                    loader.loadClass("a.a")
+                            .getMethod("patchAPK", String.class, String.class, String.class)
+                            .invoke(null, apk.getPath(), patched.getPath(), app.getPackageName());
                 } catch (Exception e) {
-                    return;
+                    e.printStackTrace();
+                    // Fallback to use the current implementation
+                    PatchAPK.patch(apk.getPath(), patched.getPath(), app.getPackageName());
                 }
             }
             APKInstall.install(app, patched);
@@ -84,10 +75,10 @@ public class DownloadApp {
         }
     }
 
-    static class RestoreManager extends ManagerDownloadListener {
+    private static class RestoreManager extends ManagerDownloadListener {
 
         @Override
-        public void onDownloadComplete(File apk, ProgressNotification progress) {
+        public void onResponse(File apk) {
             App app = App.self;
             progress.getNotificationBuilder()
                     .setProgress(0, 0, true)

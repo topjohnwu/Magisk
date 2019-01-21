@@ -19,7 +19,10 @@
 #include "daemon.h"
 #include "selinux.h"
 #include "db.h"
+#include "resetprop.h"
 #include "flags.h"
+
+int SDK_INT = -1;
 
 static void get_client_cred(int fd, struct ucred *cred) {
 	socklen_t ucred_length = sizeof(*cred);
@@ -44,7 +47,7 @@ static void *request_handler(void *args) {
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
-			return NULL;
+			return nullptr;
 		}
 	default:
 		break;
@@ -100,6 +103,16 @@ static void main_daemon() {
 	xdup2(fd, STDIN_FILENO);
 	close(fd);
 
+	// Get API level
+	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
+		if (strcmp(key, "ro.build.version.sdk") == 0) {
+			LOGI("* Device API level: %s\n", val);
+			SDK_INT = atoi(val);
+			return false;
+		}
+		return true;
+	});
+
 	struct sockaddr_un sun;
 	socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
 	fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
@@ -116,20 +129,20 @@ static void main_daemon() {
 	sigemptyset(&block_set);
 	sigaddset(&block_set, SIGUSR1);
 	sigaddset(&block_set, SIGUSR2);
-	pthread_sigmask(SIG_SETMASK, &block_set, NULL);
+	pthread_sigmask(SIG_SETMASK, &block_set, nullptr);
 
 	// Ignore SIGPIPE
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
 	act.sa_handler = SIG_IGN;
-	sigaction(SIGPIPE, &act, NULL);
+	sigaction(SIGPIPE, &act, nullptr);
 
 	// Loop forever to listen for requests
 	while(1) {
 		int *client = new int;
-		*client = xaccept4(fd, NULL, NULL, SOCK_CLOEXEC);
+		*client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
 		pthread_t thread;
-		xpthread_create(&thread, NULL, request_handler, client);
+		xpthread_create(&thread, nullptr, request_handler, client);
 		// Detach the thread, we will never join it
 		pthread_detach(thread);
 	}

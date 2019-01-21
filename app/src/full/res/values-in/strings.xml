@@ -74,8 +74,8 @@
     <string name="progress_channel">Notifikasi Kemajuan</string>
     <string name="download_complete">Unduhan selesai</string>
     <string name="download_file_error">Kesalahan mengunduh file</string>
-    <string name="magisk_update_title">Pembaruan Magisk Baru Tersedia!</string>
-    <string name="manager_update_title">Pembaruan Magisk Manager Baru Tersedia!</string>
+    <string name="magisk_update_title">Pembaruan Magisk Tersedia!</string>
+    <string name="manager_update_title">Pembaruan Magisk Manager Tersedia!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Tutup</string>
@@ -125,6 +125,7 @@
     <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
     <string name="downloading_toast">Mengunduh %1$s</string>
     <string name="no_rw_storage">Fitur ini tidak akan bekerja tanpa izin untuk menulis ke penyimpanan eksternal.</string>
+    <string name="dl_one_module">Unduh satu modul pada suatu waktu.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Umum</string>

@@ -227,5 +227,6 @@
     <string name="download_complete">下載完成</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模組</string>
     <string name="progress_channel">進度通知</string>
+    <string name="dl_one_module">一次僅能下載一個模組</string>
 
 </resources>
