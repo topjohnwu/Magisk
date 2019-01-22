@@ -129,9 +129,6 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                 .setNegativeButton(R.string.no_thanks, null)
                 .setCancelable(true)
                 .show());
-
-        // Hide for now
-        holder.moreInfo.setVisibility(View.GONE);
     }
 
     @Override

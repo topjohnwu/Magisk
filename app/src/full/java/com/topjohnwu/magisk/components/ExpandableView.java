@@ -19,6 +19,7 @@ public interface ExpandableView {
 
     default void setupExpandable() {
         Container container = getContainer();
+        setExpanded(false);
         container.expandLayout.getViewTreeObserver().addOnPreDrawListener(
             new ViewTreeObserver.OnPreDrawListener() {
 
@@ -32,7 +33,6 @@ public interface ExpandableView {
                     }
 
                     container.expandLayout.getViewTreeObserver().removeOnPreDrawListener(this);
-                    container.expandLayout.setVisibility(View.GONE);
                     container.expandAnimator = slideAnimator(0, container.expandHeight);
                     container.collapseAnimator = slideAnimator(container.expandHeight, 0);
                     return true;
@@ -51,7 +51,6 @@ public interface ExpandableView {
         ViewGroup.LayoutParams layoutParams = container.expandLayout.getLayoutParams();
         layoutParams.height = expanded ? container.expandHeight : 0;
         container.expandLayout.setLayoutParams(layoutParams);
-        container.expandLayout.setVisibility(expanded ? View.VISIBLE : View.GONE);
     }
 
     default void expand() {
