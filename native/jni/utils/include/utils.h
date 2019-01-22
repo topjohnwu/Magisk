@@ -16,8 +16,8 @@
 #include <string>
 #include <vector>
 
-#define str_contains(s, ss) ((s).find(ss) != string::npos)
-#define str_starts(s, ss) ((s).compare(0, strlen(ss), ss) == 0)
+#define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != string::npos)
+#define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)
 
 std::vector<std::string> file_to_vector(const char *filename);
 char *strdup2(const char *s, size_t *size = nullptr);
