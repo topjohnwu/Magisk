@@ -17,7 +17,7 @@ public class Const {
     public static final String SU_KEYSTORE_KEY = "su_key";
 
     // Paths
-    public static final String MAGISK_PATH = "/sbin/.magisk/img";
+    public static final String MAGISK_PATH = Config.magiskVersionCode < 18000 ? "/sbin/.core/img" : "/sbin/.magisk/img";
     public static final File EXTERNAL_PATH;
     public static File MAGISK_DISABLE_FILE;
 
