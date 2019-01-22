@@ -349,9 +349,9 @@ public class Config {
                 continue;
             switch (getConfigType(key)) {
                 case PREF_INT:
-                case DB_INT:
                     editor.putInt(key, defs.getInt(key));
                     break;
+                case DB_INT:
                 case PREF_STR_INT:
                     editor.putString(key, String.valueOf(defs.getInt(key)));
                     break;
