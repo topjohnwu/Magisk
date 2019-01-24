@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,11 +94,12 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
                 itemExpanded.add(realIdx);
             }
         });
+        Context context = holder.itemView.getContext();
         holder.appName.setText(entry.appName);
         holder.action.setText(entry.action ? R.string.grant : R.string.deny);
-        holder.command.setText(entry.command);
-        holder.fromPid.setText(String.valueOf(entry.fromPid));
-        holder.toUid.setText(String.valueOf(entry.toUid));
+        holder.pid.setText(context.getString(R.string.pid, entry.fromPid));
+        holder.uid.setText(context.getString(R.string.target_uid, entry.toUid));
+        holder.command.setText(context.getString(R.string.command, entry.command));
         holder.time.setText(entry.getTimeString());
     }
 
@@ -125,9 +127,9 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.action) TextView action;
         @BindView(R.id.time) TextView time;
-        @BindView(R.id.fromPid) TextView fromPid;
-        @BindView(R.id.toUid) TextView toUid;
-        @BindView(R.id.command) TextView command;
+        @BindView(R.id.pid) TextView pid;
+        @BindView(R.id.uid) TextView uid;
+        @BindView(R.id.cmd) TextView command;
         @BindView(R.id.expand_layout) ViewGroup expandLayout;
 
         private Container container = new Container();

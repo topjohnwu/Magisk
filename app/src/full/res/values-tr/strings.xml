@@ -226,8 +226,7 @@
     <string name="auth_fail">Kimlik Doğrulama Başarısız</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Hedef UID:\u0020</string>
-    <string name="command">Komut:\u0020</string>
+    <string name="target_uid">Hedef UID: %1$d</string>
+    <string name="command">Komut: %1$s</string>
 
 </resources>

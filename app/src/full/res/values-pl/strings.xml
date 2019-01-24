@@ -226,8 +226,7 @@
     <string name="auth_fail">Uwierzytelnienie Nieudane</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Identyfikator UID:\u0020</string>
-    <string name="command">Komenda:\u0020</string>
+    <string name="target_uid">Identyfikator UID: %1$d</string>
+    <string name="command">Komenda: %1$s</string>
 
 </resources>

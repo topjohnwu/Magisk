@@ -227,8 +227,7 @@
     <string name="auth_fail">验证失败</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">目标 UID:\u0020</string>
-    <string name="command">命令:\u0020</string>
+    <string name="target_uid">目标 UID: %1$d</string>
+    <string name="command">命令: %1$s</string>
 
 </resources>

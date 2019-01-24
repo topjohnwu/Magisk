@@ -11,7 +11,7 @@
   <string name="checking_for_updates">البحث عن تحديثات…</string>
   <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
   <string name="close">إغلاق</string>
-  <string name="command">"الأمر: "</string>
+  <string name="command">الأمر: %1$s</string>
   <string name="current_magisk_title">نسخة Magisk المثبته: %1$s</string>
   <string name="deny">رفض</string>
   <string name="deny_with_str">رفض%1$s</string>
@@ -48,8 +48,7 @@
   <string name="once">مرة</string>
   <string name="owner_manage_summary">يمكن للمالك فقط إدارة صلاحيات الروت وتلقي مطالبات الطلب</string>
   <string name="owner_only_summary">المالك فقط لديه صلاحيات الروت</string>
-  <string name="pid">"PID: "</string>
-  <string name="process_error">خطأ في العملية</string>
+    <string name="process_error">خطأ في العملية</string>
   <string name="prompt">طلب</string>
   <string name="reboot">إعادة التشغيل</string>
   <string name="release_notes">ملاحظات الإصدار</string>
@@ -105,7 +104,7 @@
   <string name="superuser_access">Superuser صلاحيات</string>
   <string name="superuser_notification">Superuser إشعارات</string>
   <string name="support_thread">منتدى الدعم</string>
-  <string name="target_uid">"الهدف UID: "</string>
+  <string name="target_uid">الهدف UID: %1$d</string>
   <string name="tenmin">10 دقائق</string>
   <string name="thirtymin">30 دقائق</string>
   <string name="toast">ملاحظة منبثقة</string>

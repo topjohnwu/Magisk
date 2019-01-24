@@ -226,7 +226,6 @@
     <string name="auth_fail">Otentikasi Gagal</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">UID target:\u0020</string>
-    <string name="command">Perintah:\u0020</string>
+    <string name="target_uid">UID target: %1$d</string>
+    <string name="command">Perintah: %1$s</string>
 </resources>

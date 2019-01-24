@@ -217,8 +217,7 @@
     <string name="auth_fail">Autentifikácia zlyhala</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Target UID:\u0020</string>
-    <string name="command">Príkaz:\u0020</string>
+    <string name="target_uid">Target UID: %1$d</string>
+    <string name="command">Príkaz: %1$s</string>
 
 </resources>

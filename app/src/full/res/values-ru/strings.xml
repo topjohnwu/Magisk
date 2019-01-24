@@ -221,8 +221,7 @@
     <string name="auth_fail">Ошибка аутентификации</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">UID:\u0020</string>
-    <string name="command">Команда:\u0020</string>
+    <string name="target_uid">UID: %1$d</string>
+    <string name="command">Команда: %1$s</string>
 
 </resources>

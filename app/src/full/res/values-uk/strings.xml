@@ -227,8 +227,7 @@
     <string name="auth_fail">Помилка автентифікації</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Цільовий UID:\u0020</string>
-    <string name="command">Команда:\u0020</string>
+    <string name="target_uid">Цільовий UID: %1$d</string>
+    <string name="command">Команда: %1$s</string>
 
 </resources>

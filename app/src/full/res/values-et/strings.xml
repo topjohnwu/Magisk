@@ -216,8 +216,7 @@
     <string name="auth_fail">Autentimine ebaõnnestus</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\\u0020</string>
-    <string name="target_uid">Siht-UID:\\u0020</string>
-    <string name="command">Käsklus:\\u0020</string>
+    <string name="target_uid">Siht-UID: %1$d</string>
+    <string name="command">Käsklus: %1$s</string>
 
 </resources>

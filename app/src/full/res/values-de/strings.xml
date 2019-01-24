@@ -221,8 +221,7 @@
     <string name="auth_fail">Authentifizierung fehlgeschlagen</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Ziel-UID:\u0020</string>
-    <string name="command">Befehl:\u0020</string>
+    <string name="target_uid">Ziel-UID: %1$d</string>
+    <string name="command">Befehl: %1$s</string>
 
 </resources>

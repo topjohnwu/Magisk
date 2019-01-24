@@ -159,8 +159,7 @@
     <string name="none">Inga</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Mål-UID:\u0020</string>
-    <string name="command">Kommando:\u0020</string>
+    <string name="target_uid">Mål-UID: %1$d</string>
+    <string name="command">Kommando: %1$s</string>
 
 </resources>

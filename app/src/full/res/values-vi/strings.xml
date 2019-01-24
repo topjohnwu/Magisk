@@ -219,7 +219,6 @@
     <string name="auth_fail">Xác thực thất bại</string>
     
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Mục UID:\u0020</string>
-    <string name="command">Điều khiển:\u0020</string>
+    <string name="target_uid">Mục UID: %1$d</string>
+    <string name="command">Điều khiển: %1$s</string>
 </resources>

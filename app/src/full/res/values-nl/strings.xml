@@ -209,8 +209,7 @@
     <string name="auth_fail">Authenticatie mislukt</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Doel UID:\u0020</string>
-    <string name="command">Opdracht:\u0020</string>
+    <string name="target_uid">Doel UID: %1$d</string>
+    <string name="command">Opdracht: %1$s</string>
 
 </resources>

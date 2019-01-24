@@ -222,8 +222,7 @@
     <string name="auth_fail">Неуспешна заверка.</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Целеви UID:\u0020</string>
-    <string name="command">Команда:\u0020</string>
+    <string name="target_uid">Целеви UID: %1$d</string>
+    <string name="command">Команда: %1$s</string>
 
 </resources>

@@ -202,8 +202,7 @@
     <string name="auth_fail">認証に失敗しました</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">ターゲット UID:\u0020</string>
-    <string name="command">コマンド:\u0020</string>
+    <string name="target_uid">ターゲット UID: %1$d</string>
+    <string name="command">コマンド: %1$s</string>
 
 </resources>

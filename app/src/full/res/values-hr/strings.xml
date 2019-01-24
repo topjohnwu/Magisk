@@ -187,8 +187,7 @@
     <string name="none">Nijedan</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Ciljani UID:\u0020</string>
-    <string name="command">Naredba:\u0020</string>
+    <string name="target_uid">Ciljani UID: %1$d</string>
+    <string name="command">Naredba: %1$s</string>
 
 </resources>

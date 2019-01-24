@@ -215,8 +215,7 @@
     <string name="auth_fail">Patvirtinimas žlugo</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Target UID:\u0020</string>
-    <string name="command">Komanda:\u0020</string>
+    <string name="target_uid">Target UID: %1$d</string>
+    <string name="command">Komanda: %1$s</string>
 
 </resources>

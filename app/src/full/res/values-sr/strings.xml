@@ -192,8 +192,7 @@
     <string name="none">Ниједан</string>
 
     <!--Superuser logs-->
-    <string name="pid">ПИД:\u0020</string>
-    <string name="target_uid">Циљани УИД:\u0020</string>
-    <string name="command">Команда:\u0020</string>
+    <string name="target_uid">Циљани УИД: %1$d</string>
+    <string name="command">Команда: %1$s</string>
 
 </resources>

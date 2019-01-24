@@ -226,8 +226,7 @@
     <string name="auth_fail">Autentificare eşuată</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">UID:\u0020</string>
-    <string name="command">Comandă:\u0020</string>
+    <string name="target_uid">UID: %1$d</string>
+    <string name="command">Comandă: %1$s</string>
 
 </resources>

@@ -133,8 +133,7 @@
     <string name="none">Žádné</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Cílové UID:\u0020</string>
-    <string name="command">Příkaz:\u0020</string>
+    <string name="target_uid">Cílové UID: %1$d</string>
+    <string name="command">Příkaz: %1$s</string>
 
 </resources>
