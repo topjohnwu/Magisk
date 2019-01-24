@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.core.container.Module;
@@ -193,7 +192,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         @BindView(R.id.version_name) TextView versionName;
         @BindView(R.id.description) TextView description;
         @BindView(R.id.author) TextView author;
-        @BindView(R.id.info_layout) LinearLayout infoLayout;
+        @BindView(R.id.info_layout) View infoLayout;
         @BindView(R.id.download) ImageView downloadImage;
         @BindView(R.id.update_time) TextView updateTime;
 
