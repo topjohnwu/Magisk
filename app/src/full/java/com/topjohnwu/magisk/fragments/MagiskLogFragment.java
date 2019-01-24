@@ -101,6 +101,7 @@ public class MagiskLogFragment extends BaseFragment {
 
     private void clearLogs() {
         Shell.su("echo -n > " + Const.MAGISK_LOG).submit();
+        txtLog.setText(R.string.log_is_empty);
         SnackbarMaker.make(rv, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
     }
 
