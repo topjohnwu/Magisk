@@ -61,15 +61,13 @@ public class MagiskLogFragment extends BaseFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_refresh:
-                readLogs();
-                return true;
             case R.id.menu_save:
                 runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, this::saveLogs);
                 return true;
             case R.id.menu_clear:
                 clearLogs();
-                return true;
+            case R.id.menu_refresh:
+                readLogs();
             default:
                 return true;
         }
@@ -101,7 +99,6 @@ public class MagiskLogFragment extends BaseFragment {
 
     private void clearLogs() {
         Shell.su("echo -n > " + Const.MAGISK_LOG).submit();
-        txtLog.setText(R.string.log_is_empty);
         SnackbarMaker.make(rv, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
     }
 
