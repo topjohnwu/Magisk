@@ -78,7 +78,7 @@ public class MagiskLogFragment extends BaseFragment {
     }
 
     private void readLogs() {
-        Shell.su("cat " + Const.MAGISK_LOG + " | tail -n 5000").submit(result -> {
+        Shell.su("tail -n 5000 " + Const.MAGISK_LOG).submit(result -> {
             rv.setAdapter(new MagiskLogAdapter(result.getOut()));
         });
     }
