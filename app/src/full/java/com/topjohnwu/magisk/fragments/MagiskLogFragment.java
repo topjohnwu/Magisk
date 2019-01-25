@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.adapters.StringListAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.internal.NOPList;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +70,7 @@ public class MagiskLogFragment extends BaseFragment {
                 return true;
             case R.id.menu_clear:
                 clearLogs();
+                rv.setAdapter(new MagiskLogAdapter(NOPList.getInstance()));
                 return true;
             default:
                 return true;
@@ -101,14 +103,15 @@ public class MagiskLogFragment extends BaseFragment {
 
     private void clearLogs() {
         Shell.su("echo -n > " + Const.MAGISK_LOG).submit();
-        txtLog.setText(R.string.log_is_empty);
         SnackbarMaker.make(rv, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
     }
 
-    private static class MagiskLogAdapter extends StringListAdapter<MagiskLogAdapter.ViewHolder> {
+    private class MagiskLogAdapter extends StringListAdapter<MagiskLogAdapter.ViewHolder> {
 
         MagiskLogAdapter(List<String> list) {
             super(list);
+            if (mList.isEmpty())
+                mList.add(requireContext().getString(R.string.log_is_empty));
         }
 
         @Override
