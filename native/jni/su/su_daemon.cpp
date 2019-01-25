@@ -335,7 +335,6 @@ void su_daemon_handler(int client, struct ucred *credential) {
 
 		// Setup environment
 		umask(022);
-		set_identity(ctx.req.uid);
 		char path[32], buf[4096];
 		snprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
 		xreadlink(path, buf, sizeof(buf));
@@ -363,6 +362,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 			}
 		}
 
+		set_identity(ctx.req.uid);
 		execvp(ctx.req.shell, (char **) argv);
 		fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell, strerror(errno));
 		PLOGE("exec");
