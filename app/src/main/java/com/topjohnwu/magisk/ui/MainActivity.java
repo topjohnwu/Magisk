@@ -3,25 +3,23 @@ package com.topjohnwu.magisk.ui;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 
-import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ui.base.BaseActivity;
-import com.topjohnwu.magisk.ui.hide.MagiskHideFragment;
 import com.topjohnwu.magisk.ui.home.MagiskFragment;
 import com.topjohnwu.magisk.ui.log.LogFragment;
 import com.topjohnwu.magisk.ui.module.ModulesFragment;
@@ -29,21 +27,19 @@ import com.topjohnwu.magisk.ui.module.ReposFragment;
 import com.topjohnwu.magisk.ui.settings.SettingsFragment;
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 import butterknife.BindView;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements BottomNavigationView.OnNavigationItemSelectedListener,
+        PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
-    private final Handler mDrawerHandler = new Handler();
     private int mDrawerItem;
     private static boolean fromShortcut = false;
 
     @BindView(R.id.toolbar) public Toolbar toolbar;
-    @BindView(R.id.drawer_layout) DrawerLayout drawer;
-    @BindView(R.id.nav_view) NavigationView navigationView;
+    @BindView(R.id.bottom_nav) BottomNavigationView bottomNavigationView;
 
     private float toolbarElevation;
 
@@ -65,25 +61,9 @@ public class MainActivity extends BaseActivity
         checkHideSection();
         setSupportActionBar(toolbar);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.magisk, R.string.magisk) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                super.onDrawerSlide(drawerView, 0); // this disables the arrow @ completed tate
-            }
-
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                super.onDrawerSlide(drawerView, 0); // this disables the animation
-            }
-        };
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolbarElevation = toolbar.getElevation();
         }
-
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
 
         if (savedInstanceState == null) {
             String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
@@ -91,13 +71,15 @@ public class MainActivity extends BaseActivity
             navigate(section);
         }
 
-        navigationView.setNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
     }
 
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(navigationView)) {
-            drawer.closeDrawer(navigationView);
+        int entryCount = getSupportFragmentManager().getBackStackEntryCount();
+        if (entryCount > 0) {
+            getSupportFragmentManager().popBackStack();
+            setHasBack(entryCount > 1);
         } else if (mDrawerItem != R.id.magisk && !fromShortcut) {
             navigate(R.id.magisk);
         } else {
@@ -107,19 +89,13 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
-        mDrawerHandler.removeCallbacksAndMessages(null);
-        mDrawerHandler.postDelayed(() -> navigate(menuItem.getItemId()), 250);
-        drawer.closeDrawer(navigationView);
+        navigate(menuItem.getItemId());
         return true;
     }
 
     public void checkHideSection() {
-        Menu menu = navigationView.getMenu();
-        menu.findItem(R.id.magiskhide).setVisible(Shell.rootAccess() &&
-                (boolean) Config.get(Config.Key.MAGISKHIDE));
+        Menu menu = bottomNavigationView.getMenu();
         menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Config.magiskVersionCode >= 0);
-        menu.findItem(R.id.downloads).setVisible(Networking.checkNetworkStatus(this)
-                && Shell.rootAccess() && Config.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Utils.showSuperUser());
     }
@@ -137,9 +113,6 @@ public class MainActivity extends BaseActivity
                 case "downloads":
                     itemId = R.id.downloads;
                     break;
-                case "magiskhide":
-                    itemId = R.id.magiskhide;
-                    break;
                 case "log":
                     itemId = R.id.log;
                     break;
@@ -152,8 +125,9 @@ public class MainActivity extends BaseActivity
     }
 
     public void navigate(int itemId) {
+        if (mDrawerItem == itemId) return;
         mDrawerItem = itemId;
-        navigationView.setCheckedItem(itemId);
+        bottomNavigationView.setSelectedItemId(itemId);
         switch (itemId) {
             case R.id.magisk:
                 fromShortcut = false;
@@ -168,9 +142,6 @@ public class MainActivity extends BaseActivity
             case R.id.downloads:
                 displayFragment(new ReposFragment(), true);
                 break;
-            case R.id.magiskhide:
-                displayFragment(new MagiskHideFragment(), true);
-                break;
             case R.id.log:
                 displayFragment(new LogFragment(), false);
                 break;
@@ -184,11 +155,42 @@ public class MainActivity extends BaseActivity
         supportInvalidateOptionsMenu();
         getSupportFragmentManager()
                 .beginTransaction()
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .replace(R.id.content_frame, navFragment)
                 .commitNow();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolbar.setElevation(setElevation ? toolbarElevation : 0);
         }
+    }
+
+    @Override
+    public boolean onPreferenceStartFragment(PreferenceFragmentCompat caller, Preference pref) {
+        addFragment(Fragment.instantiate(this, pref.getFragment()));
+        return true;
+    }
+
+    public void addFragment(@NonNull Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .replace(R.id.content_frame, fragment)
+                .addToBackStack(null)
+                .commit();
+        setHasBack(true);
+    }
+
+    private void setHasBack(boolean show) {
+        getSupportActionBar().setDisplayShowHomeEnabled(show);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(show);
+        bottomNavigationView.setVisibility(show ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

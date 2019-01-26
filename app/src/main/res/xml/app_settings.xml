@@ -58,7 +58,7 @@
             android:title="@string/settings_core_only_title"
             android:summary="@string/settings_core_only_summary" />
 
-        <SwitchPreferenceCompat
+        <com.topjohnwu.magisk.ui.settings.MagiskHidePreference
             android:key="magiskhide"
             android:title="@string/magiskhide"
             android:summary="@string/settings_magiskhide_summary" />

@@ -41,9 +41,15 @@ public class SettingsFragment extends BasePreferenceFragment {
             requestTimeout, rootConfig, multiuserConfig, nsConfig;
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        requireActivity().setTitle(R.string.settings);
+    }
+
+    @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.app_settings, rootKey);
-        requireActivity().setTitle(R.string.settings);
 
         boolean showSuperuser = Utils.showSuperUser();
         app.prefs.edit()
@@ -233,7 +239,7 @@ public class SettingsFragment extends BasePreferenceFragment {
                 }).show();
                 break;
         }
-        return true;
+        return super.onPreferenceTreeClick(preference);
     }
 
     private void setSummary(String key) {

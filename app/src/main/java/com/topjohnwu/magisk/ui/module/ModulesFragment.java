@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.model.entity.Module;
+import com.topjohnwu.magisk.ui.MainActivity;
 import com.topjohnwu.magisk.ui.base.BaseFragment;
 import com.topjohnwu.magisk.ui.flash.FlashActivity;
 import com.topjohnwu.magisk.utils.Event;
@@ -76,14 +77,19 @@ public class ModulesFragment extends BaseFragment {
             }
         });
 
-        requireActivity().setTitle(R.string.modules);
-
         return view;
     }
 
     @Override
     public int[] getListeningEvents() {
         return new int[] {Event.MODULE_LOAD_DONE};
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        requireActivity().setTitle(R.string.modules);
     }
 
     @Override
@@ -103,6 +109,7 @@ public class ModulesFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_modules, menu);
         inflater.inflate(R.menu.menu_reboot, menu);
     }
 
@@ -120,6 +127,9 @@ public class ModulesFragment extends BaseFragment {
                 return true;
             case R.id.reboot_download:
                 Shell.su("/system/bin/reboot download").submit();
+                return true;
+            case R.id.downloads:
+                ((MainActivity) requireActivity()).addFragment(new ReposFragment());
                 return true;
             default:
                 return false;
