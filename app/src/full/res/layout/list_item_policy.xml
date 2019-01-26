@@ -72,12 +72,21 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="5dp"
+                android:tint="@color/icon_grey"
                 app:layout_constraintBottom_toBottomOf="@+id/package_name"
                 app:layout_constraintEnd_toEndOf="@+id/app_name"
                 app:layout_constraintStart_toEndOf="@+id/package_name"
                 app:layout_constraintTop_toTopOf="@+id/package_name"
-                android:tint="@color/icon_grey"
                 app:srcCompat="@drawable/ic_arrow" />
+
+            <View
+                android:id="@+id/trigger"
+                android:layout_width="35dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/arrow"
+                app:layout_constraintStart_toStartOf="@+id/arrow"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/master_switch"

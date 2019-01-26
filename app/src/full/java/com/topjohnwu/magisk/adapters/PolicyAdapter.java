@@ -5,6 +5,8 @@ import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,9 +19,7 @@ import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
@@ -31,10 +31,11 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
     private List<Policy> policyList;
     private MagiskDB dbHelper;
     private PackageManager pm;
-    private Set<Policy> expandList = new HashSet<>();
+    private boolean[] expandList;
 
     public PolicyAdapter(List<Policy> list, MagiskDB db, PackageManager pm) {
         policyList = list;
+        expandList = new boolean[policyList.size()];
         dbHelper = db;
         this.pm = pm;
     }
@@ -50,15 +51,14 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Policy policy = policyList.get(position);
 
-        holder.setExpanded(expandList.contains(policy));
-
-        holder.itemView.setOnClickListener(view -> {
+        holder.setExpanded(expandList[position]);
+        holder.trigger.setOnClickListener(view -> {
             if (holder.isExpanded()) {
                 holder.collapse();
-                expandList.remove(policy);
+                expandList[position] = false;
             } else {
                 holder.expand();
-                expandList.add(policy);
+                expandList[position] = true;
             }
         });
 
@@ -145,7 +145,8 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         @BindView(R.id.notification_switch) SwitchCompat notificationSwitch;
         @BindView(R.id.logging_switch) SwitchCompat loggingSwitch;
         @BindView(R.id.expand_layout) ViewGroup expandLayout;
-
+        @BindView(R.id.arrow) ImageView arrow;
+        @BindView(R.id.trigger) View trigger;
         @BindView(R.id.delete) ImageView delete;
         @BindView(R.id.more_info) ImageView moreInfo;
 
@@ -161,6 +162,32 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         @Override
         public Container getContainer() {
             return container;
+        }
+
+        @Override
+        public void setExpanded(boolean expanded) {
+            ExpandableView.super.setExpanded(expanded);
+            arrow.setRotation(expanded ? 180 : 0);
+        }
+
+        private void setRotate(RotateAnimation rotate) {
+            rotate.setDuration(300);
+            rotate.setFillAfter(true);
+            arrow.startAnimation(rotate);
+        }
+
+        @Override
+        public void expand() {
+            ExpandableView.super.expand();
+            setRotate(new RotateAnimation(0, 180,
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
+        }
+
+        @Override
+        public void collapse() {
+            ExpandableView.super.collapse();
+            setRotate(new RotateAnimation(180, 0,
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
         }
     }
 }
