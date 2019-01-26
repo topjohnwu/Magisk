@@ -71,14 +71,10 @@ dependencies {
     fullImplementation "androidx.recyclerview:recyclerview:${androidXVersion}"
     fullImplementation "androidx.cardview:cardview:${androidXVersion}"
     fullImplementation "com.google.android.material:material:${androidXVersion}"
-    fullImplementation 'android.arch.work:work-runtime:1.0.0-beta02'
+    fullImplementation 'android.arch.work:work-runtime:1.0.0-beta03'
     fullImplementation 'androidx.room:room-runtime:2.0.0'
 
     def butterKnifeVersion = '10.0.0'
-    if (properties.containsKey('android.injected.invoked.from.ide')) {
-        fullImplementation "com.jakewharton:butterknife-reflect:${butterKnifeVersion}"
-    } else {
-        fullImplementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
-        fullAnnotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
-    }
+    fullImplementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
+    fullAnnotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 }
