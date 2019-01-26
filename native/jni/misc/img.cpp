@@ -61,10 +61,10 @@ static char *loopsetup(const char *img) {
 		}
 	}
 	if (lfd < 0)
-		return NULL;
+		return nullptr;
 	ffd = xopen(img, O_RDWR);
 	if (ioctl(lfd, LOOP_SET_FD, ffd) == -1)
-		return NULL;
+		return nullptr;
 	strncpy((char *) info.lo_file_name, img, sizeof(info.lo_file_name));
 	ioctl(lfd, LOOP_SET_STATUS64, &info);
 	close(lfd);
@@ -122,7 +122,7 @@ int imgtool_main(int argc, char *argv[]) {
 		xdup2(out, STDOUT_FILENO);
 		close(fd);
 		close(out);
-		if (loop == NULL) {
+		if (loop == nullptr) {
 			fprintf(stderr, "Cannot mount image!\n");
 			return 1;
 		} else {
@@ -162,29 +162,29 @@ int create_img(const char *img, int size) {
 	char size_str[16];
 	snprintf(size_str, sizeof(size_str), "%dM", size);
 	if (access("/system/bin/make_ext4fs", X_OK) == 0)
-		return exec_command_sync("/system/bin/make_ext4fs", "-b", "4096", "-l", size_str, img, NULL);
+		return exec_command_sync("/system/bin/make_ext4fs", "-b", "4096", "-l", size_str, img);
 	else if (access("/system/bin/mke2fs", X_OK) == 0)
 		// On Android P there is no make_ext4fs, use mke2fs
-		return exec_command_sync("/system/bin/mke2fs", "-b", "4096", "-t", "ext4", img, size_str, NULL);
+		return exec_command_sync("/system/bin/mke2fs", "-b", "4096", "-t", "ext4", img, size_str);
 	else
 		return 1;
 }
 
 int resize_img(const char *img, int size) {
 	LOGI("Resize %s to %dM\n", img, size);
-	exec_command_sync("/system/bin/e2fsck", "-yf", img, NULL);
+	exec_command_sync("/system/bin/e2fsck", "-yf", img);
 	char ss[16];
 	snprintf(ss, sizeof(ss), "%dM", size);
-	return exec_command_sync("/system/bin/resize2fs", img, ss, NULL);
+	return exec_command_sync("/system/bin/resize2fs", img, ss);
 }
 
 char *mount_image(const char *img, const char *target) {
 	if (access(img, F_OK) == -1 || access(target, F_OK) == -1)
-		return NULL;
-	exec_command_sync("/system/bin/e2fsck", "-yf", img, NULL);
+		return nullptr;
+	exec_command_sync("/system/bin/e2fsck", "-yf", img);
 	char *device = loopsetup(img);
 	if (device)
-		xmount(device, target, "ext4", MS_NOATIME, NULL);
+		xmount(device, target, "ext4", MS_NOATIME, nullptr);
 	return device;
 }
 
@@ -220,10 +220,10 @@ int merge_img(const char *source, const char *target) {
 	xmkdir(TARGET_TMP, 0755);
 	char *s_loop, *t_loop, *m_loop;
 	s_loop = mount_image(source, SOURCE_TMP);
-	if (s_loop == NULL)
+	if (s_loop == nullptr)
 		return 1;
 	t_loop = mount_image(target, TARGET_TMP);
-	if (t_loop == NULL)
+	if (t_loop == nullptr)
 		return 1;
 
 	snprintf(buf, sizeof(buf), "%s/%s", SOURCE_TMP, "lost+found");
@@ -256,7 +256,7 @@ int merge_img(const char *source, const char *target) {
 	create_img(buf, round_size(src.used + tgt.used));
 	xmkdir(MERGE_TMP, 0755);
 	m_loop = mount_image(buf, MERGE_TMP);
-	if (m_loop == NULL)
+	if (m_loop == nullptr)
 		return 1;
 
 	LOGI("* Merging %s + %s -> %s", source, target, buf);
@@ -288,7 +288,7 @@ int trim_img(const char *img, const char *mount, char *loop) {
 		umount_image(mount, loop);
 		resize_img(img, new_size);
 		char *loop2 = mount_image(img, mount);
-		if (loop2 == NULL)
+		if (loop2 == nullptr)
 			return 1;
 		strcpy(loop, loop2);
 		free(loop2);

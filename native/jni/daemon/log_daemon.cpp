@@ -134,7 +134,7 @@ static void log_daemon() {
 	// Test whether these buffers actually works
 	const char *b[] = { "main", "events", "crash" };
 	for (auto &buffer : b) {
-		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-b", buffer, "-d", "-f", "/dev/null", nullptr) == 0) {
+		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-b", buffer, "-d", "-f", "/dev/null") == 0) {
 			log_cmd.push_back("-b");
 			log_cmd.push_back(buffer);
 		}
@@ -183,7 +183,7 @@ static void log_daemon() {
 
 bool start_log_daemon() {
 	if (!log_daemon_started) {
-		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-d", "-f", "/dev/null", nullptr) == 0) {
+		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-d", "-f", "/dev/null") == 0) {
 			if (fork_dont_care() == 0)
 				log_daemon();
 			log_daemon_started = true;

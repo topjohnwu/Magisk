@@ -195,39 +195,8 @@ int exec_command(exec_t &exec) {
 	exit(-1);
 }
 
-/*
-   fd == nullptr -> Ignore output
-  *fd < 0     -> Open pipe and set *fd to the read end
-  *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
-  *pre_exec   -> A callback function called after forking, before execvp
-*/
-int exec_command(bool err, int *fd, void (*pre_exec)(), const char **argv) {
-	exec_t exec {
-		.err = err,
-		.fd = fd ? *fd : -2,
-		.pre_exec = pre_exec,
-		.argv = argv
-	};
-	int pid = exec_command(exec);
-	if (fd) *fd = exec.fd;
-	return pid;
-}
-
-static int v_exec_command(bool err, int *fd, void (*cb)(), const char *argv0, va_list argv) {
-	// Collect va_list into vector
-	vector<const char *> args;
-	args.push_back(argv0);
-	for (const char *arg = va_arg(argv, char*); arg; arg = va_arg(argv, char*))
-		args.push_back(arg);
-	args.push_back(nullptr);
-	int pid = exec_command(err, fd, cb, args.data());
-	return pid;
-}
-
 int exec_command_sync(const char **argv) {
-	exec_t exec {
-		.argv = argv
-	};
+	exec_t exec { .argv = argv };
 	int pid, status;
 	pid = exec_command(exec);
 	if (pid < 0)
@@ -236,22 +205,3 @@ int exec_command_sync(const char **argv) {
 	return WEXITSTATUS(status);
 }
 
-int exec_command_sync(const char *argv0, ...) {
-	va_list argv;
-	va_start(argv, argv0);
-	int pid, status;
-	pid = v_exec_command(false, nullptr, nullptr, argv0, argv);
-	va_end(argv);
-	if (pid < 0)
-		return pid;
-	waitpid(pid, &status, 0);
-	return WEXITSTATUS(status);
-}
-
-int exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, ...) {
-	va_list argv;
-	va_start(argv, argv0);
-	int pid = v_exec_command(err, fd, cb, argv0, argv);
-	va_end(argv);
-	return pid;
-}

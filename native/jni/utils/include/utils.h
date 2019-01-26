@@ -95,7 +95,7 @@ int __fsetxattr(int fd, const char *name, const void *value, size_t size, int fl
 
 // file.cpp
 
-#define do_align(p, a)     (((p) + (a) - 1) / (a) * (a))
+#define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (do_align(p, a) - (p))
 
 extern const char **excl_list;
@@ -138,24 +138,36 @@ void write_zero(int fd, size_t size);
 #include <string>
 #include <vector>
 
-#define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != string::npos)
+#define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != std::string::npos)
 #define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)
 
+// file.cpp
+
 std::vector<std::string> file_to_vector(const char *filename);
+
+// misc.cpp
 
 struct exec_t {
 	bool err = false;
 	int fd = -2;
 	void (*pre_exec)() = nullptr;
-	const char **argv = nullptr;
 	int (*fork)() = xfork;
+	const char **argv = nullptr;
 };
 
 int exec_command(exec_t &exec);
-int exec_command(bool err, int *fd, void (*pre_exec)(), const char **argv);
-int exec_command(bool err, int *fd, void (*cb)(), const char *argv0, ...);
+template <class ...Args>
+int exec_command(exec_t &exec, Args &&...args) {
+	const char *argv[] = {args..., nullptr};
+	exec.argv = argv;
+	return exec_command(exec);
+}
 int exec_command_sync(const char **argv);
-int exec_command_sync(const char *argv0, ...);
+template <class ...Args>
+int exec_command_sync(Args &&...args) {
+	const char *argv[] = {args..., nullptr};
+	return exec_command_sync(argv);
+}
 
 #endif
 

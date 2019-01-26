@@ -323,9 +323,8 @@ static void exec_common_script(const char* stage) {
 			if (access(entry->d_name, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			int pid = exec_command(false, nullptr,
-					strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
-					MIRRDIR "/system/bin/sh", entry->d_name, nullptr);
+			exec_t exec { .pre_exec = strcmp(stage, "post-fs-data") ? set_path : set_mirror_path };
+			int pid = exec_command(exec, MIRRDIR "/system/bin/sh", entry->d_name);
 			if (pid != -1)
 				waitpid(pid, nullptr, 0);
 		}
@@ -342,9 +341,8 @@ static void exec_module_script(const char* stage) {
 		if (access(buf2, F_OK) == -1)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		int pid = exec_command(false, nullptr,
-				strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
-				MIRRDIR "/system/bin/sh", buf2, nullptr);
+		exec_t exec { .pre_exec = strcmp(stage, "post-fs-data") ? set_path : set_mirror_path };
+		int pid = exec_command(exec, MIRRDIR "/system/bin/sh", buf2);
 		if (pid != -1)
 			waitpid(pid, nullptr, 0);
 	}
@@ -471,7 +469,7 @@ static bool magisk_env() {
 	if (access(MIRRDIR "/bin/busybox", X_OK) == -1)
 		return false;
 	LOGI("* Setting up internal busybox");
-	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, nullptr);
+	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH);
 	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 
 	// Disable/remove magiskhide, resetprop, and modules
@@ -557,11 +555,10 @@ static void install_apk(const char *apk) {
 	while (true) {
 		sleep(5);
 		LOGD("apk_install: attempting to install APK\n");
-		int fd = -1, pid;
-		pid = exec_command(true, &fd, nullptr, "/system/bin/sh",
-				"/system/bin/pm", "install", "-r", apk, nullptr);
-		FILE *res = fdopen(fd, "r");
+		exec_t exec { .err = true, .fd = -1 };
+		int pid = exec_command(exec, "/system/bin/pm", "install", "-r", apk);
 		if (pid != -1) {
+			FILE *res = fdopen(exec.fd, "r");
 			bool err = false;
 			while (fgets(buf, PATH_MAX, res)) {
 				LOGD("apk_install: %s", buf);
@@ -874,7 +871,7 @@ void late_start(int client) {
 		// It's safe to create the folder at this point if the system didn't create it
 		xmkdir(SECURE_DIR, 0700);
 		// And reboot to make proper setup possible
-		exec_command_sync("/system/bin/reboot", nullptr);
+		exec_command_sync("/system/bin/reboot");
 	}
 
 	auto_start_magiskhide();
@@ -901,7 +898,7 @@ core_only:
 		get_db_strings(&str, SU_MANAGER);
 		if (validate_manager(str[SU_MANAGER], 0, nullptr)) {
 			// There is no manager installed, install the stub
-			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk", nullptr);
+			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk");
 			install_apk("/data/magisk.apk");
 		}
 	}
