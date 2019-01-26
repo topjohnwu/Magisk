@@ -40,6 +40,12 @@ extern void auto_start_magiskhide();
  * Magic Mount *
  ***************/
 
+#ifdef MAGISK_DEBUG
+#define VLOGI(tag, from, to) LOGI("%s: %s <- %s\n", tag, to, from)
+#else
+#define VLOGI(tag, from, to) LOGI("%s: %s\n", tag, to)
+#endif
+
 // Precedence: MODULE > SKEL > INTER > DUMMY
 #define IS_DUMMY   0x01    /* mount from mirror */
 #define IS_INTER   0x02    /* intermediate node */
@@ -223,7 +229,7 @@ void node_entry::clone_skeleton() {
 		if (is_root() && child->name == "vendor") {
 			if (seperate_vendor) {
 				cp_afc(MIRRDIR "/system/vendor", "/system/vendor");
-				LOGI("copy_link : %s <- %s\n", "/system/vendor", MIRRDIR "/system/vendor");
+				VLOGI("copy_link ", "/system/vendor", MIRRDIR "/system/vendor");
 			}
 			// Skip
 			continue;
@@ -243,11 +249,7 @@ void node_entry::clone_skeleton() {
 		if (IS_LNK(child)) {
 			// Copy symlinks directly
 			cp_afc(buf2, buf);
-#ifdef MAGISK_DEBUG
-			LOGI("copy_link : %s <- %s\n",buf, buf2);
-#else
-			LOGI("copy_link : %s\n", buf);
-#endif
+			VLOGI("copy_link ", buf2, buf);
 		} else {
 			snprintf(buf, PATH_MAX, "%s/%s", full_path.c_str(), child->name.c_str());
 			bind_mount(buf2, buf);
@@ -389,11 +391,7 @@ static void simple_mount(const char *path) {
 
 static int bind_mount(const char *from, const char *to) {
 	int ret = xmount(from, to, nullptr, MS_BIND, nullptr);
-#ifdef MAGISK_DEBUG
-	LOGI("bind_mount: %s <- %s\n", to, from);
-#else
-	LOGI("bind_mount: %s\n", to);
-#endif
+	VLOGI("bind_mount", from, to);
 	return ret;
 }
 
@@ -449,22 +447,14 @@ static bool magisk_env() {
 			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
 			system_block = strdup2(buf);
 			xmount(system_block, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
-#ifdef MAGISK_DEBUG
-			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
-#else
-			LOGI("mount: %s\n", MIRRDIR "/system");
-#endif
+			VLOGI("mount", system_block, MIRRDIR "/system");
 		} else if (str_contains(line, " /vendor ")) {
 			seperate_vendor = true;
 			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
 			vendor_block = strdup2(buf);
 			xmkdir(MIRRDIR "/vendor", 0755);
-			xmount(buf, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
-#ifdef MAGISK_DEBUG
-			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
-#else
-			LOGI("mount: %s\n", MIRRDIR "/vendor");
-#endif
+			xmount(vendor_block, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
+			VLOGI("mount", vendor_block, MIRRDIR "/system");
 		} else if (SDK_INT >= 24 &&
 		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
 			// Enforce hidepid
@@ -473,11 +463,7 @@ static bool magisk_env() {
 	}
 	if (!seperate_vendor) {
 		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
-#ifdef MAGISK_DEBUG
-		LOGI("link: %s <- %s\n", MIRRDIR "/vendor", MIRRDIR "/system/vendor");
-#else
-		LOGI("link: %s\n", MIRRDIR "/vendor");
-#endif
+		VLOGI("link", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 	}
 
 	xmkdirs(DATABIN, 0755);
