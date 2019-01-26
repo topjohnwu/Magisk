@@ -82,33 +82,35 @@ static void *monitor_thread(void *) {
 }
 
 static void *logcat_thread(void *) {
-	int log_fd = -1, log_pid;
+	int log_pid;
 	char line[4096];
-	while (1) {
+	while (true) {
 		// Start logcat
-		log_pid = exec_command(false, &log_fd, nullptr, log_cmd.data());
-		FILE *logs = fdopen(log_fd, "r");
+		exec_t exec {
+			.fd = -1,
+			.argv = log_cmd.data()
+		};
+		log_pid = exec_command(exec);
+		FILE *logs = fdopen(exec.fd, "r");
 		while (fgets(line, sizeof(line), logs)) {
 			if (line[0] == '-')
 				continue;
 			size_t len = strlen(line);
 			pthread_mutex_lock(&lock);
-			for (int i = 0; i < EVENT_NUM; ++i) {
-				if (events[i].fd > 0 && events[i].filter(line))
-					write(events[i].fd, line, len);
+			for (auto &event : events) {
+				if (event.fd > 0 && event.filter(line))
+					write(event.fd, line, len);
 			}
 			pthread_mutex_unlock(&lock);
 		}
 
 		fclose(logs);
-		log_fd = -1;
 		kill(log_pid, SIGTERM);
 		waitpid(log_pid, nullptr, 0);
 
 		LOGI("magisklogd: logcat output EOF");
 		// Clear buffer
-		log_pid = exec_command(false, nullptr, nullptr, clear_cmd.data());
-		waitpid(log_pid, nullptr, 0);
+		exec_command_sync(clear_cmd.data());
 	}
 }
 
@@ -131,10 +133,10 @@ static void log_daemon() {
 	log_cmd.push_back(MIRRDIR "/system/bin/logcat");
 	// Test whether these buffers actually works
 	const char *b[] = { "main", "events", "crash" };
-	for (int i = 0; i < 3; ++i) {
-		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", nullptr) == 0) {
+	for (auto &buffer : b) {
+		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-b", buffer, "-d", "-f", "/dev/null", nullptr) == 0) {
 			log_cmd.push_back("-b");
-			log_cmd.push_back(b[i]);
+			log_cmd.push_back(buffer);
 		}
 	}
 	chmod("/dev/null", 0666);

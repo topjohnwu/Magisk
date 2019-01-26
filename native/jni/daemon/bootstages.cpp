@@ -441,17 +441,17 @@ static bool magisk_env() {
 		if (str_contains(line, " /system_root ")) {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			sscanf(line.c_str(), "%s", buf);
-			system_block = strdup2(buf);
+			system_block = strdup(buf);
 			system_as_root = true;
 		} else if (!system_as_root && str_contains(line, " /system ")) {
 			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
-			system_block = strdup2(buf);
+			system_block = strdup(buf);
 			xmount(system_block, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
 			VLOGI("mount", system_block, MIRRDIR "/system");
 		} else if (str_contains(line, " /vendor ")) {
 			seperate_vendor = true;
 			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
-			vendor_block = strdup2(buf);
+			vendor_block = strdup(buf);
 			xmkdir(MIRRDIR "/vendor", 0755);
 			xmount(vendor_block, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
 			VLOGI("mount", vendor_block, MIRRDIR "/system");

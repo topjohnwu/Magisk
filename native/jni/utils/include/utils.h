@@ -142,10 +142,19 @@ void write_zero(int fd, size_t size);
 #define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)
 
 std::vector<std::string> file_to_vector(const char *filename);
-char *strdup2(const char *s, size_t *size = nullptr);
 
+struct exec_t {
+	bool err = false;
+	int fd = -2;
+	void (*pre_exec)() = nullptr;
+	const char **argv = nullptr;
+	int (*fork)() = xfork;
+};
+
+int exec_command(exec_t &exec);
 int exec_command(bool err, int *fd, void (*pre_exec)(), const char **argv);
 int exec_command(bool err, int *fd, void (*cb)(), const char *argv0, ...);
+int exec_command_sync(const char **argv);
 int exec_command_sync(const char *argv0, ...);
 
 #endif
