@@ -17,8 +17,10 @@
 #include "utils.h"
 #include "su.h"
 
-#define AM_PATH  "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am"
-#define RECEIVER "a.h"
+#define BROADCAST_BOOT_COMPLETED \
+"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
+"broadcast", nullptr, nullptr, "-a", "android.intent.action.BOOT_COMPLETED", \
+"-f", "0x00000020"
 
 static inline const char *get_command(const struct su_request *to) {
 	if (to->command[0])
@@ -28,18 +30,27 @@ static inline const char *get_command(const struct su_request *to) {
 	return DEFAULT_SHELL;
 }
 
-static void silent_run(const char *args[]) {
-	if (fork_dont_care())
-		return;
-	int zero = open("/dev/zero", O_RDONLY | O_CLOEXEC);
-	xdup2(zero, 0);
-	int null = open("/dev/null", O_WRONLY | O_CLOEXEC);
-	xdup2(null, 1);
-	xdup2(null, 2);
-	setenv("CLASSPATH", "/system/framework/am.jar", 1);
-	execv(args[0], (char **) args);
-	PLOGE("exec am");
-	_exit(EXIT_FAILURE);
+static void silent_run(const char **args, struct su_info *info) {
+	char component[128];
+	if (SDK_INT >= 22) {
+		args[4] = "-p";
+		args[5] = info->str[SU_MANAGER];
+	} else {
+		sprintf(component, "%s/a.h", info->str[SU_MANAGER]);
+		args[4] = "-n";
+		args[5] = component;
+	}
+	exec_t exec {
+		.pre_exec = []() -> void {
+			int null = xopen("/dev/null", O_WRONLY | O_CLOEXEC);
+			dup2(null, STDOUT_FILENO);
+			dup2(null, STDERR_FILENO);
+			setenv("CLASSPATH", "/system/framework/am.jar", 1);
+		},
+		.fork = fork_dont_care,
+		.argv = args
+	};
+	exec_command(exec);
 }
 
 static void setup_user(char *user, struct su_info *info) {
@@ -72,14 +83,8 @@ void app_log(struct su_context *ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
-	char component[128];
-	sprintf(component, "%s/" RECEIVER, ctx->info->str[SU_MANAGER]);
-
 	const char *cmd[] = {
-		AM_PATH, "broadcast",
-		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-n", component,
-		"-f", "0x00000020",
+		BROADCAST_BOOT_COMPLETED,
 		"--user", user,
 		"--es", "action", "log",
 		"--ei", "from.uid", fromUid,
@@ -90,7 +95,7 @@ void app_log(struct su_context *ctx) {
 		"--ez", "notify", ctx->info->access.notify ? "true" : "false",
 		nullptr
 	};
-	silent_run(cmd);
+	silent_run(cmd, ctx->info);
 }
 
 void app_notify(struct su_context *ctx) {
@@ -105,39 +110,29 @@ void app_notify(struct su_context *ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
-	char component[128];
-	sprintf(component, "%s/" RECEIVER, ctx->info->str[SU_MANAGER]);
-
 	const char *cmd[] = {
-			AM_PATH, "broadcast",
-			"-a", "android.intent.action.BOOT_COMPLETED",
-			"-n", component,
-			"-f", "0x00000020",
-			"--user", user,
-			"--es", "action", "notify",
-			"--ei", "from.uid", fromUid,
-			"--ei", "policy", policy,
-			nullptr
+		BROADCAST_BOOT_COMPLETED,
+		"--user", user,
+		"--es", "action", "notify",
+		"--ei", "from.uid", fromUid,
+		"--ei", "policy", policy,
+		nullptr
 	};
-	silent_run(cmd);
+	silent_run(cmd, ctx->info);
 }
 
 void app_connect(const char *socket, struct su_info *info) {
 	char user[8];
 	setup_user(user, info);
-	char component[128];
-	sprintf(component, "%s/" RECEIVER, info->str[SU_MANAGER]);
+
 	const char *cmd[] = {
-		AM_PATH, "broadcast",
-		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-n", component,
-		"-f", "0x00000020",
+		BROADCAST_BOOT_COMPLETED,
 		"--user", user,
 		"--es", "action", "request",
 		"--es", "socket", socket,
 		nullptr
 	};
-	silent_run(cmd);
+	silent_run(cmd, info);
 }
 
 void socket_send_request(int fd, struct su_info *info) {
