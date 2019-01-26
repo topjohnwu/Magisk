@@ -161,7 +161,7 @@ int __fsetxattr(int fd, const char *name, const void *value, size_t size, int fl
   *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
   *pre_exec   -> A callback function called after forking, before execvp
 */
-int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
+int exec_command(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
 	int pipefd[2], outfd = -1;
 
 	if (fd) {
@@ -207,7 +207,7 @@ static int v_exec_command(bool err, int *fd, void (*cb)(void), const char *argv0
 	for (const char *arg = va_arg(argv, char*); arg; arg = va_arg(argv, char*))
 		args.push_back(arg);
 	args.push_back(nullptr);
-	int pid = exec_array(err, fd, cb, args.data());
+	int pid = exec_command(err, fd, cb, args.data());
 	return pid;
 }
 

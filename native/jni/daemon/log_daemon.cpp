@@ -86,7 +86,7 @@ static void *logcat_thread(void *) {
 	char line[4096];
 	while (1) {
 		// Start logcat
-		log_pid = exec_array(false, &log_fd, nullptr, log_cmd.data());
+		log_pid = exec_command(false, &log_fd, nullptr, log_cmd.data());
 		FILE *logs = fdopen(log_fd, "r");
 		while (fgets(line, sizeof(line), logs)) {
 			if (line[0] == '-')
@@ -107,7 +107,7 @@ static void *logcat_thread(void *) {
 
 		LOGI("magisklogd: logcat output EOF");
 		// Clear buffer
-		log_pid = exec_array(false, nullptr, nullptr, clear_cmd.data());
+		log_pid = exec_command(false, nullptr, nullptr, clear_cmd.data());
 		waitpid(log_pid, nullptr, 0);
 	}
 }
