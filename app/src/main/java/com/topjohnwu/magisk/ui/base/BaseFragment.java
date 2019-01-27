@@ -55,4 +55,8 @@ public abstract class BaseFragment extends Fragment implements Event.AutoListene
 
     @Override
     public void onEvent(int event) {}
+
+    public boolean onBackPressed() {
+        return false;
+    }
 }
