@@ -72,7 +72,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginStart="5dp"
-                android:tint="@color/icon_grey"
+                android:tint="?attr/imageColorTint"
                 app:layout_constraintBottom_toBottomOf="@+id/package_name"
                 app:layout_constraintEnd_toEndOf="@+id/app_name"
                 app:layout_constraintStart_toEndOf="@+id/package_name"
