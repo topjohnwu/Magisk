@@ -18,17 +18,17 @@
     <string name="safetyNet_check_success">SafetyNet Check Success</string>
     <string name="safetyNet_api_error">SafetyNet API Error</string>
     <string name="safetyNet_res_invalid">The response is invalid.</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk is up to date</string>
+    <string name="manager_up_to_date">Magisk Manager is up to date</string>
     <string name="advanced_settings_title">Advanced Settings</string>
     <string name="keep_force_encryption">Preserve force encryption</string>
     <string name="keep_dm_verity">Preserve AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Installed Version: %1$s</string>
-    <string name="install_magisk_title">Latest Version: %1$s</string>
+    <string name="current_installed">Installed: %1$s</string>
+    <string name="latest_version">Latest: %1$s</string>
     <string name="uninstall">Uninstall</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and your data potentially encrypted if not already.</string>
-    <string name="update">Update %1$s</string>
+    <string name="update">Update</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>

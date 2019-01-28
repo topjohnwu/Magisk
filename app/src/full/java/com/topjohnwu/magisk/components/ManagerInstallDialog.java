@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.components;
 
+import android.app.Activity;
 import android.text.TextUtils;
 
 import com.topjohnwu.core.Config;
@@ -11,7 +12,7 @@ import androidx.annotation.NonNull;
 
 public class ManagerInstallDialog extends CustomAlertDialog {
 
-    public ManagerInstallDialog(@NonNull BaseActivity a) {
+    public ManagerInstallDialog(@NonNull Activity a) {
         super(a);
         String name = Utils.fmt("MagiskManager v%s(%d)",
                 Config.remoteManagerVersionString, Config.remoteManagerVersionCode);

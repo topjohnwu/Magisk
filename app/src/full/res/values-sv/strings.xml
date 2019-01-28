@@ -23,11 +23,11 @@
     <string name="advanced_settings_title">Advancerade inställningar</string>
     <string name="keep_force_encryption">Fortsätt tvinga kryptering</string>
     <string name="keep_dm_verity">Behåll AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Installerad: %1$s</string>
-    <string name="install_magisk_title">Senaste: %1$s</string>
+    <string name="current_installed">Installerad: %1$s</string>
+    <string name="latest_version">Senaste: %1$s</string>
     <string name="uninstall">Avinstallera</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
-    <string name="update">Uppdatera %1$s</string>
+    <string name="update">Uppdatera</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Ingen information tillhandahållen)</string>

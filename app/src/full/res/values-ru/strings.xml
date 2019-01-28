@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Расширенные опции</string>
     <string name="keep_force_encryption">Сохранить шифрование</string>
     <string name="keep_dm_verity">Сохранить AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Установлена версия: %1$s</string>
-    <string name="install_magisk_title">Последняя версия: %1$s</string>
+    <string name="current_installed">Установлена: %1$s</string>
+    <string name="latest_version">Последняя: %1$s</string>
     <string name="uninstall">Удаление</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
     <string name="uninstall_magisk_msg">Все модули будут отключены/удалены. Root-права будут удалены. Шифрование будет активировано.</string>
-    <string name="update">Обновить %1$s</string>
+    <string name="update">Обновить</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет информации)</string>

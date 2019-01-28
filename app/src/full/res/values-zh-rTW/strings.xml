@@ -21,8 +21,8 @@
     <string name="advanced_settings_title">高級設置</string>
     <string name="keep_force_encryption">保持強制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">已安裝版本：%1$s</string>
-    <string name="install_magisk_title">最新的版本：%1$s</string>
+    <string name="current_installed">已安裝：%1$s</string>
+    <string name="latest_version">最新：%1$s</string>
     <string name="uninstall">解除安裝</string>
 
     <!--Module Fragment-->
@@ -157,7 +157,7 @@
     <string name="settings_ns_global">全域 Namespace</string>
     <string name="settings_ns_isolate">獨立 Namespace</string>
     <string name="settings_ns_requester">繼承 Namespace</string>
-    <string name="update">更新 %1$s</string>
+    <string name="update">更新</string>
     <string name="update_channel">Magisk 更新</string>
     <string name="system_default">(系統預設)</string>
     <string name="language">語言</string>

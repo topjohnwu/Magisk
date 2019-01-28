@@ -24,12 +24,12 @@
     <string name="advanced_settings_title">Προηγμένες ρυθμίσεις</string>
     <string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
     <string name="keep_dm_verity">Διατήρηση dm-verity</string>
-    <string name="current_magisk_title">Εγκατεστημένη έκδοση: %1$s</string>
-    <string name="install_magisk_title">Τελευταία έκδοση: %1$s</string>
+    <string name="current_installed">Εγκατεστημένη: %1$s</string>
+    <string name="latest_version">Τελευταία: %1$s</string>
     <string name="uninstall">Απεγκατάσταση</string>
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
     <string name="uninstall_magisk_msg">Όλα τα modules θα απενεργοποιηθούν/αφαιρεθούν. Το root θα αφαιρεθεί και ενδέχεται να κρυπτογραφηθούν τα δεδομένα σας, εάν δεν είναι κρυπτογραφημένα</string>
-    <string name="update">Ενημέρωση %1$s</string>
+    <string name="update">Ενημέρωση</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Δεν δόθηκαν πληροφορίες)</string>

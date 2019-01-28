@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">高度な設定</string>
     <string name="keep_force_encryption">強制的な暗号化を維持する</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verityを維持する</string>
-    <string name="current_magisk_title">インストール済: %1$s</string>
-    <string name="install_magisk_title">最新: %1$s</string>
+    <string name="current_installed">インストール済: %1$s</string>
+    <string name="latest_version">最新: %1$s</string>
     <string name="uninstall">アンインストール</string>
     <string name="uninstall_magisk_title">Magiskのアンインストール</string>
     <string name="uninstall_magisk_msg">すべてのモジュールが無効化/削除されます。Rootも無効化され、ストレージが暗号化されていない場合、暗号化される場合があります</string>
-    <string name="update">%1$sの更新</string>
+    <string name="update">更新</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(情報がありません)</string>

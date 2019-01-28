@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Išplėstiniai nustatymai</string>
     <string name="keep_force_encryption">Palikti priverstinį šifravimą</string>
     <string name="keep_dm_verity">Palikti dm-verity</string>
-    <string name="current_magisk_title">Instaliuota versija: %1$s</string>
-    <string name="install_magisk_title">Naujausia versija: %1$s</string>
+    <string name="current_installed">Instaliuota: %1$s</string>
+    <string name="latest_version">Naujausia: %1$s</string>
     <string name="uninstall">Pašalinti</string>
     <string name="uninstall_magisk_title">Pašalinti Magisk</string>
     <string name="uninstall_magisk_msg">Visi papildiniai bus išjungti/pašalinti. Root bus panaikintas. Yra galimybė, kad duomenys bus užšifruoti…</string>
-    <string name="update">Atnaujinti %1$s</string>
+    <string name="update">Atnaujinti</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nėra informacijos)</string>

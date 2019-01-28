@@ -22,12 +22,12 @@
     <string name="advanced_settings_title">Pengaturan Lanjutan</string>
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Versi yang Terpasang: %1$s</string>
-    <string name="install_magisk_title">Versi Terbaru: %1$s</string>
+    <string name="current_installed">Versi yang Terpasang: %1$s</string>
+    <string name="latest_version">Versi Terbaru: %1$s</string>
     <string name="uninstall">Copot</string>
     <string name="uninstall_magisk_title">Copot Magisk</string>
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus. Root akan dihapus, dan berpotensi mengenkripsi data Anda jika belum.</string>
-    <string name="update">Perbarui %1$s</string>
+    <string name="update">Perbarui</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Tidak ada info tersedia)</string>

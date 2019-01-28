@@ -24,12 +24,12 @@
     <string name="advanced_settings_title">Configuració avançada</string>
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
     <string name="keep_dm_verity">Mantenir AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Versió instal·lada: %1$s</string>
-    <string name="install_magisk_title">Última versió: %1$s</string>
+    <string name="current_installed">Instal·lada: %1$s</string>
+    <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstal·lar</string>
     <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Root s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
-    <string name="update">Actualització %1$s</string>
+    <string name="update">Actualització</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>

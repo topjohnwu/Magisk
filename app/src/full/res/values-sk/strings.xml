@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Pokročilé nastavenia</string>
     <string name="keep_force_encryption">Ponechať vynútené šifrovanie</string>
     <string name="keep_dm_verity">Ponechať AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Nainštalovaná verzia: %1$s</string>
-    <string name="install_magisk_title">Najnovšia verzia: %1$s</string>
+    <string name="current_installed">Nainštalovaná: %1$s</string>
+    <string name="latest_version">Najnovšia: %1$s</string>
     <string name="uninstall">Odinštalovať</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené. Root bude odstránený a teoreticky môže dôjsť k zašifrovaniu vašich dát ak ich momentálne nemáte zašifrované</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
-    <string name="update">Aktualizovať %1$s</string>
+    <string name="update">Aktualizovať</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie sú k dispozícii žiadne informácie)</string>

@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'yi koru</string>
-    <string name="current_magisk_title">Yüklü Sürüm: %1$s</string>
-    <string name="install_magisk_title">Yeni Sürüm: %1$s</string>
+    <string name="current_installed">Yüklü: %1$s</string>
+    <string name="latest_version">Yeni: %1$s</string>
     <string name="uninstall">Kaldır</string>
     <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verileriniz şifrelenecek</string>
-    <string name="update">Güncelle %1$s</string>
+    <string name="update">Güncelle</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>

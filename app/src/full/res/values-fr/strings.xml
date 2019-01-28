@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
     <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Version installée : %1$s</string>
-    <string name="install_magisk_title">Dernière version : %1$s</string>
+    <string name="current_installed">Version : %1$s</string>
+    <string name="latest_version">Dernière : %1$s</string>
     <string name="uninstall">Désinstaller</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés. Les permissions de super‐utilisateur seront perdues et vos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
-    <string name="update">Mise à jour %1$s</string>
+    <string name="update">Mise à jour</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(aucune information transmise)</string>

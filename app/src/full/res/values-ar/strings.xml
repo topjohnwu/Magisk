@@ -12,8 +12,7 @@
   <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
   <string name="close">إغلاق</string>
   <string name="command">الأمر: %1$s</string>
-  <string name="current_magisk_title">نسخة Magisk المثبته: %1$s</string>
-  <string name="deny">رفض</string>
+    <string name="deny">رفض</string>
   <string name="deny_with_str">رفض%1$s</string>
   <string name="disable_file_created">سيتم تعطيل الإضافة في إعادة التشغيل التالي</string>
   <string name="disable_file_removed">سيتم تمكين الإضافة في إعادة التشغيل التالي</string>
@@ -23,8 +22,7 @@
   <string name="forever">للابد</string>
   <string name="grant">سماح</string>
   <string name="install">التثبيت</string>
-  <string name="install_magisk_title">آخر نسخة Magisk: %1$s</string>
-  <string name="installed">مثبت</string>
+    <string name="installed">مثبت</string>
   <string name="internal_storage">"يتم تخزين الملف المضغوط في:
 [التخزين الداخلي]%1$s"</string>
   <string name="keep_dm_verity">إبقاء AVB 2.0/dm-verity</string>
@@ -196,7 +194,7 @@
   <string name="su_db_corrupt">قاعدة بيانات SU معطوبة ، سوف يتم إنشاء قاعدة بيانات جديدة</string>
   <string name="system_default">(أفتراضي النظام)</string>
   <string name="uninstall_magisk_msg">سيتم تعطيل/إزالة جميع الوحدات. ستتم إزالة الجذر ، وربما تشفير بياناتك إذا كانت بياناتك غير مشفرة حالياً</string>
-  <string name="update">تحديث %1$s</string>
+  <string name="update">تحديث</string>
   <string name="updated_on">تم التحديث في: %1$s</string>
   <string name="warning">تحذير</string>
   <string name="zip_download_msg">تحميل ملف zip (%1$d%%)…</string>

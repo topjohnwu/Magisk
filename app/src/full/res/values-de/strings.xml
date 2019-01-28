@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Erweiterte Optionen</string>
     <string name="keep_force_encryption">\"force encryption\" beibehalten</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity beibehalten</string>
-    <string name="current_magisk_title">Installierte Version: %1$s</string>
-    <string name="install_magisk_title">Neueste Version: %1$s</string>
+    <string name="current_installed">Installierte: %1$s</string>
+    <string name="latest_version">Neueste: %1$s</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
     <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt und möglicherweise werden Ihre Daten verschlüsseln, falls Ihre Daten derzeit nicht verschlüsselt sind.</string>
-    <string name="update">Aktualisierung %1$s</string>
+    <string name="update">Aktualisierung</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nichts angegeben)</string>

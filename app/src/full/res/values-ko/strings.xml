@@ -21,8 +21,8 @@
     <string name="advanced_settings_title">고급 설정</string>
     <string name="keep_force_encryption">강제 암호화 유지</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity 유지</string>
-    <string name="current_magisk_title">설치된버전: %1$s</string>
-    <string name="install_magisk_title">최신버전: %1$s</string>
+    <string name="current_installed">설치된: %1$s</string>
+    <string name="latest_version">최신: %1$s</string>
     <string name="uninstall">제거</string>
     <string name="uninstall_magisk_title">Magisk 제거</string>
 

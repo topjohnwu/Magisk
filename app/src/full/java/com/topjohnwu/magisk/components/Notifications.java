@@ -52,7 +52,7 @@ public class Notifications {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(app, Const.ID.UPDATE_NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk_outline)
                 .setContentTitle(app.getString(R.string.magisk_update_title))
-                .setContentText(app.getString(R.string.magisk_update_available, Config.remoteMagiskVersionString))
+                .setContentText(app.getString(R.string.manager_download_install))
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);

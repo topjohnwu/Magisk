@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Допълнителни настройки</string>
     <string name="keep_force_encryption">Запазване на наложеното криптиране</string>
     <string name="keep_dm_verity">Запазване на AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Инсталирана версия: %1$s</string>
-    <string name="install_magisk_title">Най-нова версия: %1$s</string>
+    <string name="current_installed">Инсталирана: %1$s</string>
+    <string name="latest_version">Най-нова: %1$s</string>
     <string name="uninstall">Деинсталиране</string>
     <string name="uninstall_magisk_title">Деинсталиране на Magisk</string>
     <string name="uninstall_magisk_msg">Всички модули ще бъдат изключени/премахнати. Руут достъпът ще бъде премахнат и е възможно криптиране на данните Ви.</string>
-    <string name="update">Актуализация %1$s</string>
+    <string name="update">Актуализация</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Не е представена информация)</string>

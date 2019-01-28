@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Розширені налаштування</string>
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
     <string name="keep_dm_verity">Залишити AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Поточна версія: %1$s</string>
-    <string name="install_magisk_title">Найновіша версія: %1$s</string>
+    <string name="current_installed">Поточна: %1$s</string>
+    <string name="latest_version">Найновіша: %1$s</string>
     <string name="uninstall">Видалити</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
-    <string name="update">Оновити %1$s</string>
+    <string name="update">Оновити</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(немає наданої інформації)</string>

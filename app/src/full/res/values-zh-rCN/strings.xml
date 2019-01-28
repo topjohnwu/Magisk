@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">安装选项</string>
     <string name="keep_force_encryption">保持强制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">已安装版本：%1$s</string>
-    <string name="install_magisk_title">最新的版本：%1$s</string>
+    <string name="current_installed">已安装：%1$s</string>
+    <string name="latest_version">最新：%1$s</string>
     <string name="uninstall">卸载</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">所有模块将停用或删除，Root 会被移除。未加密的设备重启时可能会被进行加密。</string>
-    <string name="update">更新 %1$s</string>
+    <string name="update">更新</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
