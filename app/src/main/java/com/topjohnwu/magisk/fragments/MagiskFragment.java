@@ -29,6 +29,7 @@ import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.dialogs.EnvFixDialog;
 import com.topjohnwu.magisk.dialogs.MagiskInstallDialog;
 import com.topjohnwu.magisk.dialogs.ManagerInstallDialog;
+import com.topjohnwu.magisk.dialogs.NoRootDialog;
 import com.topjohnwu.magisk.dialogs.UninstallDialog;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.uicomponents.ArrowExpandable;
@@ -324,11 +325,14 @@ public class MagiskFragment extends BaseFragment
             uninstallButton.setVisibility(Shell.rootAccess() ? View.VISIBLE : View.GONE);
         }
 
-        if (!shownDialog && Config.magiskVersionCode > 0 &&
-                !Shell.su("env_check").exec().isSuccess()) {
-            shownDialog = true;
-            new EnvFixDialog(requireActivity()).show();
+        if (!shownDialog && Config.magiskVersionCode > 0) {
+            if (!Shell.rootAccess()) {
+                shownDialog = true;
+                new NoRootDialog(requireActivity()).show();
+            } else if (!Shell.su("env_check").exec().isSuccess()) {
+                shownDialog = true;
+                new EnvFixDialog(requireActivity()).show();
+            }
         }
     }
 }
-

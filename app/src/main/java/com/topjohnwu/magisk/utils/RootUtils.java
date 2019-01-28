@@ -30,6 +30,7 @@ public class RootUtils extends Shell.Initializer {
         } else {
             InputStream nonroot = context.getResources().openRawResource(R.raw.nonroot_utils);
             job.add(nonroot);
+            Config.loadMagiskInfo();
         }
 
         job.add("mount_partitions", "get_flags", "run_migrations", "export BOOTMODE=true").exec();

@@ -114,6 +114,9 @@
     <string name="setup_msg">Running environment setup…</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
+    <string name="no_root_title">No root access</string>
+    <string name="no_root_msg_user0">Magisk is installed, but this app can\'t manage Magisk.\nHave you hidden Magisk Manager?</string>
+    <string name="no_root_msg">Magisk is installed, but this app can\'t manage Magisk.\nHave you set only owner can manage root access?</string>
     <string name="dl_one_module">Download one module at a time.</string>
 
     <!--Settings Activity -->
