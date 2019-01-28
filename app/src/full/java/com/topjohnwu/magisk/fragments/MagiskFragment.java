@@ -24,7 +24,7 @@ import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.EnvFixDialog;
-import com.topjohnwu.magisk.components.ExpandableView;
+import com.topjohnwu.magisk.components.ExpandableViewHolder;
 import com.topjohnwu.magisk.components.MagiskInstallDialog;
 import com.topjohnwu.magisk.components.ManagerInstallDialog;
 import com.topjohnwu.magisk.components.UninstallDialog;
@@ -50,9 +50,8 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 public class MagiskFragment extends BaseFragment
-        implements SwipeRefreshLayout.OnRefreshListener, ExpandableView, Topic.Subscriber {
+        implements SwipeRefreshLayout.OnRefreshListener, Topic.Subscriber {
 
-    private Container expandableContainer = new Container();
     private static boolean shownDialog = false;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -83,6 +82,7 @@ public class MagiskFragment extends BaseFragment
 
     private UpdateCardHolder magisk;
     private UpdateCardHolder manager;
+    private ExpandableViewHolder snExpandableHolder;
     private Transition transition;
 
     @OnClick(R.id.safetyNet_title)
@@ -92,7 +92,7 @@ public class MagiskFragment extends BaseFragment
             safetyNetRefreshIcon.setVisibility(View.GONE);
             safetyNetStatusText.setText(R.string.checking_safetyNet_status);
             SafetyNet.check(requireActivity());
-            collapse();
+            snExpandableHolder.collapse();
         };
         if (!SafetyNet.EXT_APK.exists()) {
             // Show dialog
@@ -134,8 +134,7 @@ public class MagiskFragment extends BaseFragment
         unbinder = new MagiskFragment_ViewBinding(this, v);
         requireActivity().setTitle(R.string.magisk);
 
-        expandableContainer.expandLayout = expandLayout;
-        setupExpandable();
+        snExpandableHolder = new ExpandableViewHolder(expandLayout);
 
         magisk = new UpdateCardHolder(inflater, root);
         manager = new UpdateCardHolder(inflater, root);
@@ -168,7 +167,7 @@ public class MagiskFragment extends BaseFragment
     @Override
     public void onRefresh() {
         safetyNetStatusText.setText(R.string.safetyNet_check_text);
-        setExpanded(false);
+        snExpandableHolder.setExpanded(false);
 
         mSwipeRefreshLayout.setRefreshing(false);
         TransitionManager.beginDelayedTransition(root, transition);
@@ -205,11 +204,6 @@ public class MagiskFragment extends BaseFragment
                 updateCheckUI();
                 break;
         }
-    }
-
-    @Override
-    public Container getContainer() {
-        return expandableContainer;
     }
 
     private boolean hasGms() {
@@ -352,7 +346,7 @@ public class MagiskFragment extends BaseFragment
             basicStatusIcon.setImageResource(b ? R.drawable.ic_check_circle : R.drawable.ic_cancel);
             basicStatusIcon.setColorFilter(b ? colorOK : colorBad);
 
-            expand();
+            snExpandableHolder.expand();
         } else {
             @StringRes int resid;
             switch (response) {

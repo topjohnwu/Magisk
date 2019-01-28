@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.topjohnwu.core.container.SuLogEntry;
 import com.topjohnwu.core.database.MagiskDB;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.ExpandableView;
+import com.topjohnwu.magisk.components.ExpandableViewHolder;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -84,13 +84,13 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
     public void onBindItemViewHolder(LogViewHolder holder, int section, int position) {
         SuLogEntry entry = logEntries.get(section).get(position);
         int realIdx = getItemPosition(section, position);
-        holder.setExpanded(itemExpanded.contains(realIdx));
+        holder.expandable.setExpanded(itemExpanded.contains(realIdx));
         holder.itemView.setOnClickListener(view -> {
-            if (holder.isExpanded()) {
-                holder.collapse();
+            if (holder.expandable.isExpanded()) {
+                holder.expandable.collapse();
                 itemExpanded.remove(realIdx);
             } else {
-                holder.expand();
+                holder.expandable.expand();
                 itemExpanded.add(realIdx);
             }
         });
@@ -122,7 +122,7 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
         }
     }
 
-    static class LogViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
+    static class LogViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.action) TextView action;
@@ -132,18 +132,12 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
         @BindView(R.id.cmd) TextView command;
         @BindView(R.id.expand_layout) ViewGroup expandLayout;
 
-        private Container container = new Container();
+        ExpandableViewHolder expandable;
 
         LogViewHolder(View itemView) {
             super(itemView);
             new SuLogAdapter$LogViewHolder_ViewBinding(this, itemView);
-            container.expandLayout = expandLayout;
-            setupExpandable();
-        }
-
-        @Override
-        public Container getContainer() {
-            return container;
+            expandable = new ExpandableViewHolder(expandLayout);
         }
     }
 }

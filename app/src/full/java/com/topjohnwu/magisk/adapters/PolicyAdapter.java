@@ -15,7 +15,7 @@ import com.topjohnwu.core.container.Policy;
 import com.topjohnwu.core.database.MagiskDB;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
-import com.topjohnwu.magisk.components.ExpandableView;
+import com.topjohnwu.magisk.components.ExpandableViewHolder;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 
@@ -51,13 +51,13 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Policy policy = policyList.get(position);
 
-        holder.setExpanded(expandList[position]);
+        holder.settings.setExpanded(expandList[position]);
         holder.trigger.setOnClickListener(view -> {
-            if (holder.isExpanded()) {
-                holder.collapse();
+            if (holder.settings.isExpanded()) {
+                holder.settings.collapse();
                 expandList[position] = false;
             } else {
-                holder.expand();
+                holder.settings.expand();
                 expandList[position] = true;
             }
         });
@@ -136,7 +136,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         return policyList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.package_name) TextView packageName;
@@ -150,44 +150,38 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         @BindView(R.id.delete) ImageView delete;
         @BindView(R.id.more_info) ImageView moreInfo;
 
-        private Container container = new Container();
+        ExpandableViewHolder settings;
 
         public ViewHolder(View itemView) {
             super(itemView);
             new PolicyAdapter$ViewHolder_ViewBinding(this, itemView);
-            container.expandLayout = expandLayout;
-            setupExpandable();
-        }
+            settings = new ExpandableViewHolder(expandLayout) {
+                @Override
+                public void setExpanded(boolean expanded) {
+                    super.setExpanded(expanded);
+                    arrow.setRotation(expanded ? 180 : 0);
+                }
 
-        @Override
-        public Container getContainer() {
-            return container;
-        }
+                @Override
+                public void expand() {
+                    super.expand();
+                    setRotate(new RotateAnimation(0, 180,
+                            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
+                }
 
-        @Override
-        public void setExpanded(boolean expanded) {
-            ExpandableView.super.setExpanded(expanded);
-            arrow.setRotation(expanded ? 180 : 0);
+                @Override
+                public void collapse() {
+                    super.collapse();
+                    setRotate(new RotateAnimation(180, 0,
+                            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
+                }
+            };
         }
 
         private void setRotate(RotateAnimation rotate) {
             rotate.setDuration(300);
             rotate.setFillAfter(true);
             arrow.startAnimation(rotate);
-        }
-
-        @Override
-        public void expand() {
-            ExpandableView.super.expand();
-            setRotate(new RotateAnimation(0, 180,
-                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
-        }
-
-        @Override
-        public void collapse() {
-            ExpandableView.super.collapse();
-            setRotate(new RotateAnimation(180, 0,
-                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
         }
     }
 }
