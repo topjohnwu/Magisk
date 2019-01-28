@@ -38,7 +38,7 @@ fun MagiskPolicy.toMap() = mapOf(
 fun Map<String, String>.toPolicy(pm: PackageManager): MagiskPolicy {
     val uid = get("uid")?.toIntOrNull() ?: -1
     val packageName = get("package_name").orEmpty()
-    val info = pm.getApplicationInfo(packageName, 0)
+    val info = pm.getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES)
 
     if (info.uid != uid)
         throw PackageManager.NameNotFoundException()
@@ -59,9 +59,9 @@ fun Map<String, String>.toPolicy(pm: PackageManager): MagiskPolicy {
 fun Int.toPolicy(pm: PackageManager, policy: Int = INTERACTIVE): MagiskPolicy {
     val pkg = pm.getPackagesForUid(this)?.firstOrNull()
         ?: throw PackageManager.NameNotFoundException()
-    val info = pm.getApplicationInfo(pkg, 0)
+    val info = pm.getApplicationInfo(pkg, PackageManager.GET_UNINSTALLED_PACKAGES)
     return MagiskPolicy(
-        uid = this,
+        uid = info.uid,
         packageName = pkg,
         policy = policy,
         applicationInfo = info,

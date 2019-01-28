@@ -34,10 +34,6 @@ enum {
 (info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER \
 ? info->uid / 100000 : 0)
 
-#define get_uid(info) \
-(info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED \
-? info->uid % 100000 : info->uid)
-
 #define get_cmd(to) \
 (to.command[0] ? to.command : to.shell[0] ? to.shell : DEFAULT_SHELL)
 
@@ -165,7 +161,7 @@ void app_log(const su_context &ctx) {
 	if (fork_dont_care() == 0) {
 		vector<Extra> extras;
 		extras.reserve(6);
-		extras.emplace_back("from.uid", get_uid(ctx.info));
+		extras.emplace_back("from.uid", ctx.info->uid);
 		extras.emplace_back("to.uid", ctx.req.uid);
 		extras.emplace_back("pid", ctx.pid);
 		extras.emplace_back("policy", ctx.info->access.policy);
@@ -181,7 +177,7 @@ void app_notify(const su_context &ctx) {
 	if (fork_dont_care() == 0) {
 		vector<Extra> extras;
 		extras.reserve(2);
-		extras.emplace_back("from.uid", get_uid(ctx.info));
+		extras.emplace_back("from.uid", ctx.info->uid);
 		extras.emplace_back("policy", ctx.info->access.policy);
 
 		exec_cmd("notify", extras, ctx.info);
