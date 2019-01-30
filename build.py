@@ -89,7 +89,7 @@ def zip_with_msg(zipfile, source, target):
 def collect_binary():
 	for arch in archs:
 		mkdir_p(os.path.join('native', 'out', arch))
-		for bin in ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']:
+		for bin in ['magisk', 'magiskinit', 'magiskboot', 'busybox']:
 			source = os.path.join('native', 'libs', arch, bin)
 			target = os.path.join('native', 'out', arch, bin)
 			mv(source, target)
@@ -105,11 +105,11 @@ def xz(data):
 
 def sign_zip(unsigned, output, release):
 	signer_name = 'zipsigner-3.0.jar'
-	zipsigner = os.path.join('utils', 'build', 'libs', signer_name)
+	zipsigner = os.path.join('signing', 'build', 'libs', signer_name)
 
 	if not os.path.exists(zipsigner):
 		header('* Building ' + signer_name)
-		proc = execv([gradlew, 'utils:shadowJar'])
+		proc = execv([gradlew, 'signing:shadowJar'])
 		if proc.returncode != 0:
 			error(f'Build {signer_name} failed!')
 
@@ -236,7 +236,7 @@ def build_apk(args, flavor):
 
 def build_app(args):
 	source = os.path.join('scripts', 'util_functions.sh')
-	target = os.path.join('core', 'src', 'main', 'res', 'raw', 'util_functions.sh')
+	target = os.path.join('app-core', 'src', 'main', 'res', 'raw', 'util_functions.sh')
 	cp(source, target)
 	build_apk(args, 'Full')
 
@@ -379,7 +379,7 @@ def cleanup(args):
 
 	if 'java' in args.target:
 		header('* Cleaning java')
-		execv([gradlew, 'app:clean', 'snet:clean', 'utils:clean'])
+		execv([gradlew, 'app:clean', 'app-core:clean', 'snet:clean', 'signing:clean'])
 
 def build_all(args):
 	vars(args)['target'] = []

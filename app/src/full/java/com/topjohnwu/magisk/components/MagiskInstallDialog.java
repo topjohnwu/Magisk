@@ -3,10 +3,10 @@ package com.topjohnwu.magisk.components;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.AppUtils;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 

@@ -6,7 +6,7 @@ configProps.load(new FileInputStream(configPath))
 
 android {
     defaultConfig {
-        applicationId "com.topjohnwu.magisk"
+        applicationId 'com.topjohnwu.magisk'
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -33,7 +33,7 @@ android {
         }
     }
 
-    flavorDimensions "mode"
+    flavorDimensions 'mode'
 
     productFlavors {
         full {
@@ -47,7 +47,7 @@ android {
         }
         stub {
             versionCode 1
-            versionName "stub"
+            versionName 'stub'
         }
     }
 
@@ -59,7 +59,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':net')
-    fullImplementation project(':core')
+    fullImplementation project(':app-core')
     fullImplementation 'ru.noties:markwon:2.0.1'
     fullImplementation 'com.caverock:androidsvg-aar:1.3'
 

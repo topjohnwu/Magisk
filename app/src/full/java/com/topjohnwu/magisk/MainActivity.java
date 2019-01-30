@@ -9,10 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.material.navigation.NavigationView;
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.utils.Topic;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.fragments.LogFragment;
 import com.topjohnwu.magisk.fragments.MagiskFragment;
@@ -21,6 +17,8 @@ import com.topjohnwu.magisk.fragments.ModulesFragment;
 import com.topjohnwu.magisk.fragments.ReposFragment;
 import com.topjohnwu.magisk.fragments.SettingsFragment;
 import com.topjohnwu.magisk.fragments.SuperuserFragment;
+import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 

@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk;
 
-import com.topjohnwu.core.App;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.receivers.GeneralReceiver;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;

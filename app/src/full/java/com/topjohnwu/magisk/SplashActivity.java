@@ -5,16 +5,14 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.tasks.CheckUpdates;
-import com.topjohnwu.core.tasks.UpdateRepos;
-import com.topjohnwu.core.utils.LocaleManager;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
+import com.topjohnwu.magisk.tasks.CheckUpdates;
+import com.topjohnwu.magisk.tasks.UpdateRepos;
 import com.topjohnwu.magisk.utils.AppUtils;
+import com.topjohnwu.magisk.utils.LocaleManager;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 

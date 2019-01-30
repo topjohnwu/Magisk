@@ -6,13 +6,13 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.widget.Toast;
 
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.container.Repo;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.ClassMap;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.ProgressNotification;
+import com.topjohnwu.magisk.container.Repo;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;

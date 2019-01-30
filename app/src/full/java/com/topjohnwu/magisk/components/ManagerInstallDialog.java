@@ -3,10 +3,10 @@ package com.topjohnwu.magisk.components;
 import android.app.Activity;
 import android.text.TextUtils;
 
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.DownloadApp;
+import com.topjohnwu.magisk.utils.Utils;
 
 import androidx.annotation.NonNull;
 

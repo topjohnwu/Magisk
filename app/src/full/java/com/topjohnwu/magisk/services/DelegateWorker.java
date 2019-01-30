@@ -9,17 +9,13 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Executor;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.annotation.RestrictTo;
 import androidx.work.Data;
 import androidx.work.ListenableWorker;
-import androidx.work.WorkerFactory;
-import androidx.work.impl.utils.taskexecutor.TaskExecutor;
 
 public abstract class DelegateWorker {
 

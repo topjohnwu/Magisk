@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     defaultConfig {
-        applicationId "com.topjohnwu.snet"
+        applicationId 'com.topjohnwu.snet'
         minSdkVersion 14
         versionCode 12
-        versionName "snet"
+        versionName 'snet'
     }
 
     buildTypes {

@@ -8,13 +8,13 @@ import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;

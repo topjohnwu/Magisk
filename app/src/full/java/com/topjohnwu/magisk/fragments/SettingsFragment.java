@@ -8,19 +8,19 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.tasks.CheckUpdates;
-import com.topjohnwu.core.utils.LocaleManager;
-import com.topjohnwu.core.utils.Topic;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BasePreferenceFragment;
+import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
+import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.PatchAPK;
+import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 

@@ -2,11 +2,9 @@ package com.topjohnwu.magisk.utils;
 
 import android.os.AsyncTask;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.utils.RootUtils;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.ProgressNotification;
 import com.topjohnwu.net.Networking;

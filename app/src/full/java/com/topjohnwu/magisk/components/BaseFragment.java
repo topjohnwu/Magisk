@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.components;
 
 import android.content.Intent;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.utils.Topic;
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.utils.Topic;
 
 import androidx.fragment.app.Fragment;
 import butterknife.Unbinder;

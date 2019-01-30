@@ -16,9 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.container.Policy;
 import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.SuConnector;
 

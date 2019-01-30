@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.topjohnwu.core.Const;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.MarkDownWindow;

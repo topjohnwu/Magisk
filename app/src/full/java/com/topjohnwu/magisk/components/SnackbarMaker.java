@@ -6,8 +6,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Utils;
 
 import androidx.annotation.StringRes;
 

@@ -7,14 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.receivers.GeneralReceiver;
+import com.topjohnwu.magisk.utils.Utils;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;

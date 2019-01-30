@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.Const;
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.SuRequestActivity;
 import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.utils.DownloadApp;

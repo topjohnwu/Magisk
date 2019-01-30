@@ -16,10 +16,9 @@ import android.security.keystore.KeyProperties;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 

@@ -8,9 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.utils.Topic;
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Topic;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;

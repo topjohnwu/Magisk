@@ -9,12 +9,12 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Config;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.utils.LocaleManager;
-import com.topjohnwu.core.utils.Topic;
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.LocaleManager;
+import com.topjohnwu.magisk.utils.Topic;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

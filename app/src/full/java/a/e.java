@@ -1,6 +1,6 @@
 package a;
 
-import com.topjohnwu.core.App;
+import com.topjohnwu.magisk.App;
 
 public class e extends App {
     /* stub */

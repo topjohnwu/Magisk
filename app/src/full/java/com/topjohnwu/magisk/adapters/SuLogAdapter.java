@@ -9,10 +9,10 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.topjohnwu.core.container.SuLogEntry;
-import com.topjohnwu.core.database.MagiskDB;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.ExpandableViewHolder;
+import com.topjohnwu.magisk.container.SuLogEntry;
+import com.topjohnwu.magisk.database.MagiskDB;
 
 import java.util.Collections;
 import java.util.HashSet;

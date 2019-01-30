@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.components;
 import android.app.Notification;
 import android.widget.Toast;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.DownloadProgressListener;
 
 import androidx.core.app.NotificationCompat;

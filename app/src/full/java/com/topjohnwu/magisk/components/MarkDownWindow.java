@@ -11,13 +11,13 @@ import android.view.View;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
+import com.topjohnwu.signing.ByteArrayStream;
 import com.topjohnwu.superuser.ShellUtils;
-import com.topjohnwu.utils.ByteArrayStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -11,12 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.topjohnwu.core.container.Policy;
-import com.topjohnwu.core.database.MagiskDB;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.ExpandableViewHolder;
 import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.container.Policy;
+import com.topjohnwu.magisk.database.MagiskDB;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 
 import java.util.List;
