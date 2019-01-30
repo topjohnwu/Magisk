@@ -36,101 +36,105 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <RelativeLayout
-                        android:id="@+id/safetyNet_title"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="wrap_content">
 
                         <ImageView
-                            android:id="@+id/safetyNet_refresh"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerVertical="true"
-                            android:layout_margin="15dp"
-                            android:layout_toStartOf="@+id/safetyNet_status"
-                            app:srcCompat="@drawable/ic_refresh" />
-
-                        <ProgressBar
-                            android:id="@+id/safetyNet_check_progress"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerVertical="true"
-                            android:layout_margin="15dp"
-                            android:layout_toStartOf="@+id/safetyNet_status"
-                            android:visibility="gone" />
+                            android:id="@+id/sn_logo"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginEnd="24dp"
+                            android:layout_marginBottom="12dp"
+                            android:tint="@color/green500"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/safetyNet_status"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_safetynet" />
 
                         <TextView
                             android:id="@+id/safetyNet_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
                             android:gravity="center"
-                            android:minWidth="175dp"
-                            android:padding="6dp"
+                            android:minWidth="200dp"
                             android:text="@string/safetyNet_check_text"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                    </RelativeLayout>
+                        <ImageView
+                            android:id="@+id/safetyNet_refresh"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginStart="24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/safetyNet_status"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_refresh" />
 
-                    <LinearLayout
-                        android:id="@+id/expand_layout"
+                        <ProgressBar
+                            android:id="@+id/safetyNet_check_progress"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="@+id/safetyNet_refresh"
+                            app:layout_constraintEnd_toEndOf="@+id/safetyNet_refresh"
+                            app:layout_constraintStart_toStartOf="@+id/safetyNet_refresh"
+                            app:layout_constraintTop_toTopOf="@+id/safetyNet_refresh" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/safetyNet_expand"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp">
+                        android:paddingBottom="10dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <ImageView
+                            android:id="@+id/cts_status_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginEnd="8dp"
+                            app:layout_constraintBottom_toBottomOf="@+id/cts_status"
+                            app:layout_constraintEnd_toStartOf="@+id/cts_status"
+                            app:layout_constraintTop_toTopOf="@+id/cts_status" />
+
+                        <TextView
+                            android:id="@+id/cts_status"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:padding="6dp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="@+id/basic_status"
+                            app:layout_constraintStart_toStartOf="@+id/basic_status"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <ImageView
-                                android:id="@+id/cts_status_icon"
-                                android:layout_width="25dp"
-                                android:layout_height="25dp"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginTop="5dp"
-                                android:layout_marginEnd="10dp"
-                                android:layout_marginBottom="5dp" />
+                        <ImageView
+                            android:id="@+id/basic_status_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginEnd="8dp"
+                            app:layout_constraintBottom_toBottomOf="@+id/basic_status"
+                            app:layout_constraintEnd_toStartOf="@+id/basic_status"
+                            app:layout_constraintTop_toTopOf="@+id/basic_status" />
 
-                            <TextView
-                                android:id="@+id/cts_status"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:minWidth="150dp"
-                                android:padding="6dp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:id="@+id/basic_status"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:padding="6dp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/cts_status" />
 
-                            <ImageView
-                                android:id="@+id/basic_status_icon"
-                                android:layout_width="25dp"
-                                android:layout_height="25dp"
-                                android:layout_margin="10dp" />
 
-                            <TextView
-                                android:id="@+id/basic_status"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:minWidth="150dp"
-                                android:padding="6dp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 

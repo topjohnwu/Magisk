@@ -7,10 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
@@ -18,16 +15,13 @@ import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.BaseFragment;
-import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.EnvFixDialog;
-import com.topjohnwu.magisk.components.ExpandableViewHolder;
 import com.topjohnwu.magisk.components.MagiskInstallDialog;
 import com.topjohnwu.magisk.components.ManagerInstallDialog;
+import com.topjohnwu.magisk.components.SafetyNet;
 import com.topjohnwu.magisk.components.UninstallDialog;
 import com.topjohnwu.magisk.components.UpdateCardHolder;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
-import com.topjohnwu.magisk.tasks.SafetyNet;
-import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
@@ -37,7 +31,6 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.transition.ChangeBounds;
@@ -57,16 +50,6 @@ public class MagiskFragment extends BaseFragment
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.linearLayout) LinearLayout root;
 
-    @BindView(R.id.safetyNet_card) CardView safetyNetCard;
-    @BindView(R.id.safetyNet_refresh) ImageView safetyNetRefreshIcon;
-    @BindView(R.id.safetyNet_status) TextView safetyNetStatusText;
-    @BindView(R.id.safetyNet_check_progress) ProgressBar safetyNetProgress;
-    @BindView(R.id.expand_layout) LinearLayout expandLayout;
-    @BindView(R.id.cts_status_icon) ImageView ctsStatusIcon;
-    @BindView(R.id.cts_status) TextView ctsStatusText;
-    @BindView(R.id.basic_status_icon) ImageView basicStatusIcon;
-    @BindView(R.id.basic_status) TextView basicStatusText;
-
     @BindView(R.id.install_option_card) CardView installOptionCard;
     @BindView(R.id.keep_force_enc) CheckBox keepEncChkbox;
     @BindView(R.id.keep_verity) CheckBox keepVerityChkbox;
@@ -80,31 +63,8 @@ public class MagiskFragment extends BaseFragment
 
     private UpdateCardHolder magisk;
     private UpdateCardHolder manager;
-    private ExpandableViewHolder snExpandableHolder;
+    private SafetyNet safetyNet;
     private Transition transition;
-
-    @OnClick(R.id.safetyNet_title)
-    void safetyNet() {
-        Runnable task = () -> {
-            safetyNetProgress.setVisibility(View.VISIBLE);
-            safetyNetRefreshIcon.setVisibility(View.GONE);
-            safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-            SafetyNet.check(requireActivity());
-            snExpandableHolder.collapse();
-        };
-        if (!SafetyNet.EXT_APK.exists()) {
-            // Show dialog
-            new CustomAlertDialog(requireActivity())
-                    .setTitle(R.string.proprietary_title)
-                    .setMessage(R.string.proprietary_notice)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.yes, (d, i) -> task.run())
-                    .setNegativeButton(R.string.no_thanks, null)
-                    .show();
-        } else {
-            task.run();
-        }
-    }
 
     private void magiskInstall(View v) {
         // Show Manager update first
@@ -132,8 +92,7 @@ public class MagiskFragment extends BaseFragment
         unbinder = new MagiskFragment_ViewBinding(this, v);
         requireActivity().setTitle(R.string.magisk);
 
-        snExpandableHolder = new ExpandableViewHolder(expandLayout);
-
+        safetyNet = new SafetyNet(v);
         magisk = new UpdateCardHolder(inflater, root);
         manager = new UpdateCardHolder(inflater, root);
         root.addView(magisk.itemView, 0);
@@ -157,9 +116,6 @@ public class MagiskFragment extends BaseFragment
             manager.additional.setVisibility(View.VISIBLE);
         }
 
-        safetyNetCard.setVisibility(hasGms() && Networking.checkNetworkStatus(app) ?
-                View.VISIBLE : View.GONE);
-
         transition = new TransitionSet()
                 .setOrdering(TransitionSet.ORDERING_TOGETHER)
                 .addTransition(new Fade(Fade.OUT))
@@ -172,11 +128,9 @@ public class MagiskFragment extends BaseFragment
 
     @Override
     public void onRefresh() {
-        safetyNetStatusText.setText(R.string.safetyNet_check_text);
-        snExpandableHolder.setExpanded(false);
-
         mSwipeRefreshLayout.setRefreshing(false);
         TransitionManager.beginDelayedTransition(root, transition);
+        safetyNet.reset();
         magisk.reset();
         manager.reset();
 
@@ -197,19 +151,12 @@ public class MagiskFragment extends BaseFragment
 
     @Override
     public int[] getSubscribedTopics() {
-        return new int[] {Topic.SNET_CHECK_DONE, Topic.UPDATE_CHECK_DONE};
+        return new int[] {Topic.UPDATE_CHECK_DONE};
     }
 
     @Override
     public void onPublish(int topic, Object[] result) {
-        switch (topic) {
-            case Topic.SNET_CHECK_DONE:
-                updateSafetyNetUI((int) result[0]);
-                break;
-            case Topic.UPDATE_CHECK_DONE:
-                updateCheckUI();
-                break;
-        }
+        updateCheckUI();
     }
 
     private boolean hasGms() {
@@ -332,39 +279,6 @@ public class MagiskFragment extends BaseFragment
         if (!shownDialog && !ShellUtils.fastCmdResult("env_check")) {
             shownDialog = true;
             new EnvFixDialog(requireActivity()).show();
-        }
-    }
-
-    private void updateSafetyNetUI(int response) {
-        safetyNetProgress.setVisibility(View.GONE);
-        safetyNetRefreshIcon.setVisibility(View.VISIBLE);
-        if ((response & 0x0F) == 0) {
-            safetyNetStatusText.setText(R.string.safetyNet_check_success);
-
-            boolean b;
-            b = (response & ISafetyNetHelper.CTS_PASS) != 0;
-            ctsStatusText.setText("ctsProfile: " + b);
-            ctsStatusIcon.setImageResource(b ? R.drawable.ic_check_circle : R.drawable.ic_cancel);
-            ctsStatusIcon.setColorFilter(b ? colorOK : colorBad);
-
-            b = (response & ISafetyNetHelper.BASIC_PASS) != 0;
-            basicStatusText.setText("basicIntegrity: " + b);
-            basicStatusIcon.setImageResource(b ? R.drawable.ic_check_circle : R.drawable.ic_cancel);
-            basicStatusIcon.setColorFilter(b ? colorOK : colorBad);
-
-            snExpandableHolder.expand();
-        } else {
-            @StringRes int resid;
-            switch (response) {
-                case ISafetyNetHelper.RESPONSE_ERR:
-                    resid = R.string.safetyNet_res_invalid;
-                    break;
-                case ISafetyNetHelper.CONNECTION_FAIL:
-                default:
-                    resid = R.string.safetyNet_api_error;
-                    break;
-            }
-            safetyNetStatusText.setText(resid);
         }
     }
 }
