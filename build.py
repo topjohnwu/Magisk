@@ -374,7 +374,7 @@ def cleanup(args):
 
 	if 'native' in args.target:
 		header('* Cleaning native')
-		system(ndk_build + ' -C native B_MAGISK=1 B_INIT=1 B_BOOT=1 B_BXZ=1 B_BB=1 clean')
+		system(ndk_build + ' -C native B_MAGISK=1 B_INIT=1 B_BOOT=1 B_BB=1 clean')
 		shutil.rmtree(os.path.join('native', 'out'), ignore_errors=True)
 
 	if 'java' in args.target:
