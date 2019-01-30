@@ -1,6 +1,5 @@
-package com.topjohnwu.magisk.receivers;
+package com.topjohnwu.magisk.components;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
@@ -8,7 +7,6 @@ import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 
-import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -21,58 +19,58 @@ import java.util.ArrayList;
 
 import androidx.annotation.RequiresApi;
 
-public class ShortcutReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
+public class Shortcuts {
+
+    public static void setup(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             ShortcutManager manager = context.getSystemService(ShortcutManager.class);
-            manager.setDynamicShortcuts(getShortCuts(App.self));
+            manager.setDynamicShortcuts(getShortCuts(context));
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N_MR1)
-    private ArrayList<ShortcutInfo> getShortCuts(App app) {
+    private static ArrayList<ShortcutInfo> getShortCuts(Context context) {
         ArrayList<ShortcutInfo> shortCuts = new ArrayList<>();
         boolean root = Shell.rootAccess();
         if (Utils.showSuperUser()) {
-            shortCuts.add(new ShortcutInfo.Builder(app, "superuser")
-                    .setShortLabel(app.getString(R.string.superuser))
-                    .setIntent(new Intent(app, ClassMap.get(SplashActivity.class))
+            shortCuts.add(new ShortcutInfo.Builder(context, "superuser")
+                    .setShortLabel(context.getString(R.string.superuser))
+                    .setIntent(new Intent(context, ClassMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "superuser")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(app, R.drawable.sc_superuser))
+                    .setIcon(Icon.createWithResource(context, R.drawable.sc_superuser))
                     .setRank(0)
                     .build());
         }
         if (root && (boolean) Config.get(Config.Key.MAGISKHIDE)) {
-            shortCuts.add(new ShortcutInfo.Builder(app, "magiskhide")
-                    .setShortLabel(app.getString(R.string.magiskhide))
-                    .setIntent(new Intent(app, ClassMap.get(SplashActivity.class))
+            shortCuts.add(new ShortcutInfo.Builder(context, "magiskhide")
+                    .setShortLabel(context.getString(R.string.magiskhide))
+                    .setIntent(new Intent(context, ClassMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "magiskhide")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(app, R.drawable.sc_magiskhide))
+                    .setIcon(Icon.createWithResource(context, R.drawable.sc_magiskhide))
                     .setRank(1)
                     .build());
         }
         if (!(boolean) Config.get(Config.Key.COREONLY) && root && Config.magiskVersionCode >= 0) {
-            shortCuts.add(new ShortcutInfo.Builder(app, "modules")
-                    .setShortLabel(app.getString(R.string.modules))
-                    .setIntent(new Intent(app, ClassMap.get(SplashActivity.class))
+            shortCuts.add(new ShortcutInfo.Builder(context, "modules")
+                    .setShortLabel(context.getString(R.string.modules))
+                    .setIntent(new Intent(context, ClassMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "modules")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(app, R.drawable.sc_extension))
+                    .setIcon(Icon.createWithResource(context, R.drawable.sc_extension))
                     .setRank(3)
                     .build());
-            shortCuts.add(new ShortcutInfo.Builder(app, "downloads")
-                    .setShortLabel(app.getString(R.string.downloads))
-                    .setIntent(new Intent(app, ClassMap.get(SplashActivity.class))
+            shortCuts.add(new ShortcutInfo.Builder(context, "downloads")
+                    .setShortLabel(context.getString(R.string.downloads))
+                    .setIntent(new Intent(context, ClassMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "downloads")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(app, R.drawable.sc_cloud_download))
+                    .setIcon(Icon.createWithResource(context, R.drawable.sc_cloud_download))
                     .setRank(2)
                     .build());
         }

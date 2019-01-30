@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.Notifications;
-import com.topjohnwu.magisk.receivers.ShortcutReceiver;
+import com.topjohnwu.magisk.components.Shortcuts;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.tasks.UpdateRepos;
 import com.topjohnwu.magisk.utils.AppUtils;
@@ -54,7 +54,7 @@ public class SplashActivity extends BaseActivity {
         AppUtils.scheduleUpdateCheck();
 
         // Setup shortcuts
-        sendBroadcast(new Intent(this, ClassMap.get(ShortcutReceiver.class)));
+        Shortcuts.setup(this);
 
         if (Networking.checkNetworkStatus(this)) {
             // Fire update check

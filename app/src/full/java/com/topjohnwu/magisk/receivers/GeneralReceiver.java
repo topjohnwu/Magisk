@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.SuRequestActivity;
 import com.topjohnwu.magisk.components.Notifications;
+import com.topjohnwu.magisk.components.Shortcuts;
 import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.SuConnector;
 import com.topjohnwu.superuser.Shell;
@@ -74,6 +75,9 @@ public class GeneralReceiver extends BroadcastReceiver {
                 String pkg = getPkg(intent);
                 app.mDB.deletePolicy(pkg);
                 Shell.su("magiskhide --rm " + pkg).submit();
+                break;
+            case Intent.ACTION_LOCALE_CHANGED:
+                Shortcuts.setup(context);
                 break;
             case Const.Key.BROADCAST_MANAGER_UPDATE:
                 Config.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK);
