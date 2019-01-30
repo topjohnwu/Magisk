@@ -127,6 +127,14 @@ public class MagiskFragment extends BaseFragment
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        safetyNet.unbinder.unbind();
+        magisk.unbinder.unbind();
+        manager.unbinder.unbind();
+    }
+
+    @Override
     public void onRefresh() {
         mSwipeRefreshLayout.setRefreshing(false);
         TransitionManager.beginDelayedTransition(root, transition);

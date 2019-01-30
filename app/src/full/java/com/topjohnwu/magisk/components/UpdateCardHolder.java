@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 
 import butterknife.BindView;
+import butterknife.Unbinder;
 
 public class UpdateCardHolder {
 
@@ -23,10 +24,11 @@ public class UpdateCardHolder {
     @BindView(R.id.install) public Button install;
 
     public View itemView;
+    public Unbinder unbinder;
 
     public UpdateCardHolder(LayoutInflater inflater, ViewGroup root) {
         itemView = inflater.inflate(R.layout.update_card, root, false);
-        new UpdateCardHolder_ViewBinding(this, itemView);
+        unbinder = new UpdateCardHolder_ViewBinding(this, itemView);
     }
 
     public void setValid(boolean valid) {

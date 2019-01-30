@@ -24,6 +24,7 @@ import androidx.cardview.widget.CardView;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import dalvik.system.DexClassLoader;
 
 public class SafetyNet implements ISafetyNetHelper.Callback {
@@ -44,10 +45,11 @@ public class SafetyNet implements ISafetyNetHelper.Callback {
     @BindColor(R.color.red500) int colorBad;
     @BindColor(R.color.green500) int colorOK;
 
+    public Unbinder unbinder;
     private ExpandableViewHolder expandable;
 
     public SafetyNet(View v) {
-        new SafetyNet_ViewBinding(this, v);
+        unbinder = new SafetyNet_ViewBinding(this, v);
         expandable = new ExpandableViewHolder(expandLayout);
         Context context = v.getContext();
         safetyNetCard.setVisibility(hasGms(context) && Networking.checkNetworkStatus(context) ?
