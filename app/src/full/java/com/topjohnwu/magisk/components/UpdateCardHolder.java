@@ -19,6 +19,7 @@ public class UpdateCardHolder {
     @BindView(R.id.status) public TextView status;
     @BindView(R.id.current_version) public TextView currentVersion;
     @BindView(R.id.latest_version) public TextView latestVersion;
+    @BindView(R.id.additional) public TextView additional;
     @BindView(R.id.install) public Button install;
 
     public View itemView;

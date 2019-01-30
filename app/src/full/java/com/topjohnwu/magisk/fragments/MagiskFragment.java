@@ -57,8 +57,6 @@ public class MagiskFragment extends BaseFragment
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.linearLayout) LinearLayout root;
 
-    @BindView(R.id.core_only_notice) CardView coreOnlyNotice;
-
     @BindView(R.id.safetyNet_card) CardView safetyNetCard;
     @BindView(R.id.safetyNet_refresh) ImageView safetyNetRefreshIcon;
     @BindView(R.id.safetyNet_status) TextView safetyNetStatusText;
@@ -138,8 +136,6 @@ public class MagiskFragment extends BaseFragment
 
         magisk = new UpdateCardHolder(inflater, root);
         manager = new UpdateCardHolder(inflater, root);
-        magisk.install.setOnClickListener(this::magiskInstall);
-        manager.install.setOnClickListener(this::managerInstall);
         root.addView(magisk.itemView, 0);
         root.addView(manager.itemView, 1);
 
@@ -150,7 +146,17 @@ public class MagiskFragment extends BaseFragment
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        coreOnlyNotice.setVisibility(Config.get(Config.Key.COREONLY) ? View.VISIBLE : View.GONE);
+        magisk.install.setOnClickListener(this::magiskInstall);
+        manager.install.setOnClickListener(this::managerInstall);
+        if (Config.get(Config.Key.COREONLY)) {
+            magisk.additional.setText(R.string.core_only_enabled);
+            magisk.additional.setVisibility(View.VISIBLE);
+        }
+        if (!app.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+            manager.additional.setText("(" + app.getPackageName() +  ")");
+            manager.additional.setVisibility(View.VISIBLE);
+        }
+
         safetyNetCard.setVisibility(hasGms() && Networking.checkNetworkStatus(app) ?
                 View.VISIBLE : View.GONE);
 

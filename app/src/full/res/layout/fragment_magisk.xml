@@ -20,45 +20,6 @@
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/core_only_notice"
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="4dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="12dp">
-
-                    <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@+id/core_only"
-                        app:srcCompat="@drawable/ic_warning" />
-
-                    <TextView
-                        android:id="@+id/core_only"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:gravity="center"
-                        android:minWidth="225dp"
-                        android:padding="6dp"
-                        android:text="@string/settings_core_only_title"
-                        android:textStyle="bold" />
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
                 android:id="@+id/safetyNet_card"
                 style="?attr/cardStyle"
                 android:layout_width="match_parent"

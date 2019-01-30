@@ -29,6 +29,7 @@
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and your data potentially encrypted if not already.</string>
     <string name="update">Update</string>
+    <string name="core_only_enabled">(Core only mode enabled)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>

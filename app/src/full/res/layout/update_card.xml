@@ -77,10 +77,21 @@
             android:visibility="gone"
             app:autoSizeMinTextSize="1sp"
             app:autoSizeTextType="uniform"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/status"
             app:layout_constraintStart_toStartOf="@+id/status"
             app:layout_constraintTop_toBottomOf="@+id/current_version" />
+
+        <TextView
+            android:id="@+id/additional"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:visibility="gone"
+            app:autoSizeMinTextSize="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintEnd_toEndOf="@+id/status"
+            app:layout_constraintStart_toStartOf="@+id/status"
+            app:layout_constraintTop_toBottomOf="@+id/latest_version" />
 
         <Button
             android:id="@+id/install"
