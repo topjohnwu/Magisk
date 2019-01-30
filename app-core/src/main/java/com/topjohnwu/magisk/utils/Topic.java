@@ -15,16 +15,15 @@ public class Topic {
     public static final int MODULE_LOAD_DONE = 1;
     public static final int REPO_LOAD_DONE = 2;
     public static final int UPDATE_CHECK_DONE = 3;
-    public static final int SNET_CHECK_DONE = 4;
-    public static final int LOCALE_FETCH_DONE = 5;
+    public static final int LOCALE_FETCH_DONE = 4;
 
     @IntDef({MAGISK_HIDE_DONE, MODULE_LOAD_DONE, REPO_LOAD_DONE,
-            UPDATE_CHECK_DONE, SNET_CHECK_DONE, LOCALE_FETCH_DONE})
+            UPDATE_CHECK_DONE, LOCALE_FETCH_DONE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface TopicID {}
 
     // We will not dynamically add topics, so use arrays instead of hash tables
-    private static Store[] topicList = new Store[6];
+    private static Store[] topicList = new Store[5];
 
     public static void subscribe(Subscriber sub, @TopicID int... topics) {
         for (int topic : topics) {
@@ -38,8 +37,7 @@ public class Topic {
     }
 
     public static void subscribe(AutoSubscriber sub) {
-        if (sub instanceof Subscriber)
-            subscribe((Subscriber) sub, sub.getSubscribedTopics());
+        subscribe(sub, sub.getSubscribedTopics());
     }
 
     public static void unsubscribe(Subscriber sub, @TopicID int... topics) {
@@ -51,8 +49,7 @@ public class Topic {
     }
 
     public static void unsubscribe(AutoSubscriber sub) {
-        if (sub instanceof Subscriber)
-            unsubscribe((Subscriber) sub, sub.getSubscribedTopics());
+        unsubscribe(sub, sub.getSubscribedTopics());
     }
 
     public static void publish(@TopicID int topic, Object... results) {
@@ -100,7 +97,7 @@ public class Topic {
         void onPublish(int topic, Object[] result);
     }
 
-    public interface AutoSubscriber {
+    public interface AutoSubscriber extends Subscriber {
         @TopicID
         int[] getSubscribedTopics();
     }

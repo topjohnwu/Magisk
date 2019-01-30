@@ -43,6 +43,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
         return EMPTY_INT_ARRAY;
     }
 
+    @Override
+    public void onPublish(int topic, Object[] result) {}
+
     @StyleRes
     public int getDarkTheme() {
         return -1;

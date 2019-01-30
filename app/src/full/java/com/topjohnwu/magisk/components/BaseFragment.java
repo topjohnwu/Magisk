@@ -8,7 +8,7 @@ import com.topjohnwu.magisk.utils.Topic;
 import androidx.fragment.app.Fragment;
 import butterknife.Unbinder;
 
-public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
+public abstract class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
     public App app = App.self;
     protected Unbinder unbinder = null;
@@ -49,4 +49,7 @@ public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
     public int[] getSubscribedTopics() {
         return BaseActivity.EMPTY_INT_ARRAY;
     }
+
+    @Override
+    public void onPublish(int topic, Object[] result) {}
 }
