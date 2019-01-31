@@ -53,10 +53,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
 
     @Override
     protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        Configuration config = base.getResources().getConfiguration();
-        config.setLocale(LocaleManager.locale);
-        applyOverrideConfiguration(config);
+        super.attachBaseContext(LocaleManager.getLocaleContext(base, LocaleManager.locale));
     }
 
     @Override

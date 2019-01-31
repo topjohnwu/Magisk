@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -8,6 +9,7 @@ import android.os.Build;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.internal.InternalUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,7 +88,7 @@ public class LocaleManager {
         }
     }
 
-    public static void setLocale(App app) {
+    public static void setLocale(ContextWrapper wrapper) {
         String localeConfig = Config.get(Config.Key.LOCALE);
         if (localeConfig.isEmpty()) {
             locale = defaultLocale;
@@ -94,13 +96,17 @@ public class LocaleManager {
             locale = forLanguageTag(localeConfig);
         }
         Locale.setDefault(locale);
-        app.setResources(getLocaleContext(locale).getResources());
+        InternalUtils.replaceBaseContext(wrapper, getLocaleContext(locale));
+    }
+
+    public static Context getLocaleContext(Context context, Locale locale) {
+        Configuration config = new Configuration(context.getResources().getConfiguration());
+        config.setLocale(locale);
+        return context.createConfigurationContext(config);
     }
 
     public static Context getLocaleContext(Locale locale) {
-        Configuration config = new Configuration(App.self.getBaseContext().getResources().getConfiguration());
-        config.setLocale(locale);
-        return App.self.createConfigurationContext(config);
+        return getLocaleContext(App.self.getBaseContext(), locale);
     }
 
     public static String getString(Locale locale, @StringRes int id) {

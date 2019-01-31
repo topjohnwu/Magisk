@@ -28,8 +28,6 @@ public class App extends ContainerApp {
     public MagiskDB mDB;
     public RepoDatabaseHelper repoDB;
 
-    private Resources mResource;
-
     static {
         Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER | Shell.FLAG_USE_MAGISK_BUSYBOX);
         Shell.Config.verboseLogging(BuildConfig.DEBUG);
@@ -41,7 +39,6 @@ public class App extends ContainerApp {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         self = this;
-        mResource = base.getResources();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = new MagiskDB(this);
@@ -49,15 +46,6 @@ public class App extends ContainerApp {
 
         Networking.init(this);
         LocaleManager.setLocale(this);
-    }
-
-    @Override
-    public Resources getResources() {
-        return mResource;
-    }
-
-    public void setResources(Resources res) {
-        mResource = res;
     }
 
     @Override

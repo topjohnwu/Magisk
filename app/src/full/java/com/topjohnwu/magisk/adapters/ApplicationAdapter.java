@@ -63,8 +63,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             boolean ah = hideList.contains(a.packageName);
             boolean bh = hideList.contains(b.packageName);
             if (ah == bh) {
-                return Utils.getAppLabel(a, pm).toLowerCase()
-                        .compareTo(Utils.getAppLabel(b, pm).toLowerCase());
+                return Utils.getAppLabel(a, pm).compareToIgnoreCase(Utils.getAppLabel(b, pm));
             } else if (ah) {
                 return -1;
             } else {
