@@ -148,7 +148,7 @@ public class SuRequestActivity extends BaseActivity {
             }
         };
 
-        boolean useFP = FingerprintHelper.useFingerPrint();
+        boolean useFP = FingerprintHelper.useFingerprint();
 
         if (useFP) {
             try {

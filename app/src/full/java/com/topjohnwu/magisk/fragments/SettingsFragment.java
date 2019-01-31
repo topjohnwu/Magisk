@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BasePreferenceFragment;
+import com.topjohnwu.magisk.dialogs.FingerprintAuthDialog;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.DownloadApp;
@@ -46,7 +47,7 @@ public class SettingsFragment extends BasePreferenceFragment implements Topic.Su
 
         boolean showSuperuser = Utils.showSuperUser();
         app.prefs.edit()
-                .putBoolean(Config.Key.SU_FINGERPRINT, FingerprintHelper.useFingerPrint())
+                .putBoolean(Config.Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
                 .apply();
 
         PreferenceScreen prefScreen = getPreferenceScreen();
@@ -217,10 +218,10 @@ public class SettingsFragment extends BasePreferenceFragment implements Topic.Su
             case Config.Key.SU_FINGERPRINT:
                 boolean checked = ((SwitchPreferenceCompat) preference).isChecked();
                 ((SwitchPreferenceCompat) preference).setChecked(!checked);
-                FingerprintHelper.showAuthDialog(requireActivity(), () -> {
+                new FingerprintAuthDialog(requireActivity(), () -> {
                     ((SwitchPreferenceCompat) preference).setChecked(checked);
                     Config.set(key, checked);
-                });
+                }).show();
                 break;
         }
         return true;
