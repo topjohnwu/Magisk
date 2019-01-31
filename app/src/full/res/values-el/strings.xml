@@ -24,12 +24,12 @@
     <string name="advanced_settings_title">Προηγμένες ρυθμίσεις</string>
     <string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
     <string name="keep_dm_verity">Διατήρηση dm-verity</string>
-    <string name="current_magisk_title">Εγκατεστημένη έκδοση: %1$s</string>
-    <string name="install_magisk_title">Τελευταία έκδοση: %1$s</string>
+    <string name="current_installed">Εγκατεστημένη: %1$s</string>
+    <string name="latest_version">Τελευταία: %1$s</string>
     <string name="uninstall">Απεγκατάσταση</string>
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
     <string name="uninstall_magisk_msg">Όλα τα modules θα απενεργοποιηθούν/αφαιρεθούν. Το root θα αφαιρεθεί και ενδέχεται να κρυπτογραφηθούν τα δεδομένα σας, εάν δεν είναι κρυπτογραφημένα</string>
-    <string name="update">Ενημέρωση %1$s</string>
+    <string name="update">Ενημέρωση</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Δεν δόθηκαν πληροφορίες)</string>
@@ -149,7 +149,7 @@
     <string name="auto_response">Αυτόματη Απόκριση</string>
     <string name="request_timeout">Χρονικό όριο Αιτήματος</string>
     <string name="superuser_notification">Ειδοποίηση Υπερχρήστη</string>
-    <string name="request_timeout_summary">%1$s δευτερόλεπτα</string>
+    <string name="request_timeout_summary">%1$d δευτερόλεπτα</string>
     <string name="settings_su_reauth_title">Επαναπιστοποίηση μετά από αναβάθμιση</string>
     <string name="settings_su_reauth_summary">Επαναπιστοποίηση αδειών υπερχρήστη μετά την αναβάθμιση μίας εφαρμογής</string>
 
@@ -200,7 +200,6 @@
     <string name="none">Κανένα</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">UID Στόχος:\u0020</string>
-    <string name="command">Εντολή:\u0020</string>
+    <string name="target_uid">UID Στόχος: %1$d</string>
+    <string name="command">Εντολή: %1$s</string>
 </resources>

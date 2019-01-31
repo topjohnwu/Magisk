@@ -1,7 +1,7 @@
 package a;
 
-import com.topjohnwu.core.utils.BootSigner;
 import com.topjohnwu.magisk.utils.PatchAPK;
+import com.topjohnwu.signing.BootSigner;
 
 import androidx.annotation.Keep;
 

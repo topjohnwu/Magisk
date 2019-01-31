@@ -2,7 +2,7 @@ package a;
 
 import android.content.Context;
 
-import com.topjohnwu.magisk.services.UpdateCheckService;
+import com.topjohnwu.magisk.components.UpdateCheckService;
 
 import androidx.annotation.NonNull;
 import androidx.work.WorkerParameters;

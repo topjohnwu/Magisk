@@ -9,12 +9,12 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
-import com.topjohnwu.core.utils.LocaleManager;
-import com.topjohnwu.core.utils.Topic;
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.LocaleManager;
+import com.topjohnwu.magisk.utils.Topic;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,6 +43,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
         return EMPTY_INT_ARRAY;
     }
 
+    @Override
+    public void onPublish(int topic, Object[] result) {}
+
     @StyleRes
     public int getDarkTheme() {
         return -1;
@@ -50,16 +53,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
 
     @Override
     protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        Configuration config = base.getResources().getConfiguration();
-        config.setLocale(LocaleManager.locale);
-        applyOverrideConfiguration(config);
+        super.attachBaseContext(LocaleManager.getLocaleContext(base, LocaleManager.locale));
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Topic.subscribe(this);
-        if (Data.isDarkTheme && getDarkTheme() != -1) {
+        if (getDarkTheme() != -1 && (boolean) Config.get(Config.Key.DARK_THEME)) {
             setTheme(getDarkTheme());
         }
         super.onCreate(savedInstanceState);

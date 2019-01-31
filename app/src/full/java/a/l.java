@@ -3,7 +3,7 @@ package a;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.topjohnwu.magisk.components.AboutCardRow;
+import com.topjohnwu.magisk.uicomponents.AboutCardRow;
 
 public class l extends AboutCardRow {
     /* stub */

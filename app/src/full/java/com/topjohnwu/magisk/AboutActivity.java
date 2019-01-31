@@ -5,10 +5,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.topjohnwu.core.Const;
-import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.components.MarkDownWindow;
+import com.topjohnwu.magisk.uicomponents.AboutCardRow;
+import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
 import com.topjohnwu.magisk.utils.AppUtils;
 
 import java.util.Locale;
@@ -27,6 +26,8 @@ public class AboutActivity extends BaseActivity {
     @BindView(R.id.app_source_code) AboutCardRow appSourceCode;
     @BindView(R.id.support_thread) AboutCardRow supportThread;
     @BindView(R.id.follow_twitter) AboutCardRow twitter;
+    @BindView(R.id.paypal) AboutCardRow paypal;
+    @BindView(R.id.patreon) AboutCardRow patreon;
 
     @Override
     public int getDarkTheme() {
@@ -66,6 +67,8 @@ public class AboutActivity extends BaseActivity {
         appSourceCode.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.SOURCE_CODE_URL)));
         supportThread.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.XDA_THREAD)));
         twitter.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.TWITTER_URL)));
+        paypal.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.PAYPAL_URL)));
+        patreon.setOnClickListener(v -> AppUtils.openLink(this, Uri.parse(Const.Url.PATREON_URL)));
 
         setFloating();
     }

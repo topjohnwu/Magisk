@@ -155,30 +155,25 @@ int __fsetxattr(int fd, const char *name, const void *value, size_t size, int fl
 	return (int) syscall(__NR_fsetxattr, fd, name, value, size, flags);
 }
 
-/*
-   fd == nullptr -> Ignore output
-  *fd < 0     -> Open pipe and set *fd to the read end
-  *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
-  *pre_exec   -> A callback function called after forking, before execvp
-*/
-int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
-	int pipefd[2], outfd = -1;
+int exec_command(exec_t &exec) {
+	int pipefd[2] = {-1, -1}, outfd = -1;
 
-	if (fd) {
-		if (*fd < 0) {
-			if (xpipe2(pipefd, O_CLOEXEC) == -1)
-				return -1;
-			outfd = pipefd[1];
-		} else {
-			outfd = *fd;
-		}
+	if (exec.fd == -1) {
+		if (xpipe2(pipefd, O_CLOEXEC) == -1)
+			return -1;
+		outfd = pipefd[1];
+	} else if (exec.fd >= 0) {
+		outfd = exec.fd;
 	}
 
-	int pid = xfork();
-	if (pid != 0) {
-		if (fd && *fd < 0) {
-			// Give the read end and close write end
-			*fd = pipefd[0];
+	int pid = exec.fork();
+	if (pid < 0) {
+		close(pipefd[0]);
+		close(pipefd[1]);
+		return -1;
+	} else if (pid) {
+		if (exec.fd == -1) {
+			exec.fd = pipefd[0];
 			close(pipefd[1]);
 		}
 		return pid;
@@ -186,55 +181,27 @@ int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
 
 	if (outfd >= 0) {
 		xdup2(outfd, STDOUT_FILENO);
-		if (err)
+		if (exec.err)
 			xdup2(outfd, STDERR_FILENO);
 		close(outfd);
 	}
 
 	// Call the pre-exec callback
-	if (pre_exec)
-		pre_exec();
+	if (exec.pre_exec)
+		exec.pre_exec();
 
-	execve(argv[0], (char **) argv, environ);
-	PLOGE("execve %s", argv[0]);
+	execve(exec.argv[0], (char **) exec.argv, environ);
+	PLOGE("execve %s", exec.argv[0]);
 	exit(-1);
 }
 
-static int v_exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
-	// Collect va_list into vector
-	vector<const char *> args;
-	args.push_back(argv0);
-	for (const char *arg = va_arg(argv, char*); arg; arg = va_arg(argv, char*))
-		args.push_back(arg);
-	args.push_back(nullptr);
-	int pid = exec_array(err, fd, cb, args.data());
-	return pid;
-}
-
-int exec_command_sync(const char *argv0, ...) {
-	va_list argv;
-	va_start(argv, argv0);
+int exec_command_sync(const char **argv) {
+	exec_t exec { .argv = argv };
 	int pid, status;
-	pid = v_exec_command(false, nullptr, nullptr, argv0, argv);
-	va_end(argv);
+	pid = exec_command(exec);
 	if (pid < 0)
-		return pid;
+		return -1;
 	waitpid(pid, &status, 0);
 	return WEXITSTATUS(status);
 }
 
-int exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, ...) {
-	va_list argv;
-	va_start(argv, argv0);
-	int pid = v_exec_command(err, fd, cb, argv0, argv);
-	va_end(argv);
-	return pid;
-}
-
-char *strdup2(const char *s, size_t *size) {
-	size_t len = strlen(s) + 1;
-	char *buf = new char[len];
-	memcpy(buf, s, len);
-	if (size) *size = len;
-	return buf;
-}

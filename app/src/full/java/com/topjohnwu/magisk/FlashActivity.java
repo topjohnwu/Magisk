@@ -8,13 +8,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.tasks.FlashZip;
-import com.topjohnwu.core.tasks.MagiskInstaller;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.adapters.StringListAdapter;
 import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.tasks.FlashZip;
+import com.topjohnwu.magisk.tasks.MagiskInstaller;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
 

@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Thiết lập nâng cao</string>
     <string name="keep_force_encryption">Giữ bắt buộc mã hoá</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Phiên bản đã cài: %1$s</string>
-    <string name="install_magisk_title">Phiên bản mới nhất: %1$s</string>
+    <string name="current_installed">Đã cài: %1$s</string>
+    <string name="latest_version">Mới nhất: %1$s</string>
     <string name="uninstall">Gỡ bỏ</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
     <string name="uninstall_magisk_msg">Tất cả mô-đun sẽ bị vô hiệu/loại bỏ. Root sẽ bị loại bỏ và dữ liệu của bạn có thể bị mã hoá.</string>
-    <string name="update">Cập nhật %1$s</string>
+    <string name="update">Cập nhật</string>
     
     <!--Module Fragment-->
     <string name="no_info_provided">(Không có thông tin được cung cấp)</string>
@@ -165,7 +165,7 @@
     <string name="auto_response">Tự phản hồi</string>
     <string name="request_timeout">Thời gian chờ yêu cầu</string>
     <string name="superuser_notification">Thông báo Superuser</string>
-    <string name="request_timeout_summary">%1$s giây</string>
+    <string name="request_timeout_summary">%1$d giây</string>
     <string name="settings_su_reauth_title">Xác thực lại sau khi nâng cấp</string>
     <string name="settings_su_reauth_summary">Xác thực lại quyền superuser sau khi nâng cấp ứng dụng</string>
     <string name="settings_su_fingerprint_title">Bật xác thực vân tay</string>
@@ -219,7 +219,6 @@
     <string name="auth_fail">Xác thực thất bại</string>
     
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Mục UID:\u0020</string>
-    <string name="command">Điều khiển:\u0020</string>
+    <string name="target_uid">Mục UID: %1$d</string>
+    <string name="command">Điều khiển: %1$s</string>
 </resources>

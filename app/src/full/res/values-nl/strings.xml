@@ -24,12 +24,12 @@
     <string name="advanced_settings_title">Geavanceerde instellingen</string>
     <string name="keep_force_encryption">Behoud afgedwongen versleuteling</string>
     <string name="keep_dm_verity">Behoud AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Geïnstalleerde versie: %1$s</string>
-    <string name="install_magisk_title">Recentste versie: %1$s</string>
+    <string name="current_installed">Geïnstalleerde: %1$s</string>
+    <string name="latest_version">Recentste: %1$s</string>
     <string name="uninstall">Deïnstalleren</string>
     <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
     <string name="uninstall_magisk_msg">Alle modules worden uitgeschakeld/verwijderd. Root wordt verwijderd, en je data wordt mogelijk versleuteld als deze dat momenteel niet is</string>
-    <string name="update">Bijwerken %1$s</string>
+    <string name="update">Bijwerken</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Geen info verstrekt)</string>
@@ -154,7 +154,7 @@
     <string name="auto_response">Automatisch antwoord</string>
     <string name="request_timeout">Verzoek time-out</string>
     <string name="superuser_notification">Superuser melding</string>
-    <string name="request_timeout_summary">%1$s seconden</string>
+    <string name="request_timeout_summary">%1$d seconden</string>
     <string name="settings_su_reauth_title">Opnieuw verzoeken na bijwerken</string>
     <string name="settings_su_reauth_summary">Superuser rechten opnieuw opvragen na bijwerken applicatie</string>
     <string name="settings_su_fingerprint_title">Vingerafdruk authenticatie inschakelen</string>
@@ -209,8 +209,7 @@
     <string name="auth_fail">Authenticatie mislukt</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Doel UID:\u0020</string>
-    <string name="command">Opdracht:\u0020</string>
+    <string name="target_uid">Doel UID: %1$d</string>
+    <string name="command">Opdracht: %1$s</string>
 
 </resources>

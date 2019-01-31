@@ -14,145 +14,20 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/core_only_notice"
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="12dp"
-                    android:layout_marginTop="12dp">
-
-                    <ImageView
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@+id/core_only"
-                        app:srcCompat="@drawable/ic_warning"/>
-
-                    <TextView
-                        android:id="@+id/core_only"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:gravity="center"
-                        android:minWidth="225dp"
-                        android:padding="6dp"
-                        android:text="@string/settings_core_only_title"
-                        android:textStyle="bold" />
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:paddingBottom="7dp"
-                    android:paddingTop="7dp">
-
-                    <RelativeLayout
-                        android:id="@+id/magisk_update"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp">
-
-                        <ImageView
-                            android:id="@+id/magisk_update_icon"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@+id/magisk_update_status"
-                            android:visibility="gone" />
-
-                        <ProgressBar
-                            android:id="@+id/magisk_update_progress"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@+id/magisk_update_status" />
-
-                        <TextView
-                            android:id="@+id/magisk_update_status"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:gravity="center"
-                            android:minWidth="225dp"
-                            android:padding="6dp"
-                            android:text="@string/checking_for_updates"
-                            android:textStyle="bold" />
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:id="@+id/magisk_status_icon"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerVertical="true"
-                            android:layout_toStartOf="@+id/magisk_version" />
-
-                        <TextView
-                            android:id="@+id/magisk_version"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:gravity="center"
-                            android:minWidth="225dp"
-                            android:padding="6dp"
-                            android:textStyle="bold" />
-
-
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/safetyNet_card"
                 style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="4dp"
-                android:visibility="gone"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="4dp"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
 
@@ -161,101 +36,105 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <RelativeLayout
-                        android:id="@+id/safetyNet_title"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="wrap_content">
 
                         <ImageView
-                            android:id="@+id/safetyNet_refresh"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerVertical="true"
-                            android:layout_margin="15dp"
-                            android:layout_toStartOf="@+id/safetyNet_status"
-                            app:srcCompat="@drawable/ic_refresh" />
-
-                        <ProgressBar
-                            android:id="@+id/safetyNet_check_progress"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerVertical="true"
-                            android:layout_margin="15dp"
-                            android:layout_toStartOf="@+id/safetyNet_status"
-                            android:visibility="gone" />
+                            android:id="@+id/sn_logo"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginEnd="24dp"
+                            android:layout_marginBottom="12dp"
+                            android:tint="@color/green500"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/safetyNet_status"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_safetynet" />
 
                         <TextView
                             android:id="@+id/safetyNet_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
                             android:gravity="center"
-                            android:minWidth="175dp"
-                            android:padding="6dp"
+                            android:minWidth="200dp"
                             android:text="@string/safetyNet_check_text"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                    </RelativeLayout>
+                        <ImageView
+                            android:id="@+id/safetyNet_refresh"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginStart="24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/safetyNet_status"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_refresh" />
 
-                    <LinearLayout
-                        android:id="@+id/expand_layout"
+                        <ProgressBar
+                            android:id="@+id/safetyNet_check_progress"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="@+id/safetyNet_refresh"
+                            app:layout_constraintEnd_toEndOf="@+id/safetyNet_refresh"
+                            app:layout_constraintStart_toStartOf="@+id/safetyNet_refresh"
+                            app:layout_constraintTop_toTopOf="@+id/safetyNet_refresh" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/safetyNet_expand"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingEnd="10dp"
-                        android:paddingStart="10dp">
+                        android:paddingBottom="10dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <ImageView
+                            android:id="@+id/cts_status_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginEnd="8dp"
+                            app:layout_constraintBottom_toBottomOf="@+id/cts_status"
+                            app:layout_constraintEnd_toStartOf="@+id/cts_status"
+                            app:layout_constraintTop_toTopOf="@+id/cts_status" />
+
+                        <TextView
+                            android:id="@+id/cts_status"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:padding="6dp"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="@+id/basic_status"
+                            app:layout_constraintStart_toStartOf="@+id/basic_status"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                            <ImageView
-                                android:id="@+id/cts_status_icon"
-                                android:layout_width="25dp"
-                                android:layout_height="25dp"
-                                android:layout_marginBottom="5dp"
-                                android:layout_marginEnd="10dp"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginTop="5dp" />
+                        <ImageView
+                            android:id="@+id/basic_status_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginEnd="8dp"
+                            app:layout_constraintBottom_toBottomOf="@+id/basic_status"
+                            app:layout_constraintEnd_toStartOf="@+id/basic_status"
+                            app:layout_constraintTop_toTopOf="@+id/basic_status" />
 
-                            <TextView
-                                android:id="@+id/cts_status"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:minWidth="150dp"
-                                android:padding="6dp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:id="@+id/basic_status"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:padding="6dp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/cts_status" />
 
-                            <ImageView
-                                android:id="@+id/basic_status_icon"
-                                android:layout_width="25dp"
-                                android:layout_height="25dp"
-                                android:layout_margin="10dp" />
 
-                            <TextView
-                                android:id="@+id/basic_status"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:minWidth="150dp"
-                                android:padding="6dp"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 
@@ -267,10 +146,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
 
@@ -278,8 +158,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginBottom="15dp"
                     android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -295,72 +175,19 @@
                         android:id="@+id/keep_force_enc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="50dp"
                         android:layout_marginStart="50dp"
+                        android:layout_marginEnd="50dp"
                         android:text="@string/keep_force_encryption" />
 
                     <CheckBox
                         android:id="@+id/keep_verity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="50dp"
                         android:layout_marginStart="50dp"
+                        android:layout_marginEnd="50dp"
                         android:text="@string/keep_dm_verity" />
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/install_button"
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:visibility="gone"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginEnd="40dp"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/imageView"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="5dp"
-                        app:srcCompat="@drawable/ic_logo" />
-
-                    <TextView
-                        android:id="@+id/install_text"
-                        android:layout_width="180dp"
-                        android:layout_height="match_parent"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:ems="10"
-                        android:fontFamily="sans-serif"
-                        android:gravity="center"
-                        android:text="@string/install"
-                        android:textAllCaps="false"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                </RelativeLayout>
-
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView

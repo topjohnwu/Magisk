@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,10 +9,10 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.topjohnwu.core.container.SuLogEntry;
-import com.topjohnwu.core.database.MagiskDB;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.ExpandableView;
+import com.topjohnwu.magisk.container.SuLogEntry;
+import com.topjohnwu.magisk.database.MagiskDB;
+import com.topjohnwu.magisk.uicomponents.ExpandableViewHolder;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -83,21 +84,22 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
     public void onBindItemViewHolder(LogViewHolder holder, int section, int position) {
         SuLogEntry entry = logEntries.get(section).get(position);
         int realIdx = getItemPosition(section, position);
-        holder.setExpanded(itemExpanded.contains(realIdx));
+        holder.expandable.setExpanded(itemExpanded.contains(realIdx));
         holder.itemView.setOnClickListener(view -> {
-            if (holder.isExpanded()) {
-                holder.collapse();
+            if (holder.expandable.isExpanded()) {
+                holder.expandable.collapse();
                 itemExpanded.remove(realIdx);
             } else {
-                holder.expand();
+                holder.expandable.expand();
                 itemExpanded.add(realIdx);
             }
         });
+        Context context = holder.itemView.getContext();
         holder.appName.setText(entry.appName);
         holder.action.setText(entry.action ? R.string.grant : R.string.deny);
-        holder.command.setText(entry.command);
-        holder.fromPid.setText(String.valueOf(entry.fromPid));
-        holder.toUid.setText(String.valueOf(entry.toUid));
+        holder.pid.setText(context.getString(R.string.pid, entry.fromPid));
+        holder.uid.setText(context.getString(R.string.target_uid, entry.toUid));
+        holder.command.setText(context.getString(R.string.command, entry.command));
         holder.time.setText(entry.getTimeString());
     }
 
@@ -120,28 +122,22 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
         }
     }
 
-    static class LogViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
+    static class LogViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.action) TextView action;
         @BindView(R.id.time) TextView time;
-        @BindView(R.id.fromPid) TextView fromPid;
-        @BindView(R.id.toUid) TextView toUid;
-        @BindView(R.id.command) TextView command;
+        @BindView(R.id.pid) TextView pid;
+        @BindView(R.id.uid) TextView uid;
+        @BindView(R.id.cmd) TextView command;
         @BindView(R.id.expand_layout) ViewGroup expandLayout;
 
-        private Container container = new Container();
+        ExpandableViewHolder expandable;
 
         LogViewHolder(View itemView) {
             super(itemView);
             new SuLogAdapter$LogViewHolder_ViewBinding(this, itemView);
-            container.expandLayout = expandLayout;
-            setupExpandable();
-        }
-
-        @Override
-        public Container getContainer() {
-            return container;
+            expandable = new ExpandableViewHolder(expandLayout);
         }
     }
 }
