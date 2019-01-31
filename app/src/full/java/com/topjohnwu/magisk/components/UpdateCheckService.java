@@ -1,9 +1,9 @@
-package com.topjohnwu.magisk.services;
+package com.topjohnwu.magisk.components;
 
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
-import com.topjohnwu.magisk.components.Notifications;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
+import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.superuser.Shell;
 
 import androidx.annotation.NonNull;

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.components;
+package com.topjohnwu.magisk.uicomponents;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;

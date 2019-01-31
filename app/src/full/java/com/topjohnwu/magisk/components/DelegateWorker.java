@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.services;
+package com.topjohnwu.magisk.components;
 
 import android.content.Context;
 import android.net.Network;

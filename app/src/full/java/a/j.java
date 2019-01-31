@@ -1,6 +1,6 @@
 package a;
 
-import com.topjohnwu.magisk.services.DownloadModuleService;
+import com.topjohnwu.magisk.components.DownloadModuleService;
 
 public class j extends DownloadModuleService {
     /* stub */

@@ -15,12 +15,12 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.components.CustomAlertDialog;
-import com.topjohnwu.magisk.components.MarkDownWindow;
+import com.topjohnwu.magisk.components.DownloadModuleService;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
-import com.topjohnwu.magisk.services.DownloadModuleService;
+import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
+import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
 
 import java.util.ArrayList;
 import java.util.List;

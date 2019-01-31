@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.receivers;
+package com.topjohnwu.magisk.components;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,8 +10,8 @@ import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.SuRequestActivity;
-import com.topjohnwu.magisk.components.Notifications;
-import com.topjohnwu.magisk.components.Shortcuts;
+import com.topjohnwu.magisk.uicomponents.Notifications;
+import com.topjohnwu.magisk.uicomponents.Shortcuts;
 import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.SuConnector;
 import com.topjohnwu.superuser.Shell;

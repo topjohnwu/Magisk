@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.components;
+package com.topjohnwu.magisk.dialogs;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,6 +10,9 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.uicomponents.ProgressNotification;
+import com.topjohnwu.magisk.uicomponents.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 

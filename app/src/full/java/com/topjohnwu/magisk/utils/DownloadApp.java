@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.ProgressNotification;
+import com.topjohnwu.magisk.uicomponents.ProgressNotification;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
 import com.topjohnwu.superuser.ShellUtils;

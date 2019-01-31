@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.services.UpdateCheckService;
+import com.topjohnwu.magisk.components.UpdateCheckService;
 
 import java.util.concurrent.TimeUnit;
 

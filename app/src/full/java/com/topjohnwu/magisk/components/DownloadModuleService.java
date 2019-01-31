@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.services;
+package com.topjohnwu.magisk.components;
 
 import android.app.Service;
 import android.content.Intent;
@@ -10,8 +10,8 @@ import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.ProgressNotification;
 import com.topjohnwu.magisk.container.Repo;
+import com.topjohnwu.magisk.uicomponents.ProgressNotification;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;

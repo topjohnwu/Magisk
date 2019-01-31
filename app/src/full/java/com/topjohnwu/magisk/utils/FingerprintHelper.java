@@ -20,7 +20,7 @@ import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.CustomAlertDialog;
+import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
 
 import java.security.KeyStore;
 

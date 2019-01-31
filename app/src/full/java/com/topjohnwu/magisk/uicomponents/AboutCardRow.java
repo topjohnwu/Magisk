@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.topjohnwu.magisk.components;
+package com.topjohnwu.magisk.uicomponents;
 
 import android.content.Context;
 import android.content.res.TypedArray;

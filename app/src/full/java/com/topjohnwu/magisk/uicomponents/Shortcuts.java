@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.components;
+package com.topjohnwu.magisk.uicomponents;
 
 import android.content.Context;
 import android.content.Intent;

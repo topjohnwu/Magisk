@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk;
 
-import com.topjohnwu.magisk.components.AboutCardRow;
-import com.topjohnwu.magisk.receivers.GeneralReceiver;
-import com.topjohnwu.magisk.services.DownloadModuleService;
-import com.topjohnwu.magisk.services.UpdateCheckService;
+import com.topjohnwu.magisk.components.DownloadModuleService;
+import com.topjohnwu.magisk.components.GeneralReceiver;
+import com.topjohnwu.magisk.components.UpdateCheckService;
+import com.topjohnwu.magisk.uicomponents.AboutCardRow;
 
 import java.util.HashMap;
 import java.util.Map;

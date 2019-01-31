@@ -2,7 +2,7 @@ package a;
 
 import android.content.Context;
 
-import com.topjohnwu.magisk.services.DelegateWorker;
+import com.topjohnwu.magisk.components.DelegateWorker;
 
 import java.lang.reflect.ParameterizedType;
 

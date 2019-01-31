@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.components;
+package com.topjohnwu.magisk.uicomponents;
 
 import android.animation.ValueAnimator;
 import android.view.View;

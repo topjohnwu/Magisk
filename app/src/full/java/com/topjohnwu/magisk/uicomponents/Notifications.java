@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.components;
+package com.topjohnwu.magisk.uicomponents;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.receivers.GeneralReceiver;
+import com.topjohnwu.magisk.components.GeneralReceiver;
 import com.topjohnwu.magisk.utils.Utils;
 
 import androidx.core.app.NotificationCompat;

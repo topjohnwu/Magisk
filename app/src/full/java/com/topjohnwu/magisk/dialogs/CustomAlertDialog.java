@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.components;
+package com.topjohnwu.magisk.dialogs;
 
 import android.app.Activity;
 import android.content.DialogInterface;

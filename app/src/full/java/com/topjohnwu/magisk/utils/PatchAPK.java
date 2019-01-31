@@ -8,7 +8,7 @@ import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.Notifications;
+import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.signing.JarMap;
 import com.topjohnwu.signing.SignAPK;
 import com.topjohnwu.superuser.ShellUtils;
