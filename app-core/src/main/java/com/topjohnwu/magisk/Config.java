@@ -66,6 +66,7 @@ public class Config {
         public static final String DARK_THEME = "dark_theme";
         public static final String ETAG_KEY = "ETag";
         public static final String REPO_ORDER = "repo_order";
+        public static final String SHOW_SYSTEM_APP = "show_system";
     }
 
     public static class Value {
@@ -108,16 +109,17 @@ public class Config {
 
         // prefs bool
         defs.putBoolean(Key.CHECK_UPDATES, true);
-        // defs.putBoolean(Const.Key.DARK_THEME, false);
-        // defs.putBoolean(Const.Key.SU_REAUTH, false);
-        // defs.putBoolean(Const.Key.MAGISKHIDE, false);
-        // defs.putBoolean(Const.Key.COREONLY, false);
+        // defs.putBoolean(Key.DARK_THEME, false);
+        // defs.putBoolean(Key.SU_REAUTH, false);
+        // defs.putBoolean(Key.MAGISKHIDE, false);
+        // defs.putBoolean(Key.COREONLY, false);
+        // defs.putBoolean(Key.SHOW_SYSTEM_APP, false);
 
         // prefs string
         defs.putString(Key.CUSTOM_CHANNEL, "");
         defs.putString(Key.BOOT_FORMAT, ".img");
         defs.putString(Key.LOCALE, "");
-        // defs.putString(Const.Key.ETAG_KEY, null);
+        // defs.putString(Key.ETAG_KEY, null);
 
         // db int
         defs.putInt(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB);
@@ -125,10 +127,10 @@ public class Config {
         defs.putInt(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY);
 
         // db bool
-        // defs.putBoolean(Const.Key.SU_FINGERPRINT, false);
+        // defs.putBoolean(Key.SU_FINGERPRINT, false);
 
         // db strings
-        // defs.putString(Const.Key.SU_MANAGER, null);
+        // defs.putString(Key.SU_MANAGER, null);
     }
 
     public static void loadMagiskInfo() {
@@ -245,6 +247,7 @@ public class Config {
             case Key.CHECK_UPDATES:
             case Key.MAGISKHIDE:
             case Key.COREONLY:
+            case Key.SHOW_SYSTEM_APP:
                 return PREF_BOOL;
 
             case Key.CUSTOM_CHANNEL:

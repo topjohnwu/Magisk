@@ -232,4 +232,7 @@
     <string name="target_uid">Target UID: %1$d</string>
     <string name="command">Command: %1$s</string>
 
+    <!-- MagiskHide -->
+    <string name="show_system_app">Show system apps</string>
+
 </resources>

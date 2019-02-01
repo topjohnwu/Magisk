@@ -2,14 +2,13 @@ package com.topjohnwu.magisk.adapters;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +17,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,22 +25,30 @@ import java.util.Iterator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.WorkerThread;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ViewHolder> {
 
-    private List<ApplicationInfo> fullList, showList;
+    private static PackageInfo PLATFORM;
+
+    private List<PackageInfo> fullList, showList;
     private List<String> hideList;
     private PackageManager pm;
-    private ApplicationFilter filter;
+    private boolean showSystem;
 
     public ApplicationAdapter(Context context) {
         fullList = showList = Collections.emptyList();
         hideList = Collections.emptyList();
-        filter = new ApplicationFilter();
         pm = context.getPackageManager();
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(this::loadApps);
+        showSystem = false;
+        if (PLATFORM == null) {
+            try {
+                PLATFORM = pm.getPackageInfo("android", PackageManager.GET_SIGNATURES);
+            } catch (PackageManager.NameNotFoundException ignored) {}
+        }
+        AsyncTask.SERIAL_EXECUTOR.execute(this::loadApps);
     }
 
     @NonNull
@@ -50,12 +58,17 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         return new ViewHolder(v);
     }
 
+    @WorkerThread
     private void loadApps() {
-        fullList = pm.getInstalledApplications(0);
+        fullList = pm.getInstalledPackages(PackageManager.GET_SIGNATURES);
         hideList = Shell.su("magiskhide --ls").exec().getOut();
-        for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
-            ApplicationInfo info = i.next();
-            if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled || info.uid == 1000) {
+        for (Iterator<PackageInfo> i = fullList.iterator(); i.hasNext(); ) {
+            PackageInfo info = i.next();
+            if (Const.HIDE_BLACKLIST.contains(info.packageName) ||
+                    /* Do not show disabled apps */
+                    !info.applicationInfo.enabled ||
+                    /* Never show platform apps */
+                    PLATFORM.signatures[0].equals(info.signatures[0])) {
                 i.remove();
             }
         }
@@ -63,7 +76,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             boolean ah = hideList.contains(a.packageName);
             boolean bh = hideList.contains(b.packageName);
             if (ah == bh) {
-                return Utils.getAppLabel(a, pm).compareToIgnoreCase(Utils.getAppLabel(b, pm));
+                return Utils.getAppLabel(a.applicationInfo, pm)
+                        .compareToIgnoreCase(Utils.getAppLabel(b.applicationInfo, pm));
             } else if (ah) {
                 return -1;
             } else {
@@ -73,9 +87,13 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         Topic.publish(false, Topic.MAGISK_HIDE_DONE);
     }
 
+    public void setShowSystem(boolean b) {
+        showSystem = b;
+    }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ApplicationInfo info = showList.get(position);
+        ApplicationInfo info = showList.get(position).applicationInfo;
 
         holder.appIcon.setImageDrawable(info.loadIcon(pm));
         holder.appName.setText(Utils.getAppLabel(info, pm));
@@ -99,8 +117,37 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         return showList.size();
     }
 
+    private boolean contains(String s, String filter) {
+        return s.toLowerCase().contains(filter);
+    }
+
+    // Show if have launch intent or not system app
+    private boolean systemFilter(PackageInfo info) {
+        if (showSystem)
+            return true;
+        return (info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0 ||
+                pm.getLaunchIntentForPackage(info.packageName) != null;
+    }
+
     public void filter(String constraint) {
-        filter.filter(constraint);
+        AsyncTask.SERIAL_EXECUTOR.execute(() -> {
+            showList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0) {
+                for (PackageInfo info : fullList) {
+                    if (systemFilter(info))
+                        showList.add(info);
+                }
+            } else {
+                String filter = constraint.toLowerCase();
+                for (PackageInfo info : fullList) {
+                    if ((contains(Utils.getAppLabel(info.applicationInfo, pm), filter) ||
+                            contains(info.packageName, filter)) && systemFilter(info)) {
+                        showList.add(info);
+                    }
+                }
+            }
+            UiThreadHandler.run(this::notifyDataSetChanged);
+        });
     }
 
     public void refresh() {
@@ -117,35 +164,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         ViewHolder(View itemView) {
             super(itemView);
             new ApplicationAdapter$ViewHolder_ViewBinding(this, itemView);
-        }
-    }
-
-    class ApplicationFilter extends Filter {
-
-        private boolean lowercaseContains(String s, CharSequence filter) {
-            return !TextUtils.isEmpty(s) && s.toLowerCase().contains(filter);
-        }
-
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            if (constraint == null || constraint.length() == 0) {
-                showList = fullList;
-            } else {
-                showList = new ArrayList<>();
-                String filter = constraint.toString().toLowerCase();
-                for (ApplicationInfo info : fullList) {
-                    if (lowercaseContains(Utils.getAppLabel(info, pm), filter)
-                            || lowercaseContains(info.packageName, filter)) {
-                        showList.add(info);
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            notifyDataSetChanged();
         }
     }
 }
