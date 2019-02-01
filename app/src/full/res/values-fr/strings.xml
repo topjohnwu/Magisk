@@ -228,7 +228,6 @@
     <string name="auth_fail">Échec de l’authentification</string>
 
     <!--Superuser logs-->
-    <string name="pid" translatable="false">PID: %1$d</string>
     <string name="target_uid">UID cible : %1$d</string>
     <string name="command">Commande : %1$s</string>
 
