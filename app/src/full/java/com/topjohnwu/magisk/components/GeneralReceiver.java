@@ -40,6 +40,23 @@ public class GeneralReceiver extends BroadcastReceiver {
         if (action == null)
             return;
         switch (action) {
+            case Intent.ACTION_REBOOT:
+                String rebootAction = intent.getStringExtra("action");
+                switch (rebootAction) {
+                    case "request":
+                        Intent i = new Intent(app, ClassMap.get(SuRequestActivity.class))
+                                .putExtra("socket", intent.getStringExtra("socket"))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        app.startActivity(i);
+                        break;
+                    case "log":
+                        SU_LOGGER.handleLogs(intent);
+                        break;
+                    case "notify":
+                        SU_LOGGER.handleNotify(intent);
+                        break;
+                }
+                break;
             case Intent.ACTION_BOOT_COMPLETED:
                 String bootAction = intent.getStringExtra("action");
                 if (bootAction == null)
