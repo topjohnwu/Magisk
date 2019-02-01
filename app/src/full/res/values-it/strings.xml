@@ -1,5 +1,4 @@
 <resources>
-	<!--Universal-->
 
 	<!--Welcome Activity-->
 	<string name="modules">Moduli</string>
@@ -14,22 +13,23 @@
 	<string name="checking_for_updates">Controllo aggiornamenti…</string>
 	<string name="magisk_update_available">È disponibile Magisk v%1$s!</string>
 	<string name="invalid_update_channel">Canale di aggiornamento non valido</string>
-	<string name="safetyNet_check_text">Tocca per controllare SafetyNet.</string>
+	<string name="safetyNet_check_text">Tocca per controllare SafetyNet</string>
 	<string name="checking_safetyNet_status">Controllo stato SafetyNet…</string>
 	<string name="safetyNet_check_success">Controllo SafetyNet OK</string>
 	<string name="safetyNet_api_error">Errore API SafetyNet</string>
    	<string name="safetyNet_res_invalid">La risposta non è valida.</string>
-
-	<!--Install Fragment-->
+   	<string name="magisk_up_to_date">Magisk è aggiornato</string>
+   	<string name="manager_up_to_date">Magisk Manager è aggiornato</string>
 	<string name="advanced_settings_title">Impostazioni avanzate</string>
 	<string name="keep_force_encryption">Mantieni crittografia forzata</string>
 	<string name="keep_dm_verity">Mantieni AVB 2.0/dm-verity</string>
-	<string name="current_installed">Versione: %1$s</string>
+	<string name="current_installed">Installata: %1$s</string>
 	<string name="latest_version">Ultima: %1$s</string>
 	<string name="uninstall">Disinstalla</string>
 	<string name="uninstall_magisk_title">Disinstalla Magisk</string>
 	<string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi. Il root verrà rimosso e i tuoi dati potrebbero venire criptati, nel caso non lo siano già.</string>
 	<string name="update">Aggiorna</string>
+        <string name="core_only_enabled">(Modalità solo Core abilitata)</string>
 
 	<!--Module Fragment-->
 	<string name="no_info_provided">(Nessuna informazione)</string>
@@ -129,12 +129,11 @@
 	<string name="no_rw_storage">Questa funzione non sarà attiva senza l\'autorizzazione di scrittura nella memoria di archiviazione.</string>
 	<string name="dl_one_module">Scarica un modulo alla volta.</string>
 
-
 	<!--Settings Activity -->
 	<string name="settings_general_category">Generale</string>
 	<string name="settings_dark_theme_title">Tema scuro</string>
 	<string name="settings_dark_theme_summary">Abilita il tema scuro.</string>
-    <string name="settings_clear_cache_title">Svuota cache repository</string>
+        <string name="settings_clear_cache_title">Svuota cache repository</string>
 	<string name="settings_clear_cache_summary">Svuota la cache delle repository. Questa opzione forza l\'aggiornamento online dell\'app.</string>
 	<string name="settings_hide_manager_title">Nascondi Magisk Manager</string>
 	<string name="settings_hide_manager_summary">Reinstalla Magisk Manager con un nome pacchetto casuale.</string>
@@ -229,7 +228,11 @@
 	<string name="auth_fail">Autenticatione fallita</string>
 
 	<!--Superuser logs-->
-    <string name="target_uid">UID destinazione: %1$d</string>
+	<string name="pid" translatable="false">PID: %1$d</string>
+	<string name="target_uid">UID destinazione: %1$d</string>
 	<string name="command">Comando: %1$s</string>
+
+	<!-- MagiskHide -->
+	<string name="show_system_app">Mostra app di sistema</string>
 
 </resources>
