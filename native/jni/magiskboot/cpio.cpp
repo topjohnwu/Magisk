@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define parse_align() lseek(fd, align(lseek(fd, 0, SEEK_CUR), 4), SEEK_SET)
+#define parse_align() lseek(fd, do_align(lseek(fd, 0, SEEK_CUR), 4), SEEK_SET)
 
 static uint32_t x8u(char *hex) {
 	uint32_t val, inpos = 8, outpos;

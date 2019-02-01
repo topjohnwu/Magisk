@@ -9,10 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.material.navigation.NavigationView;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
-import com.topjohnwu.core.utils.Topic;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.fragments.LogFragment;
 import com.topjohnwu.magisk.fragments.MagiskFragment;
@@ -21,6 +17,8 @@ import com.topjohnwu.magisk.fragments.ModulesFragment;
 import com.topjohnwu.magisk.fragments.ReposFragment;
 import com.topjohnwu.magisk.fragments.SettingsFragment;
 import com.topjohnwu.magisk.fragments.SuperuserFragment;
+import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
@@ -125,10 +123,10 @@ public class MainActivity extends BaseActivity
     public void checkHideSection() {
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(Shell.rootAccess() &&
-                app.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
-        menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Data.magiskVersionCode >= 0);
+                (boolean) Config.get(Config.Key.MAGISKHIDE));
+        menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Config.magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(Networking.checkNetworkStatus(this)
-                && Shell.rootAccess() && Data.magiskVersionCode >= 0);
+                && Shell.rootAccess() && Config.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Utils.showSuperUser());
     }
@@ -155,19 +153,12 @@ public class MainActivity extends BaseActivity
                 case "settings":
                     itemId = R.id.settings;
                     break;
-                case "about":
-                    itemId = R.id.app_about;
-                    break;
-                case "donation":
-                    itemId = R.id.donation;
-                    break;
             }
         }
         navigate(itemId);
     }
 
     public void navigate(int itemId) {
-        int bak = mDrawerItem;
         mDrawerItem = itemId;
         navigationView.setCheckedItem(itemId);
         switch (itemId) {
@@ -192,14 +183,6 @@ public class MainActivity extends BaseActivity
                 break;
             case R.id.settings:
                 displayFragment(new SettingsFragment(), true);
-                break;
-            case R.id.app_about:
-                startActivity(new Intent(this, ClassMap.get(AboutActivity.class)));
-                mDrawerItem = bak;
-                break;
-            case R.id.donation:
-                startActivity(new Intent(this, ClassMap.get(DonationActivity.class)));
-                mDrawerItem = bak;
                 break;
         }
     }

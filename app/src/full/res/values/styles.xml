@@ -9,7 +9,7 @@
         <item name="cardStyle">@style/CardViewStyle.Light</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="imageColorTint">@android:color/secondary_text_light</item>
+        <item name="imageColorTint">@android:color/tertiary_text_light</item>
     </style>
 
     <style name="AppTheme" parent="AppTheme.Base"/>

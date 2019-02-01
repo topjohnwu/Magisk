@@ -2,13 +2,13 @@ package com.topjohnwu.magisk.components;
 
 import android.content.Intent;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.utils.Topic;
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.utils.Topic;
 
 import androidx.fragment.app.Fragment;
 import butterknife.Unbinder;
 
-public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
+public abstract class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
     public App app = App.self;
     protected Unbinder unbinder = null;
@@ -49,4 +49,7 @@ public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
     public int[] getSubscribedTopics() {
         return BaseActivity.EMPTY_INT_ARRAY;
     }
+
+    @Override
+    public void onPublish(int topic, Object[] result) {}
 }

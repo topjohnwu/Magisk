@@ -44,7 +44,7 @@ boot_img::~boot_img() {
 #define CHROMEOS_RET       2
 #define ELF32_RET          3
 #define ELF64_RET          4
-#define pos_align() pos = align(pos, page_size())
+#define pos_align() pos = do_align(pos, page_size())
 
 int boot_img::parse_image(const char * image) {
 	mmap_ro(image, (void **) &map_addr, &map_size);

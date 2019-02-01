@@ -10,13 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.StringListAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
-import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.uicomponents.SnackbarMaker;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.internal.NOPList;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +70,7 @@ public class MagiskLogFragment extends BaseFragment {
                 return true;
             case R.id.menu_clear:
                 clearLogs();
+                rv.setAdapter(new MagiskLogAdapter(NOPList.getInstance()));
                 return true;
             default:
                 return true;
@@ -76,7 +78,7 @@ public class MagiskLogFragment extends BaseFragment {
     }
 
     private void readLogs() {
-        Shell.su("cat " + Const.MAGISK_LOG + " | tail -n 5000").submit(result -> {
+        Shell.su("tail -n 5000 " + Const.MAGISK_LOG).submit(result -> {
             rv.setAdapter(new MagiskLogAdapter(result.getOut()));
         });
     }
@@ -104,10 +106,12 @@ public class MagiskLogFragment extends BaseFragment {
         SnackbarMaker.make(rv, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
     }
 
-    private static class MagiskLogAdapter extends StringListAdapter<MagiskLogAdapter.ViewHolder> {
+    private class MagiskLogAdapter extends StringListAdapter<MagiskLogAdapter.ViewHolder> {
 
         MagiskLogAdapter(List<String> list) {
             super(list);
+            if (mList.isEmpty())
+                mList.add(requireContext().getString(R.string.log_is_empty));
         }
 
         @Override

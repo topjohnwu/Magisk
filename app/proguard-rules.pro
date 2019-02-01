@@ -22,15 +22,21 @@
 -keep,allowoptimization class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
 -dontwarn javax.naming.**
 
-# Snet extention
--keepclassmembers class com.topjohnwu.core.utils.ISafetyNetHelper { *; }
--keepclassmembers class com.topjohnwu.core.utils.BootSigner { *; }
+# Snet
+-keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
+-keep,allowobfuscation interface com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback
+-keepclassmembers class * implements com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback {
+  void onResponse(int);
+}
+
+# BootSigner
+-keepclassmembers class com.topjohnwu.signer.BootSigner { *; }
 
 # SVG
 -dontwarn com.caverock.androidsvg.SVGAndroidRenderer
 
 # Strip logging
--assumenosideeffects class com.topjohnwu.core.utils.Logger {
+-assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
   public *** debug(...);
 }
 

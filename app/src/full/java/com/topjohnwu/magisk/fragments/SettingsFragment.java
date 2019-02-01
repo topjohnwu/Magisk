@@ -1,28 +1,27 @@
 package com.topjohnwu.magisk.fragments;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
-import com.topjohnwu.core.tasks.CheckUpdates;
-import com.topjohnwu.core.utils.LocaleManager;
-import com.topjohnwu.core.utils.Topic;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.BasePreferenceFragment;
+import com.topjohnwu.magisk.dialogs.FingerprintAuthDialog;
+import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
+import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.PatchAPK;
+import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
@@ -33,42 +32,23 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
-import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceGroupAdapter;
 import androidx.preference.PreferenceScreen;
-import androidx.preference.PreferenceViewHolder;
 import androidx.preference.SwitchPreferenceCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
-public class SettingsFragment extends PreferenceFragmentCompat
-        implements SharedPreferences.OnSharedPreferenceChangeListener,
-        Topic.Subscriber, Topic.AutoSubscriber {
-
-    private App app = App.self;
+public class SettingsFragment extends BasePreferenceFragment implements Topic.Subscriber {
 
     private ListPreference updateChannel, autoRes, suNotification,
             requestTimeout, rootConfig, multiuserConfig, nsConfig;
 
-    private int rootState, namespaceState;
-    private boolean showSuperuser;
-
-    private void prefsSync() {
-        rootState = app.mDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
-        namespaceState = app.mDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
-        showSuperuser = Utils.showSuperUser();
-        app.prefs.edit()
-                .putString(Const.Key.ROOT_ACCESS, String.valueOf(rootState))
-                .putString(Const.Key.SU_MNT_NS, String.valueOf(namespaceState))
-                .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(Data.multiuserState))
-                .putBoolean(Const.Key.SU_FINGERPRINT, FingerprintHelper.useFingerPrint())
-                .apply();
-    }
-
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        prefsSync();
-
         setPreferencesFromResource(R.xml.app_settings, rootKey);
+        requireActivity().setTitle(R.string.settings);
+
+        boolean showSuperuser = Utils.showSuperUser();
+        app.prefs.edit()
+                .putBoolean(Config.Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
+                .apply();
 
         PreferenceScreen prefScreen = getPreferenceScreen();
 
@@ -86,7 +66,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
             return true;
         });
         findPreference("clear").setOnPreferenceClickListener(pref -> {
-            app.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
+            app.prefs.edit().remove(Config.Key.ETAG_KEY).apply();
             app.repoDB.clearRepo();
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
@@ -98,33 +78,32 @@ public class SettingsFragment extends PreferenceFragmentCompat
             return true;
         });
 
-        updateChannel = (ListPreference) findPreference(Const.Key.UPDATE_CHANNEL);
-        rootConfig = (ListPreference) findPreference(Const.Key.ROOT_ACCESS);
-        autoRes = (ListPreference) findPreference(Const.Key.SU_AUTO_RESPONSE);
-        requestTimeout = (ListPreference) findPreference(Const.Key.SU_REQUEST_TIMEOUT);
-        suNotification = (ListPreference) findPreference(Const.Key.SU_NOTIFICATION);
-        multiuserConfig = (ListPreference) findPreference(Const.Key.SU_MULTIUSER_MODE);
-        nsConfig = (ListPreference) findPreference(Const.Key.SU_MNT_NS);
-        SwitchPreferenceCompat reauth = (SwitchPreferenceCompat) findPreference(Const.Key.SU_REAUTH);
-        SwitchPreferenceCompat fingerprint = (SwitchPreferenceCompat) findPreference(Const.Key.SU_FINGERPRINT);
+        updateChannel = (ListPreference) findPreference(Config.Key.UPDATE_CHANNEL);
+        rootConfig = (ListPreference) findPreference(Config.Key.ROOT_ACCESS);
+        autoRes = (ListPreference) findPreference(Config.Key.SU_AUTO_RESPONSE);
+        requestTimeout = (ListPreference) findPreference(Config.Key.SU_REQUEST_TIMEOUT);
+        suNotification = (ListPreference) findPreference(Config.Key.SU_NOTIFICATION);
+        multiuserConfig = (ListPreference) findPreference(Config.Key.SU_MULTIUSER_MODE);
+        nsConfig = (ListPreference) findPreference(Config.Key.SU_MNT_NS);
+        SwitchPreferenceCompat reauth = (SwitchPreferenceCompat) findPreference(Config.Key.SU_REAUTH);
+        SwitchPreferenceCompat fingerprint = (SwitchPreferenceCompat) findPreference(Config.Key.SU_FINGERPRINT);
 
         updateChannel.setOnPreferenceChangeListener((p, o) -> {
-            String prev =String.valueOf(Data.updateChannel);
+            int prev = Config.get(Config.Key.UPDATE_CHANNEL);
             int channel = Integer.parseInt((String) o);
-            if (channel == Const.Value.CUSTOM_CHANNEL) {
+            if (channel == Config.Value.CUSTOM_CHANNEL) {
                 View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                 EditText url = v.findViewById(R.id.custom_url);
-                url.setText(app.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
+                url.setText(app.prefs.getString(Config.Key.CUSTOM_CHANNEL, ""));
                 new AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
                         .setPositiveButton(R.string.ok, (d, i) ->
-                                app.prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
-                                        url.getText().toString()).apply())
+                               Config.set(Config.Key.CUSTOM_CHANNEL, url.getText().toString()))
                         .setNegativeButton(R.string.close, (d, i) ->
-                                app.prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
+                                Config.set(Config.Key.UPDATE_CHANNEL, prev))
                         .setOnCancelListener(d ->
-                                app.prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
+                                Config.set(Config.Key.UPDATE_CHANNEL, prev))
                         .show();
             }
             return true;
@@ -190,43 +169,17 @@ public class SettingsFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        app.prefs.registerOnSharedPreferenceChangeListener(this);
-        Topic.subscribe(this);
-        requireActivity().setTitle(R.string.settings);
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onDestroyView() {
-        app.prefs.unregisterOnSharedPreferenceChangeListener(this);
-        Topic.unsubscribe(this);
-        super.onDestroyView();
-    }
-
-    @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
         switch (key) {
-            case Const.Key.ROOT_ACCESS:
-            case Const.Key.SU_MULTIUSER_MODE:
-            case Const.Key.SU_MNT_NS:
+            case Config.Key.ROOT_ACCESS:
+            case Config.Key.SU_MULTIUSER_MODE:
+            case Config.Key.SU_MNT_NS:
                 app.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
                 break;
-        }
-        switch (key) {
-            case Const.Key.ROOT_ACCESS:
-                rootState = Utils.getPrefsInt(prefs, key);
-                break;
-            case Const.Key.SU_MULTIUSER_MODE:
-                Data.multiuserState = Utils.getPrefsInt(prefs, key);
-                break;
-            case Const.Key.SU_MNT_NS:
-                namespaceState = Utils.getPrefsInt(prefs, key);
-                break;
-            case Const.Key.DARK_THEME:
+            case Config.Key.DARK_THEME:
                 requireActivity().recreate();
                 break;
-            case Const.Key.COREONLY:
+            case Config.Key.COREONLY:
                 if (prefs.getBoolean(key, false)) {
                     try {
                         Const.MAGISK_DISABLE_FILE.createNewFile();
@@ -236,104 +189,101 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 }
                 Utils.toast(R.string.settings_reboot_toast, Toast.LENGTH_LONG);
                 break;
-            case Const.Key.MAGISKHIDE:
+            case Config.Key.MAGISKHIDE:
                 if (prefs.getBoolean(key, false)) {
                     Shell.su("magiskhide --enable").submit();
                 } else {
                     Shell.su("magiskhide --disable").submit();
                 }
                 break;
-            case Const.Key.LOCALE:
+            case Config.Key.LOCALE:
                 LocaleManager.setLocale(app);
                 requireActivity().recreate();
                 break;
-            case Const.Key.UPDATE_CHANNEL:
-            case Const.Key.CUSTOM_CHANNEL:
+            case Config.Key.UPDATE_CHANNEL:
+            case Config.Key.CUSTOM_CHANNEL:
                 CheckUpdates.check();
                 break;
-            case Const.Key.CHECK_UPDATES:
+            case Config.Key.CHECK_UPDATES:
                 AppUtils.scheduleUpdateCheck();
                 break;
         }
-        Data.loadConfig();
-        setSummary();
+        setSummary(key);
     }
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
         String key = preference.getKey();
         switch (key) {
-            case Const.Key.SU_FINGERPRINT:
+            case Config.Key.SU_FINGERPRINT:
                 boolean checked = ((SwitchPreferenceCompat) preference).isChecked();
                 ((SwitchPreferenceCompat) preference).setChecked(!checked);
-                FingerprintHelper.showAuthDialog(requireActivity(), () -> {
+                new FingerprintAuthDialog(requireActivity(), () -> {
                     ((SwitchPreferenceCompat) preference).setChecked(checked);
-                    app.mDB.setSettings(key, checked ? 1 : 0);
-                });
+                    Config.set(key, checked);
+                }).show();
                 break;
         }
         return true;
     }
 
+    private void setSummary(String key) {
+        switch (key) {
+            case Config.Key.UPDATE_CHANNEL:
+                updateChannel.setSummary(getResources()
+                        .getStringArray(R.array.update_channel)
+                        [(int) Config.get(Config.Key.UPDATE_CHANNEL)]);
+                break;
+            case Config.Key.ROOT_ACCESS:
+                rootConfig.setSummary(getResources()
+                        .getStringArray(R.array.su_access)
+                        [(int) Config.get(Config.Key.ROOT_ACCESS)]);
+                break;
+            case Config.Key.SU_AUTO_RESPONSE:
+                autoRes.setSummary(getResources()
+                        .getStringArray(R.array.auto_response)
+                        [(int) Config.get(Config.Key.SU_AUTO_RESPONSE)]);
+                break;
+            case Config.Key.SU_NOTIFICATION:
+                suNotification.setSummary(getResources()
+                        .getStringArray(R.array.su_notification)
+                        [(int) Config.get(Config.Key.SU_NOTIFICATION)]);
+                break;
+            case Config.Key.SU_REQUEST_TIMEOUT:
+                requestTimeout.setSummary(
+                        getString(R.string.request_timeout_summary,
+                                (int) Config.get(Config.Key.SU_REQUEST_TIMEOUT)));
+                break;
+            case Config.Key.SU_MULTIUSER_MODE:
+                multiuserConfig.setSummary(getResources()
+                        .getStringArray(R.array.multiuser_summary)
+                        [(int) Config.get(Config.Key.SU_MULTIUSER_MODE)]);
+                break;
+            case Config.Key.SU_MNT_NS:
+                nsConfig.setSummary(getResources()
+                        .getStringArray(R.array.namespace_summary)
+                        [(int) Config.get(Config.Key.SU_MNT_NS)]);
+                break;
+        }
+    }
+
     private void setSummary() {
-        updateChannel.setSummary(getResources()
-                .getStringArray(R.array.update_channel)[Data.updateChannel]);
-        rootConfig.setSummary(getResources()
-                .getStringArray(R.array.su_access)[rootState]);
-        autoRes.setSummary(getResources()
-                .getStringArray(R.array.auto_response)[Data.suResponseType]);
-        suNotification.setSummary(getResources()
-                .getStringArray(R.array.su_notification)[Data.suNotificationType]);
-        requestTimeout.setSummary(
-                getString(R.string.request_timeout_summary,
-                        app.prefs.getString(Const.Key.SU_REQUEST_TIMEOUT, "10")));
-        multiuserConfig.setSummary(getResources()
-                .getStringArray(R.array.multiuser_summary)[Data.multiuserState]);
-        nsConfig.setSummary(getResources()
-                .getStringArray(R.array.namespace_summary)[namespaceState]);
+        setSummary(Config.Key.UPDATE_CHANNEL);
+        setSummary(Config.Key.ROOT_ACCESS);
+        setSummary(Config.Key.SU_AUTO_RESPONSE);
+        setSummary(Config.Key.SU_NOTIFICATION);
+        setSummary(Config.Key.SU_REQUEST_TIMEOUT);
+        setSummary(Config.Key.SU_MULTIUSER_MODE);
+        setSummary(Config.Key.SU_MNT_NS);
     }
 
     @Override
     public void onPublish(int topic, Object[] result) {
-        setLocalePreference((ListPreference) findPreference(Const.Key.LOCALE));
+        setLocalePreference((ListPreference) findPreference(Config.Key.LOCALE));
     }
 
     @Override
     public int[] getSubscribedTopics() {
         return new int[] {Topic.LOCALE_FETCH_DONE};
-    }
-
-    @Override
-    protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
-        return new PreferenceGroupAdapter(preferenceScreen) {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onBindViewHolder(PreferenceViewHolder holder, int position) {
-                super.onBindViewHolder(holder, position);
-                Preference preference = getItem(position);
-                if (preference instanceof PreferenceCategory)
-                    setZeroPaddingToLayoutChildren(holder.itemView);
-                else {
-                    View iconFrame = holder.itemView.findViewById(R.id.icon_frame);
-                    if (iconFrame != null) {
-                        iconFrame.setVisibility(preference.getIcon() == null ? View.GONE : View.VISIBLE);
-                    }
-                }
-            }
-        };
-    }
-
-    private void setZeroPaddingToLayoutChildren(View view) {
-        if (!(view instanceof ViewGroup))
-            return;
-        ViewGroup viewGroup = (ViewGroup) view;
-        int childCount = viewGroup.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            setZeroPaddingToLayoutChildren(viewGroup.getChildAt(i));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-                viewGroup.setPaddingRelative(0, viewGroup.getPaddingTop(), viewGroup.getPaddingEnd(), viewGroup.getPaddingBottom());
-            else
-                viewGroup.setPadding(0, viewGroup.getPaddingTop(), viewGroup.getPaddingRight(), viewGroup.getPaddingBottom());
-        }
     }
 }

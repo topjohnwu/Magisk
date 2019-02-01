@@ -23,11 +23,11 @@
     <string name="advanced_settings_title">Advancerade inställningar</string>
     <string name="keep_force_encryption">Fortsätt tvinga kryptering</string>
     <string name="keep_dm_verity">Behåll AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Installerad: %1$s</string>
-    <string name="install_magisk_title">Senaste: %1$s</string>
+    <string name="current_installed">Installerad: %1$s</string>
+    <string name="latest_version">Senaste: %1$s</string>
     <string name="uninstall">Avinstallera</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
-    <string name="update">Uppdatera %1$s</string>
+    <string name="update">Uppdatera</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Ingen information tillhandahållen)</string>
@@ -109,7 +109,7 @@
     <string name="auto_response">Automatiskt svar</string>
     <string name="request_timeout">Förfrågnings-timeout</string>
     <string name="superuser_notification">Superuser-avisering</string>
-    <string name="request_timeout_summary">%1$s sekunder</string>
+    <string name="request_timeout_summary">%1$d sekunder</string>
     <string name="settings_su_reauth_title">Återautentisera efter uppdatering</string>
     <string name="settings_su_reauth_summary">Återautentisera superuser-behörigheter efter en applikationsuppdatering</string>
 
@@ -159,8 +159,7 @@
     <string name="none">Inga</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Mål-UID:\u0020</string>
-    <string name="command">Kommando:\u0020</string>
+    <string name="target_uid">Mål-UID: %1$d</string>
+    <string name="command">Kommando: %1$s</string>
 
 </resources>

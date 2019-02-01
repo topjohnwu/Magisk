@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'yi koru</string>
-    <string name="current_magisk_title">Yüklü Sürüm: %1$s</string>
-    <string name="install_magisk_title">Yeni Sürüm: %1$s</string>
+    <string name="current_installed">Yüklü: %1$s</string>
+    <string name="latest_version">Yeni: %1$s</string>
     <string name="uninstall">Kaldır</string>
     <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verileriniz şifrelenecek</string>
-    <string name="update">Güncelle %1$s</string>
+    <string name="update">Güncelle</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
@@ -170,7 +170,7 @@
     <string name="auto_response">Otomatik Yanıt</string>
     <string name="request_timeout">İstek Zaman Aşımı</string>
     <string name="superuser_notification">Yetkili Kullanıcı Bildirimi</string>
-    <string name="request_timeout_summary">%1$s saniye</string>
+    <string name="request_timeout_summary">%1$d saniye</string>
     <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrula</string>
     <string name="settings_su_reauth_summary">Uygulama yükseltmeleri sonrasında yetkili kullanıcı izinlerini yeniden doğrula</string>
     <string name="settings_su_fingerprint_title">Parmak İzi Kimlik Doğrulamayı Etkinleştir</string>
@@ -226,8 +226,7 @@
     <string name="auth_fail">Kimlik Doğrulama Başarısız</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Hedef UID:\u0020</string>
-    <string name="command">Komut:\u0020</string>
+    <string name="target_uid">Hedef UID: %1$d</string>
+    <string name="command">Komut: %1$s</string>
 
 </resources>

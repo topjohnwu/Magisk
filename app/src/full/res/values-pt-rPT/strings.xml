@@ -23,11 +23,11 @@
     <string name="advanced_settings_title">Definições avançadas</string>
     <string name="keep_force_encryption">Manter encriptação forçada</string>
     <string name="keep_dm_verity">Manter AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Versão instalada: %1$s</string>
-    <string name="install_magisk_title">Última versão: %1$s</string>
+    <string name="current_installed">Instalada: %1$s</string>
+    <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstalar</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-    <string name="update">Atualizar %1$s</string>
+    <string name="update">Atualizar</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
@@ -124,7 +124,7 @@
     <string name="auto_response">Resposta Automática</string>
     <string name="request_timeout">Tempo limite de solicitação</string>
     <string name="superuser_notification">Notificação de root</string>
-    <string name="request_timeout_summary">%1$s segundos</string>
+    <string name="request_timeout_summary">%1$d segundos</string>
     <string name="settings_su_reauth_title">Autenticar novamente após atualizar</string>
     <string name="settings_su_reauth_summary">Autenticar novamente permissões de root após atualizar aplicações</string>
 
@@ -175,8 +175,7 @@
     <string name="none">Nenhum</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Alvo UID:\u0020</string>
-    <string name="command">Comando:\u0020</string>
+    <string name="target_uid">Alvo UID: %1$d</string>
+    <string name="command">Comando: %1$s</string>
 
 </resources>

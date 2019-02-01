@@ -278,6 +278,9 @@ static void set_hide_config() {
 }
 
 int launch_magiskhide(int client) {
+	if (SDK_INT < 19)
+		goto error;
+
 	if (hide_enabled)
 		return HIDE_IS_ENABLED;
 

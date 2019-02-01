@@ -206,45 +206,51 @@ int deleteprop(const char *name, bool persist) {
 	return __system_property_del(name) && !(persist && strncmp(name, "persist.", 8) == 0);
 }
 
-int load_prop_file(const char *filename, bool trigger) {
-	if (init_resetprop()) return -1;
-	LOGD("resetprop: Load prop file [%s]\n", filename);
+int parse_prop_file(const char *filename, const function<bool (const char *, const char *)> &cb) {
+	LOGD("resetprop: Parse prop file [%s]\n", filename);
 	FILE *fp = xfopen(filename, "re");
 	if (fp == nullptr) {
 		LOGE("Cannot open [%s]\n", filename);
 		return 1;
 	}
-	char *line = nullptr, *pch;
+	char *line = nullptr, *eql;
 	size_t len;
 	ssize_t read;
-	int comment = 0, i;
+	int i;
 	while ((read = getline(&line, &len, fp)) != -1) {
 		// Remove the trailing newline
 		if (line[read - 1] == '\n') {
-			line[read - 1] = '\0';
-			--read;
+			line[--read] = '\0';
 		}
-		comment = 0;
+		bool comment = false;
 		for (i = 0; i < read; ++i) {
 			// Ignore starting spaces
 			if (line[i] == ' ') continue;
-			else {
-				// A line starting with # is ignored
-				if (line[i] == '#') comment = 1;
-				break;
-			}
+			// A line starting with # is ignored
+			if (line[i] == '#') comment = true;
+			break;
 		}
 		if (comment) continue;
-		pch = strchr(line, '=');
+		eql = strchr(line, '=');
 		// Ignore invalid formats
-		if ( ((pch == nullptr) || (i >= (pch - line))) || (pch >= line + read - 1) ) continue;
+		if ( ((eql == nullptr) || (i >= (eql - line))) || (eql >= line + read - 1) )
+			continue;
 		// Separate the string
-		*pch = '\0';
-		setprop(line + i, pch + 1, trigger);
+		*eql = '\0';
+		if (!cb(line + i, eql + 1))
+			break;
 	}
 	free(line);
 	fclose(fp);
 	return 0;
+}
+
+int load_prop_file(const char *filename, bool trigger) {
+	if (init_resetprop()) return -1;
+	return parse_prop_file(filename, [=](auto key, auto val) -> bool {
+		setprop(key, val, trigger);
+		return true;
+	});
 }
 
 int resetprop_main(int argc, char *argv[]) {

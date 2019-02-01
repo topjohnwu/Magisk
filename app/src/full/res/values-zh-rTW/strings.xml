@@ -21,8 +21,8 @@
     <string name="advanced_settings_title">高級設置</string>
     <string name="keep_force_encryption">保持強制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">已安裝版本：%1$s</string>
-    <string name="install_magisk_title">最新的版本：%1$s</string>
+    <string name="current_installed">已安裝：%1$s</string>
+    <string name="latest_version">最新：%1$s</string>
     <string name="uninstall">解除安裝</string>
 
     <!--Module Fragment-->
@@ -95,7 +95,7 @@
     <string name="auto_response">自動回應</string>
     <string name="request_timeout">請求逾時</string>
     <string name="superuser_notification">超級用戶通知</string>
-    <string name="request_timeout_summary">%1$s 秒</string>
+    <string name="request_timeout_summary">%1$d 秒</string>
 
     <!--Superuser-->
     <string name="su_request_title">超級用戶請求</string>
@@ -126,9 +126,8 @@
     <string name="none">無</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">目標 UID:\u0020</string>
-    <string name="command">"指令: "</string>
+    <string name="target_uid">目標 UID: %1$d</string>
+    <string name="command">指令: %1$s</string>
     <string name="close">關閉</string>
     <string name="internal_storage">Zip 已被儲存到:\n[內部儲存空間]%1$s</string>
     <string name="process_error">處理失敗</string>
@@ -158,7 +157,7 @@
     <string name="settings_ns_global">全域 Namespace</string>
     <string name="settings_ns_isolate">獨立 Namespace</string>
     <string name="settings_ns_requester">繼承 Namespace</string>
-    <string name="update">更新 %1$s</string>
+    <string name="update">更新</string>
     <string name="update_channel">Magisk 更新</string>
     <string name="system_default">(系統預設)</string>
     <string name="language">語言</string>

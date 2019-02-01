@@ -5,12 +5,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.Toast;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.ClassMap;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.services.UpdateCheckService;
+import com.topjohnwu.magisk.components.UpdateCheckService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +22,7 @@ import androidx.work.WorkManager;
 public class AppUtils {
 
     public static void scheduleUpdateCheck() {
-        if (App.self.prefs.getBoolean(Const.Key.CHECK_UPDATES, true)) {
+        if (Config.get(Config.Key.CHECK_UPDATES)) {
             Constraints constraints = new Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build();
