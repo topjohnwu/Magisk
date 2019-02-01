@@ -2,7 +2,7 @@ package a;
 
 import android.content.Context;
 
-import com.topjohnwu.magisk.services.DelegateWorker;
+import com.topjohnwu.magisk.components.DelegateWorker;
 
 import java.lang.reflect.ParameterizedType;
 
@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-public class w<T extends DelegateWorker> extends Worker {
+public abstract class w<T extends DelegateWorker> extends Worker {
 
     /* Wrapper class to workaround Proguard -keep class * extends Worker */
 
@@ -22,6 +22,7 @@ public class w<T extends DelegateWorker> extends Worker {
         try {
             base = ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
                     .getActualTypeArguments()[0]).newInstance();
+            base.setActualWorker(this);
         } catch (Exception ignored) {}
     }
 
@@ -31,5 +32,11 @@ public class w<T extends DelegateWorker> extends Worker {
         if (base == null)
             return Result.failure();
         return base.doWork();
+    }
+
+    @Override
+    public void onStopped() {
+        if (base != null)
+            base.onStopped();
     }
 }

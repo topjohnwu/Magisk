@@ -32,14 +32,14 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	misc/applets.cpp \
-	misc/img.cpp \
-	daemon/magisk.cpp \
-	daemon/daemon.cpp \
-	daemon/log_daemon.cpp \
-	daemon/bootstages.cpp \
-	daemon/socket.cpp \
-	daemon/db.cpp \
+	core/applets.cpp \
+	core/img.cpp \
+	core/magisk.cpp \
+	core/daemon.cpp \
+	core/log_daemon.cpp \
+	core/bootstages.cpp \
+	core/socket.cpp \
+	core/db.cpp \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \
@@ -73,7 +73,7 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	misc/init.cpp \
+	core/init.cpp \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
@@ -111,19 +111,6 @@ LOCAL_SRC_FILES := \
 	magiskboot/pattern.cpp
 
 LOCAL_LDLIBS := -lz
-include $(BUILD_EXECUTABLE)
-
-endif
-
-ifdef B_BXZ
-
-# b64xz
-include $(CLEAR_VARS)
-LOCAL_MODULE := b64xz
-LOCAL_STATIC_LIBRARIES := libxz
-LOCAL_C_INCLUDES := $(EXT_PATH)/include
-LOCAL_SRC_FILES := misc/b64xz.c
-LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif

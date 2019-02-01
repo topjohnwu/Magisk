@@ -22,12 +22,12 @@
     <string name="advanced_settings_title">Pengaturan Lanjutan</string>
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Versi yang Terpasang: %1$s</string>
-    <string name="install_magisk_title">Versi Terbaru: %1$s</string>
+    <string name="current_installed">Versi yang Terpasang: %1$s</string>
+    <string name="latest_version">Versi Terbaru: %1$s</string>
     <string name="uninstall">Copot</string>
     <string name="uninstall_magisk_title">Copot Magisk</string>
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus. Root akan dihapus, dan berpotensi mengenkripsi data Anda jika belum.</string>
-    <string name="update">Perbarui %1$s</string>
+    <string name="update">Perbarui</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Tidak ada info tersedia)</string>
@@ -74,8 +74,8 @@
     <string name="progress_channel">Notifikasi Kemajuan</string>
     <string name="download_complete">Unduhan selesai</string>
     <string name="download_file_error">Kesalahan mengunduh file</string>
-    <string name="magisk_update_title">Pembaruan Magisk Baru Tersedia!</string>
-    <string name="manager_update_title">Pembaruan Magisk Manager Baru Tersedia!</string>
+    <string name="magisk_update_title">Pembaruan Magisk Tersedia!</string>
+    <string name="manager_update_title">Pembaruan Magisk Manager Tersedia!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Tutup</string>
@@ -125,6 +125,7 @@
     <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
     <string name="downloading_toast">Mengunduh %1$s</string>
     <string name="no_rw_storage">Fitur ini tidak akan bekerja tanpa izin untuk menulis ke penyimpanan eksternal.</string>
+    <string name="dl_one_module">Unduh satu modul pada suatu waktu.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Umum</string>
@@ -169,7 +170,7 @@
     <string name="auto_response">Tanggapan Otomatis</string>
     <string name="request_timeout">Batas Waktu Permintaan</string>
     <string name="superuser_notification">Notifikasi Superuser</string>
-    <string name="request_timeout_summary">%1$s detik</string>
+    <string name="request_timeout_summary">%1$d detik</string>
     <string name="settings_su_reauth_title">Otentikasi ulang setelah pembaruan</string>
     <string name="settings_su_reauth_summary">Otentikasi ulang izin superuser setelah pembaruan sebuah aplikasi</string>
     <string name="settings_su_fingerprint_title">Aktifkan Otentikasi Sidik Jari</string>
@@ -225,7 +226,6 @@
     <string name="auth_fail">Otentikasi Gagal</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">UID target:\u0020</string>
-    <string name="command">Perintah:\u0020</string>
+    <string name="target_uid">UID target: %1$d</string>
+    <string name="command">Perintah: %1$s</string>
 </resources>

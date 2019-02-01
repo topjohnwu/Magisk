@@ -21,8 +21,8 @@
     <string name="advanced_settings_title">Pokročilá Nastavení</string>
     <string name="keep_force_encryption">Udržet "force encryption"</string>
     <string name="keep_dm_verity">Udržet AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Nainstalovaná verze: %1$s</string>
-    <string name="install_magisk_title">Poslední verze: %1$s</string>
+    <string name="current_installed">Nainstalovaná: %1$s</string>
+    <string name="latest_version">Poslední: %1$s</string>
     <string name="uninstall">Odinstalovat</string>
     <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
 
@@ -102,7 +102,7 @@
     <string name="auto_response">Automatická Reakce</string>
     <string name="request_timeout">Časový limit Požadavku</string>
     <string name="superuser_notification">Oznámení Superuser</string>
-    <string name="request_timeout_summary">%1$s sekund</string>
+    <string name="request_timeout_summary">%1$d sekund</string>
 
     <!--Superuser-->
     <string name="su_request_title">Požadavek Superuser</string>
@@ -133,8 +133,7 @@
     <string name="none">Žádné</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Cílové UID:\u0020</string>
-    <string name="command">Příkaz:\u0020</string>
+    <string name="target_uid">Cílové UID: %1$d</string>
+    <string name="command">Příkaz: %1$s</string>
 
 </resources>

@@ -19,7 +19,7 @@ public class ProgressInputStream extends FilterInputStream {
     @Override
     public int read() throws IOException {
         int b = super.read();
-        if (b >= 0) {
+        if (totalBytes > 0 && b >= 0) {
             bytesDownloaded++;
             Networking.mainHandler.post(() -> progress.onProgress(bytesDownloaded, totalBytes));
         }
@@ -34,7 +34,7 @@ public class ProgressInputStream extends FilterInputStream {
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int sz = super.read(b, off, len);
-        if (sz > 0) {
+        if (totalBytes > 0 && sz > 0) {
             bytesDownloaded += sz;
             Networking.mainHandler.post(() -> progress.onProgress(bytesDownloaded, totalBytes));
         }

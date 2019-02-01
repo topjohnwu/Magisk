@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">安装选项</string>
     <string name="keep_force_encryption">保持强制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">已安装版本：%1$s</string>
-    <string name="install_magisk_title">最新的版本：%1$s</string>
+    <string name="current_installed">已安装：%1$s</string>
+    <string name="latest_version">最新：%1$s</string>
     <string name="uninstall">卸载</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">所有模块将停用或删除，Root 会被移除。未加密的设备重启时可能会被进行加密。</string>
-    <string name="update">更新 %1$s</string>
+    <string name="update">更新</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
@@ -126,6 +126,7 @@
     <string name="setup_msg">运行环境安装中…</string>
     <string name="downloading_toast">正在下载 %1$s</string>
     <string name="no_rw_storage">未授予写入内置存储权限，此功能无法正常工作。</string>
+    <string name="dl_one_module">一次只能下载一个模块</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -170,7 +171,7 @@
     <string name="auto_response">自动响应</string>
     <string name="request_timeout">请求超时</string>
     <string name="superuser_notification">超级用户通知</string>
-    <string name="request_timeout_summary">%1$s 秒</string>
+    <string name="request_timeout_summary">%1$d 秒</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
     <string name="settings_su_fingerprint_title">启用指纹验证</string>
@@ -226,8 +227,7 @@
     <string name="auth_fail">验证失败</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">目标 UID:\u0020</string>
-    <string name="command">命令:\u0020</string>
+    <string name="target_uid">目标 UID: %1$d</string>
+    <string name="command">命令: %1$s</string>
 
 </resources>

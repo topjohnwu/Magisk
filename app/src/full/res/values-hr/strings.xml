@@ -24,12 +24,12 @@
     <string name="advanced_settings_title">Napredne postavke</string>
     <string name="keep_force_encryption">Zadrži prisilno šifirannje</string>
     <string name="keep_dm_verity">Zadrži AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Instalirana inačica: %1$s</string>
-    <string name="install_magisk_title">Najnovija inačica: %1$s</string>
+    <string name="current_installed">Instalirana: %1$s</string>
+    <string name="latest_version">Najnovija: %1$s</string>
     <string name="uninstall">Deinstaliraj</string>
     <string name="uninstall_magisk_title">Deinstaliraj Magisk</string>
     <string name="uninstall_magisk_msg">Svi moduli će biti onemogućeni/uklonjeni. Root će biti uklonjen i potencijalno šifrirati Vaše podatke, ukoliko Vaši podaci trenutačno nisu šifrirani</string>
-    <string name="update">Ažuriraj %1$s</string>
+    <string name="update">Ažuriraj</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nema podataka)</string>
@@ -137,7 +137,7 @@
     <string name="auto_response">Automatski odgovor</string>
     <string name="request_timeout">Vremensko ograničenje zahtjeva</string>
     <string name="superuser_notification">Superuser obavijest</string>
-    <string name="request_timeout_summary">%1$s sekundi</string>
+    <string name="request_timeout_summary">%1$d sekundi</string>
     <string name="settings_su_reauth_title">Ponovno provjerite autentičnost nakon ažuriranja</string>
     <string name="settings_su_reauth_summary">Ponovno provjerite autentičnost Superuser dopuštenja nakon ažuriranja aplikacije</string>
 
@@ -187,8 +187,7 @@
     <string name="none">Nijedan</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Ciljani UID:\u0020</string>
-    <string name="command">Naredba:\u0020</string>
+    <string name="target_uid">Ciljani UID: %1$d</string>
+    <string name="command">Naredba: %1$s</string>
 
 </resources>

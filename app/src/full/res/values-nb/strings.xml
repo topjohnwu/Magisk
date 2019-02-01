@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Avanserte innstillinger</string>
     <string name="keep_force_encryption">Preserver tvunget kryptering</string>
     <string name="keep_dm_verity">Preserver AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Installert versjon: %1$s</string>
-    <string name="install_magisk_title">Nyeste versjon: %1$s</string>
+    <string name="current_installed">Installert: %1$s</string>
+    <string name="latest_version">Nyeste: %1$s</string>
     <string name="uninstall">Avinstaller</string>
     <string name="uninstall_magisk_title">Avinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Alle moduler vil bli avskrudd/fjernet. Root vil bli fjernet, og dataene dine blir kanskje kryptert dersom de ikke allerede er det.</string>
-    <string name="update">Oppdater %1$s</string>
+    <string name="update">Oppdater</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Ingen info er oppgitt)</string>
@@ -170,7 +170,7 @@
     <string name="auto_response">Automatisk tilbakemelding</string>
     <string name="request_timeout">Tidsgrense for tilbakemelding Timeout</string>
     <string name="superuser_notification">Superbruker-notifikasjon</string>
-    <string name="request_timeout_summary">%1$s sekunder</string>
+    <string name="request_timeout_summary">%1$d sekunder</string>
     <string name="settings_su_reauth_title">Autentiser på nytt etter oppdateringer after upgrade</string>
     <string name="settings_su_reauth_summary">Autentiser superbruker-tillatelser på nytt etter at en app har blitt oppdatert</string>
     <string name="settings_su_fingerprint_title">Skru på fingeravtrykksautentisering</string>
@@ -226,8 +226,7 @@
     <string name="auth_fail">Autentisering mislyktes</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Mål-UID:\u0020</string>
-    <string name="command">Kommando:\u0020</string>
+    <string name="target_uid">Mål-UID: %1$d</string>
+    <string name="command">Kommando: %1$s</string>
 
 </resources>

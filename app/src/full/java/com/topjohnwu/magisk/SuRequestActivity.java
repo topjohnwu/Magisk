@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
@@ -15,10 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
-import com.topjohnwu.core.container.Policy;
 import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.SuConnector;
 
@@ -43,6 +42,7 @@ public class SuRequestActivity extends BaseActivity {
     private Policy policy;
     private CountDownTimer timer;
     private FingerprintHelper fingerprintHelper;
+    private SharedPreferences timeoutPrefs;
 
     @Override
     public int getDarkTheme() {
@@ -74,6 +74,7 @@ public class SuRequestActivity extends BaseActivity {
 
         PackageManager pm = getPackageManager();
         app.mDB.clearOutdated();
+        timeoutPrefs = getSharedPreferences("su_timeout", 0);
 
         // Get policy
         Intent intent = getIntent();
@@ -103,14 +104,14 @@ public class SuRequestActivity extends BaseActivity {
             return;
         }
 
-        switch (Data.suResponseType) {
-            case Const.Value.SU_AUTO_DENY:
+        switch ((int) Config.get(Config.Key.SU_AUTO_RESPONSE)) {
+            case Config.Value.SU_AUTO_DENY:
                 handleAction(Policy.DENY, 0);
                 return;
-            case Const.Value.SU_AUTO_ALLOW:
+            case Config.Value.SU_AUTO_ALLOW:
                 handleAction(Policy.ALLOW, 0);
                 return;
-            case Const.Value.SU_PROMPT:
+            case Config.Value.SU_PROMPT:
             default:
         }
 
@@ -133,8 +134,9 @@ public class SuRequestActivity extends BaseActivity {
                 R.array.allow_timeout, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeout.setAdapter(adapter);
+        timeout.setSelection(timeoutPrefs.getInt(policy.packageName, 0));
 
-        timer = new CountDownTimer(Data.suRequestTimeout * 1000, 1000) {
+        timer = new CountDownTimer((int) Config.get(Config.Key.SU_REQUEST_TIMEOUT) * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 deny_btn.setText(getString(R.string.deny_with_str, "(" + millisUntilFinished / 1000 + ")"));
@@ -146,7 +148,7 @@ public class SuRequestActivity extends BaseActivity {
             }
         };
 
-        boolean useFP = FingerprintHelper.useFingerPrint();
+        boolean useFP = FingerprintHelper.useFingerprint();
 
         if (useFP) {
             try {
@@ -210,7 +212,9 @@ public class SuRequestActivity extends BaseActivity {
     }
 
     private void handleAction(int action) {
-        handleAction(action, Const.Value.timeoutList[timeout.getSelectedItemPosition()]);
+        int pos = timeout.getSelectedItemPosition();
+        timeoutPrefs.edit().putInt(policy.packageName, pos).apply();
+        handleAction(action, Config.Value.TIMEOUT_LIST[pos]);
     }
 
     private void handleAction(int action, int time) {

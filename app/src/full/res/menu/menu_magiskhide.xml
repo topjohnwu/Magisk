@@ -7,4 +7,10 @@
         android:title=""
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/show_system"
+        android:title="@string/show_system_app"
+        android:checkable="true"/>
+
 </menu>

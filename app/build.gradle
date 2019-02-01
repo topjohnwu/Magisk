@@ -6,7 +6,7 @@ configProps.load(new FileInputStream(configPath))
 
 android {
     defaultConfig {
-        applicationId "com.topjohnwu.magisk"
+        applicationId 'com.topjohnwu.magisk'
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -33,7 +33,7 @@ android {
         }
     }
 
-    flavorDimensions "mode"
+    flavorDimensions 'mode'
 
     productFlavors {
         full {
@@ -47,7 +47,7 @@ android {
         }
         stub {
             versionCode 1
-            versionName "stub"
+            versionName 'stub'
         }
     }
 
@@ -59,26 +59,23 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':net')
-    fullImplementation project(':core')
+    fullImplementation project(':app-core')
     fullImplementation 'ru.noties:markwon:2.0.1'
     fullImplementation 'com.caverock:androidsvg-aar:1.3'
 
     def androidXVersion = "1.0.0"
     implementation 'androidx.core:core:1.0.1'
+    fullImplementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     fullImplementation 'androidx.appcompat:appcompat:1.0.2'
     fullImplementation "androidx.preference:preference:${androidXVersion}"
     fullImplementation "androidx.recyclerview:recyclerview:${androidXVersion}"
     fullImplementation "androidx.cardview:cardview:${androidXVersion}"
     fullImplementation "com.google.android.material:material:${androidXVersion}"
-    fullImplementation 'android.arch.work:work-runtime:1.0.0-beta01'
-    fullImplementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    fullImplementation 'android.arch.work:work-runtime:1.0.0-beta03'
     fullImplementation 'androidx.room:room-runtime:2.0.0'
+    fullImplementation 'androidx.transition:transition:1.0.1'
 
     def butterKnifeVersion = '10.0.0'
-    if (properties.containsKey('android.injected.invoked.from.ide')) {
-        fullImplementation "com.jakewharton:butterknife-reflect:${butterKnifeVersion}"
-    } else {
-        fullImplementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
-        fullAnnotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
-    }
+    fullImplementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
+    fullAnnotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 }

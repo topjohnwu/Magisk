@@ -15,6 +15,8 @@
 #include "utils.h"
 #include "selinux.h"
 
+using namespace std;
+
 const char **excl_list = nullptr;
 
 static int is_excl(const char *name) {
@@ -307,7 +309,7 @@ void clone_attr(const char *source, const char *target) {
 	setattr(target, &a);
 }
 
-void fclone_attr(const int sourcefd, const int targetfd) {
+void fclone_attr(int sourcefd, int targetfd) {
 	struct file_attr a;
 	fgetattr(sourcefd, &a);
 	fsetattr(targetfd, &a);
@@ -388,24 +390,25 @@ void write_zero(int fd, size_t size) {
 	lseek(fd, pos + size, SEEK_SET);
 }
 
-int file_to_vector(const char *filename, Vector<CharArray> &arr) {
+vector<string> file_to_vector(const char *filename) {
+	auto arr = vector<string>();
 	if (access(filename, R_OK) != 0)
-		return 1;
+		return arr;
 	char *line = nullptr;
 	size_t len = 0;
 	ssize_t read;
 
 	FILE *fp = xfopen(filename, "re");
 	if (fp == nullptr)
-		return 1;
+		return arr;
 
 	while ((read = getline(&line, &len, fp)) != -1) {
 		// Remove end newline
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
-		arr.push_back(line);
+		arr.emplace_back(line);
 	}
 	fclose(fp);
 	free(line);
-	return 0;
+	return arr;
 }

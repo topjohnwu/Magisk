@@ -13,22 +13,23 @@
     <string name="checking_for_updates">Checking for updates…</string>
     <string name="magisk_update_available">Magisk v%1$s is available!</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
-    <string name="safetyNet_check_text">Tap to start SafetyNet check.</string>
+    <string name="safetyNet_check_text">Tap to start SafetyNet check</string>
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
     <string name="safetyNet_check_success">SafetyNet Check Success</string>
     <string name="safetyNet_api_error">SafetyNet API Error</string>
     <string name="safetyNet_res_invalid">The response is invalid.</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk is up to date</string>
+    <string name="manager_up_to_date">Magisk Manager is up to date</string>
     <string name="advanced_settings_title">Advanced Settings</string>
     <string name="keep_force_encryption">Preserve force encryption</string>
     <string name="keep_dm_verity">Preserve AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Installed Version: %1$s</string>
-    <string name="install_magisk_title">Latest Version: %1$s</string>
+    <string name="current_installed">Installed: %1$s</string>
+    <string name="latest_version">Latest: %1$s</string>
     <string name="uninstall">Uninstall</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and your data potentially encrypted if not already.</string>
-    <string name="update">Update %1$s</string>
+    <string name="update">Update</string>
+    <string name="core_only_enabled">(Core only mode enabled)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
@@ -171,7 +172,7 @@
     <string name="auto_response">Automatic Response</string>
     <string name="request_timeout">Request Timeout</string>
     <string name="superuser_notification">Superuser Notification</string>
-    <string name="request_timeout_summary">%1$s seconds</string>
+    <string name="request_timeout_summary">%1$d seconds</string>
     <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
     <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
     <string name="settings_su_fingerprint_title">Enable Fingerprint Authentication</string>
@@ -227,8 +228,11 @@
     <string name="auth_fail">Authentication Failed</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Target UID:\u0020</string>
-    <string name="command">Command:\u0020</string>
+    <string name="pid" translatable="false">PID: %1$d</string>
+    <string name="target_uid">Target UID: %1$d</string>
+    <string name="command">Command: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Show system apps</string>
 
 </resources>

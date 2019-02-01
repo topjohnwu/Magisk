@@ -21,8 +21,8 @@
     <string name="advanced_settings_title">고급 설정</string>
     <string name="keep_force_encryption">강제 암호화 유지</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity 유지</string>
-    <string name="current_magisk_title">설치된버전: %1$s</string>
-    <string name="install_magisk_title">최신버전: %1$s</string>
+    <string name="current_installed">설치된: %1$s</string>
+    <string name="latest_version">최신: %1$s</string>
     <string name="uninstall">제거</string>
     <string name="uninstall_magisk_title">Magisk 제거</string>
 
@@ -102,7 +102,7 @@
     <string name="auto_response">자동 응답</string>
     <string name="request_timeout">요청 시간 제한</string>
     <string name="superuser_notification">슈퍼유저 알림</string>
-    <string name="request_timeout_summary">%1$s초</string>
+    <string name="request_timeout_summary">%1$d초</string>
 
     <!--Superuser-->
     <string name="su_request_title">슈퍼유저 요청</string>
@@ -133,9 +133,8 @@
     <string name="none">없음</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">대상 UID:\u0020</string>
-    <string name="command">명령:\u0020</string>
+    <string name="target_uid">대상 UID: %1$d</string>
+    <string name="command">명령: %1$s</string>
     <string name="download">다운로드</string>
 
 </resources>

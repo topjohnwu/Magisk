@@ -86,7 +86,7 @@ ssize_t xread(int fd, void *buf, size_t count) {
 ssize_t xxread(int fd, void *buf, size_t count) {
 	int ret = read(fd, buf, count);
 	if (count != ret) {
-		PLOGE("read");
+		PLOGE("read (%d != %d)", count, ret);
 	}
 	return ret;
 }
