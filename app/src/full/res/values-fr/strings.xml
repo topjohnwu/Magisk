@@ -29,6 +29,7 @@
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés. Les permissions de super‐utilisateur seront perdues et vos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
     <string name="update">Mise à jour</string>
+    <string name="core_only_enabled">(Mode noyau uniquement activé)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(aucune information transmise)</string>
