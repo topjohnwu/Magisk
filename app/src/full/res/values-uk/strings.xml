@@ -13,13 +13,13 @@
     <string name="checking_for_updates">Перевірка оновлень…</string>
     <string name="magisk_update_available">Доступно Magisk v%1$s!</string>
     <string name="invalid_update_channel">Неправильний канал оновлень</string>
-    <string name="safetyNet_check_text">Перевірити статус SafetyNet.</string>
+    <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
     <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
     <string name="safetyNet_check_success">Результат перевірки SafetyNet</string>
     <string name="safetyNet_api_error">Помилка в API SafetyNet</string>
     <string name="safetyNet_res_invalid">Невірна відповідь.</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk останньої версії</string>
+    <string name="manager_up_to_date">Magisk Manager останньої версії</string>
     <string name="advanced_settings_title">Розширені налаштування</string>
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
     <string name="keep_dm_verity">Залишити AVB 2.0/dm-verity</string>
@@ -29,6 +29,7 @@
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
     <string name="update">Оновити</string>
+    <string name="core_only_enabled">(увімкнено режим ядра)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(немає наданої інформації)</string>
@@ -227,7 +228,11 @@
     <string name="auth_fail">Помилка автентифікації</string>
 
     <!--Superuser logs-->
+    <string name="pid" translatable="false">PID: %1$d</string>
     <string name="target_uid">Цільовий UID: %1$d</string>
     <string name="command">Команда: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Показати системні програми</string>
 
 </resources>
