@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
-import com.topjohnwu.magisk.App;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -64,7 +64,7 @@ public class Topic {
             topicList[topic].published = true;
         }
         for (Subscriber sub : topicList[topic].subscribers) {
-            App.mainHandler.post(() -> sub.onPublish(topic, results));
+            UiThreadHandler.run(() -> sub.onPublish(topic, results));
         }
     }
 

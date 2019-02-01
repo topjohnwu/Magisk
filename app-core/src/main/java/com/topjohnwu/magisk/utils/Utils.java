@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 import com.topjohnwu.superuser.io.SuFile;
 
 import java.util.Locale;
@@ -28,11 +29,11 @@ import java.util.Map;
 public class Utils {
 
     public static void toast(CharSequence msg, int duration) {
-        App.mainHandler.post(() -> Toast.makeText(App.self, msg, duration).show());
+        UiThreadHandler.run(() -> Toast.makeText(App.self, msg, duration).show());
     }
 
     public static void toast(int resId, int duration) {
-        App.mainHandler.post(() -> Toast.makeText(App.self, resId, duration).show());
+        UiThreadHandler.run(() -> Toast.makeText(App.self, resId, duration).show());
     }
 
     public static String dlString(String url) {

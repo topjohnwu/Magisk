@@ -5,10 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.container.Repo;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -127,7 +127,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     private void notifyAdapter() {
         if (adapterCb != null) {
-            App.mainHandler.post(adapterCb);
+            UiThreadHandler.run(adapterCb);
         }
     }
 }

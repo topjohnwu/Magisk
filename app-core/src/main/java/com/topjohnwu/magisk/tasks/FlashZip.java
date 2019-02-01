@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -76,7 +77,7 @@ public abstract class FlashZip {
             } catch (IOException ignored) {}
             Shell.su("cd /", "rm -rf " + tmpFile.getParent() + " " + Const.TMP_FOLDER_PATH).submit();
             boolean finalSuccess = success;
-            App.mainHandler.post(() -> onResult(finalSuccess));
+            UiThreadHandler.run(() -> onResult(finalSuccess));
         });
     }
 

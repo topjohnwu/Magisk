@@ -3,9 +3,6 @@ package com.topjohnwu.magisk;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 
 import com.topjohnwu.magisk.core.BuildConfig;
@@ -20,7 +17,6 @@ import com.topjohnwu.superuser.Shell;
 public class App extends ContainerApp {
 
     public static App self;
-    public static Handler mainHandler = new Handler(Looper.getMainLooper());
     public boolean init = false;
 
     // Global resources

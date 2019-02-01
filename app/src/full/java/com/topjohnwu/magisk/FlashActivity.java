@@ -15,6 +15,7 @@ import com.topjohnwu.magisk.tasks.MagiskInstaller;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -180,7 +181,7 @@ public class FlashActivity extends BaseActivity {
         @Override
         public String set(int i, String s) {
             String ret = super.set(i, s);
-            App.mainHandler.post(this::updateUI);
+            UiThreadHandler.run(this::updateUI);
             return ret;
         }
     }
@@ -212,7 +213,7 @@ public class FlashActivity extends BaseActivity {
         @Override
         protected void onResult(boolean success) {
             if (success)
-                App.mainHandler.postDelayed(Shell.su("pm uninstall " + getPackageName())::exec, 3000);
+                UiThreadHandler.handler.postDelayed(Shell.su("pm uninstall " + getPackageName())::exec, 3000);
             else
                 super.onResult(false);
         }
