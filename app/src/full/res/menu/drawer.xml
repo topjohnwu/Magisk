@@ -54,16 +54,4 @@
 
     </group>
 
-    <group
-        android:checkableBehavior="single"
-        android:id="@+id/forth_group">
-
-        <item
-            android:checkable="false"
-            android:id="@+id/app_about"
-            android:icon="@drawable/ic_info_outline"
-            android:title="@string/about"/>
-
-    </group>
-
 </menu>

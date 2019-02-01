@@ -153,16 +153,12 @@ public class MainActivity extends BaseActivity
                 case "settings":
                     itemId = R.id.settings;
                     break;
-                case "about":
-                    itemId = R.id.app_about;
-                    break;
             }
         }
         navigate(itemId);
     }
 
     public void navigate(int itemId) {
-        int bak = mDrawerItem;
         mDrawerItem = itemId;
         navigationView.setCheckedItem(itemId);
         switch (itemId) {
@@ -187,10 +183,6 @@ public class MainActivity extends BaseActivity
                 break;
             case R.id.settings:
                 displayFragment(new SettingsFragment(), true);
-                break;
-            case R.id.app_about:
-                startActivity(new Intent(this, ClassMap.get(AboutActivity.class)));
-                mDrawerItem = bak;
                 break;
         }
     }
