@@ -5,7 +5,6 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name="a.e"
@@ -39,6 +38,7 @@
 
         <activity
             android:name="a.m"
+            android:directBootAware="true"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:taskAffinity="internal.superuser"
@@ -46,7 +46,8 @@
 
         <!-- Receiver -->
 
-        <receiver android:name="a.h">
+        <receiver android:name="a.h"
+            android:directBootAware="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />

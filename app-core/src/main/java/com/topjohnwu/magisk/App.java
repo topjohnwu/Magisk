@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 
 import com.topjohnwu.magisk.core.BuildConfig;
@@ -40,9 +41,18 @@ public class App extends Application {
         super.attachBaseContext(base);
         self = this;
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Context deContext;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            deContext = base.createDeviceProtectedStorageContext();
+            deContext.moveSharedPreferencesFrom(base,
+                    PreferenceManager.getDefaultSharedPreferencesName(base));
+            deContext.moveDatabaseFrom(base, "repo.db");
+        } else {
+            deContext = base;
+        }
+        prefs = PreferenceManager.getDefaultSharedPreferences(deContext);
+        repoDB = new RepoDatabaseHelper(deContext);
         mDB = new MagiskDB(this);
-        repoDB = new RepoDatabaseHelper(this);
 
         Networking.init(this);
         LocaleManager.setLocale(this);
