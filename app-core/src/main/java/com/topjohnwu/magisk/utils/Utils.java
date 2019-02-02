@@ -8,7 +8,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
@@ -20,6 +19,7 @@ import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 import com.topjohnwu.superuser.io.SuFile;
 
 import java.util.Locale;
@@ -28,11 +28,11 @@ import java.util.Map;
 public class Utils {
 
     public static void toast(CharSequence msg, int duration) {
-        App.mainHandler.post(() -> Toast.makeText(App.self, msg, duration).show());
+        UiThreadHandler.run(() -> Toast.makeText(App.self, msg, duration).show());
     }
 
     public static void toast(int resId, int duration) {
-        App.mainHandler.post(() -> Toast.makeText(App.self, resId, duration).show());
+        UiThreadHandler.run(() -> Toast.makeText(App.self, resId, duration).show());
     }
 
     public static String dlString(String url) {
@@ -77,7 +77,7 @@ public class Utils {
 
     public static String getAppLabel(ApplicationInfo info, PackageManager pm) {
         try {
-            if (info.labelRes > 0) {
+            if (info.labelRes > 0 && Build.VERSION.SDK_INT >= 17) {
                 Resources res = pm.getResourcesForApplication(info);
                 Configuration config = new Configuration();
                 config.setLocale(LocaleManager.locale);
@@ -96,7 +96,7 @@ public class Utils {
 
     public static void loadModules() {
         Topic.reset(Topic.MODULE_LOAD_DONE);
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             Map<String, Module> moduleMap = new ValueSortedMap<>();
             SuFile path = new SuFile(Const.MAGISK_PATH);
             SuFile[] modules = path.listFiles(

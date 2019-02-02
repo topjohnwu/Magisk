@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.tasks;
 
 import android.database.Cursor;
-import android.os.AsyncTask;
+import android.util.Pair;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
@@ -24,62 +24,46 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class UpdateRepos {
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final int CORE_POOL_SIZE = Math.max(2, CPU_COUNT - 1);
-    private static final DateFormat dateFormat;
+    private static final DateFormat DATE_FORMAT;
 
     private App app = App.self;
     private Set<String> cached;
-    private ExecutorService threadPool;
+    private Queue<Pair<String, Date>> moduleQueue;
 
     static {
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    private void waitTasks() {
-        threadPool.shutdown();
-        while (true) {
-            try {
-                if (threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS))
-                    break;
-            } catch (InterruptedException ignored) {}
+    private void runTasks(Runnable task) {
+        Future[] futures = new Future[App.THREAD_POOL.getMaximumPoolSize() - 1];
+        for (int i = 0; i < futures.length; ++i) {
+            futures[i] = App.THREAD_POOL.submit(task);
         }
-    }
-
-    private void loadJSON(JSONArray array) throws JSONException, ParseException {
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject rawRepo = array.getJSONObject(i);
-            String id = rawRepo.getString("name");
-            Date date = dateFormat.parse(rawRepo.getString("pushed_at"));
-            threadPool.execute(() -> {
-                Repo repo = app.repoDB.getRepo(id);
+        for (Future f : futures) {
+            while (true) {
                 try {
-                    if (repo == null)
-                        repo = new Repo(id);
-                    else
-                        cached.remove(id);
-                    repo.update(date);
-                    app.repoDB.addRepo(repo);
-                } catch (Repo.IllegalRepoException e) {
-                    Logger.debug(e.getMessage());
-                    app.repoDB.removeRepo(id);
-                }
-            });
+                    f.get();
+                } catch (InterruptedException e) {
+                    continue;
+                } catch (ExecutionException ignored) {}
+                break;
+            }
         }
     }
 
     /* We sort repos by last push, which means that we only need to check whether the
      * first page is updated to determine whether the online repo database is changed
      */
-    private boolean loadPage(int page) {
+    private boolean parsePage(int page) {
         Request req = Networking.get(Utils.fmt(Const.Url.REPO_URL, page + 1));
         if (page == 0) {
             String etag = Config.get(Config.Key.ETAG_KEY);
@@ -100,7 +84,12 @@ public class UpdateRepos {
             return true;
 
         try {
-            loadJSON(res.getResult());
+            for (int i = 0; i < res.getResult().length(); i++) {
+                JSONObject rawRepo = res.getResult().getJSONObject(i);
+                String id = rawRepo.getString("name");
+                Date date = DATE_FORMAT.parse(rawRepo.getString("pushed_at"));
+                moduleQueue.offer(new Pair<>(id, date));
+            }
         } catch (JSONException | ParseException e) {
             // Should not happen, but if exception occurs, page load fails
             return false;
@@ -116,18 +105,44 @@ public class UpdateRepos {
         }
 
         String links = res.getConnection().getHeaderField(Const.Key.LINK_KEY);
-        return links == null || !links.contains("next") || loadPage(page + 1);
+        return links == null || !links.contains("next") || parsePage(page + 1);
     }
 
     private boolean loadPages() {
-        return loadPage(0);
+        if (!parsePage(0))
+            return false;
+        runTasks(() -> {
+            while (true) {
+                Pair<String, Date> pair = moduleQueue.poll();
+                if (pair == null)
+                    return;
+                Repo repo = app.repoDB.getRepo(pair.first);
+                try {
+                    if (repo == null)
+                        repo = new Repo(pair.first);
+                    else
+                        cached.remove(pair.first);
+                    repo.update(pair.second);
+                    app.repoDB.addRepo(repo);
+                } catch (Repo.IllegalRepoException e) {
+                    Logger.debug(e.getMessage());
+                    app.repoDB.removeRepo(pair.first);
+                }
+            }
+        });
+        return true;
     }
 
     private void fullReload() {
         Cursor c = app.repoDB.getRawCursor();
-        while (c.moveToNext()) {
-            Repo repo = new Repo(c);
-            threadPool.execute(() -> {
+        runTasks(() -> {
+            while (true) {
+                Repo repo;
+                synchronized (c) {
+                    if (!c.moveToNext())
+                        return;
+                    repo = new Repo(c);
+                }
                 try {
                     repo.update();
                     app.repoDB.addRepo(repo);
@@ -135,19 +150,17 @@ public class UpdateRepos {
                     Logger.debug(e.getMessage());
                     app.repoDB.removeRepo(repo);
                 }
-            });
-        }
-        waitTasks();
+            }
+        });
     }
 
     public void exec(boolean force) {
         Topic.reset(Topic.REPO_LOAD_DONE);
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             cached = Collections.synchronizedSet(app.repoDB.getRepoIDSet());
-            threadPool = Executors.newFixedThreadPool(CORE_POOL_SIZE);
+            moduleQueue = new ConcurrentLinkedQueue<>();
 
             if (loadPages()) {
-                waitTasks();
                 // The leftover cached means they are removed from online repo
                 app.repoDB.removeRepo(cached);
             } else if (force) {

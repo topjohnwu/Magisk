@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.tasks;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Const;
@@ -9,6 +8,7 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -69,14 +69,14 @@ public abstract class FlashZip {
     }
 
     public void exec() {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             boolean success = false;
             try {
                 success = flash();
             } catch (IOException ignored) {}
             Shell.su("cd /", "rm -rf " + tmpFile.getParent() + " " + Const.TMP_FOLDER_PATH).submit();
             boolean finalSuccess = success;
-            App.mainHandler.post(() -> onResult(finalSuccess));
+            UiThreadHandler.run(() -> onResult(finalSuccess));
         });
     }
 

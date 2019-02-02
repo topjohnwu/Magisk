@@ -5,10 +5,10 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_marginBottom="@dimen/card_vertical_margin"
-    android:layout_marginEnd="@dimen/card_horizontal_margin"
     android:layout_marginStart="@dimen/card_horizontal_margin"
     android:layout_marginTop="@dimen/card_vertical_margin"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
     android:minHeight="?android:attr/listPreferredItemHeight"
     app:cardCornerRadius="@dimen/card_corner_radius"
     app:cardElevation="@dimen/card_elevation">
@@ -79,17 +79,17 @@
             android:textColor="@android:color/tertiary_text_dark"
             android:textStyle="bold|italic"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/title"
             app:layout_constraintStart_toStartOf="@+id/title"
-            app:layout_constraintTop_toBottomOf="@+id/description"
-            app:layout_constraintEnd_toEndOf="@+id/title" />
+            app:layout_constraintTop_toBottomOf="@+id/description" />
 
         <View
             android:id="@+id/info_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="@+id/update_time"
             app:layout_constraintEnd_toEndOf="@+id/title"
             app:layout_constraintStart_toStartOf="@+id/title"
@@ -101,16 +101,17 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
             android:gravity="end"
             android:tint="@color/icon_grey"
-            app:srcCompat="@drawable/ic_file_download_black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/title"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_file_download_black" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

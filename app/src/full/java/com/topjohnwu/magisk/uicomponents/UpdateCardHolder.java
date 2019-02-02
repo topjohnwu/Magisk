@@ -31,6 +31,12 @@ public class UpdateCardHolder {
         unbinder = new UpdateCardHolder_ViewBinding(this, itemView);
     }
 
+    public void setClickable(View.OnClickListener listener) {
+        itemView.setClickable(true);
+        itemView.setFocusable(true);
+        itemView.setOnClickListener(listener);
+    }
+
     public void setValid(boolean valid) {
         progress.setVisibility(View.GONE);
         statusIcon.setVisibility(View.VISIBLE);

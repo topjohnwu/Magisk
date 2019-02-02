@@ -10,7 +10,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk tidak terpasang.</string>
     <string name="checking_for_updates">Memeriksa pembaruan…</string>
-    <string name="magisk_update_available">Magisk v%1$s tersedia!</string>
     <string name="invalid_update_channel">Kanal Pembaruan tidak valid!</string>
     <string name="safetyNet_check_text">Ketuk untuk memulai pemeriksaan SafetyNet.</string>
     <string name="checking_safetyNet_status">Memeriksa status SafetyNet…</string>
@@ -59,15 +58,9 @@
     <string name="log_is_empty">Log kosong.</string>
 
     <!--About Activity-->
-    <string name="about">Tentang</string>
     <string name="app_changelog">Log pembaruan</string>
     <string name="translators">Albert I (krasCGQ)</string>
-    <string name="app_version">Versi</string>
-    <string name="app_source_code">Kode sumber</string>
-    <string name="donation">Donasi</string>
     <string name="app_translators">Penerjemah</string>
-    <string name="support_thread">Thread dukungan</string>
-    <string name="follow_twitter">Ikuti saya di Twitter</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Pembaruan Magisk</string>
@@ -86,18 +79,12 @@
     <string name="settings_reboot_toast">Reboot untuk menerapkan pengaturan.</string>
     <string name="release_notes">Catatan rilis</string>
     <string name="repo_cache_cleared">Cache repo dibersihkan</string>
-    <string name="process_error">Kesalahan proses</string>
     <string name="internal_storage">Zip disimpan di:\n[Penyimpanan Internal]%1$s</string>
-    <string name="zip_download_title">Mengunduh</string>
-    <string name="zip_download_msg">Mengunduh file zip (%1$d%%) …</string>
-    <string name="zip_process_title">Memproses</string>
-    <string name="zip_process_msg">Memproses file zip…</string>
     <string name="manager_download_install">Tekan untuk unduh dan pasang.</string>
     <string name="dtbo_patched_title">DTBO telah ditambal!</string>
     <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silahkan reboot.</string>
     <string name="flashing">Flashing</string>
     <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
-    <string name="hide_manager_msg">Ini mungkin membutuhkan waktu beberapa saat.</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager.</string>
     <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan.</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
@@ -107,7 +94,6 @@
     <string name="warning">Peringatan</string>
     <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah sebuah reboot!\nHanya gunakan opsi ini setelah OTA selesai.\nLanjutkan?</string>
     <string name="select_method">Pilih Metode</string>
-    <string name="no_boot_file_patch_support">Versi target Magisk tidak mendukung penambalan file boot image</string>
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar.</string>
     <string name="complete_uninstall">Copot Total</string>
     <string name="restore_img">Pulihkan Image</string>
@@ -116,7 +102,6 @@
     <string name="restore_fail">Cadangan stock tidak ada!</string>
     <string name="proprietary_title">Unduh Kode Proprieter</string>
     <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS dan tidak menyertakan kode API proprieter Google SafetyNet.\n\nAkankah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
-    <string name="su_db_corrupt">Database SU rusak. Akan membuat db yang baru</string>
     <string name="setup_done">Penyiapan selesai.</string>
     <string name="setup_fail">Penyiapan gagal.</string>
     <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
@@ -184,7 +169,6 @@
     <string name="owner_only_summary">Hanya pemilik yang memiliki akses root.</string>
     <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima permintaan.</string>
     <string name="user_indepenent_summary">Setiap pengguna memiliki aturan root-nya sendiri.</string>
-    <string name="multiuser_hint_owner_request">Permintaan telah dikirim kepada pemilik perangkat. Silakan beralih ke pemilik dan berikan izin yang diperlukan.</string>
 
     <string name="mount_namespace_mode">Mode Mount Ruang Nama</string>
     <string name="settings_ns_global">Ruang Nama Global</string>

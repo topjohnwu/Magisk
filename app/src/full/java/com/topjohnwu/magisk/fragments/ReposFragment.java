@@ -50,11 +50,7 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
         mSwipeRefreshLayout.setRefreshing(true);
         recyclerView.setVisibility(View.GONE);
 
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyRv.setVisibility(View.GONE);
-            new UpdateRepos().exec(true);
-        });
+        mSwipeRefreshLayout.setOnRefreshListener(() -> new UpdateRepos().exec(true));
 
         requireActivity().setTitle(R.string.downloads);
 
@@ -68,17 +64,21 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
 
     @Override
     public void onPublish(int topic, Object[] result) {
-        if (topic == Topic.MODULE_LOAD_DONE) {
-            adapter = new ReposAdapter(app.repoDB, (Map<String, Module>) result[0]);
-            app.repoDB.registerAdapterCallback(adapter::notifyDBChanged);
-            recyclerView.setAdapter(adapter);
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyRv.setVisibility(View.GONE);
+        switch (topic) {
+            case Topic.MODULE_LOAD_DONE:
+                adapter = new ReposAdapter(app.repoDB, (Map<String, Module>) result[0]);
+                recyclerView.setAdapter(adapter);
+                break;
+            case Topic.REPO_LOAD_DONE:
+                if (adapter != null)
+                    adapter.notifyDBChanged();
+                break;
         }
-        if (Topic.isPublished(getSubscribedTopics())) {
+        if (Topic.isPublished(this)) {
             mSwipeRefreshLayout.setRefreshing(false);
-            recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
-            emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+            boolean empty = adapter.getItemCount() == 0;
+            recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
+            emptyRv.setVisibility(empty ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -113,11 +113,5 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
                 }).show();
         }
         return true;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        app.repoDB.unregisterAdapterCallback();
     }
 }

@@ -1,12 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <resources>
-  <string name="about">حول</string>
-  <string name="advanced_settings_title">إعدادات متقدمة</string>
+    <string name="advanced_settings_title">إعدادات متقدمة</string>
   <string name="app_changelog">تغييرات التطبيق</string>
-  <string name="app_source_code">الشفرة المصدرية</string>
-  <string name="app_translators">مترجم التطبيق</string>
-  <string name="app_version">إصدار التطبيق</string>
-  <string name="author">انشئ بواسطة %1$s</string>
+    <string name="app_translators">مترجم التطبيق</string>
+    <string name="author">انشئ بواسطة %1$s</string>
   <string name="auto_response">استجابة تلقائية</string>
   <string name="checking_for_updates">البحث عن تحديثات…</string>
   <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
@@ -16,8 +13,7 @@
   <string name="deny_with_str">رفض%1$s</string>
   <string name="disable_file_created">سيتم تعطيل الإضافة في إعادة التشغيل التالي</string>
   <string name="disable_file_removed">سيتم تمكين الإضافة في إعادة التشغيل التالي</string>
-  <string name="donation">التبرع</string>
-  <string name="download">التنزيل</string>
+    <string name="download">التنزيل</string>
   <string name="downloads">التنزيلات</string>
   <string name="forever">للابد</string>
   <string name="grant">سماح</string>
@@ -30,14 +26,12 @@
   <string name="log">السجل</string>
   <string name="log_is_empty">السجل فارغ</string>
   <string name="logs_cleared">تم حذف السجل بنجاح</string>
-  <string name="magisk_update_available">Magisk v%1$s متاح!</string>
-  <string name="magisk_update_title">تحديث Magisk جديد متوفر!</string>
+    <string name="magisk_update_title">تحديث Magisk جديد متوفر!</string>
   <string name="magisk_version_error">Magisk غير مثبت</string>
   <string name="menuClearLog">حذف السجل الآن</string>
   <string name="menuReload">إعادة تحميل</string>
   <string name="modules">الإضافات</string>
-  <string name="multiuser_hint_owner_request">تم إرسال طلب إلى مالك الجهاز. يرجى التبديل إلى المالك ومنح الإذن</string>
-  <string name="multiuser_mode">وضع تعدد المستخدمين</string>
+    <string name="multiuser_mode">وضع تعدد المستخدمين</string>
   <string name="no_apps_found">لا توجد تطبيقات</string>
   <string name="no_info_provided">(لم يتم توفير أي معلومات)</string>
   <string name="no_modules_found">لم يعثر على الإضافات</string>
@@ -46,8 +40,7 @@
   <string name="once">مرة</string>
   <string name="owner_manage_summary">يمكن للمالك فقط إدارة صلاحيات الروت وتلقي مطالبات الطلب</string>
   <string name="owner_only_summary">المالك فقط لديه صلاحيات الروت</string>
-    <string name="process_error">خطأ في العملية</string>
-  <string name="prompt">طلب</string>
+    <string name="prompt">طلب</string>
   <string name="reboot">إعادة التشغيل</string>
   <string name="release_notes">ملاحظات الإصدار</string>
   <string name="remove_file_created">سيتم حذف الإضافة في إعادة التشغيل التالي</string>
@@ -101,8 +94,7 @@
   <string name="superuser">Superuser</string>
   <string name="superuser_access">Superuser صلاحيات</string>
   <string name="superuser_notification">Superuser إشعارات</string>
-  <string name="support_thread">منتدى الدعم</string>
-  <string name="target_uid">الهدف UID: %1$d</string>
+    <string name="target_uid">الهدف UID: %1$d</string>
   <string name="tenmin">10 دقائق</string>
   <string name="thirtymin">30 دقائق</string>
   <string name="toast">ملاحظة منبثقة</string>
@@ -113,9 +105,7 @@
   <string name="update_available">يتوفر تحديث</string>
   <string name="update_file_created">سيتم تحديث الإضافة في إعادة التشغيل التالي</string>
   <string name="user_indepenent_summary">كل مستخدم لديه قواعد روت منفصلة خاصة به</string>
-  <string name="zip_process_msg">معالجة الملف المضغوط …</string>
-  <string name="zip_process_title">معالجة</string>
-  <string name="android_o_not_support">لا يدعم إصدار الأندرويد +8.0</string>
+    <string name="android_o_not_support">لا يدعم إصدار الأندرويد +8.0</string>
   <string name="auth_fail">فشل المصادقة</string>
   <string name="auth_fingerprint">مصادقة البصمة</string>
   <string name="boot_file_patch_msg">حدد الذاكرة المؤقتة لنسخة boot الأصلية بتنسيق img. أو .img.tar</string>
@@ -128,12 +118,10 @@
   <string name="env_fix_msg">يحتاج جهازك إلى إعداد إضافي لـ Magisk للعمل بشكل صحيح. سيتم تنزيل ملف zip لتثبيت Magisk ، هل تريد المتابعة الآن؟</string>
   <string name="env_fix_title">يتطلب إعداد إضافي</string>
   <string name="flashing">التثبيت</string>
-  <string name="follow_twitter">تابعني على تويتر</string>
-  <string name="global_summary">تستخدم كافة جلسات الجذر مساحة الأسم ذات التركيب العالمي</string>
+    <string name="global_summary">تستخدم كافة جلسات الجذر مساحة الأسم ذات التركيب العالمي</string>
   <string name="hide_manager_fail_toast">فشل إخفاء مدير Magisk …</string>
   <string name="hide_manager_title">إخفاء مدير Magisk…</string>
-  <string name="hide_manager_msg">هذا قد يستغرق بعض الوقت…</string>
-  <string name="install_inactive_slot">التثبيت على فتحة غير نشطة (بعد OTA)</string>
+    <string name="install_inactive_slot">التثبيت على فتحة غير نشطة (بعد OTA)</string>
   <string name="install_inactive_slot_msg">"سيتم إجبار جهازك للتمهيد على الفتحة غير النشطة الحالية بعد إعادة التشغيل!
 فقط استخدام هذا الخيار بعد الانتهاء من OTA.
 استمرار؟"</string>
@@ -145,8 +133,7 @@
   <string name="manager_update_title">تحديث مدير Magisk الجديد متوفر!</string>
   <string name="menuSaveLog">حفظ السجل</string>
   <string name="mount_namespace_mode">وضع تركيب مساحة الأسم</string>
-  <string name="no_boot_file_patch_support">"لا يدعم إصدار Magisk المستهدف تصحيح ملفات صور boot"</string>
-  <string name="open_link_failed_toast">لم يتم العثور على تطبيق لفتح الرابط …</string>
+    <string name="open_link_failed_toast">لم يتم العثور على تطبيق لفتح الرابط …</string>
   <string name="patch_boot_file">تصحيح ملف صورة boot</string>
   <string name="proprietary_notice">مدير Magisk هو FOSS ، والذي لا يحتوي على شفرة API الخاصة بشركة SafetyNet الخاصة بشركة Google.
 
@@ -191,15 +178,12 @@
   <string name="sort_by_name">الترتيب حسب الاسم</string>
   <string name="sort_by_update">فرز حسب آخر تحديث</string>
   <string name="sorting_order">ترتيب الفرز</string>
-  <string name="su_db_corrupt">قاعدة بيانات SU معطوبة ، سوف يتم إنشاء قاعدة بيانات جديدة</string>
-  <string name="system_default">(أفتراضي النظام)</string>
+    <string name="system_default">(أفتراضي النظام)</string>
   <string name="uninstall_magisk_msg">سيتم تعطيل/إزالة جميع الوحدات. ستتم إزالة الجذر ، وربما تشفير بياناتك إذا كانت بياناتك غير مشفرة حالياً</string>
   <string name="update">تحديث</string>
   <string name="updated_on">تم التحديث في: %1$s</string>
   <string name="warning">تحذير</string>
-  <string name="zip_download_msg">تحميل ملف zip (%1$d%%)…</string>
-  <string name="zip_download_title">يتم التحميل</string>
-  <string name="downloading_toast">جاري التنزيل %1$s</string>
+    <string name="downloading_toast">جاري التنزيل %1$s</string>
   <string name="download_file_error">خطأ تنزيل الملف</string>
   <string name="no_rw_storage">أن هذه الميزة لا تعمل دون الحصول على إذن الكتابة على التخزين الخارجي.</string>
 </resources>

@@ -1,16 +1,17 @@
 package com.topjohnwu.magisk.fragments;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
@@ -20,8 +21,12 @@ import com.topjohnwu.magisk.dialogs.MagiskInstallDialog;
 import com.topjohnwu.magisk.dialogs.ManagerInstallDialog;
 import com.topjohnwu.magisk.dialogs.UninstallDialog;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
+import com.topjohnwu.magisk.uicomponents.ArrowExpandedViewHolder;
+import com.topjohnwu.magisk.uicomponents.ExpandableViewHolder;
+import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
 import com.topjohnwu.magisk.uicomponents.SafetyNet;
 import com.topjohnwu.magisk.uicomponents.UpdateCardHolder;
+import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
@@ -53,6 +58,9 @@ public class MagiskFragment extends BaseFragment
     @BindView(R.id.install_option_card) CardView installOptionCard;
     @BindView(R.id.keep_force_enc) CheckBox keepEncChkbox;
     @BindView(R.id.keep_verity) CheckBox keepVerityChkbox;
+    @BindView(R.id.install_option_expand) ViewGroup optionExpandLayout;
+    @BindView(R.id.arrow) ImageView arrow;
+
     @BindView(R.id.uninstall_button) CardView uninstallButton;
 
     @BindColor(R.color.red500) int colorBad;
@@ -65,6 +73,7 @@ public class MagiskFragment extends BaseFragment
     private UpdateCardHolder manager;
     private SafetyNet safetyNet;
     private Transition transition;
+    private ExpandableViewHolder optionExpand;
 
     private void magiskInstall(View v) {
         // Show Manager update first
@@ -79,9 +88,45 @@ public class MagiskFragment extends BaseFragment
         new ManagerInstallDialog(requireActivity()).show();
     }
 
+    private void openLink(String url) {
+        AppUtils.openLink(requireActivity(), Uri.parse(url));
+    }
+
+    @OnClick(R.id.paypal)
+    void paypal() {
+        openLink(Const.Url.PAYPAL_URL);
+    }
+
+    @OnClick(R.id.patreon)
+    void patreon() {
+        openLink(Const.Url.PATREON_URL);
+    }
+
+    @OnClick(R.id.twitter)
+    void twitter() {
+        openLink(Const.Url.TWITTER_URL);
+    }
+
+    @OnClick(R.id.github)
+    void github() {
+        openLink(Const.Url.SOURCE_CODE_URL);
+    }
+
+    @OnClick(R.id.xda)
+    void xda() {
+        openLink(Const.Url.XDA_THREAD);
+    }
+
     @OnClick(R.id.uninstall_button)
     void uninstall() {
         new UninstallDialog(requireActivity()).show();
+    }
+
+    @OnClick(R.id.arrow)
+    void expandOptions() {
+        if (optionExpand.isExpanded())
+            optionExpand.collapse();
+        else optionExpand.expand();
     }
 
     @Nullable
@@ -92,11 +137,15 @@ public class MagiskFragment extends BaseFragment
         unbinder = new MagiskFragment_ViewBinding(this, v);
         requireActivity().setTitle(R.string.magisk);
 
+        optionExpand = new ArrowExpandedViewHolder(optionExpandLayout, arrow);
         safetyNet = new SafetyNet(v);
         magisk = new UpdateCardHolder(inflater, root);
         manager = new UpdateCardHolder(inflater, root);
-        root.addView(magisk.itemView, 0);
-        root.addView(manager.itemView, 1);
+        manager.setClickable(vv ->
+                MarkDownWindow.show(requireActivity(), null,
+                        getResources().openRawResource(R.raw.changelog)));
+        root.addView(magisk.itemView, 1);
+        root.addView(manager.itemView, 2);
 
         keepVerityChkbox.setChecked(Config.keepVerity);
         keepVerityChkbox.setOnCheckedChangeListener((view, checked) -> Config.keepVerity = checked);
@@ -165,17 +214,6 @@ public class MagiskFragment extends BaseFragment
     @Override
     public void onPublish(int topic, Object[] result) {
         updateCheckUI();
-    }
-
-    private boolean hasGms() {
-        PackageManager pm = app.getPackageManager();
-        PackageInfo info;
-        try {
-            info = pm.getPackageInfo("com.google.android.gms", 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
-        return info.applicationInfo.enabled;
     }
 
     private void updateUI() {

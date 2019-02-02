@@ -5,8 +5,6 @@ import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +14,7 @@ import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.database.MagiskDB;
 import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
 import com.topjohnwu.magisk.dialogs.FingerprintAuthDialog;
+import com.topjohnwu.magisk.uicomponents.ArrowExpandedViewHolder;
 import com.topjohnwu.magisk.uicomponents.ExpandableViewHolder;
 import com.topjohnwu.magisk.uicomponents.SnackbarMaker;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
@@ -156,33 +155,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         public ViewHolder(View itemView) {
             super(itemView);
             new PolicyAdapter$ViewHolder_ViewBinding(this, itemView);
-            settings = new ExpandableViewHolder(expandLayout) {
-                @Override
-                public void setExpanded(boolean expanded) {
-                    super.setExpanded(expanded);
-                    arrow.setRotation(expanded ? 180 : 0);
-                }
-
-                @Override
-                public void expand() {
-                    super.expand();
-                    setRotate(new RotateAnimation(0, 180,
-                            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
-                }
-
-                @Override
-                public void collapse() {
-                    super.collapse();
-                    setRotate(new RotateAnimation(180, 0,
-                            Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
-                }
-            };
-        }
-
-        private void setRotate(RotateAnimation rotate) {
-            rotate.setDuration(300);
-            rotate.setFillAfter(true);
-            arrow.startAnimation(rotate);
+            settings = new ArrowExpandedViewHolder(expandLayout, arrow);
         }
     }
 }

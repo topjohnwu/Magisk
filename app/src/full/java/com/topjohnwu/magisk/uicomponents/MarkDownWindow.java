@@ -5,12 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.caverock.androidsvg.SVG;
-import com.caverock.androidsvg.SVGParseException;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
@@ -22,6 +20,7 @@ import com.topjohnwu.superuser.ShellUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -72,32 +71,29 @@ public class MarkDownWindow {
 
         @Override
         public void load(@NonNull String url, @NonNull AsyncDrawable asyncDrawable) {
-            AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            App.THREAD_POOL.submit((Callable<?>) () -> {
                 InputStream is = Networking.get(url).execForInputStream().getResult();
                 if (is == null)
-                    return;
+                    return null;
                 ByteArrayStream buf = new ByteArrayStream();
                 buf.readFrom(is);
                 // First try default drawables
                 Drawable drawable = Drawable.createFromStream(buf.getInputStream(), "");
                 if (drawable == null) {
                     // SVG
-                    try {
-                        SVG svg = SVG.getFromInputStream(buf.getInputStream());
-                        int width = Utils.dpInPx((int) svg.getDocumentWidth());
-                        int height = Utils.dpInPx((int) svg.getDocumentHeight());
-                        final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
-                        final Canvas canvas = new Canvas(bitmap);
-                        float density = App.self.getResources().getDisplayMetrics().density;
-                        canvas.scale(density, density);
-                        svg.renderToCanvas(canvas);
-                        drawable = new BitmapDrawable(App.self.getResources(), bitmap);
-                    } catch (SVGParseException ignored) {}
+                    SVG svg = SVG.getFromInputStream(buf.getInputStream());
+                    int width = Utils.dpInPx((int) svg.getDocumentWidth());
+                    int height = Utils.dpInPx((int) svg.getDocumentHeight());
+                    final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+                    final Canvas canvas = new Canvas(bitmap);
+                    float density = App.self.getResources().getDisplayMetrics().density;
+                    canvas.scale(density, density);
+                    svg.renderToCanvas(canvas);
+                    drawable = new BitmapDrawable(App.self.getResources(), bitmap);
                 }
-                if (drawable != null) {
-                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-                    asyncDrawable.setResult(drawable);
-                }
+                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+                asyncDrawable.setResult(drawable);
+                return null;
             });
         }
 

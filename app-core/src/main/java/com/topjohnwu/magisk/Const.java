@@ -46,7 +46,7 @@ public class Const {
     public static final int USER_ID = Process.myUid() / 100000;
 
     public static final class MAGISK_VER {
-        /* Currently no backwards compatibility needed */
+        public static final int MIN_SUPPORT = 18000;
     }
 
     public static class ID {
@@ -84,6 +84,7 @@ public class Const {
         public static final String LINK_KEY = "Link";
         public static final String IF_NONE_MATCH = "If-None-Match";
         // intents
+        public static final String FROM_SPLASH = "splash";
         public static final String OPEN_SECTION = "section";
         public static final String INTENT_SET_NAME = "filename";
         public static final String INTENT_SET_LINK = "link";

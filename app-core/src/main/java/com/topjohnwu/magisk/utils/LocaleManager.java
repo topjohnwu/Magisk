@@ -100,9 +100,13 @@ public class LocaleManager {
     }
 
     public static Context getLocaleContext(Context context, Locale locale) {
-        Configuration config = new Configuration(context.getResources().getConfiguration());
-        config.setLocale(locale);
-        return context.createConfigurationContext(config);
+        if (Build.VERSION.SDK_INT >= 17) {
+            Configuration config = new Configuration(context.getResources().getConfiguration());
+            config.setLocale(locale);
+            return context.createConfigurationContext(config);
+        } else {
+            return context;
+        }
     }
 
     public static Context getLocaleContext(Locale locale) {
@@ -114,6 +118,8 @@ public class LocaleManager {
     }
 
     public static void loadAvailableLocales(@StringRes int compareId) {
+        if (Build.VERSION.SDK_INT < 17)
+            return;
         Shell.EXECUTOR.execute(() -> {
             locales = new ArrayList<>();
             HashSet<String> set = new HashSet<>();

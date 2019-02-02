@@ -12,7 +12,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk niet geïnstalleerd</string>
     <string name="checking_for_updates">Controleren op updates…</string>
-    <string name="magisk_update_available">Magisk v%1$s beschikbaar!</string>
     <string name="invalid_update_channel">Ongeldig bijwerkkanaal</string>
     <string name="safetyNet_check_text">Tik om SafetyNet controle te starten</string>
     <string name="checking_safetyNet_status">SafetyNet status controleren…</string>
@@ -61,14 +60,9 @@
     <string name="log_is_empty">Log is leeg</string>
 
     <!--About Activity-->
-    <string name="about">Over</string>
     <string name="app_changelog">App\'s changelog</string>
     <string name="translators" />
-    <string name="app_version">App\'s versie</string>
-    <string name="app_source_code">Broncode</string>
-    <string name="donation">Donatie</string>
     <string name="app_translators">App\'s vertalers</string>
-    <string name="support_thread">Hulp thread</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Sluiten</string>
@@ -80,12 +74,7 @@
     <string name="settings_reboot_toast">Herstarten om instellingen toe te passen</string>
     <string name="release_notes">Publicatie notities</string>
     <string name="repo_cache_cleared">Opslagcache gewist</string>
-    <string name="process_error">Verwerkingsfout</string>
     <string name="internal_storage">De zip is opgeslagen in:\n[Interne opslag]%1$s</string>
-    <string name="zip_download_title">Downloaden</string>
-    <string name="zip_download_msg">Zip-bestand downloaden (%1$d%%) …</string>
-    <string name="zip_process_title">Verwerken</string>
-    <string name="zip_process_msg">Zip-bestand verwerken…</string>
     <string name="manager_update_title">Nieuwe Magisk Manager update beschikbaar!</string>
     <string name="manager_download_install">Tik om te downloaden en installeren</string>
     <string name="dtbo_patched_title">DTBO is gepatched!</string>
@@ -93,13 +82,11 @@
     <string name="update_channel">Magisk updates</string>
     <string name="flashing">Flashen</string>
     <string name="hide_manager_title">Magisk Manager verbergen…</string>
-    <string name="hide_manager_msg">Dit kan even duren…</string>
     <string name="hide_manager_fail_toast">Magisk Manager verbergen mislukt…</string>
     <string name="download_zip_only">Alleen zip downloaden</string>
     <string name="patch_boot_file">Boot image-bestand patchen</string>
     <string name="direct_install">Direct installeren (aangeraden)</string>
     <string name="select_method">Methode kiezen</string>
-    <string name="no_boot_file_patch_support">Magisk versie ondersteund geen boot image-bestand patchen</string>
     <string name="boot_file_patch_msg">Kies originele boot image-dump in .img- of .img.tar-formaat</string>
     <string name="complete_uninstall">Compleet deïnstalleren</string>
     <string name="restore_img">Images herstellen</string>
@@ -107,7 +94,6 @@
     <string name="restore_fail">Originele back-up bestaat niet!</string>
     <string name="proprietary_title">Google\'s code downloaden</string>
     <string name="proprietary_notice">Magisk Manager is FOSS, dus bevat geen SafetyNet API code van Google.\n\nSta je Magisk Manager toe om een extensie te downloaden (bevat GoogleApiClient) voor SafetyNet controles?</string>
-    <string name="su_db_corrupt">SU database is corrupt, nieuwe db maken…</string>
     <string name="download_file_error">Fout tijdens downloaden</string>
     <string name="downloading_toast">%1$s downloaden</string>
     <string name="no_rw_storage">Deze functie werkt niet zonder schrijfpermissie voor externe opslag.</string>
@@ -167,7 +153,6 @@
     <string name="owner_only_summary">Alleen eigenaar heeft roottoegang</string>
     <string name="owner_manage_summary">Alleen eigenaar kan roottoegang beheren en prompt verzoeken ontvangen</string>
     <string name="user_indepenent_summary">Iedere gebruiker heeft eigen afzonderlijke rootregels</string>
-    <string name="multiuser_hint_owner_request">Een verzoek is naar de apparaateigenaar verstuurd. Wissel van gebruiker en sta de rechten toe</string>
 
     <string name="mount_namespace_mode">Naamruimte-mount modus</string>
     <string name="settings_ns_global">Globale naamruimte</string>

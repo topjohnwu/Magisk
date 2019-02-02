@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.tasks;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -17,6 +16,7 @@ import com.topjohnwu.signing.SignBoot;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.internal.NOPList;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 import com.topjohnwu.superuser.io.SuFileOutputStream;
@@ -307,9 +307,9 @@ public abstract class MagiskInstaller {
     protected abstract void onResult(boolean success);
 
     public void exec() {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             boolean b = operations();
-            App.mainHandler.post(() -> onResult(b));
+            UiThreadHandler.run(() -> onResult(b));
         });
     }
 

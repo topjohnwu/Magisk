@@ -3,9 +3,7 @@ package com.topjohnwu.magisk;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.os.Handler;
-import android.os.Looper;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
 import com.topjohnwu.magisk.core.BuildConfig;
@@ -17,11 +15,12 @@ import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 public class App extends ContainerApp {
 
     public static App self;
-    public static Handler mainHandler = new Handler(Looper.getMainLooper());
-    public boolean init = false;
+    public static ThreadPoolExecutor THREAD_POOL;
 
     // Global resources
     public SharedPreferences prefs;
@@ -33,6 +32,7 @@ public class App extends ContainerApp {
         Shell.Config.verboseLogging(BuildConfig.DEBUG);
         Shell.Config.addInitializers(RootUtils.class);
         Shell.Config.setTimeout(2);
+        THREAD_POOL = (ThreadPoolExecutor) AsyncTask.THREAD_POOL_EXECUTOR;
     }
 
     @Override

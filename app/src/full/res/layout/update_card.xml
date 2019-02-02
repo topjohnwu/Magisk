@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="?attr/cardStyle"
     android:layout_width="match_parent"
@@ -9,6 +8,7 @@
     android:layout_marginTop="4dp"
     android:layout_marginEnd="5dp"
     android:layout_marginBottom="4dp"
+    android:foreground="?android:attr/selectableItemBackground"
     app:cardCornerRadius="@dimen/card_corner_radius"
     app:cardElevation="@dimen/card_elevation">
 
@@ -46,6 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:maxLines="1"
             android:paddingTop="3dp"
             android:paddingBottom="3dp"
@@ -62,8 +63,8 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:text="@string/checking_for_updates"
-            app:autoSizeTextType="uniform"
             app:autoSizeMinTextSize="1sp"
+            app:autoSizeTextType="uniform"
             app:layout_constraintEnd_toEndOf="@+id/status"
             app:layout_constraintStart_toStartOf="@+id/status"
             app:layout_constraintTop_toBottomOf="@+id/status" />
@@ -98,6 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:text="@string/install"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"

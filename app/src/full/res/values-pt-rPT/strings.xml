@@ -12,7 +12,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk não instalado</string>
     <string name="checking_for_updates">A procurar por atualizações…</string>
-    <string name="magisk_update_available">Magisk v%1$s disponível!</string>
     <string name="safetyNet_check_text">Pressione para verificar SafetyNet</string>
     <string name="checking_safetyNet_status">A verificar o estado do SafetyNet…</string>
     <string name="safetyNet_check_success">SafetyNet verificado com sucesso</string>
@@ -52,13 +51,8 @@
     <string name="log_is_empty">Registo está vazio</string>
 
     <!--About Activity-->
-    <string name="about">Sobre</string>
     <string name="app_changelog">Lista de alterações da aplicação</string>
-    <string name="app_version">Versão do aplicação</string>
-    <string name="app_source_code">Código fonte</string>
-    <string name="donation">Doar</string>
     <string name="app_translators">Tradutores da Aplicação</string>
-    <string name="support_thread">Suporte</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Fechar</string>
@@ -70,18 +64,13 @@
     <string name="settings_reboot_toast">Reinicie para aplicar definições</string>
     <string name="release_notes">Notas da atualização</string>
     <string name="repo_cache_cleared">Cache do repositório apagado</string>
-    <string name="process_error">Erro no processo</string>
     <string name="internal_storage">O zip foi guardado em:
 \n[Armazenamento interno]%1$s</string>
-    <string name="zip_download_msg">A transferir ficheiro zip (%1$d%%) …</string>
-    <string name="zip_process_title">A processar</string>
-    <string name="zip_process_msg">A processar ficheiro zip …</string>
     <string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
     <string name="manager_download_install">Pressione para transferir e instalar</string>
     <string name="update_channel">Atualizações do Magisk</string>
     <string name="flashing">A instalar</string>
     <string name="hide_manager_title">A esconder Magisk Manager…</string>
-    <string name="hide_manager_msg">Isto pode demorar algum tempo...</string>
     <string name="hide_manager_fail_toast">Falha ao esconder Magisk Manager…</string>
     <string name="download_zip_only">Transferir Apenas Ficheiro Zip</string>
     <string name="patch_boot_file">Patch a Imagem de Arranque</string>
@@ -135,7 +124,6 @@
     <string name="owner_only_summary">Apenas o proprietário tem acesso a root</string>
     <string name="owner_manage_summary">Apenas o proprietário pode gerir acesso root e receber pedidos</string>
     <string name="user_indepenent_summary">Cada utilizador tem suas próprias regras de root separadas</string>
-    <string name="multiuser_hint_owner_request">Um pedido foi enviado ao proprietário do dispositivo. Mude para o proprietário e conceda a permissão</string>
 
     <string name="mount_namespace_mode">Cada sessão root terá sua própria identificação isolada</string>
     <string name="settings_ns_global">Identificação Global</string>

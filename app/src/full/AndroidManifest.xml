@@ -30,9 +30,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="a.d"
-            android:theme="@style/AppTheme.NoDrawer" />
-        <activity
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor"

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -127,8 +128,13 @@ public class SuRequestActivity extends BaseActivity {
         appIcon.setImageDrawable(policy.info.loadIcon(pm));
         appNameView.setText(policy.appName);
         packageNameView.setText(policy.packageName);
-        warning.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                AppCompatResources.getDrawable(this, R.drawable.ic_warning), null, null, null);
+        if (Build.VERSION.SDK_INT >= 17) {
+            warning.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    AppCompatResources.getDrawable(this, R.drawable.ic_warning), null, null, null);
+        } else {
+            warning.setCompoundDrawablesWithIntrinsicBounds(
+                    AppCompatResources.getDrawable(this, R.drawable.ic_warning), null, null, null);
+        }
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.allow_timeout, android.R.layout.simple_spinner_item);

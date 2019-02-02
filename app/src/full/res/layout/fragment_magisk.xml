@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
@@ -20,10 +19,139 @@
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
+                style="?attr/cardStyle"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="4dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp">
+
+                    <ImageView
+                        android:id="@+id/icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/app_name"
+                        app:layout_constraintEnd_toStartOf="@+id/app_name"
+                        app:layout_constraintHorizontal_bias="0.42"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/app_name"
+                        app:srcCompat="@drawable/ic_logo" />
+
+                    <TextView
+                        android:id="@+id/app_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:text="@string/app_name"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/icon"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/install_option_card"
+                style="?attr/cardStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="4dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/advanced_settings_title"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <ImageView
+                            android:id="@+id/arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginLeft="16dp"
+                            android:tint="?attr/imageColorTint"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/title"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_arrow" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <LinearLayout
+                        android:id="@+id/install_option_expand"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <CheckBox
+                            android:id="@+id/keep_force_enc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="50dp"
+                            android:layout_marginEnd="50dp"
+                            android:text="@string/keep_force_encryption" />
+
+                        <CheckBox
+                            android:id="@+id/keep_verity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="50dp"
+                            android:layout_marginEnd="50dp"
+                            android:text="@string/keep_dm_verity" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
                 android:id="@+id/safetyNet_card"
                 style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="5dp"
@@ -46,6 +174,7 @@
                             android:layout_height="30dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginEnd="24dp"
+                            android:layout_marginRight="24dp"
                             android:layout_marginBottom="12dp"
                             android:tint="@color/green500"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -71,6 +200,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginStart="24dp"
+                            android:layout_marginLeft="24dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/safetyNet_status"
                             app:layout_constraintTop_toTopOf="parent"
@@ -99,6 +229,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/cts_status"
                             app:layout_constraintEnd_toStartOf="@+id/cts_status"
                             app:layout_constraintTop_toTopOf="@+id/cts_status" />
@@ -118,6 +249,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/basic_status"
                             app:layout_constraintEnd_toStartOf="@+id/basic_status"
                             app:layout_constraintTop_toTopOf="@+id/basic_status" />
@@ -141,53 +273,148 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/install_option_card"
                 style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="4dp"
-                android:visibility="gone"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
 
-
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginBottom="15dp"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content">
 
-                    <TextView
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:id="@+id/paypal"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:paddingBottom="10dp"
-                        android:text="@string/advanced_settings_title"
-                        android:textStyle="bold" />
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        app:layout_constraintEnd_toStartOf="@+id/patreon"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <CheckBox
-                        android:id="@+id/keep_force_enc"
-                        android:layout_width="match_parent"
+                        <ImageView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center"
+                            android:layout_margin="10dp"
+                            android:tint="?attr/imageColorTint"
+                            app:srcCompat="@drawable/ic_paypal" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_margin="5dp"
+                            android:text="PayPal"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/patreon"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="50dp"
-                        android:layout_marginEnd="50dp"
-                        android:text="@string/keep_force_encryption" />
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/paypal"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <CheckBox
-                        android:id="@+id/keep_verity"
-                        android:layout_width="match_parent"
+                        <ImageView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center"
+                            android:layout_margin="10dp"
+                            android:tint="?attr/imageColorTint"
+                            app:srcCompat="@drawable/ic_patreon" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_margin="5dp"
+                            android:text="Patreon"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:id="@+id/twitter"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="50dp"
-                        android:layout_marginEnd="50dp"
-                        android:text="@string/keep_dm_verity" />
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/github"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/paypal">
 
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_margin="10dp"
+                            android:tint="?attr/imageColorTint"
+                            app:srcCompat="@drawable/ic_twitter" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/github"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/xda"
+                        app:layout_constraintStart_toEndOf="@+id/twitter">
+
+                        <ImageView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_margin="10dp"
+                            android:tint="?attr/imageColorTint"
+                            app:srcCompat="@drawable/ic_github" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/xda"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/github">
+
+                        <ImageView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_margin="10dp"
+                            android:tint="?attr/imageColorTint"
+                            app:srcCompat="@drawable/ic_xda" />
+
+                    </FrameLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -196,21 +423,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="4dp"
                 android:clickable="true"
+                android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation"
-                android:focusable="true">
+                app:cardElevation="@dimen/card_elevation">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
                     android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
                     android:ems="10"
                     android:fontFamily="sans-serif"
                     android:gravity="center"

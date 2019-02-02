@@ -13,7 +13,6 @@
     <string name="magisk_version_error">Magisk nije instaliran</string>
 
     <string name="checking_for_updates">Provjera ažuriranja…</string>
-    <string name="magisk_update_available">Dostupna je Maigsk inačica v%1$s!</string>
     <string name="safetyNet_check_text">Dodirni za SafetyNet provjeru</string>
     <string name="checking_safetyNet_status">Provjera SafetyNet statusa</string>
     <string name="safetyNet_check_success">SafetyNet provjera uspješna</string>
@@ -54,14 +53,9 @@
     <string name="log_is_empty">Zapisnik je prazan</string>
 
     <!--About Activity-->
-    <string name="about">O aplikaciji</string>
     <string name="app_changelog">Popis izmjena aplikacije</string>
     <string name="translators" />
-    <string name="app_version">Verzija aplikacije</string>
-    <string name="app_source_code">Izvorni kod</string>
-    <string name="donation">Donacija</string>
     <string name="app_translators">Prevoditelji aplikacije</string>
-    <string name="support_thread">Tema podrške</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Zatvori</string>
@@ -73,12 +67,7 @@
     <string name="settings_reboot_toast">Ponovno pokrenite kako biste primjenili postavke</string>
     <string name="release_notes">Bilješke o izdavanju aplikacije</string>
     <string name="repo_cache_cleared">Predmemorija repozitorija izbrisana</string>
-    <string name="process_error">Pogreška u procesu</string>
     <string name="internal_storage">Zip je pohranjen u:\n[Unutarnja pohrana]%1$s</string>
-    <string name="zip_download_title">Preuzimanje</string>
-    <string name="zip_download_msg">Preuzimanje zip datoteke (%1$d%%) …</string>
-    <string name="zip_process_title">Obrada</string>
-    <string name="zip_process_msg">Obrada zip datoteke …</string>
     <string name="manager_update_title">Dostupno je novo ažuriranje Magisk Manager aplikacije!</string>
     <string name="manager_download_install">Pritisnite za preuzimanje i instalaciju</string>
     <string name="update_channel">Magisk ažuriranja</string>
@@ -89,7 +78,6 @@
     <string name="patch_boot_file">Zakrpa datoteke za podizanje sustava</string>
     <string name="direct_install">Izravna instalacija (preporuča se)</string>
     <string name="select_method">Odaberite metodu</string>
-    <string name="no_boot_file_patch_support">Ciljana verzija Magiska ne podržava zakrpu datoteke za podizanje sustava</string>
     <string name="boot_file_patch_msg">Odaberite standardnu datoteku za podizanje sustava u .img ili .img.tar formatu</string>
     <string name="complete_uninstall">Potpuna deinstalacija</string>
     <string name="restore_done">Obnova je dovršena!</string>
@@ -148,7 +136,6 @@
     <string name="owner_only_summary">Samo vlasnik ima root pristup</string>
     <string name="owner_manage_summary">Samo vlasnik može upravljati root pristupom i primati zahtjeve za root pristup</string>
     <string name="user_indepenent_summary">Svaki korisnik ima vlastita root pravila</string>
-    <string name="multiuser_hint_owner_request">Zahtjev je poslan vlasniku uređaja. Prebacite se na vlasnika i odobrite dopuštenje</string>
 
     <string name="mount_namespace_mode">Postavljanje imenskog prostora</string>
     <string name="settings_ns_global">Globalni imenski prostor</string>
