@@ -13,7 +13,6 @@
     <string name="magisk_version_error">Magisk není nainstalován</string>
 
     <string name="checking_for_updates">Kontrola aktualizací…</string>
-    <string name="magisk_update_available">Magisk v%1$s je dostupný!</string>
     <string name="safetyNet_check_text">Kliknutím zahájíte SafetyNet kontrolu</string>
     <string name="checking_safetyNet_status">Kontrola stavu SafetyNet…</string>
 
@@ -49,14 +48,9 @@
     <string name="log_is_empty">Log je prázdný</string>
 
     <!--About Activity-->
-    <string name="about">O aplikaci</string>
     <string name="app_changelog">Seznam změn</string>
     <string name="translators" />
-    <string name="app_version">Verze aplikace</string>
-    <string name="app_source_code">Zdrojový kód</string>
-    <string name="donation">Příspěvek</string>
     <string name="app_translators">Překladatelé aplikace</string>
-    <string name="support_thread">Vlákno podpory na fóru</string>
 
     <!--Toasts, Dialogs-->
     
@@ -65,14 +59,11 @@
     <string name="repo_install_msg">Chcete nainstalovat %1$s ?</string>
     <string name="download">Stáhnout</string>
     <string name="reboot">Restart</string>
-    <string name="zip_process_msg">Zpracování zip souboru …</string>
     <string name="magisk_update_title">K dispozici je aktualizace Magisk!</string>
     <string name="settings_reboot_toast">Restartovat pro použití nastavení</string>
     <string name="release_notes">Poznámky k vydání</string>
     <string name="repo_cache_cleared">Mezipaměť smazána</string>
-    <string name="process_error">Chyba při Zpracování</string>
     <string name="internal_storage">Zip je uchován v:\n[Interním Úložišti]%1$s</string>
-    <string name="zip_process_title">Zpracování</string>
     <string name="download_file_error">Chyba při Stahování souboru</string>
     <string name="downloading_toast">Stahování %1$s</string>
     <string name="no_rw_storage">Tato funkce nebude fungovat bez povolení k zápisu na externí úložiště.</string>

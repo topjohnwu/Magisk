@@ -11,7 +11,6 @@
 	<!--Status Fragment-->
 	<string name="magisk_version_error">Magisk non è installato.</string>
 	<string name="checking_for_updates">Controllo aggiornamenti…</string>
-	<string name="magisk_update_available">È disponibile Magisk v%1$s!</string>
 	<string name="invalid_update_channel">Canale di aggiornamento non valido</string>
 	<string name="safetyNet_check_text">Tocca per controllare SafetyNet</string>
 	<string name="checking_safetyNet_status">Controllo stato SafetyNet…</string>
@@ -61,16 +60,10 @@
 	<string name="log_is_empty">Il registro eventi è vuoto.</string>
 
     <!--About Activity-->
-	<string name="about">Informazioni</string>
-    	<string name="app_changelog">Novità</string>
+	<string name="app_changelog">Novità</string>
 	<string name="translators">Auanasgheps</string>
-	<string name="app_version">Versione</string>
-	<string name="app_source_code">Codice sorgente</string>
-	<string name="donation">Dona</string>
 	<string name="app_translators">Traduttori</string>
-	<string name="support_thread">Thread di supporto</string>
-	<string name="follow_twitter">Seguimi su Twitter</string>
-	
+
 	<!-- System Components, Notifications -->
 	<string name="update_channel">Aggiornamenti Magisk</string>
    	<string name="progress_channel">Notifiche di avanzamento</string>
@@ -88,18 +81,12 @@
 	<string name="settings_reboot_toast">Riavvia per applicare i cambiamenti.</string>
 	<string name="release_notes">Note di rilascio</string>
 	<string name="repo_cache_cleared">La cache delle repository è stata svuotata</string>
-	<string name="process_error">Errore di elaborazione</string>
 	<string name="internal_storage">Il file zip si trova in:\n[Memoria Interna]%1$s</string>
-	<string name="zip_download_title">Download in corso</string>
-	<string name="zip_download_msg">Download del file zip (%1$d%%) …</string>
-	<string name="zip_process_title">Elaborazione</string>
-	<string name="zip_process_msg">Elaborazione del file zip…</string>
 	<string name="manager_download_install">Premere per scaricare e installare.</string>
 	<string name="dtbo_patched_title">DTBO è stato aggiornato!</string>
 	<string name="dtbo_patched_reboot">Magisk Manager ha aggiornato dtbo.img. Riavvia per completare.</string>
 	<string name="flashing">Flash in corso…</string>
 	<string name="hide_manager_title">Nascondendo Magisk Manager…</string>
-	<string name="hide_manager_msg">Potrebbe volerci un po\'.</string>
 	<string name="hide_manager_fail_toast">Non è stato possibile nascondere Magisk Manager.</string>
 	<string name="open_link_failed_toast">Nessuna app disponibile per aprire il link.</string>
 	<string name="download_zip_only">Scarica solo il file zip</string>
@@ -109,7 +96,6 @@
 	<string name="warning">Attenzione</string>
 	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
     <string name="select_method">Seleziona un metodo</string>
-	<string name="no_boot_file_patch_support">La versione Magisk di destinazione non supporta l\'aggiornamento dell\'immagine di boot</string>
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar.</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
@@ -118,7 +104,6 @@
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
    	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS e non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi scaricare un\'estensione (contenente GoogleApiClient) per controllare lo stato di SafetyNet?</string>
-	<string name="su_db_corrupt">Il database SU è corrotto. Vuoi ricrearne uno nuovo?</string>
 	<string name="setup_done">Configurazione completata.</string>
 	<string name="setup_fail">Configurazione fallita.</string>
 	<string name="env_fix_title">Richiedi configurazione aggiuntiva</string>
@@ -186,7 +171,6 @@
 	<string name="owner_only_summary">Solo il proprietario ha i permessi di root.</string>
 	<string name="owner_manage_summary">Solo il proprietario può gestire accesso root e ricevere richieste.</string>
 	<string name="user_indepenent_summary">Ogni utente ha le sue regole di root indpendenti.</string>
-	<string name="multiuser_hint_owner_request">Una richiesta è stata inviata al proprietario del dispositivo. Accedi come proprietario dispositivo e concedi i permessi.</string>
 
 	<string name="mount_namespace_mode">Modalità mount namespace</string>
 	<string name="settings_ns_global">Namespace globale</string>
@@ -228,7 +212,6 @@
 	<string name="auth_fail">Autenticatione fallita</string>
 
 	<!--Superuser logs-->
-	<string name="pid" translatable="false">PID: %1$d</string>
 	<string name="target_uid">UID destinazione: %1$d</string>
 	<string name="command">Comando: %1$s</string>
 

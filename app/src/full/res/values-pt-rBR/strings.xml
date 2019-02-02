@@ -12,7 +12,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk não está instalado</string>
     <string name="checking_for_updates">Verificando por atualizações…</string>
-    <string name="magisk_update_available">Magisk v%1$s está disponível!</string>
     <string name="invalid_update_channel">Canal de Atualização Inválido</string>
     <string name="safetyNet_check_text">Verificar SafetyNet</string>
     <string name="checking_safetyNet_status">Verificando status de SafetyNet…</string>
@@ -61,14 +60,9 @@
     <string name="log_is_empty">Registro vazio</string>
 
     <!--About Activity-->
-    <string name="about">Sobre</string>
     <string name="app_changelog">Registro de mudanças</string>
     <string name="translators" />
-    <string name="app_version">Versão</string>
-    <string name="app_source_code">Código fonte</string>
-    <string name="donation">Doação</string>
     <string name="app_translators">Tradutores</string>
-    <string name="support_thread">Tópico de suporte</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Fechar</string>
@@ -80,12 +74,7 @@
     <string name="settings_reboot_toast">Reinicie para aplicar as configurações</string>
     <string name="release_notes">Notas de lançamento</string>
     <string name="repo_cache_cleared">Cache de repositório limpo</string>
-    <string name="process_error">Erro de processo</string>
     <string name="internal_storage">O zip está armazenado em:\n[Armazenamento Interno]%1$s</string>
-    <string name="zip_download_title">Baixando</string>
-    <string name="zip_download_msg">Baixando arquivo zip (%1$d%%) …</string>
-    <string name="zip_process_title">Processando</string>
-    <string name="zip_process_msg">Processando arquivo zip …</string>
     <string name="manager_update_title">Nova Atualização do Magisk Manager Disponível!</string>
     <string name="manager_download_install">Toque para baixar e instalar</string>
     <string name="dtbo_patched_title">DTBO foi emendado!</string>
@@ -93,14 +82,12 @@
     <string name="update_channel">Atualizações do Magisk</string>
     <string name="flashing">Gravando</string>
     <string name="hide_manager_title">Ocultando Magisk Manager…</string>
-    <string name="hide_manager_msg">Isto pode demorar um pouco…</string>
     <string name="hide_manager_fail_toast">Falha ao ocultar Magisk Manager…</string>
     <string name="download_zip_only">Baixar Zip Apenas</string>
     <string name="patch_boot_file">Emendar Arquivo de Imagem de Inicialização</string>
     <string name="direct_install">Instalação Direta (Recomendado)</string>
     <string name="install_inactive_slot">Instalar no Slot Inativo (Após OTA)</string>
     <string name="select_method">Selecionar Método</string>
-    <string name="no_boot_file_patch_support">A versão alvo do Magisk não suporta emendamento de imagem de inicialização</string>
     <string name="boot_file_patch_msg">Selecionar depósito de imagem de inicialização de fábrica no formato .img ou .img.tar</string>
     <string name="complete_uninstall">Completar Desinstalação</string>
     <string name="restore_img">Restaurar Imagens</string>
@@ -108,7 +95,6 @@
     <string name="restore_fail">Backup original não existe!</string>
     <string name="proprietary_title">Baixar Código Proprietário</string>
     <string name="proprietary_notice">Magisk Manager é FOSS, que não contém o código proprietário da API SafetyNet da Google.\n\nPermitir ao Magisk Manager baixar uma extensão (que contém a GoogleApiClient) para a verificação SafetyNet?</string>
-    <string name="su_db_corrupt">O banco de dados do SU está corrompido, será recriado novo db</string>
     <string name="download_file_error">Erro ao baixar arquivo</string>
     <string name="downloading_toast">Baixando %1$s</string>
     <string name="no_rw_storage">Este recurso não funcionará sem permissão para gravar no armazenamento externo.</string>
@@ -168,7 +154,6 @@
     <string name="owner_only_summary">Apenas proprietário tem acesso root</string>
     <string name="owner_manage_summary">Apenas proprietário pode gerenciar acesso root e receber expedições de solicitações</string>
     <string name="user_indepenent_summary">Cada usuário tem suas próprias regras root separadas</string>
-    <string name="multiuser_hint_owner_request">Uma solicitação foi enviada ao proprietário do dispositivo. Mude para proprietário e conceda as permissões requeridas</string>
 
     <string name="mount_namespace_mode">Montar Modo de Espaço de Nome</string>
     <string name="settings_ns_global">Espaço de Nome Global</string>

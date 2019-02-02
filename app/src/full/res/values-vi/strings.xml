@@ -11,7 +11,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk chưa được cài đặt</string>
     <string name="checking_for_updates">Đang kiểm tra cập nhật…</string>
-    <string name="magisk_update_available">Magisk v%1$s đã có!</string>
     <string name="invalid_update_channel">Kênh cập nhật không hợp lệ</string>
     <string name="safetyNet_check_text">Chạm để bắt đầu kiểm tra SafetyNet</string>
     <string name="checking_safetyNet_status">Đang kiểm tra trạng thái SafetyNet…</string>
@@ -60,16 +59,10 @@
     <string name="log_is_empty">Nhật ký trống</string>
     
     <!--About Activity-->
-    <string name="about">Thông tin</string>
     <string name="app_changelog">Nhật ký thay đổi của ứng dụng</string>
     <string name="translators">Nguyễn Thanh Tài (thanhtai2009), Nguyễn Trung Hậu (trunghau1712)</string>
-    <string name="app_version">Phiên bản ứng dụng</string>
-    <string name="app_source_code">Mã nguồn</string>
-    <string name="donation">Ủng hộ</string>
     <string name="app_translators">Người dịch ứng dụng</string>
-    <string name="support_thread">Chủ đề hỗ trợ</string>
-    <string name="follow_twitter">Theo dõi trên Twitter</string>
-    
+
     <!--Toasts, Dialogs-->
     <string name="close">Đóng</string>
     <string name="repo_install_title">Cài đặt %1$s</string>
@@ -80,12 +73,7 @@
     <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
     <string name="release_notes">Thay đổi</string>
     <string name="repo_cache_cleared">Đã xoá bộ đệm kho</string>
-    <string name="process_error">Lỗi xử lý</string>
     <string name="internal_storage">Tập tin zip được lưu vào:\n[Bộ nhớ trong]%1$s</string>
-    <string name="zip_download_title">Đang tải xuống</string>
-    <string name="zip_download_msg">Đang tải xuống tập tin zip (%1$d%%) …</string>
-    <string name="zip_process_title">Đang xử lý</string>
-    <string name="zip_process_msg">Đang xử lý tập tin zip …</string>
     <string name="manager_update_title">Đã có bản cập nhật Magisk Manager mới!</string>
     <string name="manager_download_install">Nhấn để tải xuống và cài đặt.</string>
     <string name="dtbo_patched_title">DTBO đã được vá!</string>
@@ -93,7 +81,6 @@
     <string name="update_channel">Cập nhật Magisk</string>
     <string name="flashing">Đang flash</string>
     <string name="hide_manager_title">Ẩn Magisk Manager…</string>
-    <string name="hide_manager_msg">Điều này có thể mất chút thời gian.</string>
     <string name="hide_manager_fail_toast">Ẩn Magisk Manager thất bại.</string>
     <string name="open_link_failed_toast">Không tìm thấy ứng dụng nào để mở liên kết.</string>
     <string name="download_zip_only">Chỉ tải xuống tập tin zip</string>
@@ -103,7 +90,6 @@
     <string name="warning">Cảnh báo</string>
     <string name="install_inactive_slot_msg">Thiết bị của bạn sẽ bắt buộc phải khởi động tới vị trí không hoạt động hiện tại sau khi khởi động lại!\nChỉ sử dụng tuỳ chọn này sau khi cập nhật OTA hoàn tất.\nMuốn tiếp tục?</string>
     <string name="select_method">Chọn phương thức</string>
-    <string name="no_boot_file_patch_support">Phiên bản Magisk không hỗ trợ vá tập tin ảnh khởi động</string>
     <string name="boot_file_patch_msg">Chọn kết xuất hình ảnh khởi động gốc theo định dạng .img hoặc .img.tar.</string>
     <string name="complete_uninstall">Xác nhận gỡ bỏ</string>
     <string name="restore_img">Khôi phục images</string>
@@ -112,7 +98,6 @@
     <string name="restore_fail">Sao lưu gốc không tồn tại!</string>
     <string name="proprietary_title">Tải xuống mã độc quyền</string>
     <string name="proprietary_notice">Magisk Manager là FOSS và không chứa mã SafetyNet API độc quyền của Google.\n\nBạn có cho phép Magisk Manager tải xuống tiện ích (có chứa GoogleApiClient) để kiểm tra SafetyNet không?</string>
-    <string name="su_db_corrupt">Cơ sở dữ liệu SU bị hỏng. Sẽ tạo lại một cái mới</string>
     <string name="setup_done">Thiết lập xong.</string>
     <string name="setup_fail">Thiết lập thất bại.</string>
     <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
@@ -178,7 +163,6 @@
     <string name="owner_only_summary">Chỉ chủ sở hữu mới có quyền truy cập root.</string>
     <string name="owner_manage_summary">Chỉ chủ sở hữu mới có thể quản lý quyền truy cập root và nhận lời nhắc yêu cầu.</string>
     <string name="user_indepenent_summary">Mỗi người dùng có các quy tắc root riêng của mình.</string>
-    <string name="multiuser_hint_owner_request">Yêu cầu đã được gửi tới chủ sở hữu thiết bị. Vui lòng chuyển sang chủ sở hữu và cấp quyền truy cập cần thiết.</string>
     <string name="mount_namespace_mode">Chế độ không gian tên gắn kết</string>
     <string name="settings_ns_global">Không gian tên chung</string>
     <string name="settings_ns_requester">Không gian tên kế thừa</string>

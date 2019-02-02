@@ -12,7 +12,6 @@
     <string name="magisk_version_error">Το Magisk δεν είναι εγκατεστημένο</string>
 
     <string name="checking_for_updates">Έλεγχος για ενημερώσεις…</string>
-    <string name="magisk_update_available">Το Magisk v%1$s είναι διαθέσιμο!</string>
     <string name="invalid_update_channel">Λανθασμένο κανάλι ενημέρωσης</string>
     <string name="safetyNet_check_text">Πατήστε για έλεγχο του SafetyNet</string>
     <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
@@ -61,14 +60,9 @@
     <string name="log_is_empty">Το αρχείο καταγραφής είναι κενό</string>
 
     <!--About Activity-->
-    <string name="about">Περί</string>
     <string name="app_changelog">Καταγραφή αλλαγών εφαρμογής</string>
     <string name="translators">GreatApo, JpegXguy</string>
-    <string name="app_version">Έκδοση εφαρμογής</string>
-    <string name="app_source_code">Πηγαίος κώδικας</string>
-    <string name="donation">Δωρεά</string>
     <string name="app_translators">Μεταφραστές εφαρμογής</string>
-    <string name="support_thread">Σύνδεσμος υποστήριξης</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Κλείσιμο</string>
@@ -80,12 +74,7 @@
     <string name="settings_reboot_toast">Επανεκκίνηση για εφαρμογή ρυθμίσεων</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>
     <string name="repo_cache_cleared">Η Repo cache καθαρίστηκε</string>
-    <string name="process_error">Σφάλμα διαδικασίας</string>
     <string name="internal_storage">Το zip είναι αποθηκευμένο σε:\n[Εσωτερική μνήμη]%1$s</string>
-    <string name="zip_download_title">Γίνεται λήψη</string>
-    <string name="zip_download_msg">Λήψη αρχείου zip (%1$d%%) …</string>
-    <string name="zip_process_title">Γίνεται επεξεργασία</string>
-    <string name="zip_process_msg">Επεξεργασία αρχείου zip …</string>
     <string name="manager_update_title">Νέα Ενημέρωση Magisk Manager Διαθέσιμη!</string>
     <string name="manager_download_install">Πιέστε για λήψη και εγκατάσταση</string>
     <string name="dtbo_patched_title">Έγινε patch στο DTBO!</string>
@@ -93,20 +82,17 @@
     <string name="update_channel">Ενημερώσεις Magisk</string>
     <string name="flashing">Γίνεται flash</string>
     <string name="hide_manager_title">Κρύβοντας το Magisk Manager…</string>
-    <string name="hide_manager_msg">Αυτό μπορεί να πάρει λίγη ώρα…</string>
     <string name="hide_manager_fail_toast">Η απόκρυψη του Magisk Manager απέτυχε…</string>
     <string name="download_zip_only">Λήψη Zip Μόνο</string>
     <string name="patch_boot_file">Εφαρμογή Patch στο Αρχείο Εικόνας Boot</string>
     <string name="direct_install">Απευθείας Εγκατάσταση (Προτείνεται)</string>
     <string name="select_method">Επιλογή Μεθόδου</string>
-    <string name="no_boot_file_patch_support">Αυτή η Magisk έκδοση δεν υποστηρίζει patch του boot image αρχείου</string>
     <string name="boot_file_patch_msg">Επιλογή stock boot image dump σε μορφή .img ή .img.tar</string>
     <string name="complete_uninstall">Πλήρης απεγκατάσταση</string>
     <string name="restore_done">Η ανάκτηση έγινε!</string>
     <string name="restore_fail">Δεν υπάρχει αντίγραφο ασφαλείας!</string>
     <string name="proprietary_title">Λήψη Ιδιόκτητου Κώδικα</string>
     <string name="proprietary_notice">Το Magisk Manager είναι FOSS οπότε δεν περιέχει της Google τον ιδιόκτητο κώδικα του SafetyNet API.\n\nΕπιτρέπετε στο Magisk Manager να κατεβάσει μια επέκταση (περιέχει το GoogleApiClient) για ελέγχους του SafetyNet?</string>
-    <string name="su_db_corrupt">Η βάση δεδομένων SU είναι κατεστραμμένη, θα αναδημιουργηθεί νέα</string>
     <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
     <string name="downloading_toast">Κατέβασμα %1$s</string>
     <string name="no_rw_storage">Η λειτουργία αυτή δεν θα δουλέψει χωρίς την άδεια εγγραφής στον εξωτερικό χώρο αποθηκεύσης.</string>
@@ -160,7 +146,6 @@
     <string name="owner_only_summary">Μόνο ο ιδιοκτήτης έχει πρόσβαση root</string>
     <string name="owner_manage_summary">Μόνο ο ιδιοκτήτης μπορεί να διαχειριστεί την πρόσβαση root και να δεχτεί προτροπές αίτημάτων</string>
     <string name="user_indepenent_summary">Κάθε χρήστης έχει τους δικούς του ξεχωριστούς κανόνες root</string>
-    <string name="multiuser_hint_owner_request">Ένα αίτημα έχει σταλεί στον ιδιοκτήτη της συσκευής. Παρακαλώ αλλάξτε σε ιδιοκτήτη και δώστε την άδεια</string>
 
     <string name="mount_namespace_mode">Λειτουργία προσάρτησης χώρου ονομάτων</string>
     <string name="settings_ns_global">Καθολικός Χώρος Ονομάτων</string>

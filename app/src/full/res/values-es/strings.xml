@@ -12,7 +12,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no está instalado</string>
     <string name="checking_for_updates">Comprobando Actualizaciones…</string>
-    <string name="magisk_update_available">¡Disponible Magisk v%1$s!</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
     <string name="safetyNet_check_text">Comprobar el estado de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
@@ -63,17 +62,11 @@
     <string name="log_is_empty">El registro está vacio</string>
 
     <!--About Activity-->
-    <string name="about">Acerca de</string>
     <string name="app_changelog">Registro de cambios</string>
     <string name="translators">dark-basic</string>
-    <string name="app_version">Versión</string>
-    <string name="app_source_code">Código fuente</string>
-    <string name="donation">Donar</string>
     <string name="app_translators">Traductores</string>
-    <string name="support_thread">Hilo de soporte</string>
-    <string name="follow_twitter">Sigueme en Twitter</string>
-    
-        <!-- System Components, Notifications -->
+
+    <!-- System Components, Notifications -->
     <string name="update_channel">Actualización de Magisk</string>
     <string name="progress_channel">Notificaciones de progreso</string>
     <string name="download_complete">Descarga Completa</string>
@@ -87,21 +80,15 @@
     <string name="repo_install_msg">¿Quieres instalar %1$s ahora?</string>
     <string name="download">Descargar</string>
     <string name="reboot">Reiniciar</string>
-    <string name="zip_process_msg">Procesando archivo zip…</string>
     <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
     <string name="release_notes">Notas de lanzamiento</string>
     <string name="repo_cache_cleared">Caché del repositorio limpiada</string>
-    <string name="process_error">Error de proceso</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
-    <string name="zip_download_title">Descargando</string>
-    <string name="zip_download_msg">Descargando el archivo zip (%1$d%%)…</string>
-    <string name="zip_process_title">Procesando</string>
     <string name="manager_download_install">Pulse para descargar e instalar</string>
     <string name="dtbo_patched_title">DTBO fue parchado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha parcheado dtbo.img, por favor reinicia</string>
     <string name="flashing">Flasheando</string>
     <string name="hide_manager_title">Ocultando Magisk Manager…</string>
-    <string name="hide_manager_msg">Esto podría tomar un tiempo…</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
@@ -109,16 +96,14 @@
     <string name="direct_install">Instalación Directa (Recomendado)</string>
     <string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
     <string name="select_method">Seleccionar Método</string>
-    <string name="no_boot_file_patch_support">La versión de Magisk no admite el parcheo de la imagen boot</string>
     <string name="boot_file_patch_msg">Seleccione el volcado de la imagen boot en formato .img o .img.tar</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
     <string name="restore_done">¡Restauración Terminada!</string>
-    <string name="restore_img_msg">Restaurando ...</string>
+    <string name="restore_img_msg">Restaurando …</string>
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="proprietary_title">Descargar Código Propietario</string>
     <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para la comprobación de SafetyNet?</string>
-    <string name="su_db_corrupt">La base de datos SU está dañada, se creará nueva base de datos</string>
     <string name="setup_done">Instalación Realizada</string>
     <string name="setup_fail">Instalación Fallida</string>
     <string name="env_fix_title">Se Requiere una Instalación Adicional</string>
@@ -188,7 +173,6 @@
     <string name="owner_only_summary">Sólo el administrador tiene acceso root</string>
     <string name="owner_manage_summary">Sólo el administrador puede supervisar el acceso root y recibir solicitudes de otros usuarios</string>
     <string name="user_indepenent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
-    <string name="multiuser_hint_owner_request">Se ha enviado una solicitud al administrador del dispositivo. Por favor, cambie a la cuenta del administrador y conceda el permiso</string>
 
     <string name="mount_namespace_mode">Montar Namespace </string>
     <string name="settings_ns_global">Global Namespace</string>

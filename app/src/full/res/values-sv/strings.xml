@@ -13,7 +13,6 @@
     <string name="magisk_version_error">Magisk är inte installerad</string>
 
     <string name="checking_for_updates">Söker efter uppdateringar…</string>
-    <string name="magisk_update_available">Magisk v%1$s tillgänglig!</string>
     <string name="safetyNet_check_text">Tryck för att starta SafetyNet-kontroll</string>
     <string name="checking_safetyNet_status">Kontrollerar SafetyNet-status…</string>
     <string name="safetyNet_check_success">SafetyNet-kontroll lyckades</string>
@@ -52,14 +51,9 @@
     <string name="log_is_empty">Loggen är tom</string>
 
     <!--About Activity-->
-    <string name="about">Om</string>
     <string name="app_changelog">Ändringslogg</string>
     <string name="translators" />
-    <string name="app_version">Version</string>
-    <string name="app_source_code">Källkod</string>
-    <string name="donation">Donation</string>
     <string name="app_translators">Översättare</string>
-    <string name="support_thread">Supporttråd</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Stäng</string>
@@ -67,14 +61,11 @@
     <string name="repo_install_msg">Vill du installera %1$s ?</string>
     <string name="download">Ladda ner</string>
     <string name="reboot">Starta om</string>
-    <string name="zip_process_msg">Bearbetar ZIP-filen …</string>
     <string name="magisk_update_title">En uppdatering av Magisk finns tillgänglig!</string>
     <string name="settings_reboot_toast">Starta om för att tillämpa inställningar</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo-cache rensad</string>
-    <string name="process_error">Processfel</string>
     <string name="internal_storage">ZIP-filen är sparad i:\n[Internal Storage]%1$s</string>
-    <string name="zip_process_title">Arbetar</string>
     <string name="manager_update_title">En uppdatering av Magisk maneger finns tillgänglig!</string>
     <string name="manager_download_install">Tryck för att ladda ner och installera</string>
     <string name="update_channel">Magiska uppdateringar</string>
@@ -120,7 +111,6 @@
     <string name="owner_only_summary">Endast ägaren har root-tillgång</string>
     <string name="owner_manage_summary">Endast ägaren kan hantera root-åtkomst och få begärda förfrågningar</string>
     <string name="user_indepenent_summary">Varje användare har sina egna separata root-regler</string>
-    <string name="multiuser_hint_owner_request">En förfrågan har skickats till enhetens ägaren. Byt till ägaren och bevilja behörigheten</string>
 
     <string name="mount_namespace_mode">Montera namnrymdsläge</string>
     <string name="settings_ns_global">Global namnrymd</string>

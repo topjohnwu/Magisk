@@ -11,7 +11,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">未安装 Magisk</string>
     <string name="checking_for_updates">正在检查更新…</string>
-    <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
     <string name="invalid_update_channel">无效的更新通道</string>
     <string name="safetyNet_check_text">点按启动 SafetyNet 检查</string>
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
@@ -61,15 +60,9 @@
     <string name="log_is_empty">日志为空</string>
 
     <!--About Activity-->
-    <string name="about">关于</string>
     <string name="app_changelog">应用更新日志</string>
     <string name="translators">gh2923, vvb2060</string>
-    <string name="app_version">应用版本</string>
-    <string name="app_source_code">源代码</string>
-    <string name="donation">捐赠</string>
     <string name="app_translators">翻译人员</string>
-    <string name="support_thread">支持主题</string>
-    <string name="follow_twitter">关注我的 Twitter</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">更新提示</string>
@@ -88,18 +81,12 @@
     <string name="settings_reboot_toast">重启以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
-    <string name="process_error">处理失败</string>
     <string name="internal_storage">Zip 已被储存到：\n[内部存储空间]%1$s</string>
-    <string name="zip_download_title">正在下载</string>
-    <string name="zip_download_msg">正在下载 Zip 文件（%1$d%%）…</string>
-    <string name="zip_process_title">正在处理</string>
-    <string name="zip_process_msg">正在处理 zip 文件…</string>
     <string name="manager_download_install">下载并安装</string>
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
     <string name="flashing">正在刷入</string>
     <string name="hide_manager_title">正在隐藏 Magisk Manager…</string>
-    <string name="hide_manager_msg">这可能需要一点时间…</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
     <string name="open_link_failed_toast">找不到能够打开此链接的应用</string>
     <string name="download_zip_only">仅下载 Zip</string>
@@ -109,7 +96,6 @@
     <string name="warning">警告</string>
     <string name="install_inactive_slot_msg">重启后，设备将被强制切换到另一个槽位！\n请在安装完 OTA 后再使用。\n是否继续？</string>
     <string name="select_method">选择安装方法</string>
-    <string name="no_boot_file_patch_support">目标安装版本不支持修补 Boot 镜像文件</string>
     <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .img.tar 格式</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂镜像</string>
@@ -118,7 +104,6 @@
     <string name="restore_fail">原厂 Boot 镜像备份不存在！</string>
     <string name="proprietary_title">下载专有代码</string>
     <string name="proprietary_notice">Magisk Manager 是一个 100% 开源的应用，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查吗？</string>
-    <string name="su_db_corrupt">SU 数据库已损坏，将重新创建数据库</string>
     <string name="setup_done">安装完成</string>
     <string name="setup_fail">安装失败</string>
     <string name="env_fix_title">需要额外安装</string>
@@ -186,7 +171,6 @@
     <string name="owner_only_summary">仅设备所有者账户有超级用户权限</string>
     <string name="owner_manage_summary">仅设备所有者账户能管理超级用户并接收权限请求提示</string>
     <string name="user_indepenent_summary">每个用户有独立的权限规则</string>
-    <string name="multiuser_hint_owner_request">已发送权限请求到设备所有者账户中。请切换到所有者账户授予权限</string>
 
     <string name="mount_namespace_mode">挂载命名空间 模式</string>
     <string name="settings_ns_global">全局命名空间</string>

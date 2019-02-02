@@ -13,7 +13,6 @@
     <string name="magisk_version_error">Magisk가 설치되지 않음</string>
 
     <string name="checking_for_updates">업데이트 확인 중…</string>
-    <string name="magisk_update_available">Magisk v%1$s 사용 가능!</string>
     <string name="safetyNet_check_text">SafetyNet 체크를 시작하려면 누르기</string>
     <string name="checking_safetyNet_status">SafetyNet 상태 확인 중…</string>
 
@@ -49,28 +48,20 @@
     <string name="log_is_empty">로그가 비어 있음</string>
 
     <!--About Activity-->
-    <string name="about">정보</string>
     <string name="app_changelog">앱 변경 사항</string>
     <string name="translators">lilymaniac</string>
-    <string name="app_version">앱 버전</string>
-    <string name="app_source_code">소스 코드</string>
-    <string name="donation">기부</string>
     <string name="app_translators">앱 번역자</string>
-    <string name="support_thread">지원 스레드</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">닫기</string>
     <string name="repo_install_title">%1$s 설치</string>
     <string name="repo_install_msg">정말 %1$s을(를) 설치하시겠습니까?</string>
     <string name="reboot">다시 시작</string>
-    <string name="zip_process_msg">zip 파일 처리 중…</string>
     <string name="magisk_update_title">새 버전의 Magisk를 사용할 수 있습니다!</string>
     <string name="settings_reboot_toast">기기를 다시 시작하면 설정이 적용됩니다.</string>
     <string name="release_notes">릴리즈 노트</string>
     <string name="repo_cache_cleared">저장소 캐시 비워짐</string>
-    <string name="process_error">처리 오류</string>
     <string name="internal_storage">zip 파일이 다음 위치에 저장됨:\n[내부 저장소]%1$s</string>
-    <string name="zip_process_title">처리 중</string>
     <string name="download_file_error">파일 다운로드 오류</string>
     <string name="downloading_toast">%1$s 다운로드 중</string>
     <string name="no_rw_storage">이 기능은 외부 저장소 쓰기 권한 없이는 작동하지 않습니다.</string>

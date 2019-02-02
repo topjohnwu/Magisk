@@ -13,7 +13,6 @@
     <string name="magisk_version_error">未安裝 Magisk</string>
 
     <string name="checking_for_updates">正在檢查更新…</string>
-    <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
     <string name="safetyNet_check_text">點擊啟動 SafetyNet 檢查</string>
     <string name="checking_safetyNet_status">正在檢查 SafetyNet 狀態…</string>
 
@@ -48,20 +47,14 @@
     <string name="log_is_empty">日誌為空</string>
 
     <!--About Activity-->
-    <string name="about">關於</string>
     <string name="app_changelog">應用更新日誌</string>
     <string name="translators">topjohnwu</string>
-    <string name="app_version">應用版本</string>
-    <string name="app_source_code">原始碼</string>
-    <string name="donation">捐贈</string>
     <string name="app_translators">翻譯者</string>
-    <string name="support_thread">討論串</string>
 
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">安裝 %1$s</string>
     <string name="repo_install_msg">你想要安裝 %1$s 嗎？</string>
     <string name="reboot">重啟</string>
-    <string name="zip_process_msg">正在處理 zip 文件 …</string>
     <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="settings_reboot_toast">重啟以完成設定</string>
     <string name="release_notes">發布說明</string>
@@ -130,15 +123,12 @@
     <string name="command">指令: %1$s</string>
     <string name="close">關閉</string>
     <string name="internal_storage">Zip 已被儲存到:\n[內部儲存空間]%1$s</string>
-    <string name="process_error">處理失敗</string>
     <string name="download">下載</string>
-    <string name="zip_process_title">處理中</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
     <string name="uninstall_magisk_msg">所有模組將會被停用 / 刪除。root會被移除，並有可能在目前資料未加密的情況下被加密</string>
     <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU 和 MagiskHide 仍會持續運作</string>
     <string name="safetyNet_check_success">SafetyNet 檢查成功</string>
     <string name="safetyNet_res_invalid">回傳值無效</string>
-    <string name="multiuser_hint_owner_request">已發送權限請求到擁有者帳戶中。請切換到擁有者帳戶進行准許</string>
     <string name="multiuser_mode">多使用者設定</string>
     <string name="owner_manage_summary">僅裝置擁有者帳戶能管理超級用戶權限並接收權限請求通知</string>
     <string name="owner_only_summary">僅裝置擁有者帳戶有超級用戶權限</string>
@@ -172,11 +162,8 @@
     <string name="patch_boot_file">補丁 Boot 映像文件檔</string>
     <string name="direct_install">直接安裝 (推薦)</string>
     <string name="select_method">選擇安裝方法</string>
-    <string name="no_boot_file_patch_support">目標安裝版本不支援補丁 Boot 映像文件</string>
     <string name="settings_update">更新設定</string>
     <string name="settings_boot_format_title">已補丁 Boot 映像輸出格式</string>
-    <string name="zip_download_title">正在下載</string>
-    <string name="zip_download_msg">正在下載 Zip 文件 (%1$d%%) …</string>
     <string name="settings_boot_format_summary">選擇已補丁 Boot 映像文件輸出格式\n若要透過 fastboot/download 模式刷入，請選擇 .img 格式；若要透過 ODIN 刷入，則選擇 .img.tar\n</string>
     <string name="complete_uninstall">完全解除安裝</string>
     <string name="restore_done">還原完成！</string>
@@ -187,12 +174,10 @@
     <string name="proprietary_notice">Magisk Manager 是一個 100% 開源的程式，因此不會包含 Google 私有所有權的 SafetyNet API 程式碼。\n\n你允許 Magisk Manager 下載一個擴充包 (包含 GoogleApiClient) 以執行 SafetyNet 檢查嗎？</string>
     <string name="dtbo_patched_title">DTBO 已被打上補丁！</string>
     <string name="dtbo_patched_reboot">Magisk Manager 已為 dtbo.img 打上補丁，請立即重新啟動</string>
-    <string name="hide_manager_msg">這可能會花上一段時間…</string>
     <string name="settings_hide_manager_summary">將 Magisk Manager 以隨機套件名稱重新打包，以達成隱藏效果</string>
     <string name="invalid_update_channel">不合法的更新頻道</string>
     <string name="settings_update_custom">自訂</string>
     <string name="settings_update_custom_msg">請輸入自訂網址</string>
-    <string name="su_db_corrupt">SU 資料庫已毀損，將會重新建置</string>
     <string name="reboot_recovery">重啟到 Recovery</string>
     <string name="reboot_bootloader">重啟到 Bootloader</string>
     <string name="reboot_download">重啟到 Download</string>
@@ -221,7 +206,6 @@
     <string name="warning">警告</string>
     <string name="install_inactive_slot_msg">你的裝置將在下一次重新啟動後強制切換到未使用的分區！\n請在安裝完OTA之後使用。\n是否繼續？</string>
     <string name="auth_fingerprint">驗證指紋</string>
-    <string name="follow_twitter">追蹤我的 Twitter</string>
     <string name="open_link_failed_toast">沒有應用程式能夠打開此鏈結…</string>
     <string name="download_complete">下載完成</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模組</string>

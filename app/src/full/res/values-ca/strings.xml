@@ -12,7 +12,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no està instal·lat</string>
     <string name="checking_for_updates">Cercant actualitzacions</string>
-    <string name="magisk_update_available">Disponible Magisk v%1$s!</string>
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
     <string name="safetyNet_check_text">Comprova l\'estat de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprovant l\'estat de SafetyNet…</string>
@@ -61,14 +60,9 @@
     <string name="log_is_empty">El registro està buit</string>
 
     <!--About Activity-->
-    <string name="about">Sobre</string>
     <string name="app_changelog">Registre de canvis</string>
     <string name="translators">JoanVC100, QuitusAnbu27</string>
-    <string name="app_version">Versió</string>
-    <string name="app_source_code">Codi font</string>
-    <string name="donation">Donació</string>
     <string name="app_translators">Traductors</string>
-    <string name="support_thread">Fil de suport</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Tancar</string>
@@ -76,16 +70,11 @@
     <string name="repo_install_msg">Vols instal·lar %1$s ara?</string>
     <string name="download">Baixar</string>
     <string name="reboot">Reiniciar</string>
-    <string name="zip_process_msg">Processant arxiu zip…</string>
     <string name="magisk_update_title">Nova actualització de Magisk disponible!</string>
     <string name="settings_reboot_toast">Reinicia per aplicar els canvis</string>
     <string name="release_notes">Notes de llançament</string>
     <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
-    <string name="process_error">Error de procés</string>
     <string name="internal_storage">El zip està emmagatzemat en:\n[Internal Storage]%1$s</string>
-    <string name="zip_download_title">Baixant</string>
-    <string name="zip_download_msg">Baixant l’arxiu zip (%1$d%%)…</string>
-    <string name="zip_process_title">Processant</string>
     <string name="manager_update_title">Nova actualització de Magisk Manager disponible!</string>
     <string name="manager_download_install">Premi per a descarregar i instal·lar</string>
     <string name="dtbo_patched_title">DTBO ha estat arranjat</string>
@@ -93,7 +82,6 @@
     <string name="update_channel">Actualització de Magisk</string>
     <string name="flashing">Instal·lant</string>
     <string name="hide_manager_title">Amagant Magisk Manager…</string>
-    <string name="hide_manager_msg">Això pot tardar un temps…</string>
     <string name="hide_manager_fail_toast">L’amagament de Magisk Manager ha fallat…</string>
     <string name="open_link_failed_toast">No s’ha trobat cap aplicació per obrir l’enllaç…</string>
     <string name="download_zip_only">Descarregar només l’arxiu ZIP</string>
@@ -101,7 +89,6 @@
     <string name="direct_install">Instal·lació Directa (Recomanat)</string>
     <string name="install_inactive_slot">Instal·lar en ranura inactiva (després de OTA)</string>
     <string name="select_method">Seleccionar Mètode</string>
-    <string name="no_boot_file_patch_support">La versió de Magisk no admet l’arranjament de la imatge d’arrancada</string>
     <string name="boot_file_patch_msg">Seleccioni el bolcat de la imatge d’arrancada en format .img o .img.tar</string>
     <string name="complete_uninstall">Desinstal·lació completa</string>
     <string name="restore_img">Restaurar imatges</string>
@@ -110,7 +97,6 @@
     <string name="restore_fail">La copia de seguretat de la imatge d’arrancada Stock no existeix!</string>
     <string name="proprietary_title">Descarregar codi propietari</string>
     <string name="proprietary_notice">Magisk Manager es un Software Lliure. Per tant, no conté el codi API de SafetyNet (Codi Propietari de Google).\n\n Pot permetre que Magisk Manager descarregui una extensió (conté la GoogleApiClient) per la comprovació de SafetyNet?</string>
-    <string name="su_db_corrupt">La base de dades SU està danyada, es crearà una nova base de dades</string>
     <string name="setup_done">Instal·lació Realitzada</string>
     <string name="setup_fail">Instal·lació Fallida</string>
     <string name="env_fix_title">Es requereix una Instal·lació Addicional</string>
@@ -175,7 +161,6 @@
     <string name="owner_only_summary">Només l’administrador té accés root</string>
     <string name="owner_manage_summary"> Només l’administrador pot supervisar l’acces root y rebre sol·licituds d’altres usuaris</string>
     <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles de root </string>
-    <string name="multiuser_hint_owner_request">S’ha enviat una sol·licitud a l’administrador del dispositiu. Per favor, canviï a la conta de l’administrador y concedeixi el permís</string>
 
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>

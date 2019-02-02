@@ -11,7 +11,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nu este instalat</string>
     <string name="checking_for_updates">Verificare actualizări…</string>
-    <string name="magisk_update_available">Magisk v%1$s disponibil!</string>
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
     <string name="safetyNet_check_text">Verificare SafetyNet</string>
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
@@ -60,15 +59,9 @@
     <string name="log_is_empty">Jurnal gol</string>
 
     <!--About Activity-->
-    <string name="about">Despre</string>
     <string name="app_changelog">Lista modificărilor</string>
     <string name="translators" />
-    <string name="app_version">Versiune</string>
-    <string name="app_source_code">Cod sursă</string>
-    <string name="donation">Donaţie</string>
     <string name="app_translators">Traducători</string>
-    <string name="support_thread">Pagina de suport</string>
-    <string name="follow_twitter">Urmăriți-mă pe Twitter</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Actualizări Magisk</string>
@@ -87,18 +80,12 @@
     <string name="settings_reboot_toast">Reporniți pentru a aplica setările</string>
     <string name="release_notes">Note de lansare</string>
     <string name="repo_cache_cleared">Cache eliminat</string>
-    <string name="process_error">Eroare de proces</string>
     <string name="internal_storage">Zip stocat în:\n[Stocare internă]%1$s</string>
-    <string name="zip_download_title">Descărcare</string>
-    <string name="zip_download_msg">Descărcare fişier zip (%1$d%%)…</string>
-    <string name="zip_process_title">Procesare</string>
-    <string name="zip_process_msg">Procesare fişier zip…</string>
     <string name="manager_download_install">Apăsați pentru a descărca și instala</string>
     <string name="dtbo_patched_title">DTBO a fost modificat!</string>
     <string name="dtbo_patched_reboot">Magisk Manager a modificat dtbo.img, reporniţi</string>
     <string name="flashing">Procesare</string>
     <string name="hide_manager_title">Ascundere Magisk Manager…</string>
-    <string name="hide_manager_msg">Ar putea dura ceva timp…</string>
     <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eşuat</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul…</string>
     <string name="download_zip_only">Doar descărcare fişier Zip</string>
@@ -108,7 +95,6 @@
     <string name="warning">Avertizare</string>
     <string name="install_inactive_slot_msg">Dispozitivul dvs. va fi forțat să se încarce în slotul inactiv actual după repornire!\nUtilizați această opțiune numai după finalizarea OTA.\nContinuați?</string>
     <string name="select_method">Selectaţi metoda</string>
-    <string name="no_boot_file_patch_support">Versiunea Magisk nu acceptă modificarea imaginii de Boot</string>
     <string name="boot_file_patch_msg">Selectaţi formatul .img sau .img.tar pentru imaginea de Boot stoc</string>
     <string name="complete_uninstall">Dezinstalare totală</string>
     <string name="restore_img">Restabilire imagini</string>
@@ -117,7 +103,6 @@
     <string name="restore_fail">Backup stoc nu există!</string>
     <string name="proprietary_title">Descărcare cod proprietar</string>
     <string name="proprietary_notice">Magisk Manager este FOSS așa că nu conține codul API SafetyNet de la Google.\n\nPermiteți ca Magisk Manager să descarce o extensie (conține GoogleApiClient) pentru verificările SafetyNet?</string>
-    <string name="su_db_corrupt">Baza de date SU este defectă, va fi creată o bază nouă</string>
     <string name="setup_done">Configurare finalizată.</string>
     <string name="setup_fail">Configurare eșuată.</string>
     <string name="env_fix_title">Necesită configurare suplimentară</string>
@@ -184,7 +169,6 @@
     <string name="owner_only_summary">Numai proprietarul are acces la root</string>
     <string name="owner_manage_summary">Numai proprietarul poate gestiona accesul la root și să primească solicitări</string>
     <string name="user_indepenent_summary">Fiecare utilizator are propriile reguli de acces la root</string>
-    <string name="multiuser_hint_owner_request">A fost trimisă o solicitare proprietarului dispozitivului. Comutaţi la proprietar și acordați permisiunea</string>
 
     <string name="mount_namespace_mode">Mod montare spaţiu de nume</string>
     <string name="settings_ns_global">Spaţiu de nume global</string>

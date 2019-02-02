@@ -11,7 +11,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magiskがインストールされていません</string>
     <string name="checking_for_updates">更新を確認中…</string>
-    <string name="magisk_update_available">Magisk v%1$s が利用可能です！</string>
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
     <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
     <string name="checking_safetyNet_status">SafetyNetの状態をチェック中…</string>
@@ -60,15 +59,9 @@
     <string name="log_is_empty">ログは空です</string>
 
     <!--About Activity-->
-    <string name="about">このアプリについて</string>
     <string name="app_changelog">アプリの更新履歴</string>
     <string name="translators">小鳥遊桜 (@SakuraSa233) / hota (@lindwurm) / AndroPlus (@AndroPlus_org)</string>
-    <string name="app_version">アプリのバージョン</string>
-    <string name="app_source_code">ソースコード</string>
-    <string name="donation">寄付</string>
     <string name="app_translators">アプリの翻訳者</string>
-    <string name="follow_twitter">Twitterをフォロー</string>
-    <string name="support_thread">サポートスレッド</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magiskの更新</string>
@@ -87,18 +80,12 @@
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">更新履歴</string>
     <string name="repo_cache_cleared">リポジトリキャッシュを消去しました</string>
-    <string name="process_error">プロセスエラー</string>
     <string name="internal_storage">ZIPは\n[内部ストレージ]%1$sに保存されます</string>
-    <string name="zip_download_title">ダウンロード中</string>
-    <string name="zip_download_msg">ZIPファイルのダウンロード中 (%1$d%%) …</string>
-    <string name="zip_process_title">処理</string>
-    <string name="zip_process_msg">ZIPファイルの処理中…</string>
     <string name="manager_download_install">タップでダウンロードしてインストールします</string>
     <string name="dtbo_patched_title">DTBOをパッチしました！</string>
     <string name="dtbo_patched_reboot">Magisk Managerはdtbo.imgをパッチしました。再起動してください</string>
     <string name="flashing">書き込み中</string>
     <string name="hide_manager_title">Magisk Managerを隠しています…</string>
-    <string name="hide_manager_msg">しばらくお待ちください…</string>
     <string name="hide_manager_fail_toast">Magisk Managerを隠せませんでした…</string>
     <string name="open_link_failed_toast">このリンクを開けアプリがありません。</string>
     <string name="download_zip_only">ZIPのみダウンロード</string>
@@ -108,7 +95,6 @@
     <string name="warning">警告</string>
     <string name="install_inactive_slot_msg">お使いのデバイスは再起動後に現在のInactive Slotで強制に起動されます！\nこのオプションはOTA後に使うのみ。\n続行しますか?</string>
     <string name="select_method">方法の選択</string>
-    <string name="no_boot_file_patch_support">指定されたMagiskバージョンはBootイメージのパッチに対応していません</string>
     <string name="boot_file_patch_msg">StockのBootイメージ (.img または .img.tar形式) を選択してください</string>
     <string name="complete_uninstall">完全にアンインストール</string>
     <string name="restore_img">イメージのリストア</string>
@@ -117,7 +103,6 @@
     <string name="restore_fail">Stockのバックアップがありません！</string>
     <string name="proprietary_title">プロプライエタリコードのダウンロード</string>
     <string name="proprietary_notice">Magisk ManagerはFOSSのため、GoogleのプロプライエタリなSafetyNet APIコードを含んでいません。\n\nMagisk ManagerがSafetyNetチェックのための拡張機能 (GoogleApiClientを含む) をダウンロードすることを許可しますか?</string>
-    <string name="su_db_corrupt">SUデータベースが壊れています。DBを再生成します</string>
     <string name="setup_done">セットアップ完了。</string>
     <string name="setup_fail">セットアップに失敗しました。</string>
     <string name="env_fix_title">追加セットアップが必要</string>
@@ -185,7 +170,6 @@
     <string name="owner_only_summary">端末の管理者のみスーパーユーザー権限を利用できます</string>
     <string name="owner_manage_summary">端末の管理者のみがスーパーユーザー権限を管理し、リクエストを受け付けられます</string>
     <string name="user_indepenent_summary">ユーザー毎にそれぞれスーパーユーザー権限を設定できます</string>
-    <string name="multiuser_hint_owner_request">端末の管理者にリクエストを送信しました。管理者に切り替えて権限を許可してください</string>
 
     <string name="mount_namespace_mode">名前空間のマウントモード</string>
     <string name="settings_ns_global">グローバル名前空間</string>
