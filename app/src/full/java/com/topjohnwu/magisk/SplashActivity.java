@@ -37,12 +37,6 @@ public class SplashActivity extends BaseActivity {
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
 
-        // Magisk working as expected
-        if (Shell.rootAccess() && Config.magiskVersionCode > 0) {
-            // Load modules
-            Utils.loadModules();
-        }
-
         // Set default configs
         Config.initialize();
 
@@ -55,9 +49,13 @@ public class SplashActivity extends BaseActivity {
         // Setup shortcuts
         Shortcuts.setup(this);
 
-        if (Networking.checkNetworkStatus(this)) {
-            // Repo update check
-            new UpdateRepos().exec();
+        // Magisk working as expected
+        if (Shell.rootAccess() && Config.magiskVersionCode > 0) {
+            // Load modules
+            Utils.loadModules();
+            // Load repos
+            if (Networking.checkNetworkStatus(this))
+                new UpdateRepos().exec();
         }
 
         app.init = true;
