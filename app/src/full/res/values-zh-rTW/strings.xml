@@ -211,5 +211,11 @@
     <string name="settings_hosts_toast">已添加 systemless hosts 模組</string>
     <string name="progress_channel">進度通知</string>
     <string name="dl_one_module">一次僅能下載一個模組</string>
+    <string name="magisk_up_to_date">Magisk 已是最新版本</string>
+    <string name="manager_up_to_date">Magisk Manager 已是最新版本</string>
+    <string name="core_only_enabled">(核心模式啟用)</string>
+    <string name="show_system_app">顯示系統程式</string>
+    <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>
+    <string name="unsupport_magisk_message">此版本的 Magisk Magisk 不支援 Magisk v18.0 以下之版本。\n\n請自行更新 Magisk，或是手動將 Magisk Manager 降級。</string>
 
 </resources>
