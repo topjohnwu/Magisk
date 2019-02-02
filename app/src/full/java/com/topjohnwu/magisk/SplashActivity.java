@@ -28,7 +28,7 @@ public class SplashActivity extends BaseActivity {
         String pkg = Config.get(Config.Key.SU_MANAGER);
         if (pkg != null && getPackageName().equals(BuildConfig.APPLICATION_ID)) {
             Config.remove(Config.Key.SU_MANAGER);
-            Shell.su("pm uninstall " + pkg).exec();
+            Shell.su("pm uninstall " + pkg).submit();
         }
         if (TextUtils.equals(pkg, getPackageName())) {
             try {
@@ -57,8 +57,6 @@ public class SplashActivity extends BaseActivity {
         Shortcuts.setup(this);
 
         if (Networking.checkNetworkStatus(this)) {
-            // Fire update check
-            CheckUpdates.check();
             // Repo update check
             new UpdateRepos().exec();
         }
