@@ -3,17 +3,15 @@ package com.topjohnwu.magisk.utils;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.topjohnwu.core.App;
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.Data;
-import com.topjohnwu.core.utils.RootUtils;
-import com.topjohnwu.core.utils.Utils;
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.Notifications;
+import com.topjohnwu.magisk.uicomponents.Notifications;
+import com.topjohnwu.signing.JarMap;
+import com.topjohnwu.signing.SignAPK;
 import com.topjohnwu.superuser.ShellUtils;
-import com.topjohnwu.utils.JarMap;
-import com.topjohnwu.utils.SignAPK;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -110,8 +108,8 @@ public class PatchAPK {
         if (!ShellUtils.fastCmdResult("pm install " + repack))
             return false;
 
-        app.mDB.setStrings(Const.Key.SU_MANAGER, pkg);
-        Data.exportPrefs();
+        Config.set(Config.Key.SU_MANAGER, pkg);
+        Config.export();
         RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID, pkg);
 
         return true;

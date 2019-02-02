@@ -5,11 +5,10 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:name="a.q"
+        android:name="a.e"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
@@ -31,12 +30,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="a.d"
-            android:theme="@style/AppTheme.NoDrawer" />
-        <activity
-            android:name="a.e"
-            android:theme="@style/AppTheme.NoDrawer"/>
-        <activity
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor"
@@ -56,16 +49,12 @@
         <receiver android:name="a.h">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
                 <data android:scheme="package" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name="a.i">
-            <intent-filter>
-                <action android:name="android.intent.action.LOCALE_CHANGED" />
             </intent-filter>
         </receiver>
 

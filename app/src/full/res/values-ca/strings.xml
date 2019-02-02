@@ -23,12 +23,12 @@
     <string name="advanced_settings_title">Configuració avançada</string>
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
     <string name="keep_dm_verity">Mantenir AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Versió instal·lada: %1$s</string>
-    <string name="install_magisk_title">Última versió: %1$s</string>
+    <string name="current_installed">Instal·lada: %1$s</string>
+    <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstal·lar</string>
     <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Root s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
-    <string name="update">Actualització %1$s</string>
+    <string name="update">Actualització</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>
@@ -172,7 +172,7 @@
     <string name="auto_response">Resposta automàtica</string>
     <string name="request_timeout">Temps de petició</string>
     <string name="superuser_notification">Notificació de superusuari</string>
-    <string name="request_timeout_summary">%1$s segons</string>
+    <string name="request_timeout_summary">%1$d segons</string>
     <string name="settings_su_reauth_title">Re-autenticació</string>
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació es actualitzada o reinstal·lada</string>
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
@@ -229,9 +229,8 @@
     <string name="auth_fail">Autenticació fallida</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">UID de l’objectiu:\u0020</string>
-    <string name="command">Ordre:\u0020</string>
+    <string name="target_uid">UID de l’objectiu: %1$d</string>
+    <string name="command">Ordre: %1$s</string>
 
 </resources>
     <!--Universal-->

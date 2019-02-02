@@ -12,15 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.topjohnwu.core.Const;
-import com.topjohnwu.core.container.Module;
-import com.topjohnwu.core.utils.Topic;
-import com.topjohnwu.core.utils.Utils;
 import com.topjohnwu.magisk.ClassMap;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
+import com.topjohnwu.magisk.container.Module;
+import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;

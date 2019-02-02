@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="?attr/cardStyle"
     android:layout_width="fill_parent"
@@ -12,86 +10,109 @@
     android:layout_marginStart="@dimen/card_horizontal_margin"
     android:layout_marginTop="@dimen/card_vertical_margin"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    card_view:cardCornerRadius="@dimen/card_corner_radius"
-    card_view:cardElevation="@dimen/card_elevation">
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:orientation="horizontal"
-        android:padding="@dimen/card_layout_padding">
+        android:paddingStart="10dp"
+        android:paddingTop="5dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="8dp">
 
-        <LinearLayout
-            android:id="@+id/info_layout"
+        <TextView
+            android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textIsSelectable="false"
+            app:layout_constraintBottom_toTopOf="@+id/version_name"
+            app:layout_constraintEnd_toStartOf="@+id/download"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/version_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/tertiary_text_dark"
+            android:textIsSelectable="false"
+            android:textStyle="bold|italic"
+            app:layout_constraintBottom_toTopOf="@+id/author"
+            app:layout_constraintEnd_toEndOf="@+id/title"
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
+
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/tertiary_text_dark"
+            android:textIsSelectable="false"
+            android:textStyle="bold|italic"
+            app:layout_constraintBottom_toTopOf="@+id/description"
+            app:layout_constraintEnd_toEndOf="@+id/title"
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/version_name" />
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textIsSelectable="false"
+            app:layout_constraintBottom_toTopOf="@+id/update_time"
+            app:layout_constraintEnd_toEndOf="@id/title"
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/author" />
+
+        <TextView
+            android:id="@+id/update_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/tertiary_text_dark"
+            android:textStyle="bold|italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/description"
+            app:layout_constraintEnd_toEndOf="@+id/title" />
+
+        <View
+            android:id="@+id/info_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:clickable="true"
+            android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textIsSelectable="false" />
-
-            <TextView
-                android:id="@+id/version_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/no_info_provided"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/tertiary_text_dark"
-                android:textIsSelectable="false"
-                android:textStyle="bold|italic" />
-
-            <TextView
-                android:id="@+id/author"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/no_info_provided"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/tertiary_text_dark"
-                android:textIsSelectable="false"
-                android:textStyle="bold|italic" />
-
-            <TextView
-                android:id="@+id/description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/no_info_provided"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textIsSelectable="false" />
-
-            <TextView
-                android:id="@+id/update_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/tertiary_text_dark"
-                android:textIsSelectable="false"
-                android:textStyle="bold|italic" />
-
-        </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="@+id/update_time"
+            app:layout_constraintEnd_toEndOf="@+id/title"
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintTop_toTopOf="@+id/title" />
 
         <ImageView
             android:id="@+id/download"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            app:srcCompat="@drawable/ic_file_download_black"
-            android:tint="@color/icon_grey"
+            android:layout_marginStart="8dp"
             android:clickable="true"
+            android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
-            android:focusable="false"
-            android:gravity="end" />
+            android:gravity="end"
+            android:tint="@color/icon_grey"
+            app:srcCompat="@drawable/ic_file_download_black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/title"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.cardview.widget.CardView>

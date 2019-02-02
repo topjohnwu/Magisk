@@ -10,18 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.topjohnwu.core.container.Module;
-import com.topjohnwu.core.container.Repo;
-import com.topjohnwu.core.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.components.CustomAlertDialog;
-import com.topjohnwu.magisk.components.MarkDownWindow;
-import com.topjohnwu.magisk.services.DownloadModuleService;
+import com.topjohnwu.magisk.components.DownloadModuleService;
+import com.topjohnwu.magisk.container.Module;
+import com.topjohnwu.magisk.container.Repo;
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
+import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
+import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -193,7 +192,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         @BindView(R.id.version_name) TextView versionName;
         @BindView(R.id.description) TextView description;
         @BindView(R.id.author) TextView author;
-        @BindView(R.id.info_layout) LinearLayout infoLayout;
+        @BindView(R.id.info_layout) View infoLayout;
         @BindView(R.id.download) ImageView downloadImage;
         @BindView(R.id.update_time) TextView updateTime;
 

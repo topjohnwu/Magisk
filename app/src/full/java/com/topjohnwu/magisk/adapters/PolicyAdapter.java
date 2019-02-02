@@ -9,17 +9,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.topjohnwu.core.container.Policy;
-import com.topjohnwu.core.database.MagiskDB;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.CustomAlertDialog;
-import com.topjohnwu.magisk.components.ExpandableView;
-import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.container.Policy;
+import com.topjohnwu.magisk.database.MagiskDB;
+import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
+import com.topjohnwu.magisk.dialogs.FingerprintAuthDialog;
+import com.topjohnwu.magisk.uicomponents.ArrowExpandedViewHolder;
+import com.topjohnwu.magisk.uicomponents.ExpandableViewHolder;
+import com.topjohnwu.magisk.uicomponents.SnackbarMaker;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
@@ -31,10 +31,11 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
     private List<Policy> policyList;
     private MagiskDB dbHelper;
     private PackageManager pm;
-    private Set<Policy> expandList = new HashSet<>();
+    private boolean[] expandList;
 
     public PolicyAdapter(List<Policy> list, MagiskDB db, PackageManager pm) {
         policyList = list;
+        expandList = new boolean[policyList.size()];
         dbHelper = db;
         this.pm = pm;
     }
@@ -50,15 +51,14 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Policy policy = policyList.get(position);
 
-        holder.setExpanded(expandList.contains(policy));
-
-        holder.itemView.setOnClickListener(view -> {
-            if (holder.isExpanded()) {
-                holder.collapse();
-                expandList.remove(policy);
+        holder.settings.setExpanded(expandList[position]);
+        holder.trigger.setOnClickListener(view -> {
+            if (holder.settings.isExpanded()) {
+                holder.settings.collapse();
+                expandList[position] = false;
             } else {
-                holder.expand();
-                expandList.add(policy);
+                holder.settings.expand();
+                expandList[position] = true;
             }
         });
 
@@ -85,12 +85,12 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                     dbHelper.updatePolicy(policy);
                 }
             };
-            if (FingerprintHelper.useFingerPrint()) {
+            if (FingerprintHelper.useFingerprint()) {
                 holder.masterSwitch.setChecked(!isChecked);
-                FingerprintHelper.showAuthDialog((Activity) v.getContext(), () -> {
+                new FingerprintAuthDialog((Activity) v.getContext(), () -> {
                     holder.masterSwitch.setChecked(isChecked);
                     r.run();
-                });
+                }).show();
             } else {
                 r.run();
             }
@@ -129,9 +129,6 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                 .setNegativeButton(R.string.no_thanks, null)
                 .setCancelable(true)
                 .show());
-
-        // Hide for now
-        holder.moreInfo.setVisibility(View.GONE);
     }
 
     @Override
@@ -139,7 +136,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         return policyList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.package_name) TextView packageName;
@@ -148,22 +145,17 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         @BindView(R.id.notification_switch) SwitchCompat notificationSwitch;
         @BindView(R.id.logging_switch) SwitchCompat loggingSwitch;
         @BindView(R.id.expand_layout) ViewGroup expandLayout;
-
+        @BindView(R.id.arrow) ImageView arrow;
+        @BindView(R.id.trigger) View trigger;
         @BindView(R.id.delete) ImageView delete;
         @BindView(R.id.more_info) ImageView moreInfo;
 
-        private Container container = new Container();
+        ExpandableViewHolder settings;
 
         public ViewHolder(View itemView) {
             super(itemView);
             new PolicyAdapter$ViewHolder_ViewBinding(this, itemView);
-            container.expandLayout = expandLayout;
-            setupExpandable();
-        }
-
-        @Override
-        public Container getContainer() {
-            return container;
+            settings = new ArrowExpandedViewHolder(expandLayout, arrow);
         }
     }
 }

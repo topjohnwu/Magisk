@@ -60,79 +60,40 @@
             android:id="@+id/expand_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
+            android:layout_gravity="center_horizontal"
             android:gravity="center"
-            android:layout_gravity="center_horizontal">
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp">
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/pid"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:text="@string/pid"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="12sp" />
 
-                <TextView
-                    android:text="@string/pid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/fromPid"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/uid"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:text="@string/target_uid"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="12sp" />
 
-                <TextView
-                    android:text="@string/target_uid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/toUid"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/cmd"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_weight="2">
-
-                <TextView
-                    android:text="@string/command"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/command"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:gravity="start"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
+                android:layout_weight="2"
+                android:text="@string/command"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="12sp" />
 
         </LinearLayout>
 

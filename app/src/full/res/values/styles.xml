@@ -9,7 +9,8 @@
         <item name="cardStyle">@style/CardViewStyle.Light</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="imageColorTint">@android:color/secondary_text_light</item>
+        <item name="imageColorTint">@color/icon_grey</item>
+        <item name="colorControl">?android:colorControlNormal</item>
     </style>
 
     <style name="AppTheme" parent="AppTheme.Base"/>
@@ -23,6 +24,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:textColorSecondary">@color/dark_secondary_text</item>
         <item name="imageColorTint">@color/dark_secondary_text</item>
+        <item name="colorControl">?android:colorControlNormal</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.Dark.Base"/>

@@ -11,9 +11,8 @@
   <string name="checking_for_updates">البحث عن تحديثات…</string>
   <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
   <string name="close">إغلاق</string>
-  <string name="command">"الأمر: "</string>
-  <string name="current_magisk_title">نسخة Magisk المثبته: %1$s</string>
-  <string name="deny">رفض</string>
+  <string name="command">الأمر: %1$s</string>
+    <string name="deny">رفض</string>
   <string name="deny_with_str">رفض%1$s</string>
   <string name="disable_file_created">سيتم تعطيل الإضافة في إعادة التشغيل التالي</string>
   <string name="disable_file_removed">سيتم تمكين الإضافة في إعادة التشغيل التالي</string>
@@ -23,8 +22,7 @@
   <string name="forever">للابد</string>
   <string name="grant">سماح</string>
   <string name="install">التثبيت</string>
-  <string name="install_magisk_title">آخر نسخة Magisk: %1$s</string>
-  <string name="installed">مثبت</string>
+    <string name="installed">مثبت</string>
   <string name="internal_storage">"يتم تخزين الملف المضغوط في:
 [التخزين الداخلي]%1$s"</string>
   <string name="keep_dm_verity">إبقاء AVB 2.0/dm-verity</string>
@@ -48,8 +46,7 @@
   <string name="once">مرة</string>
   <string name="owner_manage_summary">يمكن للمالك فقط إدارة صلاحيات الروت وتلقي مطالبات الطلب</string>
   <string name="owner_only_summary">المالك فقط لديه صلاحيات الروت</string>
-  <string name="pid">"PID: "</string>
-  <string name="process_error">خطأ في العملية</string>
+    <string name="process_error">خطأ في العملية</string>
   <string name="prompt">طلب</string>
   <string name="reboot">إعادة التشغيل</string>
   <string name="release_notes">ملاحظات الإصدار</string>
@@ -59,7 +56,7 @@
   <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
   <string name="repo_install_title">تثبيت %1$s</string>
   <string name="request_timeout">مهلة الطلب</string>
-  <string name="request_timeout_summary">%1$s ثانية</string>
+  <string name="request_timeout_summary">%1$d ثانية</string>
   <string name="safetyNet_check_success">نجح فحص SafetyNet</string>
   <string name="safetyNet_check_text">انقر لبدء فحص SafetyNet</string>
   <string name="safetyNet_res_invalid">الاستجابة غير صالحه</string>
@@ -105,7 +102,7 @@
   <string name="superuser_access">Superuser صلاحيات</string>
   <string name="superuser_notification">Superuser إشعارات</string>
   <string name="support_thread">منتدى الدعم</string>
-  <string name="target_uid">"الهدف UID: "</string>
+  <string name="target_uid">الهدف UID: %1$d</string>
   <string name="tenmin">10 دقائق</string>
   <string name="thirtymin">30 دقائق</string>
   <string name="toast">ملاحظة منبثقة</string>
@@ -197,7 +194,7 @@
   <string name="su_db_corrupt">قاعدة بيانات SU معطوبة ، سوف يتم إنشاء قاعدة بيانات جديدة</string>
   <string name="system_default">(أفتراضي النظام)</string>
   <string name="uninstall_magisk_msg">سيتم تعطيل/إزالة جميع الوحدات. ستتم إزالة الجذر ، وربما تشفير بياناتك إذا كانت بياناتك غير مشفرة حالياً</string>
-  <string name="update">تحديث %1$s</string>
+  <string name="update">تحديث</string>
   <string name="updated_on">تم التحديث في: %1$s</string>
   <string name="warning">تحذير</string>
   <string name="zip_download_msg">تحميل ملف zip (%1$d%%)…</string>

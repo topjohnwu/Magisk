@@ -39,6 +39,7 @@
 #define MAGISKHIDE_PROP     "persist.magisk.hide"
 
 extern char *argv0;     /* For changing process name */
+extern int SDK_INT;
 
 #define applet_names ((const char *[]) { "magisk", "su", "resetprop", "magiskhide", "imgtool", nullptr })
 #define init_applet  ((const char *[]) { "magiskpolicy", "supolicy", nullptr })
