@@ -1,5 +1,4 @@
 <resources>
-    <!--Universal-->
 
     <!--Welcome Activity-->
     <string name="modules">Mòduls</string>
@@ -8,6 +7,8 @@
     <string name="log">Registre</string>
     <string name="settings">Configuració</string>
     <string name="install">Instal·lar</string>
+    <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
+    <string name="unsupport_magisk_message">Aquesta versió de Magisk Manager no suporta una versió inferior a la 18.0.\n\nPots actualitzar Magisk manualment o pots instalar una versió anterior de la app.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no està instal·lat</string>
@@ -18,26 +19,28 @@
     <string name="safetyNet_check_success">La comprovació ha sigut exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_res_invalid">La resposta és invàlida</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk està actualitzat</string>
+    <string name="manager_up_to_date">Magisk Manager està actualitzat</string>
     <string name="advanced_settings_title">Configuració avançada</string>
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
     <string name="keep_dm_verity">Mantenir AVB 2.0/dm-verity</string>
     <string name="current_installed">Instal·lada: %1$s</string>
     <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstal·lar</string>
-    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Root s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
+    <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
+    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Arrel s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="update">Actualització</string>
+    <string name="core_only_enabled">(Mode únicament nucli activat)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>
-    <string name="no_modules_found">No s’han trobat mòduls</string>
-    <string name="update_file_created">El mòdul s’actualitzarà en el següent reinici</string>
-    <string name="remove_file_created">El mòdul s’eliminarà en el següent reinici</string>
-    <string name="remove_file_deleted"> El mòdul no s’eliminarà en el següent reinici </string>
+    <string name="no_modules_found">No s\’han trobat mòduls</string>
+    <string name="update_file_created">El mòdul s\’actualitzarà en el següent reinici</string>
+    <string name="remove_file_created">El mòdul s\’eliminarà en el següent reinici</string>
+    <string name="remove_file_deleted"> El mòdul no s\’eliminarà en el següent reinici </string>
     <string name="disable_file_created"> El mòdul es desactivarà en el següent reinici </string>
-    <string name="disable_file_removed"> El mòdul s’activarà en el següent reinici </string>
+    <string name="disable_file_removed"> El mòdul s\’activarà en el següent reinici </string>
     <string name="author">Creat per %1$s</string>
     <string name="reboot_recovery">Reiniciar en Mode Recuperació</string>
     <string name="reboot_bootloader">Reiniciar en Mode Bootloader</string>
@@ -50,19 +53,27 @@
     <string name="updated_on">Actualitzat el: %1$s</string>
     <string name="sorting_order">Ordre de Classificació</string>
     <string name="sort_by_name">Ordenar per nom</string>
-    <string name="sort_by_update">Ordenar segons l’última actualització</string>
+    <string name="sort_by_update">Ordenar segons l\’última actualització</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Guardar registre</string>
     <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Netejar registre ara</string>
     <string name="logs_cleared">Registre netejat correctament</string>
-    <string name="log_is_empty">El registro està buit</string>
+    <string name="log_is_empty">El registre està buit</string>
 
     <!--About Activity-->
     <string name="app_changelog">Registre de canvis</string>
-    <string name="translators">JoanVC100, QuitusAnbu27</string>
-    <string name="app_translators">Traductors</string>
+    <string name="translators" />
+    <string name="app_translators">JoanVC100, QuitusAnbu27</string>
+    
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Actualització de Magisk</string>
+    <string name="progress_channel">Notificacions de progrés</string>
+    <string name="download_complete">Baixada completada</string>
+    <string name="download_file_error">Error en baixar l\'arxiu</string>
+    <string name="magisk_update_title">Actualització de Magisk disponible!</string>
+    <string name="manager_update_title">Actualització de Magisk Manager disponible!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Tancar</string>
@@ -70,40 +81,42 @@
     <string name="repo_install_msg">Vols instal·lar %1$s ara?</string>
     <string name="download">Baixar</string>
     <string name="reboot">Reiniciar</string>
-    <string name="magisk_update_title">Nova actualització de Magisk disponible!</string>
     <string name="settings_reboot_toast">Reinicia per aplicar els canvis</string>
     <string name="release_notes">Notes de llançament</string>
     <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
     <string name="internal_storage">El zip està emmagatzemat en:\n[Internal Storage]%1$s</string>
-    <string name="manager_update_title">Nova actualització de Magisk Manager disponible!</string>
-    <string name="manager_download_install">Premi per a descarregar i instal·lar</string>
-    <string name="dtbo_patched_title">DTBO ha estat arranjat</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img, per favor reinicia el dispositiu</string>
-    <string name="update_channel">Actualització de Magisk</string>
-    <string name="flashing">Instal·lant</string>
+    <string name="manager_download_install">Prem per descarregar i instal·lar.</string>
+    <string name="dtbo_patched_title">S\'ha arranjat DTBO</string>
+    <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img. Si us plau, reinicia el telèfon.</string>
+    <string name="flashing">Arranjament</string>
     <string name="hide_manager_title">Amagant Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">L’amagament de Magisk Manager ha fallat…</string>
-    <string name="open_link_failed_toast">No s’ha trobat cap aplicació per obrir l’enllaç…</string>
-    <string name="download_zip_only">Descarregar només l’arxiu ZIP</string>
-    <string name="patch_boot_file">Arranjament de la imatge d’arrancada</string>
-    <string name="direct_install">Instal·lació Directa (Recomanat)</string>
-    <string name="install_inactive_slot">Instal·lar en ranura inactiva (després de OTA)</string>
-    <string name="select_method">Seleccionar Mètode</string>
-    <string name="boot_file_patch_msg">Seleccioni el bolcat de la imatge d’arrancada en format .img o .img.tar</string>
+    <string name="hide_manager_fail_toast">L\'amagament de Magisk Manager ha fallat.</string>
+    <string name="open_link_failed_toast">No s\'ha trobat una aplicació per obrir l\'enllaç.</string>
+    <string name="download_zip_only">Descarrega només el ZIP</string>
+    <string name="patch_boot_file">Arranja l\'imatge d\'arrencada</string>
+    <string name="direct_install">Instal·lació directa (Recomanat)</string>
+    <string name="install_inactive_slot">Instal·lar a la ranura inactiva (Després d\'una OTA)</string>
+    <string name="warning">Avís</string>
+    <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en la ranura inactiva després de reiniciar!\nUtilitza aquesta opció només quan s\'hagi fet la OTA.\nContinuar?</string>
+    <string name="select_method">Selecciona mètode</string>
+    <string name="boot_file_patch_msg">Seleccioneu l\'arxiu de bolcat de l\'arrencada en format .img o img.tar.</string>
     <string name="complete_uninstall">Desinstal·lació completa</string>
-    <string name="restore_img">Restaurar imatges</string>
-    <string name="restore_done">Restauració Acabada</string>
-    <string name="restore_img_msg">Restaurant …</string>
-    <string name="restore_fail">La copia de seguretat de la imatge d’arrancada Stock no existeix!</string>
-    <string name="proprietary_title">Descarregar codi propietari</string>
-    <string name="proprietary_notice">Magisk Manager es un Software Lliure. Per tant, no conté el codi API de SafetyNet (Codi Propietari de Google).\n\n Pot permetre que Magisk Manager descarregui una extensió (conté la GoogleApiClient) per la comprovació de SafetyNet?</string>
-    <string name="setup_done">Instal·lació Realitzada</string>
-    <string name="setup_fail">Instal·lació Fallida</string>
-    <string name="env_fix_title">Es requereix una Instal·lació Addicional</string>
-    <string name="env_fix_msg">El seu dispositiu requereix d’una instal·lació addicional per tal de que Magisk funcioni correctament. Es descarregarà el zip d’instalació de Magisk, desitja continuar ara?</string>
-    <string name="setup_title">Configuració Addicional</string>
-    <string name="setup_msg">Executant Configuració d\'Entorn</string>
-
+    <string name="restore_img">Restaura imatges</string>
+    <string name="restore_img_msg">Restaurant…</string>
+    <string name="restore_done">Restauració feta!</string>
+    <string name="restore_fail">La còpia de seguretat de Stock no existeix!</string>
+    <string name="proprietary_title">Descarrega codi propietari</string>
+    <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nPot permetre que Magisk Manager descarregui una extensió que conté el GoogleApiClient per poder fer la comprobació de SafetyNet?</string>
+    <string name="setup_done">Instal·lació realitzada.</string>
+    <string name="setup_fail">Instal·lació fallida.</string>
+    <string name="env_fix_title">Es requereix instal·lació addicional</string>
+    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es descarregarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instalació ara?</string>
+    <string name="setup_title">Instal·lació addicional</string>
+    <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
+    <string name="downloading_toast">Descarregant %1$s</string>
+    <string name="no_rw_storage">Aquesta funció no funcionara si no es té permís per escriure a l\'emmagatzematge.</string>
+    <string name="dl_one_module">Descarrega només un mòdul a la vegada.</string>
+    
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema obscur</string>
@@ -126,11 +139,12 @@
     <string name="settings_update_custom_msg">Inserta una URL personalitzada</string>
     <string name="settings_boot_format_title">Arranja la imatge d’arrancada segons el tipus de format</string>
     <string name="settings_boot_format_summary">Seleccionar el format de sortida per arranjar la imatge d’arrancada.\nTriï  .img per flashejar mitcançant fastboot/download; triï .img.tar per flashejar amb ODIN.</string>
-
+    <string name="settings_core_only_title">Mode únicament nucli de Magisk</string>
     <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU y MagiskHide seguirán habilitats</string>
     <string name="settings_magiskhide_summary">Amagar Magisk de varies deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
+    <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
 
     <string name="settings_su_app_adb">Aplicacions y ADB</string>
     <string name="settings_su_app">Només aplicacions</string>
@@ -146,7 +160,7 @@
     <string name="auto_response">Resposta automàtica</string>
     <string name="request_timeout">Temps de petició</string>
     <string name="superuser_notification">Notificació de superusuari</string>
-    <string name="request_timeout_summary">%1$d segons</string>
+    <string name="request_timeout_summary">%1$s segons</string>
     <string name="settings_su_reauth_title">Re-autenticació</string>
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació es actualitzada o reinstal·lada</string>
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
@@ -158,19 +172,19 @@
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
     <string name="settings_owner_manage">Administrador del Dispositiu</string>
     <string name="settings_user_independent">Usuari Independent</string>
-    <string name="owner_only_summary">Només l’administrador té accés root</string>
-    <string name="owner_manage_summary"> Només l’administrador pot supervisar l’acces root y rebre sol·licituds d’altres usuaris</string>
-    <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles de root </string>
-
+    <string name="owner_only_summary">Només l\’administrador té accés d\'arrel</string>
+    <string name="owner_manage_summary"> Només l\’administrador pot supervisar l’acces d\'arrel y rebre sol·licituds d’altres usuaris</string>
+    <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel </string>
+    
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>
     <string name="settings_ns_requester">Heretar Namespace</string>
     <string name="settings_ns_isolate">Aïllar Namespace</string>
-    <string name="global_summary">Totes les sessions de root utilitzen el suport Namespace Global</string>
-    <string name="requester_summary">Les sessions de root heretaran les peticiones Namespace</string>
-    <string name="isolate_summary">Totes les sessions root tindran la seva pròpia Namespace</string>
+    <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
+    <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
+    <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
     <string name="android_o_not_support">No es compatible amb Android 8.0+</string>
-    <string name="disable_fingerprint">No s’han establert empremtes dactilars o no existeix el suport del dispositiu</string>
+    <string name="disable_fingerprint">No s\’han establert empremtes dactilars o no existeix el suport del dispositiu</string>
 
     <!--Superuser-->
     <string name="su_request_title">Petició de superusuari</string>
@@ -178,7 +192,7 @@
     <string name="deny">Denegar</string>
     <string name="prompt">Preguntar</string>
     <string name="grant">Permetre</string>
-    <string name="su_warning">Permet accés total al teu dispositiu.\n¡Denega si no n\'està segur!</string>
+    <string name="su_warning">Permet accés total al teu dispositiu.\nDenega si no n\'està segur!</string>
     <string name="forever">Sempre</string>
     <string name="once">Un cop </string>
     <string name="tenmin">10 mins</string>
@@ -196,13 +210,16 @@
     <string name="su_snack_log_off">Registres de %1$s deshabilitats</string>
     <string name="su_snack_revoke">Anul·lats drets de %1$s</string>
     <string name="su_revoke_title">¿Revocar?</string>
-    <string name="su_revoke_msg">Confirma per revocar drets de %1$s</string>
+    <string name="su_revoke_msg">Confirmi per revocar drets de %1$s</string>
     <string name="toast">Avís</string>
     <string name="none">Cap</string>
     <string name="auth_fail">Autenticació fallida</string>
 
     <!--Superuser logs-->
-    <string name="target_uid">UID de l’objectiu: %1$d</string>
+    <string name="target_uid">UID de l\’objectiu: %1$d</string>
     <string name="command">Ordre: %1$s</string>
+    
+    <!-- MagiskHide -->
+    <string name="show_system_app">Ensenya apps del sistema</string>
 
 </resources>
