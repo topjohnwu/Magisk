@@ -15,14 +15,13 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
+import androidx.appcompat.app.AlertDialog;
+
 public class SplashActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Dynamic detect all locales
-        LocaleManager.loadAvailableLocales(R.string.app_changelog);
 
         String pkg = Config.get(Config.Key.SU_MANAGER);
         if (pkg != null && getPackageName().equals(BuildConfig.APPLICATION_ID)) {
@@ -36,6 +35,22 @@ public class SplashActivity extends BaseActivity {
                 Shell.su("pm uninstall " + BuildConfig.APPLICATION_ID).submit();
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
+
+        if (Config.magiskVersionCode > 0 && Config.magiskVersionCode < Const.MAGISK_VER.MIN_SUPPORT) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.unsupport_magisk_title)
+                    .setMessage(R.string.unsupport_magisk_message)
+                    .setNegativeButton(R.string.ok, null)
+                    .setOnDismissListener(dialog -> finish())
+                    .show();
+        } else {
+            initAndStart();
+        }
+    }
+
+    private void initAndStart() {
+        // Dynamic detect all locales
+        LocaleManager.loadAvailableLocales(R.string.app_changelog);
 
         // Set default configs
         Config.initialize();

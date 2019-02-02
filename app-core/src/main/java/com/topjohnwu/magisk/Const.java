@@ -46,7 +46,7 @@ public class Const {
     public static final int USER_ID = Process.myUid() / 100000;
 
     public static final class MAGISK_VER {
-        /* Currently no backwards compatibility needed */
+        public static final int MIN_SUPPORT = 18000;
     }
 
     public static class ID {
