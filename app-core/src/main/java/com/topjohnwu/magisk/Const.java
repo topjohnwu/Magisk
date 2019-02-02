@@ -84,6 +84,7 @@ public class Const {
         public static final String LINK_KEY = "Link";
         public static final String IF_NONE_MATCH = "If-None-Match";
         // intents
+        public static final String FROM_SPLASH = "splash";
         public static final String OPEN_SECTION = "section";
         public static final String INTENT_SET_NAME = "filename";
         public static final String INTENT_SET_LINK = "link";

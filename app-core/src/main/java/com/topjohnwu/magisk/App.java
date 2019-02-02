@@ -20,7 +20,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class App extends ContainerApp {
 
     public static App self;
-    public boolean init = false;
     public static ThreadPoolExecutor THREAD_POOL;
 
     // Global resources
