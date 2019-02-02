@@ -19,7 +19,6 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_NAME = "repos";
 
     private SQLiteDatabase mDb;
-    private Runnable adapterCb;
 
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
@@ -54,13 +53,11 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     public void clearRepo() {
         mDb.delete(TABLE_NAME, null, null);
-        notifyAdapter();
     }
 
 
     public void removeRepo(String id) {
         mDb.delete(TABLE_NAME, "id=?", new String[] { id });
-        notifyAdapter();
     }
 
     public void removeRepo(Repo repo) {
@@ -72,12 +69,10 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
             if (id == null) continue;
             mDb.delete(TABLE_NAME, "id=?", new String[] { id });
         }
-        notifyAdapter();
     }
 
     public void addRepo(Repo repo) {
         mDb.replace(TABLE_NAME, null, repo.getContentValues());
-        notifyAdapter();
     }
 
     public Repo getRepo(String id) {
@@ -115,19 +110,5 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return set;
-    }
-
-    public void registerAdapterCallback(Runnable cb) {
-        adapterCb = cb;
-    }
-
-    public void unregisterAdapterCallback() {
-        adapterCb = null;
-    }
-
-    private void notifyAdapter() {
-        if (adapterCb != null) {
-            UiThreadHandler.run(adapterCb);
-        }
     }
 }

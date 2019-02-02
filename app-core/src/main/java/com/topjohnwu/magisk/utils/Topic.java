@@ -87,6 +87,10 @@ public class Topic {
         return true;
     }
 
+    public static boolean isPublished(AutoSubscriber sub) {
+        return isPublished(sub.getSubscribedTopics());
+    }
+
     private static class Store {
         boolean published = false;
         Set<Subscriber> subscribers = new HashSet<>();
