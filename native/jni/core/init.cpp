@@ -160,7 +160,7 @@ static bool setup_block(struct device *dev, const char *partname) {
 	return true;
 }
 
-static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname) {
+static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname, char *partfs) {
 	char buf[128];
 	struct stat st;
 	sprintf(buf, "/%s", mnt_point);
@@ -175,7 +175,14 @@ static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char
 		close(fd);
 		char *name = strrchr(buf, '/') + 1;
 		sprintf(partname, "%s%s", name, strend(name, cmd->slot) ? cmd->slot : "");
-		return true;
+		sprintf(buf, "%s/fstab/%s/type", cmd->dt_dir, mnt_point);
+		if (access(buf, F_OK) == 0) {
+			int fd = open(buf, O_RDONLY | O_CLOEXEC);
+			lstat(buf, &st);
+			read(fd, partfs, st.st_size);
+			close(fd);
+			return true;
+		}
 	}
 	return false;
 }
@@ -419,6 +426,7 @@ int main(int argc, char *argv[]) {
 
 	struct device dev;
 	char partname[32];
+	char partfs[32];
 
 	if (cmd.early_boot) {
 		sprintf(partname, "system%s", cmd.slot);
@@ -436,15 +444,15 @@ int main(int argc, char *argv[]) {
 
 		xmkdir("/system", 0755);
 		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
-	} else if (read_fstab_dt(&cmd, "system", partname)) {
+	} else if (read_fstab_dt(&cmd, "system", partname, partfs)) {
 		setup_block(&dev, partname);
-		xmount(dev.path, "/system", "ext4", MS_RDONLY, nullptr);
+		xmount(dev.path, "/system", partfs, MS_RDONLY, nullptr);
 		mnt_system = true;
 	}
 
-	if (read_fstab_dt(&cmd, "vendor", partname)) {
+	if (read_fstab_dt(&cmd, "vendor", partname, partfs)) {
 		setup_block(&dev, partname);
-		xmount(dev.path, "/vendor", "ext4", MS_RDONLY, nullptr);
+		xmount(dev.path, "/vendor", partfs, MS_RDONLY, nullptr);
 		mnt_vendor = true;
 	}
 
