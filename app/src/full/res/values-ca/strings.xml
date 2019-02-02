@@ -7,7 +7,7 @@
     <string name="log">Registre</string>
     <string name="settings">Configuració</string>
     <string name="install">Instal·lar</string>
-    <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
+    <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
     <string name="unsupport_magisk_message">Aquesta versió de Magisk Manager no suporta una versió inferior a la 18.0.\n\nPots actualitzar Magisk manualment o pots instalar una versió anterior de la app.</string>
 
     <!--Status Fragment-->
@@ -28,10 +28,10 @@
     <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstal·lar</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
-    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Root s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
+    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Arrel s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="update">Actualització</string>
-    <string name="core_only_enabled">(Mode nucli activat)</string>
+    <string name="core_only_enabled">(Mode únicament nucli activat)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>
@@ -60,7 +60,7 @@
     <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Netejar registre ara</string>
     <string name="logs_cleared">Registre netejat correctament</string>
-    <string name="log_is_empty">El registro està buit</string>
+    <string name="log_is_empty">El registre està buit</string>
 
     <!--About Activity-->
     <string name="app_changelog">Registre de canvis</string>
@@ -86,7 +86,7 @@
     <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
     <string name="internal_storage">El zip està emmagatzemat en:\n[Internal Storage]%1$s</string>
     <string name="manager_download_install">Prem per descarregar i instal·lar.</string>
-    <string name="dtbo_patched_title">s\'ha arranjat DTBO</string>
+    <string name="dtbo_patched_title">S\'ha arranjat DTBO</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img. Si us plau, reinicia el telèfon.</string>
     <string name="flashing">Arranjament</string>
     <string name="hide_manager_title">Amagant Magisk Manager…</string>
@@ -112,10 +112,10 @@
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
     <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es descarregarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instalació ara?</string>
     <string name="setup_title">Instal·lació addicional</string>
-    <string name="setup_msg">s\'està executant la configuració de l\'entorn…</string>
+    <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
     <string name="downloading_toast">Descarregant %1$s</string>
     <string name="no_rw_storage">Aquesta funció no funcionara si no es té permís per escriure a l\'emmagatzematge.</string>
-    <string name="dl_one_module">Descarrega només un módul a la vegada.</string>
+    <string name="dl_one_module">Descarrega només un mòdul a la vegada.</string>
     
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -139,7 +139,7 @@
     <string name="settings_update_custom_msg">Inserta una URL personalitzada</string>
     <string name="settings_boot_format_title">Arranja la imatge d’arrancada segons el tipus de format</string>
     <string name="settings_boot_format_summary">Seleccionar el format de sortida per arranjar la imatge d’arrancada.\nTriï  .img per flashejar mitcançant fastboot/download; triï .img.tar per flashejar amb ODIN.</string>
-    <string name="settings_core_only_title">Mode nucli de Magisk</string>
+    <string name="settings_core_only_title">Mode únicament nucli de Magisk</string>
     <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU y MagiskHide seguirán habilitats</string>
     <string name="settings_magiskhide_summary">Amagar Magisk de varies deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
@@ -172,17 +172,17 @@
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
     <string name="settings_owner_manage">Administrador del Dispositiu</string>
     <string name="settings_user_independent">Usuari Independent</string>
-    <string name="owner_only_summary">Només l\’administrador té accés root</string>
-    <string name="owner_manage_summary"> Només l\’administrador pot supervisar l’acces root y rebre sol·licituds d’altres usuaris</string>
-    <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles de root </string>
+    <string name="owner_only_summary">Només l\’administrador té accés d\'arrel</string>
+    <string name="owner_manage_summary"> Només l\’administrador pot supervisar l’acces d\'arrel y rebre sol·licituds d’altres usuaris</string>
+    <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel </string>
     
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>
     <string name="settings_ns_requester">Heretar Namespace</string>
     <string name="settings_ns_isolate">Aïllar Namespace</string>
-    <string name="global_summary">Totes les sessions de root utilitzen el suport Namespace Global</string>
-    <string name="requester_summary">Les sessions de root heretaran les peticiones Namespace</string>
-    <string name="isolate_summary">Totes les sessions root tindran la seva pròpia Namespace</string>
+    <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
+    <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
+    <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
     <string name="android_o_not_support">No es compatible amb Android 8.0+</string>
     <string name="disable_fingerprint">No s\’han establert empremtes dactilars o no existeix el suport del dispositiu</string>
 
@@ -216,7 +216,7 @@
     <string name="auth_fail">Autenticació fallida</string>
 
     <!--Superuser logs-->
-    <string name="target_uid">UID de l’objectiu:%1$d</string>
+    <string name="target_uid">UID de l\’objectiu: %1$d</string>
     <string name="command">Ordre: %1$s</string>
     
     <!-- MagiskHide -->
