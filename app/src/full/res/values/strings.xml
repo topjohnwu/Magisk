@@ -214,7 +214,7 @@
     <string name="auth_fail">Authentication Failed</string>
 
     <!--Superuser logs-->
-    <string name="pid" translatable="false">PID: %1$d</string>
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
     <string name="command">Command: %1$s</string>
 
