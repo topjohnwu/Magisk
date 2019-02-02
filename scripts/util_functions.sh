@@ -91,7 +91,7 @@ mount_partitions() {
   [ -f /system/build.prop ] || is_mounted /system || mount -o ro /system 2>/dev/null
   if ! is_mounted /system && ! [ -f /system/build.prop ]; then
     SYSTEMBLOCK=`find_block system$SLOT`
-    mount -t ext4 -o ro $SYSTEMBLOCK /system
+    mount -o ro $SYSTEMBLOCK /system
   fi
   [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
   grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
@@ -106,7 +106,7 @@ mount_partitions() {
     is_mounted /vendor || mount -o ro /vendor 2>/dev/null
     if ! is_mounted /vendor; then
       VENDORBLOCK=`find_block vendor$SLOT`
-      mount -t ext4 -o ro $VENDORBLOCK /vendor
+      mount -o ro $VENDORBLOCK /vendor
     fi
     is_mounted /vendor || abort "! Cannot mount /vendor"
   fi
