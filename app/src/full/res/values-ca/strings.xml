@@ -65,7 +65,7 @@
     <string name="translators">JoanVC100, QuitusAnbu27</string>
     <string name="app_version">Versió</string>
     <string name="app_source_code">Codi font</string>
-    <string name="donation">Donació l'\</string>
+    <string name="donation">Donació</string>
     <string name="app_translators">Traductors</string>
     <string name="support_thread">Fil de suport</string>
     <string name="follow_twitter">Segueix-me a Twitter</string>
@@ -172,7 +172,7 @@
     <string name="auto_response">Resposta automàtica</string>
     <string name="request_timeout">Temps de petició</string>
     <string name="superuser_notification">Notificació de superusuari</string>
-    <string name="request_timeout_summary">%1$d segons</string>
+    <string name="request_timeout_summary">%1$s segons</string>
     <string name="settings_su_reauth_title">Re-autenticació</string>
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació es actualitzada o reinstal·lada</string>
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
@@ -229,8 +229,11 @@
     <string name="auth_fail">Autenticació fallida</string>
 
     <!--Superuser logs-->
-    <string name="target_uid">UID de l’objectiu: %1$d</string>
-    <string name="command">Ordre: %1$s</string>
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">UID de l’objectiu:\u0020</string>
+    <string name="command">Ordre:\u0020</string>
+    
+    <!-- MagiskHide -->
+    <string name="show_system_app">Show system apps</string>
 
 </resources>
-    <!--Universal-->
