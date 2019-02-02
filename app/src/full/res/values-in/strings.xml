@@ -12,22 +12,23 @@
     <string name="checking_for_updates">Memeriksa pembaruan…</string>
     <string name="magisk_update_available">Magisk v%1$s tersedia!</string>
     <string name="invalid_update_channel">Kanal Pembaruan tidak valid!</string>
-    <string name="safetyNet_check_text">Ketuk untuk memulai pemeriksaan SafetyNet.</string>
+    <string name="safetyNet_check_text">Ketuk untuk memulai pemeriksaan SafetyNet</string>
     <string name="checking_safetyNet_status">Memeriksa status SafetyNet…</string>
     <string name="safetyNet_check_success">Pemeriksaan SafetyNet Berhasil</string>
     <string name="safetyNet_api_error">Kesalahan pada API SafetyNet</string>
     <string name="safetyNet_res_invalid">Tanggapan tidak valid.</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk sudah di versi terbaru</string>
+    <string name="manager_up_to_date">Magisk Manager sudah di versi terbaru</string>
     <string name="advanced_settings_title">Pengaturan Lanjutan</string>
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
-    <string name="current_installed">Versi yang Terpasang: %1$s</string>
-    <string name="latest_version">Versi Terbaru: %1$s</string>
+    <string name="current_installed">Terpasang: %1$s</string>
+    <string name="latest_version">Terbaru: %1$s</string>
     <string name="uninstall">Copot</string>
     <string name="uninstall_magisk_title">Copot Magisk</string>
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus. Root akan dihapus, dan berpotensi mengenkripsi data Anda jika belum.</string>
     <string name="update">Perbarui</string>
+    <string name="core_only_enabled">(Mode inti saja aktif)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Tidak ada info tersedia)</string>
@@ -228,4 +229,7 @@
     <!--Superuser logs-->
     <string name="target_uid">UID target: %1$d</string>
     <string name="command">Perintah: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Tampilkan apl sistem</string>
 </resources>
