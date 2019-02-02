@@ -73,7 +73,7 @@ public abstract class StringListAdapter<VH extends StringListAdapter.ViewHolder>
         ((Activity) rv.getContext()).getWindowManager()
                 .getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
-        padding = rv.getPaddingStart() + rv.getPaddingEnd();
+        padding = rv.getPaddingLeft() + rv.getPaddingRight();
         this.rv = rv;
     }
 

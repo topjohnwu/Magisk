@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
@@ -42,6 +41,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
                         app:layout_constraintBottom_toBottomOf="@+id/app_name"
                         app:layout_constraintEnd_toStartOf="@+id/app_name"
                         app:layout_constraintHorizontal_bias="0.42"
@@ -110,6 +110,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
+                            android:layout_marginLeft="16dp"
                             android:tint="?attr/imageColorTint"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/title"
@@ -173,6 +174,7 @@
                             android:layout_height="30dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginEnd="24dp"
+                            android:layout_marginRight="24dp"
                             android:layout_marginBottom="12dp"
                             android:tint="@color/green500"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -198,6 +200,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginStart="24dp"
+                            android:layout_marginLeft="24dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/safetyNet_status"
                             app:layout_constraintTop_toTopOf="parent"
@@ -226,6 +229,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/cts_status"
                             app:layout_constraintEnd_toStartOf="@+id/cts_status"
                             app:layout_constraintTop_toTopOf="@+id/cts_status" />
@@ -245,6 +249,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/basic_status"
                             app:layout_constraintEnd_toStartOf="@+id/basic_status"
                             app:layout_constraintTop_toTopOf="@+id/basic_status" />
@@ -286,11 +291,11 @@
                         android:id="@+id/paypal"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_horizontal"
+                        android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
                         app:layout_constraintEnd_toStartOf="@+id/patreon"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -317,11 +322,11 @@
                         android:id="@+id/patreon"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_horizontal"
+                        android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/paypal"
                         app:layout_constraintTop_toTopOf="parent">
@@ -380,9 +385,9 @@
                         <ImageView
                             android:layout_width="35dp"
                             android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
                             android:layout_margin="10dp"
                             android:tint="?attr/imageColorTint"
-                            android:layout_gravity="center_horizontal"
                             app:srcCompat="@drawable/ic_github" />
 
                     </FrameLayout>
@@ -401,9 +406,9 @@
                         <ImageView
                             android:layout_width="35dp"
                             android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
                             android:layout_margin="10dp"
                             android:tint="?attr/imageColorTint"
-                            android:layout_gravity="center_horizontal"
                             app:srcCompat="@drawable/ic_xda" />
 
                     </FrameLayout>

@@ -111,6 +111,10 @@ public class SettingsFragment extends BasePreferenceFragment implements Topic.Su
 
         setSummary();
 
+        // Remove language setting when API < 17
+        if (Build.VERSION.SDK_INT < 17)
+            generalCatagory.removePreference(findPreference(Config.Key.LOCALE));
+
         // Disable dangerous settings in secondary user
         if (Const.USER_ID > 0) {
             suCategory.removePreference(multiuserConfig);
