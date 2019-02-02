@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.tasks.UpdateRepos;
 import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.magisk.uicomponents.Shortcuts;

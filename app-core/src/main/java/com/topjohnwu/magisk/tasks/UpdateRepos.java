@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.tasks;
 
 import android.database.Cursor;
-import android.os.AsyncTask;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
@@ -142,7 +141,7 @@ public class UpdateRepos {
 
     public void exec(boolean force) {
         Topic.reset(Topic.REPO_LOAD_DONE);
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             cached = Collections.synchronizedSet(app.repoDB.getRepoIDSet());
             threadPool = Executors.newFixedThreadPool(CORE_POOL_SIZE);
 

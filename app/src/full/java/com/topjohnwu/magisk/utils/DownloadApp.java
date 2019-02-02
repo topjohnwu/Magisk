@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-import android.os.AsyncTask;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
@@ -32,7 +30,7 @@ public class DownloadApp {
         ProgressNotification progress = new ProgressNotification(name);
         listener.progress = progress;
         Networking.get(Config.managerLink)
-                .setExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                .setExecutor(App.THREAD_POOL)
                 .setDownloadProgressListener(progress)
                 .setErrorHandler((conn, e) -> progress.dlFail())
                 .getAsFile(apk, listener);

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.tasks;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -308,7 +307,7 @@ public abstract class MagiskInstaller {
     protected abstract void onResult(boolean success);
 
     public void exec() {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             boolean b = operations();
             UiThreadHandler.run(() -> onResult(b));
         });

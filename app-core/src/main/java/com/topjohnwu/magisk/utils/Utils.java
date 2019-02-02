@@ -8,7 +8,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
@@ -97,7 +96,7 @@ public class Utils {
 
     public static void loadModules() {
         Topic.reset(Topic.MODULE_LOAD_DONE);
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             Map<String, Module> moduleMap = new ValueSortedMap<>();
             SuFile path = new SuFile(Const.MAGISK_PATH);
             SuFile[] modules = path.listFiles(

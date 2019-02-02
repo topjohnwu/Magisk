@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.tasks;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Const;
@@ -70,7 +69,7 @@ public abstract class FlashZip {
     }
 
     public void exec() {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             boolean success = false;
             try {
                 success = flash();
