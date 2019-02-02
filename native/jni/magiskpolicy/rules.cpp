@@ -150,6 +150,9 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "chr_file", ALL);
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
 
+	// Allow all binder transactions
+	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "binder", ALL);
+
 	// Super files
 	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "file", ALL);
 	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "dir", ALL);
