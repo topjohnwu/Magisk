@@ -19,7 +19,7 @@
     <string name="safetyNet_check_success">La comprobación fue exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_res_invalid">La respuesta no es válida</string>
-    <string name="magisk_up_to_date">Magisk está actualizado</string>
+    <string name="magisk_up_to_date">Magisk está actualizado.</string>
     <string name="manager_up_to_date">Magisk Manager está actualizado.</string>
     <string name="advanced_settings_title">Ajustes avanzados</string>
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
