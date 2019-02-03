@@ -452,7 +452,7 @@ static bool magisk_env() {
 			vendor_block = strdup(buf);
 			xmkdir(MIRRDIR "/vendor", 0755);
 			xmount(vendor_block, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
-			VLOGI("mount", vendor_block, MIRRDIR "/system");
+			VLOGI("mount", vendor_block, MIRRDIR "/vendor");
 		} else if (SDK_INT >= 24 &&
 		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
 			// Enforce hidepid
