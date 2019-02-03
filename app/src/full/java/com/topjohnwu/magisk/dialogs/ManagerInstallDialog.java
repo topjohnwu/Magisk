@@ -21,7 +21,6 @@ public class ManagerInstallDialog extends CustomAlertDialog {
         setMessage(a.getString(R.string.repo_install_msg, name));
         setCancelable(true);
         setPositiveButton(R.string.install, (d, i) -> DownloadApp.upgrade(name));
-        setNegativeButton(R.string.no_thanks, null);
         if (!TextUtils.isEmpty(Config.managerNoteLink)) {
             setNeutralButton(R.string.app_changelog, (d, i) -> MarkDownWindow.show(a, null, Config.managerNoteLink));
         }
