@@ -129,7 +129,7 @@ int prop_exist(const char *name) {
 // Get prop by name, return string
 string getprop(const char *name, bool persist) {
 	if (!check_legal_property_name(name) || init_resetprop())
-		return nullptr;
+		return string();
 	const prop_info *pi = __system_property_find(name);
 	if (pi == nullptr) {
 		if (persist && strncmp(name, "persist.", 8) == 0) {
