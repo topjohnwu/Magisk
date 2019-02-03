@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/dialog_layout"
-    android:orientation="vertical"
-    android:paddingTop="5dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="5dp">
 
     <TextView
         android:id="@+id/message"
         style="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="25dp"
+        android:paddingTop="12dp"
+        android:paddingRight="25dp"
         android:paddingBottom="12dp"
-        android:paddingEnd="25dp"
-        android:paddingStart="25dp"
-        android:paddingTop="12dp" />
+        android:textColor="?android:attr/textColorPrimary" />
 
     <LinearLayout
-        style="?android:attr/buttonBarStyle"
         android:id="@+id/button_panel"
+        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="54dip"
         android:measureWithLargestChild="true"
+        android:minHeight="54dp"
         android:orientation="horizontal"
-        android:paddingEnd="2dip"
-        android:paddingStart="2dip"
-        android:paddingTop="4dip">
+        android:padding="2dp">
 
         <Button
             android:id="@+id/negative"
             style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dip"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:layout_weight="1"
@@ -42,7 +39,7 @@
         <Button
             android:id="@+id/neutral"
             style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dip"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
@@ -51,7 +48,7 @@
         <Button
             android:id="@+id/positive"
             style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dip"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="end"
             android:layout_weight="1"
