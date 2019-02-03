@@ -57,7 +57,7 @@ ui_print "- Target image: $BOOTIMAGE"
 # Detect version and architecture
 api_level_arch_detect
 
-[ $API -lt 16 ] && abort "! Magisk is only for Jellybean and above (4.1+)"
+[ $API -lt 17 ] && abort "! Magisk is only for Android 4.2 and above"
 
 ui_print "- Device platform: $ARCH"
 
