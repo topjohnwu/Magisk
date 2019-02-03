@@ -6,6 +6,8 @@
     <string name="log">Log</string>
     <string name="settings">Pengaturan</string>
     <string name="install">Pasang</string>
+    <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
+    <string name="unsupport_magisk_message">Magisk Manager versi ini tidak mendukung versi Magisk di bawah v18.0.\n\nAnda dapat memperbarui Magisk secara manual, atau menurunkan aplikasi ke versi sebelumnya.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk tidak terpasang.</string>
@@ -211,6 +213,7 @@
     <string name="auth_fail">Otentikasi Gagal</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID target: %1$d</string>
     <string name="command">Perintah: %1$s</string>
 
