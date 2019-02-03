@@ -7,8 +7,8 @@
     <string name="log">Journal</string>
     <string name="settings">Paramètres</string>
     <string name="install">Installer</string>
-    <string name="unsupport_magisk_title">Version de Magisk non supportée</string>
-    <string name="unsupport_magisk_message">Cette version de Magisk Manager ne supporte pas les versions de Magisk inférieures à la v18.0.\n\nVous pouvez soit mettre à jour manuellement Magisk, soit rétrograder l\'application vers une version plus ancienne.</string>
+    <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
+    <string name="unsupport_magisk_message">Cette version de Magisk Manager ne prend pas en charge pas les versions de Magisk inférieures à 18.0.\n\nVous pouvez soit mettre à jour manuellement Magisk, soit rétrograder la version de Magisk Manager.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk n’est pas installé.</string>
@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés. Les permissions de super‐utilisateur seront perdues et vos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
     <string name="update">Mise à jour</string>
-    <string name="core_only_enabled">(Mode noyau uniquement activé)</string>
+    <string name="core_only_enabled">(mode « sans modules » activé)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(aucune information transmise)</string>
@@ -184,7 +184,7 @@
     <string name="android_o_not_support">Android 8.0 et supérieurs ne sont pas pris en charge.</string>
     <string name="disable_fingerprint">Aucune empreinte digitale n’a été définie ou le lecteur d’empreinte n’est pas pris en charge.</string>
 
-<!--Superuser-->
+    <!--Superuser-->
     <string name="su_request_title">Requête super‐utilisateur</string>
     <string name="deny_with_str">Refuser %1$s</string>
     <string name="deny">Refuser</string>
@@ -214,11 +214,11 @@
     <string name="auth_fail">Échec de l’authentification</string>
 
     <!--Superuser logs-->
-    <string name="pid" translatable="false">PID: %1$d</string>
+    <string name="pid">PID : %1$d</string>
     <string name="target_uid">UID cible : %1$d</string>
     <string name="command">Commande : %1$s</string>
 
     <!-- MagiskHide -->
-    <string name="show_system_app">Afficher les applis du système</string>
+    <string name="show_system_app">Afficher les applications système</string>
     
 </resources>
