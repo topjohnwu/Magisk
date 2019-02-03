@@ -7,6 +7,8 @@
     <string name="log">Registro</string>
     <string name="settings">Ajustes</string>
     <string name="install">Instalar</string>
+    <string name="unsupport_magisk_title">Versión Magisk no soportada</string>
+    <string name="unsupport_magisk_message">Esta versión de Magisk Manager no admite una versión de Magisk inferior a la v18.0.\n\nPuede actualizar Magisk de forma manual o instalar una versión anterior de la aplicación.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no está instalado</string>
@@ -17,7 +19,7 @@
     <string name="safetyNet_check_success">La comprobación fue exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_res_invalid">La respuesta no es válida</string>
-    <string name="magisk_up_to_date">Magisk está actualizado</string>
+    <string name="magisk_up_to_date">Magisk está actualizado.</string>
     <string name="manager_up_to_date">Magisk Manager está actualizado.</string>
     <string name="advanced_settings_title">Ajustes avanzados</string>
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
@@ -210,6 +212,7 @@
     <string name="auth_fail">Autenticación fallida</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID de objetivo: %1$d</string>
     <string name="command">Comando: %1$s</string>
 
