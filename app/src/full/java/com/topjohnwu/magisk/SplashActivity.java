@@ -23,6 +23,22 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Shell.getShell(shell -> {
+            if (Config.magiskVersionCode > 0 &&
+                    Config.magiskVersionCode < Const.MAGISK_VER.MIN_SUPPORT) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.unsupport_magisk_title)
+                        .setMessage(R.string.unsupport_magisk_message)
+                        .setNegativeButton(R.string.ok, null)
+                        .setOnDismissListener(dialog -> finish())
+                        .show();
+            } else {
+                initAndStart();
+            }
+        });
+    }
+
+    private void initAndStart() {
         String pkg = Config.get(Config.Key.SU_MANAGER);
         if (pkg != null && getPackageName().equals(BuildConfig.APPLICATION_ID)) {
             Config.remove(Config.Key.SU_MANAGER);
@@ -36,19 +52,6 @@ public class SplashActivity extends BaseActivity {
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
 
-        if (Config.magiskVersionCode > 0 && Config.magiskVersionCode < Const.MAGISK_VER.MIN_SUPPORT) {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.unsupport_magisk_title)
-                    .setMessage(R.string.unsupport_magisk_message)
-                    .setNegativeButton(R.string.ok, null)
-                    .setOnDismissListener(dialog -> finish())
-                    .show();
-        } else {
-            initAndStart();
-        }
-    }
-
-    private void initAndStart() {
         // Dynamic detect all locales
         LocaleManager.loadAvailableLocales(R.string.app_changelog);
 

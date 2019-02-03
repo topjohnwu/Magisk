@@ -7,11 +7,14 @@ env_check() {
 
 fix_env() {
   cd /data/adb/magisk
+  local OLDPATH="$PATH"
+  PATH=/sbin:/system/bin:/vendor/bin
   sh update-binary extract
+  PATH="$OLDPATH"
+  ./busybox rm -f /sbin/.magisk/busybox/*
+  /sbin/.magisk/mirror/bin/busybox --install -s /sbin/.magisk/busybox
   rm -f update-binary magisk.apk
   cd /
-  rm -rf /sbin/.magisk/busybox/*
-  /sbin/.magisk/mirror/bin/busybox --install -s /sbin/.magisk/busybox
 }
 
 direct_install() {

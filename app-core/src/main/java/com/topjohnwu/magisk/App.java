@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -12,12 +13,11 @@ import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.net.Networking;
-import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class App extends ContainerApp {
+public class App extends Application {
 
     public static App self;
     public static ThreadPoolExecutor THREAD_POOL;
