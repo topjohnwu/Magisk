@@ -182,18 +182,35 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_safetynet" />
 
-                        <TextView
-                            android:id="@+id/safetyNet_status"
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/sn_status_start"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.25" />
+
+                        <TextView
+                            android:id="@+id/safetyNet_status"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:maxLines="1"
                             android:minWidth="200dp"
                             android:text="@string/safetyNet_check_text"
                             android:textStyle="bold"
+                            app:autoSizeMaxTextSize="14sp"
+                            app:autoSizeTextType="uniform"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/sn_status_end"
+                            app:layout_constraintStart_toStartOf="@+id/sn_status_start"
                             app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/sn_status_end"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.75" />
 
                         <ImageView
                             android:id="@+id/safetyNet_refresh"
@@ -252,17 +269,22 @@
                             android:layout_marginRight="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/basic_status"
                             app:layout_constraintEnd_toStartOf="@+id/basic_status"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/basic_status" />
 
                         <TextView
                             android:id="@+id/basic_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:padding="6dp"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/basic_status_icon"
                             app:layout_constraintTop_toBottomOf="@+id/cts_status" />
 
 
