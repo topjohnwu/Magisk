@@ -7,11 +7,12 @@
     <string name="log">Журнал</string>
     <string name="settings">Налаштування</string>
     <string name="install">Встановлення</string>
+    <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
+    <string name="unsupport_magisk_message">Ця версія Magisk Manager не підтримує версію Magisk нижчу, ніж v18.0.\n\nВи можете або вручну оновити Magisk, або понизити програму до старішої версії.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk не встановлено.</string>
     <string name="checking_for_updates">Перевірка оновлень…</string>
-    <string name="magisk_update_available">Доступно Magisk v%1$s!</string>
     <string name="invalid_update_channel">Неправильний канал оновлень</string>
     <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
     <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
@@ -61,15 +62,9 @@
     <string name="log_is_empty">Журнал пустий.</string>
 
     <!--About Activity-->
-    <string name="about">Про програму</string>
     <string name="app_changelog">Перелік змін</string>
     <string name="translators">tarasyyyk</string>
-    <string name="app_version">Версія</string>
-    <string name="app_source_code">Вихідний код</string>
-    <string name="donation">Підтримати проект</string>
     <string name="app_translators">Перекладачі</string>
-    <string name="support_thread">Сторінка підтримки</string>
-    <string name="follow_twitter">Читати мене в Twitter</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Оновлення Magisk</string>
@@ -88,18 +83,12 @@
     <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій.</string>
     <string name="release_notes">Особливості версії</string>
     <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
-    <string name="process_error">Помилка опрацювання</string>
     <string name="internal_storage">Архів розташований:\n[Внутрішнє Сховище]%1$s</string>
-    <string name="zip_download_title">Завантаження</string>
-    <string name="zip_download_msg">Завантаження zip файлу (%1$d%%) …</string>
-    <string name="zip_process_title">Опрацювання</string>
-    <string name="zip_process_msg">Опрацювання архіву…</string>
     <string name="manager_download_install">Натисніть, щоб завантажити і встановити.</string>
     <string name="dtbo_patched_title">DTBO пропатчено!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчив dtbo.img. Будь ласка, перезавантажте пристрій.</string>
     <string name="flashing">Прошивання</string>
     <string name="hide_manager_title">Приховування Magisk Manager…</string>
-    <string name="hide_manager_msg">Це може зайняти деякий час…</string>
     <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager…</string>
     <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання…</string>
     <string name="download_zip_only">Тільки завантажити</string>
@@ -109,7 +98,6 @@
     <string name="warning">Попередження</string>
     <string name="install_inactive_slot_msg">Ваш пристрій буде примусово перезавантажено в неактивний слот!\nВикористовуйте цю опцію тільки для встановлення OTA.\nПродовжити?</string>
     <string name="select_method">Виберіть спосіб</string>
-    <string name="no_boot_file_patch_support">Цільова версія Magisk не підтримує пропатчування boot образу</string>
     <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar.</string>
     <string name="complete_uninstall">Видалення виконано</string>
     <string name="restore_img">Відновити образи</string>
@@ -118,7 +106,6 @@
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
     <string name="proprietary_title">Завантажити пропрієтарний код</string>
     <string name="proprietary_notice">Magisk Manager — це безкоштовна програма з відкритим вихідним кодом, тому вона не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
-    <string name="su_db_corrupt">База даних SU пошкоджена. Буде створено нову</string>
     <string name="setup_done">Налаштування завершено.</string>
     <string name="setup_fail">Не вдалося налаштувати.</string>
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
@@ -186,7 +173,6 @@
     <string name="owner_only_summary">Тільки власник має root-доступ.</string>
     <string name="owner_manage_summary">Тільки власник може керувати root-доступом і опрацьовувати запити на надання доступу.</string>
     <string name="user_indepenent_summary">Кожен користувач має власні правила root-доступу.</string>
-    <string name="multiuser_hint_owner_request">Запит відправлено власнику. Будь ласка, перейдіть на профіль власника і надайте дозвіл.</string>
 
     <string name="mount_namespace_mode">Режим монтування простору імен</string>
     <string name="settings_ns_global">Глобальний простір імен</string>
@@ -228,7 +214,6 @@
     <string name="auth_fail">Помилка автентифікації</string>
 
     <!--Superuser logs-->
-    <string name="pid" translatable="false">PID: %1$d</string>
     <string name="target_uid">Цільовий UID: %1$d</string>
     <string name="command">Команда: %1$s</string>
 
