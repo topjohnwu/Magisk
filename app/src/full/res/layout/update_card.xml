@@ -52,6 +52,7 @@
             android:paddingBottom="3dp"
             android:text="@string/checking_for_updates"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            app:autoSizeMinTextSize="1sp"
             app:autoSizeTextType="uniform"
             app:layout_constraintEnd_toStartOf="@+id/install"
             app:layout_constraintStart_toEndOf="@+id/status_icon"
@@ -96,12 +97,14 @@
 
         <Button
             android:id="@+id/install"
-            android:layout_width="wrap_content"
+            android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:maxLines="1"
             android:text="@string/install"
-            android:visibility="gone"
+            app:autoSizeMaxTextSize="14sp"
+            app:autoSizeTextType="uniform"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
