@@ -30,7 +30,6 @@ import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellUtils;
 
 import java.util.Locale;
 
@@ -254,7 +253,7 @@ public class MagiskFragment extends BaseFragment
 
     private void updateCheckUI() {
         int image, color;
-        String status;
+        String status, button = "";
 
         if (Config.remoteMagiskVersionCode < 0) {
             color = colorNeutral;
@@ -268,12 +267,12 @@ public class MagiskFragment extends BaseFragment
                 color = colorInfo;
                 image = R.drawable.ic_update;
                 status = getString(R.string.magisk_update_title);
-                magisk.install.setText(R.string.update);
+                button = getString(R.string.update);
             } else {
                 color = colorOK;
                 image = R.drawable.ic_check_circle;
                 status = getString(R.string.magisk_up_to_date);
-                magisk.install.setText(R.string.install);
+                button = getString(R.string.install);
             }
         }
         if (Config.magiskVersionCode > 0) {
@@ -281,6 +280,7 @@ public class MagiskFragment extends BaseFragment
             magisk.statusIcon.setImageResource(image);
             magisk.statusIcon.setColorFilter(color);
             magisk.status.setText(status);
+            magisk.install.setText(button);
         }
 
         if (Config.remoteManagerVersionCode < 0) {
@@ -322,7 +322,8 @@ public class MagiskFragment extends BaseFragment
             uninstallButton.setVisibility(Shell.rootAccess() ? View.VISIBLE : View.GONE);
         }
 
-        if (!shownDialog && !ShellUtils.fastCmdResult("env_check")) {
+        if (!shownDialog && Config.magiskVersionCode > 0 &&
+                !Shell.su("env_check").exec().isSuccess()) {
             shownDialog = true;
             new EnvFixDialog(requireActivity()).show();
         }

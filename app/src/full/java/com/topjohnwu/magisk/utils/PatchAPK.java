@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.signing.JarMap;
 import com.topjohnwu.signing.SignAPK;
-import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -104,7 +104,7 @@ public class PatchAPK {
 
         // Install the application
         repack.setReadable(true, false);
-        if (!ShellUtils.fastCmdResult("pm install " + repack))
+        if (!Shell.su("pm install " + repack).exec().isSuccess())
             return false;
 
         Config.set(Config.Key.SU_MANAGER, pkg);

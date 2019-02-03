@@ -35,7 +35,8 @@ public abstract class FlashZip {
 
     private boolean unzipAndCheck() throws IOException {
         ZipUtils.unzip(tmpFile, tmpFile.getParentFile(), "META-INF/com/google/android", true);
-        return ShellUtils.fastCmdResult("grep -q '#MAGISK' " + new File(tmpFile.getParentFile(), "updater-script"));
+        return Shell.su("grep -q '#MAGISK' " + new File(tmpFile.getParentFile(), "updater-script"))
+                .exec().isSuccess();
     }
 
     private boolean flash() throws IOException {

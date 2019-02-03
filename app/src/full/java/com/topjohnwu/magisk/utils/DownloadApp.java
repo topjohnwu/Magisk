@@ -7,7 +7,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.uicomponents.ProgressNotification;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
-import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
 
@@ -84,7 +84,7 @@ public class DownloadApp {
             Config.export();
             // Make it world readable
             apk.setReadable(true, false);
-            if (ShellUtils.fastCmdResult("pm install " + apk))
+            if (Shell.su("pm install " + apk).exec().isSuccess())
                 RootUtils.rmAndLaunch(app.getPackageName(), BuildConfig.APPLICATION_ID);
             progress.dismiss();
         }

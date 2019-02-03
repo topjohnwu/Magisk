@@ -79,6 +79,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginBottom="4dp"
+                android:visibility="gone"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
 

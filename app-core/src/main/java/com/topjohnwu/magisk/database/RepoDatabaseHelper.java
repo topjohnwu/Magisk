@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import java.util.HashSet;
 import java.util.Set;
