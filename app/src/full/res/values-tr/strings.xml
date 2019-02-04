@@ -1,5 +1,7 @@
 <resources>
 
+    <resources>
+
     <!--Welcome Activity-->
     <string name="modules">Modüller</string>
     <string name="downloads">İndir</string>
@@ -7,6 +9,8 @@
     <string name="log">Günlük</string>
     <string name="settings">Ayarlar</string>
     <string name="install">Yükle</string>
+    <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
+    <string name="unsupport_magisk_message">Magisk Manager\'ın bu sürümü v18.0\'dan daha düşük Magisk versiyonlarını desteklememektedir.\n\nMagisk\'i manuel olarak yükseltebilir veya uygulamayı daha eski bir sürüme düşürebilirsiniz.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk yüklü değil</string>
@@ -17,17 +21,18 @@
     <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
     <string name="safetyNet_api_error">SafetyNet API Hatası</string>
     <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk güncel</string>
+    <string name="manager_up_to_date">Magisk Manager güncel</string>
     <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
-    <string name="keep_dm_verity">AVB 2.0/dm-verity\'yi koru</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity\'i koru</string>
     <string name="current_installed">Yüklü: %1$s</string>
     <string name="latest_version">Yeni: %1$s</string>
     <string name="uninstall">Kaldır</string>
-    <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
+    <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verileriniz şifrelenecek</string>
     <string name="update">Güncelle</string>
+    <string name="core_only_enabled">(Yalnızca çekirdek modu etkin)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
@@ -111,6 +116,7 @@
     <string name="setup_msg">Ortam kurulumu çalışıyor…</string>
     <string name="downloading_toast">%1$s indiriliyor</string>
     <string name="no_rw_storage">Bu özellik harici depolamaya yazma izni olmadan çalışmaz.</string>
+    <string name="dl_one_module">Bir seferde bir modül indirin.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
@@ -139,7 +145,7 @@
     <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
     <string name="settings_hosts_title">Sistemsiz host</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
-	<string name="settings_hosts_toast">Sistemsiz host modülü eklendi</string>
+    <string name="settings_hosts_toast">Sistemsiz host modülü eklendi</string>
 
     <string name="settings_su_app_adb">Uygulamalar ve ADB</string>
     <string name="settings_su_app">Sadece uygulamalar</string>
@@ -210,7 +216,11 @@
     <string name="auth_fail">Kimlik Doğrulama Başarısız</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">Hedef UID: %1$d</string>
     <string name="command">Komut: %1$s</string>
+	
+    <!-- MagiskHide -->
+    <string name="show_system_app">Sistem uygulamalarını göster</string>
 
 </resources>
