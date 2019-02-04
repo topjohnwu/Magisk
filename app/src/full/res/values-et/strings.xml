@@ -125,7 +125,7 @@
     <string name="settings_hide_manager_title">Peida Magisk Manager</string>
     <string name="settings_hide_manager_summary">Taaspaki Magisk Manager juhusliku nimega.</string>
      <string name="settings_restore_manager_title">Taasta Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Taasta Magisk Manageri originaalpakett</string>
+    <string name="settings_restore_manager_summary">Taasta Magisk Manager\'i originaalpakett</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
     <string name="settings_update">Uuenduste seaded</string>
