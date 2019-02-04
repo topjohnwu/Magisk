@@ -23,11 +23,11 @@ In order to use this method, you are required to obtain a copy of the stock boot
 - Download and install the latest Magisk Manager
 - If you're planning to flash the patched boot image through ODIN (Samsung only), go to **Settings > Update Settings > Patched Boot Output Format**, and select *.img.tar*, or else leave it as the default (*.img*)
 - Press **Install > Install > Patch Boot Image File**, and select your stock boot image file
-- Magisk Manager will install Magisk to your boot image, and store it in \
+- Magisk Manager will install Magisk to your boot image, and store it in
 `[Internal Storage]/Download/patched_boot.img[.tar]`
-- Copy the patched boot image from your device to your PC. If you can't find it via MTP, you can pull the file with ADB: \
+- Copy the patched boot image from your device to your PC. If you can't find it via MTP, you can pull the file with ADB:
 `adb pull /sdcard/Download/patched_boot.img[.tar]`
-- Flash the patched boot image to your device and reboot. Here is the command if using fastboot on most devices: \
+- Flash the patched boot image to your device and reboot. Here is the command if using fastboot on most devices:
 `fastboot flash boot /path/to/patched_boot.img`
 
 ## Huawei
@@ -39,20 +39,20 @@ Huawei does not release official factory images, however most firmware zips can 
 ### EMUI 8
 For EMUI 8 devices, your device have a partition named `ramdisk`, which will be where Magisk is going to be installed.
 
-- If you plan to use custom recoveries, simply follow the instructions for custom recovery above. \
-Note that to install TWRP, you will first download the TWRP recovery image, and use \
+- If you plan to use custom recoveries, simply follow the instructions for custom recovery above.
+Note that to install TWRP, you will first download the TWRP recovery image, and use
 `fastboot flash recovery_ramdisk /path/to/twrp.img` to install the custom recovery.
-- If you plan not to use custom recoveries, you will have to extract `RAMDISK.img` from your firmware. Follow the instructions for boot image patching above, but use the `RAMDISK.img` file instead of a boot image. To install the patched image back to your device, here is the fastboot command: \
-`fastboot flash ramdisk /path/to/patched_boot.img`. \
+- If you plan not to use custom recoveries, you will have to extract `RAMDISK.img` from your firmware. Follow the instructions for boot image patching above, but use the `RAMDISK.img` file instead of a boot image. To install the patched image back to your device, here is the fastboot command:
+`fastboot flash ramdisk /path/to/patched_boot.img`.
 Be aware you are flashing to `ramdisk`, not `boot`!
 
 ### EMUI 9
 For EMUI 9 devices, the `ramdisk` partition no longer exists. As a workaround, Magisk will be installed to the `recovery_ramdisk` partition. **This means that you HAVE TO boot to recovery every time you reboot. This also means that you CANNOT have Magisk and custom recoveries at the same time!** To boot to recovery, press **Power + Volume Up** when booting your device.
 
-- If you plan to use custom recoveries, simply follow the instructions for custom recovery above. \
-Note that to install TWRP, you will first download the TWRP recovery image, and use \
-`fastboot flash recovery_ramdisk /path/to/twrp.img` to install the custom recovery. \
+- If you plan to use custom recoveries, simply follow the instructions for custom recovery above.
+Note that to install TWRP, you will first download the TWRP recovery image, and use
+`fastboot flash recovery_ramdisk /path/to/twrp.img` to install the custom recovery.
 **Magisk will overwrite the custom recovery.**
-- If you plan not to use custom recoveries, you will have to extract `RECOVERY_RAMDIS.img` from your firmware. Follow the instructions for boot image patching above, but use the `RECOVERY_RAMDIS.img` file instead of a boot image. To install the patched image back to your device, here is the fastboot command: \
-`fastboot flash recovery_ramdisk /path/to/patched_boot.img`. \
+- If you plan not to use custom recoveries, you will have to extract `RECOVERY_RAMDIS.img` from your firmware. Follow the instructions for boot image patching above, but use the `RECOVERY_RAMDIS.img` file instead of a boot image. To install the patched image back to your device, here is the fastboot command:
+`fastboot flash recovery_ramdisk /path/to/patched_boot.img`.
 Be aware you are flashing to `recovery_ramdisk`, not `boot` nor `ramdisk`!
