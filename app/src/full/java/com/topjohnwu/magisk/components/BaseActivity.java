@@ -3,8 +3,10 @@ package com.topjohnwu.magisk.components;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -144,5 +146,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
 
     public interface ActivityResultListener {
         void onActivityResult(int requestCode, int resultCode, Intent data);
+    }
+
+    @Override
+    public SharedPreferences getSharedPreferences(String name, int mode) {
+        if (TextUtils.equals(name, getPackageName() + "_preferences"))
+            return app.prefs;
+        return super.getSharedPreferences(name, mode);
     }
 }
