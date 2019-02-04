@@ -1,6 +1,11 @@
 # Magisk Documentations
-(Updated on 2018.12.9)
+(Updated on 2019.2.3)
 
+- [Installation](install.md)
+    - [Prerequisite](install.md#prerequisite)
+    - [Custom Recovery](install.md#custom-recovery)
+    - [Boot Image Patching](install.md#boot-image-patching)
+    - [Huawei](install.md#huawei)
 - [Tutorials](tutorials.md)
     - [OTA Installation](tutorials.md#ota-installation)
     - [Best Practices for MagiskHide](tutorials.md#best-practices-for-magiskhide)
@@ -14,10 +19,10 @@ The followings are for developers
     - [Magic Mount](details.md#magic-mount)
     - [Simple Mount](details.md#simple-mount)
     - [Miscellaneous](details.md#Miscellaneous)
-- [Installation](install.md)
-    - [Systemless](install.md#systemless)
-    - [System Only](install.md#system-only)
-    - [Exploits](install.md#Exploits)
+- [Deployment](deploy.md)
+    - [Systemless](deploy.md#systemless)
+    - [System Only](deploy.md#system-only)
+    - [Exploits](deploy.md#exploits)
 - [Magisk Tools](tools.md)
 - [Developer Guides](guides.md)
     - [Scripts](guides.md#scripts)
@@ -26,4 +31,3 @@ The followings are for developers
     - [Submit Modules to Magisk-Modules-Repo](https://github.com/Magisk-Modules-Repo/submission)
     - [Remove Files](guides.md#remove-files)
     - [Remove Folders](guides.md#remove-folders)
-    
