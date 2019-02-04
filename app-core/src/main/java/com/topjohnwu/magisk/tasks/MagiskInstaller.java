@@ -8,7 +8,6 @@ import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.container.TarEntry;
-import com.topjohnwu.magisk.core.R;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.DownloadProgressListener;
 import com.topjohnwu.net.Networking;

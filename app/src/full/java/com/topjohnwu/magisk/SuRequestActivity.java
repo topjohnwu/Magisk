@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.SuConnector;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.IOException;
 
@@ -75,7 +76,7 @@ public class SuRequestActivity extends BaseActivity {
 
         PackageManager pm = getPackageManager();
         app.mDB.clearOutdated();
-        timeoutPrefs = getSharedPreferences("su_timeout", 0);
+        timeoutPrefs = Utils.getDEContext().getSharedPreferences("su_timeout", 0);
 
         // Get policy
         Intent intent = getIntent();
