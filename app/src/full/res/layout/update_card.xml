@@ -105,6 +105,7 @@
             android:layout_marginRight="8dp"
             android:maxLines="1"
             android:text="@string/install"
+            android:visibility="gone"
             app:autoSizeMaxTextSize="14sp"
             app:autoSizeTextType="uniform"
             app:layout_constraintBottom_toBottomOf="parent"
