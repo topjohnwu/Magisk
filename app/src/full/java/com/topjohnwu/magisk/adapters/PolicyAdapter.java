@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.adapters;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,13 +43,13 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_policy, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Policy policy = policyList.get(position);
 
         holder.settings.setExpanded(expandList[position]);
@@ -115,20 +116,28 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                 dbHelper.updatePolicy(policy);
             }
         });
-        holder.delete.setOnClickListener(v -> new CustomAlertDialog((Activity) v.getContext())
-                .setTitle(R.string.su_revoke_title)
-                .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
-                .setPositiveButton(R.string.yes, (dialog, which) -> {
-                    policyList.remove(position);
-                    notifyItemRemoved(position);
-                    notifyItemRangeChanged(position, policyList.size());
-                    SnackbarMaker.make(holder.itemView, v.getContext().getString(R.string.su_snack_revoke, policy.appName),
-                            Snackbar.LENGTH_SHORT).show();
-                    dbHelper.deletePolicy(policy);
-                })
-                .setNegativeButton(R.string.no_thanks, null)
-                .setCancelable(true)
-                .show());
+        holder.delete.setOnClickListener(v -> {
+            DialogInterface.OnClickListener l = (dialog, which) -> {
+                policyList.remove(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, policyList.size());
+                SnackbarMaker.make(holder.itemView, v.getContext().getString(R.string.su_snack_revoke, policy.appName),
+                        Snackbar.LENGTH_SHORT).show();
+                dbHelper.deletePolicy(policy);
+            };
+            if (FingerprintHelper.useFingerprint()) {
+                new FingerprintAuthDialog((Activity) v.getContext(),
+                        () -> l.onClick(null, 0)).show();
+            } else {
+                new CustomAlertDialog((Activity) v.getContext())
+                        .setTitle(R.string.su_revoke_title)
+                        .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
+                        .setPositiveButton(R.string.yes, l)
+                        .setNegativeButton(R.string.no_thanks, null)
+                        .setCancelable(true)
+                        .show();
+            }
+        });
     }
 
     @Override
