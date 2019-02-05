@@ -1,7 +1,5 @@
 <resources>
 
-    <resources>
-
     <!--Welcome Activity-->
     <string name="modules">Modüller</string>
     <string name="downloads">İndir</string>
@@ -219,7 +217,7 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Hedef UID: %1$d</string>
     <string name="command">Komut: %1$s</string>
-	
+
     <!-- MagiskHide -->
     <string name="show_system_app">Sistem uygulamalarını göster</string>
 
