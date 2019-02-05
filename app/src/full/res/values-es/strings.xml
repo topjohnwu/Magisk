@@ -7,16 +7,16 @@
     <string name="log">Registro</string>
     <string name="settings">Ajustes</string>
     <string name="install">Instalar</string>
-    <string name="unsupport_magisk_title">Versión Magisk no soportada</string>
+    <string name="unsupport_magisk_title">Versión de Magisk no soportada</string>
     <string name="unsupport_magisk_message">Esta versión de Magisk Manager no admite una versión de Magisk inferior a la v18.0.\n\nPuede actualizar Magisk de forma manual o instalar una versión anterior de la aplicación.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no está instalado</string>
-    <string name="checking_for_updates">Comprobando Actualizaciones…</string>
+    <string name="checking_for_updates">Buscando Actualizaciones…</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
-    <string name="safetyNet_check_text">Comprobar el estado de SafetyNet</string>
-    <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
-    <string name="safetyNet_check_success">La comprobación fue exitosa</string>
+    <string name="safetyNet_check_text">Verificar estado de SafetyNet</string>
+    <string name="checking_safetyNet_status">Verificando estado de SafetyNet…</string>
+    <string name="safetyNet_check_success">La verificación fue exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_res_invalid">La respuesta no es válida</string>
     <string name="magisk_up_to_date">Magisk está actualizado.</string>
@@ -128,7 +128,7 @@
     <string name="system_default">(Idioma del sistema)</string>
     <string name="settings_update">Ajustes de Actualización</string>
     <string name="settings_check_update_title">Comprobar Actualizaciones</string>
-    <string name="settings_check_update_summary">Comprobar periódicamente en segundo plano si existen actualizaciones</string>
+    <string name="settings_check_update_summary">Buscar periódicamente en segundo plano si existen actualizaciones</string>
     <string name="settings_update_channel_title">Canal de Actualización</string>
     <string name="settings_update_stable">Estable</string>
     <string name="settings_update_beta">Beta</string>
