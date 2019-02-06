@@ -14,7 +14,7 @@
     <string name="magisk_version_error">Magisk yüklü değil</string>
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
-    <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
+    <string name="safetyNet_check_text">SafetyNet kontrolünü başlat</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
     <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
     <string name="safetyNet_api_error">SafetyNet API Hatası</string>
