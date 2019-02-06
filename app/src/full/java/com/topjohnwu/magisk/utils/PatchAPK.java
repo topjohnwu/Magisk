@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.App;
@@ -11,7 +10,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.signing.JarMap;
 import com.topjohnwu.signing.SignAPK;
-import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -105,7 +104,7 @@ public class PatchAPK {
 
         // Install the application
         repack.setReadable(true, false);
-        if (!ShellUtils.fastCmdResult("pm install " + repack))
+        if (!Shell.su("pm install " + repack).exec().isSuccess())
             return false;
 
         Config.set(Config.Key.SU_MANAGER, pkg);
@@ -136,14 +135,14 @@ public class PatchAPK {
     }
 
     public static void hideManager() {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             App app = App.self;
             NotificationCompat.Builder progress =
                     Notifications.progress(app.getString(R.string.hide_manager_title));
             Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
-            boolean b = patchAndHide();
+            if(!patchAndHide())
+                Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
-            if (!b) Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
         });
     }
 }

@@ -2,7 +2,7 @@
 [Downloads](https://github.com/topjohnwu/Magisk/releases) | [Documentation](https://topjohnwu.github.io/Magisk/) | [XDA Thread](https://forum.xda-developers.com/apps/magisk/official-magisk-v7-universal-systemless-t3473445)
 
 ## Introduction
-Magisk is a suite of open source tools for customizing Android, supporting devices higher than Android 5.0 (API 21). It covers the fundamental parts for Android customization: root, boot scripts, SELinux patches, AVB2.0 / dm-verity / forceencrypt removals etc.
+Magisk is a suite of open source tools for customizing Android, supporting devices higher than Android 4.2 (API 17). It covers the fundamental parts for Android customization: root, boot scripts, SELinux patches, AVB2.0 / dm-verity / forceencrypt removals etc.
 
 Furthermore, Magisk provides a **Systemless Interface** to alter the system (or vendor) arbitrarily while the actual partitions stay completely intact. With its systemless nature along with several other hacks, Magisk can hide modifications from nearly any system integrity verifications used in banking apps, corporation monitoring apps, game cheat detections, and most importantly [Google's SafetyNet API](https://developer.android.com/training/safetynet/index.html).
 
@@ -10,7 +10,7 @@ Furthermore, Magisk provides a **Systemless Interface** to alter the system (or 
 **Make sure to install the latest [Canary Build](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337) before reporting any bugs!** **DO NOT** report bugs that is already fixed upstream. Follow the instructions in the [Canary Channel XDA Thread](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337), and report a bug either by opening an issue on GitHub or directly in the thread.
 
 ## Building Environment Requirements
-1. Python 3.5+: run `build.py` script
+1. Python 3: run `build.py` script
 2. Java Development Kit (JDK) 8: Compile Magisk Manager and sign zips
 3. Latest Android SDK: set `ANDROID_HOME` environment variable to the path to Android SDK
 4. Android NDK: Install NDK along with SDK (`$ANDROID_HOME/ndk-bundle`), or optionally specify a custom path `ANDROID_NDK_HOME`

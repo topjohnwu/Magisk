@@ -151,7 +151,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     }
 
     public void refresh() {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(this::loadApps);
+        AsyncTask.SERIAL_EXECUTOR.execute(this::loadApps);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

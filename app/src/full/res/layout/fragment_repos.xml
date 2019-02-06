@@ -20,8 +20,7 @@
             android:gravity="center"
             android:text="@string/no_modules_found"
             android:textSize="20sp"
-            android:textStyle="italic"
-            android:visibility="gone" />
+            android:textStyle="italic" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

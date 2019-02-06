@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
@@ -24,9 +23,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
                 android:layout_marginBottom="4dp"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
@@ -42,6 +41,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
                         app:layout_constraintBottom_toBottomOf="@+id/app_name"
                         app:layout_constraintEnd_toStartOf="@+id/app_name"
                         app:layout_constraintHorizontal_bias="0.42"
@@ -75,10 +75,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
                 android:layout_marginBottom="4dp"
+                android:visibility="gone"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
 
@@ -110,6 +111,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
+                            android:layout_marginLeft="16dp"
                             android:tint="?attr/imageColorTint"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/title"
@@ -128,16 +130,16 @@
                             android:id="@+id/keep_force_enc"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
-                            android:layout_marginEnd="50dp"
+                            android:layout_marginLeft="50dp"
+                            android:layout_marginRight="50dp"
                             android:text="@string/keep_force_encryption" />
 
                         <CheckBox
                             android:id="@+id/keep_verity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
-                            android:layout_marginEnd="50dp"
+                            android:layout_marginLeft="50dp"
+                            android:layout_marginRight="50dp"
                             android:text="@string/keep_dm_verity" />
 
                     </LinearLayout>
@@ -151,9 +153,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
                 android:layout_marginBottom="4dp"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
@@ -173,6 +175,7 @@
                             android:layout_height="30dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginEnd="24dp"
+                            android:layout_marginRight="24dp"
                             android:layout_marginBottom="12dp"
                             android:tint="@color/green500"
                             app:layout_constraintBottom_toBottomOf="parent"
@@ -180,24 +183,42 @@
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_safetynet" />
 
-                        <TextView
-                            android:id="@+id/safetyNet_status"
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/sn_status_start"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.25" />
+
+                        <TextView
+                            android:id="@+id/safetyNet_status"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:maxLines="1"
                             android:minWidth="200dp"
                             android:text="@string/safetyNet_check_text"
                             android:textStyle="bold"
+                            app:autoSizeMaxTextSize="14sp"
+                            app:autoSizeTextType="uniform"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/sn_status_end"
+                            app:layout_constraintStart_toStartOf="@+id/sn_status_start"
                             app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/sn_status_end"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.75" />
 
                         <ImageView
                             android:id="@+id/safetyNet_refresh"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginStart="24dp"
+                            android:layout_marginLeft="24dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/safetyNet_status"
                             app:layout_constraintTop_toTopOf="parent"
@@ -226,6 +247,7 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/cts_status"
                             app:layout_constraintEnd_toStartOf="@+id/cts_status"
                             app:layout_constraintTop_toTopOf="@+id/cts_status" />
@@ -245,19 +267,25 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/basic_status"
                             app:layout_constraintEnd_toStartOf="@+id/basic_status"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/basic_status" />
 
                         <TextView
                             android:id="@+id/basic_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:padding="6dp"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/basic_status_icon"
                             app:layout_constraintTop_toBottomOf="@+id/cts_status" />
 
 
@@ -271,9 +299,9 @@
                 style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
                 android:layout_marginBottom="4dp"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
@@ -286,11 +314,11 @@
                         android:id="@+id/paypal"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_horizontal"
+                        android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
                         app:layout_constraintEnd_toStartOf="@+id/patreon"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -317,11 +345,11 @@
                         android:id="@+id/patreon"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_horizontal"
+                        android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/paypal"
                         app:layout_constraintTop_toTopOf="parent">
@@ -380,9 +408,9 @@
                         <ImageView
                             android:layout_width="35dp"
                             android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
                             android:layout_margin="10dp"
                             android:tint="?attr/imageColorTint"
-                            android:layout_gravity="center_horizontal"
                             app:srcCompat="@drawable/ic_github" />
 
                     </FrameLayout>
@@ -401,9 +429,9 @@
                         <ImageView
                             android:layout_width="35dp"
                             android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
                             android:layout_margin="10dp"
                             android:tint="?attr/imageColorTint"
-                            android:layout_gravity="center_horizontal"
                             app:srcCompat="@drawable/ic_xda" />
 
                     </FrameLayout>
@@ -418,9 +446,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
                 android:layout_marginBottom="4dp"
                 android:clickable="true"
                 android:focusable="true"

@@ -1,11 +1,10 @@
 #!/sbin/sh
 X86_CNT=__X86_CNT__
 extract_bb() {
-  case `uname -m` in
-    x*) dd if="$0" of="$BBBIN" bs=1024 skip=1 count=$X86_CNT ;;
-    *)  dd if="$0" of="$BBBIN" bs=1024 skip=$(($X86_CNT + 1));;
-  esac
+  touch "$BBBIN"
   chmod 755 "$BBBIN"
+  dd if="$0" of="$BBBIN" bs=1024 skip=$(($X86_CNT + 1))
+  "./$BBBIN" >/dev/null || dd if="$0" of="$BBBIN" bs=1024 skip=1 count=$X86_CNT
 }
 setup_bb() {
   BBDIR=$TMPDIR/bin

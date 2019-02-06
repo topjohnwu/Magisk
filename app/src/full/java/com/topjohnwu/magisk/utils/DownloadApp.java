@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-import android.os.AsyncTask;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
@@ -9,7 +7,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.uicomponents.ProgressNotification;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
-import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
 
@@ -32,7 +30,7 @@ public class DownloadApp {
         ProgressNotification progress = new ProgressNotification(name);
         listener.progress = progress;
         Networking.get(Config.managerLink)
-                .setExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                .setExecutor(App.THREAD_POOL)
                 .setDownloadProgressListener(progress)
                 .setErrorHandler((conn, e) -> progress.dlFail())
                 .getAsFile(apk, listener);
@@ -86,7 +84,7 @@ public class DownloadApp {
             Config.export();
             // Make it world readable
             apk.setReadable(true, false);
-            if (ShellUtils.fastCmdResult("pm install " + apk))
+            if (Shell.su("pm install " + apk).exec().isSuccess())
                 RootUtils.rmAndLaunch(app.getPackageName(), BuildConfig.APPLICATION_ID);
             progress.dismiss();
         }

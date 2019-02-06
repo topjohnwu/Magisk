@@ -11,7 +11,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk не установлен</string>
     <string name="checking_for_updates">Проверка обновлений…</string>
-    <string name="magisk_update_available">Доступен Magisk v%1$s!</string>
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
@@ -60,15 +59,9 @@
     <string name="log_is_empty">Лог пуст</string>
 
     <!--About Activity-->
-    <string name="about">О приложении</string>
     <string name="app_changelog">Список изменений</string>
     <string name="translators">Displax [4PDA]</string>
-    <string name="app_version">Версия</string>
-    <string name="app_source_code">Исходный код</string>
-    <string name="donation">Поддержать проект</string>
     <string name="app_translators">Переводчики</string>
-    <string name="support_thread">Домашняя страница</string>
-    <string name="follow_twitter">Подписывайтесь в Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Закрыть</string>
@@ -80,12 +73,7 @@
     <string name="settings_reboot_toast">Для применения настроек перезагрузите устройство</string>
     <string name="release_notes">О версии</string>
     <string name="repo_cache_cleared">Кэш репозитория очищен</string>
-    <string name="process_error">Ошибка обработки</string>
     <string name="internal_storage">Расположение архива:\n[Внутреннее Хранилище]%1$s</string>
-    <string name="zip_download_title">Загрузка</string>
-    <string name="zip_download_msg">Загрузка архива (%1$d%%) …</string>
-    <string name="zip_process_title">Обработка</string>
-    <string name="zip_process_msg">Обработка архива…</string>
     <string name="manager_update_title">Доступно обновление Magisk Manager!</string>
     <string name="manager_download_install">Нажмите для установки</string>
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
@@ -93,7 +81,6 @@
     <string name="update_channel">Обновления Magisk</string>
     <string name="flashing">Прошивка…</string>
     <string name="hide_manager_title">Скрытие Magisk Manager…</string>
-    <string name="hide_manager_msg">Может занять некоторое время…</string>
     <string name="hide_manager_fail_toast">Скрытие Magisk Manager неудачно!</string>
     <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки…</string>
     <string name="download_zip_only">Загрузка установочного ZIP</string>
@@ -103,7 +90,6 @@
     <string name="warning">Предупреждение</string>
     <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный слот!\nИспользуйте эту опцию только при установке OTA.\nПродолжить?</string>
     <string name="select_method">Выбор способа</string>
-    <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образов</string>
     <string name="boot_file_patch_msg">Выберите файл ядра (boot) - *.img или *.img.tar</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
@@ -112,7 +98,6 @@
     <string name="restore_fail">Резервная копия отсутствует!</string>
     <string name="proprietary_title">Загрузка SafetyNet</string>
     <string name="proprietary_notice">Magisk Manager — свободно распространяемый продукт, он не содержит собственный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение для проверки SafetyNet? (содержит GoogleApiClient)</string>
-    <string name="su_db_corrupt">База данных SU повреждена, будет создана новая</string>
     <string name="setup_done">Установка завершена</string>
     <string name="setup_fail">Ошибка установки</string>
     <string name="env_fix_title">Требуется дополнительная установка</string>
@@ -179,7 +164,6 @@
     <string name="owner_only_summary">Только владелец имеет Root-доступ</string>
     <string name="owner_manage_summary">Только владелец управляет Root-доступом и обрабатывает запросы</string>
     <string name="user_indepenent_summary">Каждый пользователь имеет свои собственные правила Root-доступа</string>
-    <string name="multiuser_hint_owner_request">Запрос отправлен владельцу устройства. Переключитесь в профиль владельца для обработки запроса</string>
 
     <string name="mount_namespace_mode">Настройка именных пространств</string>
     <string name="settings_ns_global">Общее именное пространство</string>

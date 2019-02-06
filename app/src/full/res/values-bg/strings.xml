@@ -11,7 +11,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk не е инсталиран.</string>
     <string name="checking_for_updates">Проверяваме за актуализации…</string>
-    <string name="magisk_update_available">Magisk версия %1$s е налице.</string>
     <string name="invalid_update_channel">Невалиден канал за актуализации</string>
     <string name="safetyNet_check_text">Докоснете за стартиране на SafetyNet проверката.</string>
     <string name="checking_safetyNet_status">Проверка статуса на SafetyNet…</string>
@@ -60,15 +59,9 @@
     <string name="log_is_empty">Дневникът е празен.</string>
 
     <!--About Activity-->
-    <string name="about">Относно</string>
     <string name="app_changelog">Списък с промени</string>
     <string name="translators" />
-    <string name="app_version">Версия</string>
-    <string name="app_source_code">Изходен код</string>
-    <string name="donation">Дарение</string>
     <string name="app_translators">Преводачи</string>
-    <string name="support_thread">Страница за поддръжка</string>
-    <string name="follow_twitter">Последвайте ме в Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Затваряне</string>
@@ -80,12 +73,7 @@
     <string name="settings_reboot_toast">Трябва да рестартирате устройството, за да бъдат приложени настройките.</string>
     <string name="release_notes">Бележки</string>
     <string name="repo_cache_cleared">Кешът на хранилището е изчистен.</string>
-    <string name="process_error">Грешка при процеса</string>
     <string name="internal_storage">Архивът е записан във:\n[Вътрешната памет]%1$s.</string>
-    <string name="zip_download_title">Изтегляне</string>
-    <string name="zip_download_msg">Изтегляне на архив (%1$d%%)…</string>
-    <string name="zip_process_title">Обработване</string>
-    <string name="zip_process_msg">Обработване на архива…</string>
     <string name="manager_update_title">Налице е нова версия на Magisk Manager.</string>
     <string name="manager_download_install">Докоснете за изтегляне и инсталиране.</string>
     <string name="dtbo_patched_title">DTBO беше модифициран!</string>
@@ -93,7 +81,6 @@
     <string name="update_channel">Актуализации на Magisk</string>
     <string name="flashing">Инсталиране</string>
     <string name="hide_manager_title">Скриване на Magisk Manager…</string>
-    <string name="hide_manager_msg">Може да отнеме известно време.</string>
     <string name="hide_manager_fail_toast">Скриването на Magisk Manager бе неуспешно.</string>
     <string name="open_link_failed_toast">Не бе намерено приложение за отваряне на линка.</string>
     <string name="download_zip_only">Изтегляне само на архив</string>
@@ -103,7 +90,6 @@
     <string name="warning">Внимание</string>
     <string name="install_inactive_slot_msg">Вашето устройство НАЛОЖИТЕЛНО ще стартира текущия неактивен слот при следващото рестартиране.\nИзползвайте тази опция само след като приключи инсталирането на OTA.\nПродължаване?</string>
 .   <string name="select_method">Избор на метод</string>
-    <string name="no_boot_file_patch_support">Текущата версия на Magisk не поддържа модифициране на boot образи.</string>
     <string name="boot_file_patch_msg">Изберете стоков boot образ с формат .img или .img.tar.</string>
     <string name="complete_uninstall">Пълно деинсталиране</string>
     <string name="restore_img">Възстановяване на образи</string>
@@ -112,7 +98,6 @@
     <string name="restore_fail">Не е налице архив на стоковия образ!</string>
     <string name="proprietary_title">Изтегляне на патентования код</string>
     <string name="proprietary_notice">Magisk Manager е FOSS и затова не включва патентования код за SafetyNet ППИ на Google.\n\nПозволявате ли на Magisk Manager да изтегли добавката (включва GoogleApiClient) за SafetyNet проверки?</string>
-    <string name="su_db_corrupt">Базата данни за SU е повредена. Ще създадем нов db файл.</string>
     <string name="setup_done">Първоначалната настройка е готова.</string>
     <string name="setup_fail">Първоначалната настройка е неуспешна.</string>
     <string name="env_fix_title">Изисква допълнително настройване</string>
@@ -180,7 +165,6 @@
     <string name="owner_only_summary">Само собственикът има руут достъп.</string>
     <string name="owner_manage_summary">Само собственикът може да управлява руут достъпа и да получава запитвания за достъп.</string>
     <string name="user_indepenent_summary">Всеки потребител има собствени правила за руут достъп.</string>
-    <string name="multiuser_hint_owner_request">Направено е запитване до собственика на устройството. Моля да преминете в режим на собственик и да дадете разрешение.</string>
 
     <string name="mount_namespace_mode">Монтиране по именни пространства</string>
     <string name="settings_ns_global">Глобално</string>

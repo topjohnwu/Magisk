@@ -1,44 +1,19 @@
 package com.topjohnwu.magisk.tasks;
 
+import android.os.SystemClock;
+
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.Request;
 import com.topjohnwu.net.ResponseListener;
+import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CheckUpdates {
-
-    private static int getInt(JSONObject json, String name, int defValue) {
-        if (json == null)
-            return defValue;
-        try {
-            return json.getInt(name);
-        } catch (JSONException e) {
-            return defValue;
-        }
-    }
-
-    private static String getString(JSONObject json, String name, String defValue) {
-        if (json == null)
-            return defValue;
-        try {
-            return json.getString(name);
-        } catch (JSONException e) {
-            return defValue;
-        }
-    }
-
-    private static JSONObject getJson(JSONObject json, String name) {
-        try {
-            return json.getJSONObject(name);
-        } catch (JSONException e) {
-            return null;
-        }
-    }
 
     private static Request getRequest() {
         String url;
@@ -70,9 +45,39 @@ public class CheckUpdates {
     private static class UpdateListener implements ResponseListener<JSONObject> {
 
         private Runnable cb;
+        private long start;
 
         UpdateListener(Runnable callback) {
             cb = callback;
+            start = SystemClock.uptimeMillis();
+        }
+
+        private int getInt(JSONObject json, String name, int defValue) {
+            if (json == null)
+                return defValue;
+            try {
+                return json.getInt(name);
+            } catch (JSONException e) {
+                return defValue;
+            }
+        }
+
+        private String getString(JSONObject json, String name, String defValue) {
+            if (json == null)
+                return defValue;
+            try {
+                return json.getString(name);
+            } catch (JSONException e) {
+                return defValue;
+            }
+        }
+
+        private JSONObject getJson(JSONObject json, String name) {
+            try {
+                return json.getJSONObject(name);
+            } catch (JSONException e) {
+                return null;
+            }
         }
 
         @Override
@@ -93,7 +98,8 @@ public class CheckUpdates {
             JSONObject uninstaller = getJson(json, "uninstaller");
             Config.uninstallerLink = getString(uninstaller, "link", null);
 
-            Topic.publish(Topic.UPDATE_CHECK_DONE);
+            UiThreadHandler.handler.postAtTime(() -> Topic.publish(Topic.UPDATE_CHECK_DONE),
+                    start + 1000  /* Add artificial delay to let UI behave correctly */);
 
             if (cb != null)
                 cb.run();

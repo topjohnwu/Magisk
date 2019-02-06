@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.UpdateCheckService;
+import com.topjohnwu.magisk.tasks.CheckUpdates;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,10 +31,12 @@ public class AppUtils {
                     .Builder(ClassMap.get(UpdateCheckService.class), 12, TimeUnit.HOURS)
                     .setConstraints(constraints)
                     .build();
-            WorkManager.getInstance().enqueueUniquePeriodicWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID,
+            WorkManager.getInstance().enqueueUniquePeriodicWork(
+                    Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID,
                     ExistingPeriodicWorkPolicy.REPLACE, request);
         } else {
             WorkManager.getInstance().cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID);
+            CheckUpdates.check();
         }
     }
 

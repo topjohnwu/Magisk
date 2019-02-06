@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.tasks;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -9,7 +8,6 @@ import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.container.TarEntry;
-import com.topjohnwu.magisk.core.R;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.DownloadProgressListener;
 import com.topjohnwu.net.Networking;
@@ -287,7 +285,7 @@ public abstract class MagiskInstaller {
 
     protected boolean postOTA() {
         SuFile bootctl = new SuFile("/data/adb/bootctl");
-        try (InputStream in = App.self.getResources().openRawResource(R.raw.bootctl);
+        try (InputStream in = Networking.get(Const.Url.BOOTCTL_URL).execForInputStream().getResult();
              OutputStream out = new SuFileOutputStream(bootctl)) {
             ShellUtils.pump(in, out);
         } catch (IOException e) {
@@ -308,7 +306,7 @@ public abstract class MagiskInstaller {
     protected abstract void onResult(boolean success);
 
     public void exec() {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             boolean b = operations();
             UiThreadHandler.run(() -> onResult(b));
         });

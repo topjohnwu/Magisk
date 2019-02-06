@@ -8,10 +8,9 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
-        android:installLocation="internalOnly"
         android:allowBackup="true"
-        android:directBootAware="true"
         android:icon="@drawable/ic_launcher"
+        android:installLocation="internalOnly"
         android:label="@string/app_name"
         android:supportsRtl="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">

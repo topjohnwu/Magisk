@@ -12,7 +12,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Магиск није инсталиран</string>
     <string name="checking_for_updates">Проверавам Ажурирања…</string>
-    <string name="magisk_update_available">Магиск v%1$s је доступан!</string>
     <string name="invalid_update_channel">Непостојећи Канал Ажурирања</string>
     <string name="safetyNet_check_text">Притисни да започнеш СигурнаМрежа проверу</string>
     <string name="checking_safetyNet_status">Проверавам СигурнаМрежа статус…</string>
@@ -54,14 +53,9 @@
     <string name="log_is_empty">Дневник је празан</string>
 
     <!--About Activity-->
-    <string name="about">О апликацији</string>
     <string name="app_changelog">Дневник промена апликације</string>
     <string name="translators" />
-    <string name="app_version">Верзија апликације</string>
-    <string name="app_source_code">изворни код</string>
-    <string name="donation">Донације</string>
     <string name="app_translators">Преводиоци апликације</string>
-    <string name="support_thread">Подршка</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Затвори</string>
@@ -73,12 +67,7 @@
     <string name="settings_reboot_toast">Рестартуј да примениш подешавања</string>
     <string name="release_notes">Белешке обљављивања</string>
     <string name="repo_cache_cleared">Кеш спремишта обрисан</string>
-    <string name="process_error">Грешка у обради</string>
     <string name="internal_storage">Зип је сачуван у:\n[Интерно складиште]%1$s</string>
-    <string name="zip_download_title">Преузимање</string>
-    <string name="zip_download_msg">Преузимање зип фајла (%1$d%%) …</string>
-    <string name="zip_process_title">Обрада</string>
-    <string name="zip_process_msg">Обрада зип фајла …</string>
     <string name="manager_update_title">Ново Ажурирање Магиск Менаџера Доступно!</string>
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
     <string name="dtbo_patched_title">DTBO је закрпљен!</string>
@@ -86,20 +75,17 @@
     <string name="update_channel">Магиск Ажурирање</string>
     <string name="flashing">Флешовање</string>
     <string name="hide_manager_title">Сакривам Магиск Менаџер…</string>
-    <string name="hide_manager_msg">Ово може потрајати…</string>
     <string name="hide_manager_fail_toast">Скривање Магиск Менаџера неуспешно…</string>
     <string name="download_zip_only">Преузми само Зип</string>
     <string name="patch_boot_file">Закрпи фајл слике покретања</string>
     <string name="direct_install">Директна Инсталација (Препоручено)</string>
     <string name="select_method">Изабери Методу</string>
-    <string name="no_boot_file_patch_support">Циљана Магиск верзија не подржава закрпу фајла слике покретања</string>
     <string name="boot_file_patch_msg">Изабери испис фабричког фајла слике покретања у .img или img.tar формату</string>
     <string name="complete_uninstall">Комплетна Унинсталација</string>
     <string name="restore_done">Повратак успешан!</string>
     <string name="restore_fail">Фабрички бекап не постоји!</string>
     <string name="proprietary_title">Преузми Власнички Код</string>
     <string name="proprietary_notice">Магиск Менаџер је \'FOSS\' што значи да не садржи Гуглов власнички код од СигурнаМрежа АПИ.\n\nДа ли дозвољавате да Магиск Менаџер преузме додатак (садржи GoogleApiClient) за СигурнаМрежа провере?</string>
-    <string name="su_db_corrupt">СК база података оштећена, креирам нову</string>
     <string name="download_file_error">Грешка при преузимању фајла</string>
     <string name="downloading_toast">Преузимање %1$s</string>
     <string name="no_rw_storage">Ово својство неће радити без дозволе приступу екстерном складишту.</string>
@@ -153,7 +139,6 @@
     <string name="owner_only_summary">Само власник има приступ корену</string>
     <string name="owner_manage_summary">Само власник може да приступа корену и да прими захтеве за њега</string>
     <string name="user_indepenent_summary">Сваки корисник има своја правила корена</string>
-    <string name="multiuser_hint_owner_request">Захтев је послат власнику уређаја. Молимо вас да на власниковом налогу прихватите захтев</string>
 
     <string name="mount_namespace_mode">Постоље режима имена простора</string>
     <string name="settings_ns_global">Глобално име простора</string>

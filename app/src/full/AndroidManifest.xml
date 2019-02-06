@@ -5,13 +5,12 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name="a.e"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <!-- Activities -->
 
@@ -39,14 +38,17 @@
 
         <activity
             android:name="a.m"
+            android:directBootAware="true"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
-            android:taskAffinity="internal.superuser"
+            android:taskAffinity="a.m"
             android:theme="@style/SuRequest" />
 
         <!-- Receiver -->
 
-        <receiver android:name="a.h">
+        <receiver
+            android:name="a.h"
+            android:directBootAware="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
@@ -54,13 +56,14 @@
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
 
         <!-- Service -->
 
-        <service android:name="a.j"/>
+        <service android:name="a.j" />
 
         <!-- Hardcode GMS version -->
         <meta-data

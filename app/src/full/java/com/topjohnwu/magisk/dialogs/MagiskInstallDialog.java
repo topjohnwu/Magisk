@@ -36,7 +36,6 @@ public class MagiskInstallDialog extends CustomAlertDialog {
             }
             new InstallMethodDialog(a, options).show();
         });
-        setNegativeButton(R.string.no_thanks, null);
         if (!TextUtils.isEmpty(Config.magiskNoteLink)) {
             setNeutralButton(R.string.release_notes, (d, i) -> {
                 if (Config.magiskNoteLink.contains("forum.xda-developers")) {

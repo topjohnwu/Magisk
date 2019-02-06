@@ -11,7 +11,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk yra neinstaliuotas</string>
     <string name="checking_for_updates">Ieškoma atnaujinimų…</string>
-    <string name="magisk_update_available">Magisk v%1$s yra galima!</string>
     <string name="invalid_update_channel">Neteisingas atnaujinimų nustatymas</string>
     <string name="safetyNet_check_text">Paspauskite SafetyNet paieškai</string>
     <string name="checking_safetyNet_status">Ieškomas SafetyNet statusas…</string>
@@ -60,14 +59,9 @@
     <string name="log_is_empty">Įvykių sąrašas tuščias</string>
 
     <!--About Activity-->
-    <string name="about">Apie</string>
     <string name="app_changelog">Pakeitimų sąrašas</string>
     <string name="translators">Vv2233Bb</string>
-    <string name="app_version">Versija</string>
-    <string name="app_source_code">Prisidėkite</string>
-    <string name="donation">Paaukoti</string>
     <string name="app_translators">Vertėjai</string>
-    <string name="support_thread">Mūsų XDA puslapis</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Uždaryti</string>
@@ -79,12 +73,7 @@
     <string name="settings_reboot_toast">Nustatymų įgalinimui prašome perkrauti telefoną</string>
     <string name="release_notes">Pakeitimai</string>
     <string name="repo_cache_cleared">Repo failai išvalyti</string>
-    <string name="process_error">Proceso klaida</string>
     <string name="internal_storage">Zip failas yra saugomas:\n[Internal Storage]%1$s</string>
-    <string name="zip_download_title">Atsisiunčiama</string>
-    <string name="zip_download_msg">Atsiunčiamas zip failas(%1$d%%)…</string>
-    <string name="zip_process_title">Vyksta procesas</string>
-    <string name="zip_process_msg">Zip failas apdorojamas…</string>
     <string name="manager_update_title">Atsirado naujas Magisk Manager atnaujinimas!</string>
     <string name="manager_download_install">Paspauskite, kad atsisiųstumėte ir instaliuotumėte</string>
     <string name="dtbo_patched_title">DTBO buvo ištaisytas!</string>
@@ -92,13 +81,11 @@
     <string name="update_channel">Magisk Atnaujinimai</string>
     <string name="flashing">Instaliuojama</string>
     <string name="hide_manager_title">Magisk Manager paslėpiamas…</string>
-    <string name="hide_manager_msg">Tai užtruks sekundėlę…</string>
     <string name="hide_manager_fail_toast">Magisk Manager paslėpimas žlugo…</string>
     <string name="download_zip_only">Atsisiųsti zip failą</string>
     <string name="patch_boot_file">Ištaisyti boot failą</string>
     <string name="direct_install">Tiesioginis instaliavimas (Rekomenduojamas)</string>
     <string name="select_method">Pasirinkite metodą</string>
-    <string name="no_boot_file_patch_support">Pasirinkta Magisk versija nepalaiko pakeitimų boot faile</string>
     <string name="boot_file_patch_msg">Pasirinkti boot failą .img ar .img.tar formate</string>
     <string name="complete_uninstall">Pilnas pašalinimas</string>
     <string name="restore_img">Atstatyti boot failą</string>
@@ -107,7 +94,6 @@
     <string name="restore_fail">Gamyklinis atstatymo failas neegzistuoja!</string>
     <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
     <string name="proprietary_notice">Magisk Manager yra FOSS todėl neturi Google patentuoto SafetyNet API kodo.\n\nAr jūs leidžiate Magisk Manager atsisiųsti papildinį (turintį GoogleApiClient) SafetyNet paieškai?</string>
-    <string name="su_db_corrupt">Supervartotojo duomenų bazė yra sugadinta, perkursime naują duomenų bazę</string>
     <string name="setup_done">Pasiruošimas baigtas</string>
     <string name="setup_fail">Pasiruošimas nesėkmingas</string>
     <string name="env_fix_title">Reikalingas papildomas pasiruošimas</string>
@@ -173,7 +159,6 @@
     <string name="owner_only_summary">Tik įrenginio savininkas turi root prieigą</string>
     <string name="owner_manage_summary">Tik įrenginio savinkas gali tvarkyti root prieigą ir gauti lenteles prašančias root prieigos</string>
     <string name="user_indepenent_summary">Kiekvienas vartotojas turi savo atskiras root taisykles</string>
-    <string name="multiuser_hint_owner_request">Prašymas buvo nusiųstas savininkui. Prašome tapti savininku ir suteikite leidimą</string>
 
     <string name="mount_namespace_mode">Root sesijos vardų srities režimas</string>
     <string name="settings_ns_global">Globali vardų sritis</string>

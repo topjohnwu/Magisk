@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.tasks;
 
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Const;
@@ -36,7 +35,8 @@ public abstract class FlashZip {
 
     private boolean unzipAndCheck() throws IOException {
         ZipUtils.unzip(tmpFile, tmpFile.getParentFile(), "META-INF/com/google/android", true);
-        return ShellUtils.fastCmdResult("grep -q '#MAGISK' " + new File(tmpFile.getParentFile(), "updater-script"));
+        return Shell.su("grep -q '#MAGISK' " + new File(tmpFile.getParentFile(), "updater-script"))
+                .exec().isSuccess();
     }
 
     private boolean flash() throws IOException {
@@ -70,7 +70,7 @@ public abstract class FlashZip {
     }
 
     public void exec() {
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        App.THREAD_POOL.execute(() -> {
             boolean success = false;
             try {
                 success = flash();

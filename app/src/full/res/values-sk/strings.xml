@@ -11,7 +11,6 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie je nainštalovaný</string>
     <string name="checking_for_updates">Kontrola aktualizácií…</string>
-    <string name="magisk_update_available">Je dostupný Magisk v%1$s!</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="safetyNet_check_text">Klepnutím spustíte kontrolu SafetyNet</string>
     <string name="checking_safetyNet_status">Kontroluje sa stav SafetyNet…</string>
@@ -60,14 +59,9 @@
     <string name="log_is_empty">Nie su žiadne záznamy</string>
 
     <!--About Activity-->
-    <string name="about">O aplikácii</string>
     <string name="app_changelog">Zoznam zmien</string>
     <string name="translators" />
-    <string name="app_version">Verzia</string>
-    <string name="app_source_code">Zdrojový kód</string>
-    <string name="donation">Príspevok</string>
     <string name="app_translators">Prekladatelia</string>
-    <string name="support_thread">Podpora na fóre</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Zavrieť</string>
@@ -79,12 +73,7 @@
     <string name="settings_reboot_toast">Pre aplikovanie nastavení je potrebný reštart</string>
     <string name="release_notes">Poznámky k vydaniu</string>
     <string name="repo_cache_cleared">Cache repo odstránená</string>
-    <string name="process_error">Chyba počas spracovania</string>
     <string name="internal_storage">Zip je uložený v:\n[Vnútorné úložisko]%1$s</string>
-    <string name="zip_download_title">Sťahovanie</string>
-    <string name="zip_download_msg">Sťahovanie súboru zip (%1$d%%) …</string>
-    <string name="zip_process_title">Spracovanie</string>
-    <string name="zip_process_msg">Spracovanie súboru zip…</string>
     <string name="manager_update_title">Nová aktualizácia Magisk Manager!</string>
     <string name="manager_download_install">Stlačte pre stiahnutie a inštaláciu</string>
     <string name="dtbo_patched_title">DTBO bol zaplátaný!</string>
@@ -92,7 +81,6 @@
     <string name="update_channel">Aktualizácie Magisk</string>
     <string name="flashing">Flashovanie</string>
     <string name="hide_manager_title">Pracuje sa na skrytí Magisk Manager…</string>
-    <string name="hide_manager_msg">Môže to chvíľu trvať…</string>
     <string name="hide_manager_fail_toast">Skrytie Magisk Manager zlyhalo…</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu…</string>
     <string name="download_zip_only">Stiahnuť iba zip</string>
@@ -102,7 +90,6 @@
     <string name="warning">Upozornenie</string>
     <string name="install_inactive_slot_msg">Vaše zariadenie bude po reštarte PRINÚTENÉ nabootovať do aktuálne neaktívneho slotu!\nTúto voľbu použite iba po skončení OTA.\nPokračovať?</string>
     <string name="select_method">Vyberte metódu</string>
-    <string name="no_boot_file_patch_support">Cieľová verzia Magisk nepodporuje zaplátanie súboru boot</string>
     <string name="boot_file_patch_msg">Vyberte stock boot image dump vo formáte .img alebo .img.tar</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>
@@ -111,7 +98,6 @@
     <string name="restore_fail">Záloha stock neexistuje!</string>
     <string name="proprietary_title">Stiahnuť proprietárny kód</string>
     <string name="proprietary_notice">Magisk Manager je FOSS, ktorý neobsahuje proprietárny kód SafetyNet API od Google.\n\nChcete povoliť Magisk Manager stiahnutie rozšírenia (obsahujúce GoogleApiClient) pre kontrolu  SafetyNet?</string>
-    <string name="su_db_corrupt">Databáza SU je poškodená, bude vytvorená nová db</string>
     <string name="setup_done">Nastavenie ukončené</string>
     <string name="setup_fail">Nastavenie zlyhalo</string>
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>
@@ -175,7 +161,6 @@
     <string name="owner_only_summary">Root prístup má iba majiteľ zariadenia</string>
     <string name="owner_manage_summary">Iba majiteľ zariadenia môže spravovať prístup root a prijímať žiadosti</string>
     <string name="user_indepenent_summary">Každý používateľ má vlastné pravidlá pre root</string>
-    <string name="multiuser_hint_owner_request">Žiadosti sú odoslané na zariadenie majiteľa. Prosím, prepnite na majiteľa a udeľte požadované oprávnenia</string>
 
     <string name="mount_namespace_mode">Režim Mount Namespace</string>
     <string name="settings_ns_global">Globálne Namespace</string>

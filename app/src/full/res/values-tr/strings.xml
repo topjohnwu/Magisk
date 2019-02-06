@@ -7,28 +7,30 @@
     <string name="log">Günlük</string>
     <string name="settings">Ayarlar</string>
     <string name="install">Yükle</string>
+    <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
+    <string name="unsupport_magisk_message">Magisk Manager\'ın bu sürümü v18.0\'dan daha düşük Magisk versiyonlarını desteklememektedir.\n\nMagisk\'i manuel olarak yükseltebilir veya uygulamayı daha eski bir sürüme düşürebilirsiniz.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk yüklü değil</string>
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
-    <string name="magisk_update_available">Magisk v%1$s mevcut!</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
     <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
     <string name="safetyNet_api_error">SafetyNet API Hatası</string>
     <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk güncel</string>
+    <string name="manager_up_to_date">Magisk Manager güncel</string>
     <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
-    <string name="keep_dm_verity">AVB 2.0/dm-verity\'yi koru</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity\'i koru</string>
     <string name="current_installed">Yüklü: %1$s</string>
     <string name="latest_version">Yeni: %1$s</string>
     <string name="uninstall">Kaldır</string>
-    <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
+    <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verileriniz şifrelenecek</string>
     <string name="update">Güncelle</string>
+    <string name="core_only_enabled">(Yalnızca çekirdek modu etkin)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
@@ -60,16 +62,10 @@
     <string name="log_is_empty">Günlük boş</string>
 
     <!--About Activity-->
-    <string name="about">Hakkında</string>
     <string name="app_changelog">Uygulama değişiklikleri</string>
     <string name="translators">Fatih FIRINCI - Mevlüt TOPÇU - Muhammet Emin TURGUT</string>
-    <string name="app_version">Uygulama sürümü</string>
-    <string name="app_source_code">Kaynak kodu</string>
-    <string name="donation">Bağış Yapın</string>
     <string name="app_translators">Çevirmenler</string>
-    <string name="support_thread">Destek konusu</string>
-    <string name="follow_twitter">Beni Twitter\'da takip edin</string>
-	
+
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk Güncellemeleri</string>
     <string name="progress_channel">İlerleme Bildirimleri</string>
@@ -87,18 +83,12 @@
     <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Repo önbelleği temizlendi</string>
-    <string name="process_error">İşlem hatası</string>
     <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
-    <string name="zip_download_title">İndiriliyor</string>
-    <string name="zip_download_msg">Zip dosyası indiriliyor (%1$d%%) …</string>
-    <string name="zip_process_title">İşleniyor</string>
-    <string name="zip_process_msg">Zip dosyası işleniyor…</string>
     <string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
     <string name="dtbo_patched_title">DTBO yamalandı!</string>
     <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
     <string name="flashing">Yükleniyor</string>
     <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
-    <string name="hide_manager_msg">Bu biraz zaman alabilir…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu…</string>
     <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı…</string>
     <string name="download_zip_only">Yalnızca Zip Dosyasını İndir</string>
@@ -108,7 +98,6 @@
     <string name="warning">Uyarı</string>
     <string name="install_inactive_slot_msg">Cihazınız yeniden başlatıldıktan sonra mevcut pasif yuvaya ZORLA önyüklenecek!\nBu seçeneği yalnızca OTA tamamlandıktan sonra kullanın.\nDevam mı?</string>
     <string name="select_method">Yöntem Seçin</string>
-    <string name="no_boot_file_patch_support">Hedef Magisk sürümü önyükleme imaj dosyasını yamalamayı desteklemiyor</string>
     <string name="boot_file_patch_msg">.img veya .img.tar formatında stok önyükleme imajını seçin</string>
     <string name="complete_uninstall">Tamamen Kaldır</string>
     <string name="restore_img">Önyükleme İmajını Geri Yükle</string>
@@ -117,7 +106,6 @@
     <string name="restore_fail">Stok önyükleme yedeği yok!</string>
     <string name="proprietary_title">Tescil Kodunu İndirin</string>
     <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan Google\'ın tescilli olduğu SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için bir uzantıyı (GoogleApiClient içeriyor) indirmesine izin veriyor musunuz?</string>
-    <string name="su_db_corrupt">SU veritabanı bozuk, yeni db oluşturacak</string>
     <string name="setup_done">Kurulum tamamlandı</string>
     <string name="setup_fail">Kurulum başarısız</string>
     <string name="env_fix_title">Ek Kurulum Gerekli</string>
@@ -126,6 +114,7 @@
     <string name="setup_msg">Ortam kurulumu çalışıyor…</string>
     <string name="downloading_toast">%1$s indiriliyor</string>
     <string name="no_rw_storage">Bu özellik harici depolamaya yazma izni olmadan çalışmaz.</string>
+    <string name="dl_one_module">Bir seferde bir modül indirin.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
@@ -154,7 +143,7 @@
     <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
     <string name="settings_hosts_title">Sistemsiz host</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
-	<string name="settings_hosts_toast">Sistemsiz host modülü eklendi</string>
+    <string name="settings_hosts_toast">Sistemsiz host modülü eklendi</string>
 
     <string name="settings_su_app_adb">Uygulamalar ve ADB</string>
     <string name="settings_su_app">Sadece uygulamalar</string>
@@ -184,7 +173,6 @@
     <string name="owner_only_summary">Yalnızca kök erişimi olan kullanıcı</string>
     <string name="owner_manage_summary">Yalnızca cihaz sahibi kök erişimini yönetebilir ve izin isteklerini alabilir</string>
     <string name="user_indepenent_summary">Her kullanıcının kendi ayrı kök erişimi kuralları vardır</string>
-    <string name="multiuser_hint_owner_request">Cihaz sahibine bir istek gönderilmiştir. Lütfen cihaz sahibi hesabına geçin ve izin verin</string>
 
     <string name="mount_namespace_mode">Ad Alanı Modunu Doldur</string>
     <string name="settings_ns_global">Global Ad Alanı</string>
@@ -226,7 +214,11 @@
     <string name="auth_fail">Kimlik Doğrulama Başarısız</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">Hedef UID: %1$d</string>
     <string name="command">Komut: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Sistem uygulamalarını göster</string>
 
 </resources>

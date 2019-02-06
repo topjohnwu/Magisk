@@ -46,7 +46,7 @@ public class Const {
     public static final int USER_ID = Process.myUid() / 100000;
 
     public static final class MAGISK_VER {
-        /* Currently no backwards compatibility needed */
+        public static final int MIN_SUPPORT = 18000;
     }
 
     public static class ID {
@@ -66,8 +66,11 @@ public class Const {
     }
 
     public static class Url {
-        public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/stable.json";
-        public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/beta.json";
+        private static String getRaw(String where, String name) {
+            return String.format("https://raw.githubusercontent.com/topjohnwu/magisk_files/%s/%s", where, name);
+        }
+        public static final String STABLE_URL = getRaw("master", "stable.json");
+        public static final String BETA_URL = getRaw("master", "beta.json");
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
@@ -76,7 +79,8 @@ public class Const {
         public static final String TWITTER_URL = "https://twitter.com/topjohnwu";
         public static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
         public static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk";
-        public static final String SNET_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/b66b1a914978e5f4c4bbfd74a59f4ad371bac107/snet.apk";
+        public static final String SNET_URL = getRaw("b66b1a914978e5f4c4bbfd74a59f4ad371bac107", "snet.apk");
+        public static final String BOOTCTL_URL = getRaw("9c5dfc1b8245c0b5b524901ef0ff0f8335757b77", "bootctl");
     }
 
     public static class Key {
@@ -84,6 +88,7 @@ public class Const {
         public static final String LINK_KEY = "Link";
         public static final String IF_NONE_MATCH = "If-None-Match";
         // intents
+        public static final String FROM_SPLASH = "splash";
         public static final String OPEN_SECTION = "section";
         public static final String INTENT_SET_NAME = "filename";
         public static final String INTENT_SET_LINK = "link";
