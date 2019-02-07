@@ -108,17 +108,9 @@ static bool is_pid_safetynet_process(const int pid) {
 	return !strcmp(buf, SAFETYNET_PROCESS);
 }
 
-static void hide_daemon(int pid) {
-	LOGD("hide_daemon: handling pid=[%d]\n", pid);
-
+void do_hide_daemon(int pid) {
 	char buffer[4096];
 	vector<string> mounts;
-
-	manage_selinux();
-	clean_magisk_props();
-
-	if (switch_mnt_ns(pid))
-		goto exit;
 
 	snprintf(buffer, sizeof(buffer), "/proc/%d", pid);
 	chdir(buffer);
@@ -144,8 +136,20 @@ static void hide_daemon(int pid) {
 			lazy_unmount(buffer);
 		}
 	}
+}
 
-exit:
+
+static void hide_daemon(int pid) {
+	LOGD("hide_daemon: handling pid=[%d]\n", pid);
+
+	manage_selinux();
+	clean_magisk_props();
+
+	if (switch_mnt_ns(pid))
+		return;
+
+	do_hide_daemon(pid);
+
 	// Send resume signal
 	kill(pid, SIGCONT);
 	_exit(0);

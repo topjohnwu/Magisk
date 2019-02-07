@@ -32,6 +32,7 @@ void manage_selinux();
 void hide_sensitive_props();
 void clean_magisk_props();
 void refresh_uid();
+void do_hide_daemon(int pid);
 
 extern bool hide_enabled;
 extern pthread_mutex_t list_lock;
@@ -46,6 +47,7 @@ enum {
 	RM_HIDELIST,
 	LS_HIDELIST,
 	HIDE_STATUS,
+	EXEC_CMD,
 };
 
 enum {
