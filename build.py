@@ -19,8 +19,8 @@ def vprint(str):
 		print(str)
 
 # Environment checks
-if not sys.version_info >= (3, 5):
-	error('Requires Python 3.5+')
+if not sys.version_info >= (3, 6):
+	error('Requires Python 3.6+')
 
 if 'ANDROID_HOME' not in os.environ:
 	error('Please add Android SDK path to ANDROID_HOME environment variable!')
