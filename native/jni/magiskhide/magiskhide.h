@@ -23,6 +23,7 @@ void proc_monitor();
 void manage_selinux();
 void hide_sensitive_props();
 void clean_magisk_props();
+void do_hide_daemon(int pid);
 
 // List managements
 int add_list(const char *proc);
@@ -39,6 +40,7 @@ enum {
 	RM_HIDELIST,
 	LS_HIDELIST,
 	HIDE_STATUS,
+	EXEC_CMD,
 };
 
 enum {

@@ -6,11 +6,13 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/mount.h>
 
 #include "magisk.h"
 #include "magiskhide.h"
 #include "daemon.h"
 #include "flags.h"
+#include "utils.h"
 
 bool hide_enabled = false;
 
@@ -25,6 +27,7 @@ bool hide_enabled = false;
 		"  --add TARGET      Add TARGET to the hide list\n"
 		"  --rm TARGET       Remove TARGET from the hide list\n"
 		"  --ls              Print out the current hide list\n"
+		"  --exec CMD ARGS   Execute a CMD with ARGS in magisk hidden environment\n"
 		"\n"
 		"TARGET can be either a package name or a specific component name\n"
 		"If TARGET is a package name, all components of the app will be targeted\n"
@@ -92,8 +95,18 @@ int magiskhide_main(int argc, char *argv[]) {
 		req = LS_HIDELIST;
 	else if (strcmp(argv[1], "--status") == 0)
 		req = HIDE_STATUS;
+	else if (strcmp(argv[1], "--exec") == 0 && argc > 2)
+		req = EXEC_CMD;
 	else
 		usage(argv[0]);
+
+	if (req == EXEC_CMD) {
+		xunshare(CLONE_NEWNS);
+		xmount(NULL, "/", NULL, MS_PRIVATE | MS_REC, NULL);
+		do_hide_daemon((int)getpid());
+		execvp(argv[2], argv + 2);
+		return 1;
+	}
 
 	// Send request
 	int fd = connect_daemon();
