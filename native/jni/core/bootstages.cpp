@@ -638,6 +638,10 @@ static const char wrapper[] =
 "unset LD_PRELOAD\n"
 "exec /sbin/magisk.bin \"${0##*/}\" \"$@\"\n";
 
+static const char ric_wrapper[] =
+"#!/system/bin/sh\n"
+"exec /sbin/magiskhide --exec /sbin/ric \"$@\"\n";
+
 void startup() {
 	android_logging();
 	if (!check_data())
@@ -749,6 +753,12 @@ void startup() {
 	while((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
 		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
+		if (strcmp(entry->d_name, "ric") == 0) {
+			fd = creat("/sbin/ric", 0750);
+			xwrite(fd, ric_wrapper, sizeof(ric_wrapper) - 1);
+			close(fd);
+			continue;
+		}
 		xsymlinkat(buf, sbin, entry->d_name);
 	}
 
