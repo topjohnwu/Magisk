@@ -48,6 +48,7 @@ bool start_log_daemon();
 socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name);
 int create_rand_socket(struct sockaddr_un *sun);
 int socket_accept(int sockfd, int timeout);
+void get_client_cred(int fd, struct ucred *cred);
 int recv_fd(int sockfd);
 void send_fd(int sockfd, int fd);
 int read_int(int fd);

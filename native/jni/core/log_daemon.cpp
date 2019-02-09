@@ -166,6 +166,13 @@ static void log_daemon() {
 	xlisten(sockfd, 10);
 	while(true) {
 		int fd = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
+		struct ucred credential;
+		get_client_cred(fd, &credential);
+		if (credential.uid != 0) {
+			// Do not allow non root clients
+			close(fd);
+			continue;
+		}
 		switch(read_int(fd)) {
 			case HIDE_CONNECT:
 				pthread_mutex_lock(&lock);
