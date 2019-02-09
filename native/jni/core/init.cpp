@@ -33,6 +33,8 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
+#include <functional>
+#include <string_view>
 
 #include <xz.h>
 
@@ -70,38 +72,62 @@ struct device {
 	char path[64];
 };
 
-static void parse_cmdline(struct cmdline *cmd) {
-	// cleanup
-	memset(cmd, 0, sizeof(*cmd));
-
+static void parse_cmdline(const std::function<void (std::string_view, const char *)> &fn) {
 	char cmdline[4096];
 	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
 
-	bool skip_initramfs = false, kirin = false;
-	int enter_recovery = 0;
-
-	for (char *tok = strtok(cmdline, " "); tok; tok = strtok(nullptr, " ")) {
-		if (strncmp(tok, "androidboot.slot_suffix", 23) == 0) {
-			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
-		} else if (strncmp(tok, "androidboot.slot", 16) == 0) {
-			cmd->slot[0] = '_';
-			sscanf(tok, "androidboot.slot=%c", cmd->slot + 1);
-		} else if (strcmp(tok, "skip_initramfs") == 0) {
-			skip_initramfs = true;
-		} else if (strncmp(tok, "androidboot.android_dt_dir", 26) == 0) {
-			sscanf(tok, "androidboot.android_dt_dir=%s", cmd->dt_dir);
-		} else if (strncmp(tok, "enter_recovery", 14) == 0) {
-			sscanf(tok, "enter_recovery=%d", &enter_recovery);
-		} else if (strncmp(tok, "androidboot.hardware", 20) == 0) {
-			kirin = strstr(tok, "kirin") || strstr(tok, "hi3660");
+	char *tok, *eql, *tmp, *saveptr;
+	saveptr = cmdline;
+	while ((tok = strtok_r(nullptr, " \n", &saveptr)) != nullptr) {
+		eql = strchr(tok, '=');
+		if (eql) {
+			*eql = '\0';
+			if (eql[1] == '"') {
+				tmp = strchr(saveptr, '"');
+				if (tmp != nullptr) {
+					*tmp = '\0';
+					saveptr[-1] = ' ';
+					saveptr = tmp + 1;
+					eql++;
+				}
+			}
+			fn(tok, eql + 1);
+		} else {
+			fn(tok, "");
 		}
 	}
+}
+
+static void parse_cmdline(struct cmdline *cmd) {
+	char cmdline[4096];
+	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
+	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
+	close(fd);
+
+	bool skip_initramfs = false, kirin = false, enter_recovery = false;
+
+	parse_cmdline([&](auto key, auto value) -> void {
+		if (key == "androidboot.slot_suffix") {
+			strcpy(cmd->slot, value);
+		} else if (key == "androidboot.slot") {
+			cmd->slot[0] = '_';
+			strcpy(cmd->slot + 1, value);
+		} else if (key == "skip_initramfs") {
+			skip_initramfs = true;
+		} else if (key == "androidboot.android_dt_dir") {
+			strcpy(cmd->dt_dir, value);
+		} else if (key == "entry_recovery") {
+			enter_recovery = value[0] == '1';
+		} else if (key == "androidboot.hardware") {
+			kirin = strstr(value, "kirin") || strstr(value, "hi3660");
+		}
+	});
 
 	if (kirin && enter_recovery) {
 		// Inform that we are actually booting as recovery
-		FILE *f = fopen("/.backup/.magisk", "a");
+		FILE *f = fopen("/.backup/.magisk", "ae");
 		fprintf(f, "RECOVERYMODE=true\n");
 		fclose(f);
 		cmd->early_boot = true;
@@ -139,7 +165,7 @@ static bool setup_block(struct device *dev, const char *partname) {
 	struct dirent *entry;
 	DIR *dir = opendir("/sys/dev/block");
 	if (dir == nullptr)
-		return 1;
+		return false;
 	bool found = false;
 	while ((entry = readdir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
@@ -171,16 +197,15 @@ static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char
 	// Don't early mount if the mount point is symlink
 	if (S_ISLNK(st.st_mode))
 		return false;
+	int fd;
 	sprintf(buf, "%s/fstab/%s/dev", cmd->dt_dir, mnt_point);
-	if (access(buf, F_OK) == 0) {
-		int fd = open(buf, O_RDONLY | O_CLOEXEC);
+	if ((fd = xopen(buf, O_RDONLY | O_CLOEXEC)) >= 0) {
 		read(fd, buf, sizeof(buf));
 		close(fd);
 		char *name = strrchr(buf, '/') + 1;
 		sprintf(partname, "%s%s", name, strend(name, cmd->slot) ? cmd->slot : "");
 		sprintf(buf, "%s/fstab/%s/type", cmd->dt_dir, mnt_point);
-		if (access(buf, F_OK) == 0) {
-			int fd = open(buf, O_RDONLY | O_CLOEXEC);
+		if ((fd = xopen(buf, O_RDONLY | O_CLOEXEC)) >= 0) {
 			lstat(buf, &st);
 			read(fd, partfs, st.st_size);
 			close(fd);
@@ -293,7 +318,7 @@ static bool unxz(int fd, const uint8_t *buf, size_t size) {
 }
 
 static int dump_magisk(const char *path, mode_t mode) {
-	int fd = creat(path, mode);
+	int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
 	if (fd < 0)
 		return 1;
 	if (!unxz(fd, magisk_xz, sizeof(magisk_xz)))
@@ -303,7 +328,7 @@ static int dump_magisk(const char *path, mode_t mode) {
 }
 
 static int dump_manager(const char *path, mode_t mode) {
-	int fd = creat(path, mode);
+	int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
 	if (fd < 0)
 		return 1;
 	if (!unxz(fd, manager_xz, sizeof(manager_xz)))
@@ -353,6 +378,7 @@ static void setup_overlay() {
 	char buf[128];
 	int fd;
 
+	// Wait for early-init start
 	while (access(EARLYINIT, F_OK) != 0)
 		usleep(10);
 	selinux_builtin_impl();
@@ -450,18 +476,18 @@ int main(int argc, char *argv[]) {
 	if (null > STDERR_FILENO)
 		close(null);
 
-	// Backup stuffs
-	full_read("/init", &self, &self_sz);
-	full_read("/.backup/.magisk", &config, &config_sz);
-
 	// Communicate with kernel using procfs and sysfs
 	mkdir("/proc", 0755);
 	xmount("proc", "/proc", "proc", 0, nullptr);
 	mkdir("/sys", 0755);
 	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
 
-	struct cmdline cmd;
+	struct cmdline cmd{};
 	parse_cmdline(&cmd);
+
+	// Backup stuffs
+	full_read("/init", &self, &self_sz);
+	full_read("/.backup/.magisk", &config, &config_sz);
 
 	/* ***********
 	 * Initialize
@@ -480,11 +506,11 @@ int main(int argc, char *argv[]) {
 		// Revert original init binary
 		link("/.backup/init", "/init");
 		rm_rf("/.backup");
-	}
 
-	// Do not go further if system_root device is booting as recovery
-	if (!cmd.early_boot && access("/sbin/recovery", F_OK) == 0)
-		exec_init(argv);
+		// Do not go further if device is booting into recovery
+		if (access("/sbin/recovery", F_OK) == 0)
+			exec_init(argv);
+	}
 
 	/* ************
 	 * Early Mount
