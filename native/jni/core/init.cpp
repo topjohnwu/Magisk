@@ -312,21 +312,6 @@ static int dump_manager(const char *path, mode_t mode) {
 	return 0;
 }
 
-static int dump_magiskrc(const char *path, mode_t mode) {
-	int fd = creat(path, mode);
-	if (fd < 0)
-		return 1;
-	char startup_svc[8], late_start_svc[8], rc[sizeof(magiskrc) + 100];
-	gen_rand_str(startup_svc, sizeof(startup_svc));
-	do {
-		gen_rand_str(late_start_svc, sizeof(late_start_svc));
-	} while (strcmp(startup_svc, late_start_svc) == 0);
-	int size = sprintf(rc, magiskrc, startup_svc, startup_svc, late_start_svc);
-	xwrite(fd, rc, size);
-	close(fd);
-	return 0;
-}
-
 static void patch_socket_name(const char *path) {
 	uint8_t *buf;
 	char name[sizeof(MAIN_SOCKET)];
@@ -347,30 +332,15 @@ static void patch_socket_name(const char *path) {
 	munmap(buf, size);
 }
 
-static void setup_rc() {
-	// Patch init.rc to load magisk scripts
-	bool injected = false;
-	char line[4096];
-	FILE *fp = xfopen("/init.rc", "r");
-	int fd = open("/init.rc.new", O_WRONLY | O_CREAT | O_CLOEXEC, 0750);
-	while(fgets(line, sizeof(line), fp)) {
-		if (!injected && strncmp(line, "import", 6) == 0) {
-			if (strstr(line, "init.magisk.rc")) {
-				injected = true;
-			} else {
-				xwrite(fd, "import /init.magisk.rc\n", 23);
-				injected = true;
-			}
-		} else if (strstr(line, "selinux.reload_policy")) {
-			// Do not allow sepolicy patch
-			continue;
-		}
-		xwrite(fd, line, strlen(line));
-	}
-	fclose(fp);
-	close(fd);
-	rename("/init.rc.new", "/init.rc");
-	dump_magiskrc(MAGISKRC, 0750);
+static void setup_init_rc() {
+	FILE *rc = xfopen("/init.rc", "ae");
+	char pfd_svc[8], ls_svc[8];
+	gen_rand_str(pfd_svc, sizeof(pfd_svc));
+	do {
+		gen_rand_str(ls_svc, sizeof(ls_svc));
+	} while (strcmp(pfd_svc, ls_svc) == 0);
+	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc);
+	fclose(rc);
 }
 
 static const char wrapper[] =
@@ -468,8 +438,6 @@ int main(int argc, char *argv[]) {
 			return dump_magisk(argv[3], 0755);
 		else if (strcmp(argv[2], "manager") == 0)
 			return dump_manager(argv[3], 0644);
-		else if (strcmp(argv[2], "magiskrc") == 0)
-			return dump_magiskrc(argv[3], 0755);
 	}
 
 	// Prevent file descriptor confusion
@@ -574,7 +542,7 @@ int main(int argc, char *argv[]) {
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 	link_dir(sbin, root);
 
-	setup_rc();
+	setup_init_rc();
 	patch_sepolicy();
 
 	// Close all file descriptors
