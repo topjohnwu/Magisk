@@ -439,7 +439,7 @@ static void setup_overlay() {
 	close(fd);
 	hide_mod("/root");
 
-	close(xopen(EARLYINITDONE, O_RDONLY | O_CREAT, 0));
+	close(xopen(EARLYINITDONE, O_RDONLY | O_CREAT, 0770));
 	exit(0);
 }
 
