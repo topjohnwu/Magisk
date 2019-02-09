@@ -42,6 +42,7 @@
 #include "magiskrc.h"
 #include "magisk.h"
 #include "magiskpolicy.h"
+#include "selinux.h"
 #include "utils.h"
 #include "flags.h"
 
@@ -49,9 +50,11 @@
 
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, nullptr };
 
-static int root = -1;
 static bool mnt_system = false;
 static bool mnt_vendor = false;
+
+static void *self, *config;
+static size_t self_sz, config_sz;
 
 struct cmdline {
 	bool early_boot;
@@ -344,9 +347,104 @@ static void patch_socket_name(const char *path) {
 	munmap(buf, size);
 }
 
+static void setup_rc() {
+	// Patch init.rc to load magisk scripts
+	bool injected = false;
+	char line[4096];
+	FILE *fp = xfopen("/init.rc", "r");
+	int fd = open("/init.rc.new", O_WRONLY | O_CREAT | O_CLOEXEC, 0750);
+	while(fgets(line, sizeof(line), fp)) {
+		if (!injected && strncmp(line, "import", 6) == 0) {
+			if (strstr(line, "init.magisk.rc")) {
+				injected = true;
+			} else {
+				xwrite(fd, "import /init.magisk.rc\n", 23);
+				injected = true;
+			}
+		} else if (strstr(line, "selinux.reload_policy")) {
+			// Do not allow sepolicy patch
+			continue;
+		}
+		xwrite(fd, line, strlen(line));
+	}
+	fclose(fp);
+	close(fd);
+	rename("/init.rc.new", "/init.rc");
+	dump_magiskrc(MAGISKRC, 0750);
+}
+
+static const char wrapper[] =
+"#!/system/bin/sh\n"
+"unset LD_LIBRARY_PATH\n"
+"unset LD_PRELOAD\n"
+"exec /sbin/magisk.bin \"${0##*/}\" \"$@\"\n";
+
+static void setup_overlay() {
+	char buf[128];
+	int fd;
+
+	while (access(EARLYINIT, F_OK) != 0)
+		usleep(10);
+	selinux_builtin_impl();
+	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
+	unlink(EARLYINIT);
+
+	fd = open("/dev/null", O_RDWR);
+	xdup2(fd, STDIN_FILENO);
+	xdup2(fd, STDOUT_FILENO);
+	xdup2(fd, STDERR_FILENO);
+
+	// Mount the /sbin tmpfs overlay
+	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
+	chmod("/sbin", 0755);
+	setfilecon("/sbin", "u:object_r:rootfs:s0");
+
+	// Dump binaries
+	mkdir(MAGISKTMP, 0755);
+	fd = open(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
+	write(fd, config, config_sz);
+	close(fd);
+	fd = open("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
+	write(fd, self, self_sz);
+	close(fd);
+	fd = open("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+	write(fd, wrapper, sizeof(wrapper));
+	close(fd);
+	dump_magisk("/sbin/magisk.bin", 0755);
+	patch_socket_name("/sbin/magisk.bin");
+	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+
+	// Create applet symlinks
+	for (int i = 0; applet_names[i]; ++i) {
+		sprintf(buf, "/sbin/%s", applet_names[i]);
+		xsymlink("/sbin/magisk", buf);
+	}
+	for (int i = 0; init_applet[i]; ++i) {
+		sprintf(buf, "/sbin/%s", init_applet[i]);
+		xsymlink("/sbin/magiskinit", buf);
+	}
+
+	// Create symlinks pointing back to /root
+	DIR *dir;
+	struct dirent *entry;
+	dir = xopendir("/root");
+	fd = xopen("/sbin", O_RDONLY);
+	while((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
+		xsymlinkat(buf, fd, entry->d_name);
+	}
+	closedir(dir);
+	close(fd);
+
+	close(xopen(EARLYINITDONE, O_RDONLY | O_CREAT, 0));
+	exit(0);
+}
+
 static void exec_init(char *argv[]) {
 	// Clean up
-	close(root);
 	umount("/proc");
 	umount("/sys");
 	if (mnt_system)
@@ -384,8 +482,9 @@ int main(int argc, char *argv[]) {
 	if (null > STDERR_FILENO)
 		close(null);
 
-	// Backup self
-	rename("/init", "/init.bak");
+	// Backup stuffs
+	full_read("/init", &self, &self_sz);
+	full_read("/.backup/.magisk", &config, &config_sz);
 
 	// Communicate with kernel using procfs and sysfs
 	mkdir("/proc", 0755);
@@ -400,25 +499,24 @@ int main(int argc, char *argv[]) {
 	 * Initialize
 	 * ***********/
 
+	int root, sbin;
 	root = open("/", O_RDONLY | O_CLOEXEC);
 
 	if (cmd.early_boot) {
 		// Clear rootfs
-		const char *excl[] = { "overlay", ".backup", "proc", "sys", "init.bak", nullptr };
+		const char *excl[] = { "overlay", "proc", "sys", nullptr };
 		excl_list = excl;
 		frm_rf(root);
 		excl_list = nullptr;
 	} else {
 		// Revert original init binary
 		link("/.backup/init", "/init");
+		rm_rf("/.backup");
 	}
 
 	// Do not go further if system_root device is booting as recovery
-	if (!cmd.early_boot && access("/sbin/recovery", F_OK) == 0) {
-		// Remove Magisk traces
-		rm_rf("/.backup");
+	if (!cmd.early_boot && access("/sbin/recovery", F_OK) == 0)
 		exec_init(argv);
-	}
 
 	/* ************
 	 * Early Mount
@@ -467,38 +565,25 @@ int main(int argc, char *argv[]) {
 		close(fd);
 		rmdir("/overlay");
 	}
+	close(root);
 
-	// Patch init.rc to load magisk scripts
-	bool injected = false;
-	char line[4096];
-	FILE *fp = xfopen("/init.rc", "r");
-	fd = creat("/init.rc.new", 0750);
-	while(fgets(line, sizeof(line), fp)) {
-		if (!injected && strncmp(line, "import", 6) == 0) {
-			if (strstr(line, "init.magisk.rc")) {
-				injected = true;
-			} else {
-				xwrite(fd, "import /init.magisk.rc\n", 23);
-				injected = true;
-			}
-		} else if (strstr(line, "selinux.reload_policy")) {
-			// Do not allow sepolicy patch
-			continue;
-		}
-		xwrite(fd, line, strlen(line));
-	}
-	fclose(fp);
-	close(fd);
-	rename("/init.rc.new", "/init.rc");
+	// Create hardlink mirror of /sbin to /root
+	mkdir("/root", 0750);
+	clone_attr("/sbin", "/root");
+	root = xopen("/root", O_RDONLY | O_CLOEXEC);
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	link_dir(sbin, root);
 
-	// Patch sepolicy
+	setup_rc();
 	patch_sepolicy();
 
-	// Dump binaries
-	dump_magiskrc(MAGISKRC, 0750);
-	dump_magisk("/sbin/magisk", 0755);
-	patch_socket_name("/sbin/magisk");
-	rename("/init.bak", "/sbin/magiskinit");
+	// Close all file descriptors
+	for (int i = 0; i < 30; ++i)
+		close(i);
+
+	// Launch daemon to setup overlay
+	if (fork_dont_care() == 0)
+		setup_overlay();
 
 	exec_init(argv);
 }

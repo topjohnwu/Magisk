@@ -3,6 +3,12 @@
 
 static const char magiskrc[] =
 
+"on early-init\n"
+"    write " EARLYINIT " 1\n"
+"    wait " EARLYINITDONE "\n"
+"    rm " EARLYINITDONE "\n"
+"\n"
+
 "on post-fs-data\n"
 "    start logd\n"
 "    load_persist_props\n"
@@ -12,7 +18,7 @@ static const char magiskrc[] =
 "    rm " UNBLOCKFILE "\n"
 "\n"
 
-"service %s /sbin/magisk --startup\n"
+"service %s /sbin/magisk --post-fs-data\n"
 "    user root\n"
 "    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
 "    oneshot\n"

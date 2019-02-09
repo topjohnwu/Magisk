@@ -11,6 +11,7 @@ extern int (*lgetfilecon)(const char *path, char ** con);
 extern int (*setfilecon)(const char *path, const char * con);
 extern int (*lsetfilecon)(const char *path, const char * con);
 
+void selinux_builtin_impl();
 void dload_selinux();
 void restorecon();
 

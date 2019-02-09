@@ -1,6 +1,9 @@
 #include <dlfcn.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <string.h>
+#include <syscall.h>
+#include <sys/xattr.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -11,27 +14,73 @@
 #define ADB_CON     "u:object_r:adb_data_file:s0"
 #define MAGISK_CON  "u:object_r:" SEPOL_FILE_DOMAIN ":s0"
 
-// Stub implementations
+// Stub implementation
 
-static void v_s(char *s) { delete[] s; }
+static int stub(const char *) { return 0; }
 
-static int i_s(const char *) { return 0; }
+static int stub(const char *, const char *) { return 0; }
 
-static int i_ss(const char *, const char *) { return 0; }
-
-static int i_ssp(const char *, char ** sp) {
-	*sp = new char[1]();
+static int stub(const char *, char **ctx) {
+	*ctx = strdup("");
 	return 0;
+}
+
+// Builtin implementation
+
+static void __freecon(char *s) {
+	free(s);
+}
+
+static int __setcon(const char *ctx) {
+	int fd = open("/proc/self/attr/current", O_WRONLY | O_CLOEXEC);
+	if (fd < 0)
+		return fd;
+	size_t len = strlen(ctx) + 1;
+	int rc = write(fd, ctx, len);
+	close(fd);
+	return rc != len;
+}
+
+static int __getfilecon(const char *path, char **ctx) {
+	char buf[1024];
+	int rc = syscall(__NR_getxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
+	if (rc > 0)
+		*ctx = strdup(buf);
+	return rc;
+}
+
+static int __lgetfilecon(const char *path, char **ctx) {
+	char buf[1024];
+	int rc = syscall(__NR_lgetxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
+	if (rc > 0)
+		*ctx = strdup(buf);
+	return rc;
+}
+
+static int __setfilecon(const char *path, const char *ctx) {
+	return syscall(__NR_setxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
+}
+
+static int __lsetfilecon(const char *path, const char *ctx) {
+	return syscall(__NR_lsetxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
 }
 
 // Function pointers
 
-void (*freecon)(char *) = v_s;
-int (*setcon)(const char *) = i_s;
-int (*getfilecon)(const char *, char **) = i_ssp;
-int (*lgetfilecon)(const char *, char **) = i_ssp;
-int (*setfilecon)(const char *, const char *) = i_ss;
-int (*lsetfilecon)(const char *, const char *) = i_ss;
+void (*freecon)(char *) = __freecon;
+int (*setcon)(const char *) = stub;
+int (*getfilecon)(const char *, char **) = stub;
+int (*lgetfilecon)(const char *, char **) = stub;
+int (*setfilecon)(const char *, const char *) = stub;
+int (*lsetfilecon)(const char *, const char *) = stub;
+
+void selinux_builtin_impl() {
+	setcon = __setcon;
+	getfilecon = __getfilecon;
+	lgetfilecon = __lgetfilecon;
+	setfilecon = __setfilecon;
+	setfilecon = __lsetfilecon;
+}
 
 void dload_selinux() {
 	void *handle = dlopen("libselinux.so", RTLD_LAZY);

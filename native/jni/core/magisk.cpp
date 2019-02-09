@@ -31,7 +31,7 @@
   		"   --sqlite SQL              exec SQL to Magisk database\n"
 		"\n"
 		"Supported init triggers:\n"
-		"   startup, post-fs-data, service, boot-complete\n"
+		"   post-fs-data, service, boot-complete\n"
 		"\n"
 		"Supported applets:\n");
 
@@ -76,9 +76,6 @@ int magisk_main(int argc, char *argv[]) {
 	} else if (strcmp(argv[1], "--daemon") == 0) {
 		int fd = connect_daemon();
 		write_int(fd, DO_NOTHING);
-		return 0;
-	} else if (strcmp(argv[1], "--startup") == 0) {
-		startup();
 		return 0;
 	} else if (strcmp(argv[1], "--post-fs-data") == 0) {
 		int fd = connect_daemon();
