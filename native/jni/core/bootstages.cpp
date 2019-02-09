@@ -633,16 +633,23 @@ void unlock_blocks() {
 	pthread_exit(nullptr);
 }
 
-static const char wrapper[] =
-"#!/system/bin/sh\n"
-"unset LD_LIBRARY_PATH\n"
-"unset LD_PRELOAD\n"
-"exec /sbin/magisk.bin \"${0##*/}\" \"$@\"\n";
+[[noreturn]] static inline void core_only() {
+	auto_start_magiskhide();
+	unblock_boot_process();
+}
 
-void startup() {
-	android_logging();
+void post_fs_data(int client) {
+	// ack
+	write_int(client, 0);
+	close(client);
+
 	if (!check_data())
 		unblock_boot_process();
+
+	LOGI("** post-fs-data mode running\n");
+
+	// Unlock all blocks for rw
+	unlock_blocks();
 
 	if (access(SECURE_DIR, F_OK) != 0) {
 		/* If the folder is not automatically created by the system,
@@ -673,108 +680,6 @@ void startup() {
 		simple_mount("/system");
 		simple_mount("/vendor");
 	}
-
-	// Unlock all blocks for rw
-	unlock_blocks();
-
-	LOGI("* Creating /sbin overlay");
-	DIR *dir;
-	struct dirent *entry;
-	int root, sbin, fd;
-	void *magisk, *init;
-	size_t magisk_size, init_size;
-
-	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
-
-	// GSIs will have to override /sbin/adbd with /system/bin/adbd
-	if (access("/sbin/adbd", F_OK) == 0 && access("/system/bin/adbd", F_OK) == 0) {
-		umount2("/sbin/adbd", MNT_DETACH);
-		cp_afc("/system/bin/adbd", "/sbin/adbd");
-	}
-
-	// Create hardlink mirror of /sbin to /root
-	mkdir("/root", 0750);
-	clone_attr("/sbin", "/root");
-	full_read("/sbin/magisk", &magisk, &magisk_size);
-	unlink("/sbin/magisk");
-	full_read("/sbin/magiskinit", &init, &init_size);
-	unlink("/sbin/magiskinit");
-	root = xopen("/root", O_RDONLY | O_CLOEXEC);
-	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	link_dir(sbin, root);
-	close(sbin);
-	hide_mod("/sbin");
-
-	// Mount the /sbin tmpfs overlay
-	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
-	chmod("/sbin", 0755);
-	setfilecon("/sbin", "u:object_r:rootfs:s0");
-	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-
-	// Remove some traces of Magisk
-	unlink(MAGISKRC);
-	mkdir(MAGISKTMP, 0755);
-	cp_afc("/.backup/.magisk", MAGISKTMP "/config");
-	rm_rf("/.backup");
-
-	// Create applet symlinks
-	for (int i = 0; applet_names[i]; ++i) {
-		snprintf(buf, PATH_MAX, "/sbin/%s", applet_names[i]);
-		xsymlink("/sbin/magisk", buf);
-	}
-
-	// Setup binary and wrapper
-	fd = creat("/sbin/magisk.bin", 0755);
-	xwrite(fd, magisk, magisk_size);
-	close(fd);
-	free(magisk);
-	unlink("/sbin/magisk");
-	fd = creat("/sbin/magisk", 0755);
-	xwrite(fd, wrapper, sizeof(wrapper) - 1);
-	close(fd);
-	setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-
-	// Setup magiskinit symlinks
-	fd = creat("/sbin/magiskinit", 0755);
-	xwrite(fd, init, init_size);
-	close(fd);
-	free(init);
-	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	for (int i = 0; init_applet[i]; ++i) {
-		snprintf(buf, PATH_MAX, "/sbin/%s", init_applet[i]);
-		xsymlink("/sbin/magiskinit", buf);
-	}
-
-	// Create symlinks pointing back to /root
-	dir = xfdopendir(root);
-	while((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
-		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
-		xsymlinkat(buf, sbin, entry->d_name);
-	}
-
-	close(sbin);
-	close(root);
-	hide_mod("/root");
-
-	// Start post-fs-data mode
-	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", nullptr);
-}
-
-[[noreturn]] static inline void core_only() {
-	auto_start_magiskhide();
-	unblock_boot_process();
-}
-
-void post_fs_data(int client) {
-	// ack
-	write_int(client, 0);
-	close(client);
-
-	xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
-
-	LOGI("** post-fs-data mode running\n");
 
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");

@@ -46,6 +46,10 @@ void sepol_magisk_rules() {
 	sepol_attradd(SEPOL_PROC_DOMAIN, "bluetoothdomain");
 	sepol_attradd(SEPOL_FILE_DOMAIN, "mlstrustedobject");
 
+	// Let init daemon transit context
+	sepol_allow("kernel", "kernel", "process", "setcurrent");
+	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "process", "dyntransition");
+
 	// Let init run stuffs
 	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
 	sepol_allow("init", SEPOL_PROC_DOMAIN, "process", ALL);

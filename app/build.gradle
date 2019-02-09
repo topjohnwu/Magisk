@@ -71,7 +71,7 @@ dependencies {
     fullImplementation "androidx.recyclerview:recyclerview:${androidXVersion}"
     fullImplementation "androidx.cardview:cardview:${androidXVersion}"
     fullImplementation "com.google.android.material:material:${androidXVersion}"
-    fullImplementation 'android.arch.work:work-runtime:1.0.0-beta03'
+    fullImplementation 'android.arch.work:work-runtime:1.0.0-beta05'
     fullImplementation 'androidx.room:room-runtime:2.0.0'
     fullImplementation 'androidx.transition:transition:1.0.1'
 

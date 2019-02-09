@@ -33,6 +33,8 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
+#include <functional>
+#include <string_view>
 
 #include <xz.h>
 
@@ -42,6 +44,7 @@
 #include "magiskrc.h"
 #include "magisk.h"
 #include "magiskpolicy.h"
+#include "selinux.h"
 #include "utils.h"
 #include "flags.h"
 
@@ -49,9 +52,11 @@
 
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, nullptr };
 
-static int root = -1;
 static bool mnt_system = false;
 static bool mnt_vendor = false;
+
+static void *self, *config;
+static size_t self_sz, config_sz;
 
 struct cmdline {
 	bool early_boot;
@@ -67,38 +72,62 @@ struct device {
 	char path[64];
 };
 
-static void parse_cmdline(struct cmdline *cmd) {
-	// cleanup
-	memset(cmd, 0, sizeof(*cmd));
-
+static void parse_cmdline(const std::function<void (std::string_view, const char *)> &fn) {
 	char cmdline[4096];
 	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
 
-	bool skip_initramfs = false, kirin = false;
-	int enter_recovery = 0;
-
-	for (char *tok = strtok(cmdline, " "); tok; tok = strtok(nullptr, " ")) {
-		if (strncmp(tok, "androidboot.slot_suffix", 23) == 0) {
-			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
-		} else if (strncmp(tok, "androidboot.slot", 16) == 0) {
-			cmd->slot[0] = '_';
-			sscanf(tok, "androidboot.slot=%c", cmd->slot + 1);
-		} else if (strcmp(tok, "skip_initramfs") == 0) {
-			skip_initramfs = true;
-		} else if (strncmp(tok, "androidboot.android_dt_dir", 26) == 0) {
-			sscanf(tok, "androidboot.android_dt_dir=%s", cmd->dt_dir);
-		} else if (strncmp(tok, "enter_recovery", 14) == 0) {
-			sscanf(tok, "enter_recovery=%d", &enter_recovery);
-		} else if (strncmp(tok, "androidboot.hardware", 20) == 0) {
-			kirin = strstr(tok, "kirin") || strstr(tok, "hi3660");
+	char *tok, *eql, *tmp, *saveptr;
+	saveptr = cmdline;
+	while ((tok = strtok_r(nullptr, " \n", &saveptr)) != nullptr) {
+		eql = strchr(tok, '=');
+		if (eql) {
+			*eql = '\0';
+			if (eql[1] == '"') {
+				tmp = strchr(saveptr, '"');
+				if (tmp != nullptr) {
+					*tmp = '\0';
+					saveptr[-1] = ' ';
+					saveptr = tmp + 1;
+					eql++;
+				}
+			}
+			fn(tok, eql + 1);
+		} else {
+			fn(tok, "");
 		}
 	}
+}
+
+static void parse_cmdline(struct cmdline *cmd) {
+	char cmdline[4096];
+	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
+	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
+	close(fd);
+
+	bool skip_initramfs = false, kirin = false, enter_recovery = false;
+
+	parse_cmdline([&](auto key, auto value) -> void {
+		if (key == "androidboot.slot_suffix") {
+			strcpy(cmd->slot, value);
+		} else if (key == "androidboot.slot") {
+			cmd->slot[0] = '_';
+			strcpy(cmd->slot + 1, value);
+		} else if (key == "skip_initramfs") {
+			skip_initramfs = true;
+		} else if (key == "androidboot.android_dt_dir") {
+			strcpy(cmd->dt_dir, value);
+		} else if (key == "entry_recovery") {
+			enter_recovery = value[0] == '1';
+		} else if (key == "androidboot.hardware") {
+			kirin = strstr(value, "kirin") || strstr(value, "hi3660");
+		}
+	});
 
 	if (kirin && enter_recovery) {
 		// Inform that we are actually booting as recovery
-		FILE *f = fopen("/.backup/.magisk", "a");
+		FILE *f = fopen("/.backup/.magisk", "ae");
 		fprintf(f, "RECOVERYMODE=true\n");
 		fclose(f);
 		cmd->early_boot = true;
@@ -136,7 +165,7 @@ static bool setup_block(struct device *dev, const char *partname) {
 	struct dirent *entry;
 	DIR *dir = opendir("/sys/dev/block");
 	if (dir == nullptr)
-		return 1;
+		return false;
 	bool found = false;
 	while ((entry = readdir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
@@ -160,7 +189,7 @@ static bool setup_block(struct device *dev, const char *partname) {
 	return true;
 }
 
-static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname) {
+static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname, char *partfs) {
 	char buf[128];
 	struct stat st;
 	sprintf(buf, "/%s", mnt_point);
@@ -168,14 +197,20 @@ static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char
 	// Don't early mount if the mount point is symlink
 	if (S_ISLNK(st.st_mode))
 		return false;
+	int fd;
 	sprintf(buf, "%s/fstab/%s/dev", cmd->dt_dir, mnt_point);
-	if (access(buf, F_OK) == 0) {
-		int fd = open(buf, O_RDONLY | O_CLOEXEC);
+	if ((fd = xopen(buf, O_RDONLY | O_CLOEXEC)) >= 0) {
 		read(fd, buf, sizeof(buf));
 		close(fd);
 		char *name = strrchr(buf, '/') + 1;
 		sprintf(partname, "%s%s", name, strend(name, cmd->slot) ? cmd->slot : "");
-		return true;
+		sprintf(buf, "%s/fstab/%s/type", cmd->dt_dir, mnt_point);
+		if ((fd = xopen(buf, O_RDONLY | O_CLOEXEC)) >= 0) {
+			lstat(buf, &st);
+			read(fd, partfs, st.st_size);
+			close(fd);
+			return true;
+		}
 	}
 	return false;
 }
@@ -283,7 +318,7 @@ static bool unxz(int fd, const uint8_t *buf, size_t size) {
 }
 
 static int dump_magisk(const char *path, mode_t mode) {
-	int fd = creat(path, mode);
+	int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
 	if (fd < 0)
 		return 1;
 	if (!unxz(fd, magisk_xz, sizeof(magisk_xz)))
@@ -293,26 +328,11 @@ static int dump_magisk(const char *path, mode_t mode) {
 }
 
 static int dump_manager(const char *path, mode_t mode) {
-	int fd = creat(path, mode);
+	int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
 	if (fd < 0)
 		return 1;
 	if (!unxz(fd, manager_xz, sizeof(manager_xz)))
 		return 1;
-	close(fd);
-	return 0;
-}
-
-static int dump_magiskrc(const char *path, mode_t mode) {
-	int fd = creat(path, mode);
-	if (fd < 0)
-		return 1;
-	char startup_svc[8], late_start_svc[8], rc[sizeof(magiskrc) + 100];
-	gen_rand_str(startup_svc, sizeof(startup_svc));
-	do {
-		gen_rand_str(late_start_svc, sizeof(late_start_svc));
-	} while (strcmp(startup_svc, late_start_svc) == 0);
-	int size = sprintf(rc, magiskrc, startup_svc, startup_svc, late_start_svc);
-	xwrite(fd, rc, size);
 	close(fd);
 	return 0;
 }
@@ -337,9 +357,90 @@ static void patch_socket_name(const char *path) {
 	munmap(buf, size);
 }
 
+static void setup_init_rc() {
+	FILE *rc = xfopen("/init.rc", "ae");
+	char pfd_svc[8], ls_svc[8];
+	gen_rand_str(pfd_svc, sizeof(pfd_svc));
+	do {
+		gen_rand_str(ls_svc, sizeof(ls_svc));
+	} while (strcmp(pfd_svc, ls_svc) == 0);
+	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc);
+	fclose(rc);
+}
+
+static const char wrapper[] =
+"#!/system/bin/sh\n"
+"unset LD_LIBRARY_PATH\n"
+"unset LD_PRELOAD\n"
+"exec /sbin/magisk.bin \"${0##*/}\" \"$@\"\n";
+
+static void setup_overlay() {
+	char buf[128];
+	int fd;
+
+	// Wait for early-init start
+	while (access(EARLYINIT, F_OK) != 0)
+		usleep(10);
+	selinux_builtin_impl();
+	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
+	unlink(EARLYINIT);
+
+	fd = open("/dev/null", O_RDWR);
+	xdup2(fd, STDIN_FILENO);
+	xdup2(fd, STDOUT_FILENO);
+	xdup2(fd, STDERR_FILENO);
+
+	// Mount the /sbin tmpfs overlay
+	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
+	chmod("/sbin", 0755);
+	setfilecon("/sbin", "u:object_r:rootfs:s0");
+
+	// Dump binaries
+	mkdir(MAGISKTMP, 0755);
+	fd = open(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
+	write(fd, config, config_sz);
+	close(fd);
+	fd = open("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
+	write(fd, self, self_sz);
+	close(fd);
+	fd = open("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+	write(fd, wrapper, sizeof(wrapper));
+	close(fd);
+	dump_magisk("/sbin/magisk.bin", 0755);
+	patch_socket_name("/sbin/magisk.bin");
+	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+
+	// Create applet symlinks
+	for (int i = 0; applet_names[i]; ++i) {
+		sprintf(buf, "/sbin/%s", applet_names[i]);
+		xsymlink("/sbin/magisk", buf);
+	}
+	for (int i = 0; init_applet[i]; ++i) {
+		sprintf(buf, "/sbin/%s", init_applet[i]);
+		xsymlink("/sbin/magiskinit", buf);
+	}
+
+	// Create symlinks pointing back to /root
+	DIR *dir;
+	struct dirent *entry;
+	dir = xopendir("/root");
+	fd = xopen("/sbin", O_RDONLY);
+	while((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
+		xsymlinkat(buf, fd, entry->d_name);
+	}
+	closedir(dir);
+	close(fd);
+
+	close(xopen(EARLYINITDONE, O_RDONLY | O_CREAT, 0));
+	exit(0);
+}
+
 static void exec_init(char *argv[]) {
 	// Clean up
-	close(root);
 	umount("/proc");
 	umount("/sys");
 	if (mnt_system)
@@ -363,8 +464,6 @@ int main(int argc, char *argv[]) {
 			return dump_magisk(argv[3], 0755);
 		else if (strcmp(argv[2], "manager") == 0)
 			return dump_manager(argv[3], 0644);
-		else if (strcmp(argv[2], "magiskrc") == 0)
-			return dump_magiskrc(argv[3], 0755);
 	}
 
 	// Prevent file descriptor confusion
@@ -377,40 +476,40 @@ int main(int argc, char *argv[]) {
 	if (null > STDERR_FILENO)
 		close(null);
 
-	// Backup self
-	rename("/init", "/init.bak");
-
 	// Communicate with kernel using procfs and sysfs
 	mkdir("/proc", 0755);
 	xmount("proc", "/proc", "proc", 0, nullptr);
 	mkdir("/sys", 0755);
 	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
 
-	struct cmdline cmd;
+	struct cmdline cmd{};
 	parse_cmdline(&cmd);
+
+	// Backup stuffs
+	full_read("/init", &self, &self_sz);
+	full_read("/.backup/.magisk", &config, &config_sz);
 
 	/* ***********
 	 * Initialize
 	 * ***********/
 
+	int root, sbin;
 	root = open("/", O_RDONLY | O_CLOEXEC);
 
 	if (cmd.early_boot) {
 		// Clear rootfs
-		const char *excl[] = { "overlay", ".backup", "proc", "sys", "init.bak", nullptr };
+		const char *excl[] = { "overlay", "proc", "sys", nullptr };
 		excl_list = excl;
 		frm_rf(root);
 		excl_list = nullptr;
 	} else {
 		// Revert original init binary
 		link("/.backup/init", "/init");
-	}
-
-	// Do not go further if system_root device is booting as recovery
-	if (!cmd.early_boot && access("/sbin/recovery", F_OK) == 0) {
-		// Remove Magisk traces
 		rm_rf("/.backup");
-		exec_init(argv);
+
+		// Do not go further if device is booting into recovery
+		if (access("/sbin/recovery", F_OK) == 0)
+			exec_init(argv);
 	}
 
 	/* ************
@@ -419,6 +518,7 @@ int main(int argc, char *argv[]) {
 
 	struct device dev;
 	char partname[32];
+	char partfs[32];
 
 	if (cmd.early_boot) {
 		sprintf(partname, "system%s", cmd.slot);
@@ -436,15 +536,15 @@ int main(int argc, char *argv[]) {
 
 		xmkdir("/system", 0755);
 		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
-	} else if (read_fstab_dt(&cmd, "system", partname)) {
+	} else if (read_fstab_dt(&cmd, "system", partname, partfs)) {
 		setup_block(&dev, partname);
-		xmount(dev.path, "/system", "ext4", MS_RDONLY, nullptr);
+		xmount(dev.path, "/system", partfs, MS_RDONLY, nullptr);
 		mnt_system = true;
 	}
 
-	if (read_fstab_dt(&cmd, "vendor", partname)) {
+	if (read_fstab_dt(&cmd, "vendor", partname, partfs)) {
 		setup_block(&dev, partname);
-		xmount(dev.path, "/vendor", "ext4", MS_RDONLY, nullptr);
+		xmount(dev.path, "/vendor", partfs, MS_RDONLY, nullptr);
 		mnt_vendor = true;
 	}
 
@@ -459,38 +559,25 @@ int main(int argc, char *argv[]) {
 		close(fd);
 		rmdir("/overlay");
 	}
+	close(root);
 
-	// Patch init.rc to load magisk scripts
-	bool injected = false;
-	char line[4096];
-	FILE *fp = xfopen("/init.rc", "r");
-	fd = creat("/init.rc.new", 0750);
-	while(fgets(line, sizeof(line), fp)) {
-		if (!injected && strncmp(line, "import", 6) == 0) {
-			if (strstr(line, "init.magisk.rc")) {
-				injected = true;
-			} else {
-				xwrite(fd, "import /init.magisk.rc\n", 23);
-				injected = true;
-			}
-		} else if (strstr(line, "selinux.reload_policy")) {
-			// Do not allow sepolicy patch
-			continue;
-		}
-		xwrite(fd, line, strlen(line));
-	}
-	fclose(fp);
-	close(fd);
-	rename("/init.rc.new", "/init.rc");
+	// Create hardlink mirror of /sbin to /root
+	mkdir("/root", 0750);
+	clone_attr("/sbin", "/root");
+	root = xopen("/root", O_RDONLY | O_CLOEXEC);
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	link_dir(sbin, root);
 
-	// Patch sepolicy
+	setup_init_rc();
 	patch_sepolicy();
 
-	// Dump binaries
-	dump_magiskrc(MAGISKRC, 0750);
-	dump_magisk("/sbin/magisk", 0755);
-	patch_socket_name("/sbin/magisk");
-	rename("/init.bak", "/sbin/magiskinit");
+	// Close all file descriptors
+	for (int i = 0; i < 30; ++i)
+		close(i);
+
+	// Launch daemon to setup overlay
+	if (fork_dont_care() == 0)
+		setup_overlay();
 
 	exec_init(argv);
 }
