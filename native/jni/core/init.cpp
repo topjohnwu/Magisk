@@ -58,6 +58,8 @@ static bool mnt_vendor = false;
 static void *self, *config;
 static size_t self_sz, config_sz;
 
+extern void hide_mod(const char *file);
+
 struct cmdline {
 	bool early_boot;
 	char slot[3];
@@ -390,6 +392,7 @@ static void setup_overlay() {
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);
 
+	hide_mod("/sbin");
 	// Mount the /sbin tmpfs overlay
 	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
 	chmod("/sbin", 0755);
@@ -434,6 +437,7 @@ static void setup_overlay() {
 	}
 	closedir(dir);
 	close(fd);
+	hide_mod("/root");
 
 	close(xopen(EARLYINITDONE, O_RDONLY | O_CREAT, 0));
 	exit(0);

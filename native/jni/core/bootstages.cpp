@@ -35,7 +35,6 @@ char *system_block, *vendor_block, *magiskloop;
 
 static int bind_mount(const char *from, const char *to);
 extern void auto_start_magiskhide();
-extern void hide_mod(const char *file);
 
 /***************
  * Magic Mount *
