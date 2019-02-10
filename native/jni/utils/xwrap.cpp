@@ -22,8 +22,8 @@
 #include <sys/sendfile.h>
 #include <sys/syscall.h>
 
-#include "logging.h"
-#include "utils.h"
+#include <logging.h>
+#include <utils.h>
 
 FILE *xfopen(const char *pathname, const char *mode) {
 	FILE *fp = fopen(pathname, mode);

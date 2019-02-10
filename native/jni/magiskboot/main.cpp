@@ -5,11 +5,11 @@
 #include <sys/mman.h>
 
 #include <mincrypt/sha.h>
+#include <logging.h>
+#include <utils.h>
+#include <flags.h>
 
 #include "magiskboot.h"
-#include "logging.h"
-#include "utils.h"
-#include "flags.h"
 
 /********************
   Patch Boot Image

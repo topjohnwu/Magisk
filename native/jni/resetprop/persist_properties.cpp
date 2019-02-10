@@ -4,15 +4,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
-
 #include <vector>
 
 #include <pb.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
+#include <utils.h>
 
 #include "_resetprop.h"
-#include "utils.h"
 
 using namespace std;
 

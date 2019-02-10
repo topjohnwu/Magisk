@@ -6,12 +6,12 @@
 #include <fcntl.h>
 #include <endian.h>
 
-#include "daemon.h"
-#include "logging.h"
-#include "utils.h"
-#include "magisk.h"
+#include <daemon.h>
+#include <logging.h>
+#include <utils.h>
+#include <magisk.h>
 
-#define ABS_SOCKET_LEN(sun) (sizeof(sun->sun_family) + strlen(sun->sun_path + 1) + 1)
+#define ABS_SOCKET_LEN(sun) (sizeof(sa_family_t) + strlen(sun->sun_path + 1) + 1)
 
 socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name) {
 	memset(sun, 0, sizeof(*sun));
@@ -36,6 +36,11 @@ int socket_accept(int sockfd, int timeout) {
 		.events = POLL_IN
 	};
 	return xpoll(&pfd, 1, timeout * 1000) <= 0 ? -1 : xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
+}
+
+void get_client_cred(int fd, struct ucred *cred) {
+	socklen_t ucred_length = sizeof(*cred);
+	getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &ucred_length);
 }
 
 /*

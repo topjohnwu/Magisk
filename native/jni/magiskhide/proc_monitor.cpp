@@ -18,23 +18,22 @@
 #include <vector>
 #include <string>
 
-#include "magisk.h"
-#include "daemon.h"
-#include "utils.h"
+#include <magisk.h>
+#include <utils.h>
+#include <logcat.h>
+
 #include "magiskhide.h"
 
 using namespace std;
 
-static int sockfd = -1;
 extern char *system_block, *vendor_block, *magiskloop;
 
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
 	LOGD("proc_monitor: running cleanup\n");
+	stop_logging(HIDE_EVENT);
 	hide_list.clear();
 	hide_enabled = false;
-	close(sockfd);
-	sockfd = -1;
 	pthread_mutex_destroy(&list_lock);
 	LOGD("proc_monitor: terminating\n");
 	pthread_exit(nullptr);
@@ -124,20 +123,14 @@ void proc_monitor() {
 		term_thread(TERM_THREAD);
 	}
 
-	// Connect to the log daemon
-	sockfd = connect_log_daemon();
-	if (sockfd < 0)
-		pthread_exit(nullptr);
-	write_int(sockfd, HIDE_CONNECT);
-
-	FILE *log_in = fdopen(sockfd, "r");
-	char buf[4096];
-	while (fgets(buf, sizeof(buf), log_in)) {
+	auto &queue = start_logging(HIDE_EVENT);
+	while (true) {
 		char *log;
 		int pid, ppid;
 		struct stat ns, pns;
 
-		if ((log = strchr(buf, '[')) == nullptr)
+		string line = queue.take();
+		if ((log = strchr(&line[0], '[')) == nullptr)
 			continue;
 
 		// Extract pid
@@ -183,5 +176,4 @@ void proc_monitor() {
 		if (fork_dont_care() == 0)
 			hide_daemon(pid);
 	}
-	pthread_exit(nullptr);
 }

@@ -1,5 +1,5 @@
-#include "magisk.h"
-#include "magiskpolicy.h"
+#include <magisk.h>
+#include <magiskpolicy.h>
 
 static const char magiskrc[] =
 

@@ -3,9 +3,9 @@
 extern "C" {
 #include <libfdt.h>
 }
+#include <utils.h>
 
 #include "magiskboot.h"
-#include "utils.h"
 
 static void print_props(const void *fdt, int node, int depth) {
 	int prop;

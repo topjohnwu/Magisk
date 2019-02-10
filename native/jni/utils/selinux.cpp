@@ -5,9 +5,9 @@
 #include <syscall.h>
 #include <sys/xattr.h>
 
-#include "magisk.h"
-#include "utils.h"
-#include "selinux.h"
+#include <magisk.h>
+#include <utils.h>
+#include <selinux.h>
 
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"

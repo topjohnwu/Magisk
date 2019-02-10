@@ -4,7 +4,6 @@
 #ifndef _DAEMON_H_
 #define _DAEMON_H_
 
-#include <stdbool.h>
 #include <pthread.h>
 #include <sys/un.h>
 #include <sys/socket.h>
@@ -19,8 +18,6 @@ enum {
 	LATE_START,
 	BOOT_COMPLETE,
 	MAGISKHIDE,
-	HIDE_CONNECT,
-	HANDSHAKE,
 	SQLITE_CMD,
 };
 
@@ -37,17 +34,12 @@ enum {
 int connect_daemon();
 int switch_mnt_ns(int pid);
 
-// log_monitor.c
-
-extern bool log_daemon_started;
-int connect_log_daemon();
-bool start_log_daemon();
-
 // socket.c
 
 socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name);
 int create_rand_socket(struct sockaddr_un *sun);
 int socket_accept(int sockfd, int timeout);
+void get_client_cred(int fd, struct ucred *cred);
 int recv_fd(int sockfd);
 void send_fd(int sockfd, int fd);
 int read_int(int fd);
@@ -66,7 +58,6 @@ void write_key_token(int fd, const char *key, int tok);
  ***************/
 
 void unlock_blocks();
-void startup();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);

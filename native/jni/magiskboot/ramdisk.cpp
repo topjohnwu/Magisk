@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include <utils.h>
+
 #include "magiskboot.h"
 #include "cpio.h"
-#include "utils.h"
 
 using namespace std;
 

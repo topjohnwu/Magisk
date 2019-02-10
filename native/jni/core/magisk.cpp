@@ -4,12 +4,12 @@
 #include <libgen.h>
 #include <string.h>
 
-#include "utils.h"
-#include "magisk.h"
-#include "daemon.h"
-#include "selinux.h"
-#include "db.h"
-#include "flags.h"
+#include <utils.h>
+#include <magisk.h>
+#include <daemon.h>
+#include <selinux.h>
+#include <db.h>
+#include <flags.h>
 
 [[noreturn]] static void usage() {
 	fprintf(stderr,
@@ -96,6 +96,11 @@ int magisk_main(int argc, char *argv[]) {
 		send_fd(fd, STDOUT_FILENO);
 		return read_int(fd);
 	}
-
+#if 0
+	/* Entry point for testing stuffs */
+	else if (strcmp(argv[1], "--test") == 0) {
+		return 0;
+	}
+#endif
 	usage();
 }

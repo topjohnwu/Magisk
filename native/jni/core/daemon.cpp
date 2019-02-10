@@ -14,30 +14,39 @@
 #include <sys/types.h>
 #include <sys/mount.h>
 
-#include "magisk.h"
-#include "utils.h"
-#include "daemon.h"
-#include "selinux.h"
-#include "db.h"
-#include "resetprop.h"
-#include "flags.h"
+#include <magisk.h>
+#include <utils.h>
+#include <daemon.h>
+#include <selinux.h>
+#include <db.h>
+#include <resetprop.h>
+#include <flags.h>
 
 int SDK_INT = -1;
+struct stat SERVER_STAT;
 
-static void get_client_cred(int fd, struct ucred *cred) {
-	socklen_t ucred_length = sizeof(*cred);
-	if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &ucred_length))
-		PLOGE("getsockopt");
+static void verify_client(int client, pid_t pid) {
+	// Verify caller is the same as server
+	char path[32];
+	sprintf(path, "/proc/%d/exe", pid);
+	struct stat st{};
+	stat(path, &st);
+	if (st.st_dev != SERVER_STAT.st_dev || st.st_ino != SERVER_STAT.st_ino) {
+		close(client);
+		pthread_exit(nullptr);
+	}
 }
 
 static void *request_handler(void *args) {
 	int client = *((int *) args);
 	delete (int *) args;
-	int req = read_int(client);
 
 	struct ucred credential;
 	get_client_cred(client, &credential);
+	if (credential.uid != 0)
+		verify_client(client, credential.pid);
 
+	int req = read_int(client);
 	switch (req) {
 	case MAGISKHIDE:
 	case POST_FS_DATA:
@@ -77,9 +86,6 @@ static void *request_handler(void *args) {
 	case BOOT_COMPLETE:
 		boot_complete(client);
 		break;
-	case HANDSHAKE:
-		/* Do NOT close the client, make it hold */
-		break;
 	case SQLITE_CMD:
 		exec_sql(client);
 		close(client);
@@ -103,6 +109,11 @@ static void main_daemon() {
 	xdup2(fd, STDIN_FILENO);
 	close(fd);
 
+	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
+
+	// Get server stat
+	stat("/proc/self/exe", &SERVER_STAT);
+
 	// Get API level
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
 		if (strcmp(key, "ro.build.version.sdk") == 0) {
@@ -119,26 +130,17 @@ static void main_daemon() {
 	if (xbind(fd, (struct sockaddr*) &sun, len))
 		exit(1);
 	xlisten(fd, 10);
-	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 
 	// Change process name
 	strcpy(argv0, "magiskd");
 
-	// Block all user signals
+	// Block all signals
 	sigset_t block_set;
-	sigemptyset(&block_set);
-	sigaddset(&block_set, SIGUSR1);
-	sigaddset(&block_set, SIGUSR2);
+	sigfillset(&block_set);
 	pthread_sigmask(SIG_SETMASK, &block_set, nullptr);
 
-	// Ignore SIGPIPE
-	struct sigaction act;
-	memset(&act, 0, sizeof(act));
-	act.sa_handler = SIG_IGN;
-	sigaction(SIGPIPE, &act, nullptr);
-
 	// Loop forever to listen for requests
-	while(1) {
+	while(true) {
 		int *client = new int;
 		*client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
 		pthread_t thread;

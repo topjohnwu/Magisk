@@ -5,9 +5,9 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include "magisk.h"
-#include "db.h"
-#include "daemon.h"
+#include <magisk.h>
+#include <db.h>
+#include <daemon.h>
 
 #define DB_VERSION 7
 
