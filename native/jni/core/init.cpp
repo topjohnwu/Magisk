@@ -42,12 +42,15 @@
 #include <selinux.h>
 #include <utils.h>
 #include <flags.h>
+#include <linux/utime.h>
+#include <utime.h>
 
 #include "binaries.h"
 #include "binaries_arch.h"
 #include "magiskrc.h"
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
+#define TIMESTAMP_REF  "/res"
 
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, nullptr };
 
@@ -56,8 +59,6 @@ static bool mnt_vendor = false;
 
 static void *self, *config;
 static size_t self_sz, config_sz;
-
-extern void hide_mod(const char *file);
 
 struct cmdline {
 	bool early_boot;
@@ -374,6 +375,27 @@ static const char wrapper[] =
 "unset LD_LIBRARY_PATH\n"
 "unset LD_PRELOAD\n"
 "exec /sbin/magisk.bin \"${0##*/}\" \"$@\"\n";
+
+
+void hide_mod(const char *file) {
+	struct utimbuf new_times;
+	time_t new_ctime;
+	if (access( TIMESTAMP_REF, F_OK ) != -1 ) {
+		struct stat ref;
+		xstat(TIMESTAMP_REF, &ref);
+		new_times.actime = ref.st_atime;
+		new_times.modtime = ref.st_mtime;
+		new_ctime = ref.st_ctime;
+	} else {
+		new_times.actime = 0;
+		new_times.modtime = 0;
+		new_ctime = 0;
+	}
+	time_t sys_time = time(0);
+	stime(&new_ctime); // This is a hack is needed to set ctime (Change time) of the file
+	utime(file, &new_times);
+	stime(&sys_time);
+}
 
 static void setup_overlay() {
 	char buf[128];

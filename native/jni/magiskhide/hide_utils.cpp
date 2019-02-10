@@ -21,7 +21,6 @@ using namespace std;
 
 #define SAFETYNET_COMPONENT  "com.google.android.gms/.droidguard.DroidGuardService"
 #define SAFETYNET_PROCESS    "com.google.android.gms.unstable"
-#define TIMESTAMP_REF        "/res"
 
 vector<string> hide_list;
 pthread_mutex_t list_lock;
@@ -342,24 +341,4 @@ void auto_start_magiskhide() {
 		}, nullptr);
 		pthread_detach(thread);
 	}
-}
-
-void hide_mod(const char *file) {
-	struct utimbuf new_times;
-	time_t new_ctime;
-	if (access( TIMESTAMP_REF, F_OK ) != -1 ) {
-		struct stat ref;
-		xstat(TIMESTAMP_REF, &ref);
-		new_times.actime = ref.st_atime;
-		new_times.modtime = ref.st_mtime;
-		new_ctime = ref.st_ctime;
-	} else {
-		new_times.actime = 0;
-		new_times.modtime = 0;
-		new_ctime = 0;
-	}
-	time_t sys_time = time(0);
-	stime(&new_ctime); // This is a hack is needed to set ctime (Change time) of the file
-	utime(file, &new_times);
-	stime(&sys_time);
 }
