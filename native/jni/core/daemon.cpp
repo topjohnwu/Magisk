@@ -134,18 +134,10 @@ static void main_daemon() {
 	// Change process name
 	strcpy(argv0, "magiskd");
 
-	// Block all user signals
+	// Block all signals
 	sigset_t block_set;
-	sigemptyset(&block_set);
-	sigaddset(&block_set, SIGUSR1);
-	sigaddset(&block_set, SIGUSR2);
+	sigfillset(&block_set);
 	pthread_sigmask(SIG_SETMASK, &block_set, nullptr);
-
-	// Ignore SIGPIPE
-	struct sigaction act;
-	memset(&act, 0, sizeof(act));
-	act.sa_handler = SIG_IGN;
-	sigaction(SIGPIPE, &act, nullptr);
 
 	// Loop forever to listen for requests
 	while(true) {
