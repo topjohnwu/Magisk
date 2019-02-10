@@ -16,14 +16,15 @@
 #include <vector>
 #include <string>
 
-#include "magisk.h"
-#include "db.h"
-#include "utils.h"
-#include "img.h"
-#include "daemon.h"
-#include "resetprop.h"
-#include "selinux.h"
-#include "flags.h"
+#include <magisk.h>
+#include <db.h>
+#include <utils.h>
+#include <img.h>
+#include <daemon.h>
+#include <resetprop.h>
+#include <selinux.h>
+#include <flags.h>
+#include <logcat.h>
 
 using namespace std;
 
@@ -685,7 +686,7 @@ void post_fs_data(int client) {
 		unblock_boot_process();
 	}
 
-	start_log_daemon();
+	start_logcat();
 
 	// Run common scripts
 	LOGI("* Running post-fs-data.d scripts\n");

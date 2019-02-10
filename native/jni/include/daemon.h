@@ -19,8 +19,6 @@ enum {
 	LATE_START,
 	BOOT_COMPLETE,
 	MAGISKHIDE,
-	HIDE_CONNECT,
-	HANDSHAKE,
 	SQLITE_CMD,
 };
 
@@ -36,12 +34,6 @@ enum {
 
 int connect_daemon();
 int switch_mnt_ns(int pid);
-
-// log_monitor.c
-
-extern bool log_daemon_started;
-int connect_log_daemon();
-bool start_log_daemon();
 
 // socket.c
 
@@ -67,7 +59,6 @@ void write_key_token(int fd, const char *key, int tok);
  ***************/
 
 void unlock_blocks();
-void startup();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);

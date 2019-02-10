@@ -8,12 +8,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "magisk.h"
-#include "utils.h"
-#include "resetprop.h"
+#include <magisk.h>
+#include <utils.h>
+#include <resetprop.h>
+#include <db.h>
+#include <logcat.h>
+
 #include "magiskhide.h"
-#include "daemon.h"
-#include "db.h"
 
 using namespace std;
 
@@ -282,7 +283,7 @@ int launch_magiskhide(int client) {
 	if (hide_enabled)
 		return HIDE_IS_ENABLED;
 
-	if (!log_daemon_started)
+	if (!logcat_started)
 		return LOGCAT_DISABLED;
 
 	hide_enabled = true;
@@ -327,7 +328,7 @@ int stop_magiskhide() {
 }
 
 void auto_start_magiskhide() {
-	if (!start_log_daemon())
+	if (!start_logcat())
 		return;
 	db_settings dbs;
 	get_db_settings(&dbs, HIDE_CONFIG);

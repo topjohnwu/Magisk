@@ -86,9 +86,6 @@ static void *request_handler(void *args) {
 	case BOOT_COMPLETE:
 		boot_complete(client);
 		break;
-	case HANDSHAKE:
-		/* Do NOT close the client, make it hold */
-		break;
 	case SQLITE_CMD:
 		exec_sql(client);
 		close(client);
