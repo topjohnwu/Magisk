@@ -11,12 +11,13 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-#include "magisk.h"
-#include "daemon.h"
-#include "utils.h"
+#include <magisk.h>
+#include <daemon.h>
+#include <utils.h>
+#include <selinux.h>
+
 #include "su.h"
 #include "pts.h"
-#include "selinux.h"
 
 #define LOCK_CACHE()   pthread_mutex_lock(&cache_lock)
 #define UNLOCK_CACHE() pthread_mutex_unlock(&cache_lock)

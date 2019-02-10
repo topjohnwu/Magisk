@@ -37,16 +37,15 @@
 #include <string_view>
 
 #include <xz.h>
+#include <magisk.h>
+#include <magiskpolicy.h>
+#include <selinux.h>
+#include <utils.h>
+#include <flags.h>
 
 #include "binaries.h"
 #include "binaries_arch.h"
-
 #include "magiskrc.h"
-#include "magisk.h"
-#include "magiskpolicy.h"
-#include "selinux.h"
-#include "utils.h"
-#include "flags.h"
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 

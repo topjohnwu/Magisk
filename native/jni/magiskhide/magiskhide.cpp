@@ -7,10 +7,11 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-#include "magisk.h"
+#include <magisk.h>
+#include <daemon.h>
+#include <flags.h>
+
 #include "magiskhide.h"
-#include "daemon.h"
-#include "flags.h"
 
 bool hide_enabled = false;
 

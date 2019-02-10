@@ -10,10 +10,10 @@
 #include <lz4frame.h>
 #include <lz4hc.h>
 #include <bzlib.h>
+#include <logging.h>
+#include <utils.h>
 
 #include "magiskboot.h"
-#include "logging.h"
-#include "utils.h"
 
 #define CHUNK 0x40000
 

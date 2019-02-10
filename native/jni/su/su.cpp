@@ -21,12 +21,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "magisk.h"
-#include "daemon.h"
-#include "utils.h"
+#include <magisk.h>
+#include <daemon.h>
+#include <utils.h>
+#include <flags.h>
+
 #include "su.h"
 #include "pts.h"
-#include "flags.h"
 
 int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
 

@@ -8,11 +8,12 @@
 #include <vector>
 #include <string>
 
+#include <magisk.h>
+#include <utils.h>
+#include <flags.h>
+
 #include "sepolicy.h"
 #include "magiskpolicy.h"
-#include "magisk.h"
-#include "utils.h"
-#include "flags.h"
 
 using namespace std;
 

@@ -4,7 +4,6 @@
 #ifndef _DAEMON_H_
 #define _DAEMON_H_
 
-#include <stdbool.h>
 #include <pthread.h>
 #include <sys/un.h>
 #include <sys/socket.h>

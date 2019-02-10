@@ -27,7 +27,6 @@
 #define SIMPLEMOUNT     SECURE_DIR "/magisk_simple"
 #define BOOTCOUNT       SECURE_DIR "/.boot_count"
 #define MANAGERAPK      DATABIN "/magisk.apk"
-#define MAGISKRC        "/init.magisk.rc"
 
 // selinux consts
 #define SELINUX_PATH        "/sys/fs/selinux"
@@ -37,8 +36,6 @@
 #define SELINUX_CONTEXT     SELINUX_PATH "/context"
 #define SEPOL_PROC_DOMAIN "magisk"
 #define SEPOL_FILE_DOMAIN "magisk_file"
-
-#define MAGISKHIDE_PROP     "persist.magisk.hide"
 
 extern char *argv0;     /* For changing process name */
 extern int SDK_INT;

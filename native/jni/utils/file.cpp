@@ -11,9 +11,9 @@
 #include <sys/mman.h>
 #include <linux/fs.h>
 
-#include "magisk.h"
-#include "utils.h"
-#include "selinux.h"
+#include <magisk.h>
+#include <utils.h>
+#include <selinux.h>
 
 using namespace std;
 

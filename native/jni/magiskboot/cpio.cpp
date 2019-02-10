@@ -4,9 +4,10 @@
 #include <stdlib.h>
 #include <algorithm>
 
+#include <utils.h>
+#include <logging.h>
+
 #include "cpio.h"
-#include "utils.h"
-#include "logging.h"
 
 using namespace std;
 

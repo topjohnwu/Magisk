@@ -14,13 +14,13 @@
 #include <sys/types.h>
 #include <sys/mount.h>
 
-#include "magisk.h"
-#include "utils.h"
-#include "daemon.h"
-#include "selinux.h"
-#include "db.h"
-#include "resetprop.h"
-#include "flags.h"
+#include <magisk.h>
+#include <utils.h>
+#include <daemon.h>
+#include <selinux.h>
+#include <db.h>
+#include <resetprop.h>
+#include <flags.h>
 
 int SDK_INT = -1;
 struct stat SERVER_STAT;

@@ -6,11 +6,11 @@
 
 #include <mincrypt/sha.h>
 #include <mincrypt/sha256.h>
+#include <utils.h>
+#include <logging.h>
 
 #include "bootimg.h"
 #include "magiskboot.h"
-#include "utils.h"
-#include "logging.h"
 
 static void dump(void *buf, size_t size, const char *filename) {
 	if (size == 0)

@@ -4,8 +4,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "magisk.h"
-#include "selinux.h"
+#include <magisk.h>
+#include <selinux.h>
 
 static int (*applet_main[]) (int, char *[]) =
 		{ magisk_main, su_client_main, resetprop_main, magiskhide_main, imgtool_main, nullptr };

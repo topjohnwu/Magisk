@@ -14,10 +14,10 @@
 #include <sys/sysmacros.h>
 #include <linux/loop.h>
 
-#include "magisk.h"
-#include "utils.h"
-#include "img.h"
-#include "flags.h"
+#include <magisk.h>
+#include <utils.h>
+#include <img.h>
+#include <flags.h>
 
 #define round_size(a) ((((a) / 32) + 2) * 32)
 #define SOURCE_TMP "/dev/.img_src"
