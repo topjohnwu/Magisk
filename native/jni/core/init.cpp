@@ -503,7 +503,7 @@ int main(int argc, char *argv[]) {
 		excl_list = nullptr;
 	} else {
 		// Revert original init binary
-		link("/.backup/init", "/init");
+		rename("/.backup/init", "/init");
 		rm_rf("/.backup");
 
 		// Do not go further if device is booting into recovery
