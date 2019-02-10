@@ -19,8 +19,8 @@
     <string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
     <string name="safetyNet_api_error">Erreur de l’API SafetyNet</string>
     <string name="safetyNet_res_invalid">La réponse est incorrecte.</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk est à jour</string>
+    <string name="manager_up_to_date">Magisk Manager est à jour</string>
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
     <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés. Les permissions de super‐utilisateur seront perdues et vos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
     <string name="update">Mise à jour</string>
-    <string name="core_only_enabled">(mode « sans modules » activé)</string>
+    <string name="core_only_enabled">(Mode « sans modules » activé)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(aucune information transmise)</string>
