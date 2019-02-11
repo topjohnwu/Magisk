@@ -7,6 +7,8 @@
     <string name="log">Jurnal</string>
     <string name="settings">Setări</string>
     <string name="install">Instalare</string>
+    <string name="unsupport_magisk_title">Versiune Magisk neacceptată</string>
+    <string name="unsupport_magisk_message">Această versiune de Magisk Manager nu acceptă versiunea Magisk mai mică de v18.0.\n\nPuteți fie să actualizați manual Magisk, fie să instalați o versiune mai veche.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nu este instalat</string>
@@ -16,18 +18,19 @@
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
     <string name="safetyNet_check_success">Verificare SafetyNet cu succes</string>
     <string name="safetyNet_api_error">Eroare API SafetyNet</string>
-
-    <!--Install Fragment-->
+    <string name="safetyNet_res_invalid">Răspunsul este nevalid.</string>
+    <string name="magisk_up_to_date">Magisk este actualizat</string>
+    <string name="manager_up_to_date">Magisk Manager este actualizat</string>
     <string name="advanced_settings_title">Setări avansate</string>
     <string name="keep_force_encryption">Păstrare criptare forţată</string>
     <string name="keep_dm_verity">Păstrare AVB 2.0/dm-verity</string>
-    <string name="current_installed">Instalată: %1$s</string>
+    <string name="current_installed">Instalat: %1$s</string>
     <string name="latest_version">Ultima: %1$s</string>
     <string name="uninstall">Dezinstalare</string>
     <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
     <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate. Accesul la Root va fi eliminat și potențial se vor cripta datele dacă nu sunt în prezent criptate</string>
     <string name="update">Actualizare</string>
-
+    <string name="core_only_enabled">(Este activat numai modul de bază)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nu sunt furnizate informații)</string>
@@ -111,6 +114,7 @@
     <string name="setup_msg">Rulare configurare mediu…</string>
     <string name="downloading_toast">Descărcare %1$s</string>
     <string name="no_rw_storage">Această caracteristică nu va funcționa fără permisiunea de a scrie pe memoria externă.</string>
+    <string name="dl_one_module">Se descarcă câte un modul la un moment dat.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -212,5 +216,8 @@
     <!--Superuser logs-->
     <string name="target_uid">UID: %1$d</string>
     <string name="command">Comandă: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Afișare aplicații de sistem</string>
 
 </resources>
