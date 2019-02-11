@@ -60,7 +60,7 @@ config = {}
 def mv(source, target):
     try:
         shutil.move(source, target)
-    except shutil.Error:
+    except:
         pass
 
 
@@ -68,7 +68,7 @@ def cp(source, target):
     try:
         shutil.copyfile(source, target)
         vprint(f'cp: {source} -> {target}')
-    except shutil.Error:
+    except:
         pass
 
 
@@ -82,8 +82,8 @@ def rm(file):
 
 def mkdir(path, mode=0o777):
     try:
-        os.mkdir(path, mode, exist_ok=True) # Ok for Python 3.2+
-    except OSError:
+        os.mkdir(path, mode)
+    except:
         pass
 
 

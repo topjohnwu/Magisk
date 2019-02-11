@@ -117,7 +117,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 			skip_initramfs = true;
 		} else if (key == "androidboot.android_dt_dir") {
 			strcpy(cmd->dt_dir, value);
-		} else if (key == "entry_recovery") {
+		} else if (key == "enter_recovery") {
 			enter_recovery = value[0] == '1';
 		} else if (key == "androidboot.hardware") {
 			kirin = strstr(value, "kirin") || strstr(value, "hi3660");
