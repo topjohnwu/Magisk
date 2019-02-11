@@ -82,7 +82,7 @@ def rm(file):
 
 def mkdir(path, mode=0o777):
     try:
-        os.mkdir(path, mode, exist_ok=True) # Ok for Python 3.2+
+        os.mkdir(path, mode)
     except OSError:
         pass
 
