@@ -73,14 +73,6 @@ remove_system_su
 
 ui_print "- Constructing environment"
 
-if $DATA; then
-  MAGISKBIN=/data/magisk
-  $DATA_DE && MAGISKBIN=/data/adb/magisk
-  run_migrations
-else
-  MAGISKBIN=/cache/data_bin
-fi
-
 # Copy required files
 rm -rf $MAGISKBIN/* 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null

@@ -398,7 +398,7 @@ static bool magisk_env() {
 	LOGI("* Initializing Magisk environment\n");
 
 	// Alternative binaries paths
-	const char *alt_bin[] = { "/cache/data_bin", "/data/magisk",
+	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk",
 							  "/data/data/com.topjohnwu.magisk/install",
 							  "/data/user_de/0/com.topjohnwu.magisk/install" };
 	for (auto &alt : alt_bin) {

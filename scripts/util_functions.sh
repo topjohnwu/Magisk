@@ -7,23 +7,57 @@
 #
 ##########################################################################################
 
-#MAGISK_VERSION_STUB
+###################
+# Helper Functions
+###################
 
-# Detect whether in boot mode
-[ -z $BOOTMODE ] && BOOTMODE=false
-$BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
-$BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
+ui_print() {
+  $BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
+}
 
-# Presets
-MAGISKTMP=/sbin/.magisk
-[ -z $NVBASE ] && NVBASE=/data/adb
-[ -z $MAGISKBIN ] && MAGISKBIN=$NVBASE/magisk
-[ -z $IMG ] && IMG=$NVBASE/magisk.img
+toupper() {
+  echo "$@" | tr '[:lower:]' '[:upper:]'
+}
 
-# Bootsigner related stuff
-BOOTSIGNERCLASS=a.a
-BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
-BOOTSIGNED=false
+grep_cmdline() {
+  local REGEX="s/^$1=//p"
+  cat /proc/cmdline | tr '[:space:]' '\n' | sed -n "$REGEX" 2>/dev/null
+}
+
+grep_prop() {
+  local REGEX="s/^$1=//p"
+  shift
+  local FILES=$@
+  [ -z "$FILES" ] && FILES='/system/build.prop'
+  sed -n "$REGEX" $FILES 2>/dev/null | head -n 1
+}
+
+getvar() {
+  local VARNAME=$1
+  local VALUE=
+  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /data/.magisk /cache/.magisk`
+  [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
+}
+
+is_mounted() {
+  grep -q " `readlink -f $1` " /proc/mounts 2>/dev/null
+  return $?
+}
+
+abort() {
+  ui_print "$1"
+  $BOOTMODE || recovery_cleanup
+  exit 1
+}
+
+resolve_vars() {
+  MAGISKBIN=$NVBASE/magisk
+  IMG=$NVBASE/magisk.img
+}
+
+######################
+# Environment Related
+######################
 
 setup_flashable() {
   $BOOTMODE && return
@@ -43,18 +77,58 @@ setup_flashable() {
   fi
 }
 
-# Backward compatibility
-get_outfd() {
-  setup_flashable
+setup_bb() {
+  if [ -x $MAGISKTMP/busybox/busybox ]; then
+    # Make sure this path is in the front
+    echo $PATH | grep -q "^$MAGISKTMP/busybox" || export PATH=$MAGISKTMP/busybox:$PATH
+  elif [ -x $TMPDIR/bin/busybox ]; then
+    # Make sure this path is in the front
+    echo $PATH | grep -q "^$TMPDIR/bin" || export PATH=$TMPDIR/bin:$PATH
+  else
+    # Construct the PATH
+    mkdir -p $TMPDIR/bin
+    ln -s $MAGISKBIN/busybox $TMPDIR/bin/busybox
+    $MAGISKBIN/busybox --install -s $TMPDIR/bin
+    export PATH=$TMPDIR/bin:$PATH
+  fi
 }
 
-ui_print() {
-  $BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
+boot_actions() {
+  if [ ! -d $MAGISKTMP/mirror/bin ]; then
+    mkdir -p $MAGISKTMP/mirror/bin
+    mount -o bind $MAGISKBIN $MAGISKTMP/mirror/bin
+  fi
+  MAGISKBIN=$MAGISKTMP/mirror/bin
+  setup_bb
 }
 
-toupper() {
-  echo "$@" | tr '[:lower:]' '[:upper:]'
+recovery_actions() {
+  # TWRP bug fix
+  mount -o bind /dev/urandom /dev/random
+  # Temporarily block out all custom recovery binaries/libs
+  mv /sbin /sbin_tmp
+  # Unset library paths
+  OLD_LD_LIB=$LD_LIBRARY_PATH
+  OLD_LD_PRE=$LD_PRELOAD
+  unset LD_LIBRARY_PATH
+  unset LD_PRELOAD
 }
+
+recovery_cleanup() {
+  mv /sbin_tmp /sbin 2>/dev/null
+  [ -z $OLD_PATH ] || export PATH=$OLD_PATH
+  [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
+  [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
+  ui_print "- Unmounting partitions"
+  umount -l /system_root 2>/dev/null
+  umount -l /system 2>/dev/null
+  umount -l /vendor 2>/dev/null
+  umount -l /dev/random 2>/dev/null
+}
+
+#######################
+# Installation Related
+#######################
 
 find_block() {
   for BLOCK in "$@"; do
@@ -139,51 +213,6 @@ get_flags() {
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
 
-grep_cmdline() {
-  local REGEX="s/^$1=//p"
-  cat /proc/cmdline | tr '[:space:]' '\n' | sed -n "$REGEX" 2>/dev/null
-}
-
-grep_prop() {
-  local REGEX="s/^$1=//p"
-  shift
-  local FILES=$@
-  [ -z "$FILES" ] && FILES='/system/build.prop'
-  sed -n "$REGEX" $FILES 2>/dev/null | head -n 1
-}
-
-getvar() {
-  local VARNAME=$1
-  local VALUE=
-  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /data/.magisk /cache/.magisk`
-  [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
-}
-
-run_migrations() {
-  # Update the broken boot backup
-  if [ -f /data/stock_boot_.img.gz ]; then
-    $MAGISKBIN/magiskboot --decompress /data/stock_boot_.img.gz /data/stock_boot.img
-  fi
-  # Update our previous backup to new format if exists
-  if [ -f /data/stock_boot.img ]; then
-    ui_print "- Migrating boot image backup"
-    SHA1=`$MAGISKBIN/magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
-    STOCKDUMP=/data/stock_boot_${SHA1}.img
-    mv /data/stock_boot.img $STOCKDUMP
-    $MAGISKBIN/magiskboot --compress $STOCKDUMP
-  fi
-  # Move the stock backups
-  if [ -f /data/magisk/stock_boot* ]; then
-    mv /data/magisk/stock_boot* /data 2>/dev/null
-  fi
-  if [ -f /data/adb/magisk/stock_boot* ]; then
-    mv /data/adb/magisk/stock_boot* /data 2>/dev/null
-  fi
-  # Remove old dbs
-  rm -f /data/user*/*/magisk.db
-  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img 2>/dev/null
-}
-
 find_boot_image() {
   BOOTIMAGE=
   if [ ! -z $SLOT ]; then
@@ -201,23 +230,23 @@ flash_image() {
   # Make sure all blocks are writable
   $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   case "$1" in
-    *.gz) COM1="$MAGISKBIN/magiskboot --decompress '$1' - 2>/dev/null";;
-    *)    COM1="cat '$1'";;
+    *.gz) CMD1="$MAGISKBIN/magiskboot --decompress '$1' - 2>/dev/null";;
+    *)    CMD1="cat '$1'";;
   esac
   if $BOOTSIGNED; then
-    COM2="$BOOTSIGNER -sign"
+    CMD2="$BOOTSIGNER -sign"
     ui_print "- Sign image with test keys"
   else
-    COM2="cat -"
+    CMD2="cat -"
   fi
   if [ -b "$2" ]; then
     local s_size=`stat -c '%s' "$1"`
     local t_size=`blockdev --getsize64 "$2"`
     [ $s_size -gt $t_size ] && return 1
-    eval $COM1 | eval $COM2 | cat - /dev/zero > "$2" 2>/dev/null
+    eval $CMD1 | eval $CMD2 | cat - /dev/zero > "$2" 2>/dev/null
   else
     ui_print "- Not block device, storing image"
-    eval $COM1 | eval $COM2 > "$2" 2>/dev/null
+    eval $CMD1 | eval $CMD2 > "$2" 2>/dev/null
   fi
   return 0
 }
@@ -249,11 +278,6 @@ sign_chromeos() {
 
   rm -f empty new-boot.img
   mv new-boot.img.signed new-boot.img
-}
-
-is_mounted() {
-  grep -q " `readlink -f $1` " /proc/mounts 2>/dev/null
-  return $?
 }
 
 remove_system_su() {
@@ -305,62 +329,24 @@ check_data() {
     # Test if DE storage is writable
     $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
   fi
+  $DATA && NVBASE=/data || NVBASE=/cache/data_adb
+  $DATA_DE && NVBASE=/data/adb
+  resolve_vars
 }
 
-setup_bb() {
-  if [ -x $MAGISKTMP/busybox/busybox ]; then
-    # Make sure this path is in the front
-    echo $PATH | grep -q "^$MAGISKTMP/busybox" || export PATH=$MAGISKTMP/busybox:$PATH
-  elif [ -x $TMPDIR/bin/busybox ]; then
-    # Make sure this path is in the front
-    echo $PATH | grep -q "^$TMPDIR/bin" || export PATH=$TMPDIR/bin:$PATH
-  else
-    # Construct the PATH
-    mkdir -p $TMPDIR/bin
-    ln -s $MAGISKBIN/busybox $TMPDIR/bin/busybox
-    $MAGISKBIN/busybox --install -s $TMPDIR/bin
-    export PATH=$TMPDIR/bin:$PATH
+find_manager_apk() {
+  APK=/data/adb/magisk.apk
+  [ -f $APK ] || APK=/data/magisk/magisk.apk
+  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
+  if [ ! -f $APK ]; then
+    DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" | cut -d= -f2`
+    [ -z "$DBAPK" ] || APK=/data/app/$DBAPK*/*.apk
   fi
 }
 
-boot_actions() {
-  if [ ! -d $MAGISKTMP/mirror/bin ]; then
-    mkdir -p $MAGISKTMP/mirror/bin
-    mount -o bind $MAGISKBIN $MAGISKTMP/mirror/bin
-  fi
-  MAGISKBIN=$MAGISKTMP/mirror/bin
-  setup_bb
-}
-
-recovery_actions() {
-  # TWRP bug fix
-  mount -o bind /dev/urandom /dev/random
-  # Temporarily block out all custom recovery binaries/libs
-  mv /sbin /sbin_tmp
-  # Unset library paths
-  OLD_LD_LIB=$LD_LIBRARY_PATH
-  OLD_LD_PRE=$LD_PRELOAD
-  unset LD_LIBRARY_PATH
-  unset LD_PRELOAD
-}
-
-recovery_cleanup() {
-  mv /sbin_tmp /sbin 2>/dev/null
-  [ -z $OLD_PATH ] || export PATH=$OLD_PATH
-  [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
-  [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
-  ui_print "- Unmounting partitions"
-  umount -l /system_root 2>/dev/null
-  umount -l /system 2>/dev/null
-  umount -l /vendor 2>/dev/null
-  umount -l /dev/random 2>/dev/null
-}
-
-abort() {
-  ui_print "$1"
-  $BOOTMODE || recovery_cleanup
-  exit 1
-}
+#################
+# Module Related
+#################
 
 set_perm() {
   chown $2:$3 $1 || return 1
@@ -437,12 +423,29 @@ unmount_magisk_img() {
   fi
 }
 
-find_manager_apk() {
-  APK=/data/adb/magisk.apk
-  [ -f $APK ] || APK=/data/magisk/magisk.apk
-  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
-  if [ ! -f $APK ]; then
-    DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" | cut -d= -f2`
-    [ -z "$DBAPK" ] || APK=/data/app/$DBAPK*/*.apk
-  fi
-}
+##################################
+# Backwards Compatibile Functions
+##################################
+get_outfd() { setup_flashable; }
+
+#######
+# main
+#######
+
+#MAGISK_VERSION_STUB
+
+# Detect whether in boot mode
+[ -z $BOOTMODE ] && BOOTMODE=false
+$BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
+$BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
+
+# Presets
+MAGISKTMP=/sbin/.magisk
+NVBASE=/data/adb
+
+# Bootsigner related stuff
+BOOTSIGNERCLASS=a.a
+BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
+BOOTSIGNED=false
+
+resolve_vars

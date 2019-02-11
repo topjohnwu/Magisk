@@ -17,6 +17,19 @@ fix_env() {
   cd /
 }
 
+run_migrations() {
+  # Move the stock backups
+  if [ -f /data/magisk/stock_boot* ]; then
+    mv /data/magisk/stock_boot* /data 2>/dev/null
+  fi
+  if [ -f /data/adb/magisk/stock_boot* ]; then
+    mv /data/adb/magisk/stock_boot* /data 2>/dev/null
+  fi
+  # Remove old dbs
+  rm -f /data/user*/*/magisk.db
+  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img 2>/dev/null
+}
+
 direct_install() {
   rm -rf /data/adb/magisk/* 2>/dev/null
   mkdir -p /data/adb/magisk 2>/dev/null
