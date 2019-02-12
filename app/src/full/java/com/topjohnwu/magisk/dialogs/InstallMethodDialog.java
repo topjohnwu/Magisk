@@ -50,7 +50,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
 
     private void patchBoot(BaseActivity a) {
         Utils.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*").addCategory(Intent.CATEGORY_OPENABLE);
         a.runWithExternalRW(() ->
                 a.startActivityForResult(intent, Const.ID.SELECT_BOOT,
                         (requestCode, resultCode, data) -> {
