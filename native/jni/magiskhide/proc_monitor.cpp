@@ -26,7 +26,7 @@
 
 using namespace std;
 
-extern char *system_block, *vendor_block, *magiskloop;
+extern char *system_block, *vendor_block, *data_block;
 
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
@@ -91,10 +91,10 @@ static void hide_daemon(int pid) {
 	// Re-read mount infos
 	mounts = file_to_vector("mounts");
 
-	// Unmount everything under /system, /vendor, and loop mounts
+	// Unmount everything under /system, /vendor, and data mounts
 	for (auto &s : mounts) {
 		if ((str_contains(s, " /system/") || str_contains(s, " /vendor/")) &&
-			(str_contains(s, system_block) || str_contains(s, vendor_block) || str_contains(s, magiskloop))) {
+			(str_contains(s, system_block) || str_contains(s, vendor_block) || str_contains(s, data_block))) {
 			sscanf(s.c_str(), "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}

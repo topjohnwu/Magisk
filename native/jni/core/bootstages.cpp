@@ -19,12 +19,11 @@
 #include <magisk.h>
 #include <db.h>
 #include <utils.h>
-#include <img.h>
 #include <daemon.h>
 #include <resetprop.h>
 #include <selinux.h>
-#include <flags.h>
 #include <logcat.h>
+#include <flags.h>
 
 using namespace std;
 
@@ -32,7 +31,7 @@ static char buf[PATH_MAX], buf2[PATH_MAX];
 static vector<string> module_list;
 static bool seperate_vendor;
 
-char *system_block, *vendor_block, *magiskloop;
+char *system_block, *vendor_block, *data_block;
 
 static int bind_mount(const char *from, const char *to);
 extern void auto_start_magiskhide();
@@ -135,7 +134,7 @@ void node_entry::create_module_tree(const char *module) {
 	struct dirent *entry;
 
 	auto full_path = get_path();
-	snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, full_path.c_str());
+	snprintf(buf, PATH_MAX, "%s/%s%s", MODULEROOT, module, full_path.c_str());
 
 	if (!(dir = xopendir(buf)))
 		return;
@@ -169,7 +168,7 @@ void node_entry::create_module_tree(const char *module) {
 			node->status = IS_MODULE;
 		} else if (IS_DIR(node)) {
 			// Check if marked as replace
-			snprintf(buf2, PATH_MAX, "%s/%s%s/.replace", MOUNTPOINT, module, buf);
+			snprintf(buf2, PATH_MAX, "%s/%s%s/.replace", MODULEROOT, module, buf);
 			if (access(buf2, F_OK) == 0) {
 				// Replace everything, mark as leaf
 				node->status = IS_MODULE;
@@ -236,7 +235,7 @@ void node_entry::clone_skeleton() {
 			continue;
 		} else if (child->status & IS_MODULE) {
 			// Mount from module file to dummy file
-			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT,
+			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MODULEROOT,
 					 child->module, full_path.c_str(), child->name.c_str());
 		} else if (child->status & (IS_SKEL | IS_INTER)) {
 			// It's an intermediate folder, recursive clone
@@ -262,7 +261,7 @@ void node_entry::magic_mount() {
 	if (status & IS_MODULE) {
 		// Mount module item
 		auto real_path = get_path();
-		snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, real_path.c_str());
+		snprintf(buf, PATH_MAX, "%s/%s%s", MODULEROOT, module, real_path.c_str());
 		bind_mount(buf, real_path.c_str());
 	} else if (status & IS_SKEL) {
 		// The node is labeled to be cloned with skeleton, lets do it
@@ -338,7 +337,7 @@ static void exec_common_script(const char* stage) {
 static void exec_module_script(const char* stage) {
 	for (const auto &m : module_list) {
 		const auto module = m.c_str();
-		snprintf(buf2, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
+		snprintf(buf2, PATH_MAX, "%s/%s/%s.sh", MODULEROOT, module, stage);
 		if (access(buf2, F_OK) == -1)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
@@ -418,18 +417,21 @@ static bool magisk_env() {
 	// Remove legacy stuffs
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
+	unlink(SECURE_DIR "/magisk.img");
+	unlink(SECURE_DIR "/magisk_merge.img");
 
-	// Symlink for legacy path users
+	// Legacy support
 	symlink(MAGISKTMP, "/sbin/.core");
+	xmkdir(MAGISKTMP "/img", 0755);
 
 	// Create directories in tmpfs overlay
 	xmkdirs(MIRRDIR "/system", 0755);
 	xmkdir(MIRRDIR "/bin", 0755);
 	xmkdir(BBPATH, 0755);
-	xmkdir(MOUNTPOINT, 0755);
 	xmkdir(BLOCKDIR, 0755);
 
-	// Boot script directories
+	// /data/adb directories
+	xmkdir(MODULEROOT, 0755);
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
@@ -454,6 +456,9 @@ static bool magisk_env() {
 			xmkdir(MIRRDIR "/vendor", 0755);
 			xmount(vendor_block, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
 			VLOGI("mount", vendor_block, MIRRDIR "/vendor");
+		} else if (str_contains(line, " /data ")) {
+			sscanf(line.c_str(), "%s", buf);
+			data_block = strdup(buf);
 		} else if (SDK_INT >= 24 &&
 		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
 			// Enforce hidepid
@@ -482,16 +487,43 @@ static bool magisk_env() {
 	return true;
 }
 
+static void upgrade_modules() {
+	DIR *dir;
+	struct dirent *entry;
+	if ((dir = opendir(MODULEUPGRADE))) {
+		while ((entry = xreaddir(dir))) {
+			if (entry->d_type == DT_DIR) {
+				if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+					continue;
+				// Cleanup old module if exists
+				snprintf(buf, sizeof(buf), "%s/%s", MODULEROOT, entry->d_name);
+				if (access(buf, F_OK) == 0)
+					rm_rf(buf);
+				LOGI("Upgrade / New module: %s\n", entry->d_name);
+				snprintf(buf2, sizeof(buf2), "%s/%s", MODULEUPGRADE, entry->d_name);
+				rename(buf2, buf);
+			}
+		}
+		closedir(dir);
+		rm_rf(MODULEUPGRADE);
+	}
+	// Legacy support
+	bind_mount(MODULEROOT, MAGISKTMP "/img");
+	xmkdir(LEGACYCORE, 0755);
+	symlink(SECURE_DIR "/post-fs-data.d", LEGACYCORE "/post-fs-data.d");
+	symlink(SECURE_DIR "/service.d", LEGACYCORE "/service.d");
+}
+
 static void collect_modules() {
-	chdir(MOUNTPOINT);
+	chdir(MODULEROOT);
+	rm_rf("lost+found");
 	DIR *dir = xopendir(".");
 	struct dirent *entry;
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_DIR) {
 			if (strcmp(entry->d_name, ".") == 0 ||
 				strcmp(entry->d_name, "..") == 0 ||
-				strcmp(entry->d_name, ".core") == 0 ||
-				strcmp(entry->d_name, "lost+found") == 0)
+				strcmp(entry->d_name, ".core") == 0)
 				continue;
 			chdir(entry->d_name);
 			if (access("remove", F_OK) == 0) {
@@ -508,47 +540,6 @@ static void collect_modules() {
 	}
 	closedir(dir);
 	chdir("/");
-}
-
-static bool prepare_img() {
-	const char *alt_img[] =
-			{ "/cache/magisk.img", "/data/magisk_merge.img", "/data/adb/magisk_merge.img" };
-
-	for (auto &alt : alt_img) {
-		if (merge_img(alt, MAINIMG)) {
-			LOGE("Image merge %s -> " MAINIMG " failed!\n", alt);
-			return false;
-		}
-	}
-
-	if (access(MAINIMG, F_OK) == -1) {
-		if (create_img(MAINIMG, 64))
-			return false;
-	}
-
-	LOGI("* Mounting " MAINIMG "\n");
-	magiskloop = mount_image(MAINIMG, MOUNTPOINT);
-	if (magiskloop == nullptr)
-		return false;
-
-	// Migrate legacy boot scripts
-	struct stat st;
-	if (lstat(LEGACY_CORE "/post-fs-data.d", &st) == 0 && S_ISDIR(st.st_mode)) {
-		cp_afc(LEGACY_CORE "/post-fs-data.d", SECURE_DIR "/post-fs-data.d");
-		rm_rf(LEGACY_CORE "/post-fs-data.d");
-	}
-	if (lstat(LEGACY_CORE "/service.d", &st) == 0 && S_ISDIR(st.st_mode)) {
-		cp_afc(LEGACY_CORE "/service.d", SECURE_DIR "/service.d");
-		rm_rf(LEGACY_CORE "/service.d");
-	}
-
-	// Links for legacy paths
-	xmkdir(LEGACY_CORE, 0755);
-	symlink(SECURE_DIR "/post-fs-data.d", LEGACY_CORE "/post-fs-data.d");
-	symlink(SECURE_DIR "/service.d", LEGACY_CORE "/service.d");
-
-	collect_modules();
-	return trim_img(MAINIMG, MOUNTPOINT, magiskloop) == 0;
 }
 
 static void install_apk(const char *apk) {
@@ -688,23 +679,19 @@ void post_fs_data(int client) {
 
 	start_logcat();
 
-	// Run common scripts
 	LOGI("* Running post-fs-data.d scripts\n");
 	exec_common_script("post-fs-data");
+
+	upgrade_modules();
 
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
 		core_only();
 
-	if (!prepare_img()) {
-		LOGE("* Magisk image mount failed, switch to core-only mode\n");
-		free(magiskloop);
-		magiskloop = nullptr;
-		creat(DISABLEFILE, 0644);
-	}
-
 	restorecon();
 	chmod(SECURE_DIR, 0700);
+
+	collect_modules();
 
 	// Execute module scripts
 	LOGI("* Running module post-fs-data scripts\n");
@@ -726,17 +713,17 @@ void post_fs_data(int client) {
 	for (const auto &m : module_list) {
 		const auto module = m.c_str();
 		// Read props
-		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MOUNTPOINT, module);
+		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MODULEROOT, module);
 		if (access(buf, F_OK) == 0) {
 			LOGI("%s: loading [system.prop]\n", module);
 			load_prop_file(buf, false);
 		}
 		// Check whether enable auto_mount
-		snprintf(buf, PATH_MAX, "%s/%s/auto_mount", MOUNTPOINT, module);
+		snprintf(buf, PATH_MAX, "%s/%s/auto_mount", MODULEROOT, module);
 		if (access(buf, F_OK) == -1)
 			continue;
 		// Double check whether the system folder exists
-		snprintf(buf, PATH_MAX, "%s/%s/system", MOUNTPOINT, module);
+		snprintf(buf, PATH_MAX, "%s/%s/system", MODULEROOT, module);
 		if (access(buf, F_OK) == -1)
 			continue;
 
@@ -744,9 +731,9 @@ void post_fs_data(int client) {
 		has_modules = true;
 		LOGI("%s: constructing magic mount structure\n", module);
 		// If /system/vendor exists in module, create a link outside
-		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MOUNTPOINT, module);
+		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MODULEROOT, module);
 		if (access(buf, F_OK) == 0) {
-			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MOUNTPOINT, module);
+			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MODULEROOT, module);
 			unlink(buf2);
 			xsymlink(buf, buf2);
 		}

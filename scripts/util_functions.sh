@@ -52,7 +52,8 @@ abort() {
 
 resolve_vars() {
   MAGISKBIN=$NVBASE/magisk
-  IMG=$NVBASE/magisk.img
+  POSTFSDATAD=$NVBASE/post-fs-data.d
+  SERVICED=$NVBASE/service.d
 }
 
 ######################
@@ -351,7 +352,9 @@ find_manager_apk() {
 set_perm() {
   chown $2:$3 $1 || return 1
   chmod $4 $1 || return 1
-  [ -z $5 ] && chcon 'u:object_r:system_file:s0' $1 || chcon $5 $1 || return 1
+  CON=$5
+  [ -z $CON ] && CON=u:object_r:system_file:s0
+  chcon $CON $1 || return 1
 }
 
 set_perm_recursive() {
@@ -370,63 +373,29 @@ mktouch() {
 }
 
 request_size_check() {
-  reqSizeM=`du -ms $1 | cut -f1`
+  reqSizeM=`du -ms "$1" | cut -f1`
 }
 
 request_zip_size_check() {
   reqSizeM=`unzip -l "$1" | tail -n 1 | awk '{ print int(($1 - 1) / 1048576 + 1) }'`
 }
 
-check_filesystem() {
-  curSizeM=`wc -c < $1`
-  curSizeM=$((curSizeM / 1048576))
-  local DF=`df -Pk $2 | grep $2`
-  curUsedM=`echo $DF | awk '{ print int($3 / 1024) }'`
-  curFreeM=`echo $DF | awk '{ print int($4 / 1024) }'`
-}
-
-mount_snippet() {
-  MAGISKLOOP=`$MAGISKBIN/magisk imgtool mount $IMG $MOUNTPATH`
-  is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
-}
-
-mount_magisk_img() {
-  [ -z $reqSizeM ] && reqSizeM=0
-  mkdir -p $MOUNTPATH 2>/dev/null
-  if [ -f "$IMG" ]; then
-    ui_print "- Found $IMG"
-    mount_snippet
-    check_filesystem $IMG $MOUNTPATH
-    if [ $reqSizeM -gt $curFreeM ]; then
-      newSizeM=$(((curSizeM + reqSizeM - curFreeM) / 32 * 32 + 64))
-      ui_print "- Resizing $IMG to ${newSizeM}M"
-      $MAGISKBIN/magisk imgtool umount $MOUNTPATH $MAGISKLOOP
-      $MAGISKBIN/magisk imgtool resize $IMG $newSizeM >&2
-      mount_snippet
-    fi
-    ui_print "- Mount $IMG to $MOUNTPATH"
-  else
-    newSizeM=$((reqSizeM / 32 * 32 + 64))
-    ui_print "- Creating $IMG with size ${newSizeM}M"
-    $MAGISKBIN/magisk imgtool create $IMG $newSizeM >&2
-    mount_snippet
-  fi
-}
-
-unmount_magisk_img() {
-  check_filesystem $IMG $MOUNTPATH
-  newSizeM=$((curUsedM / 32 * 32 + 64))
-  $MAGISKBIN/magisk imgtool umount $MOUNTPATH $MAGISKLOOP
-  if [ $curSizeM -gt $newSizeM ]; then
-    ui_print "- Shrinking $IMG to ${newSizeM}M"
-    $MAGISKBIN/magisk imgtool resize $IMG $newSizeM >&2
-  fi
-}
-
 ##################################
 # Backwards Compatibile Functions
 ##################################
+
 get_outfd() { setup_flashable; }
+
+mount_magisk_img() {
+  $BOOTMODE && MODULE_BASE=modules_update || MODULE_BASE=modules
+  MODULEPATH=$NVBASE/$MODULE_BASE
+  mkdir -p $MODULEPATH 2>/dev/null
+  ln -s $MODULEPATH $MOUNTPATH
+}
+
+unmount_magisk_img() {
+  rm -f $MODULEPATH 2>/dev/null
+}
 
 #######
 # main

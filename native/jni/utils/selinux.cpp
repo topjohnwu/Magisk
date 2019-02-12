@@ -162,7 +162,8 @@ void restorecon() {
 	if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0)
 		lsetfilecon(SECURE_DIR, ADB_CON);
 	close(fd);
-	fd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
+	lsetfilecon(MODULEROOT, MAGISK_CON);
+	fd = xopen(MODULEROOT, O_RDONLY | O_CLOEXEC);
 	restore_syscon(fd);
 	close(fd);
 	fd = xopen(DATABIN, O_RDONLY | O_CLOEXEC);

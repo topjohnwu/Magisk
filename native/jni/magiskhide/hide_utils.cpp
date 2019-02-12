@@ -233,7 +233,7 @@ int rm_list(int client) {
 	return ret;
 }
 
-#define LEGACY_LIST MOUNTPOINT "/.core/hidelist"
+#define LEGACY_LIST MODULEROOT "/.core/hidelist"
 
 static int collect_list(void *, int, char **data, char**) {
 	LOGI("hide_list: [%s]\n", data[0]);
