@@ -12,7 +12,6 @@
 #include <utils.h>
 #include <resetprop.h>
 #include <db.h>
-#include <logcat.h>
 
 #include "magiskhide.h"
 
@@ -197,6 +196,10 @@ int add_list(int client) {
 	char *proc = read_string(client);
 	int ret = add_list(proc);
 	free(proc);
+
+	// Update inotify list
+	update_apk_list();
+
 	return ret;
 }
 
@@ -230,6 +233,10 @@ int rm_list(int client) {
 	char *proc = read_string(client);
 	int ret = rm_list(proc);
 	free(proc);
+
+	// Update inotify list
+	update_apk_list();
+
 	return ret;
 }
 
@@ -283,9 +290,6 @@ int launch_magiskhide(int client) {
 	if (hide_enabled)
 		return HIDE_IS_ENABLED;
 
-	if (!logcat_started)
-		return LOGCAT_DISABLED;
-
 	hide_enabled = true;
 	set_hide_config();
 	LOGI("* Starting MagiskHide\n");
@@ -328,8 +332,6 @@ int stop_magiskhide() {
 }
 
 void auto_start_magiskhide() {
-	if (!start_logcat())
-		return;
 	db_settings dbs;
 	get_db_settings(&dbs, HIDE_CONFIG);
 	if (dbs[HIDE_CONFIG]) {
