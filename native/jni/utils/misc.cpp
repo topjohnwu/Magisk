@@ -11,12 +11,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/sysmacros.h>
-#include <vector>
 
 #include <logging.h>
 #include <utils.h>
-
-using namespace std;
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
@@ -195,8 +192,7 @@ int exec_command(exec_t &exec) {
 	exit(-1);
 }
 
-int exec_command_sync(const char **argv) {
-	exec_t exec { .argv = argv };
+int exec_command_sync(exec_t &exec) {
 	int pid, status;
 	pid = exec_command(exec);
 	if (pid < 0)

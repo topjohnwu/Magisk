@@ -162,11 +162,17 @@ int exec_command(exec_t &exec, Args &&...args) {
 	exec.argv = argv;
 	return exec_command(exec);
 }
-int exec_command_sync(const char **argv);
+int exec_command_sync(exec_t &exec);
+template <class ...Args>
+int exec_command_sync(exec_t &exec, Args &&...args) {
+	const char *argv[] = {args..., nullptr};
+	exec.argv = argv;
+	return exec_command_sync(exec);
+}
 template <class ...Args>
 int exec_command_sync(Args &&...args) {
-	const char *argv[] = {args..., nullptr};
-	return exec_command_sync(argv);
+	exec_t exec{};
+	return exec_command_sync(exec, args...);
 }
 
 #endif

@@ -324,9 +324,7 @@ static void exec_common_script(const char* stage) {
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			exec_t exec { .pre_exec = strcmp(stage, "post-fs-data") ? set_path : set_mirror_path };
-			int pid = exec_command(exec, MIRRDIR "/system/bin/sh", entry->d_name);
-			if (pid != -1)
-				waitpid(pid, nullptr, 0);
+			exec_command_sync(exec, MIRRDIR "/system/bin/sh", entry->d_name);
 		}
 	}
 
@@ -342,9 +340,7 @@ static void exec_module_script(const char* stage) {
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		exec_t exec { .pre_exec = strcmp(stage, "post-fs-data") ? set_path : set_mirror_path };
-		int pid = exec_command(exec, MIRRDIR "/system/bin/sh", buf2);
-		if (pid != -1)
-			waitpid(pid, nullptr, 0);
+		exec_command_sync(exec, MIRRDIR "/system/bin/sh", buf2);
 	}
 }
 
@@ -417,8 +413,6 @@ static bool magisk_env() {
 	// Remove legacy stuffs
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
-	unlink(SECURE_DIR "/magisk.img");
-	unlink(SECURE_DIR "/magisk_merge.img");
 
 	// Legacy support
 	symlink(MAGISKTMP, "/sbin/.core");
@@ -487,7 +481,35 @@ static bool magisk_env() {
 	return true;
 }
 
+/* Too lazy to do it natively, let's write some scripts */
+static const char migrate_cmd[] =
+"IMG=%s;"
+"MNT=/dev/img_mnt;"
+"e2fsck -yf $IMG;"
+"mkdir -p $MNT;"
+"for num in 0 1 2 3 4 5 6 7; do"
+"  losetup /dev/block/loop${num} $IMG || continue;"
+"  mount -t ext4 /dev/block/loop${num} $MNT;"
+"  rm -rf $MNT/lost+found $MNT/.core;"
+"  magisk --clone $MNT " MODULEROOT ";"
+"  umount $MNT;"
+"  rm -rf $MNT;"
+"  losetup -d /dev/block/loop${num};"
+"  break;"
+"done;"
+"rm -rf $IMG";
+
 static void upgrade_modules() {
+	const char *legacy_imgs[] = {SECURE_DIR "/magisk.img", SECURE_DIR "/magisk_merge.img"};
+	for (auto img : legacy_imgs) {
+		if (access(img, F_OK) == 0) {
+			LOGI("* Migrating %s\n", img);
+			exec_t exec { .pre_exec = set_path };
+			char cmds[sizeof(migrate_cmd) + 32];
+			sprintf(cmds, migrate_cmd, img);
+			exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+		}
+	}
 	DIR *dir;
 	struct dirent *entry;
 	if ((dir = opendir(MODULEUPGRADE))) {
