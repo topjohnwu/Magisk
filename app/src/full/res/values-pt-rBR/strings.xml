@@ -18,6 +18,18 @@
     <string name="safetyNet_check_success">SafetyNet Verificado Com Sucesso</string>
     <string name="safetyNet_api_error">Erro de SafetyNet API</string>
     <string name="safetyNet_res_invalid">A resposta é inválida</string>
+    <string name="magisk_up_to_date">Magisk atualizado</string>
+    <string name="manager_up_to_date">Gerenciador Magisk atualizado</string>
+    <string name="advanced_settings_title">Configurações Avançadas</string>
+    <string name="keep_force_encryption">Manter encriptação forçada</string>
+    <string name="keep_dm_verity">Manter AVB 2.0/dm-verity</string>
+    <string name="current_installed">Instalado: %1$s</string>
+    <string name="latest_version">Último: %1$s</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="uninstall_magisk_title">Desinstalar o Magisk</string>
+    <string name="uninstall_magisk_msg">Todos os módulos serão desativados/removidos. O acesso Root será removido, e seus dados provavelmente serão criptografados se já não estiverem.</string>
+    <string name="update">Atualizar</string>
+    <string name="core_only_enabled">(Modo somente núcleo ativado)</string>
 
     <!--Install Fragment-->
     <string name="advanced_settings_title">Configurações Avançadas</string>
@@ -80,7 +92,7 @@
     <string name="dtbo_patched_title">DTBO foi emendado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager emendou dtbo.img, reinicie</string>
     <string name="update_channel">Atualizações do Magisk</string>
-    <string name="flashing">Gravando</string>
+    <string name="flashing">Flasheando</string>
     <string name="hide_manager_title">Ocultando Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Falha ao ocultar Magisk Manager…</string>
     <string name="download_zip_only">Baixar Zip Apenas</string>
@@ -163,7 +175,7 @@
     <string name="requester_summary">As sessões root herdarão espaço de nome de seu solicitante</string>
     <string name="isolate_summary">Cada sessão root terá seu próprio espaço de nome isolado</string>
     <string name="android_o_not_support">Não suporta Android 8.0+</string>
-    <string name="disable_fingerprint">Nenhuma impressão digital foi definida ou dispostivo sem suporte</string>
+    <string name="disable_fingerprint">Nenhuma impressão digital foi definida ou o dispostivo não tem suporte</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitação de Superusuário</string>
@@ -185,17 +197,21 @@
     <string name="su_snack_deny">Direitos de Superusuário de %1$s estão negados</string>
     <string name="su_snack_notif_on">Notificações de %1$s estão ativadas</string>
     <string name="su_snack_notif_off">Notificações de %1$s estão desativadas</string>
-    <string name="su_snack_log_on">Registração de %1$s está ativada</string>
-    <string name="su_snack_log_off">Registração de %1$s está desativada</string>
+    <string name="su_snack_log_on">Os logs de %1$s serão gravados</string>
+    <string name="su_snack_log_off">Os logs de %1$s não serão gravados</string>
     <string name="su_snack_revoke">Direitos de %1$s estão revogados</string>
     <string name="su_revoke_title">Revogar?</string>
     <string name="su_revoke_msg">Revogar os direitos de %1$s?</string>
-    <string name="toast">Torrada</string>
+    <string name="toast">Notificação toast</string>
     <string name="none">Nenhuma</string>
     <string name="auth_fail">Falha de Autenticação</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">Alvo UID: %1$d</string>
     <string name="command">Comando: %1$s</string>
+    
+    <!-- MagiskHide -->
+        <string name="show_system_app">Exibir apps de sistema</string>
 
 </resources>
