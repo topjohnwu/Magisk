@@ -77,7 +77,7 @@ public class Utils {
 
     public static String getAppLabel(ApplicationInfo info, PackageManager pm) {
         try {
-            if (info.labelRes > 0 && Build.VERSION.SDK_INT >= 17) {
+            if (info.labelRes > 0) {
                 Resources res = pm.getResourcesForApplication(info);
                 Configuration config = new Configuration();
                 config.setLocale(LocaleManager.locale);

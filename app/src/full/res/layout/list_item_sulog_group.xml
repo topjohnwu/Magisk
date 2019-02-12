@@ -14,7 +14,6 @@
         android:layout_width="wrap_content"
         android:layout_height="25dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
         android:tint="?attr/imageColorTint"
         app:srcCompat="@drawable/ic_arrow" />
 
