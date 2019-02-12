@@ -191,7 +191,7 @@ def build_binary(args):
     os.utime(os.path.join('native', 'jni', 'include', 'flags.h'))
 
     # Basic flags
-    base_flags = f'MAGISK_VERSION="{config["version"]}" MAGISK_VER_CODE={config["versionCode"]}'
+    base_flags = f'MAGISK_VERSION={config["version"]} MAGISK_VER_CODE={config["versionCode"]}'
     if not args.release:
         base_flags += ' MAGISK_DEBUG=1'
 

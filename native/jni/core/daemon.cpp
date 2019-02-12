@@ -70,7 +70,7 @@ static void *request_handler(void *args) {
 		su_daemon_handler(client, &credential);
 		break;
 	case CHECK_VERSION:
-		write_string(client, xstr(MAGISK_VERSION) ":MAGISK");
+		write_string(client, MAGISK_VERSION ":MAGISK");
 		close(client);
 		break;
 	case CHECK_VERSION_CODE:
@@ -109,7 +109,7 @@ static void main_daemon() {
 	xdup2(fd, STDIN_FILENO);
 	close(fd);
 
-	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
+	LOGI(SHOW_VER(Magisk) " daemon started\n");
 
 	// Get server stat
 	stat("/proc/self/exe", &SERVER_STAT);

@@ -55,7 +55,7 @@ illegal:
 
 [[noreturn]] static void usage(char* arg0) {
 	fprintf(stderr,
-		"resetprop v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu & nkk71) - System Props Modification Tool\n\n"
+		FULL_VER(resetprop) " - System Props Modification Tool\n\n"
 		"Usage: %s [flags] [options...]\n"
 		"\n"
 		"Options:\n"

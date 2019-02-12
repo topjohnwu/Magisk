@@ -11,9 +11,6 @@
 extern "C" {
 #endif
 
-#define str(a) #a
-#define xstr(a) str(a)
-
 typedef enum {
 	L_DEBUG,
 	L_INFO,

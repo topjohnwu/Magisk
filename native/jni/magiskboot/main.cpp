@@ -107,7 +107,7 @@ static void usage(char *arg0) {
 
 int main(int argc, char *argv[]) {
 	cmdline_logging();
-	fprintf(stderr, "MagiskBoot v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Boot Image Modification Tool\n");
+	fprintf(stderr, FULL_VER(MagiskBoot) " - Boot Image Modification Tool\n");
 
 	umask(0);
 	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {

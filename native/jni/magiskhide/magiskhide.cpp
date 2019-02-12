@@ -17,7 +17,7 @@ bool hide_enabled = false;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-		"MagiskHide v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu)\n\n"
+		FULL_VER(MagiskHide) "\n\n"
 		"Usage: %s [--option [arguments...] ]\n\n"
 		"Options:\n"
   		"  --status          Return the status of MagiskHide\n"

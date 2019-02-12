@@ -13,7 +13,7 @@
 
 [[noreturn]] static void usage() {
 	fprintf(stderr,
-		"Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) multi-call binary\n"
+		FULL_VER(Magisk) " multi-call binary\n"
 		"\n"
 		"Usage: magisk [applet [arguments]...]\n"
 		"   or: magisk [options]...\n"
@@ -48,7 +48,7 @@ int magisk_main(int argc, char *argv[]) {
 	if (argc < 2)
 		usage();
 	if (strcmp(argv[1], "-c") == 0) {
-		printf("%s (%d)\n", xstr(MAGISK_VERSION) ":MAGISK", MAGISK_VER_CODE);
+		printf(MAGISK_VERSION ":MAGISK (" str(MAGISK_VER_CODE) ")\n");
 		return 0;
 	} else if (strcmp(argv[1], "-v") == 0) {
 		int fd = connect_daemon();

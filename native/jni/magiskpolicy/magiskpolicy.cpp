@@ -86,7 +86,7 @@ static const char *type_msg_6 =
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-		"MagiskPolicy v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu)\n\n"
+		FULL_VER(MagiskPolicy) "\n\n"
 		"Usage: %s [--options...] [policy statements...]\n"
 		"\n"
 		"Options:\n"
