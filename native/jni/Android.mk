@@ -33,7 +33,6 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	core/applets.cpp \
-	core/img.cpp \
 	core/magisk.cpp \
 	core/daemon.cpp \
 	core/logcat.cpp \

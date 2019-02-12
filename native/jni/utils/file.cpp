@@ -80,20 +80,12 @@ void in_order_walk(int dirfd, void (*callback)(int, struct dirent*)) {
 	}
 }
 
-static void rm_cb(int dirfd, struct dirent *entry) {
-	switch (entry->d_type) {
-	case DT_DIR:
-		unlinkat(dirfd, entry->d_name, AT_REMOVEDIR);
-		break;
-	default:
-		unlinkat(dirfd, entry->d_name, 0);
-		break;
-	}
-}
-
 void rm_rf(const char *path) {
-	int fd = open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
-	if (fd >= 0) {
+	struct stat st;
+	if (lstat(path, &st) < 0)
+		return;
+	if (S_ISDIR(st.st_mode)) {
+		int fd = open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
 		frm_rf(fd);
 		close(fd);
 	}
@@ -101,7 +93,9 @@ void rm_rf(const char *path) {
 }
 
 void frm_rf(int dirfd) {
-	in_order_walk(dirfd, rm_cb);
+	in_order_walk(dirfd, [](auto dirfd, auto entry) -> void {
+		unlinkat(dirfd, entry->d_name, entry->d_type == DT_DIR ? AT_REMOVEDIR : 0);
+	});
 }
 
 /* This will only on the same file system */
