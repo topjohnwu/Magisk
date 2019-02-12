@@ -292,7 +292,7 @@ remove_system_su() {
       cd /system/bin
       if [ -e app_process64 ]; then
         ln -sf app_process64 app_process
-      else
+      elif [ -e app_process32 ]; then
         ln -sf app_process32 app_process
       fi
     fi
