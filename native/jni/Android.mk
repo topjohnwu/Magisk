@@ -35,7 +35,6 @@ LOCAL_SRC_FILES := \
 	core/applets.cpp \
 	core/magisk.cpp \
 	core/daemon.cpp \
-	core/logcat.cpp \
 	core/bootstages.cpp \
 	core/socket.cpp \
 	core/db.cpp \

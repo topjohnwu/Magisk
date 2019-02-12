@@ -16,6 +16,9 @@ int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
 
+// Update APK list for inotify
+void update_apk_list();
+
 // Process monitor
 void proc_monitor();
 
@@ -42,8 +45,7 @@ enum {
 };
 
 enum {
-	LOGCAT_DISABLED = DAEMON_LAST,
-	HIDE_IS_ENABLED,
+	HIDE_IS_ENABLED = DAEMON_LAST,
 	HIDE_NOT_ENABLED,
 	HIDE_ITEM_EXIST,
 	HIDE_ITEM_NOT_EXIST

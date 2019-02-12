@@ -110,9 +110,6 @@ int magiskhide_main(int argc, char *argv[]) {
 	switch (code) {
 	case DAEMON_SUCCESS:
 		break;
-	case LOGCAT_DISABLED:
-		fprintf(stderr, "Logcat is disabled, cannot start MagiskHide\n");
-		break;
 	case HIDE_NOT_ENABLED:
 		fprintf(stderr, "MagiskHide is not enabled\n");
 		break;

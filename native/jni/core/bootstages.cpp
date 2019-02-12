@@ -22,7 +22,6 @@
 #include <daemon.h>
 #include <resetprop.h>
 #include <selinux.h>
-#include <logcat.h>
 #include <flags.h>
 
 using namespace std;
@@ -698,8 +697,6 @@ void post_fs_data(int client) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
 		unblock_boot_process();
 	}
-
-	start_logcat();
 
 	LOGI("* Running post-fs-data.d scripts\n");
 	exec_common_script("post-fs-data");
