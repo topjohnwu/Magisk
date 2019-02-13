@@ -1,6 +1,7 @@
 APP_ABI := armeabi-v7a x86
 APP_CFLAGS := -Oz -std=gnu11 \
--D__MVSTR=${MAGISK_VERSION} -D__MCODE=${MAGISK_VER_CODE}
+    -fno-exceptions -fno-rtti -fomit-frame-pointer \
+    -D__MVSTR=${MAGISK_VERSION} -D__MCODE=${MAGISK_VER_CODE}
 APP_CPPFLAGS := -std=c++17
 APP_STL := c++_static
 APP_PLATFORM := android-16
