@@ -9,6 +9,10 @@
 
 #define TERM_THREAD SIGUSR1
 
+#define SAFETYNET_COMPONENT  "com.google.android.gms/.droidguard.DroidGuardService"
+#define SAFETYNET_PROCESS    "com.google.android.gms.unstable"
+#define SAFETYNET_PKG        "com.google.android.gms"
+
 // Daemon entries
 int launch_magiskhide(int client);
 int stop_magiskhide();
