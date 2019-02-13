@@ -84,6 +84,25 @@ static inline uid_t get_uid(const int pid) {
 	return st.st_uid;
 }
 
+static bool is_pid_safetynet_process(const int pid) {
+	char path[32];
+	char buf[64];
+	int fd;
+	ssize_t len;
+
+	sprintf(path, "/proc/%d/cmdline", pid);
+	fd = open(path, O_RDONLY);
+	if (fd == -1)
+		return false;
+
+	len = read(fd, buf, sizeof(buf));
+	close(fd);
+	if (len == -1)
+		return false;
+
+	return !strcmp(buf, SAFETYNET_PROCESS);
+}
+
 static void hide_daemon(int pid) {
 	LOGD("hide_daemon: handling pid=[%d]\n", pid);
 
@@ -147,6 +166,8 @@ static DIR *dfd;
 static unordered_map<int, uint64_t> pid_ns_map;
 // Use set for slow insertion but fast searching(which we'd encounter a lot more)
 static set<uid_t> hide_uid;
+// Treat GMS separately as we're only interested in one component
+static int gms_uid = -1;
 
 static void detect_new_processes() {
 	struct dirent *dp;
@@ -187,6 +208,14 @@ static void detect_new_processes() {
 			}
 
 			if (hide) {
+				if (uid == gms_uid) {
+					// Check /proc/uid/cmdline to see if it's SAFETYNET_PROCESS
+					if (!is_pid_safetynet_process(pid))
+						continue;
+
+					LOGI("proc_monitor: found %s\n", SAFETYNET_PROCESS);
+				}
+
 				// Send pause signal ASAP
 				if (kill(pid, SIGSTOP) == -1)
 					continue;
@@ -209,9 +238,7 @@ static void listdir_apk(const char *name) {
 	DIR *dir;
 	struct dirent *entry;
 	const char *ext;
-	char buf[4096];
 	char path[4096];
-	char *ptr;
 
 	if (!(dir = opendir(name)))
 		return;
@@ -230,13 +257,8 @@ static void listdir_apk(const char *name) {
 			if (!strncmp(".apk", ext, 4)) {
 				pthread_mutex_lock(&list_lock);
 				for (auto &s : hide_list) {
-					// Replace '/' with '\0' to stop reading beyond the actual package name
-					strcpy(buf, s.c_str());
-					if ((ptr = strchr(buf, '/')))
-						ptr[0] = '\0';
-
 					// Compare with (path + 10) to trim "/data/app/"
-					if (strncmp(path + 10, buf, strlen(buf)) == 0) {
+					if (strncmp(path + 10, s.c_str(), s.length()) == 0) {
 						if (inotify_add_watch(inotify_fd, path, IN_OPEN | IN_DELETE) > 0) {
 							LOGI("proc_monitor: Monitoring %s\n", path, inotify_fd);
 						} else {
@@ -257,9 +279,8 @@ static void update_pkg_list() {
 	DIR *dir;
 	struct dirent *entry;
 	struct stat st;
-	char buf[4096];
 	char path[4096];
-	char *ptr;
+	const char* target;
 	const char data_path[] = "/data/data";
 
 	if (!(dir = opendir(data_path)))
@@ -279,17 +300,18 @@ static void update_pkg_list() {
 		if (entry->d_type == DT_DIR) {
 			pthread_mutex_lock(&list_lock);
 			for (auto &s : hide_list) {
-				// Replace '/' with '\0' to stop reading beyond the actual package name
-				strcpy(buf, s.c_str());
-				if ((ptr = strchr(buf, '/')))
-					ptr[0] = '\0';
-
-				if (strcmp(entry->d_name, buf) == 0) {
+				target = s.c_str();
+				if (strcmp(entry->d_name, target) == 0) {
 					if (stat(path, &st) == -1)
 						continue;
 
-					LOGI("proc_monitor: %s UID is %d\n", buf, st.st_uid);
+					LOGI("proc_monitor: %s UID is %d\n", target, st.st_uid);
 					hide_uid.insert(st.st_uid);
+
+					if (strcmp(entry->d_name, SAFETYNET_PKG) == 0) {
+						LOGI("proc_monitor: Got GMS: %d\n", st.st_uid);
+						gms_uid = st.st_uid;
+					}
 				}
 			}
 			pthread_mutex_unlock(&list_lock);
