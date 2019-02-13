@@ -385,7 +385,7 @@ void write_zero(int fd, size_t size) {
 }
 
 vector<string> file_to_vector(const char *filename) {
-	auto arr = vector<string>();
+	vector<string> arr;
 	if (access(filename, R_OK) != 0)
 		return arr;
 	char *line = nullptr;

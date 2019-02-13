@@ -22,7 +22,6 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <set>
 
 #include <magisk.h>
 #include <utils.h>
@@ -33,15 +32,21 @@ using namespace std;
 
 extern char *system_block, *vendor_block, *data_block;
 
+static int inotify_fd = -1;
+
 #define EVENT_SIZE	sizeof(struct inotify_event)
 #define EVENT_BUF_LEN	(1024 * (EVENT_SIZE + 16))
+#define __ALIGN_EVENT __attribute__ ((aligned(__alignof__(struct inotify_event))))
 
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
 	LOGD("proc_monitor: running cleanup\n");
 	hide_list.clear();
+	hide_uid.clear();
 	hide_enabled = false;
 	pthread_mutex_destroy(&list_lock);
+	close(inotify_fd);
+	inotify_fd = -1;
 	LOGD("proc_monitor: terminating\n");
 	pthread_exit(nullptr);
 }
@@ -164,21 +169,16 @@ static inline int fast_atoi(const char *str) {
 static DIR *dfd;
 // Use unordered map with pid and namespace inode number to avoid time-consuming GC
 static unordered_map<int, uint64_t> pid_ns_map;
-// Use set for slow insertion but fast searching(which we'd encounter a lot more)
-static set<uid_t> hide_uid;
-// Treat GMS separately as we're only interested in one component
-static int gms_uid = -1;
 
 static void detect_new_processes() {
 	struct dirent *dp;
 	struct stat ns, pns;
 	int pid, ppid;
-	bool hide;
 	uid_t uid;
-	unordered_map<int, uint64_t>::const_iterator pos;
 
 	// Iterate through /proc and get a process that reads the target APK
 	rewinddir(dfd);
+	pthread_mutex_lock(&list_lock);
 	while ((dp = readdir(dfd))) {
 		if (!isdigit(dp->d_name[0]))
 			continue;
@@ -191,23 +191,16 @@ static void detect_new_processes() {
 			continue;
 
 		uid = get_uid(pid) % 100000; // Handle multiuser
-		if (hide_uid.find(uid) != hide_uid.end()) {
+		bool is_target = hide_uid.count(uid) != 0;
+		if (is_target) {
 			// Make sure our target is alive
 			if ((ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns) || read_ns(pid, &ns))
 				continue;
 
 			// Check if it's a process we haven't already hijacked
-			hide = false;
-			pos = pid_ns_map.find(pid);
-			if (pos == pid_ns_map.end()) {
-				hide = true;
-				pid_ns_map.insert(pair<int, uint64_t>(pid, ns.st_ino));
-			} else if (pos->second != ns.st_ino) {
-				hide = true;
-				pid_ns_map[pos->first] = ns.st_ino;
-			}
-
-			if (hide) {
+			auto pos = pid_ns_map.find(pid);
+			if (pos == pid_ns_map.end() || pos->second != ns.st_ino) {
+				pid_ns_map[pid] = ns.st_ino;
 				if (uid == gms_uid) {
 					// Check /proc/uid/cmdline to see if it's SAFETYNET_PROCESS
 					if (!is_pid_safetynet_process(pid))
@@ -225,15 +218,15 @@ static void detect_new_processes() {
 				 * We have to fork a new process, setns, then do the unmounts
 				 */
 				LOGI("proc_monitor: UID=[%ju] PID=[%d] ns=[%llu]\n",
-					(uintmax_t)uid, pid, ns.st_ino);
+					 (uintmax_t)uid, pid, ns.st_ino);
 				if (fork_dont_care() == 0)
 					hide_daemon(pid);
 			}
 		}
 	}
+	pthread_mutex_unlock(&list_lock);
 }
 
-static int inotify_fd = 0;
 static void listdir_apk(const char *name) {
 	DIR *dir;
 	struct dirent *entry;
@@ -260,9 +253,9 @@ static void listdir_apk(const char *name) {
 					// Compare with (path + 10) to trim "/data/app/"
 					if (strncmp(path + 10, s.c_str(), s.length()) == 0) {
 						if (inotify_add_watch(inotify_fd, path, IN_OPEN | IN_DELETE) > 0) {
-							LOGI("proc_monitor: Monitoring %s\n", path, inotify_fd);
+							LOGI("proc_monitor: Monitoring %s\n", path);
 						} else {
-							LOGE("proc_monitor: Failed to monitor %s: %s\n", strerror(errno));
+							LOGE("proc_monitor: Failed to monitor %s: %s\n", path, strerror(errno));
 						}
 						break;
 					}
@@ -275,58 +268,12 @@ static void listdir_apk(const char *name) {
 	closedir(dir);
 }
 
-static void update_pkg_list() {
-	DIR *dir;
-	struct dirent *entry;
-	struct stat st;
-	char path[4096];
-	const char* target;
-	const char data_path[] = "/data/data";
-
-	if (!(dir = opendir(data_path)))
-		return;
-
-	pthread_mutex_lock(&list_lock);
-	for (auto &s : hide_list)
-		LOGD("proc_monitor: hide_list: %s\n", s.c_str());
-	pthread_mutex_unlock(&list_lock);
-
-	hide_uid.clear();
-
-	while ((entry = readdir(dir)) != NULL) {
-		snprintf(path, sizeof(path), "%s/%s", data_path,
-			 entry->d_name);
-
-		if (entry->d_type == DT_DIR) {
-			pthread_mutex_lock(&list_lock);
-			for (auto &s : hide_list) {
-				target = s.c_str();
-				if (strcmp(entry->d_name, target) == 0) {
-					if (stat(path, &st) == -1)
-						continue;
-
-					LOGI("proc_monitor: %s UID is %d\n", target, st.st_uid);
-					hide_uid.insert(st.st_uid);
-
-					if (strcmp(entry->d_name, SAFETYNET_PKG) == 0) {
-						LOGI("proc_monitor: Got GMS: %d\n", st.st_uid);
-						gms_uid = st.st_uid;
-					}
-				}
-			}
-			pthread_mutex_unlock(&list_lock);
-		}
-	}
-
-	closedir(dir);
-}
-
 // Iterate through /data/app and search all .apk files
-void update_apk_list() {
+void update_inotify_mask() {
 	// Setup inotify
 	const char data_app[] = "/data/app";
 
-	if (inotify_fd)
+	if (inotify_fd >= 0)
 		close(inotify_fd);
 
 	inotify_fd = inotify_init();
@@ -344,9 +291,6 @@ void update_apk_list() {
 	} else {
 		LOGE("proc_monitor: Failed to monitor %s: %s\n", strerror(errno));
 	}
-
-	// Update pkg_uid_map by reading from /data/data
-	update_pkg_list();
 }
 
 void proc_monitor() {
@@ -366,8 +310,6 @@ void proc_monitor() {
 		term_thread(TERM_THREAD);
 	}
 
-	update_apk_list();
-
 	if ((dfd = opendir("/proc")) == NULL) {
 		LOGE("proc_monitor: Unable to open /proc\n");
 		term_thread(TERM_THREAD);
@@ -380,11 +322,11 @@ void proc_monitor() {
 	struct inotify_event *event;
 	ssize_t len;
 	char *p;
-	char buffer[EVENT_BUF_LEN] __attribute__ ((aligned(__alignof__(struct inotify_event))));
+	char buffer[EVENT_BUF_LEN] __ALIGN_EVENT;
 	for (;;) {
 		len = read(inotify_fd, buffer, EVENT_BUF_LEN);
 		if (len == -1) {
-			LOGE("proc_monitor: failed to read from inotify: %s\n", strerror(errno));
+			PLOGE("proc_monitor: read inotify");
 			sleep(1);
 			continue;
 		}
@@ -399,7 +341,10 @@ void proc_monitor() {
 				detect_new_processes();
 			} else {
 				LOGI("proc_monitor: inotify: /data/app change detected\n");
-				update_apk_list();
+				pthread_mutex_lock(&list_lock);
+				refresh_uid();
+				pthread_mutex_unlock(&list_lock);
+				update_inotify_mask();
 				break;
 			}
 

@@ -17,8 +17,13 @@
 
 using namespace std;
 
-vector<string> hide_list;
+// Protect access to both hide_list and hide_uid
 pthread_mutex_t list_lock;
+vector<string> hide_list;
+set<uid_t> hide_uid;
+
+// Treat GMS separately as we're only interested in one component
+int gms_uid = -1;
 
 static pthread_t proc_monitor_thread;
 
@@ -157,6 +162,24 @@ static void kill_process(const char *name) {
 		*slash = '/';
 }
 
+static int add_pkg_uid(const char *proc) {
+	char path[4096];
+	struct stat st;
+	const char *data = SDK_INT >= 24 ? "/data/user_de/0" : "/data/data";
+	sprintf(path, "%s/%s", data, proc);
+	if (xstat(path, &st) == 0) {
+		hide_uid.insert(st.st_uid);
+		return st.st_uid;
+	}
+	return -1;
+}
+
+void refresh_uid() {
+	hide_uid.clear();
+	for (auto &s : hide_list)
+		add_pkg_uid(s.c_str());
+}
+
 void clean_magisk_props() {
 	LOGD("hide_utils: Cleaning magisk props\n");
 	getprop([](const char *name, auto, auto) -> void {
@@ -167,12 +190,9 @@ void clean_magisk_props() {
 
 int add_list(const char *proc) {
 	for (auto &s : hide_list) {
-		// They should be unique
 		if (s == proc)
 			return HIDE_ITEM_EXIST;
 	}
-
-	LOGI("hide_list add: [%s]\n", proc);
 
 	// Add to database
 	char sql[4096];
@@ -180,12 +200,15 @@ int add_list(const char *proc) {
 	char *err = db_exec(sql);
 	db_err_cmd(err, return DAEMON_ERROR);
 
+	LOGI("hide_list add: [%s]\n", proc);
+
 	// Critical region
 	pthread_mutex_lock(&list_lock);
 	hide_list.emplace_back(proc);
-	kill_process(proc);
+	add_pkg_uid(proc);
 	pthread_mutex_unlock(&list_lock);
 
+	kill_process(proc);
 	return DAEMON_SUCCESS;
 }
 
@@ -193,29 +216,27 @@ int add_list(int client) {
 	char *proc = read_string(client);
 	int ret = add_list(proc);
 	free(proc);
-
-	// Update inotify list
-	update_apk_list();
-
+	update_inotify_mask();
 	return ret;
 }
 
 static int rm_list(const char *proc) {
-	// Update list in critical region
-	bool do_rm = false;
+	// Critical region
+	bool remove = false;
 	pthread_mutex_lock(&list_lock);
 	for (auto it = hide_list.begin(); it != hide_list.end(); ++it) {
 		if (*it == proc) {
-			do_rm = true;
+			remove = true;
 			LOGI("hide_list rm: [%s]\n", proc);
 			hide_list.erase(it);
-			kill_process(proc);
 			break;
 		}
 	}
+	if (remove)
+		refresh_uid();
 	pthread_mutex_unlock(&list_lock);
 
-	if (do_rm) {
+	if (remove) {
 		char sql[4096];
 		snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE process='%s'", proc);
 		char *err = db_exec(sql);
@@ -230,26 +251,30 @@ int rm_list(int client) {
 	char *proc = read_string(client);
 	int ret = rm_list(proc);
 	free(proc);
-
-	// Update inotify list
-	update_apk_list();
-
+	update_inotify_mask();
 	return ret;
+}
+
+int init_list(void *, int, char **data, char**) {
+	LOGI("hide_list init: [%s]\n", *data);
+	hide_list.emplace_back(*data);
+	kill_process(*data);
+	int uid = add_pkg_uid(*data);
+	if (strcmp(*data, SAFETYNET_PKG) == 0)
+		gms_uid = uid;
+	return 0;
+}
+
+void init_list(const char *proc) {
+	init_list(nullptr, 0, (char **) &proc, nullptr);
 }
 
 #define LEGACY_LIST MODULEROOT "/.core/hidelist"
 
-static int collect_list(void *, int, char **data, char**) {
-	LOGI("hide_list: [%s]\n", data[0]);
-	hide_list.push_back(data[0]);
-	kill_process(data[0]);
-	return 0;
-}
-
 bool init_list() {
 	LOGD("hide_list: initialize\n");
 
-	char *err = db_exec("SELECT process FROM hidelist", collect_list);
+	char *err = db_exec("SELECT process FROM hidelist", init_list);
 	db_err_cmd(err, return false);
 
 	// Migrate old hide list into database
@@ -260,6 +285,12 @@ bool init_list() {
 		unlink(LEGACY_LIST);
 	}
 
+	// Add SafetyNet by default
+	rm_list(SAFETYNET_PROCESS);
+	rm_list(SAFETYNET_COMPONENT);
+	init_list(SAFETYNET_PKG);
+
+	update_inotify_mask();
 	return true;
 }
 
@@ -299,11 +330,6 @@ int launch_magiskhide(int client) {
 	// Initialize the hide list
 	if (!init_list())
 		goto error;
-
-	// Add SafetyNet by default
-	rm_list(SAFETYNET_PROCESS);
-	rm_list(SAFETYNET_COMPONENT);
-	add_list(SAFETYNET_PKG);
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();
