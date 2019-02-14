@@ -366,11 +366,9 @@ void auto_start_magiskhide() {
 	db_settings dbs;
 	get_db_settings(&dbs, HIDE_CONFIG);
 	if (dbs[HIDE_CONFIG]) {
-		pthread_t thread;
-		xpthread_create(&thread, nullptr, [](void*) -> void* {
+		new_daemon_thread([](auto) -> void* {
 			launch_magiskhide(-1);
 			return nullptr;
-		}, nullptr);
-		pthread_detach(thread);
+		});
 	}
 }

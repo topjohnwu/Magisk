@@ -645,11 +645,23 @@ static void dump_logs() {
 	if (test != 0)
 		return;
 	rename(LOGFILE, LOGFILE ".bak");
-	int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
-	exec_t exec { .fd = fd };
-	exec_command(exec, "/system/bin/logcat", "-s", "Magisk");
 	log_dump = true;
-	close(fd);
+	// Start a daemon thread and wait indefinitely
+	new_daemon_thread([](auto) -> void* {
+		int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
+		exec_t exec {
+			.fd = fd,
+			.fork = fork_no_zombie
+		};
+		int pid = exec_command(exec, "/system/bin/logcat", "-s", "Magisk");
+		close(fd);
+		if (pid < 0) {
+			log_dump = false;
+			return nullptr;
+		}
+		waitpid(pid, nullptr, 0);
+		return nullptr;
+	});
 }
 
 /****************

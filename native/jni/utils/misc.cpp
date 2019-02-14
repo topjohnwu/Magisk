@@ -10,6 +10,7 @@
 #include <syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/prctl.h>
 #include <sys/sysmacros.h>
 
 #include <logging.h>
@@ -47,6 +48,20 @@ int fork_dont_care() {
 	} else if ((pid = xfork())) {
 		exit(0);
 	}
+	return 0;
+}
+
+int fork_no_zombie() {
+	int pid = xfork();
+	if (pid)
+		return pid;
+	// Unblock all signals
+	sigset_t block_set;
+	sigfillset(&block_set);
+	pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
+	prctl(PR_SET_PDEATHSIG, SIGTERM);
+	if (getppid() == 1)
+		exit(1);
 	return 0;
 }
 
@@ -199,5 +214,13 @@ int exec_command_sync(exec_t &exec) {
 		return -1;
 	waitpid(pid, &status, 0);
 	return WEXITSTATUS(status);
+}
+
+int new_daemon_thread(void *(*start_routine) (void *), void *arg, const pthread_attr_t *attr) {
+	pthread_t thread;
+	int ret = xpthread_create(&thread, attr, start_routine, arg);
+	if (ret == 0)
+		pthread_detach(thread);
+	return ret;
 }
 

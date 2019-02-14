@@ -82,6 +82,7 @@ unsigned get_shell_uid();
 unsigned get_system_uid();
 unsigned get_radio_uid();
 int fork_dont_care();
+int fork_no_zombie();
 void gen_rand_str(char *buf, int len);
 int strend(const char *s1, const char *s2);
 
@@ -146,6 +147,9 @@ void write_zero(int fd, size_t size);
 std::vector<std::string> file_to_vector(const char *filename);
 
 // misc.cpp
+
+int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
+		const pthread_attr_t *attr = nullptr);
 
 struct exec_t {
 	bool err = false;

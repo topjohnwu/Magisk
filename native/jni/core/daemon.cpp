@@ -140,20 +140,17 @@ static void main_daemon() {
 	pthread_sigmask(SIG_SETMASK, &block_set, nullptr);
 
 	// Loop forever to listen for requests
-	while(true) {
+	for (;;) {
 		int *client = new int;
 		*client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
-		pthread_t thread;
-		xpthread_create(&thread, nullptr, request_handler, client);
-		// Detach the thread, we will never join it
-		pthread_detach(thread);
+		new_daemon_thread(request_handler, client);
 	}
 }
 
 int switch_mnt_ns(int pid) {
 	char mnt[32];
 	snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
-	if(access(mnt, R_OK) == -1) return 1; // Maybe process died..
+	if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
 
 	int fd, ret;
 	fd = xopen(mnt, O_RDONLY);
