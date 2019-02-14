@@ -636,6 +636,22 @@ void unlock_blocks() {
 	close(dev);
 }
 
+static bool log_dump = false;
+static void dump_logs() {
+	if (log_dump)
+		return;
+	int test = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null");
+	chmod("/dev/null", 0666);
+	if (test != 0)
+		return;
+	rename(LOGFILE, LOGFILE ".bak");
+	int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
+	exec_t exec { .fd = fd };
+	exec_command(exec, "/system/bin/logcat", "-s", "Magisk");
+	log_dump = true;
+	close(fd);
+}
+
 /****************
  * Entry points *
  ****************/
@@ -657,6 +673,8 @@ void post_fs_data(int client) {
 
 	if (!check_data())
 		unblock_boot_process();
+
+	dump_logs();
 
 	LOGI("** post-fs-data mode running\n");
 
@@ -780,6 +798,8 @@ void late_start(int client) {
 	// ack
 	write_int(client, 0);
 	close(client);
+
+	dump_logs();
 
 	if (access(SECURE_DIR, F_OK) != 0) {
 		// It's safe to create the folder at this point if the system didn't create it
