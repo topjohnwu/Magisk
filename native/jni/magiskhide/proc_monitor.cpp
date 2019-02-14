@@ -258,12 +258,10 @@ void update_inotify_mask() {
 	// Add /data/app itself to the watch list to detect app (un)installations/updates
 	xinotify_add_watch(new_inotify, DATA_APP, IN_CLOSE_WRITE | IN_MOVED_TO | IN_DELETE);
 
-	if (inotify_fd >= 0) {
-		// Swap and close old fd
-		int tmp = inotify_fd;
-		inotify_fd = new_inotify;
+	int tmp = inotify_fd;
+	inotify_fd = new_inotify;
+	if (tmp >= 0)
 		close(tmp);
-	}
 }
 
 void proc_monitor() {
