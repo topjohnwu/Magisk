@@ -188,51 +188,64 @@ static bool process_pid(int pid) {
 	return true;
 }
 
-static void listdir_apk(const char *name) {
-	DIR *dir;
-	struct dirent *entry;
-	const char *ext;
-	char path[4096];
+static int xinotify_add_watch(int fd, const char* path, uint32_t mask) {
+	int ret = inotify_add_watch(fd, path, mask);
+	if (ret >= 0) {
+		LOGI("proc_monitor: Monitoring %s\n", path);
+	} else {
+		PLOGE("proc_monitor: Monitor %s", path);
+	}
+	return ret;
+}
 
-	if (!(dir = opendir(name)))
+static char *append_path(char *eof, const char *name) {
+	*(eof++) = '/';
+	char c;
+	while ((c = *(name++)))
+		*(eof++) = c;
+	*eof = '\0';
+	return eof;
+}
+
+#define DATA_APP "/data/app"
+
+static void find_apks(char *path, char *eof) {
+	DIR *dir = opendir(path);
+	if (dir == nullptr)
 		return;
 
-	while ((entry = readdir(dir)) != NULL) {
-		snprintf(path, sizeof(path), "%s/%s", name,
-			 entry->d_name);
+	// assert(*eof == '\0');
 
+	struct dirent *entry;
+	while ((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
 		if (entry->d_type == DT_DIR) {
-			if (strcmp(entry->d_name, ".") == 0
-			    || strcmp(entry->d_name, "..") == 0)
-				continue;
-			listdir_apk(path);
-		} else {
-			ext = &path[strlen(path) - 4];
-			if (!strncmp(".apk", ext, 4)) {
-				pthread_mutex_lock(&list_lock);
-				for (auto &s : hide_list) {
-					// Compare with (path + 10) to trim "/data/app/"
-					if (strncmp(path + 10, s.c_str(), s.length()) == 0) {
-						if (inotify_add_watch(inotify_fd, path, IN_OPEN | IN_DELETE) > 0) {
-							LOGI("proc_monitor: Monitoring %s\n", path);
-						} else {
-							LOGE("proc_monitor: Failed to monitor %s: %s\n", path, strerror(errno));
-						}
-						break;
-					}
+			find_apks(path, append_path(eof, entry->d_name));
+			*eof = '\0';
+		} else if (strend(entry->d_name, ".apk") == 0) {
+			// Path will be in this format: /data/app/[pkg]-[hash or 1 or 2]
+			char *dash = strchr(path, '-');
+			*dash = '\0';
+			for (auto &s : hide_list) {
+				if (s == path + sizeof(DATA_APP)) {
+					*dash = '-';
+					append_path(eof, entry->d_name);
+					xinotify_add_watch(inotify_fd, path, IN_OPEN | IN_DELETE);
+					*eof = '\0';
+					break;
 				}
-				pthread_mutex_unlock(&list_lock);
 			}
+			*dash = '-';
+			break;
 		}
 	}
-
 	closedir(dir);
 }
 
 // Iterate through /data/app and search all .apk files
 void update_inotify_mask() {
-	// Setup inotify
-	const char data_app[] = "/data/app";
+	char buf[4096];
 
 	if (inotify_fd >= 0)
 		close(inotify_fd);
@@ -244,14 +257,13 @@ void update_inotify_mask() {
 	}
 
 	LOGI("proc_monitor: Updating APK list\n");
-	listdir_apk(data_app);
+	strcpy(buf, DATA_APP);
+	pthread_mutex_lock(&list_lock);
+	find_apks(buf, buf + sizeof(DATA_APP) - 1);
+	pthread_mutex_unlock(&list_lock);
 
 	// Add /data/app itself to the watch list to detect app (un)installations/updates
-	if (inotify_add_watch(inotify_fd, data_app, IN_CLOSE_WRITE | IN_MOVED_TO | IN_DELETE) > 0) {
-		LOGI("proc_monitor: Monitoring %s\n", data_app, inotify_fd);
-	} else {
-		LOGE("proc_monitor: Failed to monitor %s: %s\n", strerror(errno));
-	}
+	xinotify_add_watch(inotify_fd, DATA_APP, IN_CLOSE_WRITE | IN_MOVED_TO | IN_DELETE);
 }
 
 void proc_monitor() {

@@ -60,7 +60,7 @@ int mkdirs(const char *pathname, mode_t mode) {
 	return 0;
 }
 
-void in_order_walk(int dirfd, void (*callback)(int, struct dirent*)) {
+void post_order_walk(int dirfd, void (*fn)(int, struct dirent *)) {
 	struct dirent *entry;
 	int newfd;
 	DIR *dir = fdopendir(dirfd);
@@ -73,10 +73,10 @@ void in_order_walk(int dirfd, void (*callback)(int, struct dirent*)) {
 			continue;
 		if (entry->d_type == DT_DIR) {
 			newfd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			in_order_walk(newfd, callback);
+			post_order_walk(newfd, fn);
 			close(newfd);
 		}
-		callback(dirfd, entry);
+		fn(dirfd, entry);
 	}
 }
 
@@ -93,7 +93,7 @@ void rm_rf(const char *path) {
 }
 
 void frm_rf(int dirfd) {
-	in_order_walk(dirfd, [](auto dirfd, auto entry) -> void {
+	post_order_walk(dirfd, [](auto dirfd, auto entry) -> void {
 		unlinkat(dirfd, entry->d_name, entry->d_type == DT_DIR ? AT_REMOVEDIR : 0);
 	});
 }

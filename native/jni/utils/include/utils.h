@@ -108,7 +108,7 @@ struct file_attr {
 int fd_getpath(int fd, char *path, size_t size);
 int fd_getpathat(int dirfd, const char *name, char *path, size_t size);
 int mkdirs(const char *pathname, mode_t mode);
-void in_order_walk(int dirfd, void (*callback)(int, struct dirent*));
+void post_order_walk(int dirfd, void (*fn)(int, struct dirent *));
 void rm_rf(const char *path);
 void frm_rf(int dirfd);
 void mv_f(const char *source, const char *destination);
