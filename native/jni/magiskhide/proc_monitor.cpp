@@ -33,10 +33,6 @@ extern char *system_block, *vendor_block, *data_block;
 
 static int inotify_fd = -1;
 
-#define EVENT_SIZE	sizeof(struct inotify_event)
-#define EVENT_BUF_LEN	(1024 * (EVENT_SIZE + 16))
-#define __ALIGN_EVENT __attribute__ ((aligned(__alignof__(struct inotify_event))))
-
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
 	LOGD("proc_monitor: running cleanup\n");
@@ -208,7 +204,7 @@ static char *append_path(char *eof, const char *name) {
 }
 
 #define DATA_APP "/data/app"
-
+static int new_inotify;
 static void find_apks(char *path, char *eof) {
 	DIR *dir = opendir(path);
 	if (dir == nullptr)
@@ -231,7 +227,7 @@ static void find_apks(char *path, char *eof) {
 				if (s == path + sizeof(DATA_APP)) {
 					*dash = '-';
 					append_path(eof, entry->d_name);
-					xinotify_add_watch(inotify_fd, path, IN_OPEN | IN_DELETE);
+					xinotify_add_watch(new_inotify, path, IN_OPEN | IN_DELETE);
 					*eof = '\0';
 					break;
 				}
@@ -247,23 +243,27 @@ static void find_apks(char *path, char *eof) {
 void update_inotify_mask() {
 	char buf[4096];
 
-	if (inotify_fd >= 0)
-		close(inotify_fd);
-
-	inotify_fd = inotify_init();
-	if (inotify_fd < 0) {
+	new_inotify = inotify_init();
+	if (new_inotify < 0) {
 		LOGE("proc_monitor: Cannot initialize inotify: %s\n", strerror(errno));
 		term_thread(TERM_THREAD);
 	}
 
-	LOGI("proc_monitor: Updating APK list\n");
+	LOGI("proc_monitor: Updating inotify list\n");
 	strcpy(buf, DATA_APP);
 	pthread_mutex_lock(&list_lock);
 	find_apks(buf, buf + sizeof(DATA_APP) - 1);
 	pthread_mutex_unlock(&list_lock);
 
 	// Add /data/app itself to the watch list to detect app (un)installations/updates
-	xinotify_add_watch(inotify_fd, DATA_APP, IN_CLOSE_WRITE | IN_MOVED_TO | IN_DELETE);
+	xinotify_add_watch(new_inotify, DATA_APP, IN_CLOSE_WRITE | IN_MOVED_TO | IN_DELETE);
+
+	if (inotify_fd >= 0) {
+		// Swap and close old fd
+		int tmp = inotify_fd;
+		inotify_fd = new_inotify;
+		close(tmp);
+	}
 }
 
 void proc_monitor() {
@@ -278,25 +278,13 @@ void proc_monitor() {
 	act.sa_handler = term_thread;
 	sigaction(TERM_THREAD, &act, nullptr);
 
-	if (access("/proc/1/ns/mnt", F_OK) != 0) {
-		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
-		term_thread(TERM_THREAD);
-	}
-
 	// Read inotify events
 	struct inotify_event *event;
 	ssize_t len;
 	char *p;
-	char buffer[EVENT_BUF_LEN] __ALIGN_EVENT;
-	for (;;) {
-		len = read(inotify_fd, buffer, EVENT_BUF_LEN);
-		if (len == -1) {
-			PLOGE("proc_monitor: read inotify");
-			sleep(1);
-			continue;
-		}
-
-		for (p = buffer; p < buffer + len; ) {
+	char buf[4096];
+	while ((len = read(inotify_fd, buf, sizeof(buf))) >= 0) {
+		for (p = buf; p < buf + len; ) {
 			event = (struct inotify_event *)p;
 
 			if (event->mask & IN_OPEN) {
@@ -314,7 +302,8 @@ void proc_monitor() {
 				break;
 			}
 
-			p += EVENT_SIZE + event->len;
+			p += sizeof(*event) + event->len;
 		}
 	}
+	PLOGE("proc_monitor: read inotify");
 }

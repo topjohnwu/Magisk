@@ -297,7 +297,7 @@ static void set_hide_config() {
 }
 
 static inline void launch_err(int client, int code = DAEMON_ERROR) {
-	if (code == DAEMON_ERROR)
+	if (code != HIDE_IS_ENABLED)
 		hide_enabled = false;
 	if (client >= 0) {
 		write_int(client, code);
@@ -314,6 +314,9 @@ void launch_magiskhide(int client) {
 
 	if (hide_enabled)
 		launch_err(client, HIDE_IS_ENABLED);
+
+	if (access("/proc/1/ns/mnt", F_OK) != 0)
+		launch_err(client, HIDE_NO_NS);
 
 	hide_enabled = true;
 	set_hide_config();

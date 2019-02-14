@@ -20,16 +20,12 @@ bool hide_enabled = false;
 		FULL_VER(MagiskHide) "\n\n"
 		"Usage: %s [--option [arguments...] ]\n\n"
 		"Options:\n"
-  		"  --status          Return the status of MagiskHide\n"
-		"  --enable          Start magiskhide\n"
-		"  --disable         Stop magiskhide\n"
-		"  --add TARGET      Add TARGET to the hide list\n"
-		"  --rm TARGET       Remove TARGET from the hide list\n"
-		"  --ls              Print out the current hide list\n"
-		"\n"
-		"TARGET can be either a package name or a specific component name\n"
-		"If TARGET is a package name, all components of the app will be targeted\n"
-		"A component name is composed of <pkg>/<cls>\n"
+  		"  --status     Return the status of magiskhide\n"
+		"  --enable     Start magiskhide\n"
+		"  --disable    Stop magiskhide\n"
+		"  --add PKG    Add PKG to the hide list\n"
+		"  --rm PKG     Remove PKG from the hide list\n"
+		"  --ls         List the current hide list\n"
 		, arg0);
 	exit(1);
 }
@@ -122,6 +118,9 @@ int magiskhide_main(int argc, char *argv[]) {
 	case HIDE_ITEM_NOT_EXIST:
 		fprintf(stderr, "[%s] does not exist in hide list\n", argv[2]);
 		break;
+	case HIDE_NO_NS:
+		fprintf(stderr, "Your kernel doesn't support mount namespace\n");
+		break;
 
 	/* Errors */
 	case ROOT_REQUIRED:
@@ -129,7 +128,7 @@ int magiskhide_main(int argc, char *argv[]) {
 		break;
 	case DAEMON_ERROR:
 	default:
-		fprintf(stderr, "Error occured in daemon...\n");
+		fprintf(stderr, "Daemon error\n");
 		return DAEMON_ERROR;
 	}
 
