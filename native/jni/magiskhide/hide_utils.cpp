@@ -20,7 +20,7 @@ using namespace std;
 // Protect access to both hide_list and hide_uid
 pthread_mutex_t list_lock;
 vector<string> hide_list;
-set<uid_t> hide_uid;
+set<int> hide_uid;
 
 // Treat GMS separately as we're only interested in one component
 int gms_uid = -1;
@@ -37,11 +37,6 @@ static const char *prop_value[] =
 	  "enforcing", "0", "0", "0",
 	  "1", "user", "release-keys", "0", nullptr };
 
-struct ps_arg {
-	const char *name;
-	uid_t uid;
-};
-
 void manage_selinux() {
 	char val;
 	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
@@ -54,7 +49,7 @@ void manage_selinux() {
 	}
 }
 
-void hide_sensitive_props() {
+static void hide_sensitive_props() {
 	LOGI("hide_utils: Hiding sensitive props\n");
 
 	// Hide all sensitive props
@@ -65,27 +60,32 @@ void hide_sensitive_props() {
 	}
 }
 
-static bool is_digits(const char *s) {
-	for (const char *c = s; *c; ++c) {
-		if (*c < '0' || *c > '9')
-			return false;
+/*
+ * Bionic's atoi runs through strtol().
+ * Use our own implementation for faster conversion.
+ */
+static inline int parse_int(const char *s) {
+	int val = 0;
+	char c;
+	while ((c = *(s++))) {
+		if (c > '9' || c < '0')
+			return -1;
+		val = val * 10 + c - '0';
 	}
-	return true;
+	return val;
 }
 
-static void ps(void (*cb)(int, void*), void *arg) {
-	DIR *dir;
-	struct dirent *entry;
-
-	if (!(dir = xopendir("/proc")))
-		return;
-
-	while ((entry = xreaddir(dir))) {
-		if (entry->d_type == DT_DIR && is_digits(entry->d_name))
-			cb(atoi(entry->d_name), arg);
+// Leave /proc fd opened as we're going to read from it repeatedly
+static DIR *procfp;
+void crawl_procfs(const function<bool (int)> &fn) {
+	struct dirent *dp;
+	int pid;
+	rewinddir(procfp);
+	while ((dp = readdir(procfp))) {
+		pid = parse_int(dp->d_name);
+		if (pid > 0 && !fn(pid))
+			break;
 	}
-
-	closedir(dir);
 }
 
 static bool proc_name_match(int pid, const char *name) {
@@ -94,24 +94,24 @@ static bool proc_name_match(int pid, const char *name) {
 	sprintf(buf, "/proc/%d/comm", pid);
 	if ((f = fopen(buf, "re"))) {
 		fgets(buf, sizeof(buf), f);
+		fclose(f);
 		if (strcmp(buf, name) == 0)
 			return true;
 	} else {
 		// The PID is already killed
 		return false;
 	}
-	fclose(f);
 
 	sprintf(buf, "/proc/%d/cmdline", pid);
 	if ((f = fopen(buf, "re"))) {
 		fgets(buf, sizeof(buf), f);
+		fclose(f);
 		if (strcmp(basename(buf), name) == 0)
 			return true;
 	} else {
 		// The PID is already killed
 		return false;
 	}
-	fclose(f);
 
 	sprintf(buf, "/proc/%d/exe", pid);
 	ssize_t len;
@@ -121,52 +121,38 @@ static bool proc_name_match(int pid, const char *name) {
 	return strcmp(basename(buf), name) == 0;
 }
 
-static void kill_proc_cb(int pid, void *v) {
-	auto args = static_cast<ps_arg *>(v);
-	if (proc_name_match(pid, args->name))
-		kill(pid, SIGTERM);
-	else if (args->uid > 0) {
-		char buf[64];
-		struct stat st;
-		sprintf(buf, "/proc/%d", pid);
-		stat(buf, &st);
-		if (args->uid == st.st_uid)
-			kill(pid, SIGTERM);
-	}
-
-}
-
 static void kill_process(const char *name) {
-	ps_arg args;
-	char *slash = nullptr;
-	if (strcmp(name, SAFETYNET_COMPONENT) == 0) {
-		// We do NOT want to kill gms, it will cause massive system crashes
-		args.name = SAFETYNET_PROCESS;
-	} else {
-		// Only leave the package name part of component name temporarily
-		slash = strchr((char *)name, '/');
-		if (slash)
-			*slash = '\0';
-		args.name = name;
-	}
-	struct stat st;
-	int fd = xopen("/data/data", O_RDONLY | O_CLOEXEC);
-	if (fstatat(fd, args.name, &st, 0) == 0)
-		args.uid = st.st_uid;
-	else
-		args.uid = 0;
-	close(fd);
-	ps(kill_proc_cb, &args);
-	// Revert back to component name
-	if (slash)
-		*slash = '/';
+	// We do NOT want to kill GMS itself
+	if (strcmp(name, SAFETYNET_PKG) == 0)
+		name = SAFETYNET_PROCESS;
+	crawl_procfs([=](int pid) -> bool {
+		if (proc_name_match(pid, name)) {
+			if (kill(pid, SIGTERM) == 0)
+				LOGD("hide_utils: killed PID=[%d] (%s)\n", pid, name);
+			return false;
+		}
+		return true;
+	});
 }
 
-static int add_pkg_uid(const char *proc) {
+static void kill_process(int uid) {
+	// We do NOT want to kill all GMS processes
+	if (uid == gms_uid) {
+		kill_process(SAFETYNET_PROCESS);
+		return;
+	}
+	crawl_procfs([=](int pid) -> bool {
+		if (get_uid(pid) == uid && kill(pid, SIGTERM) == 0)
+			LOGD("hide_utils: killed PID=[%d]\n", pid);
+		return true;
+	});
+}
+
+static int add_pkg_uid(const char *pkg) {
 	char path[4096];
 	struct stat st;
 	const char *data = SDK_INT >= 24 ? "/data/user_de/0" : "/data/data";
-	sprintf(path, "%s/%s", data, proc);
+	sprintf(path, "%s/%s", data, pkg);
 	if (xstat(path, &st) == 0) {
 		hide_uid.insert(st.st_uid);
 		return st.st_uid;
@@ -181,53 +167,52 @@ void refresh_uid() {
 }
 
 void clean_magisk_props() {
-	LOGD("hide_utils: Cleaning magisk props\n");
 	getprop([](const char *name, auto, auto) -> void {
 		if (strstr(name, "magisk"))
 			deleteprop(name);
 	}, nullptr, false);
 }
 
-int add_list(const char *proc) {
+int add_list(const char *pkg) {
 	for (auto &s : hide_list) {
-		if (s == proc)
+		if (s == pkg)
 			return HIDE_ITEM_EXIST;
 	}
 
 	// Add to database
 	char sql[4096];
-	snprintf(sql, sizeof(sql), "INSERT INTO hidelist (process) VALUES('%s')", proc);
+	snprintf(sql, sizeof(sql), "INSERT INTO hidelist (process) VALUES('%s')", pkg);
 	char *err = db_exec(sql);
 	db_err_cmd(err, return DAEMON_ERROR);
 
-	LOGI("hide_list add: [%s]\n", proc);
+	LOGI("hide_list add: [%s]\n", pkg);
 
 	// Critical region
 	pthread_mutex_lock(&list_lock);
-	hide_list.emplace_back(proc);
-	add_pkg_uid(proc);
+	hide_list.emplace_back(pkg);
+	int uid = add_pkg_uid(pkg);
 	pthread_mutex_unlock(&list_lock);
 
-	kill_process(proc);
+	kill_process(uid);
 	return DAEMON_SUCCESS;
 }
 
 int add_list(int client) {
-	char *proc = read_string(client);
-	int ret = add_list(proc);
-	free(proc);
+	char *pkg = read_string(client);
+	int ret = add_list(pkg);
+	free(pkg);
 	update_inotify_mask();
 	return ret;
 }
 
-static int rm_list(const char *proc) {
+static int rm_list(const char *pkg) {
 	// Critical region
 	bool remove = false;
 	pthread_mutex_lock(&list_lock);
 	for (auto it = hide_list.begin(); it != hide_list.end(); ++it) {
-		if (*it == proc) {
+		if (*it == pkg) {
 			remove = true;
-			LOGI("hide_list rm: [%s]\n", proc);
+			LOGI("hide_list rm: [%s]\n", pkg);
 			hide_list.erase(it);
 			break;
 		}
@@ -238,7 +223,7 @@ static int rm_list(const char *proc) {
 
 	if (remove) {
 		char sql[4096];
-		snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE process='%s'", proc);
+		snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE process='%s'", pkg);
 		char *err = db_exec(sql);
 		db_err(err);
 		return DAEMON_SUCCESS;
@@ -248,14 +233,14 @@ static int rm_list(const char *proc) {
 }
 
 int rm_list(int client) {
-	char *proc = read_string(client);
-	int ret = rm_list(proc);
-	free(proc);
+	char *pkg = read_string(client);
+	int ret = rm_list(pkg);
+	free(pkg);
 	update_inotify_mask();
 	return ret;
 }
 
-int init_list(void *, int, char **data, char**) {
+static int init_list(void *, int, char **data, char**) {
 	LOGI("hide_list init: [%s]\n", *data);
 	hide_list.emplace_back(*data);
 	kill_process(*data);
@@ -265,8 +250,8 @@ int init_list(void *, int, char **data, char**) {
 	return 0;
 }
 
-void init_list(const char *proc) {
-	init_list(nullptr, 0, (char **) &proc, nullptr);
+static void init_list(const char *pkg) {
+	init_list(nullptr, 0, (char **) &pkg, nullptr);
 }
 
 #define LEGACY_LIST MODULEROOT "/.core/hidelist"
@@ -311,16 +296,35 @@ static void set_hide_config() {
 	db_err(err);
 }
 
-int launch_magiskhide(int client) {
+static inline void launch_err(int client, int code = DAEMON_ERROR) {
+	if (code == DAEMON_ERROR)
+		hide_enabled = false;
+	if (client >= 0) {
+		write_int(client, code);
+		close(client);
+	}
+	pthread_exit(nullptr);
+}
+
+#define LAUNCH_ERR launch_err(client)
+
+void launch_magiskhide(int client) {
 	if (SDK_INT < 19)
-		goto error;
+		LAUNCH_ERR;
 
 	if (hide_enabled)
-		return HIDE_IS_ENABLED;
+		launch_err(client, HIDE_IS_ENABLED);
 
 	hide_enabled = true;
 	set_hide_config();
 	LOGI("* Starting MagiskHide\n");
+
+	if (procfp == nullptr) {
+		int fd = xopen("/proc", O_RDONLY | O_CLOEXEC);
+		if (fd < 0)
+			LAUNCH_ERR;
+		procfp = fdopendir(fd);
+	}
 
 	hide_sensitive_props();
 
@@ -329,20 +333,20 @@ int launch_magiskhide(int client) {
 
 	// Initialize the hide list
 	if (!init_list())
-		goto error;
+		LAUNCH_ERR;
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();
 	if (client >= 0) {
 		write_int(client, DAEMON_SUCCESS);
 		close(client);
+		client = -1;
 	}
 	// Start monitoring
 	proc_monitor();
 
-error:
-	hide_enabled = false;
-	return DAEMON_ERROR;
+	// proc_monitor should not return
+	LAUNCH_ERR;
 }
 
 int stop_magiskhide() {

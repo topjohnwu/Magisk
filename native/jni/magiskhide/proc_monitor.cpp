@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <ctype.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <pthread.h>
@@ -21,7 +20,7 @@
 #include <sys/mount.h>
 #include <vector>
 #include <string>
-#include <unordered_map>
+#include <map>
 
 #include <magisk.h>
 #include <utils.h>
@@ -62,6 +61,9 @@ static inline void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
+/* APK monitoring doesn't seem to require checking namespace
+ * separation from PPID. Preserve this function just in case */
+#if 0
 static inline int parse_ppid(const int pid) {
 	char path[32];
 	int ppid;
@@ -77,17 +79,7 @@ static inline int parse_ppid(const int pid) {
 
 	return ppid;
 }
-
-static inline uid_t get_uid(const int pid) {
-	char path[16];
-	struct stat st;
-
-	sprintf(path, "/proc/%d", pid);
-	if (stat(path, &st) == -1)
-		return -1;
-
-	return st.st_uid;
-}
+#endif
 
 static bool is_pid_safetynet_process(const int pid) {
 	char path[32];
@@ -109,7 +101,7 @@ static bool is_pid_safetynet_process(const int pid) {
 }
 
 static void hide_daemon(int pid) {
-	LOGD("hide_daemon: handling pid=[%d]\n", pid);
+	LOGD("hide_daemon: handling PID=[%d]\n", pid);
 
 	char buffer[4096];
 	vector<string> mounts;
@@ -151,80 +143,49 @@ exit:
 	_exit(0);
 }
 
-/*
- * Bionic's atoi runs through strtol() and fault-tolerence checkings.
- * Since we don't need it, use our own implementation of atoi()
- * for faster conversion.
- */
-static inline int fast_atoi(const char *str) {
-	int val = 0;
+// A mapping from pid to namespace inode to avoid time-consuming GC
+static map<int, uint64_t> pid_ns_map;
 
-	while (*str)
-		val = val * 10 + (*str++ - '0');
+static bool process_pid(int pid) {
+	// We're only interested in PIDs > 1000
+	if (pid <= 1000)
+		return true;
 
-	return val;
-}
+	struct stat ns;
+	int uid = get_uid(pid);
+	if (hide_uid.count(uid)) {
+		// Make sure we can read mount namespace
+		if (read_ns(pid, &ns))
+			return true;
 
-// Leave /proc fd opened as we're going to read from it repeatedly
-static DIR *dfd;
-// Use unordered map with pid and namespace inode number to avoid time-consuming GC
-static unordered_map<int, uint64_t> pid_ns_map;
+		// Check if it's a process we haven't already hijacked
+		auto pos = pid_ns_map.find(pid);
+		if (pos != pid_ns_map.end() && pos->second == ns.st_ino)
+			return true;
 
-static void detect_new_processes() {
-	struct dirent *dp;
-	struct stat ns, pns;
-	int pid, ppid;
-	uid_t uid;
+		if (uid == gms_uid) {
+			// Check /proc/uid/cmdline to see if it's SAFETYNET_PROCESS
+			if (!is_pid_safetynet_process(pid))
+				return true;
 
-	// Iterate through /proc and get a process that reads the target APK
-	rewinddir(dfd);
-	pthread_mutex_lock(&list_lock);
-	while ((dp = readdir(dfd))) {
-		if (!isdigit(dp->d_name[0]))
-			continue;
-
-		// dp->d_name is now the pid
-		pid = fast_atoi(dp->d_name);
-
-		// We're only interested in PIDs > 1000
-		if (pid <= 1000)
-			continue;
-
-		uid = get_uid(pid) % 100000; // Handle multiuser
-		bool is_target = hide_uid.count(uid) != 0;
-		if (is_target) {
-			// Make sure our target is alive
-			if ((ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns) || read_ns(pid, &ns))
-				continue;
-
-			// Check if it's a process we haven't already hijacked
-			auto pos = pid_ns_map.find(pid);
-			if (pos == pid_ns_map.end() || pos->second != ns.st_ino) {
-				pid_ns_map[pid] = ns.st_ino;
-				if (uid == gms_uid) {
-					// Check /proc/uid/cmdline to see if it's SAFETYNET_PROCESS
-					if (!is_pid_safetynet_process(pid))
-						continue;
-
-					LOGI("proc_monitor: found %s\n", SAFETYNET_PROCESS);
-				}
-
-				// Send pause signal ASAP
-				if (kill(pid, SIGSTOP) == -1)
-					continue;
-
-				/*
-				 * The setns system call do not support multithread processes
-				 * We have to fork a new process, setns, then do the unmounts
-				 */
-				LOGI("proc_monitor: UID=[%ju] PID=[%d] ns=[%llu]\n",
-					 (uintmax_t)uid, pid, ns.st_ino);
-				if (fork_dont_care() == 0)
-					hide_daemon(pid);
-			}
+			LOGD("proc_monitor: " SAFETYNET_PROCESS "\n");
 		}
+
+		// Send pause signal ASAP
+		if (kill(pid, SIGSTOP) == -1)
+			return true;
+
+		pid_ns_map[pid] = ns.st_ino;
+		LOGI("proc_monitor: UID=[%d] PID=[%d] ns=[%llu]\n", uid, pid, ns.st_ino);
+
+		/*
+		 * The setns system call do not support multithread processes
+		 * We have to fork a new process, setns, then do the unmounts
+		 */
+		if (fork_dont_care() == 0)
+			hide_daemon(pid);
 	}
-	pthread_mutex_unlock(&list_lock);
+	return true;
 }
 
 static void listdir_apk(const char *name) {
@@ -310,14 +271,6 @@ void proc_monitor() {
 		term_thread(TERM_THREAD);
 	}
 
-	if ((dfd = opendir("/proc")) == NULL) {
-		LOGE("proc_monitor: Unable to open /proc\n");
-		term_thread(TERM_THREAD);
-	}
-
-	// Detect existing processes for the first time
-	detect_new_processes();
-
 	// Read inotify events
 	struct inotify_event *event;
 	ssize_t len;
@@ -337,8 +290,9 @@ void proc_monitor() {
 			if (event->mask & IN_OPEN) {
 				// Since we're just watching files,
 				// extracting file name is not possible from querying event
-				// LOGI("proc_monitor: inotify: APK opened\n");
-				detect_new_processes();
+				pthread_mutex_lock(&list_lock);
+				crawl_procfs(process_pid);
+				pthread_mutex_unlock(&list_lock);
 			} else {
 				LOGI("proc_monitor: inotify: /data/app change detected\n");
 				pthread_mutex_lock(&list_lock);

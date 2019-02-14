@@ -52,8 +52,8 @@ void magiskhide_handler(int client) {
 
 	switch (req) {
 	case LAUNCH_MAGISKHIDE:
-		res = launch_magiskhide(client);
-		break;
+		launch_magiskhide(client);
+		return;
 	case STOP_MAGISKHIDE:
 		res = stop_magiskhide();
 		break;

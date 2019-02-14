@@ -2,9 +2,13 @@
 #define MAGISK_HIDE_H
 
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <vector>
 #include <string>
 #include <set>
+#include <functional>
 
 #include "daemon.h"
 
@@ -15,7 +19,7 @@
 #define SAFETYNET_PKG        "com.google.android.gms"
 
 // Daemon entries
-int launch_magiskhide(int client);
+void launch_magiskhide(int client);
 int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);
@@ -29,14 +33,26 @@ void proc_monitor();
 
 // Utility functions
 void manage_selinux();
-void hide_sensitive_props();
 void clean_magisk_props();
 void refresh_uid();
+void crawl_procfs(const std::function<bool (int)> &fn);
+
+static inline int get_uid(const int pid) {
+	char path[16];
+	struct stat st;
+
+	sprintf(path, "/proc/%d", pid);
+	if (stat(path, &st) == -1)
+		return -1;
+
+	// We don't care about multiuser
+	return st.st_uid % 100000;
+}
 
 extern bool hide_enabled;
 extern pthread_mutex_t list_lock;
 extern std::vector<std::string> hide_list;
-extern std::set<uid_t> hide_uid;
+extern std::set<int> hide_uid;
 extern int gms_uid;
 
 enum {
