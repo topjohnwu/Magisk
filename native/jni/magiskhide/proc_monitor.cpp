@@ -210,25 +210,26 @@ static void find_apks(char *path, char *eof) {
 	if (dir == nullptr)
 		return;
 
-	// assert(*eof == '\0');
-
 	struct dirent *entry;
-	while ((entry = xreaddir(dir))) {
+	char *dash;
+	for (; (entry = xreaddir(dir)); *eof = '\0') {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (entry->d_type == DT_DIR) {
 			find_apks(path, append_path(eof, entry->d_name));
-			*eof = '\0';
 		} else if (strend(entry->d_name, ".apk") == 0) {
-			// Path will be in this format: /data/app/[pkg]-[hash or 1 or 2]
-			char *dash = strchr(path, '-');
+			append_path(eof, entry->d_name);
+			/* Supported path will be in either format:
+			 * /data/app/[pkg]-[hash or 1 or 2]/base.apk
+			 * /data/app/[pkg]-[1 or 2].apk */
+			if ((dash = strchr(path, '-')) == nullptr)
+				continue;
 			*dash = '\0';
 			for (auto &s : hide_list) {
 				if (s == path + sizeof(DATA_APP)) {
 					*dash = '-';
 					append_path(eof, entry->d_name);
 					xinotify_add_watch(new_inotify, path, IN_OPEN | IN_DELETE);
-					*eof = '\0';
 					break;
 				}
 			}
