@@ -132,7 +132,7 @@ static void main_daemon() {
 	xlisten(fd, 10);
 
 	// Change process name
-	strcpy(argv0, "magiskd");
+	set_nice_name("magiskd");
 
 	// Block all signals
 	sigset_t block_set;

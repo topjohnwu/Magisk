@@ -39,7 +39,6 @@
 #define SEPOL_PROC_DOMAIN "magisk"
 #define SEPOL_FILE_DOMAIN "magisk_file"
 
-extern char *argv0;     /* For changing process name */
 extern int SDK_INT;
 
 #define applet_names ((const char *[]) { "magisk", "su", "resetprop", "magiskhide", nullptr })

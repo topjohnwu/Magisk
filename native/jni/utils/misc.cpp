@@ -224,3 +224,15 @@ int new_daemon_thread(void *(*start_routine) (void *), void *arg, const pthread_
 	return ret;
 }
 
+static char *argv0;
+static size_t name_len;
+void init_argv0(int argc, char **argv) {
+	argv0 = argv[0];
+	name_len = (argv[argc - 1] - argv[0]) + strlen(argv[argc - 1]) + 1;
+}
+
+void set_nice_name(const char *name) {
+	memset(argv0, 0, name_len);
+	strlcpy(argv0, name, name_len);
+	prctl(PR_SET_NAME, name);
+}
