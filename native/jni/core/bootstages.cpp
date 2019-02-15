@@ -294,9 +294,8 @@ node_entry *node_entry::extract(const char *name) {
  ***********/
 
 static void set_path() {
-	char buffer[512];
-	sprintf(buffer, BBPATH ":%s", getenv("PATH"));
-	setenv("PATH", buffer, 1);
+	sprintf(buf, BBPATH ":%s", getenv("PATH"));
+	setenv("PATH", buf, 1);
 }
 
 static void set_mirror_path() {
@@ -311,19 +310,25 @@ static void set_mirror_path() {
 static void exec_common_script(const char* stage) {
 	DIR *dir;
 	struct dirent *entry;
-	snprintf(buf2, PATH_MAX, "%s/%s.d", SECURE_DIR, stage);
-
+	sprintf(buf2, SECURE_DIR "/%s.d", stage);
 	if (!(dir = xopendir(buf2)))
 		return;
 	chdir(buf2);
 
+	bool pfs = strcmp(stage, "post-fs-data") == 0;
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_REG) {
 			if (access(entry->d_name, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			exec_t exec { .pre_exec = strcmp(stage, "post-fs-data") ? set_path : set_mirror_path };
-			exec_command_sync(exec, MIRRDIR "/system/bin/sh", entry->d_name);
+			exec_t exec {
+				.pre_exec = pfs ? set_mirror_path : set_path,
+				.fork = pfs ? xfork : fork_dont_care
+			};
+			if (pfs)
+				exec_command_sync(exec, MIRRDIR "/system/bin/sh", entry->d_name);
+			else
+				exec_command(exec, MIRRDIR "/system/bin/sh", entry->d_name);
 		}
 	}
 
@@ -332,14 +337,21 @@ static void exec_common_script(const char* stage) {
 }
 
 static void exec_module_script(const char* stage) {
-	for (const auto &m : module_list) {
-		const auto module = m.c_str();
-		snprintf(buf2, PATH_MAX, "%s/%s/%s.sh", MODULEROOT, module, stage);
+	bool pfs = strcmp(stage, "post-fs-data") == 0;
+	for (auto &m : module_list) {
+		const char* module = m.c_str();
+		sprintf(buf2, MODULEROOT "/%s/%s.sh", module, stage);
 		if (access(buf2, F_OK) == -1)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		exec_t exec { .pre_exec = strcmp(stage, "post-fs-data") ? set_path : set_mirror_path };
-		exec_command_sync(exec, MIRRDIR "/system/bin/sh", buf2);
+		exec_t exec {
+			.pre_exec = pfs ? set_mirror_path : set_path,
+			.fork = pfs ? xfork : fork_dont_care
+		};
+		if (pfs)
+			exec_command_sync(exec, MIRRDIR "/system/bin/sh", buf2);
+		else
+			exec_command(exec, MIRRDIR "/system/bin/sh", buf2);
 	}
 }
 
