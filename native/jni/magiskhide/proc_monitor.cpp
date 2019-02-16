@@ -187,7 +187,7 @@ static bool process_pid(int pid) {
 static int xinotify_add_watch(int fd, const char* path, uint32_t mask) {
 	int ret = inotify_add_watch(fd, path, mask);
 	if (ret >= 0) {
-		LOGI("proc_monitor: Monitoring %s\n", path);
+		LOGD("proc_monitor: Monitoring %s\n", path);
 	} else {
 		PLOGE("proc_monitor: Monitor %s", path);
 	}
@@ -253,7 +253,7 @@ void update_inotify_mask(bool refresh) {
 		term_thread(TERM_THREAD);
 	}
 
-	LOGI("proc_monitor: Updating inotify list\n");
+	LOGD("proc_monitor: Updating inotify list\n");
 	strcpy(buf, DATA_APP);
 	app_in_data.clear();
 	bool reinstall = false;
@@ -324,7 +324,7 @@ void proc_monitor() {
 				MutexGuard lock(list_lock);
 				crawl_procfs(process_pid);
 			} else if (!(event->mask & IN_IGNORED)) {
-				LOGI("proc_monitor: inotify: /data/app change detected\n");
+				LOGD("proc_monitor: inotify: /data/app change detected\n");
 				update_inotify_mask(true);
 				break;
 			}
