@@ -310,26 +310,21 @@ void proc_monitor() {
 	sigaction(TERM_THREAD, &act, nullptr);
 
 	// Read inotify events
-	struct inotify_event *event;
 	ssize_t len;
-	char *p;
 	char buf[4096];
+	auto event = reinterpret_cast<inotify_event *>(buf);
 	while ((len = read(inotify_fd, buf, sizeof(buf))) >= 0) {
-		for (p = buf; p < buf + len; ) {
-			event = (struct inotify_event *)p;
+		if (len < sizeof(*event))
+			continue;
 
-			if (event->mask & IN_OPEN) {
-				// Since we're just watching files,
-				// extracting file name is not possible from querying event
-				MutexGuard lock(list_lock);
-				crawl_procfs(process_pid);
-			} else if (!(event->mask & IN_IGNORED)) {
-				LOGD("proc_monitor: inotify: /data/app change detected\n");
-				update_inotify_mask(true);
-				break;
-			}
-
-			p += sizeof(*event) + event->len;
+		if (event->mask & IN_OPEN) {
+			// Since we're just watching files,
+			// extracting file name is not possible from querying event
+			MutexGuard lock(list_lock);
+			crawl_procfs(process_pid);
+		} else if (!(event->mask & IN_IGNORED)) {
+			LOGD("proc_monitor: inotify: /data/app change detected\n");
+			update_inotify_mask(true);
 		}
 	}
 	PLOGE("proc_monitor: read inotify");
