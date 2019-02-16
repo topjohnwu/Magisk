@@ -3,6 +3,8 @@
 
 static const char magiskrc[] =
 
+"\n"
+
 "on early-init\n"
 "    write " EARLYINIT " 1\n"
 "    wait " EARLYINITDONE "\n"
