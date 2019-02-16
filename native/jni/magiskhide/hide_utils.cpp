@@ -188,10 +188,12 @@ int add_list(const char *pkg) {
 	LOGI("hide_list add: [%s]\n", pkg);
 
 	// Critical region
-	pthread_mutex_lock(&list_lock);
-	hide_list.emplace_back(pkg);
-	int uid = add_pkg_uid(pkg);
-	pthread_mutex_unlock(&list_lock);
+	int uid;
+	{
+		MutexGuard lock(list_lock);
+		hide_list.emplace_back(pkg);
+		uid = add_pkg_uid(pkg);
+	}
 
 	kill_process(uid);
 	return DAEMON_SUCCESS;
@@ -207,36 +209,33 @@ int add_list(int client) {
 
 static int rm_list(const char *pkg) {
 	// Critical region
-	bool remove = false;
-	pthread_mutex_lock(&list_lock);
-	for (auto it = hide_list.begin(); it != hide_list.end(); ++it) {
-		if (*it == pkg) {
-			remove = true;
-			LOGI("hide_list rm: [%s]\n", pkg);
-			hide_list.erase(it);
-			break;
+	{
+		MutexGuard lock(list_lock);
+		bool remove = false;
+		for (auto it = hide_list.begin(); it != hide_list.end(); ++it) {
+			if (*it == pkg) {
+				remove = true;
+				LOGI("hide_list rm: [%s]\n", pkg);
+				hide_list.erase(it);
+				break;
+			}
 		}
+		if (!remove)
+			return HIDE_ITEM_NOT_EXIST;
 	}
-	if (remove)
-		refresh_uid();
-	pthread_mutex_unlock(&list_lock);
-
-	if (remove) {
-		char sql[4096];
-		snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE process='%s'", pkg);
-		char *err = db_exec(sql);
-		db_err(err);
-		return DAEMON_SUCCESS;
-	} else {
-		return HIDE_ITEM_NOT_EXIST;
-	}
+	char sql[4096];
+	snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE process='%s'", pkg);
+	char *err = db_exec(sql);
+	db_err(err);
+	return DAEMON_SUCCESS;
 }
 
 int rm_list(int client) {
 	char *pkg = read_string(client);
 	int ret = rm_list(pkg);
 	free(pkg);
-	update_inotify_mask();
+	if (ret == DAEMON_SUCCESS)
+		update_inotify_mask(true);
 	return ret;
 }
 

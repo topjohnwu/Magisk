@@ -72,6 +72,7 @@ void exec_common_script(const char *stage);
 void exec_module_script(const char *stage, const std::vector<std::string> &module_list);
 void migrate_img(const char *img);
 void install_apk(const char *apk);
+int reinstall_apk(const char *pkg);
 
 /**************
  * MagiskHide *

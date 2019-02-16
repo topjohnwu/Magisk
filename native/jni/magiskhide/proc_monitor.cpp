@@ -205,6 +205,8 @@ static char *append_path(char *eof, const char *name) {
 
 #define DATA_APP "/data/app"
 static int new_inotify;
+static int data_app_wd;
+static vector<bool> app_in_data;
 static void find_apks(char *path, char *eof) {
 	DIR *dir = opendir(path);
 	if (dir == nullptr)
@@ -225,11 +227,12 @@ static void find_apks(char *path, char *eof) {
 			if ((dash = strchr(path, '-')) == nullptr)
 				continue;
 			*dash = '\0';
-			for (auto &s : hide_list) {
-				if (s == path + sizeof(DATA_APP)) {
+			for (int i = 0; i < hide_list.size(); ++i) {
+				if (hide_list[i] == path + sizeof(DATA_APP)) {
 					*dash = '-';
 					append_path(eof, entry->d_name);
 					xinotify_add_watch(new_inotify, path, IN_OPEN | IN_DELETE);
+					app_in_data[i] = true;
 					break;
 				}
 			}
@@ -241,7 +244,7 @@ static void find_apks(char *path, char *eof) {
 }
 
 // Iterate through /data/app and search all .apk files
-void update_inotify_mask() {
+void update_inotify_mask(bool refresh) {
 	char buf[4096];
 
 	new_inotify = inotify_init();
@@ -252,12 +255,41 @@ void update_inotify_mask() {
 
 	LOGI("proc_monitor: Updating inotify list\n");
 	strcpy(buf, DATA_APP);
-	pthread_mutex_lock(&list_lock);
-	find_apks(buf, buf + sizeof(DATA_APP) - 1);
-	pthread_mutex_unlock(&list_lock);
+	app_in_data.clear();
+	bool reinstall = false;
+	{
+		MutexGuard lock(list_lock);
+		app_in_data.resize(hide_list.size(), false);
+		find_apks(buf, buf + sizeof(DATA_APP) - 1);
+		// Stop monitoring /data/app
+		if (inotify_fd >= 0)
+			inotify_rm_watch(inotify_fd, data_app_wd);
+		// All apps on the hide list should be installed in data
+		auto it = hide_list.begin();
+		for (bool in_data : app_in_data) {
+			if (!in_data) {
+				if (reinstall_apk(it->c_str()) != 0) {
+					// Reinstallation failed, remove from hide list
+					hide_list.erase(it);
+					refresh = true;
+					continue;
+				}
+				reinstall = true;
+			}
+			it++;
+		}
+		if (refresh && !reinstall)
+			refresh_uid();
+	}
+	if (reinstall) {
+		// Rerun detection
+		close(new_inotify);
+		update_inotify_mask(refresh);
+		return;
+	}
 
 	// Add /data/app itself to the watch list to detect app (un)installations/updates
-	xinotify_add_watch(new_inotify, DATA_APP, IN_CLOSE_WRITE | IN_MOVED_TO | IN_DELETE);
+	data_app_wd = xinotify_add_watch(new_inotify, DATA_APP, IN_CLOSE_WRITE | IN_MOVED_TO | IN_DELETE);
 
 	int tmp = inotify_fd;
 	inotify_fd = new_inotify;
@@ -289,15 +321,11 @@ void proc_monitor() {
 			if (event->mask & IN_OPEN) {
 				// Since we're just watching files,
 				// extracting file name is not possible from querying event
-				pthread_mutex_lock(&list_lock);
+				MutexGuard lock(list_lock);
 				crawl_procfs(process_pid);
-				pthread_mutex_unlock(&list_lock);
-			} else {
+			} else if (!(event->mask & IN_IGNORED)) {
 				LOGI("proc_monitor: inotify: /data/app change detected\n");
-				pthread_mutex_lock(&list_lock);
-				refresh_uid();
-				pthread_mutex_unlock(&list_lock);
-				update_inotify_mask();
+				update_inotify_mask(true);
 				break;
 			}
 

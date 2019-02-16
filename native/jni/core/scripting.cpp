@@ -72,7 +72,7 @@ void exec_module_script(const char *stage, const vector<string> &module_list) {
 }
 
 static const char migrate_script[] =
-"IMG=%s;"
+"IMG=/data/adb/tmp.img;"
 "MNT=/dev/img_mnt;"
 "e2fsck -yf $IMG;"
 "mkdir -p $MNT;"
@@ -91,27 +91,54 @@ static const char migrate_script[] =
 void migrate_img(const char *img) {
 	LOGI("* Migrating %s\n", img);
 	exec_t exec { .pre_exec = set_path };
-	char cmds[sizeof(migrate_script) + 32];
-	sprintf(cmds, migrate_script, img);
-	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+	rename(img, "/data/adb/tmp.img");
+	exec_command_sync(exec, "/system/bin/sh", "-c", migrate_script);
 }
 
 static const char install_script[] =
+"APK=%s;"
 "while true; do"
-"  OUT=`pm install -r $APK`;"
+"  OUT=`pm install -r $APK 2>&1`;"
 "  log -t Magisk \"apk_install: $OUT\";"
-"  if echo \"$OUT\" | grep -q 'Error:'; then"
+"  if echo \"$OUT\" | grep -qE \"Can't|Error:\"; then"
 "    sleep 5;"
 "    continue;"
 "  fi;"
 "  break;"
-"done";
+"done;"
+"rm -f $APK";
 
 void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	LOGI("apk_install: %s\n", apk);
 	exec_t exec { .pre_exec = set_mirror_path };
 	char cmds[sizeof(install_script) + 4096];
-	sprintf(cmds, "APK=%s;%s;rm -f $APK", apk, install_script);
-	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+	sprintf(cmds, install_script, apk);
+	exec_command_sync(exec, MIRRDIR "/system/bin/sh", "-c", cmds);
+}
+
+static const char reinstall_script[] =
+"PKG=%s;"
+"while true; do"
+"  OUT=`pm path $PKG 2>&1`;"
+"  [ -z $OUT ] && exit 1;"
+"  if echo \"$OUT\" | grep -qE \"Can't|Error:\"; then"
+"    sleep 5;"
+"    continue;"
+"  fi;"
+"  APK=`echo $OUT | cut -d':' -f2`;"
+"  log -t Magisk \"apk_install: $APK\";"
+"  OUT=`pm install -r $APK`;"
+"  [ $? -eq 0 ] || exit 1;"
+"  log -t Magisk \"apk_install: $OUT\";"
+"  break;"
+"done;"
+"exit 0";
+
+// Reinstall system apps to data
+int reinstall_apk(const char *pkg) {
+	exec_t exec { .pre_exec = set_mirror_path };
+	char cmds[sizeof(reinstall_script) + 256];
+	sprintf(cmds, reinstall_script, pkg);
+	return exec_command_sync(exec, MIRRDIR "/system/bin/sh", "-c", cmds);
 }

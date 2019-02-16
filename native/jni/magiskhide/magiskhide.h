@@ -26,7 +26,7 @@ int rm_list(int client);
 void ls_list(int client);
 
 // Update APK list for inotify
-void update_inotify_mask();
+void update_inotify_mask(bool refresh = false);
 
 // Process monitor
 void proc_monitor();

@@ -150,6 +150,24 @@ std::vector<std::string> file_to_vector(const char *filename);
 
 // misc.cpp
 
+class MutexGuard {
+public:
+	explicit MutexGuard(pthread_mutex_t &m): mutex(&m) {
+		pthread_mutex_lock(mutex);
+	}
+
+	explicit MutexGuard(pthread_mutex_t *m): mutex(m) {
+		pthread_mutex_lock(mutex);
+	}
+
+	~MutexGuard() {
+		pthread_mutex_unlock(mutex);
+	}
+
+private:
+	pthread_mutex_t *mutex;
+};
+
 int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
 		const pthread_attr_t *attr = nullptr);
 
