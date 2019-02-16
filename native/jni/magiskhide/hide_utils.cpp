@@ -153,7 +153,7 @@ static int add_pkg_uid(const char *pkg) {
 	struct stat st;
 	const char *data = SDK_INT >= 24 ? "/data/user_de/0" : "/data/data";
 	sprintf(path, "%s/%s", data, pkg);
-	if (xstat(path, &st) == 0) {
+	if (stat(path, &st) == 0) {
 		hide_uid.insert(st.st_uid);
 		return st.st_uid;
 	}
