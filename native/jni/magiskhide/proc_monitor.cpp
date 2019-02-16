@@ -57,9 +57,6 @@ static inline void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
-/* APK monitoring doesn't seem to require checking namespace
- * separation from PPID. Preserve this function just in case */
-#if 0
 static inline int parse_ppid(const int pid) {
 	char path[32];
 	int ppid;
@@ -75,7 +72,6 @@ static inline int parse_ppid(const int pid) {
 
 	return ppid;
 }
-#endif
 
 static bool is_pid_safetynet_process(const int pid) {
 	char path[32];
@@ -147,11 +143,15 @@ static bool process_pid(int pid) {
 	if (pid <= 1000)
 		return true;
 
-	struct stat ns;
+	struct stat ns, pns;
+	int ppid = parse_ppid(pid);
 	int uid = get_uid(pid);
 	if (hide_uid.count(uid)) {
 		// Make sure we can read mount namespace
-		if (read_ns(pid, &ns))
+		if (read_ns(pid, &ns) || read_ns(ppid, &pns))
+			return true;
+		// mount namespace is not separated, we only unmount once
+		if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
 			return true;
 
 		// Check if it's a process we haven't already hijacked
