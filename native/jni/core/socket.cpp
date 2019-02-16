@@ -7,7 +7,6 @@
 #include <endian.h>
 
 #include <daemon.h>
-#include <logging.h>
 #include <utils.h>
 #include <magisk.h>
 

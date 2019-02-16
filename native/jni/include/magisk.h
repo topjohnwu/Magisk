@@ -4,7 +4,7 @@
 #ifndef _MAGISK_H_
 #define _MAGISK_H_
 
-#include "logging.h"
+#include <logging.h>
 
 #define MAIN_SOCKET  "d30138f2310a9fb9c54a3e0c21f58591"
 #define LOG_SOCKET   "5864cd77f2f8c59b3882e2d35dbf51e4"

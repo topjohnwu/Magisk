@@ -79,6 +79,9 @@ private:
 	int get_path(char *path);
 };
 
+//char node_entry::buf[] = {};
+//char node_entry::buf2[] = {};
+
 node_entry::node_entry(const char *name, uint8_t status, uint8_t type)
 		: name(name), type(type), status(status), parent(nullptr) {}
 
@@ -289,72 +292,6 @@ node_entry *node_entry::extract(const char *name) {
 	return node;
 }
 
-/***********
- * setenvs *
- ***********/
-
-static void set_path() {
-	sprintf(buf, BBPATH ":%s", getenv("PATH"));
-	setenv("PATH", buf, 1);
-}
-
-static void set_mirror_path() {
-	setenv("PATH", BBPATH ":/sbin:" MIRRDIR "/system/bin:"
-				   MIRRDIR "/system/xbin:" MIRRDIR "/vendor/bin", 1);
-}
-
-/***********
- * Scripts *
- ***********/
-
-static void exec_common_script(const char* stage) {
-	DIR *dir;
-	struct dirent *entry;
-	sprintf(buf2, SECURE_DIR "/%s.d", stage);
-	if (!(dir = xopendir(buf2)))
-		return;
-	chdir(buf2);
-
-	bool pfs = strcmp(stage, "post-fs-data") == 0;
-	while ((entry = xreaddir(dir))) {
-		if (entry->d_type == DT_REG) {
-			if (access(entry->d_name, X_OK) == -1)
-				continue;
-			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			exec_t exec {
-				.pre_exec = pfs ? set_mirror_path : set_path,
-				.fork = pfs ? xfork : fork_dont_care
-			};
-			if (pfs)
-				exec_command_sync(exec, MIRRDIR "/system/bin/sh", entry->d_name);
-			else
-				exec_command(exec, MIRRDIR "/system/bin/sh", entry->d_name);
-		}
-	}
-
-	closedir(dir);
-	chdir("/");
-}
-
-static void exec_module_script(const char* stage) {
-	bool pfs = strcmp(stage, "post-fs-data") == 0;
-	for (auto &m : module_list) {
-		const char* module = m.c_str();
-		sprintf(buf2, MODULEROOT "/%s/%s.sh", module, stage);
-		if (access(buf2, F_OK) == -1)
-			continue;
-		LOGI("%s: exec [%s.sh]\n", module, stage);
-		exec_t exec {
-			.pre_exec = pfs ? set_mirror_path : set_path,
-			.fork = pfs ? xfork : fork_dont_care
-		};
-		if (pfs)
-			exec_command_sync(exec, MIRRDIR "/system/bin/sh", buf2);
-		else
-			exec_command(exec, MIRRDIR "/system/bin/sh", buf2);
-	}
-}
-
 /****************
  * Simple Mount *
  ****************/
@@ -492,34 +429,11 @@ static bool magisk_env() {
 	return true;
 }
 
-/* Too lazy to do it natively, let's write some scripts */
-static const char migrate_cmd[] =
-"IMG=%s;"
-"MNT=/dev/img_mnt;"
-"e2fsck -yf $IMG;"
-"mkdir -p $MNT;"
-"for num in 0 1 2 3 4 5 6 7; do"
-"  losetup /dev/block/loop${num} $IMG || continue;"
-"  mount -t ext4 /dev/block/loop${num} $MNT;"
-"  rm -rf $MNT/lost+found $MNT/.core;"
-"  magisk --clone $MNT " MODULEROOT ";"
-"  umount $MNT;"
-"  rm -rf $MNT;"
-"  losetup -d /dev/block/loop${num};"
-"  break;"
-"done;"
-"rm -rf $IMG";
-
 static void upgrade_modules() {
 	const char *legacy_imgs[] = {SECURE_DIR "/magisk.img", SECURE_DIR "/magisk_merge.img"};
 	for (auto img : legacy_imgs) {
-		if (access(img, F_OK) == 0) {
-			LOGI("* Migrating %s\n", img);
-			exec_t exec { .pre_exec = set_path };
-			char cmds[sizeof(migrate_cmd) + 32];
-			sprintf(cmds, migrate_cmd, img);
-			exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
-		}
+		if (access(img, F_OK) == 0)
+			migrate_img(img);
 	}
 	DIR *dir;
 	struct dirent *entry;
@@ -573,31 +487,6 @@ static void collect_modules() {
 	}
 	closedir(dir);
 	chdir("/");
-}
-
-static void install_apk(const char *apk) {
-	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	while (true) {
-		sleep(5);
-		LOGD("apk_install: attempting to install APK\n");
-		exec_t exec { .err = true, .fd = -1 };
-		int pid = exec_command(exec, "/system/bin/pm", "install", "-r", apk);
-		if (pid != -1) {
-			FILE *res = fdopen(exec.fd, "r");
-			bool err = false;
-			while (fgets(buf, PATH_MAX, res)) {
-				LOGD("apk_install: %s", buf);
-				err |= strstr(buf, "Error:") != nullptr;
-			}
-			waitpid(pid, nullptr, 0);
-			fclose(res);
-			// Keep trying until pm is started
-			if (err)
-				continue;
-			break;
-		}
-	}
-	unlink(apk);
 }
 
 static bool check_data() {
@@ -756,7 +645,7 @@ void post_fs_data(int client) {
 
 	// Execute module scripts
 	LOGI("* Running module post-fs-data scripts\n");
-	exec_module_script("post-fs-data");
+	exec_module_script("post-fs-data", module_list);
 
 	// Recollect modules
 	module_list.clear();
@@ -843,7 +732,7 @@ void late_start(int client) {
 		goto core_only;
 
 	LOGI("* Running module service scripts\n");
-	exec_module_script("service");
+	exec_module_script("service", module_list);
 
 core_only:
 	if (access(MANAGERAPK, F_OK) == 0) {

@@ -38,6 +38,7 @@ LOCAL_SRC_FILES := \
 	core/bootstages.cpp \
 	core/socket.cpp \
 	core/db.cpp \
+	core/scripting.cpp \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \

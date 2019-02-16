@@ -7,6 +7,8 @@
 #include <pthread.h>
 #include <sys/un.h>
 #include <sys/socket.h>
+#include <string>
+#include <vector>
 
 // Commands require connecting to daemon
 enum {
@@ -61,6 +63,15 @@ void unlock_blocks();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
+
+/*************
+ * Scripting *
+ *************/
+
+void exec_common_script(const char *stage);
+void exec_module_script(const char *stage, const std::vector<std::string> &module_list);
+void migrate_img(const char *img);
+void install_apk(const char *apk);
 
 /**************
  * MagiskHide *
