@@ -6,13 +6,13 @@
     <string name="superuser">スーパーユーザー</string>
     <string name="log">ログ</string>
     <string name="settings">設定</string>
-    <string name="install">インストール</string>
+    <string name="install">ｲﾝｽﾄｰﾙ</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magiskがインストールされていません</string>
     <string name="checking_for_updates">更新を確認中…</string>
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
-    <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
+    <string name="safetyNet_check_text">SafetyNetチェックを開始</string>
     <string name="checking_safetyNet_status">SafetyNetの状態をチェック中…</string>
     <string name="safetyNet_check_success">SafetyNetチェック成功</string>
     <string name="safetyNet_api_error">SafetyNet APIエラー</string>
