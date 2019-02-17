@@ -87,32 +87,44 @@ esac
 # Ramdisk restores
 ##########################################################################################
 
-# Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
-ui_print "- Checking ramdisk status"
-./magiskboot --cpio ramdisk.cpio test
-STATUS=$?
-case $((STATUS & 3)) in
-  0 )  # Stock boot
-    ui_print "- Stock boot image detected"
-    ui_print "- Backing up stock boot image"
-    SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
-    STOCKDUMP=stock_boot_${SHA1}.img.gz
-    ./magiskboot --compress "$BOOTIMAGE" $STOCKDUMP
-    cp -af ramdisk.cpio ramdisk.cpio.orig
-    ;;
-  1 )  # Magisk patched
-    ui_print "- Magisk patched boot image detected"
-    # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
-    ./magiskboot --cpio ramdisk.cpio restore
-    cp -af ramdisk.cpio ramdisk.cpio.orig
-    ;;
-  2 ) # Other patched
-    ui_print "! Boot image patched by unsupported programs"
-    abort "! Please restore stock boot image"
-    ;;
-esac
-
+# Test image status and restore ramdisk. If no ramdisk, add stub ramdisk.
+ui_print "- Checking image status"
+if [ -f ramdisk.cpio ]; then
+  ./magiskboot --cpio ramdisk.cpio test
+  STATUS=$?
+  case $((STATUS & 3)) in
+    0 )  # Stock boot
+      ui_print "- Stock boot image detected"
+      ui_print "- Backing up stock boot image"
+      SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
+      STOCKDUMP=stock_boot_${SHA1}.img.gz
+      ./magiskboot --compress "$BOOTIMAGE" $STOCKDUMP
+      cp -af ramdisk.cpio ramdisk.cpio.orig
+      ;;
+    1 )  # Magisk patched
+      ui_print "- Magisk patched boot image detected"
+      # Find SHA1 of stock boot image
+      [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+      if ./magiskboot --cpio ramdisk.cpio "exists init.rc"; then
+        ./magiskboot --cpio ramdisk.cpio restore
+        cp -af ramdisk.cpio ramdisk.cpio.orig
+      else
+        STUB=true
+      fi
+      ;;
+    2 ) # Other patched
+      ui_print "! Boot image patched by unsupported programs"
+      abort "! Please restore stock boot image"
+      ;;
+  esac
+elif [ -f kernel ]; then
+  ui_print "- Only kernel boot image detected"
+  ui_print "- Backing up stock boot image"
+  SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
+  STOCKDUMP=stock_boot_${SHA1}.img.gz
+  ./magiskboot --compress "$BOOTIMAGE" $STOCKDUMP
+  STUB=true
+fi
 ##########################################################################################
 # Ramdisk patches
 ##########################################################################################
@@ -123,11 +135,18 @@ echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
-./magiskboot --cpio ramdisk.cpio \
-"add 750 init magiskinit" \
-"patch $KEEPVERITY $KEEPFORCEENCRYPT" \
-"backup ramdisk.cpio.orig" \
-"add 000 .backup/.magisk config"
+if [ -z $STUB ]; then
+   ./magiskboot --cpio ramdisk.cpio \
+  "add 750 init magiskinit" \
+  "patch $KEEPVERITY $KEEPFORCEENCRYPT" \
+  "backup ramdisk.cpio.orig" \
+  "add 000 .backup/.magisk config"
+else
+  touch ramdisk.cpio
+  ./magiskboot --cpio ramdisk.cpio \
+  "add 750 init magiskinit" \
+  "add 000 .backup/.magisk config"
+fi
 
 if [ $((STATUS & 4)) -ne 0 ]; then
   ui_print "- Compressing ramdisk"
