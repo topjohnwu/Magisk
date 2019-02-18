@@ -79,14 +79,14 @@ static inline int parse_ppid(const int pid) {
 }
 #endif
 
-static bool is_pid_safetynet_process(const int pid) {
+static bool is_snet(const int pid) {
 	char path[32];
 	char buf[64];
 	int fd;
 	ssize_t len;
 
 	sprintf(path, "/proc/%d/cmdline", pid);
-	fd = open(path, O_RDONLY);
+	fd = open(path, O_RDONLY | O_CLOEXEC);
 	if (fd == -1)
 		return false;
 
@@ -158,7 +158,7 @@ static bool process_pid(int pid) {
 
 		if (uid == gms_uid) {
 			// Check /proc/uid/cmdline to see if it's SAFETYNET_PROCESS
-			if (!is_pid_safetynet_process(pid))
+			if (!is_snet(pid))
 				return true;
 
 			LOGD("proc_monitor: " SAFETYNET_PROCESS "\n");
