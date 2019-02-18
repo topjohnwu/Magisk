@@ -236,3 +236,9 @@ void set_nice_name(const char *name) {
 	strlcpy(argv0, name, name_len);
 	prctl(PR_SET_NAME, name);
 }
+
+bool ends_with(const std::string_view &s1, const std::string_view &s2) {
+	unsigned l1 = s1.length();
+	unsigned l2 = s2.length();
+	return l1 < l2 ? false : s1.compare(l1 - l2, l2, s2) == 0;
+}

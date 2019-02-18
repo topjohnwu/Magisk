@@ -201,6 +201,8 @@ int exec_command_sync(Args &&...args) {
 	return exec_command_sync(exec, args...);
 }
 
+bool ends_with(const std::string_view &s1, const std::string_view &s2);
+
 #endif
 
 #endif

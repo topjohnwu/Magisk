@@ -20,7 +20,6 @@ using namespace std;
 // Protect access to both hide_list and hide_uid
 pthread_mutex_t list_lock;
 vector<string> hide_list;
-set<int> hide_uid;
 
 // Treat GMS separately as we're only interested in one component
 int gms_uid = -1;
@@ -58,21 +57,6 @@ static void hide_sensitive_props() {
 		if (!value.empty() && value != prop_value[i])
 			setprop(prop_key[i], prop_value[i], false);
 	}
-}
-
-/*
- * Bionic's atoi runs through strtol().
- * Use our own implementation for faster conversion.
- */
-static inline int parse_int(const char *s) {
-	int val = 0;
-	char c;
-	while ((c = *(s++))) {
-		if (c > '9' || c < '0')
-			return -1;
-		val = val * 10 + c - '0';
-	}
-	return val;
 }
 
 // Leave /proc fd opened as we're going to read from it repeatedly
@@ -148,22 +132,12 @@ static void kill_process(int uid) {
 	});
 }
 
-static int add_pkg_uid(const char *pkg) {
+static int get_pkg_uid(const char *pkg) {
 	char path[4096];
 	struct stat st;
 	const char *data = SDK_INT >= 24 ? "/data/user_de/0" : "/data/data";
 	sprintf(path, "%s/%s", data, pkg);
-	if (stat(path, &st) == 0) {
-		hide_uid.insert(st.st_uid);
-		return st.st_uid;
-	}
-	return -1;
-}
-
-void refresh_uid() {
-	hide_uid.clear();
-	for (auto &s : hide_list)
-		add_pkg_uid(s.c_str());
+	return stat(path, &st) ? -1 : st.st_uid;
 }
 
 void clean_magisk_props() {
@@ -192,7 +166,7 @@ int add_list(const char *pkg) {
 	{
 		MutexGuard lock(list_lock);
 		hide_list.emplace_back(pkg);
-		uid = add_pkg_uid(pkg);
+		uid = get_pkg_uid(pkg);
 	}
 
 	kill_process(uid);
@@ -235,17 +209,17 @@ int rm_list(int client) {
 	int ret = rm_list(pkg);
 	free(pkg);
 	if (ret == DAEMON_SUCCESS)
-		update_inotify_mask(true);
+		update_inotify_mask();
 	return ret;
 }
 
 static int init_list(void *, int, char **data, char**) {
 	LOGI("hide_list init: [%s]\n", *data);
 	hide_list.emplace_back(*data);
-	kill_process(*data);
-	int uid = add_pkg_uid(*data);
+	int uid = get_pkg_uid(*data);
 	if (strcmp(*data, SAFETYNET_PKG) == 0)
 		gms_uid = uid;
+	kill_process(uid);
 	return 0;
 }
 

@@ -26,7 +26,7 @@ int rm_list(int client);
 void ls_list(int client);
 
 // Update APK list for inotify
-void update_inotify_mask(bool refresh = false);
+void update_inotify_mask();
 
 // Process monitor
 void proc_monitor();
@@ -34,7 +34,6 @@ void proc_monitor();
 // Utility functions
 void manage_selinux();
 void clean_magisk_props();
-void refresh_uid();
 void crawl_procfs(const std::function<bool (int)> &fn);
 
 static inline int get_uid(const int pid) {
@@ -49,10 +48,24 @@ static inline int get_uid(const int pid) {
 	return st.st_uid % 100000;
 }
 
+/*
+ * Bionic's atoi runs through strtol().
+ * Use our own implementation for faster conversion.
+ */
+static inline int parse_int(const char *s) {
+	int val = 0;
+	char c;
+	while ((c = *(s++))) {
+		if (c > '9' || c < '0')
+			return -1;
+		val = val * 10 + c - '0';
+	}
+	return val;
+}
+
 extern bool hide_enabled;
 extern pthread_mutex_t list_lock;
 extern std::vector<std::string> hide_list;
-extern std::set<int> hide_uid;
 extern int gms_uid;
 
 enum {
