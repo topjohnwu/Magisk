@@ -116,29 +116,3 @@ void install_apk(const char *apk) {
 	sprintf(cmds, install_script, apk);
 	exec_command_sync(exec, MIRRDIR "/system/bin/sh", "-c", cmds);
 }
-
-static const char reinstall_script[] =
-"PKG=%s;"
-"while true; do"
-"  OUT=`pm path $PKG 2>&1`;"
-"  [ -z $OUT ] && exit 1;"
-"  if echo \"$OUT\" | grep -qE \"Can't|Error:\"; then"
-"    sleep 5;"
-"    continue;"
-"  fi;"
-"  APK=`echo $OUT | cut -d':' -f2`;"
-"  log -t Magisk \"apk_install: $APK\";"
-"  OUT=`pm install -r $APK`;"
-"  [ $? -eq 0 ] || exit 1;"
-"  log -t Magisk \"apk_install: $OUT\";"
-"  break;"
-"done;"
-"exit 0";
-
-// Reinstall system apps to data
-int reinstall_apk(const char *pkg) {
-	exec_t exec { .pre_exec = set_mirror_path };
-	char cmds[sizeof(reinstall_script) + 256];
-	sprintf(cmds, reinstall_script, pkg);
-	return exec_command_sync(exec, MIRRDIR "/system/bin/sh", "-c", cmds);
-}
