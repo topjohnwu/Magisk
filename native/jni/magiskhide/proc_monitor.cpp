@@ -144,11 +144,11 @@ static bool process_pid(int pid) {
 		return true;
 
 	struct stat ns, pns;
-	int ppid = parse_ppid(pid);
+	int ppid;
 	int uid = get_uid(pid);
 	if (hide_uid.count(uid)) {
 		// Make sure we can read mount namespace
-		if (read_ns(pid, &ns) || read_ns(ppid, &pns))
+		if ((ppid = parse_ppid(pid)) < 0 || read_ns(pid, &ns) || read_ns(ppid, &pns))
 			return true;
 		// mount namespace is not separated, we only unmount once
 		if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
