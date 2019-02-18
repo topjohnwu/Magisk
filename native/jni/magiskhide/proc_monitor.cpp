@@ -193,6 +193,7 @@ static int xinotify_add_watch(int fd, const char* path, uint32_t mask) {
 
 static int new_inotify;
 static const string_view APK_EXT(".apk");
+static vector<string> hide_apks;
 
 static bool parse_packages_xml(string_view &s) {
 	if (!str_starts(s, "<package "))
@@ -212,7 +213,7 @@ static bool parse_packages_xml(string_view &s) {
 		} else if (strcmp(key, "codePath") == 0) {
 			if (ends_with(value_view, APK_EXT)) {
 				// Directly add to inotify list
-				xinotify_add_watch(new_inotify, value, IN_OPEN);
+				hide_apks.emplace_back(value);
 			} else {
 				DIR *dir = opendir(value);
 				if (dir == nullptr)
@@ -222,7 +223,7 @@ static bool parse_packages_xml(string_view &s) {
 					if (ends_with(entry->d_name, APK_EXT)) {
 						strcpy(value + value_view.length(), "/");
 						strcpy(value + value_view.length() + 1, entry->d_name);
-						xinotify_add_watch(new_inotify, value, IN_OPEN);
+						hide_apks.emplace_back(value);
 						break;
 					}
 				}
@@ -244,19 +245,22 @@ void update_inotify_mask() {
 	fcntl(new_inotify, F_SETFD, FD_CLOEXEC);
 
 	LOGD("proc_monitor: Updating inotify list\n");
+	hide_apks.clear();
 	{
 		MutexGuard lock(list_lock);
 		hide_uid.clear();
 		file_readline("/data/system/packages.xml", parse_packages_xml, true);
 	}
 
-	// Add /data/system to monitor /data/system/packages.xml
-	xinotify_add_watch(new_inotify, "/data/system", IN_CLOSE_WRITE);
-
+	// Swap out and close old inotify_fd
 	int tmp = inotify_fd;
 	inotify_fd = new_inotify;
 	if (tmp >= 0)
 		close(tmp);
+
+	for (auto apk : hide_apks)
+		xinotify_add_watch(inotify_fd, apk.data(), IN_OPEN);
+	xinotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
 }
 
 void proc_monitor() {
