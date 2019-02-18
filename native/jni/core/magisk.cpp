@@ -26,7 +26,7 @@
 		"   --daemon                  manually start magisk daemon\n"
 		"   --[init trigger]          start service for init trigger\n"
 		"\n"
-		"Advanced Options (Internal APIs):"
+		"Advanced Options (Internal APIs):\n"
 		"   --unlock-blocks           set BLKROSET flag to OFF for all block devices\n"
 		"   --restorecon              restore selinux context on Magisk files\n"
 		"   --clone-attr SRC DEST     clone permission, owner, and selinux context\n"
