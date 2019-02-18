@@ -378,35 +378,35 @@ static bool magisk_env() {
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
 	LOGI("* Mounting mirrors");
-	auto mounts = file_to_vector("/proc/mounts");
 	bool system_as_root = false;
-	for (auto &line : mounts) {
+	file_readline("/proc/mounts", [&](string_view &line) -> bool {
 		if (str_contains(line, " /system_root ")) {
 			bind_mount("/system_root/system", MIRRDIR "/system");
-			sscanf(line.c_str(), "%s", buf);
+			sscanf(line.data(), "%s", buf);
 			system_block = strdup(buf);
 			system_as_root = true;
 		} else if (!system_as_root && str_contains(line, " /system ")) {
-			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
+			sscanf(line.data(), "%s %*s %s", buf, buf2);
 			system_block = strdup(buf);
 			xmount(system_block, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
 			VLOGI("mount", system_block, MIRRDIR "/system");
 		} else if (str_contains(line, " /vendor ")) {
 			seperate_vendor = true;
-			sscanf(line.c_str(), "%s %*s %s", buf, buf2);
+			sscanf(line.data(), "%s %*s %s", buf, buf2);
 			vendor_block = strdup(buf);
 			xmkdir(MIRRDIR "/vendor", 0755);
 			xmount(vendor_block, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
 			VLOGI("mount", vendor_block, MIRRDIR "/vendor");
 		} else if (str_contains(line, " /data ")) {
-			sscanf(line.c_str(), "%s", buf);
+			sscanf(line.data(), "%s", buf);
 			data_block = strdup(buf);
 		} else if (SDK_INT >= 24 &&
 		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
 			// Enforce hidepid
 			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 		}
-	}
+		return true;
+	});
 	if (!seperate_vendor) {
 		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 		VLOGI("link", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
@@ -492,12 +492,11 @@ static void collect_modules() {
 static bool check_data() {
 	bool mnt = false;
 	bool data = false;
-	auto mounts = file_to_vector("/proc/mounts");
-	for (auto &line : mounts) {
-		if (line.find(" /data ") != string::npos &&
-			line.find("tmpfs") == string::npos)
+	file_readline("/proc/mounts", [&](string_view &s) -> bool {
+		if (str_contains(s, " /data ") && !str_contains(s, "tmpfs"))
 			mnt = true;
-	}
+		return true;
+	});
 	if (mnt) {
 		auto crypto = getprop("ro.crypto.state");
 		if (!crypto.empty()) {

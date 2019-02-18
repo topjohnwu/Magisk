@@ -97,41 +97,36 @@ static bool is_pid_safetynet_process(const int pid) {
 }
 
 static void hide_daemon(int pid) {
-	LOGD("hide_daemon: handling PID=[%d]\n", pid);
-
 	char buffer[4096];
-	vector<string> mounts;
-
-	manage_selinux();
-	clean_magisk_props();
-
 	if (switch_mnt_ns(pid))
 		goto exit;
 
+	LOGD("hide_daemon: handling PID=[%d]\n", pid);
+	manage_selinux();
+	clean_magisk_props();
 	snprintf(buffer, sizeof(buffer), "/proc/%d", pid);
 	chdir(buffer);
 
-	mounts = file_to_vector("mounts");
 	// Unmount dummy skeletons and /sbin links
-	for (auto &s : mounts) {
+	file_readline("mounts", [&](string_view &s) -> bool {
 		if (str_contains(s, "tmpfs /system/") || str_contains(s, "tmpfs /vendor/") ||
 			str_contains(s, "tmpfs /sbin")) {
-			sscanf(s.c_str(), "%*s %4096s", buffer);
+			sscanf(s.data(), "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
-	}
-
-	// Re-read mount infos
-	mounts = file_to_vector("mounts");
+		return true;
+	});
 
 	// Unmount everything under /system, /vendor, and data mounts
-	for (auto &s : mounts) {
+	file_readline("mounts", [&](string_view &s) -> bool {
 		if ((str_contains(s, " /system/") || str_contains(s, " /vendor/")) &&
-			(str_contains(s, system_block) || str_contains(s, vendor_block) || str_contains(s, data_block))) {
-			sscanf(s.c_str(), "%*s %4096s", buffer);
+			(str_contains(s, system_block) || str_contains(s, vendor_block) ||
+			 str_contains(s, data_block))) {
+			sscanf(s.data(), "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
-	}
+		return true;
+	});
 
 exit:
 	// Send resume signal

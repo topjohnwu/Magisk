@@ -384,25 +384,26 @@ void write_zero(int fd, size_t size) {
 	lseek(fd, pos + size, SEEK_SET);
 }
 
-vector<string> file_to_vector(const char *filename) {
-	vector<string> arr;
-	if (access(filename, R_OK) != 0)
-		return arr;
-	char *line = nullptr;
-	size_t len = 0;
-	ssize_t read;
-
+void file_readline(const char *filename, const function<bool (string_view&)> &fn, bool trim) {
 	FILE *fp = xfopen(filename, "re");
 	if (fp == nullptr)
-		return arr;
-
-	while ((read = getline(&line, &len, fp)) != -1) {
-		// Remove end newline
-		if (line[read - 1] == '\n')
-			line[read - 1] = '\0';
-		arr.emplace_back(line);
+		return;
+	size_t len = 1024;
+	char *buf = (char *) malloc(len);
+	char *start;
+	ssize_t read;
+	while ((read = getline(&buf, &len, fp)) >= 0) {
+		start = buf;
+		if (trim) {
+			while (buf[read - 1] == '\n' || buf[read - 1] == ' ')
+				buf[read-- - 1] = '\0';
+			while (*start == ' ')
+				++start;
+		}
+		string_view s(start);
+		if (!fn(s))
+			break;
 	}
 	fclose(fp);
-	free(line);
-	return arr;
+	free(buf);
 }

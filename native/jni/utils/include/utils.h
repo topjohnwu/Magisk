@@ -140,13 +140,15 @@ void write_zero(int fd, size_t size);
 
 #include <string>
 #include <vector>
+#include <functional>
+#include <string_view>
 
 #define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != std::string::npos)
 #define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)
 
 // file.cpp
 
-std::vector<std::string> file_to_vector(const char *filename);
+void file_readline(const char *filename, const std::function<bool (std::string_view&)> &fn, bool trim = false);
 
 // misc.cpp
 

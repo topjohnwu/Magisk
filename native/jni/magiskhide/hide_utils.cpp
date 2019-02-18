@@ -263,9 +263,10 @@ bool init_list() {
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {
-		auto tmp = file_to_vector(LEGACY_LIST);
-		for (auto &s : tmp)
-			add_list(s.c_str());
+		file_readline(LEGACY_LIST, [](string_view &s) -> bool {
+			add_list(s.data());
+			return true;
+		});
 		unlink(LEGACY_LIST);
 	}
 
