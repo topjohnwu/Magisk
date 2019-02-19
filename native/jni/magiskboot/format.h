@@ -26,7 +26,7 @@ typedef enum {
 #define CHROMEOS_MAGIC  "CHROMEOS"
 #define ELF32_MAGIC     "\x7f""ELF\x01"
 #define ELF64_MAGIC     "\x7f""ELF\x02"
-#define GZIP_MAGIC      "\x1f\x8b\x08\x00"
+#define GZIP_MAGIC      "\x1f\x8b\x08"
 #define LZOP_MAGIC      "\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a"
 #define XZ_MAGIC        "\xfd""7zXZ\x00"
 #define BZIP_MAGIC      "BZh"
