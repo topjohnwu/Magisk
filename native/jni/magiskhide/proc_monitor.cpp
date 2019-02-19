@@ -95,41 +95,52 @@ static bool is_snet(const int pid) {
 }
 
 static void hide_daemon(int pid) {
-	char buffer[4096];
+	RunFinally fin([=]() -> void {
+		// Send resume signal
+		kill(pid, SIGCONT);
+		_exit(0);
+	});
+
 	if (switch_mnt_ns(pid))
-		goto exit;
+		return;
 
 	LOGD("hide_daemon: handling PID=[%d]\n", pid);
 	manage_selinux();
 	clean_magisk_props();
-	snprintf(buffer, sizeof(buffer), "/proc/%d", pid);
-	chdir(buffer);
+
+	vector<string> targets;
 
 	// Unmount dummy skeletons and /sbin links
-	file_readline("mounts", [&](string_view &s) -> bool {
+	file_readline("/proc/self/mounts", [&](string_view &s) -> bool {
 		if (str_contains(s, "tmpfs /system/") || str_contains(s, "tmpfs /vendor/") ||
 			str_contains(s, "tmpfs /sbin")) {
-			sscanf(s.data(), "%*s %4096s", buffer);
-			lazy_unmount(buffer);
+			char *path = (char *) s.data();
+			// Skip first token
+			strtok_r(nullptr, " ", &path);
+			targets.emplace_back(strtok_r(nullptr, " ", &path));
 		}
 		return true;
 	});
 
+	for (auto &s : targets)
+		lazy_unmount(s.data());
+	targets.clear();
+
 	// Unmount everything under /system, /vendor, and data mounts
-	file_readline("mounts", [&](string_view &s) -> bool {
+	file_readline("/proc/self/mounts", [&](string_view &s) -> bool {
 		if ((str_contains(s, " /system/") || str_contains(s, " /vendor/")) &&
 			(str_contains(s, system_block) || str_contains(s, vendor_block) ||
 			 str_contains(s, data_block))) {
-			sscanf(s.data(), "%*s %4096s", buffer);
-			lazy_unmount(buffer);
+			char *path = (char *) s.data();
+			// Skip first token
+			strtok_r(nullptr, " ", &path);
+			targets.emplace_back(strtok_r(nullptr, " ", &path));
 		}
 		return true;
 	});
 
-exit:
-	// Send resume signal
-	kill(pid, SIGCONT);
-	_exit(0);
+	for (auto &s : targets)
+		lazy_unmount(s.data());
 }
 
 // A mapping from pid to namespace inode to avoid time-consuming GC

@@ -146,11 +146,7 @@ void write_zero(int fd, size_t size);
 #define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != std::string::npos)
 #define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)
 
-// file.cpp
-
-void file_readline(const char *filename, const std::function<bool (std::string_view&)> &fn, bool trim = false);
-
-// misc.cpp
+// RAII
 
 class MutexGuard {
 public:
@@ -169,6 +165,22 @@ public:
 private:
 	pthread_mutex_t *mutex;
 };
+
+class RunFinally {
+public:
+	explicit RunFinally(std::function<void()> &&fn): fn(std::move(fn)) {}
+
+	~RunFinally() { fn(); }
+
+private:
+	const std::function<void ()> fn;
+};
+
+// file.cpp
+
+void file_readline(const char *filename, const std::function<bool (std::string_view&)> &fn, bool trim = false);
+
+// misc.cpp
 
 int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
 		const pthread_attr_t *attr = nullptr);
