@@ -139,13 +139,13 @@ int main(int argc, char *argv[]) {
 	} else if (argc > 2 && strcmp(argv[1], "--repack") == 0) {
 		repack(argv[2], argc > 3 ? argv[3] : NEW_BOOT);
 	} else if (argc > 2 && strcmp(argv[1], "--decompress") == 0) {
-		decompress(argv[2], argc > 3 ? argv[3] : NULL);
+		decompress(argv[2], argc > 3 ? argv[3] : nullptr);
 	} else if (argc > 2 && strncmp(argv[1], "--compress", 10) == 0) {
 		const char *method;
 		method = strchr(argv[1], '=');
-		if (method == NULL) method = "gzip";
+		if (method == nullptr) method = "gzip";
 		else method++;
-		compress(method, argv[2], argc > 3 ? argv[3] : NULL);
+		compress(method, argv[2], argc > 3 ? argv[3] : nullptr);
 	} else if (argc > 4 && strcmp(argv[1], "--hexpatch") == 0) {
 		hexpatch(argv[2], argv[3], argv[4]);
 	} else if (argc > 2 && strcmp(argv[1], "--cpio") == 0) {
