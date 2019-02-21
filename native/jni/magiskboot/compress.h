@@ -140,6 +140,7 @@ public:
 	uint64_t finalize() override;
 
 private:
+	static constexpr size_t BLOCK_SZ = 1 << 22;
 	LZ4F_compressionContext_t ctx;
 	uint8_t *outbuf;
 	size_t outCapacity;

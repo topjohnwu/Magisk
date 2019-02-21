@@ -410,7 +410,7 @@ bool LZ4FEncoder::update(const void *in, size_t size) {
 	auto inbuf = (const uint8_t *) in;
 	size_t read, write;
 	do {
-		read = size > CHUNK ? CHUNK : size;
+		read = size > BLOCK_SZ ? BLOCK_SZ : size;
 		write = LZ4F_compressUpdate(ctx, outbuf, outCapacity, inbuf, read, nullptr);
 		if (LZ4F_isError(write)) {
 			LOGW("LZ4 encode error: %s\n", LZ4F_getErrorName(write));
@@ -442,7 +442,7 @@ void LZ4FEncoder::write_header() {
 			.contentChecksumFlag = LZ4F_contentChecksumEnabled
 		}
 	};
-	outCapacity = LZ4F_compressBound(CHUNK, &prefs);
+	outCapacity = LZ4F_compressBound(BLOCK_SZ, &prefs);
 	outbuf = new uint8_t[outCapacity];
 	size_t write = LZ4F_compressBegin(ctx, outbuf, outCapacity, &prefs);
 	total += write;
