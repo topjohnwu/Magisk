@@ -25,7 +25,7 @@ static size_t restore(const char *filename, int fd) {
 	int ifd = xopen(filename, O_RDONLY);
 	size_t size = lseek(ifd, 0, SEEK_END);
 	lseek(ifd, 0, SEEK_SET);
-	xsendfile(fd, ifd, NULL, size);
+	xsendfile(fd, ifd, nullptr, size);
 	close(ifd);
 	return size;
 }
@@ -36,7 +36,6 @@ static void restore_buf(int fd, const void *buf, size_t size) {
 
 boot_img::~boot_img() {
 	munmap(map_addr, map_size);
-	delete hdr;
 	delete k_hdr;
 	delete r_hdr;
 	delete b_hdr;
@@ -45,7 +44,7 @@ boot_img::~boot_img() {
 #define CHROMEOS_RET       2
 #define ELF32_RET          3
 #define ELF64_RET          4
-#define pos_align() pos = do_align(pos, page_size())
+#define pos_align() pos = do_align(pos, hdr.page_size())
 
 int boot_img::parse_image(const char * image) {
 	mmap_ro(image, (void **) &map_addr, &map_size);
@@ -80,8 +79,8 @@ int boot_img::parse_image(const char * image) {
 			if (((boot_img_hdr*) head)->page_size >= 0x02000000) {
 				flags |= PXA_FLAG;
 				fprintf(stderr, "PXA_BOOT_HDR\n");
-				hdr = new boot_img_hdr_pxa();
-				memcpy(hdr, head, sizeof(boot_img_hdr_pxa));
+				hdr.set_hdr(new boot_img_hdr_pxa());
+				memcpy(*hdr, head, sizeof(boot_img_hdr_pxa));
 			} else if (memcmp(((boot_img_hdr*) head)->cmdline, NOOKHD_MAGIC, 12) == 0
 					   || memcmp(((boot_img_hdr*) head)->cmdline, NOOKHD_NEW_MAGIC, 26) == 0) {
 				flags |= NOOKHD_FLAG;
@@ -94,12 +93,12 @@ int boot_img::parse_image(const char * image) {
 				head += ACCLAIM_PRE_HEADER_SZ - 1;
 				continue;
 			} else {
-				hdr = new boot_img_hdr();
-				memcpy(hdr, head, sizeof(boot_img_hdr));
+				hdr.set_hdr(new boot_img_hdr());
+				memcpy(*hdr, head, sizeof(boot_img_hdr));
 			}
-			pos += page_size();
+			pos += hdr.page_size();
 
-			flags |= id()[SHA_DIGEST_SIZE] ? SHA256_FLAG : 0;
+			flags |= hdr.id()[SHA_DIGEST_SIZE] ? SHA256_FLAG : 0;
 
 			print_hdr();
 
@@ -116,11 +115,11 @@ int boot_img::parse_image(const char * image) {
 			pos_align();
 
 			extra = head + pos;
-			pos += extra_size();
+			pos += hdr.extra_size();
 			pos_align();
 
 			recov_dtbo = head + pos;
-			pos += recovery_dtbo_size();
+			pos += hdr.recovery_dtbo_size();
 			pos_align();
 
 			if (pos < map_size) {
@@ -214,14 +213,14 @@ void boot_img::find_dtb() {
 }
 
 void boot_img::print_hdr() {
-	fprintf(stderr, "HEADER_VER      [%u]\n", header_version());
+	fprintf(stderr, "HEADER_VER      [%u]\n", hdr.header_version());
 	fprintf(stderr, "KERNEL_SZ       [%u]\n", hdr->kernel_size);
 	fprintf(stderr, "RAMDISK_SZ      [%u]\n", hdr->ramdisk_size);
 	fprintf(stderr, "SECOND_SZ       [%u]\n", hdr->second_size);
-	fprintf(stderr, "EXTRA_SZ        [%u]\n", extra_size());
-	fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", recovery_dtbo_size());
+	fprintf(stderr, "EXTRA_SZ        [%u]\n", hdr.extra_size());
+	fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", hdr.recovery_dtbo_size());
 
-	uint32_t ver = os_version();
+	uint32_t ver = hdr.os_version();
 	if (ver) {
 		int a,b,c,y,m = 0;
 		int version, patch_level;
@@ -238,12 +237,12 @@ void boot_img::print_hdr() {
 		fprintf(stderr, "PATCH_LEVEL     [%d-%02d]\n", y, m);
 	}
 
-	fprintf(stderr, "PAGESIZE        [%u]\n", page_size());
-	fprintf(stderr, "NAME            [%s]\n", name());
-	fprintf(stderr, "CMDLINE         [%.512s%.1024s]\n", cmdline(), extra_cmdline());
+	fprintf(stderr, "PAGESIZE        [%u]\n", hdr.page_size());
+	fprintf(stderr, "NAME            [%s]\n", hdr.name());
+	fprintf(stderr, "CMDLINE         [%.512s%.1024s]\n", hdr.cmdline(), hdr.extra_cmdline());
 	fprintf(stderr, "CHECKSUM        [");
-	for (int i = 0; id()[i]; ++i)
-		fprintf(stderr, "%02x", id()[i]);
+	for (int i = 0; hdr.id()[i]; ++i)
+		fprintf(stderr, "%02x", hdr.id()[i]);
 	fprintf(stderr, "]\n");
 }
 
@@ -277,14 +276,14 @@ int unpack(const char *image) {
 	dump(boot.second, boot.hdr->second_size, SECOND_FILE);
 
 	// Dump extra
-	dump(boot.extra, boot.extra_size(), EXTRA_FILE);
+	dump(boot.extra, boot.hdr.extra_size(), EXTRA_FILE);
 
 	// Dump recovery_dtbo
-	dump(boot.recov_dtbo, boot.recovery_dtbo_size(), RECV_DTBO_FILE);
+	dump(boot.recov_dtbo, boot.hdr.recovery_dtbo_size(), RECV_DTBO_FILE);
 	return ret;
 }
 
-#define file_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - header_off, boot.page_size()))
+#define file_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - header_off, boot.hdr.page_size()))
 void repack(const char* orig_image, const char* out_image) {
 	boot_img boot {};
 
@@ -318,7 +317,7 @@ void repack(const char* orig_image, const char* out_image) {
 
 	// Skip a page for header
 	header_off = lseek(fd, 0, SEEK_CUR);
-	write_zero(fd, boot.page_size());
+	write_zero(fd, boot.hdr.page_size());
 
 	// kernel
 	kernel_off = lseek(fd, 0, SEEK_CUR);
@@ -372,14 +371,14 @@ void repack(const char* orig_image, const char* out_image) {
 	// extra
 	extra_off = lseek(fd, 0, SEEK_CUR);
 	if (access(EXTRA_FILE, R_OK) == 0) {
-		boot.extra_size(restore(EXTRA_FILE, fd));
+		boot.hdr.extra_size(restore(EXTRA_FILE, fd));
 		file_align();
 	}
 
 	// recovery_dtbo
 	if (access(RECV_DTBO_FILE, R_OK) == 0) {
-		boot.recovery_dtbo_offset(lseek(fd, 0, SEEK_CUR));
-		boot.recovery_dtbo_size(restore(RECV_DTBO_FILE, fd));
+		boot.hdr.recovery_dtbo_offset(lseek(fd, 0, SEEK_CUR));
+		boot.hdr.recovery_dtbo_size(restore(RECV_DTBO_FILE, fd));
 		file_align();
 	}
 
@@ -421,29 +420,29 @@ void repack(const char* orig_image, const char* out_image) {
 	size = boot.hdr->second_size;
 	HASH_update(&ctx, boot.map_addr + second_off, size);
 	HASH_update(&ctx, &size, sizeof(size));
-	size = boot.extra_size();
+	size = boot.hdr.extra_size();
 	if (size) {
 		HASH_update(&ctx, boot.map_addr + extra_off, size);
 		HASH_update(&ctx, &size, sizeof(size));
 	}
-	if (boot.header_version()) {
-		size = boot.recovery_dtbo_size();
-		HASH_update(&ctx, boot.map_addr + boot.recovery_dtbo_offset(), size);
+	if (boot.hdr.header_version()) {
+		size = boot.hdr.recovery_dtbo_size();
+		HASH_update(&ctx, boot.map_addr + boot.hdr.recovery_dtbo_offset(), size);
 		HASH_update(&ctx, &size, sizeof(size));
 	}
-	memset(boot.id(), 0, 32);
-	memcpy(boot.id(), HASH_final(&ctx),
+	memset(boot.hdr.id(), 0, 32);
+	memcpy(boot.hdr.id(), HASH_final(&ctx),
 		   (boot.flags & SHA256_FLAG) ? SHA256_DIGEST_SIZE : SHA_DIGEST_SIZE);
 
 	// Print new image info
 	boot.print_hdr();
 
 	// Try to fix the header
-	if (boot.header_version() && boot.header_size() == 0)
-		boot.header_size(sizeof(boot_img_hdr));
+	if (boot.hdr.header_version() && boot.hdr.header_size() == 0)
+		boot.hdr.header_size(sizeof(boot_img_hdr));
 
 	// Main header
-	memcpy(boot.map_addr + header_off, boot.hdr, boot.hdr_size());
+	memcpy(boot.map_addr + header_off, *boot.hdr, boot.hdr.hdr_size());
 
 	if (boot.flags & DHTB_FLAG) {
 		// DHTB header
