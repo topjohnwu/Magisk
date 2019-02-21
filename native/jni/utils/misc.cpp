@@ -242,3 +242,13 @@ bool ends_with(const std::string_view &s1, const std::string_view &s2) {
 	unsigned l2 = s2.length();
 	return l1 < l2 ? false : s1.compare(l1 - l2, l2, s2) == 0;
 }
+
+char *rtrim(char *str) {
+    int i, len;
+    len = strlen(str);
+    for (i = len - 1; i >= 0; i--) {
+        if (str[i] != ' ') break;
+    }
+    str[i + 1] = '\0';
+    return str;
+}

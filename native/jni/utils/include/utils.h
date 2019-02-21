@@ -214,6 +214,7 @@ int exec_command_sync(Args &&...args) {
 }
 
 bool ends_with(const std::string_view &s1, const std::string_view &s2);
+char *rtrim(char *str);
 
 #endif
 

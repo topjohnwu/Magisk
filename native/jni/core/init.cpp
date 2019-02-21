@@ -202,7 +202,7 @@ static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char
 		read(fd, buf, sizeof(buf));
 		close(fd);
 		char *name = strrchr(buf, '/') + 1;
-		sprintf(partname, "%s%s", name, strend(name, cmd->slot) ? cmd->slot : "");
+		sprintf(partname, "%s%s", rtrim(name), strend(name, cmd->slot) ? cmd->slot : "");
 		sprintf(buf, "%s/fstab/%s/type", cmd->dt_dir, mnt_point);
 		if ((fd = xopen(buf, O_RDONLY | O_CLOEXEC)) >= 0) {
 			lstat(buf, &st);
