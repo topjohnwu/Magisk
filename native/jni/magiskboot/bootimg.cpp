@@ -13,6 +13,9 @@
 #include "magiskboot.h"
 #include "compress.h"
 
+uint32_t dyn_img_hdr::j32 = 0;
+uint64_t dyn_img_hdr::j64 = 0;
+
 static void dump(void *buf, size_t size, const char *filename) {
 	if (size == 0)
 		return;
@@ -371,14 +374,14 @@ void repack(const char* orig_image, const char* out_image) {
 	// extra
 	extra_off = lseek(fd, 0, SEEK_CUR);
 	if (access(EXTRA_FILE, R_OK) == 0) {
-		boot.hdr.extra_size(restore(EXTRA_FILE, fd));
+		boot.hdr.extra_size() = restore(EXTRA_FILE, fd);
 		file_align();
 	}
 
 	// recovery_dtbo
 	if (access(RECV_DTBO_FILE, R_OK) == 0) {
-		boot.hdr.recovery_dtbo_offset(lseek(fd, 0, SEEK_CUR));
-		boot.hdr.recovery_dtbo_size(restore(RECV_DTBO_FILE, fd));
+		boot.hdr.recovery_dtbo_offset() = lseek(fd, 0, SEEK_CUR);
+		boot.hdr.recovery_dtbo_size() = restore(RECV_DTBO_FILE, fd);
 		file_align();
 	}
 
@@ -439,7 +442,7 @@ void repack(const char* orig_image, const char* out_image) {
 
 	// Try to fix the header
 	if (boot.hdr.header_version() && boot.hdr.header_size() == 0)
-		boot.hdr.header_size(sizeof(boot_img_hdr));
+		boot.hdr.header_size() = sizeof(boot_img_hdr);
 
 	// Main header
 	memcpy(boot.map_addr + header_off, *boot.hdr, boot.hdr.hdr_size());

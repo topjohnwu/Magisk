@@ -147,28 +147,24 @@ struct blob_hdr {
 struct dyn_img_hdr {
 
 #define dyn_access(x) (pxa ? hdr_pxa->x : v1_hdr->x)
-#define dyn_get(name, type) type name() const { return dyn_access(name); }
-#define dyn_set(name, type) void name(type v) { dyn_access(name) = v; }
 
-#define dyn_func(name, type) \
-dyn_get(name, type) \
-dyn_set(name, type)
+#define dyn_get(name, type) \
+type name() const { return dyn_access(name); }
+#define dyn_ref(name, type) \
+type &name() { return dyn_access(name); }
+#define v1_ref(name, type, alt) \
+type &name() { if (pxa) { alt = 0; return alt; } return v1_hdr->name; }
 
-#define v1_func(name, type) \
-type name() const { return pxa ? 0 : v1_hdr->name; } \
-void name(type v) { if (!pxa) v1_hdr->name = v; }
-
-	dyn_func(extra_size, uint32_t);
-	dyn_func(page_size, uint32_t);
+	dyn_ref(page_size, uint32_t);
 	dyn_get(name, char *);
 	dyn_get(cmdline, char *);
 	dyn_get(id, char *);
 	dyn_get(extra_cmdline, char *);
 
-	v1_func(os_version, uint32_t);
-	v1_func(recovery_dtbo_size, uint32_t);
-	v1_func(recovery_dtbo_offset, uint32_t);
-	v1_func(header_size, uint32_t);
+	v1_ref(os_version, uint32_t, j32);
+	v1_ref(recovery_dtbo_size, uint32_t, j32);
+	v1_ref(recovery_dtbo_offset, uint64_t, j64);
+	v1_ref(header_size, uint32_t, j32);
 
 	dyn_img_hdr() : pxa(false), img_hdr(nullptr) {}
 	~dyn_img_hdr() {
@@ -179,17 +175,18 @@ void name(type v) { if (!pxa) v1_hdr->name = v; }
 	}
 
 	uint32_t header_version() {
-		if (pxa)
-			return 0;
-		uint32_t ver = v1_hdr->header_version;
 		// There won't be v4 header any time soon...
 		// If larger than 4, assume this field will be treated as extra_size
-		return ver > 4 ? 0 : ver;
+		return pxa || v1_hdr->header_version > 4 ? 0 : v1_hdr->header_version;
 	}
 
-	uint32_t extra_size() {
+	uint32_t &extra_size() {
 		// If header version > 0, we should treat this field as header_version
-		return header_version() ? 0 : dyn_access(extra_size);
+		if (header_version()) {
+			j32 = 0;
+			return j32;
+		}
+		return dyn_access(extra_size);
 	}
 
 	size_t hdr_size() {
@@ -216,13 +213,16 @@ void name(type v) { if (!pxa) v1_hdr->name = v; }
 private:
 	bool pxa;
 	union {
-		/* Main header is either AOSP or PXA
-		 * but both of them is a base header
+		/* Main header could be either AOSP or PXA,
+		 * but both of them is a base header.
 		 * Same address can be interpreted in 3 ways */
 		boot_img_hdr_base *img_hdr;  /* Common base header */
 		boot_img_hdr *v1_hdr;        /* AOSP v1 header */
 		boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
 	};
+
+	static uint32_t j32;
+	static uint64_t j64;
 };
 
 struct boot_img {
