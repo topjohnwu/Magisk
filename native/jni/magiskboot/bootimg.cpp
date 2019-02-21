@@ -11,6 +11,7 @@
 
 #include "bootimg.h"
 #include "magiskboot.h"
+#include "compress.h"
 
 static void dump(void *buf, size_t size, const char *filename) {
 	if (size == 0)
@@ -163,11 +164,8 @@ int boot_img::parse_image(const char * image) {
 				r_fmt = check_fmt(ramdisk, hdr->ramdisk_size);
 			}
 
-			char fmt[16];
-			get_fmt_name(k_fmt, fmt);
-			fprintf(stderr, "KERNEL_FMT      [%s]\n", fmt);
-			get_fmt_name(r_fmt, fmt);
-			fprintf(stderr, "RAMDISK_FMT     [%s]\n", fmt);
+			fprintf(stderr, "KERNEL_FMT      [%s]\n", fmt2name[k_fmt]);
+			fprintf(stderr, "RAMDISK_FMT     [%s]\n", fmt2name[r_fmt]);
 
 			return flags & CHROMEOS_FLAG ? CHROMEOS_RET : 0;
 		default:

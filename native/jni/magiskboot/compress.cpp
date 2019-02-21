@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <memory>
 
 #include <logging.h>
 #include <utils.h>
@@ -10,142 +11,121 @@
 #include "magiskboot.h"
 #include "compress.h"
 
+using namespace std;
+
 int64_t decompress(format_t type, int fd, const void *from, size_t size) {
-	auto cmp = get_decoder(type);
-	int64_t ret = cmp->one_step(fd, from, size);
-	delete cmp;
-	return ret;
+	unique_ptr<Compression> cmp(get_decoder(type));
+	return cmp->one_step(fd, from, size);
 }
 
 int64_t compress(format_t type, int fd, const void *from, size_t size) {
-	auto cmp = get_encoder(type);
-	int64_t ret = cmp->one_step(fd, from, size);
-	delete cmp;
-	return ret;
+	unique_ptr<Compression> cmp(get_encoder(type));
+	return cmp->one_step(fd, from, size);
 }
 
-void decompress(char *from, const char *to) {
-	int strip = 1;
-	void *file;
-	size_t size = 0;
-	if (strcmp(from, "-") == 0)
-		stream_full_read(STDIN_FILENO, &file, &size);
-	else
-		mmap_ro(from, &file, &size);
-	format_t type = check_fmt(file, size);
-	char *ext;
-	ext = strrchr(from, '.');
-	if (to == nullptr)
-		to = from;
-	if (ext != nullptr) {
-		// Strip out a matched file extension
-		switch (type) {
-		case GZIP:
-			if (strcmp(ext, ".gz") != 0)
-				strip = 0;
-			break;
-		case XZ:
-			if (strcmp(ext, ".xz") != 0)
-				strip = 0;
-			break;
-		case LZMA:
-			if (strcmp(ext, ".lzma") != 0)
-				strip = 0;
-			break;
-		case BZIP2:
-			if (strcmp(ext, ".bz2") != 0)
-				strip = 0;
-			break;
-		case LZ4_LEGACY:
-		case LZ4:
-			if (strcmp(ext, ".lz4") != 0)
-				strip = 0;
-			break;
-		default:
-			LOGE("Provided file \'%s\' is not a supported archive format\n", from);
+static bool read_file(FILE *fp, const function<void (void *, size_t)> &fn) {
+	char buf[4096];
+	size_t len;
+	while ((len = fread(buf, 1, sizeof(buf), fp)))
+		fn(buf, len);
+	return true;
+}
+
+void decompress(char *infile, const char *outfile) {
+	bool in_std = strcmp(infile, "-") == 0;
+	bool rm_in = false;
+
+	FILE *in_file = in_std ? stdin : xfopen(infile, "re");
+	int out_fd = -1;
+	unique_ptr<Compression> cmp;
+
+	read_file(in_file, [&](void *buf, size_t len) -> void {
+		if (out_fd < 0) {
+			format_t type = check_fmt(buf, len);
+			if (!COMPRESSED(type))
+				LOGE("Input file is not a compressed type!\n");
+
+			cmp = std::move(unique_ptr<Compression>(get_decoder(type)));
+			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
+
+			/* If user does not provide outfile, infile has to be either
+	 		* <path>.[ext], or '-'. Outfile will be either <path> or '-'.
+	 		* If the input does not have proper format, abort */
+
+			char *ext = nullptr;
+			if (outfile == nullptr) {
+				outfile = infile;
+				if (!in_std) {
+					ext = strrchr(infile, '.');
+					if (ext == nullptr || strcmp(ext, fmt2ext[type]) != 0)
+						LOGE("Input file is not a supported type!\n");
+
+					// Strip out extension and remove input
+					*ext = '\0';
+					rm_in = true;
+					fprintf(stderr, "Decompressing to [%s]\n", outfile);
+				}
+			}
+
+			out_fd = strcmp(outfile, "-") == 0 ? STDOUT_FILENO : creat(outfile, 0644);
+			cmp->set_outfd(out_fd);
+			if (ext) *ext = '.';
 		}
-		if (strip)
-			*ext = '\0';
-	}
+		if (!cmp->update(buf, len))
+			LOGE("Decompression error!\n");
+	});
 
-	int fd;
+	cmp->finalize();
+	fclose(in_file);
+	close(out_fd);
 
-	if (strcmp(to, "-") == 0) {
-		fd = STDOUT_FILENO;
-	} else {
-		fd = creat(to, 0644);
-		fprintf(stderr, "Decompressing to [%s]\n", to);
-	}
-
-	decompress(type, fd, file, size);
-	close(fd);
-	if (to == from && ext != nullptr) {
-		*ext = '.';
-		unlink(from);
-	}
-	if (strcmp(from, "-") == 0)
-		free(file);
-	else
-		munmap(file, size);
+	if (rm_in)
+		unlink(infile);
 }
 
-void compress(const char *method, const char *from, const char *to) {
-	format_t type;
-	const char *ext;
-	char dest[PATH_MAX];
-	if (strcmp(method, "gzip") == 0) {
-		type = GZIP;
-		ext = "gz";
-	} else if (strcmp(method, "xz") == 0) {
-		type = XZ;
-		ext = "xz";
-	} else if (strcmp(method, "lzma") == 0) {
-		type = LZMA;
-		ext = "lzma";
-	} else if (strcmp(method, "lz4") == 0) {
-		type = LZ4;
-		ext = "lz4";
-	} else if (strcmp(method, "lz4_legacy") == 0) {
-		type = LZ4_LEGACY;
-		ext = "lz4";
-	} else if (strcmp(method, "bzip2") == 0) {
-		type = BZIP2;
-		ext = "bz2";
+void compress(const char *method, const char *infile, const char *outfile) {
+	auto it = name2fmt.find(method);
+	if (it == name2fmt.end())
+		LOGE("Unsupported compression method: [%s]\n", method);
+
+	unique_ptr<Compression> cmp(get_encoder(it->second));
+
+	bool in_std = strcmp(infile, "-") == 0;
+	bool rm_in = false;
+
+	FILE *in_file = in_std ? stdin : xfopen(infile, "re");
+	int out_fd;
+
+	if (outfile == nullptr) {
+		if (in_std) {
+			out_fd = STDOUT_FILENO;
+		} else {
+			/* If user does not provide outfile and infile is not
+			 * STDIN, output to <infile>.[ext] */
+			char *tmp = new char[strlen(infile) + 5];
+			sprintf(tmp, "%s%s", infile, fmt2ext[it->second]);
+			out_fd = creat(tmp, 0644);
+			fprintf(stderr, "Compressing to [%s]\n", tmp);
+			delete[] tmp;
+			rm_in = true;
+		}
 	} else {
-		fprintf(stderr, "Only support following methods: ");
-		for (int i = 0; SUP_LIST[i]; ++i)
-			fprintf(stderr, "%s ", SUP_LIST[i]);
-		fprintf(stderr, "\n");
-		exit(1);
+		out_fd = strcmp(infile, "-") == 0 ? STDOUT_FILENO : creat(infile, 0644);
 	}
-	void *file;
-	size_t size;
-	if (strcmp(from, "-") == 0)
-		stream_full_read(STDIN_FILENO, &file, &size);
-	else
-		mmap_ro(from, &file, &size);
-	if (to == nullptr) {
-		if (strcmp(from, "-") == 0)
-			strcpy(dest, "-");
-		else
-			snprintf(dest, sizeof(dest), "%s.%s", from, ext);
-	} else
-		strcpy(dest, to);
-	int fd;
-	if (strcmp(dest, "-") == 0) {
-		fd = STDOUT_FILENO;
-	} else {
-		fd = creat(dest, 0644);
-		fprintf(stderr, "Compressing to [%s]\n", dest);
-	}
-	compress(type, fd, file, size);
-	close(fd);
-	if (strcmp(from, "-") == 0)
-		free(file);
-	else
-		munmap(file, size);
-	if (to == nullptr)
-		unlink(from);
+
+	cmp->set_outfd(out_fd);
+
+	read_file(in_file, [&](void *buf, size_t len) -> void {
+		if (!cmp->update(buf, len))
+			LOGE("Compression error!\n");
+	});
+
+	cmp->finalize();
+	fclose(in_file);
+	close(out_fd);
+
+	if (rm_in)
+		unlink(infile);
 }
 
 

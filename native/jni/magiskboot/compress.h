@@ -185,3 +185,7 @@ private:
 
 Compression *get_encoder(format_t type);
 Compression *get_decoder(format_t type);
+int64_t compress(format_t type, int fd, const void *from, size_t size);
+int64_t decompress(format_t type, int fd, const void *from, size_t size);
+void compress(const char *method, const char *infile, const char *outfile);
+void decompress(char *infile, const char *outfile);
