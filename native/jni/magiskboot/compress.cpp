@@ -254,7 +254,8 @@ bool BZStream::update(const void *in, size_t size) {
 }
 
 uint64_t BZStream::finalize() {
-	update(nullptr, 0, BZ_FINISH);
+	if (mode)
+		update(nullptr, 0, BZ_FINISH);
 	uint64_t total = ((uint64_t) strm.total_out_hi32 << 32) + strm.total_out_lo32;
 	switch(mode) {
 		case 0:
