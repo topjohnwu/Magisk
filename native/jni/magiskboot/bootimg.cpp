@@ -47,16 +47,11 @@ boot_img::~boot_img() {
 #define CHROMEOS_RET       2
 #define ELF32_RET          3
 #define ELF64_RET          4
-#define pos_align() pos = do_align(pos, hdr.page_size())
 
-int boot_img::parse_image(const char * image) {
+int boot_img::parse_file(const char *image) {
 	mmap_ro(image, (void **) &map_addr, &map_size);
-
-	// Parse image
 	fprintf(stderr, "Parsing boot image: [%s]\n", image);
 	for (uint8_t *head = map_addr; head < map_addr + map_size; ++head) {
-		size_t pos = 0;
-
 		switch (check_fmt(head, map_size)) {
 		case CHROMEOS:
 			// The caller should know it's chromeos, as it needs additional signing
@@ -67,115 +62,120 @@ int boot_img::parse_image(const char * image) {
 			flags |= SEANDROID_FLAG;
 			fprintf(stderr, "DHTB_HDR\n");
 			break;
-		case ELF32:
-			exit(ELF32_RET);
-		case ELF64:
-			exit(ELF64_RET);
 		case BLOB:
 			flags |= BLOB_FLAG;
 			fprintf(stderr, "TEGRA_BLOB\n");
 			b_hdr = new blob_hdr();
 			memcpy(b_hdr, head, sizeof(blob_hdr));
+			head += sizeof(blob_hdr) - 1;
 			break;
 		case AOSP:
-			// Read the header
-			if (((boot_img_hdr*) head)->page_size >= 0x02000000) {
-				flags |= PXA_FLAG;
-				fprintf(stderr, "PXA_BOOT_HDR\n");
-				hdr.set_hdr(new boot_img_hdr_pxa());
-				memcpy(*hdr, head, sizeof(boot_img_hdr_pxa));
-			} else if (memcmp(((boot_img_hdr*) head)->cmdline, NOOKHD_MAGIC, 12) == 0
-					   || memcmp(((boot_img_hdr*) head)->cmdline, NOOKHD_NEW_MAGIC, 26) == 0) {
-				flags |= NOOKHD_FLAG;
-				fprintf(stderr, "NOOKHD_GREEN_LOADER\n");
-				head += NOOKHD_PRE_HEADER_SZ - 1;
-				continue;
-			} else if (memcmp(((boot_img_hdr*) head)->name, ACCLAIM_MAGIC, 10) == 0) {
-				flags |= ACCLAIM_FLAG;
-				fprintf(stderr, "ACCLAIM_BAUWKSBOOT\n");
-				head += ACCLAIM_PRE_HEADER_SZ - 1;
-				continue;
-			} else {
-				hdr.set_hdr(new boot_img_hdr());
-				memcpy(*hdr, head, sizeof(boot_img_hdr));
-			}
-			pos += hdr.page_size();
+			return parse_image(head);
 
-			flags |= hdr.id()[SHA_DIGEST_SIZE] ? SHA256_FLAG : 0;
-
-			print_hdr();
-
-			kernel = head + pos;
-			pos += hdr->kernel_size;
-			pos_align();
-
-			ramdisk = head + pos;
-			pos += hdr->ramdisk_size;
-			pos_align();
-
-			second = head + pos;
-			pos += hdr->second_size;
-			pos_align();
-
-			extra = head + pos;
-			pos += hdr.extra_size();
-			pos_align();
-
-			recov_dtbo = head + pos;
-			pos += hdr.recovery_dtbo_size();
-			pos_align();
-
-			if (pos < map_size) {
-				tail = head + pos;
-				tail_size = map_size - (tail - map_addr);
-			}
-
-			// Check tail info, currently only for LG Bump and Samsung SEANDROIDENFORCE
-			if (tail_size >= 16 && memcmp(tail, SEANDROID_MAGIC, 16) == 0) {
-				flags |= SEANDROID_FLAG;
-			} else if (tail_size >= 16 && memcmp(tail, LG_BUMP_MAGIC, 16) == 0) {
-				flags |= LG_BUMP_FLAG;
-			}
-
-			find_dtb();
-
-			k_fmt = check_fmt(kernel, hdr->kernel_size);
-			r_fmt = check_fmt(ramdisk, hdr->ramdisk_size);
-
-			// Check MTK
-			if (k_fmt == MTK) {
-				fprintf(stderr, "MTK_KERNEL_HDR\n");
-				flags |= MTK_KERNEL;
-				k_hdr = new mtk_hdr();
-				memcpy(k_hdr, kernel, sizeof(mtk_hdr));
-				fprintf(stderr, "KERNEL          [%u]\n", k_hdr->size);
-				fprintf(stderr, "NAME            [%s]\n", k_hdr->name);
-				kernel += 512;
-				hdr->kernel_size -= 512;
-				k_fmt = check_fmt(kernel, hdr->kernel_size);
-			}
-			if (r_fmt == MTK) {
-				fprintf(stderr, "MTK_RAMDISK_HDR\n");
-				flags |= MTK_RAMDISK;
-				r_hdr = new mtk_hdr();
-				memcpy(r_hdr, ramdisk, sizeof(mtk_hdr));
-				fprintf(stderr, "RAMDISK         [%u]\n", r_hdr->size);
-				fprintf(stderr, "NAME            [%s]\n", r_hdr->name);
-				ramdisk += 512;
-				hdr->ramdisk_size -= 512;
-				r_fmt = check_fmt(ramdisk, hdr->ramdisk_size);
-			}
-
-			fprintf(stderr, "KERNEL_FMT      [%s]\n", fmt2name[k_fmt]);
-			fprintf(stderr, "RAMDISK_FMT     [%s]\n", fmt2name[r_fmt]);
-
-			return flags & CHROMEOS_FLAG ? CHROMEOS_RET : 0;
-		default:
-			break;
+		/* Unsupported */
+		case ELF32:
+			exit(ELF32_RET);
+		case ELF64:
+			exit(ELF64_RET);
 		}
 	}
 	LOGE("No boot image magic found!\n");
 	exit(1);
+}
+
+#define pos_align() pos = do_align(pos, hdr.page_size())
+int boot_img::parse_image(uint8_t *head) {
+	auto hp = (boot_img_hdr*) head;
+	if (hp->page_size >= 0x02000000) {
+		fprintf(stderr, "PXA_BOOT_HDR\n");
+		hdr.set_hdr(new boot_img_hdr_pxa());
+		memcpy(*hdr, head, sizeof(boot_img_hdr_pxa));
+	} else {
+		if (memcmp(hp->cmdline, NOOKHD_MAGIC, 12) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_NEW_MAGIC, 26) == 0) {
+			flags |= NOOKHD_FLAG;
+			fprintf(stderr, "NOOKHD_GREEN_LOADER\n");
+			head += NOOKHD_PRE_HEADER_SZ;
+		} else if (memcmp(hp->name, ACCLAIM_MAGIC, 10) == 0) {
+			flags |= ACCLAIM_FLAG;
+			fprintf(stderr, "ACCLAIM_BAUWKSBOOT\n");
+			head += ACCLAIM_PRE_HEADER_SZ;
+		}
+		hdr.set_hdr(new boot_img_hdr());
+		memcpy(*hdr, head, sizeof(boot_img_hdr));
+	}
+
+	size_t pos = hdr.page_size();
+
+	flags |= hdr.id()[SHA_DIGEST_SIZE] ? SHA256_FLAG : 0;
+
+	print_hdr();
+
+	kernel = head + pos;
+	pos += hdr->kernel_size;
+	pos_align();
+
+	ramdisk = head + pos;
+	pos += hdr->ramdisk_size;
+	pos_align();
+
+	second = head + pos;
+	pos += hdr->second_size;
+	pos_align();
+
+	extra = head + pos;
+	pos += hdr.extra_size();
+	pos_align();
+
+	recov_dtbo = head + pos;
+	pos += hdr.recovery_dtbo_size();
+	pos_align();
+
+	if (head + pos < map_addr + map_size) {
+		tail = head + pos;
+		tail_size = map_size - (tail - map_addr);
+	}
+
+	// Check tail info, currently only for LG Bump and Samsung SEANDROIDENFORCE
+	if (tail_size >= 16 && memcmp(tail, SEANDROID_MAGIC, 16) == 0) {
+		flags |= SEANDROID_FLAG;
+	} else if (tail_size >= 16 && memcmp(tail, LG_BUMP_MAGIC, 16) == 0) {
+		flags |= LG_BUMP_FLAG;
+	}
+
+	find_dtb();
+
+	k_fmt = check_fmt(kernel, hdr->kernel_size);
+	r_fmt = check_fmt(ramdisk, hdr->ramdisk_size);
+
+	// Check MTK
+	if (k_fmt == MTK) {
+		fprintf(stderr, "MTK_KERNEL_HDR\n");
+		flags |= MTK_KERNEL;
+		k_hdr = new mtk_hdr();
+		memcpy(k_hdr, kernel, sizeof(mtk_hdr));
+		fprintf(stderr, "KERNEL          [%u]\n", k_hdr->size);
+		fprintf(stderr, "NAME            [%s]\n", k_hdr->name);
+		kernel += 512;
+		hdr->kernel_size -= 512;
+		k_fmt = check_fmt(kernel, hdr->kernel_size);
+	}
+	if (r_fmt == MTK) {
+		fprintf(stderr, "MTK_RAMDISK_HDR\n");
+		flags |= MTK_RAMDISK;
+		r_hdr = new mtk_hdr();
+		memcpy(r_hdr, ramdisk, sizeof(mtk_hdr));
+		fprintf(stderr, "RAMDISK         [%u]\n", r_hdr->size);
+		fprintf(stderr, "NAME            [%s]\n", r_hdr->name);
+		ramdisk += 512;
+		hdr->ramdisk_size -= 512;
+		r_fmt = check_fmt(ramdisk, hdr->ramdisk_size);
+	}
+
+	fprintf(stderr, "KERNEL_FMT      [%s]\n", fmt2name[k_fmt]);
+	fprintf(stderr, "RAMDISK_FMT     [%s]\n", fmt2name[r_fmt]);
+
+	return (flags & CHROMEOS_FLAG) ? CHROMEOS_RET : 0;
 }
 
 void boot_img::find_dtb() {
@@ -251,7 +251,7 @@ void boot_img::print_hdr() {
 
 int unpack(const char *image) {
 	boot_img boot {};
-	int ret = boot.parse_image(image);
+	int ret = boot.parse_file(image);
 	int fd;
 
 	// Dump kernel
@@ -293,7 +293,7 @@ void repack(const char* orig_image, const char* out_image) {
 	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off;
 
 	// Parse original image
-	boot.parse_image(orig_image);
+	boot.parse_file(orig_image);
 
 	// Reset sizes
 	boot.hdr->kernel_size = 0;

@@ -132,17 +132,16 @@ struct blob_hdr {
 } __attribute__((packed));
 
 // Flags
-#define MTK_KERNEL      0x0001
-#define MTK_RAMDISK     0x0002
-#define CHROMEOS_FLAG   0x0004
-#define PXA_FLAG        0x0008
-#define DHTB_FLAG       0x0010
-#define SEANDROID_FLAG  0x0020
-#define LG_BUMP_FLAG    0x0040
-#define SHA256_FLAG     0x0080
-#define BLOB_FLAG       0x0100
-#define NOOKHD_FLAG     0x0200
-#define ACCLAIM_FLAG    0x0400
+#define MTK_KERNEL      1 << 1
+#define MTK_RAMDISK     1 << 2
+#define CHROMEOS_FLAG   1 << 3
+#define DHTB_FLAG       1 << 4
+#define SEANDROID_FLAG  1 << 5
+#define LG_BUMP_FLAG    1 << 6
+#define SHA256_FLAG     1 << 7
+#define BLOB_FLAG       1 << 8
+#define NOOKHD_FLAG     1 << 9
+#define ACCLAIM_FLAG    1 << 10
 
 struct dyn_img_hdr {
 
@@ -260,7 +259,8 @@ struct boot_img {
 
 	~boot_img();
 
-	int parse_image(const char *);
+	int parse_file(const char *);
+	int parse_image(uint8_t *);
 	void find_dtb();
 	void print_hdr();
 };
