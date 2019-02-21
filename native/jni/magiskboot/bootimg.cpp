@@ -77,6 +77,8 @@ int boot_img::parse_file(const char *image) {
 			exit(ELF32_RET);
 		case ELF64:
 			exit(ELF64_RET);
+		default:
+			break;
 		}
 	}
 	LOGE("No boot image magic found!\n");
@@ -180,28 +182,30 @@ int boot_img::parse_image(uint8_t *head) {
 
 void boot_img::find_dtb() {
 	for (uint32_t i = 0; i < hdr->kernel_size; ++i) {
-		if (memcmp(kernel + i, DTB_MAGIC, 4))
+		auto fdt_hdr = reinterpret_cast<fdt_header *>(kernel + i);
+		if (fdt32_to_cpu(fdt_hdr->magic) != FDT_MAGIC)
 			continue;
+
 		// Check that fdt_header.totalsize does not overflow kernel image size
-		uint32_t dt_sz = fdt32_to_cpu(*(uint32_t *)(kernel + i + 4));
-		if (dt_sz > hdr->kernel_size - i) {
+		uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
+		if (totalsize > hdr->kernel_size - i) {
 			fprintf(stderr, "Invalid DTB detection at 0x%x: size (%u) > remaining (%u)\n",
-					i, dt_sz, hdr->kernel_size - i);
+					i, totalsize, hdr->kernel_size - i);
 			continue;
 		}
 
 		// Check that fdt_header.off_dt_struct does not overflow kernel image size
-		uint32_t dt_struct_offset = fdt32_to_cpu(*(uint32_t *)(kernel + i + 8));
-		if (dt_struct_offset > hdr->kernel_size - i) {
+		uint32_t off_dt_struct = fdt32_to_cpu(fdt_hdr->off_dt_struct);
+		if (off_dt_struct > hdr->kernel_size - i) {
 			fprintf(stderr, "Invalid DTB detection at 0x%x: "
 							"struct offset (%u) > remaining (%u)\n",
-					i, dt_struct_offset, hdr->kernel_size - i);
+					i, off_dt_struct, hdr->kernel_size - i);
 			continue;
 		}
 
 		// Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
-		uint32_t dt_begin_node = fdt32_to_cpu(*(uint32_t *)(kernel + i + dt_struct_offset));
-		if (dt_begin_node != FDT_BEGIN_NODE) {
+		auto fdt_node_hdr = reinterpret_cast<fdt_node_header *>(kernel + i + off_dt_struct);
+		if (fdt32_to_cpu(fdt_node_hdr->tag) != FDT_BEGIN_NODE) {
 			fprintf(stderr, "Invalid DTB detection at 0x%x: "
 							"header tag of first node != FDT_BEGIN_NODE\n", i);
 			continue;
