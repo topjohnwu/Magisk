@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <algorithm>
-
+#include <memory>
 #include <utils.h>
 #include <logging.h>
 
@@ -30,20 +30,10 @@ static uint32_t x8u(char *hex) {
 	return val;
 }
 
-cpio_entry::cpio_entry(int fd, cpio_newc_header &header) {
-	// ino = x8u(header.ino);
-	mode = x8u(header.mode);
-	uid = x8u(header.uid);
-	gid = x8u(header.gid);
-	// nlink = x8u(header.nlink);
-	// mtime = x8u(header.mtime);
-	filesize = x8u(header.filesize);
-	// devmajor = x8u(header.devmajor);
-	// devminor = x8u(header.devminor);
-	// rdevmajor = x8u(header.rdevmajor);
-	// rdevminor = x8u(header.rdevminor);
+cpio_entry::cpio_entry(int fd, cpio_newc_header &header)
+: mode(x8u(header.mode)), uid(x8u(header.uid)), gid(x8u(header.gid)),
+filesize(x8u(header.filesize)) {
 	uint32_t namesize = x8u(header.namesize);
-	// check = x8u(header.check);
 	filename.resize(namesize - 1);
 	xxread(fd, &filename[0], namesize);
 	parse_align();
@@ -63,25 +53,16 @@ cpio::cpio(const char *filename) {
 	if (fd < 0) return;
 	fprintf(stderr, "Loading cpio: [%s]\n", filename);
 	cpio_newc_header header;
-	cpio_entry *entry;
-	int i = 0;
+	unique_ptr<cpio_entry> entry;
 	while(xxread(fd, &header, sizeof(cpio_newc_header)) != -1) {
-		entry = new cpio_entry(fd, header);
-		if (entry->filename == "." || entry->filename == ".." || entry->filename == "TRAILER!!!") {
-			bool trailer = entry->filename[0] == 'T';
-			delete entry;
-			if (trailer)
-				break;
+		entry = std::make_unique<cpio_entry>(fd, header);
+		if (entry->filename == "." || entry->filename == "..")
 			continue;
-		}
-		arr.push_back(entry);
+		if (entry->filename == "TRAILER!!!")
+			break;
+		entries.push_back(std::move(entry));
 	}
 	close(fd);
-}
-
-cpio::~cpio() {
-	for (auto &e : arr)
-		delete e;
 }
 
 #define dump_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), 4))
@@ -91,7 +72,7 @@ void cpio::dump(const char *file) {
 	char header[111];
 	sort();
 	int fd = creat(file, 0644);
-	for (auto &e : arr) {
+	for (auto &e : entries) {
 		sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
 				inode++,    // e->ino
 				e->mode,
@@ -125,50 +106,52 @@ void cpio::dump(const char *file) {
 }
 
 int cpio::find(const char *name) {
-	for (int i = 0; i < arr.size(); ++i) {
-		if (!arr[i])
+	for (int i = 0; i < entries.size(); ++i) {
+		if (!entries[i])
 			continue;
-		if (arr[i]->filename == name)
+		if (entries[i]->filename == name)
 			return i;
 	}
 	return -1;
 }
 
 void cpio::insert(cpio_entry *e) {
+	auto ue = unique_ptr<cpio_entry>(e);
+	insert(ue);
+}
+
+void cpio::insert(unique_ptr<cpio_entry> &e) {
 	int i = find(e->filename.c_str());
 	if (i >= 0) {
-		delete arr[i];
-		arr[i] = e;
+		entries[i] = std::move(e);
 	} else {
-		arr.push_back(e);
+		entries.push_back(std::move(e));
 	}
 }
 
 void cpio::rm(const char *name, bool r) {
 	size_t len = strlen(name);
-	for (auto &e : arr) {
+	for (auto &e : entries) {
 		if (!e)
 			continue;
 		if (e->filename.compare(0, len, name) == 0 &&
 			((r && e->filename[len] == '/') || e->filename[len] == '\0')) {
 			fprintf(stderr, "Remove [%s]\n", e->filename.c_str());
-			delete e;
-			e = nullptr;
-			if (!r)
-				return;
+			e.reset();
+			if (!r) return;
 		}
 	}
 }
 
 void cpio::makedir(mode_t mode, const char *name) {
-	auto e = new cpio_entry(name);
+	auto e = make_unique<cpio_entry>(name);
 	e->mode = S_IFDIR | mode;
 	insert(e);
 	fprintf(stderr, "Create directory [%s] (%04o)\n", name, mode);
 }
 
 void cpio::ln(const char *target, const char *name) {
-	auto e = new cpio_entry(name);
+	auto e = make_unique<cpio_entry>(name);
 	e->mode = S_IFLNK;
 	e->filesize = strlen(target);
 	e->data = strdup(target);
@@ -177,14 +160,15 @@ void cpio::ln(const char *target, const char *name) {
 }
 
 void cpio::add(mode_t mode, const char *name, const char *file) {
-	int fd = xopen(file, O_RDONLY);
-	auto e = new cpio_entry(name);
+	void *buf;
+	size_t sz;
+	mmap_ro(file, &buf, &sz);
+	auto e = make_unique<cpio_entry>(name);
 	e->mode = S_IFREG | mode;
-	e->filesize = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	e->data = xmalloc(e->filesize);
-	xxread(fd, e->data, e->filesize);
-	close(fd);
+	e->filesize = sz;
+	e->data = xmalloc(sz);
+	memcpy(e->data, buf, sz);
+	munmap(buf, sz);
 	insert(e);
 	fprintf(stderr, "Add entry [%s] (%04o)\n", name, mode);
 }
@@ -192,12 +176,10 @@ void cpio::add(mode_t mode, const char *name, const char *file) {
 bool cpio::mv(const char *from, const char *to) {
 	int f = find(from), t = find(to);
 	if (f >= 0) {
-		if (t > 0) {
-			delete arr[t];
-			arr[t] = nullptr;
-		}
+		if (t > 0)
+			entries[t].reset();
 		fprintf(stderr, "Move [%s] -> [%s]\n", from, to);
-		arr[f]->filename = to;
+		entries[f]->filename = to;
 		return true;
 	}
 	fprintf(stderr, "Cannot find entry %s\n", from);
@@ -225,16 +207,16 @@ static void extract_entry(cpio_entry *e, const char *file) {
 }
 
 void cpio::extract() {
-	for (auto &e : arr) {
+	for (auto &e : entries) {
 		if (!e) continue;
-		extract_entry(e, e->filename.c_str());
+		extract_entry(e.get(), e->filename.c_str());
 	}
 }
 
 bool cpio::extract(const char *name, const char *file) {
 	int i = find(name);
 	if (i > 0) {
-		extract_entry(arr[i], file);
+		extract_entry(entries[i].get(), file);
 		return true;
 	}
 	fprintf(stderr, "Cannot find the file entry [%s]\n", name);
@@ -242,13 +224,15 @@ bool cpio::extract(const char *name, const char *file) {
 }
 
 void cpio::sort() {
-	std::sort(arr.begin(), arr.end(), [] (auto a, auto b) -> bool {
-		if (a == b || a == nullptr)
+	std::sort(entries.begin(), entries.end(), []
+	(const unique_ptr<cpio_entry> &a, const unique_ptr<cpio_entry> &b) -> bool {
+		if (a == b || !a)
 			return false;
-		if (b == nullptr)
+		if (!b)
 			return true;
-		return a->filename.compare(b->filename) < 0;
+		return a->filename < b->filename;
 	});
-	while (arr.back() == nullptr)
-		arr.pop_back();
+
+	while (!entries.back())
+		entries.pop_back();
 }

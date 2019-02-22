@@ -22,9 +22,8 @@ public:
 void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s]\n",
 			keepverity ? "true" : "false", keepforceencrypt ? "true" : "false");
-	for (auto &e : arr) {
-		if (!e)
-			continue;
+	for (auto &e : entries) {
+		if (!e) continue;
 		bool fstab = (!keepverity || !keepforceencrypt) &&
 				!str_starts(e->filename, ".backup") &&
 				str_contains(e->filename, "fstab") && S_ISREG(e->mode);
@@ -33,8 +32,7 @@ void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 				patch_verity(&e->data, &e->filesize, 1);
 			} else if (e->filename == "verity_key") {
 				fprintf(stderr, "Remove [verity_key]\n");
-				delete e;
-				e = nullptr;
+				e.reset();
 				continue;
 			}
 		}
@@ -73,7 +71,7 @@ for (line = (char *) buf; line < (char *) buf + size && line[0]; line = strchr(l
 char *magisk_cpio::sha1() {
 	char sha1[41];
 	char *line;
-	for (auto &e : arr) {
+	for (auto &e : entries) {
 		if (!e) continue;
 		if (e->filename == "init.magisk.rc" || e->filename == "overlay/init.magisk.rc") {
 			for_each_line(line, e->data, e->filesize) {
@@ -99,7 +97,7 @@ char *magisk_cpio::sha1() {
 }
 
 void magisk_cpio::restore() {
-	for (auto &e : arr) {
+	for (auto &e : entries) {
 		if (!e) continue;
 		if (str_starts(e->filename, ".backup")) {
 			if (e->filename[7] == '\0') continue;
@@ -122,17 +120,14 @@ void magisk_cpio::restore() {
 	rm("magisk", true);
 }
 
+#define lhs o.entries[i]
+#define rhs entries[j]
 void magisk_cpio::backup(const char *orig) {
-	vector<cpio_entry*> bak;
-	cpio_entry *m, *n, *rem;
-	char buf[PATH_MAX];
+	vector<unique_ptr<cpio_entry> > bkup_entries;
+	string remv;
 
-	m = new cpio_entry(".backup");
-	m->mode = S_IFDIR;
-	bak.push_back(m);
-
-	rem = new cpio_entry(".backup/.rmlist");
-	rem->mode = S_IFREG;
+	bkup_entries.emplace_back(new cpio_entry(".backup"));
+	bkup_entries.back()->mode = S_IFDIR;
 
 	magisk_cpio o(orig);
 
@@ -146,59 +141,63 @@ void magisk_cpio::backup(const char *orig) {
 
 	// Start comparing
 	size_t i = 0, j = 0;
-	while(i != o.arr.size() || j != arr.size()) {
+	while(i != o.entries.size() || j != entries.size()) {
 		int res;
 		bool backup = false;
-		if (i != o.arr.size() && j != arr.size()) {
-			m = o.arr[i];
-			n = arr[j];
-			res = m->filename.compare(n->filename);
-		} else if (i == o.arr.size()) {
-			n = arr[j];
+		if (i != o.entries.size() && j != entries.size()) {
+			res = lhs->filename.compare(rhs->filename);
+		} else if (i == o.entries.size()) {
 			res = 1;
-		} else if (j == arr.size()) {
-			m = o.arr[i];
+		} else if (j == entries.size()) {
 			res = -1;
 		}
 
 		if (res < 0) {
 			// Something is missing in new ramdisk, backup!
-			++i;
 			backup = true;
 			fprintf(stderr, "Backup missing entry: ");
 		} else if (res == 0) {
-			++i; ++j;
-			if (m->filesize == n->filesize && memcmp(m->data, n->data, m->filesize) == 0)
-				continue;
-			// Not the same!
-			backup = true;
-			fprintf(stderr, "Backup mismatch entry: ");
+			if (memcmp(lhs->data, rhs->data, lhs->filesize) != 0) {
+				// Not the same!
+				backup = true;
+				fprintf(stderr, "Backup mismatch entry: ");
+			}
 		} else {
-			// Something new in ramdisk, record in rem
-			++j;
-			rem->data = xrealloc(rem->data, rem->filesize + n->filename.size());
-			memcpy((char *) rem->data + rem->filesize, n->filename.c_str(), n->filename.size());
-			rem->filesize += n->filename.size();
-			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", n->filename.c_str());
+			// Something new in ramdisk
+			remv += rhs->filename;
+			remv += (char) '\0';
+			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", rhs->filename.c_str());
 		}
 		if (backup) {
-			sprintf(buf, ".backup/%s", m->filename.c_str());
-			fprintf(stderr, "[%s] -> [%s]\n", m->filename.c_str(), buf);
-			m->filename = buf;
-			bak.push_back(m);
-			// NULL the original entry, so it won't be freed
-			o.arr[i - 1] = nullptr;
+			string back_name = ".backup/" + lhs->filename;
+			fprintf(stderr, "[%s] -> [%s]\n", lhs->filename.c_str(), back_name.c_str());
+			lhs->filename = back_name;
+			bkup_entries.push_back(std::move(lhs));
+		}
+
+		// Increment positions
+		if (res < 0) {
+			++i;
+		} else if (res == 0) {
+			++i; ++j;
+		} else {
+			++j;
 		}
 	}
 
-	if (rem->filesize)
-		bak.push_back(rem);
-	else
-		delete rem;
+	if (!remv.empty()) {
+		auto rmlist = make_unique<cpio_entry>(".backup/.rmlist");
+		rmlist->mode = S_IFREG;
+		rmlist->filesize = remv.length();
+		rmlist->data = xmalloc(remv.length());
+		memcpy(rmlist->data, remv.data(), remv.length());
+		bkup_entries.push_back(std::move(rmlist));
+	}
 
-	if (bak.size() > 1)
-		for (auto item : bak)
-			insert(item);
+	if (bkup_entries.size() > 1) {
+		entries.insert(entries.end(),
+				make_move_iterator(bkup_entries.begin()), make_move_iterator(bkup_entries.end()));
+	}
 }
 
 

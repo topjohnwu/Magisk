@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
+#include <memory>
 
 struct cpio_newc_header {
 	char magic[6];
@@ -23,20 +24,12 @@ struct cpio_newc_header {
 } __attribute__((packed));
 
 struct cpio_entry {
-	// uint32_t ino;
 	uint32_t mode = 0;
 	uint32_t uid = 0;
 	uint32_t gid = 0;
-	// uint32_t nlink;
-	// uint32_t mtime;
 	uint32_t filesize = 0;
-	// uint32_t devmajor;
-	// uint32_t devminor;
-	// uint32_t rdevmajor;
-	// uint32_t rdevminor;
-	// uint32_t namesize;
-	// uint32_t check;
-//	char *filename = nullptr;
+
+	/* Dynamic data */
 	std::string filename;
 	void *data = nullptr;
 
@@ -49,10 +42,10 @@ struct cpio_entry {
 class cpio {
 public:
 	explicit cpio(const char *filename);
-	~cpio();
 	void dump(const char *file);
 	int find(const char *name);
 	void insert(cpio_entry *e);
+	void insert(std::unique_ptr<cpio_entry> &e);
 	void rm(const char *name, bool r = false);
 	void makedir(mode_t mode, const char *name);
 	void ln(const char *target, const char *name);
@@ -63,7 +56,7 @@ public:
 	void sort();
 
 protected:
-	std::vector<cpio_entry *> arr;
+	std::vector<std::unique_ptr<cpio_entry> > entries;
 };
 
 #endif

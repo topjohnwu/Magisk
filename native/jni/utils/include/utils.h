@@ -10,6 +10,7 @@
 #include <poll.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 
 #ifdef __cplusplus
 extern "C" {
