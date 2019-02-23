@@ -109,7 +109,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
 			rm_in = true;
 		}
 	} else {
-		out_fd = strcmp(infile, "-") == 0 ? STDOUT_FILENO : creat(infile, 0644);
+		out_fd = strcmp(outfile, "-") == 0 ? STDOUT_FILENO : creat(outfile, 0644);
 	}
 
 	cmp->set_out(make_unique<FDOutStream>(out_fd));
