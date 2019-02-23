@@ -29,7 +29,7 @@
     <string name="uninstall">Odinstaluj</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
 	<string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte. Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>
-    <string name="update">Aktualizacja</string>
+    <string name="update">Aktualizuj</string>
     <string name="core_only_enabled">(Tylko w trybie jądra jest włączona)</string>
    
    <!--Module Fragment-->
