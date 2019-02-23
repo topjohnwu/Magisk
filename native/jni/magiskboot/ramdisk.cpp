@@ -3,9 +3,9 @@
 #include <sys/stat.h>
 
 #include <utils.h>
+#include <cpio.h>
 
 #include "magiskboot.h"
-#include "cpio.h"
 
 using namespace std;
 

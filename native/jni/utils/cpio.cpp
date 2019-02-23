@@ -3,10 +3,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <algorithm>
+
 #include <utils.h>
 #include <logging.h>
-
-#include "cpio.h"
+#include <cpio.h>
 
 using namespace std;
 
