@@ -1,10 +1,11 @@
-#ifndef _CPIO_H_
-#define _CPIO_H_
+#pragma once
 
 #include <stdint.h>
 #include <vector>
 #include <string>
 #include <memory>
+#include <map>
+#include <string_view>
 
 struct cpio_newc_header {
 	char magic[6];
@@ -39,24 +40,26 @@ struct cpio_entry {
 	~cpio_entry();
 };
 
+typedef std::map<std::string_view, std::unique_ptr<cpio_entry>> entry_map;
+
 class cpio {
 public:
 	explicit cpio(const char *filename);
 	void dump(const char *file);
-	int find(const char *name);
-	void insert(cpio_entry *e);
-	void insert(std::unique_ptr<cpio_entry> &e);
 	void rm(const char *name, bool r = false);
-	void makedir(mode_t mode, const char *name);
-	void ln(const char *target, const char *name);
-	void add(mode_t mode, const char *name, const char *file);
-	bool mv(const char *from, const char *to);
 	void extract();
 	bool extract(const char *name, const char *file);
-	void sort();
+	bool exists(const char *name);
+
+	void insert(cpio_entry *e);
+	void add(mode_t mode, const char *name, const char *file);
+	void makedir(mode_t mode, const char *name);
+	void ln(const char *target, const char *name);
+	bool mv(const char *from, const char *to);
 
 protected:
-	std::vector<std::unique_ptr<cpio_entry> > entries;
-};
+	entry_map entries;
 
-#endif
+	void rm(entry_map::iterator &it);
+	void mv(entry_map::iterator &it, const char *to);
+};

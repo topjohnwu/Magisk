@@ -23,43 +23,43 @@ void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s]\n",
 			keepverity ? "true" : "false", keepforceencrypt ? "true" : "false");
 	for (auto &e : entries) {
-		if (!e) continue;
 		bool fstab = (!keepverity || !keepforceencrypt) &&
-				!str_starts(e->filename, ".backup") &&
-				str_contains(e->filename, "fstab") && S_ISREG(e->mode);
+					 !str_starts(e.first, ".backup") &&
+					 str_contains(e.first, "fstab") && S_ISREG(e.second->mode);
 		if (!keepverity) {
 			if (fstab) {
-				patch_verity(&e->data, &e->filesize, 1);
-			} else if (e->filename == "verity_key") {
+				patch_verity(&e.second->data, &e.second->filesize, 1);
+			} else if (e.first == "verity_key") {
 				fprintf(stderr, "Remove [verity_key]\n");
-				e.reset();
+				e.second.reset();
 				continue;
 			}
 		}
 		if (!keepforceencrypt) {
 			if (fstab) {
-				patch_encryption(&e->data, &e->filesize);
+				patch_encryption(&e.second->data, &e.second->filesize);
 			}
 		}
 	}
 }
 
-
 #define STOCK_BOOT       0x0
 #define MAGISK_PATCH     0x1
 #define UNSUPPORT_PATCH  0x2
 int magisk_cpio::test() {
-	static const char *UNSUPPORT_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc",
-										 "boot/sbin/launch_daemonsu.sh" };
-	static const char *MAGISK_LIST[] = { ".backup/.magisk", "init.magisk.rc",
-									  "overlay/init.magisk.rc" };
+	static const char *UNSUPPORT_LIST[] =
+			{ "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc",
+	 		"boot/sbin/launch_daemonsu.sh" };
+	static const char *MAGISK_LIST[] =
+			{ ".backup/.magisk", "init.magisk.rc",
+	 		"overlay/init.magisk.rc" };
 
 	for (auto file : UNSUPPORT_LIST)
-		if (find(file) >= 0)
+		if (exists(file))
 			return UNSUPPORT_PATCH;
 
 	for (auto file : MAGISK_LIST)
-		if (find(file) >= 0)
+		if (exists(file))
 			return MAGISK_PATCH;
 
 	return STOCK_BOOT;
@@ -72,62 +72,66 @@ char *magisk_cpio::sha1() {
 	char sha1[41];
 	char *line;
 	for (auto &e : entries) {
-		if (!e) continue;
-		if (e->filename == "init.magisk.rc" || e->filename == "overlay/init.magisk.rc") {
-			for_each_line(line, e->data, e->filesize) {
+		if (e.first == "init.magisk.rc" || e.first == "overlay/init.magisk.rc") {
+			for_each_line(line, e.second->data, e.second->filesize) {
 				if (strncmp(line, "#STOCKSHA1=", 11) == 0) {
 					strncpy(sha1, line + 12, 40);
 					sha1[40] = '\0';
 					return strdup(sha1);
 				}
 			}
-		} else if (e->filename == ".backup/.magisk") {
-			for_each_line(line, e->data, e->filesize) {
+		} else if (e.first == ".backup/.magisk") {
+			for_each_line(line, e.second->data, e.second->filesize) {
 				if (strncmp(line, "SHA1=", 5) == 0) {
 					strncpy(sha1, line + 5, 40);
 					sha1[40] = '\0';
 					return strdup(sha1);
 				}
 			}
-		} else if (e->filename == ".backup/.sha1") {
-			return (char *) e->data;
+		} else if (e.first == ".backup/.sha1") {
+			return (char *) e.second->data;
 		}
 	}
 	return nullptr;
 }
 
+#define for_each_str(str, buf, size) \
+for (str = (char *) buf; str < (char *) buf + size; str = str += strlen(str) + 1)
+
 void magisk_cpio::restore() {
-	for (auto &e : entries) {
-		if (!e) continue;
-		if (str_starts(e->filename, ".backup")) {
-			if (e->filename[7] == '\0') continue;
-			if (e->filename[8] == '.') {
-				if (strcmp(&e->filename[8], ".rmlist") == 0) {
-					for (int pos = 0; pos < e->filesize; pos += strlen((char *) e->data + pos) + 1)
-						rm((char *) e->data + pos, false);
-				}
+	char *file;
+	entry_map::iterator cur;
+	auto next = entries.begin();
+	while (next != entries.end()) {
+		cur = next;
+		++next;
+		if (str_starts(cur->first, ".backup")) {
+			if (cur->first.length() == 7 || cur->first.substr(8) == ".magisk") {
+				rm(cur);
+			} else if (cur->first.substr(8) == ".rmlist") {
+				for_each_str(file, cur->second->data, cur->second->filesize)
+					rm(file, false);
+				rm(cur);
 			} else {
-				mv(e->filename.c_str(), &e->filename[8]);
+				mv(cur, &cur->first[8]);
 			}
+		} else if (str_starts(cur->first, "overlay") ||
+				str_starts(cur->first, "magisk") ||
+				cur->first == "sbin/magic_mask.sh" ||
+				cur->first == "init.magisk.rc") {
+			// Some known stuff we can remove
+			rm(cur);
 		}
 	}
-
-	// Some known stuff we can remove
-	rm(".backup", true);
-	rm("overlay", true);
-	rm("sbin/magic_mask.sh", false);
-	rm("init.magisk.rc", false);
-	rm("magisk", true);
 }
 
-#define lhs o.entries[i]
-#define rhs entries[j]
 void magisk_cpio::backup(const char *orig) {
-	vector<unique_ptr<cpio_entry> > bkup_entries;
+	entry_map bkup_entries;
 	string remv;
 
-	bkup_entries.emplace_back(new cpio_entry(".backup"));
-	bkup_entries.back()->mode = S_IFDIR;
+	auto b = new cpio_entry(".backup");
+	b->mode = S_IFDIR;
+	bkup_entries[b->filename].reset(b);
 
 	magisk_cpio o(orig);
 
@@ -135,20 +139,17 @@ void magisk_cpio::backup(const char *orig) {
 	o.rm(".backup", true);
 	rm(".backup", true);
 
-	// Sort both CPIOs before comparing
-	o.sort();
-	sort();
+	auto lhs = o.entries.begin();
+	auto rhs = entries.begin();
 
-	// Start comparing
-	size_t i = 0, j = 0;
-	while(i != o.entries.size() || j != entries.size()) {
+	while (lhs != o.entries.end() || rhs != entries.end()) {
 		int res;
 		bool backup = false;
-		if (i != o.entries.size() && j != entries.size()) {
-			res = lhs->filename.compare(rhs->filename);
-		} else if (i == o.entries.size()) {
+		if (lhs != o.entries.end() && rhs != entries.end()) {
+			res = lhs->first.compare(rhs->first);
+		} else if (lhs == o.entries.end()) {
 			res = 1;
-		} else if (j == entries.size()) {
+		} else if (rhs == entries.end()) {
 			res = -1;
 		}
 
@@ -157,49 +158,49 @@ void magisk_cpio::backup(const char *orig) {
 			backup = true;
 			fprintf(stderr, "Backup missing entry: ");
 		} else if (res == 0) {
-			if (memcmp(lhs->data, rhs->data, lhs->filesize) != 0) {
+			if (lhs->second->filesize != rhs->second->filesize ||
+				memcmp(lhs->second->data, rhs->second->data, lhs->second->filesize) != 0) {
 				// Not the same!
 				backup = true;
 				fprintf(stderr, "Backup mismatch entry: ");
 			}
 		} else {
 			// Something new in ramdisk
-			remv += rhs->filename;
+			remv += rhs->first;
 			remv += (char) '\0';
-			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", rhs->filename.c_str());
+			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", rhs->first.data());
 		}
 		if (backup) {
-			string back_name = ".backup/" + lhs->filename;
-			fprintf(stderr, "[%s] -> [%s]\n", lhs->filename.c_str(), back_name.c_str());
-			lhs->filename = back_name;
-			bkup_entries.push_back(std::move(lhs));
+			string back_name(".backup/");
+			back_name += lhs->first;
+			fprintf(stderr, "[%s] -> [%s]\n", lhs->first.data(), back_name.data());
+			cpio_entry *ex = lhs->second.release();
+			ex->filename = back_name;
+			bkup_entries[ex->filename].reset(ex);
 		}
 
 		// Increment positions
 		if (res < 0) {
-			++i;
+			++lhs;
 		} else if (res == 0) {
-			++i; ++j;
+			++lhs; ++rhs;
 		} else {
-			++j;
+			++rhs;
 		}
 	}
 
 	if (!remv.empty()) {
-		auto rmlist = make_unique<cpio_entry>(".backup/.rmlist");
+		auto rmlist = new cpio_entry(".backup/.rmlist");
 		rmlist->mode = S_IFREG;
 		rmlist->filesize = remv.length();
 		rmlist->data = xmalloc(remv.length());
 		memcpy(rmlist->data, remv.data(), remv.length());
-		bkup_entries.push_back(std::move(rmlist));
+		bkup_entries[rmlist->filename].reset(rmlist);
 	}
 
-	if (bkup_entries.size() > 1) {
-		entries.insert(entries.end(),
-				make_move_iterator(bkup_entries.begin()), make_move_iterator(bkup_entries.end()));
-	}
+	if (bkup_entries.size() > 1)
+		entries.merge(bkup_entries);
 }
-
 
 int cpio_commands(int argc, char *argv[]) {
 	char *incpio = argv[0];
@@ -232,7 +233,7 @@ int cpio_commands(int argc, char *argv[]) {
 			if (sha1) printf("%s\n", sha1);
 			return 0;
 		} else if (cmdc == 2 && strcmp(cmdv[0], "exists") == 0) {
-			exit(cpio.find(cmdv[1]) < 0);
+			exit(!cpio.exists(cmdv[1]));
 		} else if (cmdc == 2 && strcmp(cmdv[0], "backup") == 0) {
 			cpio.backup(cmdv[1]);
 		} else if (cmdc >= 2 && strcmp(cmdv[0], "rm") == 0) {
