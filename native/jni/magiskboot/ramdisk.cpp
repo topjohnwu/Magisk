@@ -9,9 +9,9 @@
 
 using namespace std;
 
-class magisk_cpio : public cpio {
+class magisk_cpio : public cpio_rw {
 public:
-	explicit magisk_cpio(const char *filename) : cpio(filename) {}
+	explicit magisk_cpio(const char *filename) : cpio_rw(filename) {}
 	void patch(bool keepverity, bool keepforceencrypt);
 	int test();
 	char * sha1();
@@ -174,7 +174,7 @@ void magisk_cpio::backup(const char *orig) {
 			string back_name(".backup/");
 			back_name += lhs->first;
 			fprintf(stderr, "[%s] -> [%s]\n", lhs->first.data(), back_name.data());
-			cpio_entry *ex = lhs->second.release();
+			auto ex = static_cast<cpio_entry*>(lhs->second.release());
 			ex->filename = back_name;
 			bkup_entries[ex->filename].reset(ex);
 		}
