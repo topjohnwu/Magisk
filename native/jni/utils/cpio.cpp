@@ -197,8 +197,7 @@ void cpio_rw::add(mode_t mode, const char *name, const char *file) {
 	void *buf;
 	size_t sz;
 	mmap_ro(file, &buf, &sz);
-	auto e = new cpio_entry(name);
-	e->mode = S_IFREG | mode;
+	auto e = new cpio_entry(name, S_IFREG | mode);
 	e->filesize = sz;
 	e->data = xmalloc(sz);
 	memcpy(e->data, buf, sz);
@@ -208,15 +207,12 @@ void cpio_rw::add(mode_t mode, const char *name, const char *file) {
 }
 
 void cpio_rw::makedir(mode_t mode, const char *name) {
-	auto e = new cpio_entry(name);
-	e->mode = S_IFDIR | mode;
-	insert(e);
+	insert(new cpio_entry(name, S_IFDIR | mode));
 	fprintf(stderr, "Create directory [%s] (%04o)\n", name, mode);
 }
 
 void cpio_rw::ln(const char *target, const char *name) {
-	auto e = new cpio_entry(name);
-	e->mode = S_IFLNK;
+	auto e = new cpio_entry(name, S_IFLNK);
 	e->filesize = strlen(target);
 	e->data = strdup(target);
 	insert(e);

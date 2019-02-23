@@ -27,7 +27,9 @@ struct cpio_entry : public cpio_entry_base {
 	std::string filename;
 
 	cpio_entry() = default;
-	explicit cpio_entry(const char *name) : filename(name) {}
+	explicit cpio_entry(const char *name, uint32_t mode) : filename(name) {
+		this->mode = mode;
+	}
 	cpio_entry(int fd, cpio_newc_header &header);
 	~cpio_entry() override;
 };

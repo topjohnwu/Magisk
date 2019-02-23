@@ -134,8 +134,7 @@ void magisk_cpio::backup(const char *orig) {
 	entry_map bkup_entries;
 	string remv;
 
-	auto b = new cpio_entry(".backup");
-	b->mode = S_IFDIR;
+	auto b = new cpio_entry(".backup", S_IFDIR);
 	bkup_entries[b->filename].reset(b);
 
 	magisk_cpio o(orig);
@@ -195,8 +194,7 @@ void magisk_cpio::backup(const char *orig) {
 	}
 
 	if (!remv.empty()) {
-		auto rmlist = new cpio_entry(".backup/.rmlist");
-		rmlist->mode = S_IFREG;
+		auto rmlist = new cpio_entry(".backup/.rmlist", S_IFREG);
 		rmlist->filesize = remv.length();
 		rmlist->data = xmalloc(remv.length());
 		memcpy(rmlist->data, remv.data(), remv.length());
@@ -216,8 +214,7 @@ void magisk_cpio::compress() {
 	encoder.finalize();
 	entries.clear();
 	entries.insert(std::move(init));
-	auto xz = new cpio_entry(ramdisk_xz);
-	xz->mode = S_IFREG;
+	auto xz = new cpio_entry(ramdisk_xz, S_IFREG);
 	static_cast<BufOutStream *>(encoder.get_out())->release(xz->data, xz->filesize);
 	insert(xz);
 }
