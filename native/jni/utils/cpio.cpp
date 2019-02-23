@@ -66,8 +66,7 @@ cpio_entry::~cpio_entry() {
 
 void cpio::dump(const char *file) {
 	fprintf(stderr, "Dump cpio: [%s]\n", file);
-	int fd = xopen(file, O_WRONLY | O_CREAT, 0644);
-	FDOutStream fd_out(fd, true);
+	FDOutStream fd_out(xopen(file, O_WRONLY | O_CREAT | O_TRUNC, 0644), true);
 	output(fd_out);
 }
 
