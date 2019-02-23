@@ -29,6 +29,7 @@ public:
 	void restore();
 	void backup(const char *orig);
 	void compress();
+	void decompress();
 };
 
 void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
@@ -206,6 +207,8 @@ void magisk_cpio::backup(const char *orig) {
 }
 
 void magisk_cpio::compress() {
+	if (exists(ramdisk_xz))
+		return;
 	fprintf(stderr, "Compressing cpio -> [%s]\n", ramdisk_xz);
 	auto init = entries.extract("init");
 	XZEncoder encoder;
@@ -217,6 +220,22 @@ void magisk_cpio::compress() {
 	auto xz = new cpio_entry(ramdisk_xz, S_IFREG);
 	static_cast<BufOutStream *>(encoder.get_out())->release(xz->data, xz->filesize);
 	insert(xz);
+}
+
+void magisk_cpio::decompress() {
+	auto it = entries.find(ramdisk_xz);
+	if (it == entries.end())
+		return;
+	fprintf(stderr, "Decompressing cpio [%s]\n", ramdisk_xz);
+	LZMADecoder decoder;
+	decoder.set_out(make_unique<BufOutStream>());
+	decoder.write(it->second->data, it->second->filesize);
+	decoder.finalize();
+	entries.erase(it);
+	char *buf;
+	size_t sz;
+	static_cast<BufOutStream *>(decoder.get_out())->getbuf(buf, sz);
+	load_cpio(buf, sz);
 }
 
 int cpio_commands(int argc, char *argv[]) {
@@ -251,6 +270,8 @@ int cpio_commands(int argc, char *argv[]) {
 			return 0;
 		} else if (strcmp(cmdv[0], "compress") == 0){
 			cpio.compress();
+		} else if (strcmp(cmdv[0], "decompress") == 0){
+			cpio.decompress();
 		} else if (cmdc == 2 && strcmp(cmdv[0], "exists") == 0) {
 			exit(!cpio.exists(cmdv[1]));
 		} else if (cmdc == 2 && strcmp(cmdv[0], "backup") == 0) {

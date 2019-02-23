@@ -64,12 +64,18 @@ public:
 		return true;
 	}
 
-	template <typename T>
-	void release(void *&b, T &len) {
+	template <typename bytes, typename length>
+	void release(bytes *&b, length &len) {
 		b = buf;
 		len = off;
 		buf = nullptr;
 		off = cap = 0;
+	}
+
+	template <typename bytes, typename length>
+	void getbuf(bytes *&b, length &len) const {
+		b = buf;
+		len = off;
 	}
 
 	~BufOutStream() override {
