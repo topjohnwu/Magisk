@@ -109,6 +109,7 @@ LOCAL_SRC_FILES := \
 	magiskboot/pattern.cpp
 
 LOCAL_LDLIBS := -lz
+LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
