@@ -19,6 +19,8 @@ public:
 
 	void set_out(strm_ptr &&ptr) { out = std::move(ptr); }
 
+	OutStream *get_out() { return out.get(); }
+
 	bool write(const void *buf, size_t len) override {
 		return out ? out->write(buf, len) : false;
 	}
@@ -43,4 +45,39 @@ public:
 protected:
 	int fd;
 	bool close;
+};
+
+class BufOutStream : public OutStream {
+public:
+	BufOutStream() : buf(nullptr), off(0), cap(0) {};
+
+	bool write(const void *b, size_t len) override {
+		bool resize = false;
+		while (off + len > cap) {
+			cap = cap ? cap << 1 : 1 << 19;
+			resize = true;
+		}
+		if (resize)
+			buf = (char *) xrealloc(buf, cap);
+		memcpy(buf + off, b, len);
+		off += len;
+		return true;
+	}
+
+	template <typename T>
+	void release(void *&b, T &len) {
+		b = buf;
+		len = off;
+		buf = nullptr;
+		off = cap = 0;
+	}
+
+	~BufOutStream() override {
+		free(buf);
+	}
+
+protected:
+	char *buf;
+	size_t off;
+	size_t cap;
 };

@@ -6,17 +6,29 @@
 #include <cpio.h>
 
 #include "magiskboot.h"
+#include "compress.h"
 
 using namespace std;
+
+static const char *ramdisk_xz = "ramdisk.cpio.xz";
+
+static const char *UNSUPPORT_LIST[] =
+		{ "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc",
+		  "boot/sbin/launch_daemonsu.sh" };
+
+static const char *MAGISK_LIST[] =
+		{ ".backup/.magisk", "init.magisk.rc",
+		  "overlay/init.magisk.rc", ramdisk_xz };
 
 class magisk_cpio : public cpio_rw {
 public:
 	explicit magisk_cpio(const char *filename) : cpio_rw(filename) {}
 	void patch(bool keepverity, bool keepforceencrypt);
 	int test();
-	char * sha1();
+	char *sha1();
 	void restore();
 	void backup(const char *orig);
+	void compress();
 };
 
 void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
@@ -47,13 +59,6 @@ void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 #define MAGISK_PATCH     0x1
 #define UNSUPPORT_PATCH  0x2
 int magisk_cpio::test() {
-	static const char *UNSUPPORT_LIST[] =
-			{ "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc",
-	 		"boot/sbin/launch_daemonsu.sh" };
-	static const char *MAGISK_LIST[] =
-			{ ".backup/.magisk", "init.magisk.rc",
-	 		"overlay/init.magisk.rc" };
-
 	for (auto file : UNSUPPORT_LIST)
 		if (exists(file))
 			return UNSUPPORT_PATCH;
@@ -202,6 +207,21 @@ void magisk_cpio::backup(const char *orig) {
 		entries.merge(bkup_entries);
 }
 
+void magisk_cpio::compress() {
+	fprintf(stderr, "Compressing cpio -> [%s]\n", ramdisk_xz);
+	auto init = entries.extract("init");
+	XZEncoder encoder;
+	encoder.set_out(make_unique<BufOutStream>());
+	output(encoder);
+	encoder.finalize();
+	entries.clear();
+	entries.insert(std::move(init));
+	auto xz = new cpio_entry(ramdisk_xz);
+	xz->mode = S_IFREG;
+	static_cast<BufOutStream *>(encoder.get_out())->release(xz->data, xz->filesize);
+	insert(xz);
+}
+
 int cpio_commands(int argc, char *argv[]) {
 	char *incpio = argv[0];
 	++argv;
@@ -232,6 +252,8 @@ int cpio_commands(int argc, char *argv[]) {
 			char *sha1 = cpio.sha1();
 			if (sha1) printf("%s\n", sha1);
 			return 0;
+		} else if (strcmp(cmdv[0], "compress") == 0){
+			cpio.compress();
 		} else if (cmdc == 2 && strcmp(cmdv[0], "exists") == 0) {
 			exit(!cpio.exists(cmdv[1]));
 		} else if (cmdc == 2 && strcmp(cmdv[0], "backup") == 0) {

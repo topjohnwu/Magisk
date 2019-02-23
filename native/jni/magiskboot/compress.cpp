@@ -44,7 +44,7 @@ void decompress(char *infile, const char *outfile) {
 			if (!COMPRESSED(type))
 				LOGE("Input file is not a compressed type!\n");
 
-			cmp = std::move(unique_ptr<Compression>(get_decoder(type)));
+			cmp.reset(get_decoder(type));
 			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
 
 			/* If user does not provide outfile, infile has to be either
@@ -66,7 +66,8 @@ void decompress(char *infile, const char *outfile) {
 				}
 			}
 
-			out_fd = strcmp(outfile, "-") == 0 ? STDOUT_FILENO : creat(outfile, 0644);
+			out_fd = strcmp(outfile, "-") == 0 ?
+					STDOUT_FILENO : xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			cmp->set_out(make_unique<FDOutStream>(out_fd));
 			if (ext) *ext = '.';
 		}
@@ -103,13 +104,14 @@ void compress(const char *method, const char *infile, const char *outfile) {
 			 * STDIN, output to <infile>.[ext] */
 			char *tmp = new char[strlen(infile) + 5];
 			sprintf(tmp, "%s%s", infile, fmt2ext[it->second]);
-			out_fd = creat(tmp, 0644);
+			out_fd = xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			fprintf(stderr, "Compressing to [%s]\n", tmp);
 			delete[] tmp;
 			rm_in = true;
 		}
 	} else {
-		out_fd = strcmp(outfile, "-") == 0 ? STDOUT_FILENO : creat(outfile, 0644);
+		out_fd = strcmp(outfile, "-") == 0 ?
+				 STDOUT_FILENO : xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	}
 
 	cmp->set_out(make_unique<FDOutStream>(out_fd));
@@ -126,9 +128,6 @@ void compress(const char *method, const char *infile, const char *outfile) {
 	if (rm_in)
 		unlink(infile);
 }
-
-
-/* Compression Streams */
 
 Compression *get_encoder(format_t type) {
 	switch (type) {
@@ -184,7 +183,7 @@ GZStream::GZStream(int mode) : mode(mode), strm({}) {
 }
 
 bool GZStream::write(const void *in, size_t size) {
-	return write(in, size, Z_NO_FLUSH);
+	return size ? write(in, size, Z_NO_FLUSH) : true;
 }
 
 uint64_t GZStream::finalize() {
@@ -237,7 +236,7 @@ BZStream::BZStream(int mode) : mode(mode), strm({}) {
 }
 
 bool BZStream::write(const void *in, size_t size) {
-	return write(in, size, BZ_RUN);
+	return size ? write(in, size, BZ_RUN) : true;
 }
 
 uint64_t BZStream::finalize() {
@@ -304,7 +303,7 @@ LZMAStream::LZMAStream(int mode) : mode(mode), strm(LZMA_STREAM_INIT) {
 }
 
 bool LZMAStream::write(const void *in, size_t size) {
-	return write(in, size, LZMA_RUN);
+	return size ? write(in, size, LZMA_RUN) : true;
 }
 
 uint64_t LZMAStream::finalize() {
@@ -394,6 +393,8 @@ LZ4FEncoder::~LZ4FEncoder() {
 bool LZ4FEncoder::write(const void *in, size_t size) {
 	if (!outbuf)
 		write_header();
+	if (size == 0)
+		return true;
 	auto inbuf = (const uint8_t *) in;
 	size_t read, write;
 	do {
@@ -507,6 +508,8 @@ bool LZ4Encoder::write(const void *in, size_t size) {
 		FilterOutStream::write("\x02\x21\x4c\x18", 4);
 		init = true;
 	}
+	if (size == 0)
+		return true;
 	in_total += size;
 	const char *inbuf = (const char *) in;
 	size_t consumed;
