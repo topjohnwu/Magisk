@@ -6,22 +6,9 @@
 #include <map>
 #include <string_view>
 
-struct cpio_newc_header {
-	char magic[6];
-	char ino[8];
-	char mode[8];
-	char uid[8];
-	char gid[8];
-	char nlink[8];
-	char mtime[8];
-	char filesize[8];
-	char devmajor[8];
-	char devminor[8];
-	char rdevmajor[8];
-	char rdevminor[8];
-	char namesize[8];
-	char check[8];
-} __attribute__((packed));
+#include <OutStream.h>
+
+struct cpio_newc_header;
 
 struct cpio_entry_base {
 	uint32_t mode = 0;
@@ -58,6 +45,7 @@ public:
 protected:
 	entry_map entries;
 	void rm(entry_map::iterator &it);
+	void output(OutStream &out);
 };
 
 class cpio_rw : public cpio {

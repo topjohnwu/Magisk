@@ -10,6 +10,23 @@
 
 using namespace std;
 
+struct cpio_newc_header {
+	char magic[6];
+	char ino[8];
+	char mode[8];
+	char uid[8];
+	char gid[8];
+	char nlink[8];
+	char mtime[8];
+	char filesize[8];
+	char devmajor[8];
+	char devminor[8];
+	char rdevmajor[8];
+	char rdevminor[8];
+	char namesize[8];
+	char check[8];
+} __attribute__((packed));
+
 static uint32_t x8u(const char *hex) {
 	uint32_t val, inpos = 8, outpos;
 	char pattern[6];
@@ -47,43 +64,11 @@ cpio_entry::~cpio_entry() {
 	free(data);
 }
 
-#define dump_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), 4))
 void cpio::dump(const char *file) {
 	fprintf(stderr, "Dump cpio: [%s]\n", file);
-	unsigned inode = 300000;
-	char header[111];
-	int fd = creat(file, 0644);
-	for (auto &e : entries) {
-		sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
-				inode++,    // e->ino
-				e.second->mode,
-				e.second->uid,
-				e.second->gid,
-				1,          // e->nlink
-				0,          // e->mtime
-				e.second->filesize,
-				0,          // e->devmajor
-				0,          // e->devminor
-				0,          // e->rdevmajor
-				0,          // e->rdevminor
-				(uint32_t) e.first.size() + 1,
-				0           // e->check
-		);
-		xwrite(fd, header, 110);
-		xwrite(fd, e.first.data(), e.first.size() + 1);
-		dump_align();
-		if (e.second->filesize) {
-			xwrite(fd, e.second->data, e.second->filesize);
-			dump_align();
-		}
-	}
-	// Write trailer
-	sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
-			inode++, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0);
-	xwrite(fd, header, 110);
-	xwrite(fd, "TRAILER!!!\0", 11);
-	dump_align();
-	close(fd);
+	int fd = xopen(file, O_WRONLY | O_CREAT, 0644);
+	FDOutStream fd_out(fd, true);
+	output(fd_out);
 }
 
 void cpio::rm(entry_map::iterator &it) {
@@ -141,6 +126,45 @@ bool cpio::extract(const char *name, const char *file) {
 
 bool cpio::exists(const char *name) {
 	return entries.count(name) != 0;
+}
+
+#define do_out(b, l) out.write(b, l); pos += (l)
+#define out_align() out.write(zeros, align_off(pos, 4)); pos = do_align(pos, 4)
+void cpio::output(OutStream &out) {
+	size_t pos = 0;
+	unsigned inode = 300000;
+	char header[111];
+	char zeros[4] = {0};
+	for (auto &e : entries) {
+		sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
+				inode++,    // e->ino
+				e.second->mode,
+				e.second->uid,
+				e.second->gid,
+				1,          // e->nlink
+				0,          // e->mtime
+				e.second->filesize,
+				0,          // e->devmajor
+				0,          // e->devminor
+				0,          // e->rdevmajor
+				0,          // e->rdevminor
+				(uint32_t) e.first.size() + 1,
+				0           // e->check
+		);
+		do_out(header, 110);
+		do_out(e.first.data(), e.first.size() + 1);
+		out_align();
+		if (e.second->filesize) {
+			do_out(e.second->data, e.second->filesize);
+			out_align();
+		}
+	}
+	// Write trailer
+	sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
+			inode++, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0);
+	do_out(header, 110);
+	do_out("TRAILER!!!\0", 11);
+	out_align();
 }
 
 cpio_rw::cpio_rw(const char *filename) {
