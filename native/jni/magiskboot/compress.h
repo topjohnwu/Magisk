@@ -1,41 +1,26 @@
 #pragma once
 
-#include <functional>
-
 #include <zlib.h>
 #include <bzlib.h>
 #include <lzma.h>
 #include <lz4.h>
 #include <lz4frame.h>
 #include <lz4hc.h>
+#include <OutStream.h>
 
 #include "format.h"
 
 #define CHUNK 0x40000
 
-class Compression {
+class Compression : public FilterOutStream {
 public:
-	virtual ~Compression() = default;
-	void set_outfn(std::function<void(const void *, size_t)> &&fn);
-	void set_outfd(int fd);
 	int64_t one_step(int outfd, const void *in, size_t size);
-	virtual bool update(const void *in, size_t size) = 0;
 	virtual uint64_t finalize() = 0;
-
-	template <class T>
-	static int64_t one_step(int outfd, const void *in, size_t size) {
-		T cmp;
-		return cmp.one_step(outfd, in, size);
-	}
-
-protected:
-	Compression();
-	std::function<void (const void*, size_t)> fn;
 };
 
 class GZStream : public Compression {
 public:
-	bool update(const void *in, size_t size) override;
+	bool write(const void *in, size_t size) override;
 	uint64_t finalize() override;
 
 protected:
@@ -46,7 +31,7 @@ private:
 	z_stream strm;
 	uint8_t outbuf[CHUNK];
 
-	bool update(const void *in, size_t size, int flush);
+	bool write(const void *in, size_t size, int flush);
 };
 
 class GZDecoder : public GZStream {
@@ -61,7 +46,7 @@ public:
 
 class BZStream : public Compression {
 public:
-	bool update(const void *in, size_t size) override;
+	bool write(const void *in, size_t size) override;
 	uint64_t finalize() override;
 
 protected:
@@ -72,7 +57,7 @@ private:
 	bz_stream strm;
 	char outbuf[CHUNK];
 
-	bool update(const void *in, size_t size, int flush);
+	bool write(const void *in, size_t size, int flush);
 };
 
 class BZDecoder : public BZStream {
@@ -87,7 +72,7 @@ public:
 
 class LZMAStream : public Compression {
 public:
-	bool update(const void *in, size_t size) override;
+	bool write(const void *in, size_t size) override;
 	uint64_t finalize() override;
 
 protected:
@@ -98,7 +83,7 @@ private:
 	lzma_stream strm;
 	uint8_t outbuf[CHUNK];
 
-	bool update(const void *in, size_t size, lzma_action flush);
+	bool write(const void *in, size_t size, lzma_action flush);
 };
 
 class LZMADecoder : public LZMAStream {
@@ -120,7 +105,7 @@ class LZ4FDecoder : public Compression {
 public:
 	LZ4FDecoder();
 	~LZ4FDecoder() override;
-	bool update(const void *in, size_t size) override;
+	bool write(const void *in, size_t size) override;
 	uint64_t finalize() override;
 
 private:
@@ -136,7 +121,7 @@ class LZ4FEncoder : public Compression {
 public:
 	LZ4FEncoder();
 	~LZ4FEncoder() override;
-	bool update(const void *in, size_t size) override;
+	bool write(const void *in, size_t size) override;
 	uint64_t finalize() override;
 
 private:
@@ -156,7 +141,7 @@ class LZ4Decoder : public Compression {
 public:
 	LZ4Decoder();
 	~LZ4Decoder() override;
-	bool update(const void *in, size_t size) override;
+	bool write(const void *in, size_t size) override;
 	uint64_t finalize() override;
 
 private:
@@ -172,7 +157,7 @@ class LZ4Encoder : public Compression {
 public:
 	LZ4Encoder();
 	~LZ4Encoder() override;
-	bool update(const void *in, size_t size) override;
+	bool write(const void *in, size_t size) override;
 	uint64_t finalize() override;
 
 private:
