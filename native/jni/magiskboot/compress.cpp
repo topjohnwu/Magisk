@@ -104,7 +104,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
 			 * STDIN, output to <infile>.[ext] */
 			char *tmp = new char[strlen(infile) + 5];
 			sprintf(tmp, "%s%s", infile, fmt2ext[it->second]);
-			out_fd = xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			out_fd = xopen(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			fprintf(stderr, "Compressing to [%s]\n", tmp);
 			delete[] tmp;
 			rm_in = true;
