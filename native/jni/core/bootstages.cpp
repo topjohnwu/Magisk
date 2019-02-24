@@ -79,9 +79,6 @@ private:
 	int get_path(char *path);
 };
 
-//char node_entry::buf[] = {};
-//char node_entry::buf2[] = {};
-
 node_entry::node_entry(const char *name, uint8_t status, uint8_t type)
 		: name(name), type(type), status(status), parent(nullptr) {}
 
@@ -358,7 +355,8 @@ static bool magisk_env() {
 		}
 	}
 
-	// Remove legacy stuffs
+	// Remove stuffs
+	rm_rf("/cache/data_adb");
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
 

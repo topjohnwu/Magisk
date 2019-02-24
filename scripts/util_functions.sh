@@ -177,6 +177,7 @@ mount_partitions() {
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
   ui_print "- Mounting /system, /vendor"
+  mkdir /system 2>/dev/null
   [ -f /system/build.prop ] || is_mounted /system || mount -o ro /system 2>/dev/null
   if ! is_mounted /system && ! [ -f /system/build.prop ]; then
     SYSTEMBLOCK=`find_block system$SLOT`
@@ -191,7 +192,7 @@ mount_partitions() {
     mount -o bind /system_root/system /system
   fi
   if [ -L /system/vendor ]; then
-    # Seperate /vendor partition
+    mkdir /vendor 2>/dev/null
     is_mounted /vendor || mount -o ro /vendor 2>/dev/null
     if ! is_mounted /vendor; then
       VENDORBLOCK=`find_block vendor$SLOT`
