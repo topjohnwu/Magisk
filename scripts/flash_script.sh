@@ -45,14 +45,12 @@ is_mounted /data || mount /data || is_mounted /cache || mount /cache || abort "!
 mount_partitions
 
 find_boot_image
-find_dtbo_image
 
 check_data
 get_flags
 
 [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
 ui_print "- Target image: $BOOTIMAGE"
-[ -z $DTBOIMAGE ] || ui_print "- DTBO image: $DTBOIMAGE"
 
 # Detect version and architecture
 api_level_arch_detect
@@ -76,7 +74,7 @@ ui_print "- Constructing environment"
 # Copy required files
 rm -rf $MAGISKBIN/* 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
-cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $TMPDIR/bin/busybox $MAGISKBIN
+cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $BBDIR/busybox $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 
 # addon.d

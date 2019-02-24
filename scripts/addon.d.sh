@@ -33,8 +33,6 @@ initialize() {
 
   # Load utility functions
   . $MAGISKBIN/util_functions.sh
-
-  find_manager_apk
 }
 
 show_logo() {
@@ -44,6 +42,7 @@ show_logo() {
 }
 
 installation() {
+  find_manager_apk
   find_boot_image
   find_dtbo_image
   [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
@@ -98,7 +97,6 @@ main_v1() {
 }
 
 main_v2() {
-  boot_actions
   show_logo
   mount_partitions
   # Swap the slot
@@ -137,9 +135,7 @@ case "$1" in
   addond-v2)
     initialize
     # Override ui_print
-    ui_print() {
-      log -t Magisk -- "$1"
-    }
+    ui_print() { log -t Magisk -- "$1"; }
     # addon.d-v2
     main_v2
   ;;

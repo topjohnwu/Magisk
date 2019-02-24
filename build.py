@@ -374,10 +374,9 @@ def zip_uninstaller(args):
 
         # Binaries
         for lib_dir, zip_dir in [('armeabi-v7a', 'arm'), ('x86', 'x86')]:
-            for bin in ['magisk', 'magiskboot']:
-                source = os.path.join('native', 'out', lib_dir, bin)
-                target = os.path.join(zip_dir, bin)
-                zip_with_msg(zipf, source, target)
+            source = os.path.join('native', 'out', lib_dir, 'magiskboot')
+            target = os.path.join(zip_dir, 'magiskboot')
+            zip_with_msg(zipf, source, target)
 
         # Scripts
         # util_functions.sh

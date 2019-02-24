@@ -7,7 +7,7 @@ extract_bb() {
   "$BBBIN" >/dev/null || dd if="$0" of="$BBBIN" bs=1024 skip=1 count=$X86_CNT
 }
 setup_bb() {
-  BBDIR=$TMPDIR/bin
+  export BBDIR=$TMPDIR/bin
   BBBIN=$BBDIR/busybox
   mkdir -p $BBDIR 2>/dev/null
   extract_bb
@@ -20,7 +20,9 @@ case "$1" in
     extract_bb
     ;;
   "indep"|"sh")
-    TMPDIR=.;setup_bb;shift
+    TMPDIR=.
+    setup_bb
+    shift
     exec /system/bin/sh "$@"
     ;;
   *)

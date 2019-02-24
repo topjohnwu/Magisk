@@ -7,6 +7,27 @@
 #
 ##########################################################################################
 
+##########
+# Presets
+##########
+
+#MAGISK_VERSION_STUB
+
+# Detect whether in boot mode
+[ -z $BOOTMODE ] && BOOTMODE=false
+$BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
+$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -qv grep && BOOTMODE=true
+
+# Presets
+MAGISKTMP=/sbin/.magisk
+NVBASE=/data/adb
+[ -z $TMPDIR ] && TMPDIR=/dev/tmp
+
+# Bootsigner related stuff
+BOOTSIGNERCLASS=a.a
+BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
+BOOTSIGNED=false
+
 ###################
 # Helper Functions
 ###################
@@ -61,10 +82,10 @@ resolve_vars() {
 ######################
 
 setup_flashable() {
-  $BOOTMODE && return
   # Preserve environment varibles
   OLD_PATH=$PATH
-  setup_bb
+  ensure_bb
+  $BOOTMODE && return
   if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
     for FD in `ls /proc/$$/fd`; do
@@ -78,48 +99,41 @@ setup_flashable() {
   fi
 }
 
-setup_bb() {
+ensure_bb() {
   if [ -x $MAGISKTMP/busybox/busybox ]; then
-    # Make sure this path is in the front
-    echo $PATH | grep -q "^$MAGISKTMP/busybox" || export PATH=$MAGISKTMP/busybox:$PATH
+    [ -z $BBDIR ] && BBDIR=$MAGISKTMP/busybox
   elif [ -x $TMPDIR/bin/busybox ]; then
-    # Make sure this path is in the front
-    echo $PATH | grep -q "^$TMPDIR/bin" || export PATH=$TMPDIR/bin:$PATH
+    [ -z $BBDIR ] && BBDIR=$TMPDIR/bin
   else
     # Construct the PATH
-    mkdir -p $TMPDIR/bin
-    ln -s $MAGISKBIN/busybox $TMPDIR/bin/busybox
-    $MAGISKBIN/busybox --install -s $TMPDIR/bin
-    export PATH=$TMPDIR/bin:$PATH
+    [ -z $BBDIR ] && BBDIR=$TMPDIR/bin
+    mkdir -p $BBDIR
+    ln -s $MAGISKBIN/busybox $BBDIR/busybox
+    $MAGISKBIN/busybox --install -s $BBDIR
   fi
-}
-
-boot_actions() {
-  if [ ! -d $MAGISKTMP/mirror/bin ]; then
-    mkdir -p $MAGISKTMP/mirror/bin
-    mount -o bind $MAGISKBIN $MAGISKTMP/mirror/bin
-  fi
-  MAGISKBIN=$MAGISKTMP/mirror/bin
-  setup_bb
+  echo $PATH | grep -q "^$BBDIR" || export PATH=$BBDIR:$PATH
 }
 
 recovery_actions() {
-  # TWRP bug fix
+  # Make sure random don't get blocked
   mount -o bind /dev/urandom /dev/random
-  # Temporarily block out all custom recovery binaries/libs
-  mv /sbin /sbin_tmp
   # Unset library paths
   OLD_LD_LIB=$LD_LIBRARY_PATH
   OLD_LD_PRE=$LD_PRELOAD
+  OLD_LD_CFG=$LD_CONFIG_FILE
   unset LD_LIBRARY_PATH
   unset LD_PRELOAD
+  unset LD_CONFIG_FILE
+  # Force our own busybox path to be in the front
+  # and do not use anything in recovery's sbin
+  export PATH=$BBDIR:/system/bin:/vendor/bin
 }
 
 recovery_cleanup() {
-  mv /sbin_tmp /sbin 2>/dev/null
-  [ -z $OLD_PATH ] || export PATH=$OLD_PATH
+  export PATH=$OLD_PATH
   [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
   [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
+  [ -z $OLD_LD_CFG ] || export LD_CONFIG_FILE=$OLD_LD_CFG
   ui_print "- Unmounting partitions"
   umount -l /system_root 2>/dev/null
   umount -l /system 2>/dev/null
@@ -257,7 +271,9 @@ find_dtbo_image() {
 }
 
 patch_dtbo_image() {
+  find_dtbo_image
   if [ ! -z $DTBOIMAGE ]; then
+    ui_print "- DTBO image: $DTBOIMAGE"
     if $MAGISKBIN/magiskboot --dtb-test $DTBOIMAGE; then
       ui_print "- Backing up stock DTBO image"
       $MAGISKBIN/magiskboot --compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
@@ -397,24 +413,10 @@ unmount_magisk_img() {
   rm -f $MODULEPATH 2>/dev/null
 }
 
-#######
-# main
-#######
+boot_actions() { return; }
 
-#MAGISK_VERSION_STUB
-
-# Detect whether in boot mode
-[ -z $BOOTMODE ] && BOOTMODE=false
-$BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
-$BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
-
-# Presets
-MAGISKTMP=/sbin/.magisk
-NVBASE=/data/adb
-
-# Bootsigner related stuff
-BOOTSIGNERCLASS=a.a
-BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
-BOOTSIGNED=false
+########
+# Setup
+########
 
 resolve_vars

@@ -215,7 +215,7 @@ public abstract class MagiskInstaller {
 
         // Patch boot image
         if (!Shell.sh(Utils.fmt("cd %s; KEEPFORCEENCRYPT=%b KEEPVERITY=%b " +
-                        "sh update-binary indep boot_patch.sh %s",
+                        "sh update-binary sh boot_patch.sh %s",
                 installDir, Config.keepEnc, Config.keepVerity, srcBoot))
                 .to(console, logs).exec().isSuccess())
             return false;
@@ -245,7 +245,7 @@ public abstract class MagiskInstaller {
                 .to(console, logs).exec().isSuccess())
             return false;
         if (!Config.keepVerity)
-            Shell.su("find_dtbo_image", "patch_dtbo_image").to(console, logs).exec();
+            Shell.su("patch_dtbo_image").to(console, logs).exec();
         return true;
     }
 
