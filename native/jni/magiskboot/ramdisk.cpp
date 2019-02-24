@@ -35,22 +35,25 @@ public:
 void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s]\n",
 			keepverity ? "true" : "false", keepforceencrypt ? "true" : "false");
-	for (auto &e : entries) {
+	auto next = entries.begin();
+	decltype(next) cur;
+	while (next != entries.end()) {
+		cur = next;
+		++next;
 		bool fstab = (!keepverity || !keepforceencrypt) &&
-					 !str_starts(e.first, ".backup") &&
-					 str_contains(e.first, "fstab") && S_ISREG(e.second->mode);
+					 !str_starts(cur->first, ".backup") &&
+					 str_contains(cur->first, "fstab") && S_ISREG(cur->second->mode);
 		if (!keepverity) {
 			if (fstab) {
-				patch_verity(&e.second->data, &e.second->filesize, 1);
-			} else if (e.first == "verity_key") {
-				fprintf(stderr, "Remove [verity_key]\n");
-				e.second.reset();
+				patch_verity(&cur->second->data, &cur->second->filesize, 1);
+			} else if (cur->first == "verity_key") {
+				rm(cur);
 				continue;
 			}
 		}
 		if (!keepforceencrypt) {
 			if (fstab) {
-				patch_encryption(&e.second->data, &e.second->filesize);
+				patch_encryption(&cur->second->data, &cur->second->filesize);
 			}
 		}
 	}
@@ -106,8 +109,8 @@ for (str = (char *) buf; str < (char *) buf + size; str = str += strlen(str) + 1
 
 void magisk_cpio::restore() {
 	char *file;
-	entry_map::iterator cur;
 	auto next = entries.begin();
+	decltype(next) cur;
 	while (next != entries.end()) {
 		cur = next;
 		++next;
