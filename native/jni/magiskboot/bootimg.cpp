@@ -44,10 +44,8 @@ boot_img::~boot_img() {
 	delete b_hdr;
 }
 
-#define CHROMEOS_RET       2
-#define ELF32_RET          3
-#define ELF64_RET          4
-
+#define UNSUPP_RET  1
+#define CHROME_RET  2
 int boot_img::parse_file(const char *image) {
 	mmap_ro(image, (void **) &map_addr, &map_size);
 	fprintf(stderr, "Parsing boot image: [%s]\n", image);
@@ -74,15 +72,13 @@ int boot_img::parse_file(const char *image) {
 
 		/* Unsupported */
 		case ELF32:
-			exit(ELF32_RET);
 		case ELF64:
-			exit(ELF64_RET);
+			exit(UNSUPP_RET);
 		default:
 			break;
 		}
 	}
-	LOGE("No boot image magic found!\n");
-	exit(1);
+	exit(UNSUPP_RET);
 }
 
 #define pos_align() pos = do_align(pos, hdr.page_size())
@@ -177,7 +173,7 @@ int boot_img::parse_image(uint8_t *head) {
 	fprintf(stderr, "KERNEL_FMT      [%s]\n", fmt2name[k_fmt]);
 	fprintf(stderr, "RAMDISK_FMT     [%s]\n", fmt2name[r_fmt]);
 
-	return (flags & CHROMEOS_FLAG) ? CHROMEOS_RET : 0;
+	return (flags & CHROMEOS_FLAG) ? CHROME_RET : 0;
 }
 
 void boot_img::find_dtb() {

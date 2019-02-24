@@ -75,19 +75,12 @@ ui_print "- Unpacking boot image"
 
 case $? in
   1 )
-    abort "! Unable to unpack boot image"
+    abort "! Unsupported/Unknown image format"
     ;;
   2 )
     ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
     ;;
-  3 )
-    ui_print "! Sony ELF32 format detected"
-    abort "! Please use BootBridge from @AdrianDC to flash Magisk"
-    ;;
-  4 )
-    ui_print "! Sony ELF64 format detected"
-    abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
 
 ##########################################################################################
