@@ -28,9 +28,7 @@ int main(int argc, char *argv[]) {
 	cmdline_logging();
 	init_argv0(argc, argv);
 
-	if (strcmp(basename(argv[0]), "magisk.bin") == 0 ||
-			(strcmp(basename(argv[0]), "magisk") == 0
-			 && argc > 1 && argv[1][0] != '-')) {
+	if ((strcmp(basename(argv[0]), "magisk") == 0 && argc > 1 && argv[1][0] != '-')) {
 		--argc;
 		++argv;
 	}
