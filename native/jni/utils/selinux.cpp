@@ -86,12 +86,12 @@ void dload_selinux() {
 	void *handle = dlopen("libselinux.so", RTLD_LAZY);
 	if (handle == nullptr)
 		return;
-	*(void **) &freecon = dlsym(handle, "freecon");
-	*(void **) &setcon = dlsym(handle, "setcon");
-	*(void **) &getfilecon = dlsym(handle, "getfilecon");
-	*(void **) &lgetfilecon = dlsym(handle, "lgetfilecon");
-	*(void **) &setfilecon = dlsym(handle, "setfilecon");
-	*(void **) &lsetfilecon = dlsym(handle, "lsetfilecon");
+	/* We only use dlopen to know whether libselinux.so exists.
+	 * For some reason calling symbols returned from dlsym
+	 * will result to SEGV_ACCERR on some devices.
+	 * Always use builtin implementations for SELinux stuffs. */
+	dlclose(handle);
+	selinux_builtin_impl();
 }
 
 static void restore_syscon(int dirfd) {
