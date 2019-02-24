@@ -201,6 +201,7 @@ void cpio_rw::mv(entry_map::iterator &it, const char *to) {
 	auto &name = static_cast<cpio_entry*>(ex.mapped().get())->filename;
 	name = to;
 	ex.key() = name;
+	entries.erase(name);
 	entries.insert(std::move(ex));
 }
 
