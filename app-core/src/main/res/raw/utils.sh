@@ -14,6 +14,7 @@ fix_env() {
   ./busybox rm -f $MAGISKTMP/busybox/*
   $MAGISKTMP/mirror/bin/busybox --install -s $MAGISKTMP/busybox
   rm -f update-binary magisk.apk
+  chmod -R 755 .
   cd /
 }
 

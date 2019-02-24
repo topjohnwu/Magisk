@@ -19,7 +19,6 @@ LIBUTILS := jni/utils/include
 
 ifdef B_MAGISK
 
-# magisk main binary
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
 LOCAL_SHARED_LIBRARIES := libsqlite
@@ -56,11 +55,19 @@ include $(BUILD_EXECUTABLE)
 
 endif
 
-ifdef B_INIT
-
-# magiskinit
 include $(CLEAR_VARS)
+
+ifdef B_INIT
 LOCAL_MODULE := magiskinit
+BB_INIT := 1
+else ifdef B_INIT64
+LOCAL_MODULE := magiskinit64
+LOCAL_CPPFLAGS += -DUSE_64BIT
+BB_INIT := 1
+endif
+
+ifdef BB_INIT
+
 LOCAL_STATIC_LIBRARIES := libsepol libxz libutils
 LOCAL_C_INCLUDES := \
 	jni/include \
@@ -85,7 +92,6 @@ endif
 
 ifdef B_BOOT
 
-# magiskboot
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils
@@ -116,7 +122,6 @@ endif
 
 ifdef B_BB
 
-# Busybox
 include jni/external/busybox/Android.mk
 
 endif

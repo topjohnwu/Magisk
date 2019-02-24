@@ -100,6 +100,8 @@ $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
 SOURCEDMODE=true
 cd $MAGISKBIN
 
+$IS64BIT && mv -f magiskinit64 magiskinit || rm -f magiskinit64
+
 # Source the boot patcher
 . ./boot_patch.sh "$BOOTIMAGE"
 

@@ -44,7 +44,11 @@
 #include <flags.h>
 
 #include "binaries.h"
+#ifdef USE_64BIT
+#include "binaries_arch64.h"
+#else
 #include "binaries_arch.h"
+#endif
 #include "magiskrc.h"
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
@@ -367,12 +371,6 @@ static void setup_init_rc() {
 	fclose(rc);
 }
 
-static const char wrapper[] =
-"#!/system/bin/sh\n"
-"unset LD_LIBRARY_PATH\n"
-"unset LD_PRELOAD\n"
-"exec /sbin/magisk.bin \"${0##*/}\" \"$@\"\n";
-
 static void setup_overlay() {
 	char buf[128];
 	int fd;
@@ -402,13 +400,9 @@ static void setup_overlay() {
 	fd = open("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
 	write(fd, self, self_sz);
 	close(fd);
-	fd = open("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
-	write(fd, wrapper, sizeof(wrapper));
-	close(fd);
-	dump_magisk("/sbin/magisk.bin", 0755);
-	patch_socket_name("/sbin/magisk.bin");
+	dump_magisk("/sbin/magisk", 0755);
+	patch_socket_name("/sbin/magisk");
 	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 
 	// Create applet symlinks

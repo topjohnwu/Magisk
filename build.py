@@ -53,6 +53,7 @@ else:
 cpu_count = multiprocessing.cpu_count()
 gradlew = os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')
 archs = ['armeabi-v7a', 'x86']
+arch64 = ['arm64-v8a', 'x86_64']
 keystore = 'release-key.jks'
 config = {}
 
@@ -99,9 +100,9 @@ def zip_with_msg(zip_file, source, target):
 
 
 def collect_binary():
-    for arch in archs:
+    for arch in archs + arch64:
         mkdir_p(os.path.join('native', 'out', arch))
-        for bin in ['magisk', 'magiskinit', 'magiskboot', 'busybox']:
+        for bin in ['magisk', 'magiskinit', 'magiskinit64', 'magiskboot', 'busybox']:
             source = os.path.join('native', 'libs', arch, bin)
             target = os.path.join('native', 'out', arch, bin)
             mv(source, target)
@@ -174,67 +175,60 @@ def gen_update_binary():
     return update_bin
 
 
+def run_ndk_build(flags):
+    proc = system(f'{ndk_build} -C native {base_flags} {flags} -j{cpu_count}')
+    if proc.returncode != 0:
+        error('Build binary failed!')
+    collect_binary()
+
+
 def build_binary(args):
     support_targets = {'magisk', 'magiskinit', 'magiskboot', 'busybox'}
     if args.target:
         args.target = set(args.target) & support_targets
+        if not args.target:
+            return
     else:
         # If nothing specified, build everything
         args.target = support_targets
-
-    # Unsure why this is separate
-    if not args.target:
-        return
 
     header('* Building binaries: ' + ' '.join(args.target))
 
     os.utime(os.path.join('native', 'jni', 'include', 'flags.h'))
 
     # Basic flags
+    global base_flags
     base_flags = f'MAGISK_VERSION={config["version"]} MAGISK_VER_CODE={config["versionCode"]}'
     if not args.release:
         base_flags += ' MAGISK_DEBUG=1'
 
-    # Magisk is special case as it is a dependency of magiskinit
     if 'magisk' in args.target:
-        proc = system(f'{ndk_build} -C native {base_flags} B_MAGISK=1 -j{cpu_count}')
-        if proc.returncode != 0:
-            error('Build Magisk binary failed!')
-        collect_binary()
+        run_ndk_build('B_MAGISK=1')
         # Dump the binary to header
         for arch in archs:
             bin_file = os.path.join('native', 'out', arch, 'magisk')
             with open(os.path.join('native', 'out', arch, 'binaries_arch.h'), 'w') as out:
                 with open(bin_file, 'rb') as src:
                     binary_dump(src, out, 'magisk_xz')
+        for arch, arch32 in list(zip(arch64, archs)):
+            bin_file = os.path.join('native', 'out', arch, 'magisk')
+            with open(os.path.join('native', 'out', arch32, 'binaries_arch64.h'), 'w') as out:
+                with open(bin_file, 'rb') as src:
+                    binary_dump(src, out, 'magisk_xz')
 
-    # BusyBox is special case as it needs special flags to build
     if 'busybox' in args.target:
-        proc = system(f'{ndk_build} -C native {base_flags} B_BB=1 -j{cpu_count}')
-        if proc.returncode != 0:
-            error('Build binaries failed!')
-        collect_binary()
-
-    build = False
-    flags = base_flags
+        run_ndk_build('B_BB=1')
 
     if 'magiskinit' in args.target:
         if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch.h')):
             error('Build "magisk" before building "magiskinit"')
         if not os.path.exists(os.path.join('native', 'out', 'binaries.h')):
             error('Build stub APK before building "magiskinit"')
-        flags += ' B_INIT=1'
-        build = True
+        run_ndk_build('B_INIT=1')
+        run_ndk_build('B_INIT64=1')
 
     if 'magiskboot' in args.target:
-        flags += ' B_BOOT=1'
-        build = True
-
-    if build:
-        proc = system(f'{ndk_build} -C native {flags} -j{cpu_count}')
-        if proc.returncode != 0:
-            error('Build binaries failed!')
-        collect_binary()
+        run_ndk_build('B_BOOT=1')
 
 
 def build_apk(args, flavor):
@@ -311,7 +305,7 @@ def zip_main(args):
 
         # Binaries
         for lib_dir, zip_dir in [('armeabi-v7a', 'arm'), ('x86', 'x86')]:
-            for binary in ['magiskinit', 'magiskboot']:
+            for binary in ['magiskinit', 'magiskinit64', 'magiskboot']:
                 source = os.path.join('native', 'out', lib_dir, binary)
                 target = os.path.join(zip_dir, binary)
                 zip_with_msg(zipf, source, target)
