@@ -256,9 +256,9 @@ flash_image() {
     CMD2="cat -"
   fi
   if [ -b "$2" ]; then
-    local s_size=`stat -c '%s' "$1"`
-    local t_size=`blockdev --getsize64 "$2"`
-    [ $s_size -gt $t_size ] && return 1
+    local img_sz=`stat -c '%s' "$1"`
+    local blk_sz=`blockdev --getsize64 "$2"`
+    [ $img_sz -gt $blk_sz ] && return 1
     eval $CMD1 | eval $CMD2 | cat - /dev/zero > "$2" 2>/dev/null
   else
     ui_print "- Not block device, storing image"

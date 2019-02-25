@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <memory>
 
+#include "utils.h"
+
 class OutStream {
 public:
 	virtual bool write(const void *buf, size_t len) = 0;

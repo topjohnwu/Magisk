@@ -222,7 +222,8 @@ public abstract class MagiskInstaller {
                 Config.keepEnc, Config.keepVerity, srcBoot)).to(console, logs).exec().isSuccess())
             return false;
 
-        job = Shell.sh("mv bin/busybox busybox",
+        job = Shell.sh("./magiskboot --cleanup",
+                "mv bin/busybox busybox",
                 "rm -rf magisk.apk bin boot.img update-binary",
                 "cd /");
 

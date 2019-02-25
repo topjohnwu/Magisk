@@ -18,7 +18,7 @@ static const char *UNSUPPORT_LIST[] =
 
 static const char *MAGISK_LIST[] =
 		{ ".backup/.magisk", "init.magisk.rc",
-		  "overlay/init.magisk.rc", ramdisk_xz };
+		  "overlay/init.magisk.rc" };
 
 class magisk_cpio : public cpio_rw {
 public:
@@ -59,17 +59,21 @@ void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 	}
 }
 
-#define STOCK_BOOT       0x0
-#define MAGISK_PATCH     0x1
-#define UNSUPPORT_PATCH  0x2
+#define STOCK_BOOT        0
+#define MAGISK_PATCHED    1 << 0
+#define UNSUPPORTED_CPIO  1 << 1
+#define COMPRESSED_CPIO   1 << 2
 int magisk_cpio::test() {
+	if (exists(ramdisk_xz))
+		return MAGISK_PATCHED | COMPRESSED_CPIO;
+
 	for (auto file : UNSUPPORT_LIST)
 		if (exists(file))
-			return UNSUPPORT_PATCH;
+			return UNSUPPORTED_CPIO;
 
 	for (auto file : MAGISK_LIST)
 		if (exists(file))
-			return MAGISK_PATCH;
+			return MAGISK_PATCHED;
 
 	return STOCK_BOOT;
 }
@@ -108,6 +112,7 @@ char *magisk_cpio::sha1() {
 for (str = (char *) buf; str < (char *) buf + size; str = str += strlen(str) + 1)
 
 void magisk_cpio::restore() {
+	decompress();
 	char *file;
 	auto next = entries.begin();
 	decltype(next) cur;
@@ -218,8 +223,12 @@ void magisk_cpio::compress() {
 	encoder.set_out(make_unique<BufOutStream>());
 	output(encoder);
 	encoder.finalize();
+	auto backup = entries.extract(".backup");
+	auto config = entries.extract(".backup/.magisk");
 	entries.clear();
 	entries.insert(std::move(init));
+	entries.insert(std::move(backup));
+	entries.insert(std::move(config));
 	auto xz = new cpio_entry(ramdisk_xz, S_IFREG);
 	static_cast<BufOutStream *>(encoder.get_out())->release(xz->data, xz->filesize);
 	insert(xz);
@@ -230,6 +239,8 @@ void magisk_cpio::decompress() {
 	if (it == entries.end())
 		return;
 	fprintf(stderr, "Decompressing cpio [%s]\n", ramdisk_xz);
+	entries.erase(".backup");
+	entries.erase(".backup/.magisk");
 	LZMADecoder decoder;
 	decoder.set_out(make_unique<BufOutStream>());
 	decoder.write(it->second->data, it->second->filesize);

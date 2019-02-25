@@ -30,7 +30,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mount.h>
-#include <sys/mman.h>
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
 #include <functional>
@@ -40,6 +39,7 @@
 #include <magisk.h>
 #include <magiskpolicy.h>
 #include <selinux.h>
+#include <cpio.h>
 #include <utils.h>
 #include <flags.h>
 
@@ -320,6 +320,24 @@ static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	return true;
 }
 
+static void decompress_ramdisk() {
+	constexpr char tmp[] = "tmp.cpio";
+	constexpr char ramdisk_xz[] = "ramdisk.cpio.xz";
+	if (access(ramdisk_xz, F_OK))
+		return;
+	uint8_t *buf;
+	size_t sz;
+	mmap_ro(ramdisk_xz, (void **) &buf, &sz);
+	int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC);
+	unxz(fd, buf, sz);
+	munmap(buf, sz);
+	close(fd);
+	cpio_mmap cpio(tmp);
+	cpio.extract();
+	unlink(tmp);
+	unlink(ramdisk_xz);
+}
+
 static int dump_magisk(const char *path, mode_t mode) {
 	int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
 	if (fd < 0)
@@ -496,6 +514,8 @@ int main(int argc, char *argv[]) {
 		frm_rf(root);
 		excl_list = nullptr;
 	} else {
+		decompress_ramdisk();
+
 		// Revert original init binary
 		rename("/.backup/init", "/init");
 		rm_rf("/.backup");

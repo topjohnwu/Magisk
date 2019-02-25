@@ -106,7 +106,15 @@ $IS64BIT && mv -f magiskinit64 magiskinit || rm -f magiskinit64
 . ./boot_patch.sh "$BOOTIMAGE"
 
 ui_print "- Flashing new boot image"
-flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
+
+if ! flash_image new-boot.img "$BOOTIMAGE"; then
+  ui_print "- Compressing ramdisk to fit in partition"
+  ./magiskboot --cpio ramdisk.cpio compress
+  ./magiskboot --repack "$BOOTIMAGE"
+  flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
+fi
+
+./magiskboot --cleanup
 rm -f new-boot.img
 
 if [ -f stock_boot* ]; then
