@@ -1,9 +1,6 @@
-#ifndef _MAGISKBOOT_H_
-#define _MAGISKBOOT_H_
+#pragma once
 
 #include <sys/types.h>
-
-#include "format.h"
 
 #define KERNEL_FILE     "kernel"
 #define RAMDISK_FILE    "ramdisk.cpio"
@@ -21,7 +18,5 @@ int cpio_commands(int argc, char *argv[]);
 int dtb_commands(const char *cmd, int argc, char *argv[]);
 
 // Pattern
-int patch_verity(void **buf, uint32_t *size, int patch);
+bool patch_verity(void **buf, uint32_t *size, bool patch = true);
 void patch_encryption(void **buf, uint32_t *size);
-
-#endif

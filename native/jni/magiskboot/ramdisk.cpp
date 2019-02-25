@@ -45,7 +45,7 @@ void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 					 str_contains(cur->first, "fstab") && S_ISREG(cur->second->mode);
 		if (!keepverity) {
 			if (fstab) {
-				patch_verity(&cur->second->data, &cur->second->filesize, 1);
+				patch_verity(&cur->second->data, &cur->second->filesize);
 			} else if (cur->first == "verity_key") {
 				rm(cur);
 				continue;

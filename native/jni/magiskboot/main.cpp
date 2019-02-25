@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
 		uint8_t sha1[SHA_DIGEST_SIZE];
 		void *buf;
 		size_t size;
-		mmap_ro(argv[2], &buf, &size);
+		mmap_ro(argv[2], buf, size);
 		SHA_hash(buf, size, sha1);
 		for (int i = 0; i < SHA_DIGEST_SIZE; ++i)
 			printf("%02x", sha1[i]);

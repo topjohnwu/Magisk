@@ -284,7 +284,7 @@ static bool patch_sepolicy() {
 		// Force init to load /sepolicy
 		uint8_t *addr;
 		size_t size;
-		mmap_rw("/init", (void **) &addr, &size);
+		mmap_rw("/init", addr, size);
 		for (int i = 0; i < size; ++i) {
 			if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
 				memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
@@ -327,7 +327,7 @@ static void decompress_ramdisk() {
 		return;
 	uint8_t *buf;
 	size_t sz;
-	mmap_ro(ramdisk_xz, (void **) &buf, &sz);
+	mmap_ro(ramdisk_xz, buf, sz);
 	int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC);
 	unxz(fd, buf, sz);
 	munmap(buf, sz);
@@ -362,7 +362,7 @@ static void patch_socket_name(const char *path) {
 	uint8_t *buf;
 	char name[sizeof(MAIN_SOCKET)];
 	size_t size;
-	mmap_rw(path, (void **) &buf, &size);
+	mmap_rw(path, buf, size);
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
 			gen_rand_str(name, sizeof(name));

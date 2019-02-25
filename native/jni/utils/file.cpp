@@ -309,24 +309,22 @@ void fclone_attr(int sourcefd, int targetfd) {
 	fsetattr(targetfd, &a);
 }
 
-static void _mmap(int rw, const char *filename, void **buf, size_t *size) {
+void *__mmap(const char *filename, size_t *size, bool rw) {
 	struct stat st;
+	void *buf;
 	int fd = xopen(filename, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
 	fstat(fd, &st);
 	if (S_ISBLK(st.st_mode))
 		ioctl(fd, BLKGETSIZE64, size);
 	else
 		*size = st.st_size;
-	*buf = *size > 0 ? xmmap(nullptr, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : nullptr;
+	buf = *size > 0 ? xmmap(nullptr, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : nullptr;
 	close(fd);
+	return buf;
 }
 
 void mmap_ro(const char *filename, void **buf, size_t *size) {
-	_mmap(0, filename, buf, size);
-}
-
-void mmap_rw(const char *filename, void **buf, size_t *size) {
-	_mmap(1, filename, buf, size);
+	*buf = __mmap(filename, size, false);
 }
 
 void fd_full_read(int fd, void **buf, size_t *size) {
@@ -357,25 +355,6 @@ void full_read_at(int dirfd, const char *filename, void **buf, size_t *size) {
 	}
 	fd_full_read(fd, buf, size);
 	close(fd);
-}
-
-void stream_full_read(int fd, void **buf, size_t *size) {
-	size_t cap = 1 << 20;
-	uint8_t tmp[1 << 20];
-	*buf = xmalloc(cap);
-	ssize_t read;
-	*size = 0;
-	while (1) {
-		read = xread(fd, tmp, sizeof(tmp));
-		if (read <= 0)
-			break;
-		if (*size + read > cap) {
-			cap *= 2;
-			*buf = realloc(*buf, cap);
-		}
-		memcpy((uint8_t *) *buf + *size, tmp, read);
-		*size += read;
-	}
 }
 
 void write_zero(int fd, size_t size) {

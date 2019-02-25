@@ -47,7 +47,7 @@ boot_img::~boot_img() {
 #define UNSUPP_RET  1
 #define CHROME_RET  2
 int boot_img::parse_file(const char *image) {
-	mmap_ro(image, (void **) &map_addr, &map_size);
+	mmap_ro(image, map_addr, map_size);
 	fprintf(stderr, "Parsing boot image: [%s]\n", image);
 	for (uint8_t *head = map_addr; head < map_addr + map_size; ++head) {
 		switch (check_fmt(head, map_size)) {
@@ -332,7 +332,7 @@ void repack(const char* orig_image, const char* out_image) {
 		if (COMPRESSED(boot.k_fmt)) {
 			size_t raw_size;
 			void *kernel_raw;
-			mmap_ro(KERNEL_FILE, &kernel_raw, &raw_size);
+			mmap_ro(KERNEL_FILE, kernel_raw, raw_size);
 			boot.hdr->kernel_size = compress(boot.k_fmt, fd, kernel_raw, raw_size);
 			munmap(kernel_raw, raw_size);
 		} else {
@@ -355,7 +355,7 @@ void repack(const char* orig_image, const char* out_image) {
 		if (COMPRESSED(boot.r_fmt)) {
 			size_t cpio_size;
 			void *cpio;
-			mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
+			mmap_ro(RAMDISK_FILE, cpio, cpio_size);
 			boot.hdr->ramdisk_size = compress(boot.r_fmt, fd, cpio, cpio_size);
 			munmap(cpio, cpio_size);
 		} else {
@@ -397,7 +397,7 @@ void repack(const char* orig_image, const char* out_image) {
 
 	// Map output image as rw
 	munmap(boot.map_addr, boot.map_size);
-	mmap_rw(out_image, (void **) &boot.map_addr, &boot.map_size);
+	mmap_rw(out_image, boot.map_addr, boot.map_size);
 
 	// MTK headers
 	if (boot.flags & MTK_KERNEL) {

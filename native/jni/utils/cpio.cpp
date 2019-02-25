@@ -152,7 +152,7 @@ void cpio::output(OutStream &out) {
 cpio_rw::cpio_rw(const char *filename) {
 	char *buf;
 	size_t sz;
-	mmap_ro(filename, (void **) &buf, &sz);
+	mmap_ro(filename, buf, sz);
 	fprintf(stderr, "Loading cpio: [%s]\n", filename);
 	load_cpio(buf, sz);
 	munmap(buf, sz);
@@ -172,7 +172,7 @@ void cpio_rw::insert(cpio_entry *e) {
 void cpio_rw::add(mode_t mode, const char *name, const char *file) {
 	void *buf;
 	size_t sz;
-	mmap_ro(file, &buf, &sz);
+	mmap_ro(file, buf, sz);
 	auto e = new cpio_entry(name, S_IFREG | mode);
 	e->filesize = sz;
 	e->data = xmalloc(sz);
@@ -242,7 +242,7 @@ void cpio_rw::load_cpio(char *buf, size_t sz) {
 }
 
 cpio_mmap::cpio_mmap(const char *filename) {
-	mmap_ro(filename, (void **) &buf, &sz);
+	mmap_ro(filename, buf, sz);
 	fprintf(stderr, "Loading cpio: [%s]\n", filename);
 	size_t pos = 0;
 	cpio_newc_header *header;

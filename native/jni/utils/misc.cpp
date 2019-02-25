@@ -24,22 +24,6 @@ unsigned get_shell_uid() {
 	return ppwd->pw_uid;
 }
 
-unsigned get_system_uid() {
-	struct passwd* ppwd = getpwnam("system");
-	if (nullptr == ppwd)
-		return 1000;
-
-	return ppwd->pw_uid;
-}
-
-unsigned get_radio_uid() {
-	struct passwd* ppwd = getpwnam("radio");
-	if (nullptr == ppwd)
-		return 1001;
-
-	return ppwd->pw_uid;
-}
-
 int fork_dont_care() {
 	int pid = xfork();
 	if (pid) {
@@ -161,10 +145,6 @@ ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream) {
 
 ssize_t __getline(char **lineptr, size_t *n, FILE *stream) {
 	return __getdelim(lineptr, n, '\n', stream);
-}
-
-int __fsetxattr(int fd, const char *name, const void *value, size_t size, int flags) {
-	return (int) syscall(__NR_fsetxattr, fd, name, value, size, flags);
 }
 
 int exec_command(exec_t &exec) {

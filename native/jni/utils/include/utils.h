@@ -1,8 +1,7 @@
 /* util.h - Header for all utility functions
  */
 
-#ifndef _UTILS_H_
-#define _UTILS_H_
+#pragma once
 
 #include <stdio.h>
 #include <dirent.h>
@@ -18,8 +17,6 @@ extern "C" {
 
 #define UID_SHELL  (get_shell_uid())
 #define UID_ROOT   0
-#define UID_SYSTEM (get_system_uid())
-#define UID_RADIO  (get_radio_uid())
 
 // xwrap.cpp
 
@@ -52,7 +49,6 @@ ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
 ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
 int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
 	void *(*start_routine) (void *), void *arg);
-int xsocketpair(int domain, int type, int protocol, int sv[2]);
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
 int xdup2(int oldfd, int newfd);
@@ -71,8 +67,7 @@ int xrename(const char *oldpath, const char *newpath);
 int xmkdir(const char *pathname, mode_t mode);
 int xmkdirs(const char *pathname, mode_t mode);
 int xmkdirat(int dirfd, const char *pathname, mode_t mode);
-void *xmmap(void *addr, size_t length, int prot, int flags,
-	int fd, off_t offset);
+void *xmmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
 int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
@@ -80,8 +75,6 @@ int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 // misc.cpp
 
 unsigned get_shell_uid();
-unsigned get_system_uid();
-unsigned get_radio_uid();
 int fork_dont_care();
 int fork_no_zombie();
 void gen_rand_str(char *buf, int len);
@@ -91,11 +84,9 @@ void set_nice_name(const char *name);
 
 #define getline __getline
 #define getdelim __getdelim
-#define fsetxattr __fsetxattr
 
 ssize_t __getline(char **lineptr, size_t *n, FILE *stream);
 ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
-int __fsetxattr(int fd, const char *name, const void *value, size_t size, int flags);
 
 // file.cpp
 
@@ -129,11 +120,9 @@ int fsetattr(int fd, struct file_attr *a);
 void fclone_attr(int sourcefd, int targetfd);
 void clone_attr(const char *source, const char *target);
 void mmap_ro(const char *filename, void **buf, size_t *size);
-void mmap_rw(const char *filename, void **buf, size_t *size);
 void fd_full_read(int fd, void **buf, size_t *size);
 void full_read(const char *filename, void **buf, size_t *size);
 void full_read_at(int dirfd, const char *filename, void **buf, size_t *size);
-void stream_full_read(int fd, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
 
 #ifdef __cplusplus
@@ -180,6 +169,31 @@ private:
 // file.cpp
 
 void file_readline(const char *filename, const std::function<bool (std::string_view&)> &fn, bool trim = false);
+void *__mmap(const char *filename, size_t *size, bool rw);
+
+template <typename B>
+void mmap_ro(const char *filename, B &buf, size_t &sz) {
+	buf = (B) __mmap(filename, &sz, false);
+}
+
+template <typename B, typename L>
+void mmap_ro(const char *filename, B &buf, L &sz) {
+	size_t __sz;
+	buf = (B) __mmap(filename, &__sz, false);
+	sz = __sz;
+}
+
+template <typename B>
+void mmap_rw(const char *filename, B &buf, size_t &sz) {
+	buf = (B) __mmap(filename, &sz, true);
+}
+
+template <typename B, typename L>
+void mmap_rw(const char *filename, B &buf, L &sz) {
+	size_t __sz;
+	buf = (B) __mmap(filename, &__sz, true);
+	sz = __sz;
+}
 
 // misc.cpp
 
@@ -215,7 +229,5 @@ int exec_command_sync(Args &&...args) {
 }
 
 bool ends_with(const std::string_view &s1, const std::string_view &s2);
-
-#endif
 
 #endif

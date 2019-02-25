@@ -157,7 +157,7 @@ static void pb_getprop(read_cb_t *read_cb) {
 	props.properties.arg = read_cb;
 	pb_byte_t *buf;
 	size_t size;
-	mmap_ro(PERSISTENT_PROPERTY_DIR "/persistent_properties", (void **) &buf, &size);
+	mmap_ro(PERSISTENT_PROPERTY_DIR "/persistent_properties", buf, size);
 	pb_istream_t stream = pb_istream_from_buffer(buf, size);
 	pb_decode(&stream, PersistentProperties_fields, &props);
 	munmap(buf, size);
