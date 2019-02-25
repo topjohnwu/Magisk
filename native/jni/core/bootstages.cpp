@@ -32,7 +32,7 @@ static bool seperate_vendor;
 
 char *system_block, *vendor_block, *data_block;
 
-static int bind_mount(const char *from, const char *to);
+static int bind_mount(const char *from, const char *to, bool log = true);
 extern void auto_start_magiskhide();
 
 /***************
@@ -237,7 +237,7 @@ void node_entry::clone_skeleton() {
 			continue;
 		} else if (child->status & IS_MODULE) {
 			// Mount from module file to dummy file
-			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MODULEROOT,
+			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MODULEMNT,
 					 child->module, full_path.c_str(), child->name.c_str());
 		} else if (child->status & (IS_SKEL | IS_INTER)) {
 			// It's an intermediate folder, recursive clone
@@ -263,7 +263,7 @@ void node_entry::magic_mount() {
 	if (status & IS_MODULE) {
 		// Mount module item
 		auto real_path = get_path();
-		snprintf(buf, PATH_MAX, "%s/%s%s", MODULEROOT, module, real_path.c_str());
+		snprintf(buf, PATH_MAX, "%s/%s%s", MODULEMNT, module, real_path.c_str());
 		bind_mount(buf, real_path.c_str());
 	} else if (status & IS_SKEL) {
 		// The node is labeled to be cloned with skeleton, lets do it
@@ -331,9 +331,9 @@ static void simple_mount(const char *path) {
  * Miscellaneous *
  *****************/
 
-static int bind_mount(const char *from, const char *to) {
+static int bind_mount(const char *from, const char *to, bool log) {
 	int ret = xmount(from, to, nullptr, MS_BIND, nullptr);
-	VLOGI("bind_mount", from, to);
+	if (log) VLOGI("bind_mount", from, to);
 	return ret;
 }
 
@@ -365,13 +365,13 @@ static bool magisk_env() {
 
 	// Legacy support
 	symlink(MAGISKTMP, "/sbin/.core");
-	xmkdir(MAGISKTMP "/img", 0755);
+	symlink(MODULEMNT, MAGISKTMP "/img");
 
 	// Create directories in tmpfs overlay
 	xmkdirs(MIRRDIR "/system", 0755);
-	xmkdir(MIRRDIR "/bin", 0755);
+	xmkdir(MIRRDIR "/data", 0755);
 	xmkdir(BBPATH, 0755);
-	xmkdir(BLOCKDIR, 0755);
+	xmkdir(MODULEMNT, 0755);
 
 	// /data/adb directories
 	xmkdir(MODULEROOT, 0755);
@@ -399,8 +399,10 @@ static bool magisk_env() {
 			xmount(vendor_block, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
 			VLOGI("mount", vendor_block, MIRRDIR "/vendor");
 		} else if (str_contains(line, " /data ")) {
-			sscanf(line.data(), "%s", buf);
+			sscanf(line.data(), "%s %*s %s", buf, buf2);
 			data_block = strdup(buf);
+			xmount(data_block, MIRRDIR "/data", buf2, 0, nullptr);
+			VLOGI("mount", data_block, MIRRDIR "/data");
 		} else if (SDK_INT >= 24 &&
 		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
 			// Enforce hidepid
@@ -413,24 +415,23 @@ static bool magisk_env() {
 		VLOGI("link", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 	}
 
-	xmkdirs(DATABIN, 0755);
-	bind_mount(DATABIN, MIRRDIR "/bin");
-	if (access(MIRRDIR "/bin/busybox", X_OK) == -1)
+	if (access(DATABIN "/busybox", X_OK) == -1)
 		return false;
 	LOGI("* Setting up internal busybox");
-	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH);
-	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+	close(xopen(BBPATH "/busybox", O_RDONLY | O_CREAT | O_CLOEXEC));
+	bind_mount(DATABIN "/busybox", BBPATH "/busybox", false);
+	exec_command_sync(BBPATH "/busybox", "--install", "-s", BBPATH);
 
 	// Disable/remove magiskhide, resetprop, and modules
 	if (SDK_INT < 19) {
-		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT, 0));
+		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
 		unlink("/sbin/resetprop");
 		unlink("/sbin/magiskhide");
 	}
 	return true;
 }
 
-static void upgrade_modules() {
+static void prepare_modules() {
 	const char *legacy_imgs[] = {SECURE_DIR "/magisk.img", SECURE_DIR "/magisk_merge.img"};
 	for (auto img : legacy_imgs) {
 		if (access(img, F_OK) == 0)
@@ -455,8 +456,8 @@ static void upgrade_modules() {
 		closedir(dir);
 		rm_rf(MODULEUPGRADE);
 	}
+	bind_mount(MIRRDIR MODULEROOT, MODULEMNT, false);
 	// Legacy support
-	bind_mount(MODULEROOT, MAGISKTMP "/img");
 	xmkdir(LEGACYCORE, 0755);
 	symlink(SECURE_DIR "/post-fs-data.d", LEGACYCORE "/post-fs-data.d");
 	symlink(SECURE_DIR "/service.d", LEGACYCORE "/service.d");
@@ -632,7 +633,7 @@ void post_fs_data(int client) {
 	LOGI("* Running post-fs-data.d scripts\n");
 	exec_common_script("post-fs-data");
 
-	upgrade_modules();
+	prepare_modules();
 
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)

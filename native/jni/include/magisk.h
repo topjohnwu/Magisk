@@ -15,9 +15,9 @@
 #define EARLYINITDONE   "/dev/.magisk_early_init_done"
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define MAGISKTMP       "/sbin/.magisk"
-#define BLOCKDIR        MAGISKTMP "/block"
 #define MIRRDIR         MAGISKTMP "/mirror"
 #define BBPATH          MAGISKTMP "/busybox"
+#define MODULEMNT       MAGISKTMP "/modules"
 #define SECURE_DIR      "/data/adb"
 #define MODULEROOT      SECURE_DIR "/modules"
 #define MODULEUPGRADE   SECURE_DIR "/modules_update"
@@ -28,7 +28,7 @@
 #define MANAGERAPK      DATABIN "/magisk.apk"
 
 // Legacy crap
-#define LEGACYCORE     MODULEROOT "/.core"
+#define LEGACYCORE      MODULEROOT "/.core"
 
 // selinux consts
 #define SELINUX_PATH        "/sys/fs/selinux"
