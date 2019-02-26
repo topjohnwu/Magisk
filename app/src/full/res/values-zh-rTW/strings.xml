@@ -11,7 +11,7 @@
     <string name="unsupport_magisk_message">此版本 Magisk Manager 最低支援版本為 Magisk 18.0。\n\n請手動更新 Magisk，或安裝舊版 Magisk Manager。</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error"未安裝 Magisk</string>
+    <string name="magisk_version_error">未安裝 Magisk</string>
     <string name="checking_for_updates">正在檢查更新…</string>
     <string name="invalid_update_channel">更新頻道無效</string>
     <string name="safetyNet_check_text">啟動 SafetyNet 檢查</string>

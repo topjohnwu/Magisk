@@ -16,7 +16,7 @@
 
     <string name="unsupport_magisk_title">Dəstəklənməyən Magisk Versiyası</string>
 
-    <string name="unsupport_magisk_message">Magisk Menecerin bu versiyası Magisk'in v18.0 versiyasndan aşağısını dəstəkləmir.\n\nMagisk'i əllə yüksəldə, yaxud tətbiqi əvvəlki versiyalarına qaytara bilərsiniz.</string>
+    <string name="unsupport_magisk_message">Magisk Menecerin bu versiyası Magisk\'in v18.0 versiyasndan aşağısını dəstəkləmir.\n\nMagisk\'i əllə yüksəldə, yaxud tətbiqi əvvəlki versiyalarına qaytara bilərsiniz.</string>
 
     <!--Status Fragment-->
 
@@ -36,15 +36,15 @@
 
     <string name="safetyNet_res_invalid">Cavab etibarsızdır.</string>
 
-    <string name="magisk_up_to_date">Magisk'in son versiyası yüklənib</string>
+    <string name="magisk_up_to_date">Magisk\'in son versiyası yüklənib</string>
 
-    <string name="manager_up_to_date">Magisk Menecer'in son versiyası yüklənib </string>
+    <string name="manager_up_to_date">Magisk Menecer\'in son versiyası yüklənib </string>
 
     <string name="advanced_settings_title">Qabaqcıl Parametrlər</string>
 
     <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
 
-    <string name="keep_dm_verity">AVB 2.0/dm-verity'i qoru</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
 
     <string name="current_installed">Yüklənən: %1$s</string>
 
@@ -52,7 +52,7 @@
 
     <string name="uninstall">Sil</string>
 
-    <string name="uninstall_magisk_title">Magisk'i Sil</string>
+    <string name="uninstall_magisk_title">Magisk\'i Sil</string>
 
     <string name="uninstall_magisk_msg">Bütün əlavələr ləğv olunacaq/silinəcək. Root silinəcək, və əgər hal-hazırda deyilsə, bütün məlumatlarınız potensiyal olaraq şifrələnəcək.</string>
 
@@ -80,7 +80,7 @@
 
     <string name="reboot_recovery">Bərpa rejimində yenidən başlat</string>
 
-    <string name="reboot_bootloader">Bootloader'ə yenidən başlat</string>
+    <string name="reboot_bootloader">Bootloader\'ə yenidən başlat</string>
 
     <string name="reboot_download">Yükləmə rejimində yenidən başlat</string>
 
@@ -102,11 +102,11 @@
 
     <!--Log Fragment-->
 
-    <string name="menuSaveLog">Log'u saxla</string>
+    <string name="menuSaveLog">Log\'u saxla</string>
 
     <string name="menuReload">Təzələ</string>
 
-    <string name="menuClearLog">Log'u indi təmizlə</string>
+    <string name="menuClearLog">Log\'u indi təmizlə</string>
 
     <string name="logs_cleared">Log uğurla təmizləndi.</string>
 
@@ -158,7 +158,7 @@
 
     <string name="dtbo_patched_title">DTBO yamaqlanıb!</string>
 
-    <string name="dtbo_patched_reboot">Magisk Menecer dtbo.img'ni yamaqladı. Xahiş olunur yenidən başladın.</string>
+    <string name="dtbo_patched_reboot">Magisk Menecer dtbo.img\'ni yamaqladı. Xahiş olunur yenidən başladın.</string>
 
     <string name="flashing">Qurulur</string>
 
@@ -174,7 +174,7 @@
 
     <string name="direct_install">Birdəfəlik Yüklə (Tövsiyə olunur)</string>
 
-    <string name="install_inactive_slot">Fəal olmayan slota quraşdır (OTA'dan sonra)</string>
+    <string name="install_inactive_slot">Fəal olmayan slota quraşdır (OTA\'dan sonra)</string>
 
     <string name="warning">Xəbərdarlıq</string>
 
