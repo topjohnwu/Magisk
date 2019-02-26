@@ -79,6 +79,7 @@ int fork_dont_care();
 int fork_no_zombie();
 void gen_rand_str(char *buf, int len);
 int strend(const char *s1, const char *s2);
+char *rtrim(char *str);
 void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
 
