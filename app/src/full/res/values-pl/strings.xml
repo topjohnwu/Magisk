@@ -98,7 +98,7 @@
     <string name="warning">Uwaga</string>
     <string name="install_inactive_slot_msg">Urządzenie będzie MUSIAŁO uruchomić się z bieżącego nieaktywnego slotu po restarcie! /\nUżyj tylko tej opcji po zakończeniu OTA.\nKontynuować?</string>
 	<string name="select_method">Wybierz Metodę</string>
-    <string name="boot_file_patch_msg">Wybierz stock boot image w formacie .img lub .img.tar</string>
+    <string name="boot_file_patch_msg">Wybierz stokowy obraz boot w formacie .img lub .img.tar</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_img">Przywróć Obraz</string>
 	<string name="restore_img_msg">Przywracanie…</string>
@@ -129,7 +129,7 @@
     <string name="language">Język</string>
     <string name="system_default">(Domyślny Systemu)</string>
     <string name="settings_update">Ustawienia Aktualizacji</string>
-    <string name="settings_check_update_title">Sprawdź Aktualizację</string>
+    <string name="settings_check_update_title">Sprawdzanie Aktualizacji</string>
     <string name="settings_check_update_summary">Regularnie sprawdzaj aktualizacje w tle</string>
     <string name="settings_update_channel_title">Kanał Aktualizacji</string>
     <string name="settings_update_stable">Stabilny</string>
@@ -164,7 +164,7 @@
     <string name="settings_su_reauth_summary">Ponowne uwierzytelnianie uprawnienia superużytkownika po aktualizacji aplikacji</string>
     <string name="settings_su_fingerprint_title">Włącz Uwierzytelnienie Odciskiem Palca</string>
     <string name="settings_su_fingerprint_summary">Użyj skanera linii papilarnych, aby zezwolić na żądania supersu</string>
-    <string name="auth_fingerprint">Uwierzytelnianie Odciskiem Palców</string>
+    <string name="auth_fingerprint">Uwierzytelnianie Odciskiem Palca</string>
     
 	<string name="multiuser_mode">Tryb Multiusera</string>
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
