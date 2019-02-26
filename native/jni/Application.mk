@@ -1,6 +1,7 @@
 APP_ABI := armeabi-v7a x86
-APP_CFLAGS := -Oz -std=gnu11 \
+APP_CFLAGS := -Oz -fomit-frame-pointer -flto \
 -D__MVSTR=${MAGISK_VERSION} -D__MCODE=${MAGISK_VER_CODE}
+APP_LDFLAGS := -flto
 APP_CPPFLAGS := -std=c++17
 APP_STL := c++_static
 APP_PLATFORM := android-16
@@ -16,7 +17,7 @@ endif
 
 # Busybox require some additional settings
 ifdef B_BB
-APP_CFLAGS := -Os
+APP_CFLAGS := -Os -fomit-frame-pointer -flto
 APP_SHORT_COMMANDS := true
 NDK_TOOLCHAIN_VERSION := 4.9
 APP_PLATFORM := android-21
