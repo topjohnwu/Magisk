@@ -244,11 +244,9 @@ bool ends_with(const std::string_view &s1, const std::string_view &s2) {
 }
 
 char *rtrim(char *str) {
-    int i, len;
-    len = strlen(str);
-    for (i = len - 1; i >= 0; i--) {
-        if (str[i] != ' ') break;
-    }
-    str[i + 1] = '\0';
-    return str;
+	int len = strlen(str);
+	while (len > 0 && str[len - 1] == ' ')
+		--len;
+	str[len] = '\0';
+	return str;
 }
