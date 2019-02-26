@@ -6,13 +6,13 @@
     <string name="superuser">スーパーユーザー</string>
     <string name="log">ログ</string>
     <string name="settings">設定</string>
-    <string name="install">インストール</string>
+    <string name="install">ｲﾝｽﾄｰﾙ</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magiskがインストールされていません</string>
     <string name="checking_for_updates">更新を確認中…</string>
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
-    <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
+    <string name="safetyNet_check_text">SafetyNetチェックを開始</string>
     <string name="checking_safetyNet_status">SafetyNetの状態をチェック中…</string>
     <string name="safetyNet_check_success">SafetyNetチェック成功</string>
     <string name="safetyNet_api_error">SafetyNet APIエラー</string>
@@ -32,11 +32,11 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(情報がありません)</string>
     <string name="no_modules_found">モジュールが見つかりません</string>
-    <string name="update_file_created">次の再起動時にモジュールを更新する</string>
-    <string name="remove_file_created">次の再起動時にモジュールを削除する</string>
-    <string name="remove_file_deleted">次の再起動時にモジュールを削除しない</string>
-    <string name="disable_file_created">次の再起動時にモジュールを無効にする</string>
-    <string name="disable_file_removed">次の再起動時にモジュールを有効にする</string>
+    <string name="update_file_created">次の再起動時にモジュールを更新します</string>
+    <string name="remove_file_created">次の再起動時にモジュールを削除します</string>
+    <string name="remove_file_deleted">次の再起動時にモジュールを削除しません</string>
+    <string name="disable_file_created">次の再起動時にモジュールを無効にします</string>
+    <string name="disable_file_removed">次の再起動時にモジュールを有効にします</string>
     <string name="author">開発者: %1$s</string>
     <string name="reboot_recovery">リカバリへ再起動</string>
     <string name="reboot_bootloader">Bootloaderへ再起動</string>
@@ -79,7 +79,7 @@
     <string name="reboot">再起動</string>
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">更新履歴</string>
-    <string name="repo_cache_cleared">リポジトリキャッシュを消去しました</string>
+    <string name="repo_cache_cleared">リポジトリのキャッシュを消去しました</string>
     <string name="internal_storage">ZIPは\n[内部ストレージ]%1$sに保存されます</string>
     <string name="manager_download_install">タップでダウンロードしてインストールします</string>
     <string name="dtbo_patched_title">DTBOをパッチしました！</string>
@@ -87,13 +87,13 @@
     <string name="flashing">書き込み中</string>
     <string name="hide_manager_title">Magisk Managerを隠しています…</string>
     <string name="hide_manager_fail_toast">Magisk Managerを隠せませんでした…</string>
-    <string name="open_link_failed_toast">このリンクを開けアプリがありません。</string>
+    <string name="open_link_failed_toast">このリンクを開けるアプリがありません</string>
     <string name="download_zip_only">ZIPのみダウンロード</string>
     <string name="patch_boot_file">Bootイメージのパッチ</string>
     <string name="direct_install">直接インストール (推奨)</string>
     <string name="install_inactive_slot">Inactive Slotにインストール (OTA後)</string>
     <string name="warning">警告</string>
-    <string name="install_inactive_slot_msg">お使いのデバイスは再起動後に現在のInactive Slotで強制に起動されます！\nこのオプションはOTA後に使うのみ。\n続行しますか?</string>
+    <string name="install_inactive_slot_msg">お使いのデバイスは再起動後に現在のInactive Slotで強制的に起動されます！\nこのオプションはOTAの完了後にのみ使用してください。\n続行しますか？</string>
     <string name="select_method">方法の選択</string>
     <string name="boot_file_patch_msg">StockのBootイメージ (.img または .img.tar形式) を選択してください</string>
     <string name="complete_uninstall">完全にアンインストール</string>
@@ -102,16 +102,16 @@
     <string name="restore_done">リストア完了！</string>
     <string name="restore_fail">Stockのバックアップがありません！</string>
     <string name="proprietary_title">プロプライエタリコードのダウンロード</string>
-    <string name="proprietary_notice">Magisk ManagerはFOSSのため、GoogleのプロプライエタリなSafetyNet APIコードを含んでいません。\n\nMagisk ManagerがSafetyNetチェックのための拡張機能 (GoogleApiClientを含む) をダウンロードすることを許可しますか?</string>
+    <string name="proprietary_notice">Magisk ManagerはFOSSであるため、GoogleのプロプライエタリなSafetyNet APIコードを含んでいません。\n\nMagisk ManagerがSafetyNetチェックのための拡張機能 (GoogleApiClientを含む) をダウンロードすることを許可しますか?</string>
     <string name="setup_done">セットアップ完了。</string>
     <string name="setup_fail">セットアップに失敗しました。</string>
-    <string name="env_fix_title">追加セットアップが必要</string>
-    <string name="env_fix_msg">Magiskを正常に機能させるには、お使いのデバイスに追加セットアップが必要です。Magiskセットアップzipをダウンロードします。今すぐ続行しますか。</string>
+    <string name="env_fix_title">追加のセットアップが必要</string>
+    <string name="env_fix_msg">Magiskを正常に機能させるには、お使いのデバイスに追加のセットアップが必要です。Magiskのセットアップ用zipをダウンロードすることになりますが、今すぐ続行しますか？</string>
     <string name="setup_title">追加セットアップ</string>
     <string name="setup_msg">環境セットアップを実行中…</string>
     <string name="downloading_toast">%1$s をダウンロード中</string>
     <string name="no_rw_storage">この機能は外部ストレージへの書き込み権限がないと動作しません</string>
-    <string name="dl_one_module">一回で1つのモジュールをダウンロードする。</string>
+    <string name="dl_one_module">一度に1つのモジュールをダウンロードする</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">一般</string>
@@ -122,15 +122,15 @@
     <string name="settings_hide_manager_title">Magisk Managerを隠す</string>
     <string name="settings_hide_manager_summary">Magisk Managerをランダムなパッケージ名で再パックします</string>
     <string name="settings_restore_manager_title">Magisk Managerを復元</string>
-    <string name="settings_restore_manager_summary">元のパッケージでMagisk Managerを復元します。</string>
+    <string name="settings_restore_manager_summary">元のパッケージでMagisk Managerを復元します</string>
     <string name="language">言語</string>
     <string name="system_default">(システム標準)</string>
     <string name="settings_update">更新設定</string>
     <string name="settings_check_update_title">更新をチェック</string>
-    <string name="settings_check_update_summary">バックグラウンドで定期的に更新をチェックします。</string>
+    <string name="settings_check_update_summary">バックグラウンドで定期的に更新をチェックします</string>
     <string name="settings_update_channel_title">更新チャンネル</string>
     <string name="settings_update_stable">安定版</string>
-    <string name="settings_update_beta">開発版</string>
+    <string name="settings_update_beta">ベータ版</string>
     <string name="settings_update_custom">カスタム</string>
     <string name="settings_update_custom_msg">カスタムURLを入力</string>
     <string name="settings_boot_format_title">パッチしたBootの出力形式</string>
@@ -140,7 +140,7 @@
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのためのSystemless hostsサポートを有効化します</string>
-    <string name="settings_hosts_toast">systemless hostsモジュールを追加しました。</string>
+    <string name="settings_hosts_toast">systemless hostsモジュールを追加しました</string>
 
     <string name="settings_su_app_adb">アプリとADB</string>
     <string name="settings_su_app">アプリのみ</string>
@@ -179,7 +179,7 @@
     <string name="requester_summary">rootセッションはリクエスト者の名前空間を継承します</string>
     <string name="isolate_summary">rootセッション毎に分離された名前空間を使用します</string>
     <string name="android_o_not_support">Android 8.0以降では対応していません</string>
-    <string name="disable_fingerprint">登録した指紋がありません、またはデバイスはサポートしていません。</string>
+    <string name="disable_fingerprint">指紋が登録されていないか、お使いの端末でサポートされていません。</string>
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザーリクエスト</string>

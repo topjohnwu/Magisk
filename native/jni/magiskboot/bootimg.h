@@ -104,15 +104,15 @@ struct boot_img_hdr_pxa : public boot_img_hdr_base {
 */
 
 struct mtk_hdr {
-	uint32_t magic;      /* MTK magic */
-	uint32_t size;       /* Size of the content */
-	char name[32];       /* The type of the header */
+	uint32_t magic;         /* MTK magic */
+	uint32_t size;          /* Size of the content */
+	char name[32];          /* The type of the header */
 } __attribute__((packed));
 
 struct dhtb_hdr {
-	char magic[8];         /* DHTB magic */
-	uint8_t checksum[40];  /* Payload SHA256, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
-	uint32_t size;         /* Payload size, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
+	char magic[8];          /* DHTB magic */
+	uint8_t checksum[40];   /* Payload SHA256, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
+	uint32_t size;          /* Payload size, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
 } __attribute__((packed));
 
 struct blob_hdr {
@@ -132,17 +132,97 @@ struct blob_hdr {
 } __attribute__((packed));
 
 // Flags
-#define MTK_KERNEL      0x0001
-#define MTK_RAMDISK     0x0002
-#define CHROMEOS_FLAG   0x0004
-#define PXA_FLAG        0x0008
-#define DHTB_FLAG       0x0010
-#define SEANDROID_FLAG  0x0020
-#define LG_BUMP_FLAG    0x0040
-#define SHA256_FLAG     0x0080
-#define BLOB_FLAG       0x0100
-#define NOOKHD_FLAG     0x0200
-#define ACCLAIM_FLAG    0x0400
+#define MTK_KERNEL      1 << 1
+#define MTK_RAMDISK     1 << 2
+#define CHROMEOS_FLAG   1 << 3
+#define DHTB_FLAG       1 << 4
+#define SEANDROID_FLAG  1 << 5
+#define LG_BUMP_FLAG    1 << 6
+#define SHA256_FLAG     1 << 7
+#define BLOB_FLAG       1 << 8
+#define NOOKHD_FLAG     1 << 9
+#define ACCLAIM_FLAG    1 << 10
+
+struct dyn_img_hdr {
+
+#define dyn_access(x) (pxa ? hdr_pxa->x : v1_hdr->x)
+
+#define dyn_get(name, type) \
+type name() const { return dyn_access(name); }
+#define dyn_ref(name, type) \
+type &name() { return dyn_access(name); }
+#define v1_ref(name, type, alt) \
+type &name() { if (pxa) { alt = 0; return alt; } return v1_hdr->name; }
+
+	dyn_ref(page_size, uint32_t);
+	dyn_get(name, char *);
+	dyn_get(cmdline, char *);
+	dyn_get(id, char *);
+	dyn_get(extra_cmdline, char *);
+
+	v1_ref(os_version, uint32_t, j32);
+	v1_ref(recovery_dtbo_size, uint32_t, j32);
+	v1_ref(recovery_dtbo_offset, uint64_t, j64);
+	v1_ref(header_size, uint32_t, j32);
+
+	dyn_img_hdr() : pxa(false), img_hdr(nullptr) {}
+	~dyn_img_hdr() {
+		if (pxa)
+			delete hdr_pxa;
+		else
+			delete v1_hdr;
+	}
+
+	uint32_t header_version() {
+		// There won't be v4 header any time soon...
+		// If larger than 4, assume this field will be treated as extra_size
+		return pxa || v1_hdr->header_version > 4 ? 0 : v1_hdr->header_version;
+	}
+
+	uint32_t &extra_size() {
+		// If header version > 0, we should treat this field as header_version
+		if (header_version()) {
+			j32 = 0;
+			return j32;
+		}
+		return dyn_access(extra_size);
+	}
+
+	size_t hdr_size() {
+		return pxa ? sizeof(boot_img_hdr_pxa) : sizeof(boot_img_hdr);
+	}
+
+	void set_hdr(boot_img_hdr *h) {
+		v1_hdr = h;
+	}
+
+	void set_hdr(boot_img_hdr_pxa *h) {
+		hdr_pxa = h;
+		pxa = true;
+	}
+
+	boot_img_hdr_base *operator-> () const {
+		return img_hdr;
+	};
+
+	boot_img_hdr_base * const &operator* () const {
+		return img_hdr;
+	}
+
+private:
+	bool pxa;
+	union {
+		/* Main header could be either AOSP or PXA,
+		 * but both of them is a base header.
+		 * Same address can be interpreted in 3 ways */
+		boot_img_hdr_base *img_hdr;  /* Common base header */
+		boot_img_hdr *v1_hdr;        /* AOSP v1 header */
+		boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
+	};
+
+	static uint32_t j32;
+	static uint64_t j64;
+};
 
 struct boot_img {
 	// Memory map of the whole image
@@ -150,10 +230,10 @@ struct boot_img {
 	size_t map_size;
 
 	// Headers
-	boot_img_hdr_base *hdr;  /* Android boot image header */
-	mtk_hdr *k_hdr;          /* MTK kernel header */
-	mtk_hdr *r_hdr;          /* MTK ramdisk header */
-	blob_hdr *b_hdr;         /* Tegra blob header */
+	dyn_img_hdr hdr;    /* Android image header */
+	mtk_hdr *k_hdr;     /* MTK kernel header */
+	mtk_hdr *r_hdr;     /* MTK ramdisk header */
+	blob_hdr *b_hdr;    /* Tegra blob header */
 
 	// Flags to indicate the state of current boot image
 	uint16_t flags;
@@ -179,54 +259,10 @@ struct boot_img {
 
 	~boot_img();
 
-	int parse_image(const char *);
+	int parse_file(const char *);
+	int parse_image(uint8_t *);
 	void find_dtb();
 	void print_hdr();
-
-	/* Access elements in header */
-
-#define IS_PXA (flags & PXA_FLAG)
-#define dyn_access(x) (IS_PXA ? \
-static_cast<boot_img_hdr_pxa *>(hdr)->x : \
-static_cast<boot_img_hdr_v1 *>(hdr)->x)
-
-#define dyn_get(x, t) t x() const { return dyn_access(x); }
-#define dyn_set(x, t) void x(t v) { dyn_access(x) = v; }
-#define hdr_get(x, t) t x() const { return IS_PXA ? 0 : static_cast<boot_img_hdr *>(hdr)->x; }
-#define hdr_set(x, t) void x(t v) { if (!IS_PXA) static_cast<boot_img_hdr *>(hdr)->x = v; }
-
-	dyn_set(extra_size, uint32_t);
-	dyn_get(page_size, uint32_t);
-	dyn_get(name, char *);
-	dyn_get(cmdline, char *);
-	dyn_get(id, char *);
-	dyn_get(extra_cmdline, char *);
-
-	hdr_get(os_version, uint32_t);
-	hdr_get(recovery_dtbo_size, uint32_t);
-	hdr_set(recovery_dtbo_size, uint32_t);
-	hdr_get(recovery_dtbo_offset, uint32_t);
-	hdr_set(recovery_dtbo_offset, uint32_t);
-	hdr_get(header_size, uint32_t);
-	hdr_set(header_size, uint32_t);
-
-	uint32_t header_version() {
-		if (IS_PXA)
-			return 0;
-		uint32_t ver = static_cast<boot_img_hdr *>(hdr)->header_version;
-		// There won't be v4 header any time soon...
-		// If larger than 4, assume this field will be treated as extra_size
-		return ver > 4 ? 0 : ver;
-	}
-
-	uint32_t extra_size() {
-		// If header version > 0, we should treat this field as header_version
-		return header_version() ? 0 : dyn_access(extra_size);
-	}
-
-	size_t hdr_size() {
-		return IS_PXA ? sizeof(boot_img_hdr_pxa) : sizeof(boot_img_hdr);
-	}
 };
 
 #endif

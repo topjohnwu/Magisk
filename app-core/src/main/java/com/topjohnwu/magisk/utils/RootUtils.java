@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 public class RootUtils extends Shell.Initializer {
 
     public static void rmAndLaunch(String rm, String launch) {
-        Shell.su(Utils.fmt("(rm_launch %d %s %s)&", Const.USER_ID, rm, launch)).exec();
+        Shell.su(Utils.fmt("(rm_launch %s %s)&", rm, launch)).exec();
     }
 
     @Override

@@ -69,8 +69,8 @@
    	<string name="progress_channel">Notifiche di avanzamento</string>
    	<string name="download_complete">Download completato</string>
 	<string name="download_file_error">Errore durante il download del file</string>
-	<string name="magisk_update_title">È disponibile un nuovo aggiornamento di Magisk!</string>
-   	<string name="manager_update_title">È disponibile un nuovo aggiornamento di Magisk Manager!</string>
+	<string name="magisk_update_title">È disponibile un aggiornamento di Magisk!</string>
+   	<string name="manager_update_title">È disponibile un aggiornamento di Magisk Manager!</string>
 
 	<!--Toasts, Dialogs-->
 	<string name="close">Chiudi</string>

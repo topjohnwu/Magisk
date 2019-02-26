@@ -11,9 +11,9 @@
 #include <sys/mman.h>
 #include <linux/fs.h>
 
-#include "magisk.h"
-#include "utils.h"
-#include "selinux.h"
+#include <magisk.h>
+#include <utils.h>
+#include <selinux.h>
 
 using namespace std;
 
@@ -60,7 +60,7 @@ int mkdirs(const char *pathname, mode_t mode) {
 	return 0;
 }
 
-void in_order_walk(int dirfd, void (*callback)(int, struct dirent*)) {
+void post_order_walk(int dirfd, void (*fn)(int, struct dirent *)) {
 	struct dirent *entry;
 	int newfd;
 	DIR *dir = fdopendir(dirfd);
@@ -73,27 +73,19 @@ void in_order_walk(int dirfd, void (*callback)(int, struct dirent*)) {
 			continue;
 		if (entry->d_type == DT_DIR) {
 			newfd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			in_order_walk(newfd, callback);
+			post_order_walk(newfd, fn);
 			close(newfd);
 		}
-		callback(dirfd, entry);
-	}
-}
-
-static void rm_cb(int dirfd, struct dirent *entry) {
-	switch (entry->d_type) {
-	case DT_DIR:
-		unlinkat(dirfd, entry->d_name, AT_REMOVEDIR);
-		break;
-	default:
-		unlinkat(dirfd, entry->d_name, 0);
-		break;
+		fn(dirfd, entry);
 	}
 }
 
 void rm_rf(const char *path) {
-	int fd = open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
-	if (fd >= 0) {
+	struct stat st;
+	if (lstat(path, &st) < 0)
+		return;
+	if (S_ISDIR(st.st_mode)) {
+		int fd = open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
 		frm_rf(fd);
 		close(fd);
 	}
@@ -101,7 +93,9 @@ void rm_rf(const char *path) {
 }
 
 void frm_rf(int dirfd) {
-	in_order_walk(dirfd, rm_cb);
+	post_order_walk(dirfd, [](auto dirfd, auto entry) -> void {
+		unlinkat(dirfd, entry->d_name, entry->d_type == DT_DIR ? AT_REMOVEDIR : 0);
+	});
 }
 
 /* This will only on the same file system */
@@ -315,24 +309,22 @@ void fclone_attr(int sourcefd, int targetfd) {
 	fsetattr(targetfd, &a);
 }
 
-static void _mmap(int rw, const char *filename, void **buf, size_t *size) {
+void *__mmap(const char *filename, size_t *size, bool rw) {
 	struct stat st;
+	void *buf;
 	int fd = xopen(filename, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
 	fstat(fd, &st);
 	if (S_ISBLK(st.st_mode))
 		ioctl(fd, BLKGETSIZE64, size);
 	else
 		*size = st.st_size;
-	*buf = *size > 0 ? xmmap(nullptr, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : nullptr;
+	buf = *size > 0 ? xmmap(nullptr, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : nullptr;
 	close(fd);
+	return buf;
 }
 
 void mmap_ro(const char *filename, void **buf, size_t *size) {
-	_mmap(0, filename, buf, size);
-}
-
-void mmap_rw(const char *filename, void **buf, size_t *size) {
-	_mmap(1, filename, buf, size);
+	*buf = __mmap(filename, size, false);
 }
 
 void fd_full_read(int fd, void **buf, size_t *size) {
@@ -365,50 +357,32 @@ void full_read_at(int dirfd, const char *filename, void **buf, size_t *size) {
 	close(fd);
 }
 
-void stream_full_read(int fd, void **buf, size_t *size) {
-	size_t cap = 1 << 20;
-	uint8_t tmp[1 << 20];
-	*buf = xmalloc(cap);
-	ssize_t read;
-	*size = 0;
-	while (1) {
-		read = xread(fd, tmp, sizeof(tmp));
-		if (read <= 0)
-			break;
-		if (*size + read > cap) {
-			cap *= 2;
-			*buf = realloc(*buf, cap);
-		}
-		memcpy((uint8_t *) *buf + *size, tmp, read);
-		*size += read;
-	}
-}
-
 void write_zero(int fd, size_t size) {
 	size_t pos = lseek(fd, 0, SEEK_CUR);
 	ftruncate(fd, pos + size);
 	lseek(fd, pos + size, SEEK_SET);
 }
 
-vector<string> file_to_vector(const char *filename) {
-	auto arr = vector<string>();
-	if (access(filename, R_OK) != 0)
-		return arr;
-	char *line = nullptr;
-	size_t len = 0;
-	ssize_t read;
-
+void file_readline(const char *filename, const function<bool (string_view&)> &fn, bool trim) {
 	FILE *fp = xfopen(filename, "re");
 	if (fp == nullptr)
-		return arr;
-
-	while ((read = getline(&line, &len, fp)) != -1) {
-		// Remove end newline
-		if (line[read - 1] == '\n')
-			line[read - 1] = '\0';
-		arr.emplace_back(line);
+		return;
+	size_t len = 1024;
+	char *buf = (char *) malloc(len);
+	char *start;
+	ssize_t read;
+	while ((read = getline(&buf, &len, fp)) >= 0) {
+		start = buf;
+		if (trim) {
+			while (buf[read - 1] == '\n' || buf[read - 1] == ' ')
+				buf[read-- - 1] = '\0';
+			while (*start == ' ')
+				++start;
+		}
+		string_view s(start);
+		if (!fn(s))
+			break;
 	}
 	fclose(fp);
-	free(line);
-	return arr;
+	free(buf);
 }

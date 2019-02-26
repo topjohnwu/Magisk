@@ -12,9 +12,10 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include "magisk.h"
-#include "daemon.h"
-#include "utils.h"
+#include <magisk.h>
+#include <daemon.h>
+#include <utils.h>
+
 #include "su.h"
 
 #define BROADCAST_BOOT_COMPLETED \

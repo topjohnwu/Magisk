@@ -1,11 +1,13 @@
 #include <unistd.h>
 #include <sys/mman.h>
+
 extern "C" {
 #include <libfdt.h>
 }
+#include <utils.h>
 
 #include "magiskboot.h"
-#include "utils.h"
+#include "format.h"
 
 static void print_props(const void *fdt, int node, int depth) {
 	int prop;
@@ -45,7 +47,7 @@ static void dtb_dump(const char *file) {
 	size_t size ;
 	uint8_t *dtb, *fdt;
 	fprintf(stderr, "Loading dtbs from [%s]\n", file);
-	mmap_ro(file, (void **) &dtb, &size);
+	mmap_ro(file, dtb, size);
 	// Loop through all the dtbs
 	int dtb_num = 0;
 	for (int i = 0; i < size; ++i) {
@@ -65,11 +67,12 @@ static void dtb_patch(const char *file, int patch) {
 	uint8_t *dtb, *fdt;
 	fprintf(stderr, "Loading dtbs from [%s]\n", file);
 	if (patch)
-		mmap_rw(file, (void **) &dtb, &size);
+		mmap_rw(file, dtb, size);
 	else
-		mmap_ro(file, (void **) &dtb, &size);
+		mmap_ro(file, dtb, size);
 	// Loop through all the dtbs
-	int dtb_num = 0, found = 0;
+	int dtb_num = 0;
+	bool found = false;
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
 			fdt = dtb + i;
@@ -85,11 +88,11 @@ static void dtb_patch(const char *file, int patch) {
 						void *dup = xmalloc(value_size);
 						memcpy(dup, value, value_size);
 						memset(value, 0, value_size);
-						found |= patch_verity(&dup, &value_size, 1);
+						found |= patch_verity(&dup, &value_size);
 						memcpy(value, dup, value_size);
 						free(dup);
 					} else {
-						found |= patch_verity(&value, &value_size, 0);
+						found |= patch_verity(&value, &value_size, false);
 					}
 				}
 			}

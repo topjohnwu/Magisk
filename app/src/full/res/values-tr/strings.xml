@@ -63,7 +63,7 @@
 
     <!--About Activity-->
     <string name="app_changelog">Uygulama değişiklikleri</string>
-    <string name="translators">Fatih FIRINCI - Mevlüt TOPÇU - Muhammet Emin TURGUT</string>
+    <string name="translators">Mevlüt TOPÇU - Muhammet Emin TURGUT</string>
     <string name="app_translators">Çevirmenler</string>
 
     <!-- System Components, Notifications -->

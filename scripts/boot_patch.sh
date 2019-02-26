@@ -75,19 +75,12 @@ ui_print "- Unpacking boot image"
 
 case $? in
   1 )
-    abort "! Unable to unpack boot image"
+    abort "! Unsupported/Unknown image format"
     ;;
   2 )
     ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
     ;;
-  3 )
-    ui_print "! Sony ELF32 format detected"
-    abort "! Please use BootBridge from @AdrianDC to flash Magisk"
-    ;;
-  4 )
-    ui_print "! Sony ELF64 format detected"
-    abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
 
 ##########################################################################################
@@ -97,7 +90,8 @@ esac
 # Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
 ui_print "- Checking ramdisk status"
 ./magiskboot --cpio ramdisk.cpio test
-case $? in
+STATUS=$?
+case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
     ui_print "- Backing up stock boot image"
@@ -134,6 +128,11 @@ echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 "patch $KEEPVERITY $KEEPFORCEENCRYPT" \
 "backup ramdisk.cpio.orig" \
 "add 000 .backup/.magisk config"
+
+if [ $((STATUS & 4)) -ne 0 ]; then
+  ui_print "- Compressing ramdisk"
+  ./magiskboot --cpio ramdisk.cpio compress
+fi
 
 rm -f ramdisk.cpio.orig config
 
@@ -174,4 +173,5 @@ ui_print "- Repacking boot image"
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos
 
-./magiskboot --cleanup
+# Reset any error code
+true

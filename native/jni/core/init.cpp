@@ -30,23 +30,26 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mount.h>
-#include <sys/mman.h>
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
 #include <functional>
 #include <string_view>
 
 #include <xz.h>
+#include <magisk.h>
+#include <magiskpolicy.h>
+#include <selinux.h>
+#include <cpio.h>
+#include <utils.h>
+#include <flags.h>
 
 #include "binaries.h"
+#ifdef USE_64BIT
+#include "binaries_arch64.h"
+#else
 #include "binaries_arch.h"
-
+#endif
 #include "magiskrc.h"
-#include "magisk.h"
-#include "magiskpolicy.h"
-#include "selinux.h"
-#include "utils.h"
-#include "flags.h"
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 
@@ -118,7 +121,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 			skip_initramfs = true;
 		} else if (key == "androidboot.android_dt_dir") {
 			strcpy(cmd->dt_dir, value);
-		} else if (key == "entry_recovery") {
+		} else if (key == "enter_recovery") {
 			enter_recovery = value[0] == '1';
 		} else if (key == "androidboot.hardware") {
 			kirin = strstr(value, "kirin") || strstr(value, "hi3660");
@@ -202,7 +205,7 @@ static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char
 	if ((fd = xopen(buf, O_RDONLY | O_CLOEXEC)) >= 0) {
 		read(fd, buf, sizeof(buf));
 		close(fd);
-		char *name = strrchr(buf, '/') + 1;
+		char *name = rtrim(strrchr(buf, '/') + 1);
 		sprintf(partname, "%s%s", name, strend(name, cmd->slot) ? cmd->slot : "");
 		sprintf(buf, "%s/fstab/%s/type", cmd->dt_dir, mnt_point);
 		if ((fd = xopen(buf, O_RDONLY | O_CLOEXEC)) >= 0) {
@@ -281,7 +284,7 @@ static bool patch_sepolicy() {
 		// Force init to load /sepolicy
 		uint8_t *addr;
 		size_t size;
-		mmap_rw("/init", (void **) &addr, &size);
+		mmap_rw("/init", addr, size);
 		for (int i = 0; i < size; ++i) {
 			if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
 				memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
@@ -317,6 +320,24 @@ static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	return true;
 }
 
+static void decompress_ramdisk() {
+	constexpr char tmp[] = "tmp.cpio";
+	constexpr char ramdisk_xz[] = "ramdisk.cpio.xz";
+	if (access(ramdisk_xz, F_OK))
+		return;
+	uint8_t *buf;
+	size_t sz;
+	mmap_ro(ramdisk_xz, buf, sz);
+	int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC);
+	unxz(fd, buf, sz);
+	munmap(buf, sz);
+	close(fd);
+	cpio_mmap cpio(tmp);
+	cpio.extract();
+	unlink(tmp);
+	unlink(ramdisk_xz);
+}
+
 static int dump_magisk(const char *path, mode_t mode) {
 	int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
 	if (fd < 0)
@@ -341,7 +362,7 @@ static void patch_socket_name(const char *path) {
 	uint8_t *buf;
 	char name[sizeof(MAIN_SOCKET)];
 	size_t size;
-	mmap_rw(path, (void **) &buf, &size);
+	mmap_rw(path, buf, size);
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
 			gen_rand_str(name, sizeof(name));
@@ -367,12 +388,6 @@ static void setup_init_rc() {
 	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc);
 	fclose(rc);
 }
-
-static const char wrapper[] =
-"#!/system/bin/sh\n"
-"unset LD_LIBRARY_PATH\n"
-"unset LD_PRELOAD\n"
-"exec /sbin/magisk.bin \"${0##*/}\" \"$@\"\n";
 
 static void setup_overlay() {
 	char buf[128];
@@ -403,13 +418,9 @@ static void setup_overlay() {
 	fd = open("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
 	write(fd, self, self_sz);
 	close(fd);
-	fd = open("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
-	write(fd, wrapper, sizeof(wrapper));
-	close(fd);
-	dump_magisk("/sbin/magisk.bin", 0755);
-	patch_socket_name("/sbin/magisk.bin");
+	dump_magisk("/sbin/magisk", 0755);
+	patch_socket_name("/sbin/magisk");
 	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 
 	// Create applet symlinks
@@ -503,8 +514,10 @@ int main(int argc, char *argv[]) {
 		frm_rf(root);
 		excl_list = nullptr;
 	} else {
+		decompress_ramdisk();
+
 		// Revert original init binary
-		link("/.backup/init", "/init");
+		rename("/.backup/init", "/init");
 		rm_rf("/.backup");
 
 		// Do not go further if device is booting into recovery

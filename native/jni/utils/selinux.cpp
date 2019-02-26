@@ -5,9 +5,9 @@
 #include <syscall.h>
 #include <sys/xattr.h>
 
-#include "magisk.h"
-#include "utils.h"
-#include "selinux.h"
+#include <magisk.h>
+#include <utils.h>
+#include <selinux.h>
 
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"
@@ -79,19 +79,17 @@ void selinux_builtin_impl() {
 	getfilecon = __getfilecon;
 	lgetfilecon = __lgetfilecon;
 	setfilecon = __setfilecon;
-	setfilecon = __lsetfilecon;
+	lsetfilecon = __lsetfilecon;
 }
 
 void dload_selinux() {
-	void *handle = dlopen("libselinux.so", RTLD_LAZY);
-	if (handle == nullptr)
+	if (access("/system/lib/libselinux.so", F_OK))
 		return;
-	*(void **) &freecon = dlsym(handle, "freecon");
-	*(void **) &setcon = dlsym(handle, "setcon");
-	*(void **) &getfilecon = dlsym(handle, "getfilecon");
-	*(void **) &lgetfilecon = dlsym(handle, "lgetfilecon");
-	*(void **) &setfilecon = dlsym(handle, "setfilecon");
-	*(void **) &lsetfilecon = dlsym(handle, "lsetfilecon");
+	/* We only check whether libselinux.so exists but don't dlopen.
+	 * For some reason calling symbols returned from dlsym
+	 * will result to SEGV_ACCERR on some devices.
+	 * Always use builtin implementations for SELinux stuffs. */
+	selinux_builtin_impl();
 }
 
 static void restore_syscon(int dirfd) {
@@ -162,7 +160,8 @@ void restorecon() {
 	if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0)
 		lsetfilecon(SECURE_DIR, ADB_CON);
 	close(fd);
-	fd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
+	lsetfilecon(MODULEROOT, SYSTEM_CON);
+	fd = xopen(MODULEROOT, O_RDONLY | O_CLOEXEC);
 	restore_syscon(fd);
 	close(fd);
 	fd = xopen(DATABIN, O_RDONLY | O_CLOEXEC);

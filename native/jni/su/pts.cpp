@@ -17,7 +17,8 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include "magisk.h"
+#include <magisk.h>
+
 #include "pts.h"
 
 /**

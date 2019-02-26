@@ -19,10 +19,11 @@
 #include <sepol/policydb/conditional.h>
 #include <sepol/policydb/constraint.h>
 
-#include "utils.h"
+#include <utils.h>
+#include <logging.h>
+
 #include "magiskpolicy.h"
 #include "sepolicy.h"
-#include "logging.h"
 
 policydb_t *policydb = NULL;
 extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);

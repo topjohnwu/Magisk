@@ -1,7 +1,8 @@
-#include "magisk.h"
-#include "magiskpolicy.h"
+#include <magisk.h>
+#include <magiskpolicy.h>
 
 static const char magiskrc[] =
+"\n\n"
 
 "on early-init\n"
 "    write " EARLYINIT " 1\n"

@@ -1,4 +1,5 @@
-#include "magisk.h"
+#include <magisk.h>
+
 #include "magiskpolicy.h"
 #include "sepolicy.h"
 
@@ -174,6 +175,10 @@ void sepol_magisk_rules() {
 	// Support deodexed ROM on Oreo
 	sepol_allow("zygote", "dalvikcache_data_file", "file", "execute");
 
+	// Support deodexed ROM on Pie (Samsung)
+	sepol_allow("system_server", "dalvikcache_data_file", "file", "write");
+	sepol_allow("system_server", "dalvikcache_data_file", "file", "execute");
+	
 	// Allow update engine to source addon.d.sh
 	sepol_allow("update_engine", "adb_data_file", "dir", ALL);
 

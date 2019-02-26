@@ -7,28 +7,25 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-#include "magisk.h"
+#include <magisk.h>
+#include <daemon.h>
+#include <flags.h>
+
 #include "magiskhide.h"
-#include "daemon.h"
-#include "flags.h"
 
 bool hide_enabled = false;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-		"MagiskHide v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu)\n\n"
+		FULL_VER(MagiskHide) "\n\n"
 		"Usage: %s [--option [arguments...] ]\n\n"
 		"Options:\n"
-  		"  --status          Return the status of MagiskHide\n"
-		"  --enable          Start magiskhide\n"
-		"  --disable         Stop magiskhide\n"
-		"  --add TARGET      Add TARGET to the hide list\n"
-		"  --rm TARGET       Remove TARGET from the hide list\n"
-		"  --ls              Print out the current hide list\n"
-		"\n"
-		"TARGET can be either a package name or a specific component name\n"
-		"If TARGET is a package name, all components of the app will be targeted\n"
-		"A component name is composed of <pkg>/<cls>\n"
+  		"  --status     Return the status of magiskhide\n"
+		"  --enable     Start magiskhide\n"
+		"  --disable    Stop magiskhide\n"
+		"  --add PKG    Add PKG to the hide list\n"
+		"  --rm PKG     Remove PKG from the hide list\n"
+		"  --ls         List the current hide list\n"
 		, arg0);
 	exit(1);
 }
@@ -51,8 +48,8 @@ void magiskhide_handler(int client) {
 
 	switch (req) {
 	case LAUNCH_MAGISKHIDE:
-		res = launch_magiskhide(client);
-		break;
+		launch_magiskhide(client);
+		return;
 	case STOP_MAGISKHIDE:
 		res = stop_magiskhide();
 		break;
@@ -109,9 +106,6 @@ int magiskhide_main(int argc, char *argv[]) {
 	switch (code) {
 	case DAEMON_SUCCESS:
 		break;
-	case LOGCAT_DISABLED:
-		fprintf(stderr, "Logcat is disabled, cannot start MagiskHide\n");
-		break;
 	case HIDE_NOT_ENABLED:
 		fprintf(stderr, "MagiskHide is not enabled\n");
 		break;
@@ -124,6 +118,9 @@ int magiskhide_main(int argc, char *argv[]) {
 	case HIDE_ITEM_NOT_EXIST:
 		fprintf(stderr, "[%s] does not exist in hide list\n", argv[2]);
 		break;
+	case HIDE_NO_NS:
+		fprintf(stderr, "Your kernel doesn't support mount namespace\n");
+		break;
 
 	/* Errors */
 	case ROOT_REQUIRED:
@@ -131,7 +128,7 @@ int magiskhide_main(int argc, char *argv[]) {
 		break;
 	case DAEMON_ERROR:
 	default:
-		fprintf(stderr, "Error occured in daemon...\n");
+		fprintf(stderr, "Daemon error\n");
 		return DAEMON_ERROR;
 	}
 

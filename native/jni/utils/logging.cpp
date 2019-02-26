@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <android/log.h>
 
-#include "logging.h"
-#include "flags.h"
+#include <logging.h>
+#include <flags.h>
 
 int nop_log(const char *fmt, va_list ap) {
 	return 0;

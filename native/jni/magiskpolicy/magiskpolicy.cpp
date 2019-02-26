@@ -8,11 +8,12 @@
 #include <vector>
 #include <string>
 
+#include <magisk.h>
+#include <utils.h>
+#include <flags.h>
+
 #include "sepolicy.h"
 #include "magiskpolicy.h"
-#include "magisk.h"
-#include "utils.h"
-#include "flags.h"
 
 using namespace std;
 
@@ -85,7 +86,7 @@ static const char *type_msg_6 =
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-		"MagiskPolicy v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu)\n\n"
+		FULL_VER(MagiskPolicy) "\n\n"
 		"Usage: %s [--options...] [policy statements...]\n"
 		"\n"
 		"Options:\n"

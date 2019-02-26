@@ -16,183 +16,183 @@
 
     <string name="unsupport_magisk_title">Dəstəklənməyən Magisk Versiyası</string>
 
-    <string name="unsupport_magisk_message">This version of Magisk Manager does not support Magisk version lower than v18.0.\n\nYou can either manually upgrade Magisk, or downgrade the app to an older version.</string>
+    <string name="unsupport_magisk_message">Magisk Menecerin bu versiyası Magisk\'in v18.0 versiyasndan aşağısını dəstəkləmir.\n\nMagisk\'i əllə yüksəldə, yaxud tətbiqi əvvəlki versiyalarına qaytara bilərsiniz.</string>
 
     <!--Status Fragment-->
 
-    <string name="magisk_version_error">Magisk is not installed.</string>
+    <string name="magisk_version_error">Magisk yüklənməyib.</string>
 
-    <string name="checking_for_updates">Checking for updates…</string>
+    <string name="checking_for_updates">Yeniləmələr yoxlanılır…</string>
 
-    <string name="invalid_update_channel">Invalid Update Channel</string>
+    <string name="invalid_update_channel">Etibarsız Yeniləmə Kanalı</string>
 
-    <string name="safetyNet_check_text">Tap to start SafetyNet check</string>
+    <string name="safetyNet_check_text">SafetyNet vəziyətinə baxmaq üçün toxun</string>
 
-    <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
+    <string name="checking_safetyNet_status">SafetyNet vəziyəti yoxlanılır…</string>
 
-    <string name="safetyNet_check_success">SafetyNet Check Success</string>
+    <string name="safetyNet_check_success">SafetyNet Uğurla Yoxlanıldı</string>
 
-    <string name="safetyNet_api_error">SafetyNet API Error</string>
+    <string name="safetyNet_api_error">SafetyNet API Xətası</string>
 
-    <string name="safetyNet_res_invalid">The response is invalid.</string>
+    <string name="safetyNet_res_invalid">Cavab etibarsızdır.</string>
 
-    <string name="magisk_up_to_date">Magisk is up to date</string>
+    <string name="magisk_up_to_date">Magisk\'in son versiyası yüklənib</string>
 
-    <string name="manager_up_to_date">Magisk Manager is up to date</string>
+    <string name="manager_up_to_date">Magisk Menecer\'in son versiyası yüklənib </string>
 
-    <string name="advanced_settings_title">Advanced Settings</string>
+    <string name="advanced_settings_title">Qabaqcıl Parametrlər</string>
 
-    <string name="keep_force_encryption">Preserve force encryption</string>
+    <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
 
-    <string name="keep_dm_verity">Preserve AVB 2.0/dm-verity</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
 
-    <string name="current_installed">Installed: %1$s</string>
+    <string name="current_installed">Yüklənən: %1$s</string>
 
-    <string name="latest_version">Latest: %1$s</string>
+    <string name="latest_version">Ən son: %1$s</string>
 
-    <string name="uninstall">Uninstall</string>
+    <string name="uninstall">Sil</string>
 
-    <string name="uninstall_magisk_title">Uninstall Magisk</string>
+    <string name="uninstall_magisk_title">Magisk\'i Sil</string>
 
-    <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and your data potentially encrypted if not already.</string>
+    <string name="uninstall_magisk_msg">Bütün əlavələr ləğv olunacaq/silinəcək. Root silinəcək, və əgər hal-hazırda deyilsə, bütün məlumatlarınız potensiyal olaraq şifrələnəcək.</string>
 
-    <string name="update">Update</string>
+    <string name="update">Yenilə</string>
 
-    <string name="core_only_enabled">(Core only mode enabled)</string>
+    <string name="core_only_enabled">(Yalnız nüvə modu qoşulub)</string>
 
     <!--Module Fragment-->
 
-    <string name="no_info_provided">(No info provided)</string>
+    <string name="no_info_provided">(Məlumat təmin edilməyib)</string>
 
-    <string name="no_modules_found">No modules found.</string>
+    <string name="no_modules_found">Əlavələr yoxdur.</string>
 
-    <string name="update_file_created">Module will be updated at next reboot.</string>
+    <string name="update_file_created">Əlavə sonrakı yenidən başlatmada yenilənəcək.</string>
 
-    <string name="remove_file_created">Module will be removed at next reboot.</string>
+    <string name="remove_file_created">Əlavə sonrakı yenidən başlatmada silinəcək.</string>
 
-    <string name="remove_file_deleted">Module will not be removed at next reboot.</string>
+    <string name="remove_file_deleted">Əlavə sonrakı yenidən başlatmada silinməyəcək.</string>
 
-    <string name="disable_file_created">Module will be disabled at next reboot.</string>
+    <string name="disable_file_created">Əlavə sonrakı yenidən başlatmada qapadılacaq.</string>
 
-    <string name="disable_file_removed">Module will be enabled at next reboot.</string>
+    <string name="disable_file_removed">Əlavə sonrakı yenidən başlatmada açılacaq.</string>
 
-    <string name="author">Created by %1$s</string>
+    <string name="author">%1$s tərəfindən yaradılıb</string>
 
-    <string name="reboot_recovery">Reboot to Recovery</string>
+    <string name="reboot_recovery">Bərpa rejimində yenidən başlat</string>
 
-    <string name="reboot_bootloader">Reboot to Bootloader</string>
+    <string name="reboot_bootloader">Bootloader\'ə yenidən başlat</string>
 
-    <string name="reboot_download">Reboot to Download</string>
+    <string name="reboot_download">Yükləmə rejimində yenidən başlat</string>
 
     <!--Repo Fragment-->
 
-    <string name="update_available">Update Available</string>
+    <string name="update_available">Yeniləmə Var</string>
 
-    <string name="installed">Installed</string>
+    <string name="installed">Yüklənib</string>
 
-    <string name="not_installed">Not Installed</string>
+    <string name="not_installed">Yüklənməyib</string>
 
-    <string name="updated_on">Updated on: %1$s</string>
+    <string name="updated_on">Yeniləmə vaxtı: %1$s</string>
 
-    <string name="sorting_order">Sorting Order</string>
+    <string name="sorting_order">Nizamlama Qaydası</string>
 
-    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_name">Ada görə nizamla</string>
 
-    <string name="sort_by_update">Sort by last update</string>
+    <string name="sort_by_update">Son yeniləməyə görə nizamla</string>
 
     <!--Log Fragment-->
 
-    <string name="menuSaveLog">Save log</string>
+    <string name="menuSaveLog">Log\'u saxla</string>
 
-    <string name="menuReload">Reload</string>
+    <string name="menuReload">Təzələ</string>
 
-    <string name="menuClearLog">Clear log now</string>
+    <string name="menuClearLog">Log\'u indi təmizlə</string>
 
-    <string name="logs_cleared">Log successfully cleared.</string>
+    <string name="logs_cleared">Log uğurla təmizləndi.</string>
 
-    <string name="log_is_empty">Log is empty.</string>
+    <string name="log_is_empty">Log boşdur.</string>
 
     <!--About Activity-->
 
-    <string name="app_changelog">Changelog</string>
+    <string name="app_changelog">Yeniliklər</string>
 
     <string name="translators" />
 
-    <string name="app_translators">Translators</string>
+    <string name="app_translators">Tərcümələr</string>
 
     <!-- System Components, Notifications -->
 
-    <string name="update_channel">Magisk Updates</string>
+    <string name="update_channel">Magisk Yeniləmələri</string>
 
-    <string name="progress_channel">Progress Notifications</string>
+    <string name="progress_channel">İnkişaf Bildirişləri</string>
 
-    <string name="download_complete">Download complete</string>
+    <string name="download_complete">Yükləmə bitdi</string>
 
-    <string name="download_file_error">Error downloading file</string>
+    <string name="download_file_error">Faylı yükləmək alınmadı</string>
 
-    <string name="magisk_update_title">Magisk Update Available!</string>
+    <string name="magisk_update_title">Magisk Yeniləməsi Var!</string>
 
-    <string name="manager_update_title">Magisk Manager Update Available!</string>
+    <string name="manager_update_title">Magisk Menecer Yeniləməsi Var!</string>
 
     <!--Toasts, Dialogs-->
 
-    <string name="close">Close</string>
+    <string name="close">Qapat</string>
 
-    <string name="repo_install_title">Install %1$s</string>
+    <string name="repo_install_title">%1$s faylını yüklə</string>
 
-    <string name="repo_install_msg">Do you want to install %1$s now?</string>
+    <string name="repo_install_msg">%1$s faylını indi yükləmək istəyirsiniz?</string>
 
-    <string name="download">Download</string>
+    <string name="download">Yüklə</string>
 
-    <string name="reboot">Reboot</string>
+    <string name="reboot">Yenidən Başlat</string>
 
-    <string name="settings_reboot_toast">Reboot to apply settings.</string>
+    <string name="settings_reboot_toast">Tənzimləmələri saxlamaq üçün yenidən başladın.</string>
 
-    <string name="release_notes">Release notes</string>
+    <string name="release_notes">Buraxılış qeydləri</string>
 
-    <string name="repo_cache_cleared">Repo cache cleared</string>
+    <string name="repo_cache_cleared">Repo keşi silindi</string>
 
-    <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
+    <string name="internal_storage">Zip faylının olduğu yer:\n[Daxili Yaddaş]%1$s</string>
 
-    <string name="manager_download_install">Press to download and install.</string>
+    <string name="manager_download_install">Yükləyib qurdaşdırmaq üçün toxun.</string>
 
-    <string name="dtbo_patched_title">DTBO was patched!</string>
+    <string name="dtbo_patched_title">DTBO yamaqlanıb!</string>
 
-    <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img. Please reboot.</string>
+    <string name="dtbo_patched_reboot">Magisk Menecer dtbo.img\'ni yamaqladı. Xahiş olunur yenidən başladın.</string>
 
-    <string name="flashing">Flashing</string>
+    <string name="flashing">Qurulur</string>
 
-    <string name="hide_manager_title">Hiding Magisk Manager…</string>
+    <string name="hide_manager_title">Magisk Menecer gizlədilir…</string>
 
-    <string name="hide_manager_fail_toast">Hide Magisk Manager failed.</string>
+    <string name="hide_manager_fail_toast">Magisk Meneceri gizlətmək alınmadı.</string>
 
-    <string name="open_link_failed_toast">No application found to open the link.</string>
+    <string name="open_link_failed_toast">Keçid açmağa heçbir tətbiq tapılmadı.</string>
 
-    <string name="download_zip_only">Download Zip Only</string>
+    <string name="download_zip_only">Yalnız Zip yüklə</string>
 
     <string name="patch_boot_file">Patch Boot Image File</string>
 
-    <string name="direct_install">Direct Install (Recommended)</string>
+    <string name="direct_install">Birdəfəlik Yüklə (Tövsiyə olunur)</string>
 
-    <string name="install_inactive_slot">Install to Inactive Slot (After OTA)</string>
+    <string name="install_inactive_slot">Fəal olmayan slota quraşdır (OTA\'dan sonra)</string>
 
-    <string name="warning">Warning</string>
+    <string name="warning">Xəbərdarlıq</string>
 
-    <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
+    <string name="install_inactive_slot_msg">Cihazınız yenidən başladıldıqdan sonra fəal olmayan slota başlamağa MƏCBUR ediləcək!\nBu seçimi yalnız OTA bitdikdən sonra istifadə edin.\nDavam edirsiniz?</string>
 
-    <string name="select_method">Select Method</string>
+    <string name="select_method">Üsul Seçin</string>
 
-    <string name="boot_file_patch_msg">Select stock boot image dump in .img or .img.tar format.</string>
+    <string name="boot_file_patch_msg">Standart boot surətinin yığılma formatını .imb yaxud img.tar kimi seçin.</string>
 
-    <string name="complete_uninstall">Complete Uninstall</string>
+    <string name="complete_uninstall">Silməni Bitir</string>
 
-    <string name="restore_img">Restore Images</string>
+    <string name="restore_img">Şəkilləri Geri Qaytar</string>
 
-    <string name="restore_img_msg">Restoring…</string>
+    <string name="restore_img_msg">Geri qaytarılır…</string>
 
-    <string name="restore_done">Restoration done!</string>
+    <string name="restore_done">Geri qaytarma bitdi!</string>
 
-    <string name="restore_fail">Stock backup does not exist!</string>
+    <string name="restore_fail">Stock nüsxə mövcud deyil!</string>
 
     <string name="proprietary_title">Download Proprietary Code</string>
 

@@ -59,7 +59,7 @@ find_boot_image
 find_dtbo_image
 
 [ -e $BOOTIMAGE ] || abort "! Unable to detect boot image"
-ui_print "- Found boot/ramdisk image: $BOOTIMAGE"
+ui_print "- Found target image: $BOOTIMAGE"
 [ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
 
 cd $MAGISKBIN
@@ -125,17 +125,13 @@ esac
 
 ui_print "- Removing Magisk files"
 rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
-        /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*magisk* 2>/dev/null
+        /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*magisk* \
+        /data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* 2>/dev/null
 
 if [ -f /system/addon.d/99-magisk.sh ]; then
   mount -o rw,remount /system
   rm -f /system/addon.d/99-magisk.sh
 fi
-
-# Remove persist props (for Android P+ using protobuf)
-for prop in `./magisk resetprop -p | grep -E 'persist.*magisk' | grep -oE '^\[[a-zA-Z0-9.@:_-]+\]' | tr -d '[]'`; do
-  ./magisk resetprop -p --delete $prop
-done
 
 cd /
 

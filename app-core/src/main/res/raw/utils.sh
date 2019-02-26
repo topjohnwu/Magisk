@@ -1,28 +1,42 @@
 env_check() {
   for file in busybox magisk magiskboot magiskinit util_functions.sh boot_patch.sh; do
-    [ -f /data/adb/magisk/$file ] || return 1
+    [ -f $MAGISKBIN/$file ] || return 1
   done
   return 0
 }
 
 fix_env() {
-  cd /data/adb/magisk
+  cd $MAGISKBIN
   local OLDPATH="$PATH"
   PATH=/sbin:/system/bin:/vendor/bin
-  sh update-binary extract
+  sh update-binary -x
   PATH="$OLDPATH"
-  ./busybox rm -f /sbin/.magisk/busybox/*
-  /sbin/.magisk/mirror/bin/busybox --install -s /sbin/.magisk/busybox
+  ./busybox rm -f $MAGISKTMP/busybox/*
+  $MAGISKTMP/mirror/bin/busybox --install -s $MAGISKTMP/busybox
   rm -f update-binary magisk.apk
+  chmod -R 755 .
   cd /
 }
 
+run_migrations() {
+  # Move the stock backups
+  if [ -f /data/magisk/stock_boot* ]; then
+    mv /data/magisk/stock_boot* /data 2>/dev/null
+  fi
+  if [ -f /data/adb/magisk/stock_boot* ]; then
+    mv /data/adb/magisk/stock_boot* /data 2>/dev/null
+  fi
+  # Remove old dbs
+  rm -f /data/user*/*/magisk.db
+  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img 2>/dev/null
+}
+
 direct_install() {
-  rm -rf /data/adb/magisk/* 2>/dev/null
-  mkdir -p /data/adb/magisk 2>/dev/null
-  chmod 700 /data/adb
-  cp -rf $1/* /data/adb/magisk
-  rm -rf /data/adb/magisk/new-boot.img
+  rm -rf $MAGISKBIN/* 2>/dev/null
+  mkdir -p $MAGISKBIN 2>/dev/null
+  chmod 700 $NVBASE
+  cp -af $1/. $MAGISKBIN
+  rm -f $MAGISKBIN/new-boot.img
   echo "- Flashing new boot image"
   flash_image $1/new-boot.img $2
   if [ $? -ne 0 ]; then
@@ -34,12 +48,7 @@ direct_install() {
 }
 
 mm_patch_dtbo() {
-  if $KEEPVERITY; then
-    return 1
-  else
-    find_dtbo_image
-    patch_dtbo_image
-  fi
+  $KEEPVERITY && return 1 || patch_dtbo_image
 }
 
 restore_imgs() {
@@ -101,8 +110,7 @@ EOF
 }
 
 rm_launch() {
-  db_clean $1
-  pm uninstall $2
-  am start -n ${3}/a.c
+  pm uninstall $1
+  am start -n ${2}/a.c
   exit
 }

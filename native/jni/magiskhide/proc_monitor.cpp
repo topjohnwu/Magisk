@@ -1,8 +1,10 @@
 /* proc_monitor.cpp - Monitor am_proc_start events and unmount
  *
- * We monitor the logcat am_proc_start events. When a target starts up,
- * we pause it ASAP, and fork a new process to join its mount namespace
- * and do all the unmounting/mocking
+ * We monitor the listed APK files from /data/app until they get opened
+ * via inotify to detect a new app launch.
+ *
+ * If it's a target we pause it ASAP, and fork a new process to join
+ * its mount namespace and do all the unmounting/mocking.
  */
 
 #include <stdlib.h>
@@ -12,35 +14,41 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <pthread.h>
+#include <sys/inotify.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/mount.h>
 #include <vector>
 #include <string>
+#include <map>
+#include <algorithm>
 
-#include "magisk.h"
-#include "daemon.h"
-#include "utils.h"
+#include <magisk.h>
+#include <utils.h>
+
 #include "magiskhide.h"
 
 using namespace std;
 
-static int sockfd = -1;
-extern char *system_block, *vendor_block, *magiskloop;
+extern char *system_block, *vendor_block, *data_block;
+
+static int inotify_fd = -1;
+static set<int> hide_uid;
 
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
 	LOGD("proc_monitor: running cleanup\n");
 	hide_list.clear();
+	hide_uid.clear();
 	hide_enabled = false;
-	close(sockfd);
-	sockfd = -1;
 	pthread_mutex_destroy(&list_lock);
+	close(inotify_fd);
+	inotify_fd = -1;
 	LOGD("proc_monitor: terminating\n");
 	pthread_exit(nullptr);
 }
 
-static int read_ns(const int pid, struct stat *st) {
+static inline int read_ns(const int pid, struct stat *st) {
 	char path[32];
 	sprintf(path, "/proc/%d/ns/mnt", pid);
 	return stat(path, st);
@@ -51,60 +59,219 @@ static inline void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
-static int parse_ppid(int pid) {
+static inline int parse_ppid(const int pid) {
 	char path[32];
 	int ppid;
+
 	sprintf(path, "/proc/%d/stat", pid);
 	FILE *stat = fopen(path, "re");
 	if (stat == nullptr)
 		return -1;
+
 	/* PID COMM STATE PPID ..... */
 	fscanf(stat, "%*d %*s %*c %d", &ppid);
 	fclose(stat);
+
 	return ppid;
 }
 
+static bool is_snet(const int pid) {
+	char path[32];
+	char buf[64];
+	int fd;
+	ssize_t len;
+
+	sprintf(path, "/proc/%d/cmdline", pid);
+	fd = open(path, O_RDONLY | O_CLOEXEC);
+	if (fd == -1)
+		return false;
+
+	len = read(fd, buf, sizeof(buf));
+	close(fd);
+	if (len == -1)
+		return false;
+
+	return !strcmp(buf, SAFETYNET_PROCESS);
+}
+
 static void hide_daemon(int pid) {
-	LOGD("hide_daemon: handling pid=[%d]\n", pid);
+	RunFinally fin([=]() -> void {
+		// Send resume signal
+		kill(pid, SIGCONT);
+		_exit(0);
+	});
 
-	char buffer[4096];
-	vector<string> mounts;
+	if (switch_mnt_ns(pid))
+		return;
 
+	LOGD("hide_daemon: handling PID=[%d]\n", pid);
 	manage_selinux();
 	clean_magisk_props();
 
-	if (switch_mnt_ns(pid))
-		goto exit;
+	vector<string> targets;
 
-	snprintf(buffer, sizeof(buffer), "/proc/%d", pid);
-	chdir(buffer);
-
-	mounts = file_to_vector("mounts");
 	// Unmount dummy skeletons and /sbin links
-	for (auto &s : mounts) {
+	file_readline("/proc/self/mounts", [&](string_view &s) -> bool {
 		if (str_contains(s, "tmpfs /system/") || str_contains(s, "tmpfs /vendor/") ||
 			str_contains(s, "tmpfs /sbin")) {
-			sscanf(s.c_str(), "%*s %4096s", buffer);
-			lazy_unmount(buffer);
+			char *path = (char *) s.data();
+			// Skip first token
+			strtok_r(nullptr, " ", &path);
+			targets.emplace_back(strtok_r(nullptr, " ", &path));
 		}
-	}
+		return true;
+	});
 
-	// Re-read mount infos
-	mounts = file_to_vector("mounts");
+	for (auto &s : targets)
+		lazy_unmount(s.data());
+	targets.clear();
 
-	// Unmount everything under /system, /vendor, and loop mounts
-	for (auto &s : mounts) {
+	// Unmount everything under /system, /vendor, and data mounts
+	file_readline("/proc/self/mounts", [&](string_view &s) -> bool {
 		if ((str_contains(s, " /system/") || str_contains(s, " /vendor/")) &&
-			(str_contains(s, system_block) || str_contains(s, vendor_block) || str_contains(s, magiskloop))) {
-			sscanf(s.c_str(), "%*s %4096s", buffer);
-			lazy_unmount(buffer);
+			(str_contains(s, system_block) || str_contains(s, vendor_block) ||
+			 str_contains(s, data_block))) {
+			char *path = (char *) s.data();
+			// Skip first token
+			strtok_r(nullptr, " ", &path);
+			targets.emplace_back(strtok_r(nullptr, " ", &path));
+		}
+		return true;
+	});
+
+	for (auto &s : targets)
+		lazy_unmount(s.data());
+}
+
+// A mapping from pid to namespace inode to avoid time-consuming GC
+static map<int, uint64_t> pid_ns_map;
+
+static bool process_pid(int pid) {
+	// We're only interested in PIDs > 1000
+	if (pid <= 1000)
+		return true;
+
+	struct stat ns, pns;
+	int ppid;
+	int uid = get_uid(pid);
+	if (hide_uid.count(uid)) {
+		// Make sure we can read mount namespace
+		if ((ppid = parse_ppid(pid)) < 0 || read_ns(pid, &ns) || read_ns(ppid, &pns))
+			return true;
+		// mount namespace is not separated, we only unmount once
+		if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
+			return true;
+
+		// Check if it's a process we haven't already hijacked
+		auto pos = pid_ns_map.find(pid);
+		if (pos != pid_ns_map.end() && pos->second == ns.st_ino)
+			return true;
+
+		if (uid == gms_uid) {
+			// Check /proc/uid/cmdline to see if it's SAFETYNET_PROCESS
+			if (!is_snet(pid))
+				return true;
+
+			LOGD("proc_monitor: " SAFETYNET_PROCESS "\n");
+		}
+
+		// Send pause signal ASAP
+		if (kill(pid, SIGSTOP) == -1)
+			return true;
+
+		pid_ns_map[pid] = ns.st_ino;
+		LOGI("proc_monitor: UID=[%d] PID=[%d] ns=[%llu]\n", uid, pid, ns.st_ino);
+
+		/*
+		 * The setns system call do not support multithread processes
+		 * We have to fork a new process, setns, then do the unmounts
+		 */
+		if (fork_dont_care() == 0)
+			hide_daemon(pid);
+	}
+	return true;
+}
+
+static int xinotify_add_watch(int fd, const char* path, uint32_t mask) {
+	int ret = inotify_add_watch(fd, path, mask);
+	if (ret >= 0) {
+		LOGD("proc_monitor: Monitoring %s\n", path);
+	} else {
+		PLOGE("proc_monitor: Monitor %s", path);
+	}
+	return ret;
+}
+
+static int new_inotify;
+static const string_view APK_EXT(".apk");
+static vector<string> hide_apks;
+
+static bool parse_packages_xml(string_view &s) {
+	if (!str_starts(s, "<package "))
+		return true;
+	/* <package key1="value1" key2="value2"....> */
+	char *start = (char *) s.data();
+	start[s.length() - 2] = '\0';  /* Remove trailing '>' */
+	char key[32], value[1024];
+	char *tok;
+	start += 9;  /* Skip '<package ' */
+	while ((tok = strtok_r(nullptr, " ", &start))) {
+		sscanf(tok, "%[^=]=\"%[^\"]", key, value);
+		string_view value_view(value);
+		if (strcmp(key, "name") == 0) {
+			if (std::count(hide_list.begin(), hide_list.end(), value_view) == 0)
+				return true;
+		} else if (strcmp(key, "codePath") == 0) {
+			if (ends_with(value_view, APK_EXT)) {
+				// Directly add to inotify list
+				hide_apks.emplace_back(value);
+			} else {
+				DIR *dir = opendir(value);
+				if (dir == nullptr)
+					return true;
+				struct dirent *entry;
+				while ((entry = xreaddir(dir))) {
+					if (ends_with(entry->d_name, APK_EXT)) {
+						strcpy(value + value_view.length(), "/");
+						strcpy(value + value_view.length() + 1, entry->d_name);
+						hide_apks.emplace_back(value);
+						break;
+					}
+				}
+				closedir(dir);
+			}
+		} else if (strcmp(key, "userId") == 0 || strcmp(key, "sharedUserId") == 0) {
+			hide_uid.insert(parse_int(value));
 		}
 	}
+	return true;
+}
 
-exit:
-	// Send resume signal
-	kill(pid, SIGCONT);
-	_exit(0);
+void update_inotify_mask() {
+	new_inotify = inotify_init();
+	if (new_inotify < 0) {
+		LOGE("proc_monitor: Cannot initialize inotify: %s\n", strerror(errno));
+		term_thread(TERM_THREAD);
+	}
+	fcntl(new_inotify, F_SETFD, FD_CLOEXEC);
+
+	LOGD("proc_monitor: Updating inotify list\n");
+	hide_apks.clear();
+	{
+		MutexGuard lock(list_lock);
+		hide_uid.clear();
+		file_readline("/data/system/packages.xml", parse_packages_xml, true);
+	}
+
+	// Swap out and close old inotify_fd
+	int tmp = inotify_fd;
+	inotify_fd = new_inotify;
+	if (tmp >= 0)
+		close(tmp);
+
+	for (auto apk : hide_apks)
+		xinotify_add_watch(inotify_fd, apk.data(), IN_OPEN);
+	xinotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
 }
 
 void proc_monitor() {
@@ -119,69 +286,22 @@ void proc_monitor() {
 	act.sa_handler = term_thread;
 	sigaction(TERM_THREAD, &act, nullptr);
 
-	if (access("/proc/1/ns/mnt", F_OK) != 0) {
-		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
-		term_thread(TERM_THREAD);
-	}
-
-	// Connect to the log daemon
-	sockfd = connect_log_daemon();
-	if (sockfd < 0)
-		pthread_exit(nullptr);
-	write_int(sockfd, HIDE_CONNECT);
-
-	FILE *log_in = fdopen(sockfd, "r");
-	char buf[4096];
-	while (fgets(buf, sizeof(buf), log_in)) {
-		char *log;
-		int pid, ppid;
-		struct stat ns, pns;
-
-		if ((log = strchr(buf, '[')) == nullptr)
+	// Read inotify events
+	ssize_t len;
+	char buf[512];
+	auto event = reinterpret_cast<inotify_event *>(buf);
+	while ((len = read(inotify_fd, buf, sizeof(buf))) >= 0) {
+		if (len < sizeof(*event))
 			continue;
-
-		// Extract pid
-		if (sscanf(log, "[%*d,%d", &pid) != 1)
-			continue;
-
-		// Extract last token (component name)
-		const char *tok, *cpnt = "";
-		while ((tok = strtok_r(nullptr, ",[]\n", &log)))
-			cpnt = tok;
-		if (cpnt[0] == '\0')
-			continue;
-
-		// Make sure our target is alive
-		if ((ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns))
-			continue;
-
-		bool hide = false;
-		pthread_mutex_lock(&list_lock);
-		for (auto &s : hide_list) {
-			if (strncmp(cpnt, s.c_str(), s.size() - 1) == 0) {
-				hide = true;
-				break;
-			}
+		if (event->mask & IN_OPEN) {
+			// Since we're just watching files,
+			// extracting file name is not possible from querying event
+			MutexGuard lock(list_lock);
+			crawl_procfs(process_pid);
+		} else if ((event->mask & IN_CLOSE_WRITE) && strcmp(event->name, "packages.xml") == 0) {
+			LOGD("proc_monitor: /data/system/packages.xml updated\n");
+			update_inotify_mask();
 		}
-		pthread_mutex_unlock(&list_lock);
-
-		if (!hide)
-			continue;
-
-		while (read_ns(pid, &ns) == 0 && ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
-			usleep(500);
-
-		// Send pause signal ASAP
-		if (kill(pid, SIGSTOP) == -1)
-			continue;
-
-		/*
-		 * The setns system call do not support multithread processes
-		 * We have to fork a new process, setns, then do the unmounts
-		 */
-		LOGI("proc_monitor: %s PID=[%d] ns=[%llu]\n", cpnt, pid, ns.st_ino);
-		if (fork_dont_care() == 0)
-			hide_daemon(pid);
 	}
-	pthread_exit(nullptr);
+	PLOGE("proc_monitor: read inotify");
 }

@@ -10,34 +10,16 @@
 #include <syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/prctl.h>
 #include <sys/sysmacros.h>
-#include <vector>
 
-#include "logging.h"
-#include "utils.h"
-
-using namespace std;
+#include <logging.h>
+#include <utils.h>
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
 	if (nullptr == ppwd)
 		return 2000;
-
-	return ppwd->pw_uid;
-}
-
-unsigned get_system_uid() {
-	struct passwd* ppwd = getpwnam("system");
-	if (nullptr == ppwd)
-		return 1000;
-
-	return ppwd->pw_uid;
-}
-
-unsigned get_radio_uid() {
-	struct passwd* ppwd = getpwnam("radio");
-	if (nullptr == ppwd)
-		return 1001;
 
 	return ppwd->pw_uid;
 }
@@ -50,6 +32,20 @@ int fork_dont_care() {
 	} else if ((pid = xfork())) {
 		exit(0);
 	}
+	return 0;
+}
+
+int fork_no_zombie() {
+	int pid = xfork();
+	if (pid)
+		return pid;
+	// Unblock all signals
+	sigset_t block_set;
+	sigfillset(&block_set);
+	pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
+	prctl(PR_SET_PDEATHSIG, SIGTERM);
+	if (getppid() == 1)
+		exit(1);
 	return 0;
 }
 
@@ -151,10 +147,6 @@ ssize_t __getline(char **lineptr, size_t *n, FILE *stream) {
 	return __getdelim(lineptr, n, '\n', stream);
 }
 
-int __fsetxattr(int fd, const char *name, const void *value, size_t size, int flags) {
-	return (int) syscall(__NR_fsetxattr, fd, name, value, size, flags);
-}
-
 int exec_command(exec_t &exec) {
 	int pipefd[2] = {-1, -1}, outfd = -1;
 
@@ -195,8 +187,7 @@ int exec_command(exec_t &exec) {
 	exit(-1);
 }
 
-int exec_command_sync(const char **argv) {
-	exec_t exec { .argv = argv };
+int exec_command_sync(exec_t &exec) {
 	int pid, status;
 	pid = exec_command(exec);
 	if (pid < 0)
@@ -205,3 +196,37 @@ int exec_command_sync(const char **argv) {
 	return WEXITSTATUS(status);
 }
 
+int new_daemon_thread(void *(*start_routine) (void *), void *arg, const pthread_attr_t *attr) {
+	pthread_t thread;
+	int ret = xpthread_create(&thread, attr, start_routine, arg);
+	if (ret == 0)
+		pthread_detach(thread);
+	return ret;
+}
+
+static char *argv0;
+static size_t name_len;
+void init_argv0(int argc, char **argv) {
+	argv0 = argv[0];
+	name_len = (argv[argc - 1] - argv[0]) + strlen(argv[argc - 1]) + 1;
+}
+
+void set_nice_name(const char *name) {
+	memset(argv0, 0, name_len);
+	strlcpy(argv0, name, name_len);
+	prctl(PR_SET_NAME, name);
+}
+
+bool ends_with(const std::string_view &s1, const std::string_view &s2) {
+	unsigned l1 = s1.length();
+	unsigned l2 = s2.length();
+	return l1 < l2 ? false : s1.compare(l1 - l2, l2, s2) == 0;
+}
+
+char *rtrim(char *str) {
+	int len = strlen(str);
+	while (len > 0 && str[len - 1] == ' ')
+		--len;
+	str[len] = '\0';
+	return str;
+}

@@ -15,7 +15,7 @@
     <string name="checking_for_updates">Buscando Actualizaciones…</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
     <string name="safetyNet_check_text">Verificar estado de SafetyNet</string>
-    <string name="checking_safetyNet_status">Verificando estado de SafetyNet…</string>
+    <string name="checking_safetyNet_status">Verificando…</string>
     <string name="safetyNet_check_success">La verificación fue exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_res_invalid">La respuesta no es válida</string>

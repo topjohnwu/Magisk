@@ -9,15 +9,15 @@
 #include <vector>
 #include <algorithm>
 
+#include <magisk.h>
+#include <resetprop.h>
+#include <utils.h>
+#include <flags.h>
+
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include "private/_system_properties.h"
 #include "private/system_properties.h"
-
-#include "magisk.h"
-#include "resetprop.h"
 #include "_resetprop.h"
-#include "utils.h"
-#include "flags.h"
 
 using namespace std;
 
@@ -55,7 +55,7 @@ illegal:
 
 [[noreturn]] static void usage(char* arg0) {
 	fprintf(stderr,
-		"resetprop v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu & nkk71) - System Props Modification Tool\n\n"
+		FULL_VER(resetprop) " - System Props Modification Tool\n\n"
 		"Usage: %s [flags] [options...]\n"
 		"\n"
 		"Options:\n"

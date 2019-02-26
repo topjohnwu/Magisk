@@ -21,12 +21,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "magisk.h"
-#include "daemon.h"
-#include "utils.h"
+#include <magisk.h>
+#include <daemon.h>
+#include <utils.h>
+#include <flags.h>
+
 #include "su.h"
 #include "pts.h"
-#include "flags.h"
 
 int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
 
@@ -34,7 +35,7 @@ static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
 
 	fprintf(stream,
-	"MagiskSU v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ")\n\n"
+	FULL_VER(MagiskSU) "\n\n"
 	"Usage: su [options] [-] [user [argument...]]\n\n"
 	"Options:\n"
 	"  -c, --command COMMAND         pass COMMAND to the invoked shell\n"
@@ -150,7 +151,7 @@ int su_client_main(int argc, char *argv[]) {
 				printf("%d\n", MAGISK_VER_CODE);
 				exit(EXIT_SUCCESS);
 			case 'v':
-				printf("%s\n", xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)");
+				printf("%s\n", MAGISK_VERSION ":MAGISKSU");
 				exit(EXIT_SUCCESS);
 			case 'z':
 				// Do nothing, placed here for legacy support :)

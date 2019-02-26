@@ -45,14 +45,12 @@ is_mounted /data || mount /data || is_mounted /cache || mount /cache || abort "!
 mount_partitions
 
 find_boot_image
-find_dtbo_image
 
 check_data
 get_flags
 
 [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
 ui_print "- Target image: $BOOTIMAGE"
-[ -z $DTBOIMAGE ] || ui_print "- DTBO image: $DTBOIMAGE"
 
 # Detect version and architecture
 api_level_arch_detect
@@ -73,18 +71,10 @@ remove_system_su
 
 ui_print "- Constructing environment"
 
-if $DATA; then
-  MAGISKBIN=/data/magisk
-  $DATA_DE && MAGISKBIN=/data/adb/magisk
-  run_migrations
-else
-  MAGISKBIN=/cache/data_bin
-fi
-
 # Copy required files
 rm -rf $MAGISKBIN/* 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
-cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $TMPDIR/bin/busybox $MAGISKBIN
+cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $BBDIR/busybox $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 
 # addon.d
@@ -110,11 +100,21 @@ $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
 SOURCEDMODE=true
 cd $MAGISKBIN
 
+$IS64BIT && mv -f magiskinit64 magiskinit || rm -f magiskinit64
+
 # Source the boot patcher
 . ./boot_patch.sh "$BOOTIMAGE"
 
 ui_print "- Flashing new boot image"
-flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
+
+if ! flash_image new-boot.img "$BOOTIMAGE"; then
+  ui_print "- Compressing ramdisk to fit in partition"
+  ./magiskboot --cpio ramdisk.cpio compress
+  ./magiskboot --repack "$BOOTIMAGE"
+  flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
+fi
+
+./magiskboot --cleanup
 rm -f new-boot.img
 
 if [ -f stock_boot* ]; then

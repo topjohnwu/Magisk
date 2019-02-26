@@ -6,8 +6,9 @@
 #define MAGISK_PROPS_H
 
 #include <string>
-#include "resetprop/private/system_properties.h"
-#include "logging.h"
+#include <logging.h>
+
+#include "private/system_properties.h"
 
 struct prop_t {
 	char *name;

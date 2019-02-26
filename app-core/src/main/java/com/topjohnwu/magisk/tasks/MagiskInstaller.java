@@ -108,7 +108,7 @@ public abstract class MagiskInstaller {
 
     protected boolean extractZip() {
         String arch;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= 21) {
             List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
             arch = abis.contains("x86") ? "x86" : "arm";
         } else {
@@ -162,8 +162,6 @@ public abstract class MagiskInstaller {
             console.add("! Cannot unzip zip");
             return false;
         }
-        Shell.sh(Utils.fmt("chmod -R 755 %s/*; %s/magiskinit -x magisk %s/magisk",
-                installDir, installDir, installDir)).exec();
         return true;
     }
 
@@ -213,14 +211,19 @@ public abstract class MagiskInstaller {
             return false;
         }
 
-        // Patch boot image
-        if (!Shell.sh(Utils.fmt("cd %s; KEEPFORCEENCRYPT=%b KEEPVERITY=%b " +
-                        "sh update-binary indep boot_patch.sh %s",
-                installDir, Config.keepEnc, Config.keepVerity, srcBoot))
-                .to(console, logs).exec().isSuccess())
+        Shell.Job job = Shell.sh("cd " + installDir);
+        if (Build.VERSION.SDK_INT >= 21 && Build.SUPPORTED_64_BIT_ABIS.length != 0) {
+            job.add("mv -f magiskinit64 magiskinit 2>/dev/null");
+        } else {
+            job.add("rm -f magiskinit64 2>/dev/null");
+        }
+        if (!job.add(Utils.fmt("KEEPFORCEENCRYPT=%b KEEPVERITY=%b " +
+                        "sh update-binary sh boot_patch.sh %s",
+                Config.keepEnc, Config.keepVerity, srcBoot)).to(console, logs).exec().isSuccess())
             return false;
 
-        Shell.Job job = Shell.sh("mv bin/busybox busybox",
+        job = Shell.sh("./magiskboot --cleanup",
+                "mv bin/busybox busybox",
                 "rm -rf magisk.apk bin boot.img update-binary",
                 "cd /");
 
@@ -245,7 +248,7 @@ public abstract class MagiskInstaller {
                 .to(console, logs).exec().isSuccess())
             return false;
         if (!Config.keepVerity)
-            Shell.su("find_dtbo_image", "patch_dtbo_image").to(console, logs).exec();
+            Shell.su("patch_dtbo_image").to(console, logs).exec();
         return true;
     }
 

@@ -27,8 +27,8 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:orientation="horizontal"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
         <ImageView
             android:id="@+id/app_icon"
@@ -36,9 +36,7 @@
             android:layout_height="50dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="5dp"
-            android:layout_marginLeft="5dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
             android:layout_weight="0" />
 
         <LinearLayout
@@ -94,8 +92,8 @@
         android:layout_height="match_parent"
         android:gravity="bottom"
         android:orientation="horizontal"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp">
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp">
 
         <Button
             android:id="@+id/deny_btn"
