@@ -18,9 +18,9 @@
 
 #include "su.h"
 
-#define BROADCAST_REBOOT_COMPLETED \
+#define BROADCAST_REBOOT \
 "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
-"broadcast", nullptr, nullptr, "-a", "android.intent.action.REBOOT", \
+"broadcast", "-n", nullptr, "-a", "android.intent.action.REBOOT", \
 "-f", "0x10000020"
 
 static inline const char *get_command(const struct su_request *to) {
@@ -34,7 +34,6 @@ static inline const char *get_command(const struct su_request *to) {
 static void silent_run(const char **args, struct su_info *info) {
 	char component[128];
 	sprintf(component, "%s/a.h", info->str[SU_MANAGER]);
-	args[4] = "-n";
 	args[5] = component;
 	exec_t exec {
 		.pre_exec = []() -> void {
@@ -80,7 +79,7 @@ void app_log(struct su_context *ctx) {
 	sprintf(policy, "%d", ctx->info->access.policy);
 
 	const char *cmd[] = {
-		BROADCAST_REBOOT_COMPLETED,
+		BROADCAST_REBOOT,
 		"--user", user,
 		"--es", "action", "log",
 		"--ei", "from.uid", fromUid,
@@ -107,7 +106,7 @@ void app_notify(struct su_context *ctx) {
 	sprintf(policy, "%d", ctx->info->access.policy);
 
 	const char *cmd[] = {
-		BROADCAST_REBOOT_COMPLETED,
+		BROADCAST_REBOOT,
 		"--user", user,
 		"--es", "action", "notify",
 		"--ei", "from.uid", fromUid,
@@ -122,7 +121,7 @@ void app_connect(const char *socket, struct su_info *info) {
 	setup_user(user, info);
 
 	const char *cmd[] = {
-		BROADCAST_REBOOT_COMPLETED,
+		BROADCAST_REBOOT,
 		"--user", user,
 		"--es", "action", "request",
 		"--es", "socket", socket,
