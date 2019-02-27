@@ -19,8 +19,8 @@
     <string name="safetyNet_check_success">Verificare SafetyNet cu succes</string>
     <string name="safetyNet_api_error">Eroare API SafetyNet</string>
     <string name="safetyNet_res_invalid">Răspunsul este nevalid.</string>
-    <string name="magisk_up_to_date">Magisk este actualizat</string>
-    <string name="manager_up_to_date">Magisk Manager este actualizat</string>
+    <string name="magisk_up_to_date">Magisk este la zi</string>
+    <string name="manager_up_to_date">Magisk Manager este la zi</string>
     <string name="advanced_settings_title">Setări avansate</string>
     <string name="keep_force_encryption">Păstrează criptarea forţată</string>
     <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
@@ -47,8 +47,8 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Actualizare disponibilă</string>
-    <string name="installed">Instalat</string>
-    <string name="not_installed">Neinstalat</string>
+    <string name="installed">Instalate</string>
+    <string name="not_installed">Neinstalate</string>
     <string name="updated_on">Actualizat la: %1$s</string>
     <string name="sorting_order">Ordine de sortare</string>
     <string name="sort_by_name">Sortează după nume</string>
@@ -219,6 +219,6 @@
     <string name="command">Comandă: %1$s</string>
 
     <!-- MagiskHide -->
-    <string name="show_system_app">Afișare aplicații de sistem</string>
+    <string name="show_system_app">Afișează aplicațiile de sistem</string>
 
 </resources>
