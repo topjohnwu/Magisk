@@ -87,10 +87,15 @@ esac
 # Ramdisk restores
 ##########################################################################################
 
-# Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
+# Test patch status and do restore
 ui_print "- Checking ramdisk status"
-./magiskboot --cpio ramdisk.cpio test
-STATUS=$?
+if [ -e ramdisk.cpio ]; then
+  ./magiskboot --cpio ramdisk.cpio test
+  STATUS=$?
+else
+  # Stock A only system-as-root
+  STATUS=0
+fi
 case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
@@ -98,18 +103,24 @@ case $((STATUS & 3)) in
     SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
     STOCKDUMP=stock_boot_${SHA1}.img.gz
     ./magiskboot --compress "$BOOTIMAGE" $STOCKDUMP
-    cp -af ramdisk.cpio ramdisk.cpio.orig
+    cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
     ;;
   1 )  # Magisk patched
     ui_print "- Magisk patched boot image detected"
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
     ./magiskboot --cpio ramdisk.cpio restore
-    cp -af ramdisk.cpio ramdisk.cpio.orig
+    if ./magiskboot --cpio ramdisk.cpio "exists init.rc"; then
+      # Normal boot image
+      cp -af ramdisk.cpio ramdisk.cpio.orig
+    else
+      # A only system-as-root
+      rm -f ramdisk.cpio
+    fi
     ;;
-  2 ) # Other patched
+  2 )  # Unsupported
     ui_print "! Boot image patched by unsupported programs"
-    abort "! Please restore stock boot image"
+    abort "! Please restore back to stock boot image"
     ;;
 esac
 
@@ -127,6 +138,7 @@ echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 "add 750 init magiskinit" \
 "patch $KEEPVERITY $KEEPFORCEENCRYPT" \
 "backup ramdisk.cpio.orig" \
+"mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
 if [ $((STATUS & 4)) -ne 0 ]; then

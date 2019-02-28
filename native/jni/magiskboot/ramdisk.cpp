@@ -22,6 +22,7 @@ static const char *MAGISK_LIST[] =
 
 class magisk_cpio : public cpio_rw {
 public:
+	magisk_cpio() = default;
 	explicit magisk_cpio(const char *filename) : cpio_rw(filename) {}
 	void patch(bool keepverity, bool keepforceencrypt);
 	int test();
@@ -140,6 +141,8 @@ void magisk_cpio::restore() {
 }
 
 void magisk_cpio::backup(const char *orig) {
+	if (access(orig, R_OK))
+		return;
 	entry_map bkup_entries;
 	string remv;
 
@@ -257,7 +260,9 @@ int cpio_commands(int argc, char *argv[]) {
 	++argv;
 	--argc;
 
-	magisk_cpio cpio(incpio);
+	magisk_cpio cpio;
+	if (access(incpio, R_OK) == 0)
+		cpio.load_cpio(incpio);
 
 	int cmdc;
 	char *cmdv[6];
@@ -305,7 +310,7 @@ int cpio_commands(int argc, char *argv[]) {
 				return 0;
 			}
 		} else if (cmdc == 3 && strcmp(cmdv[0], "mkdir") == 0) {
-			cpio.makedir(strtoul(cmdv[1], nullptr, 8), cmdv[2]);
+			cpio.mkdir(strtoul(cmdv[1], nullptr, 8), cmdv[2]);
 		} else if (cmdc == 3 && strcmp(cmdv[0], "ln") == 0) {
 			cpio.ln(cmdv[1], cmdv[2]);
 		} else if (cmdc == 4 && strcmp(cmdv[0], "add") == 0) {

@@ -53,21 +53,23 @@ protected:
 
 class cpio_rw : public cpio {
 public:
-	explicit cpio_rw(const char *filename);
-	void insert(cpio_entry *e);
+	cpio_rw() = default;
+	explicit cpio_rw(const char *file);
+	void load_cpio(const char *file);
 	void add(mode_t mode, const char *name, const char *file);
-	void makedir(mode_t mode, const char *name);
+	void mkdir(mode_t mode, const char *name);
 	void ln(const char *target, const char *name);
 	bool mv(const char *from, const char *to);
 
 protected:
+	void insert(cpio_entry *e);
 	void mv(entry_map::iterator &it, const char *to);
 	void load_cpio(char *buf, size_t sz);
 };
 
 class cpio_mmap : public cpio {
 public:
-	explicit cpio_mmap(const char *filename);
+	explicit cpio_mmap(const char *file);
 	~cpio_mmap();
 private:
 	char *buf;
