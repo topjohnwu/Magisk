@@ -7,6 +7,8 @@
     <string name="log">ログ</string>
     <string name="settings">設定</string>
     <string name="install">ｲﾝｽﾄｰﾙ</string>
+    <string name="unsupport_magisk_title">対応していないMagiskバージョン</string>
+    <string name="unsupport_magisk_message">このバージョンのMagisk Managerはv18.0以下のMagiskを対応していません。\n\n手動でMagiskを更新するか、まだは昔のMagisk Managerをインストールしてください。</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magiskがインストールされていません</string>
@@ -17,8 +19,8 @@
     <string name="safetyNet_check_success">SafetyNetチェック成功</string>
     <string name="safetyNet_api_error">SafetyNet APIエラー</string>
     <string name="safetyNet_res_invalid">応答が不正です</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magiskは最新です</string>
+    <string name="manager_up_to_date">Magisk Managerは最新です</string>
     <string name="advanced_settings_title">高度な設定</string>
     <string name="keep_force_encryption">強制的な暗号化を維持する</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verityを維持する</string>
@@ -28,6 +30,7 @@
     <string name="uninstall_magisk_title">Magiskのアンインストール</string>
     <string name="uninstall_magisk_msg">すべてのモジュールが無効化/削除されます。Rootも無効化され、ストレージが暗号化されていない場合、暗号化される場合があります</string>
     <string name="update">更新</string>
+    <string name="core_only_enabled">(コアモード有効)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(情報がありません)</string>
@@ -135,7 +138,7 @@
     <string name="settings_update_custom_msg">カスタムURLを入力</string>
     <string name="settings_boot_format_title">パッチしたBootの出力形式</string>
     <string name="settings_boot_format_summary">パッチしたBootイメージの出力形式を選択してください。\nfastboot/download modeでインストールするには .img を、ODINでインストールするには .img.tar を選択してください</string>
-    <string name="settings_core_only_title">Magisk コアモード</string>
+    <string name="settings_core_only_title">Magiskコアモード</string>
     <string name="settings_core_only_summary">コア機能のみを有効にします。すべてのモジュールが読み込まれなくなります。 MagiskSU、MagiskHide は引き続き有効になります</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -211,8 +214,11 @@
     <string name="auth_fail">認証に失敗しました</string>
 
     <!--Superuser logs-->
-    <!-- <string name="pid" translatable="false">PID: %1$d</string> -->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">ターゲット UID: %1$d</string>
     <string name="command">コマンド: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">システムアプリを表示</string>
 
 </resources>
