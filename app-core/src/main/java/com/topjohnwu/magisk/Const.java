@@ -37,12 +37,6 @@ public class Const {
     public static final int MIN_MODULE_VER = 1500;
     public static final int SNET_EXT_VER = 12;
 
-    /* A list of apps that should not be shown as hide-able */
-    public static final List<String> HIDE_BLACKLIST =  Arrays.asList(
-            App.self.getPackageName(),
-            "com.google.android.gms"
-    );
-
     public static final int USER_ID = Process.myUid() / 100000;
 
     public static final class MAGISK_VER {

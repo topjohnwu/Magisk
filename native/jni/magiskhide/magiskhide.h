@@ -9,6 +9,7 @@
 #include <string>
 #include <set>
 #include <functional>
+#include <map>
 
 #include "daemon.h"
 
@@ -35,6 +36,7 @@ void proc_monitor();
 void manage_selinux();
 void clean_magisk_props();
 void crawl_procfs(const std::function<bool (int)> &fn);
+bool proc_name_match(int pid, const char *name);
 
 static inline int get_uid(const int pid) {
 	char path[16];
@@ -64,9 +66,8 @@ static inline int parse_int(const char *s) {
 }
 
 extern bool hide_enabled;
-extern pthread_mutex_t list_lock;
-extern std::vector<std::string> hide_list;
-extern int gms_uid;
+extern pthread_mutex_t map_lock;
+extern std::map<std::string, std::string> hide_map;
 
 enum {
 	LAUNCH_MAGISKHIDE,

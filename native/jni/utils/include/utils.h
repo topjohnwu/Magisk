@@ -71,6 +71,7 @@ void *xmmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
 int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
+int xinotify_init1(int flags);
 
 // misc.cpp
 

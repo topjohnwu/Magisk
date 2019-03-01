@@ -42,15 +42,30 @@
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textIsSelectable="false"
-            app:layout_constraintBottom_toTopOf="@+id/package_name"
+            app:layout_constraintBottom_toTopOf="@+id/process"
             app:layout_constraintEnd_toStartOf="@+id/checkbox"
             app:layout_constraintStart_toEndOf="@+id/app_icon"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/process"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/tertiary_text_dark"
+            android:textIsSelectable="false"
+            app:layout_constraintBottom_toTopOf="@+id/package_name"
+            app:layout_constraintEnd_toEndOf="@+id/app_name"
+            app:layout_constraintStart_toStartOf="@+id/app_name"
+            app:layout_constraintTop_toBottomOf="@+id/app_name" />
+
+        <TextView
             android:id="@+id/package_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceSmall"
@@ -59,7 +74,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/app_name"
             app:layout_constraintStart_toStartOf="@+id/app_name"
-            app:layout_constraintTop_toBottomOf="@+id/app_name" />
+            app:layout_constraintTop_toBottomOf="@+id/process" />
 
 
         <CheckBox

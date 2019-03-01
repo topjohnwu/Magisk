@@ -9,7 +9,7 @@
 #include <db.h>
 #include <daemon.h>
 
-#define DB_VERSION 7
+#define DB_VERSION 8
 
 static sqlite3 *mDB = nullptr;
 
@@ -86,7 +86,8 @@ static char *open_and_init_db(sqlite3 *&db) {
 			SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
 	if (ret)
 		return strdup(sqlite3_errmsg(db));
-	int ver, upgrade = 0;
+	int ver;
+	bool upgrade = false;
 	char *err;
 	sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, &err);
 	err_ret(err);
@@ -117,9 +118,9 @@ static char *open_and_init_db(sqlite3 *&db) {
 					 nullptr, nullptr, &err);
 		err_ret(err);
 		ver = 3;
-		upgrade = 1;
+		upgrade = true;
 	}
-	if (ver == 3) {
+	if (ver < 4) {
 		// Strings
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS strings "
@@ -127,16 +128,16 @@ static char *open_and_init_db(sqlite3 *&db) {
 					 nullptr, nullptr, &err);
 		err_ret(err);
 		ver = 4;
-		upgrade = 1;
+		upgrade = true;
 	}
-	if (ver == 4) {
+	if (ver < 5) {
 		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", nullptr, nullptr, &err);
 		err_ret(err);
 		/* Skip version 5 */
 		ver = 6;
-		upgrade = 1;
+		upgrade = true;
 	}
-	if (ver == 5 || ver == 6) {
+	if (ver < 7) {
 		// Hide list
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS hidelist "
@@ -144,7 +145,17 @@ static char *open_and_init_db(sqlite3 *&db) {
 					 nullptr, nullptr, &err);
 		err_ret(err);
 		ver = 7;
-		upgrade =1 ;
+		upgrade = true;
+	}
+	if (ver < 8) {
+		sqlite3_exec(db,
+					 "ALTER TABLE hidelist ADD COLUMN package_name TEXT;"
+					 "SELECT process FROM hidelist;"
+					 "UPDATE hidelist SET package_name=process;",
+					 nullptr, nullptr, &err);
+		err_ret(err);
+		ver = 8;
+		upgrade = true;
 	}
 
 	if (upgrade) {

@@ -412,3 +412,11 @@ int xpoll(struct pollfd *fds, nfds_t nfds, int timeout) {
 	}
 	return ret;
 }
+
+int xinotify_init1(int flags) {
+	int ret = syscall(__NR_inotify_init1, flags);
+	if (ret == -1) {
+		PLOGE("inotify_init1");
+	}
+	return ret;
+}

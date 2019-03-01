@@ -20,12 +20,12 @@ bool hide_enabled = false;
 		FULL_VER(MagiskHide) "\n\n"
 		"Usage: %s [--option [arguments...] ]\n\n"
 		"Options:\n"
-  		"  --status     Return the status of magiskhide\n"
-		"  --enable     Start magiskhide\n"
-		"  --disable    Stop magiskhide\n"
-		"  --add PKG    Add PKG to the hide list\n"
-		"  --rm PKG     Remove PKG from the hide list\n"
-		"  --ls         List the current hide list\n"
+  		"  --status          Return the status of magiskhide\n"
+		"  --enable          Start magiskhide\n"
+		"  --disable         Stop magiskhide\n"
+		"  --add PKG [PROC]  Add a new target to the hide list\n"
+		"  --rm PKG [PROC]   Remove from the hide list\n"
+		"  --ls              List the current hide list\n"
 		, arg0);
 	exit(1);
 }
@@ -96,8 +96,10 @@ int magiskhide_main(int argc, char *argv[]) {
 	int fd = connect_daemon();
 	write_int(fd, MAGISKHIDE);
 	write_int(fd, req);
-	if (req == ADD_HIDELIST || req == RM_HIDELIST)
+	if (req == ADD_HIDELIST || req == RM_HIDELIST) {
 		write_string(fd, argv[2]);
+		write_string(fd, argv[3] ? argv[3] : "");
+	}
 	if (req == LS_HIDELIST)
 		send_fd(fd, STDOUT_FILENO);
 
@@ -113,10 +115,10 @@ int magiskhide_main(int argc, char *argv[]) {
 		fprintf(stderr, "MagiskHide is enabled\n");
 		break;
 	case HIDE_ITEM_EXIST:
-		fprintf(stderr, "[%s] already exists in hide list\n", argv[2]);
+		fprintf(stderr, "Target already exists in hide list\n");
 		break;
 	case HIDE_ITEM_NOT_EXIST:
-		fprintf(stderr, "[%s] does not exist in hide list\n", argv[2]);
+		fprintf(stderr, "Target does not exist in hide list\n");
 		break;
 	case HIDE_NO_NS:
 		fprintf(stderr, "Your kernel doesn't support mount namespace\n");

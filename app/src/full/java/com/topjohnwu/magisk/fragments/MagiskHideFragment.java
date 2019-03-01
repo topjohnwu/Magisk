@@ -72,9 +72,7 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
         inflater.inflate(R.menu.menu_magiskhide, menu);
         search = (SearchView) menu.findItem(R.id.app_search).getActionView();
         search.setOnQueryTextListener(searchListener);
-        boolean showSystem = Config.get(Config.Key.SHOW_SYSTEM_APP);
-        menu.findItem(R.id.show_system).setChecked(showSystem);
-        adapter.setShowSystem(showSystem);
+        menu.findItem(R.id.show_system).setChecked(Config.get(Config.Key.SHOW_SYSTEM_APP));
     }
 
     @Override
