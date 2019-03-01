@@ -68,6 +68,7 @@ void crawl_procfs(const function<bool (int)> &fn) {
 bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
 	FILE *f;
+#if 0
 	sprintf(buf, "/proc/%d/comm", pid);
 	if ((f = fopen(buf, "re"))) {
 		fgets(buf, sizeof(buf), f);
@@ -78,6 +79,7 @@ bool proc_name_match(int pid, const char *name) {
 		// The PID is already killed
 		return false;
 	}
+#endif
 
 	sprintf(buf, "/proc/%d/cmdline", pid);
 	if ((f = fopen(buf, "re"))) {
@@ -85,17 +87,17 @@ bool proc_name_match(int pid, const char *name) {
 		fclose(f);
 		if (strcmp(basename(buf), name) == 0)
 			return true;
-	} else {
-		// The PID is already killed
-		return false;
 	}
+	return false;
 
+#if 0
 	sprintf(buf, "/proc/%d/exe", pid);
 	ssize_t len;
 	if ((len = readlink(buf, buf, sizeof(buf))) < 0)
 		return false;
 	buf[len] = '\0';
 	return strcmp(basename(buf), name) == 0;
+#endif
 }
 
 static void kill_process(const char *name) {
