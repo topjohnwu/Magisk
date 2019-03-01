@@ -8,45 +8,45 @@
     <string name="settings">Ustawienia</string>
     <string name="install">Instaluj</string>
     <string name="unsupport_magisk_title">Nieobsługiwana Wersja Magisk</string>
-    <string name="unsupport_magisk_message">Ta wersja Magisk Manager nie obsługuje wersji Magisk niższej niż v18.0.\n\nMożesz albo ręcznie zaktualizować Magisk, lub obniżać w aplikacji do starej wersji.</string>
+    <string name="unsupport_magisk_message">Ta wersja Magisk Managera nie obsługuje wersji Magisk niższej niż v18.0.\n\nMożesz albo ręcznie zaktualizować Magisk lub obniżyć w aplikacji do starszej wersji.</string>
     
 	<!--Status Fragment-->
-    <string name="magisk_version_error">Magisk nie jest zainstalowany</string>
+    <string name="magisk_version_error">Magisk nie jest zainstalowany.</string>
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
     <string name="invalid_update_channel">Nieprawidłowy Kanał Aktualizacji</string>
 	<string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_check_success">SafetyNet Poprawny</string>
-    <string name="safetyNet_api_error">SafetyNet Błędny</string>
-    <string name="safetyNet_res_invalid">Usługa nie odpowiada</string>
+    <string name="safetyNet_api_error">SafetyNet API Błędny</string>
+    <string name="safetyNet_res_invalid">Usługa nie odpowiada.</string>
     <string name="magisk_up_to_date">Magisk jest aktualny</string>
     <string name="manager_up_to_date">Magisk Manager jest aktualny</string>
     <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
-    <string name="keep_force_encryption">Zachowaj force encryption</string>
-    <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity</string>
+    <string name="keep_force_encryption">Zachowaj force encryption n/(wymuszenie szyfrowania)</string>
+    <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity n/(weryfikację procesu bootowania)</string>
     <string name="current_installed">Zainstalowana: %1$s</string>
     <string name="latest_version">Ostatnia: %1$s</string>
     <string name="uninstall">Odinstaluj</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
 	<string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte. Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>
     <string name="update">Aktualizuj</string>
-    <string name="core_only_enabled">(Tylko w trybie jądra jest włączona)</string>
+    <string name="core_only_enabled">(Włączony tylko tryb jądra)</string>
    
    <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
-    <string name="no_modules_found">Nie znaleziono modułów</string>
-    <string name="update_file_created">Moduł zostanie zaktualizowany przy następnym restarcie</string>
-    <string name="remove_file_created">Moduł zostanie usunięty przy następnym uruchomieniu</string>
-    <string name="remove_file_deleted">Moduł nie zostanie usunięty podczas następnego restartu</string>
-    <string name="disable_file_created">Moduł zostanie wyłączony przy następnym restarcie</string>
-    <string name="disable_file_removed">Moduł zostanie włączony przy następnym restarcie</string>
+    <string name="no_modules_found">Nie znaleziono modułów.</string>
+    <string name="update_file_created">Moduł zostanie zaktualizowany przy następnym restarcie.</string>
+    <string name="remove_file_created">Moduł zostanie usunięty przy następnym uruchomieniu.</string>
+    <string name="remove_file_deleted">Moduł nie zostanie usunięty podczas następnego restartu.</string>
+    <string name="disable_file_created">Moduł zostanie wyłączony przy następnym restarcie.</string>
+    <string name="disable_file_removed">Moduł zostanie włączony przy następnym restarcie.</string>
     <string name="author">Autor: %1$s</string>
     <string name="reboot_recovery">Restart do Recovery</string>
     <string name="reboot_bootloader">Restart do Bootloadera</string>
     <string name="reboot_download">Restart do Download</string>
 
 	<!--Repo Fragment-->
-    <string name="update_available">Aktualizacja jest dostępna</string>
+    <string name="update_available">Aktualizacja dostępna</string>
     <string name="installed">Zainstalowany</string>
     <string name="not_installed">Nie zainstalowany</string>
 	<string name="updated_on">Zaktualizowano: %1$s</string>
@@ -58,8 +58,8 @@
     <string name="menuSaveLog">Zapisz log</string>
     <string name="menuReload">Załaduj ponownie</string>
     <string name="menuClearLog">Wyczyść Log</string>
-    <string name="logs_cleared">Log wyczyszczony</string>
-    <string name="log_is_empty">Log jest pusty</string>
+    <string name="logs_cleared">Log wyczyszczony.</string>
+    <string name="log_is_empty">Log jest pusty.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Zmiany</string>
@@ -72,29 +72,29 @@
     <string name="download_complete">Pobieranie zakończone</string>
     <string name="download_file_error">Błąd pobierania pliku</string>
     <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
-    <string name="manager_update_title">Nowa Wersja Magisk Manager Jest Dostępna!</string>
+    <string name="manager_update_title">Nowa Wersja Magisk Manager Dostępna!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Zamknij</string>
-    <string name="repo_install_title">Zainstaluj %1$s</string>
+    <string name="repo_install_title">Instaluj %1$s</string>
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download">Pobierz</string>
     <string name="reboot">Restart</string>
-    <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
+    <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia.</string>
     <string name="release_notes">Zmiany</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
     <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
     <string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
     <string name="dtbo_patched_title">DTBO został wgrany!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager wgrał dtbo.img, uruchom ponownie</string>
+    <string name="dtbo_patched_reboot">Magisk Manager wgrał dtbo.img. Uruchom ponownie</string>
     <string name="flashing">Flashowanie</string>
     <string name="hide_manager_title">Ukryj Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Błąd Ukrycia Magisk Managera</string>
+    <string name="hide_manager_fail_toast">Błąd Ukrycia Magisk Managera.</string>
 	<string name="open_link_failed_toast">Nie znaleziono aplikacji pod linkiem.</string>
     <string name="download_zip_only">Pobierz Tylko Zip</string>
     <string name="patch_boot_file">Patchowanie Pliku Boot Image</string>
     <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
-	<string name="install_inactive_slot">Zainstaluj do nieaktywnego Slotu (po OTA)</string>
+	<string name="install_inactive_slot">Zainstaluj do Nieaktywnego Slotu (po OTA)</string>
     <string name="warning">Uwaga</string>
     <string name="install_inactive_slot_msg">Urządzenie będzie MUSIAŁO uruchomić się z bieżącego nieaktywnego slotu po restarcie! /\nUżyj tylko tej opcji po zakończeniu OTA.\nKontynuować?</string>
 	<string name="select_method">Wybierz Metodę</string>
@@ -106,8 +106,8 @@
     <string name="restore_fail">Stock backup nie istnieje!</string>
     <string name="proprietary_title">Pobierz Kod</string>
     <string name="proprietary_notice">Magisk Manager to FOSS, więc nie zawiera zastrzeżonego kodu API SafetyNet. \n\nCzy zezwolić Magisk Managerowi na pobranie rozszerzenia (zawierającego GoogleApiClient) do sprawdzenia SafetyNet?</string>
-    <string name="setup_done">Konfiguracja gotowa</string>
-    <string name="setup_fail">Konfiguracja nieudana</string>
+    <string name="setup_done">Konfiguracja gotowa.</string>
+    <string name="setup_fail">Konfiguracja nieudana.</string>
     <string name="env_fix_title">Wymaga Dodatkowej Konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie pliku instalacyjnego Magisk, czy chcesz kontynuować?</string>
     <string name="setup_title">Dodatkowa konfiguracja</string>
@@ -121,7 +121,7 @@
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
     <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
-    <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
+    <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie repozytorium online.</string>
     <string name="settings_hide_manager_title">Ukryj Magisk Manager</string>
     <string name="settings_hide_manager_summary">Przepakowanie Magisk Manager z losową nazwą pakietu</string>
     <string name="settings_restore_manager_title">Przywróć Magisk Manager</string>
@@ -143,7 +143,7 @@
     <string name="settings_magiskhide_summary">Włącz Magisk Hide dla wykrytych aplikacji</string>
     <string name="settings_hosts_title">Włącz systemless hosts</string>
     <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
-    <string name="settings_hosts_toast">Dodano systemowy host moduł</string>
+    <string name="settings_hosts_toast">Dodano moduł systemless hosts</string>
    
     <string name="settings_su_app_adb">Aplikacje i ADB</string>
     <string name="settings_su_app">Tylko Aplikacje</string>
@@ -157,7 +157,7 @@
     <string name="settings_su_request_60">60 sekund</string>
     <string name="superuser_access">Dostęp Superuser</string>
     <string name="auto_response">Automatyczna Odpowiedź</string>
-    <string name="request_timeout">Czas na decyzję</string>
+    <string name="request_timeout">Limit Czasu Żądania</string>
     <string name="superuser_notification">Powiadomienia Superusera</string>
     <string name="request_timeout_summary">%1$d sekund</string>
     <string name="settings_su_reauth_title">Ponowienie uwierzytelnienia po aktualizacji</string>
@@ -170,7 +170,7 @@
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie Właścicielami Urządzenia</string>
     <string name="settings_user_independent">Niezależny Użytkownik</string>
-    <string name="owner_only_summary">Tylko właściciel ma dostęp do roota</string>
+    <string name="owner_only_summary">Tylko właściciel ma dostęp do roota.</string>
     <string name="owner_manage_summary">Tylko właściciel może zarządzać prawami dostępu użytkownika do roota iwyświetlać żądania dostępu</string>
     <string name="user_indepenent_summary">Każdy użytkownik ma swoje własne odrębne ustawienia dostępu</string>
 
