@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
 
 def configProps = new Properties()
-def configPath = project.hasProperty('configPath') ? project.configPath : rootProject.file('config.prop')
-configProps.load(new FileInputStream(configPath))
+def configPath = project.hasProperty('configPath') ?
+        new File(project.configPath) : rootProject.file('config.prop')
+if (configPath.exists())
+    configPath.withInputStream { is -> configProps.load(is) }
 
 android {
     defaultConfig {
