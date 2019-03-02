@@ -33,7 +33,7 @@ using namespace std;
 extern char *system_block, *vendor_block, *data_block;
 
 static int inotify_fd = -1;
-static void term_thread(int);
+static void term_thread(int sig = TERM_THREAD);
 
 static inline int read_ns(const int pid, struct stat *st) {
 	char path[32];
@@ -116,58 +116,61 @@ static void hide_daemon(int pid) {
  ********************/
 
 map<string, string> hide_map;                       /* process -> package_name */
+static map<int, int> wd_uid_map;                    /* inotify wd -> uid */
 static map<int, uint64_t> pid_ns_map;               /* pid -> last ns inode */
 static map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 
 // All maps are protected by this lock
 pthread_mutex_t map_lock;
 
-static bool check_pid(int pid) {
+static bool check_pid(int pid, int uid) {
 	// We're only interested in PIDs > 1000
 	if (pid <= 1000)
 		return true;
 
+	// Not our target UID
+	if (uid != get_uid(pid))
+		return true;
+
 	struct stat ns, pns;
 	int ppid;
-	int uid = get_uid(pid);
-	auto it = uid_proc_map.find(uid);
-	if (it != uid_proc_map.end()) {
-		// Make sure we can read mount namespace
-		if ((ppid = parse_ppid(pid)) < 0 || read_ns(pid, &ns) || read_ns(ppid, &pns))
-			return true;
-		// mount namespace is not separated, we only unmount once
-		if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
-			return true;
 
-		// Check if it's a process we haven't already hijacked
-		auto pos = pid_ns_map.find(pid);
-		if (pos != pid_ns_map.end() && pos->second == ns.st_ino)
-			return true;
+	// Make sure we can read mount namespace
+	if ((ppid = parse_ppid(pid)) < 0 || read_ns(pid, &ns) || read_ns(ppid, &pns))
+		return true;
+	// mount namespace is not separated, we only unmount once
+	if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
+		return true;
 
-		// Check whether process name match hide list
-		const char *process = nullptr;
-		for (auto &proc : it->second)
-			if (proc_name_match(pid, proc.data()))
-				process = proc.data();
+	// Check if it's a process we haven't already hijacked
+	auto pos = pid_ns_map.find(pid);
+	if (pos != pid_ns_map.end() && pos->second == ns.st_ino)
+		return true;
 
-		if (!process)
-			return true;
+	// Check whether process name match hide list
+	const char *process = nullptr;
+	for (auto &proc : uid_proc_map[uid])
+		if (proc_name_match(pid, proc.data()))
+			process = proc.data();
 
-		// Send pause signal ASAP
-		if (kill(pid, SIGSTOP) == -1)
-			return true;
+	if (!process)
+		return true;
 
-		pid_ns_map[pid] = ns.st_ino;
-		LOGI("proc_monitor: [%s] UID=[%d] PID=[%d] ns=[%llu]\n", process, uid, pid, ns.st_ino);
+	// Send pause signal ASAP
+	if (kill(pid, SIGSTOP) == -1)
+		return true;
 
-		/*
-		 * The setns system call do not support multithread processes
-		 * We have to fork a new process, setns, then do the unmounts
-		 */
-		if (fork_dont_care() == 0)
-			hide_daemon(pid);
-	}
-	return true;
+	pid_ns_map[pid] = ns.st_ino;
+	LOGI("proc_monitor: [%s] UID=[%d] PID=[%d] ns=[%llu]\n", process, uid, pid, ns.st_ino);
+
+	/*
+	 * The setns system call do not support multithread processes
+	 * We have to fork a new process, setns, then do the unmounts
+	 */
+	if (fork_dont_care() == 0)
+		hide_daemon(pid);
+
+	return false;
 }
 
 static int xinotify_add_watch(int fd, const char* path, uint32_t mask) {
@@ -187,10 +190,13 @@ static bool parse_packages_xml(string_view &s) {
 	/* <package key1="value1" key2="value2"....> */
 	char *start = (char *) s.data();
 	start[s.length() - 2] = '\0';  /* Remove trailing '>' */
+	start += 9;  /* Skip '<package ' */
+
 	char key[32], value[1024];
 	char *pkg = nullptr;
+	int wd = -1;
+
 	char *tok;
-	start += 9;  /* Skip '<package ' */
 	while ((tok = strtok_r(nullptr, " ", &start))) {
 		sscanf(tok, "%[^=]=\"%[^\"]", key, value);
 		string_view key_view(key);
@@ -207,7 +213,7 @@ static bool parse_packages_xml(string_view &s) {
 		} else if (key_view == "codePath") {
 			if (ends_with(value_view, APK_EXT)) {
 				// Directly add to inotify list
-				xinotify_add_watch(inotify_fd, value, IN_OPEN);
+				wd = xinotify_add_watch(inotify_fd, value, IN_OPEN);
 			} else {
 				DIR *dir = opendir(value);
 				if (dir == nullptr)
@@ -217,7 +223,7 @@ static bool parse_packages_xml(string_view &s) {
 					if (ends_with(entry->d_name, APK_EXT)) {
 						value[value_view.length()] = '/';
 						strcpy(value + value_view.length() + 1, entry->d_name);
-						xinotify_add_watch(inotify_fd, value, IN_OPEN);
+						wd = xinotify_add_watch(inotify_fd, value, IN_OPEN);
 						break;
 					}
 				}
@@ -225,6 +231,7 @@ static bool parse_packages_xml(string_view &s) {
 			}
 		} else if (key_view == "userId" || key_view == "sharedUserId") {
 			int uid = parse_int(value);
+			wd_uid_map[wd] = uid;
 			for (auto &hide : hide_map) {
 				if (hide.second == pkg)
 					uid_proc_map[uid].emplace_back(hide.first);
@@ -237,7 +244,7 @@ static bool parse_packages_xml(string_view &s) {
 void update_inotify_mask() {
 	int new_inotify = xinotify_init1(IN_CLOEXEC);
 	if (new_inotify < 0)
-		term_thread(TERM_THREAD);
+		term_thread();
 
 	// Swap out and close old inotify_fd
 	int tmp = inotify_fd;
@@ -249,6 +256,7 @@ void update_inotify_mask() {
 	{
 		MutexGuard lock(map_lock);
 		uid_proc_map.clear();
+		wd_uid_map.clear();
 		file_readline("/data/system/packages.xml", parse_packages_xml, true);
 	}
 	xinotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
@@ -260,6 +268,7 @@ static void term_thread(int) {
 	hide_map.clear();
 	uid_proc_map.clear();
 	pid_ns_map.clear();
+	wd_uid_map.clear();
 	hide_enabled = false;
 	pthread_mutex_destroy(&map_lock);
 	close(inotify_fd);
@@ -282,20 +291,21 @@ void proc_monitor() {
 
 	// Read inotify events
 	ssize_t len;
+	int uid;
 	char buf[512];
 	auto event = reinterpret_cast<inotify_event *>(buf);
 	while ((len = read(inotify_fd, buf, sizeof(buf))) >= 0) {
 		if (len < sizeof(*event))
 			continue;
 		if (event->mask & IN_OPEN) {
-			// Since we're just watching files,
-			// extracting file name is not possible from querying event
 			MutexGuard lock(map_lock);
-			crawl_procfs(check_pid);
+			uid = wd_uid_map[event->wd];
+			crawl_procfs([=](int pid) -> bool { return check_pid(pid, uid); });
 		} else if ((event->mask & IN_CLOSE_WRITE) && strcmp(event->name, "packages.xml") == 0) {
 			LOGD("proc_monitor: /data/system/packages.xml updated\n");
 			update_inotify_mask();
 		}
 	}
 	PLOGE("proc_monitor: read inotify");
+	term_thread();
 }
