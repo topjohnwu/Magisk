@@ -46,6 +46,7 @@ static inline void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
+#if 0
 static inline int parse_ppid(const int pid) {
 	char path[32];
 	int ppid;
@@ -61,6 +62,7 @@ static inline int parse_ppid(const int pid) {
 
 	return ppid;
 }
+#endif
 
 static void hide_daemon(int pid) {
 	RunFinally fin([=]() -> void {
@@ -132,20 +134,25 @@ static bool check_pid(int pid, int uid) {
 	if (uid != get_uid(pid))
 		return true;
 
-	struct stat ns, pns;
-	int ppid;
-
-	// Make sure we can read mount namespace
-	if ((ppid = parse_ppid(pid)) < 0 || read_ns(pid, &ns) || read_ns(ppid, &pns))
-		return true;
-	// mount namespace is not separated, we only unmount once
-	if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
+	struct stat ns;
+	if (read_ns(pid, &ns))
 		return true;
 
-	// Check if it's a process we haven't already hijacked
+	// Check if we have already seen it before
 	auto pos = pid_ns_map.find(pid);
 	if (pos != pid_ns_map.end() && pos->second == ns.st_ino)
 		return true;
+
+	// Will rather kill all just for one
+	if (kill(pid, SIGSTOP) == -1)
+		return true;
+	// Auto send resume signal if return
+	RunFinally resume([=]() -> void {
+		kill(pid, SIGCONT);
+	});
+
+	// Record this PID
+	pid_ns_map[pid] = ns.st_ino;
 
 	// Check whether process name match hide list
 	const char *process = nullptr;
@@ -156,20 +163,14 @@ static bool check_pid(int pid, int uid) {
 	if (!process)
 		return true;
 
-	// Send pause signal ASAP
-	if (kill(pid, SIGSTOP) == -1)
-		return true;
-
-	pid_ns_map[pid] = ns.st_ino;
 	LOGI("proc_monitor: [%s] UID=[%d] PID=[%d] ns=[%llu]\n", process, uid, pid, ns.st_ino);
 
-	/*
-	 * The setns system call do not support multithread processes
-	 * We have to fork a new process, setns, then do the unmounts
-	 */
+	// Disable auto resume PID, and let the daemon do it
+	resume.disable();
 	if (fork_dont_care() == 0)
 		hide_daemon(pid);
 
+	// We found what we want, stop traversal
 	return false;
 }
 

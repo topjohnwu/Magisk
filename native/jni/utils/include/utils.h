@@ -162,10 +162,12 @@ class RunFinally {
 public:
 	explicit RunFinally(std::function<void()> &&fn): fn(std::move(fn)) {}
 
-	~RunFinally() { fn(); }
+	void disable() { fn = nullptr; }
+
+	~RunFinally() { if (fn) fn(); }
 
 private:
-	const std::function<void ()> fn;
+	std::function<void ()> fn;
 };
 
 // file.cpp
