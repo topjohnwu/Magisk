@@ -11,6 +11,7 @@
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
 #define LOGFILE         "/cache/magisk.log"
 #define UNBLOCKFILE     "/dev/.magisk_unblock"
+#define POSTFSDATA      "/dev/.magisk_post_fs_data"
 #define EARLYINIT       "/dev/.magisk_early_init"
 #define EARLYINITDONE   "/dev/.magisk_early_init_done"
 #define DISABLEFILE     "/cache/.disable_magisk"

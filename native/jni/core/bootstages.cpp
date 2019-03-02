@@ -571,7 +571,9 @@ static void dump_logs() {
  ****************/
 
 [[noreturn]] static void unblock_boot_process() {
-	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+	if (access( POSTFSDATA, F_OK ) != -1 ) {
+		close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+	}
 	pthread_exit(nullptr);
 }
 

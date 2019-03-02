@@ -14,8 +14,10 @@ static const char magiskrc[] =
 "    start logd\n"
 "    load_persist_props\n"
 "    rm " UNBLOCKFILE "\n"
+"    write " POSTFSDATA " 1\n"
 "    start %s\n"
 "    wait " UNBLOCKFILE " 10\n"
+"    rm " POSTFSDATA "\n"
 "    rm " UNBLOCKFILE "\n"
 "\n"
 
