@@ -358,9 +358,13 @@ void full_read_at(int dirfd, const char *filename, void **buf, size_t *size) {
 }
 
 void write_zero(int fd, size_t size) {
-	size_t pos = lseek(fd, 0, SEEK_CUR);
-	ftruncate(fd, pos + size);
-	lseek(fd, pos + size, SEEK_SET);
+	char buf[4096] = {0};
+	size_t len;
+	while (size > 0) {
+		len = sizeof(buf) > size ? size : sizeof(buf);
+		write(fd, buf, len);
+		size -= len;
+	}
 }
 
 void file_readline(const char *filename, const function<bool (string_view&)> &fn, bool trim) {
