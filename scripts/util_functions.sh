@@ -185,12 +185,13 @@ mount_partitions() {
   fi
   [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
   grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
-  if [ -f /system/init ]; then
+  if [ -f /system/init.rc ]; then
     SYSTEM_ROOT=true
     mkdir /system_root 2>/dev/null
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   fi
+  $SYSTEM_ROOT && ui_print "- Device is system-as-root"
   if [ -L /system/vendor ]; then
     mkdir /vendor 2>/dev/null
     is_mounted /vendor || mount -o ro /vendor 2>/dev/null
@@ -210,7 +211,7 @@ get_flags() {
   if [ -z $KEEPVERITY ]; then
     if $SYSTEM_ROOT; then
       KEEPVERITY=true
-      ui_print "- Using system_root_image, keep dm/avb-verity"
+      ui_print "- System-as-root, keep dm/avb-verity"
     else
       KEEPVERITY=false
     fi
@@ -221,7 +222,7 @@ get_flags() {
     # No data access means unable to decrypt in recovery
     if $FDE || $FBE || ! $DATA; then
       KEEPFORCEENCRYPT=true
-      ui_print "- Encrypted data detected, keep forceencrypt"
+      ui_print "- Encrypted data, keep forceencrypt"
     else
       KEEPFORCEENCRYPT=false
     fi

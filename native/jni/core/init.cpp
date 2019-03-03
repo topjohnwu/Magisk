@@ -281,14 +281,29 @@ static bool patch_sepolicy() {
 	}
 
 	if (init_patch) {
-		// Force init to load /sepolicy
-		uint8_t *addr;
+		// If init is symlink, copy it to rootfs so we can patch
+		char real_init[128];
+		real_init[0] = '\0';
+		struct stat st;
+		lstat("/init", &st);
+		if (S_ISLNK(st.st_mode)) {
+			xreadlink("/init", real_init, sizeof(real_init));
+			cp_afc(real_init, "/init");
+		}
+		size_t real_init_len = strlen(real_init);
+
+		char *addr;
 		size_t size;
 		mmap_rw("/init", addr, size);
-		for (int i = 0; i < size; ++i) {
-			if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
-				memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
-				break;
+		for (char *p = addr; p < addr + size; ++p) {
+			if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
+				// Force init to load /sepolicy
+				memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
+				p += sizeof(SPLIT_PLAT_CIL) - 1;
+			} else if (real_init_len > 0 && memcmp(p, real_init, real_init_len + 1) == 0) {
+				// Force execute /init instead of real init
+				strcpy(p, "/init");
+				p += real_init_len;
 			}
 		}
 		munmap(addr, size);
