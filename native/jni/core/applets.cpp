@@ -11,13 +11,15 @@
 static int (*applet_main[]) (int, char *[]) =
 		{ magisk_main, su_client_main, resetprop_main, magiskhide_main, nullptr };
 
-__attribute__((noreturn)) static void call_applets(int argc, char *argv[]) {
+[[noreturn]] static void call_applets(int argc, char *argv[]) {
 	// Applets
 	for (int i = 0; applet_names[i]; ++i) {
 		if (strcmp(basename(argv[0]), applet_names[i]) == 0) {
 			exit((*applet_main[i])(argc, argv));
 		}
 	}
+	if (strncmp(basename(argv[0]), "app_process", 11) == 0)
+		exit(app_process_main(argc, argv));
 	fprintf(stderr, "%s: applet not found\n", argv[0]);
 	exit(1);
 }

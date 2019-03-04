@@ -320,4 +320,5 @@ void exec_sql(int client) {
 		return;
 	);
 	write_int(client, 0);
+	close(client);
 }

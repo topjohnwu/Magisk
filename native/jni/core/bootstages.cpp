@@ -575,9 +575,28 @@ static void dump_logs() {
 	pthread_exit(nullptr);
 }
 
-[[noreturn]] static inline void core_only() {
+[[noreturn]] static void core_only() {
 	auto_start_magiskhide();
+	cp_afc("/sbin/magisk", MAGISKTMP "/app_process");
+	struct stat st;
+	for (const char *app : { "app_process", "app_process32", "app_process64" }) {
+		sprintf(buf, "/system/bin/%s", app);
+		if (lstat(buf, &st) == 0 && S_ISREG(st.st_mode)) {
+			clone_attr(buf, MAGISKTMP "/app_process");
+			bind_mount(MAGISKTMP "/app_process", buf);
+		}
+	}
 	unblock_boot_process();
+}
+
+void zygote_notify(int client, struct ucred *cred) {
+	/* TODO: notify services that need zygote PIDs */
+	char *path = read_string(client);
+	LOGD("%s PID=[%d]\n", path, cred->pid);
+	close(client);
+	usleep(100000);
+	bind_mount(MAGISKTMP "/app_process", path);
+	free(path);
 }
 
 void post_fs_data(int client) {

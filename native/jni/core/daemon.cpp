@@ -88,7 +88,9 @@ static void *request_handler(void *args) {
 		break;
 	case SQLITE_CMD:
 		exec_sql(client);
-		close(client);
+		break;
+	case ZYGOTE_NOTIFY:
+		zygote_notify(client, &credential);
 		break;
 	default:
 		close(client);
@@ -161,13 +163,13 @@ int switch_mnt_ns(int pid) {
 	return ret;
 }
 
-int connect_daemon() {
+int connect_daemon(bool create) {
 	struct sockaddr_un sun;
 	socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (connect(fd, (struct sockaddr*) &sun, len)) {
-		if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
-			fprintf(stderr, "No daemon is currently running!\n");
+		if (!create || getuid() != UID_ROOT || getgid() != UID_ROOT) {
+			LOGE("No daemon is currently running!\n");
 			exit(1);
 		}
 

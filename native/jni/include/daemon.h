@@ -21,6 +21,7 @@ enum {
 	BOOT_COMPLETE,
 	MAGISKHIDE,
 	SQLITE_CMD,
+	ZYGOTE_NOTIFY,
 };
 
 // Return codes for daemon
@@ -33,7 +34,7 @@ enum {
 
 // daemon.c
 
-int connect_daemon();
+int connect_daemon(bool create = false);
 int switch_mnt_ns(int pid);
 
 // socket.c
@@ -60,6 +61,7 @@ void write_key_token(int fd, const char *key, int tok);
  ***************/
 
 void unlock_blocks();
+void zygote_notify(int client, struct ucred *cred);
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);

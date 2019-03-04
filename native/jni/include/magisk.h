@@ -41,8 +41,8 @@
 
 extern int SDK_INT;
 
-#define applet_names ((const char *[]) { "magisk", "su", "resetprop", "magiskhide", nullptr })
-#define init_applet  ((const char *[]) { "magiskpolicy", "supolicy", nullptr })
+constexpr const char *applet_names[] = { "magisk", "su", "resetprop", "magiskhide", nullptr };
+constexpr const char *init_applet[] = { "magiskpolicy", "supolicy", nullptr };
 
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);
@@ -50,5 +50,6 @@ int magiskhide_main(int argc, char *argv[]);
 int magiskpolicy_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
 int resetprop_main(int argc, char *argv[]);
+int app_process_main(int argc, char *argv[]);
 
 #endif
