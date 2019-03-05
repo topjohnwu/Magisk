@@ -61,7 +61,6 @@ void write_key_token(int fd, const char *key, int tok);
  ***************/
 
 void unlock_blocks();
-void zygote_notify(int client, struct ucred *cred);
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
@@ -80,6 +79,8 @@ void install_apk(const char *apk);
  **************/
 
 void magiskhide_handler(int client);
+void zygote_notify(int client, struct ucred *cred);
+void zygote_notify(int pid);
 
 /*************
  * Superuser *

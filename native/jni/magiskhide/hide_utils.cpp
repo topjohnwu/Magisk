@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mount.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -5,8 +8,6 @@
 #include <dirent.h>
 #include <string.h>
 #include <libgen.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include <magisk.h>
 #include <utils.h>
@@ -136,7 +137,7 @@ static int add_list(const char *pkg, const char *proc = "") {
 
 	// Critical region
 	{
-		MutexGuard lock(map_lock);
+		MutexGuard lock(monitor_lock);
 		hide_map[proc] = pkg;
 	}
 
@@ -150,14 +151,14 @@ int add_list(int client) {
 	int ret = add_list(pkg, proc);
 	free(pkg);
 	free(proc);
-	update_inotify_mask();
+	update_uid_map();
 	return ret;
 }
 
 static int rm_list(const char *pkg, const char *proc = "") {
 	{
 		// Critical region
-		MutexGuard lock(map_lock);
+		MutexGuard lock(monitor_lock);
 		bool remove = false;
 		if (proc[0] == '\0') {
 			auto next = hide_map.begin();
@@ -200,7 +201,7 @@ int rm_list(int client) {
 	free(pkg);
 	free(proc);
 	if (ret == DAEMON_SUCCESS)
-		update_inotify_mask();
+		update_uid_map();
 	return ret;
 }
 
@@ -243,7 +244,7 @@ bool init_list() {
 	rm_list(SAFETYNET_COMPONENT);
 	init_list(SAFETYNET_PKG, SAFETYNET_PROCESS);
 
-	update_inotify_mask();
+	update_uid_map();
 	return true;
 }
 
@@ -300,7 +301,7 @@ void launch_magiskhide(int client) {
 	hide_sensitive_props();
 
 	// Initialize the mutex lock
-	pthread_mutex_init(&map_lock, nullptr);
+	pthread_mutex_init(&monitor_lock, nullptr);
 
 	// Initialize the hide list
 	if (!init_list())
@@ -325,7 +326,7 @@ int stop_magiskhide() {
 
 	hide_enabled = false;
 	set_hide_config();
-	pthread_kill(proc_monitor_thread, TERM_THREAD);
+	pthread_kill(proc_monitor_thread, SIGTERMTHRD);
 
 	return DAEMON_SUCCESS;
 }
@@ -339,4 +340,23 @@ void auto_start_magiskhide() {
 			return nullptr;
 		});
 	}
+}
+
+int next_zygote = -1;
+
+void zygote_notify(int pid) {
+	if (hide_enabled) {
+		MutexGuard lock(monitor_lock);
+		next_zygote = pid;
+		pthread_kill(proc_monitor_thread, SIGZYGOTE);
+	}
+}
+
+void zygote_notify(int client, struct ucred *cred) {
+	char *path = read_string(client);
+	close(client);
+	zygote_notify(cred->pid);
+	usleep(100000);
+	xmount(MAGISKTMP "/app_process", path, nullptr, MS_BIND, nullptr);
+	free(path);
 }

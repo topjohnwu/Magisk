@@ -5,14 +5,14 @@
  * execution, load modules, install Magisk Manager etc.
  */
 
+#include <sys/mount.h>
+#include <sys/wait.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <dirent.h>
-#include <sys/mount.h>
-#include <sys/wait.h>
 #include <vector>
 #include <string>
 
@@ -587,16 +587,6 @@ static void dump_logs() {
 		}
 	}
 	unblock_boot_process();
-}
-
-void zygote_notify(int client, struct ucred *cred) {
-	/* TODO: notify services that need zygote PIDs */
-	char *path = read_string(client);
-	LOGD("%s PID=[%d]\n", path, cred->pid);
-	close(client);
-	usleep(100000);
-	bind_mount(MAGISKTMP "/app_process", path);
-	free(path);
 }
 
 void post_fs_data(int client) {
