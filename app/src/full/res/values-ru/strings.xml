@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_title">Удаление Magisk</string>
     <string name="uninstall_magisk_msg">Все модули будут отключены/удалены. Root-права будут удалены. Шифрование будет активировано.</string>
     <string name="update">Обновить</string>
-    <string name="core_only_enabled">(Включен только Core режим)</string>
+    <string name="core_only_enabled">(Активирован режим Magisk Core)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет информации)</string>
@@ -63,12 +63,12 @@
 
     <!--About Activity-->
     <string name="app_changelog">Список изменений</string>
-    <string name="translators">Displax [4PDA], igor-dyatlov</string>
+    <string name="translators">Displax [4PDA], igor-dyatlov, zertyuiop</string>
     <string name="app_translators">Переводчики</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Обновления Magisk</string>
-    <string name="progress_channel">Progress Notifications</string>
+    <string name="progress_channel">Уведомления о прогрессе</string>
     <string name="download_complete">Загрузка завершена</string>
     <string name="download_file_error">Ошибка загрузки файла</string>
     <string name="magisk_update_title">Доступно обновление Magisk!</string>
@@ -88,8 +88,8 @@
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
     <string name="flashing">Прошивка</string>
-    <string name="hide_manager_title">Скрытие Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Скрытие Magisk Manager неудачно</string>
+    <string name="hide_manager_title">Маскировка Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Не удалось замаскировать Magisk Manager</string>
     <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки.</string>
     <string name="download_zip_only">Загрузка установочного ZIP</string>
     <string name="patch_boot_file">Пропатчить образ ядра (boot.img)</string>
@@ -114,15 +114,15 @@
     <string name="setup_msg">Настройка рабочей среды…</string>
     <string name="downloading_toast">Загрузка %1$s</string>
     <string name="no_rw_storage">Требуется разрешение на запись во внешнее хранилище.</string>
-    <string name="dl_one_module">Скачать один модуль за раз.</string>
+    <string name="dl_one_module">Возможна загрузка только одного модуля.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
     <string name="settings_dark_theme_title">Тёмная тема</string>
     <string name="settings_dark_theme_summary">Включить тёмное оформление.</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
-    <string name="settings_clear_cache_summary">Очистить кэшированную информацию для репозиториев. Произойдет принудительное обновление.</string>
-    <string name="settings_hide_manager_title">Скрытие Magisk Manager</string>
+    <string name="settings_clear_cache_summary">Очистить кэшированную информацию репозитория. Произойдет принудительное обновление.</string>
+    <string name="settings_hide_manager_title">Маскировка Magisk Manager</string>
     <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным именем пакета.</string>
     <string name="settings_restore_manager_title">Восстановление Magisk Manager</string>
     <string name="settings_restore_manager_summary">Восстановить Magisk Manager с исходным именем пакета</string>
@@ -137,10 +137,10 @@
     <string name="settings_update_custom">Сторонний канал</string>
     <string name="settings_update_custom_msg">Укажите ссылку</string>
     <string name="settings_boot_format_title">Тип образа ядра</string>
-    <string name="settings_boot_format_summary">Выберите тип патченого образа ядра:\n*.img - для прошивки через fastboot/download режимы\n*.img.tar - для прошивки через ODIN (Samsung)</string>
+    <string name="settings_boot_format_summary">Выберите тип образа ядра после патча:\n*.img - для прошивки через fastboot/download режимы\n*.img.tar - для прошивки через ODIN (Samsung)</string>
     <string name="settings_core_only_title">Magisk Core</string>
     <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU и Magisk Hide останутся активными.</string>
-    <string name="settings_magiskhide_summary">Скрывать Magisk от различных обнаружений.</string>
+    <string name="settings_magiskhide_summary">Замаскировать Magisk от различных обнаружений.</string>
     <string name="settings_hosts_title">Внесистемные хосты</string>
     <string name="settings_hosts_summary">Поддержка внесистемных хостов для приложений, блокирующих рекламу.</string>
     <string name="settings_hosts_toast">Добавлен модуль внесистемных хостов</string>
@@ -174,13 +174,13 @@
     <string name="owner_manage_summary">Только владелец управляет Root-доступом и обрабатывает запросы.</string>
     <string name="user_indepenent_summary">Каждый пользователь имеет свои собственные правила Root-доступа.</string>
 
-    <string name="mount_namespace_mode">Настройка именных пространств</string>
-    <string name="settings_ns_global">Общее именное пространство</string>
-    <string name="settings_ns_requester">Наследуемое именное пространство</string>
-    <string name="settings_ns_isolate">Изолированное именное пространство</string>
-    <string name="global_summary">Сессии суперпользователя используют общее именное пространство</string>
-    <string name="requester_summary">Сессии суперпользователя наследуют именное пространство запрашивающего</string>
-    <string name="isolate_summary">Сессии суперпользователя используют изолированные именные пространства</string>
+    <string name="mount_namespace_mode">Настройка пространств имён</string>
+    <string name="settings_ns_global">Общее пространство имён</string>
+    <string name="settings_ns_requester">Наследуемое пространство имён</string>
+    <string name="settings_ns_isolate">Изолированное пространство имён</string>
+    <string name="global_summary">Сессии суперпользователя используют общее пространство имён</string>
+    <string name="requester_summary">Сессии суперпользователя наследуют пространство имён запрашивающего</string>
+    <string name="isolate_summary">Сессии суперпользователя используют изолированные пространства имён</string>
     <string name="android_o_not_support">Не поддерживается в Android 8.0+</string>
     <string name="disable_fingerprint">Не поддерживается устройством или не заданы отпечатки</string>
 
@@ -215,7 +215,7 @@
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
-    <string name="target_uid">UID: %1$d</string>
+    <string name="target_uid">Целевой UID: %1$d</string>
     <string name="command">Команда: %1$s</string>
 
     <!-- MagiskHide -->
