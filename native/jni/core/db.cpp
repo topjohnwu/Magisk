@@ -26,10 +26,10 @@ int db_strings::getKeyIdx(string_view key) const {
 
 db_settings::db_settings() {
 	// Default settings
-	data[0] = ROOT_ACCESS_APPS_AND_ADB;
-	data[1] = MULTIUSER_MODE_OWNER_ONLY;
-	data[2] = NAMESPACE_MODE_REQUESTER;
-	data[3] = 1;
+	data[ROOT_ACCESS] = ROOT_ACCESS_APPS_AND_ADB;
+	data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
+	data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
+	data[HIDE_CONFIG] = true;
 }
 
 int db_settings::getKeyIdx(string_view key) const {
