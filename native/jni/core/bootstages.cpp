@@ -752,7 +752,7 @@ core_only:
 	} else {
 		// Check whether we have a valid manager installed
 		db_strings str;
-		get_db_strings(&str, SU_MANAGER);
+		get_db_strings(str, SU_MANAGER);
 		if (validate_manager(str[SU_MANAGER], 0, nullptr)) {
 			// There is no manager installed, install the stub
 			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk");

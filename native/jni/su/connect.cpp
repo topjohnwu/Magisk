@@ -33,7 +33,7 @@ static inline const char *get_command(const struct su_request *to) {
 
 static void silent_run(const char **args, struct su_info *info) {
 	char component[128];
-	sprintf(component, "%s/a.h", info->str[SU_MANAGER]);
+	sprintf(component, "%s/a.h", info->str[SU_MANAGER].data());
 	args[5] = component;
 	exec_t exec {
 		.pre_exec = []() -> void {

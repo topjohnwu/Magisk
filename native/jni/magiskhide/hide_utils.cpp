@@ -204,24 +204,15 @@ static void init_list(const char *pkg, const char *proc) {
 	kill_process(proc);
 }
 
-static int db_init_list(void *, int col_num, char **data, char **cols) {
-	char *pkg, *proc;
-	for (int i = 0; i < col_num; ++i) {
-		if (strcmp(cols[i], "package_name") == 0)
-			pkg = data[i];
-		else if (strcmp(cols[i], "process") == 0)
-			proc = data[i];
-	}
-	init_list(pkg, proc);
-	return 0;
-}
-
 #define LEGACY_LIST MODULEROOT "/.core/hidelist"
 
 bool init_list() {
 	LOGD("hide_list: initialize\n");
 
-	char *err = db_exec("SELECT * FROM hidelist", db_init_list);
+	char *err = db_exec("SELECT * FROM hidelist", [](db_row &row) -> bool {
+		init_list(row["package_name"].data(), row["process"].data());
+		return true;
+	});
 	db_err_cmd(err, return false);
 
 	// Migrate old hide list into database
@@ -328,7 +319,7 @@ int stop_magiskhide() {
 
 void auto_start_magiskhide() {
 	db_settings dbs;
-	get_db_settings(&dbs, HIDE_CONFIG);
+	get_db_settings(dbs, HIDE_CONFIG);
 	if (dbs[HIDE_CONFIG]) {
 		new_daemon_thread([](auto) -> void* {
 			launch_magiskhide(-1);
