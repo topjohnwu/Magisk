@@ -9,7 +9,7 @@
 #include <db.h>
 #include <daemon.h>
 
-#define DB_VERSION 8
+#define DB_VERSION 9
 
 static sqlite3 *mDB = nullptr;
 
@@ -99,23 +99,23 @@ static char *open_and_init_db(sqlite3 *&db) {
 	if (ver < 3) {
 		// Policies
 		sqlite3_exec(db,
-					 "CREATE TABLE IF NOT EXISTS policies "
-					 "(uid INT, package_name TEXT, policy INT, until INT, "
-					 "logging INT, notification INT, PRIMARY KEY(uid))",
-					 nullptr, nullptr, &err);
+				"CREATE TABLE IF NOT EXISTS policies "
+				"(uid INT, package_name TEXT, policy INT, until INT, "
+				"logging INT, notification INT, PRIMARY KEY(uid))",
+				nullptr, nullptr, &err);
 		err_ret(err);
 		// Logs
 		sqlite3_exec(db,
-					 "CREATE TABLE IF NOT EXISTS logs "
-					 "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, "
-					 "to_uid INT, action INT, time INT, command TEXT)",
-					 nullptr, nullptr, &err);
+				"CREATE TABLE IF NOT EXISTS logs "
+				"(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, "
+				"to_uid INT, action INT, time INT, command TEXT)",
+				nullptr, nullptr, &err);
 		err_ret(err);
 		// Settings
 		sqlite3_exec(db,
-					 "CREATE TABLE IF NOT EXISTS settings "
-					 "(key TEXT, value INT, PRIMARY KEY(key))",
-					 nullptr, nullptr, &err);
+				"CREATE TABLE IF NOT EXISTS settings "
+				"(key TEXT, value INT, PRIMARY KEY(key))",
+				nullptr, nullptr, &err);
 		err_ret(err);
 		ver = 3;
 		upgrade = true;
@@ -123,9 +123,9 @@ static char *open_and_init_db(sqlite3 *&db) {
 	if (ver < 4) {
 		// Strings
 		sqlite3_exec(db,
-					 "CREATE TABLE IF NOT EXISTS strings "
-					 "(key TEXT, value TEXT, PRIMARY KEY(key))",
-					 nullptr, nullptr, &err);
+				"CREATE TABLE IF NOT EXISTS strings "
+				"(key TEXT, value TEXT, PRIMARY KEY(key))",
+				nullptr, nullptr, &err);
 		err_ret(err);
 		ver = 4;
 		upgrade = true;
@@ -133,28 +133,47 @@ static char *open_and_init_db(sqlite3 *&db) {
 	if (ver < 5) {
 		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", nullptr, nullptr, &err);
 		err_ret(err);
-		/* Skip version 5 */
+		/* Directly jump to version 6 */
 		ver = 6;
 		upgrade = true;
 	}
 	if (ver < 7) {
-		// Hide list
 		sqlite3_exec(db,
-					 "CREATE TABLE IF NOT EXISTS hidelist "
-					 "(process TEXT, PRIMARY KEY(process))",
-					 nullptr, nullptr, &err);
+				"CREATE TABLE IF NOT EXISTS hidelist "
+				"(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process));",
+				nullptr, nullptr, &err);
 		err_ret(err);
-		ver = 7;
+		/* Directly jump to version 9 */
+		ver = 9;
 		upgrade = true;
 	}
 	if (ver < 8) {
 		sqlite3_exec(db,
-					 "ALTER TABLE hidelist ADD COLUMN package_name TEXT;"
-					 "SELECT process FROM hidelist;"
-					 "UPDATE hidelist SET package_name=process;",
-					 nullptr, nullptr, &err);
+				"BEGIN TRANSACTION;"
+				"ALTER TABLE hidelist RENAME TO hidelist_tmp;"
+				"CREATE TABLE IF NOT EXISTS hidelist "
+				"(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process));"
+				"INSERT INTO hidelist SELECT process as package_name, process FROM hidelist_tmp;"
+				"DROP TABLE hidelist_tmp;"
+				"COMMIT;",
+				nullptr, nullptr, &err);
 		err_ret(err);
-		ver = 8;
+		/* Directly jump to version 9 */
+		ver = 9;
+		upgrade = true;
+	}
+	if (ver < 9) {
+		sqlite3_exec(db,
+				"BEGIN TRANSACTION;"
+				"ALTER TABLE hidelist RENAME TO hidelist_tmp;"
+				"CREATE TABLE IF NOT EXISTS hidelist "
+				"(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process));"
+				"INSERT INTO hidelist SELECT * FROM hidelist_tmp;"
+				"DROP TABLE hidelist_tmp;"
+				"COMMIT;",
+				nullptr, nullptr, &err);
+		err_ret(err);
+		ver = 9;
 		upgrade = true;
 	}
 

@@ -19,7 +19,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/mount.h>
-#include <set>
 
 #include <magisk.h>
 #include <utils.h>
@@ -39,7 +38,7 @@ static void new_zygote(int pid);
  * All the maps and sets
  ************************/
 
-map<string, string> hide_map;                       /* process -> package_name */
+set<pair<string, string>> hide_set;                 /* set of <pkg, process> pair */
 static map<int, struct stat> zygote_map;            /* zygote pid -> mnt ns */
 static map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 
@@ -88,7 +87,7 @@ static bool parse_packages_xml(string_view s) {
 	start += 9;  /* Skip '<package ' */
 
 	char key[32], value[1024];
-	char *pkg = nullptr;
+	const char *pkg = nullptr;
 
 	char *tok;
 	while ((tok = strtok_r(nullptr, " ", &start))) {
@@ -96,9 +95,9 @@ static bool parse_packages_xml(string_view s) {
 		string_view key_view(key);
 		string_view value_view(value);
 		if (key_view == "name") {
-			for (auto &hide : hide_map) {
-				if (hide.second == value_view) {
-					pkg = hide.second.data();
+			for (auto &hide : hide_set) {
+				if (hide.first == value_view) {
+					pkg = hide.first.data();
 					break;
 				}
 			}
@@ -106,9 +105,9 @@ static bool parse_packages_xml(string_view s) {
 				return true;
 		} else if (key_view == "userId" || key_view == "sharedUserId") {
 			int uid = parse_int(value);
-			for (auto &hide : hide_map) {
-				if (hide.second == pkg)
-					uid_proc_map[uid].emplace_back(hide.first);
+			for (auto &hide : hide_set) {
+				if (hide.first == pkg)
+					uid_proc_map[uid].emplace_back(hide.second);
 			}
 		}
 	}
@@ -184,9 +183,9 @@ static void inotify_event(int) {
 	/* Make sure we can actually read stuffs
 	 * or else the whole thread will be blocked.*/
 	struct pollfd pfd = {
-			.fd = inotify_fd,
-			.events = POLLIN,
-			.revents = 0
+		.fd = inotify_fd,
+		.events = POLLIN,
+		.revents = 0
 	};
 	if (poll(&pfd, 1, 0) <= 0)
 		return;  // Nothing to read
@@ -215,10 +214,10 @@ static void zygote_sig(int) {
 static void term_thread(int) {
 	LOGD("proc_monitor: cleaning up\n");
 	// Clear maps
-	hide_map.clear();
 	uid_proc_map.clear();
 	zygote_map.clear();
 	// Clear sets
+	hide_set.clear();
 	attaches.clear();
 	detaches.clear();
 	unknown.clear();

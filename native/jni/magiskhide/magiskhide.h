@@ -8,6 +8,7 @@
 #include <string>
 #include <functional>
 #include <map>
+#include <set>
 
 #include "daemon.h"
 
@@ -54,7 +55,7 @@ static inline int parse_int(const char *s) {
 
 extern bool hide_enabled;
 extern pthread_mutex_t monitor_lock;
-extern std::map<std::string, std::string> hide_map;
+extern std::set<std::pair<std::string, std::string>> hide_set;
 extern int next_zygote;
 
 enum {
