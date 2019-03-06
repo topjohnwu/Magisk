@@ -241,6 +241,32 @@ static void term_thread(int) {
 //#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
 #define PTRACE_LOG(...)
 
+int next_zygote = -1;
+
+void zygote_notify(int client, struct ucred *cred) {
+	char *path = read_string(client);
+
+	xptrace(PTRACE_ATTACH, cred->pid);
+	// Wait for attach
+	waitpid(cred->pid, nullptr, __WALL | __WNOTHREAD);
+	xptrace(PTRACE_CONT, cred->pid);
+	write_int(client, 0);
+	close(client);
+	// Wait for exec
+	waitpid(cred->pid, nullptr, __WALL | __WNOTHREAD);
+	xptrace(PTRACE_DETACH, cred->pid);
+
+	if (hide_enabled) {
+		MutexGuard lock(monitor_lock);
+		next_zygote = cred->pid;
+		pthread_kill(proc_monitor_thread, SIGZYGOTE);
+	}
+
+	// Remount zygote notifier ASAP
+	xmount(MAGISKTMP "/app_process", path, nullptr, MS_BIND, nullptr);
+	free(path);
+}
+
 static bool check_pid(int pid) {
 	char path[128];
 	char cmdline[1024];

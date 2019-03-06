@@ -18,7 +18,7 @@
 
 using namespace std;
 
-static pthread_t proc_monitor_thread;
+pthread_t proc_monitor_thread;
 
 static const char *prop_key[] =
 	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
@@ -328,21 +328,3 @@ void auto_start_magiskhide() {
 	}
 }
 
-int next_zygote = -1;
-
-void zygote_notify(int pid) {
-	if (hide_enabled) {
-		MutexGuard lock(monitor_lock);
-		next_zygote = pid;
-		pthread_kill(proc_monitor_thread, SIGZYGOTE);
-	}
-}
-
-void zygote_notify(int client, struct ucred *cred) {
-	char *path = read_string(client);
-	close(client);
-	zygote_notify(cred->pid);
-	usleep(100000);
-	xmount(MAGISKTMP "/app_process", path, nullptr, MS_BIND, nullptr);
-	free(path);
-}

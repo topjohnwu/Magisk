@@ -1,5 +1,4 @@
-#ifndef MAGISK_HIDE_H
-#define MAGISK_HIDE_H
+#pragma once
 
 #include <pthread.h>
 #include <sys/types.h>
@@ -54,6 +53,7 @@ static inline int parse_int(const char *s) {
 	return val;
 }
 
+extern pthread_t proc_monitor_thread;
 extern bool hide_enabled;
 extern pthread_mutex_t monitor_lock;
 extern std::set<std::pair<std::string, std::string>> hide_set;
@@ -75,5 +75,3 @@ enum {
 	HIDE_ITEM_NOT_EXIST,
 	HIDE_NO_NS
 };
-
-#endif

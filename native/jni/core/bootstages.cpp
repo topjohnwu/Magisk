@@ -583,7 +583,7 @@ static void dump_logs() {
 		sprintf(buf, "/system/bin/%s", app);
 		if (lstat(buf, &st) == 0 && S_ISREG(st.st_mode)) {
 			clone_attr(buf, MAGISKTMP "/app_process");
-			bind_mount(MAGISKTMP "/app_process", buf);
+			bind_mount(MAGISKTMP "/app_process", buf, false);
 		}
 	}
 	unblock_boot_process();

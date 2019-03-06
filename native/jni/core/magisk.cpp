@@ -129,6 +129,7 @@ int app_process_main(int argc, char *argv[]) {
 		int fd = connect_daemon();
 		write_int(fd, ZYGOTE_NOTIFY);
 		write_string(fd, path);
+		read_int(fd);
 		close(fd);
 	} else {
 		// Redirect to system mirror
