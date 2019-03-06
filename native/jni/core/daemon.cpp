@@ -118,9 +118,9 @@ static void main_daemon() {
 
 	// Get API level
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
-		if (strcmp(key, "ro.build.version.sdk") == 0) {
-			LOGI("* Device API level: %s\n", val);
-			SDK_INT = atoi(val);
+		if (key == "ro.build.version.sdk") {
+			LOGI("* Device API level: %s\n", val.data());
+			SDK_INT = atoi(val.data());
 			return false;
 		}
 		return true;

@@ -367,8 +367,8 @@ void write_zero(int fd, size_t size) {
 	}
 }
 
-void file_readline(const char *filename, const function<bool (string_view&)> &fn, bool trim) {
-	FILE *fp = xfopen(filename, "re");
+void file_readline(const char *file, const function<bool (string_view)> &fn, bool trim) {
+	FILE *fp = xfopen(file, "re");
 	if (fp == nullptr)
 		return;
 	size_t len = 1024;
@@ -383,10 +383,22 @@ void file_readline(const char *filename, const function<bool (string_view&)> &fn
 			while (*start == ' ')
 				++start;
 		}
-		string_view s(start);
-		if (!fn(s))
+		if (!fn(start))
 			break;
 	}
 	fclose(fp);
 	free(buf);
+}
+
+void parse_prop_file(const char *file, const function<bool (string_view, string_view)> &fn) {
+	file_readline(file, [&](string_view line_view) -> bool {
+		char *line = (char *) line_view.data();
+		if (line[0] == '#')
+			return true;
+		char *eql = strchr(line, '=');
+		if (eql == nullptr || eql == line)
+			return true;
+		*eql = '\0';
+		return fn(line, eql + 1);
+	}, true);
 }

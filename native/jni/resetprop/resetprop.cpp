@@ -206,49 +206,11 @@ int deleteprop(const char *name, bool persist) {
 	return __system_property_del(name) && !(persist && strncmp(name, "persist.", 8) == 0);
 }
 
-int parse_prop_file(const char *filename, const function<bool (const char *, const char *)> &cb) {
+void load_prop_file(const char *filename, bool trigger) {
+	if (init_resetprop()) return;
 	LOGD("resetprop: Parse prop file [%s]\n", filename);
-	FILE *fp = xfopen(filename, "re");
-	if (fp == nullptr) {
-		LOGE("Cannot open [%s]\n", filename);
-		return 1;
-	}
-	char *line = nullptr, *eql;
-	size_t len;
-	ssize_t read;
-	int i;
-	while ((read = getline(&line, &len, fp)) != -1) {
-		// Remove the trailing newline
-		if (line[read - 1] == '\n') {
-			line[--read] = '\0';
-		}
-		bool comment = false;
-		for (i = 0; i < read; ++i) {
-			// Ignore starting spaces
-			if (line[i] == ' ') continue;
-			// A line starting with # is ignored
-			if (line[i] == '#') comment = true;
-			break;
-		}
-		if (comment) continue;
-		eql = strchr(line, '=');
-		// Ignore invalid formats
-		if ( ((eql == nullptr) || (i >= (eql - line))) || (eql >= line + read - 1) )
-			continue;
-		// Separate the string
-		*eql = '\0';
-		if (!cb(line + i, eql + 1))
-			break;
-	}
-	free(line);
-	fclose(fp);
-	return 0;
-}
-
-int load_prop_file(const char *filename, bool trigger) {
-	if (init_resetprop()) return -1;
-	return parse_prop_file(filename, [=](auto key, auto val) -> bool {
-		setprop(key, val, trigger);
+	parse_prop_file(filename, [=](auto key, auto val) -> bool {
+		setprop(key.data(), val.data(), trigger);
 		return true;
 	});
 }
@@ -269,7 +231,8 @@ int resetprop_main(int argc, char *argv[]) {
 			switch (argv[0][idx]) {
 			case '-':
 				if (strcmp(argv[0], "--file") == 0 && argc == 2) {
-					return load_prop_file(argv[1], trigger);
+					load_prop_file(argv[1], trigger);
+					return 0;
 				} else if (strcmp(argv[0], "--delete") == 0 && argc == 2) {
 					return deleteprop(argv[1], persist);
 				} else if (strcmp(argv[0], "--help") == 0) {

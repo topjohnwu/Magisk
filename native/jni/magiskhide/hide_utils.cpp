@@ -233,7 +233,7 @@ bool init_list() {
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {
-		file_readline(LEGACY_LIST, [](string_view &s) -> bool {
+		file_readline(LEGACY_LIST, [](string_view s) -> bool {
 			add_list(s.data());
 			return true;
 		});

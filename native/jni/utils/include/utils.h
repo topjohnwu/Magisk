@@ -172,7 +172,9 @@ private:
 
 // file.cpp
 
-void file_readline(const char *filename, const std::function<bool (std::string_view&)> &fn, bool trim = false);
+void file_readline(const char *file, const std::function<bool (std::string_view)> &fn, bool trim = false);
+void parse_prop_file(const char *file, const std::function
+        <bool(std::string_view, std::string_view)> &fn);
 void *__mmap(const char *filename, size_t *size, bool rw);
 
 template <typename B>

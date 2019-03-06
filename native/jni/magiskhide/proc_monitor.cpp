@@ -79,7 +79,7 @@ static long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_t data 
 	return xptrace(true, request, pid, addr, reinterpret_cast<void *>(data));
 }
 
-static bool parse_packages_xml(string_view &s) {
+static bool parse_packages_xml(string_view s) {
 	if (!str_starts(s, "<package "))
 		return true;
 	/* <package key1="value1" key2="value2"....> */
@@ -144,7 +144,7 @@ static void hide_daemon(int pid) {
 	vector<string> targets;
 
 	// Unmount dummy skeletons and /sbin links
-	file_readline("/proc/self/mounts", [&](string_view &s) -> bool {
+	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
 		if (str_contains(s, "tmpfs /system/") || str_contains(s, "tmpfs /vendor/") ||
 			str_contains(s, "tmpfs /sbin")) {
 			char *path = (char *) s.data();
@@ -160,7 +160,7 @@ static void hide_daemon(int pid) {
 	targets.clear();
 
 	// Unmount everything under /system, /vendor, and data mounts
-	file_readline("/proc/self/mounts", [&](string_view &s) -> bool {
+	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
 		if ((str_contains(s, " /system/") || str_contains(s, " /vendor/")) &&
 			(str_contains(s, system_block) || str_contains(s, vendor_block) ||
 			 str_contains(s, data_block))) {

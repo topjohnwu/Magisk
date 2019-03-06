@@ -380,7 +380,7 @@ static bool magisk_env() {
 
 	LOGI("* Mounting mirrors");
 	bool system_as_root = false;
-	file_readline("/proc/mounts", [&](string_view &line) -> bool {
+	file_readline("/proc/mounts", [&](string_view line) -> bool {
 		if (str_contains(line, " /system_root ")) {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			sscanf(line.data(), "%s", buf);
@@ -494,7 +494,7 @@ static void collect_modules() {
 static bool check_data() {
 	bool mnt = false;
 	bool data = false;
-	file_readline("/proc/mounts", [&](string_view &s) -> bool {
+	file_readline("/proc/mounts", [&](string_view s) -> bool {
 		if (str_contains(s, " /data ") && !str_contains(s, "tmpfs"))
 			mnt = true;
 		return true;
