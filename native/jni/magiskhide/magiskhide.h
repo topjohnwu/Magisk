@@ -18,6 +18,7 @@
 #define SAFETYNET_COMPONENT  "com.google.android.gms/.droidguard.DroidGuardService"
 #define SAFETYNET_PROCESS    "com.google.android.gms.unstable"
 #define SAFETYNET_PKG        "com.google.android.gms"
+#define MICROG_SAFETYNET     "org.microg.gms.droidguard"
 
 #define WEVENT(s) (((s) & 0xffff0000) >> 16)
 

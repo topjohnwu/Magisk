@@ -237,6 +237,7 @@ bool init_list() {
 	rm_list(SAFETYNET_COMPONENT);
 	rm_list(SAFETYNET_PROCESS);
 	init_list(SAFETYNET_PKG, SAFETYNET_PROCESS);
+	init_list(MICROG_SAFETYNET, SAFETYNET_PROCESS);
 
 	update_uid_map();
 	return true;
