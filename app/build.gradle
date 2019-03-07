@@ -64,6 +64,7 @@ dependencies {
     fullImplementation project(':app-core')
     fullImplementation 'ru.noties:markwon:2.0.1'
     fullImplementation 'com.caverock:androidsvg-aar:1.3'
+    fullImplementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.0'
 
     def androidXVersion = "1.0.0"
     implementation 'androidx.core:core:1.0.1'

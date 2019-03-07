@@ -35,6 +35,9 @@
 # SVG
 -dontwarn com.caverock.androidsvg.SVGAndroidRenderer
 
+# RetroStreams
+-dontwarn java9.**
+
 # Strip logging
 -assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
   public *** debug(...);

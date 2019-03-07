@@ -33,6 +33,7 @@ import androidx.annotation.WorkerThread;
 import androidx.collection.ArraySet;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
+import java9.util.Comparators;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ViewHolder> {
 
@@ -218,12 +219,13 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         @Override
         public int compareTo(HideAppInfo o) {
-            return Comparator.comparing((HideAppInfo t) -> t.hidden)
-                    .reversed()
-                    .thenComparing((a, b) -> a.name.compareToIgnoreCase(b.name))
-                    .thenComparing(t -> t.info.packageName)
-                    .thenComparing(t -> t.process)
-                    .compare(this, o);
+            Comparator<HideAppInfo> c;
+            c = Comparators.comparing((HideAppInfo t) -> t.hidden);
+            c = Comparators.reversed(c);
+            c = Comparators.thenComparing(c, (a, b) -> a.name.compareToIgnoreCase(b.name));
+            c = Comparators.thenComparing(c, t -> t.info.packageName);
+            c = Comparators.thenComparing(c, t -> t.process);
+            return c.compare(this, o);
         }
     }
 
