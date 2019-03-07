@@ -8,7 +8,7 @@
     <string name="settings">設定</string>
     <string name="install">ｲﾝｽﾄｰﾙ</string>
     <string name="unsupport_magisk_title">対応していないMagiskバージョン</string>
-    <string name="unsupport_magisk_message">このバージョンのMagisk Managerはv18.0以下のMagiskを対応していません。\n\n手動でMagiskを更新するか、まだは昔のMagisk Managerをインストールしてください。</string>
+    <string name="unsupport_magisk_message">このバージョンのMagisk ManagerはMagisk v18.0以下には対応していません。\n\n手動でMagiskを更新するか、または古いバージョンのMagisk Managerをインストールしてください。</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magiskがインストールされていません</string>
