@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -17,6 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
+
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
@@ -25,8 +27,6 @@ import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.IOException;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
 import butterknife.BindView;
 
 public class SuRequestActivity extends BaseActivity {

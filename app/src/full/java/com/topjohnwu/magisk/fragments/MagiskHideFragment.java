@@ -9,16 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.utils.Topic;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 
 public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber {

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
@@ -18,8 +20,6 @@ import com.topjohnwu.net.Networking;
 
 import java.io.File;
 import java.util.List;
-
-import androidx.appcompat.app.AlertDialog;
 
 class InstallMethodDialog extends AlertDialog.Builder {
 

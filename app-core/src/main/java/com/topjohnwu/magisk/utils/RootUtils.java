@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.core.R;
@@ -10,8 +12,6 @@ import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.InputStream;
-
-import androidx.annotation.NonNull;
 
 public class RootUtils extends Shell.Initializer {
 

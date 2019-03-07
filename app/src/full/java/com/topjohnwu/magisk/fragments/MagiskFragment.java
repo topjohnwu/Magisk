@@ -9,6 +9,16 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.transition.ChangeBounds;
+import androidx.transition.Fade;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
+import androidx.transition.TransitionSet;
+
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -33,15 +43,6 @@ import com.topjohnwu.superuser.Shell;
 
 import java.util.Locale;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.transition.ChangeBounds;
-import androidx.transition.Fade;
-import androidx.transition.Transition;
-import androidx.transition.TransitionManager;
-import androidx.transition.TransitionSet;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.OnClick;

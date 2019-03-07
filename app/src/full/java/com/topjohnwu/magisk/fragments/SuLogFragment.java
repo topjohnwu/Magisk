@@ -9,12 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.SuLogAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class SuLogFragment extends BaseFragment {

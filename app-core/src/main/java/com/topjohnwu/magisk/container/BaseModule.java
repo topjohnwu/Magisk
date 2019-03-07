@@ -5,9 +5,9 @@ import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
+
+import java.util.List;
 
 public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
 

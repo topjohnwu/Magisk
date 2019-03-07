@@ -1,13 +1,13 @@
 package com.topjohnwu.magisk.components;
 
+import androidx.annotation.NonNull;
+import androidx.work.ListenableWorker;
+
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.superuser.Shell;
-
-import androidx.annotation.NonNull;
-import androidx.work.ListenableWorker;
 
 public class UpdateCheckService extends DelegateWorker {
 

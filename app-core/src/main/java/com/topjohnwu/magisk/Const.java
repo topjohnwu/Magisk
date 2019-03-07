@@ -4,8 +4,6 @@ import android.os.Environment;
 import android.os.Process;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 public class Const {
 

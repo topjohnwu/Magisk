@@ -5,6 +5,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.tasks.UpdateRepos;
@@ -15,8 +17,6 @@ import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
-
-import androidx.appcompat.app.AlertDialog;
 
 public class SplashActivity extends BaseActivity {
 

@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
@@ -26,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, ReposAdapter.RepoHolder> {

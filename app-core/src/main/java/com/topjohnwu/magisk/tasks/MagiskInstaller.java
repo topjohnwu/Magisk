@@ -4,6 +4,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 
+import androidx.annotation.MainThread;
+import androidx.annotation.WorkerThread;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -36,9 +39,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import androidx.annotation.MainThread;
-import androidx.annotation.WorkerThread;
 
 public abstract class MagiskInstaller {
 

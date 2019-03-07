@@ -1,13 +1,13 @@
 package com.topjohnwu.magisk.utils;
 
+import androidx.annotation.IntDef;
+
 import com.topjohnwu.superuser.internal.UiThreadHandler;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashSet;
 import java.util.Set;
-
-import androidx.annotation.IntDef;
 
 public class Topic {
 

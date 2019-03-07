@@ -6,6 +6,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 
+import androidx.annotation.StringRes;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.superuser.Shell;
@@ -16,8 +18,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-
-import androidx.annotation.StringRes;
 
 public class LocaleManager {
     public static Locale locale = Locale.getDefault();

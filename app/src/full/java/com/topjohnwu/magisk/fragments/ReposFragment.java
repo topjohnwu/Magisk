@@ -11,6 +11,11 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
@@ -21,10 +26,6 @@ import com.topjohnwu.magisk.utils.Topic;
 
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 
 public class ReposFragment extends BaseFragment implements Topic.Subscriber {

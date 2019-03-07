@@ -8,6 +8,9 @@ import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
 import com.caverock.androidsvg.SVG;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.R;
@@ -22,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import ru.noties.markwon.Markwon;
 import ru.noties.markwon.SpannableConfiguration;
 import ru.noties.markwon.spans.AsyncDrawable;

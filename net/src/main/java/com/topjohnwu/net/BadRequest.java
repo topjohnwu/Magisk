@@ -6,7 +6,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.Executor;
 
 class BadRequest extends Request {
 

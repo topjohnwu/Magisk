@@ -8,13 +8,14 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.R;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
+
+import com.topjohnwu.magisk.R;
+
 import butterknife.BindView;
 
 public class CustomAlertDialog extends AlertDialog.Builder {

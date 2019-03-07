@@ -1,13 +1,13 @@
 package com.topjohnwu.magisk.container;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import androidx.annotation.NonNull;
 
 public class ValueSortedMap<K, V extends Comparable<? super V>> extends HashMap<K, V> {
 

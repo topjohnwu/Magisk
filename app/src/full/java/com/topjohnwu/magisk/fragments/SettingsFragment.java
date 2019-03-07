@@ -8,6 +8,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.PreferenceScreen;
+import androidx.preference.SwitchPreferenceCompat;
+
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -27,13 +34,6 @@ import com.topjohnwu.superuser.Shell;
 
 import java.io.IOException;
 import java.util.Locale;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceCategory;
-import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreferenceCompat;
 
 public class SettingsFragment extends BasePreferenceFragment implements Topic.Subscriber {
 

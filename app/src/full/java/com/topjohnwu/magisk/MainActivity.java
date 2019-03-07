@@ -8,6 +8,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.material.navigation.NavigationView;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.fragments.LogFragment;
@@ -22,12 +29,6 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 
 public class MainActivity extends BaseActivity

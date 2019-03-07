@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
@@ -14,8 +16,6 @@ import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.IOException;
-
-import androidx.annotation.NonNull;
 
 public class EnvFixDialog extends CustomAlertDialog {
 

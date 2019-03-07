@@ -10,13 +10,6 @@ import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.App;
-import com.topjohnwu.magisk.Config;
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.LocaleManager;
-import com.topjohnwu.magisk.utils.Topic;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
@@ -24,6 +17,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.LocaleManager;
+import com.topjohnwu.magisk.utils.Topic;
 
 public abstract class BaseActivity extends AppCompatActivity implements Topic.AutoSubscriber {
 

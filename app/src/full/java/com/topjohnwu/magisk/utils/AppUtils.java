@@ -5,6 +5,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.Toast;
 
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -13,12 +19,6 @@ import com.topjohnwu.magisk.components.UpdateCheckService;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
 
 import java.util.concurrent.TimeUnit;
-
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 public class AppUtils {
 

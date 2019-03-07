@@ -9,6 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
@@ -24,9 +28,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class MagiskLogFragment extends BaseFragment {
