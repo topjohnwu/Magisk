@@ -22,14 +22,14 @@
     <string name="magisk_up_to_date">Magisk jest aktualny</string>
     <string name="manager_up_to_date">Magisk Manager jest aktualny</string>
     <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
-    <string name="keep_force_encryption">Zachowaj force encryption n/(wymuszenie szyfrowania)</string>
-    <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity n/(weryfikację procesu bootowania)</string>
+    <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
+    <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity (weryfikację procesu bootowania)</string>
     <string name="current_installed">Zainstalowana: %1$s</string>
     <string name="latest_version">Ostatnia: %1$s</string>
     <string name="uninstall">Odinstaluj</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
 	<string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte. Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>
-    <string name="update">Aktualizuj</string>
+    <string name="update">Pobierz</string>
     <string name="core_only_enabled">(Włączony tylko tryb jądra)</string>
    
    <!--Module Fragment-->
