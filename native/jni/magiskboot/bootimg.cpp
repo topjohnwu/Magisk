@@ -1,8 +1,11 @@
+#include <sys/mman.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <libfdt.h>
-#include <sys/mman.h>
+#include <functional>
+#include <memory>
 
 #include <mincrypt/sha.h>
 #include <mincrypt/sha256.h>
@@ -13,8 +16,25 @@
 #include "magiskboot.h"
 #include "compress.h"
 
+using namespace std;
+
 uint32_t dyn_img_hdr::j32 = 0;
 uint64_t dyn_img_hdr::j64 = 0;
+
+static int64_t one_step(unique_ptr<Compression> &&ptr, int fd, const void *in, size_t size) {
+	ptr->set_out(make_unique<FDOutStream>(fd));
+	if (!ptr->write(in, size))
+		return -1;
+	return ptr->finalize();
+}
+
+static int64_t decompress(format_t type, int fd, const void *in, size_t size) {
+	return one_step(unique_ptr<Compression>(get_decoder(type)), fd, in, size);
+}
+
+static int64_t compress(format_t type, int fd, const void *in, size_t size) {
+	return one_step(unique_ptr<Compression>(get_encoder(type)), fd, in, size);
+}
 
 static void dump(void *buf, size_t size, const char *filename) {
 	if (size == 0)
@@ -329,15 +349,15 @@ void repack(const char* orig_image, const char* out_image) {
 		write_zero(fd, 512);
 	}
 	if (access(KERNEL_FILE, R_OK) == 0) {
-		if (COMPRESSED(boot.k_fmt)) {
-			size_t raw_size;
-			void *kernel_raw;
-			mmap_ro(KERNEL_FILE, kernel_raw, raw_size);
-			boot.hdr->kernel_size = compress(boot.k_fmt, fd, kernel_raw, raw_size);
-			munmap(kernel_raw, raw_size);
+		size_t raw_size;
+		void *raw_buf;
+		mmap_ro(KERNEL_FILE, raw_buf, raw_size);
+		if (!COMPRESSED(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.k_fmt)) {
+			boot.hdr->kernel_size = compress(boot.k_fmt, fd, raw_buf, raw_size);
 		} else {
-			boot.hdr->kernel_size = restore(KERNEL_FILE, fd);
+			boot.hdr->kernel_size = write(fd, raw_buf, raw_size);
 		}
+		munmap(raw_buf, raw_size);
 	}
 
 	// dtb
@@ -352,15 +372,15 @@ void repack(const char* orig_image, const char* out_image) {
 		write_zero(fd, 512);
 	}
 	if (access(RAMDISK_FILE, R_OK) == 0) {
-		if (COMPRESSED(boot.r_fmt)) {
-			size_t cpio_size;
-			void *cpio;
-			mmap_ro(RAMDISK_FILE, cpio, cpio_size);
-			boot.hdr->ramdisk_size = compress(boot.r_fmt, fd, cpio, cpio_size);
-			munmap(cpio, cpio_size);
+		size_t raw_size;
+		void *raw_buf;
+		mmap_ro(RAMDISK_FILE, raw_buf, raw_size);
+		if (!COMPRESSED(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt)) {
+			boot.hdr->ramdisk_size = compress(boot.r_fmt, fd, raw_buf, raw_size);
 		} else {
-			boot.hdr->ramdisk_size = restore(RAMDISK_FILE, fd);
+			boot.hdr->ramdisk_size = write(fd, raw_buf, raw_size);
 		}
+		munmap(raw_buf, raw_size);
 		file_align();
 	}
 

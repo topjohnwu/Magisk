@@ -1,5 +1,4 @@
-#ifndef _FORMAT_H_
-#define _FORMAT_H_
+#pragma once
 
 #include <map>
 #include <string_view>
@@ -50,9 +49,6 @@ typedef enum {
 #define ACCLAIM_MAGIC   "BauwksBoot"
 #define ACCLAIM_PRE_HEADER_SZ 262144
 
-#define SUP_LIST      ((const char *[]) { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL })
-#define SUP_EXT_LIST  ((const char *[]) { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL })
-
 class Fmt2Name {
 public:
 	const char *operator[](format_t fmt);
@@ -68,5 +64,3 @@ format_t check_fmt(const void *buf, size_t len);
 extern std::map<std::string_view, format_t> name2fmt;
 extern Fmt2Name fmt2name;
 extern Fmt2Ext fmt2ext;
-
-#endif

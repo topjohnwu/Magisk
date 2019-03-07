@@ -14,7 +14,6 @@
 
 class Compression : public FilterOutStream {
 public:
-	int64_t one_step(int outfd, const void *in, size_t size);
 	virtual uint64_t finalize() = 0;
 };
 
@@ -171,7 +170,5 @@ private:
 
 Compression *get_encoder(format_t type);
 Compression *get_decoder(format_t type);
-int64_t compress(format_t type, int fd, const void *from, size_t size);
-int64_t decompress(format_t type, int fd, const void *from, size_t size);
 void compress(const char *method, const char *infile, const char *outfile);
 void decompress(char *infile, const char *outfile);

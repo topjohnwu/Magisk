@@ -14,14 +14,6 @@
 
 using namespace std;
 
-int64_t decompress(format_t type, int fd, const void *from, size_t size) {
-	return unique_ptr<Compression>(get_decoder(type))->one_step(fd, from, size);
-}
-
-int64_t compress(format_t type, int fd, const void *from, size_t size) {
-	return unique_ptr<Compression>(get_encoder(type))->one_step(fd, from, size);
-}
-
 static bool read_file(FILE *fp, const function<void (void *, size_t)> &fn) {
 	char buf[4096];
 	size_t len;
@@ -162,13 +154,6 @@ Compression *get_decoder(format_t type) {
 		default:
 			return new GZDecoder();
 	}
-}
-
-int64_t Compression::one_step(int outfd, const void *in, size_t size) {
-	set_out(make_unique<FDOutStream>(outfd));
-	if (!write(in, size))
-		return -1;
-	return finalize();
 }
 
 GZStream::GZStream(int mode) : mode(mode), strm({}) {

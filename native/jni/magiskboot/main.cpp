@@ -14,20 +14,21 @@
 
 static void usage(char *arg0) {
 	fprintf(stderr,
+		FULL_VER(MagiskBoot) " - Boot Image Modification Tool\n"
 		"Usage: %s <action> [args...]\n"
 		"\n"
 		"Supported actions:\n"
 		"  --unpack <bootimg>\n"
-		"    Unpack <bootimg> to kernel, ramdisk.cpio, and if available, second, dtb,\n"
-		"    and extra into the current directory. Return values:\n"
+		"    Unpack <bootimg> to, if available, kernel, ramdisk.cpio, \n"
+		"    second, dtb, extra, and recovery_dtbo into current directory.\n"
+		"    Return values:\n"
 		"    0:valid    1:error    2:chromeos    3:ELF32    4:ELF64\n"
 		"\n"
 		"  --repack <origbootimg> [outbootimg]\n"
-		"    Repack kernel, ramdisk.cpio[.ext], second, dtb... from current directory\n"
+		"    Repack boot image components from current directory\n"
 		"    to [outbootimg], or new-boot.img if not specified.\n"
-		"    It will compress ramdisk.cpio with the same method used in <origbootimg>,\n"
-		"    or attempt to find ramdisk.cpio.[ext], and repack directly with the\n"
-		"    compressed ramdisk file\n"
+		"    It will compress ramdisk.cpio and kernel with the same method in\n"
+		"    <origbootimg> if the file provided is not already compressed.\n"
 		"\n"
 		"  --hexpatch <file> <hexpattern1> <hexpattern2>\n"
 		"    Search <hexpattern1> in <file>, and replace with <hexpattern2>\n"
@@ -80,16 +81,16 @@ static void usage(char *arg0) {
 		"    <infile>/[outfile] can be '-' to be STDIN/STDOUT\n"
 		"    Supported methods: "
 	, arg0);
-	for (int i = 0; SUP_LIST[i]; ++i)
-		fprintf(stderr, "%s ", SUP_LIST[i]);
+	for (auto &it : name2fmt)
+		fprintf(stderr, "%s ", it.first.data());
 	fprintf(stderr,
 		"\n\n"
 		"  --decompress <infile> [outfile]\n"
 		"    Detect method and decompress <infile>, optionally to [outfile]\n"
 		"    <infile>/[outfile] can be '-' to be STDIN/STDOUT\n"
 		"    Supported methods: ");
-	for (int i = 0; SUP_LIST[i]; ++i)
-		fprintf(stderr, "%s ", SUP_LIST[i]);
+	for (auto &it : name2fmt)
+		fprintf(stderr, "%s ", it.first.data());
 	fprintf(stderr,
 		"\n\n"
 		"  --sha1 <file>\n"
@@ -104,31 +105,24 @@ static void usage(char *arg0) {
 
 int main(int argc, char *argv[]) {
 	cmdline_logging();
-	fprintf(stderr, FULL_VER(MagiskBoot) " - Boot Image Modification Tool\n");
-
 	umask(0);
+
 	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {
 		fprintf(stderr, "Cleaning up...\n");
-		char name[PATH_MAX];
 		unlink(KERNEL_FILE);
 		unlink(RAMDISK_FILE);
-		unlink(RAMDISK_FILE ".raw");
 		unlink(SECOND_FILE);
 		unlink(DTB_FILE);
 		unlink(EXTRA_FILE);
 		unlink(RECV_DTBO_FILE);
-		for (int i = 0; SUP_EXT_LIST[i]; ++i) {
-			sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
-			unlink(name);
-		}
 	} else if (argc > 2 && strcmp(argv[1], "--sha1") == 0) {
 		uint8_t sha1[SHA_DIGEST_SIZE];
 		void *buf;
 		size_t size;
 		mmap_ro(argv[2], buf, size);
 		SHA_hash(buf, size, sha1);
-		for (int i = 0; i < SHA_DIGEST_SIZE; ++i)
-			printf("%02x", sha1[i]);
+		for (uint8_t i : sha1)
+			printf("%02x", i);
 		printf("\n");
 		munmap(buf, size);
 	} else if (argc > 2 && strcmp(argv[1], "--unpack") == 0) {
