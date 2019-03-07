@@ -13,6 +13,11 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.WorkerThread;
+import androidx.collection.ArraySet;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
@@ -28,12 +33,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.WorkerThread;
-import androidx.collection.ArraySet;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import java9.util.Comparators;
+import java9.util.stream.Collectors;
+import java9.util.stream.Stream;
+import java9.util.stream.StreamSupport;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ViewHolder> {
 
@@ -54,8 +58,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     public ApplicationAdapter(Context context) {
         showList = Collections.emptyList();
+        hideList = Collections.emptyList();
         fullList = new ArrayList<>();
-        hideList = new ArrayList<>();
         pm = context.getPackageManager();
         showSystem = Config.get(Config.Key.SHOW_SYSTEM_APP);
         AsyncTask.SERIAL_EXECUTOR.execute(this::loadApps);
@@ -97,26 +101,27 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     private void loadApps() {
         List<ApplicationInfo> installed = pm.getInstalledApplications(0);
 
-        fullList.clear();
-        hideList.clear();
+        hideList = StreamSupport.stream(Shell.su("magiskhide --ls").exec().getOut())
+                .map(HideTarget::new).collect(Collectors.toList());
 
-        for (String line : Shell.su("magiskhide --ls").exec().getOut())
-            hideList.add(new HideTarget(line));
+        fullList.clear();
 
         for (ApplicationInfo info : installed) {
             // Do not show black-listed and disabled apps
             if (!HIDE_BLACKLIST.contains(info.packageName) && info.enabled) {
                 Set<String> set = new ArraySet<>();
-                set.add(info.packageName);
                 PackageInfo pkg = getPackageInfo(info.packageName);
                 if (pkg != null) {
                     addProcesses(set, pkg.activities);
                     addProcesses(set, pkg.services);
                     addProcesses(set, pkg.receivers);
                     addProcesses(set, pkg.providers);
+                } else {
+                    set.add(info.packageName);
                 }
-                for (String process : set)
-                    fullList.add(new HideAppInfo(info, process));
+                fullList.addAll(StreamSupport.stream(set)
+                        .map(process -> new HideAppInfo(info, process))
+                        .collect(Collectors.toList()));
             }
         }
 
@@ -188,12 +193,11 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     public void filter(String constraint) {
         AsyncTask.SERIAL_EXECUTOR.execute(() -> {
-            List<HideAppInfo> newList = new ArrayList<>();
-            for (HideAppInfo target : fullList)
-                if (systemFilter(target) && nameFilter(target, constraint))
-                    newList.add(target);
+            Stream<HideAppInfo> s = StreamSupport.stream(fullList)
+                    .filter(this::systemFilter)
+                    .filter(t -> nameFilter(t, constraint));
             UiThreadHandler.run(() -> {
-                showList = newList;
+                showList = s.collect(Collectors.toList());
                 notifyDataSetChanged();
             });
         });
