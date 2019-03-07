@@ -30,7 +30,7 @@
 }
 
 # BootSigner
--keepclassmembers class com.topjohnwu.signer.BootSigner { *; }
+-keepclassmembers class com.topjohnwu.signing.BootSigner { *; }
 
 # SVG
 -dontwarn com.caverock.androidsvg.SVGAndroidRenderer
