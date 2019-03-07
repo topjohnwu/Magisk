@@ -18,22 +18,22 @@ static void usage(char *arg0) {
 		"Usage: %s <action> [args...]\n"
 		"\n"
 		"Supported actions:\n"
-		"  --unpack <bootimg>\n"
+		"  unpack <bootimg>\n"
 		"    Unpack <bootimg> to, if available, kernel, ramdisk.cpio, \n"
 		"    second, dtb, extra, and recovery_dtbo into current directory.\n"
 		"    Return values:\n"
 		"    0:valid    1:error    2:chromeos    3:ELF32    4:ELF64\n"
 		"\n"
-		"  --repack <origbootimg> [outbootimg]\n"
+		"  repack <origbootimg> [outbootimg]\n"
 		"    Repack boot image components from current directory\n"
 		"    to [outbootimg], or new-boot.img if not specified.\n"
 		"    It will compress ramdisk.cpio and kernel with the same method in\n"
 		"    <origbootimg> if the file provided is not already compressed.\n"
 		"\n"
-		"  --hexpatch <file> <hexpattern1> <hexpattern2>\n"
+		"  hexpatch <file> <hexpattern1> <hexpattern2>\n"
 		"    Search <hexpattern1> in <file>, and replace with <hexpattern2>\n"
 		"\n"
-		"  --cpio <incpio> [commands...]\n"
+		"  cpio <incpio> [commands...]\n"
 		"    Do cpio commands to <incpio> (modifications are done directly)\n"
 		"    Each command is a single argument, use quotes if necessary\n"
 		"    Supported commands:\n"
@@ -64,7 +64,7 @@ static void usage(char *arg0) {
 		"      sha1\n"
 		"        Print stock boot SHA1 if previously backed up in ramdisk\n"
 		"\n"
-		"  --dtb-<cmd> <dtb>\n"
+		"  dtb-<cmd> <dtb>\n"
 		"    Do dtb related cmds to <dtb> (modifications are done directly)\n"
 		"    Supported commands:\n"
 		"      dump\n"
@@ -76,7 +76,7 @@ static void usage(char *arg0) {
 		"      patch\n"
 		"        Search for fstab and remove verity/avb\n"
 		"\n"
-		"  --compress[=method] <infile> [outfile]\n"
+		"  compress[=method] <infile> [outfile]\n"
 		"    Compress <infile> with [method] (default: gzip), optionally to [outfile]\n"
 		"    <infile>/[outfile] can be '-' to be STDIN/STDOUT\n"
 		"    Supported methods: "
@@ -85,7 +85,7 @@ static void usage(char *arg0) {
 		fprintf(stderr, "%s ", it.first.data());
 	fprintf(stderr,
 		"\n\n"
-		"  --decompress <infile> [outfile]\n"
+		"  decompress <infile> [outfile]\n"
 		"    Detect method and decompress <infile>, optionally to [outfile]\n"
 		"    <infile>/[outfile] can be '-' to be STDIN/STDOUT\n"
 		"    Supported methods: ");
@@ -93,10 +93,10 @@ static void usage(char *arg0) {
 		fprintf(stderr, "%s ", it.first.data());
 	fprintf(stderr,
 		"\n\n"
-		"  --sha1 <file>\n"
+		"  sha1 <file>\n"
 		"    Print the SHA1 checksum for <file>\n"
 		"\n"
-		"  --cleanup\n"
+		"  cleanup\n"
 		"    Cleanup the current working directory\n"
 		"\n");
 
@@ -107,7 +107,14 @@ int main(int argc, char *argv[]) {
 	cmdline_logging();
 	umask(0);
 
-	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {
+	if (argc < 2)
+		usage(argv[0]);
+
+	// Skip '--' for backwards compatibility
+	if (strncmp(argv[1], "--", 2) == 0)
+		argv[1] += 2;
+
+	if (strcmp(argv[1], "cleanup") == 0) {
 		fprintf(stderr, "Cleaning up...\n");
 		unlink(KERNEL_FILE);
 		unlink(RAMDISK_FILE);
@@ -115,7 +122,7 @@ int main(int argc, char *argv[]) {
 		unlink(DTB_FILE);
 		unlink(EXTRA_FILE);
 		unlink(RECV_DTBO_FILE);
-	} else if (argc > 2 && strcmp(argv[1], "--sha1") == 0) {
+	} else if (argc > 2 && strcmp(argv[1], "sha1") == 0) {
 		uint8_t sha1[SHA_DIGEST_SIZE];
 		void *buf;
 		size_t size;
@@ -125,19 +132,19 @@ int main(int argc, char *argv[]) {
 			printf("%02x", i);
 		printf("\n");
 		munmap(buf, size);
-	} else if (argc > 2 && strcmp(argv[1], "--unpack") == 0) {
+	} else if (argc > 2 && strcmp(argv[1], "unpack") == 0) {
 		return unpack(argv[2]);
-	} else if (argc > 2 && strcmp(argv[1], "--repack") == 0) {
+	} else if (argc > 2 && strcmp(argv[1], "repack") == 0) {
 		repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
-	} else if (argc > 2 && strcmp(argv[1], "--decompress") == 0) {
+	} else if (argc > 2 && strcmp(argv[1], "decompress") == 0) {
 		decompress(argv[2], argv[3]);
-	} else if (argc > 2 && strncmp(argv[1], "--compress", 10) == 0) {
+	} else if (argc > 2 && strncmp(argv[1], "compress", 10) == 0) {
 		compress(argv[1][10] == '=' ? &argv[1][11] : "gzip", argv[2], argv[3]);
-	} else if (argc > 4 && strcmp(argv[1], "--hexpatch") == 0) {
+	} else if (argc > 4 && strcmp(argv[1], "hexpatch") == 0) {
 		hexpatch(argv[2], argv[3], argv[4]);
-	} else if (argc > 2 && strcmp(argv[1], "--cpio") == 0) {
+	} else if (argc > 2 && strcmp(argv[1], "cpio") == 0) {
 		if (cpio_commands(argc - 2, argv + 2)) usage(argv[0]);
-	} else if (argc > 2 && strncmp(argv[1], "--dtb", 5) == 0) {
+	} else if (argc > 2 && strncmp(argv[1], "dtb", 5) == 0) {
 		if (argv[1][5] != '-')
 			usage(argv[0]);
 		if (dtb_commands(&argv[1][6], argc - 2, argv + 2))

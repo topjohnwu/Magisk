@@ -247,7 +247,7 @@ flash_image() {
   # Make sure all blocks are writable
   $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   case "$1" in
-    *.gz) CMD1="$MAGISKBIN/magiskboot --decompress '$1' - 2>/dev/null";;
+    *.gz) CMD1="$MAGISKBIN/magiskboot decompress '$1' - 2>/dev/null";;
     *)    CMD1="cat '$1'";;
   esac
   if $BOOTSIGNED; then
