@@ -41,7 +41,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     private static final List<String> HIDE_BLACKLIST =  Arrays.asList(
             App.self.getPackageName(),
             "android",
-            "com.android.chrome"
+            "com.android.chrome",
+            "com.google.android.webview"
     );
     private static final String SAFETYNET_PROCESS = "com.google.android.gms.unstable";
     private static final String GMS_PACKAGE = "com.google.android.gms";
@@ -73,12 +74,28 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
                 set.add(info.processName);
     }
 
+    private PackageInfo getPackageInfo(String pkg) {
+        // Try super hard to get as much info as possible
+        try {
+            return pm.getPackageInfo(pkg,
+                    PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES |
+                    PackageManager.GET_RECEIVERS | PackageManager.GET_PROVIDERS);
+        } catch (Exception e1) {
+            try {
+                PackageInfo info = pm.getPackageInfo(pkg, PackageManager.GET_ACTIVITIES);
+                info.services = pm.getPackageInfo(pkg, PackageManager.GET_SERVICES).services;
+                info.receivers = pm.getPackageInfo(pkg, PackageManager.GET_RECEIVERS).receivers;
+                info.providers = pm.getPackageInfo(pkg, PackageManager.GET_PROVIDERS).providers;
+                return info;
+            } catch (Exception e2) {
+                return null;
+            }
+        }
+    }
+
     @WorkerThread
     private void loadApps() {
-        // Get package info with all components
-        List<PackageInfo> installed = pm.getInstalledPackages(
-                PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES |
-                PackageManager.GET_RECEIVERS | PackageManager.GET_PROVIDERS);
+        List<ApplicationInfo> installed = pm.getInstalledApplications(0);
 
         fullList.clear();
         hideList.clear();
@@ -86,19 +103,20 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         for (String line : Shell.su("magiskhide --ls").exec().getOut())
             hideList.add(new HideTarget(line));
 
-        for (PackageInfo pkg : installed) {
-            if (!HIDE_BLACKLIST.contains(pkg.packageName) &&
-                    /* Do not show disabled apps */
-                    pkg.applicationInfo.enabled) {
-                // Add all possible process names
-                Set<String> procSet = new ArraySet<>();
-                addProcesses(procSet, pkg.activities);
-                addProcesses(procSet, pkg.services);
-                addProcesses(procSet, pkg.receivers);
-                addProcesses(procSet, pkg.providers);
-                for (String proc : procSet) {
-                    fullList.add(new HideAppInfo(pkg.applicationInfo, proc));
+        for (ApplicationInfo info : installed) {
+            // Do not show black-listed and disabled apps
+            if (!HIDE_BLACKLIST.contains(info.packageName) && info.enabled) {
+                Set<String> set = new ArraySet<>();
+                set.add(info.packageName);
+                PackageInfo pkg = getPackageInfo(info.packageName);
+                if (pkg != null) {
+                    addProcesses(set, pkg.activities);
+                    addProcesses(set, pkg.services);
+                    addProcesses(set, pkg.receivers);
+                    addProcesses(set, pkg.providers);
                 }
+                for (String process : set)
+                    fullList.add(new HideAppInfo(info, process));
             }
         }
 
@@ -222,7 +240,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             Comparator<HideAppInfo> c;
             c = Comparators.comparing((HideAppInfo t) -> t.hidden);
             c = Comparators.reversed(c);
-            c = Comparators.thenComparing(c, (a, b) -> a.name.compareToIgnoreCase(b.name));
+            c = Comparators.thenComparing(c, t -> t.name, String::compareToIgnoreCase);
             c = Comparators.thenComparing(c, t -> t.info.packageName);
             c = Comparators.thenComparing(c, t -> t.process);
             return c.compare(this, o);
