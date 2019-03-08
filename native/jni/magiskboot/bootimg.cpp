@@ -257,7 +257,7 @@ void boot_img::print_hdr() {
 
 		y = (patch_level >> 4) + 2000;
 		m = patch_level & 0xf;
-		fprintf(stderr, "PATCH_LEVEL     [%d-%02d]\n", y, m);
+		fprintf(stderr, "OS_PATCH_LEVEL  [%d-%02d]\n", y, m);
 	}
 
 	fprintf(stderr, "PAGESIZE        [%u]\n", hdr.page_size());
@@ -293,7 +293,7 @@ int unpack(const char *image, bool hdr) {
 
 			y = (patch_level >> 4) + 2000;
 			m = patch_level & 0xf;
-			fprintf(fp, "patch_level=%d-%02d\n", y, m);
+			fprintf(fp, "os_patch_level=%d-%02d\n", y, m);
 		}
 		fclose(fp);
 	}
@@ -384,7 +384,7 @@ void repack(const char* orig_image, const char* out_image) {
 				int a, b, c;
 				sscanf(value.data(), "%d.%d.%d", &a, &b, &c);
 				boot.hdr.os_version() = (((a << 14) | (b << 7) | c) << 11) | patch_level;
-			} else if (key == "patch_level") {
+			} else if (key == "os_patch_level") {
 				int os_version = boot.hdr.os_version() >> 11;
 				int y, m;
 				sscanf(value.data(), "%d-%d", &y, &m);
