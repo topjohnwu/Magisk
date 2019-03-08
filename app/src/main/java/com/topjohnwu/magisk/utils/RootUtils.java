@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.core.R;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;

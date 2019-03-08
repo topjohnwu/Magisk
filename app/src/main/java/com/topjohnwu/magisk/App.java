@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
-import com.topjohnwu.magisk.core.BuildConfig;
 import com.topjohnwu.magisk.database.MagiskDB;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;

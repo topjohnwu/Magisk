@@ -234,7 +234,8 @@ def build_binary(args):
 def build_apk(args, module):
     build_type = 'Release' if args.release else 'Debug'
 
-    proc = execv([gradlew, f'{module}:assemble{build_type}', '-PconfigPath=' + os.path.abspath(args.config)])
+    proc = execv([gradlew, f'{module}:assemble{build_type}',
+                 '-PconfigPath=' + os.path.abspath(args.config)])
     if proc.returncode != 0:
         error('Build Magisk Manager failed!')
 
@@ -251,7 +252,7 @@ def build_apk(args, module):
 def build_app(args):
     header('Building Magisk Manager')
     source = os.path.join('scripts', 'util_functions.sh')
-    target = os.path.join('app-core', 'src', 'main',
+    target = os.path.join('app', 'src', 'main',
                           'res', 'raw', 'util_functions.sh')
     cp(source, target)
     build_apk(args, 'app')
@@ -324,8 +325,9 @@ def zip_main(args):
         source = os.path.join('scripts', 'util_functions.sh')
         with open(source, 'r') as script:
             # Add version info util_functions.sh
-            util_func = script.read().replace('#MAGISK_VERSION_STUB',
-                                              f'MAGISK_VER="{config["version"]}"\nMAGISK_VER_CODE={config["versionCode"]}')
+            util_func = script.read().replace(
+                '#MAGISK_VERSION_STUB',
+                f'MAGISK_VER="{config["version"]}"\nMAGISK_VER_CODE={config["versionCode"]}')
             target = os.path.join('common', 'util_functions.sh')
             vprint(f'zip: {source} -> {target}')
             zipf.writestr(target, util_func)
