@@ -204,10 +204,10 @@ void mmap_rw(const char *filename, B &buf, L &sz) {
 
 // misc.cpp
 
+static inline int parse_int(char *s) { return parse_int((const char *) s); }
+
 template <class S>
-int parse_int(S __s) {
-	return parse_int(__s.data());
-}
+int parse_int(S __s) { return parse_int(__s.data()); }
 
 int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
 		const pthread_attr_t *attr = nullptr);
