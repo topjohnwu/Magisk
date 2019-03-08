@@ -104,7 +104,7 @@ static bool parse_packages_xml(string_view s) {
 			if (!pkg)
 				return true;
 		} else if (key_view == "userId" || key_view == "sharedUserId") {
-			int uid = parse_int(value);
+			int uid = b_parse_int(value);
 			for (auto &hide : hide_set) {
 				if (hide.first == pkg)
 					uid_proc_map[uid].emplace_back(hide.second);

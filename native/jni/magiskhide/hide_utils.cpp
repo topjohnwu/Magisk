@@ -60,7 +60,7 @@ void crawl_procfs(const function<bool (int)> &fn) {
 	int pid;
 	rewinddir(procfp);
 	while ((dp = readdir(procfp))) {
-		pid = parse_int(dp->d_name);
+		pid = b_parse_int(dp->d_name);
 		if (pid > 0 && !fn(pid))
 			break;
 	}
@@ -327,4 +327,3 @@ void auto_start_magiskhide() {
 		});
 	}
 }
-

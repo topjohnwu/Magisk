@@ -177,7 +177,7 @@ int su_client_main(int argc, char *argv[]) {
 		if (pw)
 			su_req.uid = pw->pw_uid;
 		else
-			su_req.uid = parse_int(argv[optind]);
+			su_req.uid = b_parse_int(argv[optind]);
 		optind++;
 	}
 

@@ -235,7 +235,7 @@ char *rtrim(char *str) {
  * Bionic's atoi runs through strtol().
  * Use our own implementation for faster conversion.
  */
-int parse_int(const char *s) {
+int b_parse_int(const char *s) {
 	int val = 0;
 	char c;
 	while ((c = *(s++))) {

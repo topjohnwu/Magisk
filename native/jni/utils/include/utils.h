@@ -83,7 +83,7 @@ int strend(const char *s1, const char *s2);
 char *rtrim(char *str);
 void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
-int parse_int(const char *s);
+int b_parse_int(const char *s);
 
 #define getline __getline
 #define getdelim __getdelim
@@ -203,11 +203,8 @@ void mmap_rw(const char *filename, B &buf, L &sz) {
 }
 
 // misc.cpp
-
-template <class S>
-int parse_int(S __s) {
-	return parse_int(__s.data());
-}
+// our own parse_int shortcut for std::string_view::data()
+# define parse_int(s) b_parse_int(s.data())
 
 int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
 		const pthread_attr_t *attr = nullptr);

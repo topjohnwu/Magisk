@@ -43,7 +43,7 @@ int db_settings::getKeyIdx(string_view key) const {
 }
 
 static int ver_cb(void *ver, int, char **data, char **) {
-	*((int *) ver) = parse_int(data[0]);
+	*((int *) ver) = b_parse_int(data[0]);
 	return 0;
 }
 
