@@ -364,13 +364,12 @@ void repack(const char* orig_image, const char* out_image) {
 
 	// header
 	if (access(HEADER_FILE, R_OK) == 0) {
-		int os_version = 0;
 		parse_prop_file(HEADER_FILE, [&](string_view key, string_view value) -> bool {
 			if (key == "page_size") {
 				boot.hdr.page_size() = parse_int(value);
 			} else if (key == "name") {
 				memset(boot.hdr.name(), 0, 16);
-				memcpy(boot.hdr.name(), value.data(), value.length() + 1);
+				memcpy(boot.hdr.name(), value.data(), value.length() > 15 ? 15 : value.length());
 			} else if (key == "cmdline") {
 				memset(boot.hdr.cmdline(), 0, 512);
 				memset(boot.hdr.extra_cmdline(), 0, 1024);
@@ -378,22 +377,22 @@ void repack(const char* orig_image, const char* out_image) {
 					memcpy(boot.hdr.cmdline(), value.data(), 512);
 					memcpy(boot.hdr.extra_cmdline(), &value[512], value.length() - 511);
 				} else {
-					memcpy(boot.hdr.cmdline(), value.data(), value.length() + 1);
+					memcpy(boot.hdr.cmdline(), value.data(), value.length());
 				}
 			} else if (key == "os_version") {
+				int patch_level = boot.hdr.os_version() & 0x7ff;
 				int a, b, c;
 				sscanf(value.data(), "%d.%d.%d", &a, &b, &c);
-				os_version |= ((a << 14) | (b << 7) | c) << 11;
+				boot.hdr.os_version() = (((a << 14) | (b << 7) | c) << 11) | patch_level;
 			} else if (key == "patch_level") {
+				int os_version = boot.hdr.os_version() >> 11;
 				int y, m;
 				sscanf(value.data(), "%d-%d", &y, &m);
 				y -= 2000;
-				os_version |= (y << 4) | m;
+				boot.hdr.os_version() = (os_version << 11) | (y << 4) | m;
 			}
 			return true;
 		});
-		if (os_version)
-			boot.hdr.os_version() = os_version;
 	}
 
 	// Skip a page for header
