@@ -22,6 +22,9 @@
 "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
 "broadcast", "-n", nullptr, "-a", "android.intent.action.REBOOT", \
 "-f", "0x10000020"
+#define ACTIVITY_REQUEST \
+"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
+"start", "-n", nullptr, "-f", "0x10000020"
 
 static inline const char *get_command(const struct su_request *to) {
 	if (to->command[0])
@@ -33,7 +36,10 @@ static inline const char *get_command(const struct su_request *to) {
 
 static void silent_run(const char **args, struct su_info *info) {
 	char component[128];
-	sprintf(component, "%s/a.h", info->str[SU_MANAGER].data());
+	if(strcmp(args[3],"start"))
+		sprintf(component, "%s/a.m", info->str[SU_MANAGER].data());
+	else
+		sprintf(component, "%s/a.h", info->str[SU_MANAGER].data());
 	args[5] = component;
 	exec_t exec {
 		.pre_exec = []() -> void {
@@ -121,7 +127,7 @@ void app_connect(const char *socket, struct su_info *info) {
 	setup_user(user, info);
 
 	const char *cmd[] = {
-		BROADCAST_REBOOT,
+		ACTIVITY_REQUEST,
 		"--user", user,
 		"--es", "action", "request",
 		"--es", "socket", socket,
