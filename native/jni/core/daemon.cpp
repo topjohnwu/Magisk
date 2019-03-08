@@ -120,7 +120,7 @@ static void main_daemon() {
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
 		if (key == "ro.build.version.sdk") {
 			LOGI("* Device API level: %s\n", val.data());
-			SDK_INT = atoi(val.data());
+			SDK_INT = parse_int(val);
 			return false;
 		}
 		return true;

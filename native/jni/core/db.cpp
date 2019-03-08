@@ -8,6 +8,7 @@
 #include <magisk.h>
 #include <db.h>
 #include <daemon.h>
+#include <utils.h>
 
 #define DB_VERSION 9
 
@@ -42,7 +43,7 @@ int db_settings::getKeyIdx(string_view key) const {
 }
 
 static int ver_cb(void *ver, int, char **data, char **) {
-	*((int *) ver) = atoi(data[0]);
+	*((int *) ver) = parse_int(data[0]);
 	return 0;
 }
 
@@ -199,7 +200,7 @@ char *db_exec(const char *sql, const db_row_cb &fn) {
 int get_db_settings(db_settings &cfg, int key) {
 	char *err;
 	auto settings_cb = [&](db_row &row) -> bool {
-		cfg[row["key"]] = atoi(row["value"].data());
+		cfg[row["key"]] = parse_int(row["value"]);
 		LOGD("magiskdb: query %s=[%s]\n", row["key"].data(), row["value"].data());
 		return true;
 	};
@@ -237,9 +238,9 @@ int get_uid_policy(int uid, su_access &su) {
 	sprintf(query, "SELECT policy, logging, notification FROM policies "
 			"WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));
 	err = db_exec(query, [&](db_row &row) -> bool {
-		su.policy = (policy_t) atoi(row["policy"].data());
-		su.log = atoi(row["logging"].data());
-		su.notify = atoi(row["notification"].data());
+		su.policy = (policy_t) parse_int(row["policy"]);
+		su.log = parse_int(row["logging"]);
+		su.notify = parse_int(row["notification"]);
 		LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n", su.policy, su.log, su.notify);
 		return true;
 	});

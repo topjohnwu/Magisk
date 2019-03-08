@@ -230,3 +230,18 @@ char *rtrim(char *str) {
 	str[len] = '\0';
 	return str;
 }
+
+/*
+ * Bionic's atoi runs through strtol().
+ * Use our own implementation for faster conversion.
+ */
+int parse_int(const char *s) {
+	int val = 0;
+	char c;
+	while ((c = *(s++))) {
+		if (c > '9' || c < '0')
+			return -1;
+		val = val * 10 + c - '0';
+	}
+	return val;
+}
