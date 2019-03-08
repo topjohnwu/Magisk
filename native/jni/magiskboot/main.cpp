@@ -18,9 +18,11 @@ static void usage(char *arg0) {
 		"Usage: %s <action> [args...]\n"
 		"\n"
 		"Supported actions:\n"
-		"  unpack <bootimg>\n"
-		"    Unpack <bootimg> to, if available, kernel, ramdisk.cpio, \n"
+		"  unpack [-h] <bootimg>\n"
+		"    Unpack <bootimg> to, if available, kernel, ramdisk.cpio,\n"
 		"    second, dtb, extra, and recovery_dtbo into current directory.\n"
+		"    If '-h' is provided, it will dump header info to 'header',\n"
+		"    which will be parsed when repacking.\n"
 		"    Return values:\n"
 		"    0:valid    1:error    2:chromeos    3:ELF32    4:ELF64\n"
 		"\n"
@@ -116,6 +118,7 @@ int main(int argc, char *argv[]) {
 
 	if (strcmp(argv[1], "cleanup") == 0) {
 		fprintf(stderr, "Cleaning up...\n");
+		unlink(HEADER_FILE);
 		unlink(KERNEL_FILE);
 		unlink(RAMDISK_FILE);
 		unlink(SECOND_FILE);
@@ -133,7 +136,13 @@ int main(int argc, char *argv[]) {
 		printf("\n");
 		munmap(buf, size);
 	} else if (argc > 2 && strcmp(argv[1], "unpack") == 0) {
-		return unpack(argv[2]);
+		if (strcmp(argv[2], "-h") == 0) {
+			if (argc == 3)
+				usage(argv[0]);
+			return unpack(argv[3], true);
+		} else {
+			return unpack(argv[2]);
+		}
 	} else if (argc > 2 && strcmp(argv[1], "repack") == 0) {
 		repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
 	} else if (argc > 2 && strcmp(argv[1], "decompress") == 0) {

@@ -269,10 +269,34 @@ void boot_img::print_hdr() {
 	fprintf(stderr, "]\n");
 }
 
-int unpack(const char *image) {
+int unpack(const char *image, bool hdr) {
 	boot_img boot {};
 	int ret = boot.parse_file(image);
 	int fd;
+
+	if (hdr) {
+		FILE *fp = xfopen(HEADER_FILE, "w");
+		fprintf(fp, "pagesize=%u\n", boot.hdr.page_size());
+		fprintf(fp, "name=%s\n", boot.hdr.name());
+		fprintf(fp, "cmdline=%.512s%.1024s\n", boot.hdr.cmdline(), boot.hdr.extra_cmdline());
+		uint32_t ver = boot.hdr.os_version();
+		if (ver) {
+			int a, b, c, y, m = 0;
+			int version, patch_level;
+			version = ver >> 11;
+			patch_level = ver & 0x7ff;
+
+			a = (version >> 14) & 0x7f;
+			b = (version >> 7) & 0x7f;
+			c = version & 0x7f;
+			fprintf(fp, "os_version=%d.%d.%d\n", a, b, c);
+
+			y = (patch_level >> 4) + 2000;
+			m = patch_level & 0xf;
+			fprintf(fp, "patch_level=%d-%02d\n", y, m);
+		}
+		fclose(fp);
+	}
 
 	// Dump kernel
 	if (COMPRESSED(boot.k_fmt)) {
@@ -336,6 +360,40 @@ void repack(const char* orig_image, const char* out_image) {
 		restore_buf(fd, boot.map_addr, NOOKHD_PRE_HEADER_SZ);
 	} else if (boot.flags & ACCLAIM_FLAG) {
 		restore_buf(fd, boot.map_addr, ACCLAIM_PRE_HEADER_SZ);
+	}
+
+	// header
+	if (access(HEADER_FILE, R_OK) == 0) {
+		int os_version = 0;
+		parse_prop_file(HEADER_FILE, [&](string_view key, string_view value) -> bool {
+			if (key == "page_size") {
+				boot.hdr.page_size() = parse_int(value);
+			} else if (key == "name") {
+				memset(boot.hdr.name(), 0, 16);
+				memcpy(boot.hdr.name(), value.data(), value.length() + 1);
+			} else if (key == "cmdline") {
+				memset(boot.hdr.cmdline(), 0, 512);
+				memset(boot.hdr.extra_cmdline(), 0, 1024);
+				if (value.length() > 512) {
+					memcpy(boot.hdr.cmdline(), value.data(), 512);
+					memcpy(boot.hdr.extra_cmdline(), &value[512], value.length() - 511);
+				} else {
+					memcpy(boot.hdr.cmdline(), value.data(), value.length() + 1);
+				}
+			} else if (key == "os_version") {
+				int a, b, c;
+				sscanf(value.data(), "%d.%d.%d", &a, &b, &c);
+				os_version |= ((a << 14) | (b << 7) | c) << 11;
+			} else if (key == "patch_level") {
+				int y, m;
+				sscanf(value.data(), "%d-%d", &y, &m);
+				y -= 2000;
+				os_version |= (y << 4) | m;
+			}
+			return true;
+		});
+		if (os_version)
+			boot.hdr.os_version() = os_version;
 	}
 
 	// Skip a page for header
