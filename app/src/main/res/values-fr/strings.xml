@@ -105,7 +105,7 @@
     <string name="restore_done">Restauration terminée !</string>
     <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
     <string name="proprietary_title">Téléchargement de code propriétaire</string>
-    <string name="proprietary_notice">Magisk Manager est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google.\n\nVoulez‐vous autoriser Magisk Manager à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet ?</string>
+    <string name="proprietary_notice">Magisk Manager est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google.Voulez‐vous autoriser Magisk Manager à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet ?</string>
     <string name="setup_done">Installation terminée</string>
     <string name="setup_fail">Échec de l’installation</string>
     <string name="env_fix_title">Installation additionnelle requise</string>
