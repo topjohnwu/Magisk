@@ -78,7 +78,6 @@ void sepol_magisk_rules() {
 	allowSuClient("untrusted_app_25");
 	allowSuClient("untrusted_app_27");
 	allowSuClient("update_engine");
-	allowSuClient("zygote");
 
 	// suRights
 	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
