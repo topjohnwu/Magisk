@@ -182,6 +182,12 @@ void sepol_magisk_rules() {
 	// Allow update engine to source addon.d.sh
 	sepol_allow("update_engine", "adb_data_file", "dir", ALL);
 
+	// Allow some appstores to install packages automatically
+	if (sepol_exists("sdcardfs")) {
+		sepol_allow("system_server", "sdcardfs", "file", "getattr");
+		sepol_allow("system_server", "sdcardfs", "file", "read");
+	}
+
 	// Remove all dontaudit
 	avtab_ptr_t av;
 	avtab_for_each(&policydb->te_avtab, av, {
