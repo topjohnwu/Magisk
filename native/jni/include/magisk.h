@@ -50,6 +50,5 @@ int magiskhide_main(int argc, char *argv[]);
 int magiskpolicy_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
 int resetprop_main(int argc, char *argv[]);
-int app_process_main(int argc, char *argv[]);
 
 #endif

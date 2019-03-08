@@ -18,8 +18,6 @@ static int (*applet_main[]) (int, char *[]) =
 			exit((*applet_main[i])(argc, argv));
 		}
 	}
-	if (strncmp(basename(argv[0]), "app_process", 11) == 0)
-		exit(app_process_main(argc, argv));
 	fprintf(stderr, "%s: applet not found\n", argv[0]);
 	exit(1);
 }

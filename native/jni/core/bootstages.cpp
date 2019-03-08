@@ -577,15 +577,6 @@ static void dump_logs() {
 
 [[noreturn]] static void core_only() {
 	auto_start_magiskhide();
-	cp_afc("/sbin/magisk", MAGISKTMP "/app_process");
-	struct stat st;
-	for (const char *app : { "app_process", "app_process32", "app_process64" }) {
-		sprintf(buf, "/system/bin/%s", app);
-		if (lstat(buf, &st) == 0 && S_ISREG(st.st_mode)) {
-			clone_attr(buf, MAGISKTMP "/app_process");
-			bind_mount(MAGISKTMP "/app_process", buf, false);
-		}
-	}
 	unblock_boot_process();
 }
 

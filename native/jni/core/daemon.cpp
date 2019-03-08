@@ -89,9 +89,6 @@ static void *request_handler(void *args) {
 	case SQLITE_CMD:
 		exec_sql(client);
 		break;
-	case ZYGOTE_NOTIFY:
-		zygote_notify(client, &credential);
-		break;
 	default:
 		close(client);
 		break;

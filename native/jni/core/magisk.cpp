@@ -112,30 +112,3 @@ int magisk_main(int argc, char *argv[]) {
 #endif
 	usage();
 }
-
-int app_process_main(int argc, char *argv[]) {
-	char path[512];
-	bool zygote = false;
-	for (int i = 0; i < argc; ++i) {
-		if (strcmp(argv[i], "--zygote") == 0) {
-			zygote = true;
-			break;
-		}
-	}
-	if (zygote) {
-		// Notify main daemon
-		sprintf(path, "/system/bin/%s", basename(argv[0]));
-		umount2(path, MNT_DETACH);
-		int fd = connect_daemon();
-		write_int(fd, ZYGOTE_NOTIFY);
-		write_string(fd, path);
-		read_int(fd);
-		close(fd);
-	} else {
-		// Redirect to system mirror
-		sprintf(path, MIRRDIR "/system/bin/%s", basename(argv[0]));
-	}
-	argv[0] = path;
-	execve(path, argv, environ);
-	return -1;
-}

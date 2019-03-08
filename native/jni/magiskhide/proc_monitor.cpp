@@ -114,8 +114,22 @@ static bool parse_packages_xml(string_view s) {
 	return true;
 }
 
+static void check_zygote() {
+	crawl_procfs([](int pid) -> bool {
+		char buf[512];
+		snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
+		FILE *f = fopen(buf, "re");
+		if (f) {
+			fgets(buf, sizeof(buf), f);
+			if (strncmp(buf, "zygote", 6) == 0)
+				new_zygote(pid);
+			fclose(f);
+		}
+		return true;
+	});
+}
+
 void *update_uid_map(void*) {
-	LOGD("proc_monitor: Updating uid maps\n");
 	MutexGuard lock(monitor_lock);
 	uid_proc_map.clear();
 	file_readline("/data/system/packages.xml", parse_packages_xml, true);
@@ -194,20 +208,9 @@ static void inotify_event(int) {
 	read(inotify_fd, buf, sizeof(buf));
 	if ((event->mask & IN_CLOSE_WRITE) && strcmp(event->name, "packages.xml") == 0) {
 		LOGD("proc_monitor: /data/system/packages.xml updated\n");
-		// Use new thread to parse xml, don't block zygote tracing
-		new_daemon_thread(update_uid_map);
+		check_zygote();
+		update_uid_map();
 	}
-}
-
-static void zygote_sig(int) {
-	int pid;
-	{
-		MutexGuard lock(monitor_lock);
-		pid = next_zygote;
-		next_zygote = -1;
-	}
-	if (pid > 0)
-		new_zygote(pid);
 }
 
 // Workaround for the lack of pthread_cancel
@@ -240,32 +243,6 @@ static void term_thread(int) {
 
 //#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
 #define PTRACE_LOG(...)
-
-int next_zygote = -1;
-
-void zygote_notify(int client, struct ucred *cred) {
-	char *path = read_string(client);
-
-	xptrace(PTRACE_ATTACH, cred->pid);
-	// Wait for attach
-	waitpid(cred->pid, nullptr, __WALL | __WNOTHREAD);
-	xptrace(PTRACE_CONT, cred->pid);
-	write_int(client, 0);
-	close(client);
-	// Wait for exec
-	waitpid(cred->pid, nullptr, __WALL | __WNOTHREAD);
-	xptrace(PTRACE_DETACH, cred->pid);
-
-	if (hide_enabled) {
-		MutexGuard lock(monitor_lock);
-		next_zygote = cred->pid;
-		pthread_kill(proc_monitor_thread, SIGZYGOTE);
-	}
-
-	// Remount zygote notifier ASAP
-	xmount(MAGISKTMP "/app_process", path, nullptr, MS_BIND, nullptr);
-	free(path);
-}
 
 static bool check_pid(int pid) {
 	char path[128];
@@ -357,15 +334,12 @@ void proc_monitor() {
 	sigset_t block_set;
 	sigemptyset(&block_set);
 	sigaddset(&block_set, SIGTERMTHRD);
-	sigaddset(&block_set, SIGZYGOTE);
 	sigaddset(&block_set, SIGIO);
 	pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
 
 	struct sigaction act{};
 	act.sa_handler = term_thread;
 	sigaction(SIGTERMTHRD, &act, nullptr);
-	act.sa_handler = zygote_sig;
-	sigaction(SIGZYGOTE, &act, nullptr);
 	act.sa_handler = inotify_event;
 	sigaction(SIGIO, &act, nullptr);
 
@@ -381,18 +355,7 @@ void proc_monitor() {
 	inotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
 
 	// First find existing zygotes
-	crawl_procfs([](int pid) -> bool {
-		char buf[512];
-		snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
-		FILE *f = fopen(buf, "re");
-		if (f) {
-			fgets(buf, sizeof(buf), f);
-			if (strncmp(buf, "zygote", 6) == 0)
-				new_zygote(pid);
-			fclose(f);
-		}
-		return true;
-	});
+	check_zygote();
 
 	int status;
 
