@@ -110,6 +110,35 @@ EOF
   cd /
 }
 
+add_system_su_redirect_module() {
+  # Do not touch existing su module
+  [ -d /sbin/.magisk/img/su ] && return 1
+  cd /sbin/.magisk/img
+  mkdir -p su/system/$1
+  cat << EOF > su/module.prop
+id=su
+name=System SU redirect
+version=1.0
+versionCode=1
+author=Magisk Manager
+description=Redirect system su to MagiskSU
+minMagisk=17000
+EOF
+  cp -df /sbin/su su/system/$1/su
+  magisk --clone-attr /sbin/su /system/$1/su
+  touch su/update
+  touch su/auto_mount
+  cd /
+  return 0
+}
+
+mm_su_check() {
+  for bin in xbin bin; do
+    [ -f /system/$bin/su ] && add_system_su_redirect_module $bin
+  done
+  return 1
+}
+
 rm_launch() {
   pm uninstall $1
   am start -n $2

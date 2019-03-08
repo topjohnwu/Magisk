@@ -46,6 +46,7 @@ open class GeneralReceiver : BroadcastReceiver() {
                         if (result.isSuccess)
                             Notifications.dtboPatched()
                     }
+                    Shell.su("mm_su_check").submit()
                     return
                 }
                 when (action) {
