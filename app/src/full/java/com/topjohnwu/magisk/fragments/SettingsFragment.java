@@ -33,6 +33,7 @@ import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Locale;
 
 public class SettingsFragment extends BasePreferenceFragment implements Topic.Subscriber {
@@ -108,6 +109,15 @@ public class SettingsFragment extends BasePreferenceFragment implements Topic.Su
             }
             return true;
         });
+
+        /* We only show canary channels if user is already on canary channel
+         * or the user have already chosen canary channel */
+        if (!BuildConfig.VERSION_NAME.contains("-") &&
+                (int) Config.get(Config.Key.UPDATE_CHANNEL) < Config.Value.CANARY_CHANNEL) {
+            // Remove the last 2 entries
+            CharSequence[] entries = updateChannel.getEntries();
+            updateChannel.setEntries(Arrays.copyOf(entries, entries.length - 2));
+        }
 
         setSummary();
 

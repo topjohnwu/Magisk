@@ -24,6 +24,12 @@ public class CheckUpdates {
             case Config.Value.CUSTOM_CHANNEL:
                 url = Config.get(Config.Key.CUSTOM_CHANNEL);
                 break;
+            case Config.Value.CANARY_CHANNEL:
+                url = Const.Url.CANARY_URL;
+                break;
+            case Config.Value.CANARY_DEBUG_CHANNEL:
+                url = Const.Url.CANARY_DEBUG_URL;
+                break;
             case Config.Value.STABLE_CHANNEL:
             default:
                 url = Const.Url.STABLE_URL;

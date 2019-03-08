@@ -63,6 +63,8 @@ public class Const {
         }
         public static final String STABLE_URL = getRaw("master", "stable.json");
         public static final String BETA_URL = getRaw("master", "beta.json");
+        public static final String CANARY_URL = getRaw("master", "canary_builds/release.json");
+        public static final String CANARY_DEBUG_URL = getRaw("master", "canary_builds/canary.json");
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
