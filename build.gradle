@@ -1,5 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+def props = new Properties()
+def configPath = project.hasProperty('configPath') ?
+        new File(project.configPath) : rootProject.file('config.prop')
+if (configPath.exists())
+    configPath.withInputStream { is -> props.load(is) }
+
 buildscript {
     
     repositories {
@@ -21,6 +27,10 @@ buildscript {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    configProps = props
 }
 
 subprojects {
@@ -45,6 +55,36 @@ subprojects {
                 compileOptions {
                     sourceCompatibility JavaVersion.VERSION_1_8
                     targetCompatibility JavaVersion.VERSION_1_8
+                }
+            }
+        }
+
+        if (it.name == 'app' || it.name == 'stub') {
+            android {
+                signingConfigs {
+                    config {
+                        storeFile rootProject.file('release-key.jks')
+                        storePassword props['keyStorePass']
+                        keyAlias props['keyAlias']
+                        keyPassword props['keyPass']
+                    }
+                }
+
+                buildTypes {
+                    debug {
+                        // If keystore exists, sign the APK with custom signature
+                        if (signingConfigs.config.storeFile.exists())
+                            signingConfig signingConfigs.config
+                    }
+                    release {
+                        minifyEnabled true
+                        shrinkResources true
+                        signingConfig signingConfigs.config
+                    }
+                }
+
+                lintOptions {
+                    disable 'MissingTranslation'
                 }
             }
         }

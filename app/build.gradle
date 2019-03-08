@@ -1,84 +1,46 @@
 apply plugin: 'com.android.application'
 
-def configProps = new Properties()
-def configPath = project.hasProperty('configPath') ?
-        new File(project.configPath) : rootProject.file('config.prop')
-if (configPath.exists())
-    configPath.withInputStream { is -> configProps.load(is) }
-
 android {
     defaultConfig {
         applicationId 'com.topjohnwu.magisk'
         vectorDrawables.useSupportLibrary = true
-    }
-
-    signingConfigs {
-        config {
-            storeFile rootProject.file('release-key.jks')
-            storePassword configProps['keyStorePass']
-            keyAlias configProps['keyAlias']
-            keyPassword configProps['keyPass']
+        versionName rootProject.ext.configProps['appVersion']
+        versionCode rootProject.ext.configProps['appVersionCode'] as Integer
+        javaCompileOptions {
+            annotationProcessorOptions {
+                argument('butterknife.debuggable', 'false')
+            }
         }
     }
 
     buildTypes {
-        debug {
-            // If keystore exists, sign the APK with custom signature
-            if (signingConfigs.config.storeFile.exists())
-                signingConfig signingConfigs.config
-        }
         release {
-            minifyEnabled true
-            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
         }
-    }
-
-    flavorDimensions 'mode'
-
-    productFlavors {
-        full {
-            versionName configProps['appVersion']
-            versionCode configProps['appVersionCode'] as Integer
-            javaCompileOptions {
-                annotationProcessorOptions {
-                    argument('butterknife.debuggable', 'false')
-                }
-            }
-        }
-        stub {
-            versionCode 1
-            versionName 'stub'
-        }
-    }
-
-    lintOptions {
-        disable 'MissingTranslation'
     }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':net')
-    fullImplementation project(':app-core')
-    fullImplementation 'ru.noties:markwon:2.0.1'
-    fullImplementation 'com.caverock:androidsvg-aar:1.3'
-    fullImplementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.0'
+    implementation project(':shared')
+    implementation project(':app-core')
+    implementation 'ru.noties:markwon:2.0.1'
+    implementation 'com.caverock:androidsvg-aar:1.3'
+    implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.0'
 
     def androidXVersion = "1.0.0"
-    implementation 'androidx.core:core:1.0.1'
-    fullImplementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    fullImplementation 'androidx.appcompat:appcompat:1.0.2'
-    fullImplementation "androidx.preference:preference:${androidXVersion}"
-    fullImplementation "androidx.recyclerview:recyclerview:${androidXVersion}"
-    fullImplementation "androidx.cardview:cardview:${androidXVersion}"
-    fullImplementation "com.google.android.material:material:${androidXVersion}"
-    fullImplementation 'android.arch.work:work-runtime:1.0.0'
-    fullImplementation 'androidx.room:room-runtime:2.0.0'
-    fullImplementation 'androidx.transition:transition:1.0.1'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation "androidx.preference:preference:${androidXVersion}"
+    implementation "androidx.recyclerview:recyclerview:${androidXVersion}"
+    implementation "androidx.cardview:cardview:${androidXVersion}"
+    implementation "com.google.android.material:material:${androidXVersion}"
+    implementation 'android.arch.work:work-runtime:1.0.0'
+    implementation 'androidx.room:room-runtime:2.0.0'
+    implementation 'androidx.transition:transition:1.0.1'
 
     def butterKnifeVersion = '10.1.0'
-    fullImplementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
-    fullAnnotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    implementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 }

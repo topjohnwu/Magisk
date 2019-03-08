@@ -231,21 +231,17 @@ def build_binary(args):
         run_ndk_build('B_BOOT=1')
 
 
-def build_apk(args, flavor):
-    header('* Building {} Magisk Manager'.format(flavor))
-
+def build_apk(args, module):
     build_type = 'Release' if args.release else 'Debug'
 
-    proc = execv([gradlew, f'app:assemble{flavor}{build_type}', '-PconfigPath=' + os.path.abspath(args.config)])
+    proc = execv([gradlew, f'{module}:assemble{build_type}', '-PconfigPath=' + os.path.abspath(args.config)])
     if proc.returncode != 0:
         error('Build Magisk Manager failed!')
 
-    flavor = flavor.lower()
     build_type = build_type.lower()
-    apk = f'app-{flavor}-{build_type}.apk'
+    apk = f'{module}-{build_type}.apk'
 
-    source = os.path.join('app', 'build', 'outputs',
-                          'apk', flavor, build_type, apk)
+    source = os.path.join(module, 'build', 'outputs', 'apk', build_type, apk)
     target = os.path.join(config['outdir'], apk)
     mv(source, target)
     header('Output: ' + target)
@@ -253,15 +249,17 @@ def build_apk(args, flavor):
 
 
 def build_app(args):
+    header('Building Magisk Manager')
     source = os.path.join('scripts', 'util_functions.sh')
     target = os.path.join('app-core', 'src', 'main',
                           'res', 'raw', 'util_functions.sh')
     cp(source, target)
-    build_apk(args, 'Full')
+    build_apk(args, 'app')
 
 
 def build_stub(args):
-    stub = build_apk(args, 'Stub')
+    header('Building Magisk Manager stub')
+    stub = build_apk(args, 'stub')
     # Dump the stub APK to header
     mkdir(os.path.join('native', 'out'))
     with open(os.path.join('native', 'out', 'binaries.h'), 'w') as out:
@@ -270,6 +268,7 @@ def build_stub(args):
 
 
 def build_snet(args):
+    header('Building snet extension')
     proc = execv([gradlew, 'snet:assembleRelease'])
     if proc.returncode != 0:
         error('Build snet extention failed!')
@@ -312,7 +311,7 @@ def zip_main(args):
 
         # APK
         source = os.path.join(
-            config['outdir'], 'app-full-release.apk' if args.release else 'app-full-debug.apk')
+            config['outdir'], 'app-release.apk' if args.release else 'app-debug.apk')
         target = os.path.join('common', 'magisk.apk')
         zip_with_msg(zipf, source, target)
 
