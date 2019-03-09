@@ -37,7 +37,6 @@ void clean_magisk_props();
 void crawl_procfs(const std::function<bool (int)> &fn);
 bool proc_name_match(int pid, const char *name);
 
-extern pthread_t proc_monitor_thread;
 extern bool hide_enabled;
 extern pthread_mutex_t monitor_lock;
 extern std::set<std::pair<std::string, std::string>> hide_set;

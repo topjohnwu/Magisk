@@ -18,7 +18,7 @@
 
 using namespace std;
 
-pthread_t proc_monitor_thread;
+static pthread_t proc_monitor_thread;
 
 static const char *prop_key[] =
 	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
@@ -327,4 +327,3 @@ void auto_start_magiskhide() {
 		});
 	}
 }
-

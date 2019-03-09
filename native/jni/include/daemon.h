@@ -79,7 +79,6 @@ void install_apk(const char *apk);
  **************/
 
 void magiskhide_handler(int client);
-void zygote_notify(int client, struct ucred *cred);
 
 /*************
  * Superuser *

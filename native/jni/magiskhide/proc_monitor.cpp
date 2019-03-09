@@ -63,6 +63,22 @@ static inline void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
+static int parse_ppid(int pid) {
+	char path[32];
+	int ppid;
+
+	sprintf(path, "/proc/%d/stat", pid);
+	FILE *stat = fopen(path, "re");
+	if (stat == nullptr)
+		return -1;
+
+	/* PID COMM STATE PPID ..... */
+	fscanf(stat, "%*d %*s %*c %d", &ppid);
+	fclose(stat);
+
+	return ppid;
+}
+
 static long xptrace(bool log, int request, pid_t pid, void *addr, void *data) {
 	long ret = ptrace(request, pid, addr, data);
 	if (log && ret == -1)
@@ -115,18 +131,25 @@ static bool parse_packages_xml(string_view s) {
 }
 
 static void check_zygote() {
-	crawl_procfs([](int pid) -> bool {
-		char buf[512];
-		snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
-		FILE *f = fopen(buf, "re");
-		if (f) {
-			fgets(buf, sizeof(buf), f);
-			if (strncmp(buf, "zygote", 6) == 0)
-				new_zygote(pid);
-			fclose(f);
-		}
-		return true;
-	});
+	int min_zyg = 1;
+	if (access("/system/bin/app_process64", R_OK) == 0)
+		min_zyg = 2;
+	for (bool first = true; zygote_map.size() < min_zyg; first = false) {
+		if (!first)
+			usleep(10000);
+		crawl_procfs([](int pid) -> bool {
+			char buf[512];
+			snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
+			FILE *f = fopen(buf, "re");
+			if (f) {
+				fgets(buf, sizeof(buf), f);
+				if (strncmp(buf, "zygote", 6) == 0 && parse_ppid(pid) == 1)
+					new_zygote(pid);
+				fclose(f);
+			}
+			return true;
+		});
+	}
 }
 
 void *update_uid_map(void*) {
@@ -138,7 +161,7 @@ void *update_uid_map(void*) {
 
 /*************************
  * The actual hide daemon
- **************************/
+ *************************/
 
 static void hide_daemon(int pid) {
 	RunFinally fin([=]() -> void {
@@ -208,8 +231,7 @@ static void inotify_event(int) {
 	read(inotify_fd, buf, sizeof(buf));
 	if ((event->mask & IN_CLOSE_WRITE) && strcmp(event->name, "packages.xml") == 0) {
 		LOGD("proc_monitor: /data/system/packages.xml updated\n");
-		check_zygote();
-		update_uid_map();
+		new_daemon_thread(update_uid_map);
 	}
 }
 
