@@ -37,8 +37,7 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:${androidXVersion}"
     implementation "androidx.cardview:cardview:${androidXVersion}"
     implementation "com.google.android.material:material:${androidXVersion}"
-    implementation 'android.arch.work:work-runtime:1.0.0'
-    implementation 'androidx.room:room-runtime:2.0.0'
+    implementation 'androidx.work:work-runtime:2.0.0-rc01'
     implementation 'androidx.transition:transition:1.0.1'
 
     def libsuVersion = '2.3.1'
