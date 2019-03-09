@@ -6,29 +6,32 @@
     <string name="superuser">Superuser</string>
     <string name="log">Záznamy</string>
     <string name="settings">Nastavenia</string>
-    <string name="install">Inštalovať</string>
+    <string name="install">Inštaluj</string>
+    <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
+    <string name="unsupport_magisk_message">Táto verzia Magisk Managera podporuje Magisk od verzie v18.0.\n\nBuď upgradujte Magisk manuálne alebo nainštalujte staršiu verziu aplikácie.</string>
+
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie je nainštalovaný</string>
     <string name="checking_for_updates">Kontrola aktualizácií…</string>
-    <string name="magisk_update_available">Je dostupný Magisk v%1$s!</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="safetyNet_check_text">Klepnutím spustíte kontrolu SafetyNet</string>
     <string name="checking_safetyNet_status">Kontroluje sa stav SafetyNet…</string>
     <string name="safetyNet_check_success">Kontrola SafetyNet prebehla úspešne</string>
     <string name="safetyNet_api_error">Chyba SafetyNet API</string>
     <string name="safetyNet_res_invalid">Odpoveď je neplatná</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk je aktuálny</string>
+    <string name="manager_up_to_date">Magisk Manager je aktuálny</string>
     <string name="advanced_settings_title">Pokročilé nastavenia</string>
     <string name="keep_force_encryption">Ponechať vynútené šifrovanie</string>
     <string name="keep_dm_verity">Ponechať AVB 2.0/dm-verity</string>
-    <string name="current_magisk_title">Nainštalovaná verzia: %1$s</string>
-    <string name="install_magisk_title">Najnovšia verzia: %1$s</string>
+    <string name="current_installed">Nainštalovaná verzia: %1$s</string>
+    <string name="latest_version">Najnovšia verzia: %1$s</string>
     <string name="uninstall">Odinštalovať</string>
-    <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené. Root bude odstránený a teoreticky môže dôjsť k zašifrovaniu vašich dát ak ich momentálne nemáte zašifrované</string>
+    <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené. Root bude odstránený a teoreticky môže dôjsť k zašifrovaniu vašich dát, ak ich momentálne nemáte zašifrované</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
-    <string name="update">Aktualizovať %1$s</string>
+    <string name="update">Aktualizovať</string>
+    <string name="core_only_enabled">(Režim Core povolený)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie sú k dispozícii žiadne informácie)</string>
@@ -60,14 +63,16 @@
     <string name="log_is_empty">Nie su žiadne záznamy</string>
 
     <!--About Activity-->
-    <string name="about">O aplikácii</string>
     <string name="app_changelog">Zoznam zmien</string>
     <string name="translators" />
-    <string name="app_version">Verzia</string>
-    <string name="app_source_code">Zdrojový kód</string>
-    <string name="donation">Príspevok</string>
     <string name="app_translators">Prekladatelia</string>
-    <string name="support_thread">Podpora na fóre</string>
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Aktualizácie Magisk</string>
+    <string name="progress_channel">Notifkikácie priebehu</string>
+    <string name="download_complete">Sťahovanie ukončené</string>
+    <string name="download_file_error">Chyba sťahovania súboru</string>
+    <string name="magisk_update_title">Je dostupná aktualizácia Magisk!</string>
+    <string name="manager_update_title">Je dostupná aktualizácia Magisk Manager!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Zavrieť</string>
@@ -75,25 +80,16 @@
     <string name="repo_install_msg">Chcete teraz nainštalovať %1$s?</string>
     <string name="download">Stiahnuť</string>
     <string name="reboot">Reštart</string>
-    <string name="magisk_update_title">Nová aktualizácia Magisk!</string>
     <string name="settings_reboot_toast">Pre aplikovanie nastavení je potrebný reštart</string>
     <string name="release_notes">Poznámky k vydaniu</string>
     <string name="repo_cache_cleared">Cache repo odstránená</string>
-    <string name="process_error">Chyba počas spracovania</string>
     <string name="internal_storage">Zip je uložený v:\n[Vnútorné úložisko]%1$s</string>
-    <string name="zip_download_title">Sťahovanie</string>
-    <string name="zip_download_msg">Sťahovanie súboru zip (%1$d%%) …</string>
-    <string name="zip_process_title">Spracovanie</string>
-    <string name="zip_process_msg">Spracovanie súboru zip…</string>
-    <string name="manager_update_title">Nová aktualizácia Magisk Manager!</string>
     <string name="manager_download_install">Stlačte pre stiahnutie a inštaláciu</string>
     <string name="dtbo_patched_title">DTBO bol zaplátaný!</string>
     <string name="dtbo_patched_reboot">Magisk Manager zaplátal dtbo.img, prosím, reštartujte</string>
-    <string name="magisk_updates">Aktualizácie Magisk</string>
     <string name="flashing">Flashovanie</string>
     <string name="hide_manager_toast">Pracuje sa na skrytí Magisk Manager…</string>
     <string name="hide_manager_toast2">Môže to chvíľu trvať…</string>
-    <string name="hide_manager_fail_toast">Skrytie Magisk Manager zlyhalo…</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu…</string>
     <string name="download_zip_only">Stiahnuť iba zip</string>
     <string name="patch_boot_file">Zaplátať Boot Image File</string>
@@ -102,7 +98,6 @@
     <string name="warning">Upozornenie</string>
     <string name="install_inactive_slot_msg">Vaše zariadenie bude po reštarte PRINÚTENÉ nabootovať do aktuálne neaktívneho slotu!\nTúto voľbu použite iba po skončení OTA.\nPokračovať?</string>
     <string name="select_method">Vyberte metódu</string>
-    <string name="no_boot_file_patch_support">Cieľová verzia Magisk nepodporuje zaplátanie súboru boot</string>
     <string name="boot_file_patch_msg">Vyberte stock boot image dump vo formáte .img alebo .img.tar</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>
@@ -111,27 +106,29 @@
     <string name="restore_fail">Záloha stock neexistuje!</string>
     <string name="proprietary_title">Stiahnuť proprietárny kód</string>
     <string name="proprietary_notice">Magisk Manager je FOSS, ktorý neobsahuje proprietárny kód SafetyNet API od Google.\n\nChcete povoliť Magisk Manager stiahnutie rozšírenia (obsahujúce GoogleApiClient) pre kontrolu  SafetyNet?</string>
-    <string name="su_db_corrupt">Databáza SU je poškodená, bude vytvorená nová db</string>
     <string name="setup_done">Nastavenie ukončené</string>
     <string name="setup_fail">Nastavenie zlyhalo</string>
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>
     <string name="env_fix_msg">Vaše zariadenie si vyžaduje ďalšie nastavenie pre správne fungovanie Magisk. Stiahne sa inštalačný zip súbor Magisk, chcete pokračovať teraz?</string>
     <string name="setup_title">Ďalšie nastavenie</string>
     <string name="setup_msg">Spustené prostredie nastavenia…</string>
+    <string name="downloading_toast">Sťahovanie %1$s</string>
+    <string name="no_rw_storage">Táto funkcia nebude fungovať bez povolenia na zápis na externé úložisko.</string>
+    <string name="dl_one_module">Sťahovanie jedného modulu naraz.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Všeobecné</string>
     <string name="settings_dark_theme_title">Tmavý motív</string>
     <string name="settings_dark_theme_summary">Povoliť tmavý motív</string>
-    <string name="settings_clear_cache_title">Vyčistenie cache repo </string>
+    <string name="settings_clear_cache_title">Vyčistiť cache repo </string>
     <string name="settings_clear_cache_summary">Vyčistí uložené informácie pre online repo, aplikácia si nové informácie stiahne online</string>
     <string name="settings_hide_manager_title">Skryť Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Prebaliť Magisk Manager s náhodným názvom balíčka</string>
+    <string name="settings_hide_manager_summary">Prebalí Magisk Manager s náhodným názvom balíčka</string>
     <string name="settings_restore_manager_title">Obnoviť Magisk Manager</string>
     <string name="settings_restore_manager_summary">Obnoví pôvodný balíček Magisk Manager</string>
     <string name="language">Jazyk</string>
     <string name="system_default">(Predvolený systémom)</string>
-    <string name="settings_update">Aktualizovať nastavenia</string>
+    <string name="settings_update">Nastavenia aktualizácie</string>
     <string name="settings_check_update_title">Kontrolovať aktualizácie</string>
     <string name="settings_check_update_summary">Aktualizácie sa budú pravidelne na pozadí kontrolovať</string>
     <string name="settings_update_channel_title">Aktualizačný kanál</string>
@@ -143,17 +140,20 @@
     <string name="settings_boot_format_summary">Vyberte výstupný formát zaplátaného obrazu boot.\nVyberte .img pre flashovanie cez fastboot/download režim; vyberte .img.tar pre flashovanie cez ODIN.</string>
     <string name="settings_core_only_title">Režim Magisk Core</string>
     <string name="settings_core_only_summary">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU, MagiskHide a systemless hosts, ale žiadne moduly nebudú zavedené.</string>
-    <string name="settings_magiskhide_summary">Ukryť Magisk pre rôznymi detekciami</string>
+    <string name="settings_magiskhide_summary">Ukryje Magisk pre rôznymi detekciami</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Podpora pre aplikácie systemless hosts Adblock</string>
+    <string name="settings_hosts_toast">Pridaný modul systemless hosts</string>
 
     <string name="settings_su_app_adb">Aplikácie a ADB</string>
     <string name="settings_su_app">Iba aplikácie</string>
     <string name="settings_su_adb">Iba ADB</string>
     <string name="settings_su_disable">Zakázané</string>
     <string name="settings_su_request_10">10 sekúnd</string>
+    <string name="settings_su_request_15">15 sekúnd</string>
     <string name="settings_su_request_20">20 sekúnd</string>
     <string name="settings_su_request_30">30 sekúnd</string>
+    <string name="settings_su_request_45">45 sekúnd</string>
     <string name="settings_su_request_60">60 sekúnd</string>
     <string name="superuser_access">Prístup Superuser</string>
     <string name="auto_response">Automatická odpoveď</string>
@@ -173,7 +173,6 @@
     <string name="owner_only_summary">Root prístup má iba majiteľ zariadenia</string>
     <string name="owner_manage_summary">Iba majiteľ zariadenia môže spravovať prístup root a prijímať žiadosti</string>
     <string name="user_indepenent_summary">Každý používateľ má vlastné pravidlá pre root</string>
-    <string name="multiuser_hint_owner_request">Žiadosti sú odoslané na zariadenie majiteľa. Prosím, prepnite na majiteľa a udeľte požadované oprávnenia</string>
 
     <string name="mount_namespace_mode">Režim Mount Namespace</string>
     <string name="settings_ns_global">Globálne Namespace</string>
@@ -215,8 +214,10 @@
     <string name="auth_fail">Autentifikácia zlyhala</string>
 
     <!--Superuser logs-->
-    <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Target UID:\u0020</string>
-    <string name="command">Príkaz:\u0020</string>
+    <string name="pid">PID:%1$d</string>
+    <string name="target_uid">Target UID: %1$d</string>
+    <string name="command">Príkaz: %1$s</string>
+    <!-- MagiskHide -->
+    <string name="show_system_app">Zobraziť systémové aplikácie</string>
 
 </resources>
