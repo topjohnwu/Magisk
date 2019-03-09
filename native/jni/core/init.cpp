@@ -407,14 +407,8 @@ static void setup_overlay() {
 	// Wait for early-init start
 	while (access(EARLYINIT, F_OK) != 0)
 		usleep(10);
-	selinux_builtin_impl();
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 	unlink(EARLYINIT);
-
-	fd = open("/dev/null", O_RDWR);
-	xdup2(fd, STDIN_FILENO);
-	xdup2(fd, STDOUT_FILENO);
-	xdup2(fd, STDERR_FILENO);
 
 	// Mount the /sbin tmpfs overlay
 	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
@@ -423,10 +417,10 @@ static void setup_overlay() {
 
 	// Dump binaries
 	mkdir(MAGISKTMP, 0755);
-	fd = open(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
+	fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
 	write(fd, config, config_sz);
 	close(fd);
-	fd = open("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
+	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
 	write(fd, self, self_sz);
 	close(fd);
 	dump_magisk("/sbin/magisk", 0755);
@@ -475,6 +469,7 @@ static void exec_init(char *argv[]) {
 
 int main(int argc, char *argv[]) {
 	umask(0);
+	no_logging();
 
 	for (int i = 0; init_applet[i]; ++i) {
 		if (strcmp(basename(argv[0]), init_applet[i]) == 0)
@@ -593,7 +588,8 @@ int main(int argc, char *argv[]) {
 	link_dir(sbin, root);
 
 	setup_init_rc();
-	patch_sepolicy();
+	if (patch_sepolicy())
+		selinux_builtin_impl();
 
 	// Close all file descriptors
 	for (int i = 0; i < 30; ++i)
