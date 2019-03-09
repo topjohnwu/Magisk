@@ -378,8 +378,9 @@ void file_readline(const char *file, const function<bool (string_view)> &fn, boo
 	while ((read = getline(&buf, &len, fp)) >= 0) {
 		start = buf;
 		if (trim) {
-			while (buf[read - 1] == '\n' || buf[read - 1] == ' ')
-				buf[read-- - 1] = '\0';
+			while (read && (buf[read - 1] == '\n' || buf[read - 1] == ' '))
+				--read;
+			buf[read] = '\0';
 			while (*start == ' ')
 				++start;
 		}
