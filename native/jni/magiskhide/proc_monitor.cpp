@@ -349,6 +349,7 @@ static void new_zygote(int pid) {
 	xptrace(PTRACE_CONT, pid);
 }
 
+#define DETACH_AND_CONT { detach = true; continue; }
 void proc_monitor() {
 	inotify_fd = xinotify_init1(IN_CLOEXEC);
 	if (inotify_fd < 0)
@@ -384,15 +385,23 @@ void proc_monitor() {
 	int status;
 
 	for (;;) {
-		int pid = waitpid(-1, &status, __WALL | __WNOTHREAD);
+		const int pid = waitpid(-1, &status, __WALL | __WNOTHREAD);
 		if (pid < 0)
 			continue;
+		bool detach = false;
+		RunFinally detach_task([&]() -> void {
+			if (detach) {
+				// Non of our business now
+				attaches[pid] = false;
+				detaches[pid] = false;
+				unknowns[pid] = false;
+				xptrace(PTRACE_DETACH, pid);
+			}
+		});
 		if (WIFSTOPPED(status)) {
 			if (detaches[pid]) {
 				PTRACE_LOG("detach\n");
-				detaches[pid] = false;
-				xptrace(PTRACE_DETACH, pid);
-				continue;
+				DETACH_AND_CONT;
 			}
 			if (WSTOPSIG(status) == SIGTRAP && WEVENT(status)) {
 				unsigned long msg;
@@ -427,10 +436,7 @@ void proc_monitor() {
 						case PTRACE_EVENT_EXEC:
 						case PTRACE_EVENT_EXIT:
 							PTRACE_LOG("exited or execve\n", msg);
-							attaches[pid] = false;
-							unknowns[pid] = false;
-							xptrace(PTRACE_DETACH, pid);
-							continue;
+							DETACH_AND_CONT;
 						default:
 							PTRACE_LOG("unknown event: %d\n", WEVENT(status));
 							break;
@@ -454,8 +460,8 @@ void proc_monitor() {
 			}
 		} else {
 			// Nothing to do with us
-			ptrace(PTRACE_DETACH, pid);
 			PTRACE_LOG("terminate\n");
+			DETACH_AND_CONT;
 		}
 	}
 }
