@@ -323,13 +323,6 @@ static bool check_pid(int pid) {
 	return true;
 }
 
-static void handle_unknown(int tid, int pid = -1) {
-	if (unknowns[pid]) {
-		unknowns[pid] = false;
-		tgkill(pid < 0 ? tid : pid, tid, SIGSTOP);
-	}
-}
-
 static void new_zygote(int pid) {
 	if (zygote_map.count(pid))
 		return;
@@ -395,7 +388,7 @@ void proc_monitor() {
 				attaches[pid] = false;
 				detaches[pid] = false;
 				unknowns[pid] = false;
-				xptrace(PTRACE_DETACH, pid);
+				ptrace(PTRACE_DETACH, pid, 0, 0);
 			}
 		});
 		if (WIFSTOPPED(status)) {
@@ -413,12 +406,17 @@ void proc_monitor() {
 						case PTRACE_EVENT_VFORK:
 							PTRACE_LOG("zygote forked: [%d]\n", msg);
 							attaches[msg] = true;
-							handle_unknown(msg);
+							if (unknowns[msg]) {
+								/* Stop the child again to make sure
+								 * we are monitoring the proper events */
+								unknowns[msg] = false;
+								tgkill(msg, msg, SIGSTOP);
+							}
 							break;
 						case PTRACE_EVENT_EXIT:
 							PTRACE_LOG("zygote exited with status: [%d]\n", msg);
 							zygote_map.erase(pid);
-							break;
+							DETACH_AND_CONT;
 						default:
 							PTRACE_LOG("unknown event: %d\n", WEVENT(status));
 							break;
@@ -429,13 +427,12 @@ void proc_monitor() {
 						case PTRACE_EVENT_CLONE:
 							PTRACE_LOG("create new threads: [%d]\n", msg);
 							detaches[msg] = true;
-							handle_unknown(msg, pid);
 							if (attaches[pid] && check_pid(pid))
 								continue;
 							break;
 						case PTRACE_EVENT_EXEC:
 						case PTRACE_EVENT_EXIT:
-							PTRACE_LOG("exited or execve\n", msg);
+							PTRACE_LOG("exited or execve\n");
 							DETACH_AND_CONT;
 						default:
 							PTRACE_LOG("unknown event: %d\n", WEVENT(status));
