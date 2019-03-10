@@ -424,11 +424,13 @@ void proc_monitor() {
 							if (attaches[pid] && check_pid(pid))
 								continue;
 							break;
+						case PTRACE_EVENT_EXEC:
 						case PTRACE_EVENT_EXIT:
-							PTRACE_LOG("exited with status: [%d]\n", msg);
+							PTRACE_LOG("exited or execve\n", msg);
 							attaches[pid] = false;
 							unknowns[pid] = false;
-							break;
+							xptrace(PTRACE_DETACH, pid);
+							continue;
 						default:
 							PTRACE_LOG("unknown event: %d\n", WEVENT(status));
 							break;
@@ -438,7 +440,8 @@ void proc_monitor() {
 			} else if (WSTOPSIG(status) == SIGSTOP) {
 				if (attaches[pid]) {
 					PTRACE_LOG("SIGSTOP from zygote child\n");
-					xptrace(PTRACE_SETOPTIONS, pid, nullptr, PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXIT);
+					xptrace(PTRACE_SETOPTIONS, pid, nullptr,
+							PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT);
 				} else {
 					PTRACE_LOG("SIGSTOP from unknown\n");
 					unknowns[pid] = true;
