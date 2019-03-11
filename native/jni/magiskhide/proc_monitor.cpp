@@ -391,74 +391,73 @@ void proc_monitor() {
 				ptrace(PTRACE_DETACH, pid, 0, 0);
 			}
 		});
-		if (WIFSTOPPED(status)) {
-			if (detaches[pid]) {
-				PTRACE_LOG("detach\n");
-				DETACH_AND_CONT;
-			}
-			if (WSTOPSIG(status) == SIGTRAP && WEVENT(status)) {
-				unsigned long msg;
-				xptrace(PTRACE_GETEVENTMSG, pid, nullptr, &msg);
-				if (zygote_map.count(pid)) {
-					// Zygote event
-					switch (WEVENT(status)) {
-						case PTRACE_EVENT_FORK:
-						case PTRACE_EVENT_VFORK:
-							PTRACE_LOG("zygote forked: [%d]\n", msg);
-							attaches[msg] = true;
-							if (unknowns[msg]) {
-								/* Stop the child again to make sure
-								 * we are monitoring the proper events */
-								unknowns[msg] = false;
-								tgkill(msg, msg, SIGSTOP);
-							}
-							break;
-						case PTRACE_EVENT_EXIT:
-							PTRACE_LOG("zygote exited with status: [%d]\n", msg);
-							zygote_map.erase(pid);
-							DETACH_AND_CONT;
-						default:
-							PTRACE_LOG("unknown event: %d\n", WEVENT(status));
-							break;
-					}
-					xptrace(PTRACE_CONT, pid);
-				} else {
-					switch (WEVENT(status)) {
-						case PTRACE_EVENT_CLONE:
-							PTRACE_LOG("create new threads: [%d]\n", msg);
-							detaches[msg] = true;
-							if (attaches[pid] && check_pid(pid))
-								continue;
-							break;
-						case PTRACE_EVENT_EXEC:
-						case PTRACE_EVENT_EXIT:
-							PTRACE_LOG("exited or execve\n");
-							DETACH_AND_CONT;
-						default:
-							PTRACE_LOG("unknown event: %d\n", WEVENT(status));
-							break;
-					}
-					xptrace(PTRACE_CONT, pid);
-				}
-			} else if (WSTOPSIG(status) == SIGSTOP) {
-				if (attaches[pid]) {
-					PTRACE_LOG("SIGSTOP from zygote child\n");
-					xptrace(PTRACE_SETOPTIONS, pid, nullptr,
-							PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT);
-				} else {
-					PTRACE_LOG("SIGSTOP from unknown\n");
-					unknowns[pid] = true;
-				}
-				xptrace(PTRACE_CONT, pid);
-			} else {
-				// Not caused by us, resend signal
-				xptrace(PTRACE_CONT, pid, nullptr, WSTOPSIG(status));
-				PTRACE_LOG("signal [%d]\n", WSTOPSIG(status));
-			}
-		} else {
+		if (!WIFSTOPPED(status)) {
 			// Nothing to do with us
 			PTRACE_LOG("terminate\n");
 			DETACH_AND_CONT;
+		}
+		if (detaches[pid]) {
+			PTRACE_LOG("detach\n");
+			DETACH_AND_CONT;
+		}
+		if (WSTOPSIG(status) == SIGTRAP && WEVENT(status)) {
+			unsigned long msg;
+			xptrace(PTRACE_GETEVENTMSG, pid, nullptr, &msg);
+			if (zygote_map.count(pid)) {
+				// Zygote event
+				switch (WEVENT(status)) {
+					case PTRACE_EVENT_FORK:
+					case PTRACE_EVENT_VFORK:
+						PTRACE_LOG("zygote forked: [%d]\n", msg);
+						attaches[msg] = true;
+						if (unknowns[msg]) {
+							/* Stop the child again to make sure
+							 * we are monitoring the proper events */
+							unknowns[msg] = false;
+							tgkill(msg, msg, SIGSTOP);
+						}
+						break;
+					case PTRACE_EVENT_EXIT:
+						PTRACE_LOG("zygote exited with status: [%d]\n", msg);
+						zygote_map.erase(pid);
+						DETACH_AND_CONT;
+					default:
+						PTRACE_LOG("unknown event: %d\n", WEVENT(status));
+						break;
+				}
+				xptrace(PTRACE_CONT, pid);
+			} else {
+				switch (WEVENT(status)) {
+					case PTRACE_EVENT_CLONE:
+						PTRACE_LOG("create new threads: [%d]\n", msg);
+						detaches[msg] = true;
+						if (attaches[pid] && check_pid(pid))
+							continue;
+						break;
+					case PTRACE_EVENT_EXEC:
+					case PTRACE_EVENT_EXIT:
+						PTRACE_LOG("exited or execve\n");
+						DETACH_AND_CONT;
+					default:
+						PTRACE_LOG("unknown event: %d\n", WEVENT(status));
+						break;
+				}
+				xptrace(PTRACE_CONT, pid);
+			}
+		} else if (WSTOPSIG(status) == SIGSTOP) {
+			if (attaches[pid]) {
+				PTRACE_LOG("SIGSTOP from zygote child\n");
+				xptrace(PTRACE_SETOPTIONS, pid, nullptr,
+						PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT);
+			} else {
+				PTRACE_LOG("SIGSTOP from unknown\n");
+				unknowns[pid] = true;
+			}
+			xptrace(PTRACE_CONT, pid);
+		} else {
+			// Not caused by us, resend signal
+			xptrace(PTRACE_CONT, pid, nullptr, WSTOPSIG(status));
+			PTRACE_LOG("signal [%d]\n", WSTOPSIG(status));
 		}
 	}
 }
