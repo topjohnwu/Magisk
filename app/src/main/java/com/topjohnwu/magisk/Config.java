@@ -315,7 +315,8 @@ public class Config {
         defs.put(Key.SU_REQUEST_TIMEOUT, 10);
         defs.put(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT);
         defs.put(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST);
-        defs.put(Key.UPDATE_CHANNEL, Value.STABLE_CHANNEL);
+        defs.put(Key.UPDATE_CHANNEL, Utils.isCanary() ?
+                Value.CANARY_DEBUG_CHANNEL : Value.STABLE_CHANNEL);
 
         // prefs bool
         defs.put(Key.CHECK_UPDATES, true);

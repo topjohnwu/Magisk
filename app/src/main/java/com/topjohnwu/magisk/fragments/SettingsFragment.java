@@ -112,7 +112,7 @@ public class SettingsFragment extends BasePreferenceFragment implements Topic.Su
 
         /* We only show canary channels if user is already on canary channel
          * or the user have already chosen canary channel */
-        if (!BuildConfig.VERSION_NAME.contains("-") &&
+        if (!Utils.isCanary() &&
                 (int) Config.get(Config.Key.UPDATE_CHANNEL) < Config.Value.CANARY_CHANNEL) {
             // Remove the last 2 entries
             CharSequence[] entries = updateChannel.getEntries();

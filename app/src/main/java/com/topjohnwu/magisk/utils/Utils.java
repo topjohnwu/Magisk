@@ -12,6 +12,7 @@ import android.provider.OpenableColumns;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.container.Module;
@@ -117,5 +118,9 @@ public class Utils {
 
     public static void reboot() {
         Shell.su("/system/bin/reboot" + (Config.recovery ? " recovery" : "")).submit();
+    }
+
+    public static boolean isCanary() {
+        return BuildConfig.VERSION_NAME.contains("-");
     }
 }
