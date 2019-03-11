@@ -8,7 +8,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
@@ -114,11 +113,6 @@ public class Utils {
         return Shell.rootAccess() && (Const.USER_ID == 0 ||
                 (int) Config.get(Config.Key.SU_MULTIUSER_MODE) !=
                         Config.Value.MULTIUSER_MODE_OWNER_MANAGED);
-    }
-
-    public static Context getDEContext() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
-                App.self.createDeviceProtectedStorageContext() : App.self;
     }
 
     public static void reboot() {

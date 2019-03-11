@@ -73,7 +73,7 @@ public abstract class MagiskInstaller {
     public MagiskInstaller(List<String> out, List<String> err) {
         console = out;
         logs = err;
-        installDir = new File(Utils.getDEContext().getFilesDir().getParent(), "install");
+        installDir = new File(App.deContext.getFilesDir().getParent(), "install");
         Shell.sh("rm -rf " + installDir).exec();
         installDir.mkdirs();
     }

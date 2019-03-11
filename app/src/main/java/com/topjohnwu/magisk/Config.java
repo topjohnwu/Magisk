@@ -147,15 +147,15 @@ public class Config {
         // Flush prefs to disk
         App app = App.self;
         app.prefs.edit().commit();
-        File xml = new File(app.getFilesDir().getParent() + "/shared_prefs",
+        File xml = new File(App.deContext.getFilesDir().getParent() + "/shared_prefs",
                 app.getPackageName() + "_preferences.xml");
-        Shell.su(Utils.fmt("cat %s > /data/user/0/%s", xml, Const.MANAGER_CONFIGS)).exec();
+        Shell.su(Utils.fmt("cat %s > /data/adb/%s", xml, Const.MANAGER_CONFIGS)).exec();
     }
 
     public static void initialize() {
         SharedPreferences pref = App.self.prefs;
         SharedPreferences.Editor editor = pref.edit();
-        SuFile config = new SuFile("/data/user/0/" + Const.MANAGER_CONFIGS);
+        SuFile config = new SuFile("/data/adb/" + Const.MANAGER_CONFIGS);
         if (config.exists()) {
             try {
                 SuFileInputStream is = new SuFileInputStream(config);
