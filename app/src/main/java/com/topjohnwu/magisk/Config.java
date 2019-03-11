@@ -342,23 +342,35 @@ public class Config {
     }
 
     private static void setDefs(SharedPreferences pref, SharedPreferences.Editor editor) {
+        App app = App.self;
         for (String key : defs.keySet()) {
+            int type = getConfigType(key);
+            switch (type) {
+                case DB_INT:
+                    editor.putString(key, String.valueOf(
+                            app.mDB.getSettings(key, (Integer) defs.get(key))));
+                    continue;
+                case DB_STR:
+                    editor.putString(key, app.mDB.getStrings(key, (String) defs.get(key)));
+                    continue;
+                case DB_BOOL:
+                    int bs = app.mDB.getSettings(key, -1);
+                    editor.putBoolean(key, bs < 0 ? (Boolean) defs.get(key) : bs != 0);
+                    continue;
+            }
             if (pref.contains(key))
                 continue;
-            switch (getConfigType(key)) {
+            switch (type) {
                 case PREF_INT:
                     editor.putInt(key, (Integer) defs.get(key));
                     break;
-                case DB_INT:
                 case PREF_STR_INT:
                     editor.putString(key, String.valueOf(defs.get(key)));
                     break;
                 case PREF_STR:
-                case DB_STR:
                     editor.putString(key, (String) defs.get(key));
                     break;
                 case PREF_BOOL:
-                case DB_BOOL:
                     editor.putBoolean(key, (Boolean) defs.get(key));
                     break;
             }
