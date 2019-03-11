@@ -320,7 +320,7 @@ public class Config {
 
         // prefs bool
         defs.put(Key.CHECK_UPDATES, true);
-        //defs.put(Key.DARK_THEME, false);
+        defs.put(Key.DARK_THEME, true);
         //defs.put(Key.SU_REAUTH, false);
         //defs.put(Key.SHOW_SYSTEM_APP, false);
 
