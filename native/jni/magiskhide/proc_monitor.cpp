@@ -106,6 +106,8 @@ static bool parse_packages_xml(string_view s) {
 	string_view pkg;
 	for (char *tok = start; *tok;) {
 		char *eql = strchr(tok, '=');
+		if (eql == nullptr)
+			break;
 		*eql = '\0';  /* Terminate '=' */
 		string_view key(tok, eql - tok);
 		eql += 2;  /* Skip '="' */
