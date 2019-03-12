@@ -46,9 +46,8 @@ static map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 pthread_mutex_t monitor_lock;
 
 #define PID_MAX 32768
-static vector<bool> attaches(PID_MAX);  /* true if pid should be monitored */
+static vector<bool> attaches(PID_MAX);  /* true if pid is monitored */
 static vector<bool> detaches(PID_MAX);  /* true if tid should be detached */
-static vector<bool> unknowns(PID_MAX);  /* true if pid/tid is in unknown state */
 
 /********
  * Utils
@@ -170,7 +169,7 @@ void *update_uid_map(void*) {
 static void hide_daemon(int pid) {
 	RunFinally fin([=]() -> void {
 		// Send resume signal
-		kill(pid, SIGCONT);
+		tgkill(pid, pid, SIGCONT);
 		_exit(0);
 	});
 
@@ -247,7 +246,6 @@ static void term_thread(int) {
 	hide_set.clear();
 	std::fill(attaches.begin(), attaches.end(), false);
 	std::fill(detaches.begin(), detaches.end(), false);
-	std::fill(unknowns.begin(), unknowns.end(), false);
 	// Misc
 	hide_enabled = false;
 	pthread_mutex_destroy(&monitor_lock);
@@ -267,6 +265,29 @@ static void term_thread(int) {
 
 //#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
 #define PTRACE_LOG(...)
+
+static void detach_pid(int pid, int signal = 0) {
+	char path[128];
+	xptrace(PTRACE_DETACH, pid, nullptr, signal);
+
+	// Detach all child threads too
+	sprintf(path, "/proc/%d/task", pid);
+	DIR *dir = opendir(path);
+	crawl_procfs(dir, [&](int tid) -> bool {
+		if (tid != pid) {
+			// Check if we should force a SIGSTOP
+			if (waitpid(tid, nullptr, __WALL | __WNOTHREAD | WNOHANG) == tid) {
+				PTRACE_LOG("detach thread [%d]\n", tid);
+				xptrace(PTRACE_DETACH, tid);
+			} else {
+				detaches[tid] = true;
+				tgkill(pid, tid, SIGSTOP);
+			}
+		}
+		return true;
+	});
+	closedir(dir);
+}
 
 static bool check_pid(int pid) {
 	char path[128];
@@ -309,9 +330,9 @@ static bool check_pid(int pid) {
 				/* Finally this is our target!
 				 * Detach from ptrace but should still remain stopped.
 				 * The hide daemon will resume the process. */
-				xptrace(PTRACE_DETACH, pid, nullptr, SIGSTOP);
-				LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
 				PTRACE_LOG("target found\n");
+				LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
+				detach_pid(pid, SIGSTOP);
 				if (fork_dont_care() == 0)
 					hide_daemon(pid);
 				return true;
@@ -319,7 +340,7 @@ static bool check_pid(int pid) {
 		}
 	}
 	PTRACE_LOG("not our target\n");
-	xptrace(PTRACE_DETACH, pid);
+	detach_pid(pid);
 	return true;
 }
 
@@ -387,17 +408,11 @@ void proc_monitor() {
 				// Non of our business now
 				attaches[pid] = false;
 				detaches[pid] = false;
-				unknowns[pid] = false;
 				ptrace(PTRACE_DETACH, pid, 0, 0);
 			}
 		});
-		if (!WIFSTOPPED(status)) {
-			// Nothing to do with us
-			PTRACE_LOG("terminate\n");
-			DETACH_AND_CONT;
-		}
-		if (detaches[pid]) {
-			PTRACE_LOG("detach\n");
+		if (!WIFSTOPPED(status) || detaches[pid]) {
+			PTRACE_LOG("detached\n");
 			DETACH_AND_CONT;
 		}
 		if (WSTOPSIG(status) == SIGTRAP && WEVENT(status)) {
@@ -410,12 +425,6 @@ void proc_monitor() {
 					case PTRACE_EVENT_VFORK:
 						PTRACE_LOG("zygote forked: [%d]\n", msg);
 						attaches[msg] = true;
-						if (unknowns[msg]) {
-							/* Stop the child again to make sure
-							 * we are monitoring the proper events */
-							unknowns[msg] = false;
-							tgkill(msg, msg, SIGSTOP);
-						}
 						break;
 					case PTRACE_EVENT_EXIT:
 						PTRACE_LOG("zygote exited with status: [%d]\n", msg);
@@ -430,7 +439,6 @@ void proc_monitor() {
 				switch (WEVENT(status)) {
 					case PTRACE_EVENT_CLONE:
 						PTRACE_LOG("create new threads: [%d]\n", msg);
-						detaches[msg] = true;
 						if (attaches[pid] && check_pid(pid))
 							continue;
 						break;
@@ -445,14 +453,9 @@ void proc_monitor() {
 				xptrace(PTRACE_CONT, pid);
 			}
 		} else if (WSTOPSIG(status) == SIGSTOP) {
-			if (attaches[pid]) {
-				PTRACE_LOG("SIGSTOP from zygote child\n");
-				xptrace(PTRACE_SETOPTIONS, pid, nullptr,
-						PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT);
-			} else {
-				PTRACE_LOG("SIGSTOP from unknown\n");
-				unknowns[pid] = true;
-			}
+			PTRACE_LOG("SIGSTOP from child\n");
+			xptrace(PTRACE_SETOPTIONS, pid, nullptr,
+					PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT);
 			xptrace(PTRACE_CONT, pid);
 		} else {
 			// Not caused by us, resend signal

@@ -56,10 +56,14 @@ static void hide_sensitive_props() {
 // Leave /proc fd opened as we're going to read from it repeatedly
 static DIR *procfp;
 void crawl_procfs(const function<bool (int)> &fn) {
+	rewinddir(procfp);
+	crawl_procfs(procfp, fn);
+}
+
+void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
 	struct dirent *dp;
 	int pid;
-	rewinddir(procfp);
-	while ((dp = readdir(procfp))) {
+	while ((dp = readdir(dir))) {
 		pid = parse_int(dp->d_name);
 		if (pid > 0 && !fn(pid))
 			break;
@@ -277,12 +281,8 @@ void launch_magiskhide(int client) {
 	set_hide_config();
 	LOGI("* Starting MagiskHide\n");
 
-	if (procfp == nullptr) {
-		int fd = xopen("/proc", O_RDONLY | O_CLOEXEC);
-		if (fd < 0)
-			LAUNCH_ERR;
-		procfp = fdopendir(fd);
-	}
+	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
+		LAUNCH_ERR;
 
 	hide_sensitive_props();
 

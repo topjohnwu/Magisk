@@ -1,9 +1,10 @@
 #pragma once
 
-#include <pthread.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <pthread.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <string>
 #include <functional>
 #include <map>
@@ -35,6 +36,7 @@ void proc_monitor();
 void manage_selinux();
 void clean_magisk_props();
 void crawl_procfs(const std::function<bool (int)> &fn);
+void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
 bool proc_name_match(int pid, const char *name);
 
 extern bool hide_enabled;
