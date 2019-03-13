@@ -7,16 +7,16 @@
     android:layout_height="wrap_content"
     android:layout_gravity="end"
     android:layout_marginStart="@dimen/card_horizontal_margin"
-    android:layout_marginTop="0dp"
     android:layout_marginEnd="@dimen/card_horizontal_margin"
-    android:layout_marginBottom="0dp"
-    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardCornerRadius="0dp"
     app:cardElevation="@dimen/card_elevation">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/info_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp">
 
         <TextView
             android:id="@+id/process"
