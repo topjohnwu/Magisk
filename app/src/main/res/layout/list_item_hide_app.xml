@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="?attr/cardStyle"
     android:layout_width="fill_parent"
@@ -57,9 +56,31 @@
             android:textColor="@android:color/tertiary_text_dark"
             android:textIsSelectable="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/app_name"
+            app:layout_constraintEnd_toStartOf="@id/arrow"
             app:layout_constraintStart_toStartOf="@+id/app_name"
             app:layout_constraintTop_toBottomOf="@+id/app_name" />
+
+        <ImageView
+            android:id="@+id/arrow"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:tint="?attr/imageColorTint"
+            app:layout_constraintBottom_toBottomOf="@+id/package_name"
+            app:layout_constraintEnd_toEndOf="@+id/app_name"
+            app:layout_constraintStart_toEndOf="@+id/package_name"
+            app:layout_constraintTop_toTopOf="@+id/package_name"
+            app:srcCompat="@drawable/ic_arrow" />
+
+        <View
+            android:id="@+id/trigger"
+            android:layout_width="35dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/arrow"
+            app:layout_constraintStart_toStartOf="@+id/arrow"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.buildware.widget.indeterm.IndeterminateCheckBox
             android:id="@+id/checkbox"
@@ -70,8 +91,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/app_name"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

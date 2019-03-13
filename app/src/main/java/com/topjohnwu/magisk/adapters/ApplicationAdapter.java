@@ -23,6 +23,8 @@ import com.buildware.widget.indeterm.IndeterminateCheckBox;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.uicomponents.ArrowExpandable;
+import com.topjohnwu.magisk.uicomponents.Expandable;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
@@ -110,30 +112,30 @@ public class ApplicationAdapter extends SectionedAdapter
         holder.app_icon.setImageDrawable(app.info.loadIcon(pm));
         holder.package_name.setText(app.info.packageName);
         holder.checkBox.setOnStateChangedListener(null);
-        holder.checkBox.setOnStateChangedListener(app.listener);
         holder.checkBox.setState(app.getState());
-        if (app.expanded) {
-            holder.checkBox.setVisibility(View.GONE);
-            getMargins(holder).bottomMargin = 0;
-        } else {
-            holder.checkBox.setVisibility(View.VISIBLE);
-            getMargins(holder).bottomMargin = BOTTOM_MARGIN;
-        }
-        holder.itemView.setOnClickListener((v) -> {
-            int index = getItemPosition(section, 0);
+        holder.ex.setExpanded(app.expanded);
+
+        int index = getItemPosition(section, 0);
+        holder.checkBox.setOnStateChangedListener((IndeterminateCheckBox box, @Nullable Boolean status) -> {
+            if (status != null) {
+                for (HideProcessInfo p : app.processList) {
+                    String cmd = Utils.fmt("magiskhide --%s %s %s",
+                            status ? "add" : "rm", app.info.packageName, p.name);
+                    Shell.su(cmd).submit();
+                    p.hidden = status;
+                }
+                notifyItemRangeChanged(index, app.processList.size());
+            }
+        });
+        holder.trigger.setOnClickListener((v) -> {
             if (app.expanded) {
                 app.expanded = false;
                 notifyItemRangeRemoved(index, app.processList.size());
-                getMargins(holder).bottomMargin = BOTTOM_MARGIN;
-                holder.checkBox.setOnStateChangedListener(null);
-                holder.checkBox.setVisibility(View.VISIBLE);
-                holder.checkBox.setState(app.getState());
-                holder.checkBox.setOnStateChangedListener(app.listener);
+                holder.ex.collapse();
             } else {
-                holder.checkBox.setVisibility(View.GONE);
-                getMargins(holder).bottomMargin = 0;
                 app.expanded = true;
                 notifyItemRangeInserted(index, app.processList.size());
+                holder.ex.expand();
             }
         });
     }
@@ -149,6 +151,7 @@ public class ApplicationAdapter extends SectionedAdapter
             Shell.su(Utils.fmt("magiskhide --%s %s %s", checked ? "add" : "rm",
                     hideApp.info.packageName, target.name)).submit();
             target.hidden = checked;
+            notifyItemChanged(getSectionPosition(section));
         });
         getMargins(holder).bottomMargin =
                 position == hideApp.processList.size() - 1 ? BOTTOM_MARGIN : 0;
@@ -350,10 +353,25 @@ public class ApplicationAdapter extends SectionedAdapter
         @BindView(R.id.app_name) TextView app_name;
         @BindView(R.id.package_name) TextView package_name;
         @BindView(R.id.checkbox) IndeterminateCheckBox checkBox;
+        @BindView(R.id.trigger) View trigger;
+        @BindView(R.id.arrow) ImageView arrow;
+
+        Expandable ex;
 
         AppViewHolder(@NonNull View itemView) {
             super(itemView);
             new ApplicationAdapter$AppViewHolder_ViewBinding(this, itemView);
+            ex = new ArrowExpandable(new Expandable() {
+                @Override
+                protected void onExpand() {
+                    getMargins(AppViewHolder.this).bottomMargin = 0;
+                }
+
+                @Override
+                protected void onCollapse() {
+                    getMargins(AppViewHolder.this).bottomMargin = BOTTOM_MARGIN;
+                }
+            }, arrow);
         }
     }
 
