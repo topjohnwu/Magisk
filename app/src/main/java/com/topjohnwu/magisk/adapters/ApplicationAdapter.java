@@ -6,31 +6,43 @@ import android.content.pm.ComponentInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 import androidx.collection.ArraySet;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.buildware.widget.indeterm.IndeterminateCheckBox;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import butterknife.BindView;
+import java9.util.Comparators;
+import java9.util.Objects;
 import java9.util.stream.Collectors;
 import java9.util.stream.Stream;
 import java9.util.stream.StreamSupport;
-import me.drakeet.multitype.MultiTypeAdapter;
 
-import static com.topjohnwu.magisk.utils.Utils.getAppLabel;
-
-
-public class ApplicationAdapter {
+public class ApplicationAdapter extends SectionedAdapter
+        <ApplicationAdapter.AppViewHolder, ApplicationAdapter.ProcessViewHolder> {
 
     /* A list of apps that should not be shown as hide-able */
     private static final List<String> HIDE_BLACKLIST = Arrays.asList(
@@ -46,24 +58,137 @@ public class ApplicationAdapter {
     private static final String SAFETYNET_PROCESS = "com.google.android.gms.unstable";
     private static final String GMS_PACKAGE = "com.google.android.gms";
 
-    private List<AppViewBinder.App> fullList;
+    private List<HideAppInfo> fullList, showList;
     private List<HideTarget> hideList;
-    private List<Object> showList;
-    private MultiTypeAdapter adapter;
     private PackageManager pm;
     private boolean showSystem;
 
-    public ApplicationAdapter(Context context, MultiTypeAdapter adapter) {
+    public ApplicationAdapter(Context context) {
+        fullList = showList = Collections.emptyList();
         hideList = Collections.emptyList();
-        fullList = new ArrayList<>();
-        showList = new ArrayList<>();
-        this.adapter = adapter;
-        this.adapter.setItems(showList);
         pm = context.getPackageManager();
         showSystem = Config.get(Config.Key.SHOW_SYSTEM_APP);
         AsyncTask.SERIAL_EXECUTOR.execute(this::loadApps);
-        adapter.register(AppViewBinder.App.class, new AppViewBinder(showList));
-        adapter.register(ProcessViewBinder.Process.class, new ProcessViewBinder());
+    }
+
+    @Override
+    public int getSectionCount() {
+        return showList.size();
+    }
+
+    @Override
+    public int getItemCount(int section) {
+        return showList.get(section).expanded ? showList.get(section).processes.size() : 0;
+    }
+
+    @Override
+    public AppViewHolder onCreateSectionViewHolder(ViewGroup parent) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_hide_app, parent, false);
+        return new AppViewHolder(v);
+    }
+
+    @Override
+    public ProcessViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_hide_process, parent, false);
+        return new ProcessViewHolder(v);
+    }
+
+    @Override
+    public void onBindSectionViewHolder(AppViewHolder holder, int section) {
+        HideAppInfo app = showList.get(section);
+        IndeterminateCheckBox.OnStateChangedListener listener =
+                (IndeterminateCheckBox indeterminateCheckBox, @Nullable Boolean stat) -> {
+                    if (stat != null) {
+                        for (HideProcessInfo p : app.processes) {
+                            String cmd = Utils.fmt("magiskhide --%s %s %s",
+                                    stat ? "add" : "rm", app.info.packageName, p.name);
+                            Shell.su(cmd).submit();
+                            p.hidden = stat;
+                        }
+                    }
+                };
+        holder.app_name.setText(app.name);
+        holder.app_icon.setImageDrawable(app.info.loadIcon(pm));
+        holder.package_name.setText(app.info.packageName);
+        holder.checkBox.setOnStateChangedListener(null);
+        holder.checkBox.setOnStateChangedListener(listener);
+        holder.checkBox.setState(app.getState());
+        if (app.expanded) {
+            holder.checkBox.setVisibility(View.GONE);
+            setBottomMargin(holder.itemView, 0);
+        } else {
+            holder.checkBox.setVisibility(View.VISIBLE);
+            setBottomMargin(holder.itemView, 2);
+        }
+        holder.itemView.setOnClickListener((v) -> {
+            int index = getItemPosition(section, 0);
+            if (app.expanded) {
+                app.expanded = false;
+                notifyItemRangeRemoved(index, app.processes.size());
+                setBottomMargin(holder.itemView, 2);
+                holder.checkBox.setOnStateChangedListener(null);
+                holder.checkBox.setVisibility(View.VISIBLE);
+                holder.checkBox.setState(app.getState());
+                holder.checkBox.setOnStateChangedListener(listener);
+            } else {
+                holder.checkBox.setVisibility(View.GONE);
+                setBottomMargin(holder.itemView, 0);
+                app.expanded = true;
+                notifyItemRangeInserted(index, app.processes.size());
+            }
+        });
+    }
+
+    @Override
+    public void onBindItemViewHolder(ProcessViewHolder holder, int section, int position) {
+        HideAppInfo hideApp = showList.get(section);
+        HideProcessInfo target = hideApp.processes.get(position);
+        holder.process.setText(target.name);
+        holder.checkbox.setOnCheckedChangeListener(null);
+        holder.checkbox.setChecked(target.hidden);
+        holder.checkbox.setOnCheckedChangeListener((v, isChecked) -> {
+            String pair = Utils.fmt("%s %s", hideApp.info.packageName, target.name);
+            if (isChecked) {
+                Shell.su("magiskhide --add " + pair).submit();
+                target.hidden = true;
+            } else {
+                Shell.su("magiskhide --rm " + pair).submit();
+                target.hidden = false;
+            }
+
+        });
+    }
+
+    public void filter(String constraint) {
+        AsyncTask.SERIAL_EXECUTOR.execute(() -> {
+            Stream<HideAppInfo> s = StreamSupport.stream(fullList)
+                    .filter(this::systemFilter)
+                    .filter(t -> nameFilter(t, constraint));
+            UiThreadHandler.run(() -> {
+                showList = s.collect(Collectors.toList());
+                notifyDataSetChanged();
+            });
+        });
+    }
+
+    public void setShowSystem(boolean b) {
+        showSystem = b;
+    }
+
+    public void refresh() {
+        AsyncTask.SERIAL_EXECUTOR.execute(this::loadApps);
+    }
+
+    private void setBottomMargin(View view, int dp) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        ViewGroup.MarginLayoutParams marginParams;
+        if (params instanceof ViewGroup.MarginLayoutParams) {
+            marginParams = (ViewGroup.MarginLayoutParams) params;
+        } else {
+            marginParams = new ViewGroup.MarginLayoutParams(params);
+        }
+        marginParams.bottomMargin = Utils.dpInPx(dp);
+        view.setLayoutParams(marginParams);
     }
 
     private void addProcesses(Set<String> set, ComponentInfo[] infos) {
@@ -93,93 +218,120 @@ public class ApplicationAdapter {
 
     @WorkerThread
     private void loadApps() {
-        List<ApplicationInfo> installed = pm.getInstalledApplications(0);
-
         hideList = StreamSupport.stream(Shell.su("magiskhide --ls").exec().getOut())
-                .map(HideTarget::new).collect(Collectors.toList());
+                .map(HideTarget::new)
+                .collect(Collectors.toList());
 
-        fullList.clear();
-
-        for (ApplicationInfo info : installed) {
-            // Do not show black-listed and disabled apps
-            if (!HIDE_BLACKLIST.contains(info.packageName) && info.enabled) {
-                AppViewBinder.App app = new AppViewBinder.App(info.loadIcon(pm),
-                        getAppLabel(info, pm), info.packageName, info.flags);
-                fullList.add(app);
-
-                Set<String> set = new ArraySet<>();
-                PackageInfo pkg = getPackageInfo(info.packageName);
-                if (pkg != null) {
-                    addProcesses(set, pkg.activities);
-                    addProcesses(set, pkg.services);
-                    addProcesses(set, pkg.receivers);
-                    addProcesses(set, pkg.providers);
-                } else {
-                    set.add(info.packageName);
-                }
-                if (set.isEmpty()) fullList.remove(app);
-                for (String proc : set) {
-                    boolean hidden = false;
-                    for (HideTarget tgt : hideList) {
-                        if (info.packageName.equals(tgt.pkg) && proc.equals(tgt.process))
-                            hidden = true;
+        fullList = StreamSupport.stream(pm.getInstalledApplications(0))
+                .filter(info -> !HIDE_BLACKLIST.contains(info.packageName) && info.enabled)
+                .map(info -> {
+                    Set<String> set = new ArraySet<>();
+                    PackageInfo pkg = getPackageInfo(info.packageName);
+                    if (pkg != null) {
+                        addProcesses(set, pkg.activities);
+                        addProcesses(set, pkg.services);
+                        addProcesses(set, pkg.receivers);
+                        addProcesses(set, pkg.providers);
                     }
-                    app.processes.add(new ProcessViewBinder.Process(proc, hidden, info.packageName));
-                }
-                app.getStat(true);
-                Collections.sort(app.processes);
-            }
-        }
+                    if (set.isEmpty())
+                        return null;
+                    return new HideAppInfo(info, set);
+                }).filter(Objects::nonNull).sorted()
+                .collect(Collectors.toList());
 
-        Collections.sort(fullList);
         Topic.publish(false, Topic.MAGISK_HIDE_DONE);
     }
 
-    public void setShowSystem(boolean b) {
-        showSystem = b;
-    }
-
-
-    // True if not system app and have launch intent, or user already hidden it
-    private boolean systemFilter(AppViewBinder.App target) {
-        return showSystem || target.stat != 0 ||
-                ((target.flags & ApplicationInfo.FLAG_SYSTEM) == 0 &&
-                        pm.getLaunchIntentForPackage(target.packageName) != null);
+    // True if not system app or user already hidden it
+    private boolean systemFilter(HideAppInfo target) {
+        return showSystem || target.haveHidden() ||
+                (target.info.flags & ApplicationInfo.FLAG_SYSTEM) == 0;
     }
 
     private boolean contains(String s, String filter) {
         return s.toLowerCase().contains(filter);
     }
 
-    private boolean nameFilter(AppViewBinder.App target, String filter) {
+    private boolean nameFilter(HideAppInfo target, String filter) {
         if (filter == null || filter.isEmpty())
             return true;
         filter = filter.toLowerCase();
-        return contains(target.name, filter) ||
-                contains(target.packageName, filter);
+        if (contains(target.name, filter))
+            return true;
+        for (HideProcessInfo p : target.processes) {
+            if (contains(p.name, filter))
+                return true;
+        }
+        return contains(target.info.packageName, filter);
     }
 
-    public void filter(String constraint) {
-        AsyncTask.SERIAL_EXECUTOR.execute(() -> {
-            Stream<AppViewBinder.App> s = StreamSupport.stream(fullList)
-                    .filter(this::systemFilter)
-                    .filter(t -> nameFilter(t, constraint));
-            UiThreadHandler.run(() -> {
-                showList.clear();
-                for (AppViewBinder.App target : s.collect(Collectors.toList())) {
-                    if (target.expand) {
-                        showList.add(target);
-                        showList.addAll(target.processes);
-                    } else showList.add(target);
+    class HideAppInfo implements Comparable<HideAppInfo> {
+        String name;
+        ApplicationInfo info;
+        List<HideProcessInfo> processes;
+        boolean expanded;
+
+        HideAppInfo(ApplicationInfo appInfo, Set<String> set) {
+            info = appInfo;
+            name = Utils.getAppLabel(info, pm);
+            expanded = false;
+            processes = StreamSupport.stream(set)
+                    .map(process -> new HideProcessInfo(info.packageName, process))
+                    .sorted().collect(Collectors.toList());
+        }
+
+        @Override
+        public int compareTo(HideAppInfo o) {
+            Comparator<HideAppInfo> c;
+            c = Comparators.comparing(HideAppInfo::haveHidden);
+            c = Comparators.reversed(c);
+            c = Comparators.thenComparing(c, t -> t.name, String::compareToIgnoreCase);
+            c = Comparators.thenComparing(c, t -> t.info.packageName);
+            return c.compare(this, o);
+        }
+
+        Boolean getState() {
+            boolean all = true;
+            boolean hidden = false;
+            for (HideProcessInfo p : processes) {
+                if (!p.hidden)
+                    all = false;
+                else
+                    hidden = true;
+            }
+            if (all)
+                return true;
+            return hidden ? null : false;
+        }
+
+        boolean haveHidden() {
+            Boolean c = getState();
+            return c == null ? true : c;
+        }
+    }
+
+    class HideProcessInfo implements Comparable<HideProcessInfo> {
+        String name;
+        boolean hidden;
+
+        HideProcessInfo(String pkg, String process) {
+            this.name = process;
+            for (HideTarget t : hideList) {
+                if (t.pkg.equals(pkg) && t.process.equals(process)) {
+                    hidden = true;
+                    break;
                 }
-                adapter.notifyDataSetChanged();
-            });
-        });
-    }
+            }
+        }
 
-    public void refresh() {
-        Collections.sort(fullList);
-        Topic.publish(false, Topic.MAGISK_HIDE_DONE);
+        @Override
+        public int compareTo(HideProcessInfo o) {
+            Comparator<HideProcessInfo> c;
+            c = Comparators.comparing((HideProcessInfo t) -> t.hidden);
+            c = Comparators.reversed(c);
+            c = Comparators.thenComparing(c, t -> t.name);
+            return c.compare(this, o);
+        }
     }
 
     class HideTarget {
@@ -197,4 +349,29 @@ public class ApplicationAdapter {
             }
         }
     }
+
+    class AppViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.app_icon) ImageView app_icon;
+        @BindView(R.id.app_name) TextView app_name;
+        @BindView(R.id.package_name) TextView package_name;
+        @BindView(R.id.checkbox) IndeterminateCheckBox checkBox;
+
+        public AppViewHolder(@NonNull View itemView) {
+            super(itemView);
+            new ApplicationAdapter$AppViewHolder_ViewBinding(this, itemView);
+        }
+    }
+
+    class ProcessViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.process) TextView process;
+        @BindView(R.id.checkbox) CheckBox checkbox;
+
+        public ProcessViewHolder(@NonNull View itemView) {
+            super(itemView);
+            new ApplicationAdapter$ProcessViewHolder_ViewBinding(this, itemView);
+        }
+    }
+
 }

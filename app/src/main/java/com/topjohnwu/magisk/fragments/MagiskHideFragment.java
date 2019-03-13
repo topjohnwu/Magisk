@@ -21,7 +21,6 @@ import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.BindView;
-import me.drakeet.multitype.MultiTypeAdapter;
 
 public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber {
 
@@ -29,7 +28,7 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
     private SearchView search;
-    private ApplicationAdapter applicationAdapter;
+    private ApplicationAdapter adapter;
     private SearchView.OnQueryTextListener searchListener;
 
     @Override
@@ -44,23 +43,22 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
         View view = inflater.inflate(R.layout.fragment_magisk_hide, container, false);
         unbinder = new MagiskHideFragment_ViewBinding(this, view);
 
-        MultiTypeAdapter adapter = new MultiTypeAdapter();
-        applicationAdapter = new ApplicationAdapter(requireActivity(), adapter);
+        adapter = new ApplicationAdapter(requireActivity());
         recyclerView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(applicationAdapter::refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(adapter::refresh);
 
         searchListener = new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                applicationAdapter.filter(query);
+                adapter.filter(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                applicationAdapter.filter(newText);
+                adapter.filter(newText);
                 return false;
             }
         };
@@ -84,8 +82,8 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
             boolean showSystem = !item.isChecked();
             item.setChecked(showSystem);
             Config.set(Config.Key.SHOW_SYSTEM_APP, showSystem);
-            applicationAdapter.setShowSystem(showSystem);
-            applicationAdapter.filter(search.getQuery().toString());
+            adapter.setShowSystem(showSystem);
+            adapter.filter(search.getQuery().toString());
         }
         return true;
     }
@@ -98,6 +96,6 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
     @Override
     public void onPublish(int topic, Object[] result) {
         mSwipeRefreshLayout.setRefreshing(false);
-        applicationAdapter.filter(search.getQuery().toString());
+        adapter.filter(search.getQuery().toString());
     }
 }
