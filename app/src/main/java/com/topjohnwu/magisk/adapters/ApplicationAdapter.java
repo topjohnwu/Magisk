@@ -124,20 +124,30 @@ public class ApplicationAdapter extends SectionedAdapter
                     Shell.su(cmd).submit();
                     p.hidden = status;
                 }
-                notifyItemRangeChanged(index, app.processList.size());
+                if (app.expanded)
+                    notifyItemRangeChanged(index, app.processList.size());
             }
         });
-        holder.trigger.setOnClickListener((v) -> {
-            if (app.expanded) {
-                app.expanded = false;
-                notifyItemRangeRemoved(index, app.processList.size());
-                holder.ex.collapse();
-            } else {
-                app.expanded = true;
-                notifyItemRangeInserted(index, app.processList.size());
-                holder.ex.expand();
-            }
-        });
+
+        if (app.processList.size() > 1) {
+            holder.arrow.setVisibility(View.VISIBLE);
+
+            holder.trigger.setOnClickListener((v) -> {
+                if (app.expanded) {
+                    app.expanded = false;
+                    notifyItemRangeRemoved(index, app.processList.size());
+                    holder.ex.collapse();
+                } else {
+                    app.expanded = true;
+                    notifyItemRangeInserted(index, app.processList.size());
+                    holder.ex.expand();
+                }
+            });
+        } else {
+            holder.arrow.setVisibility(View.GONE);
+            holder.trigger.setOnClickListener(null);
+        }
+
     }
 
     @Override
