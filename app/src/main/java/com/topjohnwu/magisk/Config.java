@@ -239,19 +239,19 @@ public class Config {
         App app = App.self;
         switch (getConfigType(key)) {
             case PREF_INT:
-                return (T) (Integer) app.prefs.getInt(key, 0);
+                return (T) (Integer) app.prefs.getInt(key, getDef(key));
             case PREF_STR_INT:
-                return (T) (Integer) Utils.getPrefsInt(app.prefs, key, 0);
+                return (T) (Integer) Utils.getPrefsInt(app.prefs, key, getDef(key));
             case PREF_BOOL:
-                return (T) (Boolean) app.prefs.getBoolean(key, false);
+                return (T) (Boolean) app.prefs.getBoolean(key, getDef(key));
             case PREF_STR:
-                return (T) app.prefs.getString(key, null);
+                return (T) app.prefs.getString(key, getDef(key));
             case DB_INT:
-                return (T) (Integer) app.mDB.getSettings(key, 0);
+                return (T) (Integer) app.mDB.getSettings(key, getDef(key));
             case DB_BOOL:
-                return (T) (Boolean) (app.mDB.getSettings(key, 0) != 0);
+                return (T) (Boolean) (app.mDB.getSettings(key, getDef(key) ? 1 : 0) != 0);
             case DB_STR:
-                return (T) app.mDB.getStrings(key, null);
+                return (T) app.mDB.getStrings(key, getDef(key));
         }
         /* Will never get here (IllegalArgumentException in getConfigType) */
         return null;
@@ -340,6 +340,24 @@ public class Config {
 
         // db strings
         //defs.put(Key.SU_MANAGER, null);
+    }
+
+    private static <T> T getDef(String key) {
+        Object val = defs.get(key);
+        switch (getConfigType(key)) {
+            case PREF_INT:
+            case DB_INT:
+            case PREF_STR_INT:
+                return val != null ? (T) val : (T) (Integer) 0;
+            case DB_BOOL:
+            case PREF_BOOL:
+                return val != null ? (T) val : (T) (Boolean) false;
+            case DB_STR:
+            case PREF_STR:
+                return (T) val;
+        }
+        /* Will never get here (IllegalArgumentException in getConfigType) */
+        return null;
     }
 
     private static void setDefs(SharedPreferences pref, SharedPreferences.Editor editor) {
