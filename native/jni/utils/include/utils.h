@@ -51,6 +51,7 @@ int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
 	void *(*start_routine) (void *), void *arg);
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
+int xfstat(int fd, struct stat *buf);
 int xdup2(int oldfd, int newfd);
 int xdup3(int oldfd, int newfd, int flags);
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz);
@@ -103,8 +104,8 @@ struct file_attr {
 	char con[128];
 };
 
-int fd_getpath(int fd, char *path, size_t size);
-int fd_getpathat(int dirfd, const char *name, char *path, size_t size);
+ssize_t fd_path(int fd, char *path, size_t size);
+int fd_pathat(int dirfd, const char *name, char *path, size_t size);
 int mkdirs(const char *pathname, mode_t mode);
 void post_order_walk(int dirfd, void (*fn)(int, struct dirent *));
 void rm_rf(const char *path);
@@ -115,17 +116,16 @@ void cp_afc(const char *source, const char *destination);
 void link_dir(int src, int dest);
 void clone_dir(int src, int dest);
 int getattr(const char *path, struct file_attr *a);
-int getattrat(int dirfd, const char *pathname, struct file_attr *a);
+int getattrat(int dirfd, const char *name, struct file_attr *a);
 int fgetattr(int fd, struct file_attr *a);
 int setattr(const char *path, struct file_attr *a);
-int setattrat(int dirfd, const char *pathname, struct file_attr *a);
+int setattrat(int dirfd, const char *name, struct file_attr *a);
 int fsetattr(int fd, struct file_attr *a);
 void fclone_attr(int sourcefd, int targetfd);
 void clone_attr(const char *source, const char *target);
 void mmap_ro(const char *filename, void **buf, size_t *size);
 void fd_full_read(int fd, void **buf, size_t *size);
 void full_read(const char *filename, void **buf, size_t *size);
-void full_read_at(int dirfd, const char *filename, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
 
 #ifdef __cplusplus
