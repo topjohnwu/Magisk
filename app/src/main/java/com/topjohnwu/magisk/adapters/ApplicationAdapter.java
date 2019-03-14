@@ -118,12 +118,7 @@ public class ApplicationAdapter extends SectionedAdapter
         int index = getItemPosition(section, 0);
         holder.checkBox.setOnStateChangedListener((IndeterminateCheckBox box, @Nullable Boolean status) -> {
             if (status != null) {
-                for (HideProcessInfo p : app.processList) {
-                    String cmd = Utils.fmt("magiskhide --%s %s %s",
-                            status ? "add" : "rm", app.info.packageName, p.name);
-                    Shell.su(cmd).submit();
-                    p.hidden = status;
-                }
+                setHide(status, app);
                 if (app.expanded)
                     notifyItemRangeChanged(index, app.processList.size());
             }
@@ -152,19 +147,17 @@ public class ApplicationAdapter extends SectionedAdapter
 
     @Override
     public void onBindItemViewHolder(ProcessViewHolder holder, int section, int position) {
-        HideAppInfo hideApp = showList.get(section);
-        HideProcessInfo target = hideApp.processList.get(position);
+        HideAppInfo app = showList.get(section);
+        HideProcessInfo target = app.processList.get(position);
         holder.process.setText(target.name);
         holder.checkbox.setOnCheckedChangeListener(null);
         holder.checkbox.setChecked(target.hidden);
         holder.checkbox.setOnCheckedChangeListener((v, checked) -> {
-            Shell.su(Utils.fmt("magiskhide --%s %s %s", checked ? "add" : "rm",
-                    hideApp.info.packageName, target.name)).submit();
-            target.hidden = checked;
+            setHide(checked, app, target);
             notifyItemChanged(getSectionPosition(section));
         });
         getMargins(holder).bottomMargin =
-                position == hideApp.processList.size() - 1 ? BOTTOM_MARGIN : 0;
+                position == app.processList.size() - 1 ? BOTTOM_MARGIN : 0;
     }
 
     public void filter(String constraint) {
@@ -185,6 +178,30 @@ public class ApplicationAdapter extends SectionedAdapter
 
     public void refresh() {
         AsyncTask.SERIAL_EXECUTOR.execute(this::loadApps);
+    }
+
+    private void setHide(boolean add, HideAppInfo app) {
+        if (add) {
+            StreamSupport.stream(app.processList).forEach(p -> setHide(true, app, p));
+        } else {
+            if (StreamSupport.stream(app.processList)
+                    .anyMatch(p -> p.name.equals(SAFETYNET_PROCESS))) {
+                StreamSupport.stream(app.processList).forEach(p -> setHide(false, app, p));
+            } else {
+                // Quick removal
+                Shell.su("magiskhide --rm " + app.info.packageName).submit();
+                StreamSupport.stream(app.processList).forEach(p -> p.hidden = false);
+            }
+        }
+    }
+
+    private void setHide(boolean add, HideAppInfo app, HideProcessInfo process) {
+        // Don't remove SafetyNet
+        if (!add && process.name.equals(SAFETYNET_PROCESS))
+            return;
+        Shell.su(Utils.fmt("magiskhide --%s %s %s", add ? "add" : "rm",
+                app.info.packageName, process.name)).submit();
+        process.hidden = add;
     }
 
     private void addProcesses(Set<String> set, ComponentInfo[] infos) {
