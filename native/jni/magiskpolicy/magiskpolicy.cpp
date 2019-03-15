@@ -92,8 +92,9 @@ static const char *type_msg_6 =
 		"Options:\n"
   		"   --help            show help message for policy statements\n"
 		"   --load FILE       load policies from FILE\n"
-		"   --compile-split   compile and load split cil policies\n"
-		"                     from system and vendor just like init\n"
+		"   --load-split      load from preloaded sepolicy or compile\n"
+		"                     split policies\n"
+		"   --compile-split   compile split cil policies\n"
 		"   --save FILE       save policies to FILE\n"
 		"   --live            directly apply sepolicy live\n"
 		"   --magisk          inject built-in rules for a minimal\n"
@@ -460,6 +461,11 @@ int magiskpolicy_main(int argc, char *argv[]) {
 					return 1;
 				}
 				++i;
+			} else if (strcmp(argv[i] + 2, "load-split") == 0) {
+				if (load_split_cil()) {
+					fprintf(stderr, "Cannot load split cil\n");
+					return 1;
+				}
 			} else if (strcmp(argv[i] + 2, "compile-split") == 0) {
 				if (compile_split_cil()) {
 					fprintf(stderr, "Cannot compile split cil\n");
@@ -486,11 +492,11 @@ int magiskpolicy_main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	for (; i < argc; ++i)
-		parse_statement(argv[i]);
-
 	if (magisk)
 		sepol_magisk_rules();
+
+	for (; i < argc; ++i)
+		parse_statement(argv[i]);
 
 	if (live && dump_policydb(SELINUX_LOAD)) {
 		fprintf(stderr, "Cannot apply policy\n");

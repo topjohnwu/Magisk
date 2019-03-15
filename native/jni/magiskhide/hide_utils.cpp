@@ -13,6 +13,7 @@
 #include <utils.h>
 #include <resetprop.h>
 #include <db.h>
+#include <selinux.h>
 
 #include "magiskhide.h"
 

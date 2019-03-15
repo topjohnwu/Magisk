@@ -1,5 +1,23 @@
 #pragma once
 
+// selinuxfs paths
+#define SELINUX_MNT         "/sys/fs/selinux"
+#define SELINUX_ENFORCE     SELINUX_MNT "/enforce"
+#define SELINUX_POLICY      SELINUX_MNT "/policy"
+#define SELINUX_LOAD        SELINUX_MNT "/load"
+#define SELINUX_CONTEXT     SELINUX_MNT "/context"
+#define SELINUX_VERSION     SELINUX_MNT "/policyvers"
+
+// sepolicy paths
+#define PLAT_POLICY_DIR     "/system/etc/selinux/"
+#define VEND_POLICY_DIR     "/vendor/etc/selinux/"
+#define PROD_POLICY_DIR     "/product/etc/selinux/"
+#define ODM_POLICY_DIR      "/odm/etc/selinux/"
+#define SPLIT_PLAT_CIL      PLAT_POLICY_DIR "plat_sepolicy.cil"
+
+#define SEPOL_PROC_DOMAIN   "magisk"
+#define SEPOL_FILE_DOMAIN   "magisk_file"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

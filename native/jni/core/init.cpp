@@ -57,6 +57,8 @@ int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_ma
 
 static bool mnt_system = false;
 static bool mnt_vendor = false;
+static bool mnt_product = false;
+static bool mnt_odm = false;
 static bool kirin = false;
 
 static void *self, *config;
@@ -196,13 +198,18 @@ static bool setup_block(struct device *dev, const char *partname) {
 	return true;
 }
 
+static inline bool is_lnk(const char *name) {
+	struct stat st;
+	if (lstat(name, &st))
+		return false;
+	return S_ISLNK(st.st_mode);
+}
+
 static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname, char *partfs) {
 	char buf[128];
 	struct stat st;
 	sprintf(buf, "/%s", mnt_point);
-	lstat(buf, &st);
-	// Don't early mount if the mount point is symlink
-	if (S_ISLNK(st.st_mode))
+	if (is_lnk(buf))
 		return false;
 	int fd;
 	sprintf(buf, "%s/fstab/%s/dev", cmd->dt_dir, mnt_point);
@@ -222,68 +229,29 @@ static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char
 	return false;
 }
 
-static bool verify_precompiled() {
-	DIR *dir;
-	struct dirent *entry;
-	int fd;
-	char sys_sha[64], ven_sha[64];
-
-	// init the strings with different value
-	sys_sha[0] = 0;
-	ven_sha[0] = 1;
-
-	dir = opendir(NONPLAT_POLICY_DIR);
-	while ((entry = readdir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		if (strend(entry->d_name, ".sha256") == 0) {
-			fd = openat(dirfd(dir), entry->d_name, O_RDONLY | O_CLOEXEC);
-			read(fd, ven_sha, sizeof(ven_sha));
-			close(fd);
-			break;
-		}
-	}
-	closedir(dir);
-	dir = opendir(PLAT_POLICY_DIR);
-	while ((entry = readdir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		if (strend(entry->d_name, ".sha256") == 0) {
-			fd = openat(dirfd(dir), entry->d_name, O_RDONLY | O_CLOEXEC);
-			read(fd, sys_sha, sizeof(sys_sha));
-			close(fd);
-			break;
-		}
-	}
-	closedir(dir);
-	LOGD("sys_sha[%.*s]\nven_sha[%.*s]\n", sizeof(sys_sha), sys_sha, sizeof(ven_sha), ven_sha);
-	return memcmp(sys_sha, ven_sha, sizeof(sys_sha)) == 0;
-}
-
 static bool patch_sepolicy() {
 	bool patch_init = false;
-	if (access(SPLIT_PRECOMPILE, R_OK) == 0 && verify_precompiled()) {
-		patch_init = true;
-		load_policydb(SPLIT_PRECOMPILE);
-	} else if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
-		patch_init = true;
-		compile_split_cil();
-	} else if (access("/sepolicy", R_OK) == 0) {
-		load_policydb("/sepolicy");
-	} else {
-		// No selinux in this ROM
-		return false;
-	}
+
+	if (access(SPLIT_PLAT_CIL, R_OK) == 0)
+		patch_init = true;                    /* Split sepolicy */
+	else if (access("/sepolicy", R_OK) == 0)
+		load_policydb("/sepolicy");           /* Monolithic sepolicy */
+	else
+		return false;                         /* No SELinux */
+
+	// Mount selinuxfs to communicate with kernel
+	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+
+	if (patch_init)
+		load_split_cil();
 
 	sepol_magisk_rules();
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 	dump_policydb("/sepolicy");
 
-	if (!kirin) {
-		// Load policy to kernel so we can label rootfs
-		xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+	// Load policy to kernel so we can label rootfs
+	if (!kirin)
 		dump_policydb(SELINUX_LOAD);
-	}
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
@@ -453,6 +421,10 @@ static void setup_overlay() {
 		umount("/system");
 	if (mnt_vendor)
 		umount("/vendor");
+	if (mnt_product)
+		umount("/product");
+	if (mnt_odm)
+		umount("/odm");
 
 	execv("/init", argv);
 	exit(1);
@@ -537,6 +509,15 @@ int main(int argc, char *argv[]) {
 		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, nullptr);
 		xmkdir("/system", 0755);
 		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
+
+		// Copy if these partitions are symlinks
+		if (is_lnk("/system_root/vendor"))
+			cp_afc("/system_root/vendor", "/vendor");
+		if (is_lnk("/system_root/product"))
+			cp_afc("/system_root/product", "/product");
+		if (is_lnk("/system_root/odm"))
+			cp_afc("/system_root/odm", "/odm");
+
 	} else if (read_fstab_dt(&cmd, "system", partname, partfs)) {
 		setup_block(&dev, partname);
 		xmount(dev.path, "/system", partfs, MS_RDONLY, nullptr);
@@ -548,6 +529,20 @@ int main(int argc, char *argv[]) {
 		xmkdir("/vendor", 0755);
 		xmount(dev.path, "/vendor", partfs, MS_RDONLY, nullptr);
 		mnt_vendor = true;
+	}
+
+	if (read_fstab_dt(&cmd, "product", partname, partfs)) {
+		setup_block(&dev, partname);
+		xmkdir("/product", 0755);
+		xmount(dev.path, "/product", partfs, MS_RDONLY, nullptr);
+		mnt_product = true;
+	}
+
+	if (read_fstab_dt(&cmd, "odm", partname, partfs)) {
+		setup_block(&dev, partname);
+		xmkdir("/odm", 0755);
+		xmount(dev.path, "/odm", partfs, MS_RDONLY, nullptr);
+		mnt_odm = true;
 	}
 
 	/***************
