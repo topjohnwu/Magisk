@@ -57,6 +57,7 @@ int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_ma
 
 static bool mnt_system = false;
 static bool mnt_vendor = false;
+static bool kirin = false;
 
 static void *self, *config;
 static size_t self_sz, config_sz;
@@ -109,7 +110,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
 
-	bool skip_initramfs = false, kirin = false, enter_recovery = false;
+	bool skip_initramfs = false, enter_recovery = false;
 
 	parse_cmdline([&](auto key, auto value) -> void {
 		LOGD("cmdline: [%s]=[%s]\n", key.data(), value);
@@ -278,9 +279,11 @@ static bool patch_sepolicy() {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 	dump_policydb("/sepolicy");
 
-	// Load policy to kernel so we can label rootfs
-	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
-	dump_policydb(SELINUX_LOAD);
+	if (!kirin) {
+		// Load policy to kernel so we can label rootfs
+		xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+		dump_policydb(SELINUX_LOAD);
+	}
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
