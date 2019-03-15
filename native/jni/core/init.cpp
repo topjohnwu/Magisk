@@ -112,6 +112,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 	bool skip_initramfs = false, kirin = false, enter_recovery = false;
 
 	parse_cmdline([&](auto key, auto value) -> void {
+		LOGD("cmdline: [%s]=[%s]\n", key.data(), value);
 		if (key == "androidboot.slot_suffix") {
 			strcpy(cmd->slot, value);
 		} else if (key == "androidboot.slot") {
@@ -130,11 +131,13 @@ static void parse_cmdline(struct cmdline *cmd) {
 
 	if (kirin && enter_recovery) {
 		// Inform that we are actually booting as recovery
-		FILE *f = fopen("/.backup/.magisk", "ae");
-		fprintf(f, "RECOVERYMODE=true\n");
-		fclose(f);
+		if (FILE *f = fopen("/.backup/.magisk", "ae"); f) {
+			fprintf(f, "RECOVERYMODE=true\n");
+			fclose(f);
+		}
 		cmd->early_boot = true;
 	}
+
 
 	cmd->early_boot |= skip_initramfs;
 
@@ -256,18 +259,18 @@ static bool verify_precompiled() {
 	return memcmp(sys_sha, ven_sha, sizeof(sys_sha)) == 0;
 }
 
-constexpr char SYSTEM_INIT[] = "/system/bin/init";
 static bool patch_sepolicy() {
-	bool init_patch = false;
+	bool patch_init = false;
 	if (access(SPLIT_PRECOMPILE, R_OK) == 0 && verify_precompiled()) {
-		init_patch = true;
+		patch_init = true;
 		load_policydb(SPLIT_PRECOMPILE);
 	} else if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
-		init_patch = true;
+		patch_init = true;
 		compile_split_cil();
 	} else if (access("/sepolicy", R_OK) == 0) {
 		load_policydb("/sepolicy");
 	} else {
+		// No selinux in this ROM
 		return false;
 	}
 
@@ -275,37 +278,20 @@ static bool patch_sepolicy() {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 	dump_policydb("/sepolicy");
 
-	// Remove the stupid debug sepolicy and use our own
+	// Load policy to kernel so we can label rootfs
+	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+	dump_policydb(SELINUX_LOAD);
+
+	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
 		unlink("/sepolicy_debug");
 		link("/sepolicy", "/sepolicy_debug");
 	}
 
-	if (init_patch) {
-		// If init is symlink, copy it to rootfs so we can patch
-		struct stat st;
-		lstat("/init", &st);
-		if (S_ISLNK(st.st_mode))
-			cp_afc(SYSTEM_INIT, "/init");
+	// Enable selinux functions
+	selinux_builtin_impl();
 
-		char *addr;
-		size_t size;
-		mmap_rw("/init", addr, size);
-		for (char *p = addr; p < addr + size; ++p) {
-			if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
-				// Force init to load /sepolicy
-				memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
-				p += sizeof(SPLIT_PLAT_CIL) - 1;
-			} else if (memcmp(p, SYSTEM_INIT, sizeof(SYSTEM_INIT)) == 0) {
-				// Force execute /init instead of /system/bin/init
-				strcpy(p, "/init");
-				p += sizeof(SYSTEM_INIT) - 1;
-			}
-		}
-		munmap(addr, size);
-	}
-
-	return true;
+	return patch_init;
 }
 
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
@@ -455,16 +441,18 @@ static void setup_overlay() {
 	exit(0);
 }
 
-static void exec_init(char *argv[]) {
+[[noreturn]] static void exec_init(char *argv[]) {
 	// Clean up
-	umount("/proc");
+	umount(SELINUX_MNT);
 	umount("/sys");
+	umount("/proc");
 	if (mnt_system)
 		umount("/system");
 	if (mnt_vendor)
 		umount("/vendor");
 
 	execv("/init", argv);
+	exit(1);
 }
 
 int main(int argc, char *argv[]) {
@@ -506,9 +494,9 @@ int main(int argc, char *argv[]) {
 	full_read("/init", &self, &self_sz);
 	full_read("/.backup/.magisk", &config, &config_sz);
 
-	/* ***********
+	/*************
 	 * Initialize
-	 * ***********/
+	 *************/
 
 	int root, sbin;
 	root = open("/", O_RDONLY | O_CLOEXEC);
@@ -531,9 +519,9 @@ int main(int argc, char *argv[]) {
 			exec_init(argv);
 	}
 
-	/* ************
+	/**************
 	 * Early Mount
-	 * ************/
+	 **************/
 
 	struct device dev;
 	char partname[32];
@@ -544,15 +532,6 @@ int main(int argc, char *argv[]) {
 		setup_block(&dev, partname);
 		xmkdir("/system_root", 0755);
 		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, nullptr);
-		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
-
-		// Clone rootfs except /system
-		const char *excl[] = { "system", nullptr };
-		excl_list = excl;
-		clone_dir(system_root, root);
-		close(system_root);
-		excl_list = nullptr;
-
 		xmkdir("/system", 0755);
 		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
 	} else if (read_fstab_dt(&cmd, "system", partname, partfs)) {
@@ -563,13 +542,51 @@ int main(int argc, char *argv[]) {
 
 	if (read_fstab_dt(&cmd, "vendor", partname, partfs)) {
 		setup_block(&dev, partname);
+		xmkdir("/vendor", 0755);
 		xmount(dev.path, "/vendor", partfs, MS_RDONLY, nullptr);
 		mnt_vendor = true;
 	}
 
-	/* ****************
-	 * Ramdisk Patches
-	 * ****************/
+	/***************
+	 * Setup Rootfs
+	 ***************/
+
+	bool patch_init = patch_sepolicy();
+
+	if (cmd.early_boot) {
+		// Clone rootfs except /system
+		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
+		const char *excl[] = { "system", nullptr };
+		excl_list = excl;
+		clone_dir(system_root, root);
+		close(system_root);
+		excl_list = nullptr;
+	}
+
+	if (patch_init) {
+		constexpr char SYSTEM_INIT[] = "/system/bin/init";
+		// If init is symlink, copy it to rootfs so we can patch
+		struct stat st;
+		lstat("/init", &st);
+		if (S_ISLNK(st.st_mode))
+			cp_afc(SYSTEM_INIT, "/init");
+
+		char *addr;
+		size_t size;
+		mmap_rw("/init", addr, size);
+		for (char *p = addr; p < addr + size; ++p) {
+			if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
+				// Force init to load /sepolicy
+				memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
+				p += sizeof(SPLIT_PLAT_CIL) - 1;
+			} else if (memcmp(p, SYSTEM_INIT, sizeof(SYSTEM_INIT)) == 0) {
+				// Force execute /init instead of /system/bin/init
+				strcpy(p, "/init");
+				p += sizeof(SYSTEM_INIT) - 1;
+			}
+		}
+		munmap(addr, size);
+	}
 
 	// Handle ramdisk overlays
 	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
@@ -578,7 +595,11 @@ int main(int argc, char *argv[]) {
 		close(fd);
 		rmdir("/overlay");
 	}
-	close(root);
+
+	setup_init_rc();
+
+	// Don't let init run in init yet
+	lsetfilecon("/init", "u:object_r:rootfs:s0");
 
 	// Create hardlink mirror of /sbin to /root
 	mkdir("/root", 0750);
@@ -586,10 +607,6 @@ int main(int argc, char *argv[]) {
 	root = xopen("/root", O_RDONLY | O_CLOEXEC);
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 	link_dir(sbin, root);
-
-	setup_init_rc();
-	if (patch_sepolicy())
-		selinux_builtin_impl();
 
 	// Close all file descriptors
 	for (int i = 0; i < 30; ++i)

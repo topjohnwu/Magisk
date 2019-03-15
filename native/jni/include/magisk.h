@@ -31,11 +31,11 @@
 #define LEGACYCORE      MODULEROOT "/.core"
 
 // selinux consts
-#define SELINUX_PATH        "/sys/fs/selinux"
-#define SELINUX_ENFORCE     SELINUX_PATH "/enforce"
-#define SELINUX_POLICY      SELINUX_PATH "/policy"
-#define SELINUX_LOAD        SELINUX_PATH "/load"
-#define SELINUX_CONTEXT     SELINUX_PATH "/context"
+#define SELINUX_MNT         "/sys/fs/selinux"
+#define SELINUX_ENFORCE     SELINUX_MNT "/enforce"
+#define SELINUX_POLICY      SELINUX_MNT "/policy"
+#define SELINUX_LOAD        SELINUX_MNT "/load"
+#define SELINUX_CONTEXT     SELINUX_MNT "/context"
 #define SEPOL_PROC_DOMAIN "magisk"
 #define SEPOL_FILE_DOMAIN "magisk_file"
 
