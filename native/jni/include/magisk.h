@@ -29,7 +29,6 @@
 extern int SDK_INT;
 
 constexpr const char *applet_names[] = { "magisk", "su", "resetprop", "magiskhide", nullptr };
-constexpr const char *init_applet[] = { "magiskpolicy", "supolicy", nullptr };
 
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);

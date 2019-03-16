@@ -53,7 +53,12 @@
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 
-int (*init_applet_main[])(int, char *[]) = { magiskpolicy_main, magiskpolicy_main, nullptr };
+static int test_main(int argc, char *argv[]);
+
+constexpr const char *init_applet[] =
+		{ "magiskpolicy", "supolicy", "init_test", nullptr };
+constexpr int (*init_applet_main[])(int, char *[]) =
+		{ magiskpolicy_main, magiskpolicy_main, test_main, nullptr };
 
 struct cmdline {
 	bool system_as_root;
@@ -597,7 +602,7 @@ void MagiskInit::test() {
 	cmdline_logging();
 	log_cb.ex = nop_ex;
 
-	chdir(argv[1]);
+	chdir(dirname(argv[0]));
 	chroot(".");
 	chdir("/");
 
@@ -606,6 +611,12 @@ void MagiskInit::test() {
 	early_mount();
 	setup_rootfs();
 	cleanup();
+}
+
+static int test_main(int argc, char *argv[]) {
+	MagiskInit init(argv);
+	init.test();
+	return 0;
 }
 
 int main(int argc, char *argv[]) {
