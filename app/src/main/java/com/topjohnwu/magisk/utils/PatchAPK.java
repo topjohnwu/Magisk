@@ -1,14 +1,17 @@
 package com.topjohnwu.magisk.utils;
 
+import android.content.ComponentName;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.signing.JarMap;
 import com.topjohnwu.signing.SignAPK;
@@ -109,7 +112,8 @@ public class PatchAPK {
 
         Config.set(Config.Key.SU_MANAGER, pkg);
         Config.export();
-        RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID, pkg);
+        RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID,
+                new ComponentName(pkg, ClassMap.get(SplashActivity.class).getName()));
 
         return true;
     }
