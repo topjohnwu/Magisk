@@ -215,7 +215,7 @@ public abstract class MagiskInstaller {
             return false;
         }
 
-        if (Shell.sh("cd " + installDir, Utils.fmt(
+        if (!Shell.sh("cd " + installDir, Utils.fmt(
                 "KEEPFORCEENCRYPT=%b KEEPVERITY=%b sh update-binary sh boot_patch.sh %s",
                 Config.keepEnc, Config.keepVerity, srcBoot))
                 .to(console, logs).exec().isSuccess())
