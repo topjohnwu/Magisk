@@ -419,18 +419,19 @@ static bool magisk_env() {
 		VLOGI("link", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 	}
 
-	if (access(DATABIN "/busybox", X_OK) == -1)
-		return false;
-	LOGI("* Setting up internal busybox");
-	cp_afc(DATABIN "/busybox", BBPATH "/busybox");
-	exec_command_sync(BBPATH "/busybox", "--install", "-s", BBPATH);
-
 	// Disable/remove magiskhide, resetprop, and modules
 	if (SDK_INT < 19) {
 		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
 		unlink("/sbin/resetprop");
 		unlink("/sbin/magiskhide");
 	}
+
+	if (access(DATABIN "/busybox", X_OK) == -1)
+		return false;
+	LOGI("* Setting up internal busybox");
+	cp_afc(DATABIN "/busybox", BBPATH "/busybox");
+	exec_command_sync(BBPATH "/busybox", "--install", "-s", BBPATH);
+
 	return true;
 }
 
