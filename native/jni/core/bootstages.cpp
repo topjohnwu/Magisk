@@ -422,8 +422,7 @@ static bool magisk_env() {
 	if (access(DATABIN "/busybox", X_OK) == -1)
 		return false;
 	LOGI("* Setting up internal busybox");
-	close(xopen(BBPATH "/busybox", O_RDONLY | O_CREAT | O_CLOEXEC));
-	bind_mount(DATABIN "/busybox", BBPATH "/busybox", false);
+	cp_afc(DATABIN "/busybox", BBPATH "/busybox");
 	exec_command_sync(BBPATH "/busybox", "--install", "-s", BBPATH);
 
 	// Disable/remove magiskhide, resetprop, and modules
