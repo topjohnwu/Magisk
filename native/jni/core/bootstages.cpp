@@ -29,6 +29,7 @@ using namespace std;
 static char buf[PATH_MAX], buf2[PATH_MAX];
 static vector<string> module_list;
 static bool seperate_vendor;
+static bool no_secure_dir = false;
 
 char *system_block, *vendor_block, *data_block;
 
@@ -341,9 +342,11 @@ static bool magisk_env() {
 	LOGI("* Initializing Magisk environment\n");
 
 	// Alternative binaries paths
-	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk",
-							  "/data/data/com.topjohnwu.magisk/install",
-							  "/data/user_de/0/com.topjohnwu.magisk/install" };
+	constexpr const char *alt_bin[] = {
+		"/cache/data_adb/magisk", "/data/magisk",
+		"/data/data/com.topjohnwu.magisk/install",
+		"/data/user_de/0/com.topjohnwu.magisk/install"
+	};
 	for (auto &alt : alt_bin) {
 		struct stat st;
 		if (lstat(alt, &st) != -1) {
@@ -363,17 +366,18 @@ static bool magisk_env() {
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
 
-	// Legacy support
+	// Backwards compatibility
 	symlink(MAGISKTMP, "/sbin/.core");
 	symlink(MODULEMNT, MAGISKTMP "/img");
 
-	// Create directories in tmpfs overlay
+	// Directories in tmpfs overlay
 	xmkdirs(MIRRDIR "/system", 0755);
 	xmkdir(MIRRDIR "/data", 0755);
 	xmkdir(BBPATH, 0755);
 	xmkdir(MODULEMNT, 0755);
 
-	// /data/adb directories
+	// Directories in /data/adb
+	xmkdir(DATABIN, 0755);
 	xmkdir(MODULEROOT, 0755);
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
@@ -600,6 +604,7 @@ void post_fs_data(int client) {
 		 * do NOT proceed further. Manual creation of the folder
 		 * will cause bootloops on FBE devices. */
 		LOGE(SECURE_DIR " is not present, abort...");
+		no_secure_dir = true;
 		unblock_boot_process();
 	}
 
@@ -619,7 +624,7 @@ void post_fs_data(int client) {
 	fclose(cf);
 #endif
 
-	// No uninstaller or core-only mode
+	// Not core-only mode
 	if (access(DISABLEFILE, F_OK) != 0) {
 		simple_mount("/system");
 		simple_mount("/vendor");
@@ -715,9 +720,10 @@ void late_start(int client) {
 
 	dump_logs();
 
-	if (access(SECURE_DIR, F_OK) != 0) {
+	if (no_secure_dir) {
 		// It's safe to create the folder at this point if the system didn't create it
-		xmkdir(SECURE_DIR, 0700);
+		if (access(SECURE_DIR, F_OK) != 0)
+			xmkdir(SECURE_DIR, 0700);
 		// And reboot to make proper setup possible
 		exec_command_sync("/system/bin/reboot");
 	}
