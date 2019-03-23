@@ -674,9 +674,9 @@ void post_fs_data(int client) {
 			LOGI("%s: loading [system.prop]\n", module);
 			load_prop_file(buf, false);
 		}
-		// Check whether enable auto_mount
-		snprintf(buf, PATH_MAX, "%s/%s/auto_mount", MODULEROOT, module);
-		if (access(buf, F_OK) == -1)
+		// Check whether skip mounting
+		snprintf(buf, PATH_MAX, "%s/%s/skip_mount", MODULEROOT, module);
+		if (access(buf, F_OK) == 0)
 			continue;
 		// Double check whether the system folder exists
 		snprintf(buf, PATH_MAX, "%s/%s/system", MODULEROOT, module);
