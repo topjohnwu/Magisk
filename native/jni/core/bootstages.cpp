@@ -482,6 +482,9 @@ static void collect_modules() {
 			if (access("remove", F_OK) == 0) {
 				chdir("..");
 				LOGI("%s: remove\n", entry->d_name);
+				sprintf(buf, "%s/uninstall.sh", entry->d_name);
+				if (access(buf, F_OK) == 0)
+					exec_script(buf);
 				rm_rf(entry->d_name);
 				continue;
 			}

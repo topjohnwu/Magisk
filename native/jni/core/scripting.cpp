@@ -16,6 +16,14 @@ static void set_path() {
 	setenv("PATH", buf, 1);
 }
 
+void exec_script(const char *script) {
+	exec_t exec {
+		.pre_exec = set_path,
+		.fork = fork_no_zombie
+	};
+	exec_command_sync(exec, "/system/bin/sh", script);
+}
+
 void exec_common_script(const char *stage) {
 	char path[4096];
 	DIR *dir;
