@@ -69,7 +69,7 @@ if imageless_magisk; then
   $BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
   MODULEROOT=$NVBASE/$MODDIRNAME
 else
-  $BOOTMODE && IMGNAME=magisk.img || IMGNAME=magisk_merge.img
+  $BOOTMODE && IMGNAME=magisk_merge.img || IMGNAME=magisk.img
   IMG=$NVBASE/$IMGNAME
   request_zip_size_check "$ZIP"
   mount_magisk_img
