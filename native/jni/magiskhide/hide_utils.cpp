@@ -232,6 +232,7 @@ bool init_list() {
 	// Add SafetyNet by default
 	rm_list(SAFETYNET_COMPONENT);
 	rm_list(SAFETYNET_PROCESS);
+	init_list(SAFETYNET_PKG, SAFETYNET_PKG);
 	init_list(SAFETYNET_PKG, SAFETYNET_PROCESS);
 	init_list(MICROG_SAFETYNET, SAFETYNET_PROCESS);
 

@@ -46,6 +46,9 @@ import java9.util.stream.StreamSupport;
 public class ApplicationAdapter extends SectionedAdapter
         <ApplicationAdapter.AppViewHolder, ApplicationAdapter.ProcessViewHolder> {
 
+    private static final String SAFETYNET_PROCESS = "com.google.android.gms.unstable";
+    private static final String GMS_PACKAGE = "com.google.android.gms";
+
     /* A list of apps that should not be shown as hide-able */
     private static final List<String> HIDE_BLACKLIST = Arrays.asList(
             App.self.getPackageName(),
@@ -57,8 +60,10 @@ public class ApplicationAdapter extends SectionedAdapter
             "com.android.webview",
             "com.google.android.webview"
     );
-    private static final String SAFETYNET_PROCESS = "com.google.android.gms.unstable";
-    private static final String GMS_PACKAGE = "com.google.android.gms";
+    private static final List<String> DEFAULT_HIDELIST = Arrays.asList(
+            GMS_PACKAGE,
+            SAFETYNET_PROCESS
+    );
 
     private static int BOTTOM_MARGIN = -1;
 
@@ -197,7 +202,7 @@ public class ApplicationAdapter extends SectionedAdapter
 
     private void setHide(boolean add, HideAppInfo app, HideProcessInfo process) {
         // Don't remove SafetyNet
-        if (!add && process.name.equals(SAFETYNET_PROCESS))
+        if (!add && DEFAULT_HIDELIST.contains(process.name))
             return;
         Shell.su(Utils.fmt("magiskhide --%s %s %s", add ? "add" : "rm",
                 app.info.packageName, process.name)).submit();
