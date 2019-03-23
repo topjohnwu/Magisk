@@ -412,7 +412,7 @@ mount_magisk_img() {
 }
 
 unmount_magisk_img() {
-  rm -f $MODULEPATH 2>/dev/null
+  rm -f $MOUNTPATH 2>/dev/null
 }
 
 boot_actions() { return; }
