@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import java9.util.stream.StreamSupport;
 
 public class ReposAdapter
         extends SectionedAdapter<ReposAdapter.SectionHolder, ReposAdapter.RepoHolder>
@@ -41,17 +43,18 @@ public class ReposAdapter
     private static final int INSTALLED = 1;
     private static final int OTHERS = 2;
 
-    private Cursor repoCursor = null;
     private Map<String, Module> moduleMap;
     private RepoDatabaseHelper repoDB;
     private List<Pair<Integer, List<Repo>>> repoPairs;
+    private List<Repo> fullList;
+    private SearchView mSearch;
 
-    public ReposAdapter(RepoDatabaseHelper db) {
-        repoDB = db;
+    public ReposAdapter() {
+        repoDB = App.self.repoDB;
         moduleMap = Collections.emptyMap();
+        fullList = Collections.emptyList();
         repoPairs = new ArrayList<>();
     }
-
 
     @Override
     public int getSectionCount() {
@@ -136,17 +139,36 @@ public class ReposAdapter
         });
     }
 
-    public void notifyDBChanged() {
-        if (repoCursor != null)
-            repoCursor.close();
-        repoCursor = repoDB.getRepoCursor();
-        onQueryTextChange("");
+    private void updateLists() {
+        if (mSearch != null)
+            onQueryTextChange(mSearch.getQuery().toString());
+        else
+            onQueryTextChange("");
+    }
+
+    private static boolean noCaseContain(String a, String b) {
+        return a.toLowerCase().contains(b.toLowerCase());
+    }
+
+    public void setSearchView(SearchView view) {
+        mSearch = view;
+        mSearch.setOnQueryTextListener(this);
+    }
+
+    public void notifyDBChanged(boolean refresh) {
+        try (Cursor c = repoDB.getRepoCursor()) {
+            fullList = new ArrayList<>(c.getCount());
+            while (c.moveToNext())
+                fullList.add(new Repo(c));
+        }
+        if (refresh)
+            updateLists();
     }
 
     @Override
     public void onEvent(int event) {
         moduleMap = Event.getResult(event);
-        notifyDataSetChanged();
+        updateLists();
     }
 
     @Override
@@ -165,29 +187,25 @@ public class ReposAdapter
         List<Repo> installed = new ArrayList<>();
         List<Repo> others = new ArrayList<>();
 
-        repoPairs.clear();
-        while (repoCursor.moveToNext()) {
-            Repo repo = new Repo(repoCursor);
-            if (repo.getName().toLowerCase().contains(s.toLowerCase())
-                    || repo.getAuthor().toLowerCase().contains(s.toLowerCase())
-                    || repo.getDescription().toLowerCase().contains(s.toLowerCase())
-            ) {
-                // Passed the repoFilter
-                Module module = moduleMap.get(repo.getId());
-                if (module != null) {
-                    if (repo.getVersionCode() > module.getVersionCode()) {
-                        // Updates
-                        updates.add(repo);
+        StreamSupport.stream(fullList)
+                .filter(repo -> noCaseContain(repo.getName(), s)
+                        || noCaseContain(repo.getAuthor(), s)
+                        || noCaseContain(repo.getDescription(), s))
+                .forEach(repo -> {
+                    Module module = moduleMap.get(repo.getId());
+                    if (module != null) {
+                        if (repo.getVersionCode() > module.getVersionCode()) {
+                            // Updates
+                            updates.add(repo);
+                        } else {
+                            installed.add(repo);
+                        }
                     } else {
-                        installed.add(repo);
+                        others.add(repo);
                     }
-                } else {
-                    others.add(repo);
-                }
-            }
-        }
-        repoCursor.moveToFirst();
+                });
 
+        repoPairs.clear();
         if (!updates.isEmpty())
             repoPairs.add(new Pair<>(UPDATES, updates));
         if (!installed.isEmpty())

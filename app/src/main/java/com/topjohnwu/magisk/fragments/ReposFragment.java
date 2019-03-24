@@ -48,8 +48,7 @@ public class ReposFragment extends BaseFragment {
         mSwipeRefreshLayout.setRefreshing(true);
         mSwipeRefreshLayout.setOnRefreshListener(() -> new UpdateRepos().exec(true));
 
-        adapter = new ReposAdapter(app.repoDB);
-        Event.register(adapter);
+        adapter = new ReposAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.GONE);
 
@@ -71,7 +70,8 @@ public class ReposFragment extends BaseFragment {
 
     @Override
     public void onEvent(int event) {
-        adapter.notifyDBChanged();
+        adapter.notifyDBChanged(false);
+        Event.register(adapter);
         mSwipeRefreshLayout.setRefreshing(false);
         boolean empty = adapter.getItemCount() == 0;
         recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
@@ -82,7 +82,7 @@ public class ReposFragment extends BaseFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_repo, menu);
         SearchView search = (SearchView) menu.findItem(R.id.repo_search).getActionView();
-        search.setOnQueryTextListener(adapter);
+        adapter.setSearchView(search);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ReposFragment extends BaseFragment {
                 .setSingleChoiceItems(R.array.sorting_orders,
                         Config.get(Config.Key.REPO_ORDER), (d, which) -> {
                     Config.set(Config.Key.REPO_ORDER, which);
-                    adapter.notifyDBChanged();
+                    adapter.notifyDBChanged(true);
                     d.dismiss();
                 }).show();
         }
