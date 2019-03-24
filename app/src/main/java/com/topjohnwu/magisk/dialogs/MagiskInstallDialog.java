@@ -7,7 +7,6 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
-import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -40,7 +39,7 @@ public class MagiskInstallDialog extends CustomAlertDialog {
             setNeutralButton(R.string.release_notes, (d, i) -> {
                 if (Config.magiskNoteLink.contains("forum.xda-developers")) {
                     // Open forum links in browser
-                    AppUtils.openLink(a, Uri.parse(Config.magiskNoteLink));
+                    Utils.openLink(a, Uri.parse(Config.magiskNoteLink));
                 } else {
                     MarkDownWindow.show(a, null, Config.magiskNoteLink);
                 }

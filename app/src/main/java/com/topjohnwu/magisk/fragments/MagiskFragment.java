@@ -37,8 +37,8 @@ import com.topjohnwu.magisk.uicomponents.ExpandableViewHolder;
 import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
 import com.topjohnwu.magisk.uicomponents.SafetyNet;
 import com.topjohnwu.magisk.uicomponents.UpdateCardHolder;
-import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.Event;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
@@ -89,7 +89,7 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
     }
 
     private void openLink(String url) {
-        AppUtils.openLink(requireActivity(), Uri.parse(url));
+        Utils.openLink(requireActivity(), Uri.parse(url));
     }
 
     @OnClick(R.id.paypal)

@@ -22,7 +22,6 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BasePreferenceFragment;
 import com.topjohnwu.magisk.dialogs.FingerprintAuthDialog;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
-import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
@@ -215,7 +214,7 @@ public class SettingsFragment extends BasePreferenceFragment {
                 CheckUpdates.check();
                 break;
             case Config.Key.CHECK_UPDATES:
-                AppUtils.scheduleUpdateCheck();
+                Utils.scheduleUpdateCheck();
                 break;
         }
         setSummary(key);
