@@ -39,7 +39,7 @@ dependencies {
     implementation "androidx.cardview:cardview:${androidXVersion}"
     implementation "com.google.android.material:material:${androidXVersion}"
     implementation 'androidx.work:work-runtime:2.0.0'
-    implementation 'androidx.transition:transition:1.0.1'
+    implementation 'androidx.transition:transition:1.1.0-alpha02'
 
     def libsuVersion = '2.3.2'
     implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"

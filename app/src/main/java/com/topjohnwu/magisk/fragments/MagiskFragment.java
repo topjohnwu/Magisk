@@ -256,6 +256,8 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
         int image, color;
         String status, button = "";
 
+        TransitionManager.beginDelayedTransition(root, transition);
+
         if (Config.remoteMagiskVersionCode < 0) {
             color = colorNeutral;
             image = R.drawable.ic_help;
@@ -310,8 +312,6 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
 
         magisk.setValid(Config.remoteMagiskVersionCode > 0);
         manager.setValid(Config.remoteManagerVersionCode > 0);
-
-        TransitionManager.beginDelayedTransition(root, transition);
 
         if (Config.remoteMagiskVersionCode < 0) {
             // Hide install related components
