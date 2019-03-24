@@ -30,7 +30,7 @@ imageless_magisk() {
 ##########################################################################################
 
 OUTFD=$2
-ZIP=$3
+ZIPFILE=$3
 
 mount /data 2>/dev/null
 
@@ -59,7 +59,7 @@ $BOOTMODE && boot_actions || recovery_actions
 ##########################################################################################
 
 # Extract common files
-unzip -oj "$ZIP" module.prop install.sh uninstall.sh 'common/*' -d $TMPDIR >&2
+unzip -oj "$ZIPFILE" module.prop install.sh uninstall.sh 'common/*' -d $TMPDIR >&2
 
 [ ! -f $TMPDIR/install.sh ] && abort "! Unable to extract zip file!"
 # Load install script
@@ -71,7 +71,7 @@ if imageless_magisk; then
 else
   $BOOTMODE && IMGNAME=magisk_merge.img || IMGNAME=magisk.img
   IMG=$NVBASE/$IMGNAME
-  request_zip_size_check "$ZIP"
+  request_zip_size_check "$ZIPFILE"
   mount_magisk_img
   MODULEROOT=$MOUNTPATH
 fi
