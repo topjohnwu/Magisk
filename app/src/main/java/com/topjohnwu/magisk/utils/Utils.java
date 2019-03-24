@@ -95,7 +95,7 @@ public class Utils {
     }
 
     public static void loadModules() {
-        Topic.reset(Topic.MODULE_LOAD_DONE);
+        Event.reset(Event.MODULE_LOAD_DONE);
         App.THREAD_POOL.execute(() -> {
             Map<String, Module> moduleMap = new ValueSortedMap<>();
             SuFile path = new SuFile(Const.MAGISK_PATH);
@@ -106,7 +106,7 @@ public class Utils {
                 Module module = new Module(Const.MAGISK_PATH + "/" + file.getName());
                 moduleMap.put(module.getId(), module);
             }
-            Topic.publish(Topic.MODULE_LOAD_DONE, moduleMap);
+            Event.trigger(Event.MODULE_LOAD_DONE, moduleMap);
         });
     }
 

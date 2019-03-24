@@ -18,11 +18,11 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
-import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Event;
 
 import butterknife.BindView;
 
-public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber {
+public class MagiskHideFragment extends BaseFragment {
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
@@ -89,12 +89,12 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
     }
 
     @Override
-    public int[] getSubscribedTopics() {
-        return new int[] {Topic.MAGISK_HIDE_DONE};
+    public int[] getListeningEvents() {
+        return new int[] {Event.MAGISK_HIDE_DONE};
     }
 
     @Override
-    public void onPublish(int topic, Object[] result) {
+    public void onEvent(int event) {
         mSwipeRefreshLayout.setRefreshing(false);
         adapter.filter(search.getQuery().toString());
     }

@@ -20,15 +20,12 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
-import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.tasks.UpdateRepos;
-import com.topjohnwu.magisk.utils.Topic;
-
-import java.util.Map;
+import com.topjohnwu.magisk.utils.Event;
 
 import butterknife.BindView;
 
-public class ReposFragment extends BaseFragment implements Topic.Subscriber {
+public class ReposFragment extends BaseFragment {
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
@@ -59,23 +56,23 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     }
 
     @Override
-    public int[] getSubscribedTopics() {
-        return new int[] {Topic.MODULE_LOAD_DONE, Topic.REPO_LOAD_DONE};
+    public int[] getListeningEvents() {
+        return new int[] {Event.MODULE_LOAD_DONE, Event.REPO_LOAD_DONE};
     }
 
     @Override
-    public void onPublish(int topic, Object[] result) {
-        switch (topic) {
-            case Topic.MODULE_LOAD_DONE:
-                adapter = new ReposAdapter(app.repoDB, (Map<String, Module>) result[0]);
+    public void onEvent(int event) {
+        switch (event) {
+            case Event.MODULE_LOAD_DONE:
+                adapter = new ReposAdapter(app.repoDB, Event.getResult(event));
                 recyclerView.setAdapter(adapter);
                 break;
-            case Topic.REPO_LOAD_DONE:
+            case Event.REPO_LOAD_DONE:
                 if (adapter != null)
                     adapter.notifyDBChanged();
                 break;
         }
-        if (Topic.isPublished(this)) {
+        if (Event.isTriggered(this)) {
             mSwipeRefreshLayout.setRefreshing(false);
             boolean empty = adapter.getItemCount() == 0;
             recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);

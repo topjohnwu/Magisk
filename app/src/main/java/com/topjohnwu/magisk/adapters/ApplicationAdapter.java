@@ -25,7 +25,7 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.uicomponents.ArrowExpandable;
 import com.topjohnwu.magisk.uicomponents.Expandable;
-import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
@@ -257,7 +257,7 @@ public class ApplicationAdapter extends SectionedAdapter
                 }).filter(Objects::nonNull).sorted()
                 .collect(Collectors.toList());
 
-        Topic.publish(false, Topic.MAGISK_HIDE_DONE);
+        Event.trigger(false, Event.MAGISK_HIDE_DONE);
     }
 
     // True if not system app or user already hidden it

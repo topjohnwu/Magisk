@@ -24,10 +24,10 @@ import com.topjohnwu.magisk.dialogs.FingerprintAuthDialog;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.DownloadApp;
+import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.PatchAPK;
-import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
 
-public class SettingsFragment extends BasePreferenceFragment implements Topic.Subscriber {
+public class SettingsFragment extends BasePreferenceFragment {
 
     private ListPreference updateChannel, autoRes, suNotification,
             requestTimeout, rootConfig, multiuserConfig, nsConfig;
@@ -288,12 +288,12 @@ public class SettingsFragment extends BasePreferenceFragment implements Topic.Su
     }
 
     @Override
-    public void onPublish(int topic, Object[] result) {
+    public void onEvent(int event) {
         setLocalePreference((ListPreference) findPreference(Config.Key.LOCALE));
     }
 
     @Override
-    public int[] getSubscribedTopics() {
-        return new int[] {Topic.LOCALE_FETCH_DONE};
+    public int[] getListeningEvents() {
+        return new int[] {Event.LOCALE_FETCH_DONE};
     }
 }
