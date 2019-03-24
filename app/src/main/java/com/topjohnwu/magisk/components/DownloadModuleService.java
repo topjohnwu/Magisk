@@ -63,7 +63,8 @@ public class DownloadModuleService extends Service {
             InputStream in = Networking.get(repo.getZipUrl())
                     .setDownloadProgressListener(progress)
                     .execForInputStream().getResult();
-            removeTopFolder(in, new BufferedOutputStream(new FileOutputStream(output)));
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(output));
+            processZip(in, out, repo.isNewInstaller());
             if (install) {
                 progress.dismiss();
                 Intent intent = new Intent(this, ClassMap.get(FlashActivity.class));
@@ -80,16 +81,35 @@ public class DownloadModuleService extends Service {
         }
     }
 
-    private void removeTopFolder(InputStream in, OutputStream out) throws IOException {
+    private void processZip(InputStream in, OutputStream out, boolean inject)
+            throws IOException {
         try (ZipInputStream zin = new ZipInputStream(in);
              ZipOutputStream zout = new ZipOutputStream(out)) {
-            ZipEntry entry;
+
+            if (inject) {
+                // Inject latest module-installer.sh as update-binary
+                zout.putNextEntry(new ZipEntry("META-INF/"));
+                zout.putNextEntry(new ZipEntry("META-INF/com/"));
+                zout.putNextEntry(new ZipEntry("META-INF/com/google/"));
+                zout.putNextEntry(new ZipEntry("META-INF/com/google/android/"));
+                zout.putNextEntry(new ZipEntry("META-INF/com/google/android/update-binary"));
+                try (InputStream update_bin = Networking.get(Const.Url.MODULE_INSTALLER)
+                        .execForInputStream().getResult()) {
+                    ShellUtils.pump(update_bin, zout);
+                }
+                zout.putNextEntry(new ZipEntry("META-INF/com/google/android/updater-script"));
+                zout.write("#MAGISK\n".getBytes("UTF-8"));
+            }
+
             int off = -1;
+            ZipEntry entry;
             while ((entry = zin.getNextEntry()) != null) {
                 if (off < 0)
                     off = entry.getName().indexOf('/') + 1;
                 String path = entry.getName().substring(off);
                 if (path.isEmpty())
+                    continue;
+                if (inject && path.startsWith("META-INF"))
                     continue;
                 zout.putNextEntry(new ZipEntry(path));
                 if (!entry.isDirectory())
