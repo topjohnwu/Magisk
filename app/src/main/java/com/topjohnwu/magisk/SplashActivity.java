@@ -74,7 +74,7 @@ public class SplashActivity extends BaseActivity {
         // Magisk working as expected
         if (Shell.rootAccess() && Config.magiskVersionCode > 0) {
             // Load modules
-            Utils.loadModules();
+            Utils.loadModules(false);
             // Load repos
             if (Networking.checkNetworkStatus(this))
                 new UpdateRepos().exec();

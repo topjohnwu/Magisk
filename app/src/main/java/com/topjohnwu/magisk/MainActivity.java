@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         new MainActivity_ViewBinding(this);
-
+        checkHideSection();
         setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.magisk, R.string.magisk) {
@@ -88,12 +88,6 @@ public class MainActivity extends BaseActivity
         }
 
         navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        checkHideSection();
     }
 
     @Override

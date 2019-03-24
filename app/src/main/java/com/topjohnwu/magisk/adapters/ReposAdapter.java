@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,14 +24,18 @@ import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
 import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
+import com.topjohnwu.magisk.utils.Event;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 
-public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, ReposAdapter.RepoHolder> {
+public class ReposAdapter
+        extends SectionedAdapter<ReposAdapter.SectionHolder, ReposAdapter.RepoHolder>
+        implements Event.AutoListener, SearchView.OnQueryTextListener {
 
     private static final int UPDATES = 0;
     private static final int INSTALLED = 1;
@@ -41,11 +46,10 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
     private RepoDatabaseHelper repoDB;
     private List<Pair<Integer, List<Repo>>> repoPairs;
 
-    public ReposAdapter(RepoDatabaseHelper db, Map<String, Module> map) {
+    public ReposAdapter(RepoDatabaseHelper db) {
         repoDB = db;
-        moduleMap = map;
+        moduleMap = Collections.emptyMap();
         repoPairs = new ArrayList<>();
-        notifyDBChanged();
     }
 
 
@@ -136,10 +140,27 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         if (repoCursor != null)
             repoCursor.close();
         repoCursor = repoDB.getRepoCursor();
-        filter("");
+        onQueryTextChange("");
     }
 
-    public void filter(String s) {
+    @Override
+    public void onEvent(int event) {
+        moduleMap = Event.getResult(event);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int[] getListeningEvents() {
+        return new int[] {Event.MODULE_LOAD_DONE};
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
         List<Repo> updates = new ArrayList<>();
         List<Repo> installed = new ArrayList<>();
         List<Repo> others = new ArrayList<>();
@@ -150,7 +171,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
             if (repo.getName().toLowerCase().contains(s.toLowerCase())
                     || repo.getAuthor().toLowerCase().contains(s.toLowerCase())
                     || repo.getDescription().toLowerCase().contains(s.toLowerCase())
-                    ) {
+            ) {
                 // Passed the repoFilter
                 Module module = moduleMap.get(repo.getId());
                 if (module != null) {
@@ -175,6 +196,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
             repoPairs.add(new Pair<>(OTHERS, others));
 
         notifyDataSetChanged();
+        return false;
     }
 
     static class SectionHolder extends RecyclerView.ViewHolder {

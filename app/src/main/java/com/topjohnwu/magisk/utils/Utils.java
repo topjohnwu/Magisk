@@ -95,8 +95,12 @@ public class Utils {
     }
 
     public static void loadModules() {
+        loadModules(true);
+    }
+
+    public static void loadModules(boolean async) {
         Event.reset(Event.MODULE_LOAD_DONE);
-        App.THREAD_POOL.execute(() -> {
+        Runnable run = () -> {
             Map<String, Module> moduleMap = new ValueSortedMap<>();
             SuFile path = new SuFile(Const.MAGISK_PATH);
             SuFile[] modules = path.listFiles(
@@ -107,7 +111,11 @@ public class Utils {
                 moduleMap.put(module.getId(), module);
             }
             Event.trigger(Event.MODULE_LOAD_DONE, moduleMap);
-        });
+        };
+        if (async)
+            App.THREAD_POOL.execute(run);
+        else
+            run.run();
     }
 
     public static boolean showSuperUser() {

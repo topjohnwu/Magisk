@@ -46,9 +46,12 @@ public class ReposFragment extends BaseFragment {
         unbinder = new ReposFragment_ViewBinding(this, view);
 
         mSwipeRefreshLayout.setRefreshing(true);
-        recyclerView.setVisibility(View.GONE);
-
         mSwipeRefreshLayout.setOnRefreshListener(() -> new UpdateRepos().exec(true));
+
+        adapter = new ReposAdapter(app.repoDB);
+        Event.register(adapter);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setVisibility(View.GONE);
 
         requireActivity().setTitle(R.string.downloads);
 
@@ -56,46 +59,30 @@ public class ReposFragment extends BaseFragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Event.unregister(adapter);
+    }
+
+    @Override
     public int[] getListeningEvents() {
-        return new int[] {Event.MODULE_LOAD_DONE, Event.REPO_LOAD_DONE};
+        return new int[] {Event.REPO_LOAD_DONE};
     }
 
     @Override
     public void onEvent(int event) {
-        switch (event) {
-            case Event.MODULE_LOAD_DONE:
-                adapter = new ReposAdapter(app.repoDB, Event.getResult(event));
-                recyclerView.setAdapter(adapter);
-                break;
-            case Event.REPO_LOAD_DONE:
-                if (adapter != null)
-                    adapter.notifyDBChanged();
-                break;
-        }
-        if (Event.isTriggered(this)) {
-            mSwipeRefreshLayout.setRefreshing(false);
-            boolean empty = adapter.getItemCount() == 0;
-            recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
-            emptyRv.setVisibility(empty ? View.VISIBLE : View.GONE);
-        }
+        adapter.notifyDBChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
+        boolean empty = adapter.getItemCount() == 0;
+        recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
+        emptyRv.setVisibility(empty ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_repo, menu);
         SearchView search = (SearchView) menu.findItem(R.id.repo_search).getActionView();
-        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.filter(newText);
-                return false;
-            }
-        });
+        search.setOnQueryTextListener(adapter);
     }
 
     @Override
