@@ -154,6 +154,7 @@ rm -f ramdisk.cpio.orig config
 
 if ! $KEEPVERITY; then
   [ -f dtb ] && ./magiskboot dtb-patch dtb && ui_print "- Removing dm(avb)-verity in dtb"
+  [ -f kernel_dtb ] && ./magiskboot dtb-patch kernel_dtb && ui_print "- Removing dm(avb)-verity in dtb"
   [ -f extra ] && ./magiskboot dtb-patch extra && ui_print "- Removing dm(avb)-verity in extra-dtb"
 fi
 

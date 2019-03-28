@@ -7,14 +7,13 @@ env_check() {
 
 fix_env() {
   cd $MAGISKBIN
-  local OLDPATH="$PATH"
-  PATH=/sbin:/system/bin:/vendor/bin
-  sh update-binary -x
-  PATH="$OLDPATH"
+  PATH=/sbin:/system/bin sh update-binary -x
   ./busybox rm -f $MAGISKTMP/busybox/*
-  $MAGISKTMP/mirror/bin/busybox --install -s $MAGISKTMP/busybox
+  cp -af busybox $MAGISKTMP/busybox/busybox
+  $MAGISKTMP/busybox/busybox --install -s $MAGISKTMP/busybox
   rm -f update-binary magisk.apk
   chmod -R 755 .
+  ./magiskinit -x magisk magisk
   cd /
 }
 
@@ -26,9 +25,6 @@ run_migrations() {
   if [ -f /data/adb/magisk/stock_boot* ]; then
     mv /data/adb/magisk/stock_boot* /data 2>/dev/null
   fi
-  # Remove old dbs
-  rm -f /data/user*/*/magisk.db
-  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img 2>/dev/null
 }
 
 direct_install() {
@@ -78,7 +74,10 @@ post_ota() {
   ./bootctl hal-info || return
   [ `./bootctl get-current-slot` -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
   ./bootctl set-active-boot-slot $SLOT_NUM
-  echo "BCTRL=${1}/bootctl;\$BCTRL mark-boot-successful;rm -f \$BCTRL \$0" > post-fs-data.d/post_ota.sh
+  cat << EOF > post-fs-data.d/post_ota.sh
+${1}/bootctl mark-boot-successful
+rm -f ${1}/bootctl
+EOF
   chmod 755 post-fs-data.d/post_ota.sh
   cd /
 }
@@ -111,6 +110,6 @@ EOF
 
 rm_launch() {
   pm uninstall $1
-  am start -n ${2}/a.c
+  am start -n $2
   exit
 }

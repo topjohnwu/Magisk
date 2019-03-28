@@ -16,9 +16,12 @@ static void set_path() {
 	setenv("PATH", buf, 1);
 }
 
-static void set_mirror_path() {
-	setenv("PATH", BBPATH ":/sbin:" MIRRDIR "/system/bin:"
-	MIRRDIR "/system/xbin:" MIRRDIR "/vendor/bin", 1);
+void exec_script(const char *script) {
+	exec_t exec {
+		.pre_exec = set_path,
+		.fork = fork_no_zombie
+	};
+	exec_command_sync(exec, "/system/bin/sh", script);
 }
 
 void exec_common_script(const char *stage) {
@@ -37,13 +40,13 @@ void exec_common_script(const char *stage) {
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			exec_t exec {
-				.pre_exec = pfs ? set_mirror_path : set_path,
-				.fork = pfs ? xfork : fork_dont_care
+				.pre_exec = set_path,
+				.fork = pfs ? fork_no_zombie : fork_dont_care
 			};
 			if (pfs)
-				exec_command_sync(exec, MIRRDIR "/system/bin/sh", entry->d_name);
+				exec_command_sync(exec, "/system/bin/sh", entry->d_name);
 			else
-				exec_command(exec, MIRRDIR "/system/bin/sh", entry->d_name);
+				exec_command(exec, "/system/bin/sh", entry->d_name);
 		}
 	}
 
@@ -61,18 +64,18 @@ void exec_module_script(const char *stage, const vector<string> &module_list) {
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		exec_t exec {
-			.pre_exec = pfs ? set_mirror_path : set_path,
-			.fork = pfs ? xfork : fork_dont_care
+			.pre_exec = set_path,
+			.fork = pfs ? fork_no_zombie : fork_dont_care
 		};
 		if (pfs)
-			exec_command_sync(exec, MIRRDIR "/system/bin/sh", path);
+			exec_command_sync(exec, "/system/bin/sh", path);
 		else
-			exec_command(exec, MIRRDIR "/system/bin/sh", path);
+			exec_command(exec, "/system/bin/sh", path);
 	}
 }
 
 static const char migrate_script[] =
-"IMG=/data/adb/tmp.img;"
+"IMG=%s;"
 "MNT=/dev/img_mnt;"
 "e2fsck -yf $IMG;"
 "mkdir -p $MNT;"
@@ -86,13 +89,14 @@ static const char migrate_script[] =
 "  losetup -d /dev/block/loop${num};"
 "  break;"
 "done;"
-"rm -rf $IMG";
+"rm -rf $IMG;";
 
 void migrate_img(const char *img) {
 	LOGI("* Migrating %s\n", img);
 	exec_t exec { .pre_exec = set_path };
-	rename(img, "/data/adb/tmp.img");
-	exec_command_sync(exec, "/system/bin/sh", "-c", migrate_script);
+	char cmds[sizeof(migrate_script) + 128];
+	sprintf(cmds, migrate_script, img);
+	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
 }
 
 static const char install_script[] =
@@ -106,13 +110,13 @@ static const char install_script[] =
 "  fi;"
 "  break;"
 "done;"
-"rm -f $APK";
+"rm -f $APK;";
 
 void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	LOGI("apk_install: %s\n", apk);
-	exec_t exec { .pre_exec = set_mirror_path };
+	exec_t exec { .pre_exec = set_path };
 	char cmds[sizeof(install_script) + 4096];
 	sprintf(cmds, install_script, apk);
-	exec_command_sync(exec, MIRRDIR "/system/bin/sh", "-c", cmds);
+	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
 }

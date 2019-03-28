@@ -22,10 +22,10 @@ import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.LocaleManager;
-import com.topjohnwu.magisk.utils.Topic;
 
-public abstract class BaseActivity extends AppCompatActivity implements Topic.AutoSubscriber {
+public abstract class BaseActivity extends AppCompatActivity implements Event.AutoListener {
 
     public static final String INTENT_PERM = "perm_dialog";
     private static Runnable grantCallback;
@@ -40,12 +40,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
     }
 
     @Override
-    public int[] getSubscribedTopics() {
+    public int[] getListeningEvents() {
         return EMPTY_INT_ARRAY;
     }
 
     @Override
-    public void onPublish(int topic, Object[] result) {}
+    public void onEvent(int event) {}
 
     @StyleRes
     public int getDarkTheme() {
@@ -59,7 +59,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        Topic.subscribe(this);
+        Event.register(this);
         if (getDarkTheme() != -1 && (boolean) Config.get(Config.Key.DARK_THEME)) {
             setTheme(getDarkTheme());
         }
@@ -71,7 +71,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
 
     @Override
     protected void onDestroy() {
-        Topic.unsubscribe(this);
+        Event.unregister(this);
         super.onDestroy();
     }
 

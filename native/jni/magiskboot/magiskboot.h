@@ -7,8 +7,9 @@
 #define RAMDISK_FILE    "ramdisk.cpio"
 #define SECOND_FILE     "second"
 #define EXTRA_FILE      "extra"
-#define DTB_FILE        "dtb"
+#define KER_DTB_FILE    "kernel_dtb"
 #define RECV_DTBO_FILE  "recovery_dtbo"
+#define DTB_FILE        "dtb"
 #define NEW_BOOT        "new-boot.img"
 
 // Main entries

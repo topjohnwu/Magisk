@@ -4,7 +4,7 @@ import android.os.SystemClock;
 
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.Request;
 import com.topjohnwu.net.ResponseListener;
@@ -104,7 +104,7 @@ public class CheckUpdates {
             JSONObject uninstaller = getJson(json, "uninstaller");
             Config.uninstallerLink = getString(uninstaller, "link", null);
 
-            UiThreadHandler.handler.postAtTime(() -> Topic.publish(Topic.UPDATE_CHECK_DONE),
+            UiThreadHandler.handler.postAtTime(() -> Event.trigger(Event.UPDATE_CHECK_DONE),
                     start + 1000  /* Add artificial delay to let UI behave correctly */);
 
             if (cb != null)

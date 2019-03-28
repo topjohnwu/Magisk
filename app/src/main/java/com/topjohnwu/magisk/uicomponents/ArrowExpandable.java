@@ -1,38 +1,37 @@
 package com.topjohnwu.magisk.uicomponents;
 
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 
-public class ArrowExpandedViewHolder extends ExpandableViewHolder {
-
+public class ArrowExpandable extends Expandable {
+    protected Expandable mBase;
     private View arrow;
 
-    public ArrowExpandedViewHolder(ViewGroup viewGroup, View arrow) {
-        super(viewGroup);
+    public ArrowExpandable(Expandable base, View arrow) {
+        mBase = base;
         this.arrow = arrow;
     }
 
     @Override
-    public void setExpanded(boolean expanded) {
-        super.setExpanded(expanded);
-        if (arrow != null)
-            arrow.setRotation(expanded ? 180 : 0);
-    }
-
-    @Override
-    public void expand() {
-        super.expand();
+    public void onExpand() {
+        mBase.onExpand();
         setRotate(new RotateAnimation(0, 180,
                 Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
     }
 
     @Override
-    public void collapse() {
-        super.collapse();
+    public void onCollapse() {
+        mBase.onCollapse();
         setRotate(new RotateAnimation(180, 0,
                 Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
+    }
+
+    @Override
+    public void onSetExpanded(boolean expanded) {
+        mBase.onSetExpanded(expanded);
+        if (arrow != null)
+            arrow.setRotation(expanded ? 180 : 0);
     }
 
     private void setRotate(RotateAnimation rotate) {

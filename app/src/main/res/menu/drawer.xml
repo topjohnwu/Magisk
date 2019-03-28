@@ -18,7 +18,8 @@
         <item
             android:id="@+id/magiskhide"
             android:icon="@drawable/ic_magiskhide"
-            android:title="@string/magiskhide" />
+            android:title="@string/magiskhide"
+            android:visible="false"/>
 
     </group>
 
@@ -29,7 +30,8 @@
         <item
             android:id="@+id/modules"
             android:icon="@drawable/ic_extension"
-            android:title="@string/modules"/>
+            android:title="@string/modules"
+            android:visible="false"/>
 
         <item
             android:id="@+id/downloads"

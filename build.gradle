@@ -16,8 +16,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools:r8:1.4.68'
-        classpath 'com.android.tools.build:gradle:3.5.0-alpha06'
+        classpath 'com.android.tools:r8:1.4.72'
+        classpath 'com.android.tools.build:gradle:3.5.0-alpha08'
         
 
         // NOTE: Do not place your application dependencies here; they belong

@@ -7,6 +7,8 @@
 	<string name="log">Registro eventi</string>
 	<string name="settings">Impostazioni</string>
 	<string name="install">Installa</string>
+	<string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
+	<string name="unsupport_magisk_message">Questa versione di Magisk Manager non supporta versioni di Magisk inferiori alla v18.0.\n\nPuoi aggiornare manualmente Magisk o tornare a una versione meno recente dell\'app.</string>
 
 	<!--Status Fragment-->
 	<string name="magisk_version_error">Magisk non è installato.</string>
@@ -59,7 +61,7 @@
 	<string name="logs_cleared">Registro eventi svuotato correttamente.</string>
 	<string name="log_is_empty">Il registro eventi è vuoto.</string>
 
-    <!--About Activity-->
+	<!--About Activity-->
 	<string name="app_changelog">Novità</string>
 	<string name="translators">Auanasgheps</string>
 	<string name="app_translators">Traduttori</string>
@@ -95,7 +97,7 @@
 	<string name="install_inactive_slot">Installa nello slot inattivo (dopo un OTA)</string>
 	<string name="warning">Attenzione</string>
 	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
-    <string name="select_method">Seleziona un metodo</string>
+	<string name="select_method">Seleziona un metodo</string>
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar.</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
@@ -162,7 +164,7 @@
 	<string name="settings_su_reauth_summary">Riautentica i permessi Superuser dopo un aggiornamento dell\'app</string>
 	<string name="settings_su_fingerprint_title">Abilita autenticazione impronta</string>
 	<string name="settings_su_fingerprint_summary">Utilizza il sensore di impronte per accettare le richieste Superuser</string>
-	<string name="auth_fingerprint">Conferma Impronta</string>
+	<string name="auth_fingerprint">Conferma impronta</string>
 
 	<string name="multiuser_mode">Modalità multiutente</string>
 	<string name="settings_owner_only">Solo proprietario del dispositivo</string>
@@ -212,6 +214,7 @@
 	<string name="auth_fail">Autenticatione fallita</string>
 
 	<!--Superuser logs-->
+	<string name="pid">PID: %1$d</string>
 	<string name="target_uid">UID destinazione: %1$d</string>
 	<string name="command">Comando: %1$s</string>
 

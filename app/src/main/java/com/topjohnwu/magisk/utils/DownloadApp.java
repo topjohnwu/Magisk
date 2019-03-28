@@ -1,9 +1,13 @@
 package com.topjohnwu.magisk.utils;
 
+import android.content.ComponentName;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.uicomponents.ProgressNotification;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
@@ -85,7 +89,9 @@ public class DownloadApp {
             // Make it world readable
             apk.setReadable(true, false);
             if (Shell.su("pm install " + apk).exec().isSuccess())
-                RootUtils.rmAndLaunch(app.getPackageName(), BuildConfig.APPLICATION_ID);
+                RootUtils.rmAndLaunch(app.getPackageName(),
+                        new ComponentName(BuildConfig.APPLICATION_ID,
+                                ClassMap.get(SplashActivity.class).getName()));
             progress.dismiss();
         }
     }

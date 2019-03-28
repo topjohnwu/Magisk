@@ -19,12 +19,12 @@ static void usage(char *arg0) {
 		"\n"
 		"Supported actions:\n"
 		"  unpack [-h] <bootimg>\n"
-		"    Unpack <bootimg> to, if available, kernel, ramdisk.cpio,\n"
+		"    Unpack <bootimg> to, if available, kernel, kernel_dtb, ramdisk.cpio,\n"
 		"    second, dtb, extra, and recovery_dtbo into current directory.\n"
 		"    If '-h' is provided, it will dump header info to 'header',\n"
 		"    which will be parsed when repacking.\n"
 		"    Return values:\n"
-		"    0:valid    1:error    2:chromeos    3:ELF32    4:ELF64\n"
+		"    0:valid    1:error    2:chromeos\n"
 		"\n"
 		"  repack <origbootimg> [outbootimg]\n"
 		"    Repack boot image components from current directory\n"
@@ -122,9 +122,10 @@ int main(int argc, char *argv[]) {
 		unlink(KERNEL_FILE);
 		unlink(RAMDISK_FILE);
 		unlink(SECOND_FILE);
-		unlink(DTB_FILE);
+		unlink(KER_DTB_FILE);
 		unlink(EXTRA_FILE);
 		unlink(RECV_DTBO_FILE);
+		unlink(DTB_FILE);
 	} else if (argc > 2 && strcmp(argv[1], "sha1") == 0) {
 		uint8_t sha1[SHA_DIGEST_SIZE];
 		void *buf;
@@ -147,16 +148,16 @@ int main(int argc, char *argv[]) {
 		repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
 	} else if (argc > 2 && strcmp(argv[1], "decompress") == 0) {
 		decompress(argv[2], argv[3]);
-	} else if (argc > 2 && strncmp(argv[1], "compress", 10) == 0) {
-		compress(argv[1][10] == '=' ? &argv[1][11] : "gzip", argv[2], argv[3]);
+	} else if (argc > 2 && strncmp(argv[1], "compress", 8) == 0) {
+		compress(argv[1][8] == '=' ? &argv[1][9] : "gzip", argv[2], argv[3]);
 	} else if (argc > 4 && strcmp(argv[1], "hexpatch") == 0) {
 		hexpatch(argv[2], argv[3], argv[4]);
 	} else if (argc > 2 && strcmp(argv[1], "cpio") == 0) {
 		if (cpio_commands(argc - 2, argv + 2)) usage(argv[0]);
-	} else if (argc > 2 && strncmp(argv[1], "dtb", 5) == 0) {
-		if (argv[1][5] != '-')
+	} else if (argc > 2 && strncmp(argv[1], "dtb", 3) == 0) {
+		if (argv[1][3] != '-')
 			usage(argv[0]);
-		if (dtb_commands(&argv[1][6], argc - 2, argv + 2))
+		if (dtb_commands(&argv[1][4], argc - 2, argv + 2))
 			usage(argv[0]);
 	} else {
 		usage(argv[0]);

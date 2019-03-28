@@ -262,6 +262,14 @@ int xlstat(const char *pathname, struct stat *buf) {
 	return ret;
 }
 
+int xfstat(int fd, struct stat *buf) {
+	int ret = fstat(fd, buf);
+	if (ret == -1) {
+		PLOGE("fstat %d", fd);
+	}
+	return ret;
+}
+
 int xdup2(int oldfd, int newfd) {
 	int ret = dup2(oldfd, newfd);
 	if (ret == -1) {

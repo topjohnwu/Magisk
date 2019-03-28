@@ -7,8 +7,8 @@ import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.container.Repo;
+import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.Request;
@@ -155,7 +155,7 @@ public class UpdateRepos {
     }
 
     public void exec(boolean force) {
-        Topic.reset(Topic.REPO_LOAD_DONE);
+        Event.reset(Event.REPO_LOAD_DONE);
         App.THREAD_POOL.execute(() -> {
             cached = Collections.synchronizedSet(app.repoDB.getRepoIDSet());
             moduleQueue = new ConcurrentLinkedQueue<>();
@@ -166,7 +166,7 @@ public class UpdateRepos {
             } else if (force) {
                 fullReload();
             }
-            Topic.publish(Topic.REPO_LOAD_DONE);
+            Event.trigger(Event.REPO_LOAD_DONE);
         });
     }
 

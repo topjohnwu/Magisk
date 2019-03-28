@@ -1,43 +1,10 @@
 # Developer Guides
-## Scripts
-In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and **late_start service** mode.
-
-- post-fs-data mode
-    - This stage is BLOCKING. Boot process is paused before execution is done, or 10 seconds has passed.
-    - Upside: Executed before Zygote is started (which pretty much means everything)
-    - Downside: Execution has time limit; blocks boot process
-    - Environment variable `PATH` is set to `PATH=$BBPATH:/sbin:$SYSTEMMIR/bin:$SYSTEMMIR/xbin:$VENDORMIR/bin`
-    - **Run scripts in this mode only if necessary!**
-- late_start service mode
-    - This stage is NON-BLOCKING. Your script runs in parallel along with the booting process.
-    - Upside: No time limit, will not block boot process
-    - Downside: Scripts are not executed as early as post-fs-data mode
-    - Environment variable `PATH` is set to `PATH=$BBPATH/sbin:$PATH`
-    - **This is the recommended stage to run most scripts!**
-
-In Magisk, there are also 2 kinds of scripts: **general scripts** and **module scripts**.
-
-- General Scripts
-    - Placed in `$SECURE_DIR/post-fs-data.d` or `$SECURE_DIR/service.d`
-    - Only executed if the script is executable (execution permissions, `chmod +x script.sh`)
-    - Scripts in `post-fs-data.d` runs in post-fs-data mode, and scripts in `service.d` runs in late_start service mode.
-    - Will still be executed when **Core-Only** mode is enabled.
-- Module Scripts
-    - Placed in the folder of the module
-    - Only executed if the module is enabled
-    - `post-fs-data.sh` runs in post-fs-data mode, and `service.sh` runs in late_start service mode.
-    - Will NOT be executed when **Core-Only** mode is enabled (all modules are disabled)
-
-### Notes
-- Be aware that the 10 seconds time limit in post-fs-data mode is shared by **ALL** post-fs-data operations, including all scripts and **Magic Mount**! If a post-fs-data script is stuck, it will affect magic mount and cause it to not work properly!
-- Magisk's internal busybox's path `$BBPATH` is always prepended in `PATH`. This means all commands you call in scripts are always using the Magisk busybox unless the applet is not included, which in that case will fallback to use system included binaries (the most common one should be `chcon` since internal busybox does not support SELinux). This makes sure that your script always run in a predictable environment and always have the full suite of commands to use regardless of which Android version it is running on.
-
 
 ## Magisk Modules
-A Magisk module is a folder placed in `magisk.img` with a structure defined below:
+A Magisk module is a folder placed in `/data/adb/modules` with a structure below:
 
 ```
-$MOUNTPOINT
+/data/adb/modules
 ├── .
 ├── .
 |
@@ -49,14 +16,15 @@ $MOUNTPOINT
 │   │
 │   │      *** Status files ***
 │   │
-│   ├── auto_mount          <--- If this file exists, auto mount is enabled
-│   ├── disable             <--- If this file exists, the module is disabled
-│   ├── remove              <--- If this file exists, the module will be removed next reboot
+│   ├── skip_mount          <--- If exists, Magisk will NOT mount your files
+│   ├── disable             <--- If exists, the module will be disabled
+│   ├── remove              <--- If exists, the module will be removed next reboot
 │   │
-│   │      *** Boot Scripts ***
+│   │      *** Scripts ***
 │   │
 │   ├── post-fs-data.sh     <--- This script will be executed in post-fs-data
 │   ├── service.sh          <--- This script will be executed in late_start service
+|   ├── uninstall.sh        <--- This script will be executed when Magisk removes your module
 │   │
 │   │      *** Resetprop Files ***
 │   │
@@ -64,7 +32,7 @@ $MOUNTPOINT
 │   │
 │   │      *** Module contents ***
 │   │
-│   ├── system              <--- If auto mount is enabled, this folder will be Magic Mounted
+│   ├── system              <--- This folder will be Magic Mounted if skip_mount does not exists
 │   │   ├── .
 │   │   ├── .
 │   │   └── .
@@ -81,7 +49,7 @@ $MOUNTPOINT
 ├── .
 ├── .
 ```
-As long as a folder follows the structure above, it will be recognized as a module. The only thing *required* is `module.prop`, other files are based on what your module aims to accomplish.
+As long as a folder follows the structure above, it will be recognized as a module.
 
 Here is the **strict** format of `module.prop`:
 
@@ -92,38 +60,68 @@ version=<string>
 versionCode=<int>
 author=<string>
 description=<string>
-minMagisk=<int>
 ```
-- `id` has to match this regular expression: `^[a-zA-Z][a-zA-Z0-9\._-]+$`.  
-ex: ✓ `a_module`, ✓ `a.module`, ✓ `module-101`, ✗ `a module`, ✗ `1_module`, ✗ `-a-module`  
-This is the **sole identifier** of your module. You should not change it once published.
+- `id` has to match this regular expression: `^[a-zA-Z][a-zA-Z0-9._-]+$`<br>
+ex: ✓ `a_module`, ✓ `a.module`, ✓ `module-101`, ✗ `a module`, ✗ `1_module`, ✗ `-a-module`<br>
+This is the **unique identifier** of your module. You should not change it once published.
 - `versionCode` has to be an **integer**. This is used to compare versions
-- `minMagisk`: an **integer** set as the target Magisk versionCode (this is also the module's minimum requirement).  
-If you are creating a new module, you should set this value to `17000`.
 - Others that isn't mentioned above can be any **single line** string.
 
-## Magisk Module Template
-The **Magisk Module Template** is hosted **[here](https://github.com/topjohnwu/magisk-module-template)**.
+## Magisk Module Installer
+The official Magisk Module installer is hosted **[here](https://github.com/topjohnwu/magisk-module-installer)**.
 
-It is a template to create a flashable zip to install Magisk Modules. It is designed to be simple to use so that anyone can create their own modules easily. The template itself contains minimal scripting for installation; most of the functions are located externally in [util_functions.sh](https://github.com/topjohnwu/Magisk/blob/master/scripts/util_functions.sh), which will be installed along with Magisk, and can be upgraded through a Magisk upgrade without the need of a template update.
+That repo is a starting point for creating a Magisk module installer zip. Here are some details:
 
-Here are some files you would want to know:
+- You will found out that `META-INF/com/google/android/update-binary` is a dummy file. If you are creating a module locally for personal usage or testing, download the latest installer [`module_installer.sh`](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) and replace `update-binary` with the script
+- The next thing to do is to modify `module.prop` to provide information about your module
+- Finally, modify `install.sh` to fit your need. The script is heavily documented so you should know what to do.
+- (Optional) If you want to run custom uninstallation logic when your module is removed, add a new file `uninstall.sh` to the root of the installer
+- **Windows users aware!!** The line endings of all text files should be in the **Unix format**. Please use advanced text editors like Sublime, Atom, Notepad++ etc. to edit **ALL** text files, **NEVER** use Windows Notepad.
 
-- `config.sh`: A simple script used as a configuration file. It is the place to configure which features your module requires. A detailed instructions on how to use the template is directly written in the top of this file.
-- `module.prop`: This file is your module's metadata.
-- `common/*`: Boot stage scripts and `system.prop`
-- `META-INF/com/google/android/update-binary`: The actual installation script. Modify this file for advanced custom behavior
+## Submit Modules
+You can submit a module to **Magisk-Module-Repo** so users can download your module directly in Magisk Manager. Before submitting, follow the instructions in the previous section to create a valid installer for your module. You can then create a request for submission via this link: [submission](https://github.com/Magisk-Modules-Repo/submission).
 
-And here are some notes to be aware of:
+- When your module is downloaded with Magisk Manager, `META-INF/com/google/android/update-binary` will be **forcefully** replaced with the latest [`module_installer.sh`](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) to make sure all installation uses the latest scripts.
+- Since `update-binary` will be replaced, this means that all modules in the repo are expected to follow how the installation framework works: the installation framework will load your `install.sh` script and run the corresponding callbacks.
+- This also means that you should NOT add custom logic in `update-binary` as they will simply be ignored.
+- **Existing module devs please read!!** For devs migrating from the old template based modules to the new installer format, one thing you might overlook is the change in configuration flags: it no longer uses `AUTO_MOUNT`, but instead uses `SKIP_MOUNT`. In a nutshell, `AUTO_MOUNT=true` behaves exactly the same as `SKIP_MOUNT=false`, and 99% of the time you should NOT touch this flag.
 
-- The template depends on external Magisk scripts, please correctly specify the `minMagisk` value in `module.prop` so the template can fail fast when an unsupported Magisk is installed.
-- **!! Windows users aware !!** The line endings of all text files should be in the **Unix format**. Please use advanced text editors like Sublime, Atom, Notepad++ etc. to edit **ALL** text files, **NEVER** use Windows Notepad.
+## Notes on Partitions
+On modern Android, `/system/vendor` is moved out from the system partition into its own separate `vendor` partition. For module developers, Magisk will handle these different configurations transparently so you do not need to worry anything about it. If you want to modify files in `vendor`, place the modified files under `/system/vendor` and you're good to go!
 
-## Submit Modules to Magisk-Modules-Repo
-Directly go to the [submission link](https://github.com/Magisk-Modules-Repo/submission).
+Starting in Android Q and some devices on older Android versions, a separate partition `platform` is available. Support for `platform` will come soon in upcoming Magisk versions, please stay tuned!
+
+## Boot Scripts
+In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and **late_start service** mode.
+
+- post-fs-data mode
+    - This stage is BLOCKING. Boot process is paused before execution is done, or 10 seconds has passed.
+    - Scripts run before any modules are mounted. This allows a module developer to dynamically adjust their modules before it gets mounted.
+    - This stage happens before Zygote is started, which pretty much means everything in Android
+    - **Run scripts in this mode only if necessary!**
+- late_start service mode
+    - This stage is NON-BLOCKING. Your script runs in parallel along with the booting process.
+    - **This is the recommended stage to run most scripts!**
+
+In Magisk, there are also 2 kinds of scripts: **general scripts** and **module scripts**.
+
+- General Scripts
+    - Placed in `/data/adb/post-fs-data.d` or `/data/adb/service.d`
+    - Only executed if the script is executable (execution permissions, `chmod +x script.sh`)
+    - Scripts in `post-fs-data.d` runs in post-fs-data mode, and scripts in `service.d` runs in late_start service mode.
+    - Will still be executed when **Core-Only** mode is enabled.
+    - Modules should **NOT** add general scripts since it violates encapsulation
+- Module Scripts
+    - Placed in the folder of the module
+    - Only executed if the module is enabled
+    - `post-fs-data.sh` runs in post-fs-data mode, and `service.sh` runs in late_start service mode.
+    - Will NOT be executed when **Core-Only** mode is enabled (all modules are disabled)
+    - Modules require boot scripts should **ONLY** use module scripts instead of general scripts
+
+Magisk's internal busybox's path `$BBPATH` is always prepended in `PATH`. This means all commands you call in scripts are always using busybox unless the applet is not included. This makes sure that your script always run in a predictable environment and always have the full suite of commands regardless of which Android version it is running on.
 
 ## Remove Files
 How to remove a file systemless-ly? To actually make the file *disappear* is complicated (possible, not worth the effort). Replacing it with a dummy file should be good enough! Create an empty file with the same name and place it in the same path within a module, it shall replace your target file with a dummy file.
 
 ## Remove Folders
-Same as mentioned above, actually making the folder *disappear* is not worth the effort. Replacing it with an empty folder should be good enough! A handy trick for module developers using [Magisk Module Template](https://github.com/topjohnwu/magisk-module-template) is to add the folder you want to remove into the `REPLACE` list within `config.sh`. If your module doesn't provide a corresponding folder, it will create an empty folder, and automatically add `.replace` into the empty folder so the dummy folder will properly replace the one in `/system`.
+Same as mentioned above, actually making the folder *disappear* is not worth the effort. Replacing it with an empty folder should be good enough! A handy trick for module developers is to add the folder you want to remove into the `REPLACE` list within `install.sh`. If your module doesn't provide a corresponding folder, it will create an empty folder, and automatically add `.replace` into the empty folder so the dummy folder will properly replace the one in `/system`.

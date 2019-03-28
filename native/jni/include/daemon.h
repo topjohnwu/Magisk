@@ -69,6 +69,7 @@ void boot_complete(int client);
  * Scripting *
  *************/
 
+void exec_script(const char *script);
 void exec_common_script(const char *stage);
 void exec_module_script(const char *stage, const std::vector<std::string> &module_list);
 void migrate_img(const char *img);

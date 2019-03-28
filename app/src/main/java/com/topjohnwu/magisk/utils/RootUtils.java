@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
+import android.content.ComponentName;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -15,8 +16,8 @@ import java.io.InputStream;
 
 public class RootUtils extends Shell.Initializer {
 
-    public static void rmAndLaunch(String rm, String launch) {
-        Shell.su(Utils.fmt("(rm_launch %s %s)&", rm, launch)).exec();
+    public static void rmAndLaunch(String rm, ComponentName component) {
+        Shell.su(Utils.fmt("(rm_launch %s %s)&", rm, component.flattenToString())).exec();
     }
 
     @Override

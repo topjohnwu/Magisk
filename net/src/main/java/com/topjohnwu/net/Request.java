@@ -8,6 +8,8 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilterInputStream;
@@ -19,7 +21,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.util.concurrent.Executor;
 
-public class Request {
+public class Request implements Closeable {
     private HttpURLConnection conn;
     private Executor executor = null;
     private DownloadProgressListener progress = null;
@@ -42,6 +44,10 @@ public class Request {
             return code;
         }
 
+        public boolean isSuccess() {
+            return code >= 200 && code <= 299;
+        }
+
         public HttpURLConnection getConnection() {
             return conn;
         }
@@ -49,6 +55,11 @@ public class Request {
 
     Request(HttpURLConnection c) {
         conn = c;
+    }
+
+    @Override
+    public void close() {
+        conn.disconnect();
     }
 
     public Request addHeaders(String key, String value) {
@@ -71,6 +82,16 @@ public class Request {
         return this;
     }
 
+    public Result<Void> connect() {
+        try {
+            connect0();
+        } catch (IOException e) {
+            if (err != null)
+                err.onError(conn, e);
+        }
+        return new Result<>();
+    }
+
     public Result<InputStream> execForInputStream() {
         return exec(this::getInputStream);
     }
@@ -81,6 +102,14 @@ public class Request {
 
     public void execForFile(File out) {
         exec(() -> dlFile(out));
+    }
+
+    public void getAsBytes(ResponseListener<byte[]> rs) {
+        submit(this::dlBytes, rs);
+    }
+
+    public Result<byte[]> execForBytes() {
+        return exec(this::dlBytes);
     }
 
     public void getAsString(ResponseListener<String> rs) {
@@ -105,6 +134,11 @@ public class Request {
 
     public Result<JSONArray> execForJSONArray() {
         return exec(this::dlJSONArray);
+    }
+
+    private void connect0() throws IOException {
+        conn.connect();
+        code = conn.getResponseCode();
     }
 
     private <T> Result<T> exec(Requestor<T> req) {
@@ -135,8 +169,7 @@ public class Request {
     }
 
     private BufferedInputStream getInputStream() throws IOException {
-        conn.connect();
-        code = conn.getResponseCode();
+        connect0();
         InputStream in = conn.getInputStream();
         if (progress != null) {
             in = new ProgressInputStream(in, conn.getContentLength(), progress) {
@@ -162,7 +195,7 @@ public class Request {
         StringBuilder builder = new StringBuilder();
         try (Reader reader = new InputStreamReader(getInputStream())) {
             int len;
-            char buf[] = new char[4096];
+            char[] buf = new char[4096];
             while ((len = reader.read(buf)) != -1) {
                 builder.append(buf, 0, len);
             }
@@ -182,11 +215,24 @@ public class Request {
         try (InputStream in  = getInputStream();
              OutputStream out = new BufferedOutputStream(new FileOutputStream(f))) {
             int len;
-            byte buf[] = new byte[4096];
+            byte[] buf = new byte[4096];
             while ((len = in.read(buf)) != -1) {
                 out.write(buf, 0, len);
             }
         }
         return f;
+    }
+
+    private byte[] dlBytes() throws IOException {
+        int len = conn.getContentLength();
+        len = len > 0 ? len : 32;
+        ByteArrayOutputStream out = new ByteArrayOutputStream(len);
+        try (InputStream in  = getInputStream()) {
+            byte[] buf = new byte[4096];
+            while ((len = in.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
+        }
+        return out.toByteArray();
     }
 }

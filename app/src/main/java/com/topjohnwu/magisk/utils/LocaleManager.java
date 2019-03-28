@@ -5,6 +5,7 @@ import android.content.ContextWrapper;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.text.TextUtils;
 
 import androidx.annotation.StringRes;
 
@@ -90,7 +91,7 @@ public class LocaleManager {
 
     public static void setLocale(ContextWrapper wrapper) {
         String localeConfig = Config.get(Config.Key.LOCALE);
-        if (localeConfig.isEmpty()) {
+        if (TextUtils.isEmpty(localeConfig)) {
             locale = defaultLocale;
         } else {
             locale = forLanguageTag(localeConfig);
@@ -140,7 +141,7 @@ public class LocaleManager {
             }
 
             Collections.sort(locales, (a, b) -> a.getDisplayName(a).compareTo(b.getDisplayName(b)));
-            Topic.publish(Topic.LOCALE_FETCH_DONE);
+            Event.trigger(Event.LOCALE_FETCH_DONE);
         });
     }
 }

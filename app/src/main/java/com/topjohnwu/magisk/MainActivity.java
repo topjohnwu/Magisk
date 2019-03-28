@@ -24,7 +24,6 @@ import com.topjohnwu.magisk.fragments.ModulesFragment;
 import com.topjohnwu.magisk.fragments.ReposFragment;
 import com.topjohnwu.magisk.fragments.SettingsFragment;
 import com.topjohnwu.magisk.fragments.SuperuserFragment;
-import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
@@ -32,7 +31,7 @@ import com.topjohnwu.superuser.Shell;
 import butterknife.BindView;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, Topic.Subscriber {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private final Handler mDrawerHandler = new Handler();
     private int mDrawerItem;
@@ -59,7 +58,7 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         new MainActivity_ViewBinding(this);
-
+        checkHideSection();
         setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.magisk, R.string.magisk) {
@@ -92,12 +91,6 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        checkHideSection();
-    }
-
-    @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(navigationView)) {
             drawer.closeDrawer(navigationView);
@@ -114,11 +107,6 @@ public class MainActivity extends BaseActivity
         mDrawerHandler.postDelayed(() -> navigate(menuItem.getItemId()), 250);
         drawer.closeDrawer(navigationView);
         return true;
-    }
-
-    @Override
-    public void onPublish(int topic, Object[] result) {
-        recreate();
     }
 
     public void checkHideSection() {

@@ -22,7 +22,7 @@
     <string name="magisk_up_to_date">Magisk este la zi</string>
     <string name="manager_up_to_date">Magisk Manager este la zi</string>
     <string name="advanced_settings_title">Setări avansate</string>
-    <string name="keep_force_encryption">Păstrează criptarea forţată</string>
+    <string name="keep_force_encryption">Păstrează criptarea forțată</string>
     <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
     <string name="current_installed">Instalată: %1$s</string>
     <string name="latest_version">Ultima: %1$s</string>
@@ -89,10 +89,10 @@
     <string name="dtbo_patched_reboot">Magisk Manager a modificat dtbo.img. Te rugăm să repornești.</string>
     <string name="flashing">Se procesează</string>
     <string name="hide_manager_title">Se ascunde Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eşuat.</string>
+    <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat.</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul.</string>
-    <string name="download_zip_only">Doar descarcă fişierul zip</string>
-    <string name="patch_boot_file">Modifică fişierul de imagine boot</string>
+    <string name="download_zip_only">Doar descarcă fișierul zip</string>
+    <string name="patch_boot_file">Modifică fișierul de imagine boot</string>
     <string name="direct_install">Instalare directă (Recomandat)</string>
     <string name="install_inactive_slot">Instalare în slotul inactiv (După OTA)</string>
     <string name="warning">Avertisment</string>
@@ -139,14 +139,14 @@
     <string name="settings_boot_format_title">Formatul bootului modificat</string>
     <string name="settings_boot_format_summary">Selectează formatul fișierului imaginii de boot modificată.\nAlege .img pentru flash prin modul fastboot/download; alege .img.tar pentru flash cu ODIN.</string>
     <string name="settings_core_only_title">Mod numai de bază pentru Magisk</string>
-    <string name="settings_core_only_summary">Activează numai caracteristicile de bază. MagiskSU şi MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat.</string>
+    <string name="settings_core_only_summary">Activează numai caracteristicile de bază. MagiskSU și MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat.</string>
     <string name="settings_magiskhide_summary">Ascunde Magisk de diferite forme de detectare.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Suport systemless hosts pentru aplicațiile adblock.</string>
     <string name="settings_hosts_toast">Modulul Systemless hosts adăugat</string>
 
-    <string name="settings_su_app_adb">Aplicaţii şi ADB</string>
-    <string name="settings_su_app">Doar aplicaţii</string>
+    <string name="settings_su_app_adb">Aplicații și ADB</string>
+    <string name="settings_su_app">Doar aplicații</string>
     <string name="settings_su_adb">Doar ADB</string>
     <string name="settings_su_disable">Dezactivat</string>
     <string name="settings_su_request_10">10 secunde</string>
@@ -174,15 +174,15 @@
     <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească solicitări.</string>
     <string name="user_indepenent_summary">Fiecare utilizator are reguli separate pentru root.</string>
 
-    <string name="mount_namespace_mode">Mod de montare pentru spaţiile de nume</string>
-    <string name="settings_ns_global">Spaţiu de nume global</string>
-    <string name="settings_ns_requester">Spaţiu de nume moştenit</string>
+    <string name="mount_namespace_mode">Mod de montare pentru spațiile de nume</string>
+    <string name="settings_ns_global">Spațiu de nume global</string>
+    <string name="settings_ns_requester">Spațiu de nume moștenit</string>
     <string name="settings_ns_isolate">Spațiu de nume izolat</string>
     <string name="global_summary">Toate sesiunile de root folosesc spațiul de nume global.</string>
     <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului.</string>
     <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat.</string>
     <string name="android_o_not_support">Nu suportă Android 8.0+.</string>
-    <string name="disable_fingerprint">Nu au fost setate amprente sau scannerul de amprentă lipseşte.</string>
+    <string name="disable_fingerprint">Nu au fost setate amprente sau scannerul de amprentă lipsește.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitare de superutilizator</string>
@@ -190,16 +190,16 @@
     <string name="deny">Refuză</string>
     <string name="prompt">Solicitare</string>
     <string name="grant">Permite</string>
-    <string name="su_warning">Acordă acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
+    <string name="su_warning">Permite acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
     <string name="forever">Pentru totdeauna</string>
-    <string name="once">O singura dată</string>
+    <string name="once">O singură dată</string>
     <string name="tenmin">10 min</string>
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">Aplicației %1$s i-au fost acordate drepturi de superutilizator</string>
     <string name="su_deny_toast">Aplicației %1$s i-au fost refuzate drepturi de superutilizator</string>
-    <string name="no_apps_found">Nicio aplicaţie găsită</string>
+    <string name="no_apps_found">Nicio aplicație găsită</string>
     <string name="su_snack_grant">Drepturile de superutilizator pentru %1$s au fost acordate</string>
     <string name="su_snack_deny">Drepturile de superutilizator pentru %1$s au fost refuzate</string>
     <string name="su_snack_notif_on">Notificările pentru %1$s au fost activate</string>
@@ -211,7 +211,7 @@
     <string name="su_revoke_msg">Confirmi revocarea drepturilor pentru %1$s?</string>
     <string name="toast">Mesaj</string>
     <string name="none">Nimic</string>
-    <string name="auth_fail">Autentificare eşuată</string>
+    <string name="auth_fail">Autentificare eșuată</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

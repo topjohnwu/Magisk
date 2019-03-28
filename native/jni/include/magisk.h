@@ -1,8 +1,4 @@
-/* magisk.h - Top header
- */
-
-#ifndef _MAGISK_H_
-#define _MAGISK_H_
+#pragma once
 
 #include <logging.h>
 
@@ -30,19 +26,9 @@
 // Legacy crap
 #define LEGACYCORE      MODULEROOT "/.core"
 
-// selinux consts
-#define SELINUX_PATH        "/sys/fs/selinux"
-#define SELINUX_ENFORCE     SELINUX_PATH "/enforce"
-#define SELINUX_POLICY      SELINUX_PATH "/policy"
-#define SELINUX_LOAD        SELINUX_PATH "/load"
-#define SELINUX_CONTEXT     SELINUX_PATH "/context"
-#define SEPOL_PROC_DOMAIN "magisk"
-#define SEPOL_FILE_DOMAIN "magisk_file"
-
 extern int SDK_INT;
 
 constexpr const char *applet_names[] = { "magisk", "su", "resetprop", "magiskhide", nullptr };
-constexpr const char *init_applet[] = { "magiskpolicy", "supolicy", nullptr };
 
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);
@@ -50,5 +36,3 @@ int magiskhide_main(int argc, char *argv[]);
 int magiskpolicy_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
 int resetprop_main(int argc, char *argv[]);
-
-#endif
