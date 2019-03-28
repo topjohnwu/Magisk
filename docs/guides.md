@@ -68,7 +68,7 @@ This is the **unique identifier** of your module. You should not change it once 
 - Others that isn't mentioned above can be any **single line** string.
 
 ## Magisk Module Installer
-The official Magisk Module installer is hosted **[here](https://github.com/topjohnwu/magisk-module-template)**.
+The official Magisk Module installer is hosted **[here](https://github.com/topjohnwu/magisk-module-installer)**.
 
 That repo is a starting point for creating a Magisk module installer zip. Here are some details:
 
