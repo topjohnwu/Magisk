@@ -31,14 +31,13 @@ import com.topjohnwu.magisk.dialogs.MagiskInstallDialog;
 import com.topjohnwu.magisk.dialogs.ManagerInstallDialog;
 import com.topjohnwu.magisk.dialogs.UninstallDialog;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
-import com.topjohnwu.magisk.uicomponents.ArrowExpandable;
-import com.topjohnwu.magisk.uicomponents.Expandable;
+import com.topjohnwu.magisk.uicomponents.ArrowExpandedViewHolder;
 import com.topjohnwu.magisk.uicomponents.ExpandableViewHolder;
 import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
 import com.topjohnwu.magisk.uicomponents.SafetyNet;
 import com.topjohnwu.magisk.uicomponents.UpdateCardHolder;
-import com.topjohnwu.magisk.utils.Event;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.AppUtils;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
@@ -48,7 +47,8 @@ import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MagiskFragment extends BaseFragment
+        implements SwipeRefreshLayout.OnRefreshListener, Topic.Subscriber {
 
     private static boolean shownDialog = false;
 
@@ -73,7 +73,7 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
     private UpdateCardHolder manager;
     private SafetyNet safetyNet;
     private Transition transition;
-    private Expandable optionExpand;
+    private ExpandableViewHolder optionExpand;
 
     private void magiskInstall(View v) {
         // Show Manager update first
@@ -89,7 +89,7 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
     }
 
     private void openLink(String url) {
-        Utils.openLink(requireActivity(), Uri.parse(url));
+        AppUtils.openLink(requireActivity(), Uri.parse(url));
     }
 
     @OnClick(R.id.paypal)
@@ -137,7 +137,7 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
         unbinder = new MagiskFragment_ViewBinding(this, v);
         requireActivity().setTitle(R.string.magisk);
 
-        optionExpand = new ArrowExpandable(new ExpandableViewHolder(optionExpandLayout), arrow);
+        optionExpand = new ArrowExpandedViewHolder(optionExpandLayout, arrow);
         safetyNet = new SafetyNet(v);
         magisk = new UpdateCardHolder(inflater, root);
         manager = new UpdateCardHolder(inflater, root);
@@ -194,7 +194,7 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
         Config.loadMagiskInfo();
         updateUI();
 
-        Event.reset(this);
+        Topic.reset(getSubscribedTopics());
         Config.remoteMagiskVersionString = null;
         Config.remoteMagiskVersionCode = -1;
 
@@ -207,12 +207,12 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
     }
 
     @Override
-    public int[] getListeningEvents() {
-        return new int[] {Event.UPDATE_CHECK_DONE};
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.UPDATE_CHECK_DONE};
     }
 
     @Override
-    public void onEvent(int event) {
+    public void onPublish(int topic, Object[] result) {
         updateCheckUI();
     }
 
@@ -255,8 +255,6 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
     private void updateCheckUI() {
         int image, color;
         String status, button = "";
-
-        TransitionManager.beginDelayedTransition(root, transition);
 
         if (Config.remoteMagiskVersionCode < 0) {
             color = colorNeutral;
@@ -312,6 +310,8 @@ public class MagiskFragment extends BaseFragment implements SwipeRefreshLayout.O
 
         magisk.setValid(Config.remoteMagiskVersionCode > 0);
         manager.setValid(Config.remoteManagerVersionCode > 0);
+
+        TransitionManager.beginDelayedTransition(root, transition);
 
         if (Config.remoteMagiskVersionCode < 0) {
             // Hide install related components

@@ -20,12 +20,15 @@ import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
+import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.tasks.UpdateRepos;
-import com.topjohnwu.magisk.utils.Event;
+import com.topjohnwu.magisk.utils.Topic;
+
+import java.util.Map;
 
 import butterknife.BindView;
 
-public class ReposFragment extends BaseFragment {
+public class ReposFragment extends BaseFragment implements Topic.Subscriber {
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
@@ -46,11 +49,9 @@ public class ReposFragment extends BaseFragment {
         unbinder = new ReposFragment_ViewBinding(this, view);
 
         mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(() -> new UpdateRepos().exec(true));
-
-        adapter = new ReposAdapter();
-        recyclerView.setAdapter(adapter);
         recyclerView.setVisibility(View.GONE);
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> new UpdateRepos().exec(true));
 
         requireActivity().setTitle(R.string.downloads);
 
@@ -58,31 +59,46 @@ public class ReposFragment extends BaseFragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Event.unregister(adapter);
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.MODULE_LOAD_DONE, Topic.REPO_LOAD_DONE};
     }
 
     @Override
-    public int[] getListeningEvents() {
-        return new int[] {Event.REPO_LOAD_DONE};
-    }
-
-    @Override
-    public void onEvent(int event) {
-        adapter.notifyDBChanged(false);
-        Event.register(adapter);
-        mSwipeRefreshLayout.setRefreshing(false);
-        boolean empty = adapter.getItemCount() == 0;
-        recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
-        emptyRv.setVisibility(empty ? View.VISIBLE : View.GONE);
+    public void onPublish(int topic, Object[] result) {
+        switch (topic) {
+            case Topic.MODULE_LOAD_DONE:
+                adapter = new ReposAdapter(app.repoDB, (Map<String, Module>) result[0]);
+                recyclerView.setAdapter(adapter);
+                break;
+            case Topic.REPO_LOAD_DONE:
+                if (adapter != null)
+                    adapter.notifyDBChanged();
+                break;
+        }
+        if (Topic.isPublished(this)) {
+            mSwipeRefreshLayout.setRefreshing(false);
+            boolean empty = adapter.getItemCount() == 0;
+            recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
+            emptyRv.setVisibility(empty ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_repo, menu);
         SearchView search = (SearchView) menu.findItem(R.id.repo_search).getActionView();
-        adapter.setSearchView(search);
+        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.filter(newText);
+                return false;
+            }
+        });
     }
 
     @Override
@@ -93,7 +109,7 @@ public class ReposFragment extends BaseFragment {
                 .setSingleChoiceItems(R.array.sorting_orders,
                         Config.get(Config.Key.REPO_ORDER), (d, which) -> {
                     Config.set(Config.Key.REPO_ORDER, which);
-                    adapter.notifyDBChanged(true);
+                    adapter.notifyDBChanged();
                     d.dismiss();
                 }).show();
         }

@@ -27,17 +27,15 @@ static int is_excl(const char *name) {
 	return 0;
 }
 
-ssize_t fd_path(int fd, char *path, size_t size) {
+int fd_getpath(int fd, char *path, size_t size) {
 	snprintf(path, size, "/proc/self/fd/%d", fd);
-	return xreadlink(path, path, size);
+	return xreadlink(path, path, size) == -1;
 }
 
-int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
-	ssize_t len = fd_path(dirfd, path, size);
-	if (len < 0)
-		return -1;
-	path[len] = '/';
-	strlcpy(&path[len + 1], name, size - len - 1);
+int fd_getpathat(int dirfd, const char *name, char *path, size_t size) {
+	if (fd_getpath(dirfd, path, size))
+		return 1;
+	snprintf(path, size, "%s/%s", path, name);
 	return 0;
 }
 
@@ -87,7 +85,7 @@ void rm_rf(const char *path) {
 	if (lstat(path, &st) < 0)
 		return;
 	if (S_ISDIR(st.st_mode)) {
-		int fd = open(path, O_RDONLY | O_CLOEXEC);
+		int fd = open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
 		frm_rf(fd);
 		close(fd);
 	}
@@ -213,7 +211,7 @@ void clone_dir(int src, int dest) {
 		case DT_REG:
 			destfd = xopenat(dest, entry->d_name, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC);
 			srcfd = xopenat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
-			xsendfile(destfd, srcfd, nullptr, a.st.st_size);
+			xsendfile(destfd, srcfd, 0, a.st.st_size);
 			fsetattr(destfd, &a);
 			close(destfd);
 			close(srcfd);
@@ -265,21 +263,16 @@ int getattr(const char *path, struct file_attr *a) {
 	return 0;
 }
 
-int getattrat(int dirfd, const char *name, struct file_attr *a) {
-	char path[4096];
-	fd_pathat(dirfd, name, path, sizeof(path));
+int getattrat(int dirfd, const char *pathname, struct file_attr *a) {
+	char path[PATH_MAX];
+	fd_getpathat(dirfd, pathname, path, sizeof(path));
 	return getattr(path, a);
 }
 
 int fgetattr(int fd, struct file_attr *a) {
-	if (xfstat(fd, &a->st) < 0)
-		return -1;
-	char *con;
-	if (fgetfilecon(fd, &con) < 0)
-		return -1;
-	strcpy(a->con, con);
-	freecon(con);
-	return 0;
+	char path[PATH_MAX];
+	fd_getpath(fd, path, sizeof(path));
+	return getattr(path, a);
 }
 
 int setattr(const char *path, struct file_attr *a) {
@@ -287,25 +280,21 @@ int setattr(const char *path, struct file_attr *a) {
 		return -1;
 	if (chown(path, a->st.st_uid, a->st.st_gid) < 0)
 		return -1;
-	if (a->con[0] && lsetfilecon(path, a->con) < 0)
+	if (strlen(a->con) && lsetfilecon(path, a->con) < 0)
 		return -1;
 	return 0;
 }
 
-int setattrat(int dirfd, const char *name, struct file_attr *a) {
-	char path[4096];
-	fd_pathat(dirfd, name, path, sizeof(path));
+int setattrat(int dirfd, const char *pathname, struct file_attr *a) {
+	char path[PATH_MAX];
+	fd_getpathat(dirfd, pathname, path, sizeof(path));
 	return setattr(path, a);
 }
 
 int fsetattr(int fd, struct file_attr *a) {
-	if (fchmod(fd, a->st.st_mode & 0777) < 0)
-		return -1;
-	if (fchown(fd, a->st.st_uid, a->st.st_gid) < 0)
-		return -1;
-	if (a->con[0] && fsetfilecon(fd, a->con) < 0)
-		return -1;
-	return 0;
+	char path[PATH_MAX];
+	fd_getpath(fd, path, sizeof(path));
+	return setattr(path, a);
 }
 
 void clone_attr(const char *source, const char *target) {
@@ -348,6 +337,17 @@ void fd_full_read(int fd, void **buf, size_t *size) {
 
 void full_read(const char *filename, void **buf, size_t *size) {
 	int fd = xopen(filename, O_RDONLY | O_CLOEXEC);
+	if (fd < 0) {
+		*buf = nullptr;
+		*size = 0;
+		return;
+	}
+	fd_full_read(fd, buf, size);
+	close(fd);
+}
+
+void full_read_at(int dirfd, const char *filename, void **buf, size_t *size) {
+	int fd = xopenat(dirfd, filename, O_RDONLY | O_CLOEXEC);
 	if (fd < 0) {
 		*buf = nullptr;
 		*size = 0;

@@ -1,9 +1,8 @@
 package com.topjohnwu.magisk;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Xml;
-
-import androidx.collection.ArrayMap;
 
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
@@ -60,16 +59,14 @@ public class Config {
         public static final String UPDATE_CHANNEL = "update_channel";
         public static final String CUSTOM_CHANNEL = "custom_channel";
         public static final String BOOT_FORMAT = "boot_format";
+        public static final String UPDATE_SERVICE_VER = "update_service_version";
+        public static final String MAGISKHIDE = "magiskhide";
+        public static final String COREONLY = "disable";
         public static final String LOCALE = "locale";
         public static final String DARK_THEME = "dark_theme";
         public static final String ETAG_KEY = "ETag";
         public static final String REPO_ORDER = "repo_order";
         public static final String SHOW_SYSTEM_APP = "show_system";
-
-        // system state
-        public static final String UPDATE_SERVICE_VER = "update_service_version";
-        public static final String MAGISKHIDE = "magiskhide";
-        public static final String COREONLY = "disable";
     }
 
     public static class Value {
@@ -98,6 +95,46 @@ public class Config {
         public static final int ORDER_DATE = 1;
     }
 
+    private static Bundle defs = new Bundle();
+
+    static {
+        /* Set default configurations */
+
+        // prefs int
+        defs.putInt(Key.REPO_ORDER, Value.ORDER_DATE);
+
+        // prefs string int
+        defs.putInt(Key.SU_REQUEST_TIMEOUT, 10);
+        defs.putInt(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT);
+        defs.putInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST);
+        defs.putInt(Key.UPDATE_CHANNEL, Value.STABLE_CHANNEL);
+
+        // prefs bool
+        defs.putBoolean(Key.CHECK_UPDATES, true);
+        // defs.putBoolean(Key.DARK_THEME, false);
+        // defs.putBoolean(Key.SU_REAUTH, false);
+        // defs.putBoolean(Key.MAGISKHIDE, false);
+        // defs.putBoolean(Key.COREONLY, false);
+        // defs.putBoolean(Key.SHOW_SYSTEM_APP, false);
+
+        // prefs string
+        defs.putString(Key.CUSTOM_CHANNEL, "");
+        defs.putString(Key.BOOT_FORMAT, ".img");
+        defs.putString(Key.LOCALE, "");
+        // defs.putString(Key.ETAG_KEY, null);
+
+        // db int
+        defs.putInt(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB);
+        defs.putInt(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER);
+        defs.putInt(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY);
+
+        // db bool
+        // defs.putBoolean(Key.SU_FINGERPRINT, false);
+
+        // db strings
+        // defs.putString(Key.SU_MANAGER, null);
+    }
+
     public static void loadMagiskInfo() {
         try {
             magiskVersionString = ShellUtils.fastCmd("magisk -v").split(":")[0];
@@ -110,15 +147,15 @@ public class Config {
         // Flush prefs to disk
         App app = App.self;
         app.prefs.edit().commit();
-        File xml = new File(App.deContext.getFilesDir().getParent() + "/shared_prefs",
+        File xml = new File(app.getFilesDir().getParent() + "/shared_prefs",
                 app.getPackageName() + "_preferences.xml");
-        Shell.su(Utils.fmt("cat %s > /data/adb/%s", xml, Const.MANAGER_CONFIGS)).exec();
+        Shell.su(Utils.fmt("cat %s > /data/user/0/%s", xml, Const.MANAGER_CONFIGS)).exec();
     }
 
     public static void initialize() {
         SharedPreferences pref = App.self.prefs;
         SharedPreferences.Editor editor = pref.edit();
-        SuFile config = new SuFile("/data/adb/" + Const.MANAGER_CONFIGS);
+        SuFile config = new SuFile("/data/user/0/" + Const.MANAGER_CONFIGS);
         if (config.exists()) {
             try {
                 SuFileInputStream is = new SuFileInputStream(config);
@@ -175,8 +212,11 @@ public class Config {
             config.delete();
         }
 
-        // Set defaults if not set
-        setDefs(pref, editor);
+        // Set to defaults if not set
+        setDefs(pref, editor,
+                Key.SU_REQUEST_TIMEOUT, Key.SU_AUTO_RESPONSE, Key.ROOT_ACCESS,
+                Key.SU_MNT_NS, Key.SU_NOTIFICATION, Key.DARK_THEME,
+                Key.CHECK_UPDATES, Key.UPDATE_CHANNEL, Key.REPO_ORDER);
 
         // These settings are from actual device state
         editor.putBoolean(Key.MAGISKHIDE, magiskHide)
@@ -239,22 +279,22 @@ public class Config {
         App app = App.self;
         switch (getConfigType(key)) {
             case PREF_INT:
-                return (T) (Integer) app.prefs.getInt(key, getDef(key));
+                return (T) (Integer) app.prefs.getInt(key, defs.getInt(key));
             case PREF_STR_INT:
-                return (T) (Integer) Utils.getPrefsInt(app.prefs, key, getDef(key));
+                return (T) (Integer) Utils.getPrefsInt(app.prefs, key, defs.getInt(key));
             case PREF_BOOL:
-                return (T) (Boolean) app.prefs.getBoolean(key, getDef(key));
+                return (T) (Boolean) app.prefs.getBoolean(key, defs.getBoolean(key));
             case PREF_STR:
-                return (T) app.prefs.getString(key, getDef(key));
+                return (T) app.prefs.getString(key, defs.getString(key));
             case DB_INT:
-                return (T) (Integer) app.mDB.getSettings(key, getDef(key));
+                return (T) (Integer) app.mDB.getSettings(key, defs.getInt(key));
             case DB_BOOL:
-                return (T) (Boolean) (app.mDB.getSettings(key, getDef(key) ? 1 : 0) != 0);
+                return (T) (Boolean) (app.mDB.getSettings(key, defs.getBoolean(key) ? 1 : 0) != 0);
             case DB_STR:
-                return (T) app.mDB.getStrings(key, getDef(key));
+                return (T) app.mDB.getStrings(key, defs.getString(key));
         }
         /* Will never get here (IllegalArgumentException in getConfigType) */
-        return null;
+        return (T) new Object();
     }
 
     public static void set(String key, Object val) {
@@ -286,6 +326,7 @@ public class Config {
 
     public static void remove(String key) {
         App app = App.self;
+        int def;
         switch (getConfigType(key)) {
             case PREF_INT:
             case PREF_STR_INT:
@@ -293,9 +334,13 @@ public class Config {
             case PREF_STR:
                 app.prefs.edit().remove(key).apply();
                 break;
-            case DB_BOOL:
             case DB_INT:
-                app.mDB.rmSettings(key);
+                def = defs.getInt(key);
+                app.mDB.setSettings(key, def);
+                break;
+            case DB_BOOL:
+                def = defs.getBoolean(key) ? 1 : 0;
+                app.mDB.setSettings(key, def);
                 break;
             case DB_STR:
                 app.mDB.setStrings(key, null);
@@ -303,94 +348,25 @@ public class Config {
         }
     }
 
-    private static ArrayMap<String, Object> defs = new ArrayMap<>();
-
-    static {
-        /* Set default configurations */
-
-        // prefs int
-        defs.put(Key.REPO_ORDER, Value.ORDER_DATE);
-
-        // prefs string int
-        defs.put(Key.SU_REQUEST_TIMEOUT, 10);
-        defs.put(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT);
-        defs.put(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST);
-        defs.put(Key.UPDATE_CHANNEL, Utils.isCanary() ?
-                Value.CANARY_DEBUG_CHANNEL : Value.STABLE_CHANNEL);
-
-        // prefs bool
-        defs.put(Key.CHECK_UPDATES, true);
-        defs.put(Key.DARK_THEME, true);
-        //defs.put(Key.SU_REAUTH, false);
-        //defs.put(Key.SHOW_SYSTEM_APP, false);
-
-        // prefs string
-        defs.put(Key.CUSTOM_CHANNEL, "");
-        defs.put(Key.BOOT_FORMAT, ".img");
-        defs.put(Key.LOCALE, "");
-        //defs.put(Key.ETAG_KEY, null);
-
-        // db int
-        defs.put(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB);
-        defs.put(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER);
-        defs.put(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY);
-
-        // db bool
-        //defs.put(Key.SU_FINGERPRINT, false);
-
-        // db strings
-        //defs.put(Key.SU_MANAGER, null);
-    }
-
-    private static <T> T getDef(String key) {
-        Object val = defs.get(key);
-        switch (getConfigType(key)) {
-            case PREF_INT:
-            case DB_INT:
-            case PREF_STR_INT:
-                return val != null ? (T) val : (T) (Integer) 0;
-            case DB_BOOL:
-            case PREF_BOOL:
-                return val != null ? (T) val : (T) (Boolean) false;
-            case DB_STR:
-            case PREF_STR:
-                return (T) val;
-        }
-        /* Will never get here (IllegalArgumentException in getConfigType) */
-        return null;
-    }
-
-    private static void setDefs(SharedPreferences pref, SharedPreferences.Editor editor) {
-        App app = App.self;
-        for (String key : defs.keySet()) {
-            int type = getConfigType(key);
-            switch (type) {
-                case DB_INT:
-                    editor.putString(key, String.valueOf(
-                            app.mDB.getSettings(key, (Integer) defs.get(key))));
-                    continue;
-                case DB_STR:
-                    editor.putString(key, app.mDB.getStrings(key, (String) defs.get(key)));
-                    continue;
-                case DB_BOOL:
-                    int bs = app.mDB.getSettings(key, -1);
-                    editor.putBoolean(key, bs < 0 ? (Boolean) defs.get(key) : bs != 0);
-                    continue;
-            }
+    private static void setDefs(SharedPreferences pref, SharedPreferences.Editor editor, String... keys) {
+        for (String key : keys) {
             if (pref.contains(key))
                 continue;
-            switch (type) {
+            switch (getConfigType(key)) {
                 case PREF_INT:
-                    editor.putInt(key, (Integer) defs.get(key));
+                    editor.putInt(key, defs.getInt(key));
                     break;
+                case DB_INT:
                 case PREF_STR_INT:
-                    editor.putString(key, String.valueOf(defs.get(key)));
+                    editor.putString(key, String.valueOf(defs.getInt(key)));
                     break;
                 case PREF_STR:
-                    editor.putString(key, (String) defs.get(key));
+                case DB_STR:
+                    editor.putString(key, defs.getString(key));
                     break;
                 case PREF_BOOL:
-                    editor.putBoolean(key, (Boolean) defs.get(key));
+                case DB_BOOL:
+                    editor.putBoolean(key, defs.getBoolean(key));
                     break;
             }
         }

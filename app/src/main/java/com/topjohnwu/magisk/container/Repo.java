@@ -8,8 +8,6 @@ import android.os.Parcelable;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.net.Networking;
-import com.topjohnwu.net.Request;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -84,27 +82,11 @@ public class Repo extends BaseModule {
     }
 
     public String getPropUrl() {
-        return getFileUrl("module.prop");
+        return String.format(Const.Url.FILE_URL, getId(), "module.prop");
     }
 
     public String getDetailUrl() {
-        return getFileUrl("README.md");
-    }
-
-    public String getFileUrl(String file) {
-        return String.format(Const.Url.FILE_URL, getId(), file);
-    }
-
-    public boolean isNewInstaller() {
-        try (Request install = Networking.get(getFileUrl("install.sh"))) {
-            if (install.connect().isSuccess()) {
-                // Double check whether config.sh exists
-                try (Request config = Networking.get(getFileUrl("config.sh"))) {
-                    return !config.connect().isSuccess();
-                }
-            }
-            return false;
-        }
+        return String.format(Const.Url.FILE_URL, getId(), "README.md");
     }
 
     public String getLastUpdateString() {

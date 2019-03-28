@@ -1,7 +1,8 @@
-#pragma once
-
 #include <stdint.h>
 #include "format.h"
+
+#ifndef _BOOT_IMAGE_H_
+#define _BOOT_IMAGE_H_
 
 struct boot_img_hdr_base {
 	char magic[8];
@@ -45,18 +46,13 @@ struct boot_img_hdr_v0 : public boot_img_hdr_base {
 } __attribute__((packed));
 
 struct boot_img_hdr_v1 : public boot_img_hdr_v0 {
-	uint32_t recovery_dtbo_size;    /* size in bytes for recovery DTBO/ACPIO image */
-	uint64_t recovery_dtbo_offset;  /* offset to recovery dtbo/acpio in boot image */
+	uint32_t recovery_dtbo_size;   /* size in bytes for recovery DTBO image */
+	uint64_t recovery_dtbo_offset; /* offset to recovery dtbo in boot image */
 	uint32_t header_size;
 } __attribute__((packed));
 
-struct boot_img_hdr_v2 : public boot_img_hdr_v1 {
-	uint32_t dtb_size;  /* size in bytes for DTB image */
-	uint64_t dtb_addr;  /* physical load address for DTB image */
-} __attribute__((packed));
-
 // Default to hdr v1
-typedef boot_img_hdr_v2 boot_img_hdr;
+typedef boot_img_hdr_v1 boot_img_hdr;
 
 // Special Samsung header
 struct boot_img_hdr_pxa : public boot_img_hdr_base {
@@ -88,15 +84,12 @@ struct boot_img_hdr_pxa : public boot_img_hdr_base {
 ** +-----------------+
 ** | recovery dtbo   | q pages
 ** +-----------------+
-** | dtb             | r pages
-** +-----------------+
 **
 ** n = (kernel_size + page_size - 1) / page_size
 ** m = (ramdisk_size + page_size - 1) / page_size
 ** o = (second_size + page_size - 1) / page_size
 ** p = (extra_size + page_size - 1) / page_size
 ** q = (recovery_dtbo_size + page_size - 1) / page_size
-** r = (dtb_size + page_size - 1) / page_size
 **
 ** 0. all entities are page_size aligned in flash
 ** 1. kernel and ramdisk are required (size != 0)
@@ -152,14 +145,14 @@ struct blob_hdr {
 
 struct dyn_img_hdr {
 
-#define dyn_access(x) (pxa ? hdr_pxa->x : v2_hdr->x)
+#define dyn_access(x) (pxa ? hdr_pxa->x : v1_hdr->x)
 
 #define dyn_get(name, type) \
 type name() const { return dyn_access(name); }
 #define dyn_ref(name, type) \
 type &name() { return dyn_access(name); }
-#define v2_ref(name, type, alt) \
-type &name() { if (pxa) { alt = 0; return alt; } return v2_hdr->name; }
+#define v1_ref(name, type, alt) \
+type &name() { if (pxa) { alt = 0; return alt; } return v1_hdr->name; }
 
 	dyn_ref(page_size, uint32_t);
 	dyn_get(name, char *);
@@ -167,24 +160,23 @@ type &name() { if (pxa) { alt = 0; return alt; } return v2_hdr->name; }
 	dyn_get(id, char *);
 	dyn_get(extra_cmdline, char *);
 
-	v2_ref(os_version, uint32_t, j32);
-	v2_ref(recovery_dtbo_size, uint32_t, j32);
-	v2_ref(recovery_dtbo_offset, uint64_t, j64);
-	v2_ref(header_size, uint32_t, j32);
-	v2_ref(dtb_size, uint32_t, j32);
+	v1_ref(os_version, uint32_t, j32);
+	v1_ref(recovery_dtbo_size, uint32_t, j32);
+	v1_ref(recovery_dtbo_offset, uint64_t, j64);
+	v1_ref(header_size, uint32_t, j32);
 
 	dyn_img_hdr() : pxa(false), img_hdr(nullptr) {}
 	~dyn_img_hdr() {
 		if (pxa)
 			delete hdr_pxa;
 		else
-			delete v2_hdr;
+			delete v1_hdr;
 	}
 
 	uint32_t header_version() {
 		// There won't be v4 header any time soon...
 		// If larger than 4, assume this field will be treated as extra_size
-		return pxa || v2_hdr->header_version > 4 ? 0 : v2_hdr->header_version;
+		return pxa || v1_hdr->header_version > 4 ? 0 : v1_hdr->header_version;
 	}
 
 	uint32_t &extra_size() {
@@ -201,7 +193,7 @@ type &name() { if (pxa) { alt = 0; return alt; } return v2_hdr->name; }
 	}
 
 	void set_hdr(boot_img_hdr *h) {
-		v2_hdr = h;
+		v1_hdr = h;
 	}
 
 	void set_hdr(boot_img_hdr_pxa *h) {
@@ -224,7 +216,7 @@ private:
 		 * but both of them is a base header.
 		 * Same address can be interpreted in 3 ways */
 		boot_img_hdr_base *img_hdr;  /* Common base header */
-		boot_img_hdr *v2_hdr;        /* AOSP v2 header */
+		boot_img_hdr *v1_hdr;        /* AOSP v1 header */
 		boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
 	};
 
@@ -251,8 +243,8 @@ struct boot_img {
 	format_t r_fmt;
 
 	// Pointer to dtb that is appended after kernel
-	uint8_t *kernel_dtb;
-	uint32_t kernel_dt_size;
+	uint8_t *dtb;
+	uint32_t dt_size;
 
 	// Pointer to end of image
 	uint8_t *tail;
@@ -264,7 +256,6 @@ struct boot_img {
 	uint8_t *second;
 	uint8_t *extra;
 	uint8_t *recov_dtbo;
-	uint8_t *dtb;
 
 	~boot_img();
 
@@ -273,3 +264,5 @@ struct boot_img {
 	void find_dtb();
 	void print_hdr();
 };
+
+#endif

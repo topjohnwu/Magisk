@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.tasks.UpdateRepos;
 import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.magisk.uicomponents.Shortcuts;
+import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
@@ -62,7 +63,7 @@ public class SplashActivity extends BaseActivity {
         Notifications.setup(this);
 
         // Schedule periodic update checks
-        Utils.scheduleUpdateCheck();
+        AppUtils.scheduleUpdateCheck();
 
         // Setup shortcuts
         Shortcuts.setup(this);
@@ -73,7 +74,7 @@ public class SplashActivity extends BaseActivity {
         // Magisk working as expected
         if (Shell.rootAccess() && Config.magiskVersionCode > 0) {
             // Load modules
-            Utils.loadModules(false);
+            Utils.loadModules();
             // Load repos
             if (Networking.checkNetworkStatus(this))
                 new UpdateRepos().exec();

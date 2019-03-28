@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -9,25 +8,15 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-
 import com.topjohnwu.magisk.App;
-import com.topjohnwu.magisk.BuildConfig;
-import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.UpdateCheckService;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
-import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
@@ -35,7 +24,6 @@ import com.topjohnwu.superuser.io.SuFile;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
@@ -107,12 +95,8 @@ public class Utils {
     }
 
     public static void loadModules() {
-        loadModules(true);
-    }
-
-    public static void loadModules(boolean async) {
-        Event.reset(Event.MODULE_LOAD_DONE);
-        Runnable run = () -> {
+        Topic.reset(Topic.MODULE_LOAD_DONE);
+        App.THREAD_POOL.execute(() -> {
             Map<String, Module> moduleMap = new ValueSortedMap<>();
             SuFile path = new SuFile(Const.MAGISK_PATH);
             SuFile[] modules = path.listFiles(
@@ -122,12 +106,8 @@ public class Utils {
                 Module module = new Module(Const.MAGISK_PATH + "/" + file.getName());
                 moduleMap.put(module.getId(), module);
             }
-            Event.trigger(Event.MODULE_LOAD_DONE, moduleMap);
-        };
-        if (async)
-            App.THREAD_POOL.execute(run);
-        else
-            run.run();
+            Topic.publish(Topic.MODULE_LOAD_DONE, moduleMap);
+        });
     }
 
     public static boolean showSuperUser() {
@@ -136,39 +116,12 @@ public class Utils {
                         Config.Value.MULTIUSER_MODE_OWNER_MANAGED);
     }
 
+    public static Context getDEContext() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
+                App.self.createDeviceProtectedStorageContext() : App.self;
+    }
+
     public static void reboot() {
         Shell.su("/system/bin/reboot" + (Config.recovery ? " recovery" : "")).submit();
-    }
-
-    public static boolean isCanary() {
-        return BuildConfig.VERSION_NAME.contains("-");
-    }
-
-    public static void scheduleUpdateCheck() {
-        if (Config.get(Config.Key.CHECK_UPDATES)) {
-            Constraints constraints = new Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build();
-            PeriodicWorkRequest request = new PeriodicWorkRequest
-                    .Builder(ClassMap.get(UpdateCheckService.class), 12, TimeUnit.HOURS)
-                    .setConstraints(constraints)
-                    .build();
-            WorkManager.getInstance().enqueueUniquePeriodicWork(
-                    Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID,
-                    ExistingPeriodicWorkPolicy.REPLACE, request);
-        } else {
-            WorkManager.getInstance().cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID);
-            CheckUpdates.check();
-        }
-    }
-
-    public static void openLink(Context context, Uri link) {
-        Intent intent = new Intent(Intent.ACTION_VIEW, link);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (intent.resolveActivity(context.getPackageManager()) != null) {
-            context.startActivity(intent);
-        } else {
-            toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT);
-        }
     }
 }

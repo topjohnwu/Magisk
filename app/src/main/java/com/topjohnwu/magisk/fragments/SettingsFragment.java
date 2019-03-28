@@ -22,11 +22,12 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BasePreferenceFragment;
 import com.topjohnwu.magisk.dialogs.FingerprintAuthDialog;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
+import com.topjohnwu.magisk.utils.AppUtils;
 import com.topjohnwu.magisk.utils.DownloadApp;
-import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.PatchAPK;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
@@ -35,7 +36,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
 
-public class SettingsFragment extends BasePreferenceFragment {
+public class SettingsFragment extends BasePreferenceFragment implements Topic.Subscriber {
 
     private ListPreference updateChannel, autoRes, suNotification,
             requestTimeout, rootConfig, multiuserConfig, nsConfig;
@@ -111,7 +112,7 @@ public class SettingsFragment extends BasePreferenceFragment {
 
         /* We only show canary channels if user is already on canary channel
          * or the user have already chosen canary channel */
-        if (!Utils.isCanary() &&
+        if (!BuildConfig.VERSION_NAME.contains("-") &&
                 (int) Config.get(Config.Key.UPDATE_CHANNEL) < Config.Value.CANARY_CHANNEL) {
             // Remove the last 2 entries
             CharSequence[] entries = updateChannel.getEntries();
@@ -214,7 +215,7 @@ public class SettingsFragment extends BasePreferenceFragment {
                 CheckUpdates.check();
                 break;
             case Config.Key.CHECK_UPDATES:
-                Utils.scheduleUpdateCheck();
+                AppUtils.scheduleUpdateCheck();
                 break;
         }
         setSummary(key);
@@ -287,12 +288,12 @@ public class SettingsFragment extends BasePreferenceFragment {
     }
 
     @Override
-    public void onEvent(int event) {
+    public void onPublish(int topic, Object[] result) {
         setLocalePreference((ListPreference) findPreference(Config.Key.LOCALE));
     }
 
     @Override
-    public int[] getListeningEvents() {
-        return new int[] {Event.LOCALE_FETCH_DONE};
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.LOCALE_FETCH_DONE};
     }
 }

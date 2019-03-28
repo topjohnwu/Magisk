@@ -152,10 +152,6 @@ public class MagiskDB {
         rawSQL("DELETE FROM %s", LOG_TABLE);
     }
 
-    public void rmSettings(String key) {
-        rawSQL("DELETE FROM %s WHERE key=\"%s\"", SETTINGS_TABLE, key);
-    }
-
     public void setSettings(String key, int value) {
         ContentValues data = new ContentValues();
         data.put("key", key);

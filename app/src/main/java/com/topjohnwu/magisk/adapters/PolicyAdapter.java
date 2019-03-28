@@ -19,8 +19,7 @@ import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.database.MagiskDB;
 import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
 import com.topjohnwu.magisk.dialogs.FingerprintAuthDialog;
-import com.topjohnwu.magisk.uicomponents.ArrowExpandable;
-import com.topjohnwu.magisk.uicomponents.Expandable;
+import com.topjohnwu.magisk.uicomponents.ArrowExpandedViewHolder;
 import com.topjohnwu.magisk.uicomponents.ExpandableViewHolder;
 import com.topjohnwu.magisk.uicomponents.SnackbarMaker;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
@@ -161,12 +160,12 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         @BindView(R.id.delete) ImageView delete;
         @BindView(R.id.more_info) ImageView moreInfo;
 
-        Expandable settings;
+        ExpandableViewHolder settings;
 
         public ViewHolder(View itemView) {
             super(itemView);
             new PolicyAdapter$ViewHolder_ViewBinding(this, itemView);
-            settings = new ArrowExpandable(new ExpandableViewHolder(expandLayout), arrow);
+            settings = new ArrowExpandedViewHolder(expandLayout, arrow);
         }
     }
 }

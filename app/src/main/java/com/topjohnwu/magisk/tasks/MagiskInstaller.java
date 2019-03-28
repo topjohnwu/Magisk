@@ -73,7 +73,7 @@ public abstract class MagiskInstaller {
     public MagiskInstaller(List<String> out, List<String> err) {
         console = out;
         logs = err;
-        installDir = new File(App.deContext.getFilesDir().getParent(), "install");
+        installDir = new File(Utils.getDEContext().getFilesDir().getParent(), "install");
         Shell.sh("rm -rf " + installDir).exec();
         installDir.mkdirs();
     }
@@ -147,9 +147,12 @@ public abstract class MagiskInstaller {
                     name = ze.getName();
                 if (name == null)
                     continue;
-                File dest = (installDir instanceof SuFile) ?
-                        new SuFile(installDir, name) :
-                        new File(installDir, name);
+                File dest;
+                if (installDir instanceof SuFile) {
+                    dest = new SuFile(installDir, name);
+                } else {
+                    dest = new File(installDir, name);
+                }
                 dest.getParentFile().mkdirs();
                 try (OutputStream out = new SuFileOutputStream(dest)) {
                     ShellUtils.pump(zi, out);
@@ -158,13 +161,6 @@ public abstract class MagiskInstaller {
         } catch (IOException e) {
             console.add("! Cannot unzip zip");
             return false;
-        }
-
-        SuFile init64 = new SuFile(installDir, "magiskinit64");
-        if (Build.VERSION.SDK_INT >= 21 && Build.SUPPORTED_64_BIT_ABIS.length != 0) {
-            init64.renameTo(new SuFile(installDir, "magiskinit"));
-        } else {
-            init64.delete();
         }
         return true;
     }
@@ -215,13 +211,18 @@ public abstract class MagiskInstaller {
             return false;
         }
 
-        if (!Shell.sh("cd " + installDir, Utils.fmt(
-                "KEEPFORCEENCRYPT=%b KEEPVERITY=%b sh update-binary sh boot_patch.sh %s",
-                Config.keepEnc, Config.keepVerity, srcBoot))
-                .to(console, logs).exec().isSuccess())
+        Shell.Job job = Shell.sh("cd " + installDir);
+        if (Build.VERSION.SDK_INT >= 21 && Build.SUPPORTED_64_BIT_ABIS.length != 0) {
+            job.add("mv -f magiskinit64 magiskinit 2>/dev/null");
+        } else {
+            job.add("rm -f magiskinit64 2>/dev/null");
+        }
+        if (!job.add(Utils.fmt("KEEPFORCEENCRYPT=%b KEEPVERITY=%b " +
+                        "sh update-binary sh boot_patch.sh %s",
+                Config.keepEnc, Config.keepVerity, srcBoot)).to(console, logs).exec().isSuccess())
             return false;
 
-        Shell.Job job = Shell.sh("./magiskboot --cleanup",
+        job = Shell.sh("./magiskboot --cleanup",
                 "mv bin/busybox busybox",
                 "rm -rf magisk.apk bin boot.img update-binary",
                 "cd /");

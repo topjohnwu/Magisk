@@ -5,11 +5,11 @@ import android.content.Intent;
 import androidx.fragment.app.Fragment;
 
 import com.topjohnwu.magisk.App;
-import com.topjohnwu.magisk.utils.Event;
+import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.Unbinder;
 
-public abstract class BaseFragment extends Fragment implements Event.AutoListener {
+public abstract class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
     public App app = App.self;
     protected Unbinder unbinder = null;
@@ -17,12 +17,12 @@ public abstract class BaseFragment extends Fragment implements Event.AutoListene
     @Override
     public void onResume() {
         super.onResume();
-        Event.register(this);
+        Topic.subscribe(this);
     }
 
     @Override
     public void onPause() {
-        Event.unregister(this);
+        Topic.unsubscribe(this);
         super.onPause();
     }
 
@@ -47,10 +47,10 @@ public abstract class BaseFragment extends Fragment implements Event.AutoListene
     }
 
     @Override
-    public int[] getListeningEvents() {
+    public int[] getSubscribedTopics() {
         return BaseActivity.EMPTY_INT_ARRAY;
     }
 
     @Override
-    public void onEvent(int event) {}
+    public void onPublish(int topic, Object[] result) {}
 }

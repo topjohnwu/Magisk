@@ -24,7 +24,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.container.Module;
-import com.topjohnwu.magisk.utils.Event;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -35,7 +35,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class ModulesFragment extends BaseFragment {
+public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
@@ -82,13 +82,13 @@ public class ModulesFragment extends BaseFragment {
     }
 
     @Override
-    public int[] getListeningEvents() {
-        return new int[] {Event.MODULE_LOAD_DONE};
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.MODULE_LOAD_DONE};
     }
 
     @Override
-    public void onEvent(int event) {
-        updateUI(Event.getResult(event));
+    public void onPublish(int topic, Object[] result) {
+        updateUI((Map<String, Module>) result[0]);
     }
 
     @Override

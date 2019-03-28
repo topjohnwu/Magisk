@@ -44,7 +44,7 @@ public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C exte
         if (info.position == -1)
             return SECTION_TYPE;
         else
-            return getItemViewType(info.section, info.position);
+            return  getItemViewType(info.section, info.position);
     }
 
     public int getItemViewType(int section, int position) {

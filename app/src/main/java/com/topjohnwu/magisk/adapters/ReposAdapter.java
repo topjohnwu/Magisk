@@ -10,12 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
@@ -25,36 +23,31 @@ import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.dialogs.CustomAlertDialog;
 import com.topjohnwu.magisk.uicomponents.MarkDownWindow;
-import com.topjohnwu.magisk.utils.Event;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
-import java9.util.stream.StreamSupport;
 
-public class ReposAdapter
-        extends SectionedAdapter<ReposAdapter.SectionHolder, ReposAdapter.RepoHolder>
-        implements Event.AutoListener, SearchView.OnQueryTextListener {
+public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, ReposAdapter.RepoHolder> {
 
     private static final int UPDATES = 0;
     private static final int INSTALLED = 1;
     private static final int OTHERS = 2;
 
+    private Cursor repoCursor = null;
     private Map<String, Module> moduleMap;
     private RepoDatabaseHelper repoDB;
     private List<Pair<Integer, List<Repo>>> repoPairs;
-    private List<Repo> fullList;
-    private SearchView mSearch;
 
-    public ReposAdapter() {
-        repoDB = App.self.repoDB;
-        moduleMap = Collections.emptyMap();
-        fullList = Collections.emptyList();
+    public ReposAdapter(RepoDatabaseHelper db, Map<String, Module> map) {
+        repoDB = db;
+        moduleMap = map;
         repoPairs = new ArrayList<>();
+        notifyDBChanged();
     }
+
 
     @Override
     public int getSectionCount() {
@@ -139,73 +132,41 @@ public class ReposAdapter
         });
     }
 
-    private void updateLists() {
-        if (mSearch != null)
-            onQueryTextChange(mSearch.getQuery().toString());
-        else
-            onQueryTextChange("");
+    public void notifyDBChanged() {
+        if (repoCursor != null)
+            repoCursor.close();
+        repoCursor = repoDB.getRepoCursor();
+        filter("");
     }
 
-    private static boolean noCaseContain(String a, String b) {
-        return a.toLowerCase().contains(b.toLowerCase());
-    }
-
-    public void setSearchView(SearchView view) {
-        mSearch = view;
-        mSearch.setOnQueryTextListener(this);
-    }
-
-    public void notifyDBChanged(boolean refresh) {
-        try (Cursor c = repoDB.getRepoCursor()) {
-            fullList = new ArrayList<>(c.getCount());
-            while (c.moveToNext())
-                fullList.add(new Repo(c));
-        }
-        if (refresh)
-            updateLists();
-    }
-
-    @Override
-    public void onEvent(int event) {
-        moduleMap = Event.getResult(event);
-        updateLists();
-    }
-
-    @Override
-    public int[] getListeningEvents() {
-        return new int[] {Event.MODULE_LOAD_DONE};
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String s) {
+    public void filter(String s) {
         List<Repo> updates = new ArrayList<>();
         List<Repo> installed = new ArrayList<>();
         List<Repo> others = new ArrayList<>();
 
-        StreamSupport.stream(fullList)
-                .filter(repo -> noCaseContain(repo.getName(), s)
-                        || noCaseContain(repo.getAuthor(), s)
-                        || noCaseContain(repo.getDescription(), s))
-                .forEach(repo -> {
-                    Module module = moduleMap.get(repo.getId());
-                    if (module != null) {
-                        if (repo.getVersionCode() > module.getVersionCode()) {
-                            // Updates
-                            updates.add(repo);
-                        } else {
-                            installed.add(repo);
-                        }
-                    } else {
-                        others.add(repo);
-                    }
-                });
-
         repoPairs.clear();
+        while (repoCursor.moveToNext()) {
+            Repo repo = new Repo(repoCursor);
+            if (repo.getName().toLowerCase().contains(s.toLowerCase())
+                    || repo.getAuthor().toLowerCase().contains(s.toLowerCase())
+                    || repo.getDescription().toLowerCase().contains(s.toLowerCase())
+                    ) {
+                // Passed the repoFilter
+                Module module = moduleMap.get(repo.getId());
+                if (module != null) {
+                    if (repo.getVersionCode() > module.getVersionCode()) {
+                        // Updates
+                        updates.add(repo);
+                    } else {
+                        installed.add(repo);
+                    }
+                } else {
+                    others.add(repo);
+                }
+            }
+        }
+        repoCursor.moveToFirst();
+
         if (!updates.isEmpty())
             repoPairs.add(new Pair<>(UPDATES, updates));
         if (!installed.isEmpty())
@@ -214,7 +175,6 @@ public class ReposAdapter
             repoPairs.add(new Pair<>(OTHERS, others));
 
         notifyDataSetChanged();
-        return false;
     }
 
     static class SectionHolder extends RecyclerView.ViewHolder {

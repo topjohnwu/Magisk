@@ -149,10 +149,6 @@ int boot_img::parse_image(uint8_t *head) {
 	pos += hdr.recovery_dtbo_size();
 	pos_align();
 
-	dtb = head + pos;
-	pos += hdr.dtb_size();
-	pos_align();
-
 	if (head + pos < map_addr + map_size) {
 		tail = head + pos;
 		tail_size = map_size - (tail - map_addr);
@@ -231,10 +227,10 @@ void boot_img::find_dtb() {
 			continue;
 		}
 
-		kernel_dtb = kernel + i;
-		kernel_dt_size = hdr->kernel_size - i;
+		dtb = kernel + i;
+		dt_size = hdr->kernel_size - i;
 		hdr->kernel_size = i;
-		fprintf(stderr, "KERNEL_DTB      [%u]\n", kernel_dt_size);
+		fprintf(stderr, "DTB             [%u]\n", dt_size);
 		break;
 	}
 }
@@ -246,7 +242,6 @@ void boot_img::print_hdr() {
 	fprintf(stderr, "SECOND_SZ       [%u]\n", hdr->second_size);
 	fprintf(stderr, "EXTRA_SZ        [%u]\n", hdr.extra_size());
 	fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", hdr.recovery_dtbo_size());
-	fprintf(stderr, "DTB             [%u]\n", hdr.dtb_size());
 
 	uint32_t ver = hdr.os_version();
 	if (ver) {
@@ -313,7 +308,7 @@ int unpack(const char *image, bool hdr) {
 	}
 
 	// Dump dtb
-	dump(boot.kernel_dtb, boot.kernel_dt_size, KER_DTB_FILE);
+	dump(boot.dtb, boot.dt_size, DTB_FILE);
 
 	// Dump ramdisk
 	if (COMPRESSED(boot.r_fmt)) {
@@ -332,9 +327,6 @@ int unpack(const char *image, bool hdr) {
 
 	// Dump recovery_dtbo
 	dump(boot.recov_dtbo, boot.hdr.recovery_dtbo_size(), RECV_DTBO_FILE);
-
-	// Dump dtb
-	dump(boot.dtb, boot.hdr.dtb_size(), DTB_FILE);
 	return ret;
 }
 
@@ -351,8 +343,7 @@ void repack(const char* orig_image, const char* out_image) {
 	boot.hdr->kernel_size = 0;
 	boot.hdr->ramdisk_size = 0;
 	boot.hdr->second_size = 0;
-	boot.hdr.dtb_size() = 0;
-	boot.kernel_dt_size = 0;
+	boot.dt_size = 0;
 
 	fprintf(stderr, "Repack to boot image: [%s]\n", out_image);
 
@@ -426,9 +417,9 @@ void repack(const char* orig_image, const char* out_image) {
 		munmap(raw_buf, raw_size);
 	}
 
-	// kernel dtb
-	if (access(KER_DTB_FILE, R_OK) == 0)
-		boot.hdr->kernel_size += restore(KER_DTB_FILE, fd);
+	// dtb
+	if (access(DTB_FILE, R_OK) == 0)
+		boot.hdr->kernel_size += restore(DTB_FILE, fd);
 	file_align();
 
 	// ramdisk
@@ -468,12 +459,6 @@ void repack(const char* orig_image, const char* out_image) {
 	if (access(RECV_DTBO_FILE, R_OK) == 0) {
 		boot.hdr.recovery_dtbo_offset() = lseek(fd, 0, SEEK_CUR);
 		boot.hdr.recovery_dtbo_size() = restore(RECV_DTBO_FILE, fd);
-		file_align();
-	}
-
-	// dtb
-	if (access(DTB_FILE, R_OK) == 0) {
-		boot.hdr.dtb_size() = restore(DTB_FILE, fd);
 		file_align();
 	}
 

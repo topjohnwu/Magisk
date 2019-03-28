@@ -18,10 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Event;
+import com.topjohnwu.magisk.utils.Topic;
 
 public abstract class BasePreferenceFragment extends PreferenceFragmentCompat
-        implements SharedPreferences.OnSharedPreferenceChangeListener, Event.AutoListener {
+        implements SharedPreferences.OnSharedPreferenceChangeListener, Topic.AutoSubscriber {
 
     public App app = App.self;
 
@@ -29,19 +29,19 @@ public abstract class BasePreferenceFragment extends PreferenceFragmentCompat
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         app.prefs.registerOnSharedPreferenceChangeListener(this);
-        Event.register(this);
+        Topic.subscribe(this);
         return v;
     }
 
     @Override
     public void onDestroyView() {
         app.prefs.unregisterOnSharedPreferenceChangeListener(this);
-        Event.unregister(this);
+        Topic.unsubscribe(this);
         super.onDestroyView();
     }
 
     @Override
-    public int[] getListeningEvents() {
+    public int[] getSubscribedTopics() {
         return BaseActivity.EMPTY_INT_ARRAY;
     }
 

@@ -5,10 +5,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
-public class ExpandableViewHolder extends Expandable {
+public class ExpandableViewHolder {
 
     private ViewGroup expandLayout;
     private ValueAnimator expandAnimator, collapseAnimator;
+    private boolean mExpanded = false;
     private int expandHeight = 0;
 
     public ExpandableViewHolder(ViewGroup viewGroup) {
@@ -33,22 +34,28 @@ public class ExpandableViewHolder extends Expandable {
                 });
     }
 
-    @Override
-    protected void onExpand() {
-        expandLayout.setVisibility(View.VISIBLE);
-        expandAnimator.start();
+    public boolean isExpanded() {
+        return mExpanded;
     }
 
-    @Override
-    protected void onCollapse() {
-        collapseAnimator.start();
-    }
-
-    @Override
-    protected void onSetExpanded(boolean expanded) {
+    public void setExpanded(boolean expanded) {
+        mExpanded = expanded;
         ViewGroup.LayoutParams layoutParams = expandLayout.getLayoutParams();
         layoutParams.height = expanded ? expandHeight : 0;
         expandLayout.setLayoutParams(layoutParams);
+    }
+
+    public void expand() {
+        if (mExpanded) return;
+        expandLayout.setVisibility(View.VISIBLE);
+        expandAnimator.start();
+        mExpanded = true;
+    }
+
+    public void collapse() {
+        if (!mExpanded) return;
+        collapseAnimator.start();
+        mExpanded = false;
     }
 
     private ValueAnimator slideAnimator(int start, int end) {

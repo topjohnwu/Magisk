@@ -20,7 +20,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class App extends Application {
 
     public static App self;
-    public static Context deContext;
     public static ThreadPoolExecutor THREAD_POOL;
 
     // Global resources
@@ -40,17 +39,16 @@ public class App extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         self = this;
-        deContext = base;
 
+        Context de = this;
         if (Build.VERSION.SDK_INT >= 24) {
-            deContext = base.createDeviceProtectedStorageContext();
-            deContext.moveSharedPreferencesFrom(base,
-                    PreferenceManager.getDefaultSharedPreferencesName(base));
+            de = createDeviceProtectedStorageContext();
+            de.moveSharedPreferencesFrom(this, PreferenceManager.getDefaultSharedPreferencesName(base));
         }
-        prefs = PreferenceManager.getDefaultSharedPreferences(deContext);
-        mDB = new MagiskDB(base);
+        prefs = PreferenceManager.getDefaultSharedPreferences(de);
+        mDB = new MagiskDB(this);
 
-        Networking.init(base);
+        Networking.init(this);
         LocaleManager.setLocale(this);
     }
 

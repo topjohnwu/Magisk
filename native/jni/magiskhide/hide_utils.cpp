@@ -13,7 +13,6 @@
 #include <utils.h>
 #include <resetprop.h>
 #include <db.h>
-#include <selinux.h>
 
 #include "magiskhide.h"
 
@@ -57,14 +56,10 @@ static void hide_sensitive_props() {
 // Leave /proc fd opened as we're going to read from it repeatedly
 static DIR *procfp;
 void crawl_procfs(const function<bool (int)> &fn) {
-	rewinddir(procfp);
-	crawl_procfs(procfp, fn);
-}
-
-void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
 	struct dirent *dp;
 	int pid;
-	while ((dp = readdir(dir))) {
+	rewinddir(procfp);
+	while ((dp = readdir(procfp))) {
 		pid = parse_int(dp->d_name);
 		if (pid > 0 && !fn(pid))
 			break;
@@ -282,8 +277,12 @@ void launch_magiskhide(int client) {
 	set_hide_config();
 	LOGI("* Starting MagiskHide\n");
 
-	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
-		LAUNCH_ERR;
+	if (procfp == nullptr) {
+		int fd = xopen("/proc", O_RDONLY | O_CLOEXEC);
+		if (fd < 0)
+			LAUNCH_ERR;
+		procfp = fdopendir(fd);
+	}
 
 	hide_sensitive_props();
 

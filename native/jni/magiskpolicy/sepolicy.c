@@ -1,5 +1,23 @@
+#include <dirent.h>
+#include <getopt.h>
+#include <unistd.h>
 #include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <limits.h>
+#include <string.h>
+#include <cil/cil.h>
+#include <sepol/debug.h>
+#include <sepol/policydb/policydb.h>
 #include <sepol/policydb/expand.h>
+#include <sepol/policydb/link.h>
+#include <sepol/policydb/services.h>
+#include <sepol/policydb/avrule_block.h>
+#include <sepol/policydb/conditional.h>
+#include <sepol/policydb/constraint.h>
 
 #include <utils.h>
 #include <logging.h>
@@ -7,6 +25,7 @@
 #include "magiskpolicy.h"
 #include "sepolicy.h"
 
+policydb_t *policydb = NULL;
 extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
 
 static int get_attr(const char *type, int value) {
@@ -214,6 +233,129 @@ static int add_xperm_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum
 		return add_avxrule(&key, low, high, not);
 	}
 	return ret;
+}
+
+int load_policydb(const char *filename) {
+	struct policy_file pf;
+	void *map;
+	size_t size;
+	int ret;
+
+	if (policydb)
+		destroy_policydb();
+
+	policydb = xcalloc(sizeof(*policydb), 1);
+
+	mmap_ro(filename, &map, &size);
+
+	policy_file_init(&pf);
+	pf.type = PF_USE_MEMORY;
+	pf.data = map;
+	pf.len = size;
+	if (policydb_init(policydb)) {
+		LOGE("policydb_init: Out of memory!\n");
+		return 1;
+	}
+	ret = policydb_read(policydb, &pf, 0);
+	if (ret) {
+		LOGE("error(s) encountered while parsing configuration\n");
+		return 1;
+	}
+
+	munmap(map, size);
+
+	return 0;
+}
+
+int compile_split_cil() {
+	DIR *dir;
+	struct dirent *entry;
+	char path[128];
+
+	struct cil_db *db = NULL;
+	sepol_policydb_t *pdb = NULL;
+	void *addr;
+	size_t size;
+
+	cil_db_init(&db);
+	cil_set_mls(db, 1);
+	cil_set_multiple_decls(db, 1);
+	cil_set_disable_neverallow(db, 1);
+	cil_set_target_platform(db, SEPOL_TARGET_SELINUX);
+	cil_set_policy_version(db, POLICYDB_VERSION_XPERMS_IOCTL);
+	cil_set_attrs_expand_generated(db, 0);
+
+	// plat
+	mmap_ro(SPLIT_PLAT_CIL, &addr, &size);
+	if (cil_add_file(db, SPLIT_PLAT_CIL, addr, size))
+		return 1;
+	LOGD("cil_add[%s]\n", SPLIT_PLAT_CIL);
+	munmap(addr, size);
+
+	// mapping
+	char plat[10];
+	int fd = open(SPLIT_NONPLAT_VER, O_RDONLY | O_CLOEXEC);
+	plat[read(fd, plat, sizeof(plat)) - 1] = '\0';
+	sprintf(path, SPLIT_PLAT_MAPPING, plat);
+	mmap_ro(path, &addr, &size);
+	if (cil_add_file(db, path, addr, size))
+		return 1;
+	LOGD("cil_add[%s]\n", path);
+	munmap(addr, size);
+	close(fd);
+
+	// nonplat
+	dir = opendir(NONPLAT_POLICY_DIR);
+	while ((entry = readdir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		if (strend(entry->d_name, ".cil") == 0) {
+			sprintf(path, NONPLAT_POLICY_DIR "%s", entry->d_name);
+			mmap_ro(path, &addr, &size);
+			if (cil_add_file(db, path, addr, size))
+				return 1;
+			LOGD("cil_add[%s]\n", path);
+			munmap(addr, size);
+		}
+	}
+	closedir(dir);
+
+	if (cil_compile(db))
+		return 1;
+	if (cil_build_policydb(db, &pdb))
+		return 1;
+
+	cil_db_destroy(&db);
+	policydb = &pdb->p;
+	return 0;
+}
+
+int dump_policydb(const char *filename) {
+	int fd, ret;
+	void *data = NULL;
+	size_t len;
+	policydb_to_image(NULL, policydb, &data, &len);
+	if (data == NULL) {
+		LOGE("Fail to dump policy image!\n");
+		return 1;
+	}
+
+	fd = creat(filename, 0644);
+	if (fd < 0) {
+		LOGE("Can't open '%s':  %s\n", filename, strerror(errno));
+		return 1;
+	}
+	ret = xwrite(fd, data, len);
+	close(fd);
+	if (ret < 0)
+		return 1;
+	return 0;
+}
+
+void destroy_policydb() {
+	policydb_destroy(policydb);
+	free(policydb);
+	policydb = NULL;
 }
 
 int create_domain(const char *d) {

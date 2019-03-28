@@ -83,7 +83,6 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
-	magiskpolicy/policydb.cpp \
 	magiskpolicy/sepolicy.c
 
 LOCAL_LDFLAGS := -static

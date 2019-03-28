@@ -250,7 +250,7 @@ def build_apk(args, module):
 
 
 def build_app(args):
-    header('* Building Magisk Manager')
+    header('Building Magisk Manager')
     source = os.path.join('scripts', 'util_functions.sh')
     target = os.path.join('app', 'src', 'main',
                           'res', 'raw', 'util_functions.sh')
@@ -259,7 +259,7 @@ def build_app(args):
 
 
 def build_stub(args):
-    header('* Building Magisk Manager stub')
+    header('Building Magisk Manager stub')
     stub = build_apk(args, 'stub')
     # Dump the stub APK to header
     mkdir(os.path.join('native', 'out'))
@@ -269,7 +269,7 @@ def build_stub(args):
 
 
 def build_snet(args):
-    header('* Building snet extension')
+    header('Building snet extension')
     proc = execv([gradlew, 'snet:assembleRelease'])
     if proc.returncode != 0:
         error('Build snet extention failed!')
@@ -409,7 +409,8 @@ def cleanup(args):
 
     if 'java' in args.target:
         header('* Cleaning java')
-        execv([gradlew, 'clean'])
+        execv([gradlew, 'app:clean', 'app-core:clean',
+               'snet:clean', 'signing:clean'])
 
 
 def build_all(args):
