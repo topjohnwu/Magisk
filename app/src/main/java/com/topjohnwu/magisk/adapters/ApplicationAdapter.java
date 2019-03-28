@@ -30,7 +30,6 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -38,6 +37,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import java9.util.Comparators;
+import java9.util.Lists;
 import java9.util.Objects;
 import java9.util.Sets;
 import java9.util.stream.Collectors;
@@ -52,7 +52,7 @@ public class ApplicationAdapter extends SectionedAdapter
     private static boolean old_hide = false;
 
     /* A list of apps that should not be shown as hide-able */
-    private static final List<String> HIDE_BLACKLIST = Arrays.asList(
+    private static final List<String> HIDE_BLACKLIST = Lists.of(
             App.self.getPackageName(),
             "android",
             "com.android.chrome",
@@ -62,8 +62,7 @@ public class ApplicationAdapter extends SectionedAdapter
             "com.android.webview",
             "com.google.android.webview"
     );
-    private static final List<String> DEFAULT_HIDELIST = Arrays.asList(
-            GMS_PACKAGE,
+    private static final List<String> DEFAULT_HIDELIST = Lists.of(
             SAFETYNET_PROCESS
     );
 
