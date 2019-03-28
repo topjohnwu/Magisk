@@ -84,6 +84,7 @@ You can submit a module to **Magisk-Module-Repo** so users can download your mod
 - When your module is downloaded with Magisk Manager, `META-INF/com/google/android/update-binary` will be **forcefully** replaced with the latest [`module_installer.sh`](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) to make sure all installation uses the latest scripts.
 - Since `update-binary` will be replaced, this means that all modules in the repo are expected to follow how the installation framework works: the installation framework will load your `install.sh` script and run the corresponding callbacks.
 - This also means that you should NOT add custom logic in `update-binary` as they will simply be ignored.
+- **Existing module devs please read!!** For devs migrating from the old template based modules to the new installer format, one thing you might overlook is the change in configuration flags: it no longer uses `AUTO_MOUNT`, but instead uses `SKIP_MOUNT`. In a nutshell, `AUTO_MOUNT=true` behaves exactly the same as `SKIP_MOUNT=false`, and 99% of the time you should NOT touch this flag.
 
 ## Notes on Partitions
 On modern Android, `/system/vendor` is moved out from the system partition into its own separate `vendor` partition. For module developers, Magisk will handle these different configurations transparently so you do not need to worry anything about it. If you want to modify files in `vendor`, place the modified files under `/system/vendor` and you're good to go!
