@@ -96,8 +96,14 @@ public class Repo extends BaseModule {
     }
 
     public boolean isNewInstaller() {
-        try (Request req = Networking.get(getFileUrl("install.sh"))) {
-            return req.connect().isSuccess();
+        try (Request install = Networking.get(getFileUrl("install.sh"))) {
+            if (install.connect().isSuccess()) {
+                // Double check whether config.sh exists
+                try (Request config = Networking.get(getFileUrl("config.sh"))) {
+                    return !config.connect().isSuccess();
+                }
+            }
+            return false;
         }
     }
 
