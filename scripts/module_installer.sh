@@ -113,8 +113,13 @@ $PROPFILE && cp -af $TMPDIR/system.prop $MODPATH/system.prop
 cp -af $TMPDIR/module.prop $MODPATH/module.prop
 if $BOOTMODE; then
   # Update info for Magisk Manager
-  mktouch $NVBASE/modules/$MODID/update
-  cp -af $TMPDIR/module.prop $NVBASE/modules/$MODID/module.prop
+  if imageless_magisk; then
+    mktouch $NVBASE/modules/$MODID/update
+    cp -af $TMPDIR/module.prop $NVBASE/modules/$MODID/module.prop
+  else
+    mktouch /sbin/.magisk/img/$MODID/update
+    cp -af $TMPDIR/module.prop /sbin/.magisk/img/$MODID/module.prop
+  fi
 fi
 
 # post-fs-data mode scripts
