@@ -16,7 +16,7 @@
 
     <string name="unsupport_magisk_title">Dəstəklənməyən Magisk Versiyası</string>
 
-    <string name="unsupport_magisk_message">Magisk Menecerin bu versiyası Magisk\'in v18.0 versiyasndan aşağısını dəstəkləmir.\n\nMagisk\'i əllə yüksəldə, yaxud tətbiqi əvvəlki versiyalarına qaytara bilərsiniz.</string>
+    <string name="unsupport_magisk_message">Magisk Manager\'in bu versiyası Magisk\'in v18.0 versiyasndan aşağısını dəstəkləmir.\n\nMagisk\'i əllə yüksəldə, yaxud tətbiqi əvvəlki versiyalarına qaytara bilərsiniz.</string>
 
     <!--Status Fragment-->
 
@@ -26,7 +26,7 @@
 
     <string name="invalid_update_channel">Etibarsız Yeniləmə Kanalı</string>
 
-    <string name="safetyNet_check_text">SafetyNet vəziyətinə baxmaq üçün toxun</string>
+    <string name="safetyNet_check_text">SafetyNet vəziyətinə bax</string>
 
     <string name="checking_safetyNet_status">SafetyNet vəziyəti yoxlanılır…</string>
 
@@ -132,7 +132,7 @@
 
     <string name="magisk_update_title">Magisk Yeniləməsi Var!</string>
 
-    <string name="manager_update_title">Magisk Menecer Yeniləməsi Var!</string>
+    <string name="manager_update_title">Magisk Manager Yeniləməsi Var!</string>
 
     <!--Toasts, Dialogs-->
 
@@ -162,15 +162,15 @@
 
     <string name="flashing">Qurulur</string>
 
-    <string name="hide_manager_title">Magisk Menecer gizlədilir…</string>
+    <string name="hide_manager_title">Magisk Manageri'i gizlədilir…</string>
 
-    <string name="hide_manager_fail_toast">Magisk Meneceri gizlətmək alınmadı.</string>
+    <string name="hide_manager_fail_toast">Magisk Manager'i gizlətmək alınmadı.</string>
 
     <string name="open_link_failed_toast">Keçid açmağa heçbir tətbiq tapılmadı.</string>
 
     <string name="download_zip_only">Yalnız Zip yüklə</string>
 
-    <string name="patch_boot_file">Patch Boot Image File</string>
+    <string name="patch_boot_file">Yamaqlı Boot Təsvir Faylı</string>
 
     <string name="direct_install">Birdəfəlik Yüklə (Tövsiyə olunur)</string>
 
@@ -194,223 +194,223 @@
 
     <string name="restore_fail">Stock nüsxə mövcud deyil!</string>
 
-    <string name="proprietary_title">Download Proprietary Code</string>
+    <string name="proprietary_title">Özəl kodu yükləyin</string>
 
-    <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
+    <string name="proprietary_notice">Magisk Manager açıq lisenziyalıdır və Google'ın özəl SafetyNet API kodunu ehtiva etmir.\n\Magisk Managerə SafetyNet yoxlamaları üçün tərkibində GoogleApiClient olan əlavəni yükləməyə icazə verirsiniz?</string>
 
-    <string name="setup_done">Setup done.</string>
+    <string name="setup_done">Quraşdırma bitdi.</string>
 
-    <string name="setup_fail">Setup failed.</string>
+    <string name="setup_fail">Quraşdırma alınmadı.</string>
 
-    <string name="env_fix_title">Requires Additional Setup</string>
+    <string name="env_fix_title">Əlavə Quraşdırma Lazımdır</string>
 
-    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
+    <string name="env_fix_msg">Cihazınızın Magisk'in düzgün işləməsi üçün əlavə quraşdırmaya ehtiyacı var . Bu Magisk zip faylını endirəcək, davam etmək istəyirsiniz?</string>
 
-    <string name="setup_title">Additional Setup</string>
+    <string name="setup_title">Əlavə quraşdırma</string>
 
-    <string name="setup_msg">Running environment setup…</string>
+    <string name="setup_msg">Quraşdırma yerinə yetirilir…</string>
 
-    <string name="downloading_toast">Downloading %1$s</string>
+    <string name="downloading_toast">%1$s yüklənir</string>
 
-    <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
+    <string name="no_rw_storage">Bu xüsusiyyət xarici yaddaş icazəsi olmadan düzgün işləməyəcək.</string>
 
-    <string name="dl_one_module">Download one module at a time.</string>
+    <string name="dl_one_module">Bir dəfədə bir əlavə yüklə.</string>
 
     <!--Settings Activity -->
 
-    <string name="settings_general_category">General</string>
+    <string name="settings_general_category">Ümumi</string>
 
-    <string name="settings_dark_theme_title">Dark Theme</string>
+    <string name="settings_dark_theme_title">Qaranlıq Mövzu</string>
 
-    <string name="settings_dark_theme_summary">Enable dark theme.</string>
+    <string name="settings_dark_theme_summary">Qaranlıq mövzunu aç.</string>
 
-    <string name="settings_clear_cache_title">Clear Repo Cache</string>
+    <string name="settings_clear_cache_title">Repo Keşini Təmizlə</string>
 
-    <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online.</string>
+    <string name="settings_clear_cache_summary">Onlayn repolar üçün keşlənmiş məlumatı silin. Bu tətbiqi onlayn şəkildə yenilənməyə məcbur edir.</string>
 
-    <string name="settings_hide_manager_title">Hide Magisk Manager</string>
+    <string name="settings_hide_manager_title">Magisk Manager'i Gizlə</string>
 
-    <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package name.</string>
+    <string name="settings_hide_manager_summary">Magisk Manageri'i təsadüfi adla yenidən sıxışdır.</string>
 
-    <string name="settings_restore_manager_title">Restore Magisk Manager</string>
+    <string name="settings_restore_manager_title">Magisk Manager'i Geri Qaytar</string>
 
-    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package</string>
+    <string name="settings_restore_manager_summary">Magisk Manageri'i orjinal sıxışdırma ilə geri qaytar</string>
 
-    <string name="language">Language</string>
+    <string name="language">Dil</string>
 
-    <string name="system_default">(System Default)</string>
+    <string name="system_default">(Sistem Dili)</string>
 
-    <string name="settings_update">Update Settings</string>
+    <string name="settings_update">Tənzimləmələri Yenilə</string>
 
-    <string name="settings_check_update_title">Check Updates</string>
+    <string name="settings_check_update_title">Yeniləmələri Yoxla</string>
 
-    <string name="settings_check_update_summary">Periodically check for updates in the background.</string>
+    <string name="settings_check_update_summary">Axraplanda vaxtaşırı yeniləmələri yoxla.</string>
 
-    <string name="settings_update_channel_title">Update Channel</string>
+    <string name="settings_update_channel_title">Kanalı Yenilə</string>
 
-    <string name="settings_update_stable">Stable</string>
+    <string name="settings_update_stable">Stabil</string>
 
     <string name="settings_update_beta">Beta</string>
 
-    <string name="settings_update_custom">Custom</string>
+    <string name="settings_update_custom">Özəl</string>
 
-    <string name="settings_update_custom_msg">Insert a custom URL</string>
+    <string name="settings_update_custom_msg">Özəl URL daxil edin</string>
 
-    <string name="settings_boot_format_title">Patched Boot Output Format</string>
+    <string name="settings_boot_format_title">Yamaqlı Boot Çıxış Formatı</string>
 
-    <string name="settings_boot_format_summary">Select the format for the output patched boot image.\nChoose .img to flash through fastboot/download mode; choose .img.tar to flash with ODIN.</string>
+    <string name="settings_boot_format_summary">Çıxışa yamaqlı boot təsviri üçün format seçin.\nFastboot yaxud yükləmə modunda yükləmək üçün .img seçin; Odin ilə yükləmək üçün .img.tar seçin.</string>
 
-    <string name="settings_core_only_title">Magisk Core Only Mode</string>
+    <string name="settings_core_only_title">Magisk Yalnız Nüvə Modu</string>
 
-    <string name="settings_core_only_summary">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded.</string>
+    <string name="settings_core_only_summary">Yalnız nüvə xüsusiyyətlərini aç. MagiskSU və MagiskHide hələ də açıq qalacaq, amma əlavələr yüklənməyəcək.</string>
 
-    <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection.</string>
+    <string name="settings_magiskhide_summary">Magisk'i fərqli növdə aşkarlamalardan gizləyin.</string>
 
-    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_title">Sistemsiz host'lar</string>
 
-    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps.</string>
+    <string name="settings_hosts_summary">Adblock tətbiqləri üçün Sistemsiz host dəstəyi.</string>
 
-    <string name="settings_hosts_toast">Added systemless hosts module</string>
+    <string name="settings_hosts_toast">Sistemsiz host əlavəsi quraşdırıldı</string>
 
-    <string name="settings_su_app_adb">Apps and ADB</string>
+    <string name="settings_su_app_adb">Tətbiqlər və ADB</string>
 
-    <string name="settings_su_app">Apps only</string>
+    <string name="settings_su_app">Yalnız Tətbiqlər</string>
 
-    <string name="settings_su_adb">ADB only</string>
+    <string name="settings_su_adb">Yalnız ADB</string>
 
-    <string name="settings_su_disable">Disabled</string>
+    <string name="settings_su_disable">Qapalı</string>
 
-    <string name="settings_su_request_10">10 seconds</string>
+    <string name="settings_su_request_10">10 saniyə</string>
 
-    <string name="settings_su_request_15">15 seconds</string>
+    <string name="settings_su_request_15">15 saniyə</string>
 
-    <string name="settings_su_request_20">20 seconds</string>
+    <string name="settings_su_request_20">20 saniyə</string>
 
-    <string name="settings_su_request_30">30 seconds</string>
+    <string name="settings_su_request_30">30 saniyə</string>
 
-    <string name="settings_su_request_45">45 seconds</string>
+    <string name="settings_su_request_45">45 saniyə</string>
 
-    <string name="settings_su_request_60">60 seconds</string>
+    <string name="settings_su_request_60">60 saniyə</string>
 
-    <string name="superuser_access">Superuser Access</string>
+    <string name="superuser_access">Superuser İcazəsi</string>
 
-    <string name="auto_response">Automatic Response</string>
+    <string name="auto_response">Avtomatik Cavab</string>
 
-    <string name="request_timeout">Request Timeout</string>
+    <string name="request_timeout">İcazə Vaxtaşımı</string>
 
-    <string name="superuser_notification">Superuser Notification</string>
+    <string name="superuser_notification">Superuser Bildirişləri</string>
 
-    <string name="request_timeout_summary">%1$d seconds</string>
+    <string name="request_timeout_summary">%1$d saniyə</string>
 
-    <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
+    <string name="settings_su_reauth_title">Yüksəltmədən sonra Yenidən İdentifikasiya et</string>
 
-    <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
+    <string name="settings_su_reauth_summary">Tətbiq yeniləmələridən sonra superuser icazələrini yenidən identifikasiya et</string>
 
-    <string name="settings_su_fingerprint_title">Enable Fingerprint Authentication</string>
+    <string name="settings_su_fingerprint_title">Barmaq İzi İdentifikasiyasını Aç</string>
 
-    <string name="settings_su_fingerprint_summary">Use fingerprint scanner to allow superuser requests</string>
+    <string name="settings_su_fingerprint_summary">Barmaq izi oxuyucunu superuser icazələri üçün işlət</string>
 
-    <string name="auth_fingerprint">Authenticate Fingerprint</string>
+    <string name="auth_fingerprint">Barmaq izini İdentifikasiya et</string>
 
-    <string name="multiuser_mode">Multiuser Mode</string>
+    <string name="multiuser_mode">Çox-istifadəçi modu</string>
 
-    <string name="settings_owner_only">Device Owner Only</string>
+    <string name="settings_owner_only">Yalnız cihaz sahibi</string>
 
-    <string name="settings_owner_manage">Device Owner Managed</string>
+    <string name="settings_owner_manage">Cihaz sahibinin idarəçiliyində</string>
 
-    <string name="settings_user_independent">User-Independent</string>
+    <string name="settings_user_independent">İstifadəçidən asılı olmayaraq</string>
 
-    <string name="owner_only_summary">Only owner has root access.</string>
+    <string name="owner_only_summary">Yalnız cihaz sahibinin root icazəsi var.</string>
 
-    <string name="owner_manage_summary">Only owner can manage root access and receive request prompts.</string>
+    <string name="owner_manage_summary">Yalnız cihaz sahibi root icazələrini redaktə edə və icazə istəkləri qəbul edə bilər.</string>
 
-    <string name="user_indepenent_summary">Each user has his/her own separate root rules.</string>
+    <string name="user_indepenent_summary">Hər istifadəçinin ayrı root qaydaları var.</string>
 
-    <string name="mount_namespace_mode">Mount Namespace Mode</string>
+    <string name="mount_namespace_mode">Namespace Modunu Qoş</string>
 
-    <string name="settings_ns_global">Global Namespace</string>
+    <string name="settings_ns_global">Qlobal Namespace</string>
 
-    <string name="settings_ns_requester">Inherit Namespace</string>
+    <string name="settings_ns_requester">Keçmə Namespace</string>
 
-    <string name="settings_ns_isolate">Isolated Namespace</string>
+    <string name="settings_ns_isolate">Ayrılmış Namespace</string>
 
-    <string name="global_summary">All root sessions use the global mount namespace.</string>
+    <string name="global_summary">Bütün root sessyaları qlobal qoşma namespace'dən istifadə edir.</string>
 
-    <string name="requester_summary">Root sessions will inherit their requester\'s namespace.</string>
+    <string name="requester_summary">Root sessyaları soruşulan namespace'ləri birindən digərinə keçirəcək.</string>
 
-    <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
+    <string name="isolate_summary">Hər bir root sessyasının ayrılmış namespace'i olacaq.</string>
 
-    <string name="android_o_not_support">Does not support Android 8.0+.</string>
+    <string name="android_o_not_support">Android 8.0+'da dəstəklənmir.</string>
 
-    <string name="disable_fingerprint">No fingerprints were set or no device support.</string>
+    <string name="disable_fingerprint">Barmaq izi təyin edilməyib ya da dəstəklənmir.</string>
 
     <!--Superuser-->
 
-    <string name="su_request_title">Superuser Request</string>
+    <string name="su_request_title">Superuser Tələbi</string>
 
-    <string name="deny_with_str">Deny%1$s</string>
+    <string name="deny_with_str">Ləğv et%1$s</string>
 
-    <string name="deny">Deny</string>
+    <string name="deny">Ləğv et</string>
 
-    <string name="prompt">Prompt</string>
+    <string name="prompt">Yönləndir</string>
 
-    <string name="grant">Grant</string>
+    <string name="grant">Təmin et</string>
 
-    <string name="su_warning">Grants full access to your device.\nDeny if you\'re not sure!</string>
+    <string name="su_warning">Cihazın tam icazəsi ilə təmin edin.\nƏmin deyilsinizsə ləğv edin!</string>
 
-    <string name="forever">Forever</string>
+    <string name="forever">Sonsuz</string>
 
-    <string name="once">Once</string>
+    <string name="once">Bir dəfəlik</string>
 
-    <string name="tenmin">10 mins</string>
+    <string name="tenmin">10 dəq</string>
 
-    <string name="twentymin">20 mins</string>
+    <string name="twentymin">20 dəq</string>
 
-    <string name="thirtymin">30 mins</string>
+    <string name="thirtymin">30 dəq</string>
 
-    <string name="sixtymin">60 mins</string>
+    <string name="sixtymin">60 dəq</string>
 
-    <string name="su_allow_toast">%1$s was granted Superuser rights</string>
+    <string name="su_allow_toast">%1$s SuperUser icazəsi ilə təmin edildi</string>
 
-    <string name="su_deny_toast">%1$s was denied Superuser rights</string>
+    <string name="su_deny_toast">%1$s SuperUser icazəsi ilə təmin edilmədi</string>
 
-    <string name="no_apps_found">No apps found</string>
+    <string name="no_apps_found">Tətbiq yoxdur</string>
 
-    <string name="su_snack_grant">Superuser rights of %1$s are granted</string>
+    <string name="su_snack_grant">%1$s üçün Superuser icazəsi verilib</string>
 
-    <string name="su_snack_deny">Superuser rights of %1$s are denied</string>
+    <string name="su_snack_deny">%1$s üçün Superuser icazəsi verilməyib</string>
 
-    <string name="su_snack_notif_on">Notifications of %1$s are enabled</string>
+    <string name="su_snack_notif_on">%1$s üçün bildirişlər açıqdır</string>
 
-    <string name="su_snack_notif_off">Notifications of %1$s are disabled</string>
+    <string name="su_snack_notif_off">%1$s üçün bildirişlər bağlıdır</string>
 
-    <string name="su_snack_log_on">Logging of %1$s is enabled</string>
+    <string name="su_snack_log_on">%1$s üçün giriş açıqdır</string>
 
-    <string name="su_snack_log_off">Logging of %1$s is disabled</string>
+    <string name="su_snack_log_off">%1$s üçün giriş bağlıdır</string>
 
-    <string name="su_snack_revoke">%1$s rights are revoked</string>
+    <string name="su_snack_revoke">%1$s üçün icazələr ləğv olundu</string>
 
-    <string name="su_revoke_title">Revoke?</string>
+    <string name="su_revoke_title">Ləğv olunsun?</string>
 
-    <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
+    <string name="su_revoke_msg">%1$s üçün haqları ləğv etməyi təsdiq edirsiniz?</string>
 
-    <string name="toast">Toast</string>
+    <string name="toast">Tost</string>
 
-    <string name="none">None</string>
+    <string name="none">Heçnə</string>
 
-    <string name="auth_fail">Authentication Failed</string>
+    <string name="auth_fail">İdentifikasiya xətası</string>
 
     <!--Superuser logs-->
 
     <string name="pid">PID: %1$d</string>
 
-    <string name="target_uid">Target UID: %1$d</string>
+    <string name="target_uid">Hədəf UID: %1$d</string>
 
-    <string name="command">Command: %1$s</string>
+    <string name="command">Komanda: %1$s</string>
 
     <!-- MagiskHide -->
 
-    <string name="show_system_app">Show system apps</string>
+    <string name="show_system_app">Sistem tətbiqlərini göstər</string>
 
 </resources>
 
