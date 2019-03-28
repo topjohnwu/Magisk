@@ -2,19 +2,9 @@
 (Note: This is not a user tutorial for installing Magisk, this is an explaination of how Magisk can be installed, and a guide for developers to properly deploy Magisk in various different situations)
 
 ## Systemless
-When a user flashes a Magisk zip in custom recoveries or have boot images patched in Magisk Manager, Magisk is installed in this way. This is the only officially supported method to install Magisk on a device. The systemless method installs Magisk into a boot image's ramdisk CPIO, sometimes require additional patches to the kernel.
+When a user flashes a Magisk zip in custom recoveries or have boot images patched in Magisk Manager, Magisk is installed in the systemless fashion. This is the only officially supported method to install Magisk on a device. The systemless method installs Magisk into a boot image's ramdisk CPIO, sometimes require additional patches to the kernel.
 
-With the introduction of `magiskinit`, the systemless installation process has become extremely simple as nearly all setup and patches are done at runtime after the device is booted up. Replacing `init` in `rootfs` with our own implementation is required for rooting system-as-root devices systemless-ly - that is why `magiskinit` was created in the first place.
-
-Here are some background knowledge about system-as-root devices:
-
-- No recovery partition. Recovery and system shares the same kernel in boot, and the ramdisk in the boot image is actually the recovery's ramdisk.
-- The root folder (`/`) and `/system` are both stored in the system partition.
-- When the device boots up, a bootloader will set flags in cmdline so the kernel can decide where to mount `rootfs`: if booting in recovery mode, mount `rootfs` from ramdisk; if not, mount `rootfs` from system with dm-verity enabled.
-
-To install anything systemless-ly, our only choice is to install Magisk files into the ramdisk in boot image. The soultion used in Magisk is to patch the kernel to always boot as recovery mode regardlessly, and we do the `rootfs` construction and booting ourselves. For more details  about how `magiskinit` works, check the **Pre-Init** section of [Magisk Booting Process](details.md#magisk-booting-process).
-
-Here are the bare minimum commands to install Magisk into a stock boot image. Be aware that the actual Magisk installation is far more complicated, the following commands will work but should be treat as proof-of-concepts.
+Here are the bare minimum commands to install Magisk into a stock boot/recovery image. Be aware that the actual Magisk installation is a little more complicated, the following commands will work but should be treat as proof-of-concepts.
 
 ```
 # Push 2 binaries, magiskboot and magiskinit to the device

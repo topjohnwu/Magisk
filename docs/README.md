@@ -1,5 +1,5 @@
 # Magisk Documentations
-(Updated on 2019.2.3)
+(Updated on 2019.3.28)
 
 - [Installation](install.md)
     - [Prerequisite](install.md#prerequisite)
@@ -19,10 +19,6 @@ The followings are for developers
     - [Magic Mount](details.md#magic-mount)
     - [Simple Mount](details.md#simple-mount)
     - [Miscellaneous](details.md#Miscellaneous)
-- [Deployment](deploy.md)
-    - [Systemless](deploy.md#systemless)
-    - [System Only](deploy.md#system-only)
-    - [Exploits](deploy.md#exploits)
 - [Magisk Tools](tools.md)
 - [Developer Guides](guides.md)
     - [Magisk Modules](guides.md#magisk-modules)
@@ -32,3 +28,7 @@ The followings are for developers
     - [Boot Scripts](guides.md#boot-scripts)
     - [Remove Files](guides.md#remove-files)
     - [Remove Folders](guides.md#remove-folders)
+- [Deployment](deploy.md)
+    - [Systemless](deploy.md#systemless)
+    - [System Only](deploy.md#system-only)
+    - [Exploits](deploy.md#exploits)
