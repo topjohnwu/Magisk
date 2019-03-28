@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">Upgrade zu vollständigem Magisk Manager, um das Setup zu beenden. Herunterladen und installieren?</string>
-    <string name="no_internet_msg">Bitte mit dem Internet verbinden! Upgrade zu volsltändigem Magisk Manager ist erforderlich.</string>
-</resources>

@@ -16,19 +16,34 @@
 #   public *;
 #}
 
-# Don't obfuscate, we are open source anyway :)
--dontobfuscate
-
 # BouncyCastle
--keep class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
--keep class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
--keep class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
 -dontwarn javax.naming.**
 
-# Gson
--keepattributes Signature
+# Snet
+-keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
+-keep,allowobfuscation interface com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback
+-keepclassmembers class * implements com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback {
+  void onResponse(int);
+}
+
+# BootSigner
+-keepclassmembers class com.topjohnwu.signing.BootSigner { *; }
+
+# SVG
+-dontwarn com.caverock.androidsvg.SVGAndroidRenderer
+
+# RetroStreams
+-dontwarn java9.**
 
 # Strip logging
 -assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
   public *** debug(...);
 }
+
+# Excessive obfuscation
+-repackageclasses 'a'
+-allowaccessmodification
+-optimizationpasses 6

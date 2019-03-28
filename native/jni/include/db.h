@@ -1,26 +1,63 @@
-#ifndef DB_H
-#define DB_H
+#pragma once
 
 #include <sqlite3.h>
 #include <sys/stat.h>
+#include <map>
+#include <string>
+#include <string_view>
+#include <functional>
+
+#define db_err(e) db_err_cmd(e, )
+#define db_err_cmd(e, cmd) if (e) { \
+	LOGE("sqlite3_exec: %s\n", e); \
+	sqlite3_free(e); \
+	cmd;\
+}
+
+template <class T, size_t num>
+class db_data_base {
+public:
+	T& operator [](std::string_view key) {
+		return data[getKeyIdx(key)];
+	}
+
+	const T& operator [](std::string_view key) const {
+		return data[getKeyIdx(key)];
+	}
+
+	T& operator [](int key) {
+		return data[key];
+	}
+
+	const T& operator [](int key) const {
+		return data[key];
+	}
+
+protected:
+	T data[num + 1];
+	virtual int getKeyIdx(std::string_view key) const = 0;
+};
 
 /***************
  * DB Settings *
  ***************/
 
-#define DB_SETTING_KEYS ((char *[]) { \
+#define DB_SETTING_KEYS \
+((const char *[]) { \
 "root_access", \
 "multiuser_mode", \
-"mnt_ns" \
+"mnt_ns", \
+"magiskhide", \
 })
 
-#define DB_SETTINGS_NUM (sizeof(DB_SETTING_KEYS) / sizeof(char*))
+#define DB_SETTINGS_NUM 4
 
-// Settings indices
+// Settings keys
 enum {
 	ROOT_ACCESS = 0,
 	SU_MULTIUSER_MODE,
-	SU_MNT_NS
+	SU_MNT_NS,
+	HIDE_CONFIG
 };
 
 // Values for root_access
@@ -45,36 +82,34 @@ enum {
 	NAMESPACE_MODE_ISOLATE
 };
 
-struct db_settings {
-	int v[DB_SETTINGS_NUM];
-};
+class db_settings : public db_data_base<int, DB_SETTINGS_NUM> {
+public:
+	db_settings();
 
-#define DEFAULT_DB_SETTINGS (struct db_settings) { .v = {\
-ROOT_ACCESS_APPS_AND_ADB, \
-MULTIUSER_MODE_OWNER_ONLY, \
-NAMESPACE_MODE_REQUESTER \
-}}
+protected:
+	int getKeyIdx(std::string_view key) const override;
+};
 
 /**************
  * DB Strings *
  **************/
 
-#define DB_STRING_KEYS ((char *[]) { \
-"requester" \
+#define DB_STRING_KEYS \
+((const char *[]) { \
+"requester", \
 })
 
-#define DB_STRING_NUM (sizeof(DB_STRING_KEYS) / sizeof(char*))
+#define DB_STRING_NUM 1
 
-// Strings indices
+// Strings keys
 enum {
 	SU_MANAGER = 0
 };
 
-struct db_strings {
-	char s[DB_STRING_NUM][128];
+class db_strings : public db_data_base<std::string, DB_STRING_NUM> {
+protected:
+	int getKeyIdx(std::string_view key) const override;
 };
-
-void INIT_DB_STRINGS(struct db_strings *str);
 
 /*************
  * SU Access *
@@ -92,19 +127,19 @@ struct su_access {
 	int notify;
 };
 
-#define DEFAULT_SU_ACCESS (struct su_access) { \
+#define DEFAULT_SU_ACCESS (su_access) { \
 .policy = QUERY, \
 .log = 1, \
 .notify = 1 \
 }
 
-#define SILENT_SU_ACCESS (struct su_access) { \
+#define SILENT_SU_ACCESS (su_access) { \
 .policy = ALLOW, \
 .log = 0, \
 .notify = 0 \
 }
 
-#define NO_SU_ACCESS (struct su_access) { \
+#define NO_SU_ACCESS (su_access) { \
 .policy = DENY, \
 .log = 0, \
 .notify = 0 \
@@ -114,10 +149,14 @@ struct su_access {
  * Public Functions *
  ********************/
 
-sqlite3 *get_magiskdb();
-int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs);
-int get_db_strings(sqlite3 *db, int key, struct db_strings *str);
-int get_uid_policy(sqlite3 *db, int uid, struct su_access *su);
-int validate_manager(char *pkg, int userid, struct stat *st);
+typedef std::map<std::string_view, std::string_view> db_row;
+typedef std::function<bool(db_row&)> db_row_cb;
 
-#endif //DB_H
+int get_db_settings(db_settings &cfg, int key = -1);
+int get_db_strings(db_strings &str, int key = -1);
+int get_uid_policy(int uid, su_access &su);
+int validate_manager(std::string &alt_pkg, int userid, struct stat *st);
+void exec_sql(int client);
+char *db_exec(const char *sql);
+char *db_exec(const char *sql, const db_row_cb &fn);
+

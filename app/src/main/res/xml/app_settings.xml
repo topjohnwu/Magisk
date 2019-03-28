@@ -1,0 +1,133 @@
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="general"
+        android:title="@string/settings_general_category">
+
+        <SwitchPreferenceCompat
+            android:key="dark_theme"
+            android:title="@string/settings_dark_theme_title"
+            android:summary="@string/settings_dark_theme_summary" />
+
+        <ListPreference
+            android:key="locale"
+            android:defaultValue="@string/empty"
+            android:title="@string/language"/>
+
+        <Preference
+            android:key="clear"
+            android:title="@string/settings_clear_cache_title"
+            android:summary="@string/settings_clear_cache_summary" />
+
+        <Preference
+            android:key="hide"
+            android:title="@string/settings_hide_manager_title"
+            android:summary="@string/settings_hide_manager_summary" />
+
+        <Preference
+            android:key="restore"
+            android:summary="@string/settings_restore_manager_summary"
+            android:title="@string/settings_restore_manager_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="update"
+        android:title="@string/settings_update">
+
+        <SwitchPreferenceCompat
+            android:key="check_update"
+            android:defaultValue="true"
+            android:title="@string/settings_check_update_title"
+            android:summary="@string/settings_check_update_summary" />
+
+        <ListPreference
+            android:key="update_channel"
+            android:title="@string/settings_update_channel_title"
+            android:entries="@array/update_channel"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
+            android:key="boot_format"
+            android:title="@string/settings_boot_format_title"
+            android:entries="@array/boot_formats"
+            android:entryValues="@array/boot_formats"
+            android:defaultValue=".img"
+            android:summary="@string/settings_boot_format_summary"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="magisk"
+        android:title="@string/magisk">
+
+        <SwitchPreferenceCompat
+            android:key="disable"
+            android:title="@string/settings_core_only_title"
+            android:summary="@string/settings_core_only_summary" />
+
+        <SwitchPreferenceCompat
+            android:key="magiskhide"
+            android:title="@string/magiskhide"
+            android:summary="@string/settings_magiskhide_summary" />
+
+        <Preference
+            android:key="hosts"
+            android:title="@string/settings_hosts_title"
+            android:summary="@string/settings_hosts_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="superuser"
+        android:title="@string/superuser">
+
+        <ListPreference
+            android:key="root_access"
+            android:title="@string/superuser_access"
+            android:entries="@array/su_access"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
+            android:key="multiuser_mode"
+            android:title="@string/multiuser_mode"
+            android:entries="@array/multiuser_mode"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
+            android:key="mnt_ns"
+            android:title="@string/mount_namespace_mode"
+            android:entries="@array/namespace"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
+            android:key="su_auto_response"
+            android:title="@string/auto_response"
+            android:entries="@array/auto_response"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
+            android:key="su_request_timeout"
+            android:title="@string/request_timeout"
+            android:entries="@array/request_timeout"
+            android:entryValues="@array/request_timeout_value" />
+
+        <ListPreference
+            android:key="su_notification"
+            android:title="@string/superuser_notification"
+            android:entries="@array/su_notification"
+            android:entryValues="@array/value_array" />
+
+        <SwitchPreferenceCompat
+            android:key="su_fingerprint"
+            android:title="@string/settings_su_fingerprint_title"
+            android:summary="@string/settings_su_fingerprint_summary"/>
+
+        <SwitchPreferenceCompat
+            android:key="su_reauth"
+            android:title="@string/settings_su_reauth_title"
+            android:summary="@string/settings_su_reauth_summary"/>
+
+    </PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

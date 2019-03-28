@@ -1,24 +1,101 @@
 package com.topjohnwu.magisk.components;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
+import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.NoUIActivity;
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Download;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-public abstract class BaseActivity extends FlavorActivity {
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.LocaleManager;
+import com.topjohnwu.magisk.utils.Topic;
+
+public abstract class BaseActivity extends AppCompatActivity implements Topic.AutoSubscriber {
 
     public static final String INTENT_PERM = "perm_dialog";
+    private static Runnable grantCallback;
 
-    protected static Runnable permissionGrantCallback;
+    static int[] EMPTY_INT_ARRAY = new int[0];
+
+    private ActivityResultListener activityResultListener;
+    public App app = App.self;
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
+    @Override
+    public int[] getSubscribedTopics() {
+        return EMPTY_INT_ARRAY;
+    }
+
+    @Override
+    public void onPublish(int topic, Object[] result) {}
+
+    @StyleRes
+    public int getDarkTheme() {
+        return -1;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleManager.getLocaleContext(base, LocaleManager.locale));
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Topic.subscribe(this);
+        if (getDarkTheme() != -1 && (boolean) Config.get(Config.Key.DARK_THEME)) {
+            setTheme(getDarkTheme());
+        }
+        super.onCreate(savedInstanceState);
+        String[] perms = getIntent().getStringArrayExtra(INTENT_PERM);
+        if (perms != null)
+            ActivityCompat.requestPermissions(this, perms, 0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Topic.unsubscribe(this);
+        super.onDestroy();
+    }
+
+    protected void setFloating() {
+        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
+        if (isTablet) {
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.height = getResources().getDimensionPixelSize(R.dimen.floating_height);
+            params.width = getResources().getDimensionPixelSize(R.dimen.floating_width);
+            params.alpha = 1.0f;
+            params.dimAmount = 0.6f;
+            params.flags |= 2;
+            getWindow().setAttributes(params);
+            setFinishOnTouchOutside(true);
+        }
+    }
+
+    public void runWithExternalRW(Runnable callback) {
+        runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, callback);
+    }
+
+    public void runWithPermission(String[] permissions, Runnable callback) {
+        runWithPermission(this, permissions, callback);
+    }
 
     public static void runWithPermission(Context context, String[] permissions, Runnable callback) {
         boolean granted = true;
@@ -27,33 +104,27 @@ public abstract class BaseActivity extends FlavorActivity {
                 granted = false;
         }
         if (granted) {
-            Download.EXTERNAL_PATH.mkdirs();
+            Const.EXTERNAL_PATH.mkdirs();
             callback.run();
         } else {
             // Passed in context should be an activity if not granted, need to show dialog!
-            permissionGrantCallback = callback;
-            if (!(context instanceof BaseActivity)) {
-                // Start activity to show dialog
-                Intent intent = new Intent(context, NoUIActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(INTENT_PERM, permissions);
-                context.startActivity(intent);
-            } else {
+            if (context instanceof BaseActivity) {
+                grantCallback = callback;
                 ActivityCompat.requestPermissions((BaseActivity) context, permissions, 0);
             }
         }
     }
 
-    public void runWithPermission(String[] permissions, Runnable callback) {
-        runWithPermission(this, permissions, callback);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (activityResultListener != null)
+            activityResultListener.onActivityResult(requestCode, resultCode, data);
+        activityResultListener = null;
     }
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        String[] perms = getIntent().getStringArrayExtra(INTENT_PERM);
-        if (perms != null)
-            ActivityCompat.requestPermissions(this, perms, 0);
+    public void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
+        activityResultListener = listener;
+        super.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -64,12 +135,23 @@ public abstract class BaseActivity extends FlavorActivity {
                 grant = false;
         }
         if (grant) {
-            if (permissionGrantCallback != null) {
-                permissionGrantCallback.run();
+            if (grantCallback != null) {
+                grantCallback.run();
             }
         } else {
             Toast.makeText(this, R.string.no_rw_storage, Toast.LENGTH_LONG).show();
         }
-        permissionGrantCallback = null;
+        grantCallback = null;
+    }
+
+    public interface ActivityResultListener {
+        void onActivityResult(int requestCode, int resultCode, Intent data);
+    }
+
+    @Override
+    public SharedPreferences getSharedPreferences(String name, int mode) {
+        if (TextUtils.equals(name, getPackageName() + "_preferences"))
+            return app.prefs;
+        return super.getSharedPreferences(name, mode);
     }
 }

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">Mettre à jour vers Magisk Manager version complête pour finir l\'installation. Télécharger et installer?</string>
-    <string name="no_internet_msg">Veuillez vous connecter à Internet! Mise à niveau de Magisk Manager requis.</string>
-</resources>

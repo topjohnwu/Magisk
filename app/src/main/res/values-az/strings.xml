@@ -1,0 +1,416 @@
+<resources>
+
+    <!--Welcome Activity-->
+
+    <string name="modules">Əlavələr</string>
+
+    <string name="downloads">Endirmələr</string>
+
+    <string name="superuser">Superuser</string>
+
+    <string name="log">Log</string>
+
+    <string name="settings">Tənzimləmələr</string>
+
+    <string name="install">Quraşdır</string>
+
+    <string name="unsupport_magisk_title">Dəstəklənməyən Magisk Versiyası</string>
+
+    <string name="unsupport_magisk_message">Magisk Menecerin bu versiyası Magisk\'in v18.0 versiyasndan aşağısını dəstəkləmir.\n\nMagisk\'i əllə yüksəldə, yaxud tətbiqi əvvəlki versiyalarına qaytara bilərsiniz.</string>
+
+    <!--Status Fragment-->
+
+    <string name="magisk_version_error">Magisk yüklənməyib.</string>
+
+    <string name="checking_for_updates">Yeniləmələr yoxlanılır…</string>
+
+    <string name="invalid_update_channel">Etibarsız Yeniləmə Kanalı</string>
+
+    <string name="safetyNet_check_text">SafetyNet vəziyətinə baxmaq üçün toxun</string>
+
+    <string name="checking_safetyNet_status">SafetyNet vəziyəti yoxlanılır…</string>
+
+    <string name="safetyNet_check_success">SafetyNet Uğurla Yoxlanıldı</string>
+
+    <string name="safetyNet_api_error">SafetyNet API Xətası</string>
+
+    <string name="safetyNet_res_invalid">Cavab etibarsızdır.</string>
+
+    <string name="magisk_up_to_date">Magisk\'in son versiyası yüklənib</string>
+
+    <string name="manager_up_to_date">Magisk Menecer\'in son versiyası yüklənib </string>
+
+    <string name="advanced_settings_title">Qabaqcıl Parametrlər</string>
+
+    <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
+
+    <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
+
+    <string name="current_installed">Yüklənən: %1$s</string>
+
+    <string name="latest_version">Ən son: %1$s</string>
+
+    <string name="uninstall">Sil</string>
+
+    <string name="uninstall_magisk_title">Magisk\'i Sil</string>
+
+    <string name="uninstall_magisk_msg">Bütün əlavələr ləğv olunacaq/silinəcək. Root silinəcək, və əgər hal-hazırda deyilsə, bütün məlumatlarınız potensiyal olaraq şifrələnəcək.</string>
+
+    <string name="update">Yenilə</string>
+
+    <string name="core_only_enabled">(Yalnız nüvə modu qoşulub)</string>
+
+    <!--Module Fragment-->
+
+    <string name="no_info_provided">(Məlumat təmin edilməyib)</string>
+
+    <string name="no_modules_found">Əlavələr yoxdur.</string>
+
+    <string name="update_file_created">Əlavə sonrakı yenidən başlatmada yenilənəcək.</string>
+
+    <string name="remove_file_created">Əlavə sonrakı yenidən başlatmada silinəcək.</string>
+
+    <string name="remove_file_deleted">Əlavə sonrakı yenidən başlatmada silinməyəcək.</string>
+
+    <string name="disable_file_created">Əlavə sonrakı yenidən başlatmada qapadılacaq.</string>
+
+    <string name="disable_file_removed">Əlavə sonrakı yenidən başlatmada açılacaq.</string>
+
+    <string name="author">%1$s tərəfindən yaradılıb</string>
+
+    <string name="reboot_recovery">Bərpa rejimində yenidən başlat</string>
+
+    <string name="reboot_bootloader">Bootloader\'ə yenidən başlat</string>
+
+    <string name="reboot_download">Yükləmə rejimində yenidən başlat</string>
+
+    <!--Repo Fragment-->
+
+    <string name="update_available">Yeniləmə Var</string>
+
+    <string name="installed">Yüklənib</string>
+
+    <string name="not_installed">Yüklənməyib</string>
+
+    <string name="updated_on">Yeniləmə vaxtı: %1$s</string>
+
+    <string name="sorting_order">Nizamlama Qaydası</string>
+
+    <string name="sort_by_name">Ada görə nizamla</string>
+
+    <string name="sort_by_update">Son yeniləməyə görə nizamla</string>
+
+    <!--Log Fragment-->
+
+    <string name="menuSaveLog">Log\'u saxla</string>
+
+    <string name="menuReload">Təzələ</string>
+
+    <string name="menuClearLog">Log\'u indi təmizlə</string>
+
+    <string name="logs_cleared">Log uğurla təmizləndi.</string>
+
+    <string name="log_is_empty">Log boşdur.</string>
+
+    <!--About Activity-->
+
+    <string name="app_changelog">Yeniliklər</string>
+
+    <string name="translators" />
+
+    <string name="app_translators">Tərcümələr</string>
+
+    <!-- System Components, Notifications -->
+
+    <string name="update_channel">Magisk Yeniləmələri</string>
+
+    <string name="progress_channel">İnkişaf Bildirişləri</string>
+
+    <string name="download_complete">Yükləmə bitdi</string>
+
+    <string name="download_file_error">Faylı yükləmək alınmadı</string>
+
+    <string name="magisk_update_title">Magisk Yeniləməsi Var!</string>
+
+    <string name="manager_update_title">Magisk Menecer Yeniləməsi Var!</string>
+
+    <!--Toasts, Dialogs-->
+
+    <string name="close">Qapat</string>
+
+    <string name="repo_install_title">%1$s faylını yüklə</string>
+
+    <string name="repo_install_msg">%1$s faylını indi yükləmək istəyirsiniz?</string>
+
+    <string name="download">Yüklə</string>
+
+    <string name="reboot">Yenidən Başlat</string>
+
+    <string name="settings_reboot_toast">Tənzimləmələri saxlamaq üçün yenidən başladın.</string>
+
+    <string name="release_notes">Buraxılış qeydləri</string>
+
+    <string name="repo_cache_cleared">Repo keşi silindi</string>
+
+    <string name="internal_storage">Zip faylının olduğu yer:\n[Daxili Yaddaş]%1$s</string>
+
+    <string name="manager_download_install">Yükləyib qurdaşdırmaq üçün toxun.</string>
+
+    <string name="dtbo_patched_title">DTBO yamaqlanıb!</string>
+
+    <string name="dtbo_patched_reboot">Magisk Menecer dtbo.img\'ni yamaqladı. Xahiş olunur yenidən başladın.</string>
+
+    <string name="flashing">Qurulur</string>
+
+    <string name="hide_manager_title">Magisk Menecer gizlədilir…</string>
+
+    <string name="hide_manager_fail_toast">Magisk Meneceri gizlətmək alınmadı.</string>
+
+    <string name="open_link_failed_toast">Keçid açmağa heçbir tətbiq tapılmadı.</string>
+
+    <string name="download_zip_only">Yalnız Zip yüklə</string>
+
+    <string name="patch_boot_file">Patch Boot Image File</string>
+
+    <string name="direct_install">Birdəfəlik Yüklə (Tövsiyə olunur)</string>
+
+    <string name="install_inactive_slot">Fəal olmayan slota quraşdır (OTA\'dan sonra)</string>
+
+    <string name="warning">Xəbərdarlıq</string>
+
+    <string name="install_inactive_slot_msg">Cihazınız yenidən başladıldıqdan sonra fəal olmayan slota başlamağa MƏCBUR ediləcək!\nBu seçimi yalnız OTA bitdikdən sonra istifadə edin.\nDavam edirsiniz?</string>
+
+    <string name="select_method">Üsul Seçin</string>
+
+    <string name="boot_file_patch_msg">Standart boot surətinin yığılma formatını .imb yaxud img.tar kimi seçin.</string>
+
+    <string name="complete_uninstall">Silməni Bitir</string>
+
+    <string name="restore_img">Şəkilləri Geri Qaytar</string>
+
+    <string name="restore_img_msg">Geri qaytarılır…</string>
+
+    <string name="restore_done">Geri qaytarma bitdi!</string>
+
+    <string name="restore_fail">Stock nüsxə mövcud deyil!</string>
+
+    <string name="proprietary_title">Download Proprietary Code</string>
+
+    <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
+
+    <string name="setup_done">Setup done.</string>
+
+    <string name="setup_fail">Setup failed.</string>
+
+    <string name="env_fix_title">Requires Additional Setup</string>
+
+    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
+
+    <string name="setup_title">Additional Setup</string>
+
+    <string name="setup_msg">Running environment setup…</string>
+
+    <string name="downloading_toast">Downloading %1$s</string>
+
+    <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
+
+    <string name="dl_one_module">Download one module at a time.</string>
+
+    <!--Settings Activity -->
+
+    <string name="settings_general_category">General</string>
+
+    <string name="settings_dark_theme_title">Dark Theme</string>
+
+    <string name="settings_dark_theme_summary">Enable dark theme.</string>
+
+    <string name="settings_clear_cache_title">Clear Repo Cache</string>
+
+    <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online.</string>
+
+    <string name="settings_hide_manager_title">Hide Magisk Manager</string>
+
+    <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package name.</string>
+
+    <string name="settings_restore_manager_title">Restore Magisk Manager</string>
+
+    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package</string>
+
+    <string name="language">Language</string>
+
+    <string name="system_default">(System Default)</string>
+
+    <string name="settings_update">Update Settings</string>
+
+    <string name="settings_check_update_title">Check Updates</string>
+
+    <string name="settings_check_update_summary">Periodically check for updates in the background.</string>
+
+    <string name="settings_update_channel_title">Update Channel</string>
+
+    <string name="settings_update_stable">Stable</string>
+
+    <string name="settings_update_beta">Beta</string>
+
+    <string name="settings_update_custom">Custom</string>
+
+    <string name="settings_update_custom_msg">Insert a custom URL</string>
+
+    <string name="settings_boot_format_title">Patched Boot Output Format</string>
+
+    <string name="settings_boot_format_summary">Select the format for the output patched boot image.\nChoose .img to flash through fastboot/download mode; choose .img.tar to flash with ODIN.</string>
+
+    <string name="settings_core_only_title">Magisk Core Only Mode</string>
+
+    <string name="settings_core_only_summary">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded.</string>
+
+    <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection.</string>
+
+    <string name="settings_hosts_title">Systemless hosts</string>
+
+    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps.</string>
+
+    <string name="settings_hosts_toast">Added systemless hosts module</string>
+
+    <string name="settings_su_app_adb">Apps and ADB</string>
+
+    <string name="settings_su_app">Apps only</string>
+
+    <string name="settings_su_adb">ADB only</string>
+
+    <string name="settings_su_disable">Disabled</string>
+
+    <string name="settings_su_request_10">10 seconds</string>
+
+    <string name="settings_su_request_15">15 seconds</string>
+
+    <string name="settings_su_request_20">20 seconds</string>
+
+    <string name="settings_su_request_30">30 seconds</string>
+
+    <string name="settings_su_request_45">45 seconds</string>
+
+    <string name="settings_su_request_60">60 seconds</string>
+
+    <string name="superuser_access">Superuser Access</string>
+
+    <string name="auto_response">Automatic Response</string>
+
+    <string name="request_timeout">Request Timeout</string>
+
+    <string name="superuser_notification">Superuser Notification</string>
+
+    <string name="request_timeout_summary">%1$d seconds</string>
+
+    <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
+
+    <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
+
+    <string name="settings_su_fingerprint_title">Enable Fingerprint Authentication</string>
+
+    <string name="settings_su_fingerprint_summary">Use fingerprint scanner to allow superuser requests</string>
+
+    <string name="auth_fingerprint">Authenticate Fingerprint</string>
+
+    <string name="multiuser_mode">Multiuser Mode</string>
+
+    <string name="settings_owner_only">Device Owner Only</string>
+
+    <string name="settings_owner_manage">Device Owner Managed</string>
+
+    <string name="settings_user_independent">User-Independent</string>
+
+    <string name="owner_only_summary">Only owner has root access.</string>
+
+    <string name="owner_manage_summary">Only owner can manage root access and receive request prompts.</string>
+
+    <string name="user_indepenent_summary">Each user has his/her own separate root rules.</string>
+
+    <string name="mount_namespace_mode">Mount Namespace Mode</string>
+
+    <string name="settings_ns_global">Global Namespace</string>
+
+    <string name="settings_ns_requester">Inherit Namespace</string>
+
+    <string name="settings_ns_isolate">Isolated Namespace</string>
+
+    <string name="global_summary">All root sessions use the global mount namespace.</string>
+
+    <string name="requester_summary">Root sessions will inherit their requester\'s namespace.</string>
+
+    <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
+
+    <string name="android_o_not_support">Does not support Android 8.0+.</string>
+
+    <string name="disable_fingerprint">No fingerprints were set or no device support.</string>
+
+    <!--Superuser-->
+
+    <string name="su_request_title">Superuser Request</string>
+
+    <string name="deny_with_str">Deny%1$s</string>
+
+    <string name="deny">Deny</string>
+
+    <string name="prompt">Prompt</string>
+
+    <string name="grant">Grant</string>
+
+    <string name="su_warning">Grants full access to your device.\nDeny if you\'re not sure!</string>
+
+    <string name="forever">Forever</string>
+
+    <string name="once">Once</string>
+
+    <string name="tenmin">10 mins</string>
+
+    <string name="twentymin">20 mins</string>
+
+    <string name="thirtymin">30 mins</string>
+
+    <string name="sixtymin">60 mins</string>
+
+    <string name="su_allow_toast">%1$s was granted Superuser rights</string>
+
+    <string name="su_deny_toast">%1$s was denied Superuser rights</string>
+
+    <string name="no_apps_found">No apps found</string>
+
+    <string name="su_snack_grant">Superuser rights of %1$s are granted</string>
+
+    <string name="su_snack_deny">Superuser rights of %1$s are denied</string>
+
+    <string name="su_snack_notif_on">Notifications of %1$s are enabled</string>
+
+    <string name="su_snack_notif_off">Notifications of %1$s are disabled</string>
+
+    <string name="su_snack_log_on">Logging of %1$s is enabled</string>
+
+    <string name="su_snack_log_off">Logging of %1$s is disabled</string>
+
+    <string name="su_snack_revoke">%1$s rights are revoked</string>
+
+    <string name="su_revoke_title">Revoke?</string>
+
+    <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
+
+    <string name="toast">Toast</string>
+
+    <string name="none">None</string>
+
+    <string name="auth_fail">Authentication Failed</string>
+
+    <!--Superuser logs-->
+
+    <string name="pid">PID: %1$d</string>
+
+    <string name="target_uid">Target UID: %1$d</string>
+
+    <string name="command">Command: %1$s</string>
+
+    <!-- MagiskHide -->
+
+    <string name="show_system_app">Show system apps</string>
+
+</resources>
+

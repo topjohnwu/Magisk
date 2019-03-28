@@ -79,13 +79,6 @@ int restore_stdin(void);
 int watch_sigwinch_async(int master, int slave);
 
 /**
- * watch_sigwinch_cleanup
- *
- * Cause the SIGWINCH watcher thread to terminate
- */
-void watch_sigwinch_cleanup(void);
-
-/**
  * pump_stdin_async
  *
  * Forward data from STDIN to the given FD
