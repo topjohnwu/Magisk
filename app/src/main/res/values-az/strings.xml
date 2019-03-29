@@ -162,9 +162,9 @@
 
     <string name="flashing">Qurulur</string>
 
-    <string name="hide_manager_title">Magisk Manageri'i gizlədilir…</string>
+    <string name="hide_manager_title">Magisk Manageri\'i gizlədilir…</string>
 
-    <string name="hide_manager_fail_toast">Magisk Manager'i gizlətmək alınmadı.</string>
+    <string name="hide_manager_fail_toast">Magisk Manager\'i gizlətmək alınmadı.</string>
 
     <string name="open_link_failed_toast">Keçid açmağa heçbir tətbiq tapılmadı.</string>
 
@@ -196,7 +196,7 @@
 
     <string name="proprietary_title">Özəl kodu yükləyin</string>
 
-    <string name="proprietary_notice">Magisk Manager açıq lisenziyalıdır və Google'ın özəl SafetyNet API kodunu ehtiva etmir.\n\Magisk Managerə SafetyNet yoxlamaları üçün tərkibində GoogleApiClient olan əlavəni yükləməyə icazə verirsiniz?</string>
+    <string name="proprietary_notice">Magisk Manager açıq lisenziyalıdır və Google\'ın özəl SafetyNet API kodunu ehtiva etmir.\n\Magisk Managerə SafetyNet yoxlamaları üçün tərkibində GoogleApiClient olan əlavəni yükləməyə icazə verirsiniz?</string>
 
     <string name="setup_done">Quraşdırma bitdi.</string>
 
@@ -204,7 +204,7 @@
 
     <string name="env_fix_title">Əlavə Quraşdırma Lazımdır</string>
 
-    <string name="env_fix_msg">Cihazınızın Magisk'in düzgün işləməsi üçün əlavə quraşdırmaya ehtiyacı var . Bu Magisk zip faylını endirəcək, davam etmək istəyirsiniz?</string>
+    <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün işləməsi üçün əlavə quraşdırmaya ehtiyacı var . Bu Magisk zip faylını endirəcək, davam etmək istəyirsiniz?</string>
 
     <string name="setup_title">Əlavə quraşdırma</string>
 
@@ -228,13 +228,13 @@
 
     <string name="settings_clear_cache_summary">Onlayn repolar üçün keşlənmiş məlumatı silin. Bu tətbiqi onlayn şəkildə yenilənməyə məcbur edir.</string>
 
-    <string name="settings_hide_manager_title">Magisk Manager'i Gizlə</string>
+    <string name="settings_hide_manager_title">Magisk Manager\'i Gizlə</string>
 
-    <string name="settings_hide_manager_summary">Magisk Manageri'i təsadüfi adla yenidən sıxışdır.</string>
+    <string name="settings_hide_manager_summary">Magisk Manageri\'i təsadüfi adla yenidən sıxışdır.</string>
 
-    <string name="settings_restore_manager_title">Magisk Manager'i Geri Qaytar</string>
+    <string name="settings_restore_manager_title">Magisk Manager\'i Geri Qaytar</string>
 
-    <string name="settings_restore_manager_summary">Magisk Manageri'i orjinal sıxışdırma ilə geri qaytar</string>
+    <string name="settings_restore_manager_summary">Magisk Manageri\'i orjinal sıxışdırma ilə geri qaytar</string>
 
     <string name="language">Dil</string>
 
@@ -264,9 +264,9 @@
 
     <string name="settings_core_only_summary">Yalnız nüvə xüsusiyyətlərini aç. MagiskSU və MagiskHide hələ də açıq qalacaq, amma əlavələr yüklənməyəcək.</string>
 
-    <string name="settings_magiskhide_summary">Magisk'i fərqli növdə aşkarlamalardan gizləyin.</string>
+    <string name="settings_magiskhide_summary">Magisk\'i fərqli növdə aşkarlamalardan gizləyin.</string>
 
-    <string name="settings_hosts_title">Sistemsiz host'lar</string>
+    <string name="settings_hosts_title">Sistemsiz host\'lar</string>
 
     <string name="settings_hosts_summary">Adblock tətbiqləri üçün Sistemsiz host dəstəyi.</string>
 
@@ -334,13 +334,13 @@
 
     <string name="settings_ns_isolate">Ayrılmış Namespace</string>
 
-    <string name="global_summary">Bütün root sessyaları qlobal qoşma namespace'dən istifadə edir.</string>
+    <string name="global_summary">Bütün root sessyaları qlobal qoşma namespace\'dən istifadə edir.</string>
 
-    <string name="requester_summary">Root sessyaları soruşulan namespace'ləri birindən digərinə keçirəcək.</string>
+    <string name="requester_summary">Root sessyaları soruşulan namespace\'ləri birindən digərinə keçirəcək.</string>
 
-    <string name="isolate_summary">Hər bir root sessyasının ayrılmış namespace'i olacaq.</string>
+    <string name="isolate_summary">Hər bir root sessyasının ayrılmış namespace\'i olacaq.</string>
 
-    <string name="android_o_not_support">Android 8.0+'da dəstəklənmir.</string>
+    <string name="android_o_not_support">Android 8.0+\'da dəstəklənmir.</string>
 
     <string name="disable_fingerprint">Barmaq izi təyin edilməyib ya da dəstəklənmir.</string>
 
