@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.topjohnwu.magisk.Config;
-import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.container.Repo;
 
 import java.util.HashSet;
@@ -14,7 +13,7 @@ import java.util.Set;
 
 public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VER = 4;
+    private static final int DATABASE_VER = 5;
     private static final String TABLE_NAME = "repos";
 
     private SQLiteDatabase mDb;
@@ -22,9 +21,6 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
         mDb = getWritableDatabase();
-
-        // Remove outdated repos
-        mDb.delete(TABLE_NAME, "minMagisk<?", new String[] { String.valueOf(Const.MIN_MODULE_VER) });
     }
 
     @Override
@@ -39,7 +35,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             db.execSQL(
                     "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
-                            "(id TEXT, name TEXT, version TEXT, versionCode INT, minMagisk INT, " +
+                            "(id TEXT, name TEXT, version TEXT, versionCode INT, " +
                             "author TEXT, description TEXT, last_update INT, PRIMARY KEY(id))");
             Config.remove(Config.Key.ETAG_KEY);
         }
@@ -96,9 +92,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
             case Config.Value.ORDER_DATE:
                 orderBy = "last_update DESC";
         }
-        return mDb.query(TABLE_NAME, null, "minMagisk<=? AND minMagisk>=?",
-                new String[] { String.valueOf(Config.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER) },
-                null, null, orderBy);
+        return mDb.query(TABLE_NAME, null, null, null, null, null, orderBy);
     }
 
     public Set<String> getRepoIDSet() {

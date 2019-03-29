@@ -6,7 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.Request;
@@ -61,9 +60,6 @@ public class Repo extends BaseModule {
 
         if (getVersionCode() < 0) {
             throw new IllegalRepoException("Repo [" + getId() + "] does not contain versionCode");
-        }
-        if (getMinMagiskVersion() < Const.MIN_MODULE_VER) {
-            Logger.debug("Repo [" + getId() + "] is outdated");
         }
     }
 

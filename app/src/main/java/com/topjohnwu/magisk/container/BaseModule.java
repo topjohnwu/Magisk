@@ -12,7 +12,7 @@ import java.util.List;
 public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
 
     private String mId, mName, mVersion, mAuthor, mDescription;
-    private int mVersionCode = -1, minMagiskVersion = -1;
+    private int mVersionCode = -1;
 
     protected BaseModule() {
         mId = mName = mVersion = mAuthor = mDescription = "";
@@ -25,7 +25,6 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         mVersionCode = c.getInt(c.getColumnIndex("versionCode"));
         mAuthor = nonNull(c.getString(c.getColumnIndex("author")));
         mDescription = nonNull(c.getString(c.getColumnIndex("description")));
-        minMagiskVersion = c.getInt(c.getColumnIndex("minMagisk"));
     }
 
     protected BaseModule(Parcel p) {
@@ -35,7 +34,6 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         mAuthor = p.readString();
         mDescription = p.readString();
         mVersionCode = p.readInt();
-        minMagiskVersion = p.readInt();
     }
 
     @Override
@@ -56,7 +54,6 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         dest.writeString(mAuthor);
         dest.writeString(mDescription);
         dest.writeInt(mVersionCode);
-        dest.writeInt(minMagiskVersion);
     }
 
     private String nonNull(String s) {
@@ -71,7 +68,6 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         values.put("versionCode", mVersionCode);
         values.put("author", mAuthor);
         values.put("description", mDescription);
-        values.put("minMagisk", minMagiskVersion);
         return values;
     }
 
@@ -106,10 +102,6 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
                     break;
                 case "description":
                     mDescription = value;
-                    break;
-                case "minMagisk":
-                case "template":
-                    minMagiskVersion = Integer.parseInt(value);
                     break;
                 default:
                     break;
@@ -149,7 +141,4 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         return mVersionCode;
     }
 
-    public int getMinMagiskVersion() {
-        return minMagiskVersion;
-    }
 }
