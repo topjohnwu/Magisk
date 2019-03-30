@@ -429,7 +429,20 @@ void MagiskInit::setup_rootfs() {
 	}
 
 	// Patch init.rc
-	FILE *rc = xfopen("/init.rc", "ae");
+	FILE *rc = xfopen("/init.p.rc", "we");
+	file_readline("/init.rc", [&](auto line) -> bool {
+		// Do not start vaultkeeper
+		if (str_contains(line, "start vaultkeeper"))
+			return true;
+		// Do not run flash_recovery
+		if (str_starts(line, "service flash_recovery")) {
+			fprintf(rc, "service flash_recovery /system/bin/xxxxx\n");
+			return true;
+		}
+		// Else just write the line
+		fprintf(rc, "%s", line.data());
+		return true;
+	});
 	char pfd_svc[8], ls_svc[8];
 	gen_rand_str(pfd_svc, sizeof(pfd_svc));
 	do {
@@ -437,6 +450,8 @@ void MagiskInit::setup_rootfs() {
 	} while (strcmp(pfd_svc, ls_svc) == 0);
 	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc);
 	fclose(rc);
+	clone_attr("/init.rc", "/init.p.rc");
+	rename("/init.p.rc", "/init.rc");
 
 	// Don't let init run in init yet
 	lsetfilecon("/init", "u:object_r:rootfs:s0");
