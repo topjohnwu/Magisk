@@ -728,7 +728,10 @@ void late_start(int client) {
 		if (access(SECURE_DIR, F_OK) != 0)
 			xmkdir(SECURE_DIR, 0700);
 		// And reboot to make proper setup possible
-		exec_command_sync("/system/bin/reboot");
+		if (RECOVERY_MODE)
+			exec_command_sync("/system/bin/reboot", "recovery");
+		else
+			exec_command_sync("/system/bin/reboot");
 	}
 
 	auto_start_magiskhide();

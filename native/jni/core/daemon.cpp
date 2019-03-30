@@ -23,7 +23,8 @@
 #include <flags.h>
 
 int SDK_INT = -1;
-struct stat SERVER_STAT;
+bool RECOVERY_MODE = false;
+static struct stat SERVER_STAT;
 
 static void verify_client(int client, pid_t pid) {
 	// Verify caller is the same as server
@@ -120,6 +121,13 @@ static void main_daemon() {
 			SDK_INT = parse_int(val);
 			return false;
 		}
+		return true;
+	});
+
+	// Load config status
+	parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
+		if (key == "RECOVERYMODE" && val == "true")
+			RECOVERY_MODE = true;
 		return true;
 	});
 

@@ -1,8 +1,4 @@
-/* daemon.h - Utility functions for daemon-client communication
- */
-
-#ifndef _DAEMON_H_
-#define _DAEMON_H_
+#pragma once
 
 #include <pthread.h>
 #include <sys/un.h>
@@ -87,4 +83,5 @@ void magiskhide_handler(int client);
 
 void su_daemon_handler(int client, struct ucred *credential);
 
-#endif
+extern int SDK_INT;
+extern bool RECOVERY_MODE;

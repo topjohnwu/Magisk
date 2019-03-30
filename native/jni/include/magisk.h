@@ -26,8 +26,6 @@
 // Legacy crap
 #define LEGACYCORE      MODULEROOT "/.core"
 
-extern int SDK_INT;
-
 constexpr const char *applet_names[] = { "magisk", "su", "resetprop", "magiskhide", nullptr };
 
 // Multi-call entrypoints
