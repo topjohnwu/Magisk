@@ -58,6 +58,7 @@ BOOTIMAGE="$1"
 # Flags
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
+[ -z $RECOVERYMODE ] && RECOVERYMODE=false
 
 chmod -R 755 .
 
@@ -133,6 +134,7 @@ ui_print "- Patching ramdisk"
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
+[ -f recovery_dtbo ] && echo "RECOVERYMODE=true" >> config
 
 ./magiskboot cpio ramdisk.cpio \
 "add 750 init magiskinit" \
@@ -153,9 +155,9 @@ rm -f ramdisk.cpio.orig config
 ##########################################################################################
 
 if ! $KEEPVERITY; then
-  [ -f dtb ] && ./magiskboot dtb-patch dtb && ui_print "- Removing dm(avb)-verity in dtb"
-  [ -f kernel_dtb ] && ./magiskboot dtb-patch kernel_dtb && ui_print "- Removing dm(avb)-verity in dtb"
-  [ -f extra ] && ./magiskboot dtb-patch extra && ui_print "- Removing dm(avb)-verity in extra-dtb"
+  for dt in dtb kernel_dtb extra recovery_dtbo; do
+    [ -f $dt ] && ./magiskboot dtb-patch $dt && ui_print "- Removing dm(avb)-verity in $dt"
+  done
 fi
 
 if [ -f kernel ]; then

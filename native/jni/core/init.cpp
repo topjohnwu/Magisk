@@ -231,13 +231,21 @@ void MagiskInit::load_kernel_info() {
 		}
 	});
 
+	parse_prop_file("/.backup/.magisk", [&](auto key, auto value) -> bool {
+		if (key == "RECOVERYMODE" && value == "true")
+			cmd.system_as_root = true;
+		return true;
+	});
+
 	if (kirin && enter_recovery) {
 		// Inform that we are actually booting as recovery
-		if (FILE *f = fopen("/.backup/.magisk", "ae"); f) {
-			fprintf(f, "RECOVERYMODE=true\n");
-			fclose(f);
+		if (!cmd.system_as_root) {
+			if (FILE *f = fopen("/.backup/.magisk", "ae"); f) {
+				fprintf(f, "RECOVERYMODE=true\n");
+				fclose(f);
+			}
+			cmd.system_as_root = true;
 		}
-		cmd.system_as_root = true;
 	}
 
 	cmd.system_as_root |= skip_initramfs;
@@ -602,10 +610,11 @@ void MagiskInit::start() {
 	if (null > STDERR_FILENO)
 		close(null);
 
+	load_kernel_info();
+
 	full_read("/init", &init.buf, &init.sz);
 	full_read("/.backup/.magisk", &config.buf, &config.sz);
 
-	load_kernel_info();
 	preset();
 	early_mount();
 	setup_rootfs();

@@ -79,12 +79,12 @@ public abstract class MagiskInstaller {
     }
 
     protected boolean findImage() {
-        console.add("- Detecting target image");
         srcBoot = ShellUtils.fastCmd("find_boot_image", "echo \"$BOOTIMAGE\"");
         if (srcBoot.isEmpty()) {
             console.add("! Unable to detect target image");
             return false;
         }
+        console.add("- Target image: " + srcBoot);
         return true;
     }
 
@@ -92,7 +92,6 @@ public abstract class MagiskInstaller {
         String slot = ShellUtils.fastCmd("echo $SLOT");
         String target = (TextUtils.equals(slot, "_a") ? "_b" : "_a");
         console.add("- Target slot: " + target);
-        console.add("- Detecting target image");
         srcBoot = ShellUtils.fastCmd(
                 "SLOT=" + target,
                 "find_boot_image",
@@ -103,6 +102,7 @@ public abstract class MagiskInstaller {
             console.add("! Unable to detect target image");
             return false;
         }
+        console.add("- Target image: " + srcBoot);
         return true;
     }
 
@@ -216,8 +216,9 @@ public abstract class MagiskInstaller {
         }
 
         if (!Shell.sh("cd " + installDir, Utils.fmt(
-                "KEEPFORCEENCRYPT=%b KEEPVERITY=%b sh update-binary sh boot_patch.sh %s",
-                Config.keepEnc, Config.keepVerity, srcBoot))
+                "KEEPFORCEENCRYPT=%b KEEPVERITY=%b RECOVERYMODE=%b " +
+                "sh update-binary sh boot_patch.sh %s",
+                Config.keepEnc, Config.keepVerity, Config.recovery, srcBoot))
                 .to(console, logs).exec().isSuccess())
             return false;
 
