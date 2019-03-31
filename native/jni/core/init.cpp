@@ -143,7 +143,7 @@ static int dump_manager(const char *path, mode_t mode) {
 class MagiskInit {
 private:
 	cmdline cmd{};
-	raw_data init{};
+	raw_data self{};
 	raw_data config{};
 	int root = -1;
 	char **argv;
@@ -204,12 +204,6 @@ void MagiskInit::load_kernel_info() {
 	mkdir("/sys", 0755);
 	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
 
-	char cmdline[4096];
-	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
-	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
-	close(fd);
-
-	bool skip_initramfs = false;
 	bool enter_recovery = false;
 	bool kirin = false;
 
@@ -221,7 +215,7 @@ void MagiskInit::load_kernel_info() {
 			cmd.slot[0] = '_';
 			strcpy(cmd.slot + 1, value);
 		} else if (key == "skip_initramfs") {
-			skip_initramfs = true;
+			cmd.system_as_root = true;
 		} else if (key == "androidboot.android_dt_dir") {
 			strcpy(cmd.dt_dir, value);
 		} else if (key == "enter_recovery") {
@@ -247,8 +241,6 @@ void MagiskInit::load_kernel_info() {
 			cmd.system_as_root = true;
 		}
 	}
-
-	cmd.system_as_root |= skip_initramfs;
 
 	if (cmd.dt_dir[0] == '\0')
 		strcpy(cmd.dt_dir, DEFAULT_DT_DIR);
@@ -574,7 +566,7 @@ void MagiskInit::setup_overlay() {
 	write(fd, config.buf, config.sz);
 	close(fd);
 	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
-	write(fd, init.buf, init.sz);
+	write(fd, self.buf, self.sz);
 	close(fd);
 	dump_magisk("/sbin/magisk", 0755);
 	patch_socket_name("/sbin/magisk");
@@ -627,7 +619,7 @@ void MagiskInit::start() {
 
 	load_kernel_info();
 
-	full_read("/init", &init.buf, &init.sz);
+	full_read("/init", &self.buf, &self.sz);
 	full_read("/.backup/.magisk", &config.buf, &config.sz);
 
 	preset();
