@@ -93,6 +93,8 @@ ui_print "******************************"
 rm -rf $MODPATH 2>/dev/null
 mkdir -p $MODPATH
 
+on_install
+
 # Remove placeholder
 rm -f $MODPATH/system/placeholder 2>/dev/null
 
@@ -127,8 +129,6 @@ $POSTFSDATA && cp -af $TMPDIR/post-fs-data.sh $MODPATH/post-fs-data.sh
 
 # service mode scripts
 $LATESTARTSERVICE && cp -af $TMPDIR/service.sh $MODPATH/service.sh
-
-on_install
 
 # Handle replace folders
 for TARGET in $REPLACE; do
