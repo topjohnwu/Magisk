@@ -1,25 +1,3 @@
-/* init.cpp - Pre-init Magisk support
- *
- * This code has to be compiled statically to work properly.
- *
- * To unify Magisk support for both legacy "normal" devices and new skip_initramfs devices,
- * magisk binary compilation is split into two parts - first part only compiles "magisk".
- * The python build script will load the magisk main binary and compress with lzma2, dumping
- * the results into "dump.h". The "magisk" binary is embedded into this binary, and will
- * get extracted to the overlay folder along with init.magisk.rc.
- *
- * This tool does all pre-init operations to setup a Magisk environment, which pathces rootfs
- * on the fly, providing fundamental support such as init, init.rc, and sepolicy patching.
- *
- * Magiskinit is also responsible for constructing a proper rootfs on skip_initramfs devices.
- * On skip_initramfs devices, it will parse kernel cmdline, mount sysfs, parse through
- * uevent files to make the system (or vendor if available) block device node, then copy
- * rootfs files from system.
- *
- * This tool will be replaced with the real init to continue the boot process, but hardlinks are
- * preserved as it also provides CLI for sepolicy patching (magiskpolicy)
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
