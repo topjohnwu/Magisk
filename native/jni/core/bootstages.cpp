@@ -293,41 +293,6 @@ node_entry *node_entry::extract(const char *name) {
 	return node;
 }
 
-/****************
- * Simple Mount *
- ****************/
-
-static void simple_mount(const char *path) {
-	DIR *dir;
-	struct dirent *entry;
-
-	snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, path);
-	if (!(dir = opendir(buf)))
-		return;
-
-	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		// Target file path
-		snprintf(buf2, PATH_MAX, "%s/%s", path, entry->d_name);
-		// Only mount existing file
-		if (access(buf2, F_OK) == -1)
-			continue;
-		if (entry->d_type == DT_DIR) {
-			simple_mount(string(buf2).c_str());
-		} else if (entry->d_type == DT_REG) {
-			// Actual file path
-			snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, buf2);
-			// Clone all attributes
-			clone_attr(buf2, buf);
-			// Finally, mount the file
-			bind_mount(buf, buf2);
-		}
-	}
-
-	closedir(dir);
-}
-
 /*****************
  * Miscellaneous *
  *****************/
@@ -626,12 +591,6 @@ void post_fs_data(int client) {
 	fprintf(cf, "%d", boot_count);
 	fclose(cf);
 #endif
-
-	// Not core-only mode
-	if (access(DISABLEFILE, F_OK) != 0) {
-		simple_mount("/system");
-		simple_mount("/vendor");
-	}
 
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
