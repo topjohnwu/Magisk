@@ -97,8 +97,6 @@ ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 #define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (do_align(p, a) - (p))
 
-extern const char **excl_list;
-
 struct file_attr {
 	struct stat st;
 	char con[128];
@@ -107,14 +105,11 @@ struct file_attr {
 ssize_t fd_path(int fd, char *path, size_t size);
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
 int mkdirs(const char *pathname, mode_t mode);
-void post_order_walk(int dirfd, void (*fn)(int, struct dirent *));
 void rm_rf(const char *path);
-void frm_rf(int dirfd);
 void mv_f(const char *source, const char *destination);
 void mv_dir(int src, int dest);
 void cp_afc(const char *source, const char *destination);
 void link_dir(int src, int dest);
-void clone_dir(int src, int dest);
 int getattr(const char *path, struct file_attr *a);
 int getattrat(int dirfd, const char *name, struct file_attr *a);
 int fgetattr(int fd, struct file_attr *a);
@@ -177,6 +172,8 @@ void file_readline(const char *file, const std::function<bool (std::string_view)
 void parse_prop_file(const char *file, const std::function
         <bool(std::string_view, std::string_view)> &fn);
 void *__mmap(const char *filename, size_t *size, bool rw);
+void frm_rf(int dirfd, std::initializer_list<const char *> excl = std::initializer_list<const char *>());
+void clone_dir(int src, int dest, bool overwrite = true);
 
 template <typename B>
 void mmap_ro(const char *filename, B &buf, size_t &sz) {

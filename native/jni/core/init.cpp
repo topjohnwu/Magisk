@@ -245,7 +245,7 @@ void MagiskInit::load_kernel_info() {
 	if (cmd.dt_dir[0] == '\0')
 		strcpy(cmd.dt_dir, DEFAULT_DT_DIR);
 
-	LOGD("system_as_root[%d] slot[%s] dt_dir[%s]\n", cmd.system_as_root, cmd.slot, cmd.dt_dir);
+	LOGD("system_as_root[%d]\nslot[%s]\ndt_dir[%s]\n", cmd.system_as_root, cmd.slot, cmd.dt_dir);
 }
 
 void MagiskInit::preset() {
@@ -253,10 +253,7 @@ void MagiskInit::preset() {
 
 	if (cmd.system_as_root) {
 		// Clear rootfs
-		const char *excl[] = { "overlay", "proc", "sys", nullptr };
-		excl_list = excl;
-		frm_rf(root);
-		excl_list = nullptr;
+		frm_rf(root, { "overlay", "proc", "sys" });
 	} else {
 		decompress_ramdisk();
 
@@ -375,24 +372,16 @@ void MagiskInit::setup_rootfs() {
 	bool patch_init = patch_sepolicy();
 
 	if (cmd.system_as_root) {
-		// Clone rootfs except /system
+		// Clone rootfs
 		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
-		const char *excl[] = { "system", nullptr };
-		excl_list = excl;
-		clone_dir(system_root, root);
+		clone_dir(system_root, root, false);
 		close(system_root);
-		excl_list = nullptr;
 	}
-
-	// Override /sepolicy if exist
-	rename("/magisk_sepolicy", "/sepolicy");
 
 	if (patch_init) {
 		constexpr char SYSTEM_INIT[] = "/system/bin/init";
 		// If init is symlink, copy it to rootfs so we can patch
-		struct stat st;
-		lstat("/init", &st);
-		if (S_ISLNK(st.st_mode))
+		if (is_lnk("/init"))
 			cp_afc(SYSTEM_INIT, "/init");
 
 		char *addr;
@@ -474,7 +463,7 @@ bool MagiskInit::patch_sepolicy() {
 
 	sepol_magisk_rules();
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
-	dump_policydb("/magisk_sepolicy");
+	dump_policydb("/sepolicy");
 
 	// Load policy to kernel so we can label rootfs
 	if (load_sepol)
@@ -483,7 +472,7 @@ bool MagiskInit::patch_sepolicy() {
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
 		unlink("/sepolicy_debug");
-		link("/magisk_sepolicy", "/sepolicy_debug");
+		link("/sepolicy", "/sepolicy_debug");
 	}
 
 	// Enable selinux functions

@@ -17,16 +17,6 @@
 
 using namespace std;
 
-const char **excl_list = nullptr;
-
-static int is_excl(const char *name) {
-	if (excl_list)
-		for (int i = 0; excl_list[i]; ++i)
-			if (strcmp(name, excl_list[i]) == 0)
-				return 1;
-	return 0;
-}
-
 ssize_t fd_path(int fd, char *path, size_t size) {
 	snprintf(path, size, "/proc/self/fd/%d", fd);
 	return xreadlink(path, path, size);
@@ -62,7 +52,15 @@ int mkdirs(const char *pathname, mode_t mode) {
 	return 0;
 }
 
-void post_order_walk(int dirfd, void (*fn)(int, struct dirent *)) {
+static bool is_excl(initializer_list<const char *> excl, const char *name) {
+	for (auto item : excl)
+		if (strcmp(item, name) == 0)
+			return true;
+	return false;
+}
+
+static void post_order_walk(int dirfd, initializer_list<const char *> excl,
+		int (*fn)(int, struct dirent *)) {
 	struct dirent *entry;
 	int newfd;
 	DIR *dir = fdopendir(dirfd);
@@ -71,15 +69,19 @@ void post_order_walk(int dirfd, void (*fn)(int, struct dirent *)) {
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
-		if (is_excl(entry->d_name))
+		if (is_excl(excl, entry->d_name))
 			continue;
 		if (entry->d_type == DT_DIR) {
 			newfd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			post_order_walk(newfd, fn);
+			post_order_walk(newfd, excl, fn);
 			close(newfd);
 		}
 		fn(dirfd, entry);
 	}
+}
+
+static int remove_at(int dirfd, struct dirent *entry) {
+	return unlinkat(dirfd, entry->d_name, entry->d_type == DT_DIR ? AT_REMOVEDIR : 0);
 }
 
 void rm_rf(const char *path) {
@@ -94,10 +96,8 @@ void rm_rf(const char *path) {
 	remove(path);
 }
 
-void frm_rf(int dirfd) {
-	post_order_walk(dirfd, [](auto dirfd, auto entry) -> void {
-		unlinkat(dirfd, entry->d_name, entry->d_type == DT_DIR ? AT_REMOVEDIR : 0);
-	});
+void frm_rf(int dirfd, initializer_list<const char *> excl) {
+	post_order_walk(dirfd, excl, remove_at);
 }
 
 /* This will only on the same file system */
@@ -133,8 +133,6 @@ void mv_dir(int src, int dest) {
 	dir = xfdopendir(src);
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		if (is_excl(entry->d_name))
 			continue;
 		getattrat(src, entry->d_name, &a);
 		switch (entry->d_type) {
@@ -186,7 +184,7 @@ void cp_afc(const char *source, const char *destination) {
 	setattr(destination, &a);
 }
 
-void clone_dir(int src, int dest) {
+void clone_dir(int src, int dest, bool overwrite) {
 	struct dirent *entry;
 	DIR *dir;
 	int srcfd, destfd, newsrc, newdest;
@@ -197,7 +195,8 @@ void clone_dir(int src, int dest) {
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
-		if (is_excl(entry->d_name))
+		if (struct stat st; !overwrite &&
+				fstatat(dest, entry->d_name, &st, AT_SYMLINK_NOFOLLOW) == 0)
 			continue;
 		getattrat(src, entry->d_name, &a);
 		switch (entry->d_type) {
@@ -206,7 +205,7 @@ void clone_dir(int src, int dest) {
 			setattrat(dest, entry->d_name, &a);
 			newsrc = xopenat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
 			newdest = xopenat(dest, entry->d_name, O_RDONLY | O_CLOEXEC);
-			clone_dir(newsrc, newdest);
+			clone_dir(newsrc, newdest, overwrite);
 			close(newsrc);
 			close(newdest);
 			break;
@@ -236,8 +235,6 @@ void link_dir(int src, int dest) {
 	dir = xfdopendir(src);
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		if (is_excl(entry->d_name))
 			continue;
 		if (entry->d_type == DT_DIR) {
 			getattrat(src, entry->d_name, &a);
