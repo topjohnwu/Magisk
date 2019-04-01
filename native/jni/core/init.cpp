@@ -1,3 +1,9 @@
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/mount.h>
+#include <sys/sendfile.h>
+#include <sys/sysmacros.h>
+#include <linux/input.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -5,11 +11,6 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <libgen.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/mount.h>
-#include <sys/sendfile.h>
-#include <sys/sysmacros.h>
 #include <functional>
 #include <string_view>
 
@@ -175,6 +176,49 @@ static inline void parse_cmdline(const std::function<void (std::string_view, con
 	}
 }
 
+#define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
+
+static bool check_key_combo() {
+	uint8_t bitmask[(KEY_MAX + 1) / 8];
+	int eventfd = -1;
+
+	for (int minor = 64; minor < 96; ++minor) {
+		if (mknod("/event", S_IFCHR | 0444, makedev(13, minor))) {
+			PLOGE("mknod");
+			continue;
+		}
+		eventfd = xopen("/event", O_RDWR | O_CLOEXEC);
+		unlink("/event");
+		if (eventfd < 0)
+			continue;
+		memset(bitmask, 0, sizeof(bitmask));
+		ioctl(eventfd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
+		if (test_bit(KEY_POWER, bitmask) && test_bit(KEY_VOLUMEUP, bitmask)) {
+			// Check KEY_POWER because KEY_VOLUMEUP could be headphone input
+			break;
+		}
+	}
+
+	if (eventfd < 0)
+		return false;
+
+	// Return true if volume key up is hold for more than 3 seconds
+	int count = 0;
+	for (int i = 0; i < 500; ++i) {
+		memset(bitmask, 0, sizeof(bitmask));
+		ioctl(eventfd, EVIOCGKEY(sizeof(bitmask)), bitmask);
+		count = test_bit(KEY_VOLUMEUP, bitmask) ? count + 1 : 0;
+		if (count >= 300) {
+			close(eventfd);
+			return true;
+		}
+		// Check every 10ms
+		usleep(10000);
+	}
+	close(eventfd);
+	return false;
+}
+
 void MagiskInit::load_kernel_info() {
 	// Communicate with kernel using procfs and sysfs
 	mkdir("/proc", 0755);
@@ -184,6 +228,7 @@ void MagiskInit::load_kernel_info() {
 
 	bool enter_recovery = false;
 	bool kirin = false;
+	bool recovery_mode = false;
 
 	parse_cmdline([&](auto key, auto value) -> void {
 		LOGD("cmdline: [%s]=[%s]\n", key.data(), value);
@@ -205,20 +250,23 @@ void MagiskInit::load_kernel_info() {
 
 	parse_prop_file("/.backup/.magisk", [&](auto key, auto value) -> bool {
 		if (key == "RECOVERYMODE" && value == "true")
-			cmd.system_as_root = true;
+			recovery_mode = true;
 		return true;
 	});
 
 	if (kirin && enter_recovery) {
 		// Inform that we are actually booting as recovery
-		if (!cmd.system_as_root) {
+		if (!recovery_mode) {
 			if (FILE *f = fopen("/.backup/.magisk", "ae"); f) {
 				fprintf(f, "RECOVERYMODE=true\n");
 				fclose(f);
 			}
-			cmd.system_as_root = true;
+			recovery_mode = true;
 		}
 	}
+
+	if (recovery_mode)
+		cmd.system_as_root = !check_key_combo();
 
 	if (cmd.dt_dir[0] == '\0')
 		strcpy(cmd.dt_dir, DEFAULT_DT_DIR);
