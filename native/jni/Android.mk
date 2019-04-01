@@ -121,6 +121,19 @@ include $(BUILD_EXECUTABLE)
 
 endif
 
+ifdef B_TEST
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := test
+LOCAL_STATIC_LIBRARIES := libutils
+LOCAL_C_INCLUDES := \
+	jni/include \
+	$(LIBUTILS)
+LOCAL_SRC_FILES := test.cpp
+include $(BUILD_EXECUTABLE)
+
+endif
+
 ifdef B_BB
 
 include jni/external/busybox/Android.mk

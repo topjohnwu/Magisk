@@ -102,7 +102,7 @@ def zip_with_msg(zip_file, source, target):
 def collect_binary():
     for arch in archs + arch64:
         mkdir_p(os.path.join('native', 'out', arch))
-        for bin in ['magisk', 'magiskinit', 'magiskinit64', 'magiskboot', 'busybox']:
+        for bin in ['magisk', 'magiskinit', 'magiskinit64', 'magiskboot', 'busybox', 'test']:
             source = os.path.join('native', 'libs', arch, bin)
             target = os.path.join('native', 'out', arch, bin)
             mv(source, target)
@@ -183,14 +183,14 @@ def run_ndk_build(flags):
 
 
 def build_binary(args):
-    support_targets = {'magisk', 'magiskinit', 'magiskboot', 'busybox'}
+    support_targets = {'magisk', 'magiskinit', 'magiskboot', 'busybox', 'test'}
     if args.target:
         args.target = set(args.target) & support_targets
         if not args.target:
             return
     else:
         # If nothing specified, build everything
-        args.target = support_targets
+        args.target = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
     header('* Building binaries: ' + ' '.join(args.target))
 
@@ -229,6 +229,9 @@ def build_binary(args):
 
     if 'magiskboot' in args.target:
         run_ndk_build('B_BOOT=1')
+
+    if 'test' in args.target:
+        run_ndk_build('B_TEST=1')
 
 
 def build_apk(args, module):
