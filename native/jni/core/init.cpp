@@ -678,6 +678,9 @@ int main(int argc, char *argv[]) {
 			return dump_manager(argv[3], 0644);
 	}
 
+	if (getpid() != 1)
+		return 1;
+
 	MagiskInit init(argv);
 
 	// Run the main routine
