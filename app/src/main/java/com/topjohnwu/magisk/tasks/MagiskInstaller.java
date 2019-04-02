@@ -10,7 +10,6 @@ import androidx.annotation.WorkerThread;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.DownloadProgressListener;
 import com.topjohnwu.net.Networking;
@@ -23,6 +22,7 @@ import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 import com.topjohnwu.superuser.io.SuFileOutputStream;
 
+import org.kamranzafar.jtar.TarEntry;
 import org.kamranzafar.jtar.TarInputStream;
 import org.kamranzafar.jtar.TarOutputStream;
 
@@ -182,7 +182,7 @@ public abstract class MagiskInstaller {
             if (Utils.getNameFromUri(App.self, bootUri).endsWith(".tar")) {
                 // Extract boot.img from tar
                 TarInputStream tar = new TarInputStream(new BufferedInputStream(in));
-                org.kamranzafar.jtar.TarEntry entry;
+                TarEntry entry;
                 while ((entry = tar.getNextEntry()) != null) {
                     if (entry.getName().equals("boot.img"))
                         break;
