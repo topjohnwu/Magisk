@@ -25,11 +25,14 @@ dependencies {
     implementation project(':net')
     implementation project(':shared')
     implementation project(':signing')
-    implementation 'ru.noties:markwon:2.0.1'
-    implementation 'com.caverock:androidsvg-aar:1.3'
     implementation 'com.github.topjohnwu:jtar:1.0.0'
     implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.0'
     implementation 'com.github.sevar83:indeterminate-checkbox:1.0.5'
+
+    def markwonVersion = '3.0.0'
+    implementation "ru.noties.markwon:core:${markwonVersion}"
+    implementation "ru.noties.markwon:html:${markwonVersion}"
+    implementation "ru.noties.markwon:image-svg:${markwonVersion}"
 
     def androidXVersion = "1.0.0"
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
