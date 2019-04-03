@@ -95,7 +95,7 @@
     <string name="warning">คำเตือน</string>
     <string name="install_inactive_slot_msg">อุปกรณ์ของคุณจะถูกบังคับให้บู๊ตไป Slot ที่ไม่ใช่งานหลังจากรีบูต!\nใช้ตัวเลือกนี้หลังจาก OTA เสร็จเท่านั้น\nดำเนินการต่อ?</string>
     <string name="select_method">เลือกวิธี</string>
-    <string name="boot_file_patch_msg">เลือกไฟล์บู๊ตจากโรงงานในรูปแบบ .img or .img.tar</string>
+    <string name="boot_file_patch_msg">เลือกไฟล์บู๊ตจากโรงงานในรูปแบบ .img or .tar</string>
     <string name="complete_uninstall">ถอนการติดตั้งแบบสมบูรณ์</string>
     <string name="restore_img">กู้คืน Images</string>
     <string name="restore_img_msg">กำลังกู้คืน…</string>

@@ -90,7 +90,7 @@
     <string name="warning">Cảnh báo</string>
     <string name="install_inactive_slot_msg">Thiết bị của bạn sẽ bắt buộc phải khởi động tới vị trí không hoạt động hiện tại sau khi khởi động lại!\nChỉ sử dụng tuỳ chọn này sau khi cập nhật OTA hoàn tất.\nMuốn tiếp tục?</string>
     <string name="select_method">Chọn phương thức</string>
-    <string name="boot_file_patch_msg">Chọn kết xuất hình ảnh khởi động gốc theo định dạng .img hoặc .img.tar.</string>
+    <string name="boot_file_patch_msg">Chọn kết xuất hình ảnh khởi động gốc theo định dạng .img hoặc .tar.</string>
     <string name="complete_uninstall">Xác nhận gỡ bỏ</string>
     <string name="restore_img">Khôi phục images</string>
     <string name="restore_img_msg">Đang khôi phục…</string>

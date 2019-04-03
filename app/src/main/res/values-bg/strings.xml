@@ -90,7 +90,7 @@
     <string name="warning">Внимание</string>
     <string name="install_inactive_slot_msg">Вашето устройство НАЛОЖИТЕЛНО ще стартира текущия неактивен слот при следващото рестартиране.\nИзползвайте тази опция само след като приключи инсталирането на OTA.\nПродължаване?</string>
 .   <string name="select_method">Избор на метод</string>
-    <string name="boot_file_patch_msg">Изберете стоков boot образ с формат .img или .img.tar.</string>
+    <string name="boot_file_patch_msg">Изберете стоков boot образ с формат .img или .tar.</string>
     <string name="complete_uninstall">Пълно деинсталиране</string>
     <string name="restore_img">Възстановяване на образи</string>
     <string name="restore_img_msg">Възстановяване…</string>

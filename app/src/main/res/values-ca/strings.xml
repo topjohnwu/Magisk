@@ -98,7 +98,7 @@
     <string name="warning">Avís</string>
     <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en la ranura inactiva després de reiniciar!\nUtilitza aquesta opció només quan s\'hagi fet la OTA.\nContinuar?</string>
     <string name="select_method">Selecciona mètode</string>
-    <string name="boot_file_patch_msg">Seleccioneu l\'arxiu de bolcat de l\'arrencada en format .img o img.tar.</string>
+    <string name="boot_file_patch_msg">Seleccioneu l\'arxiu de bolcat de l\'arrencada en format .img o .tar.</string>
     <string name="complete_uninstall">Desinstal·lació completa</string>
     <string name="restore_img">Restaura imatges</string>
     <string name="restore_img_msg">Restaurant…</string>

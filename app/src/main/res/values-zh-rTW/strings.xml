@@ -98,7 +98,7 @@
     <string name="warning">警告</string>
     <string name="install_inactive_slot_msg">此裝置將會在下次重新啟動後強制切換至未使用的分割區！\n請僅在 OTA 後使用此選項。\n是否繼續？</string>
     <string name="select_method">選擇模式</string>
-    <string name="boot_file_patch_msg">選擇原始 Boot 映像檔；應為 .img 及 .img.tar 格式</string>
+    <string name="boot_file_patch_msg">選擇原始 Boot 映像檔；應為 .img 及 .tar 格式</string>
     <string name="complete_uninstall">完整解除安裝</string>
     <string name="restore_img">還原映像檔</string>
     <string name="restore_img_msg">正在還原…</string>

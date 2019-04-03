@@ -98,7 +98,7 @@
     <string name="warning">Uyarı</string>
     <string name="install_inactive_slot_msg">Cihazınız yeniden başlatıldıktan sonra mevcut pasif yuvaya ZORLA önyüklenecek!\nBu seçeneği yalnızca OTA tamamlandıktan sonra kullanın.\nDevam mı?</string>
     <string name="select_method">Yöntem Seçin</string>
-    <string name="boot_file_patch_msg">.img veya .img.tar formatında stok önyükleme imajını seçin</string>
+    <string name="boot_file_patch_msg">.img veya .tar formatında stok önyükleme imajını seçin</string>
     <string name="complete_uninstall">Tamamen Kaldır</string>
     <string name="restore_img">Önyükleme İmajını Geri Yükle</string>
     <string name="restore_img_msg">Geri Yükleniyor…</string>

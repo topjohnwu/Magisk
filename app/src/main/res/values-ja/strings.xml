@@ -98,7 +98,7 @@
     <string name="warning">警告</string>
     <string name="install_inactive_slot_msg">お使いのデバイスは再起動後に現在のInactive Slotで強制的に起動されます！\nこのオプションはOTAの完了後にのみ使用してください。\n続行しますか？</string>
     <string name="select_method">方法の選択</string>
-    <string name="boot_file_patch_msg">StockのBootイメージ (.img または .img.tar形式) を選択してください</string>
+    <string name="boot_file_patch_msg">StockのBootイメージ (.img または .tar形式) を選択してください</string>
     <string name="complete_uninstall">完全にアンインストール</string>
     <string name="restore_img">イメージのリストア</string>
     <string name="restore_img_msg">リストア中…</string>

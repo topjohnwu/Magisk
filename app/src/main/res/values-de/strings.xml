@@ -90,7 +90,7 @@
     <string name="warning">Warnung</string>
     <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem nach dem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
     <string name="select_method">Methode auswählen</string>
-    <string name="boot_file_patch_msg">Wähle das original Boot-Image-Dump im Format .img oder .img.tar</string>
+    <string name="boot_file_patch_msg">Wähle das original Boot-Image-Dump im Format .img oder .tar</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
     <string name="restore_img">Images wiederherstellen</string>
     <string name="restore_img_msg">Wiederherstellen...</string>

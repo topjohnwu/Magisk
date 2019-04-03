@@ -95,7 +95,7 @@
     <string name="warning">Advarsel</string>
     <string name="install_inactive_slot_msg">Enheten din vil bli TVUNGET til å starte opp på det som for øyeblikket er et inaktivt felt, etter en omstart!\nBare bruk dette alternativet etter at OTA-oppdateringen er ferdig.\nVil du fortsette?</string>
     <string name="select_method">Velg metode</string>
-    <string name="boot_file_patch_msg">Velg oppstartsbildefilen som fulgte med mobilen din, i .img- eller .img.tar-format.</string>
+    <string name="boot_file_patch_msg">Velg oppstartsbildefilen som fulgte med mobilen din, i .img- eller .tar-format.</string>
     <string name="complete_uninstall">Fullstendig avinstallering</string>
     <string name="restore_img">Gjenopprett oppstartsbilde</string>
     <string name="restore_img_msg">Gjenoppretter …</string>

@@ -98,7 +98,7 @@
 	<string name="warning">Attenzione</string>
 	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
 	<string name="select_method">Seleziona un metodo</string>
-	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar.</string>
+	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o .tar.</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
 	<string name="restore_img_msg">Ripristino…</string>

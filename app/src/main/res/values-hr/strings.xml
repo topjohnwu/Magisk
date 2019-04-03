@@ -78,7 +78,7 @@
     <string name="patch_boot_file">Zakrpa datoteke za podizanje sustava</string>
     <string name="direct_install">Izravna instalacija (preporuča se)</string>
     <string name="select_method">Odaberite metodu</string>
-    <string name="boot_file_patch_msg">Odaberite standardnu datoteku za podizanje sustava u .img ili .img.tar formatu</string>
+    <string name="boot_file_patch_msg">Odaberite standardnu datoteku za podizanje sustava u .img ili .tar formatu</string>
     <string name="complete_uninstall">Potpuna deinstalacija</string>
     <string name="restore_done">Obnova je dovršena!</string>
     <string name="restore_fail">Stock backup does not exist!</string>

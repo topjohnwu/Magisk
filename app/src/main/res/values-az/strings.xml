@@ -182,7 +182,7 @@
 
     <string name="select_method">Üsul Seçin</string>
 
-    <string name="boot_file_patch_msg">Standart boot surətinin yığılma formatını .imb yaxud img.tar kimi seçin.</string>
+    <string name="boot_file_patch_msg">Standart boot surətinin yığılma formatını .img yaxud .tar kimi seçin.</string>
 
     <string name="complete_uninstall">Silməni Bitir</string>
 

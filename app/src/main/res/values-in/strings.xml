@@ -97,7 +97,7 @@
     <string name="warning">Peringatan</string>
     <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah sebuah reboot!\nHanya gunakan opsi ini setelah OTA selesai.\nLanjutkan?</string>
     <string name="select_method">Pilih Metode</string>
-    <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar.</string>
+    <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .tar.</string>
     <string name="complete_uninstall">Copot Total</string>
     <string name="restore_img">Pulihkan Image</string>
     <string name="restore_img_msg">Memulihkan…</string>

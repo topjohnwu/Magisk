@@ -98,7 +98,7 @@
     <string name="warning">警告</string>
     <string name="install_inactive_slot_msg">重启后，设备将被强制切换到另一个槽位！\n请在安装完 OTA 后再使用。\n是否继续？</string>
     <string name="select_method">选择安装方法</string>
-    <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .img.tar 格式</string>
+    <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .tar 格式</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂镜像</string>
     <string name="restore_img_msg">还原中…</string>

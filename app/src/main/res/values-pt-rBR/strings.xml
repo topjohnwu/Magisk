@@ -89,7 +89,7 @@
     <string name="direct_install">Instalação Direta (Recomendado)</string>
     <string name="install_inactive_slot">Instalar no Slot Inativo (Após OTA)</string>
     <string name="select_method">Selecionar Método</string>
-    <string name="boot_file_patch_msg">Selecionar depósito de imagem de inicialização de fábrica no formato .img ou .img.tar</string>
+    <string name="boot_file_patch_msg">Selecionar depósito de imagem de inicialização de fábrica no formato .img ou .tar</string>
     <string name="complete_uninstall">Completar Desinstalação</string>
     <string name="restore_img">Restaurar Imagens</string>
     <string name="restore_done">Restauração concluída!</string>

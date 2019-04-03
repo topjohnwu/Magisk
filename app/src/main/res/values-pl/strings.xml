@@ -98,7 +98,7 @@
     <string name="warning">Uwaga</string>
     <string name="install_inactive_slot_msg">Urządzenie będzie MUSIAŁO uruchomić się z bieżącego nieaktywnego slotu po restarcie! /\nUżyj tylko tej opcji po zakończeniu OTA.\nKontynuować?</string>
 	<string name="select_method">Wybierz Metodę</string>
-    <string name="boot_file_patch_msg">Wybierz stokowy obraz boot w formacie .img lub .img.tar</string>
+    <string name="boot_file_patch_msg">Wybierz stokowy obraz boot w formacie .img lub .tar</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_img">Przywróć Obraz</string>
 	<string name="restore_img_msg">Przywracanie…</string>

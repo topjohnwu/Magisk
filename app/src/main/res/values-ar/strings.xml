@@ -108,7 +108,7 @@
     <string name="android_o_not_support">لا يدعم إصدار الأندرويد +8.0</string>
   <string name="auth_fail">فشل المصادقة</string>
   <string name="auth_fingerprint">مصادقة البصمة</string>
-  <string name="boot_file_patch_msg">حدد الذاكرة المؤقتة لنسخة boot الأصلية بتنسيق img. أو .img.tar</string>
+  <string name="boot_file_patch_msg">حدد الذاكرة المؤقتة لنسخة boot الأصلية بتنسيق img. أو .tar</string>
   <string name="complete_uninstall">إلغاء التثبيت بالكامل</string>
   <string name="direct_install">تثبيت مباشر (موصى به)</string>
   <string name="disable_fingerprint">لم يتم تعيين بصمات الأصابع أو لا يوجد جهاز مدعوم</string>

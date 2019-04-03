@@ -80,7 +80,7 @@
     <string name="patch_boot_file">Закрпи фајл слике покретања</string>
     <string name="direct_install">Директна Инсталација (Препоручено)</string>
     <string name="select_method">Изабери Методу</string>
-    <string name="boot_file_patch_msg">Изабери испис фабричког фајла слике покретања у .img или img.tar формату</string>
+    <string name="boot_file_patch_msg">Изабери испис фабричког фајла слике покретања у .img или .tar формату</string>
     <string name="complete_uninstall">Комплетна Унинсталација</string>
     <string name="restore_done">Повратак успешан!</string>
     <string name="restore_fail">Фабрички бекап не постоји!</string>

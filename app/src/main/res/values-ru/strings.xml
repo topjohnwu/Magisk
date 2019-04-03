@@ -98,7 +98,7 @@
     <string name="warning">Предупреждение</string>
     <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный слот!\nИспользуйте эту опцию только при установке OTA.\nПродолжить?</string>
     <string name="select_method">Выбор способа</string>
-    <string name="boot_file_patch_msg">Выберите файл ядра (boot) - *.img или *.img.tar</string>
+    <string name="boot_file_patch_msg">Выберите файл ядра (boot) - *.img или *.tar</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
     <string name="restore_img_msg">Восстановление…</string>

@@ -96,7 +96,7 @@
     <string name="warning">Upozornenie</string>
     <string name="install_inactive_slot_msg">Vaše zariadenie bude po reštarte PRINÚTENÉ nabootovať do aktuálne neaktívneho slotu!\nTúto voľbu použite iba po skončení OTA.\nPokračovať?</string>
     <string name="select_method">Vyberte metódu</string>
-    <string name="boot_file_patch_msg">Vyberte stock boot image dump vo formáte .img alebo .img.tar</string>
+    <string name="boot_file_patch_msg">Vyberte stock boot image dump vo formáte .img alebo .tar</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>
     <string name="restore_img_msg">Obnovovanie…</string>

@@ -98,7 +98,7 @@
     <string name="warning">Avertisment</string>
     <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să se încarce în slotul inactiv actual după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
     <string name="select_method">Selectează metoda</string>
-    <string name="boot_file_patch_msg">Selectează formatul .img sau .img.tar pentru imaginea de boot stock.</string>
+    <string name="boot_file_patch_msg">Selectează formatul .img sau .tar pentru imaginea de boot stock.</string>
     <string name="complete_uninstall">Dezinstalare totală</string>
     <string name="restore_img">Restaurează imagini</string>
     <string name="restore_img_msg">Se restaurează…</string>
