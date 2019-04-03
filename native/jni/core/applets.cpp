@@ -8,17 +8,19 @@
 #include <selinux.h>
 #include <utils.h>
 
-static int (*applet_main[]) (int, char *[]) =
-		{ magisk_main, su_client_main, resetprop_main, magiskhide_main, nullptr };
+using namespace std::literals;
 
-[[noreturn]] static void call_applets(int argc, char *argv[]) {
+static int (*applet_main[]) (int, char *[]) =
+		{ su_client_main, resetprop_main, magiskhide_main, nullptr };
+
+[[noreturn]] static void call_applet(int argc, char **argv) {
 	// Applets
 	for (int i = 0; applet_names[i]; ++i) {
 		if (strcmp(basename(argv[0]), applet_names[i]) == 0) {
 			exit((*applet_main[i])(argc, argv));
 		}
 	}
-	fprintf(stderr, "%s: applet not found\n", argv[0]);
+	fprintf(stderr, "%s: applet not found\n", basename(argv[0]));
 	exit(1);
 }
 
@@ -28,11 +30,24 @@ int main(int argc, char *argv[]) {
 	cmdline_logging();
 	init_argv0(argc, argv);
 
-	if ((strcmp(basename(argv[0]), "magisk") == 0 && argc > 1 && argv[1][0] != '-')) {
+	if (basename(argv[0]) == "magisk.bin"sv) {
+		if (argc == 1)
+			return 1;
+		// Running through wrapper
 		--argc;
 		++argv;
 	}
 
-	call_applets(argc, argv);
+	if (basename(argv[0]) == "magisk"sv) {
+		if (argc > 1 && argv[1][0] != '-') {
+			// Calling applet via magisk [applet] args
+			--argc;
+			++argv;
+		} else {
+			return magisk_main(argc, argv);
+		}
+	}
+
+	call_applet(argc, argv);
 }
 

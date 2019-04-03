@@ -25,8 +25,10 @@
 #include "binaries.h"
 #ifdef USE_64BIT
 #include "binaries_arch64.h"
+#define LIBNAME "lib64"
 #else
 #include "binaries_arch.h"
+#define LIBNAME "lib"
 #endif
 #include "magiskrc.h"
 
@@ -560,6 +562,11 @@ static inline void patch_socket_name(const char *path) {
 	munmap(buf, size);
 }
 
+static const char wrapper[] =
+"#!/system/bin/sh\n"
+"export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH:/apex/com.android.runtime/" LIBNAME "\"\n"
+"exec /sbin/magisk.bin \"$0\" \"$@\"\n";
+
 void MagiskInit::setup_overlay() {
 	char path[128];
 	int fd;
@@ -583,8 +590,17 @@ void MagiskInit::setup_overlay() {
 	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
 	write(fd, self.buf, self.sz);
 	close(fd);
-	dump_magisk("/sbin/magisk", 0755);
-	patch_socket_name("/sbin/magisk");
+	if (access("/system/apex", F_OK) == 0) {
+		dump_magisk("/sbin/magisk.bin", 0755);
+		patch_socket_name("/sbin/magisk.bin");
+		setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+		fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+		write(fd, wrapper, sizeof(wrapper) - 1);
+		close(fd);
+	} else {
+		dump_magisk("/sbin/magisk", 0755);
+		patch_socket_name("/sbin/magisk");
+	}
 	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 
