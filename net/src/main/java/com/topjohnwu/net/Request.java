@@ -15,10 +15,9 @@ import java.io.FileOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.net.HttpURLConnection;
+import java.util.Scanner;
 import java.util.concurrent.Executor;
 
 public class Request implements Closeable {
@@ -192,15 +191,10 @@ public class Request implements Closeable {
     }
 
     private String dlString() throws IOException {
-        StringBuilder builder = new StringBuilder();
-        try (Reader reader = new InputStreamReader(getInputStream())) {
-            int len;
-            char[] buf = new char[4096];
-            while ((len = reader.read(buf)) != -1) {
-                builder.append(buf, 0, len);
-            }
+        try (Scanner s = new Scanner(getInputStream(), "UTF-8")) {
+            s.useDelimiter("\\A");
+            return s.next();
         }
-        return builder.toString();
     }
 
     private JSONObject dlJSONObject() throws IOException, JSONException {
