@@ -59,7 +59,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                         if (resultCode == Activity.RESULT_OK && data != null) {
                             Intent i = new Intent(activity, ClassMap.get(FlashActivity.class))
                                     .setData(data.getData())
-                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
+                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_FILE);
                             activity.startActivity(i);
                         }
                     });

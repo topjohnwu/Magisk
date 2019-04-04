@@ -125,8 +125,8 @@ public class FlashActivity extends BaseActivity {
             case Const.Value.FLASH_INACTIVE_SLOT:
                 new SecondSlot().exec();
                 break;
-            case Const.Value.PATCH_BOOT:
-                new PatchBoot(uri).exec();
+            case Const.Value.PATCH_FILE:
+                new PatchFile(uri).exec();
                 break;
         }
     }
@@ -254,17 +254,17 @@ public class FlashActivity extends BaseActivity {
         }
     }
 
-    private class PatchBoot extends BaseInstaller {
+    private class PatchFile extends BaseInstaller {
 
         private Uri uri;
 
-        PatchBoot(Uri u) {
+        PatchFile(Uri u) {
             uri = u;
         }
 
         @Override
         protected boolean operations() {
-            return copyBoot(uri) && extractZip() && patchBoot() && storeBoot();
+            return extractZip() && handleFile(uri) && patchBoot() && storeBoot();
         }
     }
 

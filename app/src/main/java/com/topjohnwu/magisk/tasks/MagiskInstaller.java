@@ -23,6 +23,7 @@ import com.topjohnwu.superuser.io.SuFileInputStream;
 import com.topjohnwu.superuser.io.SuFileOutputStream;
 
 import org.kamranzafar.jtar.TarEntry;
+import org.kamranzafar.jtar.TarHeader;
 import org.kamranzafar.jtar.TarInputStream;
 import org.kamranzafar.jtar.TarOutputStream;
 
@@ -30,11 +31,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -42,9 +43,12 @@ import java.util.zip.ZipInputStream;
 
 public abstract class MagiskInstaller {
 
-    private List<String> console, logs;
     protected String srcBoot;
+    protected File destFile;
     protected File installDir;
+
+    private List<String> console, logs;
+    private boolean isTar = false;
 
     private class ProgressLog implements DownloadProgressListener {
 
@@ -166,38 +170,101 @@ public abstract class MagiskInstaller {
         } else {
             init64.delete();
         }
+        Shell.sh("cd " + installDir, "chmod 755 *").exec();
         return true;
     }
 
-    protected boolean copyBoot(Uri bootUri) {
-        srcBoot = new File(installDir, "boot.img").getPath();
-        console.add("- Copying image to cache");
-        // Copy boot image to local
-        try (InputStream in = App.self.getContentResolver().openInputStream(bootUri);
-             OutputStream out = new FileOutputStream(srcBoot)) {
-            if (in == null)
-                throw new FileNotFoundException();
+    private TarEntry newEntry(String name, long size) {
+        console.add("-- Writing: " + name);
+        return new TarEntry(TarHeader.createHeader(name, size, 0, false, 0644));
+    }
 
-            InputStream src;
-            if (Utils.getNameFromUri(App.self, bootUri).endsWith(".tar")) {
-                // Extract boot.img from tar
-                TarInputStream tar = new TarInputStream(new BufferedInputStream(in));
-                TarEntry entry;
-                while ((entry = tar.getNextEntry()) != null) {
-                    if (entry.getName().equals("boot.img"))
-                        break;
+    private void handleTar(InputStream in) throws IOException {
+        console.add("- Processing tar file");
+        boolean vbmeta = false;
+        try (TarInputStream tarIn = new TarInputStream(in);
+             TarOutputStream tarOut = new TarOutputStream(destFile)) {
+            TarEntry entry;
+            while ((entry = tarIn.getNextEntry()) != null) {
+                if (entry.getName().contains("boot.img")
+                        || entry.getName().contains("recovery.img")) {
+                    String name = entry.getName();
+                    console.add("-- Extracting: " + name);
+                    File extract = new File(installDir, name);
+                    try (FileOutputStream fout = new FileOutputStream(extract)) {
+                        ShellUtils.pump(tarIn, fout);
+                    }
+                    if (name.contains(".lz4")) {
+                        console.add("-- Decompressing: " + name);
+                        Shell.sh("./magiskboot --decompress " + extract).to(console).exec();
+                    }
+                } else if (entry.getName().contains("vbmeta.img")) {
+                    vbmeta = true;
+                    ByteBuffer buf = ByteBuffer.allocate(256);
+                    buf.put("AVB0".getBytes()); // magic
+                    buf.putInt(1);              // required_libavb_version_major
+                    buf.putInt(120, 2);         // flags
+                    buf.position(128);          // release_string
+                    buf.put("avbtool 1.1.0".getBytes());
+                    tarOut.putNextEntry(newEntry("vbmeta.img", 256));
+                    tarOut.write(buf.array());
+                } else {
+                    console.add("-- Writing: " + entry.getName());
+                    tarOut.putNextEntry(entry);
+                    ShellUtils.pump(tarIn, tarOut);
                 }
-                src = tar;
-            } else {
-                // Direct copy raw image
-                src = new BufferedInputStream(in);
             }
-            ShellUtils.pump(src, out);
-        } catch (FileNotFoundException e) {
-            console.add("! Invalid Uri");
-            return false;
+            SuFile boot = new SuFile(installDir, "boot.img");
+            SuFile recovery = new SuFile(installDir, "recovery.img");
+            if (vbmeta && recovery.exists() && boot.exists()) {
+                // Install Magisk to recovery
+                srcBoot = recovery.getPath();
+                // Repack boot image to prevent restore
+                Shell.sh(
+                        "./magiskboot --unpack boot.img",
+                        "./magiskboot --repack boot.img",
+                        "./magiskboot --cleanup",
+                        "mv new-boot.img boot.img").exec();
+                try (InputStream sin = new SuFileInputStream(boot)) {
+                    tarOut.putNextEntry(newEntry("boot.img", boot.length()));
+                    ShellUtils.pump(sin, tarOut);
+                }
+                boot.delete();
+            } else {
+                if (!boot.exists()) {
+                    console.add("! No boot image found");
+                    throw new IOException();
+                }
+                srcBoot = boot.getPath();
+            }
+        }
+    }
+
+    protected boolean handleFile(Uri uri) {
+        try (InputStream in = new BufferedInputStream(App.self.getContentResolver().openInputStream(uri))) {
+            in.mark(500);
+            byte[] magic = new byte[5];
+            if (in.skip(257) != 257 || in.read(magic) != magic.length) {
+                console.add("! Invalid file");
+                return false;
+            }
+            in.reset();
+            if (Arrays.equals(magic, "ustar".getBytes())) {
+                isTar = true;
+                destFile = new File(Const.EXTERNAL_PATH, "magisk_patched.tar");
+                handleTar(in);
+            } else {
+                // Raw image
+                srcBoot = new File(installDir, "boot.img").getPath();
+                destFile = new File(Const.EXTERNAL_PATH, "magisk_patched.img");
+                console.add("- Copying image to cache");
+                try (OutputStream out = new FileOutputStream(srcBoot)) {
+                    ShellUtils.pump(in, out);
+                }
+            }
         } catch (IOException e) {
-            console.add("! Copy failed");
+            console.add("! Process error");
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -215,7 +282,7 @@ public abstract class MagiskInstaller {
             return false;
         }
 
-        if (!Shell.sh("cd " + installDir, Utils.fmt(
+        if (!Shell.sh(Utils.fmt(
                 "KEEPFORCEENCRYPT=%b KEEPVERITY=%b RECOVERYMODE=%b " +
                 "sh update-binary sh boot_patch.sh %s",
                 Config.keepEnc, Config.keepVerity, Config.recovery, srcBoot))
@@ -253,35 +320,30 @@ public abstract class MagiskInstaller {
     }
 
     protected boolean storeBoot() {
-        File patched = new File(installDir, "new-boot.img");
-        String fmt = Config.get(Config.Key.BOOT_FORMAT);
-        File dest = new File(Const.EXTERNAL_PATH, "patched_boot" + fmt);
-        dest.getParentFile().mkdirs();
-        OutputStream os;
+        SuFile patched = new SuFile(installDir, "new-boot.img");
         try {
-            switch (fmt) {
-                case ".img.tar":
-                    os = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
-                    ((TarOutputStream) os).putNextEntry(new TarEntry(patched, "boot.img"));
-                    break;
-                default:
-                case ".img":
-                    os = new BufferedOutputStream(new FileOutputStream(dest));
-                    break;
+            OutputStream os;
+            if (isTar) {
+                os = new TarOutputStream(destFile, true);
+                ((TarOutputStream) os).putNextEntry(newEntry(
+                                srcBoot.contains("recovery") ? "recovery.img" : "boot.img",
+                                patched.length()));
+            } else {
+                os = new BufferedOutputStream(new FileOutputStream(destFile));
             }
-            try (InputStream in = new SuFileInputStream(patched)) {
-                ShellUtils.pump(in, os);
-                os.close();
+            try (InputStream in = new SuFileInputStream(patched);
+                OutputStream out = os) {
+                ShellUtils.pump(in, out);
             }
         } catch (IOException e) {
-            console.add("! Failed to store boot to " + dest);
-            return false;
+            console.add("! Failed to output to " + destFile);
+            e.printStackTrace();
         }
-        Shell.sh("rm -f " + patched).exec();
+        patched.delete();
         console.add("");
         console.add("****************************");
-        console.add(" Patched image is placed in ");
-        console.add(" " + dest + " ");
+        console.add(" Output file is placed in ");
+        console.add(" " + destFile + " ");
         console.add("****************************");
         return true;
     }
