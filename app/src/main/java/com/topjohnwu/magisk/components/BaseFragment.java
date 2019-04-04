@@ -35,10 +35,12 @@ public abstract class BaseFragment extends Fragment implements Event.AutoListene
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        startActivityForResult(intent, requestCode, this::onActivityResult);
+        startActivityForResult(intent, requestCode, (resultCode, data) ->
+                onActivityResult(requestCode, resultCode, data));
     }
 
-    public void startActivityForResult(Intent intent, int requestCode, BaseActivity.ActivityResultListener listener) {
+    public void startActivityForResult(Intent intent, int requestCode,
+                                       BaseActivity.ActivityResultListener listener) {
         ((BaseActivity) requireActivity()).startActivityForResult(intent, requestCode, listener);
     }
 

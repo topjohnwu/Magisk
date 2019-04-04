@@ -92,13 +92,11 @@
     <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat.</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul.</string>
     <string name="download_zip_only">Doar descarcă fișierul zip</string>
-    <string name="patch_boot_file">Modifică fișierul de imagine boot</string>
     <string name="direct_install">Instalare directă (Recomandat)</string>
     <string name="install_inactive_slot">Instalare în slotul inactiv (După OTA)</string>
     <string name="warning">Avertisment</string>
     <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să se încarce în slotul inactiv actual după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
     <string name="select_method">Selectează metoda</string>
-    <string name="boot_file_patch_msg">Selectează formatul .img sau .tar pentru imaginea de boot stock.</string>
     <string name="complete_uninstall">Dezinstalare totală</string>
     <string name="restore_img">Restaurează imagini</string>
     <string name="restore_img_msg">Se restaurează…</string>

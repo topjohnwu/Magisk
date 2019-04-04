@@ -75,10 +75,8 @@
     <string name="hide_manager_title">Skrivanje Magisk Manager aplikacije…</string>
     <string name="hide_manager_fail_toast">Skrivanje Magisk Manager nije uspjelo</string>
     <string name="download_zip_only">Preuzmi samo zip</string>
-    <string name="patch_boot_file">Zakrpa datoteke za podizanje sustava</string>
     <string name="direct_install">Izravna instalacija (preporuča se)</string>
     <string name="select_method">Odaberite metodu</string>
-    <string name="boot_file_patch_msg">Odaberite standardnu datoteku za podizanje sustava u .img ili .tar formatu</string>
     <string name="complete_uninstall">Potpuna deinstalacija</string>
     <string name="restore_done">Obnova je dovršena!</string>
     <string name="restore_fail">Stock backup does not exist!</string>

@@ -92,13 +92,11 @@
     <string name="hide_manager_fail_toast">Błąd Ukrycia Magisk Managera.</string>
 	<string name="open_link_failed_toast">Nie znaleziono aplikacji pod linkiem.</string>
     <string name="download_zip_only">Pobierz Tylko Zip</string>
-    <string name="patch_boot_file">Patchowanie Pliku Boot Image</string>
     <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
 	<string name="install_inactive_slot">Zainstaluj do Nieaktywnego Slotu (po OTA)</string>
     <string name="warning">Uwaga</string>
     <string name="install_inactive_slot_msg">Urządzenie będzie MUSIAŁO uruchomić się z bieżącego nieaktywnego slotu po restarcie! /\nUżyj tylko tej opcji po zakończeniu OTA.\nKontynuować?</string>
 	<string name="select_method">Wybierz Metodę</string>
-    <string name="boot_file_patch_msg">Wybierz stokowy obraz boot w formacie .img lub .tar</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_img">Przywróć Obraz</string>
 	<string name="restore_img_msg">Przywracanie…</string>

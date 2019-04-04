@@ -83,10 +83,8 @@
     <string name="hide_manager_title">Magisk Manager paslėpiamas…</string>
     <string name="hide_manager_fail_toast">Magisk Manager paslėpimas žlugo…</string>
     <string name="download_zip_only">Atsisiųsti zip failą</string>
-    <string name="patch_boot_file">Ištaisyti boot failą</string>
     <string name="direct_install">Tiesioginis instaliavimas (Rekomenduojamas)</string>
     <string name="select_method">Pasirinkite metodą</string>
-    <string name="boot_file_patch_msg">Pasirinkti boot failą .img ar .tar formate</string>
     <string name="complete_uninstall">Pilnas pašalinimas</string>
     <string name="restore_img">Atstatyti boot failą</string>
     <string name="restore_img_msg">Atstatome…</string>

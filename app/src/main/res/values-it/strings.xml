@@ -92,14 +92,12 @@
 	<string name="hide_manager_fail_toast">Non è stato possibile nascondere Magisk Manager.</string>
 	<string name="open_link_failed_toast">Nessuna app disponibile per aprire il link.</string>
 	<string name="download_zip_only">Scarica solo il file zip</string>
-	<string name="patch_boot_file">Aggiorna l\'immagine di boot</string>
-	<string name="direct_install">Installazione diretta (raccomandata)</string>
+    <string name="direct_install">Installazione diretta (raccomandata)</string>
 	<string name="install_inactive_slot">Installa nello slot inattivo (dopo un OTA)</string>
 	<string name="warning">Attenzione</string>
 	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
 	<string name="select_method">Seleziona un metodo</string>
-	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o .tar.</string>
-	<string name="complete_uninstall">Disinstallazione completa</string>
+    <string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
 	<string name="restore_img_msg">Ripristino…</string>
 	<string name="restore_done">Ripristino completato!</string>

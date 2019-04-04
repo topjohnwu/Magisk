@@ -73,7 +73,6 @@
     <string name="hide_manager_title">A esconder Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Falha ao esconder Magisk Manager…</string>
     <string name="download_zip_only">Transferir Apenas Ficheiro Zip</string>
-    <string name="patch_boot_file">Patch a Imagem de Arranque</string>
     <string name="direct_install">Instalar Diretamente (Recomendado)</string>
     <string name="select_method">Selecionar Método</string>
     <string name="complete_uninstall">Desinstalação Completa</string>

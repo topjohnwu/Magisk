@@ -84,13 +84,11 @@
     <string name="hide_manager_fail_toast">Verbergen von Magisk Manager fehlgeschlagen…</string>
     <string name="open_link_failed_toast">Es wurde keine Anwendung gefunden, um diesen Link zu öffnen...</string>
     <string name="download_zip_only">Nur Zip-Datei herunterladen</string>
-    <string name="patch_boot_file">Boot-Image-Datei patchen</string>
     <string name="direct_install">Direkt installieren (empfohlen)</string>
     <string name="install_inactive_slot">Installiere auf inaktiven Slot (Nach OTA)</string>
     <string name="warning">Warnung</string>
     <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem nach dem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
     <string name="select_method">Methode auswählen</string>
-    <string name="boot_file_patch_msg">Wähle das original Boot-Image-Dump im Format .img oder .tar</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
     <string name="restore_img">Images wiederherstellen</string>
     <string name="restore_img_msg">Wiederherstellen...</string>

@@ -84,10 +84,8 @@
     <string name="hide_manager_title">Κρύβοντας το Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Η απόκρυψη του Magisk Manager απέτυχε…</string>
     <string name="download_zip_only">Λήψη Zip Μόνο</string>
-    <string name="patch_boot_file">Εφαρμογή Patch στο Αρχείο Εικόνας Boot</string>
     <string name="direct_install">Απευθείας Εγκατάσταση (Προτείνεται)</string>
     <string name="select_method">Επιλογή Μεθόδου</string>
-    <string name="boot_file_patch_msg">Επιλογή stock boot image dump σε μορφή .img ή .tar</string>
     <string name="complete_uninstall">Πλήρης απεγκατάσταση</string>
     <string name="restore_done">Η ανάκτηση έγινε!</string>
     <string name="restore_fail">Δεν υπάρχει αντίγραφο ασφαλείας!</string>

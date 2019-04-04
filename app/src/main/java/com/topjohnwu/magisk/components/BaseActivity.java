@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.collection.SparseArrayCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -32,7 +33,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
 
     static int[] EMPTY_INT_ARRAY = new int[0];
 
-    private ActivityResultListener activityResultListener;
+    private SparseArrayCompat<ActivityResultListener> resultListeners = new SparseArrayCompat<>();
     public App app = App.self;
 
     static {
@@ -117,13 +118,15 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (activityResultListener != null)
-            activityResultListener.onActivityResult(requestCode, resultCode, data);
-        activityResultListener = null;
+        ActivityResultListener listener = resultListeners.get(requestCode);
+        if (listener != null) {
+            resultListeners.remove(requestCode);
+            listener.onActivityResult(resultCode, data);
+        }
     }
 
     public void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
-        activityResultListener = listener;
+        resultListeners.put(requestCode, listener);
         super.startActivityForResult(intent, requestCode);
     }
 
@@ -145,7 +148,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
     }
 
     public interface ActivityResultListener {
-        void onActivityResult(int requestCode, int resultCode, Intent data);
+        void onActivityResult(int resultCode, Intent data);
     }
 
     @Override

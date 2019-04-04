@@ -92,11 +92,9 @@
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
-    <string name="patch_boot_file">Parcheo de la imagen boot</string>
     <string name="direct_install">Instalación Directa (Recomendado)</string>
     <string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
     <string name="select_method">Seleccionar Método</string>
-    <string name="boot_file_patch_msg">Seleccione el volcado de la imagen boot en formato .img o .tar</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
     <string name="restore_done">¡Restauración Terminada!</string>

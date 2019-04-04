@@ -25,7 +25,7 @@ public class MagiskInstallDialog extends CustomAlertDialog {
         setPositiveButton(R.string.install, (d, i) -> {
             List<String> options = new ArrayList<>();
             options.add(a.getString(R.string.download_zip_only));
-            options.add(a.getString(R.string.patch_boot_file));
+            options.add(a.getString(R.string.select_patch_file));
             if (Shell.rootAccess()) {
                 options.add(a.getString(R.string.direct_install));
                 String s = ShellUtils.fastCmd("grep_prop ro.build.ab_update");

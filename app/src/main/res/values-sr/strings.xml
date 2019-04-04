@@ -77,10 +77,8 @@
     <string name="hide_manager_title">Сакривам Магиск Менаџер…</string>
     <string name="hide_manager_fail_toast">Скривање Магиск Менаџера неуспешно…</string>
     <string name="download_zip_only">Преузми само Зип</string>
-    <string name="patch_boot_file">Закрпи фајл слике покретања</string>
     <string name="direct_install">Директна Инсталација (Препоручено)</string>
     <string name="select_method">Изабери Методу</string>
-    <string name="boot_file_patch_msg">Изабери испис фабричког фајла слике покретања у .img или .tar формату</string>
     <string name="complete_uninstall">Комплетна Унинсталација</string>
     <string name="restore_done">Повратак успешан!</string>
     <string name="restore_fail">Фабрички бекап не постоји!</string>

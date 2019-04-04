@@ -90,13 +90,11 @@
     <string name="flashing">Flashovanie</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu…</string>
     <string name="download_zip_only">Stiahnuť iba zip</string>
-    <string name="patch_boot_file">Zaplátať Boot Image File</string>
     <string name="direct_install">Priama inštalácia (Odporúča sa)</string>
     <string name="install_inactive_slot">Inštalovať na aktívny slot (Po OTA)</string>
     <string name="warning">Upozornenie</string>
     <string name="install_inactive_slot_msg">Vaše zariadenie bude po reštarte PRINÚTENÉ nabootovať do aktuálne neaktívneho slotu!\nTúto voľbu použite iba po skončení OTA.\nPokračovať?</string>
     <string name="select_method">Vyberte metódu</string>
-    <string name="boot_file_patch_msg">Vyberte stock boot image dump vo formáte .img alebo .tar</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>
     <string name="restore_img_msg">Obnovovanie…</string>

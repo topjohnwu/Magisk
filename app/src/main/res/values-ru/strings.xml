@@ -92,13 +92,11 @@
     <string name="hide_manager_fail_toast">Не удалось замаскировать Magisk Manager</string>
     <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки.</string>
     <string name="download_zip_only">Загрузка установочного ZIP</string>
-    <string name="patch_boot_file">Пропатчить образ ядра (boot.img)</string>
     <string name="direct_install">Прямая установка (Рекомендуется)</string>
     <string name="install_inactive_slot">Установка в неактивный слот (После OTA)</string>
     <string name="warning">Предупреждение</string>
     <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный слот!\nИспользуйте эту опцию только при установке OTA.\nПродолжить?</string>
     <string name="select_method">Выбор способа</string>
-    <string name="boot_file_patch_msg">Выберите файл ядра (boot) - *.img или *.tar</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
     <string name="restore_img_msg">Восстановление…</string>

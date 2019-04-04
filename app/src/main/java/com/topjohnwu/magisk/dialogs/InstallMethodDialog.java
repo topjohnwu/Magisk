@@ -26,7 +26,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
     InstallMethodDialog(BaseActivity activity, List<String> options) {
         super(activity);
         setTitle(R.string.select_method);
-        setItems(options.toArray(new String [0]), (dialog, idx) -> {
+        setItems(options.toArray(new String[0]), (dialog, idx) -> {
             Intent intent;
             switch (idx) {
                 case 1:
@@ -48,25 +48,26 @@ class InstallMethodDialog extends AlertDialog.Builder {
         });
     }
 
-    private void patchBoot(BaseActivity a) {
-        Utils.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*").addCategory(Intent.CATEGORY_OPENABLE);
-        a.runWithExternalRW(() ->
-                a.startActivityForResult(intent, Const.ID.SELECT_BOOT,
-                        (requestCode, resultCode, data) -> {
-                            if (requestCode == Const.ID.SELECT_BOOT &&
-                                    resultCode == Activity.RESULT_OK && data != null) {
-                                Intent i = new Intent(a, ClassMap.get(FlashActivity.class))
-                                        .setData(data.getData())
-                                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
-                                a.startActivity(i);
-                            }
-                        })
-        );
+    private void patchBoot(BaseActivity activity) {
+        activity.runWithExternalRW(() -> {
+            Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG);
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
+                    .setType("*/*")
+                    .addCategory(Intent.CATEGORY_OPENABLE);
+            activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
+                    (resultCode, data) -> {
+                        if (resultCode == Activity.RESULT_OK && data != null) {
+                            Intent i = new Intent(activity, ClassMap.get(FlashActivity.class))
+                                    .setData(data.getData())
+                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
+                            activity.startActivity(i);
+                        }
+                    });
+        });
     }
 
-    private void downloadOnly(BaseActivity a) {
-        a.runWithExternalRW(() -> {
+    private void downloadOnly(BaseActivity activity) {
+        activity.runWithExternalRW(() -> {
             String filename = Utils.fmt("Magisk-v%s(%d).zip",
                     Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode);
             File zip = new File(Const.EXTERNAL_PATH, filename);
@@ -76,8 +77,8 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     .setErrorHandler(((conn, e) -> progress.dlFail()))
                     .getAsFile(zip, f -> {
                         progress.dlDone();
-                        SnackbarMaker.make(a,
-                                a.getString(R.string.internal_storage, "/Download/" + filename),
+                        SnackbarMaker.make(activity,
+                                activity.getString(R.string.internal_storage, "/Download/" + filename),
                                 Snackbar.LENGTH_LONG).show();
                     });
         });
