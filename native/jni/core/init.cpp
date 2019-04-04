@@ -32,7 +32,29 @@
 #endif
 #include "magiskrc.h"
 
+using namespace std;
+
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
+
+#ifdef MAGISK_DEBUG
+static FILE *kmsg;
+static char kbuf[4096];
+static int vprintk(const char *fmt, va_list ap) {
+	vsprintf(kbuf, fmt, ap);
+	return fprintf(kmsg, "magiskinit: %s", kbuf);
+}
+
+static void setup_klog() {
+	mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
+	kmsg = xfopen("/kmsg", "ae");
+	setbuf(kmsg, nullptr);
+	unlink("/kmsg");
+	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
+	log_cb.ex = nop_ex;
+}
+#else
+#define setup_klog(...)
+#endif
 
 static int test_main(int argc, char *argv[]);
 
@@ -45,14 +67,6 @@ struct cmdline {
 	bool system_as_root;
 	char slot[3];
 	char dt_dir[128];
-};
-
-struct device {
-	dev_t major;
-	dev_t minor;
-	char devname[32];
-	char partname[32];
-	char path[64];
 };
 
 struct raw_data {
@@ -88,6 +102,7 @@ static void decompress_ramdisk() {
 	constexpr char ramdisk_xz[] = "ramdisk.cpio.xz";
 	if (access(ramdisk_xz, F_OK))
 		return;
+	LOGD("Decompressing ramdisk from %s\n", ramdisk_xz);
 	uint8_t *buf;
 	size_t sz;
 	mmap_ro(ramdisk_xz, buf, sz);
@@ -138,7 +153,7 @@ private:
 	void preset();
 	void early_mount();
 	void setup_rootfs();
-	bool read_dt_fstab(const char *mnt_point, char *partname, char *partfs);
+	bool read_dt_fstab(const char *name, char *partname, char *partfs);
 	bool patch_sepolicy();
 	void cleanup();
 
@@ -211,6 +226,7 @@ static bool check_key_combo() {
 		ioctl(eventfd, EVIOCGKEY(sizeof(bitmask)), bitmask);
 		count = test_bit(KEY_VOLUMEUP, bitmask) ? count + 1 : 0;
 		if (count >= 300) {
+			LOGD("KEY_VOLUMEUP detected: disable system-as-root\n");
 			close(eventfd);
 			return true;
 		}
@@ -223,9 +239,9 @@ static bool check_key_combo() {
 
 void MagiskInit::load_kernel_info() {
 	// Communicate with kernel using procfs and sysfs
-	mkdir("/proc", 0755);
+	xmkdir("/proc", 0755);
 	xmount("proc", "/proc", "proc", 0, nullptr);
-	mkdir("/sys", 0755);
+	xmkdir("/sys", 0755);
 	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
 
 	bool enter_recovery = false;
@@ -267,13 +283,17 @@ void MagiskInit::load_kernel_info() {
 		}
 	}
 
-	if (recovery_mode)
+	if (recovery_mode) {
+		LOGD("Running in recovery mode, waiting for key...\n");
 		cmd.system_as_root = !check_key_combo();
+	}
 
 	if (cmd.dt_dir[0] == '\0')
 		strcpy(cmd.dt_dir, DEFAULT_DT_DIR);
 
-	LOGD("system_as_root[%d]\nslot[%s]\ndt_dir[%s]\n", cmd.system_as_root, cmd.slot, cmd.dt_dir);
+	LOGD("system_as_root=[%d]\n", cmd.system_as_root);
+	LOGD("slot=[%s]\n", cmd.slot);
+	LOGD("dt_dir=[%s]\n", cmd.dt_dir);
 }
 
 void MagiskInit::preset() {
@@ -281,6 +301,7 @@ void MagiskInit::preset() {
 
 	if (cmd.system_as_root) {
 		// Clear rootfs
+		LOGD("Cleaning rootfs\n");
 		frm_rf(root, { "overlay", "proc", "sys" });
 	} else {
 		decompress_ramdisk();
@@ -290,20 +311,29 @@ void MagiskInit::preset() {
 		rm_rf("/.backup");
 
 		// Do not go further if device is booting into recovery
-		if (access("/sbin/recovery", F_OK) == 0)
+		if (access("/sbin/recovery", F_OK) == 0) {
+			LOGD("Ramdisk is recovery, abort\n");
 			re_exec_init();
+		}
 	}
 }
 
-static inline void parse_device(struct device *dev, const char *uevent) {
+struct device {
+	int major;
+	int minor;
+	char devname[32];
+	char partname[32];
+};
+
+static inline void parse_device(device *dev, const char *uevent) {
 	dev->partname[0] = '\0';
-	FILE *fp = xfopen(uevent, "r");
+	FILE *fp = xfopen(uevent, "re");
 	char buf[64];
 	while (fgets(buf, sizeof(buf), fp)) {
 		if (strncmp(buf, "MAJOR", 5) == 0) {
-			sscanf(buf, "MAJOR=%ld", (long*) &dev->major);
+			sscanf(buf, "MAJOR=%d", &dev->major);
 		} else if (strncmp(buf, "MINOR", 5) == 0) {
-			sscanf(buf, "MINOR=%ld", (long*) &dev->minor);
+			sscanf(buf, "MINOR=%d", &dev->minor);
 		} else if (strncmp(buf, "DEVNAME", 7) == 0) {
 			sscanf(buf, "DEVNAME=%s", dev->devname);
 		} else if (strncmp(buf, "PARTNAME", 8) == 0) {
@@ -311,36 +341,61 @@ static inline void parse_device(struct device *dev, const char *uevent) {
 		}
 	}
 	fclose(fp);
-	LOGD("%s [%s] (%u, %u)\n", dev->devname, dev->partname, (unsigned) dev->major, (unsigned) dev->minor);
 }
 
-static bool setup_block(struct device *dev, const char *partname) {
+static vector<device> dev_list;
+
+static void collect_devices() {
 	char path[128];
 	struct dirent *entry;
-	DIR *dir = opendir("/sys/dev/block");
+	device dev;
+	DIR *dir = xopendir("/sys/dev/block");
 	if (dir == nullptr)
-		return false;
-	bool found = false;
+		return;
 	while ((entry = readdir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
-		parse_device(dev, path);
-		if (strcasecmp(dev->partname, partname) == 0) {
-			sprintf(dev->path, "/dev/block/%s", dev->devname);
-			found = true;
-			break;
-		}
+		parse_device(&dev, path);
+		dev_list.push_back(dev);
 	}
 	closedir(dir);
+}
 
-	if (!found)
-		return false;
+static bool setup_block(const char *partname, char *block_dev) {
+	if (dev_list.empty())
+		collect_devices();
+	for (auto &dev : dev_list) {
+		if (strcasecmp(dev.partname, partname) == 0) {
+			sprintf(block_dev, "/dev/block/%s", dev.devname);
+			LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
+			xmkdir("/dev", 0755);
+			xmkdir("/dev/block", 0755);
+			mknod(block_dev, S_IFBLK | 0600, makedev(dev.major, dev.minor));
+			return true;
+		}
+	}
+	return false;
+}
 
-	mkdir("/dev", 0755);
-	mkdir("/dev/block", 0755);
-	mknod(dev->path, S_IFBLK | 0600, makedev(dev->major, dev->minor));
-	return true;
+bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *partfs) {
+	char path[128];
+	int fd;
+	sprintf(path, "%s/fstab/%s/dev", cmd.dt_dir, name);
+	if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
+		read(fd, path, sizeof(path));
+		close(fd);
+		// Some custom treble use different names, so use what we read
+		name = rtrim(strrchr(path, '/') + 1);
+		sprintf(partname, "%s%s", name, strend(name, cmd.slot) ? cmd.slot : "");
+		sprintf(path, "%s/fstab/%s/type", cmd.dt_dir, name);
+		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
+			read(fd, partfs, 32);
+			close(fd);
+			return true;
+		}
+	}
+	return false;
 }
 
 static inline bool is_lnk(const char *name) {
@@ -350,28 +405,30 @@ static inline bool is_lnk(const char *name) {
 	return S_ISLNK(st.st_mode);
 }
 
-#define link_root(part) \
-if (is_lnk("/system_root" part)) \
-	cp_afc("/system_root" part, part)
+#define link_root(name) \
+if (is_lnk("/system_root" name)) \
+	cp_afc("/system_root" name, name)
 
-#define mount_root(part) \
-if (!is_lnk("/" #part) && read_dt_fstab(#part, partname, fstype)) { \
-	setup_block(&dev, partname); \
-	xmkdir("/" #part, 0755); \
-	xmount(dev.path, "/" #part, fstype, MS_RDONLY, nullptr); \
-	mnt_##part = true; \
+#define mount_root(name) \
+if (!is_lnk("/" #name) && read_dt_fstab(#name, partname, fstype)) { \
+	LOGD("Early mount " #name "\n"); \
+	setup_block(partname, block_dev); \
+	xmkdir("/" #name, 0755); \
+	xmount(block_dev, "/" #name, fstype, MS_RDONLY, nullptr); \
+	mnt_##name = true; \
 }
 
 void MagiskInit::early_mount() {
-	struct device dev;
 	char partname[32];
 	char fstype[32];
+	char block_dev[64];
 
 	if (cmd.system_as_root) {
+		LOGD("Early mount system_root\n");
 		sprintf(partname, "system%s", cmd.slot);
-		setup_block(&dev, partname);
+		setup_block(partname, block_dev);
 		xmkdir("/system_root", 0755);
-		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, nullptr);
+		xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr);
 		xmkdir("/system", 0755);
 		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
 
@@ -401,7 +458,8 @@ void MagiskInit::setup_rootfs() {
 
 	if (cmd.system_as_root) {
 		// Clone rootfs
-		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
+		LOGD("Clone root dir from system to rootfs\n");
+		int system_root = xopen("/system_root", O_RDONLY | O_CLOEXEC);
 		clone_dir(system_root, root, false);
 		close(system_root);
 	}
@@ -418,10 +476,12 @@ void MagiskInit::setup_rootfs() {
 		for (char *p = addr; p < addr + size; ++p) {
 			if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
 				// Force init to load /sepolicy
+				LOGD("Remove from init: " SPLIT_PLAT_CIL "\n");
 				memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
 				p += sizeof(SPLIT_PLAT_CIL) - 1;
 			} else if (memcmp(p, SYSTEM_INIT, sizeof(SYSTEM_INIT)) == 0) {
 				// Force execute /init instead of /system/bin/init
+				LOGD("Patch init: [/system/bin/init] -> [/init]\n");
 				strcpy(p, "/init");
 				p += sizeof(SYSTEM_INIT) - 1;
 			}
@@ -432,6 +492,7 @@ void MagiskInit::setup_rootfs() {
 	// Handle ramdisk overlays
 	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
 	if (fd >= 0) {
+		LOGD("Merge overlay folder\n");
 		mv_dir(fd, root);
 		close(fd);
 		rmdir("/overlay");
@@ -441,10 +502,13 @@ void MagiskInit::setup_rootfs() {
 	FILE *rc = xfopen("/init.p.rc", "we");
 	file_readline("/init.rc", [&](auto line) -> bool {
 		// Do not start vaultkeeper
-		if (str_contains(line, "start vaultkeeper"))
+		if (str_contains(line, "start vaultkeeper")) {
+			LOGD("Remove vaultkeeper\n");
 			return true;
+		}
 		// Do not run flash_recovery
 		if (str_starts(line, "service flash_recovery")) {
+			LOGD("Remove flash_recovery\n");
 			fprintf(rc, "service flash_recovery /system/bin/xxxxx\n");
 			return true;
 		}
@@ -476,12 +540,16 @@ void MagiskInit::setup_rootfs() {
 bool MagiskInit::patch_sepolicy() {
 	bool patch_init = false;
 
-	if (access(SPLIT_PLAT_CIL, R_OK) == 0)
-		patch_init = true;                    /* Split sepolicy */
-	else if (access("/sepolicy", R_OK) == 0)
-		load_policydb("/sepolicy");           /* Monolithic sepolicy */
-	else
-		return false;                         /* No SELinux */
+	if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
+		LOGD("sepol: split policy\n");
+		patch_init = true;
+	} else if (access("/sepolicy", R_OK) == 0) {
+		LOGD("sepol: monolithic policy\n");
+		load_policydb("/sepolicy");
+	} else {
+		LOGD("sepol: no selinux\n");
+		return false;
+	}
 
 	// Mount selinuxfs to communicate with kernel
 	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
@@ -494,8 +562,10 @@ bool MagiskInit::patch_sepolicy() {
 	dump_policydb("/sepolicy");
 
 	// Load policy to kernel so we can label rootfs
-	if (load_sepol)
+	if (load_sepol) {
+		LOGD("sepol: preload sepolicy\n");
 		dump_policydb(SELINUX_LOAD);
+	}
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
@@ -509,28 +579,9 @@ bool MagiskInit::patch_sepolicy() {
 	return patch_init;
 }
 
-bool MagiskInit::read_dt_fstab(const char *mnt_point, char *partname, char *partfs) {
-	char path[128];
-	int fd;
-	sprintf(path, "%s/fstab/%s/dev", cmd.dt_dir, mnt_point);
-	if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
-		read(fd, path, sizeof(path));
-		close(fd);
-		char *name = rtrim(strrchr(path, '/') + 1);
-		sprintf(partname, "%s%s", name, strend(name, cmd.slot) ? cmd.slot : "");
-		sprintf(path, "%s/fstab/%s/type", cmd.dt_dir, mnt_point);
-		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
-			read(fd, partfs, 32);
-			close(fd);
-			return true;
-		}
-	}
-	return false;
-}
-
-#define umount_root(part) \
-if (mnt_##part) \
-	umount("/" #part);
+#define umount_root(name) \
+if (mnt_##name) \
+	umount("/" #name);
 
 void MagiskInit::cleanup() {
 	umount(SELINUX_MNT);
@@ -549,11 +600,6 @@ static inline void patch_socket_name(const char *path) {
 	mmap_rw(path, buf, size);
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(name, sizeof(name));
-			memcpy(buf + i, name, sizeof(name));
-			i += sizeof(name);
-		}
-		if (memcmp(buf + i, LOG_SOCKET, sizeof(LOG_SOCKET)) == 0) {
 			gen_rand_str(name, sizeof(name));
 			memcpy(buf + i, name, sizeof(name));
 			i += sizeof(name);
@@ -577,6 +623,13 @@ void MagiskInit::setup_overlay() {
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 	unlink(EARLYINIT);
 
+#ifdef MAGISK_DEBUG
+	kmsg = xfopen("/dev/kmsg", "ae");
+	setbuf(kmsg, nullptr);
+#endif
+
+	LOGD("Setting up overlay\n");
+
 	// Mount the /sbin tmpfs overlay
 	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
 	chmod("/sbin", 0755);
@@ -591,6 +644,7 @@ void MagiskInit::setup_overlay() {
 	write(fd, self.buf, self.sz);
 	close(fd);
 	if (access("/system/apex", F_OK) == 0) {
+		LOGD("APEX detected, use wrapper\n");
 		dump_magisk("/sbin/magisk.bin", 0755);
 		patch_socket_name("/sbin/magisk.bin");
 		setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
@@ -619,9 +673,9 @@ void MagiskInit::setup_overlay() {
 	struct dirent *entry;
 	fd = xopen("/sbin", O_RDONLY);
 	while((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
-		snprintf(path, PATH_MAX, "/root/%s", entry->d_name);
+		sprintf(path, "/root/%s", entry->d_name);
 		xsymlinkat(path, fd, entry->d_name);
 	}
 	closedir(dir);
@@ -648,6 +702,8 @@ void MagiskInit::start() {
 	if (null > STDERR_FILENO)
 		close(null);
 
+	setup_klog();
+
 	load_kernel_info();
 
 	full_read("/init", &self.buf, &self.sz);
@@ -673,7 +729,7 @@ void MagiskInit::test() {
 	cleanup();
 }
 
-static int test_main(int argc, char *argv[]) {
+static int test_main(int, char *argv[]) {
 	MagiskInit init(argv);
 	init.test();
 	return 0;

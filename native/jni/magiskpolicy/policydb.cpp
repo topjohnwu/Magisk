@@ -48,7 +48,8 @@ static bool cmp_sha256(const char *a, const char *b) {
 	} else {
 		return false;
 	}
-	LOGD("%s=[%.*s]\n%s=[%.*s]\n", a, SHALEN, id_a, b, SHALEN, id_b);
+	LOGD("%s=[%.*s]\n", a, SHALEN, id_a);
+	LOGD("%s=[%.*s]\n", b, SHALEN, id_b);
 	return memcmp(id_a, id_b, SHALEN) == 0;
 }
 
