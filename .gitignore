@@ -4,6 +4,7 @@ out
 *.apk
 config.prop
 update.sh
+/.vscode
 
 # Built binaries
 native/out
