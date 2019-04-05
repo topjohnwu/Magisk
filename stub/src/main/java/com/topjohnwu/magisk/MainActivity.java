@@ -17,7 +17,8 @@ import java.io.File;
 public class MainActivity extends Activity {
 
     private static final String URL =
-            "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/stable.json";
+            "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/" +
+            (BuildConfig.VERSION_NAME.contains("-") ? "canary_builds/canary.json" : "stable.json");
 
     private String apkLink;
 

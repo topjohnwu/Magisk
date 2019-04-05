@@ -4,8 +4,8 @@ android {
     defaultConfig {
         applicationId 'com.topjohnwu.magisk'
         vectorDrawables.useSupportLibrary = true
-        versionName rootProject.ext.configProps['appVersion']
-        versionCode rootProject.ext.configProps['appVersionCode'] as Integer
+        versionName configProps['appVersion']
+        versionCode configProps['appVersionCode'] as Integer
         javaCompileOptions {
             annotationProcessorOptions {
                 argument('butterknife.debuggable', 'false')

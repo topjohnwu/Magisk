@@ -4,7 +4,7 @@ android {
     defaultConfig {
         applicationId 'com.topjohnwu.magisk'
         versionCode 1
-        versionName "stub"
+        versionName configProps['appVersion']
     }
 
     buildTypes {
