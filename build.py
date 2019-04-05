@@ -203,7 +203,7 @@ def build_binary(args):
         base_flags += ' MAGISK_DEBUG=1'
 
     if 'magisk' in args.target:
-        run_ndk_build('B_MAGISK=1')
+        run_ndk_build('B_MAGISK=1 B_64BIT=1')
         # Dump the binary to header
         for arch in archs:
             bin_file = os.path.join('native', 'out', arch, 'magisk')
@@ -231,7 +231,7 @@ def build_binary(args):
         run_ndk_build('B_BOOT=1')
 
     if 'test' in args.target:
-        run_ndk_build('B_TEST=1')
+        run_ndk_build('B_TEST=1 B_64BIT=1')
 
 
 def build_apk(args, module):
