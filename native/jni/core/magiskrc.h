@@ -32,15 +32,13 @@ static const char magiskrc[] =
 "    oneshot\n"
 "\n"
 
-#if 0
 "on property:sys.boot_completed=1\n"
-"    start magisk_bc\n"
+"    start %s\n"
 "\n"
 
-"service magisk_bc /sbin/magisk --boot-complete\n"
+"service %s /sbin/magisk --boot-complete\n"
 "    user root\n"
-"    seclabel u:r:"SEPOL_PROC_DOMAIN":s0\n"
+"    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
 "    oneshot\n"
-;
-#endif
+"\n"
 ;

@@ -516,12 +516,15 @@ void MagiskInit::setup_rootfs() {
 		fprintf(rc, "%s", line.data());
 		return true;
 	});
-	char pfd_svc[8], ls_svc[8];
-	gen_rand_str(pfd_svc, sizeof(pfd_svc));
-	do {
-		gen_rand_str(ls_svc, sizeof(ls_svc));
-	} while (strcmp(pfd_svc, ls_svc) == 0);
-	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc);
+	char pfd_svc[8], ls_svc[8], bc_svc[8];
+	// Make sure to be unique
+	pfd_svc[0] = 'a';
+	ls_svc[0] = '0';
+	bc_svc[0] = 'A';
+	gen_rand_str(pfd_svc + 1, sizeof(pfd_svc) - 1);
+	gen_rand_str(ls_svc + 1, sizeof(ls_svc) - 1);
+	gen_rand_str(bc_svc + 1, sizeof(bc_svc) - 1);
+	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
 	fclose(rc);
 	clone_attr("/init.rc", "/init.p.rc");
 	rename("/init.p.rc", "/init.rc");

@@ -101,21 +101,16 @@ void migrate_img(const char *img) {
 
 static const char install_script[] =
 "APK=%s;"
-"while true; do"
-"  OUT=`pm install -r $APK 2>&1`;"
-"  log -t Magisk \"apk_install: $OUT\";"
-"  if echo \"$OUT\" | grep -qE \"Can't|Error:\"; then"
-"    sleep 5;"
-"    continue;"
-"  fi;"
-"  break;"
-"done;"
+"log -t Magisk \"apk_install: $APK\";"
+"log -t Magisk \"apk_install: `pm install -r $APK 2>&1`\";"
 "rm -f $APK;";
 
 void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	LOGI("apk_install: %s\n", apk);
-	exec_t exec { .pre_exec = set_path };
+	exec_t exec {
+		.pre_exec = set_path,
+		.fork = fork_no_zombie
+	};
 	char cmds[sizeof(install_script) + 4096];
 	sprintf(cmds, install_script, apk);
 	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);

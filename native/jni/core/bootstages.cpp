@@ -700,13 +700,22 @@ void late_start(int client) {
 	exec_common_script("service");
 
 	// Core only mode
-	if (access(DISABLEFILE, F_OK) == 0)
-		goto core_only;
+	if (access(DISABLEFILE, F_OK) != 0) {
+		LOGI("* Running module service scripts\n");
+		exec_module_script("service", module_list);
+	}
 
-	LOGI("* Running module service scripts\n");
-	exec_module_script("service", module_list);
+	// All boot stage done, cleanup
+	module_list.clear();
+	module_list.shrink_to_fit();
+}
 
-core_only:
+void boot_complete(int client) {
+	LOGI("** boot_complete triggered\n");
+	// ack
+	write_int(client, 0);
+	close(client);
+
 	if (access(MANAGERAPK, F_OK) == 0) {
 		// Install Magisk Manager if exists
 		rename(MANAGERAPK, "/data/magisk.apk");
@@ -721,16 +730,4 @@ core_only:
 			install_apk("/data/magisk.apk");
 		}
 	}
-
-	// All boot stage done, cleanup
-	module_list.clear();
-}
-
-void boot_complete(int client) {
-	LOGI("** boot_complete triggered\n");
-	// ack
-	write_int(client, 0);
-	close(client);
-
-	unlink(BOOTCOUNT);
 }
