@@ -386,8 +386,8 @@ bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *partfs) {
 		read(fd, path, sizeof(path));
 		close(fd);
 		// Some custom treble use different names, so use what we read
-		name = rtrim(strrchr(path, '/') + 1);
-		sprintf(partname, "%s%s", name, strend(name, cmd.slot) ? cmd.slot : "");
+		char *part = rtrim(strrchr(path, '/') + 1);
+		sprintf(partname, "%s%s", part, strend(part, cmd.slot) ? cmd.slot : "");
 		sprintf(path, "%s/fstab/%s/type", cmd.dt_dir, name);
 		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
 			read(fd, partfs, 32);
