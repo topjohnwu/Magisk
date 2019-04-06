@@ -56,7 +56,7 @@ Now after reading all the info above, here are the instructions:
 **Full data wipe is mandatory! Do not skip this step.** <br>
 Press *Power + Volume Down* to exit download mode, and as soon as the screen turns off, immediately press *Power + Bixby + Volume Up* to boot to recovery partition. Just as mentioned in the previous section, since we want to boot into stock recovery, **continue pressing the volume up button until you see the stock recovery screen**.
 10. In the stock recovery menu, use volume buttons to navigate through menus, and the power button to select the option. Select *Wipe data/factory reset* to wipe the data of the device.
-11. This time, we can finally boot to the system with Magisk. Select *Reboot system now*, and immediately press *Power + Bixby + Volume Up*. After seeing the splash screen, release all buttons so it can boot to the system.
+11. This time, we can finally boot to the system with Magisk. Select *Reboot system now*, and immediately press *Power + Bixby + Volume Up*. After seeing the bootloader warning screen, release all buttons so it can boot to the system.
 12. The device will automatically reboot for the first time it boots. This is completely normal and done by design.
 13. After the device is booted up, do the usual initial setup. **The following steps will need internet connection.**
 14. You shall see Magisk Manager in your app drawer; if not, manually install the APK you downloaded in step 3 and continue to the next step. The app would be a stub and it shall automatically upgrade to the full Magisk Manager when you open it.
