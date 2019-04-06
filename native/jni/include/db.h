@@ -1,8 +1,11 @@
-#ifndef DB_H
-#define DB_H
+#pragma once
 
 #include <sqlite3.h>
 #include <sys/stat.h>
+#include <map>
+#include <string>
+#include <string_view>
+#include <functional>
 
 #define db_err(e) db_err_cmd(e, )
 #define db_err_cmd(e, cmd) if (e) { \
@@ -10,6 +13,30 @@
 	sqlite3_free(e); \
 	cmd;\
 }
+
+template <class T, size_t num>
+class db_data_base {
+public:
+	T& operator [](std::string_view key) {
+		return data[getKeyIdx(key)];
+	}
+
+	const T& operator [](std::string_view key) const {
+		return data[getKeyIdx(key)];
+	}
+
+	T& operator [](int key) {
+		return data[key];
+	}
+
+	const T& operator [](int key) const {
+		return data[key];
+	}
+
+protected:
+	T data[num + 1];
+	virtual int getKeyIdx(std::string_view key) const = 0;
+};
 
 /***************
  * DB Settings *
@@ -55,17 +82,12 @@ enum {
 	NAMESPACE_MODE_ISOLATE
 };
 
-class db_settings {
+class db_settings : public db_data_base<int, DB_SETTINGS_NUM> {
 public:
 	db_settings();
-	int& operator [](const char *);
-	const int& operator [](const char *) const;
-	int& operator [](const int);
-	const int& operator [](const int) const;
 
-private:
-	int data[DB_SETTINGS_NUM + 1];
-	int getKeyIdx(const char *) const;
+protected:
+	int getKeyIdx(std::string_view key) const override;
 };
 
 /**************
@@ -84,17 +106,9 @@ enum {
 	SU_MANAGER = 0
 };
 
-class db_strings {
-public:
-	db_strings();
-	char * operator [](const char *);
-	const char * operator [](const char *) const;
-	char * operator [](const int);
-	const char * operator [](const int) const;
-
-private:
-	char data[DB_STRING_NUM + 1][128];
-	int getKeyIdx(const char *) const;
+class db_strings : public db_data_base<std::string, DB_STRING_NUM> {
+protected:
+	int getKeyIdx(std::string_view key) const override;
 };
 
 /*************
@@ -135,12 +149,14 @@ struct su_access {
  * Public Functions *
  ********************/
 
-sqlite3 *get_magiskdb(sqlite3 *&db);
-int get_db_settings(db_settings *dbs, int key = -1);
-int get_db_strings(db_strings *str, int key = -1);
-int get_uid_policy(int uid, struct su_access *su);
-int validate_manager(char *alt_pkg, int userid, struct stat *st);
-void exec_sql(int client);
-char *db_exec(const char *sql, int (*cb)(void *, int, char**, char**) = nullptr, void *v = nullptr);
+typedef std::map<std::string_view, std::string_view> db_row;
+typedef std::function<bool(db_row&)> db_row_cb;
 
-#endif //DB_H
+int get_db_settings(db_settings &cfg, int key = -1);
+int get_db_strings(db_strings &str, int key = -1);
+int get_uid_policy(int uid, su_access &su);
+int validate_manager(std::string &alt_pkg, int userid, struct stat *st);
+void exec_sql(int client);
+char *db_exec(const char *sql);
+char *db_exec(const char *sql, const db_row_cb &fn);
+

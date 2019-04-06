@@ -83,6 +83,7 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
+	magiskpolicy/policydb.cpp \
 	magiskpolicy/sepolicy.c
 
 LOCAL_LDFLAGS := -static
@@ -116,6 +117,19 @@ LOCAL_SRC_FILES := \
 
 LOCAL_LDLIBS := -lz
 LOCAL_LDFLAGS := -static
+include $(BUILD_EXECUTABLE)
+
+endif
+
+ifdef B_TEST
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := test
+LOCAL_STATIC_LIBRARIES := libutils
+LOCAL_C_INCLUDES := \
+	jni/include \
+	$(LIBUTILS)
+LOCAL_SRC_FILES := test.cpp
 include $(BUILD_EXECUTABLE)
 
 endif

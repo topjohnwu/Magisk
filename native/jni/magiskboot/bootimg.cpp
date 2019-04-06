@@ -1,8 +1,11 @@
+#include <sys/mman.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <libfdt.h>
-#include <sys/mman.h>
+#include <functional>
+#include <memory>
 
 #include <mincrypt/sha.h>
 #include <mincrypt/sha256.h>
@@ -13,8 +16,25 @@
 #include "magiskboot.h"
 #include "compress.h"
 
+using namespace std;
+
 uint32_t dyn_img_hdr::j32 = 0;
 uint64_t dyn_img_hdr::j64 = 0;
+
+static int64_t one_step(unique_ptr<Compression> &&ptr, int fd, const void *in, size_t size) {
+	ptr->set_out(make_unique<FDOutStream>(fd));
+	if (!ptr->write(in, size))
+		return -1;
+	return ptr->finalize();
+}
+
+static int64_t decompress(format_t type, int fd, const void *in, size_t size) {
+	return one_step(unique_ptr<Compression>(get_decoder(type)), fd, in, size);
+}
+
+static int64_t compress(format_t type, int fd, const void *in, size_t size) {
+	return one_step(unique_ptr<Compression>(get_encoder(type)), fd, in, size);
+}
 
 static void dump(void *buf, size_t size, const char *filename) {
 	if (size == 0)
@@ -129,6 +149,10 @@ int boot_img::parse_image(uint8_t *head) {
 	pos += hdr.recovery_dtbo_size();
 	pos_align();
 
+	dtb = head + pos;
+	pos += hdr.dtb_size();
+	pos_align();
+
 	if (head + pos < map_addr + map_size) {
 		tail = head + pos;
 		tail_size = map_size - (tail - map_addr);
@@ -207,10 +231,10 @@ void boot_img::find_dtb() {
 			continue;
 		}
 
-		dtb = kernel + i;
-		dt_size = hdr->kernel_size - i;
+		kernel_dtb = kernel + i;
+		kernel_dt_size = hdr->kernel_size - i;
 		hdr->kernel_size = i;
-		fprintf(stderr, "DTB             [%u]\n", dt_size);
+		fprintf(stderr, "KERNEL_DTB      [%u]\n", kernel_dt_size);
 		break;
 	}
 }
@@ -222,6 +246,7 @@ void boot_img::print_hdr() {
 	fprintf(stderr, "SECOND_SZ       [%u]\n", hdr->second_size);
 	fprintf(stderr, "EXTRA_SZ        [%u]\n", hdr.extra_size());
 	fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", hdr.recovery_dtbo_size());
+	fprintf(stderr, "DTB             [%u]\n", hdr.dtb_size());
 
 	uint32_t ver = hdr.os_version();
 	if (ver) {
@@ -237,7 +262,7 @@ void boot_img::print_hdr() {
 
 		y = (patch_level >> 4) + 2000;
 		m = patch_level & 0xf;
-		fprintf(stderr, "PATCH_LEVEL     [%d-%02d]\n", y, m);
+		fprintf(stderr, "OS_PATCH_LEVEL  [%d-%02d]\n", y, m);
 	}
 
 	fprintf(stderr, "PAGESIZE        [%u]\n", hdr.page_size());
@@ -249,10 +274,34 @@ void boot_img::print_hdr() {
 	fprintf(stderr, "]\n");
 }
 
-int unpack(const char *image) {
+int unpack(const char *image, bool hdr) {
 	boot_img boot {};
 	int ret = boot.parse_file(image);
 	int fd;
+
+	if (hdr) {
+		FILE *fp = xfopen(HEADER_FILE, "w");
+		fprintf(fp, "pagesize=%u\n", boot.hdr.page_size());
+		fprintf(fp, "name=%s\n", boot.hdr.name());
+		fprintf(fp, "cmdline=%.512s%.1024s\n", boot.hdr.cmdline(), boot.hdr.extra_cmdline());
+		uint32_t ver = boot.hdr.os_version();
+		if (ver) {
+			int a, b, c, y, m = 0;
+			int version, patch_level;
+			version = ver >> 11;
+			patch_level = ver & 0x7ff;
+
+			a = (version >> 14) & 0x7f;
+			b = (version >> 7) & 0x7f;
+			c = version & 0x7f;
+			fprintf(fp, "os_version=%d.%d.%d\n", a, b, c);
+
+			y = (patch_level >> 4) + 2000;
+			m = patch_level & 0xf;
+			fprintf(fp, "os_patch_level=%d-%02d\n", y, m);
+		}
+		fclose(fp);
+	}
 
 	// Dump kernel
 	if (COMPRESSED(boot.k_fmt)) {
@@ -264,7 +313,7 @@ int unpack(const char *image) {
 	}
 
 	// Dump dtb
-	dump(boot.dtb, boot.dt_size, DTB_FILE);
+	dump(boot.kernel_dtb, boot.kernel_dt_size, KER_DTB_FILE);
 
 	// Dump ramdisk
 	if (COMPRESSED(boot.r_fmt)) {
@@ -283,6 +332,9 @@ int unpack(const char *image) {
 
 	// Dump recovery_dtbo
 	dump(boot.recov_dtbo, boot.hdr.recovery_dtbo_size(), RECV_DTBO_FILE);
+
+	// Dump dtb
+	dump(boot.dtb, boot.hdr.dtb_size(), DTB_FILE);
 	return ret;
 }
 
@@ -299,7 +351,8 @@ void repack(const char* orig_image, const char* out_image) {
 	boot.hdr->kernel_size = 0;
 	boot.hdr->ramdisk_size = 0;
 	boot.hdr->second_size = 0;
-	boot.dt_size = 0;
+	boot.hdr.dtb_size() = 0;
+	boot.kernel_dt_size = 0;
 
 	fprintf(stderr, "Repack to boot image: [%s]\n", out_image);
 
@@ -318,6 +371,39 @@ void repack(const char* orig_image, const char* out_image) {
 		restore_buf(fd, boot.map_addr, ACCLAIM_PRE_HEADER_SZ);
 	}
 
+	// header
+	if (access(HEADER_FILE, R_OK) == 0) {
+		parse_prop_file(HEADER_FILE, [&](string_view key, string_view value) -> bool {
+			if (key == "page_size") {
+				boot.hdr.page_size() = parse_int(value);
+			} else if (key == "name") {
+				memset(boot.hdr.name(), 0, 16);
+				memcpy(boot.hdr.name(), value.data(), value.length() > 15 ? 15 : value.length());
+			} else if (key == "cmdline") {
+				memset(boot.hdr.cmdline(), 0, 512);
+				memset(boot.hdr.extra_cmdline(), 0, 1024);
+				if (value.length() > 512) {
+					memcpy(boot.hdr.cmdline(), value.data(), 512);
+					memcpy(boot.hdr.extra_cmdline(), &value[512], value.length() - 511);
+				} else {
+					memcpy(boot.hdr.cmdline(), value.data(), value.length());
+				}
+			} else if (key == "os_version") {
+				int patch_level = boot.hdr.os_version() & 0x7ff;
+				int a, b, c;
+				sscanf(value.data(), "%d.%d.%d", &a, &b, &c);
+				boot.hdr.os_version() = (((a << 14) | (b << 7) | c) << 11) | patch_level;
+			} else if (key == "os_patch_level") {
+				int os_version = boot.hdr.os_version() >> 11;
+				int y, m;
+				sscanf(value.data(), "%d-%d", &y, &m);
+				y -= 2000;
+				boot.hdr.os_version() = (os_version << 11) | (y << 4) | m;
+			}
+			return true;
+		});
+	}
+
 	// Skip a page for header
 	header_off = lseek(fd, 0, SEEK_CUR);
 	write_zero(fd, boot.hdr.page_size());
@@ -329,20 +415,20 @@ void repack(const char* orig_image, const char* out_image) {
 		write_zero(fd, 512);
 	}
 	if (access(KERNEL_FILE, R_OK) == 0) {
-		if (COMPRESSED(boot.k_fmt)) {
-			size_t raw_size;
-			void *kernel_raw;
-			mmap_ro(KERNEL_FILE, kernel_raw, raw_size);
-			boot.hdr->kernel_size = compress(boot.k_fmt, fd, kernel_raw, raw_size);
-			munmap(kernel_raw, raw_size);
+		size_t raw_size;
+		void *raw_buf;
+		mmap_ro(KERNEL_FILE, raw_buf, raw_size);
+		if (!COMPRESSED(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.k_fmt)) {
+			boot.hdr->kernel_size = compress(boot.k_fmt, fd, raw_buf, raw_size);
 		} else {
-			boot.hdr->kernel_size = restore(KERNEL_FILE, fd);
+			boot.hdr->kernel_size = write(fd, raw_buf, raw_size);
 		}
+		munmap(raw_buf, raw_size);
 	}
 
-	// dtb
-	if (access(DTB_FILE, R_OK) == 0)
-		boot.hdr->kernel_size += restore(DTB_FILE, fd);
+	// kernel dtb
+	if (access(KER_DTB_FILE, R_OK) == 0)
+		boot.hdr->kernel_size += restore(KER_DTB_FILE, fd);
 	file_align();
 
 	// ramdisk
@@ -352,15 +438,15 @@ void repack(const char* orig_image, const char* out_image) {
 		write_zero(fd, 512);
 	}
 	if (access(RAMDISK_FILE, R_OK) == 0) {
-		if (COMPRESSED(boot.r_fmt)) {
-			size_t cpio_size;
-			void *cpio;
-			mmap_ro(RAMDISK_FILE, cpio, cpio_size);
-			boot.hdr->ramdisk_size = compress(boot.r_fmt, fd, cpio, cpio_size);
-			munmap(cpio, cpio_size);
+		size_t raw_size;
+		void *raw_buf;
+		mmap_ro(RAMDISK_FILE, raw_buf, raw_size);
+		if (!COMPRESSED(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt)) {
+			boot.hdr->ramdisk_size = compress(boot.r_fmt, fd, raw_buf, raw_size);
 		} else {
-			boot.hdr->ramdisk_size = restore(RAMDISK_FILE, fd);
+			boot.hdr->ramdisk_size = write(fd, raw_buf, raw_size);
 		}
+		munmap(raw_buf, raw_size);
 		file_align();
 	}
 
@@ -382,6 +468,12 @@ void repack(const char* orig_image, const char* out_image) {
 	if (access(RECV_DTBO_FILE, R_OK) == 0) {
 		boot.hdr.recovery_dtbo_offset() = lseek(fd, 0, SEEK_CUR);
 		boot.hdr.recovery_dtbo_size() = restore(RECV_DTBO_FILE, fd);
+		file_align();
+	}
+
+	// dtb
+	if (access(DTB_FILE, R_OK) == 0) {
+		boot.hdr.dtb_size() = restore(DTB_FILE, fd);
 		file_align();
 	}
 

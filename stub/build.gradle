@@ -1,0 +1,21 @@
+apply plugin: 'com.android.application'
+
+android {
+    defaultConfig {
+        applicationId 'com.topjohnwu.magisk'
+        versionCode 1
+        versionName configProps['appVersion']
+    }
+
+    buildTypes {
+        release {
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':net')
+    implementation project(':shared')
+}

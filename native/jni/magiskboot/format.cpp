@@ -31,7 +31,7 @@ format_t check_fmt(const void *buf, size_t len) {
 		return ELF32;
 	} else if (MATCH(ELF64_MAGIC)) {
 		return ELF64;
-	} else if (MATCH(GZIP_MAGIC)) {
+	} else if (MATCH(GZIP1_MAGIC) || MATCH(GZIP2_MAGIC)) {
 		return GZIP;
 	} else if (MATCH(LZOP_MAGIC)) {
 		return LZOP;
@@ -42,7 +42,7 @@ format_t check_fmt(const void *buf, size_t len) {
 		return LZMA;
 	} else if (MATCH(BZIP_MAGIC)) {
 		return BZIP2;
-	} else if (MATCH(LZ4_MAGIC)) {
+	} else if (MATCH(LZ41_MAGIC) || MATCH(LZ42_MAGIC)) {
 		return LZ4;
 	} else if (MATCH(LZ4_LEG_MAGIC)) {
 		return LZ4_LEGACY;

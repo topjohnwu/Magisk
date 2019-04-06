@@ -1,3 +1,4 @@
+#include <sys/mount.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -81,19 +82,19 @@ int magisk_main(int argc, char *argv[]) {
 		cp_afc(argv[2], argv[3]);
 		return 0;
 	} else if (strcmp(argv[1], "--daemon") == 0) {
-		int fd = connect_daemon();
+		int fd = connect_daemon(true);
 		write_int(fd, DO_NOTHING);
 		return 0;
 	} else if (strcmp(argv[1], "--post-fs-data") == 0) {
-		int fd = connect_daemon();
+		int fd = connect_daemon(true);
 		write_int(fd, POST_FS_DATA);
 		return read_int(fd);
 	} else if (strcmp(argv[1], "--service") == 0) {
-		int fd = connect_daemon();
+		int fd = connect_daemon(true);
 		write_int(fd, LATE_START);
 		return read_int(fd);
 	} else if (strcmp(argv[1], "--boot-complete") == 0) {
-		int fd = connect_daemon();
+		int fd = connect_daemon(true);
 		write_int(fd, BOOT_COMPLETE);
 		return read_int(fd);
 	} else if (strcmp(argv[1], "--sqlite") == 0) {

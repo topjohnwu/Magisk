@@ -49,20 +49,16 @@ int fork_no_zombie() {
 	return 0;
 }
 
+static bool rand_init = false;
+
 void gen_rand_str(char *buf, int len) {
-	const char base[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-	int urandom;
-	if (access("/dev/urandom", R_OK) == 0) {
-		urandom = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
-	} else {
-		mknod("/urandom", S_IFCHR | 0666, makedev(1, 9));
-		urandom = xopen("/urandom", O_RDONLY | O_CLOEXEC);
-		unlink("/urandom");
+	constexpr const char base[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	if (!rand_init) {
+		srand(time(nullptr));
+		rand_init = true;
 	}
-	xxread(urandom, buf, len - 1);
-	close(urandom);
 	for (int i = 0; i < len - 1; ++i) {
-		buf[i] = base[buf[i] % (sizeof(base) - 1)];
+		buf[i] = base[rand() % (sizeof(base) - 1)];
 	}
 	buf[len - 1] = '\0';
 }
@@ -229,4 +225,19 @@ char *rtrim(char *str) {
 		--len;
 	str[len] = '\0';
 	return str;
+}
+
+/*
+ * Bionic's atoi runs through strtol().
+ * Use our own implementation for faster conversion.
+ */
+int parse_int(const char *s) {
+	int val = 0;
+	char c;
+	while ((c = *(s++))) {
+		if (c > '9' || c < '0')
+			return -1;
+		val = val * 10 + c - '0';
+	}
+	return val;
 }

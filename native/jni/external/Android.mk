@@ -1,11 +1,15 @@
 LOCAL_PATH := $(call my-dir)
 
+ifdef B_MAGISK
+
 # libsqlite.so (stub)
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libsqlite
 LOCAL_C_INCLUDES := $(EXT_PATH)/include
 LOCAL_SRC_FILES := stubs/sqlite3_stub.c
 include $(BUILD_SHARED_LIBRARY)
+
+endif
 
 # libselinux.so (stub)
 #include $(CLEAR_VARS)

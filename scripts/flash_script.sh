@@ -44,10 +44,10 @@ ui_print "************************"
 is_mounted /data || mount /data || is_mounted /cache || mount /cache || abort "! Unable to mount partitions"
 mount_partitions
 
-find_boot_image
-
 check_data
 get_flags
+
+find_boot_image
 
 [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
 ui_print "- Target image: $BOOTIMAGE"
@@ -109,12 +109,12 @@ ui_print "- Flashing new boot image"
 
 if ! flash_image new-boot.img "$BOOTIMAGE"; then
   ui_print "- Compressing ramdisk to fit in partition"
-  ./magiskboot --cpio ramdisk.cpio compress
-  ./magiskboot --repack "$BOOTIMAGE"
+  ./magiskboot cpio ramdisk.cpio compress
+  ./magiskboot repack "$BOOTIMAGE"
   flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
 fi
 
-./magiskboot --cleanup
+./magiskboot cleanup
 rm -f new-boot.img
 
 if [ -f stock_boot* ]; then

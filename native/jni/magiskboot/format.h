@@ -1,5 +1,4 @@
-#ifndef _FORMAT_H_
-#define _FORMAT_H_
+#pragma once
 
 #include <map>
 #include <string_view>
@@ -32,12 +31,14 @@ typedef enum {
 #define CHROMEOS_MAGIC  "CHROMEOS"
 #define ELF32_MAGIC     "\x7f""ELF\x01"
 #define ELF64_MAGIC     "\x7f""ELF\x02"
-#define GZIP_MAGIC      "\x1f\x8b\x08"
-#define LZOP_MAGIC      "\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a"
-#define XZ_MAGIC        "\xfd""7zXZ\x00"
+#define GZIP1_MAGIC     "\x1f\x8b"
+#define GZIP2_MAGIC     "\x1f\x9e"
+#define LZOP_MAGIC      "\x89""LZO"
+#define XZ_MAGIC        "\xfd""7zXZ"
 #define BZIP_MAGIC      "BZh"
-#define LZ4_MAGIC       "\x04\x22\x4d\x18"
 #define LZ4_LEG_MAGIC   "\x02\x21\x4c\x18"
+#define LZ41_MAGIC      "\x03\x21\x4c\x18"
+#define LZ42_MAGIC      "\x04\x22\x4d\x18"
 #define MTK_MAGIC       "\x88\x16\x88\x58"
 #define DTB_MAGIC       "\xd0\x0d\xfe\xed"
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
@@ -49,9 +50,6 @@ typedef enum {
 #define NOOKHD_PRE_HEADER_SZ 1048576
 #define ACCLAIM_MAGIC   "BauwksBoot"
 #define ACCLAIM_PRE_HEADER_SZ 262144
-
-#define SUP_LIST      ((const char *[]) { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL })
-#define SUP_EXT_LIST  ((const char *[]) { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL })
 
 class Fmt2Name {
 public:
@@ -68,5 +66,3 @@ format_t check_fmt(const void *buf, size_t len);
 extern std::map<std::string_view, format_t> name2fmt;
 extern Fmt2Name fmt2name;
 extern Fmt2Ext fmt2ext;
-
-#endif

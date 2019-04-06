@@ -14,14 +14,12 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <pthread.h>
+#include <sys/ptrace.h>
 #include <sys/inotify.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/mount.h>
 #include <vector>
-#include <string>
-#include <map>
-#include <algorithm>
 
 #include <magisk.h>
 #include <utils.h>
@@ -33,20 +31,27 @@ using namespace std;
 extern char *system_block, *vendor_block, *data_block;
 
 static int inotify_fd = -1;
-static set<int> hide_uid;
 
-// Workaround for the lack of pthread_cancel
-static void term_thread(int) {
-	LOGD("proc_monitor: running cleanup\n");
-	hide_list.clear();
-	hide_uid.clear();
-	hide_enabled = false;
-	pthread_mutex_destroy(&list_lock);
-	close(inotify_fd);
-	inotify_fd = -1;
-	LOGD("proc_monitor: terminating\n");
-	pthread_exit(nullptr);
-}
+static void term_thread(int sig = SIGTERMTHRD);
+static void new_zygote(int pid);
+
+/**********************
+ * All data structures
+ **********************/
+
+set<pair<string, string>> hide_set;                 /* set of <pkg, process> pair */
+static map<int, struct stat> zygote_map;            /* zygote pid -> mnt ns */
+static map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
+
+pthread_mutex_t monitor_lock;
+
+#define PID_MAX 32768
+static vector<bool> attaches(PID_MAX);  /* true if pid is monitored */
+static vector<bool> detaches(PID_MAX);  /* true if tid should be detached */
+
+/********
+ * Utils
+ ********/
 
 static inline int read_ns(const int pid, struct stat *st) {
 	char path[32];
@@ -59,7 +64,7 @@ static inline void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
-static inline int parse_ppid(const int pid) {
+static int parse_ppid(int pid) {
 	char path[32];
 	int ppid;
 
@@ -75,29 +80,98 @@ static inline int parse_ppid(const int pid) {
 	return ppid;
 }
 
-static bool is_snet(const int pid) {
-	char path[32];
-	char buf[64];
-	int fd;
-	ssize_t len;
-
-	sprintf(path, "/proc/%d/cmdline", pid);
-	fd = open(path, O_RDONLY | O_CLOEXEC);
-	if (fd == -1)
-		return false;
-
-	len = read(fd, buf, sizeof(buf));
-	close(fd);
-	if (len == -1)
-		return false;
-
-	return !strcmp(buf, SAFETYNET_PROCESS);
+static long xptrace(bool log, int request, pid_t pid, void *addr, void *data) {
+	long ret = ptrace(request, pid, addr, data);
+	if (log && ret == -1)
+		PLOGE("ptrace %d", pid);
+	return ret;
 }
+
+static long xptrace(int request, pid_t pid, void *addr, void *data) {
+	return xptrace(true, request, pid, addr, data);
+}
+
+static long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_t data = 0) {
+	return xptrace(true, request, pid, addr, reinterpret_cast<void *>(data));
+}
+
+static bool parse_packages_xml(string_view s) {
+	if (!str_starts(s, "<package "))
+		return true;
+	/* <package key1="value1" key2="value2"....> */
+	char *start = (char *) s.data();
+	start[s.length() - 1] = '\0';  /* Remove trailing '>' */
+	start += 9;  /* Skip '<package ' */
+
+	string_view pkg;
+	for (char *tok = start; *tok;) {
+		char *eql = strchr(tok, '=');
+		if (eql == nullptr)
+			break;
+		*eql = '\0';  /* Terminate '=' */
+		string_view key(tok, eql - tok);
+		eql += 2;  /* Skip '="' */
+		tok = strchr(eql, '\"');  /* Find closing '"' */
+		*tok = '\0';
+		string_view value(eql, tok - eql);
+		tok += 2;
+		if (key == "name") {
+			for (auto &hide : hide_set) {
+				if (hide.first == value) {
+					pkg = hide.first;
+					break;
+				}
+			}
+			if (pkg.empty())
+				return true;
+		} else if (key == "userId" || key == "sharedUserId") {
+			int uid = parse_int(value);
+			for (auto &hide : hide_set) {
+				if (hide.first == pkg)
+					uid_proc_map[uid].emplace_back(hide.second);
+			}
+		}
+	}
+	return true;
+}
+
+static void check_zygote() {
+	int min_zyg = 1;
+	if (access("/system/bin/app_process64", R_OK) == 0)
+		min_zyg = 2;
+	for (bool first = true; zygote_map.size() < min_zyg; first = false) {
+		if (!first)
+			usleep(10000);
+		crawl_procfs([](int pid) -> bool {
+			char buf[512];
+			snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
+			FILE *f = fopen(buf, "re");
+			if (f) {
+				fgets(buf, sizeof(buf), f);
+				if (strncmp(buf, "zygote", 6) == 0 && parse_ppid(pid) == 1)
+					new_zygote(pid);
+				fclose(f);
+			}
+			return true;
+		});
+	}
+}
+
+void *update_uid_map(void*) {
+	MutexGuard lock(monitor_lock);
+	uid_proc_map.clear();
+	file_readline("/data/system/packages.xml", parse_packages_xml, true);
+	return nullptr;
+}
+
+/*************************
+ * The actual hide daemon
+ *************************/
 
 static void hide_daemon(int pid) {
 	RunFinally fin([=]() -> void {
 		// Send resume signal
-		kill(pid, SIGCONT);
+		tgkill(pid, pid, SIGCONT);
 		_exit(0);
 	});
 
@@ -111,7 +185,7 @@ static void hide_daemon(int pid) {
 	vector<string> targets;
 
 	// Unmount dummy skeletons and /sbin links
-	file_readline("/proc/self/mounts", [&](string_view &s) -> bool {
+	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
 		if (str_contains(s, "tmpfs /system/") || str_contains(s, "tmpfs /vendor/") ||
 			str_contains(s, "tmpfs /sbin")) {
 			char *path = (char *) s.data();
@@ -127,7 +201,7 @@ static void hide_daemon(int pid) {
 	targets.clear();
 
 	// Unmount everything under /system, /vendor, and data mounts
-	file_readline("/proc/self/mounts", [&](string_view &s) -> bool {
+	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
 		if ((str_contains(s, " /system/") || str_contains(s, " /vendor/")) &&
 			(str_contains(s, system_block) || str_contains(s, vendor_block) ||
 			 str_contains(s, data_block))) {
@@ -143,165 +217,252 @@ static void hide_daemon(int pid) {
 		lazy_unmount(s.data());
 }
 
-// A mapping from pid to namespace inode to avoid time-consuming GC
-static map<int, uint64_t> pid_ns_map;
+/************************
+ * Async signal handlers
+ ************************/
 
-static bool process_pid(int pid) {
-	// We're only interested in PIDs > 1000
-	if (pid <= 1000)
-		return true;
-
-	struct stat ns, pns;
-	int ppid;
-	int uid = get_uid(pid);
-	if (hide_uid.count(uid)) {
-		// Make sure we can read mount namespace
-		if ((ppid = parse_ppid(pid)) < 0 || read_ns(pid, &ns) || read_ns(ppid, &pns))
-			return true;
-		// mount namespace is not separated, we only unmount once
-		if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
-			return true;
-
-		// Check if it's a process we haven't already hijacked
-		auto pos = pid_ns_map.find(pid);
-		if (pos != pid_ns_map.end() && pos->second == ns.st_ino)
-			return true;
-
-		if (uid == gms_uid) {
-			// Check /proc/uid/cmdline to see if it's SAFETYNET_PROCESS
-			if (!is_snet(pid))
-				return true;
-
-			LOGD("proc_monitor: " SAFETYNET_PROCESS "\n");
-		}
-
-		// Send pause signal ASAP
-		if (kill(pid, SIGSTOP) == -1)
-			return true;
-
-		pid_ns_map[pid] = ns.st_ino;
-		LOGI("proc_monitor: UID=[%d] PID=[%d] ns=[%llu]\n", uid, pid, ns.st_ino);
-
-		/*
-		 * The setns system call do not support multithread processes
-		 * We have to fork a new process, setns, then do the unmounts
-		 */
-		if (fork_dont_care() == 0)
-			hide_daemon(pid);
+static void inotify_event(int) {
+	/* Make sure we can actually read stuffs
+	 * or else the whole thread will be blocked.*/
+	struct pollfd pfd = {
+		.fd = inotify_fd,
+		.events = POLLIN,
+		.revents = 0
+	};
+	if (poll(&pfd, 1, 0) <= 0)
+		return;  // Nothing to read
+	char buf[512];
+	auto event = reinterpret_cast<struct inotify_event *>(buf);
+	read(inotify_fd, buf, sizeof(buf));
+	if ((event->mask & IN_CLOSE_WRITE) && strcmp(event->name, "packages.xml") == 0) {
+		LOGD("proc_monitor: /data/system/packages.xml updated\n");
+		new_daemon_thread(update_uid_map);
 	}
-	return true;
 }
 
-static int xinotify_add_watch(int fd, const char* path, uint32_t mask) {
-	int ret = inotify_add_watch(fd, path, mask);
-	if (ret >= 0) {
-		LOGD("proc_monitor: Monitoring %s\n", path);
-	} else {
-		PLOGE("proc_monitor: Monitor %s", path);
-	}
-	return ret;
+// Workaround for the lack of pthread_cancel
+static void term_thread(int) {
+	LOGD("proc_monitor: cleaning up\n");
+	uid_proc_map.clear();
+	zygote_map.clear();
+	hide_set.clear();
+	std::fill(attaches.begin(), attaches.end(), false);
+	std::fill(detaches.begin(), detaches.end(), false);
+	// Misc
+	hide_enabled = false;
+	pthread_mutex_destroy(&monitor_lock);
+	close(inotify_fd);
+	inotify_fd = -1;
+	LOGD("proc_monitor: terminate\n");
+	pthread_exit(nullptr);
 }
 
-static int new_inotify;
-static const string_view APK_EXT(".apk");
-static vector<string> hide_apks;
+/******************
+ * Ptrace Madness
+ ******************/
 
-static bool parse_packages_xml(string_view &s) {
-	if (!str_starts(s, "<package "))
-		return true;
-	/* <package key1="value1" key2="value2"....> */
-	char *start = (char *) s.data();
-	start[s.length() - 2] = '\0';  /* Remove trailing '>' */
-	char key[32], value[1024];
-	char *tok;
-	start += 9;  /* Skip '<package ' */
-	while ((tok = strtok_r(nullptr, " ", &start))) {
-		sscanf(tok, "%[^=]=\"%[^\"]", key, value);
-		string_view value_view(value);
-		if (strcmp(key, "name") == 0) {
-			if (std::count(hide_list.begin(), hide_list.end(), value_view) == 0)
-				return true;
-		} else if (strcmp(key, "codePath") == 0) {
-			if (ends_with(value_view, APK_EXT)) {
-				// Directly add to inotify list
-				hide_apks.emplace_back(value);
+/* Ptrace is super tricky, preserve all excessive debug in code
+ * but disable when actually building for usage (you won't want
+ * your logcat spammed with new thread events from all apps) */
+
+//#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
+#define PTRACE_LOG(...)
+
+static void detach_pid(int pid, int signal = 0) {
+	char path[128];
+	xptrace(PTRACE_DETACH, pid, nullptr, signal);
+
+	// Detach all child threads too
+	sprintf(path, "/proc/%d/task", pid);
+	DIR *dir = opendir(path);
+	crawl_procfs(dir, [&](int tid) -> bool {
+		if (tid != pid) {
+			// Check if we should force a SIGSTOP
+			if (waitpid(tid, nullptr, __WALL | __WNOTHREAD | WNOHANG) == tid) {
+				PTRACE_LOG("detach thread [%d]\n", tid);
+				xptrace(PTRACE_DETACH, tid);
 			} else {
-				DIR *dir = opendir(value);
-				if (dir == nullptr)
-					return true;
-				struct dirent *entry;
-				while ((entry = xreaddir(dir))) {
-					if (ends_with(entry->d_name, APK_EXT)) {
-						strcpy(value + value_view.length(), "/");
-						strcpy(value + value_view.length() + 1, entry->d_name);
-						hide_apks.emplace_back(value);
+				detaches[tid] = true;
+				tgkill(pid, tid, SIGSTOP);
+			}
+		}
+		return true;
+	});
+	closedir(dir);
+}
+
+static bool check_pid(int pid) {
+	char path[128];
+	char cmdline[1024];
+	sprintf(path, "/proc/%d/cmdline", pid);
+	FILE *f = fopen(path, "re");
+	// Process killed unexpectedly, ignore
+	if (!f) return true;
+	fgets(cmdline, sizeof(cmdline), f);
+	fclose(f);
+	if (strncmp(cmdline, "zygote", 6) == 0)
+		return false;
+
+	/* This process is fully initialized, we will stop
+	 * tracing it no matter if it is a target or not. */
+	attaches[pid] = false;
+
+	sprintf(path, "/proc/%d", pid);
+	struct stat st;
+	lstat(path, &st);
+	int uid = st.st_uid % 100000;
+	auto it = uid_proc_map.find(uid);
+	if (it != uid_proc_map.end()) {
+		for (auto &s : it->second) {
+			if (s == cmdline) {
+				// Double check whether ns is separated
+				read_ns(pid, &st);
+				bool mnt_ns = true;
+				for (auto &zit : zygote_map) {
+					if (zit.second.st_ino == st.st_ino &&
+						zit.second.st_dev == st.st_dev) {
+						mnt_ns = false;
 						break;
 					}
 				}
-				closedir(dir);
+				// For some reason ns is not separated, abort
+				if (!mnt_ns)
+					break;
+
+				/* Finally this is our target!
+				 * Detach from ptrace but should still remain stopped.
+				 * The hide daemon will resume the process. */
+				PTRACE_LOG("target found\n");
+				LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
+				detach_pid(pid, SIGSTOP);
+				if (fork_dont_care() == 0)
+					hide_daemon(pid);
+				return true;
 			}
-		} else if (strcmp(key, "userId") == 0 || strcmp(key, "sharedUserId") == 0) {
-			hide_uid.insert(parse_int(value));
 		}
 	}
+	PTRACE_LOG("not our target\n");
+	detach_pid(pid);
 	return true;
 }
 
-void update_inotify_mask() {
-	new_inotify = inotify_init();
-	if (new_inotify < 0) {
-		LOGE("proc_monitor: Cannot initialize inotify: %s\n", strerror(errno));
-		term_thread(TERM_THREAD);
-	}
-	fcntl(new_inotify, F_SETFD, FD_CLOEXEC);
+static void new_zygote(int pid) {
+	if (zygote_map.count(pid))
+		return;
 
-	LOGD("proc_monitor: Updating inotify list\n");
-	hide_apks.clear();
-	{
-		MutexGuard lock(list_lock);
-		hide_uid.clear();
-		file_readline("/data/system/packages.xml", parse_packages_xml, true);
-	}
+	LOGD("proc_monitor: ptrace zygote PID=[%d]\n", pid);
 
-	// Swap out and close old inotify_fd
-	int tmp = inotify_fd;
-	inotify_fd = new_inotify;
-	if (tmp >= 0)
-		close(tmp);
+	struct stat st;
+	if (read_ns(pid, &st))
+		return;
+	zygote_map[pid] = st;
 
-	for (auto apk : hide_apks)
-		xinotify_add_watch(inotify_fd, apk.data(), IN_OPEN);
-	xinotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
+	xptrace(PTRACE_ATTACH, pid);
+
+	waitpid(pid, nullptr, __WALL | __WNOTHREAD);
+	xptrace(PTRACE_SETOPTIONS, pid, nullptr,
+			PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK | PTRACE_O_TRACEEXIT);
+	xptrace(PTRACE_CONT, pid);
 }
 
+#define DETACH_AND_CONT { detach = true; continue; }
 void proc_monitor() {
-	// Unblock user signals
+	inotify_fd = xinotify_init1(IN_CLOEXEC);
+	if (inotify_fd < 0)
+		term_thread();
+
+	// Unblock some signals
 	sigset_t block_set;
 	sigemptyset(&block_set);
-	sigaddset(&block_set, TERM_THREAD);
+	sigaddset(&block_set, SIGTERMTHRD);
+	sigaddset(&block_set, SIGIO);
 	pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
 
-	// Register the cancel signal
 	struct sigaction act{};
 	act.sa_handler = term_thread;
-	sigaction(TERM_THREAD, &act, nullptr);
+	sigaction(SIGTERMTHRD, &act, nullptr);
+	act.sa_handler = inotify_event;
+	sigaction(SIGIO, &act, nullptr);
 
-	// Read inotify events
-	ssize_t len;
-	char buf[512];
-	auto event = reinterpret_cast<inotify_event *>(buf);
-	while ((len = read(inotify_fd, buf, sizeof(buf))) >= 0) {
-		if (len < sizeof(*event))
+	// Setup inotify asynchronous I/O
+	fcntl(inotify_fd, F_SETFL, O_ASYNC);
+	struct f_owner_ex ex = {
+		.type = F_OWNER_TID,
+		.pid = gettid()
+	};
+	fcntl(inotify_fd, F_SETOWN_EX, &ex);
+
+	// Start monitoring packages.xml
+	inotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
+
+	// First find existing zygotes
+	check_zygote();
+
+	int status;
+
+	for (;;) {
+		const int pid = waitpid(-1, &status, __WALL | __WNOTHREAD);
+		if (pid < 0)
 			continue;
-		if (event->mask & IN_OPEN) {
-			// Since we're just watching files,
-			// extracting file name is not possible from querying event
-			MutexGuard lock(list_lock);
-			crawl_procfs(process_pid);
-		} else if ((event->mask & IN_CLOSE_WRITE) && strcmp(event->name, "packages.xml") == 0) {
-			LOGD("proc_monitor: /data/system/packages.xml updated\n");
-			update_inotify_mask();
+		bool detach = false;
+		RunFinally detach_task([&]() -> void {
+			if (detach) {
+				// Non of our business now
+				attaches[pid] = false;
+				detaches[pid] = false;
+				ptrace(PTRACE_DETACH, pid, 0, 0);
+			}
+		});
+		if (!WIFSTOPPED(status) || detaches[pid]) {
+			PTRACE_LOG("detached\n");
+			DETACH_AND_CONT;
+		}
+		if (WSTOPSIG(status) == SIGTRAP && WEVENT(status)) {
+			unsigned long msg;
+			xptrace(PTRACE_GETEVENTMSG, pid, nullptr, &msg);
+			if (zygote_map.count(pid)) {
+				// Zygote event
+				switch (WEVENT(status)) {
+					case PTRACE_EVENT_FORK:
+					case PTRACE_EVENT_VFORK:
+						PTRACE_LOG("zygote forked: [%d]\n", msg);
+						attaches[msg] = true;
+						break;
+					case PTRACE_EVENT_EXIT:
+						PTRACE_LOG("zygote exited with status: [%d]\n", msg);
+						zygote_map.erase(pid);
+						DETACH_AND_CONT;
+					default:
+						PTRACE_LOG("unknown event: %d\n", WEVENT(status));
+						break;
+				}
+				xptrace(PTRACE_CONT, pid);
+			} else {
+				switch (WEVENT(status)) {
+					case PTRACE_EVENT_CLONE:
+						PTRACE_LOG("create new threads: [%d]\n", msg);
+						if (attaches[pid] && check_pid(pid))
+							continue;
+						break;
+					case PTRACE_EVENT_EXEC:
+					case PTRACE_EVENT_EXIT:
+						PTRACE_LOG("exited or execve\n");
+						DETACH_AND_CONT;
+					default:
+						PTRACE_LOG("unknown event: %d\n", WEVENT(status));
+						break;
+				}
+				xptrace(PTRACE_CONT, pid);
+			}
+		} else if (WSTOPSIG(status) == SIGSTOP) {
+			PTRACE_LOG("SIGSTOP from child\n");
+			xptrace(PTRACE_SETOPTIONS, pid, nullptr,
+					PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT);
+			xptrace(PTRACE_CONT, pid);
+		} else {
+			// Not caused by us, resend signal
+			xptrace(PTRACE_CONT, pid, nullptr, WSTOPSIG(status));
+			PTRACE_LOG("signal [%d]\n", WSTOPSIG(status));
 		}
 	}
-	PLOGE("proc_monitor: read inotify");
 }

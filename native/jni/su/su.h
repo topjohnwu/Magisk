@@ -23,9 +23,9 @@ public:
 	int count;             /* Just a count for debugging purpose */
 
 	/* These values should be guarded with internal lock */
-	struct db_settings cfg;
-	struct db_strings str;
-	struct su_access access;
+	db_settings cfg;
+	db_strings str;
+	su_access access;
 	struct stat mgr_st;
 
 	/* These should be guarded with global cache lock */

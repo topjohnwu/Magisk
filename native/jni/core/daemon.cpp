@@ -23,7 +23,8 @@
 #include <flags.h>
 
 int SDK_INT = -1;
-struct stat SERVER_STAT;
+bool RECOVERY_MODE = false;
+static struct stat SERVER_STAT;
 
 static void verify_client(int client, pid_t pid) {
 	// Verify caller is the same as server
@@ -88,7 +89,6 @@ static void *request_handler(void *args) {
 		break;
 	case SQLITE_CMD:
 		exec_sql(client);
-		close(client);
 		break;
 	default:
 		close(client);
@@ -116,11 +116,18 @@ static void main_daemon() {
 
 	// Get API level
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
-		if (strcmp(key, "ro.build.version.sdk") == 0) {
-			LOGI("* Device API level: %s\n", val);
-			SDK_INT = atoi(val);
+		if (key == "ro.build.version.sdk") {
+			LOGI("* Device API level: %s\n", val.data());
+			SDK_INT = parse_int(val);
 			return false;
 		}
+		return true;
+	});
+
+	// Load config status
+	parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
+		if (key == "RECOVERYMODE" && val == "true")
+			RECOVERY_MODE = true;
 		return true;
 	});
 
@@ -161,13 +168,13 @@ int switch_mnt_ns(int pid) {
 	return ret;
 }
 
-int connect_daemon() {
+int connect_daemon(bool create) {
 	struct sockaddr_un sun;
 	socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (connect(fd, (struct sockaddr*) &sun, len)) {
-		if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
-			fprintf(stderr, "No daemon is currently running!\n");
+		if (!create || getuid() != UID_ROOT || getgid() != UID_ROOT) {
+			LOGE("No daemon is currently running!\n");
 			exit(1);
 		}
 

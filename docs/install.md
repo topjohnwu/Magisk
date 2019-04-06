@@ -47,7 +47,7 @@ Note that to install TWRP, you will first download the TWRP recovery image, and 
 Be aware you are flashing to `ramdisk`, not `boot`!
 
 ### EMUI 9
-For EMUI 9 devices, the `ramdisk` partition no longer exists. As a workaround, Magisk will be installed to the `recovery_ramdisk` partition. **This means that you HAVE TO boot to recovery every time you reboot. This also means that you CANNOT have Magisk and custom recoveries at the same time!** To boot to recovery, press **Power + Volume Up** when booting your device.
+For EMUI 9 devices, the `ramdisk` partition no longer exists. As a workaround, Magisk will be installed to the `recovery_ramdisk` partition. **This means that you HAVE TO boot to recovery every time you reboot.** To boot to recovery, press **Power + Volume Up** when booting your device.
 
 - If you plan to use custom recoveries, simply follow the instructions for custom recovery above.
 Note that to install TWRP, you will first download the TWRP recovery image, and use
@@ -56,3 +56,4 @@ Note that to install TWRP, you will first download the TWRP recovery image, and 
 - If you plan not to use custom recoveries, you will have to extract `RECOVERY_RAMDIS.img` from your firmware. Follow the instructions for boot image patching above, but use the `RECOVERY_RAMDIS.img` file instead of a boot image. To install the patched image back to your device, here is the fastboot command:
 `fastboot flash recovery_ramdisk /path/to/patched_boot.img`.
 Be aware you are flashing to `recovery_ramdisk`, not `boot` nor `ramdisk`!
+- You can still install custom recoveries to the `erecovery_ramdisk` partition. Boot to erecovery mode to boot into custom recovery in this case

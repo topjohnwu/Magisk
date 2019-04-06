@@ -29,11 +29,17 @@
   void onResponse(int);
 }
 
+# DelegateWorker
+-keep,allowobfuscation class * extends com.topjohnwu.magisk.components.DelegateWorker
+
 # BootSigner
--keepclassmembers class com.topjohnwu.signer.BootSigner { *; }
+-keepclassmembers class com.topjohnwu.signing.BootSigner { *; }
 
 # SVG
 -dontwarn com.caverock.androidsvg.SVGAndroidRenderer
+
+# RetroStreams
+-dontwarn java9.**
 
 # Strip logging
 -assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
@@ -43,4 +49,3 @@
 # Excessive obfuscation
 -repackageclasses 'a'
 -allowaccessmodification
--optimizationpasses 6

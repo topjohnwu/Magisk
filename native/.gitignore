@@ -1,3 +1,5 @@
 /build
 obj
 libs
+/.externalNativeBuild
+/.cxx

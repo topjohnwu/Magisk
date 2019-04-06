@@ -16,3 +16,4 @@ chromeos/** binary
 *.exe binary
 *.apk binary
 *.png binary
+*.jpg binary

@@ -63,8 +63,8 @@ void su_info::deRef() {
 
 static void database_check(su_info *info) {
 	int uid = info->uid;
-	get_db_settings(&info->cfg);
-	get_db_strings(&info->str);
+	get_db_settings(info->cfg);
+	get_db_strings(info->str);
 
 	// Check multiuser settings
 	switch (info->cfg[SU_MULTIUSER_MODE]) {
@@ -83,7 +83,7 @@ static void database_check(su_info *info) {
 	}
 
 	if (uid > 0)
-		get_uid_policy(uid, &info->access);
+		get_uid_policy(uid, info->access);
 
 	// We need to check our manager
 	if (info->access.log || info->access.notify)

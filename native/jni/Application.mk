@@ -10,8 +10,8 @@ ifdef MAGISK_DEBUG
 APP_CFLAGS += -D__MDBG
 endif
 
-# Build 64 bit binaries for magisk
-ifdef B_MAGISK
+# Build 64 bit binaries
+ifdef B_64BIT
 APP_ABI += arm64-v8a x86_64
 endif
 

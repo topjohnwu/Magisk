@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mount.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -5,24 +8,16 @@
 #include <dirent.h>
 #include <string.h>
 #include <libgen.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include <magisk.h>
 #include <utils.h>
 #include <resetprop.h>
 #include <db.h>
+#include <selinux.h>
 
 #include "magiskhide.h"
 
 using namespace std;
-
-// Protect access to both hide_list and hide_uid
-pthread_mutex_t list_lock;
-vector<string> hide_list;
-
-// Treat GMS separately as we're only interested in one component
-int gms_uid = -1;
 
 static pthread_t proc_monitor_thread;
 
@@ -62,19 +57,24 @@ static void hide_sensitive_props() {
 // Leave /proc fd opened as we're going to read from it repeatedly
 static DIR *procfp;
 void crawl_procfs(const function<bool (int)> &fn) {
+	rewinddir(procfp);
+	crawl_procfs(procfp, fn);
+}
+
+void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
 	struct dirent *dp;
 	int pid;
-	rewinddir(procfp);
-	while ((dp = readdir(procfp))) {
+	while ((dp = readdir(dir))) {
 		pid = parse_int(dp->d_name);
 		if (pid > 0 && !fn(pid))
 			break;
 	}
 }
 
-static bool proc_name_match(int pid, const char *name) {
+bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
 	FILE *f;
+#if 0
 	sprintf(buf, "/proc/%d/comm", pid);
 	if ((f = fopen(buf, "re"))) {
 		fgets(buf, sizeof(buf), f);
@@ -85,6 +85,7 @@ static bool proc_name_match(int pid, const char *name) {
 		// The PID is already killed
 		return false;
 	}
+#endif
 
 	sprintf(buf, "/proc/%d/cmdline", pid);
 	if ((f = fopen(buf, "re"))) {
@@ -92,23 +93,20 @@ static bool proc_name_match(int pid, const char *name) {
 		fclose(f);
 		if (strcmp(basename(buf), name) == 0)
 			return true;
-	} else {
-		// The PID is already killed
-		return false;
 	}
+	return false;
 
+#if 0
 	sprintf(buf, "/proc/%d/exe", pid);
 	ssize_t len;
 	if ((len = readlink(buf, buf, sizeof(buf))) < 0)
 		return false;
 	buf[len] = '\0';
 	return strcmp(basename(buf), name) == 0;
+#endif
 }
 
 static void kill_process(const char *name) {
-	// We do NOT want to kill GMS itself
-	if (strcmp(name, SAFETYNET_PKG) == 0)
-		name = SAFETYNET_PROCESS;
 	crawl_procfs([=](int pid) -> bool {
 		if (proc_name_match(pid, name)) {
 			if (kill(pid, SIGTERM) == 0)
@@ -119,27 +117,6 @@ static void kill_process(const char *name) {
 	});
 }
 
-static void kill_process(int uid) {
-	// We do NOT want to kill all GMS processes
-	if (uid == gms_uid) {
-		kill_process(SAFETYNET_PROCESS);
-		return;
-	}
-	crawl_procfs([=](int pid) -> bool {
-		if (get_uid(pid) == uid && kill(pid, SIGTERM) == 0)
-			LOGD("hide_utils: killed PID=[%d]\n", pid);
-		return true;
-	});
-}
-
-static int get_pkg_uid(const char *pkg) {
-	char path[4096];
-	struct stat st;
-	const char *data = SDK_INT >= 24 ? "/data/user_de/0" : "/data/data";
-	sprintf(path, "%s/%s", data, pkg);
-	return stat(path, &st) ? -1 : st.st_uid;
-}
-
 void clean_magisk_props() {
 	getprop([](const char *name, auto, auto) -> void {
 		if (strstr(name, "magisk"))
@@ -147,58 +124,69 @@ void clean_magisk_props() {
 	}, nullptr, false);
 }
 
-int add_list(const char *pkg) {
-	for (auto &s : hide_list) {
-		if (s == pkg)
+static int add_list(const char *pkg, const char *proc = "") {
+	if (proc[0] == '\0')
+		proc = pkg;
+
+	for (auto &hide : hide_set)
+		if (hide.first == pkg && hide.second == proc)
 			return HIDE_ITEM_EXIST;
-	}
 
 	// Add to database
 	char sql[4096];
-	snprintf(sql, sizeof(sql), "INSERT INTO hidelist (process) VALUES('%s')", pkg);
+	snprintf(sql, sizeof(sql),
+			"INSERT INTO hidelist (package_name, process) VALUES('%s', '%s')", pkg, proc);
 	char *err = db_exec(sql);
 	db_err_cmd(err, return DAEMON_ERROR);
 
-	LOGI("hide_list add: [%s]\n", pkg);
+	LOGI("hide_list add: [%s/%s]\n", pkg, proc);
 
 	// Critical region
-	int uid;
 	{
-		MutexGuard lock(list_lock);
-		hide_list.emplace_back(pkg);
-		uid = get_pkg_uid(pkg);
+		MutexGuard lock(monitor_lock);
+		hide_set.emplace(pkg, proc);
 	}
 
-	kill_process(uid);
+	kill_process(proc);
 	return DAEMON_SUCCESS;
 }
 
 int add_list(int client) {
 	char *pkg = read_string(client);
-	int ret = add_list(pkg);
+	char *proc = read_string(client);
+	int ret = add_list(pkg, proc);
 	free(pkg);
-	update_inotify_mask();
+	free(proc);
+	update_uid_map();
 	return ret;
 }
 
-static int rm_list(const char *pkg) {
-	// Critical region
+static int rm_list(const char *pkg, const char *proc = "") {
 	{
-		MutexGuard lock(list_lock);
+		// Critical region
+		MutexGuard lock(monitor_lock);
 		bool remove = false;
-		for (auto it = hide_list.begin(); it != hide_list.end(); ++it) {
-			if (*it == pkg) {
+		auto next = hide_set.begin();
+		decltype(next) cur;
+		while (next != hide_set.end()) {
+			cur = next;
+			++next;
+			if (cur->first == pkg && (proc[0] == '\0' || cur->second == proc)) {
 				remove = true;
-				LOGI("hide_list rm: [%s]\n", pkg);
-				hide_list.erase(it);
-				break;
+				LOGI("hide_list rm: [%s]\n", cur->second.data());
+				hide_set.erase(cur);
 			}
 		}
 		if (!remove)
 			return HIDE_ITEM_NOT_EXIST;
 	}
+
 	char sql[4096];
-	snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE process='%s'", pkg);
+	if (proc[0] == '\0')
+		snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE package_name='%s'", pkg);
+	else
+		snprintf(sql, sizeof(sql),
+				"DELETE FROM hidelist WHERE package_name='%s' AND process='%s'", pkg, proc);
 	char *err = db_exec(sql);
 	db_err(err);
 	return DAEMON_SUCCESS;
@@ -206,25 +194,19 @@ static int rm_list(const char *pkg) {
 
 int rm_list(int client) {
 	char *pkg = read_string(client);
-	int ret = rm_list(pkg);
+	char *proc = read_string(client);
+	int ret = rm_list(pkg, proc);
 	free(pkg);
+	free(proc);
 	if (ret == DAEMON_SUCCESS)
-		update_inotify_mask();
+		update_uid_map();
 	return ret;
 }
 
-static int init_list(void *, int, char **data, char**) {
-	LOGI("hide_list init: [%s]\n", *data);
-	hide_list.emplace_back(*data);
-	int uid = get_pkg_uid(*data);
-	if (strcmp(*data, SAFETYNET_PKG) == 0)
-		gms_uid = uid;
-	kill_process(uid);
-	return 0;
-}
-
-static void init_list(const char *pkg) {
-	init_list(nullptr, 0, (char **) &pkg, nullptr);
+static void init_list(const char *pkg, const char *proc) {
+	LOGI("hide_list init: [%s/%s]\n", pkg, proc);
+	hide_set.emplace(pkg, proc);
+	kill_process(proc);
 }
 
 #define LEGACY_LIST MODULEROOT "/.core/hidelist"
@@ -232,12 +214,15 @@ static void init_list(const char *pkg) {
 bool init_list() {
 	LOGD("hide_list: initialize\n");
 
-	char *err = db_exec("SELECT process FROM hidelist", init_list);
+	char *err = db_exec("SELECT * FROM hidelist", [](db_row &row) -> bool {
+		init_list(row["package_name"].data(), row["process"].data());
+		return true;
+	});
 	db_err_cmd(err, return false);
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {
-		file_readline(LEGACY_LIST, [](string_view &s) -> bool {
+		file_readline(LEGACY_LIST, [](string_view s) -> bool {
 			add_list(s.data());
 			return true;
 		});
@@ -245,18 +230,19 @@ bool init_list() {
 	}
 
 	// Add SafetyNet by default
-	rm_list(SAFETYNET_PROCESS);
 	rm_list(SAFETYNET_COMPONENT);
-	init_list(SAFETYNET_PKG);
+	rm_list(SAFETYNET_PROCESS);
+	init_list(SAFETYNET_PKG, SAFETYNET_PROCESS);
+	init_list(MICROG_SAFETYNET, SAFETYNET_PROCESS);
 
-	update_inotify_mask();
+	update_uid_map();
 	return true;
 }
 
 void ls_list(int client) {
 	FILE *out = fdopen(recv_fd(client), "a");
-	for (auto &s : hide_list)
-		fprintf(out, "%s\n", s.c_str());
+	for (auto &hide : hide_set)
+		fprintf(out, "%s|%s\n", hide.first.data(), hide.second.data());
 	fclose(out);
 	write_int(client, DAEMON_SUCCESS);
 	close(client);
@@ -296,17 +282,13 @@ void launch_magiskhide(int client) {
 	set_hide_config();
 	LOGI("* Starting MagiskHide\n");
 
-	if (procfp == nullptr) {
-		int fd = xopen("/proc", O_RDONLY | O_CLOEXEC);
-		if (fd < 0)
-			LAUNCH_ERR;
-		procfp = fdopendir(fd);
-	}
+	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
+		LAUNCH_ERR;
 
 	hide_sensitive_props();
 
 	// Initialize the mutex lock
-	pthread_mutex_init(&list_lock, nullptr);
+	pthread_mutex_init(&monitor_lock, nullptr);
 
 	// Initialize the hide list
 	if (!init_list())
@@ -331,14 +313,14 @@ int stop_magiskhide() {
 
 	hide_enabled = false;
 	set_hide_config();
-	pthread_kill(proc_monitor_thread, TERM_THREAD);
+	pthread_kill(proc_monitor_thread, SIGTERMTHRD);
 
 	return DAEMON_SUCCESS;
 }
 
 void auto_start_magiskhide() {
 	db_settings dbs;
-	get_db_settings(&dbs, HIDE_CONFIG);
+	get_db_settings(dbs, HIDE_CONFIG);
 	if (dbs[HIDE_CONFIG]) {
 		new_daemon_thread([](auto) -> void* {
 			launch_magiskhide(-1);

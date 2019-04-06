@@ -149,11 +149,15 @@ void cpio::output(OutStream &out) {
 	out_align();
 }
 
-cpio_rw::cpio_rw(const char *filename) {
+cpio_rw::cpio_rw(const char *file) {
+	load_cpio(file);
+}
+
+void cpio_rw::load_cpio(const char *file) {
 	char *buf;
 	size_t sz;
-	mmap_ro(filename, buf, sz);
-	fprintf(stderr, "Loading cpio: [%s]\n", filename);
+	mmap_ro(file, buf, sz);
+	fprintf(stderr, "Loading cpio: [%s]\n", file);
 	load_cpio(buf, sz);
 	munmap(buf, sz);
 }
@@ -182,7 +186,7 @@ void cpio_rw::add(mode_t mode, const char *name, const char *file) {
 	fprintf(stderr, "Add entry [%s] (%04o)\n", name, mode);
 }
 
-void cpio_rw::makedir(mode_t mode, const char *name) {
+void cpio_rw::mkdir(mode_t mode, const char *name) {
 	insert(new cpio_entry(name, S_IFDIR | mode));
 	fprintf(stderr, "Create directory [%s] (%04o)\n", name, mode);
 }
@@ -241,9 +245,9 @@ void cpio_rw::load_cpio(char *buf, size_t sz) {
 	}
 }
 
-cpio_mmap::cpio_mmap(const char *filename) {
-	mmap_ro(filename, buf, sz);
-	fprintf(stderr, "Loading cpio: [%s]\n", filename);
+cpio_mmap::cpio_mmap(const char *file) {
+	mmap_ro(file, buf, sz);
+	fprintf(stderr, "Loading cpio: [%s]\n", file);
 	size_t pos = 0;
 	cpio_newc_header *header;
 	unique_ptr<cpio_entry_base> entry;

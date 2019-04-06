@@ -14,14 +14,6 @@
 
 using namespace std;
 
-int64_t decompress(format_t type, int fd, const void *from, size_t size) {
-	return unique_ptr<Compression>(get_decoder(type))->one_step(fd, from, size);
-}
-
-int64_t compress(format_t type, int fd, const void *from, size_t size) {
-	return unique_ptr<Compression>(get_encoder(type))->one_step(fd, from, size);
-}
-
 static bool read_file(FILE *fp, const function<void (void *, size_t)> &fn) {
 	char buf[4096];
 	size_t len;
@@ -162,13 +154,6 @@ Compression *get_decoder(format_t type) {
 		default:
 			return new GZDecoder();
 	}
-}
-
-int64_t Compression::one_step(int outfd, const void *in, size_t size) {
-	set_out(make_unique<FDOutStream>(outfd));
-	if (!write(in, size))
-		return -1;
-	return finalize();
 }
 
 GZStream::GZStream(int mode) : mode(mode), strm({}) {
@@ -381,7 +366,7 @@ void LZ4FDecoder::read_header(const uint8_t *&in, size_t &size) {
 	size -= read;
 }
 
-LZ4FEncoder::LZ4FEncoder() : outbuf(nullptr), outCapacity(0) {
+LZ4FEncoder::LZ4FEncoder() : outbuf(nullptr), outCapacity(0), total(0) {
 	LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
 }
 
@@ -437,10 +422,8 @@ void LZ4FEncoder::write_header() {
 	FilterOutStream::write(outbuf, write);
 }
 
-LZ4Decoder::LZ4Decoder() : init(false), buf_off(0), total(0), block_sz(0) {
-	outbuf = new char[LZ4_UNCOMPRESSED];
-	buf = new char[LZ4_COMPRESSED];
-}
+LZ4Decoder::LZ4Decoder() : init(false), buf_off(0), total(0), block_sz(0),
+outbuf(new char[LZ4_UNCOMPRESSED]), buf(new char[LZ4_COMPRESSED]) {}
 
 LZ4Decoder::~LZ4Decoder() {
 	delete[] outbuf;
@@ -493,10 +476,8 @@ uint64_t LZ4Decoder::finalize() {
 	return total;
 }
 
-LZ4Encoder::LZ4Encoder() : init(false), buf_off(0), out_total(0), in_total(0) {
-	outbuf = new char[LZ4_COMPRESSED];
-	buf = new char[LZ4_UNCOMPRESSED];
-}
+LZ4Encoder::LZ4Encoder() : init(false), buf_off(0), out_total(0), in_total(0),
+outbuf(new char[LZ4_COMPRESSED]), buf(new char[LZ4_UNCOMPRESSED]) {}
 
 LZ4Encoder::~LZ4Encoder() {
 	delete[] outbuf;

@@ -262,6 +262,14 @@ int xlstat(const char *pathname, struct stat *buf) {
 	return ret;
 }
 
+int xfstat(int fd, struct stat *buf) {
+	int ret = fstat(fd, buf);
+	if (ret == -1) {
+		PLOGE("fstat %d", fd);
+	}
+	return ret;
+}
+
 int xdup2(int oldfd, int newfd) {
 	int ret = dup2(oldfd, newfd);
 	if (ret == -1) {
@@ -409,6 +417,14 @@ int xpoll(struct pollfd *fds, nfds_t nfds, int timeout) {
 	int ret = poll(fds, nfds, timeout);
 	if (ret == -1) {
 		PLOGE("poll");
+	}
+	return ret;
+}
+
+int xinotify_init1(int flags) {
+	int ret = syscall(__NR_inotify_init1, flags);
+	if (ret == -1) {
+		PLOGE("inotify_init1");
 	}
 	return ret;
 }

@@ -5,14 +5,14 @@
  * execution, load modules, install Magisk Manager etc.
  */
 
+#include <sys/mount.h>
+#include <sys/wait.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <dirent.h>
-#include <sys/mount.h>
-#include <sys/wait.h>
 #include <vector>
 #include <string>
 
@@ -29,6 +29,7 @@ using namespace std;
 static char buf[PATH_MAX], buf2[PATH_MAX];
 static vector<string> module_list;
 static bool seperate_vendor;
+static bool no_secure_dir = false;
 
 char *system_block, *vendor_block, *data_block;
 
@@ -292,41 +293,6 @@ node_entry *node_entry::extract(const char *name) {
 	return node;
 }
 
-/****************
- * Simple Mount *
- ****************/
-
-static void simple_mount(const char *path) {
-	DIR *dir;
-	struct dirent *entry;
-
-	snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, path);
-	if (!(dir = opendir(buf)))
-		return;
-
-	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		// Target file path
-		snprintf(buf2, PATH_MAX, "%s/%s", path, entry->d_name);
-		// Only mount existing file
-		if (access(buf2, F_OK) == -1)
-			continue;
-		if (entry->d_type == DT_DIR) {
-			simple_mount(string(buf2).c_str());
-		} else if (entry->d_type == DT_REG) {
-			// Actual file path
-			snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, buf2);
-			// Clone all attributes
-			clone_attr(buf2, buf);
-			// Finally, mount the file
-			bind_mount(buf, buf2);
-		}
-	}
-
-	closedir(dir);
-}
-
 /*****************
  * Miscellaneous *
  *****************/
@@ -341,9 +307,11 @@ static bool magisk_env() {
 	LOGI("* Initializing Magisk environment\n");
 
 	// Alternative binaries paths
-	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk",
-							  "/data/data/com.topjohnwu.magisk/install",
-							  "/data/user_de/0/com.topjohnwu.magisk/install" };
+	constexpr const char *alt_bin[] = {
+		"/cache/data_adb/magisk", "/data/magisk",
+		"/data/data/com.topjohnwu.magisk/install",
+		"/data/user_de/0/com.topjohnwu.magisk/install"
+	};
 	for (auto &alt : alt_bin) {
 		struct stat st;
 		if (lstat(alt, &st) != -1) {
@@ -363,24 +331,25 @@ static bool magisk_env() {
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
 
-	// Legacy support
+	// Backwards compatibility
 	symlink(MAGISKTMP, "/sbin/.core");
 	symlink(MODULEMNT, MAGISKTMP "/img");
 
-	// Create directories in tmpfs overlay
+	// Directories in tmpfs overlay
 	xmkdirs(MIRRDIR "/system", 0755);
 	xmkdir(MIRRDIR "/data", 0755);
 	xmkdir(BBPATH, 0755);
 	xmkdir(MODULEMNT, 0755);
 
-	// /data/adb directories
+	// Directories in /data/adb
+	xmkdir(DATABIN, 0755);
 	xmkdir(MODULEROOT, 0755);
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
 	LOGI("* Mounting mirrors");
 	bool system_as_root = false;
-	file_readline("/proc/mounts", [&](string_view &line) -> bool {
+	file_readline("/proc/mounts", [&](string_view line) -> bool {
 		if (str_contains(line, " /system_root ")) {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			sscanf(line.data(), "%s", buf);
@@ -415,19 +384,19 @@ static bool magisk_env() {
 		VLOGI("link", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 	}
 
-	if (access(DATABIN "/busybox", X_OK) == -1)
-		return false;
-	LOGI("* Setting up internal busybox");
-	close(xopen(BBPATH "/busybox", O_RDONLY | O_CREAT | O_CLOEXEC));
-	bind_mount(DATABIN "/busybox", BBPATH "/busybox", false);
-	exec_command_sync(BBPATH "/busybox", "--install", "-s", BBPATH);
-
 	// Disable/remove magiskhide, resetprop, and modules
 	if (SDK_INT < 19) {
 		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
 		unlink("/sbin/resetprop");
 		unlink("/sbin/magiskhide");
 	}
+
+	if (access(DATABIN "/busybox", X_OK) == -1)
+		return false;
+	LOGI("* Setting up internal busybox");
+	cp_afc(DATABIN "/busybox", BBPATH "/busybox");
+	exec_command_sync(BBPATH "/busybox", "--install", "-s", BBPATH);
+
 	return true;
 }
 
@@ -478,6 +447,9 @@ static void collect_modules() {
 			if (access("remove", F_OK) == 0) {
 				chdir("..");
 				LOGI("%s: remove\n", entry->d_name);
+				sprintf(buf, "%s/uninstall.sh", entry->d_name);
+				if (access(buf, F_OK) == 0)
+					exec_script(buf);
 				rm_rf(entry->d_name);
 				continue;
 			}
@@ -494,7 +466,7 @@ static void collect_modules() {
 static bool check_data() {
 	bool mnt = false;
 	bool data = false;
-	file_readline("/proc/mounts", [&](string_view &s) -> bool {
+	file_readline("/proc/mounts", [&](string_view s) -> bool {
 		if (str_contains(s, " /data ") && !str_contains(s, "tmpfs"))
 			mnt = true;
 		return true;
@@ -575,7 +547,7 @@ static void dump_logs() {
 	pthread_exit(nullptr);
 }
 
-[[noreturn]] static inline void core_only() {
+[[noreturn]] static void core_only() {
 	auto_start_magiskhide();
 	unblock_boot_process();
 }
@@ -600,6 +572,7 @@ void post_fs_data(int client) {
 		 * do NOT proceed further. Manual creation of the folder
 		 * will cause bootloops on FBE devices. */
 		LOGE(SECURE_DIR " is not present, abort...");
+		no_secure_dir = true;
 		unblock_boot_process();
 	}
 
@@ -618,12 +591,6 @@ void post_fs_data(int client) {
 	fprintf(cf, "%d", boot_count);
 	fclose(cf);
 #endif
-
-	// No uninstaller or core-only mode
-	if (access(DISABLEFILE, F_OK) != 0) {
-		simple_mount("/system");
-		simple_mount("/vendor");
-	}
 
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
@@ -669,9 +636,9 @@ void post_fs_data(int client) {
 			LOGI("%s: loading [system.prop]\n", module);
 			load_prop_file(buf, false);
 		}
-		// Check whether enable auto_mount
-		snprintf(buf, PATH_MAX, "%s/%s/auto_mount", MODULEROOT, module);
-		if (access(buf, F_OK) == -1)
+		// Check whether skip mounting
+		snprintf(buf, PATH_MAX, "%s/%s/skip_mount", MODULEROOT, module);
+		if (access(buf, F_OK) == 0)
 			continue;
 		// Double check whether the system folder exists
 		snprintf(buf, PATH_MAX, "%s/%s/system", MODULEROOT, module);
@@ -715,11 +682,15 @@ void late_start(int client) {
 
 	dump_logs();
 
-	if (access(SECURE_DIR, F_OK) != 0) {
+	if (no_secure_dir) {
 		// It's safe to create the folder at this point if the system didn't create it
-		xmkdir(SECURE_DIR, 0700);
+		if (access(SECURE_DIR, F_OK) != 0)
+			xmkdir(SECURE_DIR, 0700);
 		// And reboot to make proper setup possible
-		exec_command_sync("/system/bin/reboot");
+		if (RECOVERY_MODE)
+			exec_command_sync("/system/bin/reboot", "recovery");
+		else
+			exec_command_sync("/system/bin/reboot");
 	}
 
 	auto_start_magiskhide();
@@ -729,30 +700,14 @@ void late_start(int client) {
 	exec_common_script("service");
 
 	// Core only mode
-	if (access(DISABLEFILE, F_OK) == 0)
-		goto core_only;
-
-	LOGI("* Running module service scripts\n");
-	exec_module_script("service", module_list);
-
-core_only:
-	if (access(MANAGERAPK, F_OK) == 0) {
-		// Install Magisk Manager if exists
-		rename(MANAGERAPK, "/data/magisk.apk");
-		install_apk("/data/magisk.apk");
-	} else {
-		// Check whether we have a valid manager installed
-		db_strings str;
-		get_db_strings(&str, SU_MANAGER);
-		if (validate_manager(str[SU_MANAGER], 0, nullptr)) {
-			// There is no manager installed, install the stub
-			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk");
-			install_apk("/data/magisk.apk");
-		}
+	if (access(DISABLEFILE, F_OK) != 0) {
+		LOGI("* Running module service scripts\n");
+		exec_module_script("service", module_list);
 	}
 
 	// All boot stage done, cleanup
 	module_list.clear();
+	module_list.shrink_to_fit();
 }
 
 void boot_complete(int client) {
@@ -761,5 +716,18 @@ void boot_complete(int client) {
 	write_int(client, 0);
 	close(client);
 
-	unlink(BOOTCOUNT);
+	if (access(MANAGERAPK, F_OK) == 0) {
+		// Install Magisk Manager if exists
+		rename(MANAGERAPK, "/data/magisk.apk");
+		install_apk("/data/magisk.apk");
+	} else {
+		// Check whether we have a valid manager installed
+		db_strings str;
+		get_db_strings(str, SU_MANAGER);
+		if (validate_manager(str[SU_MANAGER], 0, nullptr)) {
+			// There is no manager installed, install the stub
+			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk");
+			install_apk("/data/magisk.apk");
+		}
+	}
 }
