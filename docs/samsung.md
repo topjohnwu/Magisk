@@ -64,6 +64,7 @@ Press *Power + Volume Down* to exit download mode, and as soon as the screen tur
 16. Voila! Enjoy Magisk :)
 
 ### Final Words
+- You can directly upgrade Magisk within Magisk Manager without an issue. **Flashing in custom recovery is not supported for now.** I'm still not sure how to properly add support for flashing Magisk to recovery in custom recoveries.
 - Magisk actually patches 3 partitions on your device:
     - `vbmeta`: replace with empty vbmeta image to disable partition verification
     - `boot`: remove the signature of the image to prevent soft bricks
