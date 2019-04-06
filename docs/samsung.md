@@ -34,10 +34,11 @@ After you unlock the bootloader, every time the device powers on, you will see t
 
 The bootloader decides where to boot before the warning splash screen, either it be `system`, `recovery` or `download`. This means you actually only need to hold the *Bixby + Volume Up* button combo till you see the splash screen if you want to boot to the recovery partition.
 
-All words in summary, after installing Magisk:
-- (Power up with no button combo) → (System with no Magisk)
-- (Power + Bixby + Volume Up) → (Bootloader warning) → (Release all buttons) → (System with Magisk)
-- (Power + Bixby + Volume Up) → (Bootloader warning) → (Keep holding volume up) → (Actual recovery)
+
+**All words in summary, after installing Magisk:**
+- **(Powering up normally) → (System with no Magisk)**
+- **(Power + Bixby + Volume Up) → (Bootloader warning) → (Release all buttons) → (System with Magisk)**
+- **(Power + Bixby + Volume Up) → (Bootloader warning) → (Keep holding volume up) → (Actual recovery)**
 
 ### Instructions
 
@@ -50,7 +51,7 @@ Now after reading all the info above, here are the instructions:
 5. Select the **AP** tar file. Magisk Manager will patch the whole firmware file and store the output to `[Internal Storage]/Download/magisk_patched.tar`
 6. Copy the tar file to your PC, and boot your device to download mode.
 7. Flash `magisk_patched.tar` as AP in ODIN <br> **Important: Uncheck "Auto Reboot" in Options!!!!**
-8. Magisk is now successfully flashed to your device! But there are still several steps before you properly use the device.
+8. Magisk is now successfully flashed to your device! But there are still several steps before you can properly use the device.
 9. We now want to boot into the stock recovery to factory reset our device. <br>
 **Full data wipe is mandatory! Do not skip this step.** <br>
 Press *Power + Volume Down* to exit download mode, and as soon as the screen turns off, immediately press *Power + Bixby + Volume Up* to boot to recovery partition. Just as mentioned in the previous section, since we want to boot into stock recovery, **continue pressing the volume up button until you see the stock recovery screen**.
@@ -69,3 +70,5 @@ Press *Power + Volume Down* to exit download mode, and as soon as the screen tur
     - `recovery`: this is where Magisk is actually installed
 - **Never, ever** try to restore either of the 3 images mentioned back to stock! You can easily brick your device by doing so, and the only way out is to do full ODIN restore following with factory reset. Just don't do it.
 - If you want to upgrade your device, **never** flash the stock **AP** tar file with reasons mentioned above. **Always** pre-patch the firmware before flashing in ODIN.
+
+#### Check the [XDA Post](https://forum.xda-developers.com/galaxy-s10/development/magisk-root-galaxy-s10-series-t3918699) for more technical details
