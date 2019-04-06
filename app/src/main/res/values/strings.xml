@@ -84,6 +84,7 @@
     <string name="setup_title">Additional Setup</string>
     <string name="select_patch_file">Select and Patch a File</string>
     <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar)</string>
+    <string name="reboot_delay_toast">Rebooting in 5 seconds…</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Close</string>
