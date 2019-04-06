@@ -13,7 +13,7 @@
 
 Normally I won't provide instructions for this, but since things had changed drastically from previous Samsung devices, and there are some details that many might not know, I figure this would be helpful.
 - Allow bootloader unlocking in Developer options → OEM unlocking
-- Power off your device. Press *Power + Bixby + Volume Down* to boot into download mode
+- Power off your device. Press *Bixby + Volume Down* and plug in your device to a PC to boot into download mode
 - Long press volume up to unlock the bootloader. **This will wipe your data and automatically reboot.**
 
 Just when you think the bootloader is unlocked, surprise surprise, it is *actually* not! Samsung introduced `VaultKeeper` in the system, meaning the bootloader will reject any unofficial partitions before `VaultKeeper` explicitly allows it.
