@@ -194,7 +194,7 @@
     <string name="deny">Zamítnout</string>
     <string name="prompt">Dotaz</string>
     <string name="grant">Povolit</string>
-    <string name="su_warning">Povolí plný přístup k vašemu zařízení.\nZamítněte, pokud si nejste jisti!string>
+    <string name="su_warning">Povolí plný přístup k vašemu zařízení.\nZamítněte, pokud si nejste jisti!</string>
     <string name="forever">Navždy</string>
     <string name="once">Jednou</string>
     <string name="tenmin">10 minut</string>
