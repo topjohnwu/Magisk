@@ -239,39 +239,34 @@ public class SettingsFragment extends BasePreferenceFragment {
     private void setSummary(String key) {
         switch (key) {
             case Config.Key.UPDATE_CHANNEL:
+                int ch = Config.get(key);
+                ch = ch < 0 ? Config.Value.STABLE_CHANNEL : ch;
                 updateChannel.setSummary(getResources()
-                        .getStringArray(R.array.update_channel)
-                        [(int) Config.get(Config.Key.UPDATE_CHANNEL)]);
+                        .getStringArray(R.array.update_channel)[ch]);
                 break;
             case Config.Key.ROOT_ACCESS:
                 rootConfig.setSummary(getResources()
-                        .getStringArray(R.array.su_access)
-                        [(int) Config.get(Config.Key.ROOT_ACCESS)]);
+                        .getStringArray(R.array.su_access)[(int)Config.get(key)]);
                 break;
             case Config.Key.SU_AUTO_RESPONSE:
                 autoRes.setSummary(getResources()
-                        .getStringArray(R.array.auto_response)
-                        [(int) Config.get(Config.Key.SU_AUTO_RESPONSE)]);
+                        .getStringArray(R.array.auto_response)[(int)Config.get(key)]);
                 break;
             case Config.Key.SU_NOTIFICATION:
                 suNotification.setSummary(getResources()
-                        .getStringArray(R.array.su_notification)
-                        [(int) Config.get(Config.Key.SU_NOTIFICATION)]);
+                        .getStringArray(R.array.su_notification)[(int)Config.get(key)]);
                 break;
             case Config.Key.SU_REQUEST_TIMEOUT:
                 requestTimeout.setSummary(
-                        getString(R.string.request_timeout_summary,
-                                (int) Config.get(Config.Key.SU_REQUEST_TIMEOUT)));
+                        getString(R.string.request_timeout_summary, (int)Config.get(key)));
                 break;
             case Config.Key.SU_MULTIUSER_MODE:
                 multiuserConfig.setSummary(getResources()
-                        .getStringArray(R.array.multiuser_summary)
-                        [(int) Config.get(Config.Key.SU_MULTIUSER_MODE)]);
+                        .getStringArray(R.array.multiuser_summary)[(int)Config.get(key)]);
                 break;
             case Config.Key.SU_MNT_NS:
                 nsConfig.setSummary(getResources()
-                        .getStringArray(R.array.namespace_summary)
-                        [(int) Config.get(Config.Key.SU_MNT_NS)]);
+                        .getStringArray(R.array.namespace_summary)[(int)Config.get(key)]);
                 break;
         }
     }

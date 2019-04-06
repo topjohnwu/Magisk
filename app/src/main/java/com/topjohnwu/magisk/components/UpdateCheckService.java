@@ -15,7 +15,7 @@ public class UpdateCheckService extends DelegateWorker {
     @Override
     public ListenableWorker.Result doWork() {
         Shell.getShell();
-        CheckUpdates.checkNow(this::onCheckDone);
+        CheckUpdates.check(this::onCheckDone);
         return ListenableWorker.Result.success();
     }
 

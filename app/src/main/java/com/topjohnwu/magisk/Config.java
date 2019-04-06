@@ -73,6 +73,7 @@ public class Config {
     }
 
     public static class Value {
+        public static final int DEFAULT_CHANNEL = -1;
         public static final int STABLE_CHANNEL = 0;
         public static final int BETA_CHANNEL = 1;
         public static final int CUSTOM_CHANNEL = 2;
@@ -316,7 +317,7 @@ public class Config {
         defs.put(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT);
         defs.put(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST);
         defs.put(Key.UPDATE_CHANNEL, Utils.isCanary() ?
-                Value.CANARY_DEBUG_CHANNEL : Value.STABLE_CHANNEL);
+                Value.CANARY_DEBUG_CHANNEL : Value.DEFAULT_CHANNEL);
 
         // prefs bool
         defs.put(Key.CHECK_UPDATES, true);

@@ -155,7 +155,7 @@
     <string name="auto_response">Automatická odpoveď</string>
     <string name="request_timeout">Časový limit pre odpoveď</string>
     <string name="superuser_notification">Notifikácie Superuser</string>
-    <string name="request_timeout_summary">%1$s sekúnd</string>
+    <string name="request_timeout_summary">%1$d sekúnd</string>
     <string name="settings_su_reauth_title">Overenie autentifikácie po upgrade</string>
     <string name="settings_su_reauth_summary">Overí autentifikáciu oprávnení superuser po upgrade aplikácie</string>
     <string name="settings_su_fingerprint_title">Povoliť autentifikáciu odtlačkom prsta</string>
