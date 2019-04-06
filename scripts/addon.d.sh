@@ -43,12 +43,12 @@ show_logo() {
 
 installation() {
   find_manager_apk
+  get_flags
   find_boot_image
   find_dtbo_image
   [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
   ui_print "- Target image: $BOOTIMAGE"
   [ -z $DTBOIMAGE ] || ui_print "- DTBO image: $DTBOIMAGE"
-  get_flags
 
   remove_system_su
 
