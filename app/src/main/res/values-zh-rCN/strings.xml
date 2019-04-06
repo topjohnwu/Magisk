@@ -25,7 +25,7 @@
     <string name="keep_force_encryption">保持强制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
     <string name="current_installed">已安装：%1$s</string>
-    <string name="latest_version">最新：%1$s</string>
+    <string name="latest_version">最新版：%1$s</string>
     <string name="uninstall">卸载</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">所有模块将停用或删除，Root 会被移除。未加密的设备重启时可能会被进行加密。</string>
@@ -74,6 +74,18 @@
     <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="manager_update_title">Magisk Manager 可更新！</string>
 
+    <!-- Installation -->
+    <string name="manager_download_install">点按通知，下载并安装。</string>
+    <string name="download_zip_only">仅下载 Zip包</string>
+    <string name="direct_install">直接安装（推荐）</string>
+    <string name="install_inactive_slot">安装到未使用的槽位（OTA 后）</string>
+    <string name="install_inactive_slot_msg">重启后，设备将被强制切换到另一个槽位！\n请在 OTA 安装完毕后再使用。\n是否继续？</string>
+    <string name="select_method">选择安装方法</string>
+    <string name="setup_title">额外安装</string>
+    <string name="select_patch_file">选择并修补一个文件</string>
+    <string name="patch_file_msg">选择一个原始镜像文件 (*.img) 或一个 ODIN tar包 (*.tar)</string>
+    <string name="reboot_delay_toast">5 秒后重启……</string>
+
     <!--Toasts, Dialogs-->
     <string name="close">关闭</string>
     <string name="repo_install_title">安装 %1$s</string>
@@ -84,19 +96,14 @@
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
     <string name="internal_storage">Zip 已被储存到：\n[内部存储空间]%1$s</string>
-    <string name="manager_download_install">下载并安装</string>
+
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
     <string name="flashing">正在刷入</string>
     <string name="hide_manager_title">正在隐藏 Magisk Manager…</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
     <string name="open_link_failed_toast">找不到能够打开此链接的应用</string>
-    <string name="download_zip_only">仅下载 Zip</string>
-    <string name="direct_install">直接安装（推荐）</string>
-    <string name="install_inactive_slot">安装到未使用的槽位（安装完OTA后）</string>
     <string name="warning">警告</string>
-    <string name="install_inactive_slot_msg">重启后，设备将被强制切换到另一个槽位！\n请在安装完 OTA 后再使用。\n是否继续？</string>
-    <string name="select_method">选择安装方法</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂镜像</string>
     <string name="restore_img_msg">还原中…</string>
@@ -108,7 +115,6 @@
     <string name="setup_fail">安装失败</string>
     <string name="env_fix_title">需要额外安装</string>
     <string name="env_fix_msg">需要额外的安装才能使 Magisk 正常工作。 将下载 Magisk 安装包，是否继续？</string>
-    <string name="setup_title">额外安装</string>
     <string name="setup_msg">运行环境安装中…</string>
     <string name="downloading_toast">正在下载 %1$s</string>
     <string name="no_rw_storage">未授予写入内置存储权限，此功能无法正常工作。</string>
@@ -212,6 +218,7 @@
     <string name="auth_fail">验证失败</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">目标 UID: %1$d</string>
     <string name="command">命令: %1$s</string>
 
