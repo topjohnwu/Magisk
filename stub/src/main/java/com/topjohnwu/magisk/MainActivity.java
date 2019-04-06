@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
 
     private static final String URL =
             "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/" +
-            (BuildConfig.VERSION_NAME.contains("-") ? "canary_builds/canary.json" : "stable.json");
+            (BuildConfig.VERSION_NAME.contains("-") ? "canary_builds/release.json" : "stable.json");
 
     private String apkLink;
 
