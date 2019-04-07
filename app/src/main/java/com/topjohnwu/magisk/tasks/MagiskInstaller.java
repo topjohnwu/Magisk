@@ -164,11 +164,10 @@ public abstract class MagiskInstaller {
             return false;
         }
 
-        SuFile init64 = new SuFile(installDir, "magiskinit64");
         if (Build.VERSION.SDK_INT >= 21 && Build.SUPPORTED_64_BIT_ABIS.length != 0) {
-            init64.renameTo(new SuFile(installDir, "magiskinit"));
+            Shell.sh("mv " + installDir + "/magiskinit64 " + installDir + "/magiskinit").exec();
         } else {
-            init64.delete();
+            Shell.sh("rm " + installDir + "/magiskinit64").exec();
         }
         Shell.sh("cd " + installDir, "chmod 755 *").exec();
         return true;
