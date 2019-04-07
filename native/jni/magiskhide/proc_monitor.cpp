@@ -28,7 +28,9 @@
 
 using namespace std;
 
-extern char *system_block, *vendor_block, *data_block;
+extern char *system_block;
+extern char *vendor_block;
+extern char *data_block;
 
 static int inotify_fd = -1;
 
