@@ -28,7 +28,6 @@ using namespace std;
 
 static char buf[PATH_MAX], buf2[PATH_MAX];
 static vector<string> module_list;
-static bool seperate_vendor;
 static bool no_secure_dir = false;
 
 static int bind_mount(const char *from, const char *to, bool log = true);
@@ -76,7 +75,8 @@ private:
 		this->parent = parent;
 		this->module = module;
 	}
-	bool is_vendor();
+	bool is_special();
+	bool is_root();
 	string get_path();
 	void insert(node_entry *&);
 	void clone_skeleton();
@@ -88,8 +88,12 @@ node_entry::~node_entry() {
 		delete node;
 }
 
-bool node_entry::is_vendor() {
+bool node_entry::is_special() {
 	return parent ? (parent->parent ? false : name == "vendor") : false;
+}
+
+bool node_entry::is_root() {
+	return parent ? (parent->parent ? false : name == "vendor") : true;
 }
 
 string node_entry::get_path() {
@@ -140,35 +144,45 @@ void node_entry::create_module_tree(const char *module) {
 
 		// buf = real path, buf2 = module path
 		snprintf(buf, PATH_MAX, "%s/%s", full_path.c_str(), entry->d_name);
-		int eo2 = snprintf(buf2, PATH_MAX, MODULEROOT "/%s%s/%s",
+		int eof = snprintf(buf2, PATH_MAX, MODULEROOT "/%s%s/%s",
 				module, full_path.c_str(), entry->d_name);
 
 		/*
-		 * Clone the parent in the following condition:
-		 * 1. File in module is a symlink
-		 * 2. Target file do not exist
-		 * 3. Target file is a symlink (exclude /system/vendor)
+		 * Clone current node directory in the following condition:
+		 * 1. We are not a root node
+		 * 2. Target does not exist or
+		 * 3. Module file is a symlink or
+		 * 4. Target file is a symlink (exclude special nodes)
 		 */
 		bool clone = false;
 		if (IS_LNK(node) || access(buf, F_OK) == -1) {
 			clone = true;
-		} else if (!node->is_vendor()) {
+		} else if (!node->is_special()) {
 			struct stat s;
-			xstat(buf, &s);
+			xlstat(buf, &s);
 			if (S_ISLNK(s.st_mode))
 				clone = true;
+		}
+		if (clone && is_root()) {
+			// Remove both the new node and file that requires cloning ourselves
+			rm_rf(buf2);
+			delete node;
+			continue;
 		}
 
 		if (clone) {
 			// Mark self as a skeleton
 			status |= IS_SKEL;  /* This will not overwrite if parent is module */
 			node->status = IS_MODULE;
+		} else if (node->is_special()) {
+			// Special nodes will be pulled out as root nodes later
+			node->status = IS_INTER;
 		} else {
 			// Clone attributes from real path
 			clone_attr(buf, buf2);
 			if (IS_DIR(node)) {
 				// Check if marked as replace
-				strcpy(buf2 + eo2, "/.replace");
+				strcpy(buf2 + eof, "/.replace");
 				if (access(buf2, F_OK) == 0) {
 					// Replace everything, mark as leaf
 					node->status = IS_MODULE;
@@ -227,14 +241,7 @@ void node_entry::clone_skeleton() {
 			close(creat(buf, 0644));
 		// Links will be handled later
 
-		if (child->is_vendor()) {
-			if (seperate_vendor) {
-				cp_afc(MIRRDIR "/system/vendor", "/system/vendor");
-				VLOGI("copy_link ", "/system/vendor", MIRRDIR "/system/vendor");
-			}
-			// Skip
-			continue;
-		} else if (child->status & IS_MODULE) {
+		if (child->status & IS_MODULE) {
 			// Mount from module file to dummy file
 			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MODULEMNT,
 					 child->module, full_path.c_str(), child->name.c_str());
@@ -272,19 +279,16 @@ void node_entry::magic_mount() {
 		for (auto &child : children)
 			child->magic_mount();
 	}
-	// The only thing goes here should be placeholder nodes
-	// There should be no dummies, so don't need to handle it here
 }
 
 node_entry *node_entry::extract(const char *name) {
 	node_entry *node = nullptr;
-	// Extract the node out and swap with placeholder
-	for (auto &child : children) {
-		if (child->name == name) {
-			node = child;
-			child = new node_entry(name);
-			child->parent = node->parent;
+	// Extract the node out of the tree
+	for (auto it = children.begin(); it != children.end(); ++it) {
+		if ((*it)->name == name) {
+			node = *it;
 			node->parent = nullptr;
+			children.erase(it);
 			break;
 		}
 	}
@@ -364,12 +368,12 @@ static bool magisk_env() {
 		if (str_contains(line, " /system_root ")) {
 			mount_mirror(system_root, MS_RDONLY);
 			xsymlink(MIRRMNT(system_root) "/system", MIRRMNT(system));
+			VLOGI("link", MIRRMNT(system_root) "/system", MIRRMNT(system));
 			system_as_root = true;
 		} else if (!system_as_root && str_contains(line, " /system ")) {
 			mount_mirror(system, MS_RDONLY);
 		} else if (str_contains(line, " /vendor ")) {
 			mount_mirror(vendor, MS_RDONLY);
-			seperate_vendor = true;
 		} else if (str_contains(line, " /data ")) {
 			mount_mirror(data, 0);
 		} else if (SDK_INT >= 24 &&
@@ -379,9 +383,9 @@ static bool magisk_env() {
 		}
 		return true;
 	});
-	if (!seperate_vendor) {
-		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
-		VLOGI("link", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+	if (access(MIRRMNT(vendor), F_OK) != 0) {
+		xsymlink(MIRRMNT(system) "/vendor", MIRRMNT(vendor));
+		VLOGI("link", MIRRMNT(system) "/vendor", MIRRMNT(vendor));
 	}
 
 	// Disable/remove magiskhide, resetprop, and modules
@@ -622,9 +626,6 @@ void post_fs_data(int client) {
 	// Create the system root entry
 	auto sys_root = new node_entry("system", IS_INTER);
 
-	// Vendor root entry
-	node_entry *ven_root = nullptr;
-
 	bool has_modules = false;
 
 	LOGI("* Loading modules\n");
@@ -659,17 +660,18 @@ void post_fs_data(int client) {
 	}
 
 	if (has_modules) {
-		// Pull out /system/vendor node if exist
-		ven_root = sys_root->extract("vendor");
+		// Pull out special nodes if exist
+		node_entry *special;
+		if ((special = sys_root->extract("vendor"))) {
+			special->magic_mount();
+			delete special;
+		}
 
-		// Magic!!
 		sys_root->magic_mount();
-		if (ven_root) ven_root->magic_mount();
 	}
 
 	// Cleanup memory
 	delete sys_root;
-	delete ven_root;
 
 	core_only();
 }
