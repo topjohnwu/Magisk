@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.components;
 import androidx.annotation.NonNull;
 import androidx.work.ListenableWorker;
 
+import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.tasks.CheckUpdates;
@@ -14,8 +15,10 @@ public class UpdateCheckService extends DelegateWorker {
     @NonNull
     @Override
     public ListenableWorker.Result doWork() {
-        Shell.getShell();
-        CheckUpdates.check(this::onCheckDone);
+        if (App.self.foreground == null) {
+            Shell.getShell();
+            CheckUpdates.check(this::onCheckDone);
+        }
         return ListenableWorker.Result.success();
     }
 

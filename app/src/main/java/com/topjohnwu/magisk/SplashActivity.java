@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
+import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.tasks.UpdateRepos;
 import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.magisk.uicomponents.Shortcuts;
@@ -63,6 +64,7 @@ public class SplashActivity extends BaseActivity {
 
         // Schedule periodic update checks
         Utils.scheduleUpdateCheck();
+        CheckUpdates.check();
 
         // Setup shortcuts
         Shortcuts.setup(this);

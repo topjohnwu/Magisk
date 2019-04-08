@@ -158,7 +158,6 @@ public class Utils {
                     ExistingPeriodicWorkPolicy.REPLACE, request);
         } else {
             WorkManager.getInstance().cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID);
-            CheckUpdates.check();
         }
     }
 
