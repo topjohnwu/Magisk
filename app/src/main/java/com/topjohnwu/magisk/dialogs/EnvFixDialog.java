@@ -2,21 +2,17 @@ package com.topjohnwu.magisk.dialogs;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.tasks.MagiskInstaller;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
 import com.topjohnwu.superuser.io.SuFile;
-
-import java.io.IOException;
 
 public class EnvFixDialog extends CustomAlertDialog {
 
@@ -42,7 +38,7 @@ public class EnvFixDialog extends CustomAlertDialog {
                     pd.dismiss();
                     Utils.toast(success ? R.string.reboot_delay_toast : R.string.setup_fail, Toast.LENGTH_LONG);
                     if (success)
-                        UiThreadHandler.handler.postDelayed(Utils::reboot, 5000);
+                        UiThreadHandler.handler.postDelayed(RootUtils::reboot, 5000);
                 }
             }.exec();
         });

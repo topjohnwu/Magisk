@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.adapters.StringListAdapter;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.tasks.FlashZip;
 import com.topjohnwu.magisk.tasks.MagiskInstaller;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
@@ -47,7 +48,7 @@ public class FlashActivity extends BaseActivity {
 
     @OnClick(R.id.reboot)
     void reboot() {
-        Utils.reboot();
+        RootUtils.reboot();
     }
 
     @OnClick(R.id.save_logs)

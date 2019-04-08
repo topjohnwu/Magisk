@@ -27,7 +27,6 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.UpdateCheckService;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
-import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
@@ -134,10 +133,6 @@ public class Utils {
         return Shell.rootAccess() && (Const.USER_ID == 0 ||
                 (int) Config.get(Config.Key.SU_MULTIUSER_MODE) !=
                         Config.Value.MULTIUSER_MODE_OWNER_MANAGED);
-    }
-
-    public static void reboot() {
-        Shell.su("/system/bin/reboot" + (Config.recovery ? " recovery" : "")).submit();
     }
 
     public static boolean isCanary() {

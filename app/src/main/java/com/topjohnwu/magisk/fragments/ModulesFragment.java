@@ -25,6 +25,7 @@ import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.utils.Event;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -110,7 +111,7 @@ public class ModulesFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.reboot:
-                Utils.reboot();
+                RootUtils.reboot();
                 return true;
             case R.id.reboot_recovery:
                 Shell.su("/system/bin/reboot recovery").submit();

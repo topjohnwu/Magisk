@@ -20,6 +20,10 @@ public class RootUtils extends Shell.Initializer {
         Shell.su(Utils.fmt("(rm_launch %s %s)&", rm, component.flattenToString())).exec();
     }
 
+    public static void reboot() {
+        Shell.su("/system/bin/reboot" + (Config.recovery ? " recovery" : "")).submit();
+    }
+
     @Override
     public boolean onInit(Context context, @NonNull Shell shell) {
         Shell.Job job = shell.newJob();
