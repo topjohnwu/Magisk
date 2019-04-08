@@ -39,9 +39,9 @@ public class SuRequestActivity extends BaseActivity {
     @BindView(R.id.fingerprint) ImageView fingerprintImg;
     @BindView(R.id.warning) TextView warning;
 
-    private SuConnector connector;
-    private Policy policy;
-    private CountDownTimer timer;
+    private static SuConnector connector;
+    private static Policy policy;
+    private static CountDownTimer timer;
     private FingerprintHelper fingerprintHelper;
     private SharedPreferences timeoutPrefs;
 
@@ -54,8 +54,11 @@ public class SuRequestActivity extends BaseActivity {
     public void finish() {
         if (timer != null)
             timer.cancel();
+        timer = null;
         if (fingerprintHelper != null)
             fingerprintHelper.cancel();
+        connector = null;
+        policy = null;
         super.finish();
     }
 
@@ -79,7 +82,7 @@ public class SuRequestActivity extends BaseActivity {
 
         // Get policy
         Intent intent = getIntent();
-        try {
+        if (connector == null) try {
             String socketName = intent.getStringExtra("socket");
             connector = new SuConnector(socketName) {
                 @Override
@@ -136,6 +139,9 @@ public class SuRequestActivity extends BaseActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeout.setAdapter(adapter);
         timeout.setSelection(timeoutPrefs.getInt(policy.packageName, 0));
+
+        if (timer != null)
+            timer.cancel();
 
         timer = new CountDownTimer((int) Config.get(Config.Key.SU_REQUEST_TIMEOUT) * 1000, 1000) {
             @Override
