@@ -301,19 +301,17 @@ static int bind_mount(const char *from, const char *to, bool log) {
 	return ret;
 }
 
-char *system_block;
-char *vendor_block;
-char *data_block;
-static char *&system_root_block = system_block;
+#define MIRRMNT(part)   MIRRDIR "/" #part
+#define PARTBLK(part)   BLOCKDIR "/" #part
 
-#define MIRRPNT(part) MIRRDIR "/" #part
-
-#define mount_mirror(part, flag) \
-sscanf(line.data(), "%s %*s %s", buf, buf2); \
-part##_block = strdup(buf); \
-xmkdir(MIRRPNT(part), 0755); \
-xmount(part##_block, MIRRPNT(part), buf2, flag, nullptr); \
-VLOGI("mount", part##_block, MIRRPNT(part))
+#define mount_mirror(part, flag) { \
+	sscanf(line.data(), "%s %*s %s", buf, buf2); \
+	xstat(buf, &st); \
+	mknod(PARTBLK(part), S_IFBLK | 0600, st.st_rdev); \
+	xmkdir(MIRRMNT(part), 0755); \
+	xmount(PARTBLK(part), MIRRMNT(part), buf2, flag, nullptr); \
+	VLOGI("mount", PARTBLK(part), MIRRMNT(part)); \
+}
 
 static bool magisk_env() {
 	LOGI("* Initializing Magisk environment\n");
@@ -348,7 +346,8 @@ static bool magisk_env() {
 	symlink(MODULEMNT, MAGISKTMP "/img");
 
 	// Directories in tmpfs overlay
-	xmkdirs(MIRRPNT(system), 0755);
+	xmkdir(MIRRDIR, 0);
+	xmkdir(BLOCKDIR, 0);
 	xmkdir(BBPATH, 0755);
 	xmkdir(MODULEMNT, 0755);
 
@@ -360,10 +359,11 @@ static bool magisk_env() {
 
 	LOGI("* Mounting mirrors");
 	bool system_as_root = false;
+	struct stat st;
 	file_readline("/proc/mounts", [&](string_view line) -> bool {
 		if (str_contains(line, " /system_root ")) {
 			mount_mirror(system_root, MS_RDONLY);
-			bind_mount(MIRRPNT(system_root) "/system", MIRRPNT(system));
+			xsymlink(MIRRMNT(system_root) "/system", MIRRMNT(system));
 			system_as_root = true;
 		} else if (!system_as_root && str_contains(line, " /system ")) {
 			mount_mirror(system, MS_RDONLY);

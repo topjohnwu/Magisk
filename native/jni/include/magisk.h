@@ -11,6 +11,7 @@
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define MAGISKTMP       "/sbin/.magisk"
 #define MIRRDIR         MAGISKTMP "/mirror"
+#define BLOCKDIR        MAGISKTMP "/block"
 #define BBPATH          MAGISKTMP "/busybox"
 #define MODULEMNT       MAGISKTMP "/modules"
 #define SECURE_DIR      "/data/adb"

@@ -28,10 +28,6 @@
 
 using namespace std;
 
-extern char *system_block;
-extern char *vendor_block;
-extern char *data_block;
-
 static int inotify_fd = -1;
 
 static void term_thread(int sig = SIGTERMTHRD);
@@ -202,11 +198,9 @@ static void hide_daemon(int pid) {
 		lazy_unmount(s.data());
 	targets.clear();
 
-	// Unmount everything under /system, /vendor, and data mounts
+	// Unmount all Magisk created mounts
 	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
-		if ((str_contains(s, " /system/") || str_contains(s, " /vendor/")) &&
-			(str_contains(s, system_block) || str_contains(s, vendor_block) ||
-			 str_contains(s, data_block))) {
+		if (str_contains(s, BLOCKDIR)) {
 			char *path = (char *) s.data();
 			// Skip first token
 			strtok_r(nullptr, " ", &path);
