@@ -47,14 +47,6 @@
             android:entries="@array/update_channel"
             android:entryValues="@array/value_array" />
 
-        <ListPreference
-            android:key="boot_format"
-            android:title="@string/settings_boot_format_title"
-            android:entries="@array/boot_formats"
-            android:entryValues="@array/boot_formats"
-            android:defaultValue=".img"
-            android:summary="@string/settings_boot_format_summary"/>
-
     </PreferenceCategory>
 
     <PreferenceCategory

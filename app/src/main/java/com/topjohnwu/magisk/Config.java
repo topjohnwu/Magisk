@@ -59,7 +59,6 @@ public class Config {
         public static final String CHECK_UPDATES = "check_update";
         public static final String UPDATE_CHANNEL = "update_channel";
         public static final String CUSTOM_CHANNEL = "custom_channel";
-        public static final String BOOT_FORMAT = "boot_format";
         public static final String LOCALE = "locale";
         public static final String DARK_THEME = "dark_theme";
         public static final String ETAG_KEY = "ETag";
@@ -214,7 +213,6 @@ public class Config {
                 return PREF_BOOL;
 
             case Key.CUSTOM_CHANNEL:
-            case Key.BOOT_FORMAT:
             case Key.LOCALE:
             case Key.ETAG_KEY:
                 return PREF_STR;
@@ -327,7 +325,6 @@ public class Config {
 
         // prefs string
         defs.put(Key.CUSTOM_CHANNEL, "");
-        defs.put(Key.BOOT_FORMAT, ".img");
         defs.put(Key.LOCALE, "");
         //defs.put(Key.ETAG_KEY, null);
 
