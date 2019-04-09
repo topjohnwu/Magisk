@@ -111,7 +111,6 @@
     <string name="restore_fail">Výchozí záloha neexistuje!</string>
     <string name="proprietary_title">Stáhnout proprietární kód</string>
     <string name="proprietary_notice">Magisk Manager je FOSS a neobsahuje proprietární kód SafetyNet API společnosti Google.\n\nChcete povolit aplikaci Magisk Manager stažení rozšíření (obsahuje GoogleApiClient) pro kontrolu SafetyNet?</string>
-    <string name="setup_done">Nastavení provedeno.</string>
     <string name="setup_fail">Nastavení selhalo.</string>
     <string name="env_fix_title">Vyžaduje se další nastavení</string>
     <string name="env_fix_msg">Vaše zařízení potřebuje další nastavení, aby Magisk fungoval správně. Stáhne se instalační zip Magisk, chcete pokračovat?</string>
@@ -140,8 +139,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastní</string>
     <string name="settings_update_custom_msg">Vložte vlastní URL</string>
-    <string name="settings_boot_format_title">Formát Patched Boot Output</string>
-    <string name="settings_boot_format_summary">Vyberte formát Output Patched Boot Image.\nVyberte .img pro instalaci přes režim fastboot/download; vyberte .img.tar pro instalaci přes ODIN.</string>
     <string name="settings_core_only_title">Režim pouze Magisk Core</string>
     <string name="settings_core_only_summary">Povolit pouze funkce jádra. MagiskSU, MagiskHide a nesystémoví hostitelé budou stále povoleni, ale žádné moduly nebudou načteny.</string>
     <string name="settings_magiskhide_summary">Skrýt Magisk z různých detekcí.</string>

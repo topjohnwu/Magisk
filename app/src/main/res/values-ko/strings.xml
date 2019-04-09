@@ -110,7 +110,6 @@
     <string name="restore_fail">순정 백업이 존재하지 않습니다!</string>
     <string name="proprietary_title">사유 코드 다운로드</string>
     <string name="proprietary_notice">Magisk Manager는 자유 오픈 소스 소프트웨어이며, 구글의 사유 SafetyNet API 코드를 포함하지 않습니다.\n\nMagisk Manager가 SafetyNet 체크를 위해 (GoogleApiClient를 포함하는) 확장 기능을 다운로드하도록 허가하시겠습니까?</string>
-    <string name="setup_done">설치 완료</string>
     <string name="setup_fail">설치 실패</string>
     <string name="env_fix_title">추가 설정 요구됨</string>
     <string name="env_fix_msg">이 기기에서 Magisk가 제대로 작동하기 위해선 추가 설정이 필요합니다. Magisk 설치 zip이 다운로드 될 것인데, 계속 진행하시겠습니까?</string>
@@ -139,8 +138,6 @@
     <string name="settings_update_beta">베타</string>
     <string name="settings_update_custom">사용자 지정</string>
     <string name="settings_update_custom_msg">사용자 지정 URL 입력</string>
-    <string name="settings_boot_format_title">패치된 부트 이미지 출력 형식</string>
-    <string name="settings_boot_format_summary">Select the format for the output patched boot image.\nChoose .img to flash through fastboot/download mode; choose .img.tar to flash with ODIN.</string>
     <string name="settings_core_only_title">Magisk 핵심 기능 모드</string>
     <string name="settings_core_only_summary">핵심 기능만 사용합니다. 모든 모듈은 로드하지 않습니다. MagiskSU 및 MagiskHide 는 계속 사용할 수 있습니다.</string>
     <string name="settings_magiskhide_summary">다양한 감지로부터 Magisk를 숨깁니다.</string>

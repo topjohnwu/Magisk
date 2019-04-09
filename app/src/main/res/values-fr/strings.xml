@@ -111,7 +111,6 @@
     <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
     <string name="proprietary_title">Téléchargement de code propriétaire</string>
     <string name="proprietary_notice">Magisk Manager est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google.Voulez‐vous autoriser Magisk Manager à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet ?</string>
-    <string name="setup_done">Installation terminée</string>
     <string name="setup_fail">Échec de l’installation</string>
     <string name="env_fix_title">Installation additionnelle requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d’une configuration supplémentaire pour que Magisk fonctionne correctement. Pour cela, il est nécessaire de télécharger un fichier ZIP d’installation de Magisk. Voulez‐vous le faire maintenant ?</string>
@@ -140,8 +139,6 @@
     <string name="settings_update_beta">Bêta</string>
     <string name="settings_update_custom">Personnalisé</string>
     <string name="settings_update_custom_msg">Insérez une URL personnalisée</string>
-    <string name="settings_boot_format_title">Format de sortie du fichier d’amorçage modifié</string>
-    <string name="settings_boot_format_summary">Sélectionnez le format de sortie de l’image d’amorçage modifiée.\nChoisissez .img pour flasher via le mode démarrage rapide/téléchargement, ou .img.tar pour flasher via ODIN.</string>
     <string name="settings_core_only_title">Mode Magisk Core uniquement</string>
     <string name="settings_core_only_summary">Active uniquement les fonctionnalités de base. MagiskSU et MagiskHide resteront activés, mais aucun module ne sera chargé. </string>
     <string name="settings_magiskhide_summary">Rendre Magisk invisible à diverses formes de détection.</string>

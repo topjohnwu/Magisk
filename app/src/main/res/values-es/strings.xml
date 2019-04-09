@@ -102,7 +102,6 @@
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="proprietary_title">Descargar Código Propietario</string>
     <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para la comprobación de SafetyNet?</string>
-    <string name="setup_done">Instalación Realizada</string>
     <string name="setup_fail">Instalación Fallida</string>
     <string name="env_fix_title">Se Requiere una Instalación Adicional</string>
     <string name="env_fix_msg">Su dispositivo requiere una instalación adicional para que Magisk funcione correctamente. Se descargará el zip de instalación de Magisk, desea continuar ahora?</string>
@@ -132,8 +131,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Insertar una URL personalizada</string>
-    <string name="settings_boot_format_title">Parchear imagen boot por tipo de formato</string>
-    <string name="settings_boot_format_summary">Seleccionar el formato de salida para parchear la imagen boot.\nEscoja .img para flashear mediante fastboot/download mode; escoja .img.tar para flashear con ODIN.</string>
 
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>

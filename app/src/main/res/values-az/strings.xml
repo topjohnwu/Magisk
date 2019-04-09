@@ -194,8 +194,6 @@
 
     <string name="proprietary_notice">Magisk Manager açıq lisenziyalıdır və Google\'ın özəl SafetyNet API kodunu ehtiva etmir.\n\Magisk Managerə SafetyNet yoxlamaları üçün tərkibində GoogleApiClient olan əlavəni yükləməyə icazə verirsiniz?</string>
 
-    <string name="setup_done">Quraşdırma bitdi.</string>
-
     <string name="setup_fail">Quraşdırma alınmadı.</string>
 
     <string name="env_fix_title">Əlavə Quraşdırma Lazımdır</string>
@@ -251,10 +249,6 @@
     <string name="settings_update_custom">Özəl</string>
 
     <string name="settings_update_custom_msg">Özəl URL daxil edin</string>
-
-    <string name="settings_boot_format_title">Yamaqlı Boot Çıxış Formatı</string>
-
-    <string name="settings_boot_format_summary">Çıxışa yamaqlı boot təsviri üçün format seçin.\nFastboot yaxud yükləmə modunda yükləmək üçün .img seçin; Odin ilə yükləmək üçün .img.tar seçin.</string>
 
     <string name="settings_core_only_title">Magisk Yalnız Nüvə Modu</string>
 

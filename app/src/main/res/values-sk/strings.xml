@@ -102,7 +102,6 @@
     <string name="restore_fail">Záloha stock neexistuje!</string>
     <string name="proprietary_title">Stiahnuť proprietárny kód</string>
     <string name="proprietary_notice">Magisk Manager je FOSS, ktorý neobsahuje proprietárny kód SafetyNet API od Google.\n\nChcete povoliť Magisk Manager stiahnutie rozšírenia (obsahujúce GoogleApiClient) pre kontrolu  SafetyNet?</string>
-    <string name="setup_done">Nastavenie ukončené</string>
     <string name="setup_fail">Nastavenie zlyhalo</string>
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>
     <string name="env_fix_msg">Vaše zariadenie si vyžaduje ďalšie nastavenie pre správne fungovanie Magisk. Stiahne sa inštalačný zip súbor Magisk, chcete pokračovať teraz?</string>
@@ -132,8 +131,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastný</string>
     <string name="settings_update_custom_msg">Zadajte vlastnú URL</string>
-    <string name="settings_boot_format_title">Výstupný formát zaplátaného Boot</string>
-    <string name="settings_boot_format_summary">Vyberte výstupný formát zaplátaného obrazu boot.\nVyberte .img pre flashovanie cez fastboot/download režim; vyberte .img.tar pre flashovanie cez ODIN.</string>
     <string name="settings_core_only_title">Režim Magisk Core</string>
     <string name="settings_core_only_summary">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU, MagiskHide a systemless hosts, ale žiadne moduly nebudú zavedené.</string>
     <string name="settings_magiskhide_summary">Ukryje Magisk pre rôznymi detekciami</string>

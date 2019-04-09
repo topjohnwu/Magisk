@@ -101,7 +101,6 @@
     <string name="restore_fail">ไม่มีไฟล์แบ็คอัพ!</string>
     <string name="proprietary_title">Download Proprietary Code</string>
     <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
-    <string name="setup_done">การตั้งค่าสำเร็จ</string>
     <string name="setup_fail">การตั้งค่าล้มเหลว</string>
     <string name="env_fix_title">ต้องมีการตั้งค่าเพิ่มเติม</string>
     <string name="env_fix_msg">อุปกรณ์ของคุณต้องมีการตั้งค่าเพิ่มเติมเพื่อให้ Magisk สามารถทำงานได้ จะมีการดาวน์โหลดไฟล์ติดตั้ง Magisk ต้องการทำเลยหรือไม่?</string>
@@ -131,8 +130,6 @@
     <string name="settings_update_beta">เบต้า</string>
     <string name="settings_update_custom">กำหนดเอง</string>
     <string name="settings_update_custom_msg">ใส่ URL</string>
-    <string name="settings_boot_format_title">รูปแบบไฟล์แพตช์บู๊ต</string>
-    <string name="settings_boot_format_summary">เลือกรูปแบบสำหรับไฟล์แพตช์บู๊ต\nเลือก .img เพื่อใช้ในการแฟลชด้วย fastboot/โหมดดาวน์โหลด; เลือก .img.tar เพื่อใช้ในการแฟลชด้วย ODIN.</string>
     <string name="settings_core_only_title">โหมดคอร์เท่านั้น</string>
     <string name="settings_core_only_summary">ใช้งานฟีเจอร์หลักเท่านั้น MagiskSU และ MagiskHide จะถูกเปิดใช้งาน แต่โมดูลต่างๆจะไม่ถูกโหลด</string>
     <string name="settings_magiskhide_summary">ซ่อน Magisk จากการตรวจสอบในหลากหลายรูปแบบ</string>

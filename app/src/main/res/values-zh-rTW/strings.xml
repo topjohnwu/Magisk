@@ -104,7 +104,6 @@
     <string name="restore_fail">無原始備份檔案！</string>
     <string name="proprietary_title">下載非開源程式</string>
     <string name="proprietary_notice">Magisk Manager 完全開源，因此並不包含執行 SafetyNet 檢查所需的 Google 專有程式碼。\n\nMagisk Manager 將下載額外的元件（包含 GoogleApiClient）以進行檢查，是否繼續？</string>
-    <string name="setup_done">設定完成。</string>
     <string name="setup_fail">設定失敗。</string>
     <string name="env_fix_title">需要增量更新</string>
     <string name="env_fix_msg">為確保 Magisk 正常運作，此裝置需要安裝增量更新。將開始下載 Magisk 安裝包，是否繼續？</string>
@@ -134,8 +133,6 @@
     <string name="settings_update_beta">測試版</string>
     <string name="settings_update_custom">自訂</string>
     <string name="settings_update_custom_msg">請輸入自訂網址</string>
-    <string name="settings_boot_format_title">修改版 Boot 映像輸出格式</string>
-    <string name="settings_boot_format_summary">請選擇欲輸出的修改版 Boot 映像格式\n若欲透過 Fastboot 或 Download 刷入，請選擇 .img；若欲透過 ODIN 刷入，請選擇 .img.tar</string>
     <string name="settings_core_only_title">Magisk 核心模式</string>
     <string name="settings_core_only_summary">僅啟用 Magisk 核心功能。MagiskSU 及 MagiskHide 將保持開啟，模組則不會被載入。</string>
     <string name="settings_magiskhide_summary">隱藏 Magisk 以避免被偵測</string>

@@ -96,7 +96,6 @@
     <string name="restore_fail">Не е налице архив на стоковия образ!</string>
     <string name="proprietary_title">Изтегляне на патентования код</string>
     <string name="proprietary_notice">Magisk Manager е FOSS и затова не включва патентования код за SafetyNet ППИ на Google.\n\nПозволявате ли на Magisk Manager да изтегли добавката (включва GoogleApiClient) за SafetyNet проверки?</string>
-    <string name="setup_done">Първоначалната настройка е готова.</string>
     <string name="setup_fail">Първоначалната настройка е неуспешна.</string>
     <string name="env_fix_title">Изисква допълнително настройване</string>
     <string name="env_fix_msg">Вашето устройство се нуждае от допълнително надстройване на Magisk, за да работи нормално. Ще бъде изтеглен архивът за надстройка на Magisk. Желаете ли да продължите?</string>
@@ -126,8 +125,6 @@
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">Потребителски</string>
     <string name="settings_update_custom_msg">Въведете потребителски URL</string>
-    <string name="settings_boot_format_title">Изходен формат за модифициран boot образ</string>
-    <string name="settings_boot_format_summary">Избор на изходен формат за модифициран boot образ.\nИзберете .img за инсталиране чрез fastboot/даунлоуд режима; изберете .img.tar за инсталиране чрез ODIN.</string>
     <string name="settings_core_only_title">Режим Magisk Core Only</string>
     <string name="settings_core_only_summary">Работят само основни функции, като MagiskSU и MagiskHide, без всякакви модули.</string>
     <string name="settings_magiskhide_summary">Скриване на Magisk от различни детектори.</string>

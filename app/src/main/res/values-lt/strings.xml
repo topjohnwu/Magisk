@@ -92,7 +92,6 @@
     <string name="restore_fail">Gamyklinis atstatymo failas neegzistuoja!</string>
     <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
     <string name="proprietary_notice">Magisk Manager yra FOSS todėl neturi Google patentuoto SafetyNet API kodo.\n\nAr jūs leidžiate Magisk Manager atsisiųsti papildinį (turintį GoogleApiClient) SafetyNet paieškai?</string>
-    <string name="setup_done">Pasiruošimas baigtas</string>
     <string name="setup_fail">Pasiruošimas nesėkmingas</string>
     <string name="env_fix_title">Reikalingas papildomas pasiruošimas</string>
     <string name="env_fix_msg">Kad Magisk veiktų tinkamai, jūsų įrenginiui reikia papildomo paruošimo. Tai atsisiųs papildomą Magisk zip failą, ar norite tęsti?</string>
@@ -122,8 +121,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Pasirinktiniai</string>
     <string name="settings_update_custom_msg">Įvesti pasirinktinį URL</string>
-    <string name="settings_boot_format_title">Boot failo formatas</string>
-    <string name="settings_boot_format_summary">Pasirinkti boot failo formatą.\n.img naudojamas įdiegimui per fastboot/download; .img.tar naudojamas įdiegimui per ODIN</string>
     <string name="settings_core_only_title">Pagrindinis Magisk režimas</string>
     <string name="settings_core_only_summary">Įgalinti tik pagrindines funkcijas, išjungti visus papildinius. MagiskSU ir Magisk Hide liks įgalinti</string>
     <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>

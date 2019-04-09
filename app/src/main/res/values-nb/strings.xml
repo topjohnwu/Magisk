@@ -101,7 +101,6 @@
     <string name="restore_fail">Sikkerhetskopien av mobilens eget oppstartsbilde!</string>
     <string name="proprietary_title">Last ned proprietær kode</string>
     <string name="proprietary_notice">Magisk Manager bruker FOSSS, og kommer ikke med Googles proprietære SafetyNet-API-kode.\n\nVil du tillate Magisk Manager å laste ned utvidelse (som inneholder GoogleApiClient) for å kjøre SafetyNet-sjekker?</string>
-    <string name="setup_done">Oppsettet er fullført.</string>
     <string name="setup_fail">Oppsettet mislyktes.</string>
     <string name="env_fix_title">Krever ekstra oppsett</string>
     <string name="env_fix_msg">Enheten din krever ekstra oppsett for at Magisk skal kunne fungere ordentlig. Den vil laste ned Magisk-oppsetts-ZIP-filen, vil du fortsette med det nå?</string>
@@ -130,8 +129,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Tilpasset</string>
     <string name="settings_update_custom_msg">Skriv inn en egendefinert URL</string>
-    <string name="settings_boot_format_title">Den utdata-patchede oppstartsfilens format</string>
-    <string name="settings_boot_format_summary">Velg formatet til den utdata-patchede oppstartsfilen.\nVelg .img for å flashe gjennom fastboot-/nedlastingsmodus; velg .img.tar for å flashe gjennom ODIN.</string>
     <string name="settings_core_only_title">Kun Magisk-kjernefunksjoner</string>
     <string name="settings_core_only_summary">Bare aktiver kjernefunksjonene. MagiskSU og MagiskHide vil fortsatt være skrudd på, men ingen moduler vil bli lastet inn</string>
     <string name="settings_magiskhide_summary">Skjul Magisk fra diverse måter å bli oppdaget på.</string>

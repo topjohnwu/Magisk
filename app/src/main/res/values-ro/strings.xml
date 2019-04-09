@@ -104,7 +104,6 @@
     <string name="restore_fail">Nu există backup stock!</string>
     <string name="proprietary_title">Descarcă cod proprietar</string>
     <string name="proprietary_notice">Magisk Manager este FOSS și nu conține codul proprietar al Google pentru API-ul SafetyNet.\n\nPermiți ca Magisk Manager să descarce o extensie (care conține GoogleApiClient) pentru verificările SafetyNet?</string>
-    <string name="setup_done">Configurare terminată.</string>
     <string name="setup_fail">Configurare eșuată.</string>
     <string name="env_fix_title">Necesită configurare suplimentară</string>
     <string name="env_fix_msg">Dispozitivul tău are nevoie de configurări suplimentare pentru ca Magisk să funcționeze corect. Se va descărca zip-ul de configurare Magisk, vrei să continui acum?</string>
@@ -134,8 +133,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalizat</string>
     <string name="settings_update_custom_msg">Inserează un URL personalizat</string>
-    <string name="settings_boot_format_title">Formatul bootului modificat</string>
-    <string name="settings_boot_format_summary">Selectează formatul fișierului imaginii de boot modificată.\nAlege .img pentru flash prin modul fastboot/download; alege .img.tar pentru flash cu ODIN.</string>
     <string name="settings_core_only_title">Mod numai de bază pentru Magisk</string>
     <string name="settings_core_only_summary">Activează numai caracteristicile de bază. MagiskSU și MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat.</string>
     <string name="settings_magiskhide_summary">Ascunde Magisk de diferite forme de detectare.</string>

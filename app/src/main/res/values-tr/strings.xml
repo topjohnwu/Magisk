@@ -104,7 +104,6 @@
     <string name="restore_fail">Stok önyükleme yedeği yok!</string>
     <string name="proprietary_title">Tescil Kodunu İndirin</string>
     <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan Google\'ın tescilli olduğu SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için bir uzantıyı (GoogleApiClient içeriyor) indirmesine izin veriyor musunuz?</string>
-    <string name="setup_done">Kurulum tamamlandı</string>
     <string name="setup_fail">Kurulum başarısız</string>
     <string name="env_fix_title">Ek Kurulum Gerekli</string>
     <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
@@ -134,8 +133,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özel</string>
     <string name="settings_update_custom_msg">Özel bir URL ekleyin</string>
-    <string name="settings_boot_format_title">Yamalı Önyükleme Formatı</string>
-    <string name="settings_boot_format_summary">Yamalı önyükleme imaj dosyasının formatını seçin\nFastboot/download modunda yüklemek için .img seçeneğini seçin; ODIN ile yüklemek için .img.tar\'ı seçin.</string>
     <string name="settings_core_only_title">Magisk Sadece Çekirdek Modu</string>
     <string name="settings_core_only_summary">Sadece temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU ve MagiskHide yine de etkinleştirilecektir</string>
     <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>

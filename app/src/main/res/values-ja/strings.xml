@@ -104,7 +104,6 @@
     <string name="restore_fail">Stockのバックアップがありません！</string>
     <string name="proprietary_title">プロプライエタリコードのダウンロード</string>
     <string name="proprietary_notice">Magisk ManagerはFOSSであるため、GoogleのプロプライエタリなSafetyNet APIコードを含んでいません。\n\nMagisk ManagerがSafetyNetチェックのための拡張機能 (GoogleApiClientを含む) をダウンロードすることを許可しますか?</string>
-    <string name="setup_done">セットアップ完了。</string>
     <string name="setup_fail">セットアップに失敗しました。</string>
     <string name="env_fix_title">追加のセットアップが必要</string>
     <string name="env_fix_msg">Magiskを正常に機能させるには、お使いのデバイスに追加のセットアップが必要です。Magiskのセットアップ用zipをダウンロードすることになりますが、今すぐ続行しますか？</string>
@@ -134,8 +133,6 @@
     <string name="settings_update_beta">ベータ版</string>
     <string name="settings_update_custom">カスタム</string>
     <string name="settings_update_custom_msg">カスタムURLを入力</string>
-    <string name="settings_boot_format_title">パッチしたBootの出力形式</string>
-    <string name="settings_boot_format_summary">パッチしたBootイメージの出力形式を選択してください。\nfastboot/download modeでインストールするには .img を、ODINでインストールするには .img.tar を選択してください</string>
     <string name="settings_core_only_title">Magiskコアモード</string>
     <string name="settings_core_only_summary">コア機能のみを有効にします。すべてのモジュールが読み込まれなくなります。 MagiskSU、MagiskHide は引き続き有効になります</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠します</string>

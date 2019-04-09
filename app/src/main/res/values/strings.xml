@@ -111,7 +111,6 @@
     <string name="restore_fail">Stock backup does not exist!</string>
     <string name="proprietary_title">Download Proprietary Code</string>
     <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
-    <string name="setup_done">Setup done.</string>
     <string name="setup_fail">Setup failed.</string>
     <string name="env_fix_title">Requires Additional Setup</string>
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
@@ -140,8 +139,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Custom</string>
     <string name="settings_update_custom_msg">Insert a custom URL</string>
-    <string name="settings_boot_format_title">Patched Boot Output Format</string>
-    <string name="settings_boot_format_summary">Select the format for the output patched boot image.\nChoose .img to flash through fastboot/download mode; choose .img.tar to flash with ODIN.</string>
     <string name="settings_core_only_title">Magisk Core Only Mode</string>
     <string name="settings_core_only_summary">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded.</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection.</string>

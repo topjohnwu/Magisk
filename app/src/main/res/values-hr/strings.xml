@@ -100,8 +100,6 @@
     <string name="settings_update_channel_title">Kanal ažuriranja</string>
     <string name="settings_update_stable">Stabilno</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_boot_format_title">Izlazni format datoteke za podizanje sustava nakon zakrpe</string>
-    <string name="settings_boot_format_summary">Odaberite izlazni format datoteke za podizanje sustava nakon zakrpe.\nOdaberite .img da biste aplicirali putem brzog pokretanja(fastboota)/preuzimanja(downloada); odaberite .img.tar da biste aplicirali putem ODIN-a.</string>
 
     <string name="settings_core_only_title">Samo Magisk Core način rada</string>
     <string name="settings_core_only_summary">Omogućite samo osnovne značajke, svi se moduli neće učitati. MagiskSU i MagiskHide će i dalje biti omogućeni</string>

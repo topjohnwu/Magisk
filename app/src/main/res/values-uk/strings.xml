@@ -104,7 +104,6 @@
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
     <string name="proprietary_title">Завантажити пропрієтарний код</string>
     <string name="proprietary_notice">Magisk Manager — це безкоштовна програма з відкритим вихідним кодом, тому вона не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
-    <string name="setup_done">Налаштування завершено.</string>
     <string name="setup_fail">Не вдалося налаштувати.</string>
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
     <string name="env_fix_msg">Для правильної роботи Magisk, потрібне додаткове налаштування вашого пристрою. Буде завантажено zip-архів. Розпочати негайно?</string>
@@ -134,8 +133,6 @@
     <string name="settings_update_beta">Бета реліз</string>
     <string name="settings_update_custom">Власний</string>
     <string name="settings_update_custom_msg">Вставте власний URL</string>
-    <string name="settings_boot_format_title">Формат пропатченого образу</string>
-    <string name="settings_boot_format_summary">Виберіть формат для вихідного пропатченого boot образу.\n.img - для прошивання через fastboot/download режим;\n.img.tar - для прошивання через ODIN.</string>
     <string name="settings_core_only_title">Режим ядра Magisk</string>
     <string name="settings_core_only_summary">Увімкнути тільки можливості ядра. MagiskSU i Magisk Hide залишуться увімкненими, проте ніякі модулі не будуть завантажені.</string>
     <string name="settings_magiskhide_summary">Приховати Magisk від різних форм виявлень.</string>

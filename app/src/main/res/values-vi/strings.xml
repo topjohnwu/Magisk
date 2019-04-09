@@ -96,7 +96,6 @@
     <string name="restore_fail">Sao lưu gốc không tồn tại!</string>
     <string name="proprietary_title">Tải xuống mã độc quyền</string>
     <string name="proprietary_notice">Magisk Manager là FOSS và không chứa mã SafetyNet API độc quyền của Google.\n\nBạn có cho phép Magisk Manager tải xuống tiện ích (có chứa GoogleApiClient) để kiểm tra SafetyNet không?</string>
-    <string name="setup_done">Thiết lập xong.</string>
     <string name="setup_fail">Thiết lập thất bại.</string>
     <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
     <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Nó sẽ tải xuống tập tin zip để thiết lập Magisk, bạn có muốn tiếp tục không?</string>
@@ -126,8 +125,6 @@
     <string name="settings_update_beta">Dùng thử</string>
     <string name="settings_update_custom">Tuỳ chỉnh</string>
     <string name="settings_update_custom_msg">Chèn URL tuỳ chỉnh</string>
-    <string name="settings_boot_format_title">Định dạng đầu ra được vá cố định</string>
-    <string name="settings_boot_format_summary">Chọn định dạng cho ảnh khởi động để vá đầu ra.\nChọn .img để flash qua chế độ fastboot/download; chọn .img.tar để flash với ODIN.</string>
     <string name="settings_core_only_title">Chế độ chỉ lõi Magisk</string>
     <string name="settings_core_only_summary">Chỉ bật các tính năng chính. MagiskSU và MagiskHide sẽ vẫn được kích hoạt, nhưng sẽ không có mô-đun nào được tải.</string>
     <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>

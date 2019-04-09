@@ -104,7 +104,6 @@
     <string name="restore_fail">Originaalne varundus puudub!</string>
     <string name="proprietary_title">Laadi alla suletud koodi</string>
     <string name="proprietary_notice">Magisk Manager on vaba ja avatud lähtekoodiga ning ei sisalda Google\'i suletud SafetyNet\'i API koodi.\n\nKas lubad Magisk Manager\'il SafetyNet\'i kontrollide jaoks laadida alla laiendus (sisaldab GoogleApiClient\'i)?</string>
-    <string name="setup_done">Seadistus valmis.</string>
     <string name="setup_fail">Seadistus ebaõnnnestus.</string>
     <string name="env_fix_title">Vajab lisaseadistust</string>
     <string name="env_fix_msg">Sinu seade vajab lisaseadistust, et Magisk töötaks korralikult. Laadime alla Magisk\'i seadistus-zip\'i, kas soovid kohe jätkata?</string>
@@ -134,8 +133,6 @@
     <string name="settings_update_beta">Beeta</string>
     <string name="settings_update_custom">Kohandatud</string>
     <string name="settings_update_custom_msg">Sisesta kohandatud URL</string>
-    <string name="settings_boot_format_title">Paigatud käivitusväljundi vorming</string>
-    <string name="settings_boot_format_summary">Vali väljutatava paigatud käivitustõmmise vorming.\nVali .img, mida välgutada fastboot/allalaadimisrežiimi kaudu; vali .img.tar, mida välgutada ODIN\'i kaudu.</string>
     <string name="settings_core_only_title">Magisk\'i ainult tuuma režiim</string>
     <string name="settings_core_only_summary">Luba ainult põhifunktsioonid. MagiskSU ja MagiskHide siiski lubatakse, ent mooduleid ei laadita.</string>
     <string name="settings_magiskhide_summary">Peida Magisk erinevate tuvastuste eest</string>

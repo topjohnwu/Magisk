@@ -116,8 +116,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Aangepast</string>
     <string name="settings_update_custom_msg">Aangepaste URL invoeren</string>
-    <string name="settings_boot_format_title">Gepatchte boot uitvoerformaat</string>
-    <string name="settings_boot_format_summary">Kies het formaat van de boot image uitvoer.\nKies .img om via fastboot/downloadmodus te flashen; kies .img.tar om via ODIN te flashen.</string>
     <string name="settings_core_only_title">Magisk basismodus</string>
     <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU en MagiskHide blijven ingeschakeld</string>
     <string name="settings_magiskhide_summary">Magisk van verschillende detecties verbergen</string>

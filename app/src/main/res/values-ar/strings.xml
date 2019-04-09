@@ -147,10 +147,7 @@
   <string name="restore_img_msg">الأستعادة …</string>
   <string name="safetyNet_api_error">خطأ SafetyNet API</string>
   <string name="select_method">حدد الطريقة</string>
-  <string name="settings_boot_format_summary">"حدد تنسيق ملف boot المصحح للإخراج.
-اختر img. للتثبيت من خلال وضع fastboot/ التحميل ؛ اختر img.tar. للتثبيت مع ODIN. "</string>
-  <string name="settings_boot_format_title">تنسيق إخراج ملف Boot المصحح</string>
-  <string name="settings_check_update_summary">التحقق من التحديثات في الخلفية بشكل دوري</string>
+    <string name="settings_check_update_summary">التحقق من التحديثات في الخلفية بشكل دوري</string>
   <string name="settings_check_update_title">تفقد التحديث</string>
   <string name="settings_hide_manager_summary">أعد حزم مدير Magisk مع اسم حزمة عشوائية</string>
   <string name="settings_hide_manager_title">إخفاء مدير Magisk</string>
@@ -169,8 +166,7 @@
   <string name="settings_update_custom">مخصص</string>
   <string name="settings_update_custom_msg">أدخل عنوان URL مخصص</string>
   <string name="settings_update_stable">مستقر</string>
-  <string name="setup_done">تم الإعداد</string>
-  <string name="setup_fail">فشل الإعداد</string>
+    <string name="setup_fail">فشل الإعداد</string>
   <string name="setup_msg">تشغيل إعداد البيئة…</string>
   <string name="setup_title">إعداد إضافي</string>
   <string name="sort_by_name">الترتيب حسب الاسم</string>

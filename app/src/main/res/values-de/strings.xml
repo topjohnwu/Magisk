@@ -96,7 +96,6 @@
     <string name="restore_fail">Kein Original Backup vorhanden!</string>
     <string name="proprietary_title">Lade proprietären Code herunter</string>
     <string name="proprietary_notice">Magisk Manager ist FOSS und enthält keinen proprietären SafetyNet API Code von Google. Magisk Manager erlauben eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Checks herunterzuladen?</string>
-    <string name="setup_done">Einrichtung abgeschlossen</string>
     <string name="setup_fail">Einrichtung fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
     <string name="env_fix_msg">Ihr Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip wird heruntergeladen, fortfahren?</string>
@@ -126,8 +125,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Benutzerdefiniert</string>
     <string name="settings_update_custom_msg">Gib eine benutzerdefinierte URL ein</string>
-    <string name="settings_boot_format_title">Ausgabeformat des gepatchten Boot-Images</string>
-    <string name="settings_boot_format_summary">Wähle das Ausgabeformat des gepatchten Boot-Images.\nWähle .img, um mit \"fastboot/download mode\" zu flashen; wähle .img.tar zum Flashen mit ODIN.</string>
     <string name="settings_core_only_title">Nur Kernfunktionen</string>
     <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU und Magisk Hide bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>

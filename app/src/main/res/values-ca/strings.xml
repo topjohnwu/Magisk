@@ -104,7 +104,6 @@
     <string name="restore_fail">La còpia de seguretat de Stock no existeix!</string>
     <string name="proprietary_title">Descarrega codi propietari</string>
     <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nPot permetre que Magisk Manager descarregui una extensió que conté el GoogleApiClient per poder fer la comprobació de SafetyNet?</string>
-    <string name="setup_done">Instal·lació realitzada.</string>
     <string name="setup_fail">Instal·lació fallida.</string>
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
     <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es descarregarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instalació ara?</string>
@@ -134,8 +133,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalitzat</string>
     <string name="settings_update_custom_msg">Inserta una URL personalitzada</string>
-    <string name="settings_boot_format_title">Arranja la imatge d’arrancada segons el tipus de format</string>
-    <string name="settings_boot_format_summary">Seleccionar el format de sortida per arranjar la imatge d’arrancada.\nTriï  .img per flashejar mitcançant fastboot/download; triï .img.tar per flashejar amb ODIN.</string>
     <string name="settings_core_only_title">Mode únicament nucli de Magisk</string>
     <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU y MagiskHide seguirán habilitats</string>
     <string name="settings_magiskhide_summary">Amagar Magisk de varies deteccions</string>

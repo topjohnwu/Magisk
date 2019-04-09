@@ -104,7 +104,6 @@
     <string name="restore_fail">Резервная копия отсутствует!</string>
     <string name="proprietary_title">Загрузка SafetyNet</string>
     <string name="proprietary_notice">Magisk Manager — свободно распространяемый продукт, он не содержит собственный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение для проверки SafetyNet? (содержит GoogleApiClient)</string>
-    <string name="setup_done">Установка завершена.</string>
     <string name="setup_fail">Ошибка установки.</string>
     <string name="env_fix_title">Требуется дополнительная установка</string>
     <string name="env_fix_msg">Вашему устройству требуется дополнительная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
@@ -134,8 +133,6 @@
     <string name="settings_update_beta">Beta канал</string>
     <string name="settings_update_custom">Сторонний канал</string>
     <string name="settings_update_custom_msg">Укажите ссылку</string>
-    <string name="settings_boot_format_title">Тип образа ядра</string>
-    <string name="settings_boot_format_summary">Выберите тип образа ядра после патча:\n*.img - для прошивки через fastboot/download режимы\n*.img.tar - для прошивки через ODIN (Samsung)</string>
     <string name="settings_core_only_title">Magisk Core</string>
     <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU и Magisk Hide останутся активными.</string>
     <string name="settings_magiskhide_summary">Замаскировать Magisk от различных обнаружений.</string>

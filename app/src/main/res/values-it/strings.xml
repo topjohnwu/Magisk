@@ -104,8 +104,7 @@
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
    	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS e non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi scaricare un\'estensione (contenente GoogleApiClient) per controllare lo stato di SafetyNet?</string>
-	<string name="setup_done">Configurazione completata.</string>
-	<string name="setup_fail">Configurazione fallita.</string>
+    <string name="setup_fail">Configurazione fallita.</string>
 	<string name="env_fix_title">Richiedi configurazione aggiuntiva</string>
 	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
 	<string name="setup_title">Configurazione aggiuntiva</string>
@@ -134,9 +133,7 @@
 	<string name="settings_update_beta">Beta</string>
 	<string name="settings_update_custom">Personalizzato</string>
 	<string name="settings_update_custom_msg">Inserisci un URL personalizzato</string>
-	<string name="settings_boot_format_title">Formato dell\'immagine di boot aggiornata</string>
-	<string name="settings_boot_format_summary">Seleziona il formato nel quale la nuova immagine di boot verrà salvata.\nSeleziona .img per il flash in Fastboot/Download Mode; Seleziona .img.tar per il flash con Odin.</string>
-	<string name="settings_core_only_title">Modalità Magisk Core</string>
+    <string name="settings_core_only_title">Modalità Magisk Core</string>
 	<string name="settings_core_only_summary">Abilita solo le funzioni principali. Nessun modulo verrà caricato. MagiskSU e MagiskHide rimarranno abilitati</string>
 	<string name="settings_magiskhide_summary">Nasconde Magisk da numerose rilevazioni.</string>
 	<string name="settings_hosts_title">Host systemless</string>
