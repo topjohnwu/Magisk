@@ -164,9 +164,9 @@ public abstract class MagiskInstaller {
             return false;
         }
 
-        SuFile init64 = new SuFile(installDir, "magiskinit64");
+        File init64 = SuFile.open(installDir, "magiskinit64");
         if (Build.VERSION.SDK_INT >= 21 && Build.SUPPORTED_64_BIT_ABIS.length != 0) {
-            init64.renameTo(new SuFile(installDir, "magiskinit"));
+            init64.renameTo(SuFile.open(installDir, "magiskinit"));
         } else {
             init64.delete();
         }
@@ -214,8 +214,8 @@ public abstract class MagiskInstaller {
                     ShellUtils.pump(tarIn, tarOut);
                 }
             }
-            SuFile boot = new SuFile(installDir, "boot.img");
-            SuFile recovery = new SuFile(installDir, "recovery.img");
+            File boot = SuFile.open(installDir, "boot.img");
+            File recovery = SuFile.open(installDir, "recovery.img");
             if (vbmeta && recovery.exists() && boot.exists()) {
                 // Install Magisk to recovery
                 srcBoot = recovery.getPath();
@@ -320,7 +320,7 @@ public abstract class MagiskInstaller {
     }
 
     protected boolean storeBoot() {
-        SuFile patched = new SuFile(installDir, "new-boot.img");
+        File patched = SuFile.open(installDir, "new-boot.img");
         try {
             OutputStream os;
             if (isTar) {

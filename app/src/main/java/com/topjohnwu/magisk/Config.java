@@ -119,7 +119,7 @@ public class Config {
     public static void initialize() {
         SharedPreferences pref = App.self.prefs;
         SharedPreferences.Editor editor = pref.edit();
-        SuFile config = new SuFile("/data/adb/" + Const.MANAGER_CONFIGS);
+        File config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS);
         if (config.exists()) {
             try {
                 SuFileInputStream is = new SuFileInputStream(config);
