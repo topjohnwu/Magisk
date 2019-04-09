@@ -1,6 +1,6 @@
 ## Samsung
 
-#### Note: This guide is ONLY for Samsung devices launched with Android Pie (9.0) pre-installed, which currently includes the S10 series and A50. If you had an older device, please follow the general installation guide.
+#### Note: This guide is ONLY for Samsung devices launched with Android Pie (9.0) pre-installed, which currently includes the S10 series and A50. If you have an older device, please follow the general installation guide. Your device must also have an unlockable bootloader, which means in practice that all Exynos devices are supported, whilst those manufactured for the Northern American market (with Snapdragon SOCs), are not.
 
 ### Before Installing Magisk
 
