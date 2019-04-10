@@ -20,6 +20,8 @@ import com.topjohnwu.superuser.Shell;
 
 public class SplashActivity extends BaseActivity {
 
+    public static boolean DONE = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,8 +85,7 @@ public class SplashActivity extends BaseActivity {
 
         Intent intent = new Intent(this, ClassMap.get(MainActivity.class));
         intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION));
-        intent.putExtra(Const.Key.FROM_SPLASH, true);
-        intent.putExtra(BaseActivity.INTENT_PERM, getIntent().getStringExtra(BaseActivity.INTENT_PERM));
+        DONE = true;
         startActivity(intent);
         finish();
     }

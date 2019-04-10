@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.database.MagiskDB;
@@ -36,6 +37,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
     private volatile BaseActivity foreground;
 
     static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER | Shell.FLAG_USE_MAGISK_BUSYBOX);
         Shell.Config.verboseLogging(BuildConfig.DEBUG);
         Shell.Config.addInitializers(RootUtils.class);
