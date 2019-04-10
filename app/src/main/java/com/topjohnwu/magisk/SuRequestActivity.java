@@ -71,6 +71,7 @@ public class SuRequestActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lockOrientation();
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
         PackageManager pm = getPackageManager();

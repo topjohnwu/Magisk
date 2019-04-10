@@ -4,7 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.WindowManager;
@@ -79,6 +81,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
             getWindow().setAttributes(params);
             setFinishOnTouchOutside(true);
         }
+    }
+
+    protected void lockOrientation() {
+        if (Build.VERSION.SDK_INT < 18)
+            setRequestedOrientation(getResources().getConfiguration().orientation);
+        else
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
     }
 
     public void runWithExternalRW(Runnable callback) {
