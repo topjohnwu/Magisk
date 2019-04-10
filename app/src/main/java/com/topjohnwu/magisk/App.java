@@ -33,7 +33,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
     public SharedPreferences prefs;
     public MagiskDB mDB;
     public RepoDatabaseHelper repoDB;
-    public BaseActivity foreground;
+    private volatile BaseActivity foreground;
 
     static {
         Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER | Shell.FLAG_USE_MAGISK_BUSYBOX);
@@ -68,6 +68,10 @@ public class App extends Application implements Application.ActivityLifecycleCal
         LocaleManager.setLocale(this);
     }
 
+    public static BaseActivity foreground() {
+        return self.foreground;
+    }
+
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle bundle) {}
 
@@ -75,12 +79,12 @@ public class App extends Application implements Application.ActivityLifecycleCal
     public void onActivityStarted(@NonNull Activity activity) {}
 
     @Override
-    public void onActivityResumed(@NonNull Activity activity) {
+    public synchronized void onActivityResumed(@NonNull Activity activity) {
         foreground = (BaseActivity) activity;
     }
 
     @Override
-    public void onActivityPaused(@NonNull Activity activity) {
+    public synchronized void onActivityPaused(@NonNull Activity activity) {
         foreground = null;
     }
 

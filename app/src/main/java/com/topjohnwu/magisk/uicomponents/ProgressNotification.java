@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.uicomponents;
 
 import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -55,10 +57,17 @@ public class ProgressNotification implements DownloadProgressListener {
     }
 
     public void dlDone() {
+        dlDone(PendingIntent.getActivity(App.self, hashCode(),
+                new Intent(), PendingIntent.FLAG_UPDATE_CURRENT));
+    }
+
+    public void dlDone(PendingIntent intent) {
         builder.setProgress(0, 0, false)
                 .setContentText(App.self.getString(R.string.download_complete))
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
-                .setOngoing(false);
+                .setContentIntent(intent)
+                .setOngoing(false)
+                .setAutoCancel(true);
         lastUpdate();
     }
 

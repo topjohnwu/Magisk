@@ -15,7 +15,7 @@ public class UpdateCheckService extends DelegateWorker {
     @NonNull
     @Override
     public ListenableWorker.Result doWork() {
-        if (App.self.foreground == null) {
+        if (App.foreground() == null) {
             Shell.getShell();
             CheckUpdates.check(this::onCheckDone);
         }
