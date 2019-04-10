@@ -8,14 +8,15 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.container.SuLogEntry;
 
 import java.util.Date;
 
-public abstract class SuLogger {
+public class SuLogger {
 
-    public void handleLogs(Intent intent) {
+    public static void handleLogs(Intent intent) {
 
         int fromUid = intent.getIntExtra("from.uid", -1);
         if (fromUid < 0) return;
@@ -64,13 +65,16 @@ public abstract class SuLogger {
         app.mDB.addLog(log);
     }
 
-    private void handleNotify(Policy policy) {
+    private static void handleNotify(Policy policy) {
         if (policy.notification &&
-                (int) Config.get(Config.Key.SU_NOTIFICATION) == Config.Value.NOTIFICATION_TOAST)
-            Utils.toast(getMessage(policy), Toast.LENGTH_SHORT);
+                (int) Config.get(Config.Key.SU_NOTIFICATION) == Config.Value.NOTIFICATION_TOAST) {
+            Utils.toast(App.self.getString(policy.policy == Policy.ALLOW ?
+                    R.string.su_allow_toast : R.string.su_deny_toast, policy.appName),
+                    Toast.LENGTH_SHORT);
+        }
     }
 
-    public void handleNotify(Intent intent) {
+    public static void handleNotify(Intent intent) {
         int fromUid = intent.getIntExtra("from.uid", -1);
         if (fromUid < 0) return;
         if (fromUid == Process.myUid()) return;
@@ -81,6 +85,4 @@ public abstract class SuLogger {
                 handleNotify(policy);
         } catch (PackageManager.NameNotFoundException ignored) {}
     }
-
-    public abstract String getMessage(Policy policy);
 }
