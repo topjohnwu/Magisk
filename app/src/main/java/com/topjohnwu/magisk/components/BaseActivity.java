@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,8 +27,6 @@ import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.LocaleManager;
 
 public abstract class BaseActivity extends AppCompatActivity implements Event.AutoListener {
-
-    private static Runnable grantCallback;
 
     static int[] EMPTY_INT_ARRAY = new int[0];
 
@@ -91,14 +88,14 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
     }
 
     public void runWithExternalRW(Runnable callback) {
-        runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, callback);
+        runWithPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, callback);
     }
 
-    public void runWithPermission(String[] permissions, Runnable callback) {
-        runWithPermission(this, permissions, callback);
+    public void runWithPermissions(String[] permissions, Runnable callback) {
+        runWithPermissions(this, permissions, callback);
     }
 
-    public static void runWithPermission(Context context, String[] permissions, Runnable callback) {
+    public static void runWithPermissions(Context context, String[] permissions, Runnable callback) {
         boolean granted = true;
         for (String perm : permissions) {
             if (ContextCompat.checkSelfPermission(context, perm) != PackageManager.PERMISSION_GRANTED)
@@ -110,14 +107,20 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
         } else {
             // Passed in context should be an activity if not granted, need to show dialog!
             if (context instanceof BaseActivity) {
-                grantCallback = callback;
-                ActivityCompat.requestPermissions((BaseActivity) context, permissions, 0);
+                BaseActivity activity = (BaseActivity) context;
+                int code = callback.hashCode() & 0xFFFF;
+                activity.resultListeners.put(code, ((i, d) -> callback.run()));
+                ActivityCompat.requestPermissions(activity, permissions, code);
             }
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        onActivityResultListener(requestCode, resultCode, data);
+    }
+
+    private void onActivityResultListener(int requestCode, int resultCode, Intent data) {
         ActivityResultListener listener = resultListeners.get(requestCode);
         if (listener != null) {
             resultListeners.remove(requestCode);
@@ -137,14 +140,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
             if (result != PackageManager.PERMISSION_GRANTED)
                 grant = false;
         }
-        if (grant) {
-            if (grantCallback != null) {
-                grantCallback.run();
-            }
-        } else {
-            Toast.makeText(this, R.string.no_rw_storage, Toast.LENGTH_LONG).show();
-        }
-        grantCallback = null;
+        if (grant)
+            onActivityResultListener(requestCode, 0, null);
+        else
+            resultListeners.remove(requestCode);
     }
 
     public interface ActivityResultListener {

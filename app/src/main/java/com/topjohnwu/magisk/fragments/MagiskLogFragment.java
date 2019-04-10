@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.fragments;
 
-import android.Manifest;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,7 +66,7 @@ public class MagiskLogFragment extends BaseFragment {
                 readLogs();
                 return true;
             case R.id.menu_save:
-                runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, this::saveLogs);
+                runWithExternalRW(this::saveLogs);
                 return true;
             case R.id.menu_clear:
                 clearLogs();

@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.fragments;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,7 +43,7 @@ public class ModulesFragment extends BaseFragment {
 
     @OnClick(R.id.fab)
     void selectFile() {
-        runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
+        runWithExternalRW(() -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("application/zip");
             startActivityForResult(intent, Const.ID.FETCH_ZIP);

@@ -44,8 +44,8 @@ public abstract class BaseFragment extends Fragment implements Event.AutoListene
         ((BaseActivity) requireActivity()).startActivityForResult(intent, requestCode, listener);
     }
 
-    public void runWithPermission(String[] permissions, Runnable callback) {
-        ((BaseActivity) requireActivity()).runWithPermission(permissions,callback);
+    protected void runWithExternalRW(Runnable callback) {
+        ((BaseActivity) requireActivity()).runWithExternalRW(callback);
     }
 
     @Override
