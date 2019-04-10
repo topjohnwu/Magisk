@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.components;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
@@ -15,7 +14,6 @@ import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.uicomponents.Notifications;
 import com.topjohnwu.magisk.uicomponents.Shortcuts;
 import com.topjohnwu.magisk.utils.DownloadApp;
-import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.SuLogger;
 import com.topjohnwu.superuser.Shell;
 
@@ -51,12 +49,9 @@ public class GeneralReceiver extends BroadcastReceiver {
                     case "request":
                         Intent i = new Intent(app, ClassMap.get(SuRequestActivity.class))
                                 .putExtra("socket", intent.getStringExtra("socket"))
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        if (Build.VERSION.CODENAME.equals("Q")) {
-                            RootUtils.startActivity(i);
-                        } else {
-                            app.startActivity(i);
-                        }
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                        app.startActivity(i);
                         break;
                     case "log":
                         SU_LOGGER.handleLogs(intent);

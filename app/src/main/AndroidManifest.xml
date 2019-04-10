@@ -41,10 +41,9 @@
 
         <activity
             android:name="a.m"
+            android:exported="false"
             android:directBootAware="true"
             android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:taskAffinity="a.m"
             android:theme="@style/SuRequest" />
 
         <!-- Receiver -->
