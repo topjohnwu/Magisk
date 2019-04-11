@@ -63,4 +63,13 @@ dependencies {
     def butterKnifeVersion = '10.1.0'
     implementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
     kapt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+
+    implementation ("com.github.skoumalcz:teanity:0.3.3") {
+        exclude group: 'com.karumi', module: 'dexter'
+        exclude group: 'com.evernote', module: 'android-state'
+        exclude group: 'androidx.work', module: 'work-runtime-ktx'
+        exclude group: 'androidx.room', module: 'room-runtime'
+        exclude group: 'io.reactivex.rxjava2', module: 'rxkotlin' //hopefully not forever
+        exclude group: 'io.reactivex.rxjava2', module: 'rxandroid' //hopefully not forever
+    }
 }
