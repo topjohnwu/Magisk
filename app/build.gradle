@@ -62,5 +62,5 @@ dependencies {
 
     def butterKnifeVersion = '10.1.0'
     implementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
-    annotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    kapt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 }
