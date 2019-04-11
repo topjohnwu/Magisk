@@ -19,6 +19,7 @@
         tools:openDrawer="start">
 
         <include
+            android:id="@+id/main_include"
             layout="@layout/activity_main_content"
             viewModel="@{viewModel}" />
 

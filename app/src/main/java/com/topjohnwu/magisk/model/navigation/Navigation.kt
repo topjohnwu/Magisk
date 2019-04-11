@@ -31,4 +31,8 @@ object Navigation {
         navDirections { destination = R.id.logFragment }
     }
 
+
+    object Main {
+        const val OPEN_NAV = 1
+    }
 }

@@ -19,7 +19,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <include layout="@layout/toolbar" />
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/main_toolbar"
+                onNavigationClick="@{() -> viewModel.navPressed()}"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/primary"
+                app:navigationIcon="@drawable/ic_menu"
+                app:title="@string/magisk"
+                app:titleTextColor="@android:color/white" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
