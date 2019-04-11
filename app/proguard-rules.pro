@@ -30,7 +30,7 @@
 }
 
 # DelegateWorker
--keep,allowobfuscation class * extends com.topjohnwu.magisk.components.DelegateWorker
+-keep,allowobfuscation class * extends com.topjohnwu.magisk.model.worker.DelegateWorker
 
 # BootSigner
 -keepclassmembers class com.topjohnwu.signing.BootSigner { *; }
@@ -49,3 +49,8 @@
 # Excessive obfuscation
 -repackageclasses 'a'
 -allowaccessmodification
+
+# QOL
+-dontnote **
+-dontwarn com.caverock.androidsvg.**
+-dontwarn ru.noties.markwon.**

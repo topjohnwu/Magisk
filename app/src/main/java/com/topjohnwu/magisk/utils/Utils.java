@@ -12,21 +12,14 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.UpdateCheckService;
-import com.topjohnwu.magisk.container.Module;
-import com.topjohnwu.magisk.container.ValueSortedMap;
+import com.topjohnwu.magisk.model.entity.Module;
+import com.topjohnwu.magisk.model.update.UpdateCheckService;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
@@ -36,6 +29,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 public class Utils {
 

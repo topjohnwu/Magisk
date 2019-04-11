@@ -6,7 +6,7 @@ import android.util.Pair;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.container.Repo;
+import com.topjohnwu.magisk.model.entity.Repo;
 import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;

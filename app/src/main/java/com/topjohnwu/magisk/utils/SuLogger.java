@@ -9,8 +9,8 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.container.Policy;
-import com.topjohnwu.magisk.container.SuLogEntry;
+import com.topjohnwu.magisk.model.entity.Policy;
+import com.topjohnwu.magisk.model.entity.SuLogEntry;
 
 import java.util.Date;
 

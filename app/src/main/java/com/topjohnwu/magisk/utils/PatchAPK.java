@@ -3,16 +3,14 @@ package com.topjohnwu.magisk.utils;
 import android.content.ComponentName;
 import android.widget.Toast;
 
-import androidx.core.app.NotificationCompat;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.uicomponents.Notifications;
+import com.topjohnwu.magisk.ui.SplashActivity;
+import com.topjohnwu.magisk.view.Notifications;
 import com.topjohnwu.signing.JarMap;
 import com.topjohnwu.signing.SignAPK;
 import com.topjohnwu.superuser.Shell;
@@ -28,6 +26,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
+
+import androidx.core.app.NotificationCompat;
 
 public class PatchAPK {
 
