@@ -153,7 +153,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
     @Override
     public SharedPreferences getSharedPreferences(String name, int mode) {
         if (TextUtils.equals(name, getPackageName() + "_preferences"))
-            return app.prefs;
+            return app.getPrefs();
         return super.getSharedPreferences(name, mode);
     }
 }

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.log;
 
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 import com.google.android.material.tabs.TabLayout;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.adapters.TabFragmentAdapter;
-import com.topjohnwu.magisk.ui.MainActivity;
 import com.topjohnwu.magisk.ui.base.BaseFragment;
 
 import androidx.viewpager.widget.ViewPager;
@@ -28,9 +26,9 @@ public class LogFragment extends BaseFragment {
         View v = inflater.inflate(R.layout.fragment_log, container, false);
         unbinder = new LogFragment_ViewBinding(this, v);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ((MainActivity) requireActivity()).toolbar.setElevation(0);
-        }
+        }*/
 
         TabFragmentAdapter adapter = new TabFragmentAdapter(getChildFragmentManager());
 

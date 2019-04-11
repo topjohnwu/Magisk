@@ -37,7 +37,7 @@ public class SuLogger {
             }
         } else {
             // Doesn't report whether notify or not, check database ourselves
-            policy = app.mDB.getPolicy(fromUid);
+            policy = app.getDB().getPolicy(fromUid);
             if (policy == null)
                 return;
             notify = policy.notification;
@@ -62,7 +62,7 @@ public class SuLogger {
         log.fromPid = pid;
         log.command = command;
         log.date = new Date();
-        app.mDB.addLog(log);
+        app.getDB().addLog(log);
     }
 
     private static void handleNotify(Policy policy) {

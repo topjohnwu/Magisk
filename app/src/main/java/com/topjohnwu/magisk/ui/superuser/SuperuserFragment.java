@@ -48,13 +48,13 @@ public class SuperuserFragment extends BaseFragment {
     }
 
     private void displayPolicyList() {
-        List<Policy> policyList = app.mDB.getPolicyList();
+        List<Policy> policyList = app.getDB().getPolicyList();
 
         if (policyList.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            recyclerView.setAdapter(new PolicyAdapter(policyList, app.mDB, pm));
+            recyclerView.setAdapter(new PolicyAdapter(policyList, app.getDB(), pm));
             emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }

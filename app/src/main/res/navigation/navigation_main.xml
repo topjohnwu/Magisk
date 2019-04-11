@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_main"
+    app:startDestination="@id/magiskFragment">
+
+    <fragment
+        android:id="@+id/magiskFragment"
+        android:name="com.topjohnwu.magisk.ui.home.MagiskFragment"
+        android:label="fragment_magisk"
+        tools:layout="@layout/fragment_magisk" />
+
+</navigation>

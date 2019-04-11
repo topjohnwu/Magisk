@@ -107,8 +107,8 @@ public class SuRequestActivity extends BaseActivity {
             };
             Bundle bundle = connector.readSocketInput();
             int uid = Integer.parseInt(bundle.getString("uid"));
-            app.mDB.clearOutdated();
-            policy = app.mDB.getPolicy(uid);
+            app.getDB().clearOutdated();
+            policy = app.getDB().getPolicy(uid);
             if (policy == null) {
                 policy = new Policy(uid, getPackageManager());
             }
@@ -136,7 +136,7 @@ public class SuRequestActivity extends BaseActivity {
                 if (time >= 0) {
                     policy.until = (time == 0) ? 0
                             : (System.currentTimeMillis() / 1000 + time * 60);
-                    app.mDB.updatePolicy(policy);
+                    app.getDB().updatePolicy(policy);
                 }
                 handleAction();
             }

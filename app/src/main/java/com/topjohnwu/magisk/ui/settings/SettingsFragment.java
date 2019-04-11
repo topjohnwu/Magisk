@@ -46,7 +46,7 @@ public class SettingsFragment extends BasePreferenceFragment {
         requireActivity().setTitle(R.string.settings);
 
         boolean showSuperuser = Utils.showSuperUser();
-        app.prefs.edit()
+        app.getPrefs().edit()
                 .putBoolean(Config.Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
                 .apply();
 
@@ -66,7 +66,7 @@ public class SettingsFragment extends BasePreferenceFragment {
             return true;
         });
         findPreference("clear").setOnPreferenceClickListener(pref -> {
-            app.prefs.edit().remove(Config.Key.ETAG_KEY).apply();
+            app.getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
             app.repoDB.clearRepo();
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
@@ -94,7 +94,7 @@ public class SettingsFragment extends BasePreferenceFragment {
             if (channel == Config.Value.CUSTOM_CHANNEL) {
                 View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                 EditText url = v.findViewById(R.id.custom_url);
-                url.setText(app.prefs.getString(Config.Key.CUSTOM_CHANNEL, ""));
+                url.setText(app.getPrefs().getString(Config.Key.CUSTOM_CHANNEL, ""));
                 new AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
@@ -183,7 +183,7 @@ public class SettingsFragment extends BasePreferenceFragment {
             case Config.Key.ROOT_ACCESS:
             case Config.Key.SU_MULTIUSER_MODE:
             case Config.Key.SU_MNT_NS:
-                app.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
+                app.getDB().setSettings(key, Utils.getPrefsInt(prefs, key));
                 break;
             case Config.Key.DARK_THEME:
                 requireActivity().recreate();

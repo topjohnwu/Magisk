@@ -28,14 +28,14 @@ public abstract class BasePreferenceFragment extends PreferenceFragmentCompat
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        app.prefs.registerOnSharedPreferenceChangeListener(this);
+        app.getPrefs().registerOnSharedPreferenceChangeListener(this);
         Event.register(this);
         return v;
     }
 
     @Override
     public void onDestroyView() {
-        app.prefs.unregisterOnSharedPreferenceChangeListener(this);
+        app.getPrefs().unregisterOnSharedPreferenceChangeListener(this);
         Event.unregister(this);
         super.onDestroyView();
     }

@@ -3,8 +3,6 @@ package com.topjohnwu.magisk;
 import android.content.SharedPreferences;
 import android.util.Xml;
 
-import androidx.collection.ArrayMap;
-
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -16,6 +14,8 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
+
+import androidx.collection.ArrayMap;
 
 public class Config {
 
@@ -109,14 +109,14 @@ public class Config {
     public static void export() {
         // Flush prefs to disk
         App app = App.self;
-        app.prefs.edit().commit();
+        app.getPrefs().edit().commit();
         File xml = new File(App.deContext.getFilesDir().getParent() + "/shared_prefs",
                 app.getPackageName() + "_preferences.xml");
         Shell.su(Utils.fmt("cat %s > /data/adb/%s", xml, Const.MANAGER_CONFIGS)).exec();
     }
 
     public static void initialize() {
-        SharedPreferences pref = App.self.prefs;
+        SharedPreferences pref = App.self.getPrefs();
         SharedPreferences.Editor editor = pref.edit();
         File config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS);
         if (config.exists()) {
@@ -238,19 +238,19 @@ public class Config {
         App app = App.self;
         switch (getConfigType(key)) {
             case PREF_INT:
-                return (T) (Integer) app.prefs.getInt(key, getDef(key));
+                return (T) (Integer) app.getPrefs().getInt(key, getDef(key));
             case PREF_STR_INT:
-                return (T) (Integer) Utils.getPrefsInt(app.prefs, key, getDef(key));
+                return (T) (Integer) Utils.getPrefsInt(app.getPrefs(), key, getDef(key));
             case PREF_BOOL:
-                return (T) (Boolean) app.prefs.getBoolean(key, getDef(key));
+                return (T) (Boolean) app.getPrefs().getBoolean(key, getDef(key));
             case PREF_STR:
-                return (T) app.prefs.getString(key, getDef(key));
+                return (T) app.getPrefs().getString(key, getDef(key));
             case DB_INT:
-                return (T) (Integer) app.mDB.getSettings(key, getDef(key));
+                return (T) (Integer) app.getDB().getSettings(key, getDef(key));
             case DB_BOOL:
-                return (T) (Boolean) (app.mDB.getSettings(key, getDef(key) ? 1 : 0) != 0);
+                return (T) (Boolean) (app.getDB().getSettings(key, getDef(key) ? 1 : 0) != 0);
             case DB_STR:
-                return (T) app.mDB.getStrings(key, getDef(key));
+                return (T) app.getDB().getStrings(key, getDef(key));
         }
         /* Will never get here (IllegalArgumentException in getConfigType) */
         return null;
@@ -260,25 +260,25 @@ public class Config {
         App app = App.self;
         switch (getConfigType(key)) {
             case PREF_INT:
-                app.prefs.edit().putInt(key, (int) val).apply();
+                app.getPrefs().edit().putInt(key, (int) val).apply();
                 break;
             case PREF_STR_INT:
-                app.prefs.edit().putString(key, String.valueOf(val)).apply();
+                app.getPrefs().edit().putString(key, String.valueOf(val)).apply();
                 break;
             case PREF_BOOL:
-                app.prefs.edit().putBoolean(key, (boolean) val).apply();
+                app.getPrefs().edit().putBoolean(key, (boolean) val).apply();
                 break;
             case PREF_STR:
-                app.prefs.edit().putString(key, (String) val).apply();
+                app.getPrefs().edit().putString(key, (String) val).apply();
                 break;
             case DB_INT:
-                app.mDB.setSettings(key, (int) val);
+                app.getDB().setSettings(key, (int) val);
                 break;
             case DB_BOOL:
-                app.mDB.setSettings(key, (boolean) val ? 1 : 0);
+                app.getDB().setSettings(key, (boolean) val ? 1 : 0);
                 break;
             case DB_STR:
-                app.mDB.setStrings(key, (String) val);
+                app.getDB().setStrings(key, (String) val);
                 break;
         }
     }
@@ -290,14 +290,14 @@ public class Config {
             case PREF_STR_INT:
             case PREF_BOOL:
             case PREF_STR:
-                app.prefs.edit().remove(key).apply();
+                app.getPrefs().edit().remove(key).apply();
                 break;
             case DB_BOOL:
             case DB_INT:
-                app.mDB.rmSettings(key);
+                app.getDB().rmSettings(key);
                 break;
             case DB_STR:
-                app.mDB.setStrings(key, null);
+                app.getDB().setStrings(key, null);
                 break;
         }
     }
@@ -365,13 +365,13 @@ public class Config {
             switch (type) {
                 case DB_INT:
                     editor.putString(key, String.valueOf(
-                            app.mDB.getSettings(key, (Integer) defs.get(key))));
+                            app.getDB().getSettings(key, (Integer) defs.get(key))));
                     continue;
                 case DB_STR:
-                    editor.putString(key, app.mDB.getStrings(key, (String) defs.get(key)));
+                    editor.putString(key, app.getDB().getStrings(key, (String) defs.get(key)));
                     continue;
                 case DB_BOOL:
-                    int bs = app.mDB.getSettings(key, -1);
+                    int bs = app.getDB().getSettings(key, -1);
                     editor.putBoolean(key, bs < 0 ? (Boolean) defs.get(key) : bs != 0);
                     continue;
             }
