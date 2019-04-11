@@ -1,8 +1,12 @@
 package com.topjohnwu.magisk;
 
-import com.topjohnwu.magisk.components.DownloadModuleService;
-import com.topjohnwu.magisk.components.GeneralReceiver;
-import com.topjohnwu.magisk.components.UpdateCheckService;
+import com.topjohnwu.magisk.model.download.DownloadModuleService;
+import com.topjohnwu.magisk.model.receiver.GeneralReceiver;
+import com.topjohnwu.magisk.model.update.UpdateCheckService;
+import com.topjohnwu.magisk.ui.MainActivity;
+import com.topjohnwu.magisk.ui.SplashActivity;
+import com.topjohnwu.magisk.ui.flash.FlashActivity;
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity;
 
 import java.util.HashMap;
 import java.util.Map;
