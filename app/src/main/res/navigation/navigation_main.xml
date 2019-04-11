@@ -10,5 +10,30 @@
         android:name="com.topjohnwu.magisk.ui.home.MagiskFragment"
         android:label="fragment_magisk"
         tools:layout="@layout/fragment_magisk" />
+    <fragment
+        android:id="@+id/superuserFragment"
+        android:name="com.topjohnwu.magisk.ui.superuser.SuperuserFragment"
+        android:label="fragment_superuser"
+        tools:layout="@layout/fragment_superuser" />
+    <fragment
+        android:id="@+id/modulesFragment"
+        android:name="com.topjohnwu.magisk.ui.module.ModulesFragment"
+        android:label="fragment_modules"
+        tools:layout="@layout/fragment_modules" />
+    <fragment
+        android:id="@+id/reposFragment"
+        android:name="com.topjohnwu.magisk.ui.module.ReposFragment"
+        android:label="fragment_repos"
+        tools:layout="@layout/fragment_repos" />
+    <fragment
+        android:id="@+id/magiskHideFragment"
+        android:name="com.topjohnwu.magisk.ui.hide.MagiskHideFragment"
+        android:label="fragment_magisk_hide"
+        tools:layout="@layout/fragment_magisk_hide" />
+    <fragment
+        android:id="@+id/logFragment"
+        android:name="com.topjohnwu.magisk.ui.log.LogFragment"
+        android:label="fragment_log"
+        tools:layout="@layout/fragment_log" />
 
 </navigation>

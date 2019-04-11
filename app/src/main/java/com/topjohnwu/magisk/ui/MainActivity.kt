@@ -115,6 +115,7 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>(),
         menu.findItem(R.id.superuser).isVisible = Utils.showSuperUser()
     }
 
+    @Deprecated("Will be replaced by navigation components")
     fun navigate(item: String?) {
         var itemId = R.id.magisk
         if (item != null) {
@@ -130,6 +131,7 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>(),
         navigate(itemId)
     }
 
+    @Deprecated("Will be replaced by navigation components")
     fun navigate(itemId: Int) {
         mDrawerItem = itemId
         binding.navView.setCheckedItem(itemId)
