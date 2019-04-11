@@ -1,4 +1,16 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+kapt {
+    correctErrorTypes = true
+    useBuildCache = true
+    mapDiagnosticLocations = true
+    javacOptions {
+        option("-Xmaxerrs", 1000)
+    }
+}
 
 android {
     defaultConfig {
