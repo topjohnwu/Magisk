@@ -1,10 +1,3 @@
-/*
-** Copyright 2018, John Wu (@topjohnwu)
-** Copyright 2010, Adam Shanks (@ChainsDD)
-** Copyright 2008, Zinx Verituse (@zinxv)
-**
-*/
-
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -18,10 +11,11 @@
 
 #include "su.h"
 
-#define BROADCAST_REBOOT \
+#define START_ACTIVITY \
 "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
-"broadcast", "-n", nullptr, "-a", "android.intent.action.REBOOT", \
-"-f", "0x10000020"
+"start", "-n", nullptr, "--user", nullptr, "-f", "0x18000020", "-a"
+
+// 0x18000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_INCLUDE_STOPPED_PACKAGES
 
 static inline const char *get_command(const struct su_request *to) {
 	if (to->command[0])
@@ -31,10 +25,30 @@ static inline const char *get_command(const struct su_request *to) {
 	return DEFAULT_SHELL;
 }
 
+static inline void get_user(char *user, struct su_info *info) {
+	sprintf(user, "%d",
+			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER
+			? info->uid / 100000
+			: 0);
+}
+
+static inline void get_uid(char *uid, struct su_info *info) {
+	sprintf(uid, "%d",
+			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED
+			? info->uid % 100000
+			: info->uid);
+}
+
 static void silent_run(const char **args, struct su_info *info) {
 	char component[128];
-	sprintf(component, "%s/a.h", info->str[SU_MANAGER].data());
+	sprintf(component, "%s/a.m", info->str[SU_MANAGER].data());
+	char user[8];
+	get_user(user, info);
+
+	/* Fill in dynamic arguments */
 	args[5] = component;
+	args[7] = user;
+
 	exec_t exec {
 		.pre_exec = []() -> void {
 			int null = xopen("/dev/null", O_WRONLY | O_CLOEXEC);
@@ -48,26 +62,9 @@ static void silent_run(const char **args, struct su_info *info) {
 	exec_command(exec);
 }
 
-static void setup_user(char *user, struct su_info *info) {
-	switch (info->cfg[SU_MULTIUSER_MODE]) {
-		case MULTIUSER_MODE_OWNER_ONLY:
-		case MULTIUSER_MODE_OWNER_MANAGED:
-			sprintf(user, "%d", 0);
-			break;
-		case MULTIUSER_MODE_USER:
-			sprintf(user, "%d", info->uid / 100000);
-			break;
-	}
-}
-
 void app_log(struct su_context *ctx) {
-	char user[8];
-	setup_user(user, ctx->info);
-
 	char fromUid[8];
-	sprintf(fromUid, "%d",
-			ctx->info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED ?
-			ctx->info->uid % 100000 : ctx->info->uid);
+	get_uid(fromUid, ctx->info);
 
 	char toUid[8];
 	sprintf(toUid, "%d", ctx->req.uid);
@@ -79,9 +76,7 @@ void app_log(struct su_context *ctx) {
 	sprintf(policy, "%d", ctx->info->access.policy);
 
 	const char *cmd[] = {
-		BROADCAST_REBOOT,
-		"--user", user,
-		"--es", "action", "log",
+		START_ACTIVITY, "log",
 		"--ei", "from.uid", fromUid,
 		"--ei", "to.uid", toUid,
 		"--ei", "pid", pid,
@@ -94,21 +89,14 @@ void app_log(struct su_context *ctx) {
 }
 
 void app_notify(struct su_context *ctx) {
-	char user[8];
-	setup_user(user, ctx->info);
-
 	char fromUid[8];
-	sprintf(fromUid, "%d",
-			ctx->info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED ?
-			ctx->info->uid % 100000 : ctx->info->uid);
+	get_uid(fromUid, ctx->info);
 
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
 	const char *cmd[] = {
-		BROADCAST_REBOOT,
-		"--user", user,
-		"--es", "action", "notify",
+		START_ACTIVITY, "notify",
 		"--ei", "from.uid", fromUid,
 		"--ei", "policy", policy,
 		nullptr
@@ -117,13 +105,8 @@ void app_notify(struct su_context *ctx) {
 }
 
 void app_connect(const char *socket, struct su_info *info) {
-	char user[8];
-	setup_user(user, info);
-
 	const char *cmd[] = {
-		BROADCAST_REBOOT,
-		"--user", user,
-		"--es", "action", "request",
+		START_ACTIVITY, "request",
 		"--es", "socket", socket,
 		nullptr
 	};

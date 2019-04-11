@@ -24,6 +24,7 @@ import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.SuConnector;
+import com.topjohnwu.magisk.utils.SuLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import butterknife.BindView;
 import java9.lang.Iterables;
 
 public class SuRequestActivity extends BaseActivity {
+
     @BindView(R.id.su_popup) LinearLayout suPopup;
     @BindView(R.id.timeout) Spinner timeout;
     @BindView(R.id.app_icon) ImageView appIcon;
@@ -46,6 +48,10 @@ public class SuRequestActivity extends BaseActivity {
     private ActionHandler handler;
     private Policy policy;
     private SharedPreferences timeoutPrefs;
+
+    public static final String REQUEST = "request";
+    public static final String LOG = "log";
+    public static final String NOTIFY = "notify";
 
     @Override
     public int getDarkTheme() {
@@ -63,84 +69,97 @@ public class SuRequestActivity extends BaseActivity {
         lockOrientation();
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        app.mDB.clearOutdated();
         timeoutPrefs = App.deContext.getSharedPreferences("su_timeout", 0);
-
-        // Get policy
         Intent intent = getIntent();
-        String socketName = intent.getStringExtra("socket");
-        if (socketName != null) {
-            SuConnector connector;
-            try {
-                connector = new SuConnector(socketName) {
-                    @Override
-                    protected void onResponse() throws IOException {
-                        out.writeInt(policy.policy);
-                    }
-                };
-                Bundle bundle = connector.readSocketInput();
-                int uid = Integer.parseInt(bundle.getString("uid"));
-                policy = app.mDB.getPolicy(uid);
-                if (policy == null) {
-                    policy = new Policy(uid, getPackageManager());
-                }
-            } catch (IOException | PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
+
+        String action = intent.getAction();
+
+        if (TextUtils.equals(action, REQUEST)) {
+            if (!handleRequest())
                 finish();
-                return;
-            }
-            handler = new ActionHandler() {
-                @Override
-                void handleAction() {
-                    connector.response();
-                    done();
-                }
+            return;
+        }
 
-                @Override
-                void handleAction(int action) {
-                    int pos = timeout.getSelectedItemPosition();
-                    timeoutPrefs.edit().putInt(policy.packageName, pos).apply();
-                    handleAction(action, Config.Value.TIMEOUT_LIST[pos]);
-                }
+        if (TextUtils.equals(action, LOG))
+            SuLogger.handleLogs(intent);
+        else if (TextUtils.equals(action, NOTIFY))
+            SuLogger.handleNotify(intent);
 
+        finish();
+    }
+
+    private boolean handleRequest() {
+        String socketName = getIntent().getStringExtra("socket");
+
+        if (socketName == null)
+            return false;
+
+        SuConnector connector;
+        try {
+            connector = new SuConnector(socketName) {
                 @Override
-                void handleAction(int action, int time) {
-                    policy.policy = action;
-                    if (time >= 0) {
-                        policy.until = (time == 0) ? 0
-                                : (System.currentTimeMillis() / 1000 + time * 60);
-                        app.mDB.updatePolicy(policy);
-                    }
-                    handleAction();
+                protected void onResponse() throws IOException {
+                    out.writeInt(policy.policy);
                 }
             };
-        } else {
-            finish();
-            return;
+            Bundle bundle = connector.readSocketInput();
+            int uid = Integer.parseInt(bundle.getString("uid"));
+            app.mDB.clearOutdated();
+            policy = app.mDB.getPolicy(uid);
+            if (policy == null) {
+                policy = new Policy(uid, getPackageManager());
+            }
+        } catch (IOException | PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return false;
         }
+        handler = new ActionHandler() {
+            @Override
+            void handleAction() {
+                connector.response();
+                done();
+            }
+
+            @Override
+            void handleAction(int action) {
+                int pos = timeout.getSelectedItemPosition();
+                timeoutPrefs.edit().putInt(policy.packageName, pos).apply();
+                handleAction(action, Config.Value.TIMEOUT_LIST[pos]);
+            }
+
+            @Override
+            void handleAction(int action, int time) {
+                policy.policy = action;
+                if (time >= 0) {
+                    policy.until = (time == 0) ? 0
+                            : (System.currentTimeMillis() / 1000 + time * 60);
+                    app.mDB.updatePolicy(policy);
+                }
+                handleAction();
+            }
+        };
 
         // Never allow com.topjohnwu.magisk (could be malware)
-        if (TextUtils.equals(policy.packageName, BuildConfig.APPLICATION_ID)) {
-            finish();
-            return;
-        }
+        if (TextUtils.equals(policy.packageName, BuildConfig.APPLICATION_ID))
+            return false;
 
         // If not interactive, response directly
         if (policy.policy != Policy.INTERACTIVE) {
             handler.handleAction();
-            return;
+            return true;
         }
 
         switch ((int) Config.get(Config.Key.SU_AUTO_RESPONSE)) {
             case Config.Value.SU_AUTO_DENY:
                 handler.handleAction(Policy.DENY, 0);
-                return;
+                return true;
             case Config.Value.SU_AUTO_ALLOW:
                 handler.handleAction(Policy.ALLOW, 0);
-                return;
+                return true;
         }
 
         showUI();
+        return true;
     }
 
     @SuppressLint("ClickableViewAccessibility")

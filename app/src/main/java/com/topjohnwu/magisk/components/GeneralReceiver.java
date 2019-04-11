@@ -33,35 +33,28 @@ public class GeneralReceiver extends BroadcastReceiver {
             case Intent.ACTION_REBOOT:
             case Intent.ACTION_BOOT_COMPLETED:
                 action = intent.getStringExtra("action");
-                if (action == null)
-                    action = "boot_complete";
+                if (action == null) {
+                    // Actual boot completed event
+                    Shell.su("mm_patch_dtbo").submit(result -> {
+                        if (result.isSuccess())
+                            Notifications.dtboPatched();
+                    });
+                    break;
+                }
                 switch (action) {
-                    case "request":
+                    case SuRequestActivity.REQUEST:
                         Intent i = new Intent(app, ClassMap.get(SuRequestActivity.class))
+                                .setAction(action)
                                 .putExtra("socket", intent.getStringExtra("socket"))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                         app.startActivity(i);
                         break;
-                    case "log":
+                    case SuRequestActivity.LOG:
                         SuLogger.handleLogs(intent);
                         break;
-                    case "notify":
+                    case SuRequestActivity.NOTIFY:
                         SuLogger.handleNotify(intent);
-                        break;
-                    case "boot_complete":
-                    default:
-                        /* Devices with DTBO might want to patch dtbo.img.
-                         * However, that is not possible if Magisk is installed by
-                         * patching boot image with Magisk Manager and flashed via
-                         * fastboot, since at that time we do not have root.
-                         * Check for dtbo status every boot time, and prompt user
-                         * to reboot if dtbo wasn't patched and patched by Magisk Manager.
-                         * */
-                        Shell.su("mm_patch_dtbo").submit(result -> {
-                            if (result.isSuccess())
-                                Notifications.dtboPatched();
-                        });
                         break;
                 }
                 break;
