@@ -5,11 +5,11 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.StringRes;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
-
-import androidx.annotation.StringRes;
 
 public class SnackbarMaker {
 

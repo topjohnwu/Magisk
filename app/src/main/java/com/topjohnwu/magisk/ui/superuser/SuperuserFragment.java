@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.adapters.PolicyAdapter;
 import com.topjohnwu.magisk.model.entity.Policy;
@@ -14,8 +17,6 @@ import com.topjohnwu.magisk.ui.base.BaseFragment;
 
 import java.util.List;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class SuperuserFragment extends BaseFragment {

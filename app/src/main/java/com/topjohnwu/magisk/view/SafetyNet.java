@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.StringRes;
+import androidx.cardview.widget.CardView;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
@@ -20,8 +23,6 @@ import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
 
-import androidx.annotation.StringRes;
-import androidx.cardview.widget.CardView;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.OnClick;

@@ -13,6 +13,12 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
+import androidx.collection.ArraySet;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.buildware.widget.indeterm.IndeterminateCheckBox;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
@@ -29,11 +35,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.WorkerThread;
-import androidx.collection.ArraySet;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import java9.util.Comparators;
 import java9.util.Lists;

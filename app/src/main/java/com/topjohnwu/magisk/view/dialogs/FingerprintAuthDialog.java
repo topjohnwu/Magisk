@@ -11,12 +11,12 @@ import android.os.Build;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.Utils;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class FingerprintAuthDialog extends CustomAlertDialog {

@@ -9,6 +9,8 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.data.database.MagiskDB;
 import com.topjohnwu.magisk.model.entity.SuLogEntry;
@@ -19,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, SuLogAdapter.LogViewHolder> {

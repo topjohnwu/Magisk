@@ -9,6 +9,9 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.entity.Module;
@@ -17,8 +20,6 @@ import com.topjohnwu.superuser.Shell;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHolder> {

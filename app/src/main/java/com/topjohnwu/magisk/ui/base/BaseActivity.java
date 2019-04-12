@@ -11,13 +11,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.WindowManager;
 
-import com.topjohnwu.magisk.App;
-import com.topjohnwu.magisk.Config;
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Event;
-import com.topjohnwu.magisk.utils.LocaleManager;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
@@ -25,6 +18,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.collection.SparseArrayCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Event;
+import com.topjohnwu.magisk.utils.LocaleManager;
 
 public abstract class BaseActivity extends AppCompatActivity implements Event.AutoListener {
 

@@ -2,10 +2,11 @@ package com.topjohnwu.magisk.ui.base;
 
 import android.content.Intent;
 
+import androidx.fragment.app.Fragment;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.utils.Event;
 
-import androidx.fragment.app.Fragment;
 import butterknife.Unbinder;
 
 public abstract class BaseFragment extends Fragment implements Event.AutoListener {

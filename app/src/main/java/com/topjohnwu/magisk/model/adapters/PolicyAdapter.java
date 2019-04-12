@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.data.database.MagiskDB;
@@ -23,9 +27,6 @@ import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 
 public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder> {

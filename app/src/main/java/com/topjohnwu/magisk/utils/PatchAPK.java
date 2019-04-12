@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.utils;
 import android.content.ComponentName;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
@@ -26,8 +28,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
-
-import androidx.core.app.NotificationCompat;
 
 public class PatchAPK {
 
