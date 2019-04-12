@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.Button.Iconified" parent="Widget.MaterialComponents.Button.Icon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/colorSecondary</item>
+        <item name="rippleColor">@color/colorSecondary</item>
+    </style>
+
+    <style name="Widget.Button.Text.Iconified" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/colorSecondary</item>
+        <item name="iconTint">@color/colorSecondary</item>
+        <item name="rippleColor">@color/colorSecondary</item>
+    </style>
+
+    <style name="Widget.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.Button.Flat.Iconified" parent="Widget.MaterialComponents.Button.UnelevatedButton.Icon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="strokeColor">@color/colorSecondary</item>
+        <item name="rippleColor">@color/colorSecondary</item>
+        <item name="android:textColor">@color/colorSecondary</item>
+    </style>
+
+    <style name="Widget.Button.Outlined.Iconified" parent="Widget.MaterialComponents.Button.OutlinedButton.Icon">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="strokeColor">@color/colorSecondary</item>
+        <item name="rippleColor">@color/colorSecondary</item>
+        <item name="android:textColor">@color/colorSecondary</item>
+        <item name="iconTint">@color/colorSecondary</item>
+    </style>
+
+    <style name="Widget.FAB" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="tint">@color/colorTextInverse</item>
+    </style>
+
+</resources>
