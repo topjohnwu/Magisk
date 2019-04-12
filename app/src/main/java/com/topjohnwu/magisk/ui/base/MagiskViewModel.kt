@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.ui.base
 
-import com.skoumal.teanity.viewmodel.TeanityViewModel
+import com.skoumal.teanity.viewmodel.LoadingViewModel
 
 
-abstract class MagiskViewModel : TeanityViewModel()
+abstract class MagiskViewModel : LoadingViewModel()
