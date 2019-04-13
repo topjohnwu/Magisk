@@ -20,6 +20,7 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 #include <vector>
+#include <bitset>
 
 #include <magisk.h>
 #include <utils.h>
@@ -44,8 +45,8 @@ static map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 pthread_mutex_t monitor_lock;
 
 #define PID_MAX 32768
-static vector<bool> attaches(PID_MAX);  /* true if pid is monitored */
-static vector<bool> detaches(PID_MAX);  /* true if tid should be detached */
+static bitset<PID_MAX> attaches;  /* true if pid is monitored */
+static bitset<PID_MAX> detaches;  /* true if tid should be detached */
 
 /********
  * Utils
@@ -242,8 +243,8 @@ static void term_thread(int) {
 	uid_proc_map.clear();
 	zygote_map.clear();
 	hide_set.clear();
-	std::fill(attaches.begin(), attaches.end(), false);
-	std::fill(detaches.begin(), detaches.end(), false);
+	attaches.reset();
+	detaches.reset();
 	// Misc
 	hide_enabled = false;
 	pthread_mutex_destroy(&monitor_lock);
