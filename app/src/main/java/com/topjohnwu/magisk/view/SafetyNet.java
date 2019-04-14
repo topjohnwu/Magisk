@@ -9,7 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import androidx.annotation.StringRes;
+import androidx.cardview.widget.CardView;
+import butterknife.BindColor;
+import butterknife.BindView;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
@@ -17,23 +22,16 @@ import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
+import dalvik.system.DexClassLoader;
 
 import java.io.File;
-
-import androidx.annotation.StringRes;
-import androidx.cardview.widget.CardView;
-import butterknife.BindColor;
-import butterknife.BindView;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-import dalvik.system.DexClassLoader;
 
 public class SafetyNet implements ISafetyNetHelper.Callback {
 
     private static final File EXT_APK =
             new File(App.self.getFilesDir().getParent() + "/snet", "snet.apk");
 
-    @BindView(R.id.safetyNet_card) CardView safetyNetCard;
+    /*@BindView(R.id.safetyNet_card) */ CardView safetyNetCard;
     @BindView(R.id.safetyNet_refresh) ImageView safetyNetRefreshIcon;
     @BindView(R.id.safetyNet_status) TextView safetyNetStatusText;
     @BindView(R.id.safetyNet_check_progress) ProgressBar safetyNetProgress;

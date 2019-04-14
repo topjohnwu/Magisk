@@ -14,7 +14,13 @@
 
     <style name="ThemeFoundation.Colored.ExtraProps" />
 
-    <style name="MagiskTheme" parent="ThemeFoundation.Colored.ExtraProps" />
+    <style name="MagiskTheme" parent="ThemeFoundation.Colored.ExtraProps">
+        <!--All of these attributes are deprecated and will be removed-->
+        <item name="cardStyle">@style/CardViewStyle.Light</item>
+        <item name="imageColorTint">@color/icon_grey</item>
+        <item name="colorControl">?android:attr/textColorSecondary</item>
+        <item name="colorAccentFallback">@color/accentFallback</item>
+    </style>
 
     <style name="MagiskTheme.Flashing" parent="Theme.MaterialComponents.NoActionBar">
         <item name="colorPrimary">@android:color/black</item>

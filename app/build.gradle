@@ -56,7 +56,7 @@ dependencies {
     implementation "androidx.preference:preference:${androidXVersion}"
     implementation "androidx.recyclerview:recyclerview:${androidXVersion}"
     implementation "androidx.cardview:cardview:${androidXVersion}"
-    implementation "com.google.android.material:material:${androidXVersion}"
+    implementation "com.google.android.material:material:1.1.0-alpha05"
     implementation 'androidx.work:work-runtime:2.0.1'
     implementation 'androidx.transition:transition:1.1.0-beta01'
 

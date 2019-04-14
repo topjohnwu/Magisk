@@ -11,7 +11,7 @@
     <application
         android:allowBackup="true"
         android:name="a.e"
-        android:theme="@style/AppTheme"
+        android:theme="@style/MagiskTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 

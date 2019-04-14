@@ -39,123 +39,115 @@
 
     </data>
 
-    <androidx.cardview.widget.CardView
-        style="?attr/cardStyle"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="4dp"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:onClick="@{() -> viewModel.cardPressed(item)}"
-        app:cardCornerRadius="@dimen/card_corner_radius"
-        app:cardElevation="@dimen/card_elevation">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:background="?android:attr/selectableItemBackground"
+        android:onClick="@{() -> viewModel.cardPressed(item)}">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/install"
+            style="@style/Widget.Button.Text"
+            gone="@{state == MagiskState.LOADING}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:onClick="@{() -> viewModel.installPressed(item)}"
+            android:text="@{state != MagiskState.OBSOLETE ? @string/install : @string/update}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/install" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/install"
-                gone="@{state == MagiskState.LOADING}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:onClick="@{() -> viewModel.installPressed(item)}"
-                android:text="@{state != MagiskState.OBSOLETE ? @string/install : @string/update}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="@string/install" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/status_icon"
+            invisible="@{state == MagiskState.LOADING}"
+            srcCompat="@{state == MagiskState.UP_TO_DATE ? R.drawable.ic_check_circle : (state == MagiskState.OBSOLETE ? R.drawable.ic_update : R.drawable.ic_help)}"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/status"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@{state == MagiskState.UP_TO_DATE ? @color/colorCorrect : (state == MagiskState.OBSOLETE ? @color/colorUpdate : @color/colorError)}" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/status_icon"
-                invisible="@{state == MagiskState.LOADING}"
-                srcCompat="@{state == MagiskState.UP_TO_DATE ? R.drawable.ic_check_circle : (state == MagiskState.OBSOLETE ? R.drawable.ic_update : R.drawable.ic_help)}"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                app:tint="@{state == MagiskState.UP_TO_DATE ? @color/colorCorrect : (state == MagiskState.OBSOLETE ? @color/colorUpdate : @color/colorError)}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/status"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@style/Widget.Progress"
+            gone="@{state != MagiskState.LOADING}"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/status_icon"
+            app:layout_constraintEnd_toEndOf="@+id/status_icon"
+            app:layout_constraintStart_toStartOf="@+id/status_icon"
+            app:layout_constraintTop_toTopOf="@+id/status_icon" />
 
-            <ProgressBar
-                android:id="@+id/progress"
-                gone="@{state != MagiskState.LOADING}"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="@+id/status_icon"
-                app:layout_constraintEnd_toEndOf="@+id/status_icon"
-                app:layout_constraintStart_toStartOf="@+id/status_icon"
-                app:layout_constraintTop_toTopOf="@+id/status_icon" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:maxLines="1"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="@{text}"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            app:autoSizeMinTextSize="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toTopOf="@+id/current_version"
+            app:layout_constraintEnd_toStartOf="@+id/install"
+            app:layout_constraintStart_toEndOf="@+id/status_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Magisk is up to date" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/current_version"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:text="@{state != MagiskState.LOADING ? currentVersion : @string/checking_for_updates}"
-                app:autoSizeMinTextSize="1sp"
-                app:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toEndOf="@+id/status"
-                app:layout_constraintStart_toStartOf="@+id/status"
-                app:layout_constraintTop_toBottomOf="@+id/status"
-                tools:text="@string/checking_for_updates" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/current_version"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@{state != MagiskState.LOADING ? currentVersion : @string/checking_for_updates}"
+            app:autoSizeMinTextSize="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toTopOf="@+id/latest_version"
+            app:layout_constraintEnd_toEndOf="@+id/status"
+            app:layout_constraintStart_toStartOf="@+id/status"
+            app:layout_constraintTop_toBottomOf="@+id/status"
+            tools:text="@string/checking_for_updates" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/latest_version"
-                gone="@{currentVersion == latestVersion}"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:text="@{state != MagiskState.LOADING ? latestVersion : @string/checking_for_updates}"
-                app:autoSizeMinTextSize="1sp"
-                app:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toEndOf="@+id/status"
-                app:layout_constraintStart_toStartOf="@+id/status"
-                app:layout_constraintTop_toBottomOf="@+id/current_version"
-                tools:text="@string/checking_for_updates" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/latest_version"
+            gone="@{currentVersion == latestVersion}"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@{state != MagiskState.LOADING ? latestVersion : @string/checking_for_updates}"
+            app:autoSizeMinTextSize="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toTopOf="@+id/additional"
+            app:layout_constraintEnd_toEndOf="@+id/status"
+            app:layout_constraintStart_toStartOf="@+id/status"
+            app:layout_constraintTop_toBottomOf="@+id/current_version"
+            tools:text="@string/checking_for_updates" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/additional"
-                gone="@{additionalInfo.length == 0}"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:text="@{additionalInfo}"
-                app:autoSizeMinTextSize="1sp"
-                app:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toEndOf="@+id/status"
-                app:layout_constraintStart_toStartOf="@+id/status"
-                app:layout_constraintTop_toBottomOf="@+id/latest_version"
-                tools:text="@string/checking_for_updates" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/additional"
+            gone="@{additionalInfo.length == 0}"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@{additionalInfo}"
+            app:autoSizeMinTextSize="1sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/status"
+            app:layout_constraintStart_toStartOf="@+id/status"
+            app:layout_constraintTop_toBottomOf="@+id/latest_version"
+            tools:text="@string/checking_for_updates" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/status"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:text="@{text}"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                app:autoSizeMinTextSize="1sp"
-                app:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toStartOf="@+id/install"
-                app:layout_constraintStart_toEndOf="@+id/status_icon"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Magisk is up to date" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
