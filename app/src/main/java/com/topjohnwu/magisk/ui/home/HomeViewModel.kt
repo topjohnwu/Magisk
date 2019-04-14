@@ -69,6 +69,7 @@ class HomeViewModel(
     private val latest = resources.getString(R.string.latest_version)
 
     init {
+        Event.register(this)
         refresh()
     }
 
