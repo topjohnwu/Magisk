@@ -103,10 +103,12 @@
 
                 <View
                     style="@style/Widget.Divider.Horizontal"
+                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_margin="@dimen/margin_generic" />
 
                 <LinearLayout
+                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:animateLayoutChanges="true"
@@ -184,10 +186,12 @@
 
                 <View
                     style="@style/Widget.Divider.Horizontal"
+                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_margin="@dimen/margin_generic" />
 
                 <LinearLayout
+                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -460,11 +464,13 @@
 
                 <View
                     style="@style/Widget.Divider.Horizontal"
+                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_margin="@dimen/margin_generic" />
 
                 <com.google.android.material.button.MaterialButton
                     style="@style/Widget.Button.Text"
+                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> viewModel.uninstallPressed()}"

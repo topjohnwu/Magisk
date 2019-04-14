@@ -5,7 +5,6 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.events.*
-import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.EnvFixDialog
 import com.topjohnwu.magisk.view.dialogs.ManagerInstallDialog
@@ -123,14 +122,6 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, com.topjohnwu.magisk.dat
         /*if (Networking.checkNetworkStatus(app)) {
             CheckUpdates.check()
         }*/
-    }
-
-    private fun getListeningEvents(): IntArray {
-        return intArrayOf(Event.UPDATE_CHECK_DONE)
-    }
-
-    private fun onEvent(event: Int) {
-        updateCheckUI()
     }
 
     private fun updateUI() {

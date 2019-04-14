@@ -66,6 +66,8 @@ class HomeViewModel(
             ""
     }
 
+    val hasRoot = KObservableField(false)
+
     private var shownDialog = false
     private val current = resources.getString(R.string.current_installed)
     private val latest = resources.getString(R.string.latest_version)
@@ -109,6 +111,8 @@ class HomeViewModel(
         Event.reset(this)
         Config.remoteMagiskVersionString = null
         Config.remoteMagiskVersionCode = -1
+
+        hasRoot.value = Shell.rootAccess()
 
         if (Networking.checkNetworkStatus(app)) {
             CheckUpdates.check()
