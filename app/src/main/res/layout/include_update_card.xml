@@ -79,6 +79,7 @@
                 android:layout_height="25dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
+                app:tint="@{state == MagiskState.UP_TO_DATE ? @color/colorCorrect : (state == MagiskState.OBSOLETE ? @color/colorUpdate : @color/colorError)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/status"
                 app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +87,7 @@
 
             <ProgressBar
                 android:id="@+id/progress"
-                gone="state != MagiskState.LOADING"
+                gone="@{state != MagiskState.LOADING}"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="@+id/status_icon"

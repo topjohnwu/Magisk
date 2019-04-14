@@ -20,6 +20,7 @@ import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import timber.log.Timber
 import java.util.concurrent.ThreadPoolExecutor
 
 open class App : Application(), Application.ActivityLifecycleCallbacks {
@@ -39,6 +40,8 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
             androidContext(this@App)
             modules(koinModules)
         }
+
+        Timber.plant(Timber.DebugTree())
     }
 
     override fun attachBaseContext(base: Context) {

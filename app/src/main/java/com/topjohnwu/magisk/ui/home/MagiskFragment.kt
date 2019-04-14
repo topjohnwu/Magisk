@@ -1,12 +1,10 @@
 package com.topjohnwu.magisk.ui.home
 
 import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.events.MagiskInstallEvent
-import com.topjohnwu.magisk.model.events.ManagerInstallEvent
-import com.topjohnwu.magisk.model.events.OpenLinkEvent
-import com.topjohnwu.magisk.model.events.UninstallEvent
+import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.ManagerInstallDialog
@@ -62,6 +60,7 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, com.topjohnwu.magisk.dat
             is ManagerInstallEvent -> installManager()
             is MagiskInstallEvent -> installMagisk()
             is UninstallEvent -> uninstall()
+            is ManagerChangelogEvent -> changelogManager()
         }
     }
 

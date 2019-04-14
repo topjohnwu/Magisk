@@ -73,6 +73,9 @@ dependencies {
     implementation("org.koin:koin-android:${koin}")
     implementation("org.koin:koin-androidx-viewmodel:${koin}")
 
+    def timber = "4.7.1"
+    implementation "com.jakewharton.timber:timber:${timber}"
+
     implementation("com.github.skoumalcz:teanity:0.3.3") {
         exclude group: 'androidx.work', module: 'work-runtime-ktx'
         exclude group: 'androidx.room', module: 'room-runtime'

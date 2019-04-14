@@ -2,14 +2,14 @@ package com.topjohnwu.magisk.ui.home
 
 import android.content.res.Resources
 import com.skoumal.teanity.util.KObservableField
-import com.topjohnwu.magisk.App
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
+import com.topjohnwu.magisk.tasks.CheckUpdates
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.utils.toggle
+import com.topjohnwu.net.Networking
 
 
 class HomeViewModel(
@@ -19,8 +19,8 @@ class HomeViewModel(
 
     val isAdvancedExpanded = KObservableField(false)
 
-    val isForceEncryption = KObservableField(false /*todo*/)
-    val isKeepVerity = KObservableField(false /*todo*/)
+    val isForceEncryption = KObservableField(Config.keepEnc)
+    val isKeepVerity = KObservableField(Config.keepVerity)
 
     private val prefsObserver = Observer(isForceEncryption, isKeepVerity) {
         Config.keepEnc = isForceEncryption.value
@@ -29,13 +29,12 @@ class HomeViewModel(
 
     val magiskState = KObservableField(MagiskState.LOADING)
     val magiskStateText = Observer(magiskState) {
-        @Suppress("WhenWithOnlyElse")
         when (magiskState.value) {
             MagiskState.NO_ROOT -> TODO()
-            MagiskState.NOT_INSTALLED -> TODO()
-            MagiskState.UP_TO_DATE -> TODO()
-            MagiskState.LOADING -> TODO()
-            MagiskState.OBSOLETE -> TODO()
+            MagiskState.NOT_INSTALLED -> resources.getString(R.string.magisk_version_error)
+            MagiskState.UP_TO_DATE -> resources.getString(R.string.magisk_up_to_date)
+            MagiskState.LOADING -> resources.getString(R.string.checking_for_updates)
+            MagiskState.OBSOLETE -> resources.getString(R.string.magisk_update_title)
         }
     }
     val magiskCurrentVersion = KObservableField("")
@@ -49,13 +48,12 @@ class HomeViewModel(
 
     val managerState = KObservableField(MagiskState.LOADING)
     val managerStateText = Observer(managerState) {
-        @Suppress("WhenWithOnlyElse")
         when (managerState.value) {
-            MagiskState.NO_ROOT -> TODO()
-            MagiskState.NOT_INSTALLED -> TODO()
-            MagiskState.UP_TO_DATE -> TODO()
-            MagiskState.LOADING -> TODO()
-            MagiskState.OBSOLETE -> TODO()
+            MagiskState.NO_ROOT -> "wtf"
+            MagiskState.NOT_INSTALLED -> resources.getString(R.string.invalid_update_channel)
+            MagiskState.UP_TO_DATE -> resources.getString(R.string.manager_up_to_date)
+            MagiskState.LOADING -> resources.getString(R.string.checking_for_updates)
+            MagiskState.OBSOLETE -> resources.getString(R.string.manager_update_title)
         }
     }
     val managerCurrentVersion = KObservableField("")
@@ -67,14 +65,22 @@ class HomeViewModel(
             ""
     }
 
+    private val current = resources.getString(R.string.current_installed)
+    private val latest = resources.getString(R.string.latest_version)
+
+    init {
+        refresh()
+    }
+
+    override fun onEvent(event: Int) = updateSelf()
+    override fun getListeningEvents(): IntArray = intArrayOf(Event.UPDATE_CHECK_DONE)
+
     fun paypalPressed() = OpenLinkEvent(Const.Url.PAYPAL_URL).publish()
     fun patreonPressed() = OpenLinkEvent(Const.Url.PATREON_URL).publish()
     fun twitterPressed() = OpenLinkEvent(Const.Url.TWITTER_URL).publish()
     fun githubPressed() = OpenLinkEvent(Const.Url.REPO_URL).publish()
     fun xdaPressed() = OpenLinkEvent(Const.Url.XDA_THREAD).publish()
     fun uninstallPressed() = UninstallEvent.publish()
-
-    fun refresh() {}
 
     fun advancedPressed() = isAdvancedExpanded.toggle()
 
@@ -86,6 +92,54 @@ class HomeViewModel(
     fun cardPressed(item: MagiskItem) = when (item) {
         MagiskItem.MANAGER -> ManagerChangelogEvent.publish()
         MagiskItem.MAGISK -> MagiskChangelogEvent.publish()
+    }
+
+    fun refresh() {
+        state = State.LOADING
+        magiskState.value = MagiskState.LOADING
+        managerState.value = MagiskState.LOADING
+        Event.reset(this)
+        Config.remoteMagiskVersionString = null
+        Config.remoteMagiskVersionCode = -1
+
+        if (Networking.checkNetworkStatus(app)) {
+            CheckUpdates.check()
+        } else {
+            state = State.LOADING_FAILED
+        }
+    }
+
+    private fun updateSelf() {
+        state = State.LOADED
+        magiskState.value = when (Config.magiskVersionCode) {
+            in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
+            !in Config.remoteMagiskVersionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
+            else -> MagiskState.UP_TO_DATE
+        }
+
+        magiskCurrentVersion.value = version
+            .format(Config.magiskVersionString, Config.magiskVersionCode)
+            .let { current.format(it) }
+        magiskLatestVersion.value = version
+            .format(Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode)
+            .let { latest.format(it) }
+
+        managerState.value = when (Config.remoteManagerVersionCode) {
+            in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
+            in (BuildConfig.VERSION_CODE + 1)..Int.MAX_VALUE -> MagiskState.OBSOLETE
+            else -> MagiskState.UP_TO_DATE
+        }
+
+        managerCurrentVersion.value = version
+            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+            .let { current.format(it) }
+        managerLatestVersion.value = version
+            .format(Config.remoteManagerVersionString, Config.remoteManagerVersionCode)
+            .let { latest.format(it) }
+    }
+
+    companion object {
+        private const val version = "%s (%d)"
     }
 
 }
