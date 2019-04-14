@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.view.MarkDownWindow
+import com.topjohnwu.magisk.view.dialogs.EnvFixDialog
 import com.topjohnwu.magisk.view.dialogs.ManagerInstallDialog
 import com.topjohnwu.magisk.view.dialogs.UninstallDialog
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -61,6 +62,7 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, com.topjohnwu.magisk.dat
             is MagiskInstallEvent -> installMagisk()
             is UninstallEvent -> uninstall()
             is ManagerChangelogEvent -> changelogManager()
+            is EnvFixEvent -> fixEnv()
         }
     }
 
@@ -75,17 +77,11 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, com.topjohnwu.magisk.dat
     }
 
     private fun installManager() = ManagerInstallDialog(requireActivity()).show()
+    private fun uninstall() = UninstallDialog(requireActivity()).show()
+    private fun fixEnv() = EnvFixDialog(requireActivity()).show()
 
-    private fun uninstall() {
-        UninstallDialog(requireActivity()).show()
-    }
-
-    private fun changelogManager() {
-        MarkDownWindow.show(
-            requireActivity(), null,
-            resources.openRawResource(R.raw.changelog)
-        )
-    }
+    private fun changelogManager() = MarkDownWindow
+        .show(requireActivity(), null, resources.openRawResource(R.raw.changelog))
 
     /*override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

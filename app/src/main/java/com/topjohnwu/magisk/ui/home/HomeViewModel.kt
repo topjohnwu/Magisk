@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.utils.toggle
 import com.topjohnwu.net.Networking
+import com.topjohnwu.superuser.Shell
 
 
 class HomeViewModel(
@@ -65,6 +66,7 @@ class HomeViewModel(
             ""
     }
 
+    private var shownDialog = false
     private val current = resources.getString(R.string.current_installed)
     private val latest = resources.getString(R.string.latest_version)
 
@@ -73,7 +75,11 @@ class HomeViewModel(
         refresh()
     }
 
-    override fun onEvent(event: Int) = updateSelf()
+    override fun onEvent(event: Int) {
+        updateSelf()
+        ensureEnv()
+    }
+
     override fun getListeningEvents(): IntArray = intArrayOf(Event.UPDATE_CHECK_DONE)
 
     fun paypalPressed() = OpenLinkEvent(Const.Url.PAYPAL_URL).publish()
@@ -96,6 +102,7 @@ class HomeViewModel(
     }
 
     fun refresh() {
+        shownDialog = false
         state = State.LOADING
         magiskState.value = MagiskState.LOADING
         managerState.value = MagiskState.LOADING
@@ -137,6 +144,18 @@ class HomeViewModel(
         managerLatestVersion.value = version
             .format(Config.remoteManagerVersionString, Config.remoteManagerVersionCode)
             .let { latest.format(it) }
+    }
+
+    private fun ensureEnv() {
+        val invalidStates = listOf(MagiskState.NOT_INSTALLED, MagiskState.NO_ROOT, MagiskState.LOADING)
+
+        // Don't bother checking env when magisk is not installed, loading or already has been shown
+        if (invalidStates.any { it == magiskState.value } || shownDialog) return
+
+        if (!Shell.su("env_check").exec().isSuccess) {
+            shownDialog = true
+            EnvFixEvent().publish()
+        }
     }
 
     companion object {

@@ -12,3 +12,4 @@ class ManagerChangelogEvent : ViewEvent()
 class MagiskChangelogEvent : ViewEvent()
 
 class UninstallEvent : ViewEvent()
+class EnvFixEvent : ViewEvent()
