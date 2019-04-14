@@ -84,7 +84,8 @@
                     latestVersion="@{viewModel.magiskLatestVersion}"
                     layout="@layout/include_update_card"
                     state="@{viewModel.magiskState}"
-                    text="@{viewModel.magiskStateText}" />
+                    text="@{viewModel.magiskStateText}"
+                    viewModel="@{viewModel}" />
 
                 <include
                     android:id="@+id/home_manager_version"
@@ -95,6 +96,7 @@
                     layout="@layout/include_update_card"
                     state="@{viewModel.managerState}"
                     text="@{viewModel.managerStateText}"
+                    viewModel="@{viewModel}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/margin_generic" />
