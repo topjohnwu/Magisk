@@ -67,7 +67,7 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, com.topjohnwu.magisk.dat
     private fun installMagisk() {
         // Show Manager update first
         if (Config.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
-            ManagerInstallDialog(requireActivity()).show()
+            installManager()
             return
         }
         //FIXME dialog requires old base

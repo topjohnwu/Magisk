@@ -80,18 +80,18 @@ class HomeViewModel(
     fun twitterPressed() = OpenLinkEvent(Const.Url.TWITTER_URL).publish()
     fun githubPressed() = OpenLinkEvent(Const.Url.REPO_URL).publish()
     fun xdaPressed() = OpenLinkEvent(Const.Url.XDA_THREAD).publish()
-    fun uninstallPressed() = UninstallEvent.publish()
+    fun uninstallPressed() = UninstallEvent().publish()
 
     fun advancedPressed() = isAdvancedExpanded.toggle()
 
     fun installPressed(item: MagiskItem) = when (item) {
-        MagiskItem.MANAGER -> ManagerInstallEvent.publish()
-        MagiskItem.MAGISK -> MagiskInstallEvent.publish()
+        MagiskItem.MANAGER -> ManagerInstallEvent().publish()
+        MagiskItem.MAGISK -> MagiskInstallEvent().publish()
     }
 
     fun cardPressed(item: MagiskItem) = when (item) {
-        MagiskItem.MANAGER -> ManagerChangelogEvent.publish()
-        MagiskItem.MAGISK -> MagiskChangelogEvent.publish()
+        MagiskItem.MANAGER -> ManagerChangelogEvent().publish()
+        MagiskItem.MAGISK -> MagiskChangelogEvent().publish()
     }
 
     fun refresh() {

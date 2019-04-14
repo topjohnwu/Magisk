@@ -5,10 +5,10 @@ import com.skoumal.teanity.viewevents.ViewEvent
 
 data class OpenLinkEvent(val url: String) : ViewEvent()
 
-object ManagerInstallEvent : ViewEvent()
-object MagiskInstallEvent : ViewEvent()
+class ManagerInstallEvent : ViewEvent()
+class MagiskInstallEvent : ViewEvent()
 
-object ManagerChangelogEvent : ViewEvent()
-object MagiskChangelogEvent : ViewEvent()
+class ManagerChangelogEvent : ViewEvent()
+class MagiskChangelogEvent : ViewEvent()
 
-object UninstallEvent : ViewEvent()
+class UninstallEvent : ViewEvent()
