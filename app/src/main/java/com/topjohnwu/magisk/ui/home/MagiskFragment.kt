@@ -7,14 +7,12 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
 import com.topjohnwu.magisk.model.events.*
+import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.SafetyNet
 import com.topjohnwu.magisk.view.SafetyNet.EXT_APK
-import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog
-import com.topjohnwu.magisk.view.dialogs.EnvFixDialog
-import com.topjohnwu.magisk.view.dialogs.ManagerInstallDialog
-import com.topjohnwu.magisk.view.dialogs.UninstallDialog
+import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -47,8 +45,8 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, FragmentMagiskBinding>()
             installManager()
             return
         }
-        //FIXME dialog requires old base
-        //MagiskInstallDialog(requireActivity()).show()
+
+        MagiskInstallDialog(requireActivity() as MagiskActivity<*, *>).show()
     }
 
     private fun installManager() = ManagerInstallDialog(requireActivity()).show()

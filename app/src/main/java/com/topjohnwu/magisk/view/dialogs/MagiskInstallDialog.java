@@ -1,11 +1,12 @@
 package com.topjohnwu.magisk.view.dialogs;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.text.TextUtils;
 
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ui.base.BaseActivity;
+import com.topjohnwu.magisk.ui.base.IBaseLeanback;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.view.MarkDownWindow;
 import com.topjohnwu.superuser.Shell;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MagiskInstallDialog extends CustomAlertDialog {
-    public MagiskInstallDialog(BaseActivity a) {
+    public <Ctxt extends Activity & IBaseLeanback> MagiskInstallDialog(Ctxt a) {
         super(a);
         String filename = Utils.fmt("Magisk-v%s(%d).zip",
                 Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode);
