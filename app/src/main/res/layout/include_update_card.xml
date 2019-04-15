@@ -106,6 +106,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/current_version"
+            gone="@{state == MagiskState.LOADING || currentVersion.length == 0}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:maxLines="1"

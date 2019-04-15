@@ -129,9 +129,13 @@ class HomeViewModel(
             else -> MagiskState.UP_TO_DATE
         }
 
-        magiskCurrentVersion.value = version
-            .format(Config.magiskVersionString, Config.magiskVersionCode)
-            .let { current.format(it) }
+        if (magiskState.value != MagiskState.NOT_INSTALLED) {
+            magiskCurrentVersion.value = version
+                .format(Config.magiskVersionString, Config.magiskVersionCode)
+                .let { current.format(it) }
+        } else {
+            magiskCurrentVersion.value = ""
+        }
         magiskLatestVersion.value = version
             .format(Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode)
             .let { latest.format(it) }
