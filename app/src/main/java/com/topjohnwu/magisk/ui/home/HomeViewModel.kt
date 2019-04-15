@@ -8,6 +8,7 @@ import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.tasks.CheckUpdates
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.Event
+import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.magisk.utils.toggle
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
@@ -66,6 +67,21 @@ class HomeViewModel(
             ""
     }
 
+    val safetyNetTitle = KObservableField(resources.getString(R.string.safetyNet_check_text))
+    val ctsState = KObservableField(SafetyNetState.IDLE)
+    val basicIntegrityState = KObservableField(SafetyNetState.IDLE)
+    val safetyNetState = Observer(ctsState, basicIntegrityState) {
+        val cts = ctsState.value
+        val basic = basicIntegrityState.value
+        val states = listOf(cts, basic)
+
+        when {
+            states.any { it == SafetyNetState.LOADING } -> State.LOADING
+            states.any { it == SafetyNetState.IDLE } -> State.LOADING
+            else -> State.LOADED
+        }
+    }
+
     val hasRoot = KObservableField(false)
 
     private var shownDialog = false
@@ -103,8 +119,46 @@ class HomeViewModel(
         MagiskItem.MAGISK -> MagiskChangelogEvent().publish()
     }
 
+    fun safetyNetPressed() {
+        ctsState.value = SafetyNetState.LOADING
+        basicIntegrityState.value = SafetyNetState.LOADING
+        safetyNetTitle.value = resources.getString(R.string.checking_safetyNet_status)
+
+        UpdateSafetyNetEvent().publish()
+    }
+
+    fun finishSafetyNetCheck(response: Int) = when {
+        response and 0x0F == 0 -> {
+            val hasCtsPassed = response and ISafetyNetHelper.CTS_PASS != 0
+            val hasBasicIntegrityPassed = response and ISafetyNetHelper.BASIC_PASS != 0
+            safetyNetTitle.value = resources.getString(R.string.safetyNet_check_success)
+            ctsState.value = if (hasCtsPassed) {
+                SafetyNetState.PASS
+            } else {
+                SafetyNetState.FAILED
+            }
+            basicIntegrityState.value = if (hasBasicIntegrityPassed) {
+                SafetyNetState.PASS
+            } else {
+                SafetyNetState.FAILED
+            }
+        }
+        response == -2 -> {
+            ctsState.value = SafetyNetState.IDLE
+            basicIntegrityState.value = SafetyNetState.IDLE
+        }
+        else -> {
+            ctsState.value = SafetyNetState.IDLE
+            basicIntegrityState.value = SafetyNetState.IDLE
+            val errorString = when (response) {
+                ISafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
+                else -> R.string.safetyNet_api_error
+            }
+            safetyNetTitle.value = resources.getString(errorString)
+        }
+    }
+
     fun refresh() {
-        shownDialog = false
         state = State.LOADING
         magiskState.value = MagiskState.LOADING
         managerState.value = MagiskState.LOADING
@@ -155,7 +209,8 @@ class HomeViewModel(
     }
 
     private fun ensureEnv() {
-        val invalidStates = listOf(MagiskState.NOT_INSTALLED, MagiskState.NO_ROOT, MagiskState.LOADING)
+        val invalidStates =
+            listOf(MagiskState.NOT_INSTALLED, MagiskState.NO_ROOT, MagiskState.LOADING)
 
         // Don't bother checking env when magisk is not installed, loading or already has been shown
         if (invalidStates.any { it == magiskState.value } || shownDialog) return

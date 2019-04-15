@@ -13,3 +13,5 @@ class MagiskChangelogEvent : ViewEvent()
 
 class UninstallEvent : ViewEvent()
 class EnvFixEvent : ViewEvent()
+
+class UpdateSafetyNetEvent : ViewEvent()
