@@ -119,7 +119,7 @@ public class SafetyNet implements ISafetyNetHelper.Callback {
         };
         if (!EXT_APK.exists()) {
             // Show dialog
-            new CustomAlertDialog((Activity) v.getContext())
+            new CustomAlertDialog(v.getContext())
                     .setTitle(R.string.proprietary_title)
                     .setMessage(R.string.proprietary_notice)
                     .setCancelable(true)

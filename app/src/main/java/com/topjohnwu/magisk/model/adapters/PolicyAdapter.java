@@ -30,10 +30,10 @@ import butterknife.BindView;
 
 public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder> {
 
-    private List<Policy> policyList;
-    private MagiskDB dbHelper;
-    private PackageManager pm;
-    private boolean[] expandList;
+    private final List<Policy> policyList;
+    private final MagiskDB dbHelper;
+    private final PackageManager pm;
+    private final boolean[] expandList;
 
     public PolicyAdapter(List<Policy> list, MagiskDB db, PackageManager pm) {
         policyList = list;
@@ -78,8 +78,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         holder.masterSwitch.setOnClickListener(v -> {
             boolean isChecked = holder.masterSwitch.isChecked();
             Runnable r = () -> {
-                if ((isChecked && policy.policy == Policy.DENY) ||
-                        (!isChecked && policy.policy == Policy.ALLOW)) {
+                if (isChecked ? policy.policy == Policy.DENY : policy.policy == Policy.ALLOW) {
                     policy.policy = isChecked ? Policy.ALLOW : Policy.DENY;
                     String message = v.getContext().getString(
                             isChecked ? R.string.su_snack_grant : R.string.su_snack_deny, policy.appName);
@@ -98,8 +97,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
             }
         });
         holder.notificationSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-            if ((isChecked && !policy.notification) ||
-                    (!isChecked && policy.notification)) {
+            if (isChecked != policy.notification) {
                 policy.notification = isChecked;
                 String message = v.getContext().getString(
                         isChecked ? R.string.su_snack_notif_on : R.string.su_snack_notif_off, policy.appName);
@@ -108,8 +106,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
             }
         });
         holder.loggingSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-            if ((isChecked && !policy.logging) ||
-                    (!isChecked && policy.logging)) {
+            if (isChecked != policy.logging) {
                 policy.logging = isChecked;
                 String message = v.getContext().getString(
                         isChecked ? R.string.su_snack_log_on : R.string.su_snack_log_off, policy.appName);
@@ -130,7 +127,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                 new FingerprintAuthDialog((Activity) v.getContext(),
                         () -> l.onClick(null, 0)).show();
             } else {
-                new CustomAlertDialog((Activity) v.getContext())
+                new CustomAlertDialog(v.getContext())
                         .setTitle(R.string.su_revoke_title)
                         .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
                         .setPositiveButton(R.string.yes, l)

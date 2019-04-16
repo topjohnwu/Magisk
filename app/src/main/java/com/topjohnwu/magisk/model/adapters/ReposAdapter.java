@@ -43,8 +43,8 @@ public class ReposAdapter
     private static final int OTHERS = 2;
 
     private Map<String, Module> moduleMap;
-    private RepoDatabaseHelper repoDB;
-    private List<Pair<Integer, List<Repo>>> repoPairs;
+    private final RepoDatabaseHelper repoDB;
+    private final List<Pair<Integer, List<Repo>>> repoPairs;
     private List<Repo> fullList;
     private SearchView mSearch;
 
@@ -110,10 +110,10 @@ public class ReposAdapter
         holder.updateTime.setText(context.getString(R.string.updated_on, repo.getLastUpdateString()));
 
         holder.infoLayout.setOnClickListener(v ->
-                MarkDownWindow.show((BaseActivity) context, null, repo.getDetailUrl()));
+                MarkDownWindow.show(context, null, repo.getDetailUrl()));
 
         holder.downloadImage.setOnClickListener(v -> {
-            new CustomAlertDialog((BaseActivity) context)
+            new CustomAlertDialog(context)
                 .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
                 .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
                 .setCancelable(true)
