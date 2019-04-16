@@ -44,9 +44,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp">
+                    android:layout_height="wrap_content">
 
                     <ImageView
                         android:id="@+id/icon"
@@ -120,9 +118,7 @@
                     android:layout_height="match_parent"
                     android:animateLayoutChanges="true"
                     android:onClick="@{() -> viewModel.advancedPressed()}"
-                    android:orientation="vertical"
-                    android:paddingBottom="10dp"
-                    android:paddingTop="10dp">
+                    android:orientation="vertical">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -253,6 +249,7 @@
 
                         <ProgressBar
                             android:id="@+id/safetyNet_check_progress"
+                            style="@style/Widget.Progress"
                             goneUnless="@{viewModel.ctsState == SafetyNetState.LOADING || viewModel.basicIntegrityState == SafetyNetState.LOADING}"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
@@ -273,19 +270,18 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/cts_status_icon"
                             srcCompat="@{viewModel.ctsState == SafetyNetState.PASS ? R.drawable.ic_check_circle : R.drawable.ic_cancel}"
-                            app:tint="@{viewModel.ctsState == SafetyNetState.PASS ? @color/colorCorrect : @color/colorError}"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/cts_status"
                             app:layout_constraintEnd_toStartOf="@+id/cts_status"
                             app:layout_constraintTop_toTopOf="@+id/cts_status"
+                            app:tint="@{viewModel.ctsState == SafetyNetState.PASS ? @color/colorCorrect : @color/colorError}"
                             tools:srcCompat="@drawable/ic_check_circle" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/basic_status_icon"
                             srcCompat="@{viewModel.basicIntegrityState == SafetyNetState.PASS ? R.drawable.ic_check_circle : R.drawable.ic_cancel}"
-                            app:tint="@{viewModel.basicIntegrityState == SafetyNetState.PASS ? @color/colorCorrect : @color/colorError}"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
@@ -295,6 +291,7 @@
                             app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/basic_status"
+                            app:tint="@{viewModel.basicIntegrityState == SafetyNetState.PASS ? @color/colorCorrect : @color/colorError}"
                             tools:srcCompat="@drawable/ic_check_circle" />
 
                         <TextView
