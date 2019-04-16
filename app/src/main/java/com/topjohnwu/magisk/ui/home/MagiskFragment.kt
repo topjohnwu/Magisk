@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.ui.home
 
+import android.os.Bundle
+import android.view.View
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
@@ -37,6 +39,11 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, FragmentMagiskBinding>()
             is EnvFixEvent -> fixEnv()
             is UpdateSafetyNetEvent -> updateSafetyNet(false)
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
     private fun installMagisk() {
