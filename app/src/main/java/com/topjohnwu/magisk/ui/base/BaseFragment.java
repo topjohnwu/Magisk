@@ -40,11 +40,11 @@ public abstract class BaseFragment extends Fragment implements Event.AutoListene
 
     public void startActivityForResult(Intent intent, int requestCode,
                                        BaseActivity.ActivityResultListener listener) {
-        ((BaseActivity) requireActivity()).startActivityForResult(intent, requestCode, listener);
+        ((IBaseLeanback) requireActivity()).startActivityForResult(intent, requestCode, listener);
     }
 
     protected void runWithExternalRW(Runnable callback) {
-        ((BaseActivity) requireActivity()).runWithExternalRW(callback);
+        ((IBaseLeanback) requireActivity()).runWithExternalRW(callback);
     }
 
     @Override

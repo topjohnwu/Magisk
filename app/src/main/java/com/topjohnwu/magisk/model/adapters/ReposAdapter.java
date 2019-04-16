@@ -20,7 +20,8 @@ import com.topjohnwu.magisk.data.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.model.download.DownloadModuleService;
 import com.topjohnwu.magisk.model.entity.Module;
 import com.topjohnwu.magisk.model.entity.Repo;
-import com.topjohnwu.magisk.ui.base.BaseActivity;
+import com.topjohnwu.magisk.ui.base.IBaseLeanback;
+import com.topjohnwu.magisk.ui.base.MagiskActivity;
 import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.view.MarkDownWindow;
 import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog;
@@ -118,15 +119,15 @@ public class ReposAdapter
                 .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
                 .setCancelable(true)
                 .setPositiveButton(R.string.install, (d, i) ->
-                        startDownload((BaseActivity) context, repo, true))
+                        startDownload((MagiskActivity) context, repo, true))
                 .setNeutralButton(R.string.download, (d, i) ->
-                        startDownload((BaseActivity) context, repo, false))
+                        startDownload((MagiskActivity) context, repo, false))
                 .setNegativeButton(R.string.no_thanks, null)
                 .show();
         });
     }
 
-    private void startDownload(BaseActivity activity, Repo repo, Boolean install) {
+    private <Ctxt extends Context & IBaseLeanback> void startDownload(Ctxt activity, Repo repo, Boolean install) {
         activity.runWithExternalRW(() -> {
             Intent intent = new Intent(activity, ClassMap.get(DownloadModuleService.class))
                     .putExtra("repo", repo).putExtra("install", install);

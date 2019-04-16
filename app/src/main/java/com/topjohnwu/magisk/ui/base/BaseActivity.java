@@ -26,11 +26,11 @@ import androidx.collection.SparseArrayCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public abstract class BaseActivity extends AppCompatActivity implements Event.AutoListener {
+public abstract class BaseActivity extends AppCompatActivity implements Event.AutoListener, IBaseLeanback {
 
     static int[] EMPTY_INT_ARRAY = new int[0];
 
-    private SparseArrayCompat<ActivityResultListener> resultListeners = new SparseArrayCompat<>();
+    private final SparseArrayCompat<ActivityResultListener> resultListeners = new SparseArrayCompat<>();
     public App app = App.self;
 
     @Override
@@ -87,14 +87,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
     }
 
-    public void runWithExternalRW(Runnable callback) {
-        runWithPermissions(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, callback);
-    }
-
-    public void runWithPermissions(String[] permissions, Runnable callback) {
-        runWithPermissions(this, permissions, callback);
-    }
-
     public static void runWithPermissions(Context context, String[] permissions, Runnable callback) {
         boolean granted = true;
         for (String perm : permissions) {
@@ -109,10 +101,20 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
             if (context instanceof BaseActivity) {
                 BaseActivity activity = (BaseActivity) context;
                 int code = callback.hashCode() & 0xFFFF;
-                activity.resultListeners.put(code, ((i, d) -> callback.run()));
+                activity.resultListeners.put(code, (i, d) -> callback.run());
                 ActivityCompat.requestPermissions(activity, permissions, code);
             }
         }
+    }
+
+    @Override
+    public final void runWithExternalRW(Runnable callback) {
+        runWithPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, callback);
+    }
+
+    @Override
+    public final void runWithPermissions(String[] permissions, Runnable callback) {
+        runWithPermissions(this, permissions, callback);
     }
 
     @Override
@@ -128,9 +130,10 @@ public abstract class BaseActivity extends AppCompatActivity implements Event.Au
         }
     }
 
-    public void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
+    @Override
+    public final void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
         resultListeners.put(requestCode, listener);
-        super.startActivityForResult(intent, requestCode);
+        startActivityForResult(intent, requestCode);
     }
 
     @Override
