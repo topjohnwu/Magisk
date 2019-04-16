@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 kapt {
@@ -80,4 +80,7 @@ dependencies {
         exclude group: 'androidx.work', module: 'work-runtime-ktx'
         exclude group: 'androidx.room', module: 'room-runtime'
     }
+
+    def navigation = "3.2.0"
+    implementation "com.ncapdevi:frag-nav:${navigation}"
 }

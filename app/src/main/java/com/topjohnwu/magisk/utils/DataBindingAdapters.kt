@@ -6,11 +6,24 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 
 
 @BindingAdapter("onNavigationClick")
 fun setOnNavigationClickedListener(view: Toolbar, listener: View.OnClickListener) {
     view.setNavigationOnClickListener(listener)
+}
+
+@BindingAdapter("onNavigationClick")
+fun setOnNavigationClickedListener(
+    view: NavigationView,
+    listener: NavigationView.OnNavigationItemSelectedListener
+) {
+    view.setNavigationItemSelectedListener {
+        (view.parent as? DrawerLayout)?.closeDrawers()
+        listener.onNavigationItemSelected(it)
+    }
 }
 
 @BindingAdapter("srcCompat")

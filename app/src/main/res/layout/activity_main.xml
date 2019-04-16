@@ -29,6 +29,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:fitsSystemWindows="true"
+            onNavigationClick="@{(item) -> viewModel.navigationItemPressed(item)}"
             app:menu="@menu/drawer" />
 
     </androidx.drawerlayout.widget.DrawerLayout>

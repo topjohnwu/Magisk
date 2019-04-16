@@ -1,34 +1,43 @@
 package com.topjohnwu.magisk.model.navigation
 
-import com.skoumal.teanity.viewevents.NavigationEvent
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
+import com.topjohnwu.magisk.ui.home.MagiskFragment
+import com.topjohnwu.magisk.ui.log.LogFragment
+import com.topjohnwu.magisk.ui.module.ModulesFragment
+import com.topjohnwu.magisk.ui.module.ReposFragment
+import com.topjohnwu.magisk.ui.settings.SettingsFragment
+import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 
 
 object Navigation {
 
-    fun home() = NavigationEvent {
-        navDirections { destination = R.id.magiskFragment }
-        navOptions { popUpTo = R.id.magiskFragment }
+    fun home() = MagiskNavigationEvent {
+        navDirections { destination = MagiskFragment::class }
+        navOptions { popUpTo = MagiskFragment::class }
     }
 
-    fun superuser() = NavigationEvent {
-        navDirections { destination = R.id.superuserFragment }
+    fun superuser() = MagiskNavigationEvent {
+        navDirections { destination = SuperuserFragment::class }
     }
 
-    fun modules() = NavigationEvent {
-        navDirections { destination = R.id.modulesFragment }
+    fun modules() = MagiskNavigationEvent {
+        navDirections { destination = ModulesFragment::class }
     }
 
-    fun repos() = NavigationEvent {
-        navDirections { destination = R.id.reposFragment }
+    fun repos() = MagiskNavigationEvent {
+        navDirections { destination = ReposFragment::class }
     }
 
-    fun hide() = NavigationEvent {
-        navDirections { destination = R.id.magiskHideFragment }
+    fun hide() = MagiskNavigationEvent {
+        navDirections { destination = MagiskHideFragment::class }
     }
 
-    fun log() = NavigationEvent {
-        navDirections { destination = R.id.logFragment }
+    fun log() = MagiskNavigationEvent {
+        navDirections { destination = LogFragment::class }
+    }
+
+    fun settings() = MagiskNavigationEvent {
+        navDirections { destination = SettingsFragment::class }
     }
 
 
