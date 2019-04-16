@@ -6,12 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.material.tabs.TabLayout;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.adapters.TabFragmentAdapter;
 import com.topjohnwu.magisk.ui.base.BaseFragment;
 
-import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 
 public class LogFragment extends BaseFragment {

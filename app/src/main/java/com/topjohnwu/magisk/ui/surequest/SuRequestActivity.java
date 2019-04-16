@@ -17,6 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
@@ -31,8 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
 import butterknife.BindView;
 import java9.lang.Iterables;
 

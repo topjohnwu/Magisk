@@ -5,6 +5,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
@@ -20,8 +22,6 @@ import com.topjohnwu.magisk.view.Notifications;
 import com.topjohnwu.magisk.view.Shortcuts;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
-
-import androidx.appcompat.app.AlertDialog;
 
 public class SplashActivity extends BaseActivity {
 
