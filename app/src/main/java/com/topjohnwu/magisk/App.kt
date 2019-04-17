@@ -9,8 +9,8 @@ import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.preference.PreferenceManager
 import com.topjohnwu.magisk.data.database.MagiskDB
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
 import com.topjohnwu.magisk.di.koinModules
@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor
 open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     // Global resources
-    val prefs: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(deContext) }
+    val prefs: SharedPreferences get() = PreferenceManager.getDefaultSharedPreferences(deContext)
     val DB: MagiskDB by lazy { MagiskDB(deContext) }
     @JvmField
     var repoDB: RepoDatabaseHelper? = null
@@ -52,10 +52,7 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
         if (Build.VERSION.SDK_INT >= 24) {
             deContext = base.createDeviceProtectedStorageContext()
-            deContext.moveSharedPreferencesFrom(
-                base,
-                PreferenceManager.getDefaultSharedPreferencesName(base)
-            )
+            deContext.moveSharedPreferencesFrom(base, base.defaultPrefsName)
         }
 
         Networking.init(base)
@@ -88,6 +85,8 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     override fun onActivityDestroyed(activity: Activity) {}
     //endregion
+
+    private val Context.defaultPrefsName get() = "${packageName}_preferences"
 
     companion object {
 

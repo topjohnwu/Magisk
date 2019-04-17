@@ -3,12 +3,14 @@ package com.topjohnwu.magisk.ui.base
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.CallSuper
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.net.toUri
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
 import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
@@ -29,6 +31,17 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
     protected val navigationController by lazy {
         if (navHostId == 0) throw IllegalStateException("Did you forget to override \"navHostId\"?")
         FragNavController(supportFragmentManager, navHostId)
+    }
+
+    init {
+        val isDarkTheme = Config.get<Boolean>(Config.Key.DARK_THEME)
+        val theme = if (isDarkTheme) {
+            AppCompatDelegate.MODE_NIGHT_YES
+        } else {
+            AppCompatDelegate.MODE_NIGHT_NO
+        }
+        AppCompatDelegate.setDefaultNightMode(theme)
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -42,6 +42,7 @@ public class SettingsFragment extends BasePreferenceFragment {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        getPreferenceManager().setStorageDeviceProtected();
         setPreferencesFromResource(R.xml.app_settings, rootKey);
         requireActivity().setTitle(R.string.settings);
 
