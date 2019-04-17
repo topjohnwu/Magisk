@@ -5,6 +5,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.skoumal.teanity.view.TeanityFragment
 import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
 import kotlin.reflect.KClass
@@ -25,6 +26,7 @@ abstract class MagiskFragment<ViewModel : MagiskViewModel, Binding : ViewDataBin
         super.onEventDispatched(event)
         when (event) {
             is MagiskNavigationEvent -> navigateTo(event)
+            is ViewActionEvent -> event.action(requireActivity())
         }
     }
 

@@ -9,6 +9,7 @@
         <item name="imageColorTint">@color/dark_secondary_text</item>
         <item name="colorControl">?android:attr/textColorSecondary</item>
         <item name="colorAccentFallback">@color/accentFallback</item>
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 
 </resources>

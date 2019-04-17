@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.model.events
 
+import android.app.Activity
 import com.skoumal.teanity.viewevents.ViewEvent
 
 
@@ -15,3 +16,5 @@ class UninstallEvent : ViewEvent()
 class EnvFixEvent : ViewEvent()
 
 class UpdateSafetyNetEvent : ViewEvent()
+
+class ViewActionEvent(val action: Activity.() -> Unit) : ViewEvent()

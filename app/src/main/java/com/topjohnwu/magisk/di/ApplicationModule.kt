@@ -10,4 +10,5 @@ val applicationModule = module {
     single { RxBus() }
     single { get<Context>().resources }
     single { get<Context>() as App }
+    single { get<Context>().packageManager }
 }

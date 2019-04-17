@@ -10,6 +10,7 @@
         <item name="colorAccent">@color/colorSecondary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorSecondaryVariant">@color/colorSecondaryDark</item>
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
     <style name="ThemeFoundation.Colored.ExtraProps" />

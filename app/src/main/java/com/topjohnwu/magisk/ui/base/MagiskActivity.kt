@@ -11,6 +11,7 @@ import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
@@ -62,6 +63,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         super.onEventDispatched(event)
         when (event) {
             is MagiskNavigationEvent -> navigateTo(event)
+            is ViewActionEvent -> event.action(this)
         }
     }
 
