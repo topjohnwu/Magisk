@@ -3,7 +3,7 @@
     <!--Welcome Activity-->
     <string name="modules">Module</string>
     <string name="downloads">Descărcări</string>
-    <string name="superuser">Superuser</string>
+    <string name="superuser">Superutilizator</string>
     <string name="log">Jurnal</string>
     <string name="settings">Setări</string>
     <string name="install">Instalează</string>
@@ -17,7 +17,7 @@
     <string name="safetyNet_check_text">Atinge pentru a începe verificarea SafetyNet</string>
     <string name="checking_safetyNet_status">Se verifică starea SafetyNet…</string>
     <string name="safetyNet_check_success">Verificare SafetyNet cu succes</string>
-    <string name="safetyNet_api_error">Eroare API SafetyNet</string>
+    <string name="safetyNet_api_error">Eroare privind API-ul SafetyNet</string>
     <string name="safetyNet_res_invalid">Răspunsul este nevalid.</string>
     <string name="magisk_up_to_date">Magisk este la zi</string>
     <string name="manager_up_to_date">Magisk Manager este la zi</string>
@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_title">Dezinstalează Magisk</string>
     <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate. Rootul va fi eliminat și potențial se vor cripta datele dacă nu sunt criptate deja.</string>
     <string name="update">Actualizează</string>
-    <string name="core_only_enabled">(Este activat numai modul de bază)</string>
+    <string name="core_only_enabled">(Este activat modul numai de bază)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nu sunt furnizate informații)</string>
@@ -74,6 +74,18 @@
     <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
     <string name="manager_update_title">Actualizare Magisk Manager disponibilă!</string>
 
+    <!-- Installation -->
+    <string name="manager_download_install">Apasă pentru a descărca și a instala.</string>
+    <string name="download_zip_only">Doar descarcă zip-ul</string>
+    <string name="direct_install">Instalare directă (Recomandat)</string>
+    <string name="install_inactive_slot">Instalare în slotul inactiv (După OTA)</string>
+    <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să booteze în slotul inactiv actual după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
+    <string name="select_method">Selectează metoda</string>
+    <string name="setup_title">Configurare suplimentară</string>
+    <string name="select_patch_file">Selectează și patchuiește un fișier</string>
+    <string name="patch_file_msg">Selectează o imagine brută (*.img) sau un fișier tar ODIN (*.tar)</string>
+    <string name="reboot_delay_toast">Repornire în 5 secunde…</string>
+
     <!--Toasts, Dialogs-->
     <string name="close">Închide</string>
     <string name="repo_install_title">Instalează %1$s</string>
@@ -85,18 +97,13 @@
     <string name="repo_cache_cleared">Cache-ul depozitului golit</string>
     <string name="internal_storage">Zip-ul este stocat în:\n[Stocare internă]%1$s</string>
     <string name="manager_download_install">Apasă pentru a descărca și instala.</string>
-    <string name="dtbo_patched_title">DTBO a fost modificat!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager a modificat dtbo.img. Te rugăm să repornești.</string>
+    <string name="dtbo_patched_title">DTBO a fost patchuit!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager a patchuit dtbo.img. Te rugăm să repornești.</string>
     <string name="flashing">Se procesează</string>
     <string name="hide_manager_title">Se ascunde Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat.</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul.</string>
-    <string name="download_zip_only">Doar descarcă fișierul zip</string>
-    <string name="direct_install">Instalare directă (Recomandat)</string>
-    <string name="install_inactive_slot">Instalare în slotul inactiv (După OTA)</string>
     <string name="warning">Avertisment</string>
-    <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să se încarce în slotul inactiv actual după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
-    <string name="select_method">Selectează metoda</string>
     <string name="complete_uninstall">Dezinstalare totală</string>
     <string name="restore_img">Restaurează imagini</string>
     <string name="restore_img_msg">Se restaurează…</string>
@@ -107,7 +114,6 @@
     <string name="setup_fail">Configurare eșuată.</string>
     <string name="env_fix_title">Necesită configurare suplimentară</string>
     <string name="env_fix_msg">Dispozitivul tău are nevoie de configurări suplimentare pentru ca Magisk să funcționeze corect. Se va descărca zip-ul de configurare Magisk, vrei să continui acum?</string>
-    <string name="setup_title">Configurare adițională</string>
     <string name="setup_msg">Rulează configurarea mediului…</string>
     <string name="downloading_toast">Se descarcă %1$s</string>
     <string name="no_rw_storage">Această caracteristică nu va funcționa fără permisiunea de a scrie în stocarea externă.</string>
@@ -117,8 +123,8 @@
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Temă întunecată</string>
     <string name="settings_dark_theme_summary">Activează tema întunecată.</string>
-    <string name="settings_clear_cache_title">Golește cache-ul depozitului</string>
-    <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depoziturile online. Acest lucru forțează actualizarea aplicației online.</string>
+    <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
+    <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online.</string>
     <string name="settings_hide_manager_title">Ascunde Magisk Manager</string>
     <string name="settings_hide_manager_summary">Reîmpachetează Magisk Manager cu nume de pachet aleatoriu.</string>
     <string name="settings_restore_manager_title">Restaurează Magisk Manager</string>
