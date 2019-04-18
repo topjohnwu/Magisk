@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -12,10 +13,10 @@
         android:elevation="4dp"
         android:visibility="gone"
         app:tabPaddingEnd="20dp"
-        app:tabPaddingStart="20dp">
-
-    </com.google.android.material.tabs.TabLayout>
-
+        app:tabPaddingStart="20dp"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabTextColor="@android:color/secondary_text_dark"
+        tools:visibility="visible" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/container"
