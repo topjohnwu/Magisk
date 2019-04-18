@@ -56,6 +56,14 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
 
     }
 
+    override fun setTitle(title: CharSequence?) {
+        supportActionBar?.title = title
+    }
+
+    override fun setTitle(titleId: Int) {
+        supportActionBar?.setTitle(titleId)
+    }
+
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(binding.navView)) {
             binding.drawerLayout.closeDrawer(binding.navView)

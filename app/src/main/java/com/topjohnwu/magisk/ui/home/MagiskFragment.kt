@@ -46,6 +46,11 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, FragmentMagiskBinding>()
         setHasOptionsMenu(true)
     }
 
+    override fun onStart() {
+        super.onStart()
+        requireActivity().setTitle(R.string.magisk)
+    }
+
     private fun installMagisk() {
         // Show Manager update first
         if (Config.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {

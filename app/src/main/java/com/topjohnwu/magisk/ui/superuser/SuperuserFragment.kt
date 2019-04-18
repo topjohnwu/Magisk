@@ -13,7 +13,7 @@ class SuperuserFragment :
 
     override fun onStart() {
         super.onStart()
-        magiskActivity.supportActionBar?.title = getString(R.string.superuser)
+        requireActivity().setTitle(R.string.superuser)
     }
 
     override fun onResume() {

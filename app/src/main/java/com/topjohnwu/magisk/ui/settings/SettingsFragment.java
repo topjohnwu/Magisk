@@ -41,10 +41,15 @@ public class SettingsFragment extends BasePreferenceFragment {
             requestTimeout, rootConfig, multiuserConfig, nsConfig;
 
     @Override
+    public void onStart() {
+        super.onStart();
+        requireActivity().setTitle(R.string.settings);
+    }
+
+    @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         getPreferenceManager().setStorageDeviceProtected();
         setPreferencesFromResource(R.xml.app_settings, rootKey);
-        requireActivity().setTitle(R.string.settings);
 
         boolean showSuperuser = Utils.showSuperUser();
         app.getPrefs().edit()
@@ -100,7 +105,7 @@ public class SettingsFragment extends BasePreferenceFragment {
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
                         .setPositiveButton(R.string.ok, (d, i) ->
-                               Config.set(Config.Key.CUSTOM_CHANNEL, url.getText().toString()))
+                                Config.set(Config.Key.CUSTOM_CHANNEL, url.getText().toString()))
                         .setNegativeButton(R.string.close, (d, i) ->
                                 Config.set(Config.Key.UPDATE_CHANNEL, prev))
                         .setOnCancelListener(d ->
