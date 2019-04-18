@@ -43,6 +43,7 @@ public class SettingsFragment extends BasePreferenceFragment {
     @Override
     public void onStart() {
         super.onStart();
+        setHasOptionsMenu(true);
         requireActivity().setTitle(R.string.settings);
     }
 

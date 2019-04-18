@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.os.Bundle
-import android.view.View
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
@@ -41,13 +39,9 @@ class MagiskFragment : NewMagiskFragment<HomeViewModel, FragmentMagiskBinding>()
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onStart() {
         super.onStart()
+        setHasOptionsMenu(true)
         requireActivity().setTitle(R.string.magisk)
     }
 

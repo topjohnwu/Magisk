@@ -13,6 +13,7 @@ class SuperuserFragment :
 
     override fun onStart() {
         super.onStart()
+        setHasOptionsMenu(true)
         requireActivity().setTitle(R.string.superuser)
     }
 
