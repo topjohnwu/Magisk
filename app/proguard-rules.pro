@@ -29,6 +29,11 @@
   void onResponse(int);
 }
 
+# Keep all fragment constructors
+-keepclassmembers class * extends androidx.fragment.app.Fragment {
+  public <init>(...);
+}
+
 # DelegateWorker
 -keep,allowobfuscation class * extends com.topjohnwu.magisk.model.worker.DelegateWorker
 
