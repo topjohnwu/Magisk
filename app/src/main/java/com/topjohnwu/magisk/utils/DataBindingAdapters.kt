@@ -8,6 +8,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
+import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 
 
 @BindingAdapter("onNavigationClick")
@@ -34,4 +36,24 @@ fun setImageResource(view: AppCompatImageView, @DrawableRes resId: Int) {
 @BindingAdapter("app:tint")
 fun setTint(view: AppCompatImageView, @ColorInt tint: Int) {
     view.setColorFilter(tint)
+}
+
+@BindingAdapter("isChecked")
+fun setChecked(view: AppCompatImageView, isChecked: Boolean) {
+    val state = when (isChecked) {
+        true -> IndeterminateState.CHECKED
+        else -> IndeterminateState.UNCHECKED
+    }
+    setChecked(view, state)
+}
+
+@BindingAdapter("isChecked")
+fun setChecked(view: AppCompatImageView, isChecked: IndeterminateState) {
+    view.setImageResource(
+        when (isChecked) {
+            IndeterminateState.INDETERMINATE -> R.drawable.ic_indeterminate
+            IndeterminateState.CHECKED -> R.drawable.ic_checked
+            IndeterminateState.UNCHECKED -> R.drawable.ic_unchecked
+        }
+    )
 }
