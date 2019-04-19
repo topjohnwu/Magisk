@@ -10,6 +10,7 @@ import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.multidex.MultiDex
 import androidx.preference.PreferenceManager
 import com.topjohnwu.magisk.data.database.MagiskDB
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
@@ -46,6 +47,7 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
+        MultiDex.install(base)
         self = this
         deContext = base
         registerActivityLifecycleCallbacks(this)
