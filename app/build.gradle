@@ -56,7 +56,7 @@ dependencies {
     implementation 'androidx.work:work-runtime:2.0.1'
     implementation 'androidx.transition:transition:1.1.0-beta01'
 
-    def libsuVersion = '2.4.0'
+    def libsuVersion = '2.5.0'
     implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"
     implementation "com.github.topjohnwu.libsu:io:${libsuVersion}"
 
