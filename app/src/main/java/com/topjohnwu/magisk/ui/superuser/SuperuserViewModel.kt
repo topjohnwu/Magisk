@@ -5,6 +5,7 @@ import android.content.res.Resources
 import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.applySchedulers
+import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
@@ -19,7 +20,6 @@ import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import io.reactivex.Single
 import me.tatarka.bindingcollectionadapter2.ItemBinding
-import timber.log.Timber
 
 class SuperuserViewModel(
     private val database: MagiskDB,
@@ -46,17 +46,13 @@ class SuperuserViewModel(
             .toList()
             .applySchedulers()
             .applyViewModel(this)
-            .subscribe({
-                items.update(it)
-            }, Timber::e)
+            .subscribeK { items.update(it) }
             .add()
     }
 
     fun deletePressed(item: PolicyRvItem) {
         fun updateState() = deletePolicy(item.item)
-            .subscribe({
-                items.remove(item)
-            }, Timber::e)
+            .subscribeK { items.remove(item) }
             .add()
 
         withView {
@@ -88,11 +84,11 @@ class SuperuserViewModel(
 
                 updatePolicy(item)
                     .map { it.policy == Policy.ALLOW }
-                    .subscribe({
+                    .subscribeK {
                         val textId = if (it) R.string.su_snack_grant else R.string.su_snack_deny
                         val text = resources.getString(textId).format(item.appName)
                         SnackbarEvent(text).publish()
-                    }, Timber::e)
+                    }
                     .add()
             }
 
@@ -113,11 +109,11 @@ class SuperuserViewModel(
 
             updatePolicy(item)
                 .map { it.notification }
-                .subscribe({
+                .subscribeK {
                     val textId = if (it) R.string.su_snack_notif_on else R.string.su_snack_notif_off
                     val text = resources.getString(textId).format(item.appName)
                     SnackbarEvent(text).publish()
-                }, Timber::e)
+                }
                 .add()
         }
         shouldLog.addOnPropertyChangedCallback {
@@ -126,11 +122,11 @@ class SuperuserViewModel(
 
             updatePolicy(item)
                 .map { it.logging }
-                .subscribe({
+                .subscribeK {
                     val textId = if (it) R.string.su_snack_log_on else R.string.su_snack_log_off
                     val text = resources.getString(textId).format(item.appName)
                     SnackbarEvent(text).publish()
-                }, Timber::e)
+                }
                 .add()
         }
     }
