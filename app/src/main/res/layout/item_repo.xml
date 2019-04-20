@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.RepoRvItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.module.ModuleViewModel" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foreground="?attr/selectableItemBackground"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:onClick="@{() -> viewModel.repoPressed(item)}"
+        app:cardElevation="2dp"
+        tools:layout_gravity="center">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/margin_generic">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{item.item.name}"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toTopOf="@+id/version_name"
+                app:layout_constraintEnd_toStartOf="@+id/download"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Magisk Module" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/version_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{item.item.version == null || item.item.version.length == 0 ? @string/no_info_provided : item.item.version}"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/author"
+                app:layout_constraintEnd_toEndOf="@+id/title"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                tools:text="v1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/author"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{item.item.author == null || item.item.author.length == 0 ? @string/no_info_provided : @string/author(item.item.author)}"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/description"
+                app:layout_constraintEnd_toEndOf="@+id/title"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintTop_toBottomOf="@+id/version_name"
+                tools:text="topjohnwu" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@{item.item.description == null || item.item.description.length == 0 ? @string/no_info_provided : item.item.description}"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toTopOf="@+id/update_time"
+                app:layout_constraintEnd_toEndOf="@id/title"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintTop_toBottomOf="@+id/author"
+                tools:lines="4"
+                tools:text="@tools:sample/lorem/random" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/update_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@{@string/updated_on(item.item.lastUpdateString)}"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/title"
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintTop_toBottomOf="@+id/description"
+                tools:text="@tools:sample/date/ddmmyy" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/download"
+                style="@style/Widget.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:onClick="@{() -> viewModel.downloadPressed(item)}"
+                android:tint="?attr/imageColorTint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/title"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_file_download_black" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>
+

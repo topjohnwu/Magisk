@@ -18,6 +18,9 @@ abstract class MagiskLeanbackActivity<ViewModel : MagiskViewModel, Binding : Vie
     private val resultListeners = SparseArrayCompat<BaseActivity.ActivityResultListener>()
 
     @Deprecated("Permissions will be checked in a different streamlined way")
+    fun runWithExternalRW(callback: () -> Unit) = runWithExternalRW(Runnable { callback() })
+
+    @Deprecated("Permissions will be checked in a different streamlined way")
     override fun runWithExternalRW(callback: Runnable) {
         runWithPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, callback = callback)
     }
