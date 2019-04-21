@@ -197,43 +197,50 @@ static inline void parse_cmdline(const std::function<void (std::string_view, con
 
 static bool check_key_combo() {
 	uint8_t bitmask[(KEY_MAX + 1) / 8];
-	int eventfd = -1;
+	vector<int> events;
+	constexpr const char *name = "/event";
 
 	for (int minor = 64; minor < 96; ++minor) {
-		if (mknod("/event", S_IFCHR | 0444, makedev(13, minor))) {
+		if (mknod(name, S_IFCHR | 0444, makedev(13, minor))) {
 			PLOGE("mknod");
 			continue;
 		}
-		eventfd = xopen("/event", O_RDWR | O_CLOEXEC);
-		unlink("/event");
-		if (eventfd < 0)
+		int fd = open(name, O_RDONLY | O_CLOEXEC);
+		unlink(name);
+		if (fd < 0)
 			continue;
 		memset(bitmask, 0, sizeof(bitmask));
-		ioctl(eventfd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
-		if (test_bit(KEY_POWER, bitmask) && test_bit(KEY_VOLUMEUP, bitmask)) {
-			// Check KEY_POWER because KEY_VOLUMEUP could be headphone input
-			break;
-		}
+		ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
+		if (test_bit(KEY_VOLUMEUP, bitmask))
+			events.push_back(fd);
 	}
 
-	if (eventfd < 0)
+	if (events.empty())
 		return false;
+
+	RunFinally fin([&]() -> void {
+		for (const int &fd : events)
+			close(fd);
+	});
 
 	// Return true if volume key up is hold for more than 3 seconds
 	int count = 0;
 	for (int i = 0; i < 500; ++i) {
-		memset(bitmask, 0, sizeof(bitmask));
-		ioctl(eventfd, EVIOCGKEY(sizeof(bitmask)), bitmask);
-		count = test_bit(KEY_VOLUMEUP, bitmask) ? count + 1 : 0;
+		for (const int &fd : events) {
+			memset(bitmask, 0, sizeof(bitmask));
+			ioctl(fd, EVIOCGKEY(sizeof(bitmask)), bitmask);
+			if (test_bit(KEY_VOLUMEUP, bitmask)) {
+				count++;
+				break;
+			}
+		}
 		if (count >= 300) {
 			LOGD("KEY_VOLUMEUP detected: disable system-as-root\n");
-			close(eventfd);
 			return true;
 		}
 		// Check every 10ms
 		usleep(10000);
 	}
-	close(eventfd);
 	return false;
 }
 
