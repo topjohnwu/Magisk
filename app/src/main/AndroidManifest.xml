@@ -12,7 +12,7 @@
         android:allowBackup="false"
         android:name="a.e"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="false"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <!-- Activities -->
