@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:name="a.e"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
