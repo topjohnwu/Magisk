@@ -82,7 +82,7 @@
 	<string name="install_inactive_slot_msg">¡Se forzará su dispositivo para que arranque en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\nContinuar?</string>
     <string name="select_method">Seleccionar Método</string>
 	<string name="setup_title">Configuración Adicional</string>
-	<string name="select_patch_file">Seleccionar y parchear un archivo/string>
+	<string name="select_patch_file">Seleccionar y parchear un archivo</string>
 	<string name="patch_file_msg">Seleccione una imagen raw (* .img) o un archivo tar de ODIN (* .tar)</string>
 	<string name="reboot_delay_toast">Reiniciando en 5 segundos…</string>
 	
