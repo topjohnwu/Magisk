@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.toSingle
+import com.topjohnwu.magisk.utils.update
 import io.reactivex.Single
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
@@ -29,7 +30,7 @@ class ModuleViewModel(
 
     val query = KObservableField("")
 
-    private val allItems = DiffObservableList(ComparableRvItem.callback)
+    private val allItems = mutableListOf<ComparableRvItem<*>>()
 
     val itemsInstalled = DiffObservableList(ComparableRvItem.callback)
     val itemsRemote = DiffObservableList(ComparableRvItem.callback)
@@ -73,27 +74,27 @@ class ModuleViewModel(
             .flattenAsFlowable { it }
             .map { RepoRvItem(it) }
             .toList()
+            .doOnSuccess { allItems.update(it) }
+            .flatMap { queryRaw() }
             .applyViewModel(this)
-            .subscribeK {
-                allItems.update(it)
-                query()
-            }
+            .subscribeK { itemsRemote.update(it.first, it.second) }
             .add()
     }
 
-    private fun query(query: String = this.query.value) {
-        allItems.toSingle()
-            .map { it.filterIsInstance<RepoRvItem>() }
-            .flattenAsFlowable { it }
-            .filter {
-                it.item.name.contains(query, ignoreCase = true) ||
-                        it.item.author.contains(query, ignoreCase = true) ||
-                        it.item.description.contains(query, ignoreCase = true)
-            }
-            .toList()
-            .subscribeK { itemsRemote.update(it) }
-            .add()
-    }
+    private fun query() = queryRaw()
+        .subscribeK { itemsRemote.update(it.first, it.second) }
+        .add()
+
+    private fun queryRaw(query: String = this.query.value) = allItems.toSingle()
+        .map { it.filterIsInstance<RepoRvItem>() }
+        .flattenAsFlowable { it }
+        .filter {
+            it.item.name.contains(query, ignoreCase = true) ||
+                    it.item.author.contains(query, ignoreCase = true) ||
+                    it.item.description.contains(query, ignoreCase = true)
+        }
+        .toList()
+        .map { it to itemsRemote.calculateDiff(it) }
 
     private fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
         val out = mutableListOf<Result>()

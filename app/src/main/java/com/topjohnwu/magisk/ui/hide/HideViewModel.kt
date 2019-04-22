@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.model.events.HideProcessEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.toSingle
+import com.topjohnwu.magisk.utils.update
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
 import me.tatarka.bindingcollectionadapter2.OnItemBind
@@ -31,7 +32,7 @@ class HideViewModel(
     val query = KObservableField("")
     val isShowSystem = KObservableField(false)
 
-    private val allItems = DiffObservableList(ComparableRvItem.callback)
+    private val allItems = mutableListOf<ComparableRvItem<*>>()
     val items = DiffObservableList(ComparableRvItem.callback)
     val itemBinding = OnItemBind<ComparableRvItem<*>> { itemBinding, _, item ->
         item.bind(itemBinding)
@@ -72,27 +73,30 @@ class HideViewModel(
             .map { HideRvItem(it, hideTargets.blockingGet()) }
             .toList()
             .map { it.sortBy { it.item.info.name }; it }
+            .doOnSuccess { allItems.update(it) }
+            .flatMap { queryRaw() }
             .applyViewModel(this)
-            .subscribeK(onError = Timber::e) {
-                allItems.update(it)
-                query()
-            }
+            .subscribeK(onError = Timber::e) { items.update(it.first, it.second) }
             .add()
     }
 
-    private fun query(showSystem: Boolean = isShowSystem.value, query: String = this.query.value) {
-        allItems.toSingle()
-            .map { it.filterIsInstance<HideRvItem>() }
-            .flattenAsFlowable { it }
-            .filter {
-                it.item.name.contains(query, ignoreCase = true) ||
-                        it.item.processes.any { it.contains(query, ignoreCase = true) }
-            }
-            .filter { if (showSystem) true else it.item.info.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
-            .toList()
-            .subscribeK { items.update(it) }
-            .add()
-    }
+    private fun query() = queryRaw()
+        .subscribeK { items.update(it.first, it.second) }
+        .add()
+
+    private fun queryRaw(
+        showSystem: Boolean = isShowSystem.value,
+        query: String = this.query.value
+    ) = allItems.toSingle()
+        .map { it.filterIsInstance<HideRvItem>() }
+        .flattenAsFlowable { it }
+        .filter {
+            it.item.name.contains(query, ignoreCase = true) ||
+                    it.item.processes.any { it.contains(query, ignoreCase = true) }
+        }
+        .filter { if (showSystem) true else it.item.info.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+        .toList()
+        .map { it to items.calculateDiff(it) }
 
     private fun toggleItem(item: HideProcessRvItem) {
         val state = if (item.isHidden.value) "add" else "rm"
