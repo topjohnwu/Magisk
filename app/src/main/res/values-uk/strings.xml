@@ -74,6 +74,18 @@
     <string name="magisk_update_title">Доступне оновлення Magisk!</string>
     <string name="manager_update_title">Доступне оновлення Magisk Manager!</string>
 
+    <!-- Installation -->
+    <string name="manager_download_install">Натисніть, щоб завантажити і встановити.</string>
+    <string name="download_zip_only">Тільки завантажити</string>
+    <string name="direct_install">Пряме встановлення (рекомендовано)</string>
+    <string name="install_inactive_slot">Встановити в неактивний слот (після OTA)</string>
+    <string name="install_inactive_slot_msg">Ваш пристрій буде примусово перезавантажено в неактивний слот!\nВикористовуйте цю опцію тільки для встановлення OTA.\nПродовжити?</string>
+    <string name="select_method">Виберіть спосіб</string>
+    <string name="setup_title">Додаткове налаштування</string>
+    <string name="select_patch_file">Вибрати і пропатчити файл</string>
+    <string name="patch_file_msg">Виберіть необроблений образ (*.img) або стиснутий файл ODIN (*.tar)</string>
+    <string name="reboot_delay_toast">Перезавантаження через 5 секунд…</string>
+
     <!--Toasts, Dialogs-->
     <string name="close">Закрити</string>
     <string name="repo_install_title">Встановити %1$s</string>
@@ -83,20 +95,15 @@
     <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій.</string>
     <string name="release_notes">Особливості версії</string>
     <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
-    <string name="internal_storage">Архів розташований:\n[Внутрішнє Сховище]%1$s</string>
-    <string name="manager_download_install">Натисніть, щоб завантажити і встановити.</string>
+    <string name="internal_storage">Архів розташований у:\n[Внутрішньому Сховищі]%1$s</string>
+
     <string name="dtbo_patched_title">DTBO пропатчено!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчив dtbo.img. Будь ласка, перезавантажте пристрій.</string>
     <string name="flashing">Прошивання</string>
     <string name="hide_manager_title">Приховування Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager…</string>
     <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання…</string>
-    <string name="download_zip_only">Тільки завантажити</string>
-    <string name="direct_install">Пряме встановлення (рекомендовано)</string>
-    <string name="install_inactive_slot">Встановити в неактивний слот (після OTA)</string>
     <string name="warning">Попередження</string>
-    <string name="install_inactive_slot_msg">Ваш пристрій буде примусово перезавантажено в неактивний слот!\nВикористовуйте цю опцію тільки для встановлення OTA.\nПродовжити?</string>
-    <string name="select_method">Виберіть спосіб</string>
     <string name="complete_uninstall">Видалення виконано</string>
     <string name="restore_img">Відновити образи</string>
     <string name="restore_img_msg">Відновлення…</string>
@@ -107,7 +114,6 @@
     <string name="setup_fail">Не вдалося налаштувати.</string>
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
     <string name="env_fix_msg">Для правильної роботи Magisk, потрібне додаткове налаштування вашого пристрою. Буде завантажено zip-архів. Розпочати негайно?</string>
-    <string name="setup_title">Додаткове налаштування</string>
     <string name="setup_msg">Налаштування робочого середовища…</string>
     <string name="downloading_toast">Завантаження %1$s</string>
     <string name="no_rw_storage">Ця функція не працюватиме без дозволу на запис у Внутрішнє сховище</string>
@@ -209,6 +215,7 @@
     <string name="auth_fail">Помилка автентифікації</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">Цільовий UID: %1$d</string>
     <string name="command">Команда: %1$s</string>
 
