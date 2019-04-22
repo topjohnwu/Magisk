@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.module
 
 import android.database.Cursor
 import com.skoumal.teanity.databinding.ComparableRvItem
+import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
@@ -18,6 +19,7 @@ import com.topjohnwu.magisk.tasks.UpdateRepos
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.utils.toSingle
 import io.reactivex.Single
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
@@ -27,6 +29,8 @@ class ModuleViewModel(
 
     val query = KObservableField("")
 
+    private val allItems = DiffObservableList(ComparableRvItem.callback)
+
     val itemsInstalled = DiffObservableList(ComparableRvItem.callback)
     val itemsRemote = DiffObservableList(ComparableRvItem.callback)
     val itemBinding = OnItemBind<ComparableRvItem<*>> { itemBinding, _, item ->
@@ -35,6 +39,7 @@ class ModuleViewModel(
     }
 
     init {
+        query.addOnPropertyChangedCallback { query() }
         Event.register(this)
         refresh()
     }
@@ -69,7 +74,25 @@ class ModuleViewModel(
             .map { RepoRvItem(it) }
             .toList()
             .applyViewModel(this)
+            .subscribeK {
+                allItems.update(it)
+                query()
+            }
+            .add()
+    }
+
+    private fun query(query: String = this.query.value) {
+        allItems.toSingle()
+            .map { it.filterIsInstance<RepoRvItem>() }
+            .flattenAsFlowable { it }
+            .filter {
+                it.item.name.contains(query, ignoreCase = true) ||
+                        it.item.author.contains(query, ignoreCase = true) ||
+                        it.item.description.contains(query, ignoreCase = true)
+            }
+            .toList()
             .subscribeK { itemsRemote.update(it) }
+            .add()
     }
 
     private fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
