@@ -17,6 +17,7 @@
 
 #define SEPOL_PROC_DOMAIN   "magisk"
 #define SEPOL_FILE_DOMAIN   "magisk_file"
+#define SEPOL_SOCKET_DOMAIN "magisk_socket"
 
 #ifdef __cplusplus
 extern "C" {

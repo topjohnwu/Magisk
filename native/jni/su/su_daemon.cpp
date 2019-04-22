@@ -150,26 +150,36 @@ static struct su_info *get_su_info(unsigned uid) {
 			info->access = NO_SU_ACCESS;
 	}
 
-	// If still not determined, ask manager
-	if (info->access.policy == QUERY) {
-		// Create random socket
-		struct sockaddr_un addr;
-		int sockfd = create_rand_socket(&addr);
+    // If still not determined, ask manager
+    if (info->access.policy == QUERY) {
+        int pid = xfork();
+        if (pid == 0) {
+            setcon("u:r:" SEPOL_SOCKET_DOMAIN ":s0");
+            // Create random socket
+            struct sockaddr_un addr;
+            int sockfd = create_rand_socket(&addr);
 
-		// Connect manager
-		app_connect(addr.sun_path + 1, info);
-		int fd = socket_accept(sockfd, 60);
-		if (fd < 0) {
-			info->access.policy = DENY;
-		} else {
-			socket_send_request(fd, info);
-			int ret = read_int_be(fd);
-			info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
-			close(fd);
-		}
-		close(sockfd);
-	}
-
+            // Connect manager
+            app_connect(addr.sun_path + 1, info);
+            int fd = socket_accept(sockfd, 60);
+            int ret;
+            if (fd < 0) {
+                ret = DENY;
+            } else {
+                socket_send_request(fd, info);
+                ret = read_int_be(fd);
+                close(fd);
+            }
+            close(sockfd);
+            exit(ret);
+        }
+        int status, code;
+        if (waitpid(pid, &status, 0) > 0)
+            code = WEXITSTATUS(status);
+        else
+            code = -1;
+        info->access.policy = code < 0 ? DENY : static_cast<policy_t>(code);
+    }
 	// Unlock
 	info->unlock();
 

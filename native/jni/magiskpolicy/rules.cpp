@@ -6,14 +6,18 @@
 static void allowSuClient(const char *target) {
 	if (!sepol_exists(target))
 		return;
-	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
-	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
+	sepol_allow(target, SEPOL_SOCKET_DOMAIN, "unix_stream_socket", "connectto");
+	sepol_allow(target, SEPOL_SOCKET_DOMAIN, "unix_stream_socket", "getopt");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fd", "use");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fifo_file", ALL);
 
 	// Allow binder service
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "call");
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "transfer");
+
+	// Transition to magisk
+	sepol_typetrans(target, SEPOL_FILE_DOMAIN, "process", SEPOL_PROC_DOMAIN);
+	sepol_allow(target, SEPOL_PROC_DOMAIN, "process", "transition");
 
 	// Allow termios ioctl
 	sepol_allow(target, "devpts", "chr_file", "ioctl");
@@ -40,12 +44,17 @@ void sepol_magisk_rules() {
 		sepol_create(SEPOL_PROC_DOMAIN);
 	if (!sepol_exists(SEPOL_FILE_DOMAIN))
 		sepol_create(SEPOL_FILE_DOMAIN);
+	if (!sepol_exists(SEPOL_SOCKET_DOMAIN))
+		sepol_create(SEPOL_SOCKET_DOMAIN);
 	sepol_permissive(SEPOL_PROC_DOMAIN);
+	sepol_permissive(SEPOL_SOCKET_DOMAIN);
 
 	sepol_attradd(SEPOL_PROC_DOMAIN, "mlstrustedsubject");
 	sepol_attradd(SEPOL_PROC_DOMAIN, "netdomain");
 	sepol_attradd(SEPOL_PROC_DOMAIN, "bluetoothdomain");
 	sepol_attradd(SEPOL_FILE_DOMAIN, "mlstrustedobject");
+	sepol_attradd(SEPOL_SOCKET_DOMAIN, "mlstrustedsubject");
+	sepol_attradd(SEPOL_SOCKET_DOMAIN, "netdomain");
 
 	// Let init daemon transit context
 	sepol_allow("kernel", "kernel", "process", "setcurrent");
@@ -94,6 +103,15 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "transfer");
 	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "call");
 	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
+
+	// magisk_socket
+	sepol_allow("servicemanager", SEPOL_SOCKET_DOMAIN, "dir", "search");
+	sepol_allow("servicemanager", SEPOL_SOCKET_DOMAIN, "dir", "read");
+	sepol_allow("servicemanager", SEPOL_SOCKET_DOMAIN, "file", "open");
+	sepol_allow("servicemanager", SEPOL_SOCKET_DOMAIN, "file", "read");
+	sepol_allow("servicemanager", SEPOL_SOCKET_DOMAIN, "process", "getattr");
+	sepol_allow("servicemanager", SEPOL_SOCKET_DOMAIN, "binder", "transfer");
+	sepol_allow("system_server", SEPOL_SOCKET_DOMAIN, "fd", "use");
 
 	// allowLog
 	sepol_allow("logd", SEPOL_PROC_DOMAIN, "dir", "search");
@@ -163,6 +181,7 @@ void sepol_magisk_rules() {
 	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "dir", ALL);
 	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "fifo_file", ALL);
 	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "chr_file", ALL);
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "lnk_file", ALL);
 	sepol_allow(SEPOL_FILE_DOMAIN, ALL, "filesystem", "associate");
 
 	// For changing attributes
