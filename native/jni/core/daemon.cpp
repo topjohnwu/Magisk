@@ -25,6 +25,7 @@
 int SDK_INT = -1;
 bool RECOVERY_MODE = false;
 static struct stat SERVER_STAT;
+static char MAIN_SOCKET[32]="";
 
 static void verify_client(int client, pid_t pid) {
 	// Verify caller is the same as server
@@ -124,13 +125,6 @@ static void main_daemon() {
 		return true;
 	});
 
-	// Load config status
-	parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
-		if (key == "RECOVERYMODE" && val == "true")
-			RECOVERY_MODE = true;
-		return true;
-	});
-
 	struct sockaddr_un sun;
 	socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
 	fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
@@ -169,6 +163,24 @@ int switch_mnt_ns(int pid) {
 }
 
 int connect_daemon(bool create) {
+    // Load config status
+    parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
+        if (key == "RECOVERYMODE" && val == "true")
+            RECOVERY_MODE = true;
+        else if (key == "MAIN_SOCKET")
+            memcpy(MAIN_SOCKET, val.data(), val.length());
+        return true;
+    });
+
+    if (MAIN_SOCKET[0]=='\0') {
+        int len = gen_rand_num(16, 32);
+        gen_rand_str(MAIN_SOCKET, len);
+        if (FILE *f = fopen(MAGISKTMP "/config", "ae"); f) {
+            fprintf(f, "MAIN_SOCKET=%s\n", MAIN_SOCKET);
+            fclose(f);
+        }
+    }
+
 	struct sockaddr_un sun;
 	socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);

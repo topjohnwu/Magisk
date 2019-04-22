@@ -80,6 +80,7 @@ unsigned get_shell_uid();
 int fork_dont_care();
 int fork_no_zombie();
 void gen_rand_str(char *buf, int len);
+int gen_rand_num(int min, int max);
 int strend(const char *s1, const char *s2);
 char *rtrim(char *str);
 void init_argv0(int argc, char **argv);

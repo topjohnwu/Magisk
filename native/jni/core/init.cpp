@@ -603,21 +603,6 @@ void MagiskInit::cleanup() {
 	umount_root(odm);
 }
 
-static inline void patch_socket_name(const char *path) {
-	uint8_t *buf;
-	char name[sizeof(MAIN_SOCKET)];
-	size_t size;
-	mmap_rw(path, buf, size);
-	for (int i = 0; i < size; ++i) {
-		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(name, sizeof(name));
-			memcpy(buf + i, name, sizeof(name));
-			i += sizeof(name);
-		}
-	}
-	munmap(buf, size);
-}
-
 static const char wrapper[] =
 "#!/system/bin/sh\n"
 "export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH:/apex/com.android.runtime/" LIBNAME "\"\n"
@@ -647,7 +632,7 @@ void MagiskInit::setup_overlay() {
 
 	// Dump binaries
 	mkdir(MAGISKTMP, 0755);
-	fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
+	fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0444);
 	write(fd, config.buf, config.sz);
 	close(fd);
 	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
@@ -656,17 +641,17 @@ void MagiskInit::setup_overlay() {
 	if (access("/system/apex", F_OK) == 0) {
 		LOGD("APEX detected, use wrapper\n");
 		dump_magisk("/sbin/magisk.bin", 0755);
-		patch_socket_name("/sbin/magisk.bin");
 		setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 		fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
 		write(fd, wrapper, sizeof(wrapper) - 1);
 		close(fd);
 	} else {
 		dump_magisk("/sbin/magisk", 0755);
-		patch_socket_name("/sbin/magisk");
 	}
 	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon(MAGISKTMP, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon(MAGISKTMP "/config", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 
 	// Create applet symlinks
 	for (int i = 0; applet_names[i]; ++i) {

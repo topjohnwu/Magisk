@@ -2,7 +2,6 @@
 
 #include <logging.h>
 
-#define MAIN_SOCKET  "d30138f2310a9fb9c54a3e0c21f58591"
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
 #define LOGFILE         "/cache/magisk.log"
 #define UNBLOCKFILE     "/dev/.magisk_unblock"

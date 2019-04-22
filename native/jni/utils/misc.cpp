@@ -63,6 +63,14 @@ void gen_rand_str(char *buf, int len) {
 	buf[len - 1] = '\0';
 }
 
+int gen_rand_num(int min, int max) {
+    if (!rand_init) {
+        srand(time(nullptr));
+        rand_init = true;
+    }
+    return (rand() % (max - min)) + min; //[min,max)
+}
+
 int strend(const char *s1, const char *s2) {
 	size_t l1 = strlen(s1);
 	size_t l2 = strlen(s2);
