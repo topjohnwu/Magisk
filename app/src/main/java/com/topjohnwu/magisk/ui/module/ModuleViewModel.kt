@@ -26,6 +26,7 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.update
 import io.reactivex.Single
+import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
 class ModuleViewModel(
@@ -44,8 +45,13 @@ class ModuleViewModel(
         itemBinding.bindExtra(BR.viewModel, this@ModuleViewModel)
     }
 
+    private var queryDisposable: Disposable? = null
+
     init {
-        query.addOnPropertyChangedCallback { query() }
+        query.addOnPropertyChangedCallback {
+            queryDisposable?.dispose()
+            queryDisposable = query()
+        }
         Event.register(this)
         refresh()
     }
@@ -88,7 +94,6 @@ class ModuleViewModel(
 
     private fun query() = queryRaw()
         .subscribeK { itemsRemote.update(it.first, it.second) }
-        .add()
 
     private fun queryRaw(query: String = this.query.value) = allItems.toSingle()
         .map { it.filterIsInstance<RepoRvItem>() }
