@@ -84,7 +84,10 @@ class HideViewModel(
         allItems.toSingle()
             .map { it.filterIsInstance<HideRvItem>() }
             .flattenAsFlowable { it }
-            .filter { it.item.name.contains(query) || it.item.processes.any { it.contains(query) } }
+            .filter {
+                it.item.name.contains(query, ignoreCase = true) ||
+                        it.item.processes.any { it.contains(query, ignoreCase = true) }
+            }
             .filter { if (showSystem) true else it.item.info.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
             .toList()
             .subscribeK { items.update(it) }
