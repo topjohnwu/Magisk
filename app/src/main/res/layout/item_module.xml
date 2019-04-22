@@ -108,6 +108,7 @@
                 android:id="@+id/checkbox"
                 style="@style/Widget.Icon"
                 isChecked="@{item.isChecked}"
+                android:layout_marginEnd="@dimen/margin_generic"
                 android:onClick="@{() -> item.toggle()}"
                 app:layout_constraintBottom_toTopOf="@+id/description"
                 app:layout_constraintEnd_toStartOf="@+id/delete"
@@ -115,6 +116,14 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="?attr/imageColorTint"
                 tools:src="@drawable/ic_checked" />
+
+            <View
+                style="@style/Widget.Divider.Vertical"
+                android:backgroundTint="?attr/imageColorTint"
+                app:layout_constraintBottom_toBottomOf="@+id/checkbox"
+                app:layout_constraintEnd_toStartOf="@+id/delete"
+                app:layout_constraintStart_toEndOf="@+id/checkbox"
+                app:layout_constraintTop_toTopOf="@+id/checkbox" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/delete"
