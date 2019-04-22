@@ -13,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.R;
@@ -33,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import java9.util.stream.StreamSupport;
 
@@ -51,7 +50,7 @@ public class ReposAdapter
     private SearchView mSearch;
 
     public ReposAdapter() {
-        repoDB = App.self.repoDB;
+        repoDB = App.self.getRepoDB();
         moduleMap = Collections.emptyMap();
         fullList = Collections.emptyList();
         repoPairs = new ArrayList<>();

@@ -74,7 +74,7 @@ public class SettingsFragment extends BasePreferenceFragment {
         });
         findPreference("clear").setOnPreferenceClickListener(pref -> {
             app.getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
-            app.repoDB.clearRepo();
+            app.getRepoDB().clearRepo();
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
         });

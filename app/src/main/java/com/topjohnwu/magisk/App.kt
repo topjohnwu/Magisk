@@ -19,6 +19,7 @@ import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.RootUtils
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -29,8 +30,8 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
     // Global resources
     val prefs: SharedPreferences get() = PreferenceManager.getDefaultSharedPreferences(deContext)
     val DB: MagiskDB by lazy { MagiskDB(deContext) }
-    @JvmField
-    var repoDB: RepoDatabaseHelper? = null
+    @Deprecated("Use dependency injection")
+    val repoDB: RepoDatabaseHelper by inject()
     @Volatile
     private var foreground: Activity? = null
 
@@ -94,11 +95,13 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
         //fixme this should be at least weak reference, me no likey
         @SuppressLint("StaticFieldLeak")
+        @Deprecated("Use dependency injection")
         @JvmStatic
         lateinit var self: App
 
         //fixme this should be at least weak reference, me no likey
         @SuppressLint("StaticFieldLeak")
+        @Deprecated("Use dependency injection")
         @JvmStatic
         lateinit var deContext: Context
 
@@ -116,6 +119,7 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
         }
 
         //fixme me no likey
+        @Deprecated("")
         @JvmStatic
         fun foreground(): Activity? {
             return self.foreground

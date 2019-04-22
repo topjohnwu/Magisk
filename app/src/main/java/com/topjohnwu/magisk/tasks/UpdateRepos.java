@@ -34,7 +34,7 @@ import java.util.concurrent.Future;
 public class UpdateRepos {
     private static final DateFormat DATE_FORMAT;
 
-    private App app = App.self;
+    private final App app = App.self;
     private Set<String> cached;
     private Queue<Pair<String, Date>> moduleQueue;
 
@@ -116,17 +116,17 @@ public class UpdateRepos {
                 Pair<String, Date> pair = moduleQueue.poll();
                 if (pair == null)
                     return;
-                Repo repo = app.repoDB.getRepo(pair.first);
+                Repo repo = app.getRepoDB().getRepo(pair.first);
                 try {
                     if (repo == null)
                         repo = new Repo(pair.first);
                     else
                         cached.remove(pair.first);
                     repo.update(pair.second);
-                    app.repoDB.addRepo(repo);
+                    app.getRepoDB().addRepo(repo);
                 } catch (Repo.IllegalRepoException e) {
                     Logger.debug(e.getMessage());
-                    app.repoDB.removeRepo(pair.first);
+                    app.getRepoDB().removeRepo(pair.first);
                 }
             }
         });
@@ -134,7 +134,7 @@ public class UpdateRepos {
     }
 
     private void fullReload() {
-        Cursor c = app.repoDB.getRawCursor();
+        Cursor c = app.getRepoDB().getRawCursor();
         runTasks(() -> {
             while (true) {
                 Repo repo;
@@ -145,10 +145,10 @@ public class UpdateRepos {
                 }
                 try {
                     repo.update();
-                    app.repoDB.addRepo(repo);
+                    app.getRepoDB().addRepo(repo);
                 } catch (Repo.IllegalRepoException e) {
                     Logger.debug(e.getMessage());
-                    app.repoDB.removeRepo(repo);
+                    app.getRepoDB().removeRepo(repo);
                 }
             }
         });
@@ -157,12 +157,12 @@ public class UpdateRepos {
     public void exec(boolean force) {
         Event.reset(Event.REPO_LOAD_DONE);
         App.THREAD_POOL.execute(() -> {
-            cached = Collections.synchronizedSet(app.repoDB.getRepoIDSet());
+            cached = Collections.synchronizedSet(app.getRepoDB().getRepoIDSet());
             moduleQueue = new ConcurrentLinkedQueue<>();
 
             if (loadPages()) {
                 // The leftover cached means they are removed from online repo
-                app.repoDB.removeRepo(cached);
+                app.getRepoDB().removeRepo(cached);
             } else if (force) {
                 fullReload();
             }
