@@ -6,7 +6,10 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
+import androidx.databinding.InverseBindingListener
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
@@ -56,4 +59,25 @@ fun setChecked(view: AppCompatImageView, isChecked: IndeterminateState) {
             IndeterminateState.UNCHECKED -> R.drawable.ic_unchecked
         }
     )
+}
+
+@BindingAdapter("position")
+fun setPosition(view: ViewPager, position: Int) {
+    view.currentItem = position
+}
+
+@InverseBindingAdapter(attribute = "position", event = "positionChanged")
+fun getPosition(view: ViewPager) = view.currentItem
+
+@BindingAdapter("positionChanged")
+fun setPositionChangedListener(view: ViewPager, listener: InverseBindingListener) {
+    view.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        override fun onPageSelected(position: Int) = listener.onChange()
+        override fun onPageScrollStateChanged(state: Int) = listener.onChange()
+        override fun onPageScrolled(
+            position: Int,
+            positionOffset: Float,
+            positionOffsetPixels: Int
+        ) = listener.onChange()
+    })
 }

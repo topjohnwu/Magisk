@@ -24,3 +24,5 @@ class OpenFilePickerEvent : ViewEvent()
 
 class OpenChangelogEvent(val item: Repo) : ViewEvent()
 class InstallModuleEvent(val item: Repo) : ViewEvent()
+
+class PageChangedEvent : ViewEvent()
