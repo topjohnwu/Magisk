@@ -15,6 +15,6 @@ val viewModelModules = module {
     viewModel { HomeViewModel(get(), get()) }
     viewModel { SuperuserViewModel(get(), get(), get(), get()) }
     viewModel { HideViewModel(get(), get()) }
-    viewModel { ModuleViewModel(get()) }
+    viewModel { ModuleViewModel(get(), get()) }
     viewModel { LogViewModel(get(), get()) }
 }

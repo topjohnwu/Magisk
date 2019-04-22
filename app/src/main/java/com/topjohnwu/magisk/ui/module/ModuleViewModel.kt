@@ -1,17 +1,21 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.content.res.Resources
 import android.database.Cursor
+import androidx.annotation.StringRes
 import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
 import com.topjohnwu.magisk.model.entity.Module
 import com.topjohnwu.magisk.model.entity.Repo
 import com.topjohnwu.magisk.model.entity.recycler.ModuleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoRvItem
+import com.topjohnwu.magisk.model.entity.recycler.SectionRvItem
 import com.topjohnwu.magisk.model.events.InstallModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
@@ -25,7 +29,8 @@ import io.reactivex.Single
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
 class ModuleViewModel(
-    private val repoDatabase: RepoDatabaseHelper
+    private val repoDatabase: RepoDatabaseHelper,
+    private val resources: Resources
 ) : MagiskViewModel() {
 
     val query = KObservableField("")
@@ -94,7 +99,33 @@ class ModuleViewModel(
                     it.item.description.contains(query, ignoreCase = true)
         }
         .toList()
+        .map { if (query.isEmpty()) it.divide() else it }
         .map { it to itemsRemote.calculateDiff(it) }
+
+    private fun List<RepoRvItem>.divide(): List<ComparableRvItem<*>> {
+        val installed = itemsInstalled.filterIsInstance<ModuleRvItem>()
+        val installedModules = filter { installed.any { item -> it.item.id == item.item.id } }
+
+        fun installedByID(id: String) = installed.firstOrNull { it.item.id == id }
+
+        fun List<RepoRvItem>.filterObsolete() = filter {
+            val module = installedByID(it.item.id) ?: return@filter false
+            module.item.versionCode != it.item.versionCode
+        }
+
+        val resultObsolete = installedModules.filterObsolete()
+        val resultInstalled = installedModules - resultObsolete
+        val resultRemote = toList() - installedModules
+
+        fun buildList(@StringRes text: Int, list: List<RepoRvItem>): List<ComparableRvItem<*>> {
+            return if (list.isEmpty()) list
+            else listOf(SectionRvItem(resources.getString(text))) + list
+        }
+
+        return buildList(R.string.update_available, resultObsolete) +
+                buildList(R.string.installed, resultInstalled) +
+                buildList(R.string.not_installed, resultRemote)
+    }
 
     private fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
         val out = mutableListOf<Result>()
