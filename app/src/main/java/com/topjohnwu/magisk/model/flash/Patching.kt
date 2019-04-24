@@ -6,8 +6,8 @@ import com.topjohnwu.superuser.Shell
 
 sealed class Patching(
     private val console: MutableList<String>,
-    logs: List<String>,
-    private val resultListener: (Result<Boolean>) -> Unit
+    logs: MutableList<String>,
+    private val resultListener: FlashResultListener
 ) : MagiskInstaller(console, logs) {
 
     override fun onResult(success: Boolean) {
@@ -17,14 +17,14 @@ sealed class Patching(
             Shell.sh("rm -rf $installDir").submit()
             console.add("! Installation failed")
         }
-        resultListener(Result.success(success))
+        resultListener.onResult(success)
     }
 
     class File(
         private val uri: Uri,
         console: MutableList<String>,
-        logs: List<String>,
-        resultListener: (Result<Boolean>) -> Unit = {}
+        logs: MutableList<String>,
+        resultListener: FlashResultListener
     ) : Patching(console, logs, resultListener) {
         override fun operations() =
             extractZip() && handleFile(uri) && patchBoot() && storeBoot()
@@ -32,8 +32,8 @@ sealed class Patching(
 
     class SecondSlot(
         console: MutableList<String>,
-        logs: List<String>,
-        resultListener: (Result<Boolean>) -> Unit = {}
+        logs: MutableList<String>,
+        resultListener: FlashResultListener
     ) : Patching(console, logs, resultListener) {
         override fun operations() =
             findSecondaryImage() && extractZip() && patchBoot() && flashBoot() && postOTA()
@@ -41,8 +41,8 @@ sealed class Patching(
 
     class Direct(
         console: MutableList<String>,
-        logs: List<String>,
-        resultListener: (Result<Boolean>) -> Unit = {}
+        logs: MutableList<String>,
+        resultListener: FlashResultListener
     ) : Patching(console, logs, resultListener) {
         override fun operations() =
             findImage() && extractZip() && patchBoot() && flashBoot()

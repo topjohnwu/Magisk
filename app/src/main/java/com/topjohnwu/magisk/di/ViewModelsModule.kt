@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.di
 
+import android.net.Uri
 import com.topjohnwu.magisk.ui.MainViewModel
+import com.topjohnwu.magisk.ui.flash.FlashViewModel
 import com.topjohnwu.magisk.ui.hide.HideViewModel
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.ui.log.LogViewModel
@@ -17,4 +19,5 @@ val viewModelModules = module {
     viewModel { HideViewModel(get(), get()) }
     viewModel { ModuleViewModel(get(), get()) }
     viewModel { LogViewModel(get(), get()) }
+    viewModel { (action: String, uri: Uri?) -> FlashViewModel(action, uri, get()) }
 }

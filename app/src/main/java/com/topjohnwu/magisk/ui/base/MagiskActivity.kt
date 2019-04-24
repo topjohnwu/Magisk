@@ -16,6 +16,7 @@ import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
@@ -36,7 +37,8 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
 
     protected open val defaultPosition: Int = 0
 
-    protected val navigationController by lazy {
+    protected val navigationController get() = if (navHostId == 0) null else _navigationController
+    private val _navigationController by lazy {
         if (navHostId == 0) throw IllegalStateException("Did you forget to override \"navHostId\"?")
         FragNavController(supportFragmentManager, navHostId)
     }
@@ -54,7 +56,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        navigationController.apply {
+        navigationController?.apply {
             rootFragmentListener = this@MagiskActivity
             initialize(defaultPosition, savedInstanceState)
         }
@@ -62,13 +64,14 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        navigationController.onSaveInstanceState(outState)
+        navigationController?.onSaveInstanceState(outState)
     }
 
     @CallSuper
     override fun onEventDispatched(event: ViewEvent) {
         super.onEventDispatched(event)
         when (event) {
+            is BackPressEvent -> onBackPressed()
             is MagiskNavigationEvent -> navigateTo(event)
             is ViewActionEvent -> event.action(this)
             is PermissionEvent -> withPermissions(*event.permissions.toTypedArray()) {
@@ -86,15 +89,15 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
     override fun navigateTo(event: MagiskNavigationEvent) {
         val directions = event.navDirections
 
-        navigationController.defaultTransactionOptions = FragNavTransactionOptions.newBuilder()
+        navigationController?.defaultTransactionOptions = FragNavTransactionOptions.newBuilder()
             .customAnimations(event.animOptions)
             .build()
 
-        navigationController.currentStack
+        navigationController?.currentStack
             ?.indexOfFirst { it.javaClass == event.navOptions.popUpTo }
             ?.let { if (it == -1) null else it } // invalidate if class is not found
             ?.let { if (event.navOptions.inclusive) it + 1 else it }
-            ?.let { navigationController.popFragments(it) }
+            ?.let { navigationController?.popFragments(it) }
 
         when (directions.isActivity) {
             true -> navigateToActivity(event)
@@ -127,21 +130,21 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         when (val index = baseFragments.indexOfFirst { it.java.name == destination.name }) {
             -1 -> destination.newInstance()
                 .apply { arguments = event.navDirections.args }
-                .let { navigationController.pushFragment(it) }
+                .let { navigationController?.pushFragment(it) }
             // When it's desired that fragments of same class are put on top of one another edit this
-            else -> navigationController.switchTab(index)
+            else -> navigationController?.switchTab(index)
         }
     }
 
     override fun onBackPressed() {
-        val fragment = navigationController.currentFrag as? MagiskFragment<*, *>
+        val fragment = navigationController?.currentFrag as? MagiskFragment<*, *>
 
         if (fragment?.onBackPressed() == true) {
             return
         }
 
         try {
-            navigationController.popFragment()
+            navigationController?.popFragment() ?: throw UnsupportedOperationException()
         } catch (e: UnsupportedOperationException) {
             super.onBackPressed()
         }

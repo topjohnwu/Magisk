@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils
 
 import android.view.View
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
@@ -9,10 +10,15 @@ import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
+import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 
 
 @BindingAdapter("onNavigationClick")
@@ -80,4 +86,28 @@ fun setPositionChangedListener(view: ViewPager, listener: InverseBindingListener
             positionOffsetPixels: Int
         ) = listener.onChange()
     })
+}
+
+@BindingAdapter("invisibleScale")
+fun setInvisibleWithScale(view: View, isInvisible: Boolean) {
+    view.animate()
+        .scaleX(if (isInvisible) 0f else 1f)
+        .scaleY(if (isInvisible) 0f else 1f)
+        .setInterpolator(FastOutSlowInInterpolator())
+        .start()
+}
+
+@BindingAdapter("movieBehavior", "movieBehaviorText")
+fun setMovieBehavior(view: TextView, isMovieBehavior: Boolean, text: String) {
+    (view.tag as? Disposable)?.dispose()
+    if (isMovieBehavior) {
+        val observer = Observable
+            .interval(150, TimeUnit.MILLISECONDS)
+            .subscribeK {
+                view.text = text.replaceRandomWithSpecial()
+            }
+        view.tag = observer
+    } else {
+        view.text = text
+    }
 }

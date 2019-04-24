@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.base
 
 import android.app.Activity
 import com.skoumal.teanity.viewmodel.LoadingViewModel
+import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.utils.Event
@@ -23,4 +24,7 @@ abstract class MagiskViewModel : LoadingViewModel(), Event.AutoListener {
         val subject = PublishSubject.create<Boolean>()
         return subject.doOnSubscribe { PermissionEvent(permissions.toList(), subject).publish() }
     }
+
+    fun back() = BackPressEvent().publish()
+
 }

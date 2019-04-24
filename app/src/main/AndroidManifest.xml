@@ -35,7 +35,7 @@
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor"
-            android:theme="@style/AppTheme.NoDrawer" />
+            android:theme="@style/MagiskTheme.Flashing" />
 
         <!-- Superuser -->
 

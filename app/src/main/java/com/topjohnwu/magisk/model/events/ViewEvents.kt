@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.model.events
 import android.app.Activity
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.model.entity.Repo
+import io.reactivex.subjects.PublishSubject
 
 
 data class OpenLinkEvent(val url: String) : ViewEvent()
@@ -26,3 +27,10 @@ class OpenChangelogEvent(val item: Repo) : ViewEvent()
 class InstallModuleEvent(val item: Repo) : ViewEvent()
 
 class PageChangedEvent : ViewEvent()
+
+class PermissionEvent(
+    val permissions: List<String>,
+    val callback: PublishSubject<Boolean>
+) : ViewEvent()
+
+class BackPressEvent : ViewEvent()

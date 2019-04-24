@@ -13,7 +13,7 @@ sealed class Flashing(
     uri: Uri,
     private val console: MutableList<String>,
     log: MutableList<String>,
-    private val resultListener: (Result<Boolean>) -> Unit
+    private val resultListener: FlashResultListener
 ) : FlashZip(uri, console, log) {
 
     override fun onResult(success: Boolean) {
@@ -21,14 +21,14 @@ sealed class Flashing(
             console.add("! Installation failed")
         }
 
-        resultListener(Result.success(success))
+        resultListener.onResult(success)
     }
 
     class Install(
         uri: Uri,
         console: MutableList<String>,
         log: MutableList<String>,
-        resultListener: (Result<Boolean>) -> Unit = {}
+        resultListener: FlashResultListener
     ) : Flashing(uri, console, log, resultListener) {
 
         override fun onResult(success: Boolean) {
@@ -44,7 +44,7 @@ sealed class Flashing(
         uri: Uri,
         console: MutableList<String>,
         log: MutableList<String>,
-        resultListener: (Result<Boolean>) -> Unit = {}
+        resultListener: FlashResultListener
     ) : Flashing(uri, console, log, resultListener) {
 
         private val context: Context by inject()
