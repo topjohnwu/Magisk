@@ -1,17 +1,21 @@
+#include <sys/xattr.h>
 #include <dlfcn.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <syscall.h>
-#include <sys/xattr.h>
+#include <string_view>
 
 #include <magisk.h>
 #include <utils.h>
 #include <selinux.h>
 
+using namespace std::literals;
+
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"
 #define ADB_CON     "u:object_r:adb_data_file:s0"
+#define ROOT_CON    "u:object_r:rootfs:s0"
 #define MAGISK_CON  "u:object_r:" SEPOL_FILE_DOMAIN ":s0"
 
 // Stub implementation
@@ -164,7 +168,7 @@ static void restore_syscon(int dirfd) {
 
 	dir = xfdopendir(dirfd);
 	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		int fd = openat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
 		if (entry->d_type == DT_DIR) {
@@ -193,7 +197,7 @@ static void restore_magiskcon(int dirfd) {
 
 	dir = xfdopendir(dirfd);
 	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
 		if (entry->d_type == DT_DIR) {
@@ -219,4 +223,23 @@ void restorecon() {
 	fd = xopen(DATABIN, O_RDONLY | O_CLOEXEC);
 	restore_magiskcon(fd);
 	close(fd);
+}
+
+void restore_rootcon() {
+	setfilecon("/sbin", ROOT_CON);
+	struct dirent *entry;
+	DIR *dir = xopendir("/sbin");
+	int dfd = dirfd(dir);
+
+	while ((entry = xreaddir(dir))) {
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
+			continue;
+		setfilecon_at(dfd, entry->d_name, ROOT_CON);
+	}
+
+	setfilecon("/sbin/magisk.bin", MAGISK_CON);
+	setfilecon("/sbin/magisk", MAGISK_CON);
+	setfilecon("/sbin/magiskinit", MAGISK_CON);
+
+	closedir(dir);
 }

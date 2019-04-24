@@ -54,6 +54,8 @@ void sepol_magisk_rules() {
 	// Let init run stuffs
 	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
 	sepol_allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
+	sepol_allow("init", "tmpfs", "file", "getattr");
+	sepol_allow("init", "tmpfs", "file", "execute");
 
 	// Shell, properties, logs
 	if (sepol_exists("default_prop"))

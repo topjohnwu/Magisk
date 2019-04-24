@@ -1,14 +1,8 @@
 #include <magisk.h>
 #include <magiskpolicy.h>
 
-static const char magiskrc[] =
+constexpr const char magiskrc[] =
 "\n\n"
-
-"on early-init\n"
-"    write " EARLYINIT " 1\n"
-"    wait " EARLYINITDONE "\n"
-"    rm " EARLYINITDONE "\n"
-"\n"
 
 "on post-fs-data\n"
 "    start logd\n"

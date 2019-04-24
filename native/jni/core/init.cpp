@@ -46,7 +46,8 @@ static int vprintk(const char *fmt, va_list ap) {
 
 static void setup_klog() {
 	mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
-	kmsg = xfopen("/kmsg", "ae");
+	int fd = xopen("/kmsg", O_WRONLY | O_CLOEXEC);
+	kmsg = fdopen(fd, "w");
 	setbuf(kmsg, nullptr);
 	unlink("/kmsg");
 	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
@@ -156,11 +157,10 @@ private:
 	bool read_dt_fstab(const char *name, char *partname, char *partfs);
 	bool patch_sepolicy();
 	void cleanup();
+	void re_exec_init();
 
 public:
 	explicit MagiskInit(char *argv[]) : argv(argv) {}
-	void setup_overlay();
-	void re_exec_init();
 	void start();
 	void test();
 };
@@ -460,6 +460,27 @@ void MagiskInit::early_mount() {
 	mount_root(odm);
 }
 
+static void patch_socket_name(const char *path) {
+	uint8_t *buf;
+	char name[sizeof(MAIN_SOCKET)];
+	size_t size;
+	mmap_rw(path, buf, size);
+	for (int i = 0; i < size; ++i) {
+		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
+			gen_rand_str(name, sizeof(name));
+			memcpy(buf + i, name, sizeof(name));
+			i += sizeof(name);
+		}
+	}
+	munmap(buf, size);
+}
+
+constexpr const char wrapper[] =
+"#!/system/bin/sh\n"
+"export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH:/apex/com.android.runtime/" LIBNAME "\"\n"
+"exec /sbin/magisk.bin \"$0\" \"$@\"\n"
+;
+
 void MagiskInit::setup_rootfs() {
 	bool patch_init = patch_sepolicy();
 
@@ -531,6 +552,7 @@ void MagiskInit::setup_rootfs() {
 	gen_rand_str(pfd_svc + 1, sizeof(pfd_svc) - 1);
 	gen_rand_str(ls_svc + 1, sizeof(ls_svc) - 1);
 	gen_rand_str(bc_svc + 1, sizeof(bc_svc) - 1);
+	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
 	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
 	fclose(rc);
 	clone_attr("/init.rc", "/init.p.rc");
@@ -545,6 +567,56 @@ void MagiskInit::setup_rootfs() {
 	int rootdir = xopen("/root", O_RDONLY | O_CLOEXEC);
 	int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 	link_dir(sbin, rootdir);
+	close(sbin);
+
+	LOGD("Mount /sbin tmpfs overlay\n");
+	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+
+	char path[64];
+
+	// Create symlinks pointing back to /root
+	DIR *dir = xfdopendir(rootdir);
+	struct dirent *entry;
+	while((entry = xreaddir(dir))) {
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
+			continue;
+		sprintf(path, "/root/%s", entry->d_name);
+		xsymlinkat(path, sbin, entry->d_name);
+	}
+
+	// Dump binaries
+	mkdir(MAGISKTMP, 0755);
+	fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
+	write(fd, config.buf, config.sz);
+	close(fd);
+	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
+	write(fd, self.buf, self.sz);
+	close(fd);
+	if (access("/system/apex", F_OK) == 0) {
+		LOGD("APEX detected, use wrapper\n");
+		dump_magisk("/sbin/magisk.bin", 0755);
+		patch_socket_name("/sbin/magisk.bin");
+		fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+		write(fd, wrapper, sizeof(wrapper) - 1);
+		close(fd);
+	} else {
+		dump_magisk("/sbin/magisk", 0755);
+		patch_socket_name("/sbin/magisk");
+	}
+
+	// Create applet symlinks
+	for (int i = 0; applet_names[i]; ++i) {
+		sprintf(path, "/sbin/%s", applet_names[i]);
+		xsymlink("/sbin/magisk", path);
+	}
+	for (int i = 0; init_applet[i]; ++i) {
+		sprintf(path, "/sbin/%s", init_applet[i]);
+		xsymlink("/sbin/magiskinit", path);
+	}
+
+	close(rootdir);
+	close(sbin);
 }
 
 bool MagiskInit::patch_sepolicy() {
@@ -603,99 +675,8 @@ void MagiskInit::cleanup() {
 	umount_root(odm);
 }
 
-static inline void patch_socket_name(const char *path) {
-	uint8_t *buf;
-	char name[sizeof(MAIN_SOCKET)];
-	size_t size;
-	mmap_rw(path, buf, size);
-	for (int i = 0; i < size; ++i) {
-		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(name, sizeof(name));
-			memcpy(buf + i, name, sizeof(name));
-			i += sizeof(name);
-		}
-	}
-	munmap(buf, size);
-}
-
-static const char wrapper[] =
-"#!/system/bin/sh\n"
-"export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH:/apex/com.android.runtime/" LIBNAME "\"\n"
-"exec /sbin/magisk.bin \"$0\" \"$@\"\n";
-
-void MagiskInit::setup_overlay() {
-	char path[128];
-	int fd;
-
-	// Wait for early-init start
-	while (access(EARLYINIT, F_OK) != 0)
-		usleep(10);
-	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
-	unlink(EARLYINIT);
-
-#ifdef MAGISK_DEBUG
-	kmsg = xfopen("/dev/kmsg", "ae");
-	setbuf(kmsg, nullptr);
-#endif
-
-	LOGD("Setting up overlay\n");
-
-	// Mount the /sbin tmpfs overlay
-	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
-	chmod("/sbin", 0755);
-	setfilecon("/sbin", "u:object_r:rootfs:s0");
-
-	// Dump binaries
-	mkdir(MAGISKTMP, 0755);
-	fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
-	write(fd, config.buf, config.sz);
-	close(fd);
-	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
-	write(fd, self.buf, self.sz);
-	close(fd);
-	if (access("/system/apex", F_OK) == 0) {
-		LOGD("APEX detected, use wrapper\n");
-		dump_magisk("/sbin/magisk.bin", 0755);
-		patch_socket_name("/sbin/magisk.bin");
-		setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-		fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
-		write(fd, wrapper, sizeof(wrapper) - 1);
-		close(fd);
-	} else {
-		dump_magisk("/sbin/magisk", 0755);
-		patch_socket_name("/sbin/magisk");
-	}
-	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-
-	// Create applet symlinks
-	for (int i = 0; applet_names[i]; ++i) {
-		sprintf(path, "/sbin/%s", applet_names[i]);
-		xsymlink("/sbin/magisk", path);
-	}
-	for (int i = 0; init_applet[i]; ++i) {
-		sprintf(path, "/sbin/%s", init_applet[i]);
-		xsymlink("/sbin/magiskinit", path);
-	}
-
-	// Create symlinks pointing back to /root
-	DIR *dir = xopendir("/root");
-	struct dirent *entry;
-	fd = xopen("/sbin", O_RDONLY);
-	while((entry = xreaddir(dir))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		sprintf(path, "/root/%s", entry->d_name);
-		xsymlinkat(path, fd, entry->d_name);
-	}
-	closedir(dir);
-	close(fd);
-
-	close(xopen(EARLYINITDONE, O_RDONLY | O_CREAT, 0));
-	exit(0);
-}
-
 void MagiskInit::re_exec_init() {
+	LOGD("Re-exec /init\n");
 	cleanup();
 	execv("/init", argv);
 	exit(1);
@@ -722,6 +703,7 @@ void MagiskInit::start() {
 	preset();
 	early_mount();
 	setup_rootfs();
+	re_exec_init();
 }
 
 void MagiskInit::test() {
@@ -767,14 +749,4 @@ int main(int argc, char *argv[]) {
 
 	// Run the main routine
 	init.start();
-
-	// Close all file descriptors
-	for (int i = 0; i < 30; ++i)
-		close(i);
-
-	// Launch daemon to setup overlay
-	if (fork_dont_care() == 0)
-		init.setup_overlay();
-
-	init.re_exec_init();
 }
