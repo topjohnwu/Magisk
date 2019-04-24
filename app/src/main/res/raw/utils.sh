@@ -77,6 +77,7 @@ post_ota() {
   cat << EOF > post-fs-data.d/post_ota.sh
 ${1}/bootctl mark-boot-successful
 rm -f ${1}/bootctl
+rm -f ${1}/post-fs-data.d/post_ota.sh
 EOF
   chmod 755 post-fs-data.d/post_ota.sh
   cd /
