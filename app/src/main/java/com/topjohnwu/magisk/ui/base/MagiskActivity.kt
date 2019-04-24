@@ -7,14 +7,21 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.net.toUri
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
+import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.Utils
 import timber.log.Timber
 import kotlin.reflect.KClass
@@ -64,6 +71,13 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         when (event) {
             is MagiskNavigationEvent -> navigateTo(event)
             is ViewActionEvent -> event.action(this)
+            is PermissionEvent -> withPermissions(*event.permissions.toTypedArray()) {
+                onSuccess { event.callback.onNext(true) }
+                onFailure {
+                    event.callback.onNext(false)
+                    event.callback.onError(SecurityException("User refused permissions"))
+                }
+            }
         }
     }
 
@@ -134,6 +148,26 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
     }
 
     fun openUrl(url: String) = Utils.openLink(this, url.toUri())
+
+    fun withPermissions(vararg permissions: String, builder: PermissionRequestBuilder.() -> Unit) {
+        val request = PermissionRequestBuilder().apply(builder).build()
+        Dexter.withActivity(this)
+            .withPermissions(*permissions)
+            .withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) =
+                    if (report?.areAllPermissionsGranted() == true) {
+                        request.onSuccess()
+                    } else {
+                        request.onFailure()
+                    }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) = request.onShowRationale(permissions.orEmpty().map { it.name })
+            })
+            .check()
+    }
 
     private fun FragNavTransactionOptions.Builder.customAnimations(options: MagiskAnimBuilder) =
         customAnimations(options.enter, options.exit, options.popEnter, options.popExit)

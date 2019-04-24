@@ -5,9 +5,11 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.skoumal.teanity.view.TeanityFragment
 import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
+import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import kotlin.reflect.KClass
 
 
@@ -27,7 +29,18 @@ abstract class MagiskFragment<ViewModel : MagiskViewModel, Binding : ViewDataBin
         when (event) {
             is MagiskNavigationEvent -> navigateTo(event)
             is ViewActionEvent -> event.action(requireActivity())
+            is PermissionEvent -> magiskActivity.withPermissions(*event.permissions.toTypedArray()) {
+                onSuccess { event.callback.onNext(true) }
+                onFailure {
+                    event.callback.onNext(false)
+                    event.callback.onError(SecurityException("User refused permissions"))
+                }
+            }
         }
+    }
+
+    fun withPermissions(vararg permissions: String, builder: PermissionRequestBuilder.() -> Unit) {
+        magiskActivity.withPermissions(*permissions, builder = builder)
     }
 
     fun openLink(url: String) = magiskActivity.openUrl(url)
