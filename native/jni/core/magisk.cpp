@@ -71,6 +71,7 @@ int magisk_main(int argc, char *argv[]) {
 		unlock_blocks();
 		return 0;
 	} else if (strcmp(argv[1], "--restorecon") == 0) {
+		restore_rootcon();
 		restorecon();
 		return 0;
 	} else if (strcmp(argv[1], "--clone-attr") == 0) {

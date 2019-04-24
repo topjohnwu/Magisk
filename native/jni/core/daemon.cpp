@@ -101,6 +101,8 @@ static void main_daemon() {
 	android_logging();
 	setsid();
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
+	restore_rootcon();
+
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);

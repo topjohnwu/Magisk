@@ -71,7 +71,7 @@ void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
 	}
 }
 
-bool proc_name_match(int pid, const char *name) {
+static bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
 	FILE *f;
 #if 0
