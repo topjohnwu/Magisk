@@ -135,8 +135,7 @@ recovery_cleanup() {
   [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
   [ -z $OLD_LD_CFG ] || export LD_CONFIG_FILE=$OLD_LD_CFG
   ui_print "- Unmounting partitions"
-  umount -l /system_root 2>/dev/null
-  umount -l /system 2>/dev/null
+  umount -l $SYSTEM 2>/dev/null
   umount -l /vendor 2>/dev/null
   umount -l /dev/random 2>/dev/null
 }
@@ -168,7 +167,7 @@ find_block() {
 }
 
 mount_partitions() {
-  # Check if the device is A/B
+  # Check if the device is A/B, A-only SAR, or A-only
   if [ -n "$(grep_cmdline slot_suffix)" ]; then
     SYSTEM="/system"
     SYSTEM_ROOT=true
@@ -179,23 +178,22 @@ mount_partitions() {
       [ $SLOT = "_" ] && SLOT=
     fi
     [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
+  elif [ -n "$(cat /etc/fstab | grep /system_root)" ]; then
+    SYSTEM="/system_root"
+    SYSTEM_ROOT=true
+  else
+    SYSTEM="/system"
+    SYSTEM_ROOT=false
   fi;
 
-  ui_print "- Mounting /system, /vendor"
-  mkdir /system 2>/dev/null
-  [ -f /system/build.prop ] || is_mounted /system || mount -o ro /system 2>/dev/null
-  if ! is_mounted /system && ! [ -f /system/build.prop ]; then
-    SYSTEMBLOCK=`find_block system$SLOT`
-    mount -o ro $SYSTEMBLOCK /system
+  ui_print "- Mounting $SYSTEM, /vendor"
+  mkdir $SYSTEM 2>/dev/null
+  [ -f /system/build.prop ] || is_mounted $SYSTEM || mount -o ro $SYSTEM 2>/dev/null
+  if ! is_mounted $SYSTEM && ! [ -f /system/build.prop ]; then
+    SYSTEMBLOCK=`find_block $SYSTEM$SLOT`
+    mount -o ro $SYSTEMBLOCK $SYSTEM
   fi
   [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
-  grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
-  if [ -f /system/init.rc ]; then
-    SYSTEM_ROOT=true
-    mkdir /system_root 2>/dev/null
-    mount --move /system /system_root
-    mount -o bind /system_root/system /system
-  fi
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
   if [ -L /system/vendor ]; then
     mkdir /vendor 2>/dev/null

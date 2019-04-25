@@ -78,7 +78,7 @@ chmod -R 755 $MAGISKBIN
 # addon.d
 if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
-  mount -o rw,remount /system
+  mount -o rw,remount $SYSTEM
   ADDOND=/system/addon.d/99-magisk.sh
   echo '#!/sbin/sh' > $ADDOND
   echo '# ADDOND_VERSION=2' >> $ADDOND
