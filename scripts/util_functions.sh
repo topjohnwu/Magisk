@@ -168,13 +168,18 @@ find_block() {
 }
 
 mount_partitions() {
-  # Check A/B slot
-  SLOT=`grep_cmdline androidboot.slot_suffix`
-  if [ -z $SLOT ]; then
-    SLOT=_`grep_cmdline androidboot.slot`
-    [ $SLOT = "_" ] && SLOT=
-  fi
-  [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
+  # Check if the device is A/B
+  if [ -n "$(grep_cmdline slot_suffix)" ]; then
+    SYSTEM="/system"
+    SYSTEM_ROOT=true
+    # Check A/B slot
+    SLOT=`grep_cmdline androidboot.slot_suffix`
+    if [ -z $SLOT ]; then
+      SLOT=_`grep_cmdline androidboot.slot`
+      [ $SLOT = "_" ] && SLOT=
+    fi
+    [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
+  fi;
 
   ui_print "- Mounting /system, /vendor"
   mkdir /system 2>/dev/null
