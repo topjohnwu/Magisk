@@ -62,7 +62,10 @@ class SuperuserViewModel(
 
     fun deletePressed(item: PolicyRvItem) {
         fun updateState() = deletePolicy(item.item)
-            .subscribeK { items.remove(item) }
+            .map { items.filterIsInstance<PolicyRvItem>().toMutableList() }
+            .map { it.removeAll { it.item.packageName == item.item.packageName }; it }
+            .map { it to items.calculateDiff(it) }
+            .subscribeK { items.update(it.first, it.second) }
             .add()
 
         withView {
