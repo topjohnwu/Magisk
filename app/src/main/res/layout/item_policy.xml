@@ -191,8 +191,7 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/Widget.Icon"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:background="?android:attr/selectableItemBackground"
