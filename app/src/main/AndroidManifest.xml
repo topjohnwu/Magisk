@@ -44,7 +44,7 @@
             android:exported="false"
             android:directBootAware="true"
             android:excludeFromRecents="true"
-            android:theme="@style/SuRequest" />
+            android:theme="@style/MagiskTheme.SU" />
 
         <!-- Receiver -->
 

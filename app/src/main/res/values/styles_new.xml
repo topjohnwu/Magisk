@@ -32,7 +32,9 @@
         <item name="android:windowBackground">@android:color/black</item>
     </style>
 
-    <style name="MagiskTheme.SU" parent="Theme.AppCompat.Dialog">
+    <style name="MagiskTheme.SUFoundation" parent="Theme.MaterialComponents.Light.Dialog" />
+
+    <style name="MagiskTheme.SU" parent="MagiskTheme.SUFoundation">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsFloating">true</item>
