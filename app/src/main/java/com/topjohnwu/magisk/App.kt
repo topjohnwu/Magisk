@@ -28,8 +28,12 @@ import java.util.concurrent.ThreadPoolExecutor
 open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     // Global resources
-    val prefs: SharedPreferences get() = PreferenceManager.getDefaultSharedPreferences(deContext)
-    val DB: MagiskDB by lazy { MagiskDB(deContext) }
+    lateinit var protectedContext: Context
+    val prefs: SharedPreferences
+        get() = PreferenceManager.getDefaultSharedPreferences(
+            protectedContext
+        )
+    val DB: MagiskDB by lazy { MagiskDB(protectedContext) }
     @Deprecated("Use dependency injection")
     val repoDB: RepoDatabaseHelper by inject()
     @Volatile
@@ -49,12 +53,14 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         MultiDex.install(base)
+        protectedContext = baseContext
         self = this
         deContext = base
         registerActivityLifecycleCallbacks(this)
 
         if (Build.VERSION.SDK_INT >= 24) {
-            deContext = base.createDeviceProtectedStorageContext()
+            protectedContext = base.createDeviceProtectedStorageContext()
+            deContext = protectedContext
             deContext.moveSharedPreferencesFrom(base, base.defaultPrefsName)
         }
 

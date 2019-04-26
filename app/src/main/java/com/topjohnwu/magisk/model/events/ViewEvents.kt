@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.model.events
 
 import android.app.Activity
 import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.Repo
 import io.reactivex.subjects.PublishSubject
 
@@ -34,3 +35,6 @@ class PermissionEvent(
 ) : ViewEvent()
 
 class BackPressEvent : ViewEvent()
+
+class SuDialogEvent(val policy: Policy) : ViewEvent()
+class DieEvent : ViewEvent()

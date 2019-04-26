@@ -11,4 +11,8 @@ val applicationModule = module {
     single { get<Context>().resources }
     single { get<Context>() as App }
     single { get<Context>().packageManager }
+    single(SUTimeout) {
+        get<App>().protectedContext
+            .getSharedPreferences("su_timeout", 0)
+    }
 }
