@@ -176,16 +176,26 @@ mount_partitions() {
   fi
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
-  ui_print "- Mounting /system, /vendor"
-  mkdir /system 2>/dev/null
-  [ -f /system/build.prop ] || is_mounted /system || mount -o ro /system 2>/dev/null
-  if ! is_mounted /system && ! [ -f /system/build.prop ]; then
-    SYSTEMBLOCK=`find_block system$SLOT`
-    mount -o ro $SYSTEMBLOCK /system
+  # Check if the device is A-only system-as-root
+  if [ -n "$(cat /etc/fstab | grep /system_root)" ]; then
+    SYSTEM="/system_root"
+    AONLY_SAR=true
+    SYSTEM_ROOT=true
+  else
+    SYSTEM="/system"
+    AONLY_SAR=false
   fi
-  [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
+
+  ui_print "- Mounting $SYSTEM, /vendor"
+  mkdir $SYSTEM 2>/dev/null
+  [ -f /system/build.prop ] || is_mounted $SYSTEM || mount -o ro $SYSTEM 2>/dev/null
+  if ! is_mounted $SYSTEM && ! [ -f /system/build.prop ]; then
+    SYSTEMBLOCK=`find_block $SYSTEM$SLOT`
+    mount -o ro $SYSTEMBLOCK $SYSTEM
+  fi
+  [ -f /system/build.prop ] || is_mounted $SYSTEM || abort "! Cannot mount $SYSTEM"
   grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
-  if [ -f /system/init.rc ]; then
+  if [ -f /system/init.rc ] && [ $AONLY_SAR != "true" ]; then
     SYSTEM_ROOT=true
     mkdir /system_root 2>/dev/null
     mount --move /system /system_root

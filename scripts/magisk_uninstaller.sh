@@ -129,7 +129,7 @@ rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data
         /data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* 2>/dev/null
 
 if [ -f /system/addon.d/99-magisk.sh ]; then
-  mount -o rw,remount /system
+  mount -o rw,remount $SYSTEM
   rm -f /system/addon.d/99-magisk.sh
 fi
 
