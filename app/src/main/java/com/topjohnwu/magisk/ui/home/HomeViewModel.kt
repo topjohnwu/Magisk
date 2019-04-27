@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.content.res.Resources
+import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.model.events.*
@@ -23,11 +24,6 @@ class HomeViewModel(
 
     val isForceEncryption = KObservableField(Config.keepEnc)
     val isKeepVerity = KObservableField(Config.keepVerity)
-
-    private val prefsObserver = Observer(isForceEncryption, isKeepVerity) {
-        Config.keepEnc = isForceEncryption.value
-        Config.keepVerity = isKeepVerity.value
-    }
 
     val magiskState = KObservableField(MagiskState.LOADING)
     val magiskStateText = Observer(magiskState) {
@@ -90,6 +86,14 @@ class HomeViewModel(
 
     init {
         Event.register(this)
+
+        isForceEncryption.addOnPropertyChangedCallback {
+            Config.keepEnc = it ?: return@addOnPropertyChangedCallback
+        }
+        isKeepVerity.addOnPropertyChangedCallback {
+            Config.keepVerity = it ?: return@addOnPropertyChangedCallback
+        }
+
         refresh()
     }
 
