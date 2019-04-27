@@ -107,7 +107,7 @@ class HomeViewModel(
     fun paypalPressed() = OpenLinkEvent(Const.Url.PAYPAL_URL).publish()
     fun patreonPressed() = OpenLinkEvent(Const.Url.PATREON_URL).publish()
     fun twitterPressed() = OpenLinkEvent(Const.Url.TWITTER_URL).publish()
-    fun githubPressed() = OpenLinkEvent(Const.Url.REPO_URL).publish()
+    fun githubPressed() = OpenLinkEvent(Const.Url.SOURCE_CODE_URL).publish()
     fun xdaPressed() = OpenLinkEvent(Const.Url.XDA_THREAD).publish()
     fun uninstallPressed() = UninstallEvent().publish()
 
