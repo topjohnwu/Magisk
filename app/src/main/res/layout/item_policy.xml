@@ -194,7 +194,6 @@
                     style="@style/Widget.Icon"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="?android:attr/selectableItemBackground"
                     android:onClick="@{() -> viewModel.deletePressed(item)}"
                     android:tint="@color/icon_grey"
                     app:layout_constraintBottom_toBottomOf="parent"
