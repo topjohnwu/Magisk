@@ -8,6 +8,10 @@ import com.topjohnwu.magisk.utils.Event;
 import androidx.fragment.app.Fragment;
 import butterknife.Unbinder;
 
+/**
+ * @deprecated This class is not to be used. It is marked for deletion.
+ */
+@Deprecated
 public abstract class BaseFragment extends Fragment implements Event.AutoListener {
 
     public App app = App.self;

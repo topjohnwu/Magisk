@@ -11,12 +11,12 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
-import androidx.preference.PreferenceManager
 import com.topjohnwu.magisk.data.database.MagiskDB
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.RootUtils
+import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.android.inject
@@ -27,42 +27,39 @@ import java.util.concurrent.ThreadPoolExecutor
 
 open class App : Application(), Application.ActivityLifecycleCallbacks {
 
-    // Global resources
     lateinit var protectedContext: Context
-    val prefs: SharedPreferences
-        get() = PreferenceManager.getDefaultSharedPreferences(
-            protectedContext
-        )
-    val DB: MagiskDB by lazy { MagiskDB(protectedContext) }
+
+    @Deprecated("Use dependency injection")
+    val prefs: SharedPreferences by inject()
+    @Deprecated("Use dependency injection")
+    val DB: MagiskDB by inject()
     @Deprecated("Use dependency injection")
     val repoDB: RepoDatabaseHelper by inject()
+
     @Volatile
     private var foreground: Activity? = null
 
-    override fun onCreate() {
-        super.onCreate()
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        MultiDex.install(base)
+        Timber.plant(Timber.DebugTree())
 
         startKoin {
             androidContext(this@App)
             modules(koinModules)
         }
 
-        Timber.plant(Timber.DebugTree())
-    }
-
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base)
-        MultiDex.install(base)
         protectedContext = baseContext
         self = this
         deContext = base
-        registerActivityLifecycleCallbacks(this)
 
         if (Build.VERSION.SDK_INT >= 24) {
             protectedContext = base.createDeviceProtectedStorageContext()
             deContext = protectedContext
             deContext.moveSharedPreferencesFrom(base, base.defaultPrefsName)
         }
+
+        registerActivityLifecycleCallbacks(this)
 
         Networking.init(base)
         LocaleManager.setLocale(this)
@@ -99,19 +96,17 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     companion object {
 
-        //fixme this should be at least weak reference, me no likey
         @SuppressLint("StaticFieldLeak")
         @Deprecated("Use dependency injection")
         @JvmStatic
         lateinit var self: App
 
-        //fixme this should be at least weak reference, me no likey
         @SuppressLint("StaticFieldLeak")
-        @Deprecated("Use dependency injection")
+        @Deprecated("Use dependency injection; replace with protectedContext")
         @JvmStatic
         lateinit var deContext: Context
 
-        //fixme me no likey
+        @Deprecated("Use Rx or similar")
         @JvmField
         var THREAD_POOL: ThreadPoolExecutor
 
@@ -124,11 +119,11 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
             THREAD_POOL = AsyncTask.THREAD_POOL_EXECUTOR as ThreadPoolExecutor
         }
 
-        //fixme me no likey
         @Deprecated("")
         @JvmStatic
         fun foreground(): Activity? {
-            return self.foreground
+            val app: App by inject()
+            return app.foreground
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.di
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import com.skoumal.teanity.rxbus.RxBus
 import com.topjohnwu.magisk.App
 import org.koin.dsl.module
@@ -15,4 +16,5 @@ val applicationModule = module {
         get<App>().protectedContext
             .getSharedPreferences("su_timeout", 0)
     }
+    single { PreferenceManager.getDefaultSharedPreferences(get<App>().protectedContext) }
 }

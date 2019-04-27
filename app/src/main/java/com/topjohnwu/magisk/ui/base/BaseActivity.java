@@ -26,6 +26,10 @@ import androidx.collection.SparseArrayCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+/**
+ * @deprecated This class is not to be used. It is marked for deletion.
+ */
+@Deprecated
 public abstract class BaseActivity extends AppCompatActivity implements Event.AutoListener, IBaseLeanback {
 
     static int[] EMPTY_INT_ARRAY = new int[0];
