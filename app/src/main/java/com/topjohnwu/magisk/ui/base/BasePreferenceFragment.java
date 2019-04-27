@@ -42,7 +42,7 @@ public abstract class BasePreferenceFragment extends PreferenceFragmentCompat
 
     @Override
     public int[] getListeningEvents() {
-        return BaseActivity.EMPTY_INT_ARRAY;
+        return new int[0];
     }
 
     @Override

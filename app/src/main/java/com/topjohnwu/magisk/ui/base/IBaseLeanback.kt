@@ -6,10 +6,6 @@ interface IBaseLeanback {
 
     fun runWithExternalRW(callback: Runnable)
     fun runWithPermissions(vararg permissions: String, callback: Runnable)
-    fun startActivityForResult(
-        intent: Intent,
-        requestCode: Int,
-        listener: BaseActivity.ActivityResultListener
-    )
+    fun startActivityForResult(intent: Intent, requestCode: Int, listener: ActivityResultListener)
 
 }

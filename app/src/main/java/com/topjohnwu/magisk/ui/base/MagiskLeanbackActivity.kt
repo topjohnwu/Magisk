@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.Const
 abstract class MagiskLeanbackActivity<ViewModel : MagiskViewModel, Binding : ViewDataBinding> :
     TeanityActivity<ViewModel, Binding>(), IBaseLeanback {
 
-    private val resultListeners = SparseArrayCompat<BaseActivity.ActivityResultListener>()
+    private val resultListeners = SparseArrayCompat<ActivityResultListener>()
 
     @Deprecated("Permissions will be checked in a different streamlined way")
     fun runWithExternalRW(callback: () -> Unit) = runWithExternalRW(Runnable { callback() })
@@ -56,7 +56,7 @@ abstract class MagiskLeanbackActivity<ViewModel : MagiskViewModel, Binding : Vie
     override fun startActivityForResult(
         intent: Intent,
         requestCode: Int,
-        listener: BaseActivity.ActivityResultListener
+        listener: ActivityResultListener
     ) {
         resultListeners.put(requestCode, listener)
         startActivityForResult(intent, requestCode)
