@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.net.toUri
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -146,7 +147,15 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         try {
             navigationController?.popFragment() ?: throw UnsupportedOperationException()
         } catch (e: UnsupportedOperationException) {
-            super.onBackPressed()
+            when {
+                navigationController?.currentStackIndex != defaultPosition -> {
+                    val options = FragNavTransactionOptions.newBuilder()
+                        .transition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                        .build()
+                    navigationController?.switchTab(defaultPosition, options)
+                }
+                else -> super.onBackPressed()
+            }
         }
     }
 
@@ -173,6 +182,10 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
     }
 
     private fun FragNavTransactionOptions.Builder.customAnimations(options: MagiskAnimBuilder) =
-        customAnimations(options.enter, options.exit, options.popEnter, options.popExit)
+        customAnimations(options.enter, options.exit, options.popEnter, options.popExit).apply {
+            if (!options.anySet) {
+                transition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            }
+        }
 
 }

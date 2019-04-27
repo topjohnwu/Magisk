@@ -40,6 +40,16 @@ object Navigation {
         navDirections { destination = SettingsFragment::class }
     }
 
+    fun fromSection(section: String) = when (section) {
+        "superuser" -> superuser()
+        "modules" -> modules()
+        "downloads" -> repos()
+        "magiskhide" -> hide()
+        "log" -> log()
+        "settings" -> settings()
+        else -> home()
+    }
+
 
     object Main {
         const val OPEN_NAV = 1

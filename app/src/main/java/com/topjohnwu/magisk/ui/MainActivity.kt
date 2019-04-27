@@ -6,6 +6,7 @@ import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityMainBinding
 import com.topjohnwu.magisk.model.navigation.Navigation
@@ -22,6 +23,7 @@ import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
 import com.topjohnwu.magisk.ui.home.MagiskFragment as HomeFragment
+
 
 open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
 
@@ -54,6 +56,11 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
         checkHideSection()
         setSupportActionBar(binding.mainInclude.mainToolbar)
 
+        if (savedInstanceState == null) {
+            intent.getStringExtra(OPEN_SECTION)?.let {
+                onEventDispatched(Navigation.fromSection(it))
+            }
+        }
     }
 
     override fun setTitle(title: CharSequence?) {

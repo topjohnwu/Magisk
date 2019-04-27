@@ -79,4 +79,6 @@ class MagiskAnimBuilder {
     @AnimRes
     @AnimatorRes
     var popExit = 0
+
+    val anySet: Boolean get() = enter != 0 || exit != 0 || popEnter != 0 || popExit != 0
 }
