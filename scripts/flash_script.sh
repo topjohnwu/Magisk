@@ -87,7 +87,7 @@ if [ -d /system/addon.d ]; then
 if [ -f /data/adb/magisk/addon.d.sh ]; then
   exec sh /data/adb/magisk/addon.d.sh "\$@"
 else
-  OUTFD=\$(ps | grep -oE 'update(.*)' | grep -v 'grep' | cut -d" " -f3)
+  OUTFD=\$(ps | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
   ui_print() { echo -e "ui_print \$1\nui_print" >> /proc/self/fd/\$OUTFD; }
 
   ui_print "************************"
