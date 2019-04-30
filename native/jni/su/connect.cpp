@@ -17,7 +17,7 @@
 
 // 0x18000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_INCLUDE_STOPPED_PACKAGES
 
-static inline const char *get_command(const struct su_request *to) {
+static inline const char *get_command(const su_request *to) {
 	if (to->command[0])
 		return to->command;
 	if (to->shell[0])
@@ -25,21 +25,21 @@ static inline const char *get_command(const struct su_request *to) {
 	return DEFAULT_SHELL;
 }
 
-static inline void get_user(char *user, struct su_info *info) {
+static inline void get_user(char *user, su_info *info) {
 	sprintf(user, "%d",
 			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER
 			? info->uid / 100000
 			: 0);
 }
 
-static inline void get_uid(char *uid, struct su_info *info) {
+static inline void get_uid(char *uid, su_info *info) {
 	sprintf(uid, "%d",
 			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED
 			? info->uid % 100000
 			: info->uid);
 }
 
-static void silent_run(const char **args, struct su_info *info) {
+static void silent_run(const char **args, su_info *info) {
 	char component[128];
 	sprintf(component, "%s/a.m", info->str[SU_MANAGER].data());
 	char user[8];
@@ -62,7 +62,7 @@ static void silent_run(const char **args, struct su_info *info) {
 	exec_command(exec);
 }
 
-void app_log(struct su_context *ctx) {
+void app_log(su_context *ctx) {
 	char fromUid[8];
 	get_uid(fromUid, ctx->info);
 
@@ -88,7 +88,7 @@ void app_log(struct su_context *ctx) {
 	silent_run(cmd, ctx->info);
 }
 
-void app_notify(struct su_context *ctx) {
+void app_notify(su_context *ctx) {
 	char fromUid[8];
 	get_uid(fromUid, ctx->info);
 
@@ -104,7 +104,7 @@ void app_notify(struct su_context *ctx) {
 	silent_run(cmd, ctx->info);
 }
 
-void app_connect(const char *socket, struct su_info *info) {
+void app_connect(const char *socket, su_info *info) {
 	const char *cmd[] = {
 		START_ACTIVITY, "request",
 		"--es", "socket", socket,
@@ -113,7 +113,7 @@ void app_connect(const char *socket, struct su_info *info) {
 	silent_run(cmd, info);
 }
 
-void socket_send_request(int fd, struct su_info *info) {
+void socket_send_request(int fd, su_info *info) {
 	write_key_token(fd, "uid", info->uid);
 	write_string_be(fd, "eof");
 }

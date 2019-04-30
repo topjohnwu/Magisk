@@ -207,7 +207,7 @@ void node_entry::create_module_tree(const char *module) {
 void node_entry::clone_skeleton() {
 	DIR *dir;
 	struct dirent *entry;
-	struct node_entry *dummy;
+	node_entry *dummy;
 
 	// Clone the structure
 	auto full_path = get_path();

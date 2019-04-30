@@ -1,5 +1,5 @@
 APP_ABI := armeabi-v7a x86
-APP_CFLAGS := -Oz -fomit-frame-pointer -flto \
+APP_CFLAGS := -Wall -Oz -fomit-frame-pointer -flto \
 -D__MVSTR=${MAGISK_VERSION} -D__MCODE=${MAGISK_VER_CODE}
 APP_LDFLAGS := -flto
 APP_CPPFLAGS := -std=c++17

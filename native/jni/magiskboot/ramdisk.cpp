@@ -165,7 +165,7 @@ void magisk_cpio::backup(const char *orig) {
 			res = lhs->first.compare(rhs->first);
 		} else if (lhs == o.entries.end()) {
 			res = 1;
-		} else if (rhs == entries.end()) {
+		} else {
 			res = -1;
 		}
 
