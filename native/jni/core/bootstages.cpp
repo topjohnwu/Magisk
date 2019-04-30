@@ -498,20 +498,20 @@ void unlock_blocks() {
 	struct dirent *entry;
 	int fd, dev, OFF = 0;
 
-	if ((dev = xopen("/dev/block", O_RDONLY | O_CLOEXEC)) < 0)
+	if (!(dir = xopendir("/dev/block")))
 		return;
-	dir = xfdopendir(dev);
+	dev = dirfd(dir);
 
 	while((entry = readdir(dir))) {
 		if (entry->d_type == DT_BLK) {
-			if ((fd = openat(dev, entry->d_name, O_RDONLY)) < 0)
+			if ((fd = openat(dev, entry->d_name, O_RDONLY | O_CLOEXEC)) < 0)
 				continue;
-			if (ioctl(fd, BLKROSET, &OFF) == -1)
+			if (ioctl(fd, BLKROSET, &OFF) < 0)
 				PLOGE("unlock %s", entry->d_name);
 			close(fd);
 		}
 	}
-	close(dev);
+	closedir(dir);
 }
 
 static bool log_dump = false;
