@@ -15,6 +15,18 @@ static void allowSuClient(const char *target) {
 	// Allow binder service
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "call");
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "transfer");
+
+	// Allow termios ioctl
+	sepol_allow(target, "devpts", "chr_file", "ioctl");
+	sepol_allow(target, "untrusted_app_devpts", "chr_file", "ioctl");
+	sepol_allow(target, "untrusted_app_25_devpts", "chr_file", "ioctl");
+	sepol_allow(target, "untrusted_app_all_devpts", "chr_file", "ioctl");
+	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
+		sepol_allowxperm(target, "devpts", "chr_file", "0x5400-0x54FF");
+		sepol_allowxperm(target, "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
+		sepol_allowxperm(target, "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
+		sepol_allowxperm(target, "untrusted_app_all_devpts", "chr_file", "0x5400-0x54FF");
+	}
 }
 
 void sepol_magisk_rules() {
