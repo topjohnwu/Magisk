@@ -83,7 +83,6 @@ static void pump_async(int input, int output) {
  */
 int pts_open(char *slave_name, size_t slave_name_size) {
 	int fdm;
-	char sn_tmp[256];
 
 	// Open master ptmx device
 	fdm = open("/dev/ptmx", O_RDWR);

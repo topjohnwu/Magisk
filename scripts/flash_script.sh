@@ -80,9 +80,23 @@ if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   mount -o rw,remount /system
   ADDOND=/system/addon.d/99-magisk.sh
-  echo '#!/sbin/sh' > $ADDOND
-  echo '# ADDOND_VERSION=2' >> $ADDOND
-  echo 'exec sh /data/adb/magisk/addon.d.sh "$@"' >> $ADDOND
+  cat <<EOF > $ADDOND
+#!/sbin/sh
+# ADDOND_VERSION=2
+
+if [ -f /data/adb/magisk/addon.d.sh ]; then
+  exec sh /data/adb/magisk/addon.d.sh "\$@"
+else
+  OUTFD=\$(ps | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
+  ui_print() { echo -e "ui_print \$1\nui_print" >> /proc/self/fd/\$OUTFD; }
+
+  ui_print "************************"
+  ui_print "* Magisk addon.d failed"
+  ui_print "************************"
+  ui_print "! Cannot find Magisk binaries - was data wiped or not decrypted?"
+  ui_print "! Reflash OTA from decrypted recovery or reflash Magisk"
+fi
+EOF
   chmod 755 $ADDOND
 fi
 

@@ -26,8 +26,8 @@ static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static su_info *cache;
 
 su_info::su_info(unsigned uid) :
-		uid(uid), access(DEFAULT_SU_ACCESS), _lock(PTHREAD_MUTEX_INITIALIZER),
-		count(0), ref(0), timestamp(0), mgr_st({}) {}
+		uid(uid), count(0), access(DEFAULT_SU_ACCESS), mgr_st({}), ref(0),
+		timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
 	pthread_mutex_destroy(&_lock);
@@ -90,7 +90,7 @@ static void database_check(su_info *info) {
 		validate_manager(info->str[SU_MANAGER], uid / 100000, &info->mgr_st);
 }
 
-static struct su_info *get_su_info(unsigned uid) {
+static su_info *get_su_info(unsigned uid) {
 	su_info *info = nullptr;
 
 	// Get from cache or new instance
@@ -235,7 +235,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	// Abort upon any error occurred
 	log_cb.ex = exit;
 
-	struct su_context ctx = {
+	su_context ctx = {
 		.info = info,
 		.pid = credential->pid
 	};

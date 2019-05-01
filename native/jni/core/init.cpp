@@ -38,10 +38,9 @@ using namespace std;
 
 #ifdef MAGISK_DEBUG
 static FILE *kmsg;
-static char kbuf[4096];
 static int vprintk(const char *fmt, va_list ap) {
-	vsprintf(kbuf, fmt, ap);
-	return fprintf(kmsg, "magiskinit: %s", kbuf);
+	fprintf(kmsg, "magiskinit: ");
+	return vfprintf(kmsg, fmt, ap);
 }
 
 static void setup_klog() {

@@ -23,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -95,7 +94,7 @@ public class DownloadModuleService extends Service {
                     .setDownloadProgressListener(progress)
                     .execForInputStream().getResult();
             OutputStream out = new BufferedOutputStream(new FileOutputStream(output));
-            processZip(in, out, repo.isNewInstaller());
+            processZip(in, out);
             Intent intent = new Intent(this, ClassMap.get(FlashActivity.class));
             intent.setData(Uri.fromFile(output))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -120,25 +119,23 @@ public class DownloadModuleService extends Service {
         removeNotification(progress);
     }
 
-    private void processZip(InputStream in, OutputStream out, boolean inject)
+    private void processZip(InputStream in, OutputStream out)
             throws IOException {
         try (ZipInputStream zin = new ZipInputStream(in);
              ZipOutputStream zout = new ZipOutputStream(out)) {
 
-            if (inject) {
-                // Inject latest module-installer.sh as update-binary
-                zout.putNextEntry(new ZipEntry("META-INF/"));
-                zout.putNextEntry(new ZipEntry("META-INF/com/"));
-                zout.putNextEntry(new ZipEntry("META-INF/com/google/"));
-                zout.putNextEntry(new ZipEntry("META-INF/com/google/android/"));
-                zout.putNextEntry(new ZipEntry("META-INF/com/google/android/update-binary"));
-                try (InputStream update_bin = Networking.get(Const.Url.MODULE_INSTALLER)
-                        .execForInputStream().getResult()) {
-                    ShellUtils.pump(update_bin, zout);
-                }
-                zout.putNextEntry(new ZipEntry("META-INF/com/google/android/updater-script"));
-                zout.write("#MAGISK\n".getBytes(StandardCharsets.UTF_8));
+            // Inject latest module-installer.sh as update-binary
+            zout.putNextEntry(new ZipEntry("META-INF/"));
+            zout.putNextEntry(new ZipEntry("META-INF/com/"));
+            zout.putNextEntry(new ZipEntry("META-INF/com/google/"));
+            zout.putNextEntry(new ZipEntry("META-INF/com/google/android/"));
+            zout.putNextEntry(new ZipEntry("META-INF/com/google/android/update-binary"));
+            try (InputStream update_bin = Networking.get(Const.Url.MODULE_INSTALLER)
+                    .execForInputStream().getResult()) {
+                ShellUtils.pump(update_bin, zout);
             }
+            zout.putNextEntry(new ZipEntry("META-INF/com/google/android/updater-script"));
+            zout.write("#MAGISK\n".getBytes("UTF-8"));
 
             int off = -1;
             ZipEntry entry;
@@ -148,7 +145,7 @@ public class DownloadModuleService extends Service {
                 String path = entry.getName().substring(off);
                 if (path.isEmpty())
                     continue;
-                if (inject && path.startsWith("META-INF"))
+                if (path.startsWith("META-INF"))
                     continue;
                 zout.putNextEntry(new ZipEntry(path));
                 if (!entry.isDirectory())
