@@ -171,6 +171,7 @@ mount_part() {
   [ -L $POINT ] && rm -f $POINT
   mkdir $POINT 2>/dev/null
   is_mounted $POINT && return
+  ui_print "- Mounting $PART"
   mount -o ro $POINT 2>/dev/null
   if ! is_mounted $POINT; then
     local BLOCK=`find_block $PART$SLOT`
@@ -188,7 +189,6 @@ mount_partitions() {
   fi
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
-  ui_print "- Mounting /system, /vendor"
   mount_part system
   if [ -f /system/init.rc ]; then
     SYSTEM_ROOT=true
@@ -199,8 +199,8 @@ mount_partitions() {
   else
     grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   fi
-  $SYSTEM_ROOT && ui_print "- Device is system-as-root"
   [ -L /system/vendor ] && mount_part vendor
+  $SYSTEM_ROOT && ui_print "- Device is system-as-root"
 }
 
 get_flags() {
