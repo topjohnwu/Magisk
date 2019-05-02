@@ -73,7 +73,8 @@ class HideViewModel(
             .filter { it.processes.isNotEmpty() }
             .map { HideRvItem(it, hideTargets.blockingGet()) }
             .toList()
-            .map { it.sortBy { it.item.info.name }; it }
+            .map { it.sortWith(compareBy(
+                    {it.isHiddenState.value}, {it.item.info.name}, {it.packageName})); it }
             .doOnSuccess { allItems.update(it) }
             .flatMap { queryRaw() }
             .applyViewModel(this)
