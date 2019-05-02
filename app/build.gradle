@@ -35,6 +35,16 @@ android {
     dataBinding {
         enabled = true
     }
+
+    packagingOptions {
+        exclude '/META-INF/*.version'
+        exclude '/META-INF/*.kotlin_module'
+        exclude '/META-INF/rxkotlin.properties'
+        exclude '/androidsupportmultidexversion.txt'
+        exclude '/org/**'
+        exclude '/kotlin/**'
+        exclude '/kotlinx/**'
+    }
 }
 
 dependencies {
