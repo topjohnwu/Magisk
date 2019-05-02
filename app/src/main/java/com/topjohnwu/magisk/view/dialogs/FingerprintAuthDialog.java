@@ -36,9 +36,9 @@ public class FingerprintAuthDialog extends CustomAlertDialog {
         TypedArray ta = theme.obtainStyledAttributes(new int[] {R.attr.imageColorTint});
         fingerprint.setTint(ta.getColor(0, Color.GRAY));
         ta.recycle();
-        vh.messageView.setCompoundDrawables(null, null, null, fingerprint);
-        vh.messageView.setCompoundDrawablePadding(Utils.dpInPx(20));
-        vh.messageView.setGravity(Gravity.CENTER);
+        binding.message.setCompoundDrawables(null, null, null, fingerprint);
+        binding.message.setCompoundDrawablePadding(Utils.dpInPx(20));
+        binding.message.setGravity(Gravity.CENTER);
         setMessage(R.string.auth_fingerprint);
         setNegativeButton(R.string.close, (d, w) -> {
             helper.cancel();
@@ -81,20 +81,20 @@ public class FingerprintAuthDialog extends CustomAlertDialog {
 
         @Override
         public void onAuthenticationError(int errorCode, CharSequence errString) {
-            vh.messageView.setTextColor(Color.RED);
-            vh.messageView.setText(errString);
+            binding.message.setTextColor(Color.RED);
+            binding.message.setText(errString);
         }
 
         @Override
         public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
-            vh.messageView.setTextColor(Color.RED);
-            vh.messageView.setText(helpString);
+            binding.message.setTextColor(Color.RED);
+            binding.message.setText(helpString);
         }
 
         @Override
         public void onAuthenticationFailed() {
-            vh.messageView.setTextColor(Color.RED);
-            vh.messageView.setText(R.string.auth_fail);
+            binding.message.setTextColor(Color.RED);
+            binding.message.setText(R.string.auth_fail);
         }
 
         @Override

@@ -59,10 +59,6 @@ dependencies {
     implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"
     implementation "com.github.topjohnwu.libsu:io:${libsuVersion}"
 
-    def butterKnifeVersion = '10.1.0'
-    implementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
-    kapt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
-
     def koin = "2.0.0-rc-2"
     implementation "org.koin:koin-core:${koin}"
     implementation "org.koin:koin-android:${koin}"

@@ -609,10 +609,8 @@ void MagiskInit::setup_rootfs() {
 		sprintf(path, "/sbin/%s", applet_names[i]);
 		xsymlink("/sbin/magisk", path);
 	}
-	for (int i = 0; init_applet[i]; ++i) {
-		sprintf(path, "/sbin/%s", init_applet[i]);
-		xsymlink("/sbin/magiskinit", path);
-	}
+	xsymlink("/sbin/magiskinit", "/sbin/magiskpolicy");
+	xsymlink("/sbin/magiskinit", "/sbin/supolicy");
 
 	close(rootdir);
 	close(sbin);

@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.databinding.ActivityMainBinding
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
+import com.topjohnwu.magisk.ui.home.HomeFragment
 import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModulesFragment
 import com.topjohnwu.magisk.ui.module.ReposFragment
@@ -22,7 +23,6 @@ import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
-import com.topjohnwu.magisk.ui.home.MagiskFragment as HomeFragment
 
 
 open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {

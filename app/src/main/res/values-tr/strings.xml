@@ -63,7 +63,7 @@
 
     <!--About Activity-->
     <string name="app_changelog">Uygulama değişiklikleri</string>
-    <string name="translators">Mevlüt TOPÇU - Muhammet Emin TURGUT</string>
+    <string name="translators">Mevlüt TOPÇU - Muhammet Emin TURGUT - XORCAN</string>
     <string name="app_translators">Çevirmenler</string>
 
     <!-- System Components, Notifications -->
@@ -73,6 +73,18 @@
     <string name="download_file_error">Dosya indirme hatası</string>
     <string name="magisk_update_title">Yeni Magisk Güncellemesi Mevcut!</string>
     <string name="manager_update_title">Yeni Magisk Manager Güncellemesi Mevcut!</string>
+
+    <!-- Installation -->
+    <string name="manager_download_install">İndirmek ve yüklemek için tıklayın.</string>
+    <string name="download_zip_only">Sadece Zip\'i indir</string>
+    <string name="direct_install">Doğrudan kurulum (Önerilen)</string>
+    <string name="install_inactive_slot">İnaktif slota yükle (OTA\'dan sonra)</string>
+    <string name="install_inactive_slot_msg">Cihazınız, yeniden başlatmanın ardından inaktif slota ön yüklemek için ZORUNLU olacaktır!\nBu seçeneği yalnızca OTA yapıldıktan sonra kullanın.\nDevam?</string>
+    <string name="select_method">Yöntem seçin</string>
+    <string name="setup_title">Ek kurulum</string>
+    <string name="select_patch_file">Dosya seçin ve yamalayın</string>
+    <string name="patch_file_msg">Bir raw yansısı (*.img) ya da ODIN tarfile dosyası (*.tar) seçin</string>
+    <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Kapat</string>
@@ -84,19 +96,14 @@
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Repo önbelleği temizlendi</string>
     <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
-    <string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
+
     <string name="dtbo_patched_title">DTBO yamalandı!</string>
     <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
     <string name="flashing">Yükleniyor</string>
     <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu…</string>
     <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı…</string>
-    <string name="download_zip_only">Yalnızca Zip Dosyasını İndir</string>
-    <string name="direct_install">Doğrudan Yükle (Önerilen)</string>
-    <string name="install_inactive_slot">Pasif yuvaya yükle (OTA\'dan sonra)</string>
     <string name="warning">Uyarı</string>
-    <string name="install_inactive_slot_msg">Cihazınız yeniden başlatıldıktan sonra mevcut pasif yuvaya ZORLA önyüklenecek!\nBu seçeneği yalnızca OTA tamamlandıktan sonra kullanın.\nDevam mı?</string>
-    <string name="select_method">Yöntem Seçin</string>
     <string name="complete_uninstall">Tamamen Kaldır</string>
     <string name="restore_img">Önyükleme İmajını Geri Yükle</string>
     <string name="restore_img_msg">Geri Yükleniyor…</string>
@@ -106,8 +113,7 @@
     <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan Google\'ın tescilli olduğu SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için bir uzantıyı (GoogleApiClient içeriyor) indirmesine izin veriyor musunuz?</string>
     <string name="setup_fail">Kurulum başarısız</string>
     <string name="env_fix_title">Ek Kurulum Gerekli</string>
-    <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
-    <string name="setup_title">Ek Kurulum</string>
+    <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
     <string name="setup_msg">Ortam kurulumu çalışıyor…</string>
     <string name="downloading_toast">%1$s indiriliyor</string>
     <string name="no_rw_storage">Bu özellik harici depolamaya yazma izni olmadan çalışmaz.</string>
@@ -127,7 +133,7 @@
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_update">Güncelleme Ayarları</string>
     <string name="settings_check_update_title">Güncellemeleri denetle</string>
-    <string name="settings_check_update_summary">Düzenli aralıklarla arka planda güncellemeleri denetle</string>
+    <string name="settings_check_update_summary">Düzenli aralıklarla arka planda güncellemeleri denetle</string>
     <string name="settings_update_channel_title">Güncelleme Kanalı</string>
     <string name="settings_update_stable">Kararlı</string>
     <string name="settings_update_beta">Beta</string>
@@ -188,10 +194,10 @@
     <string name="su_warning">Cihazınıza tam erişim izni verir.\nEmin değilseniz, reddedin!</string>
     <string name="forever">Daima</string>
     <string name="once">Bir kere</string>
-    <string name="tenmin">10 dakika</string>
-    <string name="twentymin">20 dakika</string>
-    <string name="thirtymin">30 dakika</string>
-    <string name="sixtymin">60 dakika</string>
+    <string name="tenmin">10 dakika</string>
+    <string name="twentymin">20 dakika</string>
+    <string name="thirtymin">30 dakika</string>
+    <string name="sixtymin">60 dakika</string>
     <string name="su_allow_toast">%1$s için yetkili kullanıcı hakları verildi</string>
     <string name="su_deny_toast">%1$s için yetkili kullanıcı hakları reddedildi</string>
     <string name="no_apps_found">Hiçbir uygulama bulunamadı</string>

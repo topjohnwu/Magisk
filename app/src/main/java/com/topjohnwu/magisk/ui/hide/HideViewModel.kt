@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessRvItem
 import com.topjohnwu.magisk.model.entity.recycler.HideRvItem
+import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import com.topjohnwu.magisk.model.events.HideProcessEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.Utils
@@ -72,7 +73,8 @@ class HideViewModel(
             .filter { it.processes.isNotEmpty() }
             .map { HideRvItem(it, hideTargets.blockingGet()) }
             .toList()
-            .map { it.sortBy { it.item.info.name }; it }
+            .map { it.sortWith(compareBy(
+                    {it.isHiddenState.value}, {it.item.info.name}, {it.packageName})); it }
             .doOnSuccess { allItems.update(it) }
             .flatMap { queryRaw() }
             .applyViewModel(this)
@@ -94,7 +96,10 @@ class HideViewModel(
             it.item.name.contains(query, ignoreCase = true) ||
                     it.item.processes.any { it.contains(query, ignoreCase = true) }
         }
-        .filter { if (showSystem) true else it.item.info.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+        .filter {
+            showSystem || (it.isHiddenState.value != IndeterminateState.UNCHECKED) ||
+                    (it.item.info.flags and ApplicationInfo.FLAG_SYSTEM == 0)
+        }
         .toList()
         .map { it to items.calculateDiff(it) }
 
