@@ -41,7 +41,8 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
-        MultiDex.install(base)
+        if (BuildConfig.DEBUG)
+            MultiDex.install(base)
         Timber.plant(Timber.DebugTree())
 
         startKoin {
