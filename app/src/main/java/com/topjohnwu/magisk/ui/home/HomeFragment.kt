@@ -8,6 +8,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
+import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.SafetyNet
@@ -16,9 +17,8 @@ import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import com.topjohnwu.magisk.ui.base.MagiskFragment as NewMagiskFragment
 
-class MagiskFragment : NewMagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
+class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
     ISafetyNetHelper.Callback {
 
     override val layoutRes: Int = R.layout.fragment_magisk

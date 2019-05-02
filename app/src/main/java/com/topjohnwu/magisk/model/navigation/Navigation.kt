@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.model.navigation
 
 import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
-import com.topjohnwu.magisk.ui.home.MagiskFragment
+import com.topjohnwu.magisk.ui.home.HomeFragment
 import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModulesFragment
 import com.topjohnwu.magisk.ui.module.ReposFragment
@@ -12,8 +12,8 @@ import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 object Navigation {
 
     fun home() = MagiskNavigationEvent {
-        navDirections { destination = MagiskFragment::class }
-        navOptions { popUpTo = MagiskFragment::class }
+        navDirections { destination = HomeFragment::class }
+        navOptions { popUpTo = HomeFragment::class }
     }
 
     fun superuser() = MagiskNavigationEvent {
