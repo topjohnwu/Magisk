@@ -30,7 +30,7 @@
     <string name="uninstall">Odinštalovať</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené. Root bude odstránený a teoreticky môže dôjsť k zašifrovaniu vašich dát, ak ich momentálne nemáte zašifrované</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
-    <string name="update">Aktualizovať</string>
+    <string name="update">Aktualizuj</string>
     <string name="core_only_enabled">(Režim Core povolený)</string>
 
     <!--Module Fragment-->
