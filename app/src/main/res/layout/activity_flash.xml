@@ -77,7 +77,7 @@
                             style="@style/Widget.Icon"
                             android:layout_gravity="center"
                             android:background="@android:color/transparent"
-                            app:srcCompat="@drawable/ic_save"
+                            app:srcCompat="@drawable/ic_save_compat"
                             app:tint="@android:color/white" />
 
                     </FrameLayout>
