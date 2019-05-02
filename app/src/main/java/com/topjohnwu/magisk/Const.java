@@ -35,6 +35,9 @@ public class Const {
 
     public static final int USER_ID = Process.myUid() / 100000;
 
+    // Generic
+    public static final String MAGISK_INSTALL_LOG_FILENAME = "magisk_install_log_%s.log";
+
     public static final class MAGISK_VER {
         public static final int MIN_SUPPORT = 18000;
     }

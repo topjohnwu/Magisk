@@ -7,8 +7,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -20,6 +18,8 @@ import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
+
+import androidx.annotation.NonNull;
 
 public class UninstallDialog extends CustomAlertDialog {
 

@@ -4,9 +4,9 @@ import android.content.ContentValues;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
-import androidx.annotation.NonNull;
-
 import com.topjohnwu.magisk.utils.Utils;
+
+import androidx.annotation.NonNull;
 
 
 public class Policy implements Comparable<Policy>{

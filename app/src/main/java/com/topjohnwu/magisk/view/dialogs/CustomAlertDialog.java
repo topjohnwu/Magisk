@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.view.dialogs;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,14 +8,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.R;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
-
-import com.topjohnwu.magisk.R;
-
 import butterknife.BindView;
 
 public class CustomAlertDialog extends AlertDialog.Builder {
@@ -53,11 +52,11 @@ public class CustomAlertDialog extends AlertDialog.Builder {
 
     }
 
-    public CustomAlertDialog(@NonNull Activity context) {
+    public CustomAlertDialog(@NonNull Context context) {
         super(context);
     }
 
-    public CustomAlertDialog(@NonNull Activity context, @StyleRes int themeResId) {
+    public CustomAlertDialog(@NonNull Context context, @StyleRes int themeResId) {
         super(context, themeResId);
     }
 
@@ -89,7 +88,7 @@ public class CustomAlertDialog extends AlertDialog.Builder {
         vh.positive.setVisibility(View.VISIBLE);
         vh.positive.setText(text);
         positiveListener = listener;
-        vh.positive.setOnClickListener((v) -> {
+        vh.positive.setOnClickListener(v -> {
             if (positiveListener != null) {
                 positiveListener.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
             }
@@ -109,7 +108,7 @@ public class CustomAlertDialog extends AlertDialog.Builder {
         vh.negative.setVisibility(View.VISIBLE);
         vh.negative.setText(text);
         negativeListener = listener;
-        vh.negative.setOnClickListener((v) -> {
+        vh.negative.setOnClickListener(v -> {
             if (negativeListener != null) {
                 negativeListener.onClick(dialog, DialogInterface.BUTTON_NEGATIVE);
             }
@@ -129,7 +128,7 @@ public class CustomAlertDialog extends AlertDialog.Builder {
         vh.neutral.setVisibility(View.VISIBLE);
         vh.neutral.setText(text);
         neutralListener = listener;
-        vh.neutral.setOnClickListener((v) -> {
+        vh.neutral.setOnClickListener(v -> {
             if (neutralListener != null) {
                 neutralListener.onClick(dialog, DialogInterface.BUTTON_NEUTRAL);
             }

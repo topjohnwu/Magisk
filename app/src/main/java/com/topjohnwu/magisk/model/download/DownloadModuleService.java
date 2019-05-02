@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.IBinder;
 
-import androidx.annotation.Nullable;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Const;
@@ -30,6 +28,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import androidx.annotation.Nullable;
 
 public class DownloadModuleService extends Service {
 

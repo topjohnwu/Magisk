@@ -11,20 +11,23 @@ import android.os.Build;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+
 @TargetApi(Build.VERSION_CODES.M)
 public class FingerprintAuthDialog extends CustomAlertDialog {
 
-    private Runnable callback;
+    private final Runnable callback;
+    @Nullable
+    private Runnable failureCallback;
     private DialogFingerprintHelper helper;
 
-    public FingerprintAuthDialog(@NonNull Activity activity, Runnable onSuccess) {
+    public FingerprintAuthDialog(@NonNull Activity activity, @NonNull Runnable onSuccess) {
         super(activity);
         callback = onSuccess;
         Drawable fingerprint = activity.getResources().getDrawable(R.drawable.ic_fingerprint);
@@ -37,11 +40,26 @@ public class FingerprintAuthDialog extends CustomAlertDialog {
         vh.messageView.setCompoundDrawablePadding(Utils.dpInPx(20));
         vh.messageView.setGravity(Gravity.CENTER);
         setMessage(R.string.auth_fingerprint);
-        setNegativeButton(R.string.close, (d, w) -> helper.cancel());
-        setOnCancelListener(d -> helper.cancel());
+        setNegativeButton(R.string.close, (d, w) -> {
+            helper.cancel();
+            if (failureCallback != null) {
+                failureCallback.run();
+            }
+        });
+        setOnCancelListener(d -> {
+            helper.cancel();
+            if (failureCallback != null) {
+                failureCallback.run();
+            }
+        });
         try {
             helper = new DialogFingerprintHelper();
         } catch (Exception ignored) {}
+    }
+
+    public FingerprintAuthDialog(@NonNull Activity activity, @NonNull Runnable onSuccess, @NonNull Runnable onFailure) {
+        this(activity, onSuccess);
+        failureCallback = onFailure;
     }
 
     @Override

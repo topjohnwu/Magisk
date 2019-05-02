@@ -7,8 +7,6 @@ import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
-
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -18,6 +16,8 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
+
+import androidx.annotation.RequiresApi;
 
 public class Shortcuts {
 

@@ -1,26 +1,53 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/empty_rv"
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.superuser.SuperuserViewModel" />
+
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:fontFamily="sans-serif-light"
-        android:gravity="center"
-        android:text="@string/no_apps_found"
-        android:textSize="20sp"
-        android:textStyle="italic"
-        android:visibility="gone" />
+        android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:dividerHeight="@dimen/card_divider_space"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/superuser_content"
+            dividerColor="@{@android:color/transparent}"
+            dividerSize="@{@dimen/margin_generic}"
+            gone="@{!viewModel.loaded}"
+            itemBinding="@{viewModel.itemBinding}"
+            items="@{viewModel.items}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="@dimen/margin_generic"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_policy" />
 
-</LinearLayout>
+        <ProgressBar
+            style="@style/Widget.Progress"
+            gone="@{!viewModel.loading}"
+            android:layout_gravity="center" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/superuser_empty"
+            gone="@{!viewModel.loaded || viewModel.items.size &gt; 0}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:text="@string/no_apps_found"
+            android:textSize="20sp"
+            android:textStyle="italic" />
+
+    </FrameLayout>
+
+
+</layout>
+

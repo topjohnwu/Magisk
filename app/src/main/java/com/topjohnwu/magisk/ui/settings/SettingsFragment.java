@@ -8,13 +8,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceCategory;
-import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreferenceCompat;
-
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -35,18 +28,32 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.ListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.PreferenceScreen;
+import androidx.preference.SwitchPreferenceCompat;
+
 public class SettingsFragment extends BasePreferenceFragment {
 
     private ListPreference updateChannel, autoRes, suNotification,
             requestTimeout, rootConfig, multiuserConfig, nsConfig;
 
     @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.app_settings, rootKey);
+    public void onStart() {
+        super.onStart();
+        setHasOptionsMenu(true);
         requireActivity().setTitle(R.string.settings);
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        getPreferenceManager().setStorageDeviceProtected();
+        setPreferencesFromResource(R.xml.app_settings, rootKey);
 
         boolean showSuperuser = Utils.showSuperUser();
-        app.prefs.edit()
+        app.getPrefs().edit()
                 .putBoolean(Config.Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
                 .apply();
 
@@ -66,8 +73,8 @@ public class SettingsFragment extends BasePreferenceFragment {
             return true;
         });
         findPreference("clear").setOnPreferenceClickListener(pref -> {
-            app.prefs.edit().remove(Config.Key.ETAG_KEY).apply();
-            app.repoDB.clearRepo();
+            app.getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
+            app.getRepoDB().clearRepo();
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
         });
@@ -94,12 +101,12 @@ public class SettingsFragment extends BasePreferenceFragment {
             if (channel == Config.Value.CUSTOM_CHANNEL) {
                 View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                 EditText url = v.findViewById(R.id.custom_url);
-                url.setText(app.prefs.getString(Config.Key.CUSTOM_CHANNEL, ""));
+                url.setText(app.getPrefs().getString(Config.Key.CUSTOM_CHANNEL, ""));
                 new AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
                         .setPositiveButton(R.string.ok, (d, i) ->
-                               Config.set(Config.Key.CUSTOM_CHANNEL, url.getText().toString()))
+                                Config.set(Config.Key.CUSTOM_CHANNEL, url.getText().toString()))
                         .setNegativeButton(R.string.close, (d, i) ->
                                 Config.set(Config.Key.UPDATE_CHANNEL, prev))
                         .setOnCancelListener(d ->
@@ -183,7 +190,7 @@ public class SettingsFragment extends BasePreferenceFragment {
             case Config.Key.ROOT_ACCESS:
             case Config.Key.SU_MULTIUSER_MODE:
             case Config.Key.SU_MNT_NS:
-                app.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
+                app.getDB().setSettings(key, Utils.getPrefsInt(prefs, key));
                 break;
             case Config.Key.DARK_THEME:
                 requireActivity().recreate();

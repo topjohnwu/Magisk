@@ -11,7 +11,7 @@
     <application
         android:allowBackup="true"
         android:name="a.e"
-        android:theme="@style/AppTheme"
+        android:theme="@style/MagiskTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
@@ -35,7 +35,7 @@
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor"
-            android:theme="@style/AppTheme.NoDrawer" />
+            android:theme="@style/MagiskTheme.Flashing" />
 
         <!-- Superuser -->
 
@@ -44,7 +44,7 @@
             android:exported="false"
             android:directBootAware="true"
             android:excludeFromRecents="true"
-            android:theme="@style/SuRequest" />
+            android:theme="@style/MagiskTheme.SU" />
 
         <!-- Receiver -->
 

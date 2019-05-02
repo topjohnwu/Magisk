@@ -7,10 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.app.TaskStackBuilder;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
@@ -19,6 +15,10 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver;
 import com.topjohnwu.magisk.ui.SplashActivity;
 import com.topjohnwu.magisk.utils.Utils;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.TaskStackBuilder;
 
 public class Notifications {
 

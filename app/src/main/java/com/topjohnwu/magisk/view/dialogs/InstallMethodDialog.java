@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ui.base.BaseActivity;
+import com.topjohnwu.magisk.ui.base.IBaseLeanback;
 import com.topjohnwu.magisk.ui.flash.FlashActivity;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.view.ProgressNotification;
@@ -21,9 +19,11 @@ import com.topjohnwu.net.Networking;
 import java.io.File;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
+
 class InstallMethodDialog extends AlertDialog.Builder {
 
-    InstallMethodDialog(BaseActivity activity, List<String> options) {
+    <Ctxt extends Activity & IBaseLeanback> InstallMethodDialog(Ctxt activity, List<String> options) {
         super(activity);
         setTitle(R.string.select_method);
         setItems(options.toArray(new String[0]), (dialog, idx) -> {
@@ -48,7 +48,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
         });
     }
 
-    private void patchBoot(BaseActivity activity) {
+    private <Ctxt extends Activity & IBaseLeanback> void patchBoot(Ctxt activity) {
         activity.runWithExternalRW(() -> {
             Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG);
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
@@ -66,7 +66,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
         });
     }
 
-    private void downloadOnly(BaseActivity activity) {
+    private <Ctxt extends Activity & IBaseLeanback> void downloadOnly(Ctxt activity) {
         activity.runWithExternalRW(() -> {
             String filename = Utils.fmt("Magisk-v%s(%d).zip",
                     Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode);
@@ -74,7 +74,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
             ProgressNotification progress = new ProgressNotification(filename);
             Networking.get(Config.magiskLink)
                     .setDownloadProgressListener(progress)
-                    .setErrorHandler(((conn, e) -> progress.dlFail()))
+                    .setErrorHandler((conn, e) -> progress.dlFail())
                     .getAsFile(zip, f -> {
                         progress.dlDone();
                         SnackbarMaker.make(activity,
@@ -84,7 +84,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
         });
     }
 
-    private void installInactiveSlot(BaseActivity activity) {
+    private <Ctxt extends Activity & IBaseLeanback> void installInactiveSlot(Ctxt activity) {
         new CustomAlertDialog(activity)
                 .setTitle(R.string.warning)
                 .setMessage(R.string.install_inactive_slot_msg)

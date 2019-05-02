@@ -99,7 +99,9 @@
 
     <string name="dtbo_patched_title">DTBO was patched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img. Please reboot.</string>
-    <string name="flashing">Flashing</string>
+    <string name="flashing">Flashing…</string>
+    <string name="done">Done!</string>
+    <string name="failure">Failed</string>
     <string name="hide_manager_title">Hiding Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Hide Magisk Manager failed.</string>
     <string name="open_link_failed_toast">No application found to open the link.</string>

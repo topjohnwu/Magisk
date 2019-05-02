@@ -61,12 +61,12 @@ public class GeneralReceiver extends BroadcastReceiver {
             case Intent.ACTION_PACKAGE_REPLACED:
                 // This will only work pre-O
                 if (Config.get(Config.Key.SU_REAUTH)) {
-                    app.mDB.deletePolicy(getPkg(intent));
+                    app.getDB().deletePolicy(getPkg(intent));
                 }
                 break;
             case Intent.ACTION_PACKAGE_FULLY_REMOVED:
                 String pkg = getPkg(intent);
-                app.mDB.deletePolicy(pkg);
+                app.getDB().deletePolicy(pkg);
                 Shell.su("magiskhide --rm " + pkg).submit();
                 break;
             case Intent.ACTION_LOCALE_CHANGED:

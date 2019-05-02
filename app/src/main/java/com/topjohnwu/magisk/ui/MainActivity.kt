@@ -1,0 +1,104 @@
+package com.topjohnwu.magisk.ui
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
+import com.topjohnwu.magisk.ClassMap
+import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
+import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ActivityMainBinding
+import com.topjohnwu.magisk.model.navigation.Navigation
+import com.topjohnwu.magisk.ui.base.MagiskActivity
+import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
+import com.topjohnwu.magisk.ui.log.LogFragment
+import com.topjohnwu.magisk.ui.module.ModulesFragment
+import com.topjohnwu.magisk.ui.module.ReposFragment
+import com.topjohnwu.magisk.ui.settings.SettingsFragment
+import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
+import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.net.Networking
+import com.topjohnwu.superuser.Shell
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.reflect.KClass
+import com.topjohnwu.magisk.ui.home.MagiskFragment as HomeFragment
+
+
+open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
+
+    override val layoutRes: Int = R.layout.activity_main
+    override val viewModel: MainViewModel by viewModel()
+    override val navHostId: Int = R.id.main_nav_host
+    override val defaultPosition: Int = 0
+
+    override val baseFragments: List<KClass<out Fragment>> = listOf(
+        HomeFragment::class,
+        SuperuserFragment::class,
+        MagiskHideFragment::class,
+        ModulesFragment::class,
+        ReposFragment::class,
+        LogFragment::class,
+        SettingsFragment::class
+    )
+
+    /*override fun getDarkTheme(): Int {
+        return R.style.AppTheme_Dark
+    }*/
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        if (!SplashActivity.DONE) {
+            startActivity(Intent(this, ClassMap.get<Any>(SplashActivity::class.java)))
+            finish()
+        }
+
+        super.onCreate(savedInstanceState)
+        checkHideSection()
+        setSupportActionBar(binding.mainInclude.mainToolbar)
+
+        if (savedInstanceState == null) {
+            intent.getStringExtra(OPEN_SECTION)?.let {
+                onEventDispatched(Navigation.fromSection(it))
+            }
+        }
+    }
+
+    override fun setTitle(title: CharSequence?) {
+        supportActionBar?.title = title
+    }
+
+    override fun setTitle(titleId: Int) {
+        supportActionBar?.setTitle(titleId)
+    }
+
+    override fun onBackPressed() {
+        if (binding.drawerLayout.isDrawerOpen(binding.navView)) {
+            binding.drawerLayout.closeDrawer(binding.navView)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onSimpleEventDispatched(event: Int) {
+        super.onSimpleEventDispatched(event)
+        when (event) {
+            Navigation.Main.OPEN_NAV -> openNav()
+        }
+    }
+
+    private fun openNav() = binding.drawerLayout.openDrawer(GravityCompat.START)
+
+    fun checkHideSection() {
+        val menu = binding.navView.menu
+        menu.findItem(R.id.magiskHideFragment).isVisible =
+            Shell.rootAccess() && Config.get<Any>(Config.Key.MAGISKHIDE) as Boolean
+        menu.findItem(R.id.modulesFragment).isVisible =
+            Shell.rootAccess() && Config.magiskVersionCode >= 0
+        menu.findItem(R.id.reposFragment).isVisible =
+            (Networking.checkNetworkStatus(this) && Shell.rootAccess() && Config.magiskVersionCode >= 0)
+        menu.findItem(R.id.logFragment).isVisible =
+            Shell.rootAccess()
+        menu.findItem(R.id.superuserFragment).isVisible =
+            Utils.showSuperUser()
+    }
+}

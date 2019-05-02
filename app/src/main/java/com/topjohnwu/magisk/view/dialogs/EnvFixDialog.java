@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.tasks.MagiskInstaller;
 import com.topjohnwu.magisk.utils.RootUtils;
@@ -13,6 +11,8 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
 import com.topjohnwu.superuser.io.SuFile;
+
+import androidx.annotation.NonNull;
 
 public class EnvFixDialog extends CustomAlertDialog {
 

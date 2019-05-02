@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dialog_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -27,32 +28,35 @@
         android:orientation="horizontal"
         android:padding="2dp">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/negative"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/Widget.Button.Text"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:layout_weight="1"
-            android:maxLines="2" />
+            android:maxLines="2"
+            tools:text="Negative" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/neutral"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/Widget.Button.Text"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:maxLines="2" />
+            android:maxLines="2"
+            tools:text="Neutral" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/positive"
-            style="?android:attr/buttonBarButtonStyle"
+            style="@style/Widget.Button.Text"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="end"
             android:layout_weight="1"
-            android:maxLines="2" />
+            android:maxLines="2"
+            tools:text="Positive" />
 
     </LinearLayout>
 

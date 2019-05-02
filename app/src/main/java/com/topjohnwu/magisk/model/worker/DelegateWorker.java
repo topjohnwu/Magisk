@@ -4,18 +4,18 @@ import android.content.Context;
 import android.net.Network;
 import android.net.Uri;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.work.Data;
 import androidx.work.ListenableWorker;
-
-import com.google.common.util.concurrent.ListenableFuture;
-
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 public abstract class DelegateWorker {
 

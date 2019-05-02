@@ -8,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Event;
+
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
@@ -15,10 +19,6 @@ import androidx.preference.PreferenceGroupAdapter;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.PreferenceViewHolder;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.topjohnwu.magisk.App;
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Event;
 
 public abstract class BasePreferenceFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener, Event.AutoListener {
@@ -28,21 +28,21 @@ public abstract class BasePreferenceFragment extends PreferenceFragmentCompat
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        app.prefs.registerOnSharedPreferenceChangeListener(this);
+        app.getPrefs().registerOnSharedPreferenceChangeListener(this);
         Event.register(this);
         return v;
     }
 
     @Override
     public void onDestroyView() {
-        app.prefs.unregisterOnSharedPreferenceChangeListener(this);
+        app.getPrefs().unregisterOnSharedPreferenceChangeListener(this);
         Event.unregister(this);
         super.onDestroyView();
     }
 
     @Override
     public int[] getListeningEvents() {
-        return BaseActivity.EMPTY_INT_ARRAY;
+        return new int[0];
     }
 
     @Override

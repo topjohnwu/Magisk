@@ -8,4 +8,21 @@
     <dimen name="card_corner_radius">2dp</dimen>
     <dimen name="card_elevation">2dp</dimen>
     <dimen name="fab_padding">16dp</dimen>
+
+    <!--new dimens-->
+
+    <dimen name="margin_generic_quadruple">64dp</dimen>
+    <dimen name="margin_generic_triple">48dp</dimen>
+    <dimen name="margin_generic_double">32dp</dimen>
+    <dimen name="margin_generic">16dp</dimen>
+    <dimen name="margin_generic_half">8dp</dimen>
+    <dimen name="margin_generic_quarter">4dp</dimen>
+    <dimen name="margin_generic_eighth">2dp</dimen>
+
+    <dimen name="radius_generic">8dp</dimen>
+    <dimen name="supplemental_animation_height">20dp</dimen>
+
+    <dimen name="divider_size">1dp</dimen>
+
+    <!--new dimens ^^-->
 </resources>
