@@ -99,14 +99,16 @@
     
     <string name="dtbo_patched_title">DTBO fue parchado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha parcheado dtbo.img, por favor reinicia</string>
-    <string name="flashing">Flasheando</string>
+    <string name="flashing">Flasheando…</string>
+    <string name="done">¡Hecho!</string>
+    <string name="failure">Ha fallado</string>
     <string name="hide_manager_title">Ocultando Magisk Manager…</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
-	<string name="warning">Advertencia</string>
+    <string name="warning">Advertencia</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
-	<string name="restore_img_msg">Restaurando …</string>
+    <string name="restore_img_msg">Restaurando …</string>
     <string name="restore_done">¡Restauración Terminada!</string>
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="proprietary_title">Descargar Código Propietario</string>
