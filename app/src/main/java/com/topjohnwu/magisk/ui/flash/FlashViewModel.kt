@@ -43,6 +43,7 @@ class FlashViewModel(
     }
 
     private val rawItems = ObservableArrayList<String>()
+    private val logItems = ObservableArrayList<String>()
 
     init {
         rawItems.sendUpdatesTo(items) { it.map { ConsoleRvItem(it) } }
@@ -52,19 +53,19 @@ class FlashViewModel(
         val uri = uri ?: Uri.EMPTY
         when (action) {
             Const.Value.FLASH_ZIP -> Flashing
-                .Install(uri, rawItems, rawItems, this)
+                .Install(uri, rawItems, logItems, this)
                 .exec()
             Const.Value.UNINSTALL -> Flashing
-                .Uninstall(uri, rawItems, rawItems, this)
+                .Uninstall(uri, rawItems, logItems, this)
                 .exec()
             Const.Value.FLASH_MAGISK -> Patching
-                .Direct(rawItems, rawItems, this)
+                .Direct(rawItems, logItems, this)
                 .exec()
             Const.Value.FLASH_INACTIVE_SLOT -> Patching
-                .SecondSlot(rawItems, rawItems, this)
+                .SecondSlot(rawItems, logItems, this)
                 .exec()
             Const.Value.PATCH_FILE -> Patching
-                .File(uri, rawItems, rawItems, this)
+                .File(uri, rawItems, logItems, this)
                 .exec()
         }
     }
@@ -85,13 +86,20 @@ class FlashViewModel(
 
     fun savePressed() = withPermissions(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
         .map { now }
-        .map { it.toTime(timeFormatFull) }
+        .map { it.toTime(timeFormatStandard) }
         .map { Const.MAGISK_INSTALL_LOG_FILENAME.format(it) }
         .map { File(Const.EXTERNAL_PATH, it) }
         .map { file ->
             val log = items.filterIsInstance<ConsoleRvItem>()
                 .joinToString("\n") { it.item }
             file.writeText(log)
+
+            val rawLog = logItems.toList().joinToString("\n")
+            if (rawLog.isNotBlank()) {
+                file.appendText("\n=== LOG ===\n")
+                file.appendText(rawLog)
+            }
+
             file.path
         }
         .subscribeK { SnackbarEvent(it).publish() }
