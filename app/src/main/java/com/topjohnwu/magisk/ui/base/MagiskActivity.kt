@@ -44,6 +44,9 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         FragNavController(supportFragmentManager, navHostId)
     }
 
+    private val isRootFragment
+        get() = navigationController?.let { it.currentStackIndex != defaultPosition } ?: false
+
     init {
         val isDarkTheme = Config.get<Boolean>(Config.Key.DARK_THEME)
         val theme = if (isDarkTheme) {
@@ -148,7 +151,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
             navigationController?.popFragment() ?: throw UnsupportedOperationException()
         } catch (e: UnsupportedOperationException) {
             when {
-                navigationController?.currentStackIndex != defaultPosition -> {
+                isRootFragment -> {
                     val options = FragNavTransactionOptions.newBuilder()
                         .transition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                         .build()
