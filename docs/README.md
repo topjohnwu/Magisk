@@ -5,7 +5,7 @@
     - [Prerequisite](install.md#prerequisite)
     - [Custom Recovery](install.md#custom-recovery)
     - [Boot Image Patching](install.md#boot-image-patching)
-    - [Samsung (System-as-root)](#samsung-system-as-root)
+    - [Samsung (System-as-root)](install.md#samsung-system-as-root)
     - [Huawei](install.md#huawei)
 - [Tutorials](tutorials.md)
     - [OTA Installation](tutorials.md#ota-installation)
