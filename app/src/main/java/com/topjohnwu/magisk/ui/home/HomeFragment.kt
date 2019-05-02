@@ -1,22 +1,20 @@
 package com.topjohnwu.magisk.ui.home
 
+import android.app.Activity
 import com.skoumal.teanity.viewevents.ViewEvent
-import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.magisk.view.MarkDownWindow
-import com.topjohnwu.magisk.view.SafetyNet
-import com.topjohnwu.magisk.view.SafetyNet.EXT_APK
 import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
+import dalvik.system.DexClassLoader
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
 
 class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
     ISafetyNetHelper.Callback {
@@ -83,7 +81,16 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     private fun updateSafetyNet(dieOnError: Boolean) {
         try {
-            SafetyNet.dyRun(requireActivity(), this)
+            val loader = DexClassLoader(EXT_APK.path, EXT_APK.parent, null,
+                    ISafetyNetHelper::class.java.classLoader)
+            val clazz = loader.loadClass("com.topjohnwu.snet.Snet")
+            val helper = clazz.getMethod("newHelper",
+                    Class::class.java, String::class.java, Activity::class.java, Any::class.java)
+                    .invoke(null, ISafetyNetHelper::class.java, EXT_APK.path,
+                            requireActivity(), this) as ISafetyNetHelper
+            if (helper.version < Const.SNET_EXT_VER)
+                throw Exception()
+            helper.attest()
         } catch (e: Exception) {
             if (dieOnError) {
                 viewModel.finishSafetyNetCheck(-1)
@@ -93,6 +100,10 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
             EXT_APK.parentFile?.mkdir()
             downloadSafetyNet(!dieOnError)
         }
+    }
+
+    companion object {
+        val EXT_APK = File("${App.self.filesDir.parent}/snet", "snet.apk")
     }
 }
 
