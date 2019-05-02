@@ -13,6 +13,7 @@ import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.skoumal.teanity.extensions.subscribeK
@@ -141,4 +142,41 @@ fun setSelectedItemPositionListener(view: Spinner, listener: InverseBindingListe
 @BindingAdapter("onTouch")
 fun setOnTouchListener(view: View, listener: View.OnTouchListener) {
     view.setOnTouchListener(listener)
+}
+
+@BindingAdapter("scrollToLast")
+fun setScrollToLast(view: RecyclerView, shouldScrollToLast: Boolean) {
+
+    fun scrollToLast() = view.post {
+        view.scrollToPosition(view.adapter?.itemCount?.minus(1) ?: 0)
+    }
+
+    fun wait(callback: () -> Unit) {
+        Observable.timer(1, TimeUnit.SECONDS).subscribeK { callback() }
+    }
+
+    val tag = RecyclerView::class.java.name.sumBy { it.toInt() }
+
+    fun RecyclerView.Adapter<*>.setListener() {
+        val observer = object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                scrollToLast()
+            }
+        }
+        registerAdapterDataObserver(observer)
+        view.setTag(tag, observer)
+    }
+
+    fun RecyclerView.Adapter<*>.removeListener() {
+        val observer = view.getTag(tag) as? RecyclerView.AdapterDataObserver ?: return
+        unregisterAdapterDataObserver(observer)
+    }
+
+    fun trySetListener(): Unit = view.adapter?.setListener() ?: wait { trySetListener() }
+
+    if (shouldScrollToLast) {
+        trySetListener()
+    } else {
+        view.adapter?.removeListener()
+    }
 }
