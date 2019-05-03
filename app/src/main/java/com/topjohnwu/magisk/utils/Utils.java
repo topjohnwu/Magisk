@@ -58,24 +58,6 @@ public class Utils {
         return getPrefsInt(prefs, key, 0);
     }
 
-    public static String getNameFromUri(Context context, Uri uri) {
-        String name = null;
-        try (Cursor c = context.getContentResolver().query(uri, null, null, null, null)) {
-            if (c != null) {
-                int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                if (nameIndex != -1) {
-                    c.moveToFirst();
-                    name = c.getString(nameIndex);
-                }
-            }
-        }
-        if (name == null) {
-            int idx = uri.getPath().lastIndexOf('/');
-            name = uri.getPath().substring(idx + 1);
-        }
-        return name;
-    }
-
     public static int dpInPx(int dp) {
         float scale = App.self.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5);

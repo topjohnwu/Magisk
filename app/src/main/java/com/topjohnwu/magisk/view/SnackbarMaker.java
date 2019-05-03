@@ -5,11 +5,11 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.StringRes;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Utils;
-
-import androidx.annotation.StringRes;
+import com.topjohnwu.magisk.utils.XAndroidKt;
 
 public class SnackbarMaker {
 
@@ -41,7 +41,7 @@ public class SnackbarMaker {
 
     public static void showUri(Activity activity, Uri uri) {
         make(activity, activity.getString(R.string.internal_storage,
-                "/Download/" + Utils.getNameFromUri(activity, uri)),
+                "/Download/" + XAndroidKt.getFileName(uri)),
                 Snackbar.LENGTH_LONG)
                 .setAction(R.string.ok, (v)->{}).show();
     }

@@ -6,6 +6,10 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
+import android.net.Uri
+import android.provider.OpenableColumns
+import com.topjohnwu.magisk.App
+import java.io.FileNotFoundException
 
 val PackageInfo.processes
     get() = activities?.processNames.orEmpty() +
@@ -38,6 +42,22 @@ val ApplicationInfo.packageInfo: PackageInfo?
         }
     }
 
+val Uri.fileName: String get() {
+    var name: String? = null
+    App.self.contentResolver.query(this, null, null, null, null)?.use { c ->
+        val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (nameIndex != -1) {
+            c.moveToFirst()
+            name = c.getString(nameIndex)
+        }
+    }
+    if (name == null && path != null) {
+        val idx = path!!.lastIndexOf('/')
+        name = path!!.substring(idx + 1)
+    }
+    return name.orEmpty()
+}
+
 fun PackageManager.activities(packageName: String) =
     getPackageInfo(packageName, GET_ACTIVITIES)
 
@@ -51,3 +71,6 @@ fun PackageManager.providers(packageName: String) =
     getPackageInfo(packageName, GET_PROVIDERS).providers
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
+
+fun Context.readUri(uri: Uri) = contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
+

@@ -9,7 +9,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 @Throws(IOException::class)
-@JvmOverloads
 fun unzip(zip: File, folder: File, path: String = "", junkPath: Boolean = false) {
     zip.inputStream().buffered().use {
         unzip(it, folder, path, junkPath)
