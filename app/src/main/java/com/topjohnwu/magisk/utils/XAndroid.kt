@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.utils
 
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
@@ -48,3 +49,5 @@ fun PackageManager.receivers(packageName: String) =
 
 fun PackageManager.providers(packageName: String) =
     getPackageInfo(packageName, GET_PROVIDERS).providers
+
+fun Context.rawResource(id: Int) = resources.openRawResource(id)

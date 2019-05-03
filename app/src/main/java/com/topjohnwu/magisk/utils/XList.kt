@@ -10,6 +10,20 @@ fun <T> MutableList<T>.update(newList: List<T>) {
     addAll(newList)
 }
 
+fun List<String>.toShellCmd() : String {
+    val sb = StringBuilder()
+    for (s in this) {
+        if (s.contains(" ")) {
+            sb.append('"').append(s).append('"')
+        } else {
+            sb.append(s)
+        }
+        sb.append(' ')
+    }
+    sb.deleteCharAt(sb.length - 1)
+    return sb.toString()
+}
+
 fun <T1, T2> ObservableList<T1>.sendUpdatesTo(
     target: DiffObservableList<T2>,
     mapper: (List<T1>) -> List<T2>

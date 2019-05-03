@@ -12,6 +12,12 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
@@ -25,16 +31,9 @@ import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
 import com.topjohnwu.superuser.io.SuFile;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 public class Utils {
 
@@ -164,20 +163,6 @@ public class Utils {
         } else {
             toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT);
         }
-    }
-
-    public static String argsToCommand(List<String> args) {
-        StringBuilder sb = new StringBuilder();
-        for (String s : args) {
-            if (s.contains(" ")) {
-                sb.append('"').append(s).append('"');
-            } else {
-                sb.append(s);
-            }
-            sb.append(' ');
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
     }
 
 }
