@@ -24,6 +24,8 @@ import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.io.File
+import java.util.Collections
+import kotlin.collections.ArrayList
 
 class FlashViewModel(
     action: String,
@@ -42,30 +44,36 @@ class FlashViewModel(
         itemBinding.bindExtra(BR.viewModel, this@FlashViewModel)
     }
 
-    private val rawItems = ObservableArrayList<String>()
-    private val logItems = ObservableArrayList<String>()
+    private val outItems = object : ObservableArrayList<String>() {
+        override fun add(element: String?): Boolean {
+            if (element != null)
+                logItems.add(element)
+            return super.add(element)
+        }
+    }
+    private val logItems = Collections.synchronizedList(ArrayList<String>())
 
     init {
-        rawItems.sendUpdatesTo(items) { it.map { ConsoleRvItem(it) } }
+        outItems.sendUpdatesTo(items) { it.map { ConsoleRvItem(it) } }
 
         state = State.LOADING
 
         val uri = uri ?: Uri.EMPTY
         when (action) {
             Const.Value.FLASH_ZIP -> Flashing
-                .Install(uri, rawItems, logItems, this)
+                .Install(uri, outItems, logItems, this)
                 .exec()
             Const.Value.UNINSTALL -> Flashing
-                .Uninstall(uri, rawItems, logItems, this)
+                .Uninstall(uri, outItems, logItems, this)
                 .exec()
             Const.Value.FLASH_MAGISK -> Patching
-                .Direct(rawItems, logItems, this)
+                .Direct(outItems, logItems, this)
                 .exec()
             Const.Value.FLASH_INACTIVE_SLOT -> Patching
-                .SecondSlot(rawItems, logItems, this)
+                .SecondSlot(outItems, logItems, this)
                 .exec()
             Const.Value.PATCH_FILE -> Patching
-                .File(uri, rawItems, logItems, this)
+                .File(uri, outItems, logItems, this)
                 .exec()
         }
     }
@@ -90,16 +98,12 @@ class FlashViewModel(
         .map { Const.MAGISK_INSTALL_LOG_FILENAME.format(it) }
         .map { File(Const.EXTERNAL_PATH, it) }
         .map { file ->
-            val log = items.filterIsInstance<ConsoleRvItem>()
-                .joinToString("\n") { it.item }
-            file.writeText(log)
-
-            val rawLog = logItems.toList().joinToString("\n")
-            if (rawLog.isNotBlank()) {
-                file.appendText("\n=== LOG ===\n")
-                file.appendText(rawLog)
+            file.bufferedWriter().use { writer ->
+                logItems.forEach {
+                    writer.write(it)
+                    writer.newLine()
+                }
             }
-
             file.path
         }
         .subscribeK { SnackbarEvent(it).publish() }
