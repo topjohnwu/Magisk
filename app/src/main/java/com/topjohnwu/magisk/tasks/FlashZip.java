@@ -5,7 +5,7 @@ import android.net.Uri;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.ZipUtils;
+import com.topjohnwu.magisk.utils.ZipUtilsKt;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
@@ -34,7 +34,7 @@ public abstract class FlashZip {
     }
 
     private boolean unzipAndCheck() throws IOException {
-        ZipUtils.unzip(tmpFile, tmpFile.getParentFile(), "META-INF/com/google/android", true);
+        ZipUtilsKt.unzip(tmpFile, tmpFile.getParentFile(), "META-INF/com/google/android", true);
         return Shell.su("grep -q '#MAGISK' " + new File(tmpFile.getParentFile(), "updater-script"))
                 .exec().isSuccess();
     }
