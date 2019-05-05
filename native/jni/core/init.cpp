@@ -268,7 +268,7 @@ void MagiskInit::load_kernel_info() {
 		} else if (key == "enter_recovery") {
 			enter_recovery = value[0] == '1';
 		} else if (key == "androidboot.hardware") {
-			kirin = strstr(value, "kirin") || strstr(value, "hi3660");
+			kirin = strstr(value, "kirin") || strstr(value, "hi3660") || strstr(value, "hi6250");
 		}
 	});
 
