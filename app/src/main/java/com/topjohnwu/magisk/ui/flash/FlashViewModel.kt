@@ -24,8 +24,7 @@ import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.io.File
-import java.util.Collections
-import kotlin.collections.ArrayList
+import java.util.*
 
 class FlashViewModel(
     action: String,
@@ -44,17 +43,12 @@ class FlashViewModel(
         itemBinding.bindExtra(BR.viewModel, this@FlashViewModel)
     }
 
-    private val outItems = object : ObservableArrayList<String>() {
-        override fun add(element: String?): Boolean {
-            if (element != null)
-                logItems.add(element)
-            return super.add(element)
-        }
-    }
-    private val logItems = Collections.synchronizedList(ArrayList<String>())
+    private val outItems = ObservableArrayList<String>()
+    private val logItems = Collections.synchronizedList(mutableListOf<String>())
 
     init {
         outItems.sendUpdatesTo(items) { it.map { ConsoleRvItem(it) } }
+        outItems.copyNewInputInto(logItems)
 
         state = State.LOADING
 
