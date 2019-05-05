@@ -35,6 +35,16 @@ android {
     dataBinding {
         enabled = true
     }
+
+    packagingOptions {
+        exclude '/META-INF/*.version'
+        exclude '/META-INF/*.kotlin_module'
+        exclude '/META-INF/rxkotlin.properties'
+        exclude '/androidsupportmultidexversion.txt'
+        exclude '/org/**'
+        exclude '/kotlin/**'
+        exclude '/kotlinx/**'
+    }
 }
 
 dependencies {
@@ -44,8 +54,6 @@ dependencies {
     implementation project(':signing')
 
     implementation 'com.github.topjohnwu:jtar:1.0.0'
-    implementation 'net.sourceforge.streamsupport:android-retrostreams:1.7.0'
-    implementation 'com.github.sevar83:indeterminate-checkbox:1.0.5'
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.github.skoumalcz:teanity:0.3.3'
     implementation 'com.ncapdevi:frag-nav:3.2.0'

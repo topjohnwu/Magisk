@@ -89,7 +89,7 @@ public class DownloadApp {
             // Make it world readable
             apk.setReadable(true, false);
             if (Shell.su("pm install " + apk).exec().isSuccess())
-                RootUtils.rmAndLaunch(app.getPackageName(),
+                RootUtils.Companion.rmAndLaunch(app.getPackageName(),
                         new ComponentName(BuildConfig.APPLICATION_ID,
                                 ClassMap.get(SplashActivity.class).getName()));
             progress.dismiss();

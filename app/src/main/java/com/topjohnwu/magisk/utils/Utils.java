@@ -12,6 +12,12 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
@@ -25,16 +31,9 @@ import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.internal.UiThreadHandler;
 import com.topjohnwu.superuser.io.SuFile;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 public class Utils {
 
@@ -57,24 +56,6 @@ public class Utils {
 
     public static int getPrefsInt(SharedPreferences prefs, String key) {
         return getPrefsInt(prefs, key, 0);
-    }
-
-    public static String getNameFromUri(Context context, Uri uri) {
-        String name = null;
-        try (Cursor c = context.getContentResolver().query(uri, null, null, null, null)) {
-            if (c != null) {
-                int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                if (nameIndex != -1) {
-                    c.moveToFirst();
-                    name = c.getString(nameIndex);
-                }
-            }
-        }
-        if (name == null) {
-            int idx = uri.getPath().lastIndexOf('/');
-            name = uri.getPath().substring(idx + 1);
-        }
-        return name;
     }
 
     public static int dpInPx(int dp) {
@@ -164,20 +145,6 @@ public class Utils {
         } else {
             toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT);
         }
-    }
-
-    public static String argsToCommand(List<String> args) {
-        StringBuilder sb = new StringBuilder();
-        for (String s : args) {
-            if (s.contains(" ")) {
-                sb.append('"').append(s).append('"');
-            } else {
-                sb.append(s);
-            }
-            sb.append(' ');
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
     }
 
 }
