@@ -31,7 +31,7 @@ import kotlin.reflect.KClass
 
 abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBinding> :
     MagiskLeanbackActivity<ViewModel, Binding>(), FragNavController.RootFragmentListener,
-    Navigator {
+    Navigator, FragNavController.TransactionListener {
 
     override val numberOfRootFragments: Int get() = baseFragments.size
     override val baseFragments: List<KClass<out Fragment>> = listOf()
@@ -62,6 +62,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         super.onCreate(savedInstanceState)
         navigationController?.apply {
             rootFragmentListener = this@MagiskActivity
+            transactionListener = this@MagiskActivity
             initialize(defaultPosition, savedInstanceState)
         }
     }
@@ -161,6 +162,13 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
             }
         }
     }
+
+    override fun onFragmentTransaction(
+        fragment: Fragment?,
+        transactionType: FragNavController.TransactionType
+    ) = Unit
+
+    override fun onTabTransaction(fragment: Fragment?, index: Int) = Unit
 
     fun openUrl(url: String) = Utils.openLink(this, url.toUri())
 
