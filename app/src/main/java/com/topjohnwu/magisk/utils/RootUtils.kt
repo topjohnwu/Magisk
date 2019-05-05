@@ -38,72 +38,70 @@ fun Intent.toCommand(args: MutableList<String>) {
     }
     val extras = extras
     if (extras != null) {
-        for (key in extras.keySet()) {
+        loop@ for (key in extras.keySet()) {
             val v = extras.get(key) ?: continue
             var value: Any = v
             val arg: String
-            if (v is String)
-                arg = "--es"
-            else if (v is Boolean)
-                arg = "--ez"
-            else if (v is Int)
-                arg = "--ei"
-            else if (v is Long)
-                arg = "--el"
-            else if (v is Float)
-                arg = "--ef"
-            else if (v is Uri)
-                arg = "--eu"
-            else if (v is ComponentName) {
-                arg = "--ecn"
-                value = v.flattenToString()
-            } else if (v is ArrayList<*>) {
-                if (v.size <= 0)
-                /* Impossible to know the type due to type erasure */
-                    continue
-
-                arg = if (v[0] is Int)
-                    "--eial"
-                else if (v[0] is Long)
-                    "--elal"
-                else if (v[0] is Float)
-                    "--efal"
-                else if (v[0] is String)
-                    "--esal"
-                else
-                    continue  /* Unsupported */
-
-                val sb = StringBuilder()
-                for (o in v) {
-                    sb.append(o.toString().replace(",", "\\,"))
-                    sb.append(',')
+            when {
+                v is String -> arg = "--es"
+                v is Boolean -> arg = "--ez"
+                v is Int -> arg = "--ei"
+                v is Long -> arg = "--el"
+                v is Float -> arg = "--ef"
+                v is Uri -> arg = "--eu"
+                v is ComponentName -> {
+                    arg = "--ecn"
+                    value = v.flattenToString()
                 }
-                // Remove trailing comma
-                sb.deleteCharAt(sb.length - 1)
-                value = sb
-            } else if (v.javaClass.isArray) {
-                arg = if (v is IntArray)
-                    "--eia"
-                else if (v is LongArray)
-                    "--ela"
-                else if (v is FloatArray)
-                    "--efa"
-                else if (v is Array<*> && v.isArrayOf<String>())
-                    "--esa"
-                else
-                    continue  /* Unsupported */
+                v is ArrayList<*> -> {
+                    if (v.size <= 0)
+                    /* Impossible to know the type due to type erasure */
+                        continue@loop
 
-                val sb = StringBuilder()
-                val len = RArray.getLength(v)
-                for (i in 0 until len) {
-                    sb.append(RArray.get(v, i)!!.toString().replace(",", "\\,"))
-                    sb.append(',')
+                    arg = if (v[0] is Int)
+                        "--eial"
+                    else if (v[0] is Long)
+                        "--elal"
+                    else if (v[0] is Float)
+                        "--efal"
+                    else if (v[0] is String)
+                        "--esal"
+                    else
+                        continue@loop  /* Unsupported */
+
+                    val sb = StringBuilder()
+                    for (o in v) {
+                        sb.append(o.toString().replace(",", "\\,"))
+                        sb.append(',')
+                    }
+                    // Remove trailing comma
+                    sb.deleteCharAt(sb.length - 1)
+                    value = sb
                 }
-                // Remove trailing comma
-                sb.deleteCharAt(sb.length - 1)
-                value = sb
-            } else
-                continue  /* Unsupported */
+                v.javaClass.isArray -> {
+                    arg = if (v is IntArray)
+                        "--eia"
+                    else if (v is LongArray)
+                        "--ela"
+                    else if (v is FloatArray)
+                        "--efa"
+                    else if (v is Array<*> && v.isArrayOf<String>())
+                        "--esa"
+                    else
+                        continue@loop  /* Unsupported */
+
+                    val sb = StringBuilder()
+                    val len = RArray.getLength(v)
+                    for (i in 0 until len) {
+                        sb.append(RArray.get(v, i)!!.toString().replace(",", "\\,"))
+                        sb.append(',')
+                    }
+                    // Remove trailing comma
+                    sb.deleteCharAt(sb.length - 1)
+                    value = sb
+                }
+                else -> continue@loop
+            }  /* Unsupported */
 
             args.add(arg)
             args.add(key)
@@ -153,10 +151,12 @@ class RootUtils : Shell.Initializer() {
 
     companion object {
 
+        @JvmStatic
         fun rmAndLaunch(rm: String, component: ComponentName) {
             Shell.su("(rm_launch $rm ${component.flattenToString()})").exec()
         }
 
+        @JvmStatic
         fun reboot() {
             Shell.su("/system/bin/reboot ${if (Config.recovery) "recovery" else ""}").submit()
         }
