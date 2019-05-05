@@ -71,6 +71,20 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
         supportActionBar?.setTitle(titleId)
     }
 
+    override fun onTabTransaction(fragment: Fragment?, index: Int) {
+        val fragmentId = when (fragment) {
+            is HomeFragment -> R.id.magiskFragment
+            is SuperuserFragment -> R.id.superuserFragment
+            is MagiskHideFragment -> R.id.magiskHideFragment
+            is ModulesFragment -> R.id.modulesFragment
+            is ReposFragment -> R.id.reposFragment
+            is LogFragment -> R.id.logFragment
+            is SettingsFragment -> R.id.settings
+            else -> return
+        }
+        binding.navView.setCheckedItem(fragmentId)
+    }
+
     override fun onBackPressed() {
         if (binding.drawerLayout.isDrawerOpen(binding.navView)) {
             binding.drawerLayout.closeDrawer(binding.navView)
@@ -88,7 +102,7 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
 
     private fun openNav() = binding.drawerLayout.openDrawer(GravityCompat.START)
 
-    fun checkHideSection() {
+    private fun checkHideSection() {
         val menu = binding.navView.menu
         menu.findItem(R.id.magiskHideFragment).isVisible =
             Shell.rootAccess() && Config.get<Any>(Config.Key.MAGISKHIDE) as Boolean
