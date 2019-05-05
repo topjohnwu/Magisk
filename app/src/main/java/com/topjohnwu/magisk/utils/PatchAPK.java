@@ -3,8 +3,6 @@ package com.topjohnwu.magisk.utils;
 import android.content.ComponentName;
 import android.widget.Toast;
 
-import androidx.core.app.NotificationCompat;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
@@ -28,6 +26,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
+
+import androidx.core.app.NotificationCompat;
 
 public class PatchAPK {
 
@@ -56,7 +56,7 @@ public class PatchAPK {
         return builder.toString();
     }
 
-    private static boolean findAndPatch(byte xml[], String from, String to) {
+    private static boolean findAndPatch(byte[] xml, String from, String to) {
         if (from.length() != to.length())
             return false;
         CharBuffer buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer();
@@ -83,7 +83,7 @@ public class PatchAPK {
         return true;
     }
 
-    private static boolean findAndPatch(byte xml[], int a, int b) {
+    private static boolean findAndPatch(byte[] xml, int a, int b) {
         IntBuffer buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
         int len = xml.length / 4;
         for (int i = 0; i < len; ++i) {
@@ -112,7 +112,7 @@ public class PatchAPK {
 
         Config.set(Config.Key.SU_MANAGER, pkg);
         Config.export();
-        RootUtils.Companion.rmAndLaunch(BuildConfig.APPLICATION_ID,
+        RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID,
                 new ComponentName(pkg, ClassMap.get(SplashActivity.class).getName()));
 
         return true;
@@ -122,7 +122,7 @@ public class PatchAPK {
         try {
             JarMap jar = new JarMap(in);
             JarEntry je = jar.getJarEntry(Const.ANDROID_MANIFEST);
-            byte xml[] = jar.getRawData(je);
+            byte[] xml = jar.getRawData(je);
 
             if (!findAndPatch(xml, BuildConfig.APPLICATION_ID, pkg) ||
                     !findAndPatch(xml, R.string.app_name, R.string.re_app_name))

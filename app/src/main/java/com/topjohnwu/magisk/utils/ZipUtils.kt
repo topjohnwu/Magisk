@@ -9,16 +9,16 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 @Throws(IOException::class)
-fun unzip(zip: File, folder: File, path: String = "", junkPath: Boolean = false) {
-    zip.inputStream().buffered().use {
-        unzip(it, folder, path, junkPath)
+fun File.unzip(folder: File, path: String = "", junkPath: Boolean = false) {
+    inputStream().buffered().use {
+        it.unzip(folder, path, junkPath)
     }
 }
 
 @Throws(IOException::class)
-fun unzip(zip: InputStream, folder: File, path: String, junkPath: Boolean) {
+fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
     try {
-        val zin = ZipInputStream(zip)
+        val zin = ZipInputStream(this)
         var entry: ZipEntry
         while (true) {
             entry = zin.nextEntry ?: break
