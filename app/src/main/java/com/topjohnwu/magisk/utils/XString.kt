@@ -9,3 +9,6 @@ fun String.replaceRandomWithSpecial(): String {
     } while (random == '.')
     return replace(random, specialChars.random())
 }
+
+fun StringBuilder.appendIf(condition: Boolean, builder: StringBuilder.() -> Unit) =
+    if (condition) apply(builder) else this

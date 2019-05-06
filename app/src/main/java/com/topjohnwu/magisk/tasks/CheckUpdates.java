@@ -14,6 +14,7 @@ import com.topjohnwu.superuser.internal.UiThreadHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@Deprecated
 public class CheckUpdates {
 
     private static Request getRequest() {
@@ -56,8 +57,8 @@ public class CheckUpdates {
 
     private static class UpdateListener implements ResponseListener<JSONObject> {
 
-        private Runnable cb;
-        private long start;
+        private final Runnable cb;
+        private final long start;
 
         UpdateListener(Runnable callback) {
             cb = callback;

@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+@Deprecated
 public class UpdateRepos {
     private static final DateFormat DATE_FORMAT;
 

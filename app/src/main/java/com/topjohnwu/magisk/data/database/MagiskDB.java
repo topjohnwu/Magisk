@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class MagiskDB {
 
     private static final String POLICY_TABLE = "policies";
@@ -27,20 +28,24 @@ public class MagiskDB {
     private static final String SETTINGS_TABLE = "settings";
     private static final String STRINGS_TABLE = "strings";
 
-    private PackageManager pm;
+    private final PackageManager pm;
 
+    @Deprecated
     public MagiskDB(Context context) {
         pm = context.getPackageManager();
     }
 
+    @Deprecated
     public void deletePolicy(Policy policy) {
         deletePolicy(policy.uid);
     }
 
+    @Deprecated
     private List<String> rawSQL(String fmt, Object... args) {
         return Shell.su("magisk --sqlite '" + Utils.fmt(fmt, args) + "'").exec().getOut();
     }
 
+    @Deprecated
     private List<ContentValues> SQL(String fmt, Object... args) {
         List<ContentValues> list = new ArrayList<>();
         for (String raw : rawSQL(fmt, args)) {
@@ -57,6 +62,7 @@ public class MagiskDB {
         return list;
     }
 
+    @Deprecated
     private String toSQL(ContentValues values) {
         StringBuilder keys = new StringBuilder(), vals = new StringBuilder();
         keys.append('(');
@@ -80,6 +86,7 @@ public class MagiskDB {
         return keys.toString();
     }
 
+    @Deprecated
     public void clearOutdated() {
         rawSQL(
                 "DELETE FROM %s WHERE until > 0 AND until < %d;" +
@@ -89,14 +96,17 @@ public class MagiskDB {
         );
     }
 
+    @Deprecated
     public void deletePolicy(String pkg) {
         rawSQL("DELETE FROM %s WHERE package_name=\"%s\"", POLICY_TABLE, pkg);
     }
 
+    @Deprecated
     public void deletePolicy(int uid) {
         rawSQL("DELETE FROM %s WHERE uid=%d", POLICY_TABLE, uid);
     }
 
+    @Deprecated
     public Policy getPolicy(int uid) {
         List<ContentValues> res =
                 SQL("SELECT * FROM %s WHERE uid=%d", POLICY_TABLE, uid);
@@ -110,10 +120,12 @@ public class MagiskDB {
         return null;
     }
 
+    @Deprecated
     public void updatePolicy(Policy policy) {
         rawSQL("REPLACE INTO %s %s", POLICY_TABLE, toSQL(policy.getContentValues()));
     }
 
+    @Deprecated
     public List<Policy> getPolicyList() {
         List<Policy> list = new ArrayList<>();
         for (ContentValues values : SQL("SELECT * FROM %s WHERE uid/100000=%d", POLICY_TABLE, Const.USER_ID)) {
@@ -127,6 +139,7 @@ public class MagiskDB {
         return list;
     }
 
+    @Deprecated
     public List<List<SuLogEntry>> getLogs() {
         List<List<SuLogEntry>> ret = new ArrayList<>();
         List<SuLogEntry> list = null;
@@ -144,18 +157,22 @@ public class MagiskDB {
         return ret;
     }
 
+    @Deprecated
     public void addLog(SuLogEntry log) {
         rawSQL("INSERT INTO %s %s", LOG_TABLE, toSQL(log.getContentValues()));
     }
 
+    @Deprecated
     public void clearLogs() {
         rawSQL("DELETE FROM %s", LOG_TABLE);
     }
 
+    @Deprecated
     public void rmSettings(String key) {
         rawSQL("DELETE FROM %s WHERE key=\"%s\"", SETTINGS_TABLE, key);
     }
 
+    @Deprecated
     public void setSettings(String key, int value) {
         ContentValues data = new ContentValues();
         data.put("key", key);
@@ -163,6 +180,7 @@ public class MagiskDB {
         rawSQL("REPLACE INTO %s %s", SETTINGS_TABLE, toSQL(data));
     }
 
+    @Deprecated
     public int getSettings(String key, int defaultValue) {
         List<ContentValues> res = SQL("SELECT value FROM %s WHERE key=\"%s\"", SETTINGS_TABLE, key);
         if (res.isEmpty())
@@ -170,6 +188,7 @@ public class MagiskDB {
         return res.get(0).getAsInteger("value");
     }
 
+    @Deprecated
     public void setStrings(String key, String value) {
         if (value == null) {
             rawSQL("DELETE FROM %s WHERE key=\"%s\"", STRINGS_TABLE, key);
@@ -181,6 +200,7 @@ public class MagiskDB {
         rawSQL("REPLACE INTO %s %s", STRINGS_TABLE, toSQL(data));
     }
 
+    @Deprecated
     public String getStrings(String key, String defaultValue) {
         List<ContentValues> res = SQL("SELECT value FROM %s WHERE key=\"%s\"", STRINGS_TABLE, key);
         if (res.isEmpty())
