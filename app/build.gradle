@@ -38,12 +38,12 @@ android {
 
     packagingOptions {
         exclude '/META-INF/*.version'
-        exclude '/META-INF/*.kotlin_module'
-        exclude '/META-INF/rxkotlin.properties'
+        //exclude '/META-INF/*.kotlin_module'
+        //exclude '/META-INF/rxkotlin.properties'
         exclude '/androidsupportmultidexversion.txt'
         exclude '/org/**'
-        exclude '/kotlin/**'
-        exclude '/kotlinx/**'
+        //exclude '/kotlin/**'
+        //exclude '/kotlinx/**'
     }
 }
 
@@ -61,6 +61,9 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.github.skoumalcz:teanity:0.3.3'
     implementation 'com.ncapdevi:frag-nav:3.2.0'
+
+    def vRoom = "2.1.0-alpha05"
+    implementation "androidx.room:room-rxjava2:${vRoom}"
 
     def markwonVersion = '3.0.0'
     implementation "ru.noties.markwon:core:${markwonVersion}"
@@ -86,6 +89,9 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:${vOkHttp}"
     implementation "com.squareup.moshi:moshi:${vMoshi}"
     implementation "com.squareup.moshi:moshi-kotlin:${vMoshi}"
+
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}"
+    kapt "androidx.room:room-compiler:${vRoom}"
 
     def vKotpref = "2.8.0"
     implementation "com.chibatching.kotpref:kotpref:${vKotpref}"

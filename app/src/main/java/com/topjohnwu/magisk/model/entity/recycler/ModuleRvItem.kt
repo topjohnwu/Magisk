@@ -6,12 +6,12 @@ import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.entity.Module
+import com.topjohnwu.magisk.model.entity.OldModule
 import com.topjohnwu.magisk.model.entity.Repo
 import com.topjohnwu.magisk.utils.get
 import com.topjohnwu.magisk.utils.toggle
 
-class ModuleRvItem(val item: Module) : ComparableRvItem<ModuleRvItem>() {
+class ModuleRvItem(val item: OldModule) : ComparableRvItem<ModuleRvItem>() {
 
     override val layoutRes: Int = R.layout.item_module
 

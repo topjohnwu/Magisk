@@ -2,22 +2,24 @@ package com.topjohnwu.magisk.ui.home
 
 import android.content.res.Resources
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
+import com.skoumal.teanity.extensions.doOnSubscribeUi
+import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
-import com.topjohnwu.magisk.tasks.CheckUpdates
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.magisk.utils.toggle
-import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 
 
 class HomeViewModel(
     private val resources: Resources,
-    private val app: App
+    private val app: App,
+    private val magiskRepo: MagiskRepository
 ) : MagiskViewModel() {
 
     val isAdvancedExpanded = KObservableField(false)
@@ -163,20 +165,26 @@ class HomeViewModel(
     }
 
     fun refresh() {
-        state = State.LOADING
-        magiskState.value = MagiskState.LOADING
-        managerState.value = MagiskState.LOADING
-        Event.reset(this)
-        Config.remoteMagiskVersionString = null
-        Config.remoteMagiskVersionCode = -1
+        magiskRepo.fetchConfig()
+            .applyViewModel(this)
+            .doOnSubscribeUi {
+                magiskState.value = MagiskState.LOADING
+                managerState.value = MagiskState.LOADING
+            }
+            .subscribeK {
+                it.app.let {
+                    Config.remoteManagerVersionCode = it.versionCode.toIntOrNull() ?: -1
+                    Config.remoteManagerVersionString = it.version
+                }
+                it.magisk.let {
+                    Config.remoteMagiskVersionCode = it.versionCode.toIntOrNull() ?: -1
+                    Config.remoteMagiskVersionString = it.version
+                }
+                updateSelf()
+                ensureEnv()
+            }
 
         hasRoot.value = Shell.rootAccess()
-
-        if (Networking.checkNetworkStatus(app)) {
-            CheckUpdates.check()
-        } else {
-            state = State.LOADING_FAILED
-        }
     }
 
     private fun updateSelf() {

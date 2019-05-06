@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.di
 
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.topjohnwu.magisk.Constants
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawApiServices
@@ -38,7 +39,9 @@ fun createOkHttpClient(): OkHttpClient {
 }
 
 fun createConverterFactory(): Converter.Factory {
-    val moshi = Moshi.Builder().build()
+    val moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
     return MoshiConverterFactory.create(moshi)
 }
 

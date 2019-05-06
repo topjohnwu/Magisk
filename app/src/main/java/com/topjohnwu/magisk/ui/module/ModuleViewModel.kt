@@ -11,7 +11,7 @@ import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
-import com.topjohnwu.magisk.model.entity.Module
+import com.topjohnwu.magisk.model.entity.OldModule
 import com.topjohnwu.magisk.model.entity.Repo
 import com.topjohnwu.magisk.model.entity.recycler.ModuleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoRvItem
@@ -76,7 +76,7 @@ class ModuleViewModel(
         UpdateRepos().exec(true)
     }
 
-    private fun updateModules(result: Map<String, Module>) = result.values
+    private fun updateModules(result: Map<String, OldModule>) = result.values
         .map { ModuleRvItem(it) }
         .let { itemsInstalled.update(it) }
 

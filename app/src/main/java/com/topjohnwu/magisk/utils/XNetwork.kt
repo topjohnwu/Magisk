@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.KConfig
 import com.topjohnwu.magisk.R
 import okhttp3.ResponseBody
 import java.io.File
@@ -20,7 +20,7 @@ fun ResponseBody.writeToFile(context: Context, fileName: String): File {
 
 fun ResponseBody.writeToString() = string()
 
-fun String.launch() = if (Config.useCustomTabs) {
+fun String.launch() = if (KConfig.useCustomTabs) {
     launchWithCustomTabs()
 } else {
     launchWithIntent()

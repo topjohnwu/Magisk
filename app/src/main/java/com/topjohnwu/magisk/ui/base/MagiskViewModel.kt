@@ -14,7 +14,10 @@ import timber.log.Timber
 
 abstract class MagiskViewModel : LoadingViewModel(), Event.AutoListener {
 
+    @Deprecated("")
     override fun onEvent(event: Int) = Timber.i("Event of $event was not handled")
+
+    @Deprecated("")
     override fun getListeningEvents(): IntArray = intArrayOf()
 
     fun withView(action: Activity.() -> Unit) {
