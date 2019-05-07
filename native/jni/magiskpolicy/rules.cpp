@@ -179,6 +179,12 @@ void sepol_magisk_rules() {
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
 	sepol_allow("system_server", "dex2oat_exec", "file", ALL);
 
+	// EdXposed
+	sepol_allow("system_server", "system_server", "process", "execmem");
+	sepol_allow("coredomain", "coredomain", "process", "execmem");
+	sepol_allow("coredomain", "app_data_file", ALL, ALL);
+	sepol_allow("zygote", "apk_data_file", ALL, ALL);
+
 	// Support deodexed ROM on Oreo
 	sepol_allow("zygote", "dalvikcache_data_file", "file", "execute");
 
