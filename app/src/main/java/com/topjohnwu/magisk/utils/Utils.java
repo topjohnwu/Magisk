@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.WorkerThread;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
@@ -84,28 +85,37 @@ public class Utils {
                 .replace("#", "").replace("@", "").replace("\\", "_");
     }
 
+    @Deprecated
     public static void loadModules() {
         loadModules(true);
     }
 
+    @Deprecated
     public static void loadModules(boolean async) {
         Event.reset(Event.MODULE_LOAD_DONE);
         Runnable run = () -> {
-            Map<String, OldModule> moduleMap = new ValueSortedMap<>();
-            SuFile path = new SuFile(Const.MAGISK_PATH);
-            SuFile[] modules = path.listFiles(
-                    (file, name) -> !name.equals("lost+found") && !name.equals(".core"));
-            for (SuFile file : modules) {
-                if (file.isFile()) continue;
-                OldModule module = new OldModule(Const.MAGISK_PATH + "/" + file.getName());
-                moduleMap.put(module.getId(), module);
-            }
+            Map<String, OldModule> moduleMap = loadModulesLeanback();
             Event.trigger(Event.MODULE_LOAD_DONE, moduleMap);
         };
         if (async)
             App.THREAD_POOL.execute(run);
         else
             run.run();
+    }
+
+    @WorkerThread
+    public static Map<String, OldModule> loadModulesLeanback() {
+        final Map<String, OldModule> moduleMap = new ValueSortedMap<>();
+        final SuFile path = new SuFile(Const.MAGISK_PATH);
+        final SuFile[] modules = path.listFiles((file, name) ->
+                !name.equals("lost+found") && !name.equals(".core")
+        );
+        for (SuFile file : modules) {
+            if (file.isFile()) continue;
+            OldModule module = new OldModule(Const.MAGISK_PATH + "/" + file.getName());
+            moduleMap.put(module.getId(), module);
+        }
+        return moduleMap;
     }
 
     public static boolean showSuperUser() {

@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment;
 import com.topjohnwu.magisk.utils.DownloadApp;
 import com.topjohnwu.magisk.utils.Event;
@@ -218,7 +217,7 @@ public class SettingsFragment extends BasePreferenceFragment {
                 break;
             case Config.Key.UPDATE_CHANNEL:
             case Config.Key.CUSTOM_CHANNEL:
-                CheckUpdates.check();
+                //CheckUpdates.check();
                 break;
             case Config.Key.CHECK_UPDATES:
                 Utils.scheduleUpdateCheck();

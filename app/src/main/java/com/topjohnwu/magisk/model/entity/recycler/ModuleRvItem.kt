@@ -8,6 +8,7 @@ import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.OldModule
 import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.model.entity.Repository
 import com.topjohnwu.magisk.utils.get
 import com.topjohnwu.magisk.utils.toggle
 
@@ -54,6 +55,8 @@ class ModuleRvItem(val item: OldModule) : ComparableRvItem<ModuleRvItem>() {
 }
 
 class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
+
+    constructor(repo: Repository) : this(Repo(repo))
 
     override val layoutRes: Int = R.layout.item_repo
 

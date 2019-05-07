@@ -14,5 +14,5 @@ fun String.toTime(format: SimpleDateFormat) = try {
 }
 
 private val locale get() = Locale.getDefault()
-val timeFormatFull by lazy { SimpleDateFormat("YYYY/MM/DD_HH:mm:ss", locale) }
-val timeFormatStandard by lazy { SimpleDateFormat("YYYY-MM-DD'T'HH:mm:ss'Z'", locale) }
+val timeFormatFull by lazy { SimpleDateFormat("yyyy/MM/dd_HH:mm:ss", locale) }
+val timeFormatStandard by lazy { SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", locale) }

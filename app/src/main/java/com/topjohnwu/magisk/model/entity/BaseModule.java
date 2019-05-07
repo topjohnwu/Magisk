@@ -36,9 +36,18 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         mVersionCode = p.readInt();
     }
 
+    protected BaseModule(MagiskModule m) {
+        mId = m.getId();
+        mName = m.getName();
+        mVersion = m.getVersion();
+        mAuthor = m.getAuthor();
+        mDescription = m.getDescription();
+        mVersionCode = Integer.parseInt(m.getVersionCode());
+    }
+
     @Override
     public int compareTo(@NonNull BaseModule module) {
-        return this.getName().toLowerCase().compareTo(module.getName().toLowerCase());
+        return getName().toLowerCase().compareTo(module.getName().toLowerCase());
     }
 
     @Override
@@ -71,7 +80,9 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         return values;
     }
 
-    protected void parseProps(List<String> props) { parseProps(props.toArray(new String[0])); }
+    protected void parseProps(List<String> props) {
+        parseProps(props.toArray(new String[0]));
+    }
 
     protected void parseProps(String[] props) throws NumberFormatException {
         for (String line : props) {

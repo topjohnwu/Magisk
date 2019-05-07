@@ -48,7 +48,7 @@ interface GithubRawApiServices {
 
     @GET("$MAGISK_MODULES/{$MODULE}/master/{$FILE}")
     @Streaming
-    fun fetchFile(id: String, file: String): Single<ResponseBody>
+    fun fetchFile(@Path(MODULE) id: String, @Path(FILE) file: String): Single<ResponseBody>
 
     //endregion
 

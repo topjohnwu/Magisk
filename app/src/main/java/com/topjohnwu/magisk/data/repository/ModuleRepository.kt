@@ -6,6 +6,7 @@ import com.topjohnwu.magisk.data.network.GithubRawApiServices
 import com.topjohnwu.magisk.data.network.GithubServices
 import com.topjohnwu.magisk.model.entity.GithubRepo
 import com.topjohnwu.magisk.model.entity.toRepository
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.writeToFile
 import com.topjohnwu.magisk.utils.writeToString
 import io.reactivex.Single
@@ -18,9 +19,16 @@ class ModuleRepository(
 ) {
 
     fun fetchModules() = fetchAllRepos()
-        .flattenAsFlowable { it }
-        .flatMapSingle { fetchProperties(it.name, it.updatedAtMillis) }
-        .toList()
+        .map {
+            it.mapNotNull {
+                runCatching {
+                    fetchProperties(it.name, it.updatedAtMillis).blockingGet()
+                }.getOrNull()
+            }
+        }
+
+    fun fetchInstalledModules() = Single.fromCallable { Utils.loadModulesLeanback() }
+        .map { it.values.toList() }
 
     fun fetchInstallFile(module: String) = apiRaw
         .fetchFile(module, FILE_INSTALL_SH)

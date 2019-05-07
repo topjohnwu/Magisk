@@ -19,6 +19,7 @@ interface MagiskModule : Parcelable {
     val author: String
     val version: String
     val versionCode: String
+    val description: String
 }
 
 @Entity(tableName = "repos")
@@ -30,6 +31,7 @@ data class Repository(
     override val author: String,
     override val version: String,
     override val versionCode: String,
+    override val description: String,
     val lastUpdate: Long
 ) : MagiskModule
 
@@ -40,6 +42,7 @@ data class Module(
     override val author: String,
     override val version: String,
     override val versionCode: String,
+    override val description: String,
     val path: String
 ) : MagiskModule
 
@@ -57,6 +60,7 @@ fun Map<String, String>.toModule(path: String): Module {
         author = get("author").orEmpty(),
         version = get("version").orEmpty(),
         versionCode = get("versionCode").orEmpty(),
+        description = get("description").orEmpty(),
         path = path
     )
 }
@@ -77,5 +81,6 @@ fun Map<String, String>.toRepository(lastUpdate: Long) = Repository(
     author = get("author").orEmpty(),
     version = get("version").orEmpty(),
     versionCode = get("versionCode").orEmpty(),
+    description = get("description").orEmpty(),
     lastUpdate = lastUpdate
 )

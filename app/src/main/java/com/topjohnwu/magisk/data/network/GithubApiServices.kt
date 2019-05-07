@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.data.network
 
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.model.entity.GithubRepo
 import io.reactivex.Single
 import retrofit2.http.GET
@@ -12,7 +13,11 @@ interface GithubApiServices {
     fun fetchRepos(
         @Query("page") page: Int,
         @Query("per_page") count: Int = REPOS_PER_PAGE,
-        @Query("sort") sortOrder: String = "pushed"
+        @Query("sort") sortOrder: String = when (Config.get<Int>(Config.Key.REPO_ORDER)) {
+            Config.Value.ORDER_DATE -> "updated"
+            Config.Value.ORDER_NAME -> "full_name"
+            else -> "updated"
+        }
     ): Single<List<GithubRepo>>
 
     companion object {

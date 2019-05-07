@@ -6,7 +6,6 @@ import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.*
-import com.topjohnwu.magisk.tasks.CheckUpdates
 import com.topjohnwu.magisk.tasks.UpdateRepos
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.Utils
@@ -59,7 +58,7 @@ open class SplashActivity : AppCompatActivity() {
 
         // Schedule periodic update checks
         Utils.scheduleUpdateCheck()
-        CheckUpdates.check()
+        //CheckUpdates.check()
 
         // Setup shortcuts
         Shortcuts.setup(this)
