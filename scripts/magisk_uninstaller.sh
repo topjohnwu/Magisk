@@ -55,6 +55,7 @@ $BOOTMODE || recovery_actions
 # Uninstall
 ##########################################################################################
 
+get_flags
 find_boot_image
 find_dtbo_image
 
@@ -67,36 +68,35 @@ cd $MAGISKBIN
 CHROMEOS=false
 
 ui_print "- Unpacking boot image"
-./magiskboot --unpack "$BOOTIMAGE"
+./magiskboot unpack "$BOOTIMAGE"
 
 case $? in
   1 )
-    abort "! Unable to unpack boot image"
+    abort "! Unsupported/Unknown image format"
     ;;
   2 )
     ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
     ;;
-  3 )
-    ui_print "! Sony ELF32 format detected"
-    abort "! Please use BootBridge from @AdrianDC"
-    ;;
-  4 )
-    ui_print "! Sony ELF64 format detected"
-    abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
 
 # Detect boot image state
 ui_print "- Checking ramdisk status"
-./magiskboot --cpio ramdisk.cpio test
-case $? in
+if [ -e ramdisk.cpio ]; then
+  ./magiskboot cpio ramdisk.cpio test
+  STATUS=$?
+else
+  # Stock A only system-as-root
+  STATUS=0
+fi
+case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
     ;;
   1 )  # Magisk patched
     ui_print "- Magisk patched image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+    [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
     STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
     STOCKDTBO=/data/stock_dtbo.img.gz
     if [ -f $STOCKBOOT ]; then
@@ -109,16 +109,20 @@ case $? in
     else
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
-      ./magiskboot --cpio ramdisk.cpio restore
-      ./magiskboot --repack $BOOTIMAGE
+      ./magiskboot cpio ramdisk.cpio restore
+      if ! ./magiskboot cpio ramdisk.cpio "exists init.rc"; then
+        # A only system-as-root
+        rm -f ramdisk.cpio
+      fi
+      ./magiskboot repack $BOOTIMAGE
       # Sign chromeos boot
       $CHROMEOS && sign_chromeos
       ui_print "- Flashing restored boot image"
       flash_image new-boot.img $BOOTIMAGE || abort "! Insufficient partition size"
     fi
     ;;
-  2 ) # Other patched
-    ui_print "! Boot image patched by other programs"
+  2 )  # Unsupported
+    ui_print "! Boot image patched by unsupported programs"
     abort "! Cannot uninstall"
     ;;
 esac
