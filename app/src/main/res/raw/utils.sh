@@ -55,6 +55,7 @@ restore_imgs() {
   local STOCKDTBO=/data/stock_dtbo.img.gz
   [ -f $STOCKBOOT ] || return 1
 
+  get_flags
   find_boot_image
   find_dtbo_image
 
