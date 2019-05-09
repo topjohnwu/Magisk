@@ -69,6 +69,7 @@ class Select : MagiskQueryBuilder {
             .appendln(condition)
             .appendln(orderField)
             .toString()
+            .replace("\n", " ")
     }
 }
 
