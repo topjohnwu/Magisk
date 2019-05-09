@@ -7,8 +7,6 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.text.TextUtils;
 
-import androidx.annotation.StringRes;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.superuser.Shell;
@@ -20,9 +18,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.annotation.StringRes;
+
 public class LocaleManager {
     public static Locale locale = Locale.getDefault();
-    public final static Locale defaultLocale = Locale.getDefault();
+    public static final Locale defaultLocale = Locale.getDefault();
     public static List<Locale> locales;
 
     public static Locale forLanguageTag(String tag) {
@@ -44,7 +44,7 @@ public class LocaleManager {
                 default:
                     language = tok[0];
             }
-            if ((language.length() != 2 && language.length() != 3))
+            if (language.length() != 2 && language.length() != 3)
                 return new Locale("");
             if (tok.length == 1)
                 return new Locale(language);
@@ -114,6 +114,7 @@ public class LocaleManager {
         return getLocaleContext(locale).getString(id);
     }
 
+    @Deprecated
     public static void loadAvailableLocales(@StringRes int compareId) {
         Shell.EXECUTOR.execute(() -> {
             locales = new ArrayList<>();

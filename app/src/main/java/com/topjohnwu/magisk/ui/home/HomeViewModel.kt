@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.Event
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.magisk.utils.toggle
 import com.topjohnwu.superuser.Shell
@@ -87,8 +86,6 @@ class HomeViewModel(
     private val latest = resources.getString(R.string.latest_version)
 
     init {
-        Event.register(this)
-
         isForceEncryption.addOnPropertyChangedCallback {
             Config.keepEnc = it ?: return@addOnPropertyChangedCallback
         }
@@ -98,13 +95,6 @@ class HomeViewModel(
 
         refresh()
     }
-
-    override fun onEvent(event: Int) {
-        updateSelf()
-        ensureEnv()
-    }
-
-    override fun getListeningEvents(): IntArray = intArrayOf(Event.UPDATE_CHECK_DONE)
 
     fun paypalPressed() = OpenLinkEvent(Const.Url.PAYPAL_URL).publish()
     fun patreonPressed() = OpenLinkEvent(Const.Url.PATREON_URL).publish()

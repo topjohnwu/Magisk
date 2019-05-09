@@ -85,24 +85,6 @@ public class Utils {
                 .replace("#", "").replace("@", "").replace("\\", "_");
     }
 
-    @Deprecated
-    public static void loadModules() {
-        loadModules(true);
-    }
-
-    @Deprecated
-    public static void loadModules(boolean async) {
-        Event.reset(Event.MODULE_LOAD_DONE);
-        Runnable run = () -> {
-            Map<String, OldModule> moduleMap = loadModulesLeanback();
-            Event.trigger(Event.MODULE_LOAD_DONE, moduleMap);
-        };
-        if (async)
-            App.THREAD_POOL.execute(run);
-        else
-            run.run();
-    }
-
     @WorkerThread
     public static Map<String, OldModule> loadModulesLeanback() {
         final Map<String, OldModule> moduleMap = new ValueSortedMap<>();

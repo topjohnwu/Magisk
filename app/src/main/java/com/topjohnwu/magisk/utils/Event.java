@@ -12,14 +12,10 @@ import androidx.collection.ArraySet;
 @Deprecated
 public class Event {
 
-    public static final int MAGISK_HIDE_DONE = 0;
-    public static final int MODULE_LOAD_DONE = 1;
-    public static final int REPO_LOAD_DONE = 2;
-    public static final int UPDATE_CHECK_DONE = 3;
+    @Deprecated
     public static final int LOCALE_FETCH_DONE = 4;
 
-    @IntDef({MAGISK_HIDE_DONE, MODULE_LOAD_DONE, REPO_LOAD_DONE,
-            UPDATE_CHECK_DONE, LOCALE_FETCH_DONE})
+    @IntDef(LOCALE_FETCH_DONE)
     @Retention(RetentionPolicy.SOURCE)
     public @interface EventID {}
 

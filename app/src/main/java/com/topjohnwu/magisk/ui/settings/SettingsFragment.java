@@ -79,7 +79,7 @@ public class SettingsFragment extends BasePreferenceFragment {
         });
         findPreference("hosts").setOnPreferenceClickListener(pref -> {
             Shell.su("add_hosts_module").exec();
-            Utils.loadModules();
+            //Utils.loadModules();
             Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT);
             return true;
         });
@@ -288,11 +288,13 @@ public class SettingsFragment extends BasePreferenceFragment {
     }
 
     @Override
+    @Deprecated
     public void onEvent(int event) {
         setLocalePreference((ListPreference) findPreference(Config.Key.LOCALE));
     }
 
     @Override
+    @Deprecated
     public int[] getListeningEvents() {
         return new int[] {Event.LOCALE_FETCH_DONE};
     }
