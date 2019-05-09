@@ -74,7 +74,7 @@ static void usage(char *arg0) {
 		"      test\n"
 		"        Check if fstab has verity/avb flags\n"
 		"        Return values:\n"
-		"        0:no flags    1:flag exists\n"
+		"        0:flag exists    1:no flags\n"
 		"      patch\n"
 		"        Search for fstab and remove verity/avb\n"
 		"\n"
