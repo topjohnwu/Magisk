@@ -33,22 +33,8 @@ class LogRepository(
 
     private fun List<MagiskLog>.wrap(): List<WrappedMagiskLog> {
         val day = TimeUnit.DAYS.toMillis(1)
-        var currentDay = firstOrNull()?.date?.time ?: return listOf()
-        var tempList = this
-        val outList = mutableListOf<WrappedMagiskLog>()
-
-        while (tempList.isNotEmpty()) {
-            val logsGivenDay = takeWhile { it.date.time / day == currentDay / day }
-            currentDay = tempList.firstOrNull()?.date?.time ?: currentDay + day
-
-            if (logsGivenDay.isEmpty())
-                continue
-
-            outList.add(WrappedMagiskLog(currentDay / day * day, logsGivenDay))
-            tempList = tempList.subList(logsGivenDay.size, tempList.size)
-        }
-
-        return outList
+        return groupBy { it.date.time / day }
+            .map { WrappedMagiskLog(it.key * day, it.value) }
     }
 
 
