@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.model.entity
 
+import com.topjohnwu.magisk.utils.timeFormatTime
+import com.topjohnwu.magisk.utils.toTime
 import java.util.*
 
 data class MagiskLog(
@@ -11,7 +13,9 @@ data class MagiskLog(
     val command: String,
     val action: Boolean,
     val date: Date
-)
+) {
+    val timeString = date.time.toTime(timeFormatTime)
+}
 
 data class WrappedMagiskLog(
     val time: Long,

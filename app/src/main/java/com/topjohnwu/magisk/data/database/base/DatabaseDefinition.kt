@@ -18,11 +18,8 @@ object DatabaseDefinition {
 @AnyThread
 fun MagiskQuery.query() = query.su()
 
-fun String.suRaw() = Single.just(Shell.su(this))
-    .map { it.exec().out }
-
-fun String.su() = suRaw()
-    .map { it.toMap() }
+fun String.suRaw() = Single.fromCallable { Shell.su(this).exec().out }
+fun String.su() = suRaw().map { it.toMap() }
 
 fun List<String>.toMap() = map { it.split(Regex("\\|")) }
     .map { it.toMapInternal() }

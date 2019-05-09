@@ -1,11 +1,13 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
-import androidx.databinding.ObservableList
 import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.entity.SuLogEntry
+import com.topjohnwu.magisk.model.entity.MagiskLog
+import com.topjohnwu.magisk.model.entity.WrappedMagiskLog
+import com.topjohnwu.magisk.utils.timeFormatMedium
+import com.topjohnwu.magisk.utils.toTime
 import com.topjohnwu.magisk.utils.toggle
 
 class LogRvItem : ComparableRvItem<LogRvItem>() {
@@ -25,12 +27,12 @@ class LogRvItem : ComparableRvItem<LogRvItem>() {
 }
 
 class LogItemRvItem(
-    val items: ObservableList<ComparableRvItem<*>>
+    item: WrappedMagiskLog
 ) : ComparableRvItem<LogItemRvItem>() {
     override val layoutRes: Int = R.layout.item_superuser_log
 
-    val date = items.filterIsInstance<LogItemEntryRvItem>().firstOrNull()
-        ?.item?.dateString.orEmpty()
+    val date = item.time.toTime(timeFormatMedium)
+    val items: List<ComparableRvItem<*>> = item.items.map { LogItemEntryRvItem(it) }
     val isExpanded = KObservableField(false)
 
     fun toggle() = isExpanded.toggle()
@@ -41,7 +43,7 @@ class LogItemRvItem(
     override fun itemSameAs(other: LogItemRvItem): Boolean = date == other.date
 }
 
-class LogItemEntryRvItem(val item: SuLogEntry) : ComparableRvItem<LogItemEntryRvItem>() {
+class LogItemEntryRvItem(val item: MagiskLog) : ComparableRvItem<LogItemEntryRvItem>() {
     override val layoutRes: Int = R.layout.item_superuser_log_entry
 
     val isExpanded = KObservableField(false)
