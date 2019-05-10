@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.utils
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.*
 
 val now get() = System.currentTimeMillis()
 
@@ -14,7 +13,7 @@ fun String.toTime(format: DateFormat) = try {
     -1L
 }
 
-private val locale get() = Locale.getDefault()
+private val locale get() = LocaleManager.locale
 val timeFormatFull by lazy { SimpleDateFormat("yyyy/MM/dd_HH:mm:ss", locale) }
 val timeFormatStandard by lazy { SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", locale) }
 val timeFormatMedium by lazy { DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.locale) }
