@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
 import com.chibatching.kotpref.Kotpref
 import com.topjohnwu.magisk.data.database.MagiskDB
-import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.RootUtils
@@ -34,8 +33,6 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
     val prefs: SharedPreferences by inject()
     @Deprecated("Use dependency injection")
     val DB: MagiskDB by inject()
-    @Deprecated("Use dependency injection")
-    val repoDB: RepoDatabaseHelper by inject()
 
     @Volatile
     private var foreground: Activity? = null

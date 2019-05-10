@@ -105,9 +105,10 @@ public final class SettingsFragment extends BasePreferenceFragment {
             DownloadApp.restore();
             return true;
         });
-        findPreference("clear").setOnPreferenceClickListener(pref -> {
+        Preference clear = findPreference("clear");
+        clear.setEnabled(false); // temporarily disable clearing cache as repos are not cached atm
+        clear.setOnPreferenceClickListener(pref -> {
             getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
-            getRepoDB().clearRepo();
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
         });

@@ -9,7 +9,6 @@ import org.koin.dsl.module
 
 val databaseModule = module {
     single { MagiskDB(get<App>().protectedContext) }
-    single { RepoDatabaseHelper(get()) }
     single { createDatabase(get()) }
     single { LogDao() }
     single { PolicyDao(get()) }
