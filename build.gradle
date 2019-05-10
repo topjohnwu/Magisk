@@ -46,7 +46,7 @@ subprojects {
             getPlugins().hasPlugin('com.android.application')) {
             android {
                 compileSdkVersion 'android-Q'
-                buildToolsVersion '29.0.0-rc2'
+                buildToolsVersion '29.0.0-rc3'
 
                 defaultConfig {
                     if (minSdkVersion == null)

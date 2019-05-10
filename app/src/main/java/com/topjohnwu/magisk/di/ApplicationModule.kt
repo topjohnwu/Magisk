@@ -9,12 +9,11 @@ import org.koin.dsl.module
 
 val applicationModule = module {
     single { RxBus() }
-    single { get<Context>().resources }
-    single { get<Context>() as App }
-    single { get<Context>().packageManager }
+    factory { get<Context>().resources }
+    factory { get<Context>() as App }
+    factory { get<Context>().packageManager }
     single(SUTimeout) {
-        get<App>().protectedContext
-            .getSharedPreferences("su_timeout", 0)
+        get<App>().protectedContext.getSharedPreferences("su_timeout", 0)
     }
     single { PreferenceManager.getDefaultSharedPreferences(get<App>().protectedContext) }
 }

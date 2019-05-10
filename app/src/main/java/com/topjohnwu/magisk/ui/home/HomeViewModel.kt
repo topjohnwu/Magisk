@@ -1,23 +1,28 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.content.res.Resources
+import android.content.Context
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.doOnSubscribeUi
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.KObservableField
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.utils.*
+import com.topjohnwu.net.Networking
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.magisk.utils.toggle
 import com.topjohnwu.superuser.Shell
 
 
 class HomeViewModel(
-    private val resources: Resources,
-    private val app: App,
+    private val context: Context,
     private val magiskRepo: MagiskRepository
 ) : MagiskViewModel() {
 
@@ -30,17 +35,17 @@ class HomeViewModel(
     val magiskStateText = Observer(magiskState) {
         when (magiskState.value) {
             MagiskState.NO_ROOT -> TODO()
-            MagiskState.NOT_INSTALLED -> resources.getString(R.string.magisk_version_error)
-            MagiskState.UP_TO_DATE -> resources.getString(R.string.magisk_up_to_date)
-            MagiskState.LOADING -> resources.getString(R.string.checking_for_updates)
-            MagiskState.OBSOLETE -> resources.getString(R.string.magisk_update_title)
+            MagiskState.NOT_INSTALLED -> R.string.magisk_version_error.res()
+            MagiskState.UP_TO_DATE -> R.string.magisk_up_to_date.res()
+            MagiskState.LOADING -> R.string.checking_for_updates.res()
+            MagiskState.OBSOLETE -> R.string.magisk_update_title.res()
         }
     }
     val magiskCurrentVersion = KObservableField("")
     val magiskLatestVersion = KObservableField("")
     val magiskAdditionalInfo = Observer(magiskState) {
         if (Config.get<Boolean>(Config.Key.COREONLY))
-            resources.getString(R.string.core_only_enabled)
+            R.string.core_only_enabled.res()
         else
             ""
     }
@@ -49,22 +54,22 @@ class HomeViewModel(
     val managerStateText = Observer(managerState) {
         when (managerState.value) {
             MagiskState.NO_ROOT -> "wtf"
-            MagiskState.NOT_INSTALLED -> resources.getString(R.string.invalid_update_channel)
-            MagiskState.UP_TO_DATE -> resources.getString(R.string.manager_up_to_date)
-            MagiskState.LOADING -> resources.getString(R.string.checking_for_updates)
-            MagiskState.OBSOLETE -> resources.getString(R.string.manager_update_title)
+            MagiskState.NOT_INSTALLED -> R.string.invalid_update_channel.res()
+            MagiskState.UP_TO_DATE -> R.string.manager_up_to_date.res()
+            MagiskState.LOADING -> R.string.checking_for_updates.res()
+            MagiskState.OBSOLETE -> R.string.manager_update_title.res()
         }
     }
     val managerCurrentVersion = KObservableField("")
     val managerLatestVersion = KObservableField("")
     val managerAdditionalInfo = Observer(managerState) {
-        if (app.packageName != BuildConfig.APPLICATION_ID)
-            "(${app.packageName})"
+        if (packageName != BuildConfig.APPLICATION_ID)
+            "($packageName)"
         else
             ""
     }
 
-    val safetyNetTitle = KObservableField(resources.getString(R.string.safetyNet_check_text))
+    val safetyNetTitle = KObservableField(R.string.safetyNet_check_text.res())
     val ctsState = KObservableField(SafetyNetState.IDLE)
     val basicIntegrityState = KObservableField(SafetyNetState.IDLE)
     val safetyNetState = Observer(ctsState, basicIntegrityState) {
@@ -82,8 +87,6 @@ class HomeViewModel(
     val hasRoot = KObservableField(false)
 
     private var shownDialog = false
-    private val current = resources.getString(R.string.current_installed)
-    private val latest = resources.getString(R.string.latest_version)
 
     init {
         isForceEncryption.addOnPropertyChangedCallback {
@@ -118,7 +121,7 @@ class HomeViewModel(
     fun safetyNetPressed() {
         ctsState.value = SafetyNetState.LOADING
         basicIntegrityState.value = SafetyNetState.LOADING
-        safetyNetTitle.value = resources.getString(R.string.checking_safetyNet_status)
+        safetyNetTitle.value = R.string.checking_safetyNet_status.res()
 
         UpdateSafetyNetEvent().publish()
     }
@@ -127,7 +130,7 @@ class HomeViewModel(
         response and 0x0F == 0 -> {
             val hasCtsPassed = response and ISafetyNetHelper.CTS_PASS != 0
             val hasBasicIntegrityPassed = response and ISafetyNetHelper.BASIC_PASS != 0
-            safetyNetTitle.value = resources.getString(R.string.safetyNet_check_success)
+            safetyNetTitle.value = R.string.safetyNet_check_success.res()
             ctsState.value = if (hasCtsPassed) {
                 SafetyNetState.PASS
             } else {
@@ -146,11 +149,10 @@ class HomeViewModel(
         else -> {
             ctsState.value = SafetyNetState.IDLE
             basicIntegrityState.value = SafetyNetState.IDLE
-            val errorString = when (response) {
+            safetyNetTitle.value = when (response) {
                 ISafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
                 else -> R.string.safetyNet_api_error
-            }
-            safetyNetTitle.value = resources.getString(errorString)
+            }.res()
         }
     }
 
@@ -185,16 +187,14 @@ class HomeViewModel(
             else -> MagiskState.UP_TO_DATE
         }
 
-        if (magiskState.value != MagiskState.NOT_INSTALLED) {
-            magiskCurrentVersion.value = version
-                .format(Config.magiskVersionString, Config.magiskVersionCode)
-                .let { current.format(it) }
+        magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
+            version.format(Config.magiskVersionString, Config.magiskVersionCode)
         } else {
-            magiskCurrentVersion.value = ""
+            ""
         }
+
         magiskLatestVersion.value = version
             .format(Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode)
-            .let { latest.format(it) }
 
         managerState.value = when (Config.remoteManagerVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
@@ -204,10 +204,9 @@ class HomeViewModel(
 
         managerCurrentVersion.value = version
             .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
-            .let { current.format(it) }
+
         managerLatestVersion.value = version
             .format(Config.remoteManagerVersionString, Config.remoteManagerVersionCode)
-            .let { latest.format(it) }
     }
 
     private fun ensureEnv() {

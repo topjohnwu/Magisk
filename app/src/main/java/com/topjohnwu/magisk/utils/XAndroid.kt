@@ -13,6 +13,12 @@ import com.topjohnwu.magisk.App
 import java.io.File
 import java.io.FileNotFoundException
 
+val packageName: String
+    get() {
+        val app: App by inject()
+        return app.packageName
+    }
+
 val PackageInfo.processes
     get() = activities?.processNames.orEmpty() +
             services?.processNames.orEmpty() +
