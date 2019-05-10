@@ -98,7 +98,9 @@
     
     <string name="dtbo_patched_title">DTBO가 패치되었습니다!</string>
     <string name="dtbo_patched_reboot">Magisk Manager가 dtbo.img를 패치했습니다. 기기를 다시 시작해 주시기 바랍니다.</string>
-    <string name="flashing">플래싱 중</string>
+    <string name="flashing">플래싱 중...</string>
+    <string name="done">완료!</string>
+    <string name="failure">실패</string>
     <string name="hide_manager_title">Magisk Manager를 숨기는 중…</string>
     <string name="hide_manager_fail_toast">Magisk Manager를 숨기는 데 실패하였습니다.</string>
     <string name="open_link_failed_toast">링크를 열 앱이 없습니다.</string>
