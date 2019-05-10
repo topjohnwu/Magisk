@@ -52,7 +52,6 @@ class PolicyDao(
         }
 
     fun update(policy: MagiskPolicy) = query<Replace> {
-
         values(policy.toMap())
     }.ignoreElement()
 

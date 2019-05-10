@@ -13,7 +13,7 @@ val databaseModule = module {
     single { LogDao() }
     single { PolicyDao(get()) }
     single { SettingsDao() }
-    single { StringsDao() }
+    single { StringDao() }
     single { createRepositoryDao(get()) }
 }
 

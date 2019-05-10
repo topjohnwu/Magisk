@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.data.database
 
 import com.topjohnwu.magisk.data.database.base.*
 
-class StringsDao : BaseDao() {
+class StringDao : BaseDao() {
 
     override val table = DatabaseDefinition.Table.STRINGS
 
