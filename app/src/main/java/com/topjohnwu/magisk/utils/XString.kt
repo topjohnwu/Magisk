@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.utils
 
+import android.content.res.Resources
+
 val specialChars = arrayOf('!', '@', '#', '$', '%', '&', '?')
 
 fun String.replaceRandomWithSpecial(): String {
@@ -8,4 +10,9 @@ fun String.replaceRandomWithSpecial(): String {
         random = random()
     } while (random == '.')
     return replace(random, specialChars.random())
+}
+
+fun Int.res(vararg args: Any): String {
+    val resources: Resources by inject()
+    return resources.getString(this, *args)
 }

@@ -62,7 +62,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
 
     override fun applyOverrideConfiguration(config: Configuration?) {
         // Force applying our preferred local
-        config!!.setLocale(LocaleManager.locale)
+        config?.setLocale(LocaleManager.locale)
         super.applyOverrideConfiguration(config)
     }
 
