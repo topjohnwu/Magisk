@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.settings;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment;
 import com.topjohnwu.magisk.utils.DownloadApp;
-import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.PatchAPK;
@@ -25,7 +25,6 @@ import com.topjohnwu.superuser.Shell;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Locale;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.ListPreference;
@@ -33,6 +32,9 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreferenceCompat;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import kotlin.Pair;
 
 public class SettingsFragment extends BasePreferenceFragment {
 
@@ -115,6 +117,8 @@ public class SettingsFragment extends BasePreferenceFragment {
             return true;
         });
 
+        setLocalePreference((ListPreference) findPreference(Config.Key.LOCALE));
+
         /* We only show canary channels if user is already on canary channel
          * or the user have already chosen canary channel */
         if (!Utils.isCanary() &&
@@ -168,19 +172,36 @@ public class SettingsFragment extends BasePreferenceFragment {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
     private void setLocalePreference(ListPreference lp) {
-        CharSequence[] entries = new CharSequence[LocaleManager.locales.size() + 1];
-        CharSequence[] entryValues = new CharSequence[LocaleManager.locales.size() + 1];
-        entries[0] = LocaleManager.getString(LocaleManager.defaultLocale, R.string.system_default);
-        entryValues[0] = "";
-        int i = 1;
-        for (Locale locale : LocaleManager.locales) {
-            entries[i] = locale.getDisplayName(locale);
-            entryValues[i++] = LocaleManager.toLanguageTag(locale);
-        }
-        lp.setEntries(entries);
-        lp.setEntryValues(entryValues);
-        lp.setSummary(LocaleManager.locale.getDisplayName(LocaleManager.locale));
+        lp.setSummary("Loading");
+        lp.setEnabled(false);
+        LocaleManager.getAvailableLocales()
+                .flattenAsFlowable(locales -> locales)
+                .map(locale -> new Pair<>(locale.getDisplayName(locale), LocaleManager.toLanguageTag(locale)))
+                .toList()
+                .map(list -> {
+                    CharSequence[] names = new CharSequence[list.size() + 1];
+                    CharSequence[] values = new CharSequence[list.size() + 1];
+
+                    names[0] = LocaleManager.getString(LocaleManager.getDefaultLocale(), R.string.system_default);
+                    values[0] = "";
+                    int i = 1;
+                    for (Pair<String, String> item : list) {
+                        names[i] = item.getFirst();
+                        values[i++] = item.getSecond();
+                    }
+                    return new Pair<>(names, values);
+                })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(it -> {
+                    lp.setEnabled(true);
+                    lp.setEntries(it.getFirst());
+                    lp.setEntryValues(it.getSecond());
+                    lp.setSummary(LocaleManager.getLocale().getDisplayName(LocaleManager.getLocale()));
+                }, Throwable::printStackTrace);
     }
 
     @Override
@@ -198,7 +219,8 @@ public class SettingsFragment extends BasePreferenceFragment {
                 if (prefs.getBoolean(key, false)) {
                     try {
                         Const.MAGISK_DISABLE_FILE.createNewFile();
-                    } catch (IOException ignored) {}
+                    } catch (IOException ignored) {
+                    }
                 } else {
                     Const.MAGISK_DISABLE_FILE.delete();
                 }
@@ -252,27 +274,27 @@ public class SettingsFragment extends BasePreferenceFragment {
                 break;
             case Config.Key.ROOT_ACCESS:
                 rootConfig.setSummary(getResources()
-                        .getStringArray(R.array.su_access)[(int)Config.get(key)]);
+                        .getStringArray(R.array.su_access)[(int) Config.get(key)]);
                 break;
             case Config.Key.SU_AUTO_RESPONSE:
                 autoRes.setSummary(getResources()
-                        .getStringArray(R.array.auto_response)[(int)Config.get(key)]);
+                        .getStringArray(R.array.auto_response)[(int) Config.get(key)]);
                 break;
             case Config.Key.SU_NOTIFICATION:
                 suNotification.setSummary(getResources()
-                        .getStringArray(R.array.su_notification)[(int)Config.get(key)]);
+                        .getStringArray(R.array.su_notification)[(int) Config.get(key)]);
                 break;
             case Config.Key.SU_REQUEST_TIMEOUT:
                 requestTimeout.setSummary(
-                        getString(R.string.request_timeout_summary, (int)Config.get(key)));
+                        getString(R.string.request_timeout_summary, (int) Config.get(key)));
                 break;
             case Config.Key.SU_MULTIUSER_MODE:
                 multiuserConfig.setSummary(getResources()
-                        .getStringArray(R.array.multiuser_summary)[(int)Config.get(key)]);
+                        .getStringArray(R.array.multiuser_summary)[(int) Config.get(key)]);
                 break;
             case Config.Key.SU_MNT_NS:
                 nsConfig.setSummary(getResources()
-                        .getStringArray(R.array.namespace_summary)[(int)Config.get(key)]);
+                        .getStringArray(R.array.namespace_summary)[(int) Config.get(key)]);
                 break;
         }
     }
@@ -285,17 +307,5 @@ public class SettingsFragment extends BasePreferenceFragment {
         setSummary(Config.Key.SU_REQUEST_TIMEOUT);
         setSummary(Config.Key.SU_MULTIUSER_MODE);
         setSummary(Config.Key.SU_MNT_NS);
-    }
-
-    @Override
-    @Deprecated
-    public void onEvent(int event) {
-        setLocalePreference((ListPreference) findPreference(Config.Key.LOCALE));
-    }
-
-    @Override
-    @Deprecated
-    public int[] getListeningEvents() {
-        return new int[] {Event.LOCALE_FETCH_DONE};
     }
 }

@@ -71,7 +71,7 @@ public class Utils {
             if (info.labelRes > 0) {
                 Resources res = pm.getResourcesForApplication(info);
                 Configuration config = new Configuration();
-                config.setLocale(LocaleManager.locale);
+                config.setLocale(LocaleManager.getLocale());
                 res.updateConfiguration(config, res.getDisplayMetrics());
                 return res.getString(info.labelRes);
             }

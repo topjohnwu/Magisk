@@ -146,7 +146,7 @@ public class MagiskDB {
         String dateString = null, newString;
         for (ContentValues values : SQL("SELECT * FROM %s ORDER BY time DESC", LOG_TABLE)) {
             Date date = new Date(values.getAsLong("time"));
-            newString = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.locale).format(date);
+            newString = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.getLocale()).format(date);
             if (!TextUtils.equals(dateString, newString)) {
                 dateString = newString;
                 list = new ArrayList<>();

@@ -6,7 +6,6 @@ import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.*
-import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
@@ -44,9 +43,6 @@ open class SplashActivity : AppCompatActivity() {
                 Shell.su("pm uninstall " + BuildConfig.APPLICATION_ID).submit()
             }
         }
-
-        // Dynamic detect all locales
-        LocaleManager.loadAvailableLocales(R.string.app_changelog)
 
         // Set default configs
         Config.initialize()

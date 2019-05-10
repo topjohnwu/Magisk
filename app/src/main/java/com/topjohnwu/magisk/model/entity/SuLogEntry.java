@@ -47,10 +47,10 @@ public class SuLogEntry {
     }
 
     public String getDateString() {
-        return DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.locale).format(date);
+        return DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.getLocale()).format(date);
     }
 
     public String getTimeString() {
-        return new SimpleDateFormat("h:mm a", LocaleManager.locale).format(date);
+        return new SimpleDateFormat("h:mm a", LocaleManager.getLocale()).format(date);
     }
 }

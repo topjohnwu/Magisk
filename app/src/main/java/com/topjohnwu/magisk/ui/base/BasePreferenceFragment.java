@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Event;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
@@ -21,7 +20,7 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class BasePreferenceFragment extends PreferenceFragmentCompat
-        implements SharedPreferences.OnSharedPreferenceChangeListener, Event.AutoListener {
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public App app = App.self;
 
@@ -29,20 +28,13 @@ public abstract class BasePreferenceFragment extends PreferenceFragmentCompat
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         app.getPrefs().registerOnSharedPreferenceChangeListener(this);
-        Event.register(this);
         return v;
     }
 
     @Override
     public void onDestroyView() {
         app.getPrefs().unregisterOnSharedPreferenceChangeListener(this);
-        Event.unregister(this);
         super.onDestroyView();
-    }
-
-    @Override
-    public int[] getListeningEvents() {
-        return new int[0];
     }
 
     @Override
