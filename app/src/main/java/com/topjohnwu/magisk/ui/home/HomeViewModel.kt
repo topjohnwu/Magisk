@@ -63,7 +63,7 @@ class HomeViewModel(
             ""
     }
 
-    val safetyNetTitle = KObservableField(R.string.safetyNet_check_text.res())
+    val safetyNetTitle = KObservableField(R.string.safetyNet_check_text)
     val ctsState = KObservableField(SafetyNetState.IDLE)
     val basicIntegrityState = KObservableField(SafetyNetState.IDLE)
     val safetyNetState = Observer(ctsState, basicIntegrityState) {
@@ -124,7 +124,7 @@ class HomeViewModel(
     fun safetyNetPressed() {
         ctsState.value = SafetyNetState.LOADING
         basicIntegrityState.value = SafetyNetState.LOADING
-        safetyNetTitle.value = R.string.checking_safetyNet_status.res()
+        safetyNetTitle.value = R.string.checking_safetyNet_status
 
         UpdateSafetyNetEvent().publish()
     }
@@ -133,7 +133,7 @@ class HomeViewModel(
         response and 0x0F == 0 -> {
             val hasCtsPassed = response and ISafetyNetHelper.CTS_PASS != 0
             val hasBasicIntegrityPassed = response and ISafetyNetHelper.BASIC_PASS != 0
-            safetyNetTitle.value = R.string.safetyNet_check_success.res()
+            safetyNetTitle.value = R.string.safetyNet_check_success
             ctsState.value = if (hasCtsPassed) {
                 SafetyNetState.PASS
             } else {
@@ -155,7 +155,7 @@ class HomeViewModel(
             safetyNetTitle.value = when (response) {
                 ISafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
                 else -> R.string.safetyNet_api_error
-            }.res()
+            }
         }
     }
 
