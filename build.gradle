@@ -16,7 +16,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools:r8:1.4.93'
-        classpath 'com.android.tools.build:gradle:3.5.0-alpha13'
+        classpath 'com.android.tools.build:gradle:3.5.0-beta01'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.31"
 
 
@@ -46,7 +46,7 @@ subprojects {
             getPlugins().hasPlugin('com.android.application')) {
             android {
                 compileSdkVersion 'android-Q'
-                buildToolsVersion '29.0.0-rc2'
+                buildToolsVersion '29.0.0-rc3'
 
                 defaultConfig {
                     if (minSdkVersion == null)

@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.base
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.appcompat.app.AppCompatDelegate
@@ -24,6 +25,7 @@ import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
+import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.Utils
 import timber.log.Timber
 import kotlin.reflect.KClass
@@ -56,6 +58,12 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         }
         AppCompatDelegate.setDefaultNightMode(theme)
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+    }
+
+    override fun applyOverrideConfiguration(config: Configuration?) {
+        // Force applying our preferred local
+        config?.setLocale(LocaleManager.locale)
+        super.applyOverrideConfiguration(config)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
