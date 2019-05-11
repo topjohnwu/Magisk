@@ -15,7 +15,7 @@
     <string name="checking_for_updates">Cercant actualitzacions</string>
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
     <string name="safetyNet_check_text">Comprova l\'estat de SafetyNet</string>
-    <string name="checking_safetyNet_status">Comprovant l\'estat de SafetyNet…</string>
+    <string name="checking_safetyNet_status">Comprovant Safetynet…</string>
     <string name="safetyNet_check_success">La comprovació ha sigut exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_res_invalid">La resposta és invàlida</string>
@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Arrel s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
     <string name="update">Actualització</string>
-    <string name="core_only_enabled">(Mode únicament nucli activat)</string>
+    <string name="core_only_enabled">(Mode nucli activat)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>
