@@ -163,6 +163,9 @@ class HomeViewModel(
         state = State.LOADING
         magiskState.value = MagiskState.LOADING
         managerState.value = MagiskState.LOADING
+        ctsState.value = SafetyNetState.IDLE
+        basicIntegrityState.value = SafetyNetState.IDLE
+        safetyNetTitle.value = R.string.safetyNet_check_text
         Event.reset(this)
         Config.remoteMagiskVersionString = null
         Config.remoteMagiskVersionCode = -1
