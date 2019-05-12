@@ -6,13 +6,14 @@ import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.rxbus.RxBus
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.magisk.utils.toggle
 
-class PolicyRvItem(val item: Policy, val icon: Drawable) : ComparableRvItem<PolicyRvItem>() {
+class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyRvItem>() {
 
     override val layoutRes: Int = R.layout.item_policy
 
@@ -32,13 +33,11 @@ class PolicyRvItem(val item: Policy, val icon: Drawable) : ComparableRvItem<Poli
         }
         shouldNotify.addOnPropertyChangedCallback {
             it ?: return@addOnPropertyChangedCallback
-            item.notification = it
-            rxBus.post(PolicyUpdateEvent.Notification(this@PolicyRvItem))
+            rxBus.post(PolicyUpdateEvent.Notification(this@PolicyRvItem, shouldNotify.value))
         }
         shouldLog.addOnPropertyChangedCallback {
             it ?: return@addOnPropertyChangedCallback
-            item.logging = it
-            rxBus.post(PolicyUpdateEvent.Log(this@PolicyRvItem))
+            rxBus.post(PolicyUpdateEvent.Log(this@PolicyRvItem, shouldLog.value))
         }
     }
 

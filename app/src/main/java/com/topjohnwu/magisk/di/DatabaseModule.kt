@@ -2,13 +2,12 @@ package com.topjohnwu.magisk.di
 
 import android.content.Context
 import androidx.room.Room
-import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.data.database.*
 import org.koin.dsl.module
 
 
 val databaseModule = module {
-    single { MagiskDB(get<App>().protectedContext) }
+    //single { MagiskDB(get<App>().protectedContext) }
     single { createDatabase(get()) }
     single { LogDao() }
     single { PolicyDao(get()) }

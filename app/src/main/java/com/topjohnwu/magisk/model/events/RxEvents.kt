@@ -9,8 +9,8 @@ class HideProcessEvent(val item: HideProcessRvItem) : RxBus.Event
 
 class PolicyEnableEvent(val item: PolicyRvItem, val enable: Boolean) : RxBus.Event
 sealed class PolicyUpdateEvent(val item: PolicyRvItem) : RxBus.Event {
-    class Notification(item: PolicyRvItem) : PolicyUpdateEvent(item)
-    class Log(item: PolicyRvItem) : PolicyUpdateEvent(item)
+    class Notification(item: PolicyRvItem, val shouldNotify: Boolean) : PolicyUpdateEvent(item)
+    class Log(item: PolicyRvItem, val shouldLog: Boolean) : PolicyUpdateEvent(item)
 }
 
 class ModuleUpdatedEvent(val item: ModuleRvItem) : RxBus.Event

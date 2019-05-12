@@ -10,7 +10,8 @@ import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.database.MagiskDB
+import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
@@ -24,7 +25,7 @@ import io.reactivex.Single
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 
 class SuperuserViewModel(
-    private val database: MagiskDB,
+    private val appRepo: AppRepository,
     private val packageManager: PackageManager,
     private val resources: Resources,
     rxBus: RxBus
@@ -50,9 +51,9 @@ class SuperuserViewModel(
     }
 
     fun updatePolicies() {
-        Single.fromCallable { database.policyList }
+        appRepo.fetchAll()
             .flattenAsFlowable { it }
-            .map { PolicyRvItem(it, it.info.loadIcon(packageManager)) }
+            .map { PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager)) }
             .toList()
             .applySchedulers()
             .applyViewModel(this)
@@ -84,12 +85,12 @@ class SuperuserViewModel(
     }
 
     private fun updatePolicy(it: PolicyUpdateEvent) = when (it) {
-        is PolicyUpdateEvent.Notification -> updatePolicy(it.item) {
+        is PolicyUpdateEvent.Notification -> updatePolicy(it.item.item.copy(notification = it.shouldNotify)) {
             val textId = if (it.logging) R.string.su_snack_notif_on else R.string.su_snack_notif_off
             val text = resources.getString(textId).format(it.appName)
             SnackbarEvent(text).publish()
         }
-        is PolicyUpdateEvent.Log -> updatePolicy(it.item) {
+        is PolicyUpdateEvent.Log -> updatePolicy(it.item.item.copy(logging = it.shouldLog)) {
             val textId =
                 if (it.notification) R.string.su_snack_log_on else R.string.su_snack_log_off
             val text = resources.getString(textId).format(it.appName)
@@ -97,16 +98,16 @@ class SuperuserViewModel(
         }
     }
 
-    private fun updatePolicy(item: PolicyRvItem, onSuccess: (Policy) -> Unit) =
-        updatePolicy(item.item)
+    private fun updatePolicy(item: MagiskPolicy, onSuccess: (MagiskPolicy) -> Unit) =
+        updatePolicy(item)
             .subscribeK { onSuccess(it) }
             .add()
 
     private fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
         fun updateState() {
-            item.item.policy = if (enable) Policy.ALLOW else Policy.DENY
+            val app = item.item.copy(policy = if (enable) MagiskPolicy.ALLOW else MagiskPolicy.DENY)
 
-            updatePolicy(item.item)
+            updatePolicy(app)
                 .map { it.policy == Policy.ALLOW }
                 .subscribeK {
                     val textId = if (it) R.string.su_snack_grant else R.string.su_snack_deny
@@ -128,12 +129,10 @@ class SuperuserViewModel(
         }
     }
 
-    private fun updatePolicy(policy: Policy) =
-        Single.fromCallable { database.updatePolicy(policy); policy }
-            .applySchedulers()
+    private fun updatePolicy(policy: MagiskPolicy) =
+        appRepo.update(policy).andThen(Single.just(policy))
 
-    private fun deletePolicy(policy: Policy) =
-        Single.fromCallable { database.deletePolicy(policy); policy }
-            .applySchedulers()
+    private fun deletePolicy(policy: MagiskPolicy) =
+        appRepo.delete(policy.uid).andThen(Single.just(policy))
 
 }

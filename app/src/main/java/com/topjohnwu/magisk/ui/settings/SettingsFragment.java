@@ -212,7 +212,9 @@ public final class SettingsFragment extends BasePreferenceFragment {
             case Config.Key.ROOT_ACCESS:
             case Config.Key.SU_MULTIUSER_MODE:
             case Config.Key.SU_MNT_NS:
-                getDatabase().setSettings(key, Utils.getPrefsInt(prefs, key));
+                getSettingRepo().put(key, Utils.getPrefsInt(prefs, key))
+                        .subscribe(() -> {
+                        }, Throwable::printStackTrace);
                 break;
             case Config.Key.DARK_THEME:
                 requireActivity().recreate();
