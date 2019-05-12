@@ -107,8 +107,11 @@ class Condition {
     private val conditionWord = "WHERE %s"
     private var condition: String = ""
 
-    fun equals(field: String, value: String) {
-        condition = "$field=\"$value\""
+    fun equals(field: String, value: Any) {
+        condition = when (value) {
+            is String -> "$field=\"$value\""
+            else -> "$field=$value"
+        }
     }
 
     fun greaterThan(field: String, value: String) {

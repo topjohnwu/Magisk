@@ -36,13 +36,13 @@ class PolicyDao(
 
     fun delete(uid: Int) = query<Delete> {
         condition {
-            equals("uid", uid.toString())
+            equals("uid", uid)
         }
     }.ignoreElement()
 
     fun fetch(uid: Int) = query<Select> {
         condition {
-            equals("uid", uid.toString())
+            equals("uid", uid)
         }
     }.map { it.first().toPolicy(context.packageManager) }
         .doOnError {
@@ -57,7 +57,7 @@ class PolicyDao(
 
     fun fetchAll() = query<Select> {
         condition {
-            equals("uid/100000", Constants.USER_ID.toString())
+            equals("uid/100000", Constants.USER_ID)
         }
     }.flattenAsFlowable { it }
         .map { it.toPolicy(context.packageManager) }
