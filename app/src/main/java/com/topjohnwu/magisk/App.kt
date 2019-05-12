@@ -29,9 +29,9 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     lateinit var protectedContext: Context
 
-    @Deprecated("Use dependency injection")
+    @Deprecated("Use dependency injection", level = DeprecationLevel.ERROR)
     val prefs: SharedPreferences by inject()
-    @Deprecated("Use dependency injection")
+    @Deprecated("Use dependency injection", level = DeprecationLevel.ERROR)
     val DB: MagiskDB by inject()
 
     @Volatile

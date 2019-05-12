@@ -20,7 +20,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import kotlin.DeprecationLevel;
+
 @Deprecated
+@kotlin.Deprecated(message = "", level = DeprecationLevel.ERROR)
 public class MagiskDB {
 
     private static final String POLICY_TABLE = "policies";
