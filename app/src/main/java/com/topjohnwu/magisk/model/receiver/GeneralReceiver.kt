@@ -1,0 +1,73 @@
+package com.topjohnwu.magisk.model.receiver
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import com.topjohnwu.magisk.ClassMap
+import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.data.database.base.su
+import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
+import com.topjohnwu.magisk.utils.DownloadApp
+import com.topjohnwu.magisk.utils.SuLogger
+import com.topjohnwu.magisk.utils.inject
+import com.topjohnwu.magisk.view.Notifications
+import com.topjohnwu.magisk.view.Shortcuts
+import com.topjohnwu.superuser.Shell
+
+open class GeneralReceiver : BroadcastReceiver() {
+
+    private val appRepo: AppRepository by inject()
+
+    private fun getPkg(i: Intent): String {
+        return if (i.data == null) "" else i.data!!.encodedSchemeSpecificPart
+    }
+
+    override fun onReceive(context: Context, intent: Intent?) {
+        if (intent == null)
+            return
+        var action: String? = intent.action ?: return
+        when (action) {
+            Intent.ACTION_REBOOT, Intent.ACTION_BOOT_COMPLETED -> {
+                action = intent.getStringExtra("action")
+                if (action == null) {
+                    // Actual boot completed event
+                    Shell.su("mm_patch_dtbo").submit { result ->
+                        if (result.isSuccess)
+                            Notifications.dtboPatched()
+                    }
+                    return
+                }
+                when (action) {
+                    SuRequestActivity.REQUEST -> {
+                        val i = Intent(context, ClassMap.get<Any>(SuRequestActivity::class.java))
+                            .setAction(action)
+                            .putExtra("socket", intent.getStringExtra("socket"))
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                        context.startActivity(i)
+                    }
+                    SuRequestActivity.LOG -> SuLogger.handleLogs(intent)
+                    SuRequestActivity.NOTIFY -> SuLogger.handleNotify(intent)
+                }
+            }
+            Intent.ACTION_PACKAGE_REPLACED ->
+                // This will only work pre-O
+                if (Config.get<Boolean>(Config.Key.SU_REAUTH)!!) {
+                    appRepo.delete(getPkg(intent)).blockingGet()
+                }
+            Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
+                val pkg = getPkg(intent)
+                appRepo.delete(pkg).blockingGet()
+                "magiskhide --rm $pkg".su().blockingGet()
+            }
+            Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
+            Const.Key.BROADCAST_MANAGER_UPDATE -> {
+                Config.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK)
+                DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME))
+            }
+            Const.Key.BROADCAST_REBOOT -> Shell.su("/system/bin/reboot").submit()
+        }
+    }
+}

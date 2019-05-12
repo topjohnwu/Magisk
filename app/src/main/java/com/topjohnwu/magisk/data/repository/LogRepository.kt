@@ -31,6 +31,8 @@ class LogRepository(
         .toSingle()
         .map { it.exec() }
 
+    fun put(log: MagiskLog) = logDao.put(log)
+
     private fun List<MagiskLog>.wrap(): List<WrappedMagiskLog> {
         val day = TimeUnit.DAYS.toMillis(1)
         return groupBy { it.date.time / day }

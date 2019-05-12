@@ -15,11 +15,11 @@ public class SuLogEntry {
     public boolean action;
     public Date date;
 
-    public SuLogEntry(Policy policy) {
-        fromUid = policy.uid;
-        packageName = policy.packageName;
-        appName = policy.appName;
-        action = policy.policy == Policy.ALLOW;
+    public SuLogEntry(MagiskPolicy policy) {
+        fromUid = policy.getUid();
+        packageName = policy.getPackageName();
+        appName = policy.getAppName();
+        action = policy.getPolicy() == Policy.ALLOW;
     }
 
     public SuLogEntry(ContentValues values) {

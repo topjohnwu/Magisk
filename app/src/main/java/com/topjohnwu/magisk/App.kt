@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Build
@@ -29,8 +28,6 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     lateinit var protectedContext: Context
 
-    @Deprecated("Use dependency injection", level = DeprecationLevel.ERROR)
-    val prefs: SharedPreferences by inject()
     @Deprecated("Use dependency injection", level = DeprecationLevel.ERROR)
     val DB: MagiskDB by inject()
 

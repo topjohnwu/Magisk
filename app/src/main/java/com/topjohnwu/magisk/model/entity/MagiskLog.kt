@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.model.entity
 
+import com.topjohnwu.magisk.model.entity.MagiskPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.utils.timeFormatTime
 import com.topjohnwu.magisk.utils.toTime
 import java.util.*
@@ -48,3 +49,10 @@ fun MagiskLog.toMap() = mapOf(
     "action" to action,
     "time" to date
 ).mapValues { it.toString() }
+
+fun MagiskPolicy.toLog(
+    toUid: Int,
+    fromPid: Int,
+    command: String,
+    date: Date
+) = MagiskLog(uid, toUid, fromPid, packageName, appName, command, policy == ALLOW, date)

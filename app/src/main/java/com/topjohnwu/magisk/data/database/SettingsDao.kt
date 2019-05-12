@@ -14,8 +14,8 @@ class SettingsDao : BaseDao() {
         values(key to value.toString())
     }.ignoreElement()
 
-    fun fetch(key: String) = query<Select> {
+    fun fetch(key: String, default: Int = -1) = query<Select> {
         condition { equals("key", key) }
-    }.map { it.first().values.first().toIntOrNull() ?: -1 }
+    }.map { it.firstOrNull()?.values?.firstOrNull()?.toIntOrNull() ?: default }
 
 }
