@@ -1,12 +1,15 @@
 package com.topjohnwu.magisk.data.repository
 
 import android.content.Context
+import com.skoumal.teanity.extensions.subscribeK
+import com.topjohnwu.magisk.data.database.RepositoryDao
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawApiServices
 import com.topjohnwu.magisk.data.network.GithubServices
 import com.topjohnwu.magisk.model.entity.GithubRepo
 import com.topjohnwu.magisk.model.entity.toRepository
 import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.writeToFile
 import com.topjohnwu.magisk.utils.writeToString
 import io.reactivex.Single
@@ -15,10 +18,15 @@ class ModuleRepository(
     private val context: Context,
     private val apiRaw: GithubRawApiServices,
     private val api: GithubApiServices,
-    private val apiWeb: GithubServices
+    private val apiWeb: GithubServices,
+    private val repoDao: RepositoryDao
 ) {
 
-    fun fetchModules() = fetchAllRepos()
+    fun fetchModules() = Single.fromCallable { repoDao.fetchAll() }
+        .flatMap { if (it.isEmpty()) fetchRemoteRepos() else it.toSingle() }
+        .doOnSuccess { fetchRemoteRepos().subscribeK() } // cache changed for next time or next hot reload
+
+    private fun fetchRemoteRepos() = fetchAllRepos()
         .map {
             it.mapNotNull {
                 runCatching {
@@ -26,6 +34,7 @@ class ModuleRepository(
                 }.getOrNull()
             }
         }
+        .doOnSuccess { repoDao.insert(it) }
 
     fun fetchInstalledModules() = Single.fromCallable { Utils.loadModulesLeanback() }
         .map { it.values.toList() }

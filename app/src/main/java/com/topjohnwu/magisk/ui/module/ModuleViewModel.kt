@@ -5,6 +5,7 @@ import android.database.Cursor
 import androidx.annotation.StringRes
 import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
+import com.skoumal.teanity.extensions.doOnSuccessUi
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
@@ -20,6 +21,7 @@ import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.update
+import com.topjohnwu.magisk.utils.zip
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
@@ -54,7 +56,16 @@ class ModuleViewModel(
     fun downloadPressed(item: RepoRvItem) = InstallModuleEvent(item.item).publish()
 
     fun refresh() {
-        moduleRepo.fetchModules()
+        val updateInstalled = moduleRepo.fetchInstalledModules()
+            .flattenAsFlowable { it }
+            .map { ModuleRvItem(it) }
+            .toList()
+            .map { it to itemsInstalled.calculateDiff(it) }
+            .doOnSuccessUi { itemsInstalled.update(it.first, it.second) }
+
+        val updateRemote = moduleRepo.fetchModules()
+
+        zip(updateInstalled, updateRemote) { _, remote -> remote }
             .flattenAsFlowable { it }
             .map { RepoRvItem(it) }
             .toList()
@@ -62,13 +73,6 @@ class ModuleViewModel(
             .flatMap { queryRaw() }
             .applyViewModel(this)
             .subscribeK { itemsRemote.update(it.first, it.second) }
-
-        moduleRepo.fetchInstalledModules()
-            .flattenAsFlowable { it }
-            .map { ModuleRvItem(it) }
-            .toList()
-            .map { it to itemsInstalled.calculateDiff(it) }
-            .subscribeK { itemsInstalled.update(it.first, it.second) }
     }
 
     private fun query() = queryRaw()
