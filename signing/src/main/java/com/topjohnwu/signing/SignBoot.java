@@ -12,7 +12,6 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
@@ -23,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
@@ -31,10 +29,6 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 
 public class SignBoot {
-
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
 
     private static class PushBackRWStream extends FilterInputStream {
         private OutputStream out;

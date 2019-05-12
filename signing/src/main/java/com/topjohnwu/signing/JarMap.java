@@ -23,7 +23,7 @@ import java.util.zip.ZipFile;
 * On the other hand, when a JarFile is provided, it simply works as a wrapper.
 * */
 
-public class JarMap implements Closeable, AutoCloseable {
+public class JarMap implements Closeable {
 
     private JarFile jarFile;
     private JarInputStream jis;
@@ -119,7 +119,10 @@ public class JarMap implements Closeable, AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        (jarFile == null ? jis : jarFile).close();
+        if (jarFile != null)
+            jarFile.close();
+        else
+            jis.close();
     }
 
     private static class JarMapEntry extends JarEntry {

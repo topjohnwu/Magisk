@@ -16,12 +16,6 @@
 #   public *;
 #}
 
-# BouncyCastle
--keep,allowoptimization class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
--keep,allowoptimization class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
--keep,allowoptimization class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
--dontwarn javax.naming.**
-
 # Snet
 -keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
 -keep,allowobfuscation interface com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback
@@ -39,12 +33,6 @@
 
 # BootSigner
 -keepclassmembers class com.topjohnwu.signing.BootSigner { *; }
-
-# SVG
--dontwarn com.caverock.androidsvg.SVGAndroidRenderer
-
-# RetroStreams
--dontwarn java9.**
 
 # Strip logging
 -assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
