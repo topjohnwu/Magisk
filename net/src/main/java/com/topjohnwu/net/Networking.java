@@ -43,7 +43,7 @@ public class Networking {
             gms.getClassLoader()
                     .loadClass("com.google.android.gms.common.security.ProviderInstallerImpl")
                     .getMethod("insertProvider", Context.class)
-                    .invoke(null, context);
+                    .invoke(null, gms);
         } catch (Exception e) {
             // Failed to update SSL provider, use NoSSLv3SocketFactory on SDK < 21
             if (Build.VERSION.SDK_INT < 21)
