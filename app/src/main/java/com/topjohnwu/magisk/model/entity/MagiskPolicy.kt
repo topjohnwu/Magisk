@@ -59,7 +59,7 @@ fun MagiskPolicy.toMap() = mapOf(
     "until" to until,
     "logging" to if (logging) 1 else 0,
     "notification" to if (notification) 1 else 0
-).mapValues { it.toString() }
+).mapValues { it.value.toString() }
 
 @Throws(PackageManager.NameNotFoundException::class)
 fun Map<String, String>.toPolicy(pm: PackageManager): MagiskPolicy {

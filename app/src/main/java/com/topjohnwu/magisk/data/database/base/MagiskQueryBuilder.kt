@@ -82,7 +82,7 @@ open class Insert : MagiskQueryBuilder {
     override lateinit var table: String
 
     private val keys get() = _values.keys.joinToString(",")
-    private val values get() = _values.values.joinToString(",")
+    private val values get() = _values.values.joinToString(",") { "\"$it\"" }
     private var _values: Map<String, String> = mapOf()
 
     fun values(vararg pairs: Pair<String, String>) {

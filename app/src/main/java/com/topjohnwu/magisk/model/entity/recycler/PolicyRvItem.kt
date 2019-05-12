@@ -26,6 +26,13 @@ class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvIte
 
     private val rxBus: RxBus by inject()
 
+    private val currentStateItem
+        get() = item.copy(
+            policy = if (isEnabled.value) Policy.ALLOW else Policy.DENY,
+            notification = shouldNotify.value,
+            logging = shouldLog.value
+        )
+
     init {
         isEnabled.addOnPropertyChangedCallback {
             it ?: return@addOnPropertyChangedCallback
@@ -33,11 +40,11 @@ class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvIte
         }
         shouldNotify.addOnPropertyChangedCallback {
             it ?: return@addOnPropertyChangedCallback
-            rxBus.post(PolicyUpdateEvent.Notification(this@PolicyRvItem, shouldNotify.value))
+            rxBus.post(PolicyUpdateEvent.Notification(currentStateItem))
         }
         shouldLog.addOnPropertyChangedCallback {
             it ?: return@addOnPropertyChangedCallback
-            rxBus.post(PolicyUpdateEvent.Log(this@PolicyRvItem, shouldLog.value))
+            rxBus.post(PolicyUpdateEvent.Log(currentStateItem))
         }
     }
 

@@ -85,13 +85,13 @@ class SuperuserViewModel(
     }
 
     private fun updatePolicy(it: PolicyUpdateEvent) = when (it) {
-        is PolicyUpdateEvent.Notification -> updatePolicy(it.item.item.copy(notification = it.shouldNotify)) {
+        is PolicyUpdateEvent.Notification -> updatePolicy(it.item) {
             val textId =
                 if (it.notification) R.string.su_snack_notif_on else R.string.su_snack_notif_off
             val text = resources.getString(textId).format(it.appName)
             SnackbarEvent(text).publish()
         }
-        is PolicyUpdateEvent.Log -> updatePolicy(it.item.item.copy(logging = it.shouldLog)) {
+        is PolicyUpdateEvent.Log -> updatePolicy(it.item) {
             val textId =
                 if (it.logging) R.string.su_snack_log_on else R.string.su_snack_log_off
             val text = resources.getString(textId).format(it.appName)
