@@ -15,9 +15,11 @@ import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.database.MagiskDB
+import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
+import com.topjohnwu.magisk.model.entity.toPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.FingerprintHelper
@@ -29,7 +31,7 @@ import java.util.concurrent.TimeUnit.*
 
 class SuRequestViewModel(
     private val packageManager: PackageManager,
-    private val database: MagiskDB,
+    private val appRepo: AppRepository,
     private val timeoutPrefs: SharedPreferences,
     private val resources: Resources
 ) : MagiskViewModel() {
@@ -52,7 +54,7 @@ class SuRequestViewModel(
 
     var handler: ActionHandler? = null
     private var timer: CountDownTimer? = null
-    private var policy: Policy? = null
+    private var policy: MagiskPolicy? = null
         set(value) {
             field = value
             updatePolicy(value)
@@ -64,10 +66,10 @@ class SuRequestViewModel(
             .let { items.update(it) }
     }
 
-    private fun updatePolicy(policy: Policy?) {
+    private fun updatePolicy(policy: MagiskPolicy?) {
         policy ?: return
 
-        icon.value = policy.info.loadIcon(packageManager)
+        icon.value = policy.applicationInfo.loadIcon(packageManager)
         title.value = policy.appName
         packageName.value = policy.packageName
 
@@ -107,8 +109,8 @@ class SuRequestViewModel(
             }
             val bundle = connector.readSocketInput()
             val uid = bundle.getString("uid")?.toIntOrNull() ?: return false
-            database.clearOutdated()
-            policy = database.getPolicy(uid) ?: Policy(uid, packageManager)
+            appRepo.deleteOutdated().blockingGet() // wrong!
+            policy = appRepo.fetch(uid).blockingGet() ?: uid.toPolicy(packageManager)
         } catch (e: IOException) {
             e.printStackTrace()
             return false
@@ -130,18 +132,18 @@ class SuRequestViewModel(
             }
 
             override fun handleAction(action: Int, time: Int) {
-                policy?.apply {
-                    policy = action
-                    if (time >= 0) {
-                        until = if (time == 0) {
-                            0
-                        } else {
-                            MILLISECONDS.toSeconds(now) + MINUTES.toSeconds(time.toLong())
-                        }
-                        database.updatePolicy(this)
+                val until = if (time >= 0) {
+                    if (time == 0) {
+                        0
+                    } else {
+                        MILLISECONDS.toSeconds(now) + MINUTES.toSeconds(time.toLong())
                     }
+                } else {
+                    policy?.until ?: 0
                 }
-                policy?.policy = action
+                policy = policy?.copy(policy = action, until = until)?.apply {
+                    appRepo.update(this).blockingGet()
+                }
 
                 handleAction()
             }
