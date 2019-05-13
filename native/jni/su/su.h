@@ -32,7 +32,7 @@ public:
 	int ref;
 	time_t timestamp;
 
-	su_info(unsigned uid);
+	su_info(unsigned uid = 0);
 	~su_info();
 	void lock();
 	void unlock();

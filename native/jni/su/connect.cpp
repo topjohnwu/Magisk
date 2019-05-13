@@ -11,11 +11,20 @@
 
 #include "su.h"
 
+bool CONNECT_BROADCAST;
+
 #define START_ACTIVITY \
 "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
 "start", "-n", nullptr, "--user", nullptr, "-f", "0x18000020", "-a"
 
 // 0x18000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_INCLUDE_STOPPED_PACKAGES
+
+#define START_BROADCAST \
+"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
+"broadcast", "-n", nullptr, "--user", nullptr, "-f", "0x00000020", \
+"-a", "android.intent.action.REBOOT", "--es", "action"
+
+// 0x00000020 = FLAG_INCLUDE_STOPPED_PACKAGES
 
 static inline const char *get_command(const su_request *to) {
 	if (to->command[0])
@@ -39,9 +48,9 @@ static inline void get_uid(char *uid, su_info *info) {
 			: info->uid);
 }
 
-static void silent_run(const char **args, su_info *info) {
+static void exec_am_cmd(const char **args, su_info *info) {
 	char component[128];
-	sprintf(component, "%s/a.m", info->str[SU_MANAGER].data());
+	sprintf(component, "%s/%s", info->str[SU_MANAGER].data(), args[3][0] == 'b' ? "a.h" : "a.m");
 	char user[8];
 	get_user(user, info);
 
@@ -62,6 +71,16 @@ static void silent_run(const char **args, su_info *info) {
 	exec_command(exec);
 }
 
+#define LOG_BODY \
+"log", \
+"--ei", "from.uid", fromUid, \
+"--ei", "to.uid", toUid, \
+"--ei", "pid", pid, \
+"--ei", "policy", policy, \
+"--es", "command", get_command(&ctx->req), \
+"--ez", "notify", ctx->info->access.notify ? "true" : "false", \
+nullptr
+
 void app_log(su_context *ctx) {
 	char fromUid[8];
 	get_uid(fromUid, ctx->info);
@@ -75,18 +94,20 @@ void app_log(su_context *ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
-	const char *cmd[] = {
-		START_ACTIVITY, "log",
-		"--ei", "from.uid", fromUid,
-		"--ei", "to.uid", toUid,
-		"--ei", "pid", pid,
-		"--ei", "policy", policy,
-		"--es", "command", get_command(&ctx->req),
-		"--ez", "notify", ctx->info->access.notify ? "true" : "false",
-		nullptr
-	};
-	silent_run(cmd, ctx->info);
+	if (CONNECT_BROADCAST) {
+		const char *cmd[] = { START_BROADCAST, LOG_BODY };
+		exec_am_cmd(cmd, ctx->info);
+	} else {
+		const char *cmd[] = { START_ACTIVITY, LOG_BODY };
+		exec_am_cmd(cmd, ctx->info);
+	}
 }
+
+#define NOTIFY_BODY \
+"notify", \
+"--ei", "from.uid", fromUid, \
+"--ei", "policy", policy, \
+nullptr
 
 void app_notify(su_context *ctx) {
 	char fromUid[8];
@@ -95,13 +116,14 @@ void app_notify(su_context *ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
-	const char *cmd[] = {
-		START_ACTIVITY, "notify",
-		"--ei", "from.uid", fromUid,
-		"--ei", "policy", policy,
-		nullptr
-	};
-	silent_run(cmd, ctx->info);
+	if (CONNECT_BROADCAST) {
+		const char *cmd[] = { START_BROADCAST, NOTIFY_BODY };
+		exec_am_cmd(cmd, ctx->info);
+	} else {
+		const char *cmd[] = { START_ACTIVITY, NOTIFY_BODY };
+		exec_am_cmd(cmd, ctx->info);
+	}
+
 }
 
 void app_connect(const char *socket, su_info *info) {
@@ -110,7 +132,17 @@ void app_connect(const char *socket, su_info *info) {
 		"--es", "socket", socket,
 		nullptr
 	};
-	silent_run(cmd, info);
+	exec_am_cmd(cmd, info);
+}
+
+void broadcast_test() {
+	su_info info;
+	get_db_settings(info.cfg);
+	get_db_strings(info.str);
+	validate_manager(info.str[SU_MANAGER], 0, &info.mgr_st);
+
+	const char *cmd[] = { START_BROADCAST, "test", nullptr };
+	exec_am_cmd(cmd, &info);
 }
 
 void socket_send_request(int fd, su_info *info) {
