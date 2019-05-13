@@ -35,6 +35,7 @@ void manage_selinux();
 void clean_magisk_props();
 void crawl_procfs(const std::function<bool (int)> &fn);
 void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
+void do_hide_daemon(int pid);
 
 extern bool hide_enabled;
 extern pthread_mutex_t monitor_lock;

@@ -211,6 +211,10 @@ static void hide_daemon(int pid) {
 	manage_selinux();
 	clean_magisk_props();
 
+	do_hide_daemon(pid);
+}
+
+void do_hide_daemon(int pid) {
 	vector<string> targets;
 
 	// Unmount dummy skeletons and /sbin links

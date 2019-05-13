@@ -6,10 +6,12 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/mount.h>
 
 #include <magisk.h>
 #include <daemon.h>
 #include <flags.h>
+#include <utils.h>
 
 #include "magiskhide.h"
 
@@ -26,6 +28,7 @@ bool hide_enabled = false;
 		"  --add PKG [PROC]  Add a new target to the hide list\n"
 		"  --rm PKG [PROC]   Remove from the hide list\n"
 		"  --ls              List the current hide list\n"
+		"  --exec CMD ARGS   Execute a CMD with ARGS in magisk hidden environment\n"
 		, arg0);
 	exit(1);
 }
@@ -89,7 +92,13 @@ int magiskhide_main(int argc, char *argv[]) {
 		req = LS_HIDELIST;
 	else if (strcmp(argv[1], "--status") == 0)
 		req = HIDE_STATUS;
-	else
+	else if (strcmp(argv[1], "--exec") == 0 && argc > 2) {
+		xunshare(CLONE_NEWNS);
+		xmount(NULL, "/", NULL, MS_PRIVATE | MS_REC, NULL);
+		do_hide_daemon((int)getpid());
+		execvp(argv[2], argv + 2);
+		return 1;
+	} else
 		usage(argv[0]);
 
 	// Send request
