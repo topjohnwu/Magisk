@@ -3,7 +3,6 @@
 # Magisk General Utility Functions
 # by topjohnwu
 #
-#########################################
 
 ##########
 # Presets
@@ -252,7 +251,7 @@ flash_image() {
     *.gz) CMD1="$MAGISKBIN/magiskboot decompress '$1' - 2>/dev/null";;
     *)    CMD1="cat '$1'";;
   esac
-  if $BOOTSIGNED; then
+  if ! $BOOTSIGNED; then
     CMD2="$BOOTSIGNER -sign"
     ui_print "- Sign image with test keys"
   else
