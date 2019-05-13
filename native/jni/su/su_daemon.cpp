@@ -83,7 +83,7 @@ static void database_check(su_info *info) {
 	}
 
 	if (uid > 0)
-		get_uid_policy(uid, info->access);
+		get_uid_policy(info->access, uid);
 
 	// We need to check our manager
 	if (info->access.log || info->access.notify)

@@ -10,8 +10,10 @@ import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.repository.AppRepository
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.DownloadApp
+import com.topjohnwu.magisk.utils.RootUtils
 import com.topjohnwu.magisk.utils.SuLogger
 import com.topjohnwu.magisk.utils.inject
+import com.topjohnwu.magisk.utils.get
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
@@ -20,8 +22,15 @@ open class GeneralReceiver : BroadcastReceiver() {
 
     private val appRepo: AppRepository by inject()
 
-    private fun getPkg(i: Intent): String {
-        return if (i.data == null) "" else i.data!!.encodedSchemeSpecificPart
+    companion object {
+        const val REQUEST = "request"
+        const val LOG = "log"
+        const val NOTIFY = "notify"
+        const val TEST = "test"
+    }
+
+    private fun getPkg(intent: Intent): String {
+        return intent.data?.encodedSchemeSpecificPart ?: ""
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
@@ -40,16 +49,17 @@ open class GeneralReceiver : BroadcastReceiver() {
                     return
                 }
                 when (action) {
-                    SuRequestActivity.REQUEST -> {
+                    REQUEST -> {
                         val i = Intent(context, ClassMap[SuRequestActivity::class.java])
-                            .setAction(action)
-                            .putExtra("socket", intent.getStringExtra("socket"))
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                                .setAction(action)
+                                .putExtra("socket", intent.getStringExtra("socket"))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
                         context.startActivity(i)
                     }
-                    SuRequestActivity.LOG -> SuLogger.handleLogs(intent)
-                    SuRequestActivity.NOTIFY -> SuLogger.handleNotify(intent)
+                    LOG -> SuLogger.handleLogs(intent)
+                    NOTIFY -> SuLogger.handleNotify(intent)
+                    TEST -> Shell.su("magisk --use-broadcast").submit()
                 }
             }
             Intent.ACTION_PACKAGE_REPLACED ->
@@ -67,7 +77,7 @@ open class GeneralReceiver : BroadcastReceiver() {
                 Config.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK)
                 DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME))
             }
-            Const.Key.BROADCAST_REBOOT -> Shell.su("/system/bin/reboot").submit()
+            Const.Key.BROADCAST_REBOOT -> RootUtils.reboot()
         }
     }
 }

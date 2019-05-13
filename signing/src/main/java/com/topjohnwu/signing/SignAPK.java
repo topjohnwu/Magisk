@@ -11,7 +11,6 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.cms.CMSTypedData;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -60,15 +59,10 @@ public class SignAPK {
     private static final String CERT_SF_NAME = "META-INF/CERT.SF";
     private static final String CERT_SIG_NAME = "META-INF/CERT.%s";
 
-    private static Provider sBouncyCastleProvider;
+    private static Provider sBouncyCastleProvider = Security.getProvider("BC");
     // bitmasks for which hash algorithms we need the manifest to include.
     private static final int USE_SHA1 = 1;
     private static final int USE_SHA256 = 2;
-
-    static {
-        sBouncyCastleProvider = new BouncyCastleProvider();
-        Security.insertProviderAt(sBouncyCastleProvider, 1);
-    }
 
     public static void sign(JarMap input, OutputStream output) throws Exception {
         sign(SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem"),

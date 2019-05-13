@@ -1,9 +1,12 @@
 package com.topjohnwu.signing;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.Security;
 
 public class ZipSigner {
 
@@ -21,6 +24,8 @@ public class ZipSigner {
     public static void main(String[] args) throws Exception {
         if (args.length != 2 && args.length != 4 && args.length != 6)
             usage();
+
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);
 
         try (JarMap in = new JarMap(args[args.length - 2], false);
              OutputStream out = new FileOutputStream(args[args.length - 1])) {

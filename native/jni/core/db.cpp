@@ -233,7 +233,7 @@ int get_db_strings(db_strings &str, int key) {
 	return 0;
 }
 
-int get_uid_policy(int uid, su_access &su) {
+int get_uid_policy(su_access &su, int uid) {
 	char query[256], *err;
 	sprintf(query, "SELECT policy, logging, notification FROM policies "
 			"WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));

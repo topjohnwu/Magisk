@@ -732,4 +732,7 @@ void boot_complete(int client) {
 			install_apk("/data/magisk.apk");
 		}
 	}
+
+	// Test whether broadcast can be used or not
+	broadcast_test();
 }
