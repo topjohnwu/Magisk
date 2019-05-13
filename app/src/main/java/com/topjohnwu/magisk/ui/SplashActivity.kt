@@ -17,7 +17,7 @@ open class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         Shell.getShell {
-            if (Config.magiskVersionCode > 0 && Config.magiskVersionCode < Const.MAGISK_VER.MIN_SUPPORT) {
+            if (Config.magiskVersionCode > 0 && Config.magiskVersionCode < Const.MagiskVersion.MIN_SUPPORT) {
                 AlertDialog.Builder(this)
                     .setTitle(R.string.unsupport_magisk_title)
                     .setMessage(R.string.unsupport_magisk_message)
