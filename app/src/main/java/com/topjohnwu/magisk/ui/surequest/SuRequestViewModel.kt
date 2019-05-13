@@ -110,7 +110,8 @@ class SuRequestViewModel(
             val bundle = connector.readSocketInput()
             val uid = bundle.getString("uid")?.toIntOrNull() ?: return false
             appRepo.deleteOutdated().blockingGet() // wrong!
-            policy = appRepo.fetch(uid).blockingGet() ?: uid.toPolicy(packageManager)
+            policy = runCatching { appRepo.fetch(uid).blockingGet() }
+                .getOrDefault(uid.toPolicy(packageManager))
         } catch (e: IOException) {
             e.printStackTrace()
             return false

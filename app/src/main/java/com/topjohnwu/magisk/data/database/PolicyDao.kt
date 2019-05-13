@@ -44,7 +44,7 @@ class PolicyDao(
         condition {
             equals("uid", uid)
         }
-    }.map { it.first().toPolicy(context.packageManager) }
+    }.map { it.firstOrNull()?.toPolicy(context.packageManager) }
         .doOnError {
             if (it is PackageManager.NameNotFoundException) {
                 delete(uid).subscribe()
