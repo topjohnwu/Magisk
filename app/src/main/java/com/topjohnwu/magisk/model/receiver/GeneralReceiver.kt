@@ -41,7 +41,7 @@ open class GeneralReceiver : BroadcastReceiver() {
                 }
                 when (action) {
                     SuRequestActivity.REQUEST -> {
-                        val i = Intent(context, ClassMap.get<Any>(SuRequestActivity::class.java))
+                        val i = Intent(context, ClassMap[SuRequestActivity::class.java])
                             .setAction(action)
                             .putExtra("socket", intent.getStringExtra("socket"))
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.WorkerThread;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.ListenableWorker;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
@@ -110,13 +111,15 @@ public class Utils {
         return BuildConfig.VERSION_NAME.contains("-");
     }
 
+    @SuppressWarnings("unchecked")
     public static void scheduleUpdateCheck() {
         if (Config.get(Config.Key.CHECK_UPDATES)) {
             Constraints constraints = new Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build();
+            Class<? extends ListenableWorker> service = (Class<? extends ListenableWorker>) ClassMap.get(UpdateCheckService.class);
             PeriodicWorkRequest request = new PeriodicWorkRequest
-                    .Builder(ClassMap.get(UpdateCheckService.class), 12, TimeUnit.HOURS)
+                    .Builder(service, 12, TimeUnit.HOURS)
                     .setConstraints(constraints)
                     .build();
             WorkManager.getInstance().enqueueUniquePeriodicWork(

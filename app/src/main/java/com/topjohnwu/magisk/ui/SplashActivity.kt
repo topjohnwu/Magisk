@@ -66,7 +66,7 @@ open class SplashActivity : AppCompatActivity() {
             //UpdateRepos().exec()
         }
 
-        val intent = Intent(this, ClassMap.get<Any>(MainActivity::class.java))
+        val intent = Intent(this, ClassMap[MainActivity::class.java])
         intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION))
         DONE = true
         startActivity(intent)
