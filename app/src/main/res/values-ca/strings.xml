@@ -79,7 +79,7 @@
     <string name="download_zip_only">Descarrega només el ZIP</string>
     <string name="direct_install">Instal·lació directa (Recomanat)</string>
     <string name="install_inactive_slot">Instal·la a la ranura inactiva (Després d\'una OTA)</string>
-    <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en l\'actual ranura inactiva després del reinici!\nUtilitza aquesta opció NOMÉS quan l'\OTA s'hagi fet.\nContinuar?</string>
+    <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en l\'actual ranura inactiva després del reinici!\nUtilitza aquesta opció NOMÉS quan l\'OTA s\'hagi fet.\nContinuar?</string>
     <string name="select_method">Sel·lecciona mètode</string>
     <string name="setup_title">Instal·lació addicional</string>
     <string name="select_patch_file">Sel·lecciona i arranja un arxiu</string>
@@ -99,7 +99,7 @@
 
     <string name="dtbo_patched_title">S\'ha arranjat DTBO</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img. Si us plau, reinicia el telèfon.</string>
-    <string name="flashing">Arranjament...</string>
+    <string name="flashing">Arranjament…</string>
     <string name="done">Fet!</string>
     <string name="failure">Fallit</string>
     <string name="hide_manager_title">Amagant Magisk Manager…</string>
