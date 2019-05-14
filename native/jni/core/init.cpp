@@ -451,7 +451,22 @@ void MagiskInit::early_mount() {
 		link_root("/product");
 		link_root("/odm");
 	} else {
-		mount_root(system);
+		if (!is_lnk("/system") && read_dt_fstab("system", partname, fstype)) {
+			LOGD("Early mount system\n");
+			for (int i = 0; i < 10; ++i) {
+				if (setup_block(partname, block_dev)) {
+					break;
+				} else {
+					LOGD("%s not found, wait 20ms\n", partname);
+					usleep(20000);
+					dev_list.clear();
+					collect_devices();
+				}
+			}	
+			xmkdir("/system", 0755);
+			xmount(block_dev, "/system", fstype, MS_RDONLY, nullptr);
+			mnt_system = true;
+		}
 	}
 
 	mount_root(vendor);
