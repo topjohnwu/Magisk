@@ -83,7 +83,7 @@
 	<string name="select_method">Seleziona un metodo</string>
 	<string name="setup_title">Configurazione aggiuntiva</string>
 	<string name="select_patch_file">Seleziona e aggiorna un file</string>
-   	<string name="patch_file_msg">Seleziona una immagine in formato .img o un file ODIN .tar</string>
+   	<string name="patch_file_msg">Seleziona un\'immagine in formato .img o un file ODIN .tar</string>
    	<string name="reboot_delay_toast">Riavvio fra 5 secondi…</string>
 	
 	<!--Toasts, Dialogs-->
