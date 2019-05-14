@@ -33,8 +33,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -59,7 +57,6 @@ public class SignAPK {
     private static final String CERT_SF_NAME = "META-INF/CERT.SF";
     private static final String CERT_SIG_NAME = "META-INF/CERT.%s";
 
-    private static Provider sBouncyCastleProvider = Security.getProvider("BC");
     // bitmasks for which hash algorithms we need the manifest to include.
     private static final int USE_SHA1 = 1;
     private static final int USE_SHA256 = 2;
@@ -140,8 +137,7 @@ public class SignAPK {
      */
     private static int getDigestAlgorithm(X509Certificate cert) {
         String sigAlg = cert.getSigAlgName().toUpperCase(Locale.US);
-        if ("SHA1WITHRSA".equals(sigAlg) ||
-                "MD5WITHRSA".equals(sigAlg)) {     // see "HISTORICAL NOTE" above.
+        if (sigAlg.startsWith("SHA1WITHRSA") || sigAlg.startsWith("MD5WITHRSA")) {
             return USE_SHA1;
         } else if (sigAlg.startsWith("SHA256WITH")) {
             return USE_SHA256;
@@ -309,13 +305,10 @@ public class SignAPK {
         JcaCertStore certs = new JcaCertStore(certList);
         CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
         ContentSigner signer = new JcaContentSignerBuilder(getSignatureAlgorithm(publicKey))
-                .setProvider(sBouncyCastleProvider)
                 .build(privateKey);
         gen.addSignerInfoGenerator(
                 new JcaSignerInfoGeneratorBuilder(
-                        new JcaDigestCalculatorProviderBuilder()
-                                .setProvider(sBouncyCastleProvider)
-                                .build())
+                        new JcaDigestCalculatorProviderBuilder().build())
                         .setDirectSignature(true)
                         .build(signer, publicKey));
         gen.addCertificates(certs);
