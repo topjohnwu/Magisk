@@ -94,11 +94,13 @@
     <string name="reboot">Repornește</string>
     <string name="settings_reboot_toast">Repornește pentru a aplica setările.</string>
     <string name="release_notes">Note privind versiunea</string>
-    <string name="repo_cache_cleared">Cache-ul depozitului golit</string>
+    <string name="repo_cache_cleared">Cache-ul depozitelor golit</string>
     <string name="internal_storage">Zip-ul este stocat în:\n[Stocare internă]%1$s</string>
     <string name="dtbo_patched_title">DTBO a fost patchuit!</string>
     <string name="dtbo_patched_reboot">Magisk Manager a patchuit dtbo.img. Te rugăm să repornești.</string>
-    <string name="flashing">Se procesează</string>
+    <string name="flashing">Procesare în curs…</string>
+    <string name="done">Terminat!</string>
+    <string name="failure">Eșec</string>
     <string name="hide_manager_title">Se ascunde Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat.</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul.</string>
@@ -115,7 +117,7 @@
     <string name="env_fix_msg">Dispozitivul tău are nevoie de configurări suplimentare pentru ca Magisk să funcționeze corect. Se va descărca zip-ul de configurare Magisk, vrei să continui acum?</string>
     <string name="setup_msg">Rulează configurarea mediului…</string>
     <string name="downloading_toast">Se descarcă %1$s</string>
-    <string name="no_rw_storage">Această caracteristică nu va funcționa fără permisiunea de a scrie în stocarea externă.</string>
+    <string name="no_rw_storage">Această funcție nu va funcționa fără permisiunea de a scrie în stocarea externă.</string>
     <string name="dl_one_module">Descarcă câte un modul odată.</string>
 
     <!--Settings Activity -->
@@ -139,7 +141,7 @@
     <string name="settings_update_custom">Personalizat</string>
     <string name="settings_update_custom_msg">Inserează un URL personalizat</string>
     <string name="settings_core_only_title">Mod numai de bază pentru Magisk</string>
-    <string name="settings_core_only_summary">Activează numai caracteristicile de bază. MagiskSU și MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat.</string>
+    <string name="settings_core_only_summary">Activează numai funcțiile de bază. MagiskSU și MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat.</string>
     <string name="settings_magiskhide_summary">Ascunde Magisk de diferite forme de detectare.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Suport systemless hosts pentru aplicațiile adblock.</string>
