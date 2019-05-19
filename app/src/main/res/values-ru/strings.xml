@@ -100,6 +100,8 @@
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
     <string name="flashing">Прошивка</string>
+    <string name="done">Завершено!</string>
+    <string name="failure">Ошибка</string>
     <string name="hide_manager_title">Маскировка Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Не удалось замаскировать Magisk Manager</string>
     <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки.</string> 
