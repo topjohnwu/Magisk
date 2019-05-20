@@ -345,7 +345,7 @@ int unpack(const char *image, bool hdr) {
 void repack(const char* orig_image, const char* out_image) {
 	boot_img boot {};
 
-	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off;
+	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off, dtb_off;
 
 	// Parse original image
 	boot.parse_file(orig_image);
@@ -475,6 +475,7 @@ void repack(const char* orig_image, const char* out_image) {
 	}
 
 	// dtb
+	dtb_off = lseek(fd, 0, SEEK_CUR);
 	if (access(DTB_FILE, R_OK) == 0) {
 		boot.hdr.dtb_size() = restore(DTB_FILE, fd);
 		file_align();
@@ -527,6 +528,11 @@ void repack(const char* orig_image, const char* out_image) {
 		size = boot.hdr.recovery_dtbo_size();
 		HASH_update(&ctx, boot.map_addr + boot.hdr.recovery_dtbo_offset(), size);
 		HASH_update(&ctx, &size, sizeof(size));
+		size = boot.hdr.dtb_size();
+		if (size) {
+			HASH_update(&ctx, boot.map_addr + dtb_off, size);
+			HASH_update(&ctx, &size, sizeof(size));
+		}
 	}
 	memset(boot.hdr.id(), 0, 32);
 	memcpy(boot.hdr.id(), HASH_final(&ctx),
