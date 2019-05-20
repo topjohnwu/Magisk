@@ -45,8 +45,11 @@ typedef enum {
 #define DHTB_MAGIC      "\x44\x48\x54\x42\x01\x00\x00\x00"
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"
 #define TEGRABLOB_MAGIC "-SIGNED-BY-SIGNBLOB-"
-#define NOOKHD_MAGIC    "Green Loader"
-#define NOOKHD_NEW_MAGIC "eMMC boot.img+secondloader"
+#define NOOKHD_RL_MAGIC "Red Loader"
+#define NOOKHD_GL_MAGIC "Green Loader"
+#define NOOKHD_GR_MAGIC "Green Recovery"
+#define NOOKHD_EB_MAGIC "eMMC boot.img+secondloader"
+#define NOOKHD_ER_MAGIC "eMMC recovery.img+secondloader"
 #define NOOKHD_PRE_HEADER_SZ 1048576
 #define ACCLAIM_MAGIC   "BauwksBoot"
 #define ACCLAIM_PRE_HEADER_SZ 262144
