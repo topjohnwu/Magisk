@@ -422,7 +422,6 @@ def build_all(args):
     build_binary(args)
     zip_main(args)
     zip_uninstaller(args)
-    build_snet(args)
 
 
 parser = argparse.ArgumentParser(description='Magisk build script')
