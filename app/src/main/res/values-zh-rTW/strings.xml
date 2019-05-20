@@ -215,5 +215,10 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">顯示系統應用程式</string>
+    <string name="done">完成！</string>
+    <string name="failure">失敗</string>
+    <string name="patch_file_msg">選擇一個 image (*.img) 或是 ODIN tarfile (*.tar)</string>
+    <string name="reboot_delay_toast">5 秒鐘之後將會重新啟動…</string>
+    <string name="select_patch_file">選擇並對檔案進行補丁</string>
 
 </resources>

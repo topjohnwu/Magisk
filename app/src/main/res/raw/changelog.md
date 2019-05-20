@@ -1,3 +1,3 @@
-# v7.1.2
-- Support patching Samsung AP firmware
-- Much better module downloading mechanism
+# v7.2.0
+- Huge UI overhaul
+- More sweet changes coming in the future!

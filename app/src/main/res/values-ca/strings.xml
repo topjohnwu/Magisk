@@ -15,7 +15,7 @@
     <string name="checking_for_updates">Cercant actualitzacions</string>
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
     <string name="safetyNet_check_text">Comprova l\'estat de SafetyNet</string>
-    <string name="checking_safetyNet_status">Comprovant l\'estat de SafetyNet…</string>
+    <string name="checking_safetyNet_status">Comprovant Safetynet…</string>
     <string name="safetyNet_check_success">La comprovació ha sigut exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_res_invalid">La resposta és invàlida</string>
@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Arrel s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
     <string name="update">Actualització</string>
-    <string name="core_only_enabled">(Mode únicament nucli activat)</string>
+    <string name="core_only_enabled">(Mode nucli activat)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>
@@ -74,6 +74,18 @@
     <string name="magisk_update_title">Actualització de Magisk disponible!</string>
     <string name="manager_update_title">Actualització de Magisk Manager disponible!</string>
 
+    <!-- Installation -->
+    <string name="manager_download_install">Prem per descarregar i instalar.</string>
+    <string name="download_zip_only">Descarrega només el ZIP</string>
+    <string name="direct_install">Instal·lació directa (Recomanat)</string>
+    <string name="install_inactive_slot">Instal·la a la ranura inactiva (Després d\'una OTA)</string>
+    <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en l\'actual ranura inactiva després del reinici!\nUtilitza aquesta opció NOMÉS quan l\'OTA s\'hagi fet.\nContinuar?</string>
+    <string name="select_method">Sel·lecciona mètode</string>
+    <string name="setup_title">Instal·lació addicional</string>
+    <string name="select_patch_file">Sel·lecciona i arranja un arxiu</string>
+    <string name="patch_file_msg">Sel·lecciona una imatge crua (*.img) o un ODIN tarfile (*.tar)</string>
+    <string name="reboot_delay_toast">Reinici en 5 segons…</string>
+
     <!--Toasts, Dialogs-->
     <string name="close">Tancar</string>
     <string name="repo_install_title">Instal·lar %1$s</string>
@@ -84,19 +96,16 @@
     <string name="release_notes">Notes de llançament</string>
     <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
     <string name="internal_storage">El zip està emmagatzemat en:\n[Internal Storage]%1$s</string>
-    <string name="manager_download_install">Prem per descarregar i instal·lar.</string>
+
     <string name="dtbo_patched_title">S\'ha arranjat DTBO</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img. Si us plau, reinicia el telèfon.</string>
-    <string name="flashing">Arranjament</string>
+    <string name="flashing">Arranjament…</string>
+    <string name="done">Fet!</string>
+    <string name="failure">Fallit</string>
     <string name="hide_manager_title">Amagant Magisk Manager…</string>
     <string name="hide_manager_fail_toast">L\'amagament de Magisk Manager ha fallat.</string>
     <string name="open_link_failed_toast">No s\'ha trobat una aplicació per obrir l\'enllaç.</string>
-    <string name="download_zip_only">Descarrega només el ZIP</string>
-    <string name="direct_install">Instal·lació directa (Recomanat)</string>
-    <string name="install_inactive_slot">Instal·lar a la ranura inactiva (Després d\'una OTA)</string>
     <string name="warning">Avís</string>
-    <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en la ranura inactiva després de reiniciar!\nUtilitza aquesta opció només quan s\'hagi fet la OTA.\nContinuar?</string>
-    <string name="select_method">Selecciona mètode</string>
     <string name="complete_uninstall">Desinstal·lació completa</string>
     <string name="restore_img">Restaura imatges</string>
     <string name="restore_img_msg">Restaurant…</string>
@@ -107,7 +116,6 @@
     <string name="setup_fail">Instal·lació fallida.</string>
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
     <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es descarregarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instalació ara?</string>
-    <string name="setup_title">Instal·lació addicional</string>
     <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
     <string name="downloading_toast">Descarregant %1$s</string>
     <string name="no_rw_storage">Aquesta funció no funcionara si no es té permís per escriure a l\'emmagatzematge.</string>
@@ -133,7 +141,7 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalitzat</string>
     <string name="settings_update_custom_msg">Inserta una URL personalitzada</string>
-    <string name="settings_core_only_title">Mode únicament nucli de Magisk</string>
+    <string name="settings_core_only_title">Mode nucli de Magisk</string>
     <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU y MagiskHide seguirán habilitats</string>
     <string name="settings_magiskhide_summary">Amagar Magisk de varies deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
@@ -160,7 +168,6 @@
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
     <string name="settings_su_fingerprint_summary">Utilitza el sensor d’Empremta Dactilar per permetre les sol·licituds de superusuari</string>
     <string name="auth_fingerprint">Autenticar Emprempta Digital</string>
-
 
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
@@ -210,10 +217,11 @@
     <string name="auth_fail">Autenticació fallida</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID de l\’objectiu: %1$d</string>
     <string name="command">Ordre: %1$s</string>
     
     <!-- MagiskHide -->
-    <string name="show_system_app">Ensenya apps del sistema</string>
+    <string name="show_system_app">Mostra apps del sistema</string>
 
 </resources>
