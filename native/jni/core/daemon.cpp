@@ -54,6 +54,7 @@ static void *request_handler(void *args) {
 	case LATE_START:
 	case BOOT_COMPLETE:
 	case SQLITE_CMD:
+	case BROADCAST_ACK:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -90,6 +91,10 @@ static void *request_handler(void *args) {
 	case SQLITE_CMD:
 		exec_sql(client);
 		break;
+	case BROADCAST_ACK:
+		LOGD("* Use broadcasts for su logging and notify\n");
+		CONNECT_BROADCAST = true;
+		close(client);
 	default:
 		close(client);
 		break;

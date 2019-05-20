@@ -109,14 +109,17 @@ int boot_img::parse_image(uint8_t *head) {
 		hdr.set_hdr(new boot_img_hdr_pxa());
 		memcpy(*hdr, head, sizeof(boot_img_hdr_pxa));
 	} else {
-		if (memcmp(hp->cmdline, NOOKHD_MAGIC, 12) == 0 ||
-			memcmp(hp->cmdline, NOOKHD_NEW_MAGIC, 26) == 0) {
+		if (memcmp(hp->cmdline, NOOKHD_RL_MAGIC, 10) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_GL_MAGIC, 12) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_GR_MAGIC, 14) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_EB_MAGIC, 26) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_ER_MAGIC, 30) == 0) {
 			flags |= NOOKHD_FLAG;
-			fprintf(stderr, "NOOKHD_GREEN_LOADER\n");
+			fprintf(stderr, "NOOKHD_LOADER\n");
 			head += NOOKHD_PRE_HEADER_SZ;
 		} else if (memcmp(hp->name, ACCLAIM_MAGIC, 10) == 0) {
 			flags |= ACCLAIM_FLAG;
-			fprintf(stderr, "ACCLAIM_BAUWKSBOOT\n");
+			fprintf(stderr, "ACCLAIM_LOADER\n");
 			head += ACCLAIM_PRE_HEADER_SZ;
 		}
 		hdr.set_hdr(new boot_img_hdr());

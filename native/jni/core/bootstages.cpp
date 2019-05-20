@@ -374,7 +374,7 @@ static bool magisk_env() {
 			mount_mirror(system, MS_RDONLY);
 		} else if (str_contains(line, " /vendor ")) {
 			mount_mirror(vendor, MS_RDONLY);
-		} else if (str_contains(line, " /data ")) {
+		} else if (str_contains(line, " /data ") && !str_contains(line, "tmpfs")) {
 			mount_mirror(data, 0);
 		} else if (SDK_INT >= 24 &&
 		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
@@ -732,4 +732,7 @@ void boot_complete(int client) {
 			install_apk("/data/magisk.apk");
 		}
 	}
+
+	// Test whether broadcast can be used or not
+	broadcast_test();
 }

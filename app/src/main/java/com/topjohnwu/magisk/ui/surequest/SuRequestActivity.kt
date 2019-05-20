@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
 import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.events.DieEvent
+import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.utils.SuLogger
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -31,15 +32,15 @@ open class SuRequestActivity : MagiskActivity<SuRequestViewModel, ActivityReques
         val intent = intent
         val action = intent.action
 
-        if (TextUtils.equals(action, REQUEST)) {
+        if (TextUtils.equals(action, GeneralReceiver.REQUEST)) {
             if (!viewModel.handleRequest(intent) {})
                 finish()
             return
         }
 
-        if (TextUtils.equals(action, LOG))
+        if (TextUtils.equals(action, GeneralReceiver.LOG))
             SuLogger.handleLogs(intent)
-        else if (TextUtils.equals(action, NOTIFY))
+        else if (TextUtils.equals(action, GeneralReceiver.NOTIFY))
             SuLogger.handleNotify(intent)
 
         finish()
@@ -57,11 +58,5 @@ open class SuRequestActivity : MagiskActivity<SuRequestViewModel, ActivityReques
             resources.configuration.orientation
         else
             ActivityInfo.SCREEN_ORIENTATION_LOCKED
-    }
-
-    companion object {
-        const val REQUEST = "request"
-        const val LOG = "log"
-        const val NOTIFY = "notify"
     }
 }
