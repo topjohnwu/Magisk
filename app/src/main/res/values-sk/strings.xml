@@ -215,7 +215,7 @@
 
     <!--Superuser logs-->
     <string name="pid">PID:%1$d</string>
-    <string name="target_uid">Target UID: %1$d</string>
+    <string name="target_uid">Cieľový UID: %1$d</string>
     <string name="command">Príkaz: %1$s</string>
     <!-- MagiskHide -->
     <string name="show_system_app">Zobraziť systémové aplikácie</string>
