@@ -6,7 +6,7 @@
     <string name="superuser">Superuser</string>
     <string name="log">Záznamy</string>
     <string name="settings">Nastavenia</string>
-    <string name="install">Inštaluj</string>
+    <string name="install">Inštalovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
     <string name="unsupport_magisk_message">Táto verzia Magisk Managera podporuje Magisk od verzie v18.0.\n\nBuď upgradujte Magisk manuálne alebo nainštalujte staršiu verziu aplikácie.</string>
 
@@ -208,7 +208,7 @@
 
     <!--Superuser logs-->
     <string name="pid">PID:%1$d</string>
-    <string name="target_uid">Target UID: %1$d</string>
+    <string name="target_uid">Cieľový UID: %1$d</string>
     <string name="command">Príkaz: %1$s</string>
     <!-- MagiskHide -->
     <string name="show_system_app">Zobraziť systémové aplikácie</string>
