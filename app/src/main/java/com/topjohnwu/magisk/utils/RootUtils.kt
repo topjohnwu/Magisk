@@ -163,7 +163,7 @@ class RootUtils : Shell.Initializer() {
 
         @JvmStatic
         fun reboot(reason: String) {
-            Shell.su("svc power reboot $reason").submit()
+            Shell.su("/system/bin/svc power reboot $reason").submit()
         }
     }
 }
