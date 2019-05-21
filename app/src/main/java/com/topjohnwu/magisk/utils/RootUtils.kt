@@ -163,7 +163,7 @@ class RootUtils : Shell.Initializer() {
 
         @JvmStatic
         fun reboot(reason: String) {
-            Shell.su("service call power ${getRebootTransactionCode()} i32 1 s16 $reason i32 0").submit()
+            Shell.su("service call power ${getRebootTransactionCode()} i32 0 s16 $reason i32 0").submit()
         } 
 
         private fun getRebootTransactionCode(): Int {
