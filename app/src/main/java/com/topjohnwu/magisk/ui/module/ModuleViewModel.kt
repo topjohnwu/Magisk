@@ -5,33 +5,29 @@ import android.database.Cursor
 import androidx.annotation.StringRes
 import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
+import com.skoumal.teanity.extensions.doOnSuccessUi
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
-import com.topjohnwu.magisk.model.entity.Module
-import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.data.repository.ModuleRepository
 import com.topjohnwu.magisk.model.entity.recycler.ModuleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoRvItem
 import com.topjohnwu.magisk.model.entity.recycler.SectionRvItem
 import com.topjohnwu.magisk.model.events.InstallModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
-import com.topjohnwu.magisk.tasks.UpdateRepos
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.Event
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.update
-import io.reactivex.Single
+import com.topjohnwu.magisk.utils.zip
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
 class ModuleViewModel(
-    private val repoDatabase: RepoDatabaseHelper,
-    private val resources: Resources
+    private val resources: Resources,
+    private val moduleRepo: ModuleRepository
 ) : MagiskViewModel() {
 
     val query = KObservableField("")
@@ -52,18 +48,7 @@ class ModuleViewModel(
             queryDisposable?.dispose()
             queryDisposable = query()
         }
-        Event.register(this)
         refresh()
-    }
-
-    override fun getListeningEvents(): IntArray {
-        return intArrayOf(Event.MODULE_LOAD_DONE, Event.REPO_LOAD_DONE)
-    }
-
-    override fun onEvent(event: Int) = when (event) {
-        Event.MODULE_LOAD_DONE -> updateModules(Event.getResult(event))
-        Event.REPO_LOAD_DONE -> updateRepos()
-        else -> Unit
     }
 
     fun fabPressed() = OpenFilePickerEvent().publish()
@@ -71,17 +56,16 @@ class ModuleViewModel(
     fun downloadPressed(item: RepoRvItem) = InstallModuleEvent(item.item).publish()
 
     fun refresh() {
-        state = State.LOADING
-        Utils.loadModules(true)
-        UpdateRepos().exec(true)
-    }
+        val updateInstalled = moduleRepo.fetchInstalledModules()
+            .flattenAsFlowable { it }
+            .map { ModuleRvItem(it) }
+            .toList()
+            .map { it to itemsInstalled.calculateDiff(it) }
+            .doOnSuccessUi { itemsInstalled.update(it.first, it.second) }
 
-    private fun updateModules(result: Map<String, Module>) = result.values
-        .map { ModuleRvItem(it) }
-        .let { itemsInstalled.update(it) }
+        val updateRemote = moduleRepo.fetchModules()
 
-    internal fun updateRepos() {
-        Single.fromCallable { repoDatabase.repoCursor.toList { Repo(it) } }
+        zip(updateInstalled, updateRemote) { _, remote -> remote }
             .flattenAsFlowable { it }
             .map { RepoRvItem(it) }
             .toList()
@@ -89,7 +73,6 @@ class ModuleViewModel(
             .flatMap { queryRaw() }
             .applyViewModel(this)
             .subscribeK { itemsRemote.update(it.first, it.second) }
-            .add()
     }
 
     private fun query() = queryRaw()

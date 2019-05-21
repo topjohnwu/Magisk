@@ -2,22 +2,28 @@ package com.topjohnwu.magisk.ui.home
 
 import android.content.Context
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
+import com.skoumal.teanity.extensions.doOnSubscribeUi
+import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
-import com.topjohnwu.magisk.tasks.CheckUpdates
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.net.Networking
+import com.topjohnwu.magisk.utils.ISafetyNetHelper
+import com.topjohnwu.magisk.utils.toggle
 import com.topjohnwu.superuser.Shell
 
 
 class HomeViewModel(
-    private val context: Context
+    private val context: Context,
+    private val magiskRepo: MagiskRepository
 ) : MagiskViewModel() {
 
     val isAdvancedExpanded = KObservableField(false)
@@ -83,8 +89,6 @@ class HomeViewModel(
     private var shownDialog = false
 
     init {
-        Event.register(this)
-
         isForceEncryption.addOnPropertyChangedCallback {
             Config.keepEnc = it ?: return@addOnPropertyChangedCallback
         }
@@ -94,13 +98,6 @@ class HomeViewModel(
 
         refresh()
     }
-
-    override fun onEvent(event: Int) {
-        updateSelf()
-        ensureEnv()
-    }
-
-    override fun getListeningEvents(): IntArray = intArrayOf(Event.UPDATE_CHECK_DONE)
 
     fun paypalPressed() = OpenLinkEvent(Const.Url.PAYPAL_URL).publish()
     fun patreonPressed() = OpenLinkEvent(Const.Url.PATREON_URL).publish()
@@ -160,23 +157,29 @@ class HomeViewModel(
     }
 
     fun refresh() {
-        state = State.LOADING
-        magiskState.value = MagiskState.LOADING
-        managerState.value = MagiskState.LOADING
-        ctsState.value = SafetyNetState.IDLE
-        basicIntegrityState.value = SafetyNetState.IDLE
-        safetyNetTitle.value = R.string.safetyNet_check_text
-        Event.reset(this)
-        Config.remoteMagiskVersionString = null
-        Config.remoteMagiskVersionCode = -1
+        magiskRepo.fetchConfig()
+            .applyViewModel(this)
+            .doOnSubscribeUi {
+                magiskState.value = MagiskState.LOADING
+                managerState.value = MagiskState.LOADING
+                ctsState.value = SafetyNetState.IDLE
+                basicIntegrityState.value = SafetyNetState.IDLE
+                safetyNetTitle.value = R.string.safetyNet_check_text
+            }
+            .subscribeK {
+                it.app.let {
+                    Config.remoteManagerVersionCode = it.versionCode.toIntOrNull() ?: -1
+                    Config.remoteManagerVersionString = it.version
+                }
+                it.magisk.let {
+                    Config.remoteMagiskVersionCode = it.versionCode.toIntOrNull() ?: -1
+                    Config.remoteMagiskVersionString = it.version
+                }
+                updateSelf()
+                ensureEnv()
+            }
 
         hasRoot.value = Shell.rootAccess()
-
-        if (Networking.checkNetworkStatus(context)) {
-            CheckUpdates.check()
-        } else {
-            state = State.LOADING_FAILED
-        }
     }
 
     private fun updateSelf() {

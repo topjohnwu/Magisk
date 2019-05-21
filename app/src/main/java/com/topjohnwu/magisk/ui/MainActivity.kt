@@ -48,7 +48,7 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (!SplashActivity.DONE) {
-            startActivity(Intent(this, ClassMap.get<Any>(SplashActivity::class.java)))
+            startActivity(Intent(this, ClassMap[SplashActivity::class.java]))
             finish()
         }
 

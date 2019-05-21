@@ -4,22 +4,19 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
-import com.topjohnwu.magisk.data.database.MagiskDB
-import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
+import com.chibatching.kotpref.Kotpref
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.RootUtils
 import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
-import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -29,15 +26,14 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     lateinit var protectedContext: Context
 
-    @Deprecated("Use dependency injection")
-    val prefs: SharedPreferences by inject()
-    @Deprecated("Use dependency injection")
-    val DB: MagiskDB by inject()
-    @Deprecated("Use dependency injection")
-    val repoDB: RepoDatabaseHelper by inject()
-
     @Volatile
     private var foreground: Activity? = null
+
+    override fun onCreate() {
+        super.onCreate()
+
+        Kotpref.init(this)
+    }
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)

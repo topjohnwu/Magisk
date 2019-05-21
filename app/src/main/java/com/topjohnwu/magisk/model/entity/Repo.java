@@ -29,6 +29,11 @@ public class Repo extends BaseModule {
         mLastUpdate = new Date(p.readLong());
     }
 
+    public Repo(Repository repo) {
+        super(repo);
+        mLastUpdate = new Date(repo.getLastUpdate());
+    }
+
     public static final Parcelable.Creator<Repo> CREATOR = new Parcelable.Creator<Repo>() {
 
         @Override
@@ -49,7 +54,7 @@ public class Repo extends BaseModule {
     }
 
     public void update() throws IllegalRepoException {
-        String props[] = Utils.dlString(getPropUrl()).split("\\n");
+        String[] props = Utils.dlString(getPropUrl()).split("\\n");
         try {
             parseProps(props);
         } catch (NumberFormatException e) {

@@ -15,11 +15,11 @@ public class SuLogEntry {
     public boolean action;
     public Date date;
 
-    public SuLogEntry(Policy policy) {
-        fromUid = policy.uid;
-        packageName = policy.packageName;
-        appName = policy.appName;
-        action = policy.policy == Policy.ALLOW;
+    public SuLogEntry(MagiskPolicy policy) {
+        fromUid = policy.getUid();
+        packageName = policy.getPackageName();
+        appName = policy.getAppName();
+        action = policy.getPolicy() == Policy.ALLOW;
     }
 
     public SuLogEntry(ContentValues values) {
@@ -47,10 +47,10 @@ public class SuLogEntry {
     }
 
     public String getDateString() {
-        return DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.locale).format(date);
+        return DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.getLocale()).format(date);
     }
 
     public String getTimeString() {
-        return new SimpleDateFormat("h:mm a", LocaleManager.locale).format(date);
+        return new SimpleDateFormat("h:mm a", LocaleManager.getLocale()).format(date);
     }
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.os.postDelayed
 import com.topjohnwu.magisk.tasks.FlashZip
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
@@ -33,7 +32,7 @@ sealed class Flashing(
 
         override fun onResult(success: Boolean) {
             if (success) {
-                Utils.loadModules()
+                //Utils.loadModules()
             }
             super.onResult(success)
         }

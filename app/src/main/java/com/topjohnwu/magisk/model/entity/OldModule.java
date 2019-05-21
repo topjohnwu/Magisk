@@ -6,16 +6,33 @@ import android.os.Parcelable;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
-public class Module extends BaseModule {
+public class OldModule extends BaseModule {
 
-    private SuFile mRemoveFile, mDisableFile, mUpdateFile;
-    private boolean mEnable, mRemove, mUpdated;
+    public static final Parcelable.Creator<OldModule> CREATOR = new Creator<OldModule>() {
+        /* It won't be used at any place */
+        @Override
+        public OldModule createFromParcel(Parcel source) {
+            return null;
+        }
 
-    public Module(String path) {
+        @Override
+        public OldModule[] newArray(int size) {
+            return null;
+        }
+    };
+    private final SuFile mRemoveFile;
+    private final SuFile mDisableFile;
+    private final SuFile mUpdateFile;
+    private final boolean mUpdated;
+    private boolean mEnable;
+    private boolean mRemove;
+
+    public OldModule(String path) {
 
         try {
             parseProps(Shell.su("dos2unix <  " + path + "/module.prop").exec().getOut());
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
 
         mRemoveFile = new SuFile(path, "remove");
         mDisableFile = new SuFile(path, "disable");
@@ -34,19 +51,6 @@ public class Module extends BaseModule {
         mRemove = mRemoveFile.exists();
         mUpdated = mUpdateFile.exists();
     }
-
-    public static final Parcelable.Creator<Module> CREATOR = new Creator<Module>() {
-        /* It won't be used at any place */
-        @Override
-        public Module createFromParcel(Parcel source) {
-            return null;
-        }
-
-        @Override
-        public Module[] newArray(int size) {
-            return null;
-        }
-    };
 
     public void createDisableFile() {
         mEnable = !mDisableFile.createNewFile();

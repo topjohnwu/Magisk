@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
@@ -9,6 +10,7 @@ import android.content.pm.PackageManager.*
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.topjohnwu.magisk.App
+import java.io.File
 import java.io.FileNotFoundException
 
 val packageName: String
@@ -80,3 +82,22 @@ fun Context.rawResource(id: Int) = resources.openRawResource(id)
 
 fun Context.readUri(uri: Uri) = contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
 
+fun ApplicationInfo.findAppLabel(pm: PackageManager): String {
+    return pm.getApplicationLabel(this)?.toString().orEmpty()
+}
+
+fun Intent.startActivity(context: Context) = context.startActivity(this)
+
+fun File.provide(): Uri {
+    val context: Context by inject()
+    return FileProvider.getUriForFile(context, "com.topjohnwu.magisk.fileprovider", this)
+}
+
+fun File.mv(destination: File) {
+    inputStream().copyTo(destination)
+    deleteRecursively()
+}
+
+fun String.toFile() = File(this)
+
+fun Intent.chooser(title: String = "Pick an app") = Intent.createChooser(this, title)

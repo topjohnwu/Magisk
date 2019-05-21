@@ -6,17 +6,21 @@ import android.content.Intent
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.data.database.MagiskDB
+import com.topjohnwu.magisk.data.database.base.su
+import com.topjohnwu.magisk.data.repository.AppRepository
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.DownloadApp
 import com.topjohnwu.magisk.utils.RootUtils
 import com.topjohnwu.magisk.utils.SuLogger
+import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.magisk.utils.get
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 
 open class GeneralReceiver : BroadcastReceiver() {
+
+    private val appRepo: AppRepository by inject()
 
     companion object {
         const val REQUEST = "request"
@@ -32,7 +36,6 @@ open class GeneralReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent == null)
             return
-        val mDB: MagiskDB = get()
         var action: String? = intent.action ?: return
         when (action) {
             Intent.ACTION_REBOOT, Intent.ACTION_BOOT_COMPLETED -> {
@@ -47,7 +50,7 @@ open class GeneralReceiver : BroadcastReceiver() {
                 }
                 when (action) {
                     REQUEST -> {
-                        val i = Intent(context, ClassMap.get<Any>(SuRequestActivity::class.java))
+                        val i = Intent(context, ClassMap[SuRequestActivity::class.java])
                                 .setAction(action)
                                 .putExtra("socket", intent.getStringExtra("socket"))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -62,12 +65,12 @@ open class GeneralReceiver : BroadcastReceiver() {
             Intent.ACTION_PACKAGE_REPLACED ->
                 // This will only work pre-O
                 if (Config.get<Boolean>(Config.Key.SU_REAUTH)!!) {
-                    mDB.deletePolicy(getPkg(intent))
+                    appRepo.delete(getPkg(intent)).blockingGet()
                 }
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
                 val pkg = getPkg(intent)
-                mDB.deletePolicy(pkg)
-                Shell.su("magiskhide --rm $pkg").submit()
+                appRepo.delete(pkg).blockingGet()
+                "magiskhide --rm $pkg".su().blockingGet()
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
             Const.Key.BROADCAST_MANAGER_UPDATE -> {
