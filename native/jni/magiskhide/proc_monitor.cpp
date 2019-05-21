@@ -377,16 +377,18 @@ static bool check_pid(int pid) {
 }
 
 static void new_zygote(int pid) {
-	if (zygote_map.count(pid))
-		return;
-
-	LOGD("proc_monitor: ptrace zygote PID=[%d]\n", pid);
-
 	struct stat st;
 	if (read_ns(pid, &st))
 		return;
+
+	auto it = zygote_map.find(pid);
+	if (it != zygote_map.end()) {
+		if (it->second.st_ino != st.st_ino) zygote_map[pid] = st;
+		return;
+	}
 	zygote_map[pid] = st;
 
+	LOGD("proc_monitor: ptrace zygote PID=[%d]\n", pid);
 	xptrace(PTRACE_ATTACH, pid);
 
 	waitpid(pid, nullptr, __WALL | __WNOTHREAD);
