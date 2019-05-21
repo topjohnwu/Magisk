@@ -158,7 +158,21 @@ class RootUtils : Shell.Initializer() {
 
         @JvmStatic
         fun reboot() {
-            Shell.su("/system/bin/reboot ${if (Config.recovery) "recovery" else ""}").submit()
+            reboot(if (Config.recovery) "recovery" else "")
+        }
+
+        @JvmStatic
+        fun reboot(reason: String) {
+            Shell.su("service call power ${getRebootTransactionCode()} i32 1 s16 $reason i32 0").submit()
+        } 
+
+        private fun getRebootTransactionCode(): Int {
+            // Get the transaction code for the reboot method in PowerManager.
+            // Warning: Hidden-api usage.
+            val clz = java.lang.Class.forName("android.os.IPowerManager\$Stub")
+            val field = clz.getDeclaredField("TRANSACTION_reboot")
+            field.setAccessible(true)
+            return field.getInt(null)
         }
     }
 }
