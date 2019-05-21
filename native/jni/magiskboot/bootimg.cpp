@@ -90,10 +90,6 @@ int boot_img::parse_file(const char *image) {
 		case AOSP:
 			return parse_image(head);
 
-		/* Unsupported */
-		case ELF32:
-		case ELF64:
-			exit(UNSUPP_RET);
 		default:
 			break;
 		}
