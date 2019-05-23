@@ -25,6 +25,9 @@ class PolicyDao(
             and {
                 lessThan("until", nowSeconds.toString())
             }
+            or {
+                lessThan("until", "0")
+            }
         }
     }.ignoreElement()
 
