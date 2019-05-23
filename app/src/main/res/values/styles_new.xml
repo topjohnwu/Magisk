@@ -35,11 +35,7 @@
     <style name="MagiskTheme.SUFoundation" parent="Theme.MaterialComponents.Light.Dialog" />
 
     <style name="MagiskTheme.SU" parent="MagiskTheme.SUFoundation">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
-        <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
