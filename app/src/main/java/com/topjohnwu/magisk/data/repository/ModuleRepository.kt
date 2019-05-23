@@ -59,6 +59,8 @@ class ModuleRepository(
         .fetchModuleInstaller()
         .map { it.writeToFile(context, FILE_MODULE_INSTALLER_SH) }
 
+    fun deleteAllCached() = repoDao.deleteAll()
+
 
     private fun fetchProperties(module: String, lastChanged: Long) = apiRaw
         .fetchFile(module, "module.prop")

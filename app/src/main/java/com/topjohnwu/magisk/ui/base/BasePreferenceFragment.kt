@@ -13,6 +13,7 @@ import androidx.preference.*
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.data.repository.ModuleRepository
 import com.topjohnwu.magisk.data.repository.SettingRepository
 import org.koin.android.ext.android.inject
 
@@ -22,6 +23,7 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
     protected val prefs: SharedPreferences by inject()
     protected val app: App by inject()
     protected val settingRepo: SettingRepository by inject()
+    protected val moduleRepo: ModuleRepository by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater,

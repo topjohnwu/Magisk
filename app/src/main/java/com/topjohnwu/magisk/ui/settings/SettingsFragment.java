@@ -106,9 +106,9 @@ public final class SettingsFragment extends BasePreferenceFragment {
             return true;
         });
         Preference clear = findPreference("clear");
-        clear.setEnabled(false); // temporarily disable clearing cache as repos are not cached atm
         clear.setOnPreferenceClickListener(pref -> {
             getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
+            getModuleRepo().deleteAllCached();
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
         });
