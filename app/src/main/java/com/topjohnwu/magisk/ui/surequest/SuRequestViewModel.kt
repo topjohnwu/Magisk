@@ -10,6 +10,7 @@ import android.hardware.fingerprint.FingerprintManager
 import android.os.CountDownTimer
 import android.text.TextUtils
 import com.skoumal.teanity.databinding.ComparableRvItem
+import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
@@ -25,7 +26,9 @@ import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.FingerprintHelper
 import com.topjohnwu.magisk.utils.SuConnector
 import com.topjohnwu.magisk.utils.now
+import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
 import me.tatarka.bindingcollectionadapter2.ItemBinding
+import timber.log.Timber
 import java.io.IOException
 import java.util.concurrent.TimeUnit.*
 
@@ -46,9 +49,14 @@ class SuRequestViewModel(
     val canUseFingerprint = KObservableField(FingerprintHelper.useFingerprint())
     val selectedItemPosition = KObservableField(0)
 
-    val items = DiffObservableList(ComparableRvItem.callback)
-    val itemBinding = ItemBinding.of<ComparableRvItem<*>> { binding, _, item ->
+    private val items = DiffObservableList(ComparableRvItem.callback)
+    private val itemBinding = ItemBinding.of<ComparableRvItem<*>> { binding, _, item ->
         item.bind(binding)
+    }
+
+    val adapter = BindingListViewAdapter<ComparableRvItem<*>>(1).apply {
+        itemBinding = this@SuRequestViewModel.itemBinding
+        setItems(items)
     }
 
 
@@ -64,6 +72,10 @@ class SuRequestViewModel(
         resources.getStringArray(R.array.allow_timeout)
             .map { SpinnerRvItem(it) }
             .let { items.update(it) }
+
+        selectedItemPosition.addOnPropertyChangedCallback {
+            Timber.e("Changed position to $it")
+        }
     }
 
     private fun updatePolicy(policy: MagiskPolicy?) {
@@ -96,7 +108,7 @@ class SuRequestViewModel(
         return false
     }
 
-    fun handleRequest(intent: Intent, createUICallback: () -> Unit): Boolean {
+    fun handleRequest(intent: Intent): Boolean {
         val socketName = intent.getStringExtra("socket") ?: return false
 
         val connector: SuConnector
@@ -126,9 +138,10 @@ class SuRequestViewModel(
                 done()
             }
 
+            @SuppressLint("ApplySharedPref")
             override fun handleAction(action: Int) {
                 val pos = selectedItemPosition.value
-                timeoutPrefs.edit().putInt(policy?.packageName, pos).apply()
+                timeoutPrefs.edit().putInt(policy?.packageName, pos).commit()
                 handleAction(action, Config.Value.TIMEOUT_LIST[pos])
             }
 
@@ -160,7 +173,7 @@ class SuRequestViewModel(
             return true
         }
 
-        when (Config.get<Any>(Config.Key.SU_AUTO_RESPONSE) as Int) {
+        when (Config.get<Int>(Config.Key.SU_AUTO_RESPONSE)) {
             Config.Value.SU_AUTO_DENY -> {
                 handler?.handleAction(Policy.DENY, 0)
                 return true
@@ -171,7 +184,6 @@ class SuRequestViewModel(
             }
         }
 
-        createUICallback()
         showUI()
         return true
     }

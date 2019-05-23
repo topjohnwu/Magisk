@@ -33,7 +33,7 @@ open class SuRequestActivity : MagiskActivity<SuRequestViewModel, ActivityReques
         val action = intent.action
 
         if (TextUtils.equals(action, GeneralReceiver.REQUEST)) {
-            if (!viewModel.handleRequest(intent) {})
+            if (!viewModel.handleRequest(intent))
                 finish()
             return
         }

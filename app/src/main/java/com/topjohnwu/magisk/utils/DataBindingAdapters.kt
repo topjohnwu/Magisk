@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.utils
 
 import android.view.View
-import android.widget.AdapterView
-import android.widget.Spinner
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
@@ -115,7 +113,7 @@ fun setMovieBehavior(view: TextView, isMovieBehavior: Boolean, text: String) {
     }
 }
 
-@BindingAdapter("android:selectedItemPosition")
+/*@BindingAdapter("selection"*//*, "selectionAttrChanged", "adapter"*//*)
 fun setSelectedItemPosition(view: Spinner, position: Int) {
     view.setSelection(position)
 }
@@ -126,7 +124,7 @@ fun setSelectedItemPosition(view: Spinner, position: Int) {
 )
 fun getSelectedItemPosition(view: Spinner) = view.selectedItemPosition
 
-@BindingAdapter("android:selectedItemPositionAttrChanged")
+@BindingAdapter("selectedItemPositionAttrChanged")
 fun setSelectedItemPositionListener(view: Spinner, listener: InverseBindingListener) {
     view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -137,7 +135,7 @@ fun setSelectedItemPositionListener(view: Spinner, listener: InverseBindingListe
             listener.onChange()
         }
     }
-}
+}*/
 
 @BindingAdapter("onTouch")
 fun setOnTouchListener(view: View, listener: View.OnTouchListener) {

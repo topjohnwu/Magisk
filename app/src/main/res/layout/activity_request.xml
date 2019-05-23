@@ -89,15 +89,12 @@
 
         <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/timeout"
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{viewModel.items}"
             onTouch="@{() -> viewModel.spinnerTouched()}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:selectedItemPosition="@={viewModel.selectedItemPosition}" />
-        itemDropDownLayout="@{android.R.layout.simple_spinner_dropdown_item}"
-        android:onClick="@{() -> viewModel.spinnerPressed()}"
+            android:adapter="@{viewModel.adapter}"
+            android:selection="@={viewModel.selectedItemPosition}" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/warning"
