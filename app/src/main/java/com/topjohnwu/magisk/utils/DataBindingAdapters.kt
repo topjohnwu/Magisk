@@ -155,8 +155,6 @@ fun setScrollToLast(view: RecyclerView, shouldScrollToLast: Boolean) {
         Observable.timer(1, TimeUnit.SECONDS).subscribeK { callback() }
     }
 
-    val tag = RecyclerView::class.java.name.sumBy { it.toInt() }
-
     fun RecyclerView.Adapter<*>.setListener() {
         val observer = object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -164,11 +162,12 @@ fun setScrollToLast(view: RecyclerView, shouldScrollToLast: Boolean) {
             }
         }
         registerAdapterDataObserver(observer)
-        view.setTag(tag, observer)
+        view.setTag(R.id.recyclerScrollListener, observer)
     }
 
     fun RecyclerView.Adapter<*>.removeListener() {
-        val observer = view.getTag(tag) as? RecyclerView.AdapterDataObserver ?: return
+        val observer =
+            view.getTag(R.id.recyclerScrollListener) as? RecyclerView.AdapterDataObserver ?: return
         unregisterAdapterDataObserver(observer)
     }
 
