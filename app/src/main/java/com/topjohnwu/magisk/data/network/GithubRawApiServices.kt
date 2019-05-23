@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.data.network
 
 import com.topjohnwu.magisk.Constants
+import com.topjohnwu.magisk.KConfig
 import com.topjohnwu.magisk.model.entity.MagiskConfig
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -25,6 +26,9 @@ interface GithubRawApiServices {
 
     @GET("$MAGISK_FILES/master/canary_builds/canary.json")
     fun fetchCanaryDebugConfig(): Single<MagiskConfig>
+
+    @GET
+    fun fetchCustomConfig(@Url url: String): Single<MagiskConfig>
 
     @GET("$MAGISK_FILES/{$REVISION}/snet.apk")
     @Streaming
@@ -67,7 +71,7 @@ interface GithubRawApiServices {
         private const val FILE = "file"
 
 
-        private const val MAGISK_FILES = "topjohnwu/magisk_files"
+        private const val MAGISK_FILES = KConfig.DEFAULT_CHANNEL
         private const val MAGISK_MASTER = "topjohnwu/Magisk/master"
         private const val MAGISK_MODULES = "Magisk-Modules-Repo"
     }

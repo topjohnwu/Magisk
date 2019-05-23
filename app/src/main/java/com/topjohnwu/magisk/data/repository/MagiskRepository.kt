@@ -24,12 +24,6 @@ class MagiskRepository(
     private val packageManager: PackageManager
 ) {
 
-    private val config = apiRaw.fetchConfig()
-    private val configBeta = apiRaw.fetchBetaConfig()
-    private val configCanary = apiRaw.fetchCanaryConfig()
-    private val configCanaryDebug = apiRaw.fetchCanaryDebugConfig()
-
-
     fun fetchMagisk() = fetchConfig()
         .flatMap { apiRaw.fetchFile(it.magisk.link) }
         .map { it.writeToFile(context, FILE_MAGISK_ZIP) }
@@ -52,10 +46,11 @@ class MagiskRepository(
 
 
     fun fetchConfig() = when (KConfig.updateChannel) {
-        KConfig.UpdateChannel.STABLE -> config
-        KConfig.UpdateChannel.BETA -> configBeta
-        KConfig.UpdateChannel.CANARY -> configCanary
-        KConfig.UpdateChannel.CANARY_DEBUG -> configCanaryDebug
+        KConfig.UpdateChannel.STABLE -> apiRaw.fetchConfig()
+        KConfig.UpdateChannel.BETA -> apiRaw.fetchBetaConfig()
+        KConfig.UpdateChannel.CANARY -> apiRaw.fetchCanaryConfig()
+        KConfig.UpdateChannel.CANARY_DEBUG -> apiRaw.fetchCanaryDebugConfig()
+        KConfig.UpdateChannel.CUSTOM -> apiRaw.fetchCustomConfig(KConfig.customUpdateChannel)
     }
 
 

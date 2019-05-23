@@ -1,36 +1,44 @@
 package com.topjohnwu.magisk
 
-import androidx.appcompat.app.AppCompatDelegate
+import com.chibatching.kotpref.ContextProvider
 import com.chibatching.kotpref.KotprefModel
-import com.topjohnwu.magisk.KConfig.UpdateChannel.*
+import com.topjohnwu.magisk.KConfig.UpdateChannel.STABLE
+import com.topjohnwu.magisk.utils.get
 
-object KConfig : KotprefModel() {
+object KConfig : KotprefModel(get<ContextProvider>()) {
     override val kotprefName: String = "${context.packageName}_preferences"
 
-    var darkMode by intPref(default = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM, key = "darkMode")
-    var magiskChecksum by stringPref("", "magiskChecksum")
-    var forceEncrypt by booleanPref(false, "forceEncryption")
-    var keepVerity by booleanPref(false, "keepVerity")
-    var bootFormat by stringPref("img", "bootFormat")
-    var suLogTimeout by longPref(0, "suLogTimeout")
-    private var internalUpdateChannel by stringPref(
-        KConfig.UpdateChannel.STABLE.toString(),
-        "updateChannel"
-    )
+    private var internalUpdateChannel by intPref(STABLE.id, "updateChannel")
     var useCustomTabs by booleanPref(true, "useCustomTabs")
+    @JvmStatic
+    var customUpdateChannel by stringPref("", "custom_channel")
 
+    @JvmStatic
     var updateChannel: UpdateChannel
-        get() = valueOf(internalUpdateChannel)
+        get() = UpdateChannel.byId(internalUpdateChannel)
         set(value) {
-            internalUpdateChannel = value.toString()
+            internalUpdateChannel = value.id
         }
 
-    val isStable get() = !(isCanary || isBeta)
-    val isCanary get() = updateChannel == CANARY || updateChannel == CANARY_DEBUG
-    val isBeta get() = updateChannel == BETA
+    internal const val DEFAULT_CHANNEL = "topjohnwu/magisk_files"
 
+    enum class UpdateChannel(val id: Int) {
 
-    enum class UpdateChannel {
-        STABLE, BETA, CANARY, CANARY_DEBUG
+        STABLE(Config.Value.STABLE_CHANNEL),
+        BETA(Config.Value.BETA_CHANNEL),
+        CANARY(Config.Value.CANARY_CHANNEL),
+        CANARY_DEBUG(Config.Value.CANARY_DEBUG_CHANNEL),
+        CUSTOM(Config.Value.CUSTOM_CHANNEL);
+
+        companion object {
+            fun byId(id: Int) = when (id) {
+                Config.Value.STABLE_CHANNEL -> STABLE
+                Config.Value.BETA_CHANNEL -> BETA
+                Config.Value.CUSTOM_CHANNEL -> CUSTOM
+                Config.Value.CANARY_CHANNEL -> CANARY
+                Config.Value.CANARY_DEBUG_CHANNEL -> CANARY_DEBUG
+                else -> STABLE
+            }
+        }
     }
 }

@@ -12,6 +12,8 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.KConfig;
+import com.topjohnwu.magisk.KConfig.UpdateChannel;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment;
 import com.topjohnwu.magisk.utils.DownloadApp;
@@ -130,21 +132,23 @@ public final class SettingsFragment extends BasePreferenceFragment {
         SwitchPreferenceCompat fingerprint = (SwitchPreferenceCompat) findPreference(Config.Key.SU_FINGERPRINT);
 
         updateChannel.setOnPreferenceChangeListener((p, o) -> {
-            int prev = Config.get(Config.Key.UPDATE_CHANNEL);
             int channel = Integer.parseInt((String) o);
-            if (channel == Config.Value.CUSTOM_CHANNEL) {
+
+            final UpdateChannel previousUpdateChannel = KConfig.getUpdateChannel();
+            final UpdateChannel updateChannel = getChannelCompat(channel);
+
+            KConfig.setUpdateChannel(updateChannel);
+
+            if (updateChannel == UpdateChannel.CUSTOM) {
                 View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                 EditText url = v.findViewById(R.id.custom_url);
-                url.setText(getPrefs().getString(Config.Key.CUSTOM_CHANNEL, ""));
+                url.setText(KConfig.getCustomUpdateChannel());
                 new AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
-                        .setPositiveButton(R.string.ok, (d, i) ->
-                                Config.set(Config.Key.CUSTOM_CHANNEL, url.getText().toString()))
-                        .setNegativeButton(R.string.close, (d, i) ->
-                                Config.set(Config.Key.UPDATE_CHANNEL, prev))
-                        .setOnCancelListener(d ->
-                                Config.set(Config.Key.UPDATE_CHANNEL, prev))
+                        .setPositiveButton(R.string.ok, (d, i) -> setCustomUpdateChannel(url.getText().toString()))
+                        .setNegativeButton(R.string.close, (d, i) -> KConfig.setUpdateChannel(previousUpdateChannel))
+                        .setOnCancelListener(d -> KConfig.setUpdateChannel(previousUpdateChannel))
                         .show();
             }
             return true;
