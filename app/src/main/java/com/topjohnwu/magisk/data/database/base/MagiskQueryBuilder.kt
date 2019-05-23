@@ -14,7 +14,9 @@ interface MagiskQueryBuilder {
             Builder::class.java.newInstance()
                 .apply(builder)
                 .toString()
-                .let { MagiskQuery(it) }
+                .let {
+                    MagiskQuery(it)
+                }
     }
 
 }
@@ -131,11 +133,11 @@ class Condition {
     }
 
     fun and(builder: Condition.() -> Unit) {
-        condition += " " + Condition().apply(builder).condition
+        condition = "($condition AND ${Condition().apply(builder).condition})"
     }
 
     fun or(builder: Condition.() -> Unit) {
-        condition += " " + Condition().apply(builder).condition
+        condition = "($condition OR ${Condition().apply(builder).condition})"
     }
 
     override fun toString(): String {
