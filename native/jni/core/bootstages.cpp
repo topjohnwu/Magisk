@@ -694,6 +694,14 @@ void late_start(int client) {
 			exec_command_sync("/system/bin/reboot");
 	}
 
+    if (access(BBPATH, F_OK) != 0){
+        LOGE("* post-fs-data mode is not triggered\n");
+        unlock_blocks();
+        magisk_env();
+        prepare_modules();
+        close(xopen(DISABLEFILE, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
+    }
+
 	auto_start_magiskhide();
 
 	// Run scripts after full patch, most reliable way to run scripts
