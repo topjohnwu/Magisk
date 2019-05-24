@@ -1,10 +1,12 @@
 package com.topjohnwu.magisk.model.entity
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.topjohnwu.magisk.utils.timeFormatStandard
 import com.topjohnwu.magisk.utils.toTime
 import timber.log.Timber
 
+@JsonClass(generateAdapter = true)
 data class GithubRepo(
     @Json(name = "name") val name: String,
     @Json(name = "updated_at") val updatedAt: String
