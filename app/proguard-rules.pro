@@ -35,6 +35,7 @@
 -keepclassmembers class com.topjohnwu.signing.BootSigner { *; }
 
 # Strip logging
+-assumenosideeffects class timber.log.Timber.Tree { *; }
 -assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
   public *** debug(...);
 }
