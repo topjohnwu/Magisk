@@ -74,7 +74,7 @@ dependencies {
     implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"
     implementation "com.github.topjohnwu.libsu:io:${libsuVersion}"
 
-    def koin = "2.0.0-rc-2"
+    def koin = "2.0.0-GA6"
     implementation "org.koin:koin-core:${koin}"
     implementation "org.koin:koin-android:${koin}"
     implementation "org.koin:koin-androidx-viewmodel:${koin}"
