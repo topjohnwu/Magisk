@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.content.Context
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.doOnSubscribeUi
 import com.skoumal.teanity.extensions.subscribeK
@@ -9,20 +8,18 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.*
-import com.topjohnwu.net.Networking
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
+import com.topjohnwu.magisk.utils.packageName
+import com.topjohnwu.magisk.utils.res
 import com.topjohnwu.magisk.utils.toggle
 import com.topjohnwu.superuser.Shell
 
 
 class HomeViewModel(
-    private val context: Context,
     private val magiskRepo: MagiskRepository
 ) : MagiskViewModel() {
 
