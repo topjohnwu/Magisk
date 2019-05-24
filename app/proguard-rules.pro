@@ -16,6 +16,11 @@
 #   public *;
 #}
 
+# Internal app data and IO helper constructors
+-keep class com.topjohnwu.magisk.model.entity.** { *; }
+-keep class com.topjohnwu.magisk.data.database.base.** { public <init>(...); }
+-keep class com.topjohnwu.magisk.data.network.** { public <init>(...); }
+
 # Snet
 -keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
 -keep,allowobfuscation interface com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback
