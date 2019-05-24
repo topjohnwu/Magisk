@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.writeToFile
 import com.topjohnwu.magisk.utils.writeToString
+import io.reactivex.Completable
 import io.reactivex.Single
 
 class ModuleRepository(
@@ -59,7 +60,7 @@ class ModuleRepository(
         .fetchModuleInstaller()
         .map { it.writeToFile(context, FILE_MODULE_INSTALLER_SH) }
 
-    fun deleteAllCached() = repoDao.deleteAll()
+    fun deleteAllCached() = Completable.fromCallable { repoDao.deleteAll() }
 
 
     private fun fetchProperties(module: String, lastChanged: Long) = apiRaw

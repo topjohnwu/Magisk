@@ -110,7 +110,9 @@ public final class SettingsFragment extends BasePreferenceFragment {
         Preference clear = findPreference("clear");
         clear.setOnPreferenceClickListener(pref -> {
             getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
-            getModuleRepo().deleteAllCached();
+            getModuleRepo().deleteAllCached().subscribeOn(Schedulers.io()).subscribe(() -> {
+            }, throwable -> {
+            });
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
         });
