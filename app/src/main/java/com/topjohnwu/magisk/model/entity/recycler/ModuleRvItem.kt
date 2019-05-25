@@ -50,8 +50,9 @@ class ModuleRvItem(val item: OldModule) : ComparableRvItem<ModuleRvItem>() {
     override fun contentSameAs(other: ModuleRvItem): Boolean = item.version == other.item.version
             && item.versionCode == other.item.versionCode
             && item.description == other.item.description
+            && item.name == other.item.name
 
-    override fun itemSameAs(other: ModuleRvItem): Boolean = item.name == other.item.name
+    override fun itemSameAs(other: ModuleRvItem): Boolean = item.id == other.item.id
 }
 
 class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
@@ -64,6 +65,7 @@ class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
             && item.lastUpdate == other.item.lastUpdate
             && item.versionCode == other.item.versionCode
             && item.description == other.item.description
+            && item.detailUrl == other.item.detailUrl
 
-    override fun itemSameAs(other: RepoRvItem): Boolean = item.detailUrl == other.item.detailUrl
+    override fun itemSameAs(other: RepoRvItem): Boolean = item.id == other.item.id
 }

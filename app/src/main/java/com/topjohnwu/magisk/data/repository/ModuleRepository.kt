@@ -35,6 +35,9 @@ class ModuleRepository(
                 }.getOrNull()
             }
         }
+        //either github apparently returns repos incorrectly or ...
+        //either ways this fixes duplicates
+        .map { it.distinctBy { it.id } }
         .doOnSuccess { repoDao.insert(it) }
 
     private fun fetchCachedOrdered() = Single.fromCallable {
