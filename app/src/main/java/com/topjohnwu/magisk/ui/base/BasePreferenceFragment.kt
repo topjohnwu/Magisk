@@ -73,6 +73,7 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
 
     protected fun getChannelCompat(channel: Int): KConfig.UpdateChannel {
         return when (channel) {
+            Config.Value.STABLE_CHANNEL,
             Config.Value.DEFAULT_CHANNEL -> KConfig.UpdateChannel.STABLE
             Config.Value.BETA_CHANNEL -> KConfig.UpdateChannel.BETA
             Config.Value.CANARY_CHANNEL -> KConfig.UpdateChannel.CANARY
