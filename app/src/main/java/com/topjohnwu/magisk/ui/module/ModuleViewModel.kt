@@ -48,14 +48,14 @@ class ModuleViewModel(
             queryDisposable?.dispose()
             queryDisposable = query()
         }
-        refresh()
+        refresh(false)
     }
 
     fun fabPressed() = OpenFilePickerEvent().publish()
     fun repoPressed(item: RepoRvItem) = OpenChangelogEvent(item.item).publish()
     fun downloadPressed(item: RepoRvItem) = InstallModuleEvent(item.item).publish()
 
-    fun refresh() {
+    fun refresh(forceReload: Boolean) {
         val updateInstalled = moduleRepo.fetchInstalledModules()
             .flattenAsFlowable { it }
             .map { ModuleRvItem(it) }
@@ -63,7 +63,7 @@ class ModuleViewModel(
             .map { it to itemsInstalled.calculateDiff(it) }
             .doOnSuccessUi { itemsInstalled.update(it.first, it.second) }
 
-        val updateRemote = moduleRepo.fetchModules()
+        val updateRemote = moduleRepo.fetchModules(forceReload)
 
         zip(updateInstalled, updateRemote) { _, remote -> remote }
             .flattenAsFlowable { it }

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.data.repository
 
 import android.content.Context
-import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.data.database.RepositoryDao
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawApiServices
@@ -23,9 +22,9 @@ class ModuleRepository(
     private val repoDao: RepositoryDao
 ) {
 
-    fun fetchModules() = Single.fromCallable { repoDao.fetchAll() }
-        .flatMap { if (it.isEmpty()) fetchRemoteRepos() else it.toSingle() }
-        .doOnSuccess { fetchRemoteRepos().subscribeK() } // cache changed for next time or next hot reload
+    fun fetchModules(force: Boolean = false) =
+        if (force) fetchRemoteRepos() else Single.fromCallable { repoDao.fetchAll() }
+            .flatMap { if (it.isEmpty()) fetchRemoteRepos() else it.toSingle() }
 
     private fun fetchRemoteRepos() = fetchAllRepos()
         .map {

@@ -56,7 +56,7 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
                     Config.get<Int>(Config.Key.REPO_ORDER)!!
                 ) { d, which ->
                     Config.set(Config.Key.REPO_ORDER, which)
-                    viewModel.refresh()
+                    viewModel.refresh(false)
                     d.dismiss()
                 }.show()
         }
