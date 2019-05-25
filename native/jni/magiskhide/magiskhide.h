@@ -25,6 +25,7 @@ int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
+[[noreturn]] void test_proc_monitor();
 
 // Process monitoring
 void proc_monitor();

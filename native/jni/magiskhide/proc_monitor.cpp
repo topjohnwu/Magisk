@@ -1,12 +1,3 @@
-/* proc_monitor.cpp - Monitor am_proc_start events and unmount
- *
- * We monitor the listed APK files from /data/app until they get opened
- * via inotify to detect a new app launch.
- *
- * If it's a target we pause it ASAP, and fork a new process to join
- * its mount namespace and do all the unmounting/mocking.
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -188,9 +179,6 @@ static void setup_inotify() {
 	} else {
 		inotify_add_watch(inotify_fd, APP_PROC, IN_ACCESS);
 	}
-
-	// First find existing zygotes
-	check_zygote();
 }
 
 /*************************
@@ -291,12 +279,12 @@ static void term_thread(int) {
  * Ptrace Madness
  ******************/
 
-/* Ptrace is super tricky, preserve all excessive debug in code
+/* Ptrace is super tricky, preserve all excessive logging in code
  * but disable when actually building for usage (you won't want
  * your logcat spammed with new thread events from all apps) */
 
-//#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
-#define PTRACE_LOG(...)
+#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
+//#define PTRACE_LOG(...)
 
 static void detach_pid(int pid, int signal = 0) {
 	char path[128];
@@ -371,7 +359,7 @@ static bool check_pid(int pid) {
 			}
 		}
 	}
-	PTRACE_LOG("not our target\n");
+	PTRACE_LOG("[%s] not our target\n", cmdline);
 	detach_pid(pid);
 	return true;
 }
@@ -413,6 +401,9 @@ void proc_monitor() {
 	sigaction(SIGIO, &act, nullptr);
 
 	setup_inotify();
+
+	// First find existing zygotes
+	check_zygote();
 
 	int status;
 

@@ -328,3 +328,10 @@ void auto_start_magiskhide() {
 		});
 	}
 }
+
+void test_proc_monitor() {
+	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
+		exit(1);
+	proc_monitor();
+	exit(0);
+}

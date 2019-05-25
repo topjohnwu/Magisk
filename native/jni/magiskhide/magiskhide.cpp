@@ -13,6 +13,8 @@
 
 #include "magiskhide.h"
 
+using namespace std::literals;
+
 bool hide_enabled = false;
 
 [[noreturn]] static void usage(char *arg0) {
@@ -26,6 +28,7 @@ bool hide_enabled = false;
 		"  --add PKG [PROC]  Add a new target to the hide list\n"
 		"  --rm PKG [PROC]   Remove from the hide list\n"
 		"  --ls              List the current hide list\n"
+		"  --test            Run process monitor test\n"
 		, arg0);
 	exit(1);
 }
@@ -77,18 +80,20 @@ int magiskhide_main(int argc, char *argv[]) {
 		usage(argv[0]);
 
 	int req;
-	if (strcmp(argv[1], "--enable") == 0)
+	if (argv[1] == "--enable"sv)
 		req = LAUNCH_MAGISKHIDE;
-	else if (strcmp(argv[1], "--disable") == 0)
+	else if (argv[1] == "--disable"sv)
 		req = STOP_MAGISKHIDE;
-	else if (strcmp(argv[1], "--add") == 0 && argc > 2)
+	else if (argv[1] == "--add"sv)
 		req = ADD_HIDELIST;
-	else if (strcmp(argv[1], "--rm") == 0 && argc > 2)
+	else if (argv[1] == "--rm"sv)
 		req = RM_HIDELIST;
-	else if (strcmp(argv[1], "--ls") == 0)
+	else if (argv[1] == "--ls"sv)
 		req = LS_HIDELIST;
-	else if (strcmp(argv[1], "--status") == 0)
+	else if (argv[1] == "--status"sv)
 		req = HIDE_STATUS;
+	else if (argv[1] == "--test"sv)
+		test_proc_monitor();
 	else
 		usage(argv[0]);
 
