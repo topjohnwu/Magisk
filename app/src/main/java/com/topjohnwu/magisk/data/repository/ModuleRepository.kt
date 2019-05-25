@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.data.repository
 
 import android.content.Context
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.data.database.RepositoryDao
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawApiServices
@@ -23,7 +24,7 @@ class ModuleRepository(
 ) {
 
     fun fetchModules(force: Boolean = false) =
-        if (force) fetchRemoteRepos() else Single.fromCallable { repoDao.fetchAll() }
+        if (force) fetchRemoteRepos() else fetchCachedOrdered()
             .flatMap { if (it.isEmpty()) fetchRemoteRepos() else it.toSingle() }
 
     private fun fetchRemoteRepos() = fetchAllRepos()
@@ -35,6 +36,14 @@ class ModuleRepository(
             }
         }
         .doOnSuccess { repoDao.insert(it) }
+
+    private fun fetchCachedOrdered() = Single.fromCallable {
+        when (Config.get<Int>(Config.Key.REPO_ORDER)) {
+            Config.Value.ORDER_DATE -> repoDao.fetchAll()
+            Config.Value.ORDER_NAME -> repoDao.fetchAllOrderByName()
+            else -> repoDao.fetchAll()
+        }
+    }
 
     fun fetchInstalledModules() = Single.fromCallable { Utils.loadModulesLeanback() }
         .map { it.values.toList() }

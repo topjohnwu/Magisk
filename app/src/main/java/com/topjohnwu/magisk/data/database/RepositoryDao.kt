@@ -13,7 +13,10 @@ interface RepositoryDao : BaseDao<Repository> {
     @Transaction
     override fun deleteAll()
 
-    @Query("SELECT * FROM repos")
+    @Query("SELECT * FROM repos ORDER BY lastUpdate DESC")
     override fun fetchAll(): List<Repository>
+
+    @Query("SELECT * FROM repos ORDER BY name ASC")
+    fun fetchAllOrderByName(): List<Repository>
 
 }
