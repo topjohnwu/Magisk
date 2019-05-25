@@ -116,6 +116,8 @@ public class Utils {
         if (Config.get(Config.Key.CHECK_UPDATES)) {
             Constraints constraints = new Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
+                    //ensures that notification doesn't pop up every time user starts the app
+                    .setRequiresDeviceIdle(true)
                     .build();
             Class<? extends ListenableWorker> service = (Class<? extends ListenableWorker>) ClassMap.get(UpdateCheckService.class);
             PeriodicWorkRequest request = new PeriodicWorkRequest
