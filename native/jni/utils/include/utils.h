@@ -208,6 +208,7 @@ int parse_int(S __s) { return parse_int(__s.data()); }
 
 int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
 		const pthread_attr_t *attr = nullptr);
+int new_daemon_thread(std::function<void()> &&fn);
 
 struct exec_t {
 	bool err = false;

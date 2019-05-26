@@ -200,6 +200,17 @@ int new_daemon_thread(void *(*start_routine) (void *), void *arg, const pthread_
 	return ret;
 }
 
+static void *proxy_routine(void *fp) {
+	auto fn = reinterpret_cast<std::function<void()>*>(fp);
+	(*fn)();
+	delete fn;
+	return nullptr;
+}
+
+int new_daemon_thread(std::function<void()> &&fn) {
+	return new_daemon_thread(proxy_routine, new std::function<void()>(std::move(fn)));
+}
+
 static char *argv0;
 static size_t name_len;
 void init_argv0(int argc, char **argv) {
