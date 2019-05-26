@@ -280,8 +280,8 @@ static void term_thread(int) {
  * but disable when actually building for usage (you won't want
  * your logcat spammed with new thread events from all apps) */
 
-#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
-//#define PTRACE_LOG(...)
+//#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
+#define PTRACE_LOG(...)
 
 static void detach_pid(int pid, int signal = 0) {
 	char path[128];
