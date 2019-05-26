@@ -362,14 +362,18 @@ static bool check_pid(int pid) {
 }
 
 static void new_zygote(int pid) {
-	if (zygote_map.count(pid))
-		return;
-
-	LOGD("proc_monitor: ptrace zygote PID=[%d]\n", pid);
-
 	struct stat st;
 	if (read_ns(pid, &st))
 		return;
+
+	auto it = zygote_map.find(pid);
+	if (it != zygote_map.end()) {
+		// Update namespace info
+		it->second = st;
+		return;
+	}
+
+	LOGD("proc_monitor: ptrace zygote PID=[%d]\n", pid);
 	zygote_map[pid] = st;
 
 	xptrace(PTRACE_ATTACH, pid);
