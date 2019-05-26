@@ -38,7 +38,6 @@ void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
 // Hide policies
 void hide_daemon(int pid);
 void hide_sensitive_props();
-void manage_selinux();
 
 extern bool hide_enabled;
 extern pthread_mutex_t monitor_lock;

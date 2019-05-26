@@ -19,18 +19,6 @@ static const char *prop_value[] =
 		  "enforcing", "0", "0", "0",
 		  "1", "user", "release-keys", "0", nullptr };
 
-void manage_selinux() {
-	char val;
-	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
-	xxread(fd, &val, sizeof(val));
-	close(fd);
-	// Permissive
-	if (val == '0') {
-		chmod(SELINUX_ENFORCE, 0640);
-		chmod(SELINUX_POLICY, 0440);
-	}
-}
-
 void hide_sensitive_props() {
 	LOGI("hide_policy: Hiding sensitive props\n");
 
@@ -40,13 +28,6 @@ void hide_sensitive_props() {
 		if (!value.empty() && value != prop_value[i])
 			setprop(prop_key[i], prop_value[i], false);
 	}
-}
-
-static inline void clean_magisk_props() {
-	getprop([](const char *name, auto, auto) -> void {
-		if (strstr(name, "magisk"))
-			deleteprop(name);
-	}, nullptr, false);
 }
 
 static inline void lazy_unmount(const char* mountpoint) {
@@ -65,8 +46,21 @@ void hide_daemon(int pid) {
 		return;
 
 	LOGD("hide_policy: handling PID=[%d]\n", pid);
-	manage_selinux();
-	clean_magisk_props();
+
+	char val;
+	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
+	xxread(fd, &val, sizeof(val));
+	close(fd);
+	// Permissive
+	if (val == '0') {
+		chmod(SELINUX_ENFORCE, 0640);
+		chmod(SELINUX_POLICY, 0440);
+	}
+
+	getprop([](const char *name, auto, auto) -> void {
+		if (strstr(name, "magisk"))
+			deleteprop(name);
+	}, nullptr, false);
 
 	vector<string> targets;
 
