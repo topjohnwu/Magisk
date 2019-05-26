@@ -20,16 +20,16 @@ bool hide_enabled = false;
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
 		FULL_VER(MagiskHide) "\n\n"
-		"Usage: %s [--option [arguments...] ]\n\n"
-		"Options:\n"
-  		"  --status          Return the status of magiskhide\n"
-		"  --enable          Start magiskhide\n"
-		"  --disable         Stop magiskhide\n"
-		"  --add PKG [PROC]  Add a new target to the hide list\n"
-		"  --rm PKG [PROC]   Remove from the hide list\n"
-		"  --ls              List the current hide list\n"
+		"Usage: %s [action [arguments...] ]\n\n"
+		"Actions:\n"
+  		"   status          Return the status of magiskhide\n"
+		"   enable          Start magiskhide\n"
+		"   disable         Stop magiskhide\n"
+		"   add PKG [PROC]  Add a new target to the hide list\n"
+		"   rm PKG [PROC]   Remove target(s) from the hide list\n"
+		"   ls              Print the current hide list\n"
 #ifdef MAGISK_DEBUG
-		"  --test            Run process monitor test\n"
+		"   test            Run process monitor test\n"
 #endif
 		, arg0);
 	exit(1);
@@ -81,21 +81,26 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (argc < 2)
 		usage(argv[0]);
 
+	// CLI backwards compatibility
+	const char *opt = argv[1];
+	if (opt[0] == '-' && opt[1] == '-')
+		opt += 2;
+
 	int req;
-	if (argv[1] == "--enable"sv)
+	if (opt == "enable"sv)
 		req = LAUNCH_MAGISKHIDE;
-	else if (argv[1] == "--disable"sv)
+	else if (opt == "disable"sv)
 		req = STOP_MAGISKHIDE;
-	else if (argv[1] == "--add"sv)
+	else if (opt == "add"sv)
 		req = ADD_HIDELIST;
-	else if (argv[1] == "--rm"sv)
+	else if (opt == "rm"sv)
 		req = RM_HIDELIST;
-	else if (argv[1] == "--ls"sv)
+	else if (opt == "ls"sv)
 		req = LS_HIDELIST;
-	else if (argv[1] == "--status"sv)
+	else if (opt == "status"sv)
 		req = HIDE_STATUS;
 #ifdef MAGISK_DEBUG
-	else if (argv[1] == "--test"sv)
+	else if (opt == "test"sv)
 		test_proc_monitor();
 #endif
 	else
