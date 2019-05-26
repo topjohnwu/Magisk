@@ -41,6 +41,7 @@ LOCAL_SRC_FILES := \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \
+	magiskhide/hide_policy.cpp \
 	resetprop/persist_properties.cpp \
 	resetprop/resetprop.cpp \
 	resetprop/system_property_api.cpp \

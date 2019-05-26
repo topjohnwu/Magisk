@@ -32,10 +32,13 @@ void proc_monitor();
 void update_uid_map();
 
 // Utility functions
-void manage_selinux();
-void clean_magisk_props();
 void crawl_procfs(const std::function<bool (int)> &fn);
 void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
+
+// Hide policies
+void hide_daemon(int pid);
+void hide_sensitive_props();
+void manage_selinux();
 
 extern bool hide_enabled;
 extern pthread_mutex_t monitor_lock;

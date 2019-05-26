@@ -49,11 +49,6 @@ static inline int read_ns(const int pid, struct stat *st) {
 	return stat(path, st);
 }
 
-static inline void lazy_unmount(const char* mountpoint) {
-	if (umount2(mountpoint, MNT_DETACH) != -1)
-		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
-}
-
 static int parse_ppid(int pid) {
 	char path[32];
 	int ppid;
@@ -175,57 +170,6 @@ static void setup_inotify() {
 	} else {
 		inotify_add_watch(inotify_fd, APP_PROC, IN_ACCESS);
 	}
-}
-
-/*************************
- * The actual hide daemon
- *************************/
-
-static void hide_daemon(int pid) {
-	RunFinally fin([=]() -> void {
-		// Send resume signal
-		tgkill(pid, pid, SIGCONT);
-		_exit(0);
-	});
-
-	if (switch_mnt_ns(pid))
-		return;
-
-	LOGD("hide_daemon: handling PID=[%d]\n", pid);
-	manage_selinux();
-	clean_magisk_props();
-
-	vector<string> targets;
-
-	// Unmount dummy skeletons and /sbin links
-	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
-		if (str_contains(s, "tmpfs /system/") || str_contains(s, "tmpfs /vendor/") ||
-			str_contains(s, "tmpfs /sbin")) {
-			char *path = (char *) s.data();
-			// Skip first token
-			strtok_r(nullptr, " ", &path);
-			targets.emplace_back(strtok_r(nullptr, " ", &path));
-		}
-		return true;
-	});
-
-	for (auto &s : targets)
-		lazy_unmount(s.data());
-	targets.clear();
-
-	// Unmount all Magisk created mounts
-	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
-		if (str_contains(s, BLOCKDIR)) {
-			char *path = (char *) s.data();
-			// Skip first token
-			strtok_r(nullptr, " ", &path);
-			targets.emplace_back(strtok_r(nullptr, " ", &path));
-		}
-		return true;
-	});
-
-	for (auto &s : targets)
-		lazy_unmount(s.data());
 }
 
 /************************
