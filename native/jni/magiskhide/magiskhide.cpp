@@ -28,7 +28,9 @@ bool hide_enabled = false;
 		"  --add PKG [PROC]  Add a new target to the hide list\n"
 		"  --rm PKG [PROC]   Remove from the hide list\n"
 		"  --ls              List the current hide list\n"
+#ifdef MAGISK_DEBUG
 		"  --test            Run process monitor test\n"
+#endif
 		, arg0);
 	exit(1);
 }
@@ -92,8 +94,10 @@ int magiskhide_main(int argc, char *argv[]) {
 		req = LS_HIDELIST;
 	else if (argv[1] == "--status"sv)
 		req = HIDE_STATUS;
+#ifdef MAGISK_DEBUG
 	else if (argv[1] == "--test"sv)
 		test_proc_monitor();
+#endif
 	else
 		usage(argv[0]);
 
