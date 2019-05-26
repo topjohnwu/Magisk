@@ -70,19 +70,15 @@ static int parse_ppid(int pid) {
 	return ppid;
 }
 
-static long xptrace(bool log, int request, pid_t pid, void *addr, void *data) {
+static inline long xptrace(int request, pid_t pid, void *addr, void *data) {
 	long ret = ptrace(request, pid, addr, data);
-	if (log && ret == -1)
+	if (ret < 0)
 		PLOGE("ptrace %d", pid);
 	return ret;
 }
 
-static long xptrace(int request, pid_t pid, void *addr, void *data) {
-	return xptrace(true, request, pid, addr, data);
-}
-
-static long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_t data = 0) {
-	return xptrace(true, request, pid, addr, reinterpret_cast<void *>(data));
+static inline long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_t data = 0) {
+	return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
 }
 
 static bool parse_packages_xml(string_view s) {
@@ -254,6 +250,7 @@ static void inotify_event(int) {
 		uid_proc_map.clear();
 		file_readline("/data/system/packages.xml", parse_packages_xml, true);
 	} else if (event->mask & IN_ACCESS) {
+		LOGD("proc_monitor: app_process access\n");
 		check_zygote();
 	}
 }
@@ -409,8 +406,19 @@ void proc_monitor() {
 
 	for (;;) {
 		const int pid = waitpid(-1, &status, __WALL | __WNOTHREAD);
-		if (pid < 0)
+		if (pid < 0) {
+			if (errno == ECHILD) {
+				/* This mean we have nothing to wait, sleep
+				 * and wait till signal interruption */
+				LOGD("proc_monitor: nothing to monitor, wait for signal\n");
+				struct timespec timespec = {
+					.tv_sec = INT_MAX,
+					.tv_nsec = 0
+				};
+				nanosleep(&timespec, nullptr);
+			}
 			continue;
+		}
 		bool detach = false;
 		RunFinally detach_task([&]() -> void {
 			if (detach) {
