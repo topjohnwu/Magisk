@@ -116,7 +116,8 @@ void MagiskInit::early_mount() {
 		sprintf(partname, "system%s", cmd.slot);
 		setup_block(partname, block_dev);
 		xmkdir("/system_root", 0755);
-		xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr);
+		if (xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr))
+			xmount(block_dev, "/system_root", "erofs", MS_RDONLY, nullptr);
 		xmkdir("/system", 0755);
 		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
 
