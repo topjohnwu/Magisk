@@ -10,30 +10,35 @@
 
 using namespace std;
 
-static void parse_device(device *dev, const char *uevent) {
-	dev->partname[0] = '\0';
-	FILE *fp = xfopen(uevent, "re");
-	char buf[64];
-	while (fgets(buf, sizeof(buf), fp)) {
-		if (strncmp(buf, "MAJOR", 5) == 0) {
-			sscanf(buf, "MAJOR=%d", &dev->major);
-		} else if (strncmp(buf, "MINOR", 5) == 0) {
-			sscanf(buf, "MINOR=%d", &dev->minor);
-		} else if (strncmp(buf, "DEVNAME", 7) == 0) {
-			sscanf(buf, "DEVNAME=%s", dev->devname);
-		} else if (strncmp(buf, "PARTNAME", 8) == 0) {
-			sscanf(buf, "PARTNAME=%s", dev->partname);
-		}
-	}
-	fclose(fp);
-}
+struct devinfo {
+	int major;
+	int minor;
+	char devname[32];
+	char partname[32];
+};
 
-static vector<device> dev_list;
+static vector<devinfo> dev_list;
+
+static void parse_device(devinfo *dev, const char *uevent) {
+	dev->partname[0] = '\0';
+	parse_prop_file(uevent, [=](string_view key, string_view value) -> bool {
+		if (key == "MAJOR")
+			dev->major = atoi(value.data());
+		else if (key == "MINOR")
+			dev->minor = atoi(value.data());
+		else if (key == "DEVNAME")
+			strcpy(dev->devname, value.data());
+		else if (key == "PARTNAME")
+			strcpy(dev->partname, value.data());
+
+		return true;
+	});
+}
 
 static void collect_devices() {
 	char path[128];
 	struct dirent *entry;
-	device dev;
+	devinfo dev;
 	DIR *dir = xopendir("/sys/dev/block");
 	if (dir == nullptr)
 		return;
@@ -63,7 +68,7 @@ static bool setup_block(const char *partname, char *block_dev) {
 	return false;
 }
 
-bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *partfs) {
+bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
 	char path[128];
 	int fd;
 	sprintf(path, "%s/fstab/%s/dev", cmd.dt_dir, name);
@@ -75,7 +80,7 @@ bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *partfs) {
 		sprintf(partname, "%s%s", part, strend(part, cmd.slot) ? cmd.slot : "");
 		sprintf(path, "%s/fstab/%s/type", cmd.dt_dir, name);
 		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
-			read(fd, partfs, 32);
+			read(fd, fstype, 32);
 			close(fd);
 			return true;
 		}

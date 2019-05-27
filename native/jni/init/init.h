@@ -11,13 +11,6 @@ struct raw_data {
 	size_t sz;
 };
 
-struct device {
-	int major;
-	int minor;
-	char devname[32];
-	char partname[32];
-};
-
 class MagiskInit {
 private:
 	cmdline cmd{};
@@ -35,7 +28,7 @@ private:
 	void preset();
 	void early_mount();
 	void setup_rootfs();
-	bool read_dt_fstab(const char *name, char *partname, char *partfs);
+	bool read_dt_fstab(const char *name, char *partname, char *fstype);
 	bool patch_sepolicy();
 	void cleanup();
 	void re_exec_init();
