@@ -123,25 +123,17 @@ void update_uid_map() {
 }
 
 static void check_zygote() {
-	int min_zyg = 1;
-	if (access("/system/bin/app_process64", R_OK) == 0)
-		min_zyg = 2;
-	for (;;) {
-		crawl_procfs([](int pid) -> bool {
-			char buf[512];
-			snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
-			if (FILE *f = fopen(buf, "re"); f) {
-				fgets(buf, sizeof(buf), f);
-				if (strncmp(buf, "zygote", 6) == 0 && parse_ppid(pid) == 1)
-					new_zygote(pid);
-				fclose(f);
-			}
-			return true;
-		});
-		if (zygote_map.size() >= min_zyg)
-			break;
-		usleep(10000);
-	}
+	crawl_procfs([](int pid) -> bool {
+		char buf[512];
+		snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
+		if (FILE *f = fopen(buf, "re"); f) {
+			fgets(buf, sizeof(buf), f);
+			if (strncmp(buf, "zygote", 6) == 0 && parse_ppid(pid) == 1)
+				new_zygote(pid);
+			fclose(f);
+		}
+		return true;
+	});
 }
 
 #define APP_PROC "/system/bin/app_process"
@@ -189,14 +181,9 @@ static void inotify_event(int) {
 	char buf[512];
 	auto event = reinterpret_cast<struct inotify_event *>(buf);
 	read(inotify_fd, buf, sizeof(buf));
-	if ((event->mask & IN_CLOSE_WRITE) && strcmp(event->name, "packages.xml") == 0) {
-		LOGD("proc_monitor: /data/system/packages.xml updated\n");
-		uid_proc_map.clear();
-		file_readline("/data/system/packages.xml", parse_packages_xml, true);
-	} else if (event->mask & IN_ACCESS) {
-		LOGD("proc_monitor: app_process access\n");
-		check_zygote();
-	}
+	if ((event->mask & IN_CLOSE_WRITE) && event->name == "packages.xml"sv)
+		update_uid_map();
+	check_zygote();
 }
 
 // Workaround for the lack of pthread_cancel
