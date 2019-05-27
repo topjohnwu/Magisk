@@ -52,20 +52,25 @@ static void collect_devices() {
 	closedir(dir);
 }
 
-static bool setup_block(const char *partname, char *block_dev) {
+static void setup_block(const char *partname, char *block_dev) {
 	if (dev_list.empty())
 		collect_devices();
-	for (auto &dev : dev_list) {
-		if (strcasecmp(dev.partname, partname) == 0) {
-			sprintf(block_dev, "/dev/block/%s", dev.devname);
-			LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
-			xmkdir("/dev", 0755);
-			xmkdir("/dev/block", 0755);
-			mknod(block_dev, S_IFBLK | 0600, makedev(dev.major, dev.minor));
-			return true;
+	for (;;) {
+		for (auto &dev : dev_list) {
+			if (strcasecmp(dev.partname, partname) == 0) {
+				sprintf(block_dev, "/dev/block/%s", dev.devname);
+				LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
+				xmkdir("/dev", 0755);
+				xmkdir("/dev/block", 0755);
+				mknod(block_dev, S_IFBLK | 0600, makedev(dev.major, dev.minor));
+				return;
+			}
 		}
+		// Wait 10ms and try again
+		usleep(10000);
+		dev_list.clear();
+		collect_devices();
 	}
-	return false;
 }
 
 bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
