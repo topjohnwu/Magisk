@@ -80,7 +80,10 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	core/init.cpp \
+	init/init.cpp \
+	init/early_mount.cpp \
+	init/rootfs.cpp \
+	init/getinfo.cpp \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
