@@ -308,6 +308,7 @@ int unpack(const char *image, bool hdr) {
 		decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size);
 		close(fd);
 	} else {
+		fprintf(stderr, "Kernel is uncompressed or not a supported compressed type!\n");
 		dump(boot.kernel, boot.hdr->kernel_size, KERNEL_FILE);
 	}
 
@@ -320,6 +321,7 @@ int unpack(const char *image, bool hdr) {
 		decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size);
 		close(fd);
 	} else {
+		fprintf(stderr, "Ramdisk is uncompressed or not a supported compressed type!\n");
 		dump(boot.ramdisk, boot.hdr->ramdisk_size, RAMDISK_FILE);
 	}
 

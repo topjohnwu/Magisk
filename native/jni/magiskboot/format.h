@@ -17,8 +17,9 @@ typedef enum {
 	BZIP2,
 	LZ4,
 	LZ4_LEGACY,
-/* Misc */
+/* Unsupported compression */
 	LZOP,
+/* Misc */
 	MTK,
 	DTB,
 } format_t;

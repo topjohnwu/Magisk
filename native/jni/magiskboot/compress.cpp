@@ -33,11 +33,13 @@ void decompress(char *infile, const char *outfile) {
 	read_file(in_file, [&](void *buf, size_t len) -> void {
 		if (out_fd < 0) {
 			format_t type = check_fmt(buf, len);
+
+			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
+
 			if (!COMPRESSED(type))
-				LOGE("Input file is not a compressed type!\n");
+				LOGE("Input file is not a supported compressed type!\n");
 
 			cmp.reset(get_decoder(type));
-			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
 
 			/* If user does not provide outfile, infile has to be either
 	 		* <path>.[ext], or '-'. Outfile will be either <path> or '-'.
