@@ -1,6 +1,5 @@
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mount.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -11,48 +10,13 @@
 
 #include <magisk.h>
 #include <utils.h>
-#include <resetprop.h>
 #include <db.h>
-#include <selinux.h>
 
 #include "magiskhide.h"
 
 using namespace std;
 
 static pthread_t proc_monitor_thread;
-
-static const char *prop_key[] =
-	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
-	  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
-	  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", nullptr };
-
-static const char *prop_value[] =
-	{ "locked", "green", "1",
-	  "enforcing", "0", "0", "0",
-	  "1", "user", "release-keys", "0", nullptr };
-
-void manage_selinux() {
-	char val;
-	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
-	xxread(fd, &val, sizeof(val));
-	close(fd);
-	// Permissive
-	if (val == '0') {
-		chmod(SELINUX_ENFORCE, 0640);
-		chmod(SELINUX_POLICY, 0440);
-	}
-}
-
-static void hide_sensitive_props() {
-	LOGI("hide_utils: Hiding sensitive props\n");
-
-	// Hide all sensitive props
-	for (int i = 0; prop_key[i]; ++i) {
-		auto value = getprop(prop_key[i]);
-		if (!value.empty() && value != prop_value[i])
-			setprop(prop_key[i], prop_value[i], false);
-	}
-}
 
 // Leave /proc fd opened as we're going to read from it repeatedly
 static DIR *procfp;
@@ -115,13 +79,6 @@ static void kill_process(const char *name) {
 		}
 		return true;
 	});
-}
-
-void clean_magisk_props() {
-	getprop([](const char *name, auto, auto) -> void {
-		if (strstr(name, "magisk"))
-			deleteprop(name);
-	}, nullptr, false);
 }
 
 static int add_list(const char *pkg, const char *proc = "") {
@@ -322,9 +279,13 @@ void auto_start_magiskhide() {
 	db_settings dbs;
 	get_db_settings(dbs, HIDE_CONFIG);
 	if (dbs[HIDE_CONFIG]) {
-		new_daemon_thread([](auto) -> void* {
-			launch_magiskhide(-1);
-			return nullptr;
-		});
+		new_daemon_thread([]() -> void { launch_magiskhide(-1); });
 	}
+}
+
+void test_proc_monitor() {
+	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
+		exit(1);
+	proc_monitor();
+	exit(0);
 }

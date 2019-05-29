@@ -331,10 +331,6 @@ void *__mmap(const char *filename, size_t *size, bool rw) {
 	return buf;
 }
 
-void mmap_ro(const char *filename, void **buf, size_t *size) {
-	*buf = __mmap(filename, size, false);
-}
-
 void fd_full_read(int fd, void **buf, size_t *size) {
 	*size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);

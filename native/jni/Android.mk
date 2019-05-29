@@ -41,6 +41,7 @@ LOCAL_SRC_FILES := \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \
+	magiskhide/hide_policy.cpp \
 	resetprop/persist_properties.cpp \
 	resetprop/resetprop.cpp \
 	resetprop/system_property_api.cpp \
@@ -79,7 +80,10 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	core/init.cpp \
+	init/init.cpp \
+	init/early_mount.cpp \
+	init/rootfs.cpp \
+	init/getinfo.cpp \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
