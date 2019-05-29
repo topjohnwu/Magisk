@@ -46,7 +46,7 @@ Now after reading all the info above, here are the instructions:
 
 1. Download the firmware for your device.
 2. Unzip the firmware and copy the **AP** tar file to your device. It is normally named as `AP_[device_model_sw_ver].tar.md5`
-3. Install Magisk Manager from the [Canary Channel](https://raw.githubusercontent.com/topjohnwu/magisk_files/master/canary_builds/app-release.apk)
+3. Install Magisk Manager
 4. In Magisk Manager: Install → Install → Select and Patch a File
 5. Select the **AP** tar file. Magisk Manager will patch the whole firmware file and store the output to `[Internal Storage]/Download/magisk_patched.tar`
 6. Copy the tar file to your PC, and boot your device to download mode.
