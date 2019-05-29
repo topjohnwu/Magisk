@@ -5,11 +5,15 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.tasks.UpdateRepos
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
+import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
+import org.koin.android.ext.android.get
 
 open class SplashActivity : AppCompatActivity() {
 
@@ -62,8 +66,9 @@ open class SplashActivity : AppCompatActivity() {
             // Load modules
             //Utils.loadModules(false)
             // Load repos
-            //if (Networking.checkNetworkStatus(this))
-            //UpdateRepos().exec()
+            if (Networking.checkNetworkStatus(this)) {
+                get<UpdateRepos>().exec().subscribeK()
+            }
         }
 
         val intent = Intent(this, ClassMap[MainActivity::class.java])

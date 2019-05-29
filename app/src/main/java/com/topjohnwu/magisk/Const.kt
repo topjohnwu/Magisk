@@ -59,6 +59,9 @@ object Const {
     }
 
     object Url {
+        @Deprecated("This shouldn't be used. There's literally no need for it")
+        const val REPO_URL =
+            "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed&page=%d"
         const val FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s"
         const val ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip"
         const val MODULE_INSTALLER =

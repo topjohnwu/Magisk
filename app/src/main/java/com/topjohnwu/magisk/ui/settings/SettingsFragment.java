@@ -107,12 +107,12 @@ public final class SettingsFragment extends BasePreferenceFragment {
             DownloadApp.restore();
             return true;
         });
-        Preference clear = findPreference("clear");
-        clear.setOnPreferenceClickListener(pref -> {
+        findPreference("clear").setOnPreferenceClickListener(pref -> {
             getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
-            getModuleRepo().deleteAllCached().subscribeOn(Schedulers.io()).subscribe(() -> {
-            }, throwable -> {
-            });
+            getRepoDatabase().clearRepo();
+            //getModuleRepo().deleteAllCached().subscribeOn(Schedulers.io()).subscribe(() -> {
+            //}, throwable -> {
+            //});
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
         });
