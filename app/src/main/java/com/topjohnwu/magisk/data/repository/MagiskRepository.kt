@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.data.repository
 import android.content.Context
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.App
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.KConfig
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.database.base.suRaw
@@ -51,6 +52,17 @@ class MagiskRepository(
         KConfig.UpdateChannel.CANARY -> apiRaw.fetchCanaryConfig()
         KConfig.UpdateChannel.CANARY_DEBUG -> apiRaw.fetchCanaryDebugConfig()
         KConfig.UpdateChannel.CUSTOM -> apiRaw.fetchCustomConfig(KConfig.customUpdateChannel)
+    }
+    .doOnSuccess {
+	Config.remoteMagiskVersionCode = it.magisk.versionCode.toIntOrNull() ?: 0
+	Config.magiskLink = it.magisk.link
+	Config.magiskNoteLink = it.magisk.note
+	Config.magiskMD5 = it.magisk.hash
+	Config.remoteManagerVersionCode = it.app.versionCode.toIntOrNull() ?: 0
+	Config.remoteManagerVersionString = it.app.version
+	Config.managerLink = it.app.link
+	Config.managerNoteLink = it.app.note
+	Config.uninstallerLink = it.uninstaller.link
     }
 
 
