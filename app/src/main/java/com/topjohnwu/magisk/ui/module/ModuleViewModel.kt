@@ -94,7 +94,7 @@ class ModuleViewModel(
             .toList()
             .map { it to itemsInstalled.calculateDiff(it) }
             .doOnSuccessUi { itemsInstalled.update(it.first, it.second) }
-            .flatMap { repoUpdater.exec() }
+            .flatMap { repoUpdater.exec(force) }
             .flatMap { Single.fromCallable { repoDatabase.repoCursor.toList { Repo(it) } } }
             .flattenAsFlowable { it }
             .map { RepoRvItem(it) }
