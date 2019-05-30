@@ -40,22 +40,6 @@ interface GithubRawApiServices {
 
     //endregion
 
-    //region topjohnwu/Magisk/master
-
-    @GET("$MAGISK_MASTER/scripts/module_installer.sh")
-    @Streaming
-    fun fetchModuleInstaller(): Single<ResponseBody>
-
-    //endregion
-
-    //region Magisk-Modules-Repo
-
-    @GET("$MAGISK_MODULES/{$MODULE}/master/{$FILE}")
-    @Streaming
-    fun fetchFile(@Path(MODULE) id: String, @Path(FILE) file: String): Single<ResponseBody>
-
-    //endregion
-
     /**
      * This method shall be used exclusively for fetching files from urls from previous requests.
      * Him, who uses it in a wrong way, shall die in an eternal flame.

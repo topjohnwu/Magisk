@@ -11,7 +11,6 @@ import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
-import com.topjohnwu.magisk.data.repository.ModuleRepository
 import com.topjohnwu.magisk.model.entity.Repo
 import com.topjohnwu.magisk.model.entity.recycler.ModuleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoRvItem
@@ -21,20 +20,17 @@ import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
 import com.topjohnwu.magisk.tasks.UpdateRepos
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.update
-import com.topjohnwu.magisk.utils.zip
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
 class ModuleViewModel(
-    private val resources: Resources,
-    private val moduleRepo: ModuleRepository,
-    private val repoDatabase: RepoDatabaseHelper,
-    private val repoUpdater: UpdateRepos
+        private val resources: Resources,
+        private val repoDatabase: RepoDatabaseHelper,
+        private val repoUpdater: UpdateRepos
 ) : MagiskViewModel() {
 
     val query = KObservableField("")
@@ -62,33 +58,9 @@ class ModuleViewModel(
     fun repoPressed(item: RepoRvItem) = OpenChangelogEvent(item.item).publish()
     fun downloadPressed(item: RepoRvItem) = InstallModuleEvent(item.item).publish()
 
-    fun refreshNew(forceReload: Boolean) {
-        val updateInstalled = moduleRepo.fetchInstalledModules()
-            .flattenAsFlowable { it }
-            .map { ModuleRvItem(it) }
-            .toList()
-            .map { it to itemsInstalled.calculateDiff(it) }
-
-        val updateRemote = moduleRepo.fetchModules(forceReload)
-
-        zip(updateInstalled, updateRemote) { installed, remote -> installed to remote }
-            .observeOn(AndroidSchedulers.mainThread())
-            .map {
-                itemsInstalled.update(it.first.first, it.first.second)
-                it.second
-            }
-            .observeOn(Schedulers.computation())
-            .flattenAsFlowable { it }
-            .map { RepoRvItem(it) }
-            .toList()
-            .doOnSuccess { allItems.update(it) }
-            .flatMap { queryRaw() }
-            .applyViewModel(this)
-            .subscribeK { itemsRemote.update(it.first, it.second) }
-    }
-
-    fun refresh/*Old*/(force: Boolean) {
-        moduleRepo.fetchInstalledModules()
+    fun refresh(force: Boolean) {
+        Single.fromCallable { Utils.loadModulesLeanback() }
+            .map { it.values.toList() }
             .flattenAsFlowable { it }
             .map { ModuleRvItem(it) }
             .toList()

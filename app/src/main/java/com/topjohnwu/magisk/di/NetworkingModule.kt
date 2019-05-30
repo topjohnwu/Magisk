@@ -3,9 +3,7 @@ package com.topjohnwu.magisk.di
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.topjohnwu.magisk.Constants
-import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawApiServices
-import com.topjohnwu.magisk.data.network.GithubServices
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -23,8 +21,6 @@ val networkingModule = module {
 
     single { createRetrofit(get(), get(), get()) }
 
-    single { createApiService<GithubServices>(get(), Constants.GITHUB_URL) }
-    single { createApiService<GithubApiServices>(get(), Constants.GITHUB_API_URL) }
     single { createApiService<GithubRawApiServices>(get(), Constants.GITHUB_RAW_API_URL) }
 }
 
