@@ -56,6 +56,30 @@ include $(BUILD_EXECUTABLE)
 
 endif
 
+ifdef B_POLICY
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := magiskpolicy
+LOCAL_STATIC_LIBRARIES := libsepol libutils
+LOCAL_C_INCLUDES := \
+	jni/include \
+	$(LIBSEPOL) \
+	$(LIBUTILS)
+
+LOCAL_SRC_FILES := \
+	core/applet_stub.cpp \
+	magiskpolicy/api.cpp \
+	magiskpolicy/magiskpolicy.cpp \
+	magiskpolicy/rules.cpp \
+	magiskpolicy/policydb.cpp \
+	magiskpolicy/sepolicy.c
+
+LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
+LOCAL_LDFLAGS := -static
+include $(BUILD_EXECUTABLE)
+
+endif
+
 include $(CLEAR_VARS)
 
 ifdef B_INIT
