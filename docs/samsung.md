@@ -49,8 +49,8 @@ Now after reading all the info above, here are the instructions:
 3. Install Magisk Manager from the [Canary Channel](https://raw.githubusercontent.com/topjohnwu/magisk_files/master/canary_builds/app-release.apk)
 4. In Magisk Manager: Install → Install → Select and Patch a File
 5. Select the **AP** tar file. Magisk Manager will patch the whole firmware file and store the output to `[Internal Storage]/Download/magisk_patched.tar`
-6. Copy the tar file to your PC, and boot your device to download mode.
-7. Flash `magisk_patched.tar` as AP in ODIN <br> **Important: Uncheck "Auto Reboot" in Options!!!!**
+6. Copy the tar file to your PC (using `adb`: some people report corruption using MTP), and boot your device to download mode.
+7. Flash `magisk_patched.tar` as AP in ODIN, together with the BL, CP and HOME_CSC files. Never flash only an AP file, as some versions of Odin will shrink your `/data` file-system if you do.<br> **Important: Uncheck "Auto Reboot" in Options!**
 8. Magisk is now successfully flashed to your device! But there are still several steps before you can properly use the device.
 9. We now want to boot into the stock recovery to factory reset our device. <br>
 **Full data wipe is mandatory! Do not skip this step.** <br>
