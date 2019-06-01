@@ -14,12 +14,9 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 val networkingModule = module {
     single { createOkHttpClient() }
-
     single { createConverterFactory() }
     single { createCallAdapterFactory() }
-
     single { createRetrofit(get(), get(), get()) }
-
     single { createApiService<GithubRawApiServices>(get(), Constants.GITHUB_RAW_API_URL) }
 }
 
