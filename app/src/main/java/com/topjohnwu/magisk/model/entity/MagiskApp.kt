@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.model.entity
 
-import com.squareup.moshi.JsonClass
+import se.ansman.kotshi.JsonSerializable
 
-@JsonClass(generateAdapter = true)
+@JsonSerializable
 data class MagiskApp(
     val version: String,
     val versionCode: String,

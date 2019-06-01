@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.di
 
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.Constants
 import com.topjohnwu.magisk.data.network.GithubRawApiServices
@@ -11,6 +12,7 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 val networkingModule = module {
     single { createOkHttpClient() }
@@ -31,7 +33,9 @@ fun createOkHttpClient(): OkHttpClient {
 }
 
 fun createConverterFactory(): Converter.Factory {
-    val moshi = Moshi.Builder().build()
+    val moshi = Moshi.Builder()
+            .add(JsonAdapterFactory.INSTANCE)
+            .build()
     return MoshiConverterFactory.create(moshi)
 }
 
@@ -48,6 +52,13 @@ fun createRetrofit(
         .addConverterFactory(converterFactory)
         .addCallAdapterFactory(callAdapterFactory)
         .client(okHttpClient)
+}
+
+@KotshiJsonAdapterFactory
+abstract class JsonAdapterFactory : JsonAdapter.Factory {
+    companion object {
+        val INSTANCE: JsonAdapterFactory = KotshiJsonAdapterFactory
+    }
 }
 
 inline fun <reified T> createApiService(retrofitBuilder: Retrofit.Builder, baseUrl: String): T {

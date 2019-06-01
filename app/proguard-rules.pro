@@ -17,7 +17,7 @@
 #}
 
 # Retrofit classes
--keep,allowobfuscation class com.topjohnwu.magisk.data.network.**
+-keep,allowobfuscation class com.topjohnwu.magisk.data.network.*
 
 # Snet
 -keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
