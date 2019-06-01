@@ -23,6 +23,8 @@ android {
 
     buildTypes {
         release {
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro', 'proguard-moshi.pro', 'proguard-kotlin.pro'
         }

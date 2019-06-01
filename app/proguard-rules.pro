@@ -16,10 +16,8 @@
 #   public *;
 #}
 
-# Internal app data and IO helper constructors
--keep class com.topjohnwu.magisk.model.entity.** { *; }
--keep class com.topjohnwu.magisk.data.database.base.** { public <init>(...); }
--keep class com.topjohnwu.magisk.data.network.** { public <init>(...); }
+# Retrofit classes
+-keep,allowobfuscation class com.topjohnwu.magisk.data.network.**
 
 # Snet
 -keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
