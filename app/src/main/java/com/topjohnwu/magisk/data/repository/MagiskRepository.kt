@@ -54,15 +54,15 @@ class MagiskRepository(
         KConfig.UpdateChannel.CUSTOM -> apiRaw.fetchCustomConfig(KConfig.customUpdateChannel)
     }
     .doOnSuccess {
-	Config.remoteMagiskVersionCode = it.magisk.versionCode.toIntOrNull() ?: 0
-	Config.magiskLink = it.magisk.link
-	Config.magiskNoteLink = it.magisk.note
-	Config.magiskMD5 = it.magisk.hash
-	Config.remoteManagerVersionCode = it.app.versionCode.toIntOrNull() ?: 0
-	Config.remoteManagerVersionString = it.app.version
-	Config.managerLink = it.app.link
-	Config.managerNoteLink = it.app.note
-	Config.uninstallerLink = it.uninstaller.link
+        Config.remoteMagiskVersionCode = it.magisk.versionCode.toIntOrNull() ?: -1
+        Config.magiskLink = it.magisk.link
+        Config.magiskNoteLink = it.magisk.note
+        Config.magiskMD5 = it.magisk.hash
+        Config.remoteManagerVersionCode = it.app.versionCode.toIntOrNull() ?: -1
+        Config.remoteManagerVersionString = it.app.version
+        Config.managerLink = it.app.link
+        Config.managerNoteLink = it.app.note
+        Config.uninstallerLink = it.uninstaller.link
     }
 
 
