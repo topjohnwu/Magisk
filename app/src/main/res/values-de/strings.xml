@@ -7,6 +7,8 @@
     <string name="log">Log</string>
     <string name="settings">Einstellungen</string>
     <string name="install">Installieren</string>
+    <string name="unsupport_magisk_title">Nicht unterstützte Magisk Version</string>
+    <string name="unsupport_magisk_message">Diese Version von Magisk Manager unterstützt keine Magisk-Version kleiner als 18.0. \n\nSie können entweder Magisk manuell aktualisieren oder die App auf eine ältere Version herabstufen.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
@@ -17,17 +19,18 @@
     <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
     <string name="safetyNet_api_error">SafetyNet API Fehler</string>
     <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
-
-    <!--Install Fragment-->
+    <string name="magisk_up_to_date">Magisk ist auf dem neuesten Stand</string>
+    <string name="manager_up_to_date">Magisk Manager ist auf dem neuesten Stand</string>
     <string name="advanced_settings_title">Erweiterte Optionen</string>
     <string name="keep_force_encryption">\"force encryption\" beibehalten</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity beibehalten</string>
-    <string name="current_installed">Installierte: %1$s</string>
+    <string name="current_installed">Installiert: %1$s</string>
     <string name="latest_version">Neueste: %1$s</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
-    <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt und möglicherweise werden Ihre Daten verschlüsseln, falls Ihre Daten derzeit nicht verschlüsselt sind.</string>
-    <string name="update">Aktualisierung</string>
+    <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt, und Ihre Daten werden möglicherweise verschlüsselt, wenn nicht bereits der Fall.</string>
+    <string name="update">aktuallisieren</string>
+    <string name="core_only_enabled">(Core only Modus aktiviert)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nichts angegeben)</string>
@@ -60,8 +63,28 @@
 
     <!--About Activity-->
     <string name="app_changelog">Änderungsprotokoll</string>
-    <string name="translators">skalnet, c727, jenslody, SuperSandro2000</string>
+    <string name="translators">skalnet, c727, jenslody, SuperSandro2000, aney1</string>
     <string name="app_translators">Übersetzer</string>
+
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Magisk Update</string>
+    <string name="progress_channel">Fortschrittsbenachrichtigungen</string>
+    <string name="download_complete">Download abgeschlossen</string>
+    <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
+    <string name="magisk_update_title">Neues Magisk Update verfügbar!</string>
+    <string name="manager_update_title">Aktualisierung für Magisk Manager verfügbar!</string>
+
+    <!-- Installation -->
+    <string name="manager_download_install">Herunterladen und installieren</string>
+    <string name="download_zip_only">Nur Zip-Datei herunterladen</string>
+    <string name="direct_install">Direkt installieren (empfohlen)</string>
+    <string name="install_inactive_slot">Installiere auf inaktiven Slot (Nach OTA)</string>
+    <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem nach dem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
+    <string name="select_method">Methode auswählen</string>
+    <string name="setup_title">Zusätzliche Einrichtung</string>
+    <string name="select_patch_file">Auswählen und Patchen einer Datei</string>
+    <string name="patch_file_msg">Wählen Sie ein Rohabbild (*.img) oder eine ODIN-Tar-Datei (*.tar) aus.</string>
+    <string name="reboot_delay_toast">Neustart in 5 Sekunden…</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Schließen</string>
@@ -69,26 +92,20 @@
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download">Herunterladen</string>
     <string name="reboot">Neustart</string>
-    <string name="magisk_update_title">Neues Magisk Update verfügbar!</string>
     <string name="settings_reboot_toast">Neustarten, um die Änderungen zu übernehmen</string>
     <string name="release_notes">Versionshinweise</string>
     <string name="repo_cache_cleared">Repo-Cache geleert</string>
     <string name="internal_storage">Die Zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
-    <string name="manager_update_title">Aktualisierung für Magisk Manager verfügbar!</string>
-    <string name="manager_download_install">Herunterladen und installieren</string>
+
     <string name="dtbo_patched_title">DTBO wurde gepatched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatched, bitte neustarten</string>
-    <string name="update_channel">Magisk Update</string>
     <string name="flashing">Flashing</string>
+    <string name="done">Erledigt!</string>
+    <string name="failure">Fehler</string>
     <string name="hide_manager_title">Verberge Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Verbergen von Magisk Manager fehlgeschlagen…</string>
     <string name="open_link_failed_toast">Es wurde keine Anwendung gefunden, um diesen Link zu öffnen...</string>
-    <string name="download_zip_only">Nur Zip-Datei herunterladen</string>
-    <string name="direct_install">Direkt installieren (empfohlen)</string>
-    <string name="install_inactive_slot">Installiere auf inaktiven Slot (Nach OTA)</string>
     <string name="warning">Warnung</string>
-    <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem nach dem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
-    <string name="select_method">Methode auswählen</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
     <string name="restore_img">Images wiederherstellen</string>
     <string name="restore_img_msg">Wiederherstellen...</string>
@@ -99,11 +116,10 @@
     <string name="setup_fail">Einrichtung fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
     <string name="env_fix_msg">Ihr Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip wird heruntergeladen, fortfahren?</string>
-    <string name="setup_title">Zusätzliche Einrichtung</string>
     <string name="setup_msg">Umgebungseinrichtung läuft…</string>
-    <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="downloading_toast">Herunterladen von %1$s</string>
     <string name="no_rw_storage">Dieses Feature funktioniert nicht, ohne die Berechtigung den externen Speicher zu beschreiben.</string>
+    <string name="dl_one_module">Ein Modul nach dem anderen herunterladen.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
@@ -130,6 +146,7 @@
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
+    <string name="settings_hosts_toast">systemless Hosts-Modul hinzugefügt</string>
 
     <string name="settings_su_app_adb">Apps und ADB</string>
     <string name="settings_su_app">Nur Apps</string>
@@ -200,7 +217,11 @@
     <string name="auth_fail">Authentifizierung fehlgeschlagen</string>
 
     <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">Ziel-UID: %1$d</string>
     <string name="command">Befehl: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">System Apps anzeigen</string>
 
 </resources>
