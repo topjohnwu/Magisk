@@ -19,3 +19,5 @@ fun Int.res(vararg args: Any): String {
     val resources: Resources by inject()
     return resources.getString(this, *args)
 }
+
+fun String.trimEmptyToNull(): String? = if (isBlank()) null else this
