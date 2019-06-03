@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
-import com.chibatching.kotpref.Kotpref
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.RootUtils
@@ -28,12 +27,6 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
 
     @Volatile
     private var foreground: Activity? = null
-
-    override fun onCreate() {
-        super.onCreate()
-
-        Kotpref.init(this)
-    }
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)

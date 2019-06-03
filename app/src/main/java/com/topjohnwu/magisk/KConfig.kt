@@ -1,23 +1,26 @@
 package com.topjohnwu.magisk
 
-import com.chibatching.kotpref.ContextProvider
-import com.chibatching.kotpref.KotprefModel
+import android.content.Context
 import com.topjohnwu.magisk.KConfig.UpdateChannel.STABLE
-import com.topjohnwu.magisk.utils.get
+import com.topjohnwu.magisk.di.Protected
+import com.topjohnwu.magisk.model.preference.PreferenceModel
+import com.topjohnwu.magisk.utils.inject
 
-object KConfig : KotprefModel(get<ContextProvider>()) {
-    override val kotprefName: String = "${context.packageName}_preferences"
+object KConfig : PreferenceModel() {
 
-    private var internalUpdateChannel by intPref(STABLE.id, "updateChannel")
-    var useCustomTabs by booleanPref(true, "useCustomTabs")
+    override val context: Context by inject(Protected)
+    override val fileName: String = "${context.packageName}_preferences"
+
+    private var internalUpdateChannel by preference(Config.Key.UPDATE_CHANNEL, STABLE.id.toString())
+    var useCustomTabs by preference("useCustomTabs", true)
     @JvmStatic
-    var customUpdateChannel by stringPref("", "custom_channel")
+    var customUpdateChannel by preference(Config.Key.CUSTOM_CHANNEL, "")
 
     @JvmStatic
     var updateChannel: UpdateChannel
-        get() = UpdateChannel.byId(internalUpdateChannel)
+        get() = UpdateChannel.byId(internalUpdateChannel.toIntOrNull() ?: STABLE.id)
         set(value) {
-            internalUpdateChannel = value.id
+            internalUpdateChannel = value.id.toString()
         }
 
     internal const val DEFAULT_CHANNEL = "topjohnwu/magisk_files"
