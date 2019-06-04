@@ -76,50 +76,20 @@ static inline long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_
 	return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
 }
 
-static bool parse_packages_xml(string_view s) {
-	if (!str_starts(s, "<package "))
-		return true;
-	/* <package key1="value1" key2="value2"....> */
-	char *start = (char *) s.data();
-	start[s.length() - 1] = '\0';  /* Remove trailing '>' */
-	start += 9;  /* Skip '<package ' */
-
-	string_view pkg;
-	for (char *tok = start; *tok;) {
-		char *eql = strchr(tok, '=');
-		if (eql == nullptr)
-			break;
-		*eql = '\0';  /* Terminate '=' */
-		string_view key(tok, eql - tok);
-		eql += 2;  /* Skip '="' */
-		tok = strchr(eql, '\"');  /* Find closing '"' */
-		*tok = '\0';
-		string_view value(eql, tok - eql);
-		tok += 2;
-		if (key == "name") {
-			for (auto &hide : hide_set) {
-				if (hide.first == value) {
-					pkg = hide.first;
-					break;
-				}
-			}
-			if (pkg.empty())
-				return true;
-		} else if (key == "userId" || key == "sharedUserId") {
-			int uid = parse_int(value);
-			for (auto &hide : hide_set) {
-				if (hide.first == pkg)
-					uid_proc_map[uid].emplace_back(hide.second);
-			}
-		}
-	}
-	return true;
-}
-
 void update_uid_map() {
 	MutexGuard lock(monitor_lock);
 	uid_proc_map.clear();
-	file_readline("/data/system/packages.xml", parse_packages_xml, true);
+	string data_path(APP_DATA_DIR);
+	data_path += "/0/";
+	size_t len = data_path.length();
+	struct stat st;
+	for (auto &hide : hide_set) {
+		data_path.erase(data_path.begin() + len, data_path.end());
+		data_path += hide.first;
+		if (stat(data_path.data(), &st))
+			continue;
+		uid_proc_map[st.st_uid].emplace_back(hide.second);
+	}
 }
 
 static void check_zygote() {
