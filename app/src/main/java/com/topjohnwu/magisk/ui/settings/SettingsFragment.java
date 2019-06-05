@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.settings;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,11 +12,11 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.KConfig;
+import com.topjohnwu.magisk.KConfig.UpdateChannel;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.tasks.CheckUpdates;
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment;
 import com.topjohnwu.magisk.utils.DownloadApp;
-import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.PatchAPK;
@@ -26,7 +27,6 @@ import com.topjohnwu.superuser.Shell;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Locale;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.ListPreference;
@@ -34,26 +34,61 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreferenceCompat;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import kotlin.Pair;
 
-public class SettingsFragment extends BasePreferenceFragment {
+public final class SettingsFragment extends BasePreferenceFragment {
 
     private ListPreference updateChannel, autoRes, suNotification,
             requestTimeout, rootConfig, multiuserConfig, nsConfig;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
+    private static void setLocalePreference(ListPreference lp) {
+        lp.setSummary("Loading");
+        lp.setEnabled(false);
+        LocaleManager.getAvailableLocales()
+                .flattenAsFlowable(locales -> locales)
+                .map(locale -> new Pair<>(locale.getDisplayName(locale), LocaleManager.toLanguageTag(locale)))
+                .toList()
+                .map(list -> {
+                    CharSequence[] names = new CharSequence[list.size() + 1];
+                    CharSequence[] values = new CharSequence[list.size() + 1];
+
+                    names[0] = LocaleManager.getString(LocaleManager.getDefaultLocale(), R.string.system_default);
+                    values[0] = "";
+                    int i = 1;
+                    for (Pair<String, String> item : list) {
+                        names[i] = item.getFirst();
+                        values[i++] = item.getSecond();
+                    }
+                    return new Pair<>(names, values);
+                })
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(it -> {
+                    lp.setEnabled(true);
+                    lp.setEntries(it.getFirst());
+                    lp.setEntryValues(it.getSecond());
+                    lp.setSummary(LocaleManager.getLocale().getDisplayName(LocaleManager.getLocale()));
+                }, Throwable::printStackTrace);
+    }
+
     @Override
-    public void onStart() {
+    public final void onStart() {
         super.onStart();
         setHasOptionsMenu(true);
         requireActivity().setTitle(R.string.settings);
     }
 
     @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+    public final void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         getPreferenceManager().setStorageDeviceProtected();
         setPreferencesFromResource(R.xml.app_settings, rootKey);
 
         boolean showSuperuser = Utils.showSuperUser();
-        app.getPrefs().edit()
+        getPrefs().edit()
                 .putBoolean(Config.Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
                 .apply();
 
@@ -73,14 +108,17 @@ public class SettingsFragment extends BasePreferenceFragment {
             return true;
         });
         findPreference("clear").setOnPreferenceClickListener(pref -> {
-            app.getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
-            app.getRepoDB().clearRepo();
+            getPrefs().edit().remove(Config.Key.ETAG_KEY).apply();
+            getRepoDatabase().clearRepo();
+            //getModuleRepo().deleteAllCached().subscribeOn(Schedulers.io()).subscribe(() -> {
+            //}, throwable -> {
+            //});
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
             return true;
         });
         findPreference("hosts").setOnPreferenceClickListener(pref -> {
             Shell.su("add_hosts_module").exec();
-            Utils.loadModules();
+            //Utils.loadModules();
             Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT);
             return true;
         });
@@ -96,25 +134,29 @@ public class SettingsFragment extends BasePreferenceFragment {
         SwitchPreferenceCompat fingerprint = (SwitchPreferenceCompat) findPreference(Config.Key.SU_FINGERPRINT);
 
         updateChannel.setOnPreferenceChangeListener((p, o) -> {
-            int prev = Config.get(Config.Key.UPDATE_CHANNEL);
             int channel = Integer.parseInt((String) o);
-            if (channel == Config.Value.CUSTOM_CHANNEL) {
+
+            final UpdateChannel previousUpdateChannel = KConfig.getUpdateChannel();
+            final UpdateChannel updateChannel = getChannelCompat(channel);
+
+            KConfig.setUpdateChannel(updateChannel);
+
+            if (updateChannel == UpdateChannel.CUSTOM) {
                 View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                 EditText url = v.findViewById(R.id.custom_url);
-                url.setText(app.getPrefs().getString(Config.Key.CUSTOM_CHANNEL, ""));
+                url.setText(KConfig.getCustomUpdateChannel());
                 new AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
-                        .setPositiveButton(R.string.ok, (d, i) ->
-                                Config.set(Config.Key.CUSTOM_CHANNEL, url.getText().toString()))
-                        .setNegativeButton(R.string.close, (d, i) ->
-                                Config.set(Config.Key.UPDATE_CHANNEL, prev))
-                        .setOnCancelListener(d ->
-                                Config.set(Config.Key.UPDATE_CHANNEL, prev))
+                        .setPositiveButton(R.string.ok, (d, i) -> setCustomUpdateChannel(url.getText().toString()))
+                        .setNegativeButton(R.string.close, (d, i) -> KConfig.setUpdateChannel(previousUpdateChannel))
+                        .setOnCancelListener(d -> KConfig.setUpdateChannel(previousUpdateChannel))
                         .show();
             }
             return true;
         });
+
+        setLocalePreference((ListPreference) findPreference(Config.Key.LOCALE));
 
         /* We only show canary channels if user is already on canary channel
          * or the user have already chosen canary channel */
@@ -147,11 +189,12 @@ public class SettingsFragment extends BasePreferenceFragment {
         }
 
         if (Shell.rootAccess() && Const.USER_ID == 0) {
-            if (app.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+            if (getApp().getPackageName().equals(BuildConfig.APPLICATION_ID)) {
                 generalCatagory.removePreference(restoreManager);
             } else {
-                if (!Networking.checkNetworkStatus(app))
+                if (!Networking.checkNetworkStatus(requireContext())) {
                     generalCatagory.removePreference(restoreManager);
+                }
                 generalCatagory.removePreference(hideManager);
             }
         } else {
@@ -169,28 +212,15 @@ public class SettingsFragment extends BasePreferenceFragment {
         }
     }
 
-    private void setLocalePreference(ListPreference lp) {
-        CharSequence[] entries = new CharSequence[LocaleManager.locales.size() + 1];
-        CharSequence[] entryValues = new CharSequence[LocaleManager.locales.size() + 1];
-        entries[0] = LocaleManager.getString(LocaleManager.defaultLocale, R.string.system_default);
-        entryValues[0] = "";
-        int i = 1;
-        for (Locale locale : LocaleManager.locales) {
-            entries[i] = locale.getDisplayName(locale);
-            entryValues[i++] = LocaleManager.toLanguageTag(locale);
-        }
-        lp.setEntries(entries);
-        lp.setEntryValues(entryValues);
-        lp.setSummary(LocaleManager.locale.getDisplayName(LocaleManager.locale));
-    }
-
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+    public final void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
         switch (key) {
             case Config.Key.ROOT_ACCESS:
             case Config.Key.SU_MULTIUSER_MODE:
             case Config.Key.SU_MNT_NS:
-                app.getDB().setSettings(key, Utils.getPrefsInt(prefs, key));
+                getSettingRepo().put(key, Utils.getPrefsInt(prefs, key))
+                        .subscribe(() -> {
+                        }, Throwable::printStackTrace);
                 break;
             case Config.Key.DARK_THEME:
                 requireActivity().recreate();
@@ -199,7 +229,8 @@ public class SettingsFragment extends BasePreferenceFragment {
                 if (prefs.getBoolean(key, false)) {
                     try {
                         Const.MAGISK_DISABLE_FILE.createNewFile();
-                    } catch (IOException ignored) {}
+                    } catch (IOException ignored) {
+                    }
                 } else {
                     Const.MAGISK_DISABLE_FILE.delete();
                 }
@@ -213,12 +244,12 @@ public class SettingsFragment extends BasePreferenceFragment {
                 }
                 break;
             case Config.Key.LOCALE:
-                LocaleManager.setLocale(app);
+                LocaleManager.setLocale(getApp());
                 requireActivity().recreate();
                 break;
             case Config.Key.UPDATE_CHANNEL:
             case Config.Key.CUSTOM_CHANNEL:
-                CheckUpdates.check();
+                //CheckUpdates.check();
                 break;
             case Config.Key.CHECK_UPDATES:
                 Utils.scheduleUpdateCheck();
@@ -228,7 +259,7 @@ public class SettingsFragment extends BasePreferenceFragment {
     }
 
     @Override
-    public boolean onPreferenceTreeClick(Preference preference) {
+    public final boolean onPreferenceTreeClick(Preference preference) {
         String key = preference.getKey();
         switch (key) {
             case Config.Key.SU_FINGERPRINT:
@@ -253,27 +284,27 @@ public class SettingsFragment extends BasePreferenceFragment {
                 break;
             case Config.Key.ROOT_ACCESS:
                 rootConfig.setSummary(getResources()
-                        .getStringArray(R.array.su_access)[(int)Config.get(key)]);
+                        .getStringArray(R.array.su_access)[(int) Config.get(key)]);
                 break;
             case Config.Key.SU_AUTO_RESPONSE:
                 autoRes.setSummary(getResources()
-                        .getStringArray(R.array.auto_response)[(int)Config.get(key)]);
+                        .getStringArray(R.array.auto_response)[(int) Config.get(key)]);
                 break;
             case Config.Key.SU_NOTIFICATION:
                 suNotification.setSummary(getResources()
-                        .getStringArray(R.array.su_notification)[(int)Config.get(key)]);
+                        .getStringArray(R.array.su_notification)[(int) Config.get(key)]);
                 break;
             case Config.Key.SU_REQUEST_TIMEOUT:
                 requestTimeout.setSummary(
-                        getString(R.string.request_timeout_summary, (int)Config.get(key)));
+                        getString(R.string.request_timeout_summary, (int) Config.get(key)));
                 break;
             case Config.Key.SU_MULTIUSER_MODE:
                 multiuserConfig.setSummary(getResources()
-                        .getStringArray(R.array.multiuser_summary)[(int)Config.get(key)]);
+                        .getStringArray(R.array.multiuser_summary)[(int) Config.get(key)]);
                 break;
             case Config.Key.SU_MNT_NS:
                 nsConfig.setSummary(getResources()
-                        .getStringArray(R.array.namespace_summary)[(int)Config.get(key)]);
+                        .getStringArray(R.array.namespace_summary)[(int) Config.get(key)]);
                 break;
         }
     }
@@ -286,15 +317,5 @@ public class SettingsFragment extends BasePreferenceFragment {
         setSummary(Config.Key.SU_REQUEST_TIMEOUT);
         setSummary(Config.Key.SU_MULTIUSER_MODE);
         setSummary(Config.Key.SU_MNT_NS);
-    }
-
-    @Override
-    public void onEvent(int event) {
-        setLocalePreference((ListPreference) findPreference(Config.Key.LOCALE));
-    }
-
-    @Override
-    public int[] getListeningEvents() {
-        return new int[] {Event.LOCALE_FETCH_DONE};
     }
 }

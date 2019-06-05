@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:onRefreshListener="@{() -> viewModel.refresh()}"
+            app:onRefreshListener="@{() -> viewModel.refresh(true)}"
             app:refreshing="@{viewModel.loading}">
 
             <androidx.recyclerview.widget.RecyclerView

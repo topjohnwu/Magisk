@@ -1,32 +1,26 @@
 package com.topjohnwu.magisk.ui.hide
 
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.rxbus.RxBus
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
-import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.model.entity.HideAppInfo
-import com.topjohnwu.magisk.model.entity.HideTarget
+import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessRvItem
 import com.topjohnwu.magisk.model.entity.recycler.HideRvItem
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import com.topjohnwu.magisk.model.events.HideProcessEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.update
-import com.topjohnwu.superuser.Shell
-import io.reactivex.Single
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 import timber.log.Timber
 
 class HideViewModel(
-    private val packageManager: PackageManager,
+    private val magiskRepo: MagiskRepository,
     rxBus: RxBus
 ) : MagiskViewModel() {
 
@@ -55,26 +49,19 @@ class HideViewModel(
         // fetching this for every item is nonsensical, so we add .cache() so the response is all
         // the same for every single mapped item, it only actually executes the whole thing the
         // first time around.
-        val hideTargets = Shell.su("magiskhide --ls").toSingle()
-            .map { it.exec().out }
-            .flattenAsFlowable { it }
-            .map { HideTarget(it) }
-            .toList()
-            .cache()
+        val hideTargets = magiskRepo.fetchHideTargets().cache()
 
-        Single.fromCallable { packageManager.getInstalledApplications(0) }
+        magiskRepo.fetchApps()
             .flattenAsFlowable { it }
-            .filter { it.enabled && !blacklist.contains(it.packageName) }
-            .map {
-                val label = Utils.getAppLabel(it, packageManager)
-                val icon = it.loadIcon(packageManager)
-                HideAppInfo(it, label, icon)
-            }
-            .filter { it.processes.isNotEmpty() }
             .map { HideRvItem(it, hideTargets.blockingGet()) }
             .toList()
-            .map { it.sortWith(compareBy(
-                    {it.isHiddenState.value}, {it.item.name}, {it.packageName})); it }
+            .map {
+                it.sortedWith(compareBy(
+                    { it.isHiddenState.value },
+                    { it.item.name.toLowerCase() },
+                    { it.packageName }
+                ))
+            }
             .doOnSuccess { allItems.update(it) }
             .flatMap { queryRaw() }
             .applyViewModel(this)
@@ -103,26 +90,9 @@ class HideViewModel(
         .toList()
         .map { it to items.calculateDiff(it) }
 
-    private fun toggleItem(item: HideProcessRvItem) {
-        val state = if (item.isHidden.value) "add" else "rm"
-        "magiskhide --%s %s %s".format(state, item.packageName, item.process)
-            .let { Shell.su(it) }
-            .toSingle()
-            .map { it.submit() }
-            .subscribeK()
-    }
-
-    companion object {
-        private val blacklist = listOf(
-            App.self.packageName,
-            "android",
-            "com.android.chrome",
-            "com.chrome.beta",
-            "com.chrome.dev",
-            "com.chrome.canary",
-            "com.android.webview",
-            "com.google.android.webview"
-        )
-    }
+    private fun toggleItem(item: HideProcessRvItem) = magiskRepo
+        .toggleHide(item.isHidden.value, item.packageName, item.process)
+        .subscribeK()
+        .add()
 
 }

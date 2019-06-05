@@ -16,6 +16,9 @@
 #   public *;
 #}
 
+# Retrofit classes
+-keep,allowobfuscation class com.topjohnwu.magisk.data.network.*
+
 # Snet
 -keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
 -keep,allowobfuscation interface com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback
@@ -35,6 +38,7 @@
 -keepclassmembers class com.topjohnwu.signing.BootSigner { *; }
 
 # Strip logging
+-assumenosideeffects class timber.log.Timber.Tree { *; }
 -assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
   public *** debug(...);
 }

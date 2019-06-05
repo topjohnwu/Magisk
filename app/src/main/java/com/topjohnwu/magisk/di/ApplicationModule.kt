@@ -12,8 +12,7 @@ val applicationModule = module {
     factory { get<Context>().resources }
     factory { get<Context>() as App }
     factory { get<Context>().packageManager }
-    single(SUTimeout) {
-        get<App>().protectedContext.getSharedPreferences("su_timeout", 0)
-    }
-    single { PreferenceManager.getDefaultSharedPreferences(get<App>().protectedContext) }
+    factory(Protected) { get<App>().protectedContext }
+    single(SUTimeout) { get<Context>(Protected).getSharedPreferences("su_timeout", 0) }
+    single { PreferenceManager.getDefaultSharedPreferences(get<Context>(Protected)) }
 }

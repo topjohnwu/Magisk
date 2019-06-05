@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.utils
 
 import android.view.View
-import android.widget.AdapterView
-import android.widget.Spinner
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
@@ -115,7 +113,7 @@ fun setMovieBehavior(view: TextView, isMovieBehavior: Boolean, text: String) {
     }
 }
 
-@BindingAdapter("android:selectedItemPosition")
+/*@BindingAdapter("selection"*//*, "selectionAttrChanged", "adapter"*//*)
 fun setSelectedItemPosition(view: Spinner, position: Int) {
     view.setSelection(position)
 }
@@ -126,7 +124,7 @@ fun setSelectedItemPosition(view: Spinner, position: Int) {
 )
 fun getSelectedItemPosition(view: Spinner) = view.selectedItemPosition
 
-@BindingAdapter("android:selectedItemPositionAttrChanged")
+@BindingAdapter("selectedItemPositionAttrChanged")
 fun setSelectedItemPositionListener(view: Spinner, listener: InverseBindingListener) {
     view.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -137,7 +135,7 @@ fun setSelectedItemPositionListener(view: Spinner, listener: InverseBindingListe
             listener.onChange()
         }
     }
-}
+}*/
 
 @BindingAdapter("onTouch")
 fun setOnTouchListener(view: View, listener: View.OnTouchListener) {
@@ -155,8 +153,6 @@ fun setScrollToLast(view: RecyclerView, shouldScrollToLast: Boolean) {
         Observable.timer(1, TimeUnit.SECONDS).subscribeK { callback() }
     }
 
-    val tag = RecyclerView::class.java.name.sumBy { it.toInt() }
-
     fun RecyclerView.Adapter<*>.setListener() {
         val observer = object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -164,11 +160,12 @@ fun setScrollToLast(view: RecyclerView, shouldScrollToLast: Boolean) {
             }
         }
         registerAdapterDataObserver(observer)
-        view.setTag(tag, observer)
+        view.setTag(R.id.recyclerScrollListener, observer)
     }
 
     fun RecyclerView.Adapter<*>.removeListener() {
-        val observer = view.getTag(tag) as? RecyclerView.AdapterDataObserver ?: return
+        val observer =
+            view.getTag(R.id.recyclerScrollListener) as? RecyclerView.AdapterDataObserver ?: return
         unregisterAdapterDataObserver(observer)
     }
 

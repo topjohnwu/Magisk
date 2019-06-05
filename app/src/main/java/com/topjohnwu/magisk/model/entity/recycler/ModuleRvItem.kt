@@ -6,12 +6,13 @@ import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.entity.Module
+import com.topjohnwu.magisk.model.entity.OldModule
 import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.model.entity.Repository
 import com.topjohnwu.magisk.utils.get
 import com.topjohnwu.magisk.utils.toggle
 
-class ModuleRvItem(val item: Module) : ComparableRvItem<ModuleRvItem>() {
+class ModuleRvItem(val item: OldModule) : ComparableRvItem<ModuleRvItem>() {
 
     override val layoutRes: Int = R.layout.item_module
 
@@ -49,11 +50,14 @@ class ModuleRvItem(val item: Module) : ComparableRvItem<ModuleRvItem>() {
     override fun contentSameAs(other: ModuleRvItem): Boolean = item.version == other.item.version
             && item.versionCode == other.item.versionCode
             && item.description == other.item.description
+            && item.name == other.item.name
 
-    override fun itemSameAs(other: ModuleRvItem): Boolean = item.name == other.item.name
+    override fun itemSameAs(other: ModuleRvItem): Boolean = item.id == other.item.id
 }
 
 class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
+
+    constructor(repo: Repository) : this(Repo(repo))
 
     override val layoutRes: Int = R.layout.item_repo
 
@@ -61,6 +65,7 @@ class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
             && item.lastUpdate == other.item.lastUpdate
             && item.versionCode == other.item.versionCode
             && item.description == other.item.description
+            && item.detailUrl == other.item.detailUrl
 
-    override fun itemSameAs(other: RepoRvItem): Boolean = item.detailUrl == other.item.detailUrl
+    override fun itemSameAs(other: RepoRvItem): Boolean = item.id == other.item.id
 }

@@ -56,7 +56,7 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
                     Config.get<Int>(Config.Key.REPO_ORDER)!!
                 ) { d, which ->
                     Config.set(Config.Key.REPO_ORDER, which)
-                    viewModel.updateRepos()
+                    viewModel.refresh(false)
                     d.dismiss()
                 }.show()
         }
@@ -82,7 +82,7 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
 
         fun download(install: Boolean) {
             context.runWithExternalRW {
-                val intent = Intent(activity, ClassMap.get<Any>(DownloadModuleService::class.java))
+                val intent = Intent(activity, ClassMap[DownloadModuleService::class.java])
                     .putExtra("repo", item).putExtra("install", install)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(intent) //hmm, service starts itself in foreground, this seems unnecessary

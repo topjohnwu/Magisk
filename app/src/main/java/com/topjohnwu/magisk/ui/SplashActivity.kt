@@ -5,15 +5,15 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.*
-import com.topjohnwu.magisk.tasks.CheckUpdates
 import com.topjohnwu.magisk.tasks.UpdateRepos
-import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
+import org.koin.android.ext.android.get
 
 open class SplashActivity : AppCompatActivity() {
 
@@ -21,7 +21,7 @@ open class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         Shell.getShell {
-            if (Config.magiskVersionCode > 0 && Config.magiskVersionCode < Const.MAGISK_VER.MIN_SUPPORT) {
+            if (Config.magiskVersionCode > 0 && Config.magiskVersionCode < Const.MagiskVersion.MIN_SUPPORT) {
                 AlertDialog.Builder(this)
                     .setTitle(R.string.unsupport_magisk_title)
                     .setMessage(R.string.unsupport_magisk_message)
@@ -48,9 +48,6 @@ open class SplashActivity : AppCompatActivity() {
             }
         }
 
-        // Dynamic detect all locales
-        LocaleManager.loadAvailableLocales(R.string.app_changelog)
-
         // Set default configs
         Config.initialize()
 
@@ -59,7 +56,7 @@ open class SplashActivity : AppCompatActivity() {
 
         // Schedule periodic update checks
         Utils.scheduleUpdateCheck()
-        CheckUpdates.check()
+        //CheckUpdates.check()
 
         // Setup shortcuts
         Shortcuts.setup(this)
@@ -67,13 +64,14 @@ open class SplashActivity : AppCompatActivity() {
         // Magisk working as expected
         if (Shell.rootAccess() && Config.magiskVersionCode > 0) {
             // Load modules
-            Utils.loadModules(false)
+            //Utils.loadModules(false)
             // Load repos
-            if (Networking.checkNetworkStatus(this))
-                UpdateRepos().exec()
+            if (Networking.checkNetworkStatus(this)) {
+                get<UpdateRepos>().exec().subscribeK()
+            }
         }
 
-        val intent = Intent(this, ClassMap.get<Any>(MainActivity::class.java))
+        val intent = Intent(this, ClassMap[MainActivity::class.java])
         intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION))
         DONE = true
         startActivity(intent)

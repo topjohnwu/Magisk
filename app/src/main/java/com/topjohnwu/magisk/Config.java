@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Xml;
 
@@ -15,26 +16,29 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
 
+import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 
-public class Config {
+import static com.topjohnwu.magisk.ConfigLeanback.getPrefs;
+import static com.topjohnwu.magisk.utils.XAndroidKt.getPackageName;
 
-    // Current status
-    public static String magiskVersionString;
+public final class Config {
+
+    private static final ArrayMap<String, Object> defs = new ArrayMap<>();
     public static int magiskVersionCode = -1;
-    private static boolean magiskHide;
-
+    // Current status
+    public static String magiskVersionString = "";
     // Update Info
-    public static String remoteMagiskVersionString;
+    public static String remoteMagiskVersionString = "";
     public static int remoteMagiskVersionCode = -1;
-    public static String magiskLink;
-    public static String magiskNoteLink;
-    public static String magiskMD5;
-    public static String remoteManagerVersionString;
+    public static String magiskLink = "";
+    public static String magiskNoteLink = "";
+    public static String magiskMD5 = "";
+    public static String remoteManagerVersionString = "";
     public static int remoteManagerVersionCode = -1;
-    public static String managerLink;
-    public static String managerNoteLink;
-    public static String uninstallerLink;
+    public static String managerLink = "";
+    public static String managerNoteLink = "";
+    public static String uninstallerLink = "";
 
     // Install flags
     public static boolean keepVerity = false;
@@ -98,25 +102,76 @@ public class Config {
         public static final int ORDER_DATE = 1;
     }
 
+    private static boolean magiskHide = false;
+
     public static void loadMagiskInfo() {
         try {
             magiskVersionString = ShellUtils.fastCmd("magisk -v").split(":")[0];
             magiskVersionCode = Integer.parseInt(ShellUtils.fastCmd("magisk -V"));
             magiskHide = Shell.su("magiskhide --status").exec().isSuccess();
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
     }
 
     public static void export() {
         // Flush prefs to disk
-        App app = App.self;
-        app.getPrefs().edit().commit();
-        File xml = new File(App.deContext.getFilesDir().getParent() + "/shared_prefs",
-                app.getPackageName() + "_preferences.xml");
+        getPrefs().edit().apply();
+        Context context = ConfigLeanback.getProtectedContext();
+        File xml = new File(context.getFilesDir().getParent() + "/shared_prefs",
+                getPackageName() + "_preferences.xml");
         Shell.su(Utils.fmt("cat %s > /data/adb/%s", xml, Const.MANAGER_CONFIGS)).exec();
     }
 
+    private static final int PREF_INT = 0;
+    private static final int PREF_STR_INT = 1;
+    private static final int PREF_BOOL = 2;
+    private static final int PREF_STR = 3;
+    private static final int DB_INT = 4;
+    private static final int DB_BOOL = 5;
+    private static final int DB_STR = 6;
+
+    private static int getConfigType(String key) {
+        switch (key) {
+            case Key.REPO_ORDER:
+                return PREF_INT;
+
+            case Key.SU_REQUEST_TIMEOUT:
+            case Key.SU_AUTO_RESPONSE:
+            case Key.SU_NOTIFICATION:
+            case Key.UPDATE_CHANNEL:
+                return PREF_STR_INT;
+
+            case Key.DARK_THEME:
+            case Key.SU_REAUTH:
+            case Key.CHECK_UPDATES:
+            case Key.MAGISKHIDE:
+            case Key.COREONLY:
+            case Key.SHOW_SYSTEM_APP:
+                return PREF_BOOL;
+
+            case Key.CUSTOM_CHANNEL:
+            case Key.LOCALE:
+            case Key.ETAG_KEY:
+                return PREF_STR;
+
+            case Key.ROOT_ACCESS:
+            case Key.SU_MNT_NS:
+            case Key.SU_MULTIUSER_MODE:
+                return DB_INT;
+
+            case Key.SU_FINGERPRINT:
+                return DB_BOOL;
+
+            case Key.SU_MANAGER:
+                return DB_STR;
+
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     public static void initialize() {
-        SharedPreferences pref = App.self.getPrefs();
+        SharedPreferences pref = getPrefs();
         SharedPreferences.Editor editor = pref.edit();
         File config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS);
         if (config.exists()) {
@@ -185,124 +240,71 @@ public class Config {
                 .apply();
     }
 
-    private static final int PREF_INT = 0;
-    private static final int PREF_STR_INT = 1;
-    private static final int PREF_BOOL = 2;
-    private static final int PREF_STR = 3;
-    private static final int DB_INT = 4;
-    private static final int DB_BOOL = 5;
-    private static final int DB_STR = 6;
-
-    private static int getConfigType(String key) {
-        switch (key) {
-            case Key.REPO_ORDER:
-                return PREF_INT;
-
-            case Key.SU_REQUEST_TIMEOUT:
-            case Key.SU_AUTO_RESPONSE:
-            case Key.SU_NOTIFICATION:
-            case Key.UPDATE_CHANNEL:
-                return PREF_STR_INT;
-
-            case Key.DARK_THEME:
-            case Key.SU_REAUTH:
-            case Key.CHECK_UPDATES:
-            case Key.MAGISKHIDE:
-            case Key.COREONLY:
-            case Key.SHOW_SYSTEM_APP:
-                return PREF_BOOL;
-
-            case Key.CUSTOM_CHANNEL:
-            case Key.LOCALE:
-            case Key.ETAG_KEY:
-                return PREF_STR;
-
-            case Key.ROOT_ACCESS:
-            case Key.SU_MNT_NS:
-            case Key.SU_MULTIUSER_MODE:
-                return DB_INT;
-
-            case Key.SU_FINGERPRINT:
-                return DB_BOOL;
-
-            case Key.SU_MANAGER:
-                return DB_STR;
-
-            default:
-                throw new IllegalArgumentException();
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public static <T> T get(String key) {
-        App app = App.self;
         switch (getConfigType(key)) {
             case PREF_INT:
-                return (T) (Integer) app.getPrefs().getInt(key, getDef(key));
+                return (T) (Integer) getPrefs().getInt(key, getDef(key));
             case PREF_STR_INT:
-                return (T) (Integer) Utils.getPrefsInt(app.getPrefs(), key, getDef(key));
+                return (T) (Integer) Utils.getPrefsInt(getPrefs(), key, getDef(key));
             case PREF_BOOL:
-                return (T) (Boolean) app.getPrefs().getBoolean(key, getDef(key));
+                return (T) (Boolean) getPrefs().getBoolean(key, getDef(key));
             case PREF_STR:
-                return (T) app.getPrefs().getString(key, getDef(key));
+                return (T) getPrefs().getString(key, getDef(key));
             case DB_INT:
-                return (T) (Integer) app.getDB().getSettings(key, getDef(key));
+                return (T) (Integer) ConfigLeanback.get(key, (Integer) getDef(key));
             case DB_BOOL:
-                return (T) (Boolean) (app.getDB().getSettings(key, getDef(key) ? 1 : 0) != 0);
+                return (T) (Boolean) (ConfigLeanback.get(key, getDef(key) ? 1 : 0) != 0);
             case DB_STR:
-                return (T) app.getDB().getStrings(key, getDef(key));
+                return (T) ConfigLeanback.get(key, getDef(key));
         }
         /* Will never get here (IllegalArgumentException in getConfigType) */
         return null;
     }
 
     public static void set(String key, Object val) {
-        App app = App.self;
         switch (getConfigType(key)) {
             case PREF_INT:
-                app.getPrefs().edit().putInt(key, (int) val).apply();
+                getPrefs().edit().putInt(key, (int) val).apply();
                 break;
             case PREF_STR_INT:
-                app.getPrefs().edit().putString(key, String.valueOf(val)).apply();
+                getPrefs().edit().putString(key, String.valueOf(val)).apply();
                 break;
             case PREF_BOOL:
-                app.getPrefs().edit().putBoolean(key, (boolean) val).apply();
+                getPrefs().edit().putBoolean(key, (boolean) val).apply();
                 break;
             case PREF_STR:
-                app.getPrefs().edit().putString(key, (String) val).apply();
+                getPrefs().edit().putString(key, (String) val).apply();
                 break;
             case DB_INT:
-                app.getDB().setSettings(key, (int) val);
+                ConfigLeanback.put(key, (int) val);
                 break;
             case DB_BOOL:
-                app.getDB().setSettings(key, (boolean) val ? 1 : 0);
+                ConfigLeanback.put(key, (boolean) val ? 1 : 0);
                 break;
             case DB_STR:
-                app.getDB().setStrings(key, (String) val);
+                ConfigLeanback.put(key, (String) val);
                 break;
         }
     }
 
     public static void remove(String key) {
-        App app = App.self;
         switch (getConfigType(key)) {
             case PREF_INT:
             case PREF_STR_INT:
             case PREF_BOOL:
             case PREF_STR:
-                app.getPrefs().edit().remove(key).apply();
+                getPrefs().edit().remove(key).apply();
                 break;
             case DB_BOOL:
             case DB_INT:
-                app.getDB().rmSettings(key);
+                ConfigLeanback.delete(key);
                 break;
             case DB_STR:
-                app.getDB().setStrings(key, null);
+                ConfigLeanback.put(key, null);
                 break;
         }
     }
-
-    private static ArrayMap<String, Object> defs = new ArrayMap<>();
 
     static {
         /* Set default configurations */
@@ -340,7 +342,9 @@ public class Config {
         //defs.put(Key.SU_MANAGER, null);
     }
 
-    private static <T> T getDef(String key) {
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private static <T> T getDef(String key) throws IllegalArgumentException {
         Object val = defs.get(key);
         switch (getConfigType(key)) {
             case PREF_INT:
@@ -359,36 +363,35 @@ public class Config {
     }
 
     private static void setDefs(SharedPreferences pref, SharedPreferences.Editor editor) {
-        App app = App.self;
         for (String key : defs.keySet()) {
+            Object value = defs.get(key);
             int type = getConfigType(key);
             switch (type) {
                 case DB_INT:
-                    editor.putString(key, String.valueOf(
-                            app.getDB().getSettings(key, (Integer) defs.get(key))));
+                    editor.putString(key, String.valueOf(ConfigLeanback.get(key, (Integer) value)));
                     continue;
                 case DB_STR:
-                    editor.putString(key, app.getDB().getStrings(key, (String) defs.get(key)));
+                    editor.putString(key, ConfigLeanback.get(key, String.valueOf(value)));
                     continue;
                 case DB_BOOL:
-                    int bs = app.getDB().getSettings(key, -1);
-                    editor.putBoolean(key, bs < 0 ? (Boolean) defs.get(key) : bs != 0);
+                    int bs = ConfigLeanback.get(key, -1);
+                    editor.putBoolean(key, bs < 0 ? (Boolean) value : bs != 0);
                     continue;
             }
             if (pref.contains(key))
                 continue;
             switch (type) {
                 case PREF_INT:
-                    editor.putInt(key, (Integer) defs.get(key));
+                    editor.putInt(key, (Integer) value);
                     break;
                 case PREF_STR_INT:
-                    editor.putString(key, String.valueOf(defs.get(key)));
+                    editor.putString(key, String.valueOf(value));
                     break;
                 case PREF_STR:
-                    editor.putString(key, (String) defs.get(key));
+                    editor.putString(key, (String) value);
                     break;
                 case PREF_BOOL:
-                    editor.putBoolean(key, (Boolean) defs.get(key));
+                    editor.putBoolean(key, (Boolean) value);
                     break;
             }
         }

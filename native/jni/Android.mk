@@ -41,6 +41,7 @@ LOCAL_SRC_FILES := \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \
+	magiskhide/hide_policy.cpp \
 	resetprop/persist_properties.cpp \
 	resetprop/resetprop.cpp \
 	resetprop/system_property_api.cpp \
@@ -51,6 +52,30 @@ LOCAL_SRC_FILES := \
 	su/su_daemon.cpp
 
 LOCAL_LDLIBS := -llog
+include $(BUILD_EXECUTABLE)
+
+endif
+
+ifdef B_POLICY
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := magiskpolicy
+LOCAL_STATIC_LIBRARIES := libsepol libutils
+LOCAL_C_INCLUDES := \
+	jni/include \
+	$(LIBSEPOL) \
+	$(LIBUTILS)
+
+LOCAL_SRC_FILES := \
+	core/applet_stub.cpp \
+	magiskpolicy/api.cpp \
+	magiskpolicy/magiskpolicy.cpp \
+	magiskpolicy/rules.cpp \
+	magiskpolicy/policydb.cpp \
+	magiskpolicy/sepolicy.c
+
+LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
+LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
@@ -79,7 +104,10 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	core/init.cpp \
+	init/init.cpp \
+	init/early_mount.cpp \
+	init/rootfs.cpp \
+	init/getinfo.cpp \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \

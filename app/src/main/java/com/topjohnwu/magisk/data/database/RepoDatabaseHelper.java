@@ -11,13 +11,15 @@ import com.topjohnwu.magisk.model.entity.Repo;
 import java.util.HashSet;
 import java.util.Set;
 
+@Deprecated
 public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VER = 5;
     private static final String TABLE_NAME = "repos";
 
-    private SQLiteDatabase mDb;
+    private final SQLiteDatabase mDb;
 
+    @Deprecated
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
         mDb = getWritableDatabase();
@@ -46,32 +48,38 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         onUpgrade(db, 0, DATABASE_VER);
     }
 
+    @Deprecated
     public void clearRepo() {
         mDb.delete(TABLE_NAME, null, null);
     }
 
 
+    @Deprecated
     public void removeRepo(String id) {
-        mDb.delete(TABLE_NAME, "id=?", new String[] { id });
+        mDb.delete(TABLE_NAME, "id=?", new String[]{id});
     }
 
+    @Deprecated
     public void removeRepo(Repo repo) {
         removeRepo(repo.getId());
     }
 
+    @Deprecated
     public void removeRepo(Iterable<String> list) {
         for (String id : list) {
             if (id == null) continue;
-            mDb.delete(TABLE_NAME, "id=?", new String[] { id });
+            mDb.delete(TABLE_NAME, "id=?", new String[]{id});
         }
     }
 
+    @Deprecated
     public void addRepo(Repo repo) {
         mDb.replace(TABLE_NAME, null, repo.getContentValues());
     }
 
+    @Deprecated
     public Repo getRepo(String id) {
-        try (Cursor c = mDb.query(TABLE_NAME, null, "id=?", new String[] { id }, null, null, null)) {
+        try (Cursor c = mDb.query(TABLE_NAME, null, "id=?", new String[]{id}, null, null, null)) {
             if (c.moveToNext()) {
                 return new Repo(c);
             }
@@ -79,10 +87,12 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    @Deprecated
     public Cursor getRawCursor() {
         return mDb.query(TABLE_NAME, null, null, null, null, null, null);
     }
 
+    @Deprecated
     public Cursor getRepoCursor() {
         String orderBy = null;
         switch ((int) Config.get(Config.Key.REPO_ORDER)) {
@@ -95,6 +105,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         return mDb.query(TABLE_NAME, null, null, null, null, null, orderBy);
     }
 
+    @Deprecated
     public Set<String> getRepoIDSet() {
         HashSet<String> set = new HashSet<>(300);
         try (Cursor c = mDb.query(TABLE_NAME, null, null, null, null, null, null)) {

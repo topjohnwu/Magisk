@@ -7,16 +7,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.OpenableColumns;
 import android.widget.Toast;
-
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
@@ -24,7 +16,7 @@ import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.model.entity.Module;
+import com.topjohnwu.magisk.model.entity.OldModule;
 import com.topjohnwu.magisk.model.update.UpdateCheckService;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
@@ -34,6 +26,14 @@ import com.topjohnwu.superuser.io.SuFile;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import androidx.annotation.WorkerThread;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.ListenableWorker;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 public class Utils {
 
@@ -72,7 +72,7 @@ public class Utils {
             if (info.labelRes > 0) {
                 Resources res = pm.getResourcesForApplication(info);
                 Configuration config = new Configuration();
-                config.setLocale(LocaleManager.locale);
+                config.setLocale(LocaleManager.getLocale());
                 res.updateConfiguration(config, res.getDisplayMetrics());
                 return res.getString(info.labelRes);
             }
@@ -86,28 +86,19 @@ public class Utils {
                 .replace("#", "").replace("@", "").replace("\\", "_");
     }
 
-    public static void loadModules() {
-        loadModules(true);
-    }
-
-    public static void loadModules(boolean async) {
-        Event.reset(Event.MODULE_LOAD_DONE);
-        Runnable run = () -> {
-            Map<String, Module> moduleMap = new ValueSortedMap<>();
-            SuFile path = new SuFile(Const.MAGISK_PATH);
-            SuFile[] modules = path.listFiles(
-                    (file, name) -> !name.equals("lost+found") && !name.equals(".core"));
-            for (SuFile file : modules) {
-                if (file.isFile()) continue;
-                Module module = new Module(Const.MAGISK_PATH + "/" + file.getName());
-                moduleMap.put(module.getId(), module);
-            }
-            Event.trigger(Event.MODULE_LOAD_DONE, moduleMap);
-        };
-        if (async)
-            App.THREAD_POOL.execute(run);
-        else
-            run.run();
+    @WorkerThread
+    public static Map<String, OldModule> loadModulesLeanback() {
+        final Map<String, OldModule> moduleMap = new ValueSortedMap<>();
+        final SuFile path = new SuFile(Const.MAGISK_PATH);
+        final SuFile[] modules = path.listFiles((file, name) ->
+                !name.equals("lost+found") && !name.equals(".core")
+        );
+        for (SuFile file : modules) {
+            if (file.isFile()) continue;
+            OldModule module = new OldModule(Const.MAGISK_PATH + "/" + file.getName());
+            moduleMap.put(module.getId(), module);
+        }
+        return moduleMap;
     }
 
     public static boolean showSuperUser() {
@@ -120,13 +111,17 @@ public class Utils {
         return BuildConfig.VERSION_NAME.contains("-");
     }
 
+    @SuppressWarnings("unchecked")
     public static void scheduleUpdateCheck() {
         if (Config.get(Config.Key.CHECK_UPDATES)) {
             Constraints constraints = new Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
+                    //ensures that notification doesn't pop up every time user starts the app
+                    .setRequiresDeviceIdle(true)
                     .build();
+            Class<? extends ListenableWorker> service = (Class<? extends ListenableWorker>) ClassMap.get(UpdateCheckService.class);
             PeriodicWorkRequest request = new PeriodicWorkRequest
-                    .Builder(ClassMap.get(UpdateCheckService.class), 12, TimeUnit.HOURS)
+                    .Builder(service, 12, TimeUnit.HOURS)
                     .setConstraints(constraints)
                     .build();
             WorkManager.getInstance().enqueueUniquePeriodicWork(

@@ -6,8 +6,8 @@ import android.util.Pair;
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.data.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.model.entity.Repo;
-import com.topjohnwu.magisk.utils.Event;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.Networking;
@@ -31,16 +31,25 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import androidx.annotation.NonNull;
+import io.reactivex.Single;
+
+@Deprecated
 public class UpdateRepos {
     private static final DateFormat DATE_FORMAT;
-
-    private final App app = App.self;
-    private Set<String> cached;
-    private Queue<Pair<String, Date>> moduleQueue;
 
     static {
         DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    @NonNull
+    private final RepoDatabaseHelper repoDB;
+    private Set<String> cached;
+    private Queue<Pair<String, Date>> moduleQueue;
+
+    public UpdateRepos(@NonNull RepoDatabaseHelper repoDatabase) {
+        repoDB = repoDatabase;
     }
 
     private void runTasks(Runnable task) {
@@ -54,7 +63,8 @@ public class UpdateRepos {
                     f.get();
                 } catch (InterruptedException e) {
                     continue;
-                } catch (ExecutionException ignored) {}
+                } catch (ExecutionException ignored) {
+                }
                 break;
             }
         }
@@ -116,17 +126,17 @@ public class UpdateRepos {
                 Pair<String, Date> pair = moduleQueue.poll();
                 if (pair == null)
                     return;
-                Repo repo = app.getRepoDB().getRepo(pair.first);
+                Repo repo = repoDB.getRepo(pair.first);
                 try {
                     if (repo == null)
                         repo = new Repo(pair.first);
                     else
                         cached.remove(pair.first);
                     repo.update(pair.second);
-                    app.getRepoDB().addRepo(repo);
+                    repoDB.addRepo(repo);
                 } catch (Repo.IllegalRepoException e) {
                     Logger.debug(e.getMessage());
-                    app.getRepoDB().removeRepo(pair.first);
+                    repoDB.removeRepo(pair.first);
                 }
             }
         });
@@ -134,7 +144,7 @@ public class UpdateRepos {
     }
 
     private void fullReload() {
-        Cursor c = app.getRepoDB().getRawCursor();
+        Cursor c = repoDB.getRawCursor();
         runTasks(() -> {
             while (true) {
                 Repo repo;
@@ -145,32 +155,31 @@ public class UpdateRepos {
                 }
                 try {
                     repo.update();
-                    app.getRepoDB().addRepo(repo);
+                    repoDB.addRepo(repo);
                 } catch (Repo.IllegalRepoException e) {
                     Logger.debug(e.getMessage());
-                    app.getRepoDB().removeRepo(repo);
+                    repoDB.removeRepo(repo);
                 }
             }
         });
     }
 
-    public void exec(boolean force) {
-        Event.reset(Event.REPO_LOAD_DONE);
-        App.THREAD_POOL.execute(() -> {
-            cached = Collections.synchronizedSet(app.getRepoDB().getRepoIDSet());
+    public Single<Boolean> exec(boolean force) {
+        return Single.fromCallable(() -> {
+            cached = Collections.synchronizedSet(repoDB.getRepoIDSet());
             moduleQueue = new ConcurrentLinkedQueue<>();
 
             if (loadPages()) {
                 // The leftover cached means they are removed from online repo
-                app.getRepoDB().removeRepo(cached);
+                repoDB.removeRepo(cached);
             } else if (force) {
                 fullReload();
             }
-            Event.trigger(Event.REPO_LOAD_DONE);
+            return force; // not important
         });
     }
 
-    public void exec() {
-        exec(false);
+    public Single<Boolean> exec() {
+        return exec(false);
     }
 }

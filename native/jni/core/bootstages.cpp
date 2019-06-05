@@ -525,7 +525,7 @@ static void dump_logs() {
 	rename(LOGFILE, LOGFILE ".bak");
 	log_dump = true;
 	// Start a daemon thread and wait indefinitely
-	new_daemon_thread([](auto) -> void* {
+	new_daemon_thread([]() -> void {
 		int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
 		exec_t exec {
 			.fd = fd,
@@ -535,10 +535,9 @@ static void dump_logs() {
 		close(fd);
 		if (pid < 0) {
 			log_dump = false;
-			return nullptr;
+		} else {
+			waitpid(pid, nullptr, 0);
 		}
-		waitpid(pid, nullptr, 0);
-		return nullptr;
 	});
 }
 
@@ -693,6 +692,14 @@ void late_start(int client) {
 			exec_command_sync("/system/bin/reboot", "recovery");
 		else
 			exec_command_sync("/system/bin/reboot");
+	}
+
+	if (access(BBPATH, F_OK) != 0){
+		LOGE("* post-fs-data mode is not triggered\n");
+		unlock_blocks();
+		magisk_env();
+		prepare_modules();
+		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
 	}
 
 	auto_start_magiskhide();

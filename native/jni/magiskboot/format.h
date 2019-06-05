@@ -8,8 +8,6 @@ typedef enum {
 /* Boot formats */
 	CHROMEOS,
 	AOSP,
-	ELF32,
-	ELF64,
 	DHTB,
 	BLOB,
 /* Compression formats */
@@ -19,8 +17,9 @@ typedef enum {
 	BZIP2,
 	LZ4,
 	LZ4_LEGACY,
-/* Misc */
+/* Unsupported compression */
 	LZOP,
+/* Misc */
 	MTK,
 	DTB,
 } format_t;
@@ -29,8 +28,6 @@ typedef enum {
 
 #define BOOT_MAGIC      "ANDROID!"
 #define CHROMEOS_MAGIC  "CHROMEOS"
-#define ELF32_MAGIC     "\x7f""ELF\x01"
-#define ELF64_MAGIC     "\x7f""ELF\x02"
 #define GZIP1_MAGIC     "\x1f\x8b"
 #define GZIP2_MAGIC     "\x1f\x9e"
 #define LZOP_MAGIC      "\x89""LZO"

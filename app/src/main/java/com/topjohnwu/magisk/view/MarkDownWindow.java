@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.view;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.net.Networking;
@@ -50,7 +51,13 @@ public class MarkDownWindow {
             AlertDialog.Builder alert = new AlertDialog.Builder(activity);
             alert.setTitle(title);
             View mv = LayoutInflater.from(activity).inflate(R.layout.markdown_window, null);
-            markwon.setMarkdown(mv.findViewById(R.id.md_txt), md);
+            TextView tv = mv.findViewById(R.id.md_txt);
+            try {
+                markwon.setMarkdown(tv, md);
+            } catch (ExceptionInInitializerError e) {
+                //Nothing we can do about this error other than show error message
+                tv.setText(R.string.download_file_error);
+            }
             alert.setView(mv);
             alert.setNegativeButton(R.string.close, (dialog, id) -> dialog.dismiss());
             alert.show();

@@ -110,12 +110,10 @@
 
                 <View
                     style="@style/Widget.Divider.Horizontal"
-                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_margin="@dimen/margin_generic" />
 
                 <LinearLayout
-                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:animateLayoutChanges="true"

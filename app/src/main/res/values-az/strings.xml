@@ -38,7 +38,7 @@
 
     <string name="magisk_up_to_date">Magisk\'in son versiyası yüklənib</string>
 
-    <string name="manager_up_to_date">Magisk Menecer\'in son versiyası yüklənib </string>
+    <string name="manager_up_to_date">Magisk Manager\'in son versiyası yüklənib </string>
 
     <string name="advanced_settings_title">Qabaqcıl Parametrlər</string>
 
@@ -148,7 +148,7 @@
 
     <string name="settings_reboot_toast">Tənzimləmələri saxlamaq üçün yenidən başladın.</string>
 
-    <string name="release_notes">Buraxılış qeydləri</string>
+    <string name="release_notes">Yeniliklər</string>
 
     <string name="repo_cache_cleared">Repo keşi silindi</string>
 
@@ -158,11 +158,11 @@
 
     <string name="dtbo_patched_title">DTBO yamaqlanıb!</string>
 
-    <string name="dtbo_patched_reboot">Magisk Menecer dtbo.img\'ni yamaqladı. Xahiş olunur yenidən başladın.</string>
+    <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'ni yamaqladı. Xahiş olunur yenidən başladın.</string>
 
     <string name="flashing">Qurulur</string>
 
-    <string name="hide_manager_title">Magisk Manageri\'i gizlədilir…</string>
+    <string name="hide_manager_title">Magisk Manager gizlədilir…</string>
 
     <string name="hide_manager_fail_toast">Magisk Manager\'i gizlətmək alınmadı.</string>
 
@@ -224,11 +224,11 @@
 
     <string name="settings_hide_manager_title">Magisk Manager\'i Gizlə</string>
 
-    <string name="settings_hide_manager_summary">Magisk Manageri\'i təsadüfi adla yenidən sıxışdır.</string>
+    <string name="settings_hide_manager_summary">Magisk Manager\'i təsadüfi adla yenidən sıxışdır.</string>
 
     <string name="settings_restore_manager_title">Magisk Manager\'i Geri Qaytar</string>
 
-    <string name="settings_restore_manager_summary">Magisk Manageri\'i orjinal sıxışdırma ilə geri qaytar</string>
+    <string name="settings_restore_manager_summary">Magisk Manager\'i orjinal sıxışdırma ilə geri qaytar</string>
 
     <string name="language">Dil</string>
 
