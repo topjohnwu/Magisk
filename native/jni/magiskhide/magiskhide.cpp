@@ -6,9 +6,11 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/mount.h>
 
 #include <magisk.h>
 #include <daemon.h>
+#include <utils.h>
 #include <flags.h>
 
 #include "magiskhide.h"
@@ -28,6 +30,8 @@ bool hide_enabled = false;
 		"   add PKG [PROC]  Add a new target to the hide list\n"
 		"   rm PKG [PROC]   Remove target(s) from the hide list\n"
 		"   ls              Print the current hide list\n"
+		"   exec CMDs...    Execute commands in isolated mount\n"
+		"                   namespace and do all hide unmounts\n"
 #ifdef MAGISK_DEBUG
 		"   test            Run process monitor test\n"
 #endif
@@ -99,6 +103,13 @@ int magiskhide_main(int argc, char *argv[]) {
 		req = LS_HIDELIST;
 	else if (opt == "status"sv)
 		req = HIDE_STATUS;
+	else if (opt == "exec"sv && argc > 2) {
+		xunshare(CLONE_NEWNS);
+		xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
+		hide_unmount();
+		execvp(argv[2], argv + 2);
+		exit(1);
+	}
 #ifdef MAGISK_DEBUG
 	else if (opt == "test"sv)
 		test_proc_monitor();

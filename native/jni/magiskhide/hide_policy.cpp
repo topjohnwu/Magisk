@@ -41,7 +41,10 @@ void hide_daemon(int pid) {
 		tgkill(pid, pid, SIGCONT);
 		_exit(0);
 	});
+	hide_unmount(pid);
+}
 
+void hide_unmount(int pid) {
 	if (switch_mnt_ns(pid))
 		return;
 

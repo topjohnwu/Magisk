@@ -37,6 +37,7 @@ void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
 
 // Hide policies
 void hide_daemon(int pid);
+void hide_unmount(int pid = getpid());
 void hide_sensitive_props();
 
 extern bool hide_enabled;
