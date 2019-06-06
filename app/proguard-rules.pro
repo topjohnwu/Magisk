@@ -16,9 +16,6 @@
 #   public *;
 #}
 
-# Retrofit classes
--keep,allowobfuscation class com.topjohnwu.magisk.data.network.*
-
 # Snet
 -keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
 -keep,allowobfuscation interface com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback
