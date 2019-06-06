@@ -419,7 +419,7 @@ void repack(const char* orig_image, const char* out_image) {
 		size_t raw_size;
 		void *raw_buf;
 		mmap_ro(KERNEL_FILE, raw_buf, raw_size);
-		if (!COMPRESSED(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.k_fmt)) {
+		if (!COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.k_fmt)) {
 			boot.hdr->kernel_size = compress(boot.k_fmt, fd, raw_buf, raw_size);
 		} else {
 			boot.hdr->kernel_size = write(fd, raw_buf, raw_size);
@@ -442,7 +442,7 @@ void repack(const char* orig_image, const char* out_image) {
 		size_t raw_size;
 		void *raw_buf;
 		mmap_ro(RAMDISK_FILE, raw_buf, raw_size);
-		if (!COMPRESSED(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt)) {
+		if (!COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt)) {
 			boot.hdr->ramdisk_size = compress(boot.r_fmt, fd, raw_buf, raw_size);
 		} else {
 			boot.hdr->ramdisk_size = write(fd, raw_buf, raw_size);
