@@ -36,7 +36,6 @@ subprojects {
     repositories {
         google()
         jcenter()
-        maven { url "https://maven.fabric.io/public" }
         maven { url "https://jitpack.io" }
         maven { url "http://oss.sonatype.org/content/repositories/snapshots" }
     }
@@ -44,8 +43,8 @@ subprojects {
         if (getPlugins().hasPlugin('com.android.library') ||
             getPlugins().hasPlugin('com.android.application')) {
             android {
-                compileSdkVersion 'android-Q'
-                buildToolsVersion '29.0.0-rc3'
+                compileSdkVersion 29
+                buildToolsVersion '29.0.0'
 
                 defaultConfig {
                     if (minSdkVersion == null)
