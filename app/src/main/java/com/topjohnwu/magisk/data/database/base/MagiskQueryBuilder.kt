@@ -32,11 +32,7 @@ class Delete : MagiskQueryBuilder {
     }
 
     override fun toString(): String {
-        return StringBuilder()
-            .appendln(requestType)
-            .appendln(table)
-            .appendln(condition)
-            .toString()
+        return listOf(requestType, table, condition).joinToString(" ")
     }
 }
 
@@ -65,13 +61,7 @@ class Select : MagiskQueryBuilder {
     }
 
     override fun toString(): String {
-        return StringBuilder()
-            .appendln(requestType)
-            .appendln(table)
-            .appendln(condition)
-            .appendln(orderField)
-            .toString()
-            .replace("\n", " ")
+        return listOf(requestType, table, condition, orderField).joinToString(" ")
     }
 }
 
@@ -84,23 +74,21 @@ open class Insert : MagiskQueryBuilder {
     override lateinit var table: String
 
     private val keys get() = _values.keys.joinToString(",")
-    private val values get() = _values.values.joinToString(",") { "\"$it\"" }
-    private var _values: Map<String, String> = mapOf()
+    private val values get() = _values.values.joinToString(",") {
+        if (it is String) "\"$it\"" else it.toString()
+    }
+    private var _values: Map<String, Any> = mapOf()
 
-    fun values(vararg pairs: Pair<String, String>) {
+    fun values(vararg pairs: Pair<String, Any>) {
         _values = pairs.toMap()
     }
 
-    fun values(values: Map<String, String>) {
+    fun values(values: Map<String, Any>) {
         _values = values
     }
 
     override fun toString(): String {
-        return StringBuilder()
-            .appendln(requestType)
-            .appendln(table)
-            .appendln("($keys) VALUES($values)")
-            .toString()
+        return listOf(requestType, table, "($keys) VALUES($values)").joinToString(" ")
     }
 }
 

@@ -10,8 +10,8 @@ class StringDao : BaseDao() {
         condition { equals("key", key) }
     }.ignoreElement()
 
-    fun put(key: String, value: String) = query<Insert> {
-        values(key to value)
+    fun put(key: String, value: String) = query<Replace> {
+        values("key" to key, "value" to value)
     }.ignoreElement()
 
     fun fetch(key: String, default: String = "") = query<Select> {
