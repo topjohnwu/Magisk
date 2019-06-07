@@ -26,11 +26,12 @@ static void usage(char *arg0) {
 		"    Return values:\n"
 		"    0:valid    1:error    2:chromeos\n"
 		"\n"
-		"  repack <origbootimg> [outbootimg]\n"
+		"  repack [-n] <origbootimg> [outbootimg]\n"
 		"    Repack boot image components from current directory\n"
 		"    to [outbootimg], or new-boot.img if not specified.\n"
-		"    It will compress ramdisk.cpio and kernel with the same method in\n"
-		"    <origbootimg> if the file provided is not already compressed.\n"
+		"    If '-n' is provided, it will not attempt to recompress ramdisk.cpio,\n"
+		"    otherwise it will compress ramdisk.cpio and kernel with the same method\n"
+		"    in <origbootimg> if the file provided is not already compressed.\n"
 		"\n"
 		"  hexpatch <file> <hexpattern1> <hexpattern2>\n"
 		"    Search <hexpattern1> in <file>, and replace with <hexpattern2>\n"
@@ -145,7 +146,13 @@ int main(int argc, char *argv[]) {
 			return unpack(argv[2]);
 		}
 	} else if (argc > 2 && strcmp(argv[1], "repack") == 0) {
-		repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
+		if (strcmp(argv[2], "-n") == 0) {
+			if (argc == 4)
+				usage(argv[0]);
+			repack(argv[3], argv[4] ? argv[4] : NEW_BOOT, true);
+		} else {
+			repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
+		}
 	} else if (argc > 2 && strcmp(argv[1], "decompress") == 0) {
 		decompress(argv[2], argv[3]);
 	} else if (argc > 2 && strncmp(argv[1], "compress", 8) == 0) {
