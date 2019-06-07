@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.di
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Constants
 import com.topjohnwu.magisk.data.network.GithubRawApiServices
 import okhttp3.OkHttpClient
@@ -23,13 +24,16 @@ val networkingModule = module {
 }
 
 fun createOkHttpClient(): OkHttpClient {
-    val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+    val builder = OkHttpClient.Builder()
+
+    if (BuildConfig.DEBUG) {
+        val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+        builder.addInterceptor(httpLoggingInterceptor)
     }
 
-    return OkHttpClient.Builder()
-        .addInterceptor(httpLoggingInterceptor)
-        .build()
+    return builder.build()
 }
 
 fun createConverterFactory(): Converter.Factory {

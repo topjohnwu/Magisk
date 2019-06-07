@@ -55,6 +55,12 @@ class SuperuserViewModel(
             .flattenAsFlowable { it }
             .map { PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager)) }
             .toList()
+            .map {
+                it.sortedWith(compareBy(
+                    { it.item.appName.toLowerCase() },
+                    { it.item.packageName }
+                ))
+            }
             .applySchedulers()
             .applyViewModel(this)
             .subscribeK { items.update(it) }
