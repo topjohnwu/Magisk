@@ -75,7 +75,11 @@ open class Insert : MagiskQueryBuilder {
 
     private val keys get() = _values.keys.joinToString(",")
     private val values get() = _values.values.joinToString(",") {
-        if (it is String) "\"$it\"" else it.toString()
+        when (it) {
+            is Boolean -> if (it) "1" else "0"
+            is Number -> it.toString()
+            else -> "\"$it\""
+        }
     }
     private var _values: Map<String, Any> = mapOf()
 
