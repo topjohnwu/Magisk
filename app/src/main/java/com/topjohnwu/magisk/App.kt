@@ -10,6 +10,9 @@ import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
+import androidx.room.Room
+import androidx.work.impl.WorkDatabase
+import androidx.work.impl.WorkDatabase_Impl
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.RootUtils
@@ -107,6 +110,12 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
             Shell.Config.addInitializers(RootUtils::class.java)
             Shell.Config.setTimeout(2)
             THREAD_POOL = AsyncTask.THREAD_POOL_EXECUTOR as ThreadPoolExecutor
+            Room.setFactory {
+                when (it) {
+                    WorkDatabase::class.java -> WorkDatabase_Impl()
+                    else -> null
+                }
+            }
         }
 
         @Deprecated("")

@@ -90,6 +90,14 @@ dependencies {
     implementation "se.ansman.kotshi:api:${vKotshi}"
     kapt "se.ansman.kotshi:compiler:${vKotshi}"
 
+    modules {
+        module('androidx.room:room-runtime') {
+            replacedBy('com.github.topjohnwu:room-runtime')
+        }
+    }
+    def vRoom = "2.1.0-rc01"
+    implementation "com.github.topjohnwu:room-runtime:${vRoom}"
+
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.preference:preference:1.0.0'
