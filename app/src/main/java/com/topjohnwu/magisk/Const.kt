@@ -9,32 +9,27 @@ object Const {
 
     const val DEBUG_TAG = "MagiskManager"
 
-    // APK content
-    const val ANDROID_MANIFEST = "AndroidManifest.xml"
-
-    const val SU_KEYSTORE_KEY = "su_key"
-
     // Paths
     const val MAGISK_PATH = "/sbin/.magisk/img"
     @JvmField
-    val EXTERNAL_PATH: File =
-        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val EXTERNAL_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)!!
     @JvmField
-    var MAGISK_DISABLE_FILE: File = File("xxx")
-
+    var MAGISK_DISABLE_FILE = File("xxx")
     const val TMP_FOLDER_PATH = "/dev/tmp"
     const val MAGISK_LOG = "/cache/magisk.log"
-    const val MANAGER_CONFIGS = ".tmp.magisk.config"
 
     // Versions
     const val UPDATE_SERVICE_VER = 1
     const val SNET_EXT_VER = 12
+    const val SNET_REVISION = "b66b1a914978e5f4c4bbfd74a59f4ad371bac107"
+    const val BOOTCTL_REVISION = "9c5dfc1b8245c0b5b524901ef0ff0f8335757b77"
 
+    // Misc
+    const val ANDROID_MANIFEST = "AndroidManifest.xml"
+    const val MAGISK_INSTALL_LOG_FILENAME = "magisk_install_log_%s.log"
+    const val MANAGER_CONFIGS = ".tmp.magisk.config"
     @JvmField
     val USER_ID = Process.myUid() / 100000
-
-    // Generic
-    const val MAGISK_INSTALL_LOG_FILENAME = "magisk_install_log_%s.log"
 
     init {
         EXTERNAL_PATH.mkdirs()
@@ -75,9 +70,10 @@ object Const {
         val SNET_URL = getRaw("b66b1a914978e5f4c4bbfd74a59f4ad371bac107", "snet.apk")
         @JvmField
         val BOOTCTL_URL = getRaw("9c5dfc1b8245c0b5b524901ef0ff0f8335757b77", "bootctl")
+        const val GITHUB_RAW_API_URL = "https://raw.githubusercontent.com/"
 
         private fun getRaw(where: String, name: String) =
-            "https://raw.githubusercontent.com/topjohnwu/magisk_files/%s/%s".format(where, name)
+            "${GITHUB_RAW_API_URL}topjohnwu/magisk_files/$where/$name"
     }
 
     object Key {

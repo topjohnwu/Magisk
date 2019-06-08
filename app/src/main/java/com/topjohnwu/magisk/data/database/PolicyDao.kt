@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.data.database
 
 import android.content.Context
 import android.content.pm.PackageManager
-import com.topjohnwu.magisk.Constants
+import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.data.database.base.*
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.toMap
@@ -60,7 +60,7 @@ class PolicyDao(
 
     fun fetchAll() = query<Select> {
         condition {
-            equals("uid/100000", Constants.USER_ID)
+            equals("uid/100000", Const.USER_ID)
         }
     }.flattenAsFlowable { it }
         .map { it.toPolicy(context.packageManager) }

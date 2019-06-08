@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.data.network
 
-import com.topjohnwu.magisk.Constants
+import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.KConfig
 import com.topjohnwu.magisk.model.entity.MagiskConfig
 import io.reactivex.Single
@@ -32,11 +32,11 @@ interface GithubRawApiServices {
 
     @GET("$MAGISK_FILES/{$REVISION}/snet.apk")
     @Streaming
-    fun fetchSafetynet(@Path(REVISION) revision: String = Constants.SNET_REVISION): Single<ResponseBody>
+    fun fetchSafetynet(@Path(REVISION) revision: String = Const.SNET_REVISION): Single<ResponseBody>
 
     @GET("$MAGISK_FILES/{$REVISION}/bootctl")
     @Streaming
-    fun fetchBootctl(@Path(REVISION) revision: String = Constants.BOOTCTL_REVISION): Single<ResponseBody>
+    fun fetchBootctl(@Path(REVISION) revision: String = Const.BOOTCTL_REVISION): Single<ResponseBody>
 
     //endregion
 

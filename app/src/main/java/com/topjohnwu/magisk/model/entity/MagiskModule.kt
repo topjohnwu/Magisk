@@ -6,7 +6,7 @@ import androidx.annotation.NonNull
 import androidx.annotation.WorkerThread
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.topjohnwu.magisk.Constants
+import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.data.database.base.su
 import io.reactivex.Single
 import kotlinx.android.parcel.Parcelize
@@ -48,7 +48,7 @@ data class Module(
 
 @AnyThread
 fun File.toModule(): Single<Module> {
-    val path = "${Constants.MAGISK_PATH}/$name"
+    val path = "${Const.MAGISK_PATH}/$name"
     return "dos2unix < $path/module.prop".su()
         .map { it.first().toModule(path) }
 }

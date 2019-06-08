@@ -25,6 +25,7 @@ public abstract class FingerprintHelper {
     private FingerprintManager manager;
     private Cipher cipher;
     private CancellationSignal cancel;
+    private static final String SU_KEYSTORE_KEY = "su_key";
 
     public static boolean useFingerprint() {
         boolean fp = Config.get(Config.Key.SU_FINGERPRINT);
@@ -50,7 +51,7 @@ public abstract class FingerprintHelper {
                 + KeyProperties.BLOCK_MODE_CBC + "/"
                 + KeyProperties.ENCRYPTION_PADDING_PKCS7);
         keyStore.load(null);
-        SecretKey key = (SecretKey) keyStore.getKey(Const.SU_KEYSTORE_KEY, null);
+        SecretKey key = (SecretKey) keyStore.getKey(SU_KEYSTORE_KEY, null);
         if (key == null) {
             key = generateKey();
         }
@@ -86,7 +87,7 @@ public abstract class FingerprintHelper {
         KeyGenerator keygen = KeyGenerator
                 .getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
         KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(
-                Const.SU_KEYSTORE_KEY,
+                SU_KEYSTORE_KEY,
                 KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                 .setUserAuthenticationRequired(true)

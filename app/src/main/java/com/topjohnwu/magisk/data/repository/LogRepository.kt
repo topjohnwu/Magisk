@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.data.repository
 
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.Constants
 import com.topjohnwu.magisk.data.database.LogDao
 import com.topjohnwu.magisk.data.database.base.suRaw
 import com.topjohnwu.magisk.model.entity.MagiskLog
@@ -20,7 +19,7 @@ class LogRepository(
         .map { it.sortByDescending { it.date.time }; it }
         .map { it.wrap() }
 
-    fun fetchMagiskLogs() = "tail -n 5000 ${Constants.MAGISK_LOG}".suRaw()
+    fun fetchMagiskLogs() = "tail -n 5000 ${Const.MAGISK_LOG}".suRaw()
         .filter { it.isNotEmpty() }
         .map { Timber.i(it.toString()); it }
 
