@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 	} else if (argc > 2 && strncmp(argv[1], "compress", 8) == 0) {
 		compress(argv[1][8] == '=' ? &argv[1][9] : "gzip", argv[2], argv[3]);
 	} else if (argc > 4 && strcmp(argv[1], "hexpatch") == 0) {
-		hexpatch(argv[2], argv[3], argv[4]);
+		return hexpatch(argv[2], argv[3], argv[4]);
 	} else if (argc > 2 && strcmp(argv[1], "cpio") == 0) {
 		if (cpio_commands(argc - 2, argv + 2)) usage(argv[0]);
 	} else if (argc > 2 && strncmp(argv[1], "dtb", 3) == 0) {
