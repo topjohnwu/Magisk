@@ -6,10 +6,9 @@ import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.model.preference.PreferenceModel
 import com.topjohnwu.magisk.utils.inject
 
-object KConfig : PreferenceModel() {
+object KConfig : PreferenceModel {
 
     override val context: Context by inject(Protected)
-    override val fileName: String = "${context.packageName}_preferences"
 
     private var internalUpdateChannel by preference(Config.Key.UPDATE_CHANNEL, STABLE.id.toString())
     var useCustomTabs by preference("useCustomTabs", true)

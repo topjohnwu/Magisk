@@ -16,7 +16,7 @@ class StringProperty(
         property: KProperty<*>
     ): String {
         val prefName = name.trimEmptyToNull() ?: property.name
-        return runCatching { thisRef.prefs.get(prefName, default) }.getOrNull() ?: default
+        return thisRef.prefs.get(prefName, default)
     }
 
     override operator fun setValue(

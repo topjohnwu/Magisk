@@ -1,51 +1,53 @@
 package com.topjohnwu.magisk.model.preference
 
 import android.content.Context
-import kotlin.properties.ReadWriteProperty
+import android.content.SharedPreferences
 
-abstract class PreferenceModel(
-    private val commitPrefs: Boolean = false
-) {
+interface PreferenceModel {
 
-    protected abstract val fileName: String
-    protected abstract val context: Context
+    val context: Context
 
-    internal val prefs get() = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
+    val fileName: String
+        get() = "${context.packageName}_preferences"
+    val commitPrefs: Boolean
+        get() = false
+    val prefs: SharedPreferences
+        get() = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
 
-    protected fun preference(
+    fun preference(
         name: String,
         default: Boolean,
         commit: Boolean = commitPrefs
-    ): ReadWriteProperty<PreferenceModel, Boolean> = BooleanProperty(name, default, commit)
+    ) = BooleanProperty(name, default, commit)
 
-    protected fun preference(
+    fun preference(
         name: String,
         default: Float,
         commit: Boolean = commitPrefs
-    ): ReadWriteProperty<PreferenceModel, Float> = FloatProperty(name, default, commit)
+    ) = FloatProperty(name, default, commit)
 
-    protected fun preference(
+    fun preference(
         name: String,
         default: Int,
         commit: Boolean = commitPrefs
-    ): ReadWriteProperty<PreferenceModel, Int> = IntProperty(name, default, commit)
+    ) = IntProperty(name, default, commit)
 
-    protected fun preference(
+    fun preference(
         name: String,
         default: Long,
         commit: Boolean = commitPrefs
-    ): ReadWriteProperty<PreferenceModel, Long> = LongProperty(name, default, commit)
+    ) = LongProperty(name, default, commit)
 
-    protected fun preference(
+    fun preference(
         name: String,
         default: String,
         commit: Boolean = commitPrefs
-    ): ReadWriteProperty<PreferenceModel, String> = StringProperty(name, default, commit)
+    ) = StringProperty(name, default, commit)
 
-    protected fun preference(
+    fun preference(
         name: String,
         default: Set<String>,
         commit: Boolean = commitPrefs
-    ): ReadWriteProperty<PreferenceModel, Set<String>> = StringSetProperty(name, default, commit)
+    ) = StringSetProperty(name, default, commit)
 
 }
