@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.base
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -64,6 +65,10 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         // Force applying our preferred local
         config?.setLocale(LocaleManager.locale)
         super.applyOverrideConfiguration(config)
+    }
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(LocaleManager.getLocaleContext(base, LocaleManager.locale))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
