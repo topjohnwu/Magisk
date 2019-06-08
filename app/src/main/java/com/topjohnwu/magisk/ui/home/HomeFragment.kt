@@ -1,16 +1,20 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.app.Activity
+import android.os.Bundle
+import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
+import com.topjohnwu.magisk.utils.copyTo
+import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.*
-import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import dalvik.system.DexClassLoader
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -21,6 +25,8 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     override val layoutRes: Int = R.layout.fragment_magisk
     override val viewModel: HomeViewModel by viewModel()
+    val magiskRepo: MagiskRepository by inject()
+    lateinit var EXT_FILE: File
 
     override fun onResponse(responseCode: Int) = viewModel.finishSafetyNetCheck(responseCode)
 
@@ -35,6 +41,11 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
             is EnvFixEvent -> fixEnv()
             is UpdateSafetyNetEvent -> updateSafetyNet(false)
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        EXT_FILE = File("${requireActivity().filesDir.parent}/snet", "snet.apk")
     }
 
     override fun onStart() {
@@ -61,9 +72,9 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
         .show(requireActivity(), null, resources.openRawResource(R.raw.changelog))
 
     private fun downloadSafetyNet(requiresUserInput: Boolean = true) {
-        fun download() = Networking
-            .get(Const.Url.SNET_URL)
-            .getAsFile(EXT_APK) { updateSafetyNet(true) }
+        fun download() = magiskRepo.fetchSafetynet()
+                .map { it.byteStream().copyTo(EXT_FILE) }
+                .subscribeK { updateSafetyNet(true) }
 
         if (!requiresUserInput) {
             download()

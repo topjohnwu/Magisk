@@ -37,9 +37,7 @@ class MagiskRepository(
         .flatMap { apiRaw.fetchFile(it.uninstaller.link) }
         .map { it.writeToFile(context, FILE_UNINSTALLER_ZIP) }
 
-    fun fetchSafetynet() = apiRaw
-        .fetchSafetynet()
-        .map { it.writeToFile(context, FILE_SAFETY_NET_APK) }
+    fun fetchSafetynet() = apiRaw.fetchSafetynet()
 
     fun fetchBootctl() = apiRaw
         .fetchBootctl()

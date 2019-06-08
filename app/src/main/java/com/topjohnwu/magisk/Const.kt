@@ -67,8 +67,6 @@ object Const {
         const val XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382"
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
         @JvmField
-        val SNET_URL = getRaw("b66b1a914978e5f4c4bbfd74a59f4ad371bac107", "snet.apk")
-        @JvmField
         val BOOTCTL_URL = getRaw("9c5dfc1b8245c0b5b524901ef0ff0f8335757b77", "bootctl")
         const val GITHUB_RAW_API_URL = "https://raw.githubusercontent.com/"
 
