@@ -21,7 +21,7 @@ object ClassMap {
     )
 
     @JvmStatic
-    operator fun get(c: Class<*>): Class<*>? {
-        return map.getOrElse(c) { null } //as? Class<T>
+    operator fun <T : Class<*>>get(c: Class<*>): T {
+        return map.getOrElse(c) { throw IllegalArgumentException() } as T
     }
 }

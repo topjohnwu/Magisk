@@ -111,17 +111,14 @@ public class Utils {
         return BuildConfig.VERSION_NAME.contains("-");
     }
 
-    @SuppressWarnings("unchecked")
     public static void scheduleUpdateCheck() {
         if (Config.get(Config.Key.CHECK_UPDATES)) {
             Constraints constraints = new Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
-                    //ensures that notification doesn't pop up every time user starts the app
                     .setRequiresDeviceIdle(true)
                     .build();
-            Class<? extends ListenableWorker> service = (Class<? extends ListenableWorker>) ClassMap.get(UpdateCheckService.class);
             PeriodicWorkRequest request = new PeriodicWorkRequest
-                    .Builder(service, 12, TimeUnit.HOURS)
+                    .Builder(ClassMap.get(UpdateCheckService.class), 12, TimeUnit.HOURS)
                     .setConstraints(constraints)
                     .build();
             WorkManager.getInstance().enqueueUniquePeriodicWork(
