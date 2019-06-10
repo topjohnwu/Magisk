@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
+import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityMainBinding
 import com.topjohnwu.magisk.model.navigation.Navigation
@@ -105,11 +106,11 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
     private fun checkHideSection() {
         val menu = binding.navView.menu
         menu.findItem(R.id.magiskHideFragment).isVisible =
-            Shell.rootAccess() && Config.get<Any>(Config.Key.MAGISKHIDE) as Boolean
+            Shell.rootAccess() && Config.magiskHide
         menu.findItem(R.id.modulesFragment).isVisible =
-            Shell.rootAccess() && Config.magiskVersionCode >= 0
+            Shell.rootAccess() && Info.magiskVersionCode >= 0
         menu.findItem(R.id.reposFragment).isVisible =
-            (Networking.checkNetworkStatus(this) && Shell.rootAccess() && Config.magiskVersionCode >= 0)
+            (Networking.checkNetworkStatus(this) && Shell.rootAccess() && Info.magiskVersionCode >= 0)
         menu.findItem(R.id.logFragment).isVisible =
             Shell.rootAccess()
         menu.findItem(R.id.superuserFragment).isVisible =

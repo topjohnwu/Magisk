@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.model.preference
 
 import android.content.Context
 import android.content.SharedPreferences
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 interface PreferenceModel {
 
@@ -13,6 +15,20 @@ interface PreferenceModel {
         get() = false
     val prefs: SharedPreferences
         get() = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
+
+    fun preferenceStrInt(
+        name: String,
+        default: Int,
+        writeDefault: Boolean = false,
+        commit: Boolean = commitPrefs
+    ) = object: ReadWriteProperty<PreferenceModel, Int> {
+        val base = StringProperty(name, default.toString(), commit)
+        override fun getValue(thisRef: PreferenceModel, property: KProperty<*>): Int =
+                base.getValue(thisRef, property).toInt()
+
+        override fun setValue(thisRef: PreferenceModel, property: KProperty<*>, value: Int) =
+                base.setValue(thisRef, property, value.toString())
+    }
 
     fun preference(
         name: String,

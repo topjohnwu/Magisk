@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.data.network
 
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.KConfig
 import com.topjohnwu.magisk.model.entity.MagiskConfig
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -16,19 +15,19 @@ interface GithubRawApiServices {
     //region topjohnwu/magisk_files
 
     @GET("$MAGISK_FILES/master/stable.json")
-    fun fetchConfig(): Single<MagiskConfig>
+    fun fetchStableUpdate(): Single<MagiskConfig>
 
     @GET("$MAGISK_FILES/master/beta.json")
-    fun fetchBetaConfig(): Single<MagiskConfig>
+    fun fetchBetaUpdate(): Single<MagiskConfig>
 
     @GET("$MAGISK_FILES/master/canary_builds/release.json")
-    fun fetchCanaryConfig(): Single<MagiskConfig>
+    fun fetchCanaryUpdate(): Single<MagiskConfig>
 
     @GET("$MAGISK_FILES/master/canary_builds/canary.json")
-    fun fetchCanaryDebugConfig(): Single<MagiskConfig>
+    fun fetchCanaryDebugUpdate(): Single<MagiskConfig>
 
     @GET
-    fun fetchCustomConfig(@Url url: String): Single<MagiskConfig>
+    fun fetchCustomUpdate(@Url url: String): Single<MagiskConfig>
 
     @GET("$MAGISK_FILES/{$REVISION}/snet.apk")
     @Streaming
@@ -55,7 +54,7 @@ interface GithubRawApiServices {
         private const val FILE = "file"
 
 
-        private const val MAGISK_FILES = KConfig.DEFAULT_CHANNEL
+        private const val MAGISK_FILES = "topjohnwu/magisk_files"
         private const val MAGISK_MASTER = "topjohnwu/Magisk/master"
         private const val MAGISK_MODULES = "Magisk-Modules-Repo"
     }

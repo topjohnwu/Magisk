@@ -4,10 +4,7 @@ import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.doOnSubscribeUi
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.KObservableField
-import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
@@ -25,8 +22,8 @@ class HomeViewModel(
 
     val isAdvancedExpanded = KObservableField(false)
 
-    val isForceEncryption = KObservableField(Config.keepEnc)
-    val isKeepVerity = KObservableField(Config.keepVerity)
+    val isForceEncryption = KObservableField(Info.keepEnc)
+    val isKeepVerity = KObservableField(Info.keepVerity)
 
     val magiskState = KObservableField(MagiskState.LOADING)
     val magiskStateText = Observer(magiskState) {
@@ -41,7 +38,7 @@ class HomeViewModel(
     val magiskCurrentVersion = KObservableField("")
     val magiskLatestVersion = KObservableField("")
     val magiskAdditionalInfo = Observer(magiskState) {
-        if (Config.get<Boolean>(Config.Key.COREONLY))
+        if (Config.coreOnly)
             R.string.core_only_enabled.res()
         else
             ""
@@ -87,10 +84,10 @@ class HomeViewModel(
 
     init {
         isForceEncryption.addOnPropertyChangedCallback {
-            Config.keepEnc = it ?: return@addOnPropertyChangedCallback
+            Info.keepEnc = it ?: return@addOnPropertyChangedCallback
         }
         isKeepVerity.addOnPropertyChangedCallback {
-            Config.keepVerity = it ?: return@addOnPropertyChangedCallback
+            Info.keepVerity = it ?: return@addOnPropertyChangedCallback
         }
 
         refresh()
@@ -154,7 +151,7 @@ class HomeViewModel(
     }
 
     fun refresh() {
-        magiskRepo.fetchConfig()
+        magiskRepo.fetchUpdate()
             .applyViewModel(this)
             .doOnSubscribeUi {
                 magiskState.value = MagiskState.LOADING
@@ -164,14 +161,6 @@ class HomeViewModel(
                 safetyNetTitle.value = R.string.safetyNet_check_text
             }
             .subscribeK {
-                it.app.let {
-                    Config.remoteManagerVersionCode = it.versionCode.toIntOrNull() ?: -1
-                    Config.remoteManagerVersionString = it.version
-                }
-                it.magisk.let {
-                    Config.remoteMagiskVersionCode = it.versionCode.toIntOrNull() ?: -1
-                    Config.remoteMagiskVersionString = it.version
-                }
                 updateSelf()
                 ensureEnv()
             }
@@ -181,22 +170,22 @@ class HomeViewModel(
 
     private fun updateSelf() {
         state = State.LOADED
-        magiskState.value = when (Config.magiskVersionCode) {
+        magiskState.value = when (Info.magiskVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
-            !in Config.remoteMagiskVersionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
+            !in Info.remoteMagiskVersionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
         magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
-            version.format(Config.magiskVersionString, Config.magiskVersionCode)
+            version.format(Info.magiskVersionString, Info.magiskVersionCode)
         } else {
             ""
         }
 
         magiskLatestVersion.value = version
-            .format(Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode)
+            .format(Info.remoteMagiskVersionString, Info.remoteMagiskVersionCode)
 
-        managerState.value = when (Config.remoteManagerVersionCode) {
+        managerState.value = when (Info.remoteManagerVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
             in (BuildConfig.VERSION_CODE + 1)..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
@@ -206,7 +195,7 @@ class HomeViewModel(
             .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
 
         managerLatestVersion.value = version
-            .format(Config.remoteManagerVersionString, Config.remoteManagerVersionCode)
+            .format(Info.remoteManagerVersionString, Info.remoteManagerVersionCode)
     }
 
     private fun ensureEnv() {

@@ -11,13 +11,13 @@ import android.os.Build;
 import android.view.Gravity;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.FingerprintHelper;
-import com.topjohnwu.magisk.utils.Utils;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.FingerprintHelper;
+import com.topjohnwu.magisk.utils.Utils;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class FingerprintAuthDialog extends CustomAlertDialog {
@@ -31,13 +31,13 @@ public class FingerprintAuthDialog extends CustomAlertDialog {
         super(activity);
         callback = onSuccess;
         Drawable fingerprint = activity.getResources().getDrawable(R.drawable.ic_fingerprint);
-        fingerprint.setBounds(0, 0, Utils.dpInPx(50), Utils.dpInPx(50));
+        fingerprint.setBounds(0, 0, Utils.INSTANCE.dpInPx(50), Utils.INSTANCE.dpInPx(50));
         Resources.Theme theme = activity.getTheme();
         TypedArray ta = theme.obtainStyledAttributes(new int[] {R.attr.imageColorTint});
         fingerprint.setTint(ta.getColor(0, Color.GRAY));
         ta.recycle();
         binding.message.setCompoundDrawables(null, null, null, fingerprint);
-        binding.message.setCompoundDrawablePadding(Utils.dpInPx(20));
+        binding.message.setCompoundDrawablePadding(Utils.INSTANCE.dpInPx(20));
         binding.message.setGravity(Gravity.CENTER);
         setMessage(R.string.auth_fingerprint);
         setNegativeButton(R.string.close, (d, w) -> {
@@ -54,7 +54,9 @@ public class FingerprintAuthDialog extends CustomAlertDialog {
         });
         try {
             helper = new DialogFingerprintHelper();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
     }
 
     public FingerprintAuthDialog(@NonNull Activity activity, @NonNull Runnable onSuccess, @NonNull Runnable onFailure) {
@@ -67,7 +69,7 @@ public class FingerprintAuthDialog extends CustomAlertDialog {
         create();
         if (helper == null) {
             dialog.dismiss();
-            Utils.toast(R.string.auth_fail, Toast.LENGTH_SHORT);
+            Utils.INSTANCE.toast(R.string.auth_fail, Toast.LENGTH_SHORT);
         } else {
             helper.authenticate();
             dialog.show();

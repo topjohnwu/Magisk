@@ -6,6 +6,7 @@ import android.content.Intent
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.repository.AppRepository
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
@@ -13,7 +14,6 @@ import com.topjohnwu.magisk.utils.DownloadApp
 import com.topjohnwu.magisk.utils.RootUtils
 import com.topjohnwu.magisk.utils.SuLogger
 import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.get
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
@@ -64,9 +64,8 @@ open class GeneralReceiver : BroadcastReceiver() {
             }
             Intent.ACTION_PACKAGE_REPLACED ->
                 // This will only work pre-O
-                if (Config.get<Boolean>(Config.Key.SU_REAUTH)!!) {
+                if (Config.suReAuth)
                     appRepo.delete(getPkg(intent)).blockingGet()
-                }
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
                 val pkg = getPkg(intent)
                 appRepo.delete(pkg).blockingGet()
@@ -74,7 +73,7 @@ open class GeneralReceiver : BroadcastReceiver() {
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
             Const.Key.BROADCAST_MANAGER_UPDATE -> {
-                Config.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK)
+                Info.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK)
                 DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME))
             }
             Const.Key.BROADCAST_REBOOT -> RootUtils.reboot()

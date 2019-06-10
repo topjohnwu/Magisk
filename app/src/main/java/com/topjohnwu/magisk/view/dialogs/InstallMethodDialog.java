@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.ClassMap;
-import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Info;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ui.base.IBaseLeanback;
 import com.topjohnwu.magisk.ui.flash.FlashActivity;
@@ -18,8 +20,6 @@ import com.topjohnwu.net.Networking;
 
 import java.io.File;
 import java.util.List;
-
-import androidx.appcompat.app.AlertDialog;
 
 class InstallMethodDialog extends AlertDialog.Builder {
 
@@ -50,7 +50,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
 
     private <Ctxt extends Activity & IBaseLeanback> void patchBoot(Ctxt activity) {
         activity.runWithExternalRW(() -> {
-            Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG);
+            Utils.INSTANCE.toast(R.string.patch_file_msg, Toast.LENGTH_LONG);
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
                     .setType("*/*")
                     .addCategory(Intent.CATEGORY_OPENABLE);
@@ -68,11 +68,11 @@ class InstallMethodDialog extends AlertDialog.Builder {
 
     private <Ctxt extends Activity & IBaseLeanback> void downloadOnly(Ctxt activity) {
         activity.runWithExternalRW(() -> {
-            String filename = Utils.fmt("Magisk-v%s(%d).zip",
-                    Config.remoteMagiskVersionString, Config.remoteMagiskVersionCode);
+            String filename = Utils.INSTANCE.fmt("Magisk-v%s(%d).zip",
+                    Info.remoteMagiskVersionString, Info.remoteMagiskVersionCode);
             File zip = new File(Const.EXTERNAL_PATH, filename);
             ProgressNotification progress = new ProgressNotification(filename);
-            Networking.get(Config.magiskLink)
+            Networking.get(Info.magiskLink)
                     .setDownloadProgressListener(progress)
                     .setErrorHandler((conn, e) -> progress.dlFail())
                     .getAsFile(zip, f -> {

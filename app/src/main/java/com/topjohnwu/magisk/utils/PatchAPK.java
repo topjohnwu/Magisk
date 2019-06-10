@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.utils;
 import android.content.ComponentName;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
@@ -26,8 +28,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
-
-import androidx.core.app.NotificationCompat;
 
 public class PatchAPK {
 
@@ -110,7 +110,7 @@ public class PatchAPK {
         if (!Shell.su("pm install " + repack).exec().isSuccess())
             return false;
 
-        Config.set(Config.Key.SU_MANAGER, pkg);
+        Config.setSuManager(pkg);
         Config.export();
         RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID,
                 new ComponentName(pkg, ClassMap.get(SplashActivity.class).getName()));
@@ -145,7 +145,7 @@ public class PatchAPK {
                     Notifications.progress(app.getString(R.string.hide_manager_title));
             Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
             if(!patchAndHide())
-                Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
+                Utils.INSTANCE.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
         });
     }

@@ -4,9 +4,9 @@ import android.content.ContentValues;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
-import com.topjohnwu.magisk.utils.Utils;
-
 import androidx.annotation.NonNull;
+
+import com.topjohnwu.magisk.utils.Utils;
 
 
 public class Policy implements Comparable<Policy>{
@@ -27,7 +27,7 @@ public class Policy implements Comparable<Policy>{
         this.uid = uid;
         packageName = pkgs[0];
         info = pm.getApplicationInfo(packageName, 0);
-        appName = Utils.getAppLabel(info, pm);
+        appName = Utils.INSTANCE.getAppLabel(info, pm);
     }
 
     public Policy(ContentValues values, PackageManager pm) throws PackageManager.NameNotFoundException {

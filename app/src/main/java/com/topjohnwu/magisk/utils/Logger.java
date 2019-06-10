@@ -13,7 +13,7 @@ public class Logger {
     }
 
     public static void debug(String fmt, Object... args) {
-        debug(Utils.fmt(fmt, args));
+        debug(Utils.INSTANCE.fmt(fmt, args));
     }
 
     public static void error(String line) {
@@ -21,6 +21,6 @@ public class Logger {
     }
 
     public static void error(String fmt, Object... args) {
-        error(Utils.fmt(fmt, args));
+        error(Utils.INSTANCE.fmt(fmt, args));
     }
 }

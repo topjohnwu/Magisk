@@ -4,8 +4,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
@@ -132,7 +132,7 @@ class RootUtils : Shell.Initializer() {
             job.add(context.rawResource(R.raw.util_functions))
                     .add(context.rawResource(R.raw.utils))
             Const.MAGISK_DISABLE_FILE = SuFile("/cache/.disable_magisk")
-            Config.loadMagiskInfo()
+            Info.loadMagiskInfo()
         } else {
             job.add(context.rawResource(R.raw.nonroot_utils))
         }
@@ -143,9 +143,9 @@ class RootUtils : Shell.Initializer() {
                 "export BOOTMODE=true")
                 .exec()
 
-        Config.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
-        Config.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
-        Config.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
+        Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
+        Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
+        Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
         return true
     }
 
@@ -158,7 +158,7 @@ class RootUtils : Shell.Initializer() {
 
         @JvmStatic
         fun reboot() {
-            Shell.su("/system/bin/reboot ${if (Config.recovery) "recovery" else ""}").submit()
+            Shell.su("/system/bin/reboot ${if (Info.recovery) "recovery" else ""}").submit()
         }
     }
 }

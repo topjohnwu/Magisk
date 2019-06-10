@@ -7,18 +7,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.TaskStackBuilder;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
-import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Info;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver;
 import com.topjohnwu.magisk.ui.SplashActivity;
 import com.topjohnwu.magisk.utils.Utils;
-
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.app.TaskStackBuilder;
 
 public class Notifications {
 
@@ -62,12 +62,12 @@ public class Notifications {
 
     public static void managerUpdate() {
         App app = App.self;
-        String name = Utils.fmt("MagiskManager v%s(%d)",
-                Config.remoteManagerVersionString, Config.remoteManagerVersionCode);
+        String name = Utils.INSTANCE.fmt("MagiskManager v%s(%d)",
+                Info.remoteManagerVersionString, Info.remoteManagerVersionCode);
 
         Intent intent = new Intent(app, ClassMap.get(GeneralReceiver.class));
         intent.setAction(Const.Key.BROADCAST_MANAGER_UPDATE);
-        intent.putExtra(Const.Key.INTENT_SET_LINK, Config.managerLink);
+        intent.putExtra(Const.Key.INTENT_SET_LINK, Info.managerLink);
         intent.putExtra(Const.Key.INTENT_SET_NAME, name);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(app,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);

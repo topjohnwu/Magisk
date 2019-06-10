@@ -107,9 +107,9 @@ object LocaleManager {
 
     @JvmStatic
     fun setLocale(wrapper: ContextWrapper) {
-        val localeConfig = Config.get<String>(Config.Key.LOCALE)
+        val localeConfig = Config.locale
         locale = when {
-            localeConfig.isNullOrEmpty() -> defaultLocale
+            localeConfig.isEmpty() -> defaultLocale
             else -> forLanguageTag(localeConfig)
         }
         Locale.setDefault(locale)

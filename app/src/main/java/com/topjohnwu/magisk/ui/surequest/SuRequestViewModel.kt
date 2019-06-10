@@ -173,7 +173,7 @@ class SuRequestViewModel(
             return true
         }
 
-        when (Config.get<Int>(Config.Key.SU_AUTO_RESPONSE)) {
+        when (Config.suAutoReponse) {
             Config.Value.SU_AUTO_DENY -> {
                 handler?.handleAction(Policy.DENY, 0)
                 return true
@@ -190,8 +190,7 @@ class SuRequestViewModel(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun showUI() {
-        val seconds = Config.get<Int>(Config.Key.SU_REQUEST_TIMEOUT).toLong()
-        val millis = SECONDS.toMillis(seconds)
+        val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
         timer = object : CountDownTimer(millis, 1000) {
             override fun onTick(remains: Long) {
                 denyText.value = "%s (%d)"

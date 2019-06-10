@@ -8,8 +8,8 @@ import androidx.annotation.MainThread;
 import androidx.annotation.WorkerThread;
 
 import com.topjohnwu.magisk.App;
-import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Info;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.DownloadProgressListener;
 import com.topjohnwu.net.Networking;
@@ -123,9 +123,9 @@ public abstract class MagiskInstaller {
 
         File zip = new File(App.self.getCacheDir(), "magisk.zip");
 
-        if (!ShellUtils.checkSum("MD5", zip, Config.magiskMD5)) {
+        if (!ShellUtils.checkSum("MD5", zip, Info.magiskMD5)) {
             console.add("- Downloading zip");
-            Networking.get(Config.magiskLink)
+            Networking.get(Info.magiskLink)
                     .setDownloadProgressListener(new ProgressLog())
                     .execForFile(zip);
         } else {
@@ -282,10 +282,10 @@ public abstract class MagiskInstaller {
             return false;
         }
 
-        if (!Shell.sh(Utils.fmt(
+        if (!Shell.sh(Utils.INSTANCE.fmt(
                 "KEEPFORCEENCRYPT=%b KEEPVERITY=%b RECOVERYMODE=%b " +
                 "sh update-binary sh boot_patch.sh %s",
-                Config.keepEnc, Config.keepVerity, Config.recovery, srcBoot))
+                Info.keepEnc, Info.keepVerity, Info.recovery, srcBoot))
                 .to(console, logs).exec().isSuccess())
             return false;
 
@@ -311,10 +311,10 @@ public abstract class MagiskInstaller {
     }
 
     protected boolean flashBoot() {
-        if (!Shell.su(Utils.fmt("direct_install %s %s", installDir, srcBoot))
+        if (!Shell.su(Utils.INSTANCE.fmt("direct_install %s %s", installDir, srcBoot))
                 .to(console, logs).exec().isSuccess())
             return false;
-        if (!Config.keepVerity)
+        if (!Info.keepVerity)
             Shell.su("patch_dtbo_image").to(console, logs).exec();
         return true;
     }

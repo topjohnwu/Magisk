@@ -28,7 +28,7 @@ class MagiskHideFragment : MagiskFragment<HideViewModel, FragmentMagiskHideBindi
             (findItem(R.id.app_search).actionView as? SearchView)
                 ?.setOnQueryTextListener(this@MagiskHideFragment)
 
-            val showSystem = Config.get<Boolean>(Config.Key.SHOW_SYSTEM_APP)
+            val showSystem = Config.showSystemApp
 
             findItem(R.id.show_system).isChecked = showSystem
             viewModel.isShowSystem.value = showSystem
@@ -39,10 +39,8 @@ class MagiskHideFragment : MagiskFragment<HideViewModel, FragmentMagiskHideBindi
         if (item.itemId == R.id.show_system) {
             val showSystem = !item.isChecked
             item.isChecked = showSystem
-            Config.set(Config.Key.SHOW_SYSTEM_APP, showSystem)
+            Config.showSystemApp = showSystem
             viewModel.isShowSystem.value = showSystem
-            //adapter!!.setShowSystem(showSystem)
-            //adapter!!.filter(search!!.query.toString())
         }
         return true
     }
@@ -56,9 +54,4 @@ class MagiskHideFragment : MagiskFragment<HideViewModel, FragmentMagiskHideBindi
         viewModel.query.value = query.orEmpty()
         return false
     }
-
-    /*override fun onEvent(event: Int) {
-        //mSwipeRefreshLayout!!.isRefreshing = false
-        adapter!!.filter(search!!.query.toString())
-    }*/
 }

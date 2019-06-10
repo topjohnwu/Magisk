@@ -5,12 +5,12 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.net.DownloadProgressListener;
-
-import androidx.core.app.NotificationCompat;
 
 public class ProgressNotification implements DownloadProgressListener {
 
@@ -22,7 +22,7 @@ public class ProgressNotification implements DownloadProgressListener {
         builder = Notifications.progress(title);
         prevTime = System.currentTimeMillis();
         update();
-        Utils.toast(App.self.getString(R.string.downloading_toast, title), Toast.LENGTH_SHORT);
+        Utils.INSTANCE.toast(App.self.getString(R.string.downloading_toast, title), Toast.LENGTH_SHORT);
     }
 
     @Override

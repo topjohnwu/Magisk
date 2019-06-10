@@ -8,6 +8,4 @@ val repositoryModule = module {
     single { MagiskRepository(get(), get(), get()) }
     single { LogRepository(get()) }
     single { AppRepository(get()) }
-    single { SettingRepository(get()) }
-    single { StringRepository(get()) }
 }

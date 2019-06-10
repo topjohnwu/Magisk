@@ -13,10 +13,11 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
 import com.skoumal.teanity.extensions.subscribeK
-import com.topjohnwu.magisk.*
-import com.topjohnwu.magisk.KConfig.UpdateChannel
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
-import com.topjohnwu.magisk.data.repository.SettingRepository
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
@@ -27,7 +28,6 @@ import org.koin.android.ext.android.inject
 class SettingsFragment : BasePreferenceFragment() {
 
     private val repoDatabase: RepoDatabaseHelper by inject()
-    private val settingRepo: SettingRepository by inject()
 
     private lateinit var updateChannel: ListPreference
     private lateinit var autoRes: ListPreference
@@ -53,7 +53,7 @@ class SettingsFragment : BasePreferenceFragment() {
         requestTimeout = findPref(Config.Key.SU_REQUEST_TIMEOUT)
         suNotification = findPref(Config.Key.SU_NOTIFICATION)
         multiuserConfig = findPref(Config.Key.SU_MULTIUSER_MODE)
-        nsConfig = findPref(Config.Key.SU_MNT_NS) as ListPreference
+        nsConfig = findPref(Config.Key.SU_MNT_NS)
         val reauth = findPreference(Config.Key.SU_REAUTH) as SwitchPreferenceCompat
         val fingerprint = findPreference(Config.Key.SU_FINGERPRINT) as SwitchPreferenceCompat
         val generalCatagory = findPreference("general") as PreferenceCategory
@@ -70,7 +70,9 @@ class SettingsFragment : BasePreferenceFragment() {
             true
         }
         findPreference("clear").setOnPreferenceClickListener {
-            prefs.edit().remove(Config.Key.ETAG_KEY).apply()
+            prefs.edit {
+                remove(Config.Key.ETAG_KEY)
+            }
             repoDatabase.clearRepo()
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
             true
@@ -81,30 +83,23 @@ class SettingsFragment : BasePreferenceFragment() {
             true
         }
 
-        prefs.edit {
-            putBoolean(Config.Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
-        }
-
         updateChannel.setOnPreferenceChangeListener { _, value ->
             val channel = Integer.parseInt(value as String)
+            val previous = Config.updateChannel
 
-            val previousUpdateChannel = KConfig.updateChannel
-            val updateChannel = getChannelCompat(channel)
-
-            KConfig.updateChannel = updateChannel
-
-            if (updateChannel === UpdateChannel.CUSTOM) {
-                val v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null)
+            if (channel == Config.Value.CUSTOM_CHANNEL) {
+                val v = LayoutInflater.from(requireActivity())
+                        .inflate(R.layout.custom_channel_dialog, null)
                 val url = v.findViewById<EditText>(R.id.custom_url)
-                url.setText(KConfig.customUpdateChannel)
+                url.setText(Config.customChannelUrl)
                 AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
                         .setPositiveButton(R.string.ok) { _, _ ->
-                            setCustomUpdateChannel(url.text.toString()) }
+                            Config.customChannelUrl = url.text.toString() }
                         .setNegativeButton(R.string.close) { _, _ ->
-                            KConfig.updateChannel = previousUpdateChannel }
-                        .setOnCancelListener { KConfig.updateChannel = previousUpdateChannel }
+                            Config.updateChannel = previous }
+                        .setOnCancelListener { Config.updateChannel = previous }
                         .show()
             }
             true
@@ -114,7 +109,7 @@ class SettingsFragment : BasePreferenceFragment() {
 
         /* We only show canary channels if user is already on canary channel
          * or the user have already chosen canary channel */
-        if (!Utils.isCanary() && Config.get<Int>(Config.Key.UPDATE_CHANNEL) < Config.Value.CANARY_CHANNEL) {
+        if (!Utils.isCanary && Config.updateChannel < Config.Value.CANARY_CHANNEL) {
             // Remove the last 2 entries
             val entries = updateChannel.entries
             updateChannel.entries = entries.copyOf(entries.size - 2)
@@ -168,8 +163,9 @@ class SettingsFragment : BasePreferenceFragment() {
 
     override fun onSharedPreferenceChanged(prefs: SharedPreferences, key: String) {
         when (key) {
-            Config.Key.ROOT_ACCESS, Config.Key.SU_MULTIUSER_MODE, Config.Key.SU_MNT_NS ->
-                settingRepo.put(key, Utils.getPrefsInt(prefs, key)).subscribe()
+            Config.Key.ROOT_ACCESS -> Config.rootMode = Utils.getPrefsInt(prefs, key)
+            Config.Key.SU_MULTIUSER_MODE -> Config.suMultiuserMode = Utils.getPrefsInt(prefs, key)
+            Config.Key.SU_MNT_NS -> Config.suMntNamespaceMode = Utils.getPrefsInt(prefs, key)
             Config.Key.DARK_THEME -> requireActivity().recreate()
             Config.Key.COREONLY -> {
                 if (prefs.getBoolean(key, false)) {
@@ -196,14 +192,13 @@ class SettingsFragment : BasePreferenceFragment() {
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
-        val key = preference.key
-        when (key) {
+        when (preference.key) {
             Config.Key.SU_FINGERPRINT -> {
                 val checked = (preference as SwitchPreferenceCompat).isChecked
                 preference.isChecked = !checked
                 FingerprintAuthDialog(requireActivity()) {
                     preference.isChecked = checked
-                    Config.set(key, checked)
+                    Config.suFingerprint = checked
                 }.show()
             }
         }
@@ -237,34 +232,34 @@ class SettingsFragment : BasePreferenceFragment() {
 
     private fun setSummary(key: String) {
         when (key) {
+            Config.Key.ROOT_ACCESS -> rootConfig.summary = resources
+                    .getStringArray(R.array.su_access)[Config.rootMode]
+            Config.Key.SU_MULTIUSER_MODE -> multiuserConfig.summary = resources
+                    .getStringArray(R.array.multiuser_summary)[Config.suMultiuserMode]
+            Config.Key.SU_MNT_NS -> nsConfig.summary = resources
+                    .getStringArray(R.array.namespace_summary)[Config.suMntNamespaceMode]
             Config.Key.UPDATE_CHANNEL -> {
-                var ch = Config.get<Int>(key)
+                var ch = Config.updateChannel
                 ch = if (ch < 0) Config.Value.STABLE_CHANNEL else ch
                 updateChannel.summary = resources
                         .getStringArray(R.array.update_channel)[ch]
             }
-            Config.Key.ROOT_ACCESS -> rootConfig.summary = resources
-                    .getStringArray(R.array.su_access)[Config.get<Int>(key)]
             Config.Key.SU_AUTO_RESPONSE -> autoRes.summary = resources
-                    .getStringArray(R.array.auto_response)[Config.get<Int>(key)]
+                    .getStringArray(R.array.auto_response)[Config.suAutoReponse]
             Config.Key.SU_NOTIFICATION -> suNotification.summary = resources
-                    .getStringArray(R.array.su_notification)[Config.get<Int>(key)]
+                    .getStringArray(R.array.su_notification)[Config.suNotification]
             Config.Key.SU_REQUEST_TIMEOUT -> requestTimeout.summary =
-                    getString(R.string.request_timeout_summary, Config.get<Int>(key))
-            Config.Key.SU_MULTIUSER_MODE -> multiuserConfig.summary =
-                    resources.getStringArray(R.array.multiuser_summary)[Config.get<Int>(key)]
-            Config.Key.SU_MNT_NS -> nsConfig.summary = resources
-                    .getStringArray(R.array.namespace_summary)[Config.get<Int>(key)]
+                    getString(R.string.request_timeout_summary, Config.suDefaultTimeout)
         }
     }
 
     private fun setSummary() {
-        setSummary(Config.Key.UPDATE_CHANNEL)
         setSummary(Config.Key.ROOT_ACCESS)
+        setSummary(Config.Key.SU_MULTIUSER_MODE)
+        setSummary(Config.Key.SU_MNT_NS)
+        setSummary(Config.Key.UPDATE_CHANNEL)
         setSummary(Config.Key.SU_AUTO_RESPONSE)
         setSummary(Config.Key.SU_NOTIFICATION)
         setSummary(Config.Key.SU_REQUEST_TIMEOUT)
-        setSummary(Config.Key.SU_MULTIUSER_MODE)
-        setSummary(Config.Key.SU_MNT_NS)
     }
 }

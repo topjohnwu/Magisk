@@ -53,9 +53,9 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
                 .setTitle(R.string.sorting_order)
                 .setSingleChoiceItems(
                     R.array.sorting_orders,
-                    Config.get<Int>(Config.Key.REPO_ORDER)!!
+                    Config.repoOrder
                 ) { d, which ->
-                    Config.set(Config.Key.REPO_ORDER, which)
+                    Config.repoOrder = which
                     viewModel.refresh(false)
                     d.dismiss()
                 }.show()

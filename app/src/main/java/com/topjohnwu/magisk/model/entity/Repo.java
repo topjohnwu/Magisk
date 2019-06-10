@@ -54,7 +54,7 @@ public class Repo extends BaseModule {
     }
 
     public void update() throws IllegalRepoException {
-        String[] props = Utils.dlString(getPropUrl()).split("\\n");
+        String[] props = Utils.INSTANCE.dlString(getPropUrl()).split("\\n");
         try {
             parseProps(props);
         } catch (NumberFormatException e) {
@@ -103,7 +103,7 @@ public class Repo extends BaseModule {
     }
 
     public String getDownloadFilename() {
-        return Utils.getLegalFilename(getName() + "-" + getVersion() + ".zip");
+        return Utils.INSTANCE.getLegalFilename(getName() + "-" + getVersion() + ".zip");
     }
 
     public class IllegalRepoException extends Exception {

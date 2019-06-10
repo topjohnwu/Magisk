@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.tasks;
 import android.database.Cursor;
 import android.util.Pair;
 
+import androidx.annotation.NonNull;
+
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -31,7 +33,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import androidx.annotation.NonNull;
 import io.reactivex.Single;
 
 @Deprecated
@@ -74,10 +75,10 @@ public class UpdateRepos {
      * first page is updated to determine whether the online repo database is changed
      */
     private boolean parsePage(int page) {
-        Request req = Networking.get(Utils.fmt(Const.Url.REPO_URL, page + 1));
+        Request req = Networking.get(Utils.INSTANCE.fmt(Const.Url.REPO_URL, page + 1));
         if (page == 0) {
-            String etag = Config.get(Config.Key.ETAG_KEY);
-            if (etag != null)
+            String etag = Config.getEtagKey();
+            if (!etag.isEmpty())
                 req.addHeaders(Const.Key.IF_NONE_MATCH, etag);
         }
         Request.Result<JSONArray> res = req.execForJSONArray();
@@ -110,7 +111,7 @@ public class UpdateRepos {
             String etag = res.getConnection().getHeaderField(Config.Key.ETAG_KEY);
             if (etag != null) {
                 etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
-                Config.set(Config.Key.ETAG_KEY, etag);
+                Config.setEtagKey(etag);
             }
         }
 

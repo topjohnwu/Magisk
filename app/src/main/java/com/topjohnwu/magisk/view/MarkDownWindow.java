@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
@@ -12,7 +14,6 @@ import com.topjohnwu.net.ResponseListener;
 import java.io.InputStream;
 import java.util.Scanner;
 
-import androidx.appcompat.app.AlertDialog;
 import ru.noties.markwon.Markwon;
 import ru.noties.markwon.html.HtmlPlugin;
 import ru.noties.markwon.image.ImagesPlugin;

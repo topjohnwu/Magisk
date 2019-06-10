@@ -1,10 +1,10 @@
 package com.topjohnwu.magisk.utils
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Process
 import android.widget.Toast
-import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.AppRepository
@@ -16,6 +16,8 @@ import com.topjohnwu.magisk.model.entity.toPolicy
 import java.util.*
 
 object SuLogger {
+
+    private val context: Context by inject()
 
     @JvmStatic
     fun handleLogs(intent: Intent) {
@@ -66,9 +68,9 @@ object SuLogger {
     }
 
     private fun handleNotify(policy: MagiskPolicy) {
-        if (policy.notification && Config.get<Any>(Config.Key.SU_NOTIFICATION) as Int == Config.Value.NOTIFICATION_TOAST) {
+        if (policy.notification && Config.suNotification == Config.Value.NOTIFICATION_TOAST) {
             Utils.toast(
-                App.self.getString(
+                context.getString(
                     if (policy.policy == Policy.ALLOW)
                         R.string.su_allow_toast
                     else

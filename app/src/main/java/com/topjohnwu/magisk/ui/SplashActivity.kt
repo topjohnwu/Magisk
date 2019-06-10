@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.data.database.SettingsDao
 import com.topjohnwu.magisk.tasks.UpdateRepos
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
@@ -21,7 +22,7 @@ open class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         Shell.getShell {
-            if (Config.magiskVersionCode > 0 && Config.magiskVersionCode < Const.MagiskVersion.MIN_SUPPORT) {
+            if (Info.magiskVersionCode > 0 && Info.magiskVersionCode < Const.MagiskVersion.MIN_SUPPORT) {
                 AlertDialog.Builder(this)
                     .setTitle(R.string.unsupport_magisk_title)
                     .setMessage(R.string.unsupport_magisk_message)
@@ -35,9 +36,9 @@ open class SplashActivity : AppCompatActivity() {
     }
 
     private fun initAndStart() {
-        val pkg = Config.get<String>(Config.Key.SU_MANAGER)
-        if (pkg != null && packageName == BuildConfig.APPLICATION_ID) {
-            Config.remove(Config.Key.SU_MANAGER)
+        val pkg = Config.suManager
+        if (Config.suManager.isNotEmpty() && packageName == BuildConfig.APPLICATION_ID) {
+            get<SettingsDao>().delete(Config.Key.SU_MANAGER)
             Shell.su("pm uninstall $pkg").submit()
         }
         if (TextUtils.equals(pkg, packageName)) {
@@ -56,15 +57,12 @@ open class SplashActivity : AppCompatActivity() {
 
         // Schedule periodic update checks
         Utils.scheduleUpdateCheck()
-        //CheckUpdates.check()
 
         // Setup shortcuts
         Shortcuts.setup(this)
 
         // Magisk working as expected
-        if (Shell.rootAccess() && Config.magiskVersionCode > 0) {
-            // Load modules
-            //Utils.loadModules(false)
+        if (Shell.rootAccess() && Info.magiskVersionCode > 0) {
             // Load repos
             if (Networking.checkNetworkStatus(this)) {
                 get<UpdateRepos>().exec().subscribeK()

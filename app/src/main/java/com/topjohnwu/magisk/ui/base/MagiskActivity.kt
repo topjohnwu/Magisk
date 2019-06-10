@@ -51,14 +51,12 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         get() = navigationController?.let { it.currentStackIndex != defaultPosition } ?: false
 
     init {
-        val isDarkTheme = Config.get<Boolean>(Config.Key.DARK_THEME)
-        val theme = if (isDarkTheme) {
+        val theme = if (Config.darkTheme) {
             AppCompatDelegate.MODE_NIGHT_YES
         } else {
             AppCompatDelegate.MODE_NIGHT_NO
         }
         AppCompatDelegate.setDefaultNightMode(theme)
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
     }
 
     override fun applyOverrideConfiguration(config: Configuration?) {

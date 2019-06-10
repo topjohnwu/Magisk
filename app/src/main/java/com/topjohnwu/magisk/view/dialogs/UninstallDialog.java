@@ -7,9 +7,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.topjohnwu.magisk.ClassMap;
-import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Info;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ui.flash.FlashActivity;
 import com.topjohnwu.magisk.utils.Utils;
@@ -18,8 +20,6 @@ import com.topjohnwu.net.Networking;
 import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
-
-import androidx.annotation.NonNull;
 
 public class UninstallDialog extends CustomAlertDialog {
 
@@ -34,17 +34,17 @@ public class UninstallDialog extends CustomAlertDialog {
             Shell.su("restore_imgs").submit(result -> {
                 dialog.cancel();
                 if (result.isSuccess()) {
-                    Utils.toast(R.string.restore_done, Toast.LENGTH_SHORT);
+                    Utils.INSTANCE.toast(R.string.restore_done, Toast.LENGTH_SHORT);
                 } else {
-                    Utils.toast(R.string.restore_fail, Toast.LENGTH_LONG);
+                    Utils.INSTANCE.toast(R.string.restore_fail, Toast.LENGTH_LONG);
                 }
             });
         });
-        if (!TextUtils.isEmpty(Config.uninstallerLink)) {
+        if (!TextUtils.isEmpty(Info.uninstallerLink)) {
             setPositiveButton(R.string.complete_uninstall, (d, i) -> {
                 File zip = new File(activity.getFilesDir(), "uninstaller.zip");
                 ProgressNotification progress = new ProgressNotification(zip.getName());
-                Networking.get(Config.uninstallerLink)
+                Networking.get(Info.uninstallerLink)
                     .setDownloadProgressListener(progress)
                     .setErrorHandler(((conn, e) -> progress.dlFail()))
                     .getAsFile(zip, f -> {

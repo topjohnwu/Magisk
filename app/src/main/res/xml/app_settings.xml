@@ -6,6 +6,7 @@
 
         <SwitchPreferenceCompat
             android:key="dark_theme"
+            android:defaultValue="true"
             android:title="@string/settings_dark_theme_title"
             android:summary="@string/settings_dark_theme_summary" />
 
@@ -95,28 +96,33 @@
         <ListPreference
             android:key="su_auto_response"
             android:title="@string/auto_response"
+            android:defaultValue="0"
             android:entries="@array/auto_response"
             android:entryValues="@array/value_array" />
 
         <ListPreference
             android:key="su_request_timeout"
             android:title="@string/request_timeout"
+            android:defaultValue="10"
             android:entries="@array/request_timeout"
             android:entryValues="@array/request_timeout_value" />
 
         <ListPreference
             android:key="su_notification"
             android:title="@string/superuser_notification"
+            android:defaultValue="1"
             android:entries="@array/su_notification"
             android:entryValues="@array/value_array" />
 
         <SwitchPreferenceCompat
             android:key="su_fingerprint"
+            android:defaultValue="false"
             android:title="@string/settings_su_fingerprint_title"
             android:summary="@string/settings_su_fingerprint_summary"/>
 
         <SwitchPreferenceCompat
             android:key="su_reauth"
+            android:defaultValue="false"
             android:title="@string/settings_su_reauth_title"
             android:summary="@string/settings_su_reauth_summary"/>
 
