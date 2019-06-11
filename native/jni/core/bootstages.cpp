@@ -311,7 +311,7 @@ static int bind_mount(const char *from, const char *to, bool log) {
 #define mount_mirror(part, flag) { \
 	sscanf(line.data(), "%s %*s %s", buf, buf2); \
 	xstat(buf, &st); \
-	mknod(PARTBLK(part), S_IFBLK | 0600, st.st_rdev); \
+	mknod(PARTBLK(part), (st.st_mode & S_IFMT) | 0600, st.st_rdev); \
 	xmkdir(MIRRMNT(part), 0755); \
 	xmount(PARTBLK(part), MIRRMNT(part), buf2, flag, nullptr); \
 	VLOGI("mount", PARTBLK(part), MIRRMNT(part)); \
