@@ -12,6 +12,8 @@ static int check_verity_pattern(const char *s) {
 		skip += 6;
 	else if (strncmp(s + skip, "avb", 3) == 0)
 		skip += 3;
+  else if (strncmp(s + skip, "support_scfs", 12) == 0)
+    skip += 12;
 	else
 		return -1;
 
@@ -22,7 +24,7 @@ static int check_verity_pattern(const char *s) {
 }
 
 static int check_encryption_pattern(const char *s) {
-	const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe", NULL };
+	const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe", "fileencryption", NULL };
 	for (int i = 0 ; encrypt_list[i]; ++i) {
 		int len = strlen(encrypt_list[i]);
 		if (strncmp(s, encrypt_list[i], len) == 0)
