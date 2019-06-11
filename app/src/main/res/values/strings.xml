@@ -7,8 +7,10 @@
     <string name="log">Log</string>
     <string name="settings">Settings</string>
     <string name="install">Install</string>
+    <string name="exit">Exit</string>
+    <string name="continue_enter">Continue</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
-    <string name="unsupport_magisk_message">This version of Magisk Manager does not support Magisk version lower than v18.0.\n\nYou can either manually upgrade Magisk, or downgrade the app to an older version.</string>
+    <string name="unsupport_magisk_message2">This version of Magisk Manager does not support Magisk version lower than v18.0.\n\nIf you continue, all Magisk features are not available and you will only be able to upgrade Magisk.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk is not installed</string>

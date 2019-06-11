@@ -23,11 +23,15 @@ open class SplashActivity : Activity() {
         Shell.getShell {
             if (Info.env.magiskVersionCode > 0 && Info.env.magiskVersionCode < Const.Version.MIN_SUPPORT) {
                 AlertDialog.Builder(this)
-                    .setTitle(R.string.unsupport_magisk_title)
-                    .setMessage(R.string.unsupport_magisk_message)
-                    .setNegativeButton(R.string.ok, null)
-                    .setOnDismissListener { finish() }
-                    .show()
+                        .setTitle(R.string.unsupport_magisk_title)
+                        .setMessage(R.string.unsupport_magisk_message2)
+                        .setCancelable(false)
+                        .setNegativeButton(R.string.exit) { _, _ -> finish() }
+                        .setPositiveButton(R.string.continue_enter) { _, _ ->
+                            Info.env.magiskVersionCode = -2
+                            initAndStart()
+                        }
+                        .show()
             } else {
                 initAndStart()
             }

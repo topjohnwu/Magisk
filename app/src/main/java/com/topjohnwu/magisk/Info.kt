@@ -45,7 +45,7 @@ object Info {
     }.getOrElse { Env() }
 
     class Env(
-        val magiskVersionCode: Int = -1,
+        var magiskVersionCode: Int = -1,
         val magiskVersionString: String = "",
         hide: Boolean = false,
         var connectionMode: Int = -1
