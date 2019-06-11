@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.model.binding.BindingAdapter
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LogItemRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LogRvItem
@@ -30,6 +31,7 @@ class LogViewModel(
     private val logRepo: LogRepository
 ) : MagiskViewModel(), BindingViewPagerAdapter.PageTitles<ComparableRvItem<*>> {
 
+    val itemsAdapter = BindingAdapter()
     val items = DiffObservableList(ComparableRvItem.callback)
     val itemBinding = OnItemBind<ComparableRvItem<*>> { itemBinding, _, item ->
         item.bind(itemBinding)
