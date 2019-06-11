@@ -15,25 +15,20 @@
 
     </data>
 
-    <FrameLayout
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <androidx.recyclerview.widget.RecyclerView
+            adapter="@{viewModel.itemsAdapter}"
+            itemBinding="@{viewModel.itemBinding}"
+            items="@{item.items}"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_console" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                itemBinding="@{viewModel.itemBinding}"
-                items="@{item.items}"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_console" />
-
-        </HorizontalScrollView>
-
-    </FrameLayout>
+    </HorizontalScrollView>
 
 </layout>
