@@ -81,6 +81,22 @@ static void kill_process(const char *name) {
 	});
 }
 
+static void kill_all_usap() {
+	crawl_procfs([](int pid) -> bool {
+		char buf[512];
+		snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
+		if (FILE *f = fopen(buf, "re"); f) {
+			fgets(buf, sizeof(buf), f);
+			if (strncmp(buf, "usap", 4) == 0) {
+				if (kill(pid, SIGTERM) == 0)
+					LOGD("hide_utils: killed PID=[%d] (usap)\n", pid);
+			}
+			fclose(f);
+		}
+		return true;
+	});
+}
+
 static int add_list(const char *pkg, const char *proc = "") {
 	if (proc[0] == '\0')
 		proc = pkg;
@@ -250,6 +266,9 @@ void launch_magiskhide(int client) {
 	// Initialize the hide list
 	if (!init_list())
 		LAUNCH_ERR;
+
+	// Kill blastula pool
+	kill_all_usap();
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();

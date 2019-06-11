@@ -219,6 +219,8 @@ static bool check_pid(int pid) {
 	fclose(f);
 	if (strncmp(cmdline, "zygote", 6) == 0)
 		return false;
+	if (strncmp(cmdline, "usap", 4) == 0)
+		return false;
 
 	sprintf(path, "/proc/%d", pid);
 	struct stat st;
