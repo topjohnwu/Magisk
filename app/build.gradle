@@ -43,6 +43,10 @@ android {
         exclude '/kotlin/**'
         exclude '/kotlinx/**'
     }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 androidExtensions {
