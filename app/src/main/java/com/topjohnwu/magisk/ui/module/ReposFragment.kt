@@ -74,20 +74,22 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
     }
 
     private fun openChangelog(item: Repo) {
-        MarkDownWindow.show(context, null, item.detailUrl)
+        MarkDownWindow.show(requireActivity(), null, item.detailUrl)
     }
 
     private fun installModule(item: Repo) {
         val context = magiskActivity
 
         fun download(install: Boolean) {
-            context.runWithExternalRW {
-                val intent = Intent(activity, ClassMap[DownloadModuleService::class.java])
-                    .putExtra("repo", item).putExtra("install", install)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(intent) //hmm, service starts itself in foreground, this seems unnecessary
-                } else {
-                    context.startService(intent)
+            context.withExternalRW {
+                onSuccess {
+                    val intent = Intent(activity, ClassMap[DownloadModuleService::class.java])
+                            .putExtra("repo", item).putExtra("install", install)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(intent)
+                    } else {
+                        context.startService(intent)
+                    }
                 }
             }
         }
