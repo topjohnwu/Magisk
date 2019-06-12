@@ -7,8 +7,8 @@
     <string name="log">記錄檔</string>
     <string name="settings">設定</string>
     <string name="install">安裝</string>
-    <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>
-    <string name="unsupport_magisk_message">此版本 Magisk Manager 最低支援版本為 Magisk 18.0。\n\n請手動更新 Magisk，或安裝舊版 Magisk Manager。</string>
+    <string name="unsupport_magisk_title">不支援此 Magisk 版本</string>
+    <string name="unsupport_magisk_message">此 Magisk Manager 版本最低支援 Magisk 18.0。\n\n請手動更新 Magisk，或安裝舊版 Magisk Manager。</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">未安裝 Magisk</string>
@@ -19,25 +19,25 @@
     <string name="safetyNet_check_success">SafetyNet 檢查通過</string>
     <string name="safetyNet_api_error">SafetyNet API 錯誤</string>
     <string name="safetyNet_res_invalid">回傳值無效</string>
-    <string name="magisk_up_to_date">Magisk 已為最新版本</string>
-    <string name="manager_up_to_date">Magisk Manager 已為最新版本</string>
+    <string name="magisk_up_to_date">Magisk 為最新版本</string>
+    <string name="manager_up_to_date">Magisk Manager 為最新版本</string>
     <string name="advanced_settings_title">進階設定</string>
     <string name="keep_force_encryption">保留強制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
-    <string name="current_installed">已安裝：%1$s</string>
+    <string name="current_installed">已安裝版本：%1$s</string>
     <string name="latest_version">最新版本：%1$s</string>
     <string name="uninstall">解除安裝</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
-    <string name="uninstall_magisk_msg">將停用或移除所有模組。同時將移除 Root 權限並可能加密目前未加密的資料夾。</string>
+    <string name="uninstall_magisk_msg">將停用或移除所有模組。同時移除 Root 權限且可能加密尚未加密的資料。</string>
     <string name="update">更新</string>
-    <string name="core_only_enabled">（核心模式已啟用）</string>
+    <string name="core_only_enabled">（已啟用核心模式）</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供資訊）</string>
     <string name="no_modules_found">未找到模組</string>
     <string name="update_file_created">模組將在下次重新啟動後更新</string>
     <string name="remove_file_created">模組將在下次重新啟動後移除</string>
-    <string name="remove_file_deleted">模組將不會在下次重新啟動後移除</string>
+    <string name="remove_file_deleted">模組不會在下次重新啟動後移除</string>
     <string name="disable_file_created">模組將在下次重新啟動後禁用</string>
     <string name="disable_file_removed">模組將在下次重新啟動後啟用</string>
     <string name="author">作者：%1$s</string>
@@ -46,10 +46,10 @@
     <string name="reboot_download">重新啟動至 Download</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">有可用的更新</string>
+    <string name="update_available">可更新</string>
     <string name="installed">已安裝</string>
     <string name="not_installed">未安裝</string>
-    <string name="updated_on">最後更新：%1$s</string>
+    <string name="updated_on">上次更新：%1$s</string>
     <string name="sorting_order">排列順序</string>
     <string name="sort_by_name">依名稱排序</string>
     <string name="sort_by_update">依更新日期排序</string>
@@ -71,8 +71,20 @@
     <string name="progress_channel">進度通知</string>
     <string name="download_complete">下載完成</string>
     <string name="download_file_error">下載錯誤</string>
-    <string name="magisk_update_title">有可用的 Magisk 更新！</string>
-    <string name="manager_update_title">有可用的 Magisk Manager 更新！</string>
+    <string name="magisk_update_title">Magisk 已推出新版本！</string>
+    <string name="manager_update_title">Magisk Manager 已推出新版本！</string>
+
+    <!-- Installation -->
+    <string name="manager_download_install">輕觸以下載及安裝</string>
+    <string name="download_zip_only">僅下載 ZIP</string>
+    <string name="direct_install">直接安裝（建議）</string>
+    <string name="install_inactive_slot">安裝至未使用的分割區（OTA 後）</string>
+    <string name="install_inactive_slot_msg">下次重新啟動後，裝置將切換至未使用的分割區！\n請僅在 OTA 後使用此選項。\n是否繼續？</string>
+    <string name="select_method">選擇模式</string>
+    <string name="setup_title">增量更新</string>
+    <string name="select_patch_file">選擇並修改檔案</string>
+    <string name="patch_file_msg">請選取未修改過的映像檔（*.img）或 ODIN TAR 檔 (*.tar)</string>
+    <string name="reboot_delay_toast">將在 5 秒後重新啟動…</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">關閉</string>
@@ -80,35 +92,31 @@
     <string name="repo_install_msg">即將安裝 %1$s</string>
     <string name="download">下載</string>
     <string name="reboot">重新啟動</string>
-    <string name="settings_reboot_toast">重新啟動以套用變更</string>
+    <string name="settings_reboot_toast">重新啟動即可套用變更</string>
     <string name="release_notes">發布說明</string>
     <string name="repo_cache_cleared">已清除資源庫快取</string>
     <string name="internal_storage">ZIP 已儲存至：\n[內部儲存空間]%1$s</string>
-    <string name="manager_download_install">輕觸以下載或安裝</string>
+
     <string name="dtbo_patched_title">已修改 DTBO！</string>
     <string name="dtbo_patched_reboot">Magisk Manager 已修改 DTBO，請重新啟動</string>
     <string name="flashing">正在刷入</string>
+    <string name="done">完成！</string>
+    <string name="failure">失敗</string>
     <string name="hide_manager_title">正在隱藏 Magisk Manager…</string>
     <string name="hide_manager_fail_toast">隱藏 Magisk Manager 失敗</string>
     <string name="open_link_failed_toast">無可開啟此連結的應用程式</string>
-    <string name="download_zip_only">僅下載 ZIP</string>
-    <string name="direct_install">直接安裝（建議）</string>
-    <string name="install_inactive_slot">安裝至未使用的分割區（OTA 後）</string>
     <string name="warning">警告</string>
-    <string name="install_inactive_slot_msg">此裝置將會在下次重新啟動後強制切換至未使用的分割區！\n請僅在 OTA 後使用此選項。\n是否繼續？</string>
-    <string name="select_method">選擇模式</string>
     <string name="complete_uninstall">完整解除安裝</string>
     <string name="restore_img">還原映像檔</string>
     <string name="restore_img_msg">正在還原…</string>
     <string name="restore_done">還原完成！</string>
     <string name="restore_fail">無原始備份檔案！</string>
     <string name="proprietary_title">下載非開源程式</string>
-    <string name="proprietary_notice">Magisk Manager 完全開源，因此並不包含執行 SafetyNet 檢查所需的 Google 專有程式碼。\n\nMagisk Manager 將下載額外的元件（包含 GoogleApiClient）以進行檢查，是否繼續？</string>
+    <string name="proprietary_notice">Magisk Manager 完全開源，因此不包含 SafetyNet 檢查所需的 Google 專有程式。\n\n需要下載額外元件（包含 GoogleApiClient）以進行檢查，是否繼續？</string>
     <string name="setup_fail">設定失敗。</string>
     <string name="env_fix_title">需要增量更新</string>
-    <string name="env_fix_msg">為確保 Magisk 正常運作，此裝置需要安裝增量更新。將開始下載 Magisk 安裝包，是否繼續？</string>
-    <string name="setup_title">增量更新</string>
-    <string name="setup_msg">安裝環境設定中…</string>
+    <string name="env_fix_msg">為確保 Magisk 正常運作，此裝置需要安裝增量更新。將開始下載 Magisk 安裝套件，是否繼續？</string>
+    <string name="setup_msg">正在設定安裝環境…</string>
     <string name="downloading_toast">正在下載 %1$s</string>
     <string name="no_rw_storage">未授予外部儲存空間寫入權限，此功能將無法正常運作。</string>
     <string name="dl_one_module">僅能同時下載單個模組</string>
@@ -118,16 +126,16 @@
     <string name="settings_dark_theme_title">深色主題</string>
     <string name="settings_dark_theme_summary">啟用深色主題</string>
     <string name="settings_clear_cache_title">清除資源庫快取</string>
-    <string name="settings_clear_cache_summary">清除已暫存的線上資源庫快取。將強制重新載入線上資源庫。</string>
+    <string name="settings_clear_cache_summary">清除暫存資源庫快取，並強制重新載入線上資源庫。</string>
     <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>
-    <string name="settings_hide_manager_summary">將 Magisk Manager 以隨機套件名重新打包</string>
+    <string name="settings_hide_manager_summary">以亂碼套件名重新安裝 Magisk Manager</string>
     <string name="settings_restore_manager_title">還原 Magisk Manager</string>
-    <string name="settings_restore_manager_summary">將 Magisk Manager 以原始套件名重新打包</string>
+    <string name="settings_restore_manager_summary">以原始套件名重新安裝 Magisk Manager</string>
     <string name="language">語言</string>
     <string name="system_default">（系統預設）</string>
     <string name="settings_update">更新設定</string>
     <string name="settings_check_update_title">檢查更新</string>
-    <string name="settings_check_update_summary">定期於背景中檢查更新</string>
+    <string name="settings_check_update_summary">定期於背景檢查更新</string>
     <string name="settings_update_channel_title">更新頻道</string>
     <string name="settings_update_stable">穩定版</string>
     <string name="settings_update_beta">測試版</string>
@@ -135,7 +143,7 @@
     <string name="settings_update_custom_msg">請輸入自訂網址</string>
     <string name="settings_core_only_title">Magisk 核心模式</string>
     <string name="settings_core_only_summary">僅啟用 Magisk 核心功能。MagiskSU 及 MagiskHide 將保持開啟，模組則不會被載入。</string>
-    <string name="settings_magiskhide_summary">隱藏 Magisk 以避免被偵測</string>
+    <string name="settings_magiskhide_summary">隱藏 Magisk 以避免偵測</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">為廣告阻擋程式提供 Systemless hosts</string>
     <string name="settings_hosts_toast">已安裝 Systemless hosts 模組</string>
@@ -155,17 +163,17 @@
     <string name="request_timeout">請求逾時</string>
     <string name="superuser_notification">Superuser 通知</string>
     <string name="request_timeout_summary">%1$d 秒</string>
-    <string name="settings_su_reauth_title">更新後，重新進行驗證</string>
+    <string name="settings_su_reauth_title">更新後重新驗證</string>
     <string name="settings_su_reauth_summary">應用程式更新後，重新驗證 Superuser 請求</string>
-    <string name="settings_su_fingerprint_title">啟用指紋驗證</string>
+    <string name="settings_su_fingerprint_title">指紋驗證</string>
     <string name="settings_su_fingerprint_summary">使用指紋辨識器允許 Superuser 請求</string>
     <string name="auth_fingerprint">指紋驗證</string>
 
     <string name="multiuser_mode">多使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
     <string name="settings_owner_manage">由裝置擁有者管理</string>
-    <string name="settings_user_independent">各使用者獨立</string>
-    <string name="owner_only_summary">Root 權限僅限裝置擁有者可用</string>
+    <string name="settings_user_independent">使用者獨立管理</string>
+    <string name="owner_only_summary">僅限裝置擁有者可使用 Root 權限</string>
     <string name="owner_manage_summary">僅限裝置擁有者可管理及接收 Root 請求</string>
     <string name="user_indepenent_summary">各使用者皆擁有獨立權限設定</string>
 
@@ -197,10 +205,10 @@
     <string name="no_apps_found">找不到應用程式</string>
     <string name="su_snack_grant">已授予 %1$s Superuser 權限</string>
     <string name="su_snack_deny">已拒絕授予 %1$s Superuser 權限</string>
-    <string name="su_snack_notif_on">已允許 %1$s 的通知</string>
-    <string name="su_snack_notif_off">已拒絕 %1$s 的通知</string>
-    <string name="su_snack_log_on">已啟用 %1$s 的記錄檔</string>
-    <string name="su_snack_log_off">已停用 %1$s 的記錄檔</string>
+    <string name="su_snack_notif_on">已允許 %1$s 發送通知</string>
+    <string name="su_snack_notif_off">已拒絕 %1$s 發送通知</string>
+    <string name="su_snack_log_on">已啟用 %1$s 寫入記錄檔</string>
+    <string name="su_snack_log_off">已停用 %1$s 寫入記錄檔</string>
     <string name="su_snack_revoke">已撤銷 %1$s 的權限</string>
     <string name="su_revoke_title">撤銷</string>
     <string name="su_revoke_msg">確定撤銷 %1$s 的權限？</string>
@@ -215,10 +223,5 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">顯示系統應用程式</string>
-    <string name="done">完成！</string>
-    <string name="failure">失敗</string>
-    <string name="patch_file_msg">選擇一個 image (*.img) 或是 ODIN tarfile (*.tar)</string>
-    <string name="reboot_delay_toast">5 秒鐘之後將會重新啟動…</string>
-    <string name="select_patch_file">選擇並對檔案進行補丁</string>
 
 </resources>
