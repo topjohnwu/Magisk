@@ -15,20 +15,39 @@
 
     </data>
 
-    <HorizontalScrollView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            adapter="@{viewModel.itemsAdapter}"
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{item.items}"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_console" />
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </HorizontalScrollView>
+            <androidx.recyclerview.widget.RecyclerView
+                adapter="@{viewModel.itemsAdapter}"
+                itemBinding="@{viewModel.itemBinding}"
+                items="@{item.items}"
+                scrollPosition="@={viewModel.scrollPosition}"
+                scrollPositionSmooth="@{true}"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_console" />
+
+        </HorizontalScrollView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            hide="@{viewModel.scrollPosition == item.items.size - 1}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/margin_generic"
+            android:onClick="@{() -> viewModel.scrollDownPressed()}"
+            app:srcCompat="@drawable/ic_arrow_down"
+            app:tint="@color/colorTextInverse" />
+
+    </FrameLayout>
+
 
 </layout>

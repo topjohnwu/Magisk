@@ -43,6 +43,8 @@ class LogViewModel(
     private val logItem get() = items[0] as LogRvItem
     private val magiskLogItem get() = items[1] as MagiskLogRvItem
 
+    val scrollPosition = KObservableField(0)
+
     init {
         currentPage.addOnPropertyChangedCallback {
             it ?: return@addOnPropertyChangedCallback
@@ -57,6 +59,10 @@ class LogViewModel(
         is LogRvItem -> resources.getString(R.string.superuser)
         is MagiskLogRvItem -> resources.getString(R.string.magisk)
         else -> ""
+    }
+
+    fun scrollDownPressed() {
+        scrollPosition.value = magiskLogItem.items.size - 1
     }
 
     fun refresh() {
