@@ -11,9 +11,9 @@ import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.repository.AppRepository
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.DownloadApp
-import com.topjohnwu.magisk.utils.RootUtils
 import com.topjohnwu.magisk.utils.SuLogger
 import com.topjohnwu.magisk.utils.inject
+import com.topjohnwu.magisk.utils.reboot
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
@@ -76,7 +76,7 @@ open class GeneralReceiver : BroadcastReceiver() {
                 Info.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK)
                 DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME))
             }
-            Const.Key.BROADCAST_REBOOT -> RootUtils.reboot()
+            Const.Key.BROADCAST_REBOOT -> reboot()
         }
     }
 }

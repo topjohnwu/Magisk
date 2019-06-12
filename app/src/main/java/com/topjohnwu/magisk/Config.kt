@@ -3,9 +3,9 @@ package com.topjohnwu.magisk
 import android.content.Context
 import android.util.Xml
 import androidx.core.content.edit
-import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.data.database.SettingsDao
 import com.topjohnwu.magisk.data.database.StringDao
+import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.model.preference.PreferenceModel
 import com.topjohnwu.magisk.utils.*

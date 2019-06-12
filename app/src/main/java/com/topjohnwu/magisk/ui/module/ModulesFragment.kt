@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.databinding.FragmentModulesBinding
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.ui.flash.FlashActivity
-import com.topjohnwu.magisk.utils.RootUtils
+import com.topjohnwu.magisk.utils.reboot
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -64,19 +64,20 @@ class ModulesFragment : MagiskFragment<ModuleViewModel, FragmentModulesBinding>(
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.reboot -> {
-                RootUtils.reboot()
+                reboot()
                 return true
             }
             R.id.reboot_recovery -> {
-                Shell.su("/system/bin/reboot recovery").submit()
+                reboot("recovery")
                 return true
             }
             R.id.reboot_bootloader -> {
+                reboot("booloader")
                 Shell.su("/system/bin/reboot bootloader").submit()
                 return true
             }
             R.id.reboot_download -> {
-                Shell.su("/system/bin/reboot download").submit()
+                reboot("download")
                 return true
             }
             else -> return false
@@ -90,26 +91,4 @@ class ModulesFragment : MagiskFragment<ModuleViewModel, FragmentModulesBinding>(
             startActivityForResult(intent, Const.ID.FETCH_ZIP)
         }
     }
-
-    /*override fun getListeningEvents(): IntArray {
-        return intArrayOf(Event.MODULE_LOAD_DONE)
-    }
-
-    override fun onEvent(event: Int) {
-        updateUI(Event.getResult(event))
-    }*/
-
-    /*private fun updateUI(moduleMap: Map<String, Module>) {
-        listModules.clear()
-        listModules.addAll(moduleMap.values)
-        if (listModules.size == 0) {
-            emptyRv!!.visibility = View.VISIBLE
-            recyclerView!!.visibility = View.GONE
-        } else {
-            emptyRv!!.visibility = View.GONE
-            recyclerView!!.visibility = View.VISIBLE
-            recyclerView!!.adapter = ModulesAdapter(listModules)
-        }
-        mSwipeRefreshLayout!!.isRefreshing = false
-    }*/
 }

@@ -1,18 +1,13 @@
 package com.topjohnwu.magisk.utils
 
+import com.topjohnwu.magisk.Info
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import java.io.File
 
-fun reboot(recovery: Boolean = false): Shell.Result {
-    val command = StringBuilder("/system/bin/reboot")
-        .appendIf(recovery) {
-            append(" recovery")
-        }
-        .toString()
-
-    return Shell.su(command).exec()
+fun reboot(reason: String = if (Info.recovery) "recovery" else "") {
+    Shell.su("/system/bin/svc power reboot $reason || /system/bin/reboot $reason").submit()
 }
 
 fun File.suOutputStream() = SuFileOutputStream(this)

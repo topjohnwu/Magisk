@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.di
 
-import com.topjohnwu.magisk.data.repository.*
+import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.data.repository.MagiskRepository
 import org.koin.dsl.module
 
 
