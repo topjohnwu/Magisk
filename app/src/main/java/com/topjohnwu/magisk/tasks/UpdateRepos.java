@@ -3,8 +3,6 @@ package com.topjohnwu.magisk.tasks;
 import android.database.Cursor;
 import android.util.Pair;
 
-import androidx.annotation.NonNull;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
@@ -20,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -33,16 +30,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Single;
 
 @Deprecated
 public class UpdateRepos {
-    private static final DateFormat DATE_FORMAT;
-
-    static {
-        DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     @NonNull
     private final RepoDatabaseHelper repoDB;
@@ -71,6 +63,17 @@ public class UpdateRepos {
         }
     }
 
+    /**
+     * Static instance of (Simple)DateFormat is not threadsafe so in order to make it safe it needs
+     * to be created beforehand on the same thread where it'll be used.
+     * See https://stackoverflow.com/a/18383395
+     */
+    private static SimpleDateFormat getDateFormat() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return format;
+    }
+
     /* We sort repos by last push, which means that we only need to check whether the
      * first page is updated to determine whether the online repo database is changed
      */
@@ -95,10 +98,12 @@ public class UpdateRepos {
             return true;
 
         try {
+            SimpleDateFormat dateFormat = getDateFormat();
+
             for (int i = 0; i < res.getResult().length(); i++) {
                 JSONObject rawRepo = res.getResult().getJSONObject(i);
                 String id = rawRepo.getString("name");
-                Date date = DATE_FORMAT.parse(rawRepo.getString("pushed_at"));
+                Date date = dateFormat.parse(rawRepo.getString("pushed_at"));
                 moduleQueue.offer(new Pair<>(id, date));
             }
         } catch (JSONException | ParseException e) {
