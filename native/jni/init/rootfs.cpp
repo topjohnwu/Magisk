@@ -48,6 +48,9 @@ void MagiskInit::setup_rootfs() {
 		close(system_root);
 	}
 
+	// Some "security" mechanisms tries to read /sepolicy
+	chmod("/sepolicy", 0600);
+
 	if (patch_init) {
 		constexpr char SYSTEM_INIT[] = "/system/bin/init";
 		// If init is symlink, copy it to rootfs so we can patch
