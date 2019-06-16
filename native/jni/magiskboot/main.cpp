@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 		} else {
 			return unpack(argv[2]);
 		}
-	} else if (argc > 2 && action == "unpack") {
+	} else if (argc > 2 && action == "repack") {
 		if (argv[2] == "-n"sv) {
 			if (argc == 3)
 				usage(argv[0]);
