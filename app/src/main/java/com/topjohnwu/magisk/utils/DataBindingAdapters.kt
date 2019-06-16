@@ -186,9 +186,17 @@ fun setHidden(view: FloatingActionButton, hide: Boolean) {
 }
 
 @BindingAdapter("scrollPosition", "scrollPositionSmooth", requireAll = false)
-fun setScrollPosition(view: RecyclerView, position: Int, smoothScroll: Boolean) = when {
-    smoothScroll -> view.smoothScrollToPosition(position)
-    else -> view.scrollToPosition(position)
+fun setScrollPosition(view: RecyclerView, position: Int, smoothScroll: Boolean) {
+    val adapterItemCount = view.adapter?.itemCount ?: -1
+    if (position !in 0 until adapterItemCount) {
+        // the position is not in adapter bounds, adapter will throw exception for invalid positions
+        return
+    }
+
+    when {
+        smoothScroll -> view.smoothScrollToPosition(position)
+        else -> view.scrollToPosition(position)
+    }
 }
 
 @BindingAdapter("recyclerScrollEvent")
