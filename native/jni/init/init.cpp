@@ -120,7 +120,7 @@ static int dump_manager(const char *path, mode_t mode) {
 void MagiskInit::preset() {
 	root = open("/", O_RDONLY | O_CLOEXEC);
 
-	if (cmd.system_as_root) {
+	if (cmd->system_as_root) {
 		// Clear rootfs
 		LOGD("Cleaning rootfs\n");
 		frm_rf(root, { "overlay", "proc", "sys" });
@@ -171,10 +171,6 @@ void MagiskInit::start() {
 	if (null > STDERR_FILENO)
 		close(null);
 
-	setup_klog();
-
-	load_kernel_info();
-
 	full_read("/init", &self.buf, &self.sz);
 	full_read("/.backup/.magisk", &config.buf, &config.sz);
 
@@ -192,7 +188,6 @@ void MagiskInit::test() {
 	chroot(".");
 	chdir("/");
 
-	load_kernel_info();
 	preset();
 	early_mount();
 	setup_rootfs();
@@ -200,7 +195,9 @@ void MagiskInit::test() {
 }
 
 static int test_main(int, char *argv[]) {
-	MagiskInit init(argv);
+	cmdline cmd{};
+	load_kernel_info(&cmd);
+	MagiskInit init(argv, &cmd);
 	init.test();
 	return 0;
 }
@@ -223,7 +220,12 @@ int main(int argc, char *argv[]) {
 	if (getpid() != 1)
 		return 1;
 
-	MagiskInit init(argv);
+	setup_klog();
+
+	cmdline cmd{};
+	load_kernel_info(&cmd);
+
+	MagiskInit init(argv, &cmd);
 
 	// Run the main routine
 	init.start();

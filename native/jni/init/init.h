@@ -13,7 +13,7 @@ struct raw_data {
 
 class MagiskInit {
 private:
-	cmdline cmd{};
+	cmdline *cmd;
 	raw_data self{};
 	raw_data config{};
 	int root = -1;
@@ -24,7 +24,6 @@ private:
 	bool mnt_product = false;
 	bool mnt_odm = false;
 
-	void load_kernel_info();
 	void preset();
 	void early_mount();
 	void setup_rootfs();
@@ -34,7 +33,7 @@ private:
 	void re_exec_init();
 
 public:
-	explicit MagiskInit(char *argv[]) : argv(argv) {}
+	explicit MagiskInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv) {}
 	void start();
 	void test();
 };
@@ -46,4 +45,5 @@ static inline bool is_lnk(const char *name) {
 	return S_ISLNK(st.st_mode);
 }
 
+void load_kernel_info(cmdline *cmd);
 int dump_magisk(const char *path, mode_t mode);

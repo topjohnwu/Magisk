@@ -76,14 +76,14 @@ static void setup_block(const char *partname, char *block_dev) {
 bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
 	char path[128];
 	int fd;
-	sprintf(path, "%s/fstab/%s/dev", cmd.dt_dir, name);
+	sprintf(path, "%s/fstab/%s/dev", cmd->dt_dir, name);
 	if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
 		read(fd, path, sizeof(path));
 		close(fd);
 		// Some custom treble use different names, so use what we read
 		char *part = rtrim(strrchr(path, '/') + 1);
-		sprintf(partname, "%s%s", part, strend(part, cmd.slot) ? cmd.slot : "");
-		sprintf(path, "%s/fstab/%s/type", cmd.dt_dir, name);
+		sprintf(partname, "%s%s", part, strend(part, cmd->slot) ? cmd->slot : "");
+		sprintf(path, "%s/fstab/%s/type", cmd->dt_dir, name);
 		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
 			read(fd, fstype, 32);
 			close(fd);
@@ -111,9 +111,9 @@ void MagiskInit::early_mount() {
 	char fstype[32];
 	char block_dev[64];
 
-	if (cmd.system_as_root) {
+	if (cmd->system_as_root) {
 		LOGD("Early mount system_root\n");
-		sprintf(partname, "system%s", cmd.slot);
+		sprintf(partname, "system%s", cmd->slot);
 		setup_block(partname, block_dev);
 		xmkdir("/system_root", 0755);
 		if (xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr))
