@@ -61,9 +61,10 @@ class SuperuserViewModel(
                     { it.item.packageName }
                 ))
             }
+            .map { it to items.calculateDiff(it) }
             .applySchedulers()
             .applyViewModel(this)
-            .subscribeK { items.update(it) }
+            .subscribeK { items.update(it.first, it.second) }
             .add()
     }
 
