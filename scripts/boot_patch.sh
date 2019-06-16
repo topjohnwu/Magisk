@@ -84,6 +84,17 @@ case $? in
     ;;
 esac
 
+for part in kernel ramdisk.cpio; do
+  var=$(basename $part .cpio)comp
+  eval $var=$(./magiskboot decompress $part 2>&1 | grep -v 'raw' | sed -n 's;.*\[\(.*\)\];\1;p')
+  eval comp=\$$var
+  if [ "$comp" ]; then
+    cp -af $part $part.$comp
+    $comp -dc $part.$comp > $part
+    rm -f $part.$comp
+  fi
+done
+
 ##########################################################################################
 # Ramdisk restores
 ##########################################################################################
@@ -183,6 +194,16 @@ fi
 ##########################################################################################
 
 ui_print "- Repacking boot image"
+
+for part in kernel ramdisk.cpio; do
+  eval comp=\$$(basename $part .cpio)comp
+  if [ "$comp" ]; then
+    cp -af $part $part.uncomp
+    $comp -9c $part.uncomp > $part
+    rm -f $part.uncomp
+  fi
+done
+
 ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image!"
 
 # Sign chromeos boot
