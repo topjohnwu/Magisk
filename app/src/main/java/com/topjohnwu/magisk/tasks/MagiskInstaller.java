@@ -123,9 +123,9 @@ public abstract class MagiskInstaller {
 
         File zip = new File(App.self.getCacheDir(), "magisk.zip");
 
-        if (!ShellUtils.checkSum("MD5", zip, Info.magiskMD5)) {
+        if (!ShellUtils.checkSum("MD5", zip, Info.remote.getMagisk().getHash())) {
             console.add("- Downloading zip");
-            Networking.get(Info.magiskLink)
+            Networking.get(Info.remote.getMagisk().getLink())
                     .setDownloadProgressListener(new ProgressLog())
                     .execForFile(zip);
         } else {

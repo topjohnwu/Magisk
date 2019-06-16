@@ -172,7 +172,7 @@ class HomeViewModel(
         state = State.LOADED
         magiskState.value = when (Info.magiskVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
-            !in Info.remoteMagiskVersionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
+            !in Info.remote.magisk.versionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
@@ -183,9 +183,9 @@ class HomeViewModel(
         }
 
         magiskLatestVersion.value = version
-            .format(Info.remoteMagiskVersionString, Info.remoteMagiskVersionCode)
+            .format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
 
-        managerState.value = when (Info.remoteManagerVersionCode) {
+        managerState.value = when (Info.remote.app.versionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
             in (BuildConfig.VERSION_CODE + 1)..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
@@ -195,7 +195,7 @@ class HomeViewModel(
             .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
 
         managerLatestVersion.value = version
-            .format(Info.remoteManagerVersionString, Info.remoteManagerVersionCode)
+            .format(Info.remote.app.version, Info.remote.app.versionCode)
     }
 
     private fun ensureEnv() {

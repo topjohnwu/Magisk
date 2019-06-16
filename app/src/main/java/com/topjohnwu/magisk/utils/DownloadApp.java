@@ -26,7 +26,7 @@ public class DownloadApp {
 
     public static void restore() {
         String name = Utils.INSTANCE.fmt("MagiskManager v%s(%d)",
-                Info.remoteManagerVersionString, Info.remoteManagerVersionCode);
+                Info.remote.getApp().getVersion(), Info.remote.getApp().getVersionCode());
         dlInstall(name, new RestoreManager());
     }
 
@@ -34,7 +34,7 @@ public class DownloadApp {
         File apk = new File(App.self.getCacheDir(), "manager.apk");
         ProgressNotification progress = new ProgressNotification(name);
         listener.progress = progress;
-        Networking.get(Info.managerLink)
+        Networking.get(Info.remote.getApp().getLink())
                 .setExecutor(App.THREAD_POOL)
                 .setDownloadProgressListener(progress)
                 .setErrorHandler((conn, e) -> progress.dlFail())

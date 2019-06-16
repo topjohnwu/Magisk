@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.view.dialogs
 
 import android.net.Uri
-import android.text.TextUtils
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.ui.base.MagiskActivity
@@ -13,8 +12,8 @@ import java.util.*
 
 class MagiskInstallDialog(a: MagiskActivity<*, *>) : CustomAlertDialog(a) {
     init {
-        val filename = "Magisk v${Info.remoteMagiskVersionString}" +
-                "(${Info.remoteMagiskVersionCode})"
+        val filename = "Magisk v${Info.remote.magisk.version}" +
+                "(${Info.remote.magisk.versionCode})"
         setTitle(a.getString(R.string.repo_install_title, a.getString(R.string.magisk)))
         setMessage(a.getString(R.string.repo_install_msg, filename))
         setCancelable(true)
@@ -31,13 +30,13 @@ class MagiskInstallDialog(a: MagiskActivity<*, *>) : CustomAlertDialog(a) {
             }
             InstallMethodDialog(a, options).show()
         }
-        if (!TextUtils.isEmpty(Info.magiskNoteLink)) {
+        if (Info.remote.magisk.note.isNotEmpty()) {
             setNeutralButton(R.string.release_notes) { _, _ ->
-                if (Info.magiskNoteLink.contains("forum.xda-developers")) {
+                if (Info.remote.magisk.note.contains("forum.xda-developers")) {
                     // Open forum links in browser
-                    Utils.openLink(a, Uri.parse(Info.magiskNoteLink))
+                    Utils.openLink(a, Uri.parse(Info.remote.magisk.note))
                 } else {
-                    MarkDownWindow.show(a, null, Info.magiskNoteLink)
+                    MarkDownWindow.show(a, null, Info.remote.magisk.note)
                 }
             }
         }

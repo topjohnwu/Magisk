@@ -73,7 +73,8 @@ open class GeneralReceiver : BroadcastReceiver() {
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
             Const.Key.BROADCAST_MANAGER_UPDATE -> {
-                Info.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK)
+                Info.remote = Info.remote.copy(app = Info.remote.app.copy(
+                        link = intent.getStringExtra(Const.Key.INTENT_SET_LINK) ?: ""))
                 DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME))
             }
             Const.Key.BROADCAST_REBOOT -> reboot()

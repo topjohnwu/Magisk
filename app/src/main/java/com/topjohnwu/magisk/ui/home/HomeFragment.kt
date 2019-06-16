@@ -56,7 +56,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     private fun installMagisk() {
         // Show Manager update first
-        if (Info.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
+        if (Info.remote.app.versionCode > BuildConfig.VERSION_CODE) {
             installManager()
             return
         }

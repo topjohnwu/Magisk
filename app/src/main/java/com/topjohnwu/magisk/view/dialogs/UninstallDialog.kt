@@ -4,9 +4,7 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
-import android.text.TextUtils
 import android.widget.Toast
-
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
@@ -16,7 +14,6 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.ProgressNotification
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
-
 import java.io.File
 
 class UninstallDialog(activity: Activity) : CustomAlertDialog(activity) {
@@ -37,11 +34,11 @@ class UninstallDialog(activity: Activity) : CustomAlertDialog(activity) {
                 }
             }
         }
-        if (!TextUtils.isEmpty(Info.uninstallerLink)) {
+        if (Info.remote.uninstaller.link.isNotEmpty()) {
             setPositiveButton(R.string.complete_uninstall) { d, i ->
                 val zip = File(activity.filesDir, "uninstaller.zip")
                 val progress = ProgressNotification(zip.name)
-                Networking.get(Info.uninstallerLink)
+                Networking.get(Info.remote.uninstaller.link)
                         .setDownloadProgressListener(progress)
                         .setErrorHandler { _, _ -> progress.dlFail() }
                         .getAsFile(zip) { f ->

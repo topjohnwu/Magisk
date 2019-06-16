@@ -50,27 +50,14 @@ class MagiskRepository(
         else -> throw IllegalArgumentException()
     }.flatMap {
         // If remote version is lower than current installed, try switching to beta
-        if (it.magisk.versionCode.toIntOrNull() ?: -1 < Info.magiskVersionCode
+        if (it.magisk.versionCode < Info.magiskVersionCode
                 && Config.updateChannel == Config.Value.DEFAULT_CHANNEL) {
             Config.updateChannel = Config.Value.BETA_CHANNEL
             apiRaw.fetchBetaUpdate()
         } else {
             Single.just(it)
         }
-    }.doOnSuccess {
-        Info.remoteMagiskVersionString = it.magisk.version
-        Info.remoteMagiskVersionCode = it.magisk.versionCode.toIntOrNull() ?: -1
-        Info.magiskLink = it.magisk.link
-        Info.magiskNoteLink = it.magisk.note
-        Info.magiskMD5 = it.magisk.hash
-
-        Info.remoteManagerVersionString = it.app.version
-        Info.remoteManagerVersionCode = it.app.versionCode.toIntOrNull() ?: -1
-        Info.managerLink = it.app.link
-        Info.managerNoteLink = it.app.note
-
-        Info.uninstallerLink = it.uninstaller.link
-    }
+    }.map { Info.remote = it; it }
 
     fun fetchApps() =
         Single.fromCallable { packageManager.getInstalledApplications(0) }

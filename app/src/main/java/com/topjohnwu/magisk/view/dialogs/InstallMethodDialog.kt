@@ -57,11 +57,11 @@ internal class InstallMethodDialog(activity: MagiskActivity<*, *>, options: List
     private fun downloadOnly(activity: MagiskActivity<*, *>) {
         activity.withExternalRW {
             onSuccess {
-                val filename = "Magisk-v${Info.remoteMagiskVersionString}" +
-                        "(${Info.remoteMagiskVersionCode}).zip"
+                val filename = "Magisk-v${Info.remote.magisk.version}" +
+                        "(${Info.remote.magisk.versionCode}).zip"
                 val zip = File(Const.EXTERNAL_PATH, filename)
                 val progress = ProgressNotification(filename)
-                Networking.get(Info.magiskLink)
+                Networking.get(Info.remote.magisk.link)
                         .setDownloadProgressListener(progress)
                         .setErrorHandler { _, _ -> progress.dlFail() }
                         .getAsFile(zip) {

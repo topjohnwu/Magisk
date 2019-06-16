@@ -9,15 +9,15 @@ import com.topjohnwu.magisk.view.MarkDownWindow
 class ManagerInstallDialog(a: Activity) : CustomAlertDialog(a) {
 
     init {
-        val name = "MagiskManager v${Info.remoteManagerVersionString}" +
-                "(${Info.remoteManagerVersionCode})"
+        val name = "MagiskManager v${Info.remote.app.version}" +
+                "(${Info.remote.app.versionCode})"
         setTitle(a.getString(R.string.repo_install_title, a.getString(R.string.app_name)))
         setMessage(a.getString(R.string.repo_install_msg, name))
         setCancelable(true)
         setPositiveButton(R.string.install) { _, _ -> DownloadApp.upgrade(name) }
-        if (Info.managerNoteLink.isNotEmpty()) {
+        if (Info.remote.app.note.isNotEmpty()) {
             setNeutralButton(R.string.app_changelog) { _, _ ->
-                MarkDownWindow.show(a, null, Info.managerNoteLink) }
+                MarkDownWindow.show(a, null, Info.remote.app.note) }
         }
     }
 }
