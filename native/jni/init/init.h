@@ -11,21 +11,21 @@ struct raw_data {
 	size_t sz;
 };
 
-class MagiskInit {
-private:
+class BaseInit {
+protected:
 	cmdline *cmd;
 	raw_data self{};
 	raw_data config{};
-	int root = -1;
 	char **argv;
+	int root = -1;
 	bool load_sepol = false;
 	bool mnt_system = false;
 	bool mnt_vendor = false;
 	bool mnt_product = false;
 	bool mnt_odm = false;
 
-	void preset();
-	void early_mount();
+	virtual void preset() {};
+	virtual void early_mount() {}
 	void setup_rootfs();
 	bool read_dt_fstab(const char *name, char *partname, char *fstype);
 	bool patch_sepolicy();
@@ -33,9 +33,25 @@ private:
 	void re_exec_init();
 
 public:
-	explicit MagiskInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv) {}
-	void start();
-	void test();
+	BaseInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv) {}
+	virtual ~BaseInit() = default;
+	virtual void start();
+};
+
+class LegacyInit : public BaseInit {
+protected:
+	void preset() override;
+	void early_mount() override;
+public:
+	LegacyInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+};
+
+class SARInit : public BaseInit {
+protected:
+	void preset() override;
+	void early_mount() override;
+public:
+	SARInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 };
 
 static inline bool is_lnk(const char *name) {

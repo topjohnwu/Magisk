@@ -5,6 +5,7 @@
 
 #include <utils.h>
 #include <logging.h>
+#include <selinux.h>
 
 #include "init.h"
 
@@ -73,7 +74,7 @@ static void setup_block(const char *partname, char *block_dev) {
 	}
 }
 
-bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
+bool BaseInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
 	char path[128];
 	int fd;
 	sprintf(path, "%s/fstab/%s/dev", cmd->dt_dir, name);
@@ -106,38 +107,57 @@ if (!is_lnk("/" #name) && read_dt_fstab(#name, partname, fstype)) { \
 	mnt_##name = true; \
 }
 
-void MagiskInit::early_mount() {
+void LegacyInit::early_mount() {
 	char partname[32];
 	char fstype[32];
 	char block_dev[64];
 
-	if (cmd->system_as_root) {
-		LOGD("Early mount system_root\n");
-		sprintf(partname, "system%s", cmd->slot);
-		setup_block(partname, block_dev);
-		xmkdir("/system_root", 0755);
-		if (xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr))
-			xmount(block_dev, "/system_root", "erofs", MS_RDONLY, nullptr);
-		xmkdir("/system", 0755);
-		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
-
-		// Android Q
-		if (is_lnk("/system_root/init"))
-			load_sepol = true;
-
-		// System-as-root with monolithic sepolicy
-		if (access("/system_root/sepolicy", F_OK) == 0)
-			cp_afc("/system_root/sepolicy", "/sepolicy");
-
-		// Copy if these partitions are symlinks
-		link_root("/vendor");
-		link_root("/product");
-		link_root("/odm");
-	} else {
-		mount_root(system);
-	}
-
+	mount_root(system);
 	mount_root(vendor);
 	mount_root(product);
 	mount_root(odm);
+}
+
+void SARInit::early_mount() {
+	char partname[32];
+	char fstype[32];
+	char block_dev[64];
+
+	LOGD("Early mount system_root\n");
+	sprintf(partname, "system%s", cmd->slot);
+	setup_block(partname, block_dev);
+	xmkdir("/system_root", 0755);
+	if (xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr))
+		xmount(block_dev, "/system_root", "erofs", MS_RDONLY, nullptr);
+	xmkdir("/system", 0755);
+	xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
+
+	// Android Q
+	if (is_lnk("/system_root/init"))
+		load_sepol = true;
+
+	// System-as-root with monolithic sepolicy
+	if (access("/system_root/sepolicy", F_OK) == 0)
+		cp_afc("/system_root/sepolicy", "/sepolicy");
+
+	link_root("/vendor");
+	link_root("/product");
+	link_root("/odm");
+	mount_root(vendor);
+	mount_root(product);
+	mount_root(odm);
+}
+
+#define umount_root(name) \
+if (mnt_##name) \
+	umount("/" #name);
+
+void BaseInit::cleanup() {
+	umount(SELINUX_MNT);
+	umount("/sys");
+	umount("/proc");
+	umount_root(system);
+	umount_root(vendor);
+	umount_root(product);
+	umount_root(odm);
 }

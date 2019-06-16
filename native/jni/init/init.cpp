@@ -6,13 +6,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <dirent.h>
 #include <fcntl.h>
 #include <libgen.h>
 
 #include <xz.h>
 #include <magisk.h>
-#include <selinux.h>
 #include <cpio.h>
 #include <utils.h>
 #include <flags.h>
@@ -48,12 +46,10 @@ static void setup_klog() {
 #define setup_klog(...)
 #endif
 
-static int test_main(int argc, char *argv[]);
-
 constexpr const char *init_applet[] =
-		{ "magiskpolicy", "supolicy", "init_test", nullptr };
+		{ "magiskpolicy", "supolicy", nullptr };
 constexpr int (*init_applet_main[])(int, char *[]) =
-		{ magiskpolicy_main, magiskpolicy_main, test_main, nullptr };
+		{ magiskpolicy_main, magiskpolicy_main, nullptr };
 
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
@@ -117,50 +113,27 @@ static int dump_manager(const char *path, mode_t mode) {
 	return 0;
 }
 
-void MagiskInit::preset() {
-	root = open("/", O_RDONLY | O_CLOEXEC);
-
-	if (cmd->system_as_root) {
-		// Clear rootfs
-		LOGD("Cleaning rootfs\n");
-		frm_rf(root, { "overlay", "proc", "sys" });
-	} else {
-		decompress_ramdisk();
-
-		// Revert original init binary
-		rename("/.backup/init", "/init");
-		rm_rf("/.backup");
-
-		// Do not go further if device is booting into recovery
-		if (access("/sbin/recovery", F_OK) == 0) {
-			LOGD("Ramdisk is recovery, abort\n");
-			re_exec_init();
-		}
-	}
-}
-
-#define umount_root(name) \
-if (mnt_##name) \
-	umount("/" #name);
-
-void MagiskInit::cleanup() {
-	umount(SELINUX_MNT);
-	umount("/sys");
-	umount("/proc");
-	umount_root(system);
-	umount_root(vendor);
-	umount_root(product);
-	umount_root(odm);
-}
-
-void MagiskInit::re_exec_init() {
+void BaseInit::re_exec_init() {
 	LOGD("Re-exec /init\n");
 	cleanup();
 	execv("/init", argv);
 	exit(1);
 }
 
-void MagiskInit::start() {
+void LegacyInit::preset() {
+	LOGD("Reverting /init\n");
+	root = open("/", O_RDONLY | O_CLOEXEC);
+	rename("/.backup/init", "/init");
+	rm_rf("/.backup");
+}
+
+void SARInit::preset() {
+	LOGD("Cleaning rootfs\n");
+	root = open("/", O_RDONLY | O_CLOEXEC);
+	frm_rf(root, { "overlay", "proc", "sys" });
+}
+
+void BaseInit::start() {
 	// Prevent file descriptor confusion
 	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
 	int null = open("/null", O_RDWR | O_CLOEXEC);
@@ -180,27 +153,27 @@ void MagiskInit::start() {
 	re_exec_init();
 }
 
-void MagiskInit::test() {
-	cmdline_logging();
-	log_cb.ex = nop_ex;
+class RecoveryInit : public BaseInit {
+public:
+	RecoveryInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	void start() override {
+		LOGD("Ramdisk is recovery, abort\n");
+		rename("/.backup/init", "/init");
+		rm_rf("/.backup");
+		re_exec_init();
+	}
+};
 
-	chdir(dirname(argv[0]));
-	chroot(".");
-	chdir("/");
-
-	preset();
-	early_mount();
-	setup_rootfs();
-	cleanup();
-}
-
-static int test_main(int, char *argv[]) {
-	cmdline cmd{};
-	load_kernel_info(&cmd);
-	MagiskInit init(argv, &cmd);
-	init.test();
-	return 0;
-}
+class TestInit : public SARInit {
+public:
+	TestInit(char *argv[], cmdline *cmd) : SARInit(argv, cmd) {};
+	void start() override {
+		preset();
+		early_mount();
+		setup_rootfs();
+		cleanup();
+	}
+};
 
 int main(int argc, char *argv[]) {
 	umask(0);
@@ -217,16 +190,40 @@ int main(int argc, char *argv[]) {
 			return dump_manager(argv[3], 0644);
 	}
 
-	if (getpid() != 1)
-		return 1;
+#ifdef MAGISK_DEBUG
+	bool run_test = getenv("INIT_TEST") != nullptr;
+#else
+	constexpr bool run_test = false;
+#endif
 
-	setup_klog();
+	if (run_test) {
+		chdir(dirname(argv[0]));
+		chroot(".");
+		chdir("/");
+		cmdline_logging();
+		log_cb.ex = nop_ex;
+	} else {
+		if (getpid() != 1)
+			return 1;
+		setup_klog();
+	}
 
 	cmdline cmd{};
 	load_kernel_info(&cmd);
 
-	MagiskInit init(argv, &cmd);
+	unique_ptr<BaseInit> init;
+	if (run_test) {
+		init = make_unique<TestInit>(argv, &cmd);
+	} else if (cmd.system_as_root) {
+		init = make_unique<SARInit>(argv, &cmd);
+	} else {
+		decompress_ramdisk();
+		if (access("/sbin/recovery", F_OK) == 0)
+			init = make_unique<RecoveryInit>(argv, &cmd);
+		else
+			init = make_unique<LegacyInit>(argv, &cmd);
+	}
 
 	// Run the main routine
-	init.start();
+	init->start();
 }
