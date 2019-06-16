@@ -38,7 +38,7 @@
         </HorizontalScrollView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            hide="@{viewModel.scrollPosition == item.items.size - 1}"
+            hide="@{viewModel.scrollPosition == item.items.size - 1 || item.items.size == 0}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
