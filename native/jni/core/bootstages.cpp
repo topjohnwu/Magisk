@@ -731,7 +731,7 @@ void boot_complete(int client) {
 		rename(MANAGERAPK, "/data/magisk.apk");
 		install_apk("/data/magisk.apk");
 		installed = true;
-	} else {
+	} else if (access(MAGISKDB, F_OK) == 0) {
 		// Check whether we have a valid manager installed
 		db_strings str;
 		get_db_strings(str, SU_MANAGER);
