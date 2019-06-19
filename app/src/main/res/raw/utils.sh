@@ -125,7 +125,7 @@ description=Redirect system su to MagiskSU
 minMagisk=17000
 EOF
   cp -df /sbin/su su/system/$1/su
-  magisk --clone-attr /sbin/su /system/$1/su
+  magisk --clone-attr /sbin/su su/system/$1/su
   touch su/update
   touch su/auto_mount
   cd /
