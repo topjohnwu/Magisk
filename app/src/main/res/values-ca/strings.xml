@@ -63,8 +63,8 @@
 
     <!--About Activity-->
     <string name="app_changelog">Registre de canvis</string>
-    <string name="translators" />
-    <string name="app_translators">JoanVC100, QuitusAnbu27</string>
+    <string name="translators">JoanVC100, QuitusAnbu27</string>
+    <string name="app_translators">Traductors</string>
     
     <!-- System Components, Notifications -->
     <string name="update_channel">Actualització de Magisk</string>
