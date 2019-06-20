@@ -49,11 +49,22 @@ class SuperuserViewModel(
             .subscribeK { updatePolicy(it) }
             .add()
 
+        // !!!!!!! BEWARE !!!!!!!
         updatePolicies()
+        updatePolicies()
+        updatePolicies()
+        updatePolicies()
+        updatePolicies()
+        updatePolicies()
+        // !!!!!!! BEWARE !!!!!!!
+        /*
+        * This piece of code is an intentional stress test!
+        * It's not to be merged!
+        * */
     }
 
     fun updatePolicies() {
-        if (fetchTask?.isDisposed?.not() == true) return
+        fetchTask?.dispose()
         fetchTask = appRepo.fetchAll()
             .flattenAsFlowable { it }
             .map { PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager)) }
@@ -67,7 +78,7 @@ class SuperuserViewModel(
             .map { it to items.calculateDiff(it) }
             .applySchedulers()
             .applyViewModel(this)
-            .subscribeK { items.update(it.first, it.second) }
+            .subscribeK { /*items.update(it.first, it.second)*/ }
     }
 
     fun deletePressed(item: PolicyRvItem) {
