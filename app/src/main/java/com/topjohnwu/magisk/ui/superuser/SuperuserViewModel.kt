@@ -53,7 +53,7 @@ class SuperuserViewModel(
     }
 
     fun updatePolicies() {
-        fetchTask?.dispose()
+        if (fetchTask?.isDisposed?.not() == true) return
         fetchTask = appRepo.fetchAll()
             .flattenAsFlowable { it }
             .map { PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager)) }
