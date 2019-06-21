@@ -43,8 +43,23 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_repo, menu)
-        (menu.findItem(R.id.repo_search).actionView as? SearchView)
-            ?.setOnQueryTextListener(this)
+
+        val query = viewModel.query.value
+        val searchItem = menu.findItem(R.id.repo_search)
+        val searchView = searchItem.actionView as? SearchView
+
+        searchView?.run {
+            setOnQueryTextListener(this@ReposFragment)
+            setQuery(query, false)
+        }
+
+        if (query.isNotBlank()) {
+            searchItem.expandActionView()
+            searchView?.isIconified = false
+        } else {
+            searchItem.collapseActionView()
+            searchView?.isIconified = true
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -84,7 +99,7 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
             context.withExternalRW {
                 onSuccess {
                     val intent = Intent(activity, ClassMap[DownloadModuleService::class.java])
-                            .putExtra("repo", item).putExtra("install", install)
+                        .putExtra("repo", item).putExtra("install", install)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         context.startForegroundService(intent)
                     } else {

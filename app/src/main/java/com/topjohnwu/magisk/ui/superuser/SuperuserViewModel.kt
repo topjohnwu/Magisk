@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.utils.toggle
 import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import io.reactivex.Single
+import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 
 class SuperuserViewModel(
@@ -38,6 +39,7 @@ class SuperuserViewModel(
     }
 
     private var ignoreNext: PolicyRvItem? = null
+    private var fetchTask: Disposable? = null
 
     init {
         rxBus.register<PolicyEnableEvent>()
@@ -51,7 +53,8 @@ class SuperuserViewModel(
     }
 
     fun updatePolicies() {
-        appRepo.fetchAll()
+        if (fetchTask?.isDisposed?.not() == true) return
+        fetchTask = appRepo.fetchAll()
             .flattenAsFlowable { it }
             .map { PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager)) }
             .toList()
@@ -65,7 +68,6 @@ class SuperuserViewModel(
             .applySchedulers()
             .applyViewModel(this)
             .subscribeK { items.update(it.first, it.second) }
-            .add()
     }
 
     fun deletePressed(item: PolicyRvItem) {

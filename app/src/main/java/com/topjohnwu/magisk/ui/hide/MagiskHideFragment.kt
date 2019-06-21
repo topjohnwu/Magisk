@@ -25,8 +25,22 @@ class MagiskHideFragment : MagiskFragment<HideViewModel, FragmentMagiskHideBindi
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_magiskhide, menu)
         menu.apply {
-            (findItem(R.id.app_search).actionView as? SearchView)
-                ?.setOnQueryTextListener(this@MagiskHideFragment)
+            val query = viewModel.query.value
+            val searchItem = menu.findItem(R.id.app_search)
+            val searchView = searchItem.actionView as? SearchView
+
+            searchView?.run {
+                setOnQueryTextListener(this@MagiskHideFragment)
+                setQuery(query, false)
+            }
+
+            if (query.isNotBlank()) {
+                searchItem.expandActionView()
+                searchView?.isIconified = false
+            } else {
+                searchItem.collapseActionView()
+                searchView?.isIconified = true
+            }
 
             val showSystem = Config.showSystemApp
 
