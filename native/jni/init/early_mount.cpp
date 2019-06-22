@@ -74,7 +74,7 @@ static void setup_block(const char *partname, char *block_dev) {
 	}
 }
 
-bool BaseInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
+bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
 	char path[128];
 	int fd;
 	sprintf(path, "%s/fstab/%s/dev", cmd->dt_dir, name);
@@ -152,10 +152,9 @@ void SARInit::early_mount() {
 if (mnt_##name) \
 	umount("/" #name);
 
-void BaseInit::cleanup() {
+void MagiskInit::cleanup() {
+	BaseInit::cleanup();
 	umount(SELINUX_MNT);
-	umount("/sys");
-	umount("/proc");
 	umount_root(system);
 	umount_root(vendor);
 	umount_root(product);

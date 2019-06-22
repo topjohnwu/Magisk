@@ -1,11 +1,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mount.h>
 #include <fcntl.h>
 
 #include <magisk.h>
 #include <utils.h>
 
 #include "init.h"
+#include "flags.h"
 #include "magiskrc.h"
 
 #ifdef USE_64BIT
@@ -37,7 +39,7 @@ constexpr const char wrapper[] =
 "exec /sbin/magisk.bin \"$0\" \"$@\"\n"
 ;
 
-void BaseInit::setup_rootfs() {
+void MagiskInit::setup_rootfs() {
 	bool patch_init = patch_sepolicy();
 
 	if (cmd->system_as_root) {
@@ -125,55 +127,13 @@ void BaseInit::setup_rootfs() {
 	link_dir(sbin, rootdir);
 	close(sbin);
 
-	LOGD("Mount /sbin tmpfs overlay\n");
-	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
-	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-
-	char path[64];
-
-	// Create symlinks pointing back to /root
-	DIR *dir = xfdopendir(rootdir);
-	struct dirent *entry;
-	while((entry = xreaddir(dir))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		sprintf(path, "/root/%s", entry->d_name);
-		xsymlinkat(path, sbin, entry->d_name);
-	}
-
-	// Dump binaries
-	mkdir(MAGISKTMP, 0755);
-	fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
-	write(fd, config.buf, config.sz);
-	close(fd);
-	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
+	// Dump magiskinit as magisk
+	fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
 	write(fd, self.buf, self.sz);
 	close(fd);
-	if (access("/system/apex", F_OK) == 0) {
-		LOGD("APEX detected, use wrapper\n");
-		dump_magisk("/sbin/magisk.bin", 0755);
-		patch_socket_name("/sbin/magisk.bin");
-		fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
-		write(fd, wrapper, sizeof(wrapper) - 1);
-		close(fd);
-	} else {
-		dump_magisk("/sbin/magisk", 0755);
-		patch_socket_name("/sbin/magisk");
-	}
-
-	// Create applet symlinks
-	for (int i = 0; applet_names[i]; ++i) {
-		sprintf(path, "/sbin/%s", applet_names[i]);
-		xsymlink("/sbin/magisk", path);
-	}
-	xsymlink("/sbin/magiskinit", "/sbin/magiskpolicy");
-	xsymlink("/sbin/magiskinit", "/sbin/supolicy");
-
-	close(rootdir);
-	close(sbin);
 }
 
-bool BaseInit::patch_sepolicy() {
+bool MagiskInit::patch_sepolicy() {
 	bool patch_init = false;
 
 	if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
@@ -213,4 +173,87 @@ bool BaseInit::patch_sepolicy() {
 	selinux_builtin_impl();
 
 	return patch_init;
+}
+
+#ifdef MAGISK_DEBUG
+static FILE *kmsg;
+static int vprintk(const char *fmt, va_list ap) {
+	fprintf(kmsg, "magiskinit: ");
+	return vfprintf(kmsg, fmt, ap);
+}
+static void setup_klog() {
+	int fd = xopen("/proc/kmsg", O_WRONLY | O_CLOEXEC);
+	kmsg = fdopen(fd, "w");
+	setbuf(kmsg, nullptr);
+	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
+	log_cb.ex = nop_ex;
+}
+#else
+#define setup_klog(...)
+#endif
+
+int magisk_proxy_main(int argc, char *argv[]) {
+	setup_klog();
+
+	raw_data config;
+	raw_data self;
+
+	full_read("/sbin/magisk", &self.buf, &self.sz);
+	full_read("/.backup/.magisk", &config.buf, &config.sz);
+
+	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
+
+	unlink("/sbin/magisk");
+	rm_rf("/.backup");
+
+	LOGD("Mount /sbin tmpfs overlay\n");
+	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
+	int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+
+	char path[64];
+
+	// Create symlinks pointing back to /root
+	{
+		unique_ptr<DIR, decltype(&closedir)> dir(xopendir("/root"), &closedir);
+		struct dirent *entry;
+		while((entry = xreaddir(dir.get()))) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv)
+				continue;
+			sprintf(path, "/root/%s", entry->d_name);
+			xsymlinkat(path, sbin, entry->d_name);
+		}
+	}
+
+	// Dump binaries
+	mkdir(MAGISKTMP, 0755);
+	int fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
+	write(fd, config.buf, config.sz);
+	close(fd);
+	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
+	write(fd, self.buf, self.sz);
+	close(fd);
+	if (access("/system/apex", F_OK) == 0) {
+		LOGD("APEX detected, use wrapper\n");
+		dump_magisk("/sbin/magisk.bin", 0755);
+		patch_socket_name("/sbin/magisk.bin");
+		fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+		write(fd, wrapper, sizeof(wrapper) - 1);
+		close(fd);
+	} else {
+		dump_magisk("/sbin/magisk", 0755);
+		patch_socket_name("/sbin/magisk");
+	}
+
+	// Create applet symlinks
+	for (int i = 0; applet_names[i]; ++i) {
+		sprintf(path, "/sbin/%s", applet_names[i]);
+		xsymlink("/sbin/magisk", path);
+	}
+	xsymlink("/sbin/magiskinit", "/sbin/magiskpolicy");
+	xsymlink("/sbin/magiskinit", "/sbin/supolicy");
+
+	setenv("REMOUNT_ROOT", "1", 1);
+	execv("/sbin/magisk", argv);
+
+	return 1;
 }

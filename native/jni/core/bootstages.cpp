@@ -560,6 +560,9 @@ void post_fs_data(int client) {
 	write_int(client, 0);
 	close(client);
 
+	if (getenv("REMOUNT_ROOT"))
+		xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
+
 	if (!check_data())
 		unblock_boot_process();
 
