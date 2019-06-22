@@ -26,13 +26,17 @@
 
 using namespace std;
 
+constexpr const char *init_applet[] =
+		{ "magiskpolicy", "supolicy", "magisk", nullptr };
+constexpr int (*init_applet_main[])(int, char *[]) =
+		{ magiskpolicy_main, magiskpolicy_main, magisk_proxy_main, nullptr };
+
 #ifdef MAGISK_DEBUG
 static FILE *kmsg;
 static int vprintk(const char *fmt, va_list ap) {
 	fprintf(kmsg, "magiskinit: ");
 	return vfprintf(kmsg, fmt, ap);
 }
-
 static void setup_klog() {
 	mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
 	int fd = xopen("/kmsg", O_WRONLY | O_CLOEXEC);
@@ -45,11 +49,6 @@ static void setup_klog() {
 #else
 #define setup_klog(...)
 #endif
-
-constexpr const char *init_applet[] =
-		{ "magiskpolicy", "supolicy", nullptr };
-constexpr int (*init_applet_main[])(int, char *[]) =
-		{ magiskpolicy_main, magiskpolicy_main, nullptr };
 
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
@@ -113,6 +112,11 @@ static int dump_manager(const char *path, mode_t mode) {
 	return 0;
 }
 
+void BaseInit::cleanup() {
+	umount("/sys");
+	umount("/proc");
+}
+
 void BaseInit::re_exec_init() {
 	LOGD("Re-exec /init\n");
 	cleanup();
@@ -121,19 +125,22 @@ void BaseInit::re_exec_init() {
 }
 
 void LegacyInit::preset() {
+	full_read("/init", &self.buf, &self.sz);
+
 	LOGD("Reverting /init\n");
 	root = open("/", O_RDONLY | O_CLOEXEC);
 	rename("/.backup/init", "/init");
-	rm_rf("/.backup");
 }
 
-void SARInit::preset() {
+void SARCompatInit::preset() {
+	full_read("/init", &self.buf, &self.sz);
+
 	LOGD("Cleaning rootfs\n");
 	root = open("/", O_RDONLY | O_CLOEXEC);
 	frm_rf(root, { "overlay", "proc", "sys" });
 }
 
-void BaseInit::start() {
+void MagiskInit::start() {
 	// Prevent file descriptor confusion
 	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
 	int null = open("/null", O_RDWR | O_CLOEXEC);
@@ -143,9 +150,6 @@ void BaseInit::start() {
 	xdup3(null, STDERR_FILENO, O_CLOEXEC);
 	if (null > STDERR_FILENO)
 		close(null);
-
-	full_read("/init", &self.buf, &self.sz);
-	full_read("/.backup/.magisk", &config.buf, &config.sz);
 
 	preset();
 	early_mount();
@@ -164,9 +168,9 @@ public:
 	}
 };
 
-class TestInit : public SARInit {
+class TestInit : public SARCompatInit {
 public:
-	TestInit(char *argv[], cmdline *cmd) : SARInit(argv, cmd) {};
+	TestInit(char *argv[], cmdline *cmd) : SARCompatInit(argv, cmd) {};
 	void start() override {
 		preset();
 		early_mount();
@@ -215,7 +219,7 @@ int main(int argc, char *argv[]) {
 	if (run_test) {
 		init = make_unique<TestInit>(argv, &cmd);
 	} else if (cmd.system_as_root) {
-		init = make_unique<SARInit>(argv, &cmd);
+		init = make_unique<SARCompatInit>(argv, &cmd);
 	} else {
 		decompress_ramdisk();
 		if (access("/sbin/recovery", F_OK) == 0)
