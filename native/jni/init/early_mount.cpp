@@ -118,7 +118,7 @@ void LegacyInit::early_mount() {
 	mount_root(odm);
 }
 
-void SARInit::early_mount() {
+void SARCompatInit::early_mount() {
 	char partname[32];
 	char fstype[32];
 	char block_dev[64];

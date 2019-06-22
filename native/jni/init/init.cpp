@@ -132,7 +132,7 @@ void LegacyInit::preset() {
 	rename("/.backup/init", "/init");
 }
 
-void SARInit::preset() {
+void SARCompatInit::preset() {
 	full_read("/init", &self.buf, &self.sz);
 
 	LOGD("Cleaning rootfs\n");
@@ -168,9 +168,9 @@ public:
 	}
 };
 
-class TestInit : public SARInit {
+class TestInit : public SARCompatInit {
 public:
-	TestInit(char *argv[], cmdline *cmd) : SARInit(argv, cmd) {};
+	TestInit(char *argv[], cmdline *cmd) : SARCompatInit(argv, cmd) {};
 	void start() override {
 		preset();
 		early_mount();
@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
 	if (run_test) {
 		init = make_unique<TestInit>(argv, &cmd);
 	} else if (cmd.system_as_root) {
-		init = make_unique<SARInit>(argv, &cmd);
+		init = make_unique<SARCompatInit>(argv, &cmd);
 	} else {
 		decompress_ramdisk();
 		if (access("/sbin/recovery", F_OK) == 0)

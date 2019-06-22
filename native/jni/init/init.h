@@ -52,12 +52,12 @@ public:
 	LegacyInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
 };
 
-class SARInit : public MagiskInit {
+class SARCompatInit : public MagiskInit {
 protected:
 	void preset() override;
 	void early_mount() override;
 public:
-	SARInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
+	SARCompatInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
 };
 
 static inline bool is_lnk(const char *name) {
