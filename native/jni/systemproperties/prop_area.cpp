@@ -320,7 +320,6 @@ prop_bt *prop_area::find_prop_bt(prop_bt *const trie, const char *name, bool all
 const prop_info* prop_area::find_property(prop_bt* const trie, const char* name, uint32_t namelen,
                                           const char* value, uint32_t valuelen,
                                           bool alloc_if_needed) {
-  const char* remaining_name = name;
   prop_bt* current = find_prop_bt(trie, name, alloc_if_needed);
   if (!current)
 	  return nullptr;
