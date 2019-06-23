@@ -63,7 +63,7 @@
 
     <!--About Activity-->
     <string name="app_changelog">Jurnalul modificărilor</string>
-    <string name="translators" />
+    <string name="translators">Cristian Silaghi, Igor Sorocean</string>
     <string name="app_translators">Traducători</string>
 
     <!-- System Components, Notifications -->
@@ -96,6 +96,7 @@
     <string name="release_notes">Note privind versiunea</string>
     <string name="repo_cache_cleared">Cache-ul depozitelor golit</string>
     <string name="internal_storage">Zip-ul este stocat în:\n[Stocare internă]%1$s</string>
+
     <string name="dtbo_patched_title">DTBO a fost patchuit!</string>
     <string name="dtbo_patched_reboot">Magisk Manager a patchuit dtbo.img. Te rugăm să repornești.</string>
     <string name="flashing">Procesare în curs…</string>
