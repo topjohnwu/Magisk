@@ -307,13 +307,13 @@ static int bind_mount(const char *from, const char *to, bool log) {
 
 #define MIRRMNT(part)   MIRRDIR "/" #part
 #define PARTBLK(part)   BLOCKDIR "/" #part
+#define DIR_IS(part)    (me->mnt_dir == "/" #part ""sv)
 
 #define mount_mirror(part, flag) { \
-	sscanf(line.data(), "%s %*s %s", buf, buf2); \
-	xstat(buf, &st); \
+	xstat(me->mnt_fsname, &st); \
 	mknod(PARTBLK(part), (st.st_mode & S_IFMT) | 0600, st.st_rdev); \
 	xmkdir(MIRRMNT(part), 0755); \
-	xmount(PARTBLK(part), MIRRMNT(part), buf2, flag, nullptr); \
+	xmount(PARTBLK(part), MIRRMNT(part), me->mnt_type, flag, nullptr); \
 	VLOGI("mount", PARTBLK(part), MIRRMNT(part)); \
 }
 
@@ -364,21 +364,19 @@ static bool magisk_env() {
 	LOGI("* Mounting mirrors");
 	bool system_as_root = false;
 	struct stat st;
-	file_readline("/proc/mounts", [&](string_view line) -> bool {
-		if (str_contains(line, " /system_root ")) {
+	parse_mnt("/proc/mounts", [&](mntent *me) {
+		if (DIR_IS(system_root)) {
 			mount_mirror(system_root, MS_RDONLY);
 			xsymlink(MIRRMNT(system_root) "/system", MIRRMNT(system));
 			VLOGI("link", MIRRMNT(system_root) "/system", MIRRMNT(system));
 			system_as_root = true;
-		} else if (!system_as_root && str_contains(line, " /system ")) {
+		} else if (!system_as_root && DIR_IS(system)) {
 			mount_mirror(system, MS_RDONLY);
-		} else if (str_contains(line, " /vendor ")) {
+		} else if (DIR_IS(vendor)) {
 			mount_mirror(vendor, MS_RDONLY);
-		} else if (str_contains(line, " /data ") && !str_contains(line, "tmpfs")) {
+		} else if (DIR_IS(data) && me->mnt_type != "tmpfs"sv) {
 			mount_mirror(data, 0);
-		} else if (SDK_INT >= 24 &&
-		str_contains(line, " /proc ") && !str_contains(line, "hidepid=2")) {
-			// Enforce hidepid
+		} else if (SDK_INT >= 24 && DIR_IS(proc) && !strstr(me->mnt_opts, "hidepid=2")) {
 			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 		}
 		return true;

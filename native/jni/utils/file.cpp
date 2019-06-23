@@ -1,15 +1,15 @@
 /* file.cpp - Contains all files related utilities
  */
 
+#include <sys/sendfile.h>
+#include <sys/mman.h>
+#include <linux/fs.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <libgen.h>
-#include <sys/sendfile.h>
-#include <sys/mman.h>
-#include <linux/fs.h>
 
 #include <magisk.h>
 #include <utils.h>
@@ -395,4 +395,15 @@ void parse_prop_file(const char *file, const function<bool (string_view, string_
 		*eql = '\0';
 		return fn(line, eql + 1);
 	}, true);
+}
+
+void parse_mnt(const char *file, const function<bool (mntent*)> &fn) {
+	unique_ptr<FILE, decltype(&fclose)> fp(xfopen(file, "rce"), &fclose);
+	if (fp) {
+		mntent *mentry;
+		while ((mentry = getmntent(fp.get())) != nullptr) {
+			if (!fn(mentry))
+				break;
+		}
+	}
 }

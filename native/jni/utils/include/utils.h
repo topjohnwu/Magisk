@@ -3,13 +3,14 @@
 
 #pragma once
 
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 #include <stdio.h>
 #include <dirent.h>
 #include <pthread.h>
 #include <poll.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
+#include <mntent.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -173,6 +174,7 @@ void parse_prop_file(const char *file, const std::function
 void *__mmap(const char *filename, size_t *size, bool rw);
 void frm_rf(int dirfd, std::initializer_list<const char *> excl = std::initializer_list<const char *>());
 void clone_dir(int src, int dest, bool overwrite = true);
+void parse_mnt(const char *file, const std::function<bool (mntent*)> &fn);
 
 template <typename B>
 void mmap_ro(const char *filename, B &buf, size_t &sz) {
