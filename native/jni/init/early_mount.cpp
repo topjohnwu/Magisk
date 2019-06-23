@@ -53,17 +53,20 @@ static void collect_devices() {
 	closedir(dir);
 }
 
-static void setup_block(const char *partname, char *block_dev) {
+static void setup_block(const char *partname, char *block_dev = nullptr) {
 	if (dev_list.empty())
 		collect_devices();
 	for (;;) {
 		for (auto &dev : dev_list) {
 			if (strcasecmp(dev.partname, partname) == 0) {
-				sprintf(block_dev, "/dev/block/%s", dev.devname);
-				LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
 				xmkdir("/dev", 0755);
-				xmkdir("/dev/block", 0755);
-				mknod(block_dev, S_IFBLK | 0600, makedev(dev.major, dev.minor));
+				if (block_dev) {
+					sprintf(block_dev, "/dev/block/%s", dev.devname);
+					xmkdir("/dev/block", 0755);
+				}
+				LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
+				mknod(block_dev ? block_dev : "/dev/root", S_IFBLK | 0600,
+						makedev(dev.major, dev.minor));
 				return;
 			}
 		}
@@ -146,6 +149,36 @@ void SARCompatInit::early_mount() {
 	mount_root(vendor);
 	mount_root(product);
 	mount_root(odm);
+}
+
+static void switch_root(const string &path) {
+	LOGD("Switch root to %s\n", path.data());
+	vector<string> mounts;
+	parse_mnt("/proc/mounts", [&](mntent *me) {
+		if (me->mnt_dir != "/"sv && me->mnt_dir != path)
+			mounts.emplace_back(me->mnt_dir);
+		return true;
+	});
+	for (auto &dir : mounts) {
+		auto new_path = path + dir;
+		mkdir(new_path.data(), 0755);
+		xmount(dir.data(), new_path.c_str(), nullptr, MS_MOVE, nullptr);
+	}
+	chdir(path.data());
+	xmount(path.data(), "/", nullptr, MS_MOVE, nullptr);
+	chroot(".");
+}
+
+void SARInit::early_mount() {
+	char partname[32];
+
+	LOGD("Early mount system_root\n");
+	sprintf(partname, "system%s", cmd->slot);
+	setup_block(partname);
+	xmkdir("/system_root", 0755);
+	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
+		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
+	switch_root("/system_root");
 }
 
 #define umount_root(name) \

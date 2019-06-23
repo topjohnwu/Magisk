@@ -39,7 +39,7 @@ constexpr const char wrapper[] =
 "exec /sbin/magisk.bin \"$0\" \"$@\"\n"
 ;
 
-void MagiskInit::setup_rootfs() {
+void RootFSInit::setup_rootfs() {
 	bool patch_init = patch_sepolicy();
 
 	if (cmd->system_as_root) {

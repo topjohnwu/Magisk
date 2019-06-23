@@ -35,29 +35,44 @@ protected:
 
 	virtual void preset() = 0;
 	virtual void early_mount() = 0;
-	void setup_rootfs();
 	bool read_dt_fstab(const char *name, char *partname, char *fstype);
 	bool patch_sepolicy();
 	void cleanup() override;
 public:
 	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+};
+
+class SARInit : public MagiskInit {
+protected:
+	void preset() override;
+	void early_mount() override;
+public:
+	SARInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
 	void start() override;
 };
 
-class LegacyInit : public MagiskInit {
+class RootFSInit : public MagiskInit {
 protected:
-	void preset() override;
-	void early_mount() override;
+	void setup_rootfs();
 public:
-	LegacyInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
+	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
+	void start() override;
 };
 
-class SARCompatInit : public MagiskInit {
+class LegacyInit : public RootFSInit {
 protected:
 	void preset() override;
 	void early_mount() override;
 public:
-	SARCompatInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
+	LegacyInit(char *argv[], cmdline *cmd) : RootFSInit(argv, cmd) {};
+};
+
+class SARCompatInit : public RootFSInit {
+protected:
+	void preset() override;
+	void early_mount() override;
+public:
+	SARCompatInit(char *argv[], cmdline *cmd) : RootFSInit(argv, cmd) {};
 };
 
 static inline bool is_lnk(const char *name) {

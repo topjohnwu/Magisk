@@ -132,6 +132,14 @@ void LegacyInit::preset() {
 	rename("/.backup/init", "/init");
 }
 
+void SARInit::preset() {
+	full_read("/init", &self.buf, &self.sz);
+
+	LOGD("Cleaning rootfs\n");
+	root = open("/", O_RDONLY | O_CLOEXEC);
+	frm_rf(root, { "proc", "sys" });
+}
+
 void SARCompatInit::preset() {
 	full_read("/init", &self.buf, &self.sz);
 
@@ -140,20 +148,16 @@ void SARCompatInit::preset() {
 	frm_rf(root, { "overlay", "proc", "sys" });
 }
 
-void MagiskInit::start() {
-	// Prevent file descriptor confusion
-	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
-	int null = open("/null", O_RDWR | O_CLOEXEC);
-	unlink("/null");
-	xdup3(null, STDIN_FILENO, O_CLOEXEC);
-	xdup3(null, STDOUT_FILENO, O_CLOEXEC);
-	xdup3(null, STDERR_FILENO, O_CLOEXEC);
-	if (null > STDERR_FILENO)
-		close(null);
-
+void RootFSInit::start() {
 	preset();
 	early_mount();
 	setup_rootfs();
+	re_exec_init();
+}
+
+void SARInit::start() {
+	preset();
+	early_mount();
 	re_exec_init();
 }
 
@@ -168,13 +172,12 @@ public:
 	}
 };
 
-class TestInit : public SARCompatInit {
+class TestInit : public SARInit {
 public:
-	TestInit(char *argv[], cmdline *cmd) : SARCompatInit(argv, cmd) {};
+	TestInit(char *argv[], cmdline *cmd) : SARInit(argv, cmd) {};
 	void start() override {
 		preset();
 		early_mount();
-		setup_rootfs();
 		cleanup();
 	}
 };
@@ -210,6 +213,16 @@ int main(int argc, char *argv[]) {
 		if (getpid() != 1)
 			return 1;
 		setup_klog();
+
+		// Prevent file descriptor confusion
+		mknod("/null", S_IFCHR | 0666, makedev(1, 3));
+		int null = open("/null", O_RDWR | O_CLOEXEC);
+		unlink("/null");
+		xdup3(null, STDIN_FILENO, O_CLOEXEC);
+		xdup3(null, STDOUT_FILENO, O_CLOEXEC);
+		xdup3(null, STDERR_FILENO, O_CLOEXEC);
+		if (null > STDERR_FILENO)
+			close(null);
 	}
 
 	cmdline cmd{};
@@ -219,7 +232,10 @@ int main(int argc, char *argv[]) {
 	if (run_test) {
 		init = make_unique<TestInit>(argv, &cmd);
 	} else if (cmd.system_as_root) {
-		init = make_unique<SARCompatInit>(argv, &cmd);
+		if (access("/overlay", F_OK) == 0)  /* Compatible mode */
+			init = make_unique<SARCompatInit>(argv, &cmd);
+		else
+			init = make_unique<SARInit>(argv, &cmd);
 	} else {
 		decompress_ramdisk();
 		if (access("/sbin/recovery", F_OK) == 0)
