@@ -398,11 +398,12 @@ void parse_prop_file(const char *file, const function<bool (string_view, string_
 }
 
 void parse_mnt(const char *file, const function<bool (mntent*)> &fn) {
-	unique_ptr<FILE, decltype(&fclose)> fp(xfopen(file, "rce"), &fclose);
+	unique_ptr<FILE, decltype(&endmntent)> fp(setmntent(file, "re"), &endmntent);
 	if (fp) {
-		mntent *mentry;
-		while ((mentry = getmntent(fp.get())) != nullptr) {
-			if (!fn(mentry))
+		mntent mentry{};
+		char buf[4096];
+		while (getmntent_r(fp.get(), &mentry, buf, sizeof(buf))) {
+			if (!fn(&mentry))
 				break;
 		}
 	}

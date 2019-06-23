@@ -12,6 +12,8 @@
 #include <poll.h>
 #include <mntent.h>
 
+#include "missing.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -86,12 +88,6 @@ char *rtrim(char *str);
 void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
 int parse_int(const char *s);
-
-#define getline __getline
-#define getdelim __getdelim
-
-ssize_t __getline(char **lineptr, size_t *n, FILE *stream);
-ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 
 // file.cpp
 
