@@ -115,6 +115,12 @@ void LegacyInit::early_mount() {
 	char fstype[32];
 	char block_dev[64];
 
+	full_read("/init", &self.buf, &self.sz);
+
+	LOGD("Reverting /init\n");
+	root = xopen("/", O_RDONLY | O_CLOEXEC);
+	rename("/.backup/init", "/init");
+
 	mount_root(system);
 	mount_root(vendor);
 	mount_root(product);
@@ -125,6 +131,12 @@ void SARCompatInit::early_mount() {
 	char partname[32];
 	char fstype[32];
 	char block_dev[64];
+
+	full_read("/init", &self.buf, &self.sz);
+
+	LOGD("Cleaning rootfs\n");
+	root = xopen("/", O_RDONLY | O_CLOEXEC);
+	frm_rf(root, { ".backup", "overlay", "proc", "sys" });
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
@@ -163,6 +175,14 @@ static void switch_root(const string &path) {
 
 void SARInit::early_mount() {
 	char partname[32];
+
+	full_read("/init", &self.buf, &self.sz);
+	full_read("/.backup/.magisk", &config.buf, &config.sz);
+
+	LOGD("Cleaning rootfs\n");
+	int root = xopen("/", O_RDONLY | O_CLOEXEC);
+	frm_rf(root, { "proc", "sys" });
+	close(root);
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);

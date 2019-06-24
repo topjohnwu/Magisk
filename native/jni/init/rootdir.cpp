@@ -40,14 +40,6 @@ constexpr const char wrapper[] =
 ;
 
 void RootFSInit::setup_rootfs() {
-	if (cmd->system_as_root) {
-		// Clone rootfs
-		LOGD("Clone root dir from system to rootfs\n");
-		int system_root = xopen("/system_root", O_RDONLY | O_CLOEXEC);
-		clone_dir(system_root, root, false);
-		close(system_root);
-	}
-
 	if (patch_sepolicy()) {
 		constexpr char SYSTEM_INIT[] = "/system/bin/init";
 		// If init is symlink, copy it to rootfs so we can patch
@@ -129,6 +121,16 @@ void RootFSInit::setup_rootfs() {
 	fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
 	write(fd, self.buf, self.sz);
 	close(fd);
+}
+
+void SARCompatInit::setup_rootfs() {
+	// Clone rootfs
+	LOGD("Clone root dir from system to rootfs\n");
+	int system_root = xopen("/system_root", O_RDONLY | O_CLOEXEC);
+	clone_dir(system_root, root, false);
+	close(system_root);
+
+	RootFSInit::setup_rootfs();
 }
 
 bool MagiskInit::patch_sepolicy() {

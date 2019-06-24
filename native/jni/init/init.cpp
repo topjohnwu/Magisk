@@ -124,40 +124,13 @@ void BaseInit::re_exec_init() {
 	exit(1);
 }
 
-void LegacyInit::preset() {
-	full_read("/init", &self.buf, &self.sz);
-
-	LOGD("Reverting /init\n");
-	root = open("/", O_RDONLY | O_CLOEXEC);
-	rename("/.backup/init", "/init");
-}
-
-void SARInit::preset() {
-	full_read("/init", &self.buf, &self.sz);
-	full_read("/.backup/.magisk", &config.buf, &config.sz);
-
-	LOGD("Cleaning rootfs\n");
-	root = open("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { "proc", "sys" });
-}
-
-void SARCompatInit::preset() {
-	full_read("/init", &self.buf, &self.sz);
-
-	LOGD("Cleaning rootfs\n");
-	root = open("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { ".backup", "overlay", "proc", "sys" });
-}
-
 void RootFSInit::start() {
-	preset();
 	early_mount();
 	setup_rootfs();
 	re_exec_init();
 }
 
 void SARInit::start() {
-	preset();
 	early_mount();
 	patch_rootdir();
 	re_exec_init();
@@ -178,8 +151,8 @@ class TestInit : public SARInit {
 public:
 	TestInit(char *argv[], cmdline *cmd) : SARInit(argv, cmd) {};
 	void start() override {
-		preset();
 		early_mount();
+		patch_rootdir();
 		cleanup();
 	}
 };

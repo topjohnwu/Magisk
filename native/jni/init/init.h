@@ -26,13 +26,11 @@ public:
 class MagiskInit : public BaseInit {
 protected:
 	raw_data self{};
-	int root = -1;
 	bool mnt_system = false;
 	bool mnt_vendor = false;
 	bool mnt_product = false;
 	bool mnt_odm = false;
 
-	virtual void preset() = 0;
 	virtual void early_mount() = 0;
 	bool read_dt_fstab(const char *name, char *partname, char *fstype);
 	bool patch_sepolicy();
@@ -46,7 +44,6 @@ protected:
 	raw_data config{};
 	dev_t system_dev;
 
-	void preset() override;
 	void early_mount() override;
 	void patch_rootdir();
 public:
@@ -56,7 +53,9 @@ public:
 
 class RootFSInit : public MagiskInit {
 protected:
-	void setup_rootfs();
+	int root = -1;
+
+	virtual void setup_rootfs();
 public:
 	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
 	void start() override;
@@ -64,7 +63,6 @@ public:
 
 class LegacyInit : public RootFSInit {
 protected:
-	void preset() override;
 	void early_mount() override;
 public:
 	LegacyInit(char *argv[], cmdline *cmd) : RootFSInit(argv, cmd) {};
@@ -72,8 +70,8 @@ public:
 
 class SARCompatInit : public RootFSInit {
 protected:
-	void preset() override;
 	void early_mount() override;
+	void setup_rootfs() override;
 public:
 	SARCompatInit(char *argv[], cmdline *cmd) : RootFSInit(argv, cmd) {};
 };
