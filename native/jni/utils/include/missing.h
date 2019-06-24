@@ -9,6 +9,7 @@
 #define setns         __setns
 #define unshare       __unshare
 #define accept4       __accept4
+#define dup3          __dup3
 #define readlinkat    __readlinkat
 #define symlinkat     __symlinkat
 #define linkat        __linkat
@@ -37,6 +38,10 @@ static inline int __unshare(int flags) {
 
 static inline int __accept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
 	return syscall(__NR_accept4, sockfd, addr, addrlen, flags);
+}
+
+static inline int __dup3(int oldfd, int newfd, int flags) {
+	return syscall(__NR_dup3, oldfd, newfd, flags);
 }
 
 static inline ssize_t __readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {

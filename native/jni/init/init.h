@@ -44,8 +44,12 @@ public:
 
 class SARInit : public MagiskInit {
 protected:
+	raw_data config{};
+	dev_t system_dev;
+
 	void preset() override;
 	void early_mount() override;
+	void patch_rootdir();
 public:
 	SARInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
 	void start() override;

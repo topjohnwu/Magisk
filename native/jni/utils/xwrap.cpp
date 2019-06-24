@@ -278,7 +278,7 @@ int xdup2(int oldfd, int newfd) {
 }
 
 int xdup3(int oldfd, int newfd, int flags) {
-	int ret = (int) syscall(__NR_dup3, oldfd, newfd, flags);
+	int ret = dup3(oldfd, newfd, flags);
 	if (ret == -1) {
 		PLOGE("dup3");
 	}

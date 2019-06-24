@@ -53,7 +53,7 @@ static void collect_devices() {
 	closedir(dir);
 }
 
-static void setup_block(const char *partname, char *block_dev = nullptr) {
+static dev_t setup_block(const char *partname, char *block_dev = nullptr) {
 	if (dev_list.empty())
 		collect_devices();
 	for (;;) {
@@ -65,9 +65,9 @@ static void setup_block(const char *partname, char *block_dev = nullptr) {
 					xmkdir("/dev/block", 0755);
 				}
 				LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
-				mknod(block_dev ? block_dev : "/dev/root", S_IFBLK | 0600,
-						makedev(dev.major, dev.minor));
-				return;
+				dev_t rdev = makedev(dev.major, dev.minor);
+				mknod(block_dev ? block_dev : "/dev/root", S_IFBLK | 0600, rdev);
+				return rdev;
 			}
 		}
 		// Wait 10ms and try again
@@ -174,7 +174,7 @@ void SARInit::early_mount() {
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
-	setup_block(partname);
+	system_dev = setup_block(partname);
 	xmkdir("/system_root", 0755);
 	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);

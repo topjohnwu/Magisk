@@ -134,6 +134,7 @@ void LegacyInit::preset() {
 
 void SARInit::preset() {
 	full_read("/init", &self.buf, &self.sz);
+	full_read("/.backup/.magisk", &config.buf, &config.sz);
 
 	LOGD("Cleaning rootfs\n");
 	root = open("/", O_RDONLY | O_CLOEXEC);
@@ -145,7 +146,7 @@ void SARCompatInit::preset() {
 
 	LOGD("Cleaning rootfs\n");
 	root = open("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { "overlay", "proc", "sys" });
+	frm_rf(root, { ".backup", "overlay", "proc", "sys" });
 }
 
 void RootFSInit::start() {
@@ -158,6 +159,7 @@ void RootFSInit::start() {
 void SARInit::start() {
 	preset();
 	early_mount();
+	patch_rootdir();
 	re_exec_init();
 }
 
