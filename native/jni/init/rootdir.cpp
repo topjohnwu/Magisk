@@ -40,8 +40,6 @@ constexpr const char wrapper[] =
 ;
 
 void RootFSInit::setup_rootfs() {
-	bool patch_init = patch_sepolicy();
-
 	if (cmd->system_as_root) {
 		// Clone rootfs
 		LOGD("Clone root dir from system to rootfs\n");
@@ -50,7 +48,7 @@ void RootFSInit::setup_rootfs() {
 		close(system_root);
 	}
 
-	if (patch_init) {
+	if (patch_sepolicy()) {
 		constexpr char SYSTEM_INIT[] = "/system/bin/init";
 		// If init is symlink, copy it to rootfs so we can patch
 		if (is_lnk("/init"))
@@ -157,20 +155,11 @@ bool MagiskInit::patch_sepolicy() {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 	dump_policydb("/sepolicy");
 
-	// Load policy to kernel so we can label rootfs
-	if (load_sepol) {
-		LOGD("sepol: preload sepolicy\n");
-		dump_policydb(SELINUX_LOAD);
-	}
-
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
 		unlink("/sepolicy_debug");
 		link("/sepolicy", "/sepolicy_debug");
 	}
-
-	// Enable selinux functions
-	selinux_builtin_impl();
 
 	return patch_init;
 }

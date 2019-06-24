@@ -27,7 +27,6 @@ class MagiskInit : public BaseInit {
 protected:
 	raw_data self{};
 	int root = -1;
-	bool load_sepol = false;
 	bool mnt_system = false;
 	bool mnt_vendor = false;
 	bool mnt_product = false;

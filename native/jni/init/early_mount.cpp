@@ -135,14 +135,6 @@ void SARCompatInit::early_mount() {
 	xmkdir("/system", 0755);
 	xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
 
-	// Android Q
-	if (is_lnk("/system_root/init"))
-		load_sepol = true;
-
-	// System-as-root with monolithic sepolicy
-	if (access("/system_root/sepolicy", F_OK) == 0)
-		cp_afc("/system_root/sepolicy", "/sepolicy");
-
 	link_root("/vendor");
 	link_root("/product");
 	link_root("/odm");
