@@ -68,16 +68,19 @@ class ModulesFragment : MagiskFragment<ModuleViewModel, FragmentModulesBinding>(
                 return true
             }
             R.id.reboot_recovery -> {
-                reboot("recovery")
+                Shell.su("/system/bin/reboot recovery").submit()
                 return true
             }
             R.id.reboot_bootloader -> {
-                reboot("booloader")
-                Shell.su("/system/bin/reboot bootloader").submit()
+                reboot("bootloader")
                 return true
             }
             R.id.reboot_download -> {
                 reboot("download")
+                return true
+            }
+            R.id.reboot_edl -> {
+                reboot("edl")
                 return true
             }
             else -> return false
