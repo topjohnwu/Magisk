@@ -205,8 +205,8 @@ void SARInit::patch_rootdir() {
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
 
 	// Recreate original sbin structure
-	int src = xopen(ROOTMIR, O_RDONLY | O_CLOEXEC);
-	int dest = xopen(ROOTMIR, O_RDONLY | O_CLOEXEC);
+	int src = xopen(ROOTMIR "/sbin", O_RDONLY | O_CLOEXEC);
+	int dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 	DIR *fp = fdopendir(src);
 	struct dirent *entry;
 	struct stat st;
