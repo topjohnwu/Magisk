@@ -45,6 +45,16 @@ static void setup_klog() {
 	unlink("/kmsg");
 	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
 	log_cb.ex = nop_ex;
+
+	// Prevent file descriptor confusion
+	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
+	int null = open("/null", O_RDWR | O_CLOEXEC);
+	unlink("/null");
+	xdup3(null, STDIN_FILENO, O_CLOEXEC);
+	xdup3(null, STDOUT_FILENO, O_CLOEXEC);
+	xdup3(null, STDERR_FILENO, O_CLOEXEC);
+	if (null > STDERR_FILENO)
+		close(null);
 }
 #else
 #define setup_klog(...)
@@ -158,6 +168,31 @@ public:
 	}
 };
 
+static void setup_test(const char *dir) {
+	// Log to console
+	cmdline_logging();
+	log_cb.ex = nop_ex;
+
+	// Switch to isolate namespace
+	xunshare(CLONE_NEWNS);
+	xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
+
+	// Unmount everything in reverse
+	vector<string> mounts;
+	parse_mnt("/proc/mounts", [&](mntent *me) {
+		if (me->mnt_dir != "/"sv)
+			mounts.emplace_back(me->mnt_dir);
+		return true;
+	});
+	for (auto m = mounts.rbegin(); m != mounts.rend(); ++m)
+		xumount(m->data());
+
+	// chroot jail
+	chdir(dir);
+	chroot(".");
+	chdir("/");
+}
+
 int main(int argc, char *argv[]) {
 	umask(0);
 
@@ -180,25 +215,11 @@ int main(int argc, char *argv[]) {
 #endif
 
 	if (run_test) {
-		chdir(dirname(argv[0]));
-		chroot(".");
-		chdir("/");
-		cmdline_logging();
-		log_cb.ex = nop_ex;
+		setup_test(dirname(argv[0]));
 	} else {
 		if (getpid() != 1)
 			return 1;
 		setup_klog();
-
-		// Prevent file descriptor confusion
-		mknod("/null", S_IFCHR | 0666, makedev(1, 3));
-		int null = open("/null", O_RDWR | O_CLOEXEC);
-		unlink("/null");
-		xdup3(null, STDIN_FILENO, O_CLOEXEC);
-		xdup3(null, STDOUT_FILENO, O_CLOEXEC);
-		xdup3(null, STDERR_FILENO, O_CLOEXEC);
-		if (null > STDERR_FILENO)
-			close(null);
 	}
 
 	cmdline cmd{};
