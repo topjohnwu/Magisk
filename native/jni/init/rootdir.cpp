@@ -41,11 +41,6 @@ constexpr const char wrapper[] =
 
 void RootFSInit::setup_rootfs() {
 	if (patch_sepolicy()) {
-		constexpr char SYSTEM_INIT[] = "/system/bin/init";
-		// If init is symlink, copy it to rootfs so we can patch
-		if (is_lnk("/init"))
-			cp_afc(SYSTEM_INIT, "/init");
-
 		char *addr;
 		size_t size;
 		mmap_rw("/init", addr, size);
@@ -54,12 +49,7 @@ void RootFSInit::setup_rootfs() {
 				// Force init to load /sepolicy
 				LOGD("Remove from init: " SPLIT_PLAT_CIL "\n");
 				memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
-				p += sizeof(SPLIT_PLAT_CIL) - 1;
-			} else if (memcmp(p, SYSTEM_INIT, sizeof(SYSTEM_INIT)) == 0) {
-				// Force execute /init instead of /system/bin/init
-				LOGD("Patch init: [/system/bin/init] -> [/init]\n");
-				strcpy(p, "/init");
-				p += sizeof(SYSTEM_INIT) - 1;
+				break;
 			}
 		}
 		munmap(addr, size);
