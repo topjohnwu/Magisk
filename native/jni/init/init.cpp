@@ -115,6 +115,7 @@ static int dump_manager(const char *path, mode_t mode) {
 void BaseInit::cleanup() {
 	umount("/sys");
 	umount("/proc");
+	umount("/dev");
 }
 
 void BaseInit::re_exec_init() {

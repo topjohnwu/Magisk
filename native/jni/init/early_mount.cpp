@@ -175,6 +175,8 @@ static void switch_root(const string &path) {
 
 void SARInit::early_mount() {
 	char partname[32];
+	char fstype[32];
+	char block_dev[64];
 
 	full_read("/init", &self.buf, &self.sz);
 	full_read("/.backup/.magisk", &config.buf, &config.sz);
@@ -191,6 +193,13 @@ void SARInit::early_mount() {
 	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
 	switch_root("/system_root");
+
+	// Make dev writable
+	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
+
+	mount_root(vendor);
+	mount_root(product);
+	mount_root(odm);
 }
 
 #define umount_root(name) \
@@ -198,8 +207,8 @@ if (mnt_##name) \
 	umount("/" #name);
 
 void MagiskInit::cleanup() {
-	BaseInit::cleanup();
 	umount(SELINUX_MNT);
+	BaseInit::cleanup();
 	umount_root(system);
 	umount_root(vendor);
 	umount_root(product);
