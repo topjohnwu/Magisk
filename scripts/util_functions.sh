@@ -166,6 +166,7 @@ find_block() {
 }
 
 mount_part() {
+  $BOOTMODE && return
   local PART=$1
   local POINT=/${PART}
   [ -L $POINT ] && rm -f $POINT

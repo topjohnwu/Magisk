@@ -227,6 +227,10 @@ void restorecon() {
 
 void restore_rootcon() {
 	setfilecon("/sbin", ROOT_CON);
+	setfilecon(MAGISKTMP, ROOT_CON);
+	setfilecon(MIRRDIR, ROOT_CON);
+	setfilecon(BLOCKDIR, ROOT_CON);
+
 	struct dirent *entry;
 	DIR *dir = xopendir("/sbin");
 	int dfd = dirfd(dir);

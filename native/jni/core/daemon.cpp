@@ -108,6 +108,12 @@ static void main_daemon() {
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 	restore_rootcon();
 
+	// Unmount pre-init patches
+	umount2("/init", MNT_DETACH);
+	umount2("/init.rc", MNT_DETACH);
+	umount2("/system/lib/libselinux.so", MNT_DETACH);
+	umount2("/system/lib64/libselinux.so", MNT_DETACH);
+
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);

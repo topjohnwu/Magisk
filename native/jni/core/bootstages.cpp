@@ -381,6 +381,11 @@ static bool magisk_env() {
 		}
 		return true;
 	});
+	if (access(MIRRMNT(system), F_OK) != 0 && access(MIRRMNT(system_root), F_OK) == 0) {
+		// Pre-init mirrors
+		xsymlink(MIRRMNT(system_root) "/system", MIRRMNT(system));
+		VLOGI("link", MIRRMNT(system_root) "/system", MIRRMNT(system));
+	}
 	if (access(MIRRMNT(vendor), F_OK) != 0) {
 		xsymlink(MIRRMNT(system) "/vendor", MIRRMNT(vendor));
 		VLOGI("link", MIRRMNT(system) "/vendor", MIRRMNT(vendor));
@@ -606,12 +611,12 @@ void post_fs_data(int client) {
 
 	prepare_modules();
 
+	restorecon();
+	chmod(SECURE_DIR, 0700);
+
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
 		core_only();
-
-	restorecon();
-	chmod(SECURE_DIR, 0700);
 
 	collect_modules();
 

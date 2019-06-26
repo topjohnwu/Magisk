@@ -48,6 +48,9 @@ void sepol_magisk_rules() {
 	sepol_attradd(SEPOL_PROC_DOMAIN, "bluetoothdomain");
 	sepol_attradd(SEPOL_FILE_DOMAIN, "mlstrustedobject");
 
+	// Let everyone access tmpfs files (for SAR sbin overlay)
+	sepol_allow(ALL, "tmpfs", "file", ALL);
+
 	// Let init transit to SEPOL_PROC_DOMAIN
 	sepol_allow("kernel", "kernel", "process", "setcurrent");
 	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "process", "dyntransition");

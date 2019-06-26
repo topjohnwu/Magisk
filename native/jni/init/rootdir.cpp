@@ -33,11 +33,34 @@ static void patch_socket_name(const char *path) {
 	munmap(buf, size);
 }
 
-constexpr const char wrapper[] =
-"#!/system/bin/sh\n"
-"export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH:/apex/com.android.runtime/" LIBNAME "\"\n"
-"exec /sbin/magisk.bin \"$0\" \"$@\"\n"
-;
+static void patch_init_rc(FILE *rc) {
+	file_readline("/init.rc", [&](string_view line) -> bool {
+		// Do not start vaultkeeper
+		if (str_contains(line, "start vaultkeeper")) {
+			LOGD("Remove vaultkeeper\n");
+			return true;
+		}
+		// Do not run flash_recovery
+		if (str_starts(line, "service flash_recovery")) {
+			LOGD("Remove flash_recovery\n");
+			fprintf(rc, "service flash_recovery /system/bin/xxxxx\n");
+			return true;
+		}
+		// Else just write the line
+		fprintf(rc, "%s", line.data());
+		return true;
+	});
+	char pfd_svc[8], ls_svc[8], bc_svc[8];
+	// Make sure to be unique
+	pfd_svc[0] = 'a';
+	ls_svc[0] = '0';
+	bc_svc[0] = 'A';
+	gen_rand_str(pfd_svc + 1, sizeof(pfd_svc) - 1);
+	gen_rand_str(ls_svc + 1, sizeof(ls_svc) - 1);
+	gen_rand_str(bc_svc + 1, sizeof(bc_svc) - 1);
+	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
+	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
+}
 
 void RootFSInit::setup_rootfs() {
 	if (patch_sepolicy()) {
@@ -66,38 +89,10 @@ void RootFSInit::setup_rootfs() {
 
 	// Patch init.rc
 	FILE *rc = xfopen("/init.p.rc", "we");
-	file_readline("/init.rc", [&](auto line) -> bool {
-		// Do not start vaultkeeper
-		if (str_contains(line, "start vaultkeeper")) {
-			LOGD("Remove vaultkeeper\n");
-			return true;
-		}
-		// Do not run flash_recovery
-		if (str_starts(line, "service flash_recovery")) {
-			LOGD("Remove flash_recovery\n");
-			fprintf(rc, "service flash_recovery /system/bin/xxxxx\n");
-			return true;
-		}
-		// Else just write the line
-		fprintf(rc, "%s", line.data());
-		return true;
-	});
-	char pfd_svc[8], ls_svc[8], bc_svc[8];
-	// Make sure to be unique
-	pfd_svc[0] = 'a';
-	ls_svc[0] = '0';
-	bc_svc[0] = 'A';
-	gen_rand_str(pfd_svc + 1, sizeof(pfd_svc) - 1);
-	gen_rand_str(ls_svc + 1, sizeof(ls_svc) - 1);
-	gen_rand_str(bc_svc + 1, sizeof(bc_svc) - 1);
-	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
-	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
+	patch_init_rc(rc);
 	fclose(rc);
 	clone_attr("/init.rc", "/init.p.rc");
 	rename("/init.p.rc", "/init.rc");
-
-	// Don't let init run in init yet
-	lsetfilecon("/init", "u:object_r:rootfs:s0");
 
 	// Create hardlink mirror of /sbin to /root
 	mkdir("/root", 0750);
@@ -155,6 +150,12 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 
 	return patch_init;
 }
+
+constexpr const char wrapper[] =
+"#!/system/bin/sh\n"
+"export LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH:/apex/com.android.runtime/" LIBNAME "\"\n"
+"exec /sbin/magisk.bin \"$0\" \"$@\"\n"
+;
 
 static void sbin_overlay(const raw_data &self, const raw_data &config) {
 	LOGD("Mount /sbin tmpfs overlay\n");
@@ -236,7 +237,10 @@ void SARInit::patch_rootdir() {
 	close(src);
 	close(dest);
 
-	// Customize rootdir
+	/* ******************
+	 * Customize rootdir
+	 * ******************/
+
 	char *addr;
 	size_t size;
 	file_attr attr;
@@ -288,6 +292,12 @@ void SARInit::patch_rootdir() {
 	}
 
 	patch_sepolicy(PATCHPOLICY);
+
+	FILE *rc = xfopen(ROOTOVERLAY "/init.rc", "we");
+	patch_init_rc(rc);
+	fclose(rc);
+	clone_attr("/init.rc", ROOTOVERLAY "/init.rc");
+	xmount(ROOTOVERLAY "/init.rc", "/init.rc", nullptr, MS_BIND, nullptr);
 }
 
 #ifdef MAGISK_DEBUG
