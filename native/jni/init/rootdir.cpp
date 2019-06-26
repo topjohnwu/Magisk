@@ -123,7 +123,7 @@ void SARCompatInit::setup_rootfs() {
 	RootFSInit::setup_rootfs();
 }
 
-bool MagiskInit::patch_sepolicy() {
+bool MagiskInit::patch_sepolicy(const char *file) {
 	bool patch_init = false;
 
 	if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
@@ -145,7 +145,7 @@ bool MagiskInit::patch_sepolicy() {
 
 	sepol_magisk_rules();
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
-	dump_policydb("/sepolicy");
+	dump_policydb(file);
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
@@ -192,6 +192,9 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 
 #define ROOTMIR MIRRDIR "/system_root"
 #define ROOTBLK BLOCKDIR "/system_root"
+#define MONOPOLICY  "/sepolicy"
+#define PATCHPOLICY "/sbin/.se"
+#define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 
 void SARInit::patch_rootdir() {
 	sbin_overlay(self, config);
@@ -232,6 +235,59 @@ void SARInit::patch_rootdir() {
 	}
 	close(src);
 	close(dest);
+
+	// Customize rootdir
+	char *addr;
+	size_t size;
+	file_attr attr;
+	bool redirect = false;
+	xmkdir(ROOTOVERLAY, 0);
+	src = xopen("/init", O_RDONLY | O_CLOEXEC);
+	fgetattr(src, &attr);
+	fd_full_read(src, (void**)&addr, &size);
+	close(src);
+	for (char *p = addr; p < addr + size; ++p) {
+		if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
+			// Force init to load monolithic policy
+			LOGD("Remove from init: " SPLIT_PLAT_CIL "\n");
+			memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
+			p += sizeof(SPLIT_PLAT_CIL) - 1;
+		} else if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
+			// Redirect /sepolicy to tmpfs
+			LOGD("Patch init [" MONOPOLICY "] -> [" PATCHPOLICY "]\n");
+			memcpy(p, PATCHPOLICY, sizeof(PATCHPOLICY));
+			redirect = true;
+			p += sizeof(MONOPOLICY) - 1;
+		}
+	}
+	dest = xopen(ROOTOVERLAY "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
+	xwrite(dest, addr, size);
+	free(addr);
+	fsetattr(dest, &attr);
+	close(dest);
+	xmount(ROOTOVERLAY "/init", "/init", nullptr, MS_BIND, nullptr);
+
+	if (!redirect) {
+		// init is dynamically linked, need to patch libselinux
+		full_read(LIBSELINUX, (void**)&addr, &size);
+		getattr(LIBSELINUX, &attr);
+		for (char *p = addr; p < addr + size; ++p) {
+			if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
+				// Redirect /sepolicy to tmpfs
+				LOGD("Patch libselinux.so [" MONOPOLICY "] -> [" PATCHPOLICY "]\n");
+				memcpy(p, PATCHPOLICY, sizeof(PATCHPOLICY));
+				break;
+			}
+		}
+		dest = xopen(ROOTOVERLAY "/libselinux.so", O_CREAT | O_WRONLY | O_CLOEXEC);
+		xwrite(dest, addr, size);
+		free(addr);
+		fsetattr(dest, &attr);
+		close(dest);
+		xmount(ROOTOVERLAY "/libselinux.so", LIBSELINUX, nullptr, MS_BIND, nullptr);
+	}
+
+	patch_sepolicy(PATCHPOLICY);
 }
 
 #ifdef MAGISK_DEBUG
