@@ -44,6 +44,7 @@
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
     <string name="reboot_download">Redémarrer en mode téléchargement</string>
+    <string name="reboot_edl">Redémarrer en mode EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Mise à jour disponible</string>
