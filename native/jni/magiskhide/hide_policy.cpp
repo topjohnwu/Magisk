@@ -38,7 +38,7 @@ static inline void lazy_unmount(const char* mountpoint) {
 void hide_daemon(int pid) {
 	RunFinally fin([=]() -> void {
 		// Send resume signal
-		tgkill(pid, pid, SIGCONT);
+		kill(pid, SIGCONT);
 		_exit(0);
 	});
 	hide_unmount(pid);
