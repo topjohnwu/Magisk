@@ -201,9 +201,9 @@ void SARCommon::patch_rootdir() {
 	sbin_overlay(self, config);
 
 	// Mount system_root mirror
-	xmkdir(MIRRDIR, 0777);
-	xmkdir(ROOTMIR, 0777);
-	xmkdir(BLOCKDIR, 0777);
+	xmkdir(MIRRDIR, 0);
+	xmkdir(ROOTMIR, 0755);
+	xmkdir(BLOCKDIR, 0);
 	mknod(ROOTBLK, S_IFBLK | 0600, system_dev);
 	if (xmount(ROOTBLK, ROOTMIR, "ext4", MS_RDONLY, nullptr))
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
