@@ -112,6 +112,8 @@ void load_kernel_info(cmdline *cmd) {
 			strcpy(cmd->slot + 1, value);
 		} else if (key == "skip_initramfs") {
 			cmd->system_as_root = true;
+		} else if (key == "androidboot.force_normal_boot") {
+			cmd->force_normal_boot = value[0] == '1';
 		} else if (key == "androidboot.android_dt_dir") {
 			strcpy(cmd->dt_dir, value);
 		} else if (key == "enter_recovery") {
@@ -147,6 +149,7 @@ void load_kernel_info(cmdline *cmd) {
 		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
 
 	LOGD("system_as_root=[%d]\n", cmd->system_as_root);
+	LOGD("force_normal_boot=[%d]\n", cmd->force_normal_boot);
 	LOGD("slot=[%s]\n", cmd->slot);
 	LOGD("dt_dir=[%s]\n", cmd->dt_dir);
 }

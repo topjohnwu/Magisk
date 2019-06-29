@@ -2,6 +2,7 @@
 
 struct cmdline {
 	bool system_as_root;
+	bool force_normal_boot;
 	char slot[3];
 	char dt_dir[128];
 };
@@ -11,10 +12,15 @@ struct raw_data {
 	size_t sz;
 };
 
+/* *************
+ * Base classes
+ * *************/
+
 class BaseInit {
 protected:
 	cmdline *cmd;
 	char **argv;
+
 	void re_exec_init();
 	virtual void cleanup();
 public:
@@ -39,18 +45,6 @@ public:
 	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 };
 
-class SARInit : public MagiskInit {
-protected:
-	raw_data config{};
-	dev_t system_dev;
-
-	void early_mount() override;
-	void patch_rootdir();
-public:
-	SARInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
-	void start() override;
-};
-
 class RootFSInit : public MagiskInit {
 protected:
 	int root = -1;
@@ -61,12 +55,62 @@ public:
 	void start() override;
 };
 
+class SARCommon : public MagiskInit {
+protected:
+	raw_data config{};
+	dev_t system_dev;
+
+	void patch_rootdir();
+public:
+	SARCommon(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
+	void start() override;
+};
+
+/* *******************
+ * Logical Partitions
+ * *******************/
+
+class FirstStageInit : public BaseInit {
+protected:
+	void patch_fstab();
+public:
+	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	void start() override;
+};
+
+class SecondStageInit : public SARCommon {
+protected:
+	void early_mount() override;
+	void cleanup() override { /* Do not do any cleanup */ }
+public:
+	SecondStageInit(char *argv[]) : SARCommon(argv, nullptr) {};
+};
+
+/* ***********
+ * Normal SAR
+ * ***********/
+
+class SARInit : public SARCommon {
+protected:
+	void early_mount() override;
+public:
+	SARInit(char *argv[], cmdline *cmd) : SARCommon(argv, cmd) {};
+};
+
+/* **********
+ * Initramfs
+ * **********/
+
 class LegacyInit : public RootFSInit {
 protected:
 	void early_mount() override;
 public:
 	LegacyInit(char *argv[], cmdline *cmd) : RootFSInit(argv, cmd) {};
 };
+
+/* ****************
+ * Compat-mode SAR
+ * ****************/
 
 class SARCompatInit : public RootFSInit {
 protected:

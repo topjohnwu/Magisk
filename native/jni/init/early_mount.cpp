@@ -159,8 +159,15 @@ static void switch_root(const string &path) {
 	LOGD("Switch root to %s\n", path.data());
 	vector<string> mounts;
 	parse_mnt("/proc/mounts", [&](mntent *me) {
-		if (me->mnt_dir != "/"sv && me->mnt_dir != path)
-			mounts.emplace_back(me->mnt_dir);
+		// Skip root and self
+		if (me->mnt_dir == "/"sv || me->mnt_dir == path)
+			return true;
+		// Do not include subtrees
+		for (const auto &m : mounts) {
+			if (strncmp(me->mnt_dir, m.data(), m.length()) == 0)
+				return true;
+		}
+		mounts.emplace_back(me->mnt_dir);
 		return true;
 	});
 	for (auto &dir : mounts) {
@@ -200,6 +207,28 @@ void SARInit::early_mount() {
 	mount_root(vendor);
 	mount_root(product);
 	mount_root(odm);
+}
+
+void SecondStageInit::early_mount() {
+	// Early mounts should already be done by first stage init
+
+	full_read("/system/bin/init", &self.buf, &self.sz);
+	full_read("/.backup/.magisk", &config.buf, &config.sz);
+	rm_rf("/system");
+	rm_rf("/.backup");
+
+	// Find system_dev
+	parse_mnt("/proc/mounts", [&](mntent *me) -> bool {
+		if (me->mnt_dir == "/system_root"sv) {
+			struct stat st;
+			stat(me->mnt_fsname, &st);
+			system_dev = st.st_rdev;
+			return false;
+		}
+		return true;
+	});
+
+	switch_root("/system_root");
 }
 
 #define umount_root(name) \

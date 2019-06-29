@@ -141,10 +141,17 @@ void RootFSInit::start() {
 	re_exec_init();
 }
 
-void SARInit::start() {
+void SARCommon::start() {
 	early_mount();
 	patch_rootdir();
 	re_exec_init();
+}
+
+void FirstStageInit::start() {
+	patch_fstab();
+	cleanup();
+	execv("/system/bin/init", argv);
+	exit(1);
 }
 
 class RecoveryInit : public BaseInit {
@@ -208,6 +215,11 @@ int main(int argc, char *argv[]) {
 			return dump_manager(argv[3], 0644);
 	}
 
+	if (argc > 1 && argv[1] == "selinux_setup"sv) {
+		auto init = make_unique<SecondStageInit>(argv);
+		init->start();
+	}
+
 #ifdef MAGISK_DEBUG
 	bool run_test = getenv("INIT_TEST") != nullptr;
 #else
@@ -228,6 +240,8 @@ int main(int argc, char *argv[]) {
 	unique_ptr<BaseInit> init;
 	if (run_test) {
 		init = make_unique<TestInit>(argv, &cmd);
+	} else if (cmd.force_normal_boot) {
+		init = make_unique<FirstStageInit>(argv, &cmd);
 	} else if (cmd.system_as_root) {
 		if (access("/overlay", F_OK) == 0)  /* Compatible mode */
 			init = make_unique<SARCompatInit>(argv, &cmd);
@@ -243,4 +257,5 @@ int main(int argc, char *argv[]) {
 
 	// Run the main routine
 	init->start();
+	exit(1);
 }

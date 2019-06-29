@@ -34,7 +34,7 @@ static void patch_socket_name(const char *path) {
 }
 
 static void patch_init_rc(FILE *rc) {
-	file_readline("/init.rc", [&](string_view line) -> bool {
+	file_readline("/init.rc", [=](string_view line) -> bool {
 		// Do not start vaultkeeper
 		if (str_contains(line, "start vaultkeeper")) {
 			LOGD("Remove vaultkeeper\n");
@@ -197,7 +197,7 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 #define PATCHPOLICY "/sbin/.se"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 
-void SARInit::patch_rootdir() {
+void SARCommon::patch_rootdir() {
 	sbin_overlay(self, config);
 
 	// Mount system_root mirror
@@ -298,6 +298,68 @@ void SARInit::patch_rootdir() {
 	fclose(rc);
 	clone_attr("/init.rc", ROOTOVERLAY "/init.rc");
 	xmount(ROOTOVERLAY "/init.rc", "/init.rc", nullptr, MS_BIND, nullptr);
+}
+
+#define FSR "/first_stage_ramdisk"
+
+void FirstStageInit::patch_fstab() {
+	// Find fstab
+	DIR *dir = xopendir(FSR);
+	if (!dir)
+		return;
+	dirent *de;
+	string fstab(FSR "/");
+	while ((de = readdir(dir))) {
+		if (strstr(de->d_name, "fstab")) {
+			fstab += de->d_name;
+			break;
+		}
+	}
+	closedir(dir);
+	if (fstab.length() == sizeof(FSR))
+		return;
+
+	// Patch fstab
+	string patched = fstab + ".p";
+	FILE *fp = xfopen(patched.data(), "we");
+	file_readline(fstab.data(), [=](string_view l) -> bool {
+		if (l[0] == '#' || l.length() == 1)
+			return true;
+		char *line = (char *) l.data();
+		int src0, src1, mnt0, mnt1, type0, type1, opt0, opt1, flag0, flag1;
+		sscanf(line, "%n%*s%n %n%*s%n %n%*s%n %n%*s%n %n%*s%n",
+			   &src0, &src1, &mnt0, &mnt1, &type0, &type1, &opt0, &opt1, &flag0, &flag1);
+		const char *src, *mnt, *type, *opt, *flag;
+		src = &line[src0];
+		line[src1] = '\0';
+		mnt = &line[mnt0];
+		line[mnt1] = '\0';
+		type = &line[type0];
+		line[type1] = '\0';
+		opt = &line[opt0];
+		line[opt1] = '\0';
+		flag = &line[flag0];
+		line[flag1] = '\0';
+
+		// Redirect system to system_root
+		if (mnt == "/system"sv)
+			mnt = "/system_root";
+
+		fprintf(fp, "%s %s %s %s %s\n", src, mnt, type, opt, flag);
+		return true;
+	});
+	fclose(fp);
+
+	// Replace old fstab
+	clone_attr(fstab.data(), patched.data());
+	rename(patched.data(), fstab.data());
+
+	// Move stuffs for next stage
+	xmkdir(FSR "/system", 0755);
+	xmkdir(FSR "/system/bin", 0755);
+	rename("/init", FSR "/system/bin/init");
+	xmkdir(FSR "/.backup", 0);
+	rename("/.backup/.magisk", FSR "/.backup/.magisk");
 }
 
 #ifdef MAGISK_DEBUG
