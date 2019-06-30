@@ -1,3 +1,5 @@
+#include <sys/mount.h>
+#include <unistd.h>
 #include <stdlib.h>
 
 struct cmdline {
@@ -21,8 +23,16 @@ protected:
 	cmdline *cmd;
 	char **argv;
 
-	void re_exec_init();
-	virtual void cleanup();
+	void exec_init(const char *init = "/init") {
+		cleanup();
+		execv(init, argv);
+		exit(1);
+	}
+	virtual void cleanup() {
+		umount("/sys");
+		umount("/proc");
+		umount("/dev");
+	}
 public:
 	BaseInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv) {}
 	virtual ~BaseInit() = default;
@@ -52,7 +62,11 @@ protected:
 	virtual void setup_rootfs();
 public:
 	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
-	void start() override;
+	void start() override {
+		early_mount();
+		setup_rootfs();
+		exec_init();
+	}
 };
 
 class SARCommon : public MagiskInit {
@@ -63,7 +77,11 @@ protected:
 	void patch_rootdir();
 public:
 	SARCommon(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
-	void start() override;
+	void start() override {
+		early_mount();
+		patch_rootdir();
+		exec_init();
+	}
 };
 
 /* *******************
@@ -75,7 +93,10 @@ protected:
 	void patch_fstab();
 public:
 	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
-	void start() override;
+	void start() override {
+		patch_fstab();
+		exec_init("/system/bin/init");
+	}
 };
 
 class SecondStageInit : public SARCommon {
@@ -119,13 +140,6 @@ protected:
 public:
 	SARCompatInit(char *argv[], cmdline *cmd) : RootFSInit(argv, cmd) {};
 };
-
-static inline bool is_lnk(const char *name) {
-	struct stat st;
-	if (lstat(name, &st))
-		return false;
-	return S_ISLNK(st.st_mode);
-}
 
 void load_kernel_info(cmdline *cmd);
 int dump_magisk(const char *path, mode_t mode);

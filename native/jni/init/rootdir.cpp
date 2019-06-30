@@ -1,6 +1,5 @@
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mount.h>
 #include <fcntl.h>
 
 #include <magisk.h>
@@ -396,19 +395,18 @@ int magisk_proxy_main(int argc, char *argv[]) {
 	sbin_overlay(self, config);
 
 	// Create symlinks pointing back to /root
-	{
-		char path[256];
-		int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-		unique_ptr<DIR, decltype(&closedir)> dir(xopendir("/root"), &closedir);
-		struct dirent *entry;
-		while((entry = xreaddir(dir.get()))) {
-			if (entry->d_name == "."sv || entry->d_name == ".."sv)
-				continue;
-			sprintf(path, "/root/%s", entry->d_name);
-			xsymlinkat(path, sbin, entry->d_name);
-		}
-		close(sbin);
+	char path[256];
+	int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	DIR *dir = xopendir("/root");
+	struct dirent *entry;
+	while((entry = xreaddir(dir))) {
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
+			continue;
+		sprintf(path, "/root/%s", entry->d_name);
+		xsymlinkat(path, sbin, entry->d_name);
 	}
+	close(sbin);
+	closedir(dir);
 
 	setenv("REMOUNT_ROOT", "1", 1);
 	execv("/sbin/magisk", argv);

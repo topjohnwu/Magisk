@@ -1,4 +1,3 @@
-#include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <string.h>
 #include <stdio.h>
@@ -75,6 +74,13 @@ static dev_t setup_block(const char *partname, char *block_dev = nullptr) {
 		dev_list.clear();
 		collect_devices();
 	}
+}
+
+static bool is_lnk(const char *name) {
+	struct stat st;
+	if (lstat(name, &st))
+		return false;
+	return S_ISLNK(st.st_mode);
 }
 
 bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {

@@ -1,10 +1,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
 #include <libgen.h>
@@ -48,7 +45,7 @@ static void setup_klog() {
 
 	// Prevent file descriptor confusion
 	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
-	int null = open("/null", O_RDWR | O_CLOEXEC);
+	int null = xopen("/null", O_RDWR | O_CLOEXEC);
 	unlink("/null");
 	xdup3(null, STDIN_FILENO, O_CLOEXEC);
 	xdup3(null, STDOUT_FILENO, O_CLOEXEC);
@@ -122,38 +119,6 @@ static int dump_manager(const char *path, mode_t mode) {
 	return 0;
 }
 
-void BaseInit::cleanup() {
-	umount("/sys");
-	umount("/proc");
-	umount("/dev");
-}
-
-void BaseInit::re_exec_init() {
-	LOGD("Re-exec /init\n");
-	cleanup();
-	execv("/init", argv);
-	exit(1);
-}
-
-void RootFSInit::start() {
-	early_mount();
-	setup_rootfs();
-	re_exec_init();
-}
-
-void SARCommon::start() {
-	early_mount();
-	patch_rootdir();
-	re_exec_init();
-}
-
-void FirstStageInit::start() {
-	patch_fstab();
-	cleanup();
-	execv("/system/bin/init", argv);
-	exit(1);
-}
-
 class RecoveryInit : public BaseInit {
 public:
 	RecoveryInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
@@ -161,7 +126,7 @@ public:
 		LOGD("Ramdisk is recovery, abort\n");
 		rename("/.backup/init", "/init");
 		rm_rf("/.backup");
-		re_exec_init();
+		exec_init();
 	}
 };
 
