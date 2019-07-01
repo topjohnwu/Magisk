@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 
-#include <magisk.h>
+#include <logging.h>
 #include <daemon.h>
 #include <utils.h>
 #include <selinux.h>

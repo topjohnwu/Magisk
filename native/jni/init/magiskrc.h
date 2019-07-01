@@ -1,5 +1,5 @@
 #include <magisk.h>
-#include <magiskpolicy.h>
+#include <selinux.h>
 
 constexpr const char magiskrc[] =
 "\n\n"

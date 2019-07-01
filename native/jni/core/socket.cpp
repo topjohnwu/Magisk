@@ -8,7 +8,7 @@
 
 #include <daemon.h>
 #include <utils.h>
-#include <magisk.h>
+#include <logging.h>
 
 #define ABS_SOCKET_LEN(sun) (sizeof(sa_family_t) + strlen(sun->sun_path + 1) + 1)
 
@@ -34,7 +34,7 @@ int socket_accept(int sockfd, int timeout) {
 		.fd = sockfd,
 		.events = POLL_IN
 	};
-	return xpoll(&pfd, 1, timeout * 1000) <= 0 ? -1 : xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
+	return xpoll(&pfd, 1, timeout * 1000) <= 0 ? -1 : xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
 }
 
 void get_client_cred(int fd, struct ucred *cred) {
@@ -86,7 +86,7 @@ int recv_fd(int sockfd) {
 
 	cmsg = CMSG_FIRSTHDR(&msg);
 
-	if (cmsg             == NULL                  ||
+	if (cmsg             == nullptr                  ||
 		cmsg->cmsg_len   != CMSG_LEN(sizeof(int)) ||
 		cmsg->cmsg_level != SOL_SOCKET            ||
 		cmsg->cmsg_type  != SCM_RIGHTS) {

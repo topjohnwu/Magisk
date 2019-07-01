@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include <magisk.h>
 #include <daemon.h>
 #include <utils.h>
 

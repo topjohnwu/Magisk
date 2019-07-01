@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "db.h"
+#include <db.h>
 
 #define DEFAULT_SHELL "/system/bin/sh"
 

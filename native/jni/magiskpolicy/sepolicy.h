@@ -1,14 +1,11 @@
 /* sepolicy.h - Header for magiskpolicy non-public APIs
  */
 
-#ifndef _SEPOLICY_H
-#define _SEPOLICY_H
+#pragma once
 
 #include <sepol/policydb/policydb.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 // Global policydb
 extern policydb_t *policydb;
@@ -36,8 +33,4 @@ int add_rule(const char *s, const char *t, const char *c, const char *p, int eff
 int add_xperm_rule(const char *s, const char *t, const char *c, const char *range, int effect, int n);
 int add_type_rule(const char *s, const char *t, const char *c, const char *d, int effect);
 
-#ifdef __cplusplus
-};
-#endif
-
-#endif
+__END_DECLS

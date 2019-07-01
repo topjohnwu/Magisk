@@ -3,6 +3,7 @@
 #include <fcntl.h>
 
 #include <magisk.h>
+#include <magiskpolicy.h>
 #include <utils.h>
 
 #include "init.h"

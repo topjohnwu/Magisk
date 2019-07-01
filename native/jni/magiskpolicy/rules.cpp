@@ -1,8 +1,8 @@
-#include <magisk.h>
+#include <logging.h>
+#include <flags.h>
 
 #include "magiskpolicy.h"
 #include "sepolicy.h"
-#include "flags.h"
 
 static void allowSuClient(const char *target) {
 	if (!sepol_exists(target))
