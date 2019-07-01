@@ -223,15 +223,15 @@ void SARCommon::patch_rootdir() {
 			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
 			xsymlinkat(buf, dest, entry->d_name);
 		} else {
-			char tpath[256];
+			char spath[256];
 			sprintf(buf, "/sbin/%s", entry->d_name);
-			sprintf(tpath, ROOTMIR "/sbin/%s", entry->d_name);
+			sprintf(spath, ROOTMIR "/sbin/%s", entry->d_name);
 			// Create dummy
 			if (S_ISDIR(st.st_mode))
-				xmkdir(tpath, st.st_mode & 0777);
+				xmkdir(buf, st.st_mode & 0777);
 			else
-				close(xopen(tpath, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
-			xmount(tpath, buf, nullptr, MS_BIND, nullptr);
+				close(xopen(buf, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
+			xmount(spath, buf, nullptr, MS_BIND, nullptr);
 		}
 	}
 	close(src);
