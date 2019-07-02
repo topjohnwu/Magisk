@@ -1,6 +1,7 @@
 #include <sys/sysmacros.h>
 #include <string.h>
 #include <stdio.h>
+#include <vector>
 
 #include <utils.h>
 #include <logging.h>

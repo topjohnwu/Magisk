@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <linux/input.h>
 #include <fcntl.h>
+#include <vector>
 
 #include <utils.h>
 #include <logging.h>

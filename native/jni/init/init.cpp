@@ -5,6 +5,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <libgen.h>
+#include <vector>
 
 #include <xz.h>
 #include <magisk.h>
