@@ -51,6 +51,9 @@ void sepol_magisk_rules() {
 	// Let everyone access tmpfs files (for SAR sbin overlay)
 	sepol_allow(ALL, "tmpfs", "file", ALL);
 
+	// For normal rootfs file/directory operations when rw (for SAR / overlay)
+	sepol_allow("rootfs", "labeledfs", "filesystem", "associate");
+
 	// Let init transit to SEPOL_PROC_DOMAIN
 	sepol_allow("kernel", "kernel", "process", "setcurrent");
 	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "process", "dyntransition");
