@@ -87,12 +87,12 @@ public class SignBoot {
             in.unread(hdr);
             BootSignature bootsig = new BootSignature(target, signableSize);
             if (cert == null) {
-                cert = SignBoot.class.getResourceAsStream("/keys/testkey.x509.pem");
+                cert = SignBoot.class.getResourceAsStream("/keys/verity.x509.pem");
             }
             X509Certificate certificate = CryptoUtils.readCertificate(cert);
             bootsig.setCertificate(certificate);
             if (key == null) {
-                key = SignBoot.class.getResourceAsStream("/keys/testkey.pk8");
+                key = SignBoot.class.getResourceAsStream("/keys/verity.pk8");
             }
             PrivateKey privateKey = CryptoUtils.readPrivateKey(key);
             byte[] sig = bootsig.sign(privateKey, in, signableSize);
