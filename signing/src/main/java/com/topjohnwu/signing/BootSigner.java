@@ -24,7 +24,9 @@ public class BootSigner {
                 cert = new FileInputStream(args[1]);
                 key = new FileInputStream(args[2]);
             }
-            if (args.length >= 4) {
+            if (args.length == 2) {
+                name = args[1];
+            } else if (args.length >= 4) {
                 name = args[3];
             }
 
