@@ -162,6 +162,24 @@ public class SignBoot {
                 + ((kernelSize + pageSize - 1) / pageSize) * pageSize
                 + ((ramdskSize + pageSize - 1) / pageSize) * pageSize
                 + ((secondSize + pageSize - 1) / pageSize) * pageSize;
+        int headerVersion = image.getInt(); // boot image header version
+        if (headerVersion > 0) {
+            image.position(BOOT_IMAGE_HEADER_V1_RECOVERY_DTBO_SIZE_OFFSET);
+            int recoveryDtboLength = image.getInt();
+            length += ((recoveryDtboLength + pageSize - 1) / pageSize) * pageSize;
+            image.getLong(); // recovery_dtbo address
+            int headerSize = image.getInt();
+            if (headerVersion == 2) {
+                image.position(BOOT_IMAGE_HEADER_V2_DTB_SIZE_OFFSET);
+                int dtbLength = image.getInt();
+                length += ((dtbLength + pageSize - 1) / pageSize) * pageSize;
+                image.getLong(); // dtb address
+            }
+            if (image.position() != headerSize) {
+                throw new IllegalArgumentException(
+                        "Invalid image header: invalid header length");
+            }
+        }
         length = ((length + pageSize - 1) / pageSize) * pageSize;
         if (length <= 0) {
             throw new IllegalArgumentException("Invalid image header: invalid length");
@@ -178,6 +196,8 @@ public class SignBoot {
         private DEROctetString signature;
         private PublicKey publicKey;
         private static final int FORMAT_VERSION = 1;
+        private static final int BOOT_IMAGE_HEADER_V1_RECOVERY_DTBO_SIZE_OFFSET = 1632;
+        private static final int BOOT_IMAGE_HEADER_V2_DTB_SIZE_OFFSET = 1648;
 
         /**
          * Initializes the object for signing an image file
