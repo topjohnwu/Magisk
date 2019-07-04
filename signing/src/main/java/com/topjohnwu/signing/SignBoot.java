@@ -162,8 +162,8 @@ public class SignBoot {
                 + ((kernelSize + pageSize - 1) / pageSize) * pageSize
                 + ((ramdskSize + pageSize - 1) / pageSize) * pageSize
                 + ((secondSize + pageSize - 1) / pageSize) * pageSize;
-        int headerVersion = image.getInt(); // boot image header version
-        if (headerVersion > 0) {
+        int headerVersion = image.getInt(); // boot image header version or extra size
+        if (headerVersion > 0 && headerVersion < 4) {
             image.position(BOOT_IMAGE_HEADER_V1_RECOVERY_DTBO_SIZE_OFFSET);
             int recoveryDtboLength = image.getInt();
             length += ((recoveryDtboLength + pageSize - 1) / pageSize) * pageSize;
@@ -179,6 +179,9 @@ public class SignBoot {
                 throw new IllegalArgumentException(
                         "Invalid image header: invalid header length");
             }
+        } else {
+            // headerVersion is 0 or actually extra size in this case
+            length += ((headerVersion + pageSize - 1) / pageSize) * pageSize;
         }
         length = ((length + pageSize - 1) / pageSize) * pageSize;
         if (length <= 0) {
