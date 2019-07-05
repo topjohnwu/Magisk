@@ -348,8 +348,8 @@ static bool magisk_env() {
 	unlink("/data/magisk_debug.log");
 
 	// Backwards compatibility
-	symlink(MAGISKTMP, "/sbin/.core");
-	symlink(MODULEMNT, MAGISKTMP "/img");
+	symlink("./magisk", "/sbin/.core");
+	symlink("./modules", MAGISKTMP "/img");
 
 	// Directories in tmpfs overlay
 	xmkdir(MIRRDIR, 0);
@@ -663,14 +663,14 @@ void post_fs_data(int client) {
 		if (access(buf, F_OK) == 0) {
 			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MODULEROOT, module);
 			unlink(buf2);
-			xsymlink(buf, buf2);
+			xsymlink("./system/vendor", buf2);
 		}
 		// If /system/product exists in module, create a link outside
 		snprintf(buf, PATH_MAX, "%s/%s/system/product", MODULEROOT, module);
 		if (access(buf, F_OK) == 0) {
 			snprintf(buf2, PATH_MAX, "%s/%s/product", MODULEROOT, module);
 			unlink(buf2);
-			xsymlink(buf, buf2);
+			xsymlink("./system/product", buf2);
 		}
 		sys_root->create_module_tree(module);
 	}

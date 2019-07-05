@@ -185,10 +185,10 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 	char path[64];
 	for (int i = 0; applet_names[i]; ++i) {
 		sprintf(path, "/sbin/%s", applet_names[i]);
-		xsymlink("/sbin/magisk", path);
+		xsymlink("./magisk", path);
 	}
-	xsymlink("/sbin/magiskinit", "/sbin/magiskpolicy");
-	xsymlink("/sbin/magiskinit", "/sbin/supolicy");
+	xsymlink("./magiskinit", "/sbin/magiskpolicy");
+	xsymlink("./magiskinit", "/sbin/supolicy");
 }
 
 #define ROOTMIR MIRRDIR "/system_root"
