@@ -10,6 +10,8 @@
 
 #include "su.h"
 
+using namespace std;
+
 bool CONNECT_BROADCAST;
 
 #define START_ACTIVITY \
@@ -33,21 +35,21 @@ static inline const char *get_command(const su_request *to) {
 	return DEFAULT_SHELL;
 }
 
-static inline void get_user(char *user, su_info *info) {
+static inline void get_user(char *user, const su_info *info) {
 	sprintf(user, "%d",
 			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER
 			? info->uid / 100000
 			: 0);
 }
 
-static inline void get_uid(char *uid, su_info *info) {
+static inline void get_uid(char *uid, const su_info *info) {
 	sprintf(uid, "%d",
 			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED
 			? info->uid % 100000
 			: info->uid);
 }
 
-static void exec_am_cmd(const char **args, su_info *info) {
+static void exec_am_cmd(const char **args, const su_info *info) {
 	char component[128];
 	sprintf(component, "%s/%s", info->str[SU_MANAGER].data(), args[3][0] == 'b' ? "a.h" : "a.m");
 	char user[8];
@@ -76,29 +78,29 @@ static void exec_am_cmd(const char **args, su_info *info) {
 "--ei", "to.uid", toUid, \
 "--ei", "pid", pid, \
 "--ei", "policy", policy, \
-"--es", "command", get_command(&ctx->req), \
-"--ez", "notify", ctx->info->access.notify ? "true" : "false", \
+"--es", "command", get_command(&ctx.req), \
+"--ez", "notify", ctx.info->access.notify ? "true" : "false", \
 nullptr
 
-void app_log(su_context *ctx) {
+void app_log(const su_context &ctx) {
 	char fromUid[8];
-	get_uid(fromUid, ctx->info);
+	get_uid(fromUid, ctx.info.get());
 
 	char toUid[8];
-	sprintf(toUid, "%d", ctx->req.uid);
+	sprintf(toUid, "%d", ctx.req.uid);
 
 	char pid[8];
-	sprintf(pid, "%d", ctx->pid);
+	sprintf(pid, "%d", ctx.pid);
 
 	char policy[2];
-	sprintf(policy, "%d", ctx->info->access.policy);
+	sprintf(policy, "%d", ctx.info->access.policy);
 
 	if (CONNECT_BROADCAST) {
 		const char *cmd[] = { START_BROADCAST, LOG_BODY };
-		exec_am_cmd(cmd, ctx->info);
+		exec_am_cmd(cmd, ctx.info.get());
 	} else {
 		const char *cmd[] = { START_ACTIVITY, LOG_BODY };
-		exec_am_cmd(cmd, ctx->info);
+		exec_am_cmd(cmd, ctx.info.get());
 	}
 }
 
@@ -108,30 +110,30 @@ void app_log(su_context *ctx) {
 "--ei", "policy", policy, \
 nullptr
 
-void app_notify(su_context *ctx) {
+void app_notify(const su_context &ctx) {
 	char fromUid[8];
-	get_uid(fromUid, ctx->info);
+	get_uid(fromUid, ctx.info.get());
 
 	char policy[2];
-	sprintf(policy, "%d", ctx->info->access.policy);
+	sprintf(policy, "%d", ctx.info->access.policy);
 
 	if (CONNECT_BROADCAST) {
 		const char *cmd[] = { START_BROADCAST, NOTIFY_BODY };
-		exec_am_cmd(cmd, ctx->info);
+		exec_am_cmd(cmd, ctx.info.get());
 	} else {
 		const char *cmd[] = { START_ACTIVITY, NOTIFY_BODY };
-		exec_am_cmd(cmd, ctx->info);
+		exec_am_cmd(cmd, ctx.info.get());
 	}
 
 }
 
-void app_connect(const char *socket, su_info *info) {
+void app_connect(const char *socket, const shared_ptr<su_info> &info) {
 	const char *cmd[] = {
 		START_ACTIVITY, "request",
 		"--es", "socket", socket,
 		nullptr
 	};
-	exec_am_cmd(cmd, info);
+	exec_am_cmd(cmd, info.get());
 }
 
 void broadcast_test() {
@@ -144,7 +146,7 @@ void broadcast_test() {
 	exec_am_cmd(cmd, &info);
 }
 
-void socket_send_request(int fd, su_info *info) {
+void socket_send_request(int fd, const shared_ptr<su_info> &info) {
 	write_key_token(fd, "uid", info->uid);
 	write_string_be(fd, "eof");
 }

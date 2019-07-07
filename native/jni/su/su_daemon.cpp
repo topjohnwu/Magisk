@@ -20,14 +20,16 @@
 #include "su.h"
 #include "pts.h"
 
+using namespace std;
+
 #define LOCK_CACHE()   pthread_mutex_lock(&cache_lock)
 #define UNLOCK_CACHE() pthread_mutex_unlock(&cache_lock)
 
 static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
-static su_info *cache;
+static shared_ptr<su_info> cached;
 
 su_info::su_info(unsigned uid) :
-		uid(uid), count(0), access(DEFAULT_SU_ACCESS), mgr_st({}), ref(0),
+		uid(uid), access(DEFAULT_SU_ACCESS), mgr_st({}),
 		timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
@@ -42,27 +44,20 @@ void su_info::unlock() {
 	pthread_mutex_unlock(&_lock);
 }
 
-bool su_info::isFresh() {
-	return time(nullptr) - timestamp < 3;  /* 3 seconds */
+bool su_info::is_fresh() {
+	timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	long current = ts.tv_sec * 1000L + ts.tv_nsec / 1000L;
+	return current - timestamp < 3000;  /* 3 seconds */
 }
 
-void su_info::newRef() {
-	timestamp = time(nullptr);
-	++ref;
+void su_info::refresh() {
+	timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	timestamp = ts.tv_sec * 1000L + ts.tv_nsec / 1000L;
 }
 
-void su_info::deRef() {
-	LOCK_CACHE();
-	--ref;
-	if (ref == 0 && !isFresh()) {
-		if (cache == this)
-			cache = nullptr;
-		delete this;
-	}
-	UNLOCK_CACHE();
-}
-
-static void database_check(su_info *info) {
+static void database_check(const shared_ptr<su_info> &info) {
 	int uid = info->uid;
 	get_db_settings(info->cfg);
 	get_db_strings(info->str);
@@ -91,28 +86,24 @@ static void database_check(su_info *info) {
 		validate_manager(info->str[SU_MANAGER], uid / 100000, &info->mgr_st);
 }
 
-static su_info *get_su_info(unsigned uid) {
-	su_info *info = nullptr;
+static shared_ptr<su_info> get_su_info(unsigned uid) {
+	shared_ptr<su_info> info;
 
 	// Get from cache or new instance
 	LOCK_CACHE();
-	if (cache && cache->uid == uid && cache->isFresh()) {
-		info = cache;
-	} else {
-		if (cache && cache->ref == 0)
-			delete cache;
-		cache = info = new su_info(uid);
-	}
-	info->newRef();
+	if (!cached || cached->uid != uid || !cached->is_fresh())
+		cached = make_shared<su_info>(uid);
+	info = cached;
+	info->refresh();
 	UNLOCK_CACHE();
 
-	LOGD("su: request from uid=[%d] (#%d)\n", info->uid, ++info->count);
+	LOGD("su: request from uid=[%d]\n", info->uid);
 
 	// Lock before the policy is determined
 	info->lock();
 
 	if (info->access.policy == QUERY) {
-		//  Not cached, get data from database
+		// Not cached, get data from database
 		database_check(info);
 
 		// Check su access settings
@@ -195,13 +186,12 @@ static void set_identity(unsigned uid) {
 
 void su_daemon_handler(int client, struct ucred *credential) {
 	LOGD("su: request from pid=[%d], client=[%d]\n", credential->pid, client);
-	
-	su_info *info = get_su_info(credential->uid);
+
+	auto info = get_su_info(credential->uid);
 
 	// Fail fast
 	if (info->access.policy == DENY && info->str[SU_MANAGER][0] == '\0') {
 		LOGD("su: fast deny\n");
-		info->deRef();
 		write_int(client, DENY);
 		close(client);
 		return;
@@ -214,7 +204,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	 */
 	int child = xfork();
 	if (child) {
-		info->deRef();
+		info.reset();
 
 		// Wait result
 		LOGD("su: waiting child pid=[%d]\n", child);
@@ -320,9 +310,9 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	}
 
 	if (info->access.log)
-		app_log(&ctx);
+		app_log(ctx);
 	else if (info->access.notify)
-		app_notify(&ctx);
+		app_notify(ctx);
 
 	if (info->access.policy == ALLOW) {
 		const char *argv[] = { nullptr, nullptr, nullptr, nullptr };
