@@ -47,14 +47,14 @@ void su_info::unlock() {
 bool su_info::is_fresh() {
 	timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
-	long current = ts.tv_sec * 1000L + ts.tv_nsec / 1000L;
+	long current = ts.tv_sec * 1000L + ts.tv_nsec / 1000000L;
 	return current - timestamp < 3000;  /* 3 seconds */
 }
 
 void su_info::refresh() {
 	timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
-	timestamp = ts.tv_sec * 1000L + ts.tv_nsec / 1000L;
+	timestamp = ts.tv_sec * 1000L + ts.tv_nsec / 1000000L;
 }
 
 static void database_check(const shared_ptr<su_info> &info) {
