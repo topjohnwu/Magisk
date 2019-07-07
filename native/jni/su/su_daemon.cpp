@@ -352,6 +352,10 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		}
 	}
 
+	// Unblock all signals
+	sigset_t block_set;
+	sigemptyset(&block_set);
+	sigprocmask(SIG_SETMASK, &block_set, nullptr);
 	set_identity(ctx.req.uid);
 	execvp(ctx.req.shell, (char **) argv);
 	fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell, strerror(errno));
