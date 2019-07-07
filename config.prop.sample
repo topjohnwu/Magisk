@@ -17,4 +17,5 @@ prettyName=false
 # keyPass is the pwd for the specified keyAlias
 keyStorePass=
 keyAlias=
+keyStorePass=
 keyPass=
