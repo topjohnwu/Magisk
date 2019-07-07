@@ -2,7 +2,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <limits.h>
 #include <memory>
 
 #include <db.h>
@@ -40,18 +39,25 @@ private:
 };
 
 struct su_req_base {
-	unsigned uid;
-	bool login;
-	bool keepenv;
-	bool mount_master;
-protected:
-	su_req_base();
+	unsigned uid = UID_ROOT;
+	bool login = false;
+	bool keepenv = false;
+	bool mount_master = false;
 } __attribute__((packed));
 
 struct su_request : public su_req_base {
-	const char *shell;
-	const char *command;
-	su_request();
+	const char *shell = DEFAULT_SHELL;
+	const char *command = "";
+	su_request(bool dyn = false) : dyn(dyn) {}
+	~su_request() {
+		if (dyn) {
+			free(const_cast<char*>(shell));
+			free(const_cast<char*>(command));
+		}
+	}
+
+private:
+	bool dyn;
 } __attribute__((packed));
 
 struct su_context {
@@ -59,8 +65,6 @@ struct su_context {
 	su_request req;
 	pid_t pid;
 };
-
-// connect.c
 
 void app_log(const su_context &ctx);
 void app_notify(const su_context &ctx);

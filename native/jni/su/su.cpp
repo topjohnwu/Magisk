@@ -94,15 +94,6 @@ static void setup_sighandlers(void (*handler)(int)) {
 	}
 }
 
-// Default values
-su_req_base::su_req_base()
-		: uid(UID_ROOT), login(false), keepenv(false), mount_master(false) {}
-su_request::su_request()
-		: shell(DEFAULT_SHELL), command("") {}
-
-/*
- * Connect daemon, send argc, argv, cwd, pts slave
- */
 int su_client_main(int argc, char *argv[]) {
 	int c;
 	struct option long_opts[] = {
@@ -189,17 +180,17 @@ int su_client_main(int argc, char *argv[]) {
 	// Tell the daemon we are su
 	write_int(fd, SUPERUSER);
 
-	// Wait for ack from daemon
-	if (read_int(fd)) {
-		// Fast fail
-		fprintf(stderr, "%s\n", strerror(EACCES));
-		return DENY;
-	}
-
 	// Send su_request
 	xwrite(fd, &su_req, sizeof(su_req_base));
 	write_string(fd, su_req.shell);
 	write_string(fd, su_req.command);
+
+	// Wait for ack from daemon
+	if (read_int(fd)) {
+		// Fast fail
+		fprintf(stderr, "%s\n", strerror(EACCES));
+		return EACCES;
+	}
 
 	// Determine which one of our streams are attached to a TTY
 	int atty = 0;
