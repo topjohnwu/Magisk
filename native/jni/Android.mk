@@ -160,6 +160,7 @@ LOCAL_C_INCLUDES := \
 	jni/include \
 	$(LIBUTILS)
 LOCAL_SRC_FILES := test.cpp
+LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
