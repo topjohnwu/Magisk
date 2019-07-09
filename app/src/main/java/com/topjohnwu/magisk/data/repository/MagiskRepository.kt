@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.magisk.utils.toSingle
-import com.topjohnwu.magisk.utils.writeToFile
+import com.topjohnwu.magisk.utils.writeToCachedFile
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
 
@@ -24,21 +24,21 @@ class MagiskRepository(
 
     fun fetchMagisk() = fetchUpdate()
         .flatMap { apiRaw.fetchFile(it.magisk.link) }
-        .map { it.writeToFile(context, FILE_MAGISK_ZIP) }
+        .map { it.writeToCachedFile(context, FILE_MAGISK_ZIP) }
 
     fun fetchManager() = fetchUpdate()
         .flatMap { apiRaw.fetchFile(it.app.link) }
-        .map { it.writeToFile(context, FILE_MAGISK_APK) }
+        .map { it.writeToCachedFile(context, FILE_MAGISK_APK) }
 
     fun fetchUninstaller() = fetchUpdate()
         .flatMap { apiRaw.fetchFile(it.uninstaller.link) }
-        .map { it.writeToFile(context, FILE_UNINSTALLER_ZIP) }
+        .map { it.writeToCachedFile(context, FILE_UNINSTALLER_ZIP) }
 
     fun fetchSafetynet() = apiRaw.fetchSafetynet()
 
     fun fetchBootctl() = apiRaw
         .fetchBootctl()
-        .map { it.writeToFile(context, FILE_BOOTCTL_SH) }
+        .map { it.writeToCachedFile(context, FILE_BOOTCTL_SH) }
 
 
     fun fetchUpdate() = when (Config.updateChannel) {
