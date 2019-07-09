@@ -42,6 +42,7 @@ object Config : PreferenceModel, DBConfig {
         const val ETAG_KEY = "ETag"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
+        const val DOWNLOAD_CACHE = "download_cache"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -94,6 +95,7 @@ object Config : PreferenceModel, DBConfig {
             if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
             else Value.DEFAULT_CHANNEL
 
+    var isDownloadCacheEnabled by preference(Key.DOWNLOAD_CACHE, true)
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
