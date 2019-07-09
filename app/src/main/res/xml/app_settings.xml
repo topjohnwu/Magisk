@@ -15,6 +15,12 @@
             android:defaultValue="@string/empty"
             android:title="@string/language"/>
 
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="download_cache"
+            android:summary="@string/settings_download_cache_summary"
+            android:title="@string/settings_download_cache_title" />
+
         <Preference
             android:key="clear"
             android:title="@string/settings_clear_cache_title"
