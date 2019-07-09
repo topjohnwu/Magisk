@@ -7,10 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.app.TaskStackBuilder;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Const;
@@ -19,6 +15,10 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver;
 import com.topjohnwu.magisk.ui.SplashActivity;
 import com.topjohnwu.magisk.utils.Utils;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.TaskStackBuilder;
 
 public class Notifications {
 
@@ -101,9 +101,12 @@ public class Notifications {
         mgr.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build());
     }
 
-    public static NotificationCompat.Builder progress(String title) {
-        App app = App.self;
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(app, Const.ID.PROGRESS_NOTIFICATION_CHANNEL);
+    public static NotificationCompat.Builder progress(CharSequence title) {
+        return progress(App.self, title);
+    }
+
+    public static NotificationCompat.Builder progress(Context context, CharSequence title) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Const.ID.PROGRESS_NOTIFICATION_CHANNEL);
         builder.setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(title)
