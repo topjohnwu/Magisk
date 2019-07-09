@@ -71,6 +71,8 @@
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Progress Notifications</string>
     <string name="download_complete">Download complete</string>
+    <string name="download_local">Looking for local copies…</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="magisk_update_title">Magisk Update Available!</string>
     <string name="manager_update_title">Magisk Manager Update Available!</string>
