@@ -4,9 +4,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 
-import androidx.annotation.MainThread;
-import androidx.annotation.WorkerThread;
-
 import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Info;
@@ -41,13 +38,21 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
+
 public abstract class MagiskInstaller {
 
     protected String srcBoot;
     protected File destFile;
     protected File installDir;
 
-    private List<String> console, logs;
+    @Nullable
+    private final Uri preDownloadedFile;
+    private final List<String> console;
+    private final List<String> logs;
     private boolean isTar = false;
 
     private class ProgressLog implements DownloadProgressListener {
@@ -72,14 +77,16 @@ public abstract class MagiskInstaller {
     protected MagiskInstaller() {
         console = NOPList.getInstance();
         logs = NOPList.getInstance();
+        preDownloadedFile = null;
     }
 
-    public MagiskInstaller(List<String> out, List<String> err) {
+    public MagiskInstaller(List<String> out, List<String> err, @NonNull Uri magisk) {
         console = out;
         logs = err;
         installDir = new File(App.deContext.getFilesDir().getParent(), "install");
         Shell.sh("rm -rf " + installDir).exec();
         installDir.mkdirs();
+        preDownloadedFile = magisk;
     }
 
     protected boolean findImage() {
@@ -94,7 +101,7 @@ public abstract class MagiskInstaller {
 
     protected boolean findSecondaryImage() {
         String slot = ShellUtils.fastCmd("echo $SLOT");
-        String target = (TextUtils.equals(slot, "_a") ? "_b" : "_a");
+        String target = TextUtils.equals(slot, "_a") ? "_b" : "_a";
         console.add("- Target slot: " + target);
         srcBoot = ShellUtils.fastCmd(
                 "SLOT=" + target,
@@ -122,14 +129,21 @@ public abstract class MagiskInstaller {
         console.add("- Device platform: " + Build.CPU_ABI);
 
         File zip = new File(App.self.getCacheDir(), "magisk.zip");
+        if (preDownloadedFile != null) {
+            console.add("- Using already downloaded file");
 
-        if (!ShellUtils.checkSum("MD5", zip, Info.remote.getMagisk().getHash())) {
-            console.add("- Downloading zip");
-            Networking.get(Info.remote.getMagisk().getLink())
-                    .setDownloadProgressListener(new ProgressLog())
-                    .execForFile(zip);
+            InstallerHelper.copyFileTo(preDownloadedFile, zip);
         } else {
-            console.add("- Existing zip found");
+            console.add("- Using legacy download method");
+
+            if (!ShellUtils.checkSum("MD5", zip, Info.remote.getMagisk().getHash())) {
+                console.add("- Downloading zip");
+                Networking.get(Info.remote.getMagisk().getLink())
+                        .setDownloadProgressListener(new ProgressLog())
+                        .execForFile(zip);
+            } else {
+                console.add("- Existing zip found");
+            }
         }
 
         try {
@@ -151,7 +165,7 @@ public abstract class MagiskInstaller {
                     name = ze.getName();
                 if (name == null)
                     continue;
-                File dest = (installDir instanceof SuFile) ?
+                File dest = installDir instanceof SuFile ?
                         new SuFile(installDir, name) :
                         new File(installDir, name);
                 dest.getParentFile().mkdirs();
