@@ -1,9 +1,11 @@
 package com.topjohnwu.magisk.model.download
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.model.entity.internal.Configuration
@@ -80,6 +82,7 @@ open class CompoundDownloadService : SubstrateDownloadService() {
 
     companion object {
 
+        @RequiresPermission(allOf = [Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE])
         fun download(context: Context, subject: DownloadSubject) =
             Intent(context, ClassMap[CompoundDownloadService::class.java])
                 .putExtra(ARG_URL, subject)
