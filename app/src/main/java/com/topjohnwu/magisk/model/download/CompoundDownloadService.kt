@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
@@ -85,10 +86,17 @@ open class CompoundDownloadService : SubstrateDownloadService() {
     companion object {
 
         @RequiresPermission(allOf = [Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE])
-        fun download(context: Context, subject: DownloadSubject) =
+        fun download(context: Context, subject: DownloadSubject) {
             Intent(context, ClassMap[CompoundDownloadService::class.java])
                 .putExtra(ARG_URL, subject)
-                .let { context.startService(it); Unit }
+                .let {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(it)
+                    } else {
+                        context.startService(it)
+                    }
+                }
+        }
 
     }
 
