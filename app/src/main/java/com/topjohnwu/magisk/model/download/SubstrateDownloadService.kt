@@ -22,6 +22,7 @@ import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 import java.io.File
 import kotlin.random.Random.Default.nextInt
 
@@ -51,7 +52,7 @@ abstract class SubstrateDownloadService : Service() {
     private fun start(subject: DownloadSubject) = search(subject)
         .onErrorResumeNext(download(subject))
         .subscribeK {
-            runCatching { onFinished(it, subject) }
+            runCatching { onFinished(it, subject) }.onFailure { Timber.e(it) }
             finish(it, subject)
         }
 
@@ -93,7 +94,10 @@ abstract class SubstrateDownloadService : Service() {
 
     protected fun moveToDownloads(file: File) {
         val destination = downloadsFile(file.name)
-        file.copyTo(destination)
+        if (file != destination) {
+            destination.deleteRecursively()
+            file.copyTo(destination)
+        }
         toast(getString(R.string.internal_storage, "/Download/${file.name}"), Toast.LENGTH_LONG)
     }
 
