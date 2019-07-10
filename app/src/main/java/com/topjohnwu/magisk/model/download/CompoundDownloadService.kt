@@ -17,51 +17,57 @@ open class CompoundDownloadService : SubstrateDownloadService() {
 
     private val context get() = this
 
-    override fun onFinished(file: File, subject: DownloadSubject) {
-        when (subject) {
-            is DownloadSubject.Magisk -> {
-                if (subject.configuration == Configuration.FLASH) {
-                    FlashActivity.flashMagisk(this, file)
-                }
-            }
-            is DownloadSubject.Module -> {
-                if (subject.configuration == Configuration.FLASH) {
-                    FlashActivity.flashModule(this, file)
-                }
-            }
-        }
+    override fun onFinished(file: File, subject: DownloadSubject) = when (subject) {
+        is DownloadSubject.Magisk -> onFinishedInternal(file, subject)
+        is DownloadSubject.Module -> onFinishedInternal(file, subject)
+    }
+
+    private fun onFinishedInternal(
+        file: File,
+        subject: DownloadSubject.Magisk
+    ) = when (subject.configuration) {
+        Configuration.FLASH -> FlashActivity.flash(this, file)
+        else -> Unit
+    }
+
+    private fun onFinishedInternal(
+        file: File,
+        subject: DownloadSubject.Module
+    ) = when (subject.configuration) {
+        Configuration.FLASH -> FlashActivity.install(this, file)
+        else -> Unit
     }
 
     // ---
 
-    override fun NotificationCompat.Builder.addActions(file: File, subject: DownloadSubject) =
-        when (subject) {
-            is DownloadSubject.Magisk -> addMagiskActions(file, subject.configuration)
-            is DownloadSubject.Module -> addModuleActions(file, subject.configuration)
-        }
-
-    private fun NotificationCompat.Builder.addMagiskActions(
+    override fun NotificationCompat.Builder.addActions(
         file: File,
-        configuration: Configuration
-    ) = apply {
-        when (configuration) {
-            Configuration.FLASH -> {
-                val inner = FlashActivity.flashMagiskIntent(context, file)
-                val intent = PendingIntent
-                    .getActivity(context, nextInt(), inner, PendingIntent.FLAG_ONE_SHOT)
-
-                setContentIntent(intent)
-            }
-        }
-
+        subject: DownloadSubject
+    ) = when (subject) {
+        is DownloadSubject.Magisk -> addActionsInternal(file, subject)
+        is DownloadSubject.Module -> addActionsInternal(file, subject)
     }
 
-    private fun NotificationCompat.Builder.addModuleActions(
+    private fun NotificationCompat.Builder.addActionsInternal(
         file: File,
-        configuration: Configuration
-    ) = apply {
-
+        subject: DownloadSubject.Magisk
+    ) = when (subject.configuration) {
+        Configuration.FLASH -> setContentIntent(FlashActivity.flashIntent(context, file))
+        else -> this
     }
+
+    private fun NotificationCompat.Builder.addActionsInternal(
+        file: File,
+        subject: DownloadSubject.Module
+    ) = when (subject.configuration) {
+        Configuration.FLASH -> setContentIntent(FlashActivity.installIntent(context, file))
+        else -> this
+    }
+
+    @Suppress("ReplaceSingleLineLet")
+    private fun NotificationCompat.Builder.setContentIntent(intent: Intent) =
+        PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
+            .let { setContentIntent(it) }
 
     companion object {
 
