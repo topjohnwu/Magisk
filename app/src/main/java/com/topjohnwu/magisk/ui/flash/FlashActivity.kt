@@ -18,7 +18,7 @@ open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>(
     override val layoutRes: Int = R.layout.activity_flash
     override val viewModel: FlashViewModel by viewModel {
         val uri = intent.data ?: let { finish(); Uri.EMPTY }
-        val additionalUri = intent.getParcelableExtra<Uri>(Const.Key.FLASH_DATA) ?: Uri.EMPTY
+        val additionalUri = intent.getParcelableExtra<Uri>(Const.Key.FLASH_DATA) ?: uri
         val action = intent.getStringExtra(Const.Key.FLASH_ACTION) ?: let { finish();"" }
         parametersOf(action, uri, additionalUri)
     }
