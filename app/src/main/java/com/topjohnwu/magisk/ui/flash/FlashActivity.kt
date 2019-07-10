@@ -33,13 +33,16 @@ open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>(
         private fun intent(context: Context) = Intent(context, ClassMap[FlashActivity::class.java])
         private fun intent(context: Context, file: File) = intent(context).setData(file.toUri())
 
+        private fun flashType(isSecondSlot: Boolean) =
+            if (isSecondSlot) Const.Value.FLASH_INACTIVE_SLOT else Const.Value.FLASH_MAGISK
+
         /* Flashing is understood as installing / flashing magisk itself */
 
-        fun flashIntent(context: Context, file: File) = intent(context, file)
-            .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK)
+        fun flashIntent(context: Context, file: File, isSecondSlot: Boolean) = intent(context, file)
+            .putExtra(Const.Key.FLASH_ACTION, flashType(isSecondSlot))
 
-        fun flash(context: Context, file: File) =
-            context.startActivity(flashIntent(context, file))
+        fun flash(context: Context, file: File, isSecondSlot: Boolean) =
+            context.startActivity(flashIntent(context, file, isSecondSlot))
 
         /* Patching is understood as injecting img files with magisk */
 

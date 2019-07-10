@@ -6,8 +6,15 @@ import kotlinx.android.parcel.Parcelize
 
 sealed class Configuration : Parcelable {
 
-    @Parcelize
-    object Flash : Configuration()
+    sealed class Flash : Configuration() {
+
+        @Parcelize
+        object Primary : Flash()
+
+        @Parcelize
+        object Secondary : Flash()
+
+    }
 
     @Parcelize
     object Download : Configuration()
