@@ -29,21 +29,39 @@ open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>(
     companion object {
 
         private fun intent(context: Context) = Intent(context, ClassMap[FlashActivity::class.java])
+        private fun intent(context: Context, file: File) = intent(context).setData(file.toUri())
 
-        fun flashMagiskIntent(context: Context, file: File) = intent(context)
-            .setData(file.toUri())
+        /* Flashing is understood as installing / flashing magisk itself */
+
+        fun flashIntent(context: Context, file: File) = intent(context, file)
             .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK)
 
-        fun flashMagisk(context: Context, file: File) =
-            context.startActivity(flashMagiskIntent(context, file))
+        fun flash(context: Context, file: File) =
+            context.startActivity(flashIntent(context, file))
 
+        /* Patching is understood as injecting img files with magisk */
 
-        fun flashModuleIntent(context: Context, file: File) = intent(context)
-            .setData(file.toUri())
+        fun patchIntent(context: Context, file: File) = intent(context, file)
+            .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_FILE)
+
+        fun patch(context: Context, file: File) =
+            context.startActivity(patchIntent(context, file))
+
+        /* Uninstalling is understood as removing magisk entirely */
+
+        fun uninstallIntent(context: Context, file: File) = intent(context, file)
+            .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL)
+
+        fun uninstall(context: Context, file: File) =
+            context.startActivity(uninstallIntent(context, file))
+
+        /* Installing is understood as flashing modules / zips */
+
+        fun installIntent(context: Context, file: File) = intent(context, file)
             .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP)
 
-        fun flashModule(context: Context, file: File) =
-            context.startActivity(flashModuleIntent(context, file))
+        fun install(context: Context, file: File) =
+            context.startActivity(installIntent(context, file))
 
     }
 

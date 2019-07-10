@@ -28,7 +28,7 @@ import java.util.*
 
 class FlashViewModel(
     action: String,
-    uri: Uri?,
+    uri: Uri?, // FIXME uri is now flashable file, not additional file
     private val resources: Resources
 ) : MagiskViewModel(), FlashResultListener {
 
