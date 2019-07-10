@@ -8,8 +8,11 @@ import android.content.Intent
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
-import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.Configuration.*
+import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import java.io.File
 import kotlin.random.Random.Default.nextInt
@@ -20,27 +23,27 @@ open class CompoundDownloadService : SubstrateDownloadService() {
     private val context get() = this
 
     override fun onFinished(file: File, subject: DownloadSubject) = when (subject) {
-        is DownloadSubject.Magisk -> onFinishedInternal(file, subject)
-        is DownloadSubject.Module -> onFinishedInternal(file, subject)
+        is Magisk -> onFinishedInternal(file, subject)
+        is Module -> onFinishedInternal(file, subject)
     }
 
     private fun onFinishedInternal(
         file: File,
-        subject: DownloadSubject.Magisk
+        subject: Magisk
     ) = when (val conf = subject.configuration) {
-        Configuration.Download -> moveToDownloads(file)
-        Configuration.Flash -> FlashActivity.flash(this, file)
-        Configuration.Uninstall -> FlashActivity.uninstall(this, file)
-        is Configuration.Patch -> FlashActivity.patch(this, file, conf.fileUri)
+        Download -> moveToDownloads(file)
+        Uninstall -> FlashActivity.uninstall(this, file)
+        is Patch -> FlashActivity.patch(this, file, conf.fileUri)
+        is Flash -> FlashActivity.flash(this, file, conf is Secondary)
         else -> Unit
     }
 
     private fun onFinishedInternal(
         file: File,
-        subject: DownloadSubject.Module
+        subject: Module
     ) = when (subject.configuration) {
-        Configuration.Download -> moveToDownloads(file)
-        Configuration.Flash -> FlashActivity.install(this, file)
+        Download -> moveToDownloads(file)
+        is Flash -> FlashActivity.install(this, file)
         else -> Unit
     }
 
@@ -50,28 +53,27 @@ open class CompoundDownloadService : SubstrateDownloadService() {
         file: File,
         subject: DownloadSubject
     ) = when (subject) {
-        is DownloadSubject.Magisk -> addActionsInternal(file, subject)
-        is DownloadSubject.Module -> addActionsInternal(file, subject)
+        is Magisk -> addActionsInternal(file, subject)
+        is Module -> addActionsInternal(file, subject)
     }
 
     private fun NotificationCompat.Builder.addActionsInternal(
         file: File,
-        subject: DownloadSubject.Magisk
+        subject: Magisk
     ) = when (val conf = subject.configuration) {
-        Configuration.Download -> setContentIntent(fileIntent(subject.fileName))
-        Configuration.Flash -> setContentIntent(FlashActivity.flashIntent(context, file))
-        Configuration.Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, file))
-        is Configuration.Patch ->
-            setContentIntent(FlashActivity.patchIntent(context, file, conf.fileUri))
+        Download -> setContentIntent(fileIntent(subject.fileName))
+        Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, file))
+        is Flash -> setContentIntent(FlashActivity.flashIntent(context, file, conf is Secondary))
+        is Patch -> setContentIntent(FlashActivity.patchIntent(context, file, conf.fileUri))
         else -> this
     }
 
     private fun NotificationCompat.Builder.addActionsInternal(
         file: File,
-        subject: DownloadSubject.Module
+        subject: Module
     ) = when (subject.configuration) {
-        Configuration.Download -> setContentIntent(fileIntent(subject.fileName))
-        Configuration.Flash -> setContentIntent(FlashActivity.installIntent(context, file))
+        Download -> setContentIntent(fileIntent(subject.fileName))
+        is Flash -> setContentIntent(FlashActivity.installIntent(context, file))
         else -> this
     }
 

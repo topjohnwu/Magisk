@@ -14,8 +14,8 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.provide
-import com.topjohnwu.magisk.utils.toast
 import com.topjohnwu.magisk.utils.writeToCachedFile
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
@@ -98,7 +98,10 @@ abstract class SubstrateDownloadService : Service() {
             destination.deleteRecursively()
             file.copyTo(destination)
         }
-        toast(getString(R.string.internal_storage, "/Download/${file.name}"), Toast.LENGTH_LONG)
+        Utils.toast(
+            getString(R.string.internal_storage, "/Download/${file.name}"),
+            Toast.LENGTH_LONG
+        )
     }
 
     // ---
