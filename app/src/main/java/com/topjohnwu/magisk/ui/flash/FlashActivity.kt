@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.flash
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
@@ -16,9 +17,10 @@ open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>(
 
     override val layoutRes: Int = R.layout.activity_flash
     override val viewModel: FlashViewModel by viewModel {
-        val uri = intent.data
+        val uri = intent.data ?: let { finish(); Uri.EMPTY }
+        val additionalUri = intent.getParcelableExtra<Uri>(Const.Key.FLASH_DATA) ?: Uri.EMPTY
         val action = intent.getStringExtra(Const.Key.FLASH_ACTION) ?: let { finish();"" }
-        parametersOf(action, uri)
+        parametersOf(action, uri, additionalUri)
     }
 
     override fun onBackPressed() {
@@ -41,11 +43,12 @@ open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>(
 
         /* Patching is understood as injecting img files with magisk */
 
-        fun patchIntent(context: Context, file: File) = intent(context, file)
+        fun patchIntent(context: Context, file: File, uri: Uri) = intent(context, file)
+            .putExtra(Const.Key.FLASH_DATA, uri)
             .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_FILE)
 
-        fun patch(context: Context, file: File) =
-            context.startActivity(patchIntent(context, file))
+        fun patch(context: Context, file: File, uri: Uri) =
+            context.startActivity(patchIntent(context, file, uri))
 
         /* Uninstalling is understood as removing magisk entirely */
 

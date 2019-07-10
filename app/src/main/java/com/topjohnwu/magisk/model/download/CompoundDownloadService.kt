@@ -25,8 +25,11 @@ open class CompoundDownloadService : SubstrateDownloadService() {
     private fun onFinishedInternal(
         file: File,
         subject: DownloadSubject.Magisk
-    ) = when (subject.configuration) {
+    ) = when (val conf = subject.configuration) {
+        Configuration.Download -> moveToDownloads(file)
         Configuration.Flash -> FlashActivity.flash(this, file)
+        Configuration.Uninstall -> FlashActivity.uninstall(this, file)
+        is Configuration.Patch -> FlashActivity.patch(this, file, conf.fileUri)
         else -> Unit
     }
 
@@ -34,6 +37,7 @@ open class CompoundDownloadService : SubstrateDownloadService() {
         file: File,
         subject: DownloadSubject.Module
     ) = when (subject.configuration) {
+        Configuration.Download -> moveToDownloads(file)
         Configuration.Flash -> FlashActivity.install(this, file)
         else -> Unit
     }
@@ -51,8 +55,12 @@ open class CompoundDownloadService : SubstrateDownloadService() {
     private fun NotificationCompat.Builder.addActionsInternal(
         file: File,
         subject: DownloadSubject.Magisk
-    ) = when (subject.configuration) {
+    ) = when (val conf = subject.configuration) {
+        Configuration.Download -> setContentIntent(fileIntent(subject.fileName))
         Configuration.Flash -> setContentIntent(FlashActivity.flashIntent(context, file))
+        Configuration.Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, file))
+        is Configuration.Patch ->
+            setContentIntent(FlashActivity.patchIntent(context, file, conf.fileUri))
         else -> this
     }
 
@@ -60,6 +68,7 @@ open class CompoundDownloadService : SubstrateDownloadService() {
         file: File,
         subject: DownloadSubject.Module
     ) = when (subject.configuration) {
+        Configuration.Download -> setContentIntent(fileIntent(subject.fileName))
         Configuration.Flash -> setContentIntent(FlashActivity.installIntent(context, file))
         else -> this
     }

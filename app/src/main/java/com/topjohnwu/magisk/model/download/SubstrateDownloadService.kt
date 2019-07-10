@@ -4,14 +4,18 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import android.webkit.MimeTypeMap
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
+import com.topjohnwu.magisk.utils.toast
 import com.topjohnwu.magisk.utils.writeToCachedFile
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
@@ -79,6 +83,27 @@ abstract class SubstrateDownloadService : Service() {
         .map { it.toFile(subject.fileName) }
 
     // ---
+
+    protected fun fileIntent(fileName: String): Intent {
+        val file = downloadsFile(fileName)
+        return Intent(Intent.ACTION_VIEW)
+            .setDataAndType(file.toUri(), file.type)
+    }
+
+    protected fun moveToDownloads(file: File) {
+        val destination = downloadsFile(file.name)
+        file.copyTo(destination)
+        toast(getString(R.string.internal_storage, "/Download/${file.name}"), Toast.LENGTH_LONG)
+    }
+
+    // ---
+
+    private val File.type
+        get() = MimeTypeMap.getSingleton()
+            .getMimeTypeFromExtension(extension)
+            .orEmpty()
+
+    private fun downloadsFile(name: String) = File(Const.EXTERNAL_PATH, name)
 
     private fun ResponseBody.toFile(name: String): File {
         val maxRaw = contentLength()
