@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.model.entity.internal
 
 import android.os.Parcelable
+import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.model.entity.MagiskJson
 import kotlinx.android.parcel.Parcelize
 import com.topjohnwu.magisk.model.entity.Module as MagiskModule
@@ -23,8 +24,8 @@ sealed class DownloadSubject : Parcelable {
 
     @Parcelize
     data class Magisk(
-        val magisk: MagiskJson,
-        val configuration: Configuration
+        val configuration: Configuration,
+        val magisk: MagiskJson = Info.remote.magisk
     ) : DownloadSubject() {
 
         override val url: String get() = magisk.link
