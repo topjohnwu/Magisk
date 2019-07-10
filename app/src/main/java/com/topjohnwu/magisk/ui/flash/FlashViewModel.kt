@@ -28,7 +28,8 @@ import java.util.*
 
 class FlashViewModel(
     action: String,
-    uri: Uri?, // FIXME uri is now flashable file, not additional file
+    file: Uri,
+    uri: Uri,
     private val resources: Resources
 ) : MagiskViewModel(), FlashResultListener {
 
@@ -52,7 +53,6 @@ class FlashViewModel(
 
         state = State.LOADING
 
-        val uri = uri ?: Uri.EMPTY
         when (action) {
             Const.Value.FLASH_ZIP -> Flashing
                 .Install(uri, outItems, logItems, this)

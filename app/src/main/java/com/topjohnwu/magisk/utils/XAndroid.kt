@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.widget.Toast
 import com.topjohnwu.magisk.App
 import java.io.File
 import java.io.FileNotFoundException
@@ -50,21 +51,22 @@ val ApplicationInfo.packageInfo: PackageInfo?
         }
     }
 
-val Uri.fileName: String get() {
-    var name: String? = null
-    App.self.contentResolver.query(this, null, null, null, null)?.use { c ->
-        val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (nameIndex != -1) {
-            c.moveToFirst()
-            name = c.getString(nameIndex)
+val Uri.fileName: String
+    get() {
+        var name: String? = null
+        App.self.contentResolver.query(this, null, null, null, null)?.use { c ->
+            val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1) {
+                c.moveToFirst()
+                name = c.getString(nameIndex)
+            }
         }
+        if (name == null && path != null) {
+            val idx = path!!.lastIndexOf('/')
+            name = path!!.substring(idx + 1)
+        }
+        return name.orEmpty()
     }
-    if (name == null && path != null) {
-        val idx = path!!.lastIndexOf('/')
-        name = path!!.substring(idx + 1)
-    }
-    return name.orEmpty()
-}
 
 fun PackageManager.activities(packageName: String) =
     getPackageInfo(packageName, GET_ACTIVITIES)
@@ -80,10 +82,11 @@ fun PackageManager.providers(packageName: String) =
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
 
-fun Context.readUri(uri: Uri) = contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
+fun Context.readUri(uri: Uri) =
+    contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
 
 fun ApplicationInfo.findAppLabel(pm: PackageManager): String {
-    return pm.getApplicationLabel(this)?.toString().orEmpty()
+    return pm.getApplicationLabel(this).toString().orEmpty()
 }
 
 fun Intent.startActivity(context: Context) = context.startActivity(this)
@@ -101,3 +104,9 @@ fun File.mv(destination: File) {
 fun String.toFile() = File(this)
 
 fun Intent.chooser(title: String = "Pick an app") = Intent.createChooser(this, title)
+
+fun Context.toast(message: Int, duration: Int = Toast.LENGTH_SHORT) =
+    toast(getString(message), duration)
+
+fun Context.toast(message: CharSequence, duration: Int = Toast.LENGTH_SHORT) =
+    Toast.makeText(this, message, duration)
