@@ -1,22 +1,18 @@
 package com.topjohnwu.magisk.view.dialogs
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.snackbar.Snackbar
-import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.model.download.CompoundDownloadService
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.ui.base.MagiskActivity
-import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.view.ProgressNotification
-import com.topjohnwu.magisk.view.SnackbarMaker
-import com.topjohnwu.net.Networking
-import com.topjohnwu.superuser.ShellUtils
-import java.io.File
 
 internal class InstallMethodDialog(activity: MagiskActivity<*, *>, options: List<String>) :
     AlertDialog.Builder(activity) {
@@ -27,78 +23,54 @@ internal class InstallMethodDialog(activity: MagiskActivity<*, *>, options: List
             when (idx) {
                 0 -> downloadOnly(activity)
                 1 -> patchBoot(activity)
-                2 -> {
-                    val intent = Intent(activity, ClassMap[FlashActivity::class.java])
-                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK)
-                    activity.startActivity(intent)
-                }
+                2 -> flash(activity)
                 3 -> installInactiveSlot(activity)
             }
         }
     }
 
-    private fun patchBoot(activity: MagiskActivity<*, *>) {
-        activity.withExternalRW {
-            onSuccess {
-                Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
-                val intent = Intent(Intent.ACTION_GET_CONTENT)
-                    .setType("*/*")
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                activity.startActivityForResult(intent, Const.ID.SELECT_BOOT) { resultCode, data ->
-                    if (resultCode == Activity.RESULT_OK && data != null) {
-                        val i = Intent(this, ClassMap[FlashActivity::class.java])
-                            .setData(data.data)
-                            .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_FILE)
-                        startActivity(i)
-                    }
+    @SuppressLint("MissingPermission")
+    private fun flash(activity: MagiskActivity<*, *>) = activity.withExternalRW {
+        onSuccess {
+            val subject = DownloadSubject.Magisk(Configuration.Flash.Primary)
+            CompoundDownloadService.download(context, subject)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun patchBoot(activity: MagiskActivity<*, *>) = activity.withExternalRW {
+        onSuccess {
+            Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+                .setType("*/*")
+                .addCategory(Intent.CATEGORY_OPENABLE)
+            activity.startActivityForResult(intent, Const.ID.SELECT_BOOT) { resultCode, data ->
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val safeData = data.data ?: Uri.EMPTY
+                    val subject = DownloadSubject.Magisk(Configuration.Patch(safeData))
+                    CompoundDownloadService.download(activity, subject)
                 }
             }
         }
     }
 
-    private fun downloadOnly(activity: MagiskActivity<*, *>) {
-        activity.withExternalRW {
-            onSuccess {
-                val filename = "Magisk-v${Info.remote.magisk.version}" +
-                        "(${Info.remote.magisk.versionCode}).zip"
-                val zip = File(Const.EXTERNAL_PATH, filename)
-                val cachedZip = File(activity.cacheDir, "magisk.zip")
-
-                fun onSuccess() {
-                    SnackbarMaker.make(
-                        activity,
-                        activity.getString(R.string.internal_storage, "/Download/$filename"),
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                }
-
-                if (ShellUtils.checkSum("MD5", cachedZip, Info.remote.magisk.hash)) {
-                    cachedZip.copyTo(zip, true)
-                    onSuccess()
-                } else {
-                    val progress = ProgressNotification(filename)
-                    Networking.get(Info.remote.magisk.link)
-                        .setDownloadProgressListener(progress)
-                        .setErrorHandler { _, _ -> progress.dlFail() }
-                        .getAsFile(zip) {
-                            progress.dlDone()
-                            onSuccess()
-                        }
-                }
-
-            }
+    @SuppressLint("MissingPermission")
+    private fun downloadOnly(activity: MagiskActivity<*, *>) = activity.withExternalRW {
+        onSuccess {
+            val subject = DownloadSubject.Magisk(Configuration.Download)
+            CompoundDownloadService.download(activity, subject)
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun installInactiveSlot(activity: MagiskActivity<*, *>) {
         CustomAlertDialog(activity)
             .setTitle(R.string.warning)
             .setMessage(R.string.install_inactive_slot_msg)
             .setCancelable(true)
             .setPositiveButton(R.string.yes) { _, _ ->
-                val intent = Intent(activity, ClassMap[FlashActivity::class.java])
-                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT)
-                activity.startActivity(intent)
+                val subject = DownloadSubject.Magisk(Configuration.Flash.Secondary)
+                CompoundDownloadService.download(activity, subject)
             }
             .setNegativeButton(R.string.no_thanks, null)
             .show()
