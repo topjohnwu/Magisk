@@ -91,9 +91,8 @@ fun ApplicationInfo.findAppLabel(pm: PackageManager): String {
 
 fun Intent.startActivity(context: Context) = context.startActivity(this)
 
-fun File.provide(): Uri {
-    val context: Context by inject()
-    return FileProvider.getUriForFile(context, "com.topjohnwu.magisk.fileprovider", this)
+fun File.provide(context: Context = get()): Uri {
+    return FileProvider.getUriForFile(context, context.packageName + ".provider", this)
 }
 
 fun File.mv(destination: File) {

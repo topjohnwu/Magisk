@@ -8,13 +8,13 @@ import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
-import androidx.core.net.toUri
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
+import com.topjohnwu.magisk.utils.provide
 import com.topjohnwu.magisk.utils.toast
 import com.topjohnwu.magisk.utils.writeToCachedFile
 import com.topjohnwu.magisk.view.Notifications
@@ -87,7 +87,8 @@ abstract class SubstrateDownloadService : Service() {
     protected fun fileIntent(fileName: String): Intent {
         val file = downloadsFile(fileName)
         return Intent(Intent.ACTION_VIEW)
-            .setDataAndType(file.toUri(), file.type)
+            .setDataAndType(file.provide(this), file.type)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
     protected fun moveToDownloads(file: File) {
