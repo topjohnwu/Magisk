@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
 import android.net.Uri
 import android.provider.OpenableColumns
-import android.widget.Toast
 import com.topjohnwu.magisk.App
 import java.io.File
 import java.io.FileNotFoundException
@@ -103,9 +102,3 @@ fun File.mv(destination: File) {
 fun String.toFile() = File(this)
 
 fun Intent.chooser(title: String = "Pick an app") = Intent.createChooser(this, title)
-
-fun Context.toast(message: Int, duration: Int = Toast.LENGTH_SHORT) =
-    toast(getString(message), duration)
-
-fun Context.toast(message: CharSequence, duration: Int = Toast.LENGTH_SHORT) =
-    Toast.makeText(this, message, duration)
