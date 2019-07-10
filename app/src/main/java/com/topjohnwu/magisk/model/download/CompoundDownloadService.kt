@@ -26,7 +26,7 @@ open class CompoundDownloadService : SubstrateDownloadService() {
         file: File,
         subject: DownloadSubject.Magisk
     ) = when (subject.configuration) {
-        Configuration.FLASH -> FlashActivity.flash(this, file)
+        Configuration.Flash -> FlashActivity.flash(this, file)
         else -> Unit
     }
 
@@ -34,7 +34,7 @@ open class CompoundDownloadService : SubstrateDownloadService() {
         file: File,
         subject: DownloadSubject.Module
     ) = when (subject.configuration) {
-        Configuration.FLASH -> FlashActivity.install(this, file)
+        Configuration.Flash -> FlashActivity.install(this, file)
         else -> Unit
     }
 
@@ -52,7 +52,7 @@ open class CompoundDownloadService : SubstrateDownloadService() {
         file: File,
         subject: DownloadSubject.Magisk
     ) = when (subject.configuration) {
-        Configuration.FLASH -> setContentIntent(FlashActivity.flashIntent(context, file))
+        Configuration.Flash -> setContentIntent(FlashActivity.flashIntent(context, file))
         else -> this
     }
 
@@ -60,7 +60,7 @@ open class CompoundDownloadService : SubstrateDownloadService() {
         file: File,
         subject: DownloadSubject.Module
     ) = when (subject.configuration) {
-        Configuration.FLASH -> setContentIntent(FlashActivity.installIntent(context, file))
+        Configuration.Flash -> setContentIntent(FlashActivity.installIntent(context, file))
         else -> this
     }
 
