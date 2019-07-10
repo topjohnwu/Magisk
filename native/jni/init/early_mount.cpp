@@ -123,11 +123,13 @@ void LegacyInit::early_mount() {
 	char block_dev[64];
 
 	full_read("/init", &self.buf, &self.sz);
+	full_read("/sepolicy_custom", &sepolicy.buf, &sepolicy.sz);
 
 	LOGD("Reverting /init\n");
 	root = xopen("/", O_RDONLY | O_CLOEXEC);
 	rename("/.backup/init", "/init");
-
+	rm_rf("/sepolicy_custom");
+	
 	mount_root(system);
 	mount_root(vendor);
 	mount_root(product);
@@ -140,10 +142,11 @@ void SARCompatInit::early_mount() {
 	char block_dev[64];
 
 	full_read("/init", &self.buf, &self.sz);
+	full_read("/sepolicy_custom", &sepolicy.buf, &sepolicy.sz);
 
 	LOGD("Cleaning rootfs\n");
 	root = xopen("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { ".backup", "overlay", "proc", "sys" });
+	frm_rf(root, { ".backup", "overlay", "proc", "sys", "sepolicy_custom" });
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
@@ -194,10 +197,11 @@ void SARInit::early_mount() {
 
 	full_read("/init", &self.buf, &self.sz);
 	full_read("/.backup/.magisk", &config.buf, &config.sz);
+	full_read("/sepolicy_custom", &sepolicy.buf, &sepolicy.sz);
 
 	LOGD("Cleaning rootfs\n");
 	int root = xopen("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { "proc", "sys" });
+	frm_rf(root, { "proc", "sys", "sepolicy_custom" });
 	close(root);
 
 	LOGD("Early mount system_root\n");
@@ -221,8 +225,10 @@ void SecondStageInit::early_mount() {
 
 	full_read("/system/bin/init", &self.buf, &self.sz);
 	full_read("/.backup/.magisk", &config.buf, &config.sz);
+	full_read("/sepolicy_custom", &sepolicy.buf, &sepolicy.sz);
 	rm_rf("/system");
 	rm_rf("/.backup");
+	rm_rf("/sepolicy_custom");
 
 	// Find system_dev
 	parse_mnt("/proc/mounts", [&](mntent *me) -> bool {

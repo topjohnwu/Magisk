@@ -120,13 +120,11 @@ void SARCompatInit::setup_rootfs() {
 
 bool MagiskInit::patch_sepolicy(const char *file) {
 	bool patch_init = false;
+	bool custom = sepolicy.buf != nullptr;
 
 	if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
-		LOGD("sepol: split policy\n");
 		patch_init = true;
 	} else if (access("/sepolicy", R_OK) == 0) {
-		LOGD("sepol: monolithic policy\n");
-		load_policydb("/sepolicy");
 	} else {
 		LOGD("sepol: no selinux\n");
 		return false;
@@ -135,8 +133,28 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 	// Mount selinuxfs to communicate with kernel
 	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
 
-	if (patch_init)
-		load_split_cil();
+	if (custom) {
+		LOGD("sepol: use sepolicy_custom\n");
+
+		int fd = xopen("/sbin/.se_custom", O_WRONLY | O_CREAT, 0644);
+		if (fd != -1 && xwrite(fd, sepolicy.buf, sepolicy.sz) == sepolicy.sz)	
+			load_policydb("/sbin/.se_custom");
+		else
+			custom = false;
+
+		if (fd != -1)
+			close(fd);
+	}
+
+	if (!custom) {
+		if (patch_init) {
+			LOGD("sepol: split policy\n");
+			load_split_cil();
+		} else {
+			LOGD("sepol: monolithic policy\n");
+			load_policydb("/sepolicy");
+		}
+	}
 
 	sepol_magisk_rules();
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);

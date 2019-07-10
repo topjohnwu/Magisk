@@ -46,6 +46,7 @@ protected:
 	bool mnt_vendor = false;
 	bool mnt_product = false;
 	bool mnt_odm = false;
+	raw_data sepolicy{};
 
 	virtual void early_mount() = 0;
 	bool read_dt_fstab(const char *name, char *partname, char *fstype);
