@@ -1,19 +1,19 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.Intent
-import android.os.Build
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.SearchView
 import com.skoumal.teanity.viewevents.ViewEvent
-import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentReposBinding
-import com.topjohnwu.magisk.model.download.DownloadModuleService
+import com.topjohnwu.magisk.model.download.CompoundDownloadService
 import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.InstallModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.ui.base.MagiskFragment
@@ -92,19 +92,16 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
         MarkDownWindow.show(requireActivity(), null, item.detailUrl)
     }
 
+    @SuppressLint("MissingPermission")
     private fun installModule(item: Repo) {
         val context = magiskActivity
 
         fun download(install: Boolean) {
             context.withExternalRW {
                 onSuccess {
-                    val intent = Intent(activity, ClassMap[DownloadModuleService::class.java])
-                        .putExtra("repo", item).putExtra("install", install)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(intent)
-                    } else {
-                        context.startService(intent)
-                    }
+                    val config = if (install) Configuration.Flash() else Configuration.Download
+                    val subject = DownloadSubject.Module(item, config)
+                    CompoundDownloadService.download(context, subject)
                 }
             }
         }
