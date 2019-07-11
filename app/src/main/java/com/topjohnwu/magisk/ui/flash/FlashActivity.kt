@@ -31,6 +31,7 @@ open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>(
     companion object {
 
         private fun intent(context: Context) = Intent(context, ClassMap[FlashActivity::class.java])
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         private fun intent(context: Context, file: File) = intent(context).setData(file.toUri())
 
         private fun flashType(isSecondSlot: Boolean) =
