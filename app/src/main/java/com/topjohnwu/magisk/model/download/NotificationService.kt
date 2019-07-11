@@ -15,14 +15,14 @@ abstract class NotificationService : Service() {
     abstract val defaultNotification: NotificationCompat.Builder
 
     private val manager get() = getSystemService<NotificationManager>()
-    private val hasNotifications get() = notifications.isEmpty()
+    private val hasNotifications get() = notifications.isNotEmpty()
 
     private val notifications =
         Collections.synchronizedMap(mutableMapOf<Int, NotificationCompat.Builder>())
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        notifications.values.forEach { cancel(it.hashCode()) }
+        notifications.forEach { cancel(it.key) }
         notifications.clear()
     }
 
@@ -45,15 +45,12 @@ abstract class NotificationService : Service() {
         id: Int,
         editBody: (NotificationCompat.Builder) -> NotificationCompat.Builder? = { null }
     ) {
-        val currentNotification = remove(id)?.run(editBody) ?: let {
-            cancel(id)
-            return
-        }
+        val currentNotification = remove(id)?.run(editBody)
 
         updateForeground()
 
         cancel(id)
-        notify(nextInt(), currentNotification.build())
+        currentNotification?.let { notify(nextInt(), it.build()) }
 
         if (!hasNotifications) {
             stopForeground(true)
