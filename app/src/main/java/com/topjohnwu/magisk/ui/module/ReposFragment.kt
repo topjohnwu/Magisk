@@ -10,7 +10,7 @@ import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentReposBinding
-import com.topjohnwu.magisk.model.download.CompoundDownloadService
+import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.Repo
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -96,12 +96,11 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
     private fun installModule(item: Repo) {
         val context = magiskActivity
 
-        fun download(install: Boolean) {
-            context.withExternalRW {
-                onSuccess {
+        fun download(install: Boolean) = context.withExternalRW {
+            onSuccess {
+                DownloadService(context) {
                     val config = if (install) Configuration.Flash() else Configuration.Download
-                    val subject = DownloadSubject.Module(item, config)
-                    CompoundDownloadService.download(context, subject)
+                    subject = DownloadSubject.Module(item, config)
                 }
             }
         }

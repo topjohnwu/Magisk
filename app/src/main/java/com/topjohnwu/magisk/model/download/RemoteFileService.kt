@@ -1,21 +1,13 @@
 package com.topjohnwu.magisk.model.download
 
-import android.app.NotificationManager
-import android.app.Service
 import android.content.Intent
-import android.os.IBinder
-import android.webkit.MimeTypeMap
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import androidx.core.content.getSystemService
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.provide
 import com.topjohnwu.magisk.utils.writeToCachedFile
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
@@ -24,35 +16,26 @@ import okhttp3.ResponseBody
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.io.File
-import java.util.*
-import kotlin.random.Random.Default.nextInt
 
-abstract class SubstrateDownloadService : Service() {
+abstract class RemoteFileService : NotificationService() {
 
     private val repo by inject<FileRepository>()
-    private val manager get() = getSystemService<NotificationManager>()
 
-    private val notifications =
-        Collections.synchronizedMap(mutableMapOf<Int, NotificationCompat.Builder>())
-
-    override fun onBind(p0: Intent?): IBinder? = null
+    override val defaultNotification: NotificationCompat.Builder
+        get() = Notifications
+            .progress(this, "")
+            .setContentText(getString(R.string.download_local))
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.getParcelableExtra<DownloadSubject>(ARG_URL)?.let { start(it) }
         return START_REDELIVER_INTENT
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        notifications.values.forEach { manager?.cancel(it.hashCode()) }
-        notifications.clear()
-    }
-
     // ---
 
     private fun start(subject: DownloadSubject) = search(subject)
         .onErrorResumeNext(download(subject))
-        .doOnSubscribe { updateNotification(subject.hashCode()) { it.setContentTitle(subject.fileName) } }
+        .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.fileName) } }
         .subscribeK {
             runCatching { onFinished(it, subject) }.onFailure { Timber.e(it) }
             finish(it, subject)
@@ -84,45 +67,18 @@ abstract class SubstrateDownloadService : Service() {
 
     private fun download(subject: DownloadSubject) = repo.downloadFile(subject.url)
         .map { it.toFile(subject.hashCode(), subject.fileName) }
+        .map { map(subject, it) }
 
     // ---
-
-    protected fun fileIntent(fileName: String): Intent {
-        val file = downloadsFile(fileName)
-        return Intent(Intent.ACTION_VIEW)
-            .setDataAndType(file.provide(this), file.type)
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-
-    protected fun moveToDownloads(file: File) {
-        val destination = downloadsFile(file.name)
-        if (file != destination) {
-            destination.deleteRecursively()
-            file.copyTo(destination)
-        }
-        Utils.toast(
-            getString(R.string.internal_storage, "/Download/${file.name}"),
-            Toast.LENGTH_LONG
-        )
-    }
-
-    // ---
-
-    private val File.type
-        get() = MimeTypeMap.getSingleton()
-            .getMimeTypeFromExtension(extension)
-            .orEmpty()
-
-    private fun downloadsFile(name: String) = File(Const.EXTERNAL_PATH, name)
 
     private fun ResponseBody.toFile(id: Int, name: String): File {
         val maxRaw = contentLength()
         val max = maxRaw / 1_000_000f
 
-        return writeToCachedFile(this@SubstrateDownloadService, name) {
+        return writeToCachedFile(this@RemoteFileService, name) {
             val progress = it / 1_000_000f
 
-            updateNotification(id) { notification ->
+            update(id) { notification ->
                 notification
                     .setProgress(maxRaw.toInt(), it.toInt(), false)
                     .setContentText(getString(R.string.download_progress, progress, max))
@@ -130,51 +86,13 @@ abstract class SubstrateDownloadService : Service() {
         }
     }
 
-    private fun finish(file: File, subject: DownloadSubject) {
-        val currentNotification = notifications.remove(subject.hashCode()) ?: let {
-            manager?.cancel(subject.hashCode())
-            return
-        }
-        val notification = currentNotification.addActions(file, subject)
+    private fun finish(file: File, subject: DownloadSubject) = finishWork(subject.hashCode()) {
+        it.addActions(file, subject)
             .setContentText(getString(R.string.download_complete))
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setProgress(0, 0, false)
             .setOngoing(false)
             .setAutoCancel(true)
-            .build()
-
-        updateForeground()
-
-        manager?.cancel(subject.hashCode())
-        manager?.notify(nextInt(), notification)
-
-        if (notifications.isEmpty()) {
-            stopForeground(true)
-            stopSelf()
-        }
-    }
-
-    private inline fun updateNotification(
-        id: Int,
-        body: (NotificationCompat.Builder) -> Unit = {}
-    ) {
-        val notification = notifications.getOrPut(id) {
-            Notifications
-                .progress(this, "")
-                .setContentText(getString(R.string.download_local))
-        }
-
-        manager?.notify(id, notification.also(body).build())
-
-        if (notifications.size == 1) {
-            updateForeground()
-        }
-    }
-
-    private fun updateForeground() {
-        runCatching { notifications.keys.first() to notifications.values.first() }
-            .getOrNull()
-            ?.let { startForeground(it.first, it.second.build()) }
     }
 
     // ---
@@ -188,6 +106,7 @@ abstract class SubstrateDownloadService : Service() {
         subject: DownloadSubject
     ): NotificationCompat.Builder
 
+    protected abstract fun map(subject: DownloadSubject, file: File): File
 
     companion object {
         const val ARG_URL = "arg_url"

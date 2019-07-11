@@ -1,5 +1,5 @@
 package a
 
-import com.topjohnwu.magisk.model.download.CompoundDownloadService
+import com.topjohnwu.magisk.model.download.DownloadService
 
-class k : CompoundDownloadService()
+class k : DownloadService()
