@@ -10,15 +10,29 @@ inline fun ResponseBody.writeToCachedFile(
     context: Context,
     fileName: String,
     progress: (Long) -> Unit = {}
-): File {
-    val file = File(context.cacheDir, fileName)
-    withStreams(byteStream(), file.outputStream()) { inStream, outStream ->
+): File = byteStream().writeToCachedFile(context, fileName, progress)
+
+inline fun InputStream.writeToCachedFile(
+    context: Context,
+    fileName: String,
+    progress: (Long) -> Unit = {}
+) = context.cachedFile(fileName).apply {
+    writeToFile(this, progress)
+}
+
+inline fun InputStream.writeToFile(file: File, progress: (Long) -> Unit = {}) = file.apply {
+    writeTo(file.outputStream(), progress)
+}
+
+inline fun InputStream.writeTo(output: OutputStream, progress: (Long) -> Unit = {}) {
+    withStreams(this, output) { inStream, outStream ->
         inStream.copyToWithProgress(outStream, progress)
     }
-    return file
 }
 
 fun ResponseBody.writeToString() = string()
+
+fun Context.cachedFile(name: String) = File(cacheDir, name)
 
 inline fun InputStream.copyToWithProgress(
     out: OutputStream,
