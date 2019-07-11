@@ -6,22 +6,39 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.webkit.MimeTypeMap
+import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.ui.flash.FlashActivity
+import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.utils.provide
 import java.io.File
 import kotlin.random.Random.Default.nextInt
 
+/* More of a facade for [RemoteFileService], but whatever... */
 @SuppressLint("Registered")
-open class CompoundDownloadService : SubstrateDownloadService() {
+open class DownloadService : RemoteFileService() {
 
     private val context get() = this
+    private val String.downloadsFile get() = File(Const.EXTERNAL_PATH, this)
+    private val File.type
+        get() = MimeTypeMap.getSingleton()
+            .getMimeTypeFromExtension(extension)
+            .orEmpty()
+
+    override fun map(subject: DownloadSubject, file: File): File = when (subject) {
+        is Module -> file // todo tbd
+        else -> file
+    }
 
     override fun onFinished(file: File, subject: DownloadSubject) = when (subject) {
         is Magisk -> onFinishedInternal(file, subject)
@@ -83,19 +100,44 @@ open class CompoundDownloadService : SubstrateDownloadService() {
         PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
             .let { setContentIntent(it) }
 
+    // ---
+
+    private fun moveToDownloads(file: File) {
+        val destination = file.name.downloadsFile
+        if (file != destination) {
+            destination.deleteRecursively()
+            file.copyTo(destination)
+        }
+        Utils.toast(
+            getString(R.string.internal_storage, "/Download/${file.name}"),
+            Toast.LENGTH_LONG
+        )
+    }
+
+    private fun fileIntent(fileName: String): Intent {
+        val file = fileName.downloadsFile
+        return Intent(Intent.ACTION_VIEW)
+            .setDataAndType(file.provide(this), file.type)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    class Builder {
+        lateinit var subject: DownloadSubject
+    }
+
     companion object {
 
         @RequiresPermission(allOf = [Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE])
-        fun download(context: Context, subject: DownloadSubject) {
-            Intent(context, ClassMap[CompoundDownloadService::class.java])
-                .putExtra(ARG_URL, subject)
-                .let {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(it)
-                    } else {
-                        context.startService(it)
-                    }
-                }
+        inline operator fun invoke(context: Context, argBuilder: Builder.() -> Unit) {
+            val builder = Builder().apply(argBuilder)
+            val intent = Intent(context, ClassMap[DownloadService::class.java])
+                .putExtra(ARG_URL, builder.subject)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
         }
 
     }
