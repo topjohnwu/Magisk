@@ -21,7 +21,10 @@ abstract class FlashZip(
 ) {
 
     private val app: App by inject()
-    private val tmpFile: File = File(app.cacheDir, "install.zip")
+    private val installFolder = File(app.cacheDir, "flash").apply {
+        if (!exists()) mkdirs()
+    }
+    private val tmpFile: File = File(installFolder, "install.zip")
 
     @Throws(IOException::class)
     private fun unzipAndCheck(): Boolean {
