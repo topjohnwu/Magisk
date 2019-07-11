@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.model.entity.internal
 
 import android.os.Parcelable
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.model.entity.MagiskJson
 import com.topjohnwu.magisk.model.entity.Repo
@@ -31,6 +33,12 @@ sealed class DownloadSubject : Parcelable {
         override val url: String get() = magisk.link
         override val fileName get() = "Magisk-v${magisk.version}(${magisk.versionCode}).zip"
 
+    }
+
+    @Parcelize
+    object Installer : DownloadSubject() {
+        override val fileName: String get() = "module_installer(${BuildConfig.VERSION_CODE}).sh"
+        override val url: String get() = Const.Url.MODULE_INSTALLER
     }
 
 }

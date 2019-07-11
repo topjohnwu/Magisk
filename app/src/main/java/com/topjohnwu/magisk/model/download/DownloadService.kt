@@ -43,6 +43,7 @@ open class DownloadService : RemoteFileService() {
     override fun onFinished(file: File, subject: DownloadSubject) = when (subject) {
         is Magisk -> onFinishedInternal(file, subject)
         is Module -> onFinishedInternal(file, subject)
+        else -> Unit
     }
 
     private fun onFinishedInternal(
@@ -73,6 +74,7 @@ open class DownloadService : RemoteFileService() {
     ) = when (subject) {
         is Magisk -> addActionsInternal(file, subject)
         is Module -> addActionsInternal(file, subject)
+        else -> this
     }
 
     private fun NotificationCompat.Builder.addActionsInternal(
