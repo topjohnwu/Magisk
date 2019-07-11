@@ -35,11 +35,6 @@ open class DownloadService : RemoteFileService() {
             .getMimeTypeFromExtension(extension)
             .orEmpty()
 
-    override fun map(subject: DownloadSubject, file: File): File = when (subject) {
-        is Module -> file // todo tbd
-        else -> file
-    }
-
     override fun onFinished(file: File, subject: DownloadSubject) = when (subject) {
         is Magisk -> onFinishedInternal(file, subject)
         is Module -> onFinishedInternal(file, subject)

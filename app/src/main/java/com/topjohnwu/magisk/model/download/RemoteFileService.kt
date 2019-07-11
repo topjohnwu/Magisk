@@ -108,7 +108,6 @@ abstract class RemoteFileService : NotificationService() {
             var off = -1
             var entry: ZipEntry? = zin.nextEntry
             while (entry != null) {
-                Timber.i("Let's gooo (${entry.name})")
                 if (off < 0) {
                     off = entry.name.indexOf('/') + 1
                 }
@@ -166,8 +165,6 @@ abstract class RemoteFileService : NotificationService() {
         file: File,
         subject: DownloadSubject
     ): NotificationCompat.Builder
-
-    protected abstract fun map(subject: DownloadSubject, file: File): File
 
     companion object {
         const val ARG_URL = "arg_url"
