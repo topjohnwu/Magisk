@@ -9,20 +9,17 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
-import com.topjohnwu.magisk.utils.cachedFile
-import com.topjohnwu.magisk.utils.withStreams
 import com.topjohnwu.magisk.utils.writeToCachedFile
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import okhttp3.ResponseBody
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 import java.io.File
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
 
 abstract class RemoteFileService : NotificationService() {
 
@@ -40,7 +37,7 @@ abstract class RemoteFileService : NotificationService() {
 
     // ---
 
-    private fun startInternal(subject: DownloadSubject) = search(subject)
+    private fun startInternal(subject: DownloadSubject): Single<File> = search(subject)
         .onErrorResumeNext(download(subject))
         .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.fileName) } }
         .observeOn(AndroidSchedulers.mainThread())
@@ -76,56 +73,21 @@ abstract class RemoteFileService : NotificationService() {
     }
 
     private fun download(subject: DownloadSubject) = repo.downloadFile(subject.url)
+        .map { it.toFile(subject.hashCode(), subject.fileName) }
         .map {
             when (subject) {
-                is Module -> appendInstaller(it, subject)
-                else -> it.toFile(subject.hashCode(), subject.fileName)
-            }
-        }
-
-    private fun appendInstaller(body: ResponseBody, subject: DownloadSubject): File {
-        update(subject.hashCode()) {
-            it.setContentText(getString(R.string.download_module))
-        }
-
-        val installer = startInternal(Installer).blockingGet()
-        val target = cachedFile(subject.fileName)
-
-        val input = ZipInputStream(body.byteStream())
-        val output = ZipOutputStream(target.outputStream())
-
-        withStreams(input, output) { zin, zout ->
-            zout.putNextEntry(ZipEntry("META-INF/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/update-binary"))
-            installer.inputStream().copyTo(zout).also { zout.flush() }
-
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/updater-script"))
-            zout.write("#MAGISK\n".toByteArray(charset("UTF-8")))
-
-            var off = -1
-            var entry: ZipEntry? = zin.nextEntry
-            while (entry != null) {
-                if (off < 0) {
-                    off = entry.name.indexOf('/') + 1
-                }
-
-                val path = entry.name.substring(off)
-                if (path.isNotEmpty() && !path.startsWith("META-INF")) {
-                    zout.putNextEntry(ZipEntry(path))
-                    if (!entry.isDirectory) {
-                        zin.copyTo(zout).also { zout.flush() }
+                is Module -> {
+                    update(subject.hashCode()) {
+                        it.setContentText(getString(R.string.download_module))
+                            .setProgress(0, 0, true)
                     }
-                }
 
-                entry = zin.nextEntry
+                    get<ModuleTransformer> { parametersOf(subject) }
+                        .inject(it, startInternal(Installer).blockingGet())
+                }
+                else -> it
             }
         }
-
-        return target
-    }
 
     // ---
 
