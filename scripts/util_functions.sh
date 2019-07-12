@@ -203,6 +203,12 @@ mount_partitions() {
   fi
   [ -L /system/vendor ] && mount_part vendor
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
+  if [ -f /system/.Magisk ]; then
+    SYSTEMMODE=true
+  else
+    SYSTEMMODE=false
+  fi
+  $SYSTEMMODE && ui_print "- System root detected"
 }
 
 get_flags() {
@@ -210,6 +216,7 @@ get_flags() {
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar RECOVERYMODE
+  getvar FORCESYSTEMMODE
   if [ -z $KEEPVERITY ]; then
     if $SYSTEM_ROOT; then
       KEEPVERITY=true
@@ -230,6 +237,7 @@ get_flags() {
     fi
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  [ -z $FORCESYSTEMMODE ] && SYSTEMMODE=true || SYSTEMMODE=false
 }
 
 find_boot_image() {
@@ -365,6 +373,29 @@ find_manager_apk() {
     DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" | cut -d= -f2`
     [ -z "$DBAPK" ] || APK=/data/app/$DBAPK*/*.apk
   fi
+}
+
+# Install manager apk
+install_manager_apk() {
+  ui_print "- Install Manager Apk"
+  APKPATH=com.topjohnwu.magisk-1
+  for i in `ls /data/app | grep com.topjohnwu.magisk-`; do
+    if [ `cat /data/system/packages.xml | grep $i >/dev/null 2>&1; echo $?` -eq 0 ]; then
+      APKPATH=$i
+      break;
+    fi
+  done
+  rm -rf /data/app/com.topjohnwu.magisk-*
+
+  mkdir /data/app/$APKPATH
+  chown 1000.1000 /data/app/$APKPATH
+  chmod 0755 /data/app/$APKPATH
+  chcon u:object_r:apk_data_file:s0 /data/app/$APKPATH
+
+  cp -fp $MAGISKBIN/magisk.apk /data/app/$APKPATH/base.apk
+  chown 1000.1000 /data/app/$APKPATH/base.apk
+  chmod 0644 /data/app/$APKPATH/base.apk
+  chcon u:object_r:apk_data_file:s0 /data/app/$APKPATH/base.apk
 }
 
 #################

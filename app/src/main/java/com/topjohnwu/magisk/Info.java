@@ -18,6 +18,7 @@ public final class Info {
     public static boolean keepVerity = false;
     public static boolean keepEnc = false;
     public static boolean recovery = false;
+    public static boolean systemMode = false;
 
     public static void loadMagiskInfo() {
         try {

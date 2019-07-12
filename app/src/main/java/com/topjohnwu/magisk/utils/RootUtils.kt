@@ -146,6 +146,7 @@ class RootUtils : Shell.Initializer() {
         Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
         Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
         Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
+        Info.systemMode = ShellUtils.fastCmd("echo \$FORCESYSTEMMODE").toBoolean()
         return true
     }
 

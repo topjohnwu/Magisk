@@ -329,6 +329,14 @@ def zip_main(args):
         source = os.path.join('scripts', 'boot_patch.sh')
         target = os.path.join('common', 'boot_patch.sh')
         zip_with_msg(zipf, source, target)
+        # system_patch.sh
+        source = os.path.join('scripts', 'system_patch.sh')
+        target = os.path.join('common', 'system_patch.sh')
+        zip_with_msg(zipf, source, target)
+        # install-recovery.sh
+        source = os.path.join('scripts', 'install-recovery.sh')
+        target = os.path.join('common', 'install-recovery.sh')
+        zip_with_msg(zipf, source, target)
         # util_functions.sh
         source = os.path.join('scripts', 'util_functions.sh')
         with open(source, 'r') as script:

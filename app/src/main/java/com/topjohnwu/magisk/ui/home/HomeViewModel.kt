@@ -24,6 +24,7 @@ class HomeViewModel(
 
     val isForceEncryption = KObservableField(Info.keepEnc)
     val isKeepVerity = KObservableField(Info.keepVerity)
+    val isSystemMode = KObservableField(Info.systemMode)
 
     val magiskState = KObservableField(MagiskState.LOADING)
     val magiskStateText = Observer(magiskState) {
@@ -88,6 +89,9 @@ class HomeViewModel(
         }
         isKeepVerity.addOnPropertyChangedCallback {
             Info.keepVerity = it ?: return@addOnPropertyChangedCallback
+        }
+        isSystemMode.addOnPropertyChangedCallback {
+            Info.systemMode = it ?: return@addOnPropertyChangedCallback
         }
 
         refresh()

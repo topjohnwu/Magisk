@@ -39,6 +39,7 @@ ui_print "************************"
 is_mounted /data || mount /data || abort "! Unable to mount partitions"
 is_mounted /cache || mount /cache 2>/dev/null
 mount_partitions
+$SYSTEMMODE && is_mounted /system || mount /system 
 
 api_level_arch_detect
 
@@ -49,83 +50,88 @@ chmod -R 755 $MAGISKBIN
 
 check_data
 $DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
-$BOOTMODE || recovery_actions
+$BOOTMODE && $SYSTEMMODE || recovery_actions
 
 ##########################################################################################
 # Uninstall
 ##########################################################################################
 
 get_flags
-find_boot_image
-find_dtbo_image
 
-[ -e $BOOTIMAGE ] || abort "! Unable to detect boot image"
-ui_print "- Found target image: $BOOTIMAGE"
-[ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
+boot_uninstalling() {
+  find_boot_image
+  find_dtbo_image
 
-cd $MAGISKBIN
+  [ -e $BOOTIMAGE ] || abort "! Unable to detect boot image"
+  ui_print "- Found target image: $BOOTIMAGE"
+  [ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
 
-CHROMEOS=false
+  cd $MAGISKBIN
 
-ui_print "- Unpacking boot image"
-./magiskboot unpack "$BOOTIMAGE"
+  CHROMEOS=false
 
-case $? in
-  1 )
-    abort "! Unsupported/Unknown image format"
-    ;;
-  2 )
-    ui_print "- ChromeOS boot image detected"
-    CHROMEOS=true
-    ;;
-esac
+  ui_print "- Unpacking boot image"
+  ./magiskboot unpack "$BOOTIMAGE"
 
-# Detect boot image state
-ui_print "- Checking ramdisk status"
-if [ -e ramdisk.cpio ]; then
-  ./magiskboot cpio ramdisk.cpio test
-  STATUS=$?
-else
-  # Stock A only system-as-root
-  STATUS=0
-fi
-case $((STATUS & 3)) in
-  0 )  # Stock boot
-    ui_print "- Stock boot image detected"
-    ;;
-  1 )  # Magisk patched
-    ui_print "- Magisk patched image detected"
-    # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
-    STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
-    STOCKDTBO=/data/stock_dtbo.img.gz
-    if [ -f $STOCKBOOT ]; then
-      ui_print "- Restoring stock boot image"
-      flash_image $STOCKBOOT $BOOTIMAGE
-      if [ -f $STOCKDTBO -a -b "$DTBOIMAGE" ]; then
-        ui_print "- Restoring stock dtbo image"
-        flash_image $STOCKDTBO $DTBOIMAGE
+  case $? in
+    1 )
+      abort "! Unsupported/Unknown image format"
+      ;;
+    2 )
+      ui_print "- ChromeOS boot image detected"
+      CHROMEOS=true
+      ;;
+  esac
+
+  # Detect boot image state
+  ui_print "- Checking ramdisk status"
+  if [ -e ramdisk.cpio ]; then
+    ./magiskboot cpio ramdisk.cpio test
+    STATUS=$?
+  else
+    # Stock A only system-as-root
+    STATUS=0
+  fi
+  case $((STATUS & 3)) in
+    0 )  # Stock boot
+      ui_print "- Stock boot image detected"
+      ;;
+    1 )  # Magisk patched
+      ui_print "- Magisk patched image detected"
+      # Find SHA1 of stock boot image
+      [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
+      STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
+      STOCKDTBO=/data/stock_dtbo.img.gz
+      if [ -f $STOCKBOOT ]; then
+        ui_print "- Restoring stock boot image"
+        flash_image $STOCKBOOT $BOOTIMAGE
+        if [ -f $STOCKDTBO -a -b "$DTBOIMAGE" ]; then
+          ui_print "- Restoring stock dtbo image"
+          flash_image $STOCKDTBO $DTBOIMAGE
+        fi
+      else
+        ui_print "! Boot image backup unavailable"
+        ui_print "- Restoring ramdisk with internal backup"
+        ./magiskboot cpio ramdisk.cpio restore
+        if ! ./magiskboot cpio ramdisk.cpio "exists init.rc"; then
+          # A only system-as-root
+          rm -f ramdisk.cpio
+        fi
+        ./magiskboot repack $BOOTIMAGE
+        # Sign chromeos boot
+        $CHROMEOS && sign_chromeos
+        ui_print "- Flashing restored boot image"
+        flash_image new-boot.img $BOOTIMAGE || abort "! Insufficient partition size"
       fi
-    else
-      ui_print "! Boot image backup unavailable"
-      ui_print "- Restoring ramdisk with internal backup"
-      ./magiskboot cpio ramdisk.cpio restore
-      if ! ./magiskboot cpio ramdisk.cpio "exists init.rc"; then
-        # A only system-as-root
-        rm -f ramdisk.cpio
-      fi
-      ./magiskboot repack $BOOTIMAGE
-      # Sign chromeos boot
-      $CHROMEOS && sign_chromeos
-      ui_print "- Flashing restored boot image"
-      flash_image new-boot.img $BOOTIMAGE || abort "! Insufficient partition size"
-    fi
-    ;;
-  2 )  # Unsupported
-    ui_print "! Boot image patched by unsupported programs"
-    abort "! Cannot uninstall"
-    ;;
-esac
+      ;;
+    2 )  # Unsupported
+      ui_print "! Boot image patched by unsupported programs"
+      abort "! Cannot uninstall"
+      ;;
+  esac
+}
+
+$SYSTEMMODE || boot_uninstalling
 
 ui_print "- Removing Magisk files"
 rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
@@ -135,6 +141,14 @@ rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data
 if [ -f /system/addon.d/99-magisk.sh ]; then
   mount -o rw,remount /system
   rm -f /system/addon.d/99-magisk.sh
+fi
+
+if [ -f /system/xbin/magisk ] && [ -f /system/xbin/magiskinit ]; then
+  mount -o rw,remount /system
+  rm -rf /system/xbin/magisk* /system/xbin/imgtool /system/xbin/resetprop /system/xbin/su \
+        /system/etc/install-recovery.sh /system/.Magisk
+
+  mv -f /system/bin/install-recovery_original.sh /system/bin/install-recovery.sh
 fi
 
 cd /

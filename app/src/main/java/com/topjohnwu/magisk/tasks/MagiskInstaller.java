@@ -283,9 +283,9 @@ public abstract class MagiskInstaller {
         }
 
         if (!Shell.sh(Utils.INSTANCE.fmt(
-                "KEEPFORCEENCRYPT=%b KEEPVERITY=%b RECOVERYMODE=%b " +
+                "KEEPFORCEENCRYPT=%b KEEPVERITY=%b RECOVERYMODE=%b FORCESYSTEMMODE=%b" +
                 "sh update-binary sh boot_patch.sh %s",
-                Info.keepEnc, Info.keepVerity, Info.recovery, srcBoot))
+                Info.keepEnc, Info.keepVerity, Info.recovery, Info.systemMode, srcBoot))
                 .to(console, logs).exec().isSuccess())
             return false;
 
