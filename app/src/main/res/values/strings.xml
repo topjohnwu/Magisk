@@ -76,6 +76,8 @@
     <string name="download_module">Injecting installer…</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="download_file_folder_error">Unable to fetch parent folder in order to save the downloaded file, check permissions.</string>
+    <string name="download_open_parent">Show in parent folder</string>
+    <string name="download_open_self">Show file</string>
     <string name="magisk_update_title">Magisk Update Available!</string>
     <string name="manager_update_title">Magisk Manager Update Available!</string>
 

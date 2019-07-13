@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.utils.chooser
 import com.topjohnwu.magisk.utils.provide
 import java.io.File
 import kotlin.random.Random.Default.nextInt
@@ -34,7 +35,7 @@ open class DownloadService : RemoteFileService() {
     private val File.type
         get() = MimeTypeMap.getSingleton()
             .getMimeTypeFromExtension(extension)
-            .orEmpty()
+            ?: "resource/folder"
 
     override fun onFinished(file: File, subject: DownloadSubject) = when (subject) {
         is Magisk -> onFinishedInternal(file, subject)
@@ -77,7 +78,8 @@ open class DownloadService : RemoteFileService() {
         file: File,
         subject: Magisk
     ) = when (val conf = subject.configuration) {
-        Download -> setContentIntent(fileIntent(subject.fileName))
+        Download -> addAction(0, R.string.download_open_parent, fileParentIntent(subject.fileName))
+            .addAction(0, R.string.download_open_self, fileIntent(subject.fileName))
         Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, file))
         is Flash -> setContentIntent(FlashActivity.flashIntent(context, file, conf is Secondary))
         is Patch -> setContentIntent(FlashActivity.patchIntent(context, file, conf.fileUri))
@@ -88,7 +90,8 @@ open class DownloadService : RemoteFileService() {
         file: File,
         subject: Module
     ) = when (subject.configuration) {
-        Download -> setContentIntent(fileIntent(subject.fileName))
+        Download -> addAction(0, R.string.download_open_parent, fileParentIntent(subject.fileName))
+            .addAction(0, R.string.download_open_self, fileIntent(subject.fileName))
         is Flash -> setContentIntent(FlashActivity.installIntent(context, file))
         else -> this
     }
@@ -97,6 +100,11 @@ open class DownloadService : RemoteFileService() {
     private fun NotificationCompat.Builder.setContentIntent(intent: Intent) =
         PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
             .let { setContentIntent(it) }
+
+    @Suppress("ReplaceSingleLineLet")
+    private fun NotificationCompat.Builder.addAction(icon: Int, title: Int, intent: Intent) =
+        PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
+            .let { addAction(icon, getString(title), it) }
 
     // ---
 
@@ -131,9 +139,26 @@ open class DownloadService : RemoteFileService() {
             )
             return Intent()
         }
+        return fileIntent(file)
+    }
+
+    private fun fileParentIntent(fileName: String): Intent {
+        val file = fileName.downloadsFile?.parentFile ?: let {
+            Utils.toast(
+                getString(R.string.download_file_folder_error),
+                Toast.LENGTH_LONG
+            )
+            return Intent()
+        }
+        return fileIntent(file)
+    }
+
+    private fun fileIntent(file: File): Intent {
         return Intent(Intent.ACTION_VIEW)
             .setDataAndType(file.provide(this), file.type)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            .chooser()
     }
 
     class Builder {
