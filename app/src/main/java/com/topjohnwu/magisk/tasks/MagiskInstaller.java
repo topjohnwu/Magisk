@@ -123,11 +123,23 @@ public abstract class MagiskInstaller {
 
         File zip = new File(App.self.getCacheDir(), "magisk.zip");
 
+        String dlZipName = Utils.INSTANCE.fmt("Magisk-v%s(%d).zip",
+                Info.remote.getMagisk().getVersion(), Info.remote.getMagisk().getVersionCode());
+        File dlZip = new File(Const.EXTERNAL_PATH, dlZipName);
+
         if (!ShellUtils.checkSum("MD5", zip, Info.remote.getMagisk().getHash())) {
-            console.add("- Downloading zip");
-            Networking.get(Info.remote.getMagisk().getLink())
-                    .setDownloadProgressListener(new ProgressLog())
-                    .execForFile(zip);
+            if (ShellUtils.checkSum("MD5", dlZip, Info.remote.getMagisk().getHash())) {
+                console.add("- Existing zip found");
+                try (InputStream in = new FileInputStream(dlZip);
+                     OutputStream out = new FileOutputStream(zip)) {
+                    ShellUtils.pump(in, out);
+                }
+            } else {
+                console.add("- Downloading zip");
+                Networking.get(Info.remote.getMagisk().getLink())
+                        .setDownloadProgressListener(new ProgressLog())
+                        .execForFile(zip);
+            }
         } else {
             console.add("- Existing zip found");
         }
