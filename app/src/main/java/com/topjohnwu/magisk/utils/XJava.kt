@@ -36,3 +36,10 @@ inline fun <In : InputStream, Out : OutputStream> withStreams(
         }
     }
 }
+
+inline fun <T, R> List<T>.firstMap(mapper: (T) -> R?): R {
+    for (item: T in this) {
+        return mapper(item) ?: continue
+    }
+    throw NoSuchElementException("Collection contains no element matching the predicate.")
+}

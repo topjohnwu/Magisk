@@ -83,24 +83,34 @@ class SettingsFragment : BasePreferenceFragment() {
             true
         }
 
+        findPreference(Config.Key.DOWNLOAD_PATH).apply {
+            summary = Config.downloadPath
+        }.setOnPreferenceClickListener { preference ->
+            activity.withExternalRW {
+                onSuccess {
+                    showUrlDialog(Config.downloadPath) {
+                        Config.downloadsFile(it)?.let { _ ->
+                            Config.downloadPath = it
+                            preference.summary = it
+                        } ?: let {
+                            Utils.toast(R.string.settings_download_path_error, Toast.LENGTH_SHORT)
+                        }
+                    }
+                }
+            }
+            true
+        }
+
         updateChannel.setOnPreferenceChangeListener { _, value ->
             val channel = Integer.parseInt(value as String)
             val previous = Config.updateChannel
 
             if (channel == Config.Value.CUSTOM_CHANNEL) {
-                val v = LayoutInflater.from(requireActivity())
-                        .inflate(R.layout.custom_channel_dialog, null)
-                val url = v.findViewById<EditText>(R.id.custom_url)
-                url.setText(Config.customChannelUrl)
-                AlertDialog.Builder(requireActivity())
-                        .setTitle(R.string.settings_update_custom)
-                        .setView(v)
-                        .setPositiveButton(R.string.ok) { _, _ ->
-                            Config.customChannelUrl = url.text.toString() }
-                        .setNegativeButton(R.string.close) { _, _ ->
-                            Config.updateChannel = previous }
-                        .setOnCancelListener { Config.updateChannel = previous }
-                        .show()
+                showUrlDialog(Config.customChannelUrl, {
+                    Config.updateChannel = previous
+                }, {
+                    Config.customChannelUrl = it
+                })
             }
             true
         }
@@ -208,48 +218,51 @@ class SettingsFragment : BasePreferenceFragment() {
     private fun setLocalePreference(lp: ListPreference) {
         lp.isEnabled = false
         LocaleManager.availableLocales
-                .map {
-                    val names = mutableListOf<String>()
-                    val values = mutableListOf<String>()
+            .map {
+                val names = mutableListOf<String>()
+                val values = mutableListOf<String>()
 
-                    names.add(LocaleManager.getString(
-                            LocaleManager.defaultLocale, R.string.system_default))
-                    values.add("")
+                names.add(
+                    LocaleManager.getString(
+                        LocaleManager.defaultLocale, R.string.system_default
+                    )
+                )
+                values.add("")
 
-                    it.forEach { locale ->
-                        names.add(locale.getDisplayName(locale))
-                        values.add(LocaleManager.toLanguageTag(locale))
-                    }
-
-                    Pair(names.toTypedArray(), values.toTypedArray())
-                }.subscribeK { (names, values) ->
-                    lp.isEnabled = true
-                    lp.entries = names
-                    lp.entryValues = values
-                    lp.summary = LocaleManager.locale.getDisplayName(LocaleManager.locale)
+                it.forEach { locale ->
+                    names.add(locale.getDisplayName(locale))
+                    values.add(LocaleManager.toLanguageTag(locale))
                 }
+
+                Pair(names.toTypedArray(), values.toTypedArray())
+            }.subscribeK { (names, values) ->
+                lp.isEnabled = true
+                lp.entries = names
+                lp.entryValues = values
+                lp.summary = LocaleManager.locale.getDisplayName(LocaleManager.locale)
+            }
     }
 
     private fun setSummary(key: String) {
         when (key) {
             Config.Key.ROOT_ACCESS -> rootConfig.summary = resources
-                    .getStringArray(R.array.su_access)[Config.rootMode]
+                .getStringArray(R.array.su_access)[Config.rootMode]
             Config.Key.SU_MULTIUSER_MODE -> multiuserConfig.summary = resources
-                    .getStringArray(R.array.multiuser_summary)[Config.suMultiuserMode]
+                .getStringArray(R.array.multiuser_summary)[Config.suMultiuserMode]
             Config.Key.SU_MNT_NS -> nsConfig.summary = resources
-                    .getStringArray(R.array.namespace_summary)[Config.suMntNamespaceMode]
+                .getStringArray(R.array.namespace_summary)[Config.suMntNamespaceMode]
             Config.Key.UPDATE_CHANNEL -> {
                 var ch = Config.updateChannel
                 ch = if (ch < 0) Config.Value.STABLE_CHANNEL else ch
                 updateChannel.summary = resources
-                        .getStringArray(R.array.update_channel)[ch]
+                    .getStringArray(R.array.update_channel)[ch]
             }
             Config.Key.SU_AUTO_RESPONSE -> autoRes.summary = resources
-                    .getStringArray(R.array.auto_response)[Config.suAutoReponse]
+                .getStringArray(R.array.auto_response)[Config.suAutoReponse]
             Config.Key.SU_NOTIFICATION -> suNotification.summary = resources
-                    .getStringArray(R.array.su_notification)[Config.suNotification]
+                .getStringArray(R.array.su_notification)[Config.suNotification]
             Config.Key.SU_REQUEST_TIMEOUT -> requestTimeout.summary =
-                    getString(R.string.request_timeout_summary, Config.suDefaultTimeout)
+                getString(R.string.request_timeout_summary, Config.suDefaultTimeout)
         }
     }
 
@@ -261,5 +274,27 @@ class SettingsFragment : BasePreferenceFragment() {
         setSummary(Config.Key.SU_AUTO_RESPONSE)
         setSummary(Config.Key.SU_NOTIFICATION)
         setSummary(Config.Key.SU_REQUEST_TIMEOUT)
+    }
+
+    private inline fun showUrlDialog(
+        initialValue: String,
+        crossinline onCancel: () -> Unit = {},
+        crossinline onSuccess: (String) -> Unit
+    ) {
+        val v = LayoutInflater
+            .from(requireActivity())
+            .inflate(R.layout.custom_channel_dialog, null)
+
+        val url = v.findViewById<EditText>(R.id.custom_url).apply {
+            setText(initialValue)
+        }
+
+        AlertDialog.Builder(requireActivity())
+            .setTitle(R.string.settings_update_custom)
+            .setView(v)
+            .setPositiveButton(R.string.ok) { _, _ -> onSuccess(url.text.toString()) }
+            .setNegativeButton(R.string.close) { _, _ -> onCancel() }
+            .setOnCancelListener { onCancel() }
+            .show()
     }
 }

@@ -43,6 +43,7 @@ object Config : PreferenceModel, DBConfig {
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
         const val DOWNLOAD_CACHE = "download_cache"
+        const val DOWNLOAD_PATH = "download_path"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -92,10 +93,13 @@ object Config : PreferenceModel, DBConfig {
     }
 
     private val defaultChannel =
-            if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
-            else Value.DEFAULT_CHANNEL
+        if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
+        else Value.DEFAULT_CHANNEL
+
+    private val defaultDownloadPath get() = Const.EXTERNAL_PATH.toRelativeString(Const.EXTERNAL_PATH.parentFile)
 
     var isDownloadCacheEnabled by preference(Key.DOWNLOAD_CACHE, true)
+    var downloadPath by preference(Key.DOWNLOAD_PATH, defaultDownloadPath)
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
@@ -122,6 +126,15 @@ object Config : PreferenceModel, DBConfig {
     var suFingerprint by dbSettings(Key.SU_FINGERPRINT, false)
     @JvmStatic
     var suManager by dbStrings(Key.SU_MANAGER, "")
+
+    fun downloadsFile(path: String = downloadPath) =
+        File(Const.EXTERNAL_PATH.parentFile, path).run {
+            if (exists()) {
+                if (isDirectory) this else null
+            } else {
+                if (mkdirs()) this else null
+            }
+        }
 
     fun initialize() = prefs.edit {
         val config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS)
@@ -190,8 +203,10 @@ object Config : PreferenceModel, DBConfig {
     fun export() {
         // Flush prefs to disk
         prefs.edit().apply()
-        val xml = File("${get<Context>(Protected).filesDir.parent}/shared_prefs",
-                "${packageName}_preferences.xml")
+        val xml = File(
+            "${get<Context>(Protected).filesDir.parent}/shared_prefs",
+            "${packageName}_preferences.xml"
+        )
         Shell.su("cat $xml > /data/adb/${Const.MANAGER_CONFIGS}").exec()
     }
 
