@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
+import com.topjohnwu.magisk.utils.firstMap
 import com.topjohnwu.magisk.utils.writeToCachedFile
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
@@ -24,6 +25,13 @@ import java.io.File
 abstract class RemoteFileService : NotificationService() {
 
     private val repo by inject<FileRepository>()
+
+    private val supportedFolders
+        get() = listOfNotNull(
+            cacheDir,
+            Config.downloadsFile(),
+            Const.EXTERNAL_PATH
+        )
 
     override val defaultNotification: NotificationCompat.Builder
         get() = Notifications
@@ -53,15 +61,7 @@ abstract class RemoteFileService : NotificationService() {
             throw IllegalStateException("The download cache is disabled")
         }
 
-        val file = runCatching {
-            cacheDir.list().orEmpty()
-                .first { it == subject.fileName } // this throws an exception if not found
-                .let { File(cacheDir, it) }
-        }.getOrElse {
-            Const.EXTERNAL_PATH.list().orEmpty()
-                .first { it == subject.fileName } // this throws an exception if not found
-                .let { File(Const.EXTERNAL_PATH, it) }
-        }
+        val file = supportedFolders.firstMap { it.find(subject.fileName) }
 
         if (subject is Magisk) {
             if (!ShellUtils.checkSum("MD5", file, subject.magisk.hash)) {
@@ -90,6 +90,10 @@ abstract class RemoteFileService : NotificationService() {
         }
 
     // ---
+
+    private fun File.find(name: String) = list().orEmpty()
+        .firstOrNull { it == name }
+        ?.let { File(this, it) }
 
     private fun ResponseBody.toFile(id: Int, name: String): File {
         val maxRaw = contentLength()

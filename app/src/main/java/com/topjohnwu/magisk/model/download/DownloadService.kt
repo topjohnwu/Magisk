@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
@@ -29,7 +30,7 @@ import kotlin.random.Random.Default.nextInt
 open class DownloadService : RemoteFileService() {
 
     private val context get() = this
-    private val String.downloadsFile get() = File(Const.EXTERNAL_PATH, this)
+    private val String.downloadsFile get() = Config.downloadsFile()?.let { File(it, this) }
     private val File.type
         get() = MimeTypeMap.getSingleton()
             .getMimeTypeFromExtension(extension)
@@ -100,19 +101,36 @@ open class DownloadService : RemoteFileService() {
     // ---
 
     private fun moveToDownloads(file: File) {
-        val destination = file.name.downloadsFile
+        val destination = file.name.downloadsFile ?: let {
+            Utils.toast(
+                getString(R.string.download_file_folder_error),
+                Toast.LENGTH_LONG
+            )
+            return
+        }
+
         if (file != destination) {
             destination.deleteRecursively()
             file.copyTo(destination)
         }
+
         Utils.toast(
-            getString(R.string.internal_storage, "/Download/${file.name}"),
+            getString(
+                R.string.internal_storage,
+                "/" + destination.toRelativeString(Const.EXTERNAL_PATH.parentFile)
+            ),
             Toast.LENGTH_LONG
         )
     }
 
     private fun fileIntent(fileName: String): Intent {
-        val file = fileName.downloadsFile
+        val file = fileName.downloadsFile ?: let {
+            Utils.toast(
+                getString(R.string.download_file_folder_error),
+                Toast.LENGTH_LONG
+            )
+            return Intent()
+        }
         return Intent(Intent.ACTION_VIEW)
             .setDataAndType(file.provide(this), file.type)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
