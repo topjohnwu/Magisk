@@ -53,16 +53,16 @@ int fork_no_zombie() {
 constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 static bool seeded = false;
 static std::mt19937 gen;
-static std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 1);
+static std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
 void gen_rand_str(char *buf, int len, bool varlen) {
 	if (!seeded) {
-		if (access("/dev/urandom", F_OK) == 0) {
-			std::random_device rdev;
-			gen.seed(rdev());
-		} else {
-			// In magiskinit
-			gen.seed(time(nullptr));
-		}
+		if (access("/dev/urandom", F_OK) != 0)
+			mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
+		int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
+		unsigned seed;
+		xxread(fd, &seed, sizeof(seed));
+		gen.seed(seed);
+		close(fd);
 		seeded = true;
 	}
 	if (varlen) {

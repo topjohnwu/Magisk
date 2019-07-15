@@ -48,7 +48,7 @@ static void patch_init_rc(FILE *rc) {
 		fprintf(rc, "%s", line.data());
 		return true;
 	});
-	char pfd_svc[32], ls_svc[32], bc_svc[32];
+	char pfd_svc[16], ls_svc[16], bc_svc[16];
 	gen_rand_str(pfd_svc, sizeof(pfd_svc));
 	gen_rand_str(ls_svc, sizeof(ls_svc));
 	gen_rand_str(bc_svc, sizeof(bc_svc));
