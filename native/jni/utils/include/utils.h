@@ -9,7 +9,7 @@
 #include <poll.h>
 #include <mntent.h>
 
-#include "missing.h"
-#include "xwrap.h"
-#include "files.h"
-#include "misc.h"
+#include "../missing.h"
+#include "../xwrap.h"
+#include "../files.h"
+#include "../misc.h"
