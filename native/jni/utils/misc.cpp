@@ -1,6 +1,10 @@
 /* misc.cpp - Store all functions that are unable to be catagorized clearly
  */
- 
+
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/prctl.h>
+#include <sys/sysmacros.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,10 +12,7 @@
 #include <pwd.h>
 #include <unistd.h>
 #include <syscall.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/prctl.h>
-#include <sys/sysmacros.h>
+#include <random>
 
 #include <logging.h>
 #include <utils.h>
@@ -49,17 +50,27 @@ int fork_no_zombie() {
 	return 0;
 }
 
-static bool rand_init = false;
-
-void gen_rand_str(char *buf, int len) {
-	constexpr const char base[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-	if (!rand_init) {
-		srand(time(nullptr));
-		rand_init = true;
+constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+static bool seeded = false;
+static std::mt19937 gen;
+static std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 1);
+void gen_rand_str(char *buf, int len, bool varlen) {
+	if (!seeded) {
+		if (access("/dev/urandom", F_OK) == 0) {
+			std::random_device rdev;
+			gen.seed(rdev());
+		} else {
+			// In magiskinit
+			gen.seed(time(nullptr));
+		}
+		seeded = true;
 	}
-	for (int i = 0; i < len - 1; ++i) {
-		buf[i] = base[rand() % (sizeof(base) - 1)];
+	if (varlen) {
+		std::uniform_int_distribution<int> len_dist(len / 2, len);
+		len = len_dist(gen);
 	}
+	for (int i = 0; i < len - 1; ++i)
+		buf[i] = ALPHANUM[dist(gen)];
 	buf[len - 1] = '\0';
 }
 

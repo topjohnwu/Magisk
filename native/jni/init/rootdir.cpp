@@ -19,15 +19,13 @@
 using namespace std;
 
 static void patch_socket_name(const char *path) {
-	uint8_t *buf;
-	char name[sizeof(MAIN_SOCKET)];
+	char *buf;
 	size_t size;
 	mmap_rw(path, buf, size);
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(name, sizeof(name));
-			memcpy(buf + i, name, sizeof(name));
-			i += sizeof(name);
+			gen_rand_str(buf + i, sizeof(MAIN_SOCKET));
+			i += sizeof(MAIN_SOCKET);
 		}
 	}
 	munmap(buf, size);
@@ -50,14 +48,10 @@ static void patch_init_rc(FILE *rc) {
 		fprintf(rc, "%s", line.data());
 		return true;
 	});
-	char pfd_svc[8], ls_svc[8], bc_svc[8];
-	// Make sure to be unique
-	pfd_svc[0] = 'a';
-	ls_svc[0] = '0';
-	bc_svc[0] = 'A';
-	gen_rand_str(pfd_svc + 1, sizeof(pfd_svc) - 1);
-	gen_rand_str(ls_svc + 1, sizeof(ls_svc) - 1);
-	gen_rand_str(bc_svc + 1, sizeof(bc_svc) - 1);
+	char pfd_svc[32], ls_svc[32], bc_svc[32];
+	gen_rand_str(pfd_svc, sizeof(pfd_svc));
+	gen_rand_str(ls_svc, sizeof(ls_svc));
+	gen_rand_str(bc_svc, sizeof(bc_svc));
 	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
 	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
 }
