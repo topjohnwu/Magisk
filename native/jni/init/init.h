@@ -16,10 +16,10 @@ struct raw_data {
 	raw_data() = default;
 	raw_data(const raw_data&) = delete;
 	raw_data(raw_data &&d) {
-		d.buf = buf;
-		d.sz = sz;
-		buf = nullptr;
-		sz = 0;
+		buf = d.buf;
+		sz = d.sz;
+		d.buf = nullptr;
+		d.sz = 0;
 	}
 	~raw_data() {
 		free(buf);
