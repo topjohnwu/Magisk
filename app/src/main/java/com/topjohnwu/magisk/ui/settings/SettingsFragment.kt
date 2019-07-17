@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
+import androidx.databinding.DataBindingUtil
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -18,6 +19,8 @@ import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
+import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
+import com.topjohnwu.magisk.model.entity.internal.DownloadDialogData
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
@@ -88,13 +91,9 @@ class SettingsFragment : BasePreferenceFragment() {
         }.setOnPreferenceClickListener { preference ->
             activity.withExternalRW {
                 onSuccess {
-                    showUrlDialog(Config.downloadPath) {
-                        Config.downloadsFile(it)?.let { _ ->
-                            Config.downloadPath = it
-                            preference.summary = it
-                        } ?: let {
-                            Utils.toast(R.string.settings_download_path_error, Toast.LENGTH_SHORT)
-                        }
+                    showDownloadDialog {
+                        Config.downloadPath = it
+                        preference.summary = it
                     }
                 }
             }
@@ -295,6 +294,26 @@ class SettingsFragment : BasePreferenceFragment() {
             .setPositiveButton(R.string.ok) { _, _ -> onSuccess(url.text.toString()) }
             .setNegativeButton(R.string.close) { _, _ -> onCancel() }
             .setOnCancelListener { onCancel() }
+            .show()
+    }
+
+    private inline fun showDownloadDialog(
+        initialValue: String = Config.downloadPath,
+        crossinline onSuccess: (String) -> Unit
+    ) {
+        val data = DownloadDialogData(initialValue)
+        val binding: CustomDownloadDialogBinding = DataBindingUtil
+            .inflate(layoutInflater, R.layout.custom_download_dialog, null, false)
+        binding.also { it.data = data }
+
+        AlertDialog.Builder(requireActivity())
+            .setTitle(R.string.settings_download_path_title)
+            .setView(binding.root)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                Config.downloadsFile(data.text.value)?.let { onSuccess(data.text.value) }
+                    ?: Utils.toast(R.string.settings_download_path_error, Toast.LENGTH_SHORT)
+            }
+            .setNegativeButton(R.string.close, null)
             .show()
     }
 }
