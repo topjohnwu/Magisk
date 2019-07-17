@@ -136,6 +136,7 @@
     <string name="settings_download_cache_title">Download Cache</string>
     <string name="settings_download_cache_summary">Enables download cache for Magisk and Module zip files.</string>
     <string name="settings_download_path_title">Download path</string>
+    <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
     <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online.</string>
     <string name="settings_hide_manager_title">Hide Magisk Manager</string>
