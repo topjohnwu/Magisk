@@ -18,9 +18,9 @@ class UpdateCheckService : DelegateWorker() {
         Shell.getShell()
         return runCatching {
             magiskRepo.fetchUpdate().blockingGet()
-            if (BuildConfig.VERSION_CODE < Info.remoteManagerVersionCode)
+            if (BuildConfig.VERSION_CODE < Info.remote.app.versionCode)
                 Notifications.managerUpdate()
-            else if (Info.magiskVersionCode < Info.remoteMagiskVersionCode)
+            else if (Info.magiskVersionCode < Info.remote.magisk.versionCode)
                 Notifications.magiskUpdate()
             ListenableWorker.Result.success()
         }.getOrElse {

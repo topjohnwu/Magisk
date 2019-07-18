@@ -63,11 +63,11 @@ public class Notifications {
     public static void managerUpdate() {
         App app = App.self;
         String name = Utils.INSTANCE.fmt("MagiskManager v%s(%d)",
-                Info.remoteManagerVersionString, Info.remoteManagerVersionCode);
+                Info.remote.getApp().getVersion(), Info.remote.getApp().getVersionCode());
 
         Intent intent = new Intent(app, ClassMap.get(GeneralReceiver.class));
         intent.setAction(Const.Key.BROADCAST_MANAGER_UPDATE);
-        intent.putExtra(Const.Key.INTENT_SET_LINK, Info.managerLink);
+        intent.putExtra(Const.Key.INTENT_SET_LINK, Info.remote.getApp().getLink());
         intent.putExtra(Const.Key.INTENT_SET_NAME, name);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(app,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);

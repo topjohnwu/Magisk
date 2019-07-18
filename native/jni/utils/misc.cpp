@@ -1,6 +1,10 @@
 /* misc.cpp - Store all functions that are unable to be catagorized clearly
  */
- 
+
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/prctl.h>
+#include <sys/sysmacros.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,10 +12,7 @@
 #include <pwd.h>
 #include <unistd.h>
 #include <syscall.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/prctl.h>
-#include <sys/sysmacros.h>
+#include <random>
 
 #include <logging.h>
 #include <utils.h>
@@ -49,17 +50,27 @@ int fork_no_zombie() {
 	return 0;
 }
 
-static bool rand_init = false;
-
-void gen_rand_str(char *buf, int len) {
-	constexpr const char base[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-	if (!rand_init) {
-		srand(time(nullptr));
-		rand_init = true;
+constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+static bool seeded = false;
+static std::mt19937 gen;
+static std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
+void gen_rand_str(char *buf, int len, bool varlen) {
+	if (!seeded) {
+		if (access("/dev/urandom", F_OK) != 0)
+			mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
+		int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
+		unsigned seed;
+		xxread(fd, &seed, sizeof(seed));
+		gen.seed(seed);
+		close(fd);
+		seeded = true;
 	}
-	for (int i = 0; i < len - 1; ++i) {
-		buf[i] = base[rand() % (sizeof(base) - 1)];
+	if (varlen) {
+		std::uniform_int_distribution<int> len_dist(len / 2, len);
+		len = len_dist(gen);
 	}
+	for (int i = 0; i < len - 1; ++i)
+		buf[i] = ALPHANUM[dist(gen)];
 	buf[len - 1] = '\0';
 }
 
@@ -67,80 +78,6 @@ int strend(const char *s1, const char *s2) {
 	size_t l1 = strlen(s1);
 	size_t l2 = strlen(s2);
 	return strcmp(s1 + l1 - l2, s2);
-}
-
-/* Original source: https://opensource.apple.com/source/cvs/cvs-19/cvs/lib/getline.c
- * License: GPL 2 or later
- * Adjusted to match POSIX */
-#define MIN_CHUNK 64
-ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream) {
-	size_t nchars_avail;
-	char *read_pos;
-
-	if (!lineptr || !n || !stream) {
-		errno = EINVAL;
-		return -1;
-	}
-
-	if (!*lineptr) {
-		*n = MIN_CHUNK;
-		*lineptr = (char *) malloc(*n);
-		if (!*lineptr) {
-			errno = ENOMEM;
-			return -1;
-		}
-	}
-
-	nchars_avail = *n;
-	read_pos = *lineptr;
-
-	while (1) {
-		int save_errno;
-		int c = getc(stream);
-
-		save_errno = errno;
-
-		if (nchars_avail < 2) {
-			if (*n > MIN_CHUNK)
-				*n *= 2;
-			else
-				*n += MIN_CHUNK;
-
-			nchars_avail = *n + *lineptr - read_pos;
-			*lineptr = (char *) realloc(*lineptr, *n);
-			if (!*lineptr) {
-				errno = ENOMEM;
-				return -1;
-			}
-			read_pos = *n - nchars_avail + *lineptr;
-		}
-
-		if (ferror(stream)) {
-			errno = save_errno;
-			return -1;
-		}
-
-		if (c == EOF) {
-			if (read_pos == *lineptr)
-				return -1;
-			else
-				break;
-		}
-
-		*read_pos++ = c;
-		nchars_avail--;
-
-		if (c == delim)
-			break;
-	}
-
-	*read_pos = '\0';
-
-	return read_pos - *lineptr;
-}
-
-ssize_t __getline(char **lineptr, size_t *n, FILE *stream) {
-	return __getdelim(lineptr, n, '\n', stream);
 }
 
 int exec_command(exec_t &exec) {

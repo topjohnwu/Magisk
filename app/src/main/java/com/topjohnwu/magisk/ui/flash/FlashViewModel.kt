@@ -103,7 +103,7 @@ class FlashViewModel(
         .subscribeK { SnackbarEvent(it).publish() }
         .add()
 
-    fun restartPressed() = RootUtils.reboot()
+    fun restartPressed() = reboot()
 
     fun backPressed() = back()
 

@@ -130,8 +130,8 @@ void magisk_cpio::restore() {
 			} else {
 				mv(cur, &cur->first[8]);
 			}
-		} else if (str_starts(cur->first, "overlay") ||
-				str_starts(cur->first, "magisk") ||
+		} else if (str_starts(cur->first, "magisk") ||
+				cur->first == "overlay/init.magisk.rc" ||
 				cur->first == "sbin/magic_mask.sh" ||
 				cur->first == "init.magisk.rc") {
 			// Some known stuff we can remove

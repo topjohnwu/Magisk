@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.model.binding.BindingAdapter
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LogItemRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LogRvItem
@@ -30,6 +31,7 @@ class LogViewModel(
     private val logRepo: LogRepository
 ) : MagiskViewModel(), BindingViewPagerAdapter.PageTitles<ComparableRvItem<*>> {
 
+    val itemsAdapter = BindingAdapter()
     val items = DiffObservableList(ComparableRvItem.callback)
     val itemBinding = OnItemBind<ComparableRvItem<*>> { itemBinding, _, item ->
         item.bind(itemBinding)
@@ -40,6 +42,8 @@ class LogViewModel(
 
     private val logItem get() = items[0] as LogRvItem
     private val magiskLogItem get() = items[1] as MagiskLogRvItem
+
+    val scrollPosition = KObservableField(0)
 
     init {
         currentPage.addOnPropertyChangedCallback {
@@ -55,6 +59,10 @@ class LogViewModel(
         is LogRvItem -> resources.getString(R.string.superuser)
         is MagiskLogRvItem -> resources.getString(R.string.magisk)
         else -> ""
+    }
+
+    fun scrollDownPressed() {
+        scrollPosition.value = magiskLogItem.items.size - 1
     }
 
     fun refresh() {

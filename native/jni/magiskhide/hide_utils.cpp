@@ -6,7 +6,6 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
-#include <libgen.h>
 
 #include <magisk.h>
 #include <utils.h>
@@ -37,45 +36,22 @@ void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
 
 static bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
-	FILE *f;
-#if 0
-	sprintf(buf, "/proc/%d/comm", pid);
-	if ((f = fopen(buf, "re"))) {
+	sprintf(buf, "/proc/%d/cmdline", pid);
+	if (FILE *f; (f = fopen(buf, "re"))) {
 		fgets(buf, sizeof(buf), f);
 		fclose(f);
 		if (strcmp(buf, name) == 0)
 			return true;
-	} else {
-		// The PID is already killed
-		return false;
-	}
-#endif
-
-	sprintf(buf, "/proc/%d/cmdline", pid);
-	if ((f = fopen(buf, "re"))) {
-		fgets(buf, sizeof(buf), f);
-		fclose(f);
-		if (strcmp(basename(buf), name) == 0)
-			return true;
 	}
 	return false;
-
-#if 0
-	sprintf(buf, "/proc/%d/exe", pid);
-	ssize_t len;
-	if ((len = readlink(buf, buf, sizeof(buf))) < 0)
-		return false;
-	buf[len] = '\0';
-	return strcmp(basename(buf), name) == 0;
-#endif
 }
 
-static void kill_process(const char *name) {
+static void kill_process(const char *name, bool multi = false) {
 	crawl_procfs([=](int pid) -> bool {
 		if (proc_name_match(pid, name)) {
 			if (kill(pid, SIGTERM) == 0)
 				LOGD("hide_utils: killed PID=[%d] (%s)\n", pid, name);
-			return false;
+			return multi;
 		}
 		return true;
 	});
@@ -176,6 +152,12 @@ bool init_list() {
 		return true;
 	});
 	db_err_cmd(err, return false);
+
+	// If Android Q+, also kill blastula pool
+	if (SDK_INT >= 29) {
+		kill_process("usap32", true);
+		kill_process("usap64", true);
+	}
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {

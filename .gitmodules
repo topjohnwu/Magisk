@@ -19,3 +19,6 @@
 [submodule "nanopb"]
 	path = native/jni/external/nanopb
 	url = https://github.com/nanopb/nanopb.git
+[submodule "mincrypt"]
+	path = native/jni/external/mincrypt
+	url = https://github.com/topjohnwu/mincrypt.git

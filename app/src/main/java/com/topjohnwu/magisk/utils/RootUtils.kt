@@ -155,10 +155,5 @@ class RootUtils : Shell.Initializer() {
         fun rmAndLaunch(rm: String, component: ComponentName) {
             Shell.su("(rm_launch $rm ${component.flattenToString()})").exec()
         }
-
-        @JvmStatic
-        fun reboot() {
-            Shell.su("/system/bin/reboot ${if (Info.recovery) "recovery" else ""}").submit()
-        }
     }
 }

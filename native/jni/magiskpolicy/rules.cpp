@@ -1,8 +1,8 @@
-#include <magisk.h>
+#include <logging.h>
+#include <flags.h>
 
 #include "magiskpolicy.h"
 #include "sepolicy.h"
-#include "flags.h"
 
 static void allowSuClient(const char *target) {
 	if (!sepol_exists(target))
@@ -47,6 +47,12 @@ void sepol_magisk_rules() {
 	sepol_attradd(SEPOL_PROC_DOMAIN, "netdomain");
 	sepol_attradd(SEPOL_PROC_DOMAIN, "bluetoothdomain");
 	sepol_attradd(SEPOL_FILE_DOMAIN, "mlstrustedobject");
+
+	// Let everyone access tmpfs files (for SAR sbin overlay)
+	sepol_allow(ALL, "tmpfs", "file", ALL);
+
+	// For normal rootfs file/directory operations when rw (for SAR / overlay)
+	sepol_allow("rootfs", "labeledfs", "filesystem", "associate");
 
 	// Let init transit to SEPOL_PROC_DOMAIN
 	sepol_allow("kernel", "kernel", "process", "setcurrent");
@@ -148,6 +154,7 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "mount");
 	sepol_allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "unmount");
 	sepol_allow("kernel", ALL, "file", "read");
+	sepol_allow("kernel", ALL, "file", "write");
 
 	// Allow us to do anything to any files/dir/links
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "file", ALL);

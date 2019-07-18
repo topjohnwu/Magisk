@@ -29,7 +29,7 @@
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
     <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt, und Ihre Daten werden möglicherweise verschlüsselt, wenn nicht bereits der Fall.</string>
-    <string name="update">aktuallisieren</string>
+    <string name="update">aktualisieren</string>
     <string name="core_only_enabled">(Core only Modus aktiviert)</string>
 
     <!--Module Fragment-->
@@ -79,7 +79,7 @@
     <string name="download_zip_only">Nur Zip-Datei herunterladen</string>
     <string name="direct_install">Direkt installieren (empfohlen)</string>
     <string name="install_inactive_slot">Installiere auf inaktiven Slot (Nach OTA)</string>
-    <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem nach dem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
+    <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
     <string name="select_method">Methode auswählen</string>
     <string name="setup_title">Zusätzliche Einrichtung</string>
     <string name="select_patch_file">Auswählen und Patchen einer Datei</string>

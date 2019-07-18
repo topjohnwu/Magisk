@@ -7,7 +7,6 @@ import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.magisk.model.entity.WrappedMagiskLog
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.superuser.Shell
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
@@ -21,7 +20,6 @@ class LogRepository(
 
     fun fetchMagiskLogs() = "tail -n 5000 ${Const.MAGISK_LOG}".suRaw()
         .filter { it.isNotEmpty() }
-        .map { Timber.i(it.toString()); it }
 
     fun clearLogs() = logDao.deleteAll()
     fun clearOutdated() = logDao.deleteOutdated()

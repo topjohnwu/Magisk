@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <linux/input.h>
 #include <fcntl.h>
+#include <vector>
 
 #include <utils.h>
 #include <logging.h>
@@ -92,7 +93,7 @@ static bool check_key_combo() {
 	return false;
 }
 
-void MagiskInit::load_kernel_info() {
+void load_kernel_info(cmdline *cmd) {
 	// Communicate with kernel using procfs and sysfs
 	xmkdir("/proc", 0755);
 	xmount("proc", "/proc", "proc", 0, nullptr);
@@ -106,14 +107,16 @@ void MagiskInit::load_kernel_info() {
 	parse_cmdline([&](auto key, auto value) -> void {
 		LOGD("cmdline: [%s]=[%s]\n", key.data(), value);
 		if (key == "androidboot.slot_suffix") {
-			strcpy(cmd.slot, value);
+			strcpy(cmd->slot, value);
 		} else if (key == "androidboot.slot") {
-			cmd.slot[0] = '_';
-			strcpy(cmd.slot + 1, value);
+			cmd->slot[0] = '_';
+			strcpy(cmd->slot + 1, value);
 		} else if (key == "skip_initramfs") {
-			cmd.system_as_root = true;
+			cmd->system_as_root = true;
+		} else if (key == "androidboot.force_normal_boot") {
+			cmd->force_normal_boot = value[0] == '1';
 		} else if (key == "androidboot.android_dt_dir") {
-			strcpy(cmd.dt_dir, value);
+			strcpy(cmd->dt_dir, value);
 		} else if (key == "enter_recovery") {
 			enter_recovery = value[0] == '1';
 		} else if (key == "androidboot.hardware") {
@@ -140,13 +143,14 @@ void MagiskInit::load_kernel_info() {
 
 	if (recovery_mode) {
 		LOGD("Running in recovery mode, waiting for key...\n");
-		cmd.system_as_root = !check_key_combo();
+		cmd->system_as_root = !check_key_combo();
 	}
 
-	if (cmd.dt_dir[0] == '\0')
-		strcpy(cmd.dt_dir, DEFAULT_DT_DIR);
+	if (cmd->dt_dir[0] == '\0')
+		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
 
-	LOGD("system_as_root=[%d]\n", cmd.system_as_root);
-	LOGD("slot=[%s]\n", cmd.slot);
-	LOGD("dt_dir=[%s]\n", cmd.dt_dir);
+	LOGD("system_as_root=[%d]\n", cmd->system_as_root);
+	LOGD("force_normal_boot=[%d]\n", cmd->force_normal_boot);
+	LOGD("slot=[%s]\n", cmd->slot);
+	LOGD("dt_dir=[%s]\n", cmd->dt_dir);
 }

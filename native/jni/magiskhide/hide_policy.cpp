@@ -38,11 +38,14 @@ static inline void lazy_unmount(const char* mountpoint) {
 void hide_daemon(int pid) {
 	RunFinally fin([=]() -> void {
 		// Send resume signal
-		tgkill(pid, pid, SIGCONT);
+		kill(pid, SIGCONT);
 		_exit(0);
 	});
 	hide_unmount(pid);
 }
+
+#define TMPFS_MNT(dir) (mentry->mnt_type == "tmpfs"sv && \
+strncmp(mentry->mnt_dir, "/" #dir, sizeof("/" #dir) - 1) == 0)
 
 void hide_unmount(int pid) {
 	if (switch_mnt_ns(pid))
@@ -60,22 +63,12 @@ void hide_unmount(int pid) {
 		chmod(SELINUX_POLICY, 0440);
 	}
 
-	getprop([](const char *name, auto, auto) -> void {
-		if (strstr(name, "magisk"))
-			deleteprop(name);
-	}, nullptr, false);
-
 	vector<string> targets;
 
 	// Unmount dummy skeletons and /sbin links
-	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
-		if (str_contains(s, "tmpfs /system/") || str_contains(s, "tmpfs /vendor/") ||
-			str_contains(s, "tmpfs /sbin")) {
-			char *path = (char *) s.data();
-			// Skip first token
-			strtok_r(nullptr, " ", &path);
-			targets.emplace_back(strtok_r(nullptr, " ", &path));
-		}
+	parse_mnt("/proc/self/mounts", [&](mntent *mentry) {
+		if (TMPFS_MNT(system) || TMPFS_MNT(vendor) || TMPFS_MNT(sbin))
+			targets.emplace_back(mentry->mnt_dir);
 		return true;
 	});
 
@@ -84,13 +77,9 @@ void hide_unmount(int pid) {
 	targets.clear();
 
 	// Unmount all Magisk created mounts
-	file_readline("/proc/self/mounts", [&](string_view s) -> bool {
-		if (str_contains(s, BLOCKDIR)) {
-			char *path = (char *) s.data();
-			// Skip first token
-			strtok_r(nullptr, " ", &path);
-			targets.emplace_back(strtok_r(nullptr, " ", &path));
-		}
+	parse_mnt("/proc/self/mounts", [&](mntent *mentry) {
+		if (strstr(mentry->mnt_fsname, BLOCKDIR))
+			targets.emplace_back(mentry->mnt_dir);
 		return true;
 	});
 

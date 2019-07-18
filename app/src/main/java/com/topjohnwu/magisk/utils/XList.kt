@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.utils
 
+import androidx.collection.SparseArrayCompat
 import androidx.databinding.ObservableList
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.DiffObservableList
@@ -77,3 +78,7 @@ fun <T1> ObservableList<T1>.copyNewInputInto(
         target.addAll(addedValues)
     }
 })
+
+operator fun <E> SparseArrayCompat<E>.set(key: Int, value: E) {
+    put(key, value)
+}

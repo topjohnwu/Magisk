@@ -1,26 +1,20 @@
 package com.topjohnwu.magisk;
 
+import androidx.annotation.NonNull;
+
+import com.topjohnwu.magisk.model.entity.UpdateInfo;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 
 public final class Info {
 
     public static int magiskVersionCode = -1;
-    // Current status
-    public static String magiskVersionString = "";
-    // Update Info
-    public static String remoteMagiskVersionString = "";
-    public static int remoteMagiskVersionCode = -1;
-    public static String magiskLink = "";
-    public static String magiskNoteLink = "";
-    public static String magiskMD5 = "";
-    public static String remoteManagerVersionString = "";
-    public static int remoteManagerVersionCode = -1;
-    public static String managerLink = "";
-    public static String managerNoteLink = "";
-    public static String uninstallerLink = "";
 
-    // Install flags
+    @NonNull
+    public static String magiskVersionString = "";
+
+    public static UpdateInfo remote = new UpdateInfo();
+
     public static boolean keepVerity = false;
     public static boolean keepEnc = false;
     public static boolean recovery = false;

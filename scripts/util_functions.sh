@@ -166,6 +166,7 @@ find_block() {
 }
 
 mount_part() {
+  $BOOTMODE && return
   local PART=$1
   local POINT=/${PART}
   [ -L $POINT ] && rm -f $POINT
@@ -197,7 +198,8 @@ mount_partitions() {
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   else
-    grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+    grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
+    && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   fi
   [ -L /system/vendor ] && mount_part vendor
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"

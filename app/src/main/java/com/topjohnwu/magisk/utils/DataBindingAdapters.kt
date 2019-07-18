@@ -11,8 +11,10 @@ import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.R
@@ -177,3 +179,39 @@ fun setScrollToLast(view: RecyclerView, shouldScrollToLast: Boolean) {
         view.adapter?.removeListener()
     }
 }
+
+@BindingAdapter("hide")
+fun setHidden(view: FloatingActionButton, hide: Boolean) {
+    if (hide) view.hide() else view.show()
+}
+
+@BindingAdapter("scrollPosition", "scrollPositionSmooth", requireAll = false)
+fun setScrollPosition(view: RecyclerView, position: Int, smoothScroll: Boolean) {
+    val adapterItemCount = view.adapter?.itemCount ?: -1
+    if (position !in 0 until adapterItemCount) {
+        // the position is not in adapter bounds, adapter will throw exception for invalid positions
+        return
+    }
+
+    when {
+        smoothScroll -> view.smoothScrollToPosition(position)
+        else -> view.scrollToPosition(position)
+    }
+}
+
+@BindingAdapter("recyclerScrollEvent")
+fun setScrollListener(view: RecyclerView, listener: InverseBindingListener) {
+    view.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            // don't change this or the recycler will stop at every line, effectively disabling smooth scroll
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                listener.onChange()
+            }
+        }
+    })
+}
+
+@InverseBindingAdapter(attribute = "scrollPosition", event = "recyclerScrollEvent")
+fun getScrollPosition(view: RecyclerView) = (view.layoutManager as? LinearLayoutManager)
+    ?.findLastCompletelyVisibleItemPosition()
+    ?: -1

@@ -13,7 +13,7 @@
 #include <vector>
 #include <bitset>
 
-#include <magisk.h>
+#include <logging.h>
 #include <utils.h>
 
 #include "magiskhide.h"
@@ -37,7 +37,6 @@ pthread_mutex_t monitor_lock;
 
 #define PID_MAX 32768
 static bitset<PID_MAX> attaches;  /* true if pid is monitored */
-static bitset<PID_MAX> detaches;  /* true if tid should be detached */
 
 /********
  * Utils
@@ -163,7 +162,6 @@ static void term_thread(int) {
 	zygote_map.clear();
 	hide_set.clear();
 	attaches.reset();
-	detaches.reset();
 	// Misc
 	hide_enabled = false;
 	pthread_mutex_destroy(&monitor_lock);
@@ -185,44 +183,41 @@ static void term_thread(int) {
 #define PTRACE_LOG(...)
 
 static void detach_pid(int pid, int signal = 0) {
-	char path[128];
 	attaches[pid] = false;
-	xptrace(PTRACE_DETACH, pid, nullptr, signal);
-
-	// Detach all child threads too
-	sprintf(path, "/proc/%d/task", pid);
-	DIR *dir = opendir(path);
-	crawl_procfs(dir, [&](int tid) -> bool {
-		if (tid != pid) {
-			// Check if we should force a SIGSTOP
-			if (waitpid(tid, nullptr, __WALL | __WNOTHREAD | WNOHANG) == tid) {
-				PTRACE_LOG("detach thread [%d]\n", tid);
-				xptrace(PTRACE_DETACH, tid);
-			} else {
-				detaches[tid] = true;
-				tgkill(pid, tid, SIGSTOP);
-			}
-		}
-		return true;
-	});
-	closedir(dir);
+	ptrace(PTRACE_DETACH, pid, 0, signal);
+	PTRACE_LOG("detach\n");
 }
 
 static bool check_pid(int pid) {
 	char path[128];
 	char cmdline[1024];
-	sprintf(path, "/proc/%d/cmdline", pid);
-	FILE *f = fopen(path, "re");
-	// Process killed unexpectedly, ignore
-	if (!f) return true;
-	fgets(cmdline, sizeof(cmdline), f);
-	fclose(f);
-	if (strncmp(cmdline, "zygote", 6) == 0)
-		return false;
+	struct stat st;
 
 	sprintf(path, "/proc/%d", pid);
-	struct stat st;
-	lstat(path, &st);
+	if (stat(path, &st)) {
+		// Process killed unexpectedly, ignore
+		detach_pid(pid);
+		return true;
+	}
+
+	// UID hasn't changed
+	if (st.st_uid == 0)
+		return false;
+
+	sprintf(path, "/proc/%d/cmdline", pid);
+	if (FILE *f; (f = fopen(path, "re"))) {
+		fgets(cmdline, sizeof(cmdline), f);
+		fclose(f);
+	} else {
+		// Process killed unexpectedly, ignore
+		detach_pid(pid);
+		return true;
+	}
+
+	// Still zygote/usap
+	if (strncmp(cmdline, "zygote", 6) == 0 || strncmp(cmdline, "usap", 4) == 0)
+		return false;
+
 	int uid = st.st_uid % 100000;
 	auto it = uid_proc_map.find(uid);
 	if (it != uid_proc_map.end()) {
@@ -257,6 +252,25 @@ static bool check_pid(int pid) {
 	PTRACE_LOG("[%s] not our target\n", cmdline);
 	detach_pid(pid);
 	return true;
+}
+
+static bool is_process(int pid) {
+	char buf[128];
+	char key[32];
+	int tgid;
+	sprintf(buf, "/proc/%d/status", pid);
+	unique_ptr<FILE, decltype(&fclose)> fp(fopen(buf, "re"), &fclose);
+	// PID is dead
+	if (!fp)
+		return false;
+	while (fgets(buf, sizeof(buf), fp.get())) {
+		sscanf(buf, "%s", key);
+		if (key == "Tgid:"sv) {
+			sscanf(buf, "%*s %d", &tgid);
+			return tgid == pid;
+		}
+	}
+	return false;
 }
 
 static void new_zygote(int pid) {
@@ -322,17 +336,13 @@ void proc_monitor() {
 			continue;
 		}
 		bool detach = false;
-		RunFinally detach_task([&]() -> void {
-			if (detach) {
+		RunFinally detach_task([&] {
+			if (detach)
 				// Non of our business now
-				attaches[pid] = false;
-				detaches[pid] = false;
-				ptrace(PTRACE_DETACH, pid, 0, 0);
-				PTRACE_LOG("detach\n");
-			}
+				detach_pid(pid);
 		});
 
-		if (!WIFSTOPPED(status) /* Ignore if not ptrace-stop */ || detaches[pid])
+		if (!WIFSTOPPED(status) /* Ignore if not ptrace-stop */)
 			DETACH_AND_CONT;
 
 		if (WSTOPSIG(status) == SIGTRAP && WEVENT(status)) {
@@ -370,10 +380,21 @@ void proc_monitor() {
 			}
 			xptrace(PTRACE_CONT, pid);
 		} else if (WSTOPSIG(status) == SIGSTOP) {
-			PTRACE_LOG("SIGSTOP from child\n");
-			xptrace(PTRACE_SETOPTIONS, pid, nullptr,
-					PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT);
-			xptrace(PTRACE_CONT, pid);
+			if (!attaches[pid]) {
+				// Double check if this is actually a process
+				attaches[pid] = is_process(pid);
+			}
+			if (attaches[pid]) {
+				// This is a process, continue monitoring
+				PTRACE_LOG("SIGSTOP from child\n");
+				xptrace(PTRACE_SETOPTIONS, pid, nullptr,
+						PTRACE_O_TRACECLONE | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT);
+				xptrace(PTRACE_CONT, pid);
+			} else {
+				// This is a thread, do NOT monitor
+				PTRACE_LOG("SIGSTOP from thread\n");
+				DETACH_AND_CONT;
+			}
 		} else {
 			// Not caused by us, resend signal
 			xptrace(PTRACE_CONT, pid, nullptr, WSTOPSIG(status));

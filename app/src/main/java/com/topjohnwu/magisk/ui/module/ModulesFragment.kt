@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.databinding.FragmentModulesBinding
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.ui.flash.FlashActivity
-import com.topjohnwu.magisk.utils.RootUtils
+import com.topjohnwu.magisk.utils.reboot
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -64,7 +64,7 @@ class ModulesFragment : MagiskFragment<ModuleViewModel, FragmentModulesBinding>(
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.reboot -> {
-                RootUtils.reboot()
+                reboot()
                 return true
             }
             R.id.reboot_recovery -> {
@@ -72,11 +72,15 @@ class ModulesFragment : MagiskFragment<ModuleViewModel, FragmentModulesBinding>(
                 return true
             }
             R.id.reboot_bootloader -> {
-                Shell.su("/system/bin/reboot bootloader").submit()
+                reboot("bootloader")
                 return true
             }
             R.id.reboot_download -> {
-                Shell.su("/system/bin/reboot download").submit()
+                reboot("download")
+                return true
+            }
+            R.id.reboot_edl -> {
+                reboot("edl")
                 return true
             }
             else -> return false
@@ -84,32 +88,12 @@ class ModulesFragment : MagiskFragment<ModuleViewModel, FragmentModulesBinding>(
     }
 
     private fun selectFile() {
-        magiskActivity.runWithExternalRW {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "application/zip"
-            startActivityForResult(intent, Const.ID.FETCH_ZIP)
+        magiskActivity.withExternalRW {
+            onSuccess {
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.type = "application/zip"
+                startActivityForResult(intent, Const.ID.FETCH_ZIP)
+            }
         }
     }
-
-    /*override fun getListeningEvents(): IntArray {
-        return intArrayOf(Event.MODULE_LOAD_DONE)
-    }
-
-    override fun onEvent(event: Int) {
-        updateUI(Event.getResult(event))
-    }*/
-
-    /*private fun updateUI(moduleMap: Map<String, Module>) {
-        listModules.clear()
-        listModules.addAll(moduleMap.values)
-        if (listModules.size == 0) {
-            emptyRv!!.visibility = View.VISIBLE
-            recyclerView!!.visibility = View.GONE
-        } else {
-            emptyRv!!.visibility = View.GONE
-            recyclerView!!.visibility = View.VISIBLE
-            recyclerView!!.adapter = ModulesAdapter(listModules)
-        }
-        mSwipeRefreshLayout!!.isRefreshing = false
-    }*/
 }

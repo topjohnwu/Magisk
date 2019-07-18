@@ -12,6 +12,8 @@
 #include "magiskboot.h"
 #include "compress.h"
 
+using namespace std;
+
 static void usage(char *arg0) {
 	fprintf(stderr,
 		FULL_VER(MagiskBoot) " - Boot Image Modification Tool\n"
@@ -114,10 +116,11 @@ int main(int argc, char *argv[]) {
 		usage(argv[0]);
 
 	// Skip '--' for backwards compatibility
-	if (strncmp(argv[1], "--", 2) == 0)
-		argv[1] += 2;
+	string_view action(argv[1]);
+	if (str_starts(action, "--"))
+		action = argv[1] + 2;
 
-	if (strcmp(argv[1], "cleanup") == 0) {
+	if (action == "cleanup") {
 		fprintf(stderr, "Cleaning up...\n");
 		unlink(HEADER_FILE);
 		unlink(KERNEL_FILE);
@@ -127,7 +130,7 @@ int main(int argc, char *argv[]) {
 		unlink(EXTRA_FILE);
 		unlink(RECV_DTBO_FILE);
 		unlink(DTB_FILE);
-	} else if (argc > 2 && strcmp(argv[1], "sha1") == 0) {
+	} else if (argc > 2 && action == "sha1") {
 		uint8_t sha1[SHA_DIGEST_SIZE];
 		void *buf;
 		size_t size;
@@ -137,34 +140,35 @@ int main(int argc, char *argv[]) {
 			printf("%02x", i);
 		printf("\n");
 		munmap(buf, size);
-	} else if (argc > 2 && strcmp(argv[1], "unpack") == 0) {
-		if (strcmp(argv[2], "-h") == 0) {
+	} else if (argc > 2 && action == "unpack") {
+		if (argv[2] == "-h"sv) {
 			if (argc == 3)
 				usage(argv[0]);
 			return unpack(argv[3], true);
 		} else {
 			return unpack(argv[2]);
 		}
-	} else if (argc > 2 && strcmp(argv[1], "repack") == 0) {
-		if (strcmp(argv[2], "-n") == 0) {
-			if (argc == 4)
+	} else if (argc > 2 && action == "repack") {
+		if (argv[2] == "-n"sv) {
+			if (argc == 3)
 				usage(argv[0]);
 			repack(argv[3], argv[4] ? argv[4] : NEW_BOOT, true);
 		} else {
 			repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
 		}
-	} else if (argc > 2 && strcmp(argv[1], "decompress") == 0) {
+	} else if (argc > 2 && action == "decompress") {
 		decompress(argv[2], argv[3]);
-	} else if (argc > 2 && strncmp(argv[1], "compress", 8) == 0) {
-		compress(argv[1][8] == '=' ? &argv[1][9] : "gzip", argv[2], argv[3]);
-	} else if (argc > 4 && strcmp(argv[1], "hexpatch") == 0) {
+	} else if (argc > 2 && str_starts(action, "compress")) {
+		compress(action[8] == '=' ? &action[9] : "gzip", argv[2], argv[3]);
+	} else if (argc > 4 && action == "hexpatch") {
 		return hexpatch(argv[2], argv[3], argv[4]);
-	} else if (argc > 2 && strcmp(argv[1], "cpio") == 0) {
-		if (cpio_commands(argc - 2, argv + 2)) usage(argv[0]);
-	} else if (argc > 2 && strncmp(argv[1], "dtb", 3) == 0) {
-		if (argv[1][3] != '-')
+	} else if (argc > 2 && action == "cpio"sv) {
+		if (cpio_commands(argc - 2, argv + 2))
 			usage(argv[0]);
-		if (dtb_commands(&argv[1][4], argc - 2, argv + 2))
+	} else if (argc > 2 && str_starts(action, "dtb")) {
+		if (action[3] != '-')
+			usage(argv[0]);
+		if (dtb_commands(&action[4], argc - 2, argv + 2))
 			usage(argv[0]);
 	} else {
 		usage(argv[0]);
