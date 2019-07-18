@@ -154,6 +154,7 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "mount");
 	sepol_allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "unmount");
 	sepol_allow("kernel", ALL, "file", "read");
+	sepol_allow("kernel", ALL, "file", "write");
 
 	// Allow us to do anything to any files/dir/links
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "file", ALL);

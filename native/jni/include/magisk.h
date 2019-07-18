@@ -12,7 +12,6 @@
 #define BLOCKDIR        MAGISKTMP "/block"
 #define BBPATH          MAGISKTMP "/busybox"
 #define MODULEMNT       MAGISKTMP "/modules"
-#define ROOTOVERLAY     MAGISKTMP "/rootdir"
 #define SECURE_DIR      "/data/adb"
 #define MODULEROOT      SECURE_DIR "/modules"
 #define MODULEUPGRADE   SECURE_DIR "/modules_update"

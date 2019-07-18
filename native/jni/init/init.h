@@ -10,8 +10,20 @@ struct cmdline {
 };
 
 struct raw_data {
-	void *buf;
-	size_t sz;
+	uint8_t *buf = nullptr;
+	size_t sz = 0;
+
+	raw_data() = default;
+	raw_data(const raw_data&) = delete;
+	raw_data(raw_data &&d) {
+		d.buf = buf;
+		d.sz = sz;
+		buf = nullptr;
+		sz = 0;
+	}
+	~raw_data() {
+		free(buf);
+	}
 };
 
 /* *************
@@ -41,7 +53,7 @@ public:
 
 class MagiskInit : public BaseInit {
 protected:
-	raw_data self{};
+	raw_data self;
 	bool mnt_system = false;
 	bool mnt_vendor = false;
 	bool mnt_product = false;
@@ -72,9 +84,10 @@ public:
 
 class SARCommon : public MagiskInit {
 protected:
-	raw_data config{};
+	raw_data config;
 	dev_t system_dev;
 
+	void backup_files();
 	void patch_rootdir();
 public:
 	SARCommon(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
@@ -91,11 +104,11 @@ public:
 
 class FirstStageInit : public BaseInit {
 protected:
-	void patch_fstab();
+	void prepare();
 public:
 	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 	void start() override {
-		patch_fstab();
+		prepare();
 		exec_init("/system/bin/init");
 	}
 };

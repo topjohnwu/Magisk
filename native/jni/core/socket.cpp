@@ -22,7 +22,7 @@ socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name) {
 int create_rand_socket(struct sockaddr_un *sun) {
 	memset(sun, 0, sizeof(*sun));
 	sun->sun_family = AF_LOCAL;
-	gen_rand_str(sun->sun_path + 1, 9);
+	gen_rand_str(sun->sun_path + 1, sizeof(sun->sun_path) - 1);
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	xbind(fd, (struct sockaddr*) sun, ABS_SOCKET_LEN(sun));
 	xlisten(fd, 1);

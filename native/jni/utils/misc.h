@@ -10,7 +10,6 @@ extern "C" {
 unsigned get_shell_uid();
 int fork_dont_care();
 int fork_no_zombie();
-void gen_rand_str(char *buf, int len);
 int strend(const char *s1, const char *s2);
 char *rtrim(char *str);
 void init_argv0(int argc, char **argv);
@@ -23,6 +22,8 @@ int parse_int(const char *s);
 #include <string>
 #include <functional>
 #include <string_view>
+
+void gen_rand_str(char *buf, int len, bool varlen = true);
 
 #define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != std::string::npos)
 #define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)

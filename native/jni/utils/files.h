@@ -46,6 +46,18 @@ void frm_rf(int dirfd, std::initializer_list<const char *> excl = std::initializ
 void clone_dir(int src, int dest, bool overwrite = true);
 void parse_mnt(const char *file, const std::function<bool (mntent*)> &fn);
 
+template <typename T>
+void full_read(const char *filename, T &buf, size_t &size) {
+	static_assert(std::is_pointer<T>::value);
+	full_read(filename, reinterpret_cast<void**>(&buf), &size);
+}
+
+template <typename T>
+void fd_full_read(int fd, T &buf, size_t &size) {
+	static_assert(std::is_pointer<T>::value);
+	fd_full_read(fd, reinterpret_cast<void**>(&buf), &size);
+}
+
 template <typename B>
 void mmap_ro(const char *filename, B &buf, size_t &sz) {
 	buf = (B) __mmap(filename, &sz, false);

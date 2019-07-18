@@ -127,6 +127,7 @@ public:
 		LOGD("Ramdisk is recovery, abort\n");
 		rename("/.backup/init", "/init");
 		rm_rf("/.backup");
+		rm_rf("/sepolicy_custom");
 		exec_init();
 	}
 };

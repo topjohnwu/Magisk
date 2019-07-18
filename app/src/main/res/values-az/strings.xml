@@ -36,9 +36,9 @@
 
     <string name="safetyNet_res_invalid">Cavab etibarsızdır.</string>
 
-    <string name="magisk_up_to_date">Magisk\'in son versiyası yüklənib</string>
+    <string name="magisk_up_to_date">Magisk ən yenidir</string>
 
-    <string name="manager_up_to_date">Magisk Manager\'in son versiyası yüklənib </string>
+    <string name="manager_up_to_date">Magisk Manager ən yenidir</string>
 
     <string name="advanced_settings_title">Qabaqcıl Parametrlər</string>
 
@@ -154,7 +154,7 @@
 
     <string name="internal_storage">Zip faylının olduğu yer:\n[Daxili Yaddaş]%1$s</string>
 
-    <string name="manager_download_install">Yükləyib qurdaşdırmaq üçün toxun.</string>
+    <string name="manager_download_install">Yükləyib quraşdırmaq üçün toxun.</string>
 
     <string name="dtbo_patched_title">DTBO yamaqlanıb!</string>
 
