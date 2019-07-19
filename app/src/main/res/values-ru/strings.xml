@@ -44,6 +44,7 @@
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
     <string name="reboot_download">Перезагрузка в Download</string>
+    <string name="reboot_edl">Перезагрузка в EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступно обновление</string>
