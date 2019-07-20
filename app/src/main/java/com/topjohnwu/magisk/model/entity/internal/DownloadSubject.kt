@@ -31,7 +31,11 @@ sealed class DownloadSubject : Parcelable {
     ) : DownloadSubject() {
 
         override val url: String get() = magisk.link
-        override val fileName get() = "Magisk-v${magisk.version}(${magisk.versionCode}).zip"
+        override val fileName get() =
+            if (configuration is Configuration.Flash)
+                "magisk.zip"
+            else
+                "Magisk-v${magisk.version}(${magisk.versionCode}).zip"
 
     }
 
