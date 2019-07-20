@@ -3,11 +3,14 @@ package com.topjohnwu.magisk.view.dialogs
 import android.app.Activity
 import android.app.ProgressDialog
 import android.widget.Toast
+import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.tasks.MagiskInstaller
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.reboot
+import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.io.SuFile
 
@@ -25,6 +28,8 @@ class EnvFixDialog(activity: Activity) : CustomAlertDialog(activity) {
                 override fun operations(): Boolean {
                     installDir = SuFile("/data/adb/magisk")
                     Shell.su("rm -rf /data/adb/magisk/*").exec()
+                    if (!ShellUtils.checkSum("MD5", zipFile, Info.remote.magisk.hash))
+                        Networking.get(Info.remote.magisk.link).execForFile(zipFile)
                     return extractZip() && Shell.su("fix_env").exec().isSuccess
                 }
 
