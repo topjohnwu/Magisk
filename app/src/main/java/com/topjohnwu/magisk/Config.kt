@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Xml
 import androidx.core.content.edit
 import com.topjohnwu.magisk.data.database.SettingsDao
@@ -137,6 +138,22 @@ object Config : PreferenceModel, DBConfig {
         }
 
     fun initialize() = prefs.edit {
+        parsePrefs(this)
+
+        if (!prefs.contains(Key.UPDATE_CHANNEL))
+            putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
+
+        // Get actual state
+        putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
+
+        // Write database configs
+        putString(Key.ROOT_ACCESS, rootMode.toString())
+        putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
+        putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
+        putBoolean(Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
+    }
+
+    private fun parsePrefs(editor: SharedPreferences.Editor) = editor.apply {
         val config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS)
         if (config.exists()) runCatching {
             val input = SuFileInputStream(config).buffered()
@@ -184,19 +201,8 @@ object Config : PreferenceModel, DBConfig {
                 }
             }
             config.delete()
+            remove(Key.ETAG_KEY)
         }
-        remove(Key.ETAG_KEY)
-        if (!prefs.contains(Key.UPDATE_CHANNEL))
-            putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
-
-        // Get actual state
-        putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
-
-        // Write database configs
-        putString(Key.ROOT_ACCESS, rootMode.toString())
-        putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
-        putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
-        putBoolean(Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
     }
 
     @JvmStatic

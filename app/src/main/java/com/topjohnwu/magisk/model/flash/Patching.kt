@@ -9,7 +9,7 @@ sealed class Patching(
     private val console: MutableList<String>,
     logs: MutableList<String>,
     private val resultListener: FlashResultListener
-) : MagiskInstaller(console, logs) {
+) : MagiskInstaller(file, console, logs) {
 
     override fun onResult(success: Boolean) {
         if (success) {

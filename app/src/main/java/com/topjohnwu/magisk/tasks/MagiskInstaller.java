@@ -29,7 +29,6 @@ import org.kamranzafar.jtar.TarOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +44,7 @@ public abstract class MagiskInstaller {
     protected String srcBoot;
     protected File destFile;
     protected File installDir;
-    protected File zipFile = new File(App.self.getCacheDir(), "magisk.zip");
+    protected Uri zipUri;
 
     private final List<String> console;
     private final List<String> logs;
@@ -56,9 +55,10 @@ public abstract class MagiskInstaller {
         logs = NOPList.getInstance();
     }
 
-    public MagiskInstaller(List<String> out, List<String> err) {
+    public MagiskInstaller(Uri zip, List<String> out, List<String> err) {
         console = out;
         logs = err;
+        zipUri = zip;
         installDir = new File(App.deContext.getFilesDir().getParent(), "install");
         Shell.sh("rm -rf " + installDir).exec();
         installDir.mkdirs();
@@ -105,7 +105,7 @@ public abstract class MagiskInstaller {
 
         try {
             ZipInputStream zi = new ZipInputStream(new BufferedInputStream(
-                    new FileInputStream(zipFile), (int) zipFile.length()));
+                    App.self.getContentResolver().openInputStream(zipUri)));
             ZipEntry ze;
             while ((ze = zi.getNextEntry()) != null) {
                 if (ze.isDirectory())

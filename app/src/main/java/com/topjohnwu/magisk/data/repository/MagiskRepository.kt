@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.magisk.utils.toSingle
-import com.topjohnwu.magisk.utils.writeToCachedFile
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
 
@@ -22,24 +21,7 @@ class MagiskRepository(
     private val packageManager: PackageManager
 ) {
 
-    fun fetchMagisk() = fetchUpdate()
-        .flatMap { apiRaw.fetchFile(it.magisk.link) }
-        .map { it.writeToCachedFile(context, FILE_MAGISK_ZIP) }
-
-    fun fetchManager() = fetchUpdate()
-        .flatMap { apiRaw.fetchFile(it.app.link) }
-        .map { it.writeToCachedFile(context, FILE_MAGISK_APK) }
-
-    fun fetchUninstaller() = fetchUpdate()
-        .flatMap { apiRaw.fetchFile(it.uninstaller.link) }
-        .map { it.writeToCachedFile(context, FILE_UNINSTALLER_ZIP) }
-
     fun fetchSafetynet() = apiRaw.fetchSafetynet()
-
-    fun fetchBootctl() = apiRaw
-        .fetchBootctl()
-        .map { it.writeToCachedFile(context, FILE_BOOTCTL_SH) }
-
 
     fun fetchUpdate() = when (Config.updateChannel) {
         Config.Value.DEFAULT_CHANNEL, Config.Value.STABLE_CHANNEL -> apiRaw.fetchStableUpdate()
@@ -83,12 +65,6 @@ class MagiskRepository(
     private val Boolean.state get() = if (this) "add" else "rm"
 
     companion object {
-        const val FILE_MAGISK_ZIP = "magisk.zip"
-        const val FILE_MAGISK_APK = "magisk.apk"
-        const val FILE_UNINSTALLER_ZIP = "uninstaller.zip"
-        const val FILE_SAFETY_NET_APK = "safetynet.apk"
-        const val FILE_BOOTCTL_SH = "bootctl"
-
         private val blacklist = listOf(
             let { val app: App by inject(); app }.packageName,
             "android",
