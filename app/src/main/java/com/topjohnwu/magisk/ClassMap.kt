@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk
 
-import com.topjohnwu.magisk.model.download.DownloadModuleService
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.model.update.UpdateCheckService
@@ -17,8 +16,7 @@ object ClassMap {
         FlashActivity::class.java to a.f::class.java,
         UpdateCheckService::class.java to a.g::class.java,
         GeneralReceiver::class.java to a.h::class.java,
-        DownloadModuleService::class.java to a.j::class.java,
-        DownloadService::class.java to a.k::class.java,
+        DownloadService::class.java to a.j::class.java,
         SuRequestActivity::class.java to a.m::class.java
     )
 

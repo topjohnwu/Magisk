@@ -1,7 +1,7 @@
 package a;
 
-import com.topjohnwu.magisk.model.download.DownloadModuleService;
+import com.topjohnwu.magisk.model.download.DownloadService;
 
-public class j extends DownloadModuleService {
+public class j extends DownloadService {
     /* stub */
 }

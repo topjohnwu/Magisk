@@ -9,18 +9,19 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
+import com.topjohnwu.magisk.utils.ProgInputStream
+import com.topjohnwu.magisk.utils.cachedFile
 import com.topjohnwu.magisk.utils.firstMap
-import com.topjohnwu.magisk.utils.writeToCachedFile
+import com.topjohnwu.magisk.utils.writeTo
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import okhttp3.ResponseBody
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 import java.io.File
+import java.io.InputStream
 
 abstract class RemoteFileService : NotificationService() {
 
@@ -73,19 +74,14 @@ abstract class RemoteFileService : NotificationService() {
     }
 
     private fun download(subject: DownloadSubject) = repo.downloadFile(subject.url)
-        .map { it.toFile(subject.hashCode(), subject.fileName) }
+        .map { it.toStream(subject.hashCode()) }
         .map {
-            when (subject) {
-                is Module -> {
-                    update(subject.hashCode()) {
-                        it.setContentText(getString(R.string.download_module))
-                            .setProgress(0, 0, true)
-                    }
-
-                    get<ModuleTransformer> { parametersOf(subject) }
-                        .inject(it, startInternal(Installer).blockingGet())
+            cachedFile(subject.fileName).apply {
+                when (subject) {
+                    is Module -> it.toModule(this,
+                            repo.downloadFile(Const.Url.MODULE_INSTALLER).blockingGet().byteStream())
+                    else -> it.writeTo(this)
                 }
-                else -> it
             }
         }
 
@@ -95,11 +91,11 @@ abstract class RemoteFileService : NotificationService() {
         .firstOrNull { it == name }
         ?.let { File(this, it) }
 
-    private fun ResponseBody.toFile(id: Int, name: String): File {
+    private fun ResponseBody.toStream(id: Int): InputStream {
         val maxRaw = contentLength()
         val max = maxRaw / 1_000_000f
 
-        return writeToCachedFile(this@RemoteFileService, name) {
+        return ProgInputStream(byteStream()) {
             val progress = it / 1_000_000f
 
             update(id) { notification ->

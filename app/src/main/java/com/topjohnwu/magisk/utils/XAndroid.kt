@@ -95,10 +95,12 @@ fun File.provide(context: Context = get()): Uri {
 }
 
 fun File.mv(destination: File) {
-    inputStream().copyTo(destination)
+    inputStream().writeTo(destination)
     deleteRecursively()
 }
 
 fun String.toFile() = File(this)
 
 fun Intent.chooser(title: String = "Pick an app") = Intent.createChooser(this, title)
+
+fun Context.cachedFile(name: String) = File(cacheDir, name)

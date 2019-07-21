@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
-import com.topjohnwu.magisk.utils.copyTo
+import com.topjohnwu.magisk.utils.writeTo
 import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.*
@@ -73,7 +73,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     private fun downloadSafetyNet(requiresUserInput: Boolean = true) {
         fun download() = magiskRepo.fetchSafetynet()
-                .map { it.byteStream().copyTo(EXT_FILE) }
+                .map { it.byteStream().writeTo(EXT_FILE) }
                 .subscribeK { updateSafetyNet(true) }
 
         if (!requiresUserInput) {

@@ -65,9 +65,7 @@
 
         <!-- Service -->
 
-        <service android:name="a.j" />
-        <service
-            android:name="a.k"
+        <service android:name="a.j"
             android:exported="false" />
 
         <!-- Hardcode GMS version -->
