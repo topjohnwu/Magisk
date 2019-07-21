@@ -193,7 +193,7 @@
     <string name="deny">Verweigern</string>
     <string name="prompt">Nachfragen</string>
     <string name="grant">Gewähren</string>
-    <string name="su_warning">Erlaubt den vollen Zugriff auf das Gerät.\nVerweiger dies, wenn du dir unsicher bist!</string>
+    <string name="su_warning">Erlaubt den vollen Zugriff auf das Gerät.\nVerweigere dies, wenn du dir unsicher bist!</string>
     <string name="forever">Dauerhaft</string>
     <string name="once">Einmalig</string>
     <string name="tenmin">10 Min.</string>
