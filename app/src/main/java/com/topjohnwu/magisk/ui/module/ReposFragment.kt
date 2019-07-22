@@ -99,7 +99,7 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
         fun download(install: Boolean) = context.withExternalRW {
             onSuccess {
                 DownloadService(context) {
-                    val config = if (install) Configuration.Flash() else Configuration.Download
+                    val config = if (install) Configuration.Flash.Primary else Configuration.Download
                     subject = DownloadSubject.Module(item, config)
                 }
             }

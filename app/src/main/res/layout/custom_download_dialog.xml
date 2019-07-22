@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="com.topjohnwu.magisk.model.entity.internal.DownloadDialogData" />
+            type="com.topjohnwu.magisk.ui.settings.SettingsFragment.DownloadDialogData" />
 
     </data>
 

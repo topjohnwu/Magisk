@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.net.Uri
+import android.os.Environment
 import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.work.*
@@ -19,6 +20,7 @@ import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.io.SuFile
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -119,5 +121,10 @@ object Utils {
             toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT)
         }
     }
+
+    fun ensureDownloadPath(path : String) =
+        File(Environment.getExternalStorageDirectory(), path).run {
+            if ((exists() && isDirectory) || mkdirs()) this else null
+        }
 
 }

@@ -2,6 +2,7 @@ package com.topjohnwu.magisk
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Environment
 import android.util.Xml
 import androidx.core.content.edit
 import com.topjohnwu.magisk.data.database.SettingsDao
@@ -97,10 +98,8 @@ object Config : PreferenceModel, DBConfig {
         if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
         else Value.DEFAULT_CHANNEL
 
-    private val defaultDownloadPath get() = Const.EXTERNAL_PATH.toRelativeString(Const.EXTERNAL_PATH.parentFile)
-
     var isDownloadCacheEnabled by preference(Key.DOWNLOAD_CACHE, true)
-    var downloadPath by preference(Key.DOWNLOAD_PATH, defaultDownloadPath)
+    var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
@@ -128,14 +127,9 @@ object Config : PreferenceModel, DBConfig {
     @JvmStatic
     var suManager by dbStrings(Key.SU_MANAGER, "")
 
-    fun downloadsFile(path: String = downloadPath) =
-        File(Const.EXTERNAL_PATH.parentFile, path).run {
-            if (exists()) {
-                if (isDirectory) this else null
-            } else {
-                if (mkdirs()) this else null
-            }
-        }
+    // Always return a path in external storage where we can write
+    val downloadDirectory get() =
+        Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
 
     fun initialize() = prefs.edit {
         parsePrefs(this)

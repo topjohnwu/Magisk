@@ -6,13 +6,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Environment
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
@@ -31,7 +31,7 @@ import kotlin.random.Random.Default.nextInt
 open class DownloadService : RemoteFileService() {
 
     private val context get() = this
-    private val String.downloadsFile get() = Config.downloadsFile()?.let { File(it, this) }
+    private val String.downloadsFile get() = File(Config.downloadDirectory, this)
     private val File.type
         get() = MimeTypeMap.getSingleton()
             .getMimeTypeFromExtension(extension)
@@ -40,7 +40,6 @@ open class DownloadService : RemoteFileService() {
     override fun onFinished(file: File, subject: DownloadSubject) = when (subject) {
         is Magisk -> onFinishedInternal(file, subject)
         is Module -> onFinishedInternal(file, subject)
-        else -> Unit
     }
 
     private fun onFinishedInternal(
@@ -71,7 +70,6 @@ open class DownloadService : RemoteFileService() {
     ) = when (subject) {
         is Magisk -> addActionsInternal(file, subject)
         is Module -> addActionsInternal(file, subject)
-        else -> this
     }
 
     private fun NotificationCompat.Builder.addActionsInternal(
@@ -109,13 +107,7 @@ open class DownloadService : RemoteFileService() {
     // ---
 
     private fun moveToDownloads(file: File) {
-        val destination = file.name.downloadsFile ?: let {
-            Utils.toast(
-                getString(R.string.download_file_folder_error),
-                Toast.LENGTH_LONG
-            )
-            return
-        }
+        val destination = file.name.downloadsFile
 
         if (file != destination) {
             destination.deleteRecursively()
@@ -125,32 +117,18 @@ open class DownloadService : RemoteFileService() {
         Utils.toast(
             getString(
                 R.string.internal_storage,
-                "/" + destination.toRelativeString(Const.EXTERNAL_PATH.parentFile)
+                "/" + destination.toRelativeString(Environment.getExternalStorageDirectory())
             ),
             Toast.LENGTH_LONG
         )
     }
 
     private fun fileIntent(fileName: String): Intent {
-        val file = fileName.downloadsFile ?: let {
-            Utils.toast(
-                getString(R.string.download_file_folder_error),
-                Toast.LENGTH_LONG
-            )
-            return Intent()
-        }
-        return fileIntent(file)
+        return fileIntent(fileName.downloadsFile)
     }
 
     private fun fileParentIntent(fileName: String): Intent {
-        val file = fileName.downloadsFile?.parentFile ?: let {
-            Utils.toast(
-                getString(R.string.download_file_folder_error),
-                Toast.LENGTH_LONG
-            )
-            return Intent()
-        }
-        return fileIntent(file)
+        return fileIntent(fileName.downloadsFile.parentFile!!)
     }
 
     private fun fileIntent(file: File): Intent {

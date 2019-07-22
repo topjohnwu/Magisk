@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.settings
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.Toast
@@ -14,19 +15,21 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
 import com.skoumal.teanity.extensions.subscribeK
+import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
-import com.topjohnwu.magisk.model.entity.internal.DownloadDialogData
+import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.android.inject
+import java.io.File
 
 class SettingsFragment : BasePreferenceFragment() {
 
@@ -297,6 +300,13 @@ class SettingsFragment : BasePreferenceFragment() {
             .show()
     }
 
+    inner class DownloadDialogData(initialValue: String) {
+        val text = KObservableField(initialValue)
+        val path = Observer(text) {
+            File(Environment.getExternalStorageDirectory(), text.value).absolutePath
+        }
+    }
+
     private inline fun showDownloadDialog(
         initialValue: String = Config.downloadPath,
         crossinline onSuccess: (String) -> Unit
@@ -310,7 +320,7 @@ class SettingsFragment : BasePreferenceFragment() {
             .setTitle(R.string.settings_download_path_title)
             .setView(binding.root)
             .setPositiveButton(R.string.ok) { _, _ ->
-                Config.downloadsFile(data.text.value)?.let { onSuccess(data.text.value) }
+                Utils.ensureDownloadPath(data.text.value)?.let { onSuccess(data.text.value) }
                     ?: Utils.toast(R.string.settings_download_path_error, Toast.LENGTH_SHORT)
             }
             .setNegativeButton(R.string.close, null)

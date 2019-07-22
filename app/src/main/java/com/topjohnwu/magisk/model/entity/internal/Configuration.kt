@@ -14,10 +14,6 @@ sealed class Configuration : Parcelable {
         @Parcelize
         object Secondary : Flash()
 
-        companion object {
-            operator fun invoke(): Flash = Primary
-        }
-
     }
 
     @Parcelize

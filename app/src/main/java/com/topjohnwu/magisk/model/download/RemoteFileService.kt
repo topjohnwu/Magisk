@@ -8,7 +8,8 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.utils.ProgInputStream
 import com.topjohnwu.magisk.utils.cachedFile
 import com.topjohnwu.magisk.utils.firstMap
@@ -30,8 +31,7 @@ abstract class RemoteFileService : NotificationService() {
     private val supportedFolders
         get() = listOfNotNull(
             cacheDir,
-            Config.downloadsFile(),
-            Const.EXTERNAL_PATH
+            Config.downloadDirectory
         )
 
     override val defaultNotification: NotificationCompat.Builder
@@ -46,31 +46,27 @@ abstract class RemoteFileService : NotificationService() {
 
     // ---
 
-    private fun startInternal(subject: DownloadSubject): Single<File> = search(subject)
+    private fun start(subject: DownloadSubject) = search(subject)
         .onErrorResumeNext(download(subject))
         .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.fileName) } }
         .observeOn(AndroidSchedulers.mainThread())
         .doOnSuccess {
             runCatching { onFinished(it, subject) }.onFailure { Timber.e(it) }
             finish(it, subject)
-        }
-
-    private fun start(subject: DownloadSubject) = startInternal(subject).subscribeK()
+        }.subscribeK()
 
     private fun search(subject: DownloadSubject) = Single.fromCallable {
         if (!Config.isDownloadCacheEnabled) {
             throw IllegalStateException("The download cache is disabled")
         }
 
-        val file = supportedFolders.firstMap { it.find(subject.fileName) }
-
-        if (subject is Magisk) {
-            if (!ShellUtils.checkSum("MD5", file, subject.magisk.hash)) {
-                throw IllegalStateException("The given file doesn't match the hash")
+        supportedFolders.firstMap { it.find(subject.fileName) }.also {
+            if (subject is Magisk) {
+                if (!ShellUtils.checkSum("MD5", it, subject.magisk.hash)) {
+                    throw IllegalStateException("The given file doesn't match the hash")
+                }
             }
         }
-
-        file
     }
 
     private fun download(subject: DownloadSubject) = repo.downloadFile(subject.url)
@@ -107,8 +103,6 @@ abstract class RemoteFileService : NotificationService() {
     }
 
     private fun finish(file: File, subject: DownloadSubject) = finishWork(subject.hashCode()) {
-        if (subject is Installer) return@finishWork null
-
         it.addActions(file, subject)
             .setContentText(getString(R.string.download_complete))
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
