@@ -11,7 +11,6 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.utils.ProgInputStream
-import com.topjohnwu.magisk.utils.cachedFile
 import com.topjohnwu.magisk.utils.firstMap
 import com.topjohnwu.magisk.utils.writeTo
 import com.topjohnwu.magisk.view.Notifications
@@ -48,7 +47,7 @@ abstract class RemoteFileService : NotificationService() {
 
     private fun start(subject: DownloadSubject) = search(subject)
         .onErrorResumeNext(download(subject))
-        .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.fileName) } }
+        .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.title) } }
         .observeOn(AndroidSchedulers.mainThread())
         .doOnSuccess {
             runCatching { onFinished(it, subject) }.onFailure { Timber.e(it) }
@@ -60,7 +59,7 @@ abstract class RemoteFileService : NotificationService() {
             throw IllegalStateException("The download cache is disabled")
         }
 
-        supportedFolders.firstMap { it.find(subject.fileName) }.also {
+        supportedFolders.firstMap { it.find(subject.file.name) }.also {
             if (subject is Magisk) {
                 if (!ShellUtils.checkSum("MD5", it, subject.magisk.hash)) {
                     throw IllegalStateException("The given file doesn't match the hash")
@@ -72,7 +71,7 @@ abstract class RemoteFileService : NotificationService() {
     private fun download(subject: DownloadSubject) = repo.downloadFile(subject.url)
         .map { it.toStream(subject.hashCode()) }
         .map {
-            cachedFile(subject.fileName).apply {
+            subject.file.apply {
                 when (subject) {
                     is Module -> it.toModule(this,
                             repo.downloadFile(Const.Url.MODULE_INSTALLER).blockingGet().byteStream())

@@ -6,13 +6,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Environment
 import android.webkit.MimeTypeMap
-import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
@@ -20,7 +17,6 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.ui.flash.FlashActivity
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.chooser
 import com.topjohnwu.magisk.utils.provide
 import java.io.File
@@ -31,7 +27,6 @@ import kotlin.random.Random.Default.nextInt
 open class DownloadService : RemoteFileService() {
 
     private val context get() = this
-    private val String.downloadsFile get() = File(Config.downloadDirectory, this)
     private val File.type
         get() = MimeTypeMap.getSingleton()
             .getMimeTypeFromExtension(extension)
@@ -46,17 +41,16 @@ open class DownloadService : RemoteFileService() {
         file: File,
         subject: Magisk
     ) = when (val conf = subject.configuration) {
-        Download -> moveToDownloads(file)
         Uninstall -> FlashActivity.uninstall(this, file)
         is Patch -> FlashActivity.patch(this, file, conf.fileUri)
         is Flash -> FlashActivity.flash(this, file, conf is Secondary)
+        else -> Unit
     }
 
     private fun onFinishedInternal(
         file: File,
         subject: Module
     ) = when (subject.configuration) {
-        Download -> moveToDownloads(file)
         is Flash -> FlashActivity.install(this, file)
         else -> Unit
     }
@@ -75,8 +69,8 @@ open class DownloadService : RemoteFileService() {
         file: File,
         subject: Magisk
     ) = when (val conf = subject.configuration) {
-        Download -> addAction(0, R.string.download_open_parent, fileParentIntent(subject.fileName))
-            .addAction(0, R.string.download_open_self, fileIntent(subject.fileName))
+        Download -> addAction(0, R.string.download_open_parent, fileIntent(subject.file.parentFile!!))
+            .addAction(0, R.string.download_open_self, fileIntent(subject.file))
         Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, file))
         is Flash -> setContentIntent(FlashActivity.flashIntent(context, file, conf is Secondary))
         is Patch -> setContentIntent(FlashActivity.patchIntent(context, file, conf.fileUri))
@@ -87,8 +81,8 @@ open class DownloadService : RemoteFileService() {
         file: File,
         subject: Module
     ) = when (subject.configuration) {
-        Download -> addAction(0, R.string.download_open_parent, fileParentIntent(subject.fileName))
-            .addAction(0, R.string.download_open_self, fileIntent(subject.fileName))
+        Download -> addAction(0, R.string.download_open_parent, fileIntent(subject.file.parentFile!!))
+            .addAction(0, R.string.download_open_self, fileIntent(subject.file))
         is Flash -> setContentIntent(FlashActivity.installIntent(context, file))
         else -> this
     }
@@ -104,31 +98,6 @@ open class DownloadService : RemoteFileService() {
             .let { addAction(icon, getString(title), it) }
 
     // ---
-
-    private fun moveToDownloads(file: File) {
-        val destination = file.name.downloadsFile
-
-        if (file != destination) {
-            destination.deleteRecursively()
-            file.copyTo(destination)
-        }
-
-        Utils.toast(
-            getString(
-                R.string.internal_storage,
-                "/" + destination.toRelativeString(Environment.getExternalStorageDirectory())
-            ),
-            Toast.LENGTH_LONG
-        )
-    }
-
-    private fun fileIntent(fileName: String): Intent {
-        return fileIntent(fileName.downloadsFile)
-    }
-
-    private fun fileParentIntent(fileName: String): Intent {
-        return fileIntent(fileName.downloadsFile.parentFile!!)
-    }
 
     private fun fileIntent(file: File): Intent {
         return Intent(Intent.ACTION_VIEW)
