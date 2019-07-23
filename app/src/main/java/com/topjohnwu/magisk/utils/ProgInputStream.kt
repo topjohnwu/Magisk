@@ -10,12 +10,21 @@ class ProgInputStream(
 ) : FilterInputStream(base) {
 
     private var bytesRead = 0L
+    private var lastUpdate = 0L
+
+    private fun emitProgress() {
+        val cur = System.currentTimeMillis()
+        if (cur - lastUpdate > 1000) {
+            lastUpdate = cur
+            UiThreadHandler.run { progressEmitter(bytesRead) }
+        }
+    }
 
     override fun read(): Int {
         val b = read()
         if (b >= 0) {
             bytesRead++
-            UiThreadHandler.run { progressEmitter(bytesRead) }
+            emitProgress()
         }
         return b
     }
@@ -28,7 +37,7 @@ class ProgInputStream(
         val sz = super.read(b, off, len)
         if (sz > 0) {
             bytesRead += sz
-            UiThreadHandler.run { progressEmitter(bytesRead) }
+            emitProgress()
         }
         return sz
     }
