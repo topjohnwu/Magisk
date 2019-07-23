@@ -50,7 +50,6 @@ open class DownloadService : RemoteFileService() {
         Uninstall -> FlashActivity.uninstall(this, file)
         is Patch -> FlashActivity.patch(this, file, conf.fileUri)
         is Flash -> FlashActivity.flash(this, file, conf is Secondary)
-        else -> Unit
     }
 
     private fun onFinishedInternal(
