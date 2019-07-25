@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.ui.flash
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
@@ -23,6 +25,13 @@ open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>(
         parametersOf(action, uri, additionalUri)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val id = intent.getIntExtra(Const.Key.DISMISS_ID, -1)
+        if (id != -1)
+            NotificationManagerCompat.from(this).cancel(id)
+    }
+
     override fun onBackPressed() {
         if (viewModel.loading) return
         super.onBackPressed()
@@ -39,36 +48,44 @@ open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>(
 
         /* Flashing is understood as installing / flashing magisk itself */
 
-        fun flashIntent(context: Context, file: File, isSecondSlot: Boolean) = intent(context, file)
+        fun flashIntent(context: Context, file: File, isSecondSlot: Boolean, id : Int = -1)
+            = intent(context, file)
             .putExtra(Const.Key.FLASH_ACTION, flashType(isSecondSlot))
+            .putExtra(Const.Key.DISMISS_ID, id)
 
-        fun flash(context: Context, file: File, isSecondSlot: Boolean) =
-            context.startActivity(flashIntent(context, file, isSecondSlot))
+        fun flash(context: Context, file: File, isSecondSlot: Boolean, id: Int) =
+            context.startActivity(flashIntent(context, file, isSecondSlot, id))
 
         /* Patching is understood as injecting img files with magisk */
 
-        fun patchIntent(context: Context, file: File, uri: Uri) = intent(context, file)
+        fun patchIntent(context: Context, file: File, uri: Uri, id : Int = -1)
+            = intent(context, file)
             .putExtra(Const.Key.FLASH_DATA, uri)
             .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_FILE)
+            .putExtra(Const.Key.DISMISS_ID, id)
 
-        fun patch(context: Context, file: File, uri: Uri) =
-            context.startActivity(patchIntent(context, file, uri))
+        fun patch(context: Context, file: File, uri: Uri, id: Int) =
+            context.startActivity(patchIntent(context, file, uri, id))
 
         /* Uninstalling is understood as removing magisk entirely */
 
-        fun uninstallIntent(context: Context, file: File) = intent(context, file)
+        fun uninstallIntent(context: Context, file: File, id : Int = -1)
+            = intent(context, file)
             .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL)
+            .putExtra(Const.Key.DISMISS_ID, id)
 
-        fun uninstall(context: Context, file: File) =
-            context.startActivity(uninstallIntent(context, file))
+        fun uninstall(context: Context, file: File, id: Int) =
+            context.startActivity(uninstallIntent(context, file, id))
 
         /* Installing is understood as flashing modules / zips */
 
-        fun installIntent(context: Context, file: File) = intent(context, file)
+        fun installIntent(context: Context, file: File, id : Int = -1)
+            = intent(context, file)
             .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP)
+            .putExtra(Const.Key.DISMISS_ID, id)
 
-        fun install(context: Context, file: File) =
-            context.startActivity(installIntent(context, file))
+        fun install(context: Context, file: File, id: Int) =
+            context.startActivity(installIntent(context, file, id))
 
     }
 

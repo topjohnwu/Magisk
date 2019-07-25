@@ -83,6 +83,7 @@ object Const {
         const val INTENT_SET_LINK = "link"
         const val FLASH_ACTION = "action"
         const val FLASH_DATA = "additional_data"
+        const val DISMISS_ID = "dismiss_id"
         const val BROADCAST_MANAGER_UPDATE = "manager_update"
         const val BROADCAST_REBOOT = "reboot"
     }

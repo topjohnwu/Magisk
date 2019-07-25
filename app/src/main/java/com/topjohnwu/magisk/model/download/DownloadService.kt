@@ -32,26 +32,28 @@ open class DownloadService : RemoteFileService() {
             .getMimeTypeFromExtension(extension)
             ?: "resource/folder"
 
-    override fun onFinished(file: File, subject: DownloadSubject) = when (subject) {
-        is Magisk -> onFinishedInternal(file, subject)
-        is Module -> onFinishedInternal(file, subject)
+    override fun onFinished(file: File, subject: DownloadSubject, id: Int) = when (subject) {
+        is Magisk -> onFinishedInternal(file, subject, id)
+        is Module -> onFinishedInternal(file, subject, id)
     }
 
     private fun onFinishedInternal(
         file: File,
-        subject: Magisk
+        subject: Magisk,
+        id: Int
     ) = when (val conf = subject.configuration) {
-        Uninstall -> FlashActivity.uninstall(this, file)
-        is Patch -> FlashActivity.patch(this, file, conf.fileUri)
-        is Flash -> FlashActivity.flash(this, file, conf is Secondary)
+        Uninstall -> FlashActivity.uninstall(this, file, id)
+        is Patch -> FlashActivity.patch(this, file, conf.fileUri, id)
+        is Flash -> FlashActivity.flash(this, file, conf is Secondary, id)
         else -> Unit
     }
 
     private fun onFinishedInternal(
         file: File,
-        subject: Module
+        subject: Module,
+        id: Int
     ) = when (subject.configuration) {
-        is Flash -> FlashActivity.install(this, file)
+        is Flash -> FlashActivity.install(this, file, id)
         else -> Unit
     }
 

@@ -1,12 +1,11 @@
 package com.topjohnwu.magisk.model.download
 
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.core.content.getSystemService
+import androidx.core.app.NotificationManagerCompat
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 
@@ -14,7 +13,7 @@ abstract class NotificationService : Service() {
 
     abstract val defaultNotification: NotificationCompat.Builder
 
-    private val manager get() = getSystemService<NotificationManager>()
+    private val manager by lazy { NotificationManagerCompat.from(this) }
     private val hasNotifications get() = notifications.isNotEmpty()
 
     private val notifications =
@@ -44,37 +43,41 @@ abstract class NotificationService : Service() {
     protected fun finishWork(
         id: Int,
         editBody: (NotificationCompat.Builder) -> NotificationCompat.Builder? = { null }
-    ) {
+    ) : Int {
         val currentNotification = remove(id)?.run(editBody)
 
         updateForeground()
 
         cancel(id)
-        currentNotification?.let { notify(nextInt(), it.build()) }
+        var newId = -1
+        currentNotification?.let {
+            newId = nextInt(Int.MAX_VALUE)
+            notify(newId, it.build())
+        }
 
         if (!hasNotifications) {
             stopForeground(true)
             stopSelf()
         }
+        return newId
     }
 
     // ---
 
     private fun notify(id: Int, notification: Notification) {
-        manager?.notify(id, notification)
+        manager.notify(id, notification)
     }
 
     private fun cancel(id: Int) {
-        manager?.cancel(id)
+        manager.cancel(id)
     }
 
     private fun remove(id: Int) = notifications.remove(id)
         .also { updateForeground() }
 
     private fun updateForeground() {
-        runCatching { notifications.keys.first() to notifications.values.first() }
-            .getOrNull()
-            ?.let { startForeground(it.first, it.second.build()) }
+        if (notifications.isNotEmpty())
+            startForeground(notifications.keys.first(), notifications.values.first().build())
     }
 
     // --
