@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.view.dialogs
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -29,16 +28,10 @@ internal class InstallMethodDialog(activity: MagiskActivity<*, *>, options: List
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private fun flash(activity: MagiskActivity<*, *>) = activity.withExternalRW {
-        onSuccess {
-            DownloadService(context) {
-                subject = DownloadSubject.Magisk(Configuration.Flash.Primary)
-            }
-        }
+    private fun flash(activity: MagiskActivity<*, *>) = DownloadService(activity) {
+        subject = DownloadSubject.Magisk(Configuration.Flash.Primary)
     }
 
-    @SuppressLint("MissingPermission")
     private fun patchBoot(activity: MagiskActivity<*, *>) = activity.withExternalRW {
         onSuccess {
             Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
@@ -56,7 +49,6 @@ internal class InstallMethodDialog(activity: MagiskActivity<*, *>, options: List
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun downloadOnly(activity: MagiskActivity<*, *>) = activity.withExternalRW {
         onSuccess {
             DownloadService(activity) {
@@ -65,7 +57,6 @@ internal class InstallMethodDialog(activity: MagiskActivity<*, *>, options: List
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun installInactiveSlot(activity: MagiskActivity<*, *>) {
         CustomAlertDialog(activity)
             .setTitle(R.string.warning)

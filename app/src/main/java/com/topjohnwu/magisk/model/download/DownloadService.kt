@@ -1,13 +1,11 @@
 package com.topjohnwu.magisk.model.download
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.webkit.MimeTypeMap
-import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.R
@@ -115,7 +113,6 @@ open class DownloadService : RemoteFileService() {
 
     companion object {
 
-        @RequiresPermission(allOf = [Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE])
         inline operator fun invoke(context: Context, argBuilder: Builder.() -> Unit) {
             val builder = Builder().apply(argBuilder)
             val intent = Intent(context, ClassMap[DownloadService::class.java])

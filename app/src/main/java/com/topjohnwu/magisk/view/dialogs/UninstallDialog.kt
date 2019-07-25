@@ -2,19 +2,14 @@ package com.topjohnwu.magisk.view.dialogs
 
 import android.app.Activity
 import android.app.ProgressDialog
-import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
-import com.topjohnwu.magisk.ClassMap
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.ui.flash.FlashActivity
+import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.view.ProgressNotification
-import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
-import java.io.File
 
 class UninstallDialog(activity: Activity) : CustomAlertDialog(activity) {
 
@@ -35,20 +30,10 @@ class UninstallDialog(activity: Activity) : CustomAlertDialog(activity) {
             }
         }
         if (Info.remote.uninstaller.link.isNotEmpty()) {
-            setPositiveButton(R.string.complete_uninstall) { d, i ->
-                val zip = File(activity.filesDir, "uninstaller.zip")
-                val progress = ProgressNotification(zip.name)
-                Networking.get(Info.remote.uninstaller.link)
-                        .setDownloadProgressListener(progress)
-                        .setErrorHandler { _, _ -> progress.dlFail() }
-                        .getAsFile(zip) { f ->
-                            progress.dismiss()
-                            val intent = Intent(activity, ClassMap[FlashActivity::class.java])
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .setData(Uri.fromFile(f))
-                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL)
-                            activity.startActivity(intent)
-                        }
+            setPositiveButton(R.string.complete_uninstall) { _, _ ->
+                DownloadService(activity) {
+                    subject = DownloadSubject.Magisk(Configuration.Uninstall)
+                }
             }
         }
     }

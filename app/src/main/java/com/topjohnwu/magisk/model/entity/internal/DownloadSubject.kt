@@ -50,6 +50,17 @@ sealed class DownloadSubject : Parcelable {
         }
 
         @Parcelize
+        protected class Uninstall : Magisk() {
+            override val configuration: Configuration get() = Configuration.Uninstall
+            override val url: String get() = Info.remote.uninstaller.link
+
+            @IgnoredOnParcel
+            override val file by lazy {
+                get<Context>().cachedFile("uninstall.zip")
+            }
+        }
+
+        @Parcelize
         protected class Download : Magisk() {
             override val configuration: Configuration get() = Configuration.Download
             override val url: String get() = magisk.link
@@ -63,6 +74,7 @@ sealed class DownloadSubject : Parcelable {
         companion object {
             operator fun invoke(configuration: Configuration) = when (configuration) {
                 Configuration.Download -> Download()
+                Configuration.Uninstall -> Uninstall()
                 else -> Flash(configuration)
             }
         }
