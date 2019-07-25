@@ -46,9 +46,6 @@ abstract class NotificationService : Service() {
     ) : Int {
         val currentNotification = remove(id)?.run(editBody)
 
-        updateForeground()
-
-        cancel(id)
         var newId = -1
         currentNotification?.let {
             newId = nextInt(Int.MAX_VALUE)
@@ -56,7 +53,6 @@ abstract class NotificationService : Service() {
         }
 
         if (!hasNotifications) {
-            stopForeground(true)
             stopSelf()
         }
         return newId
@@ -72,12 +68,16 @@ abstract class NotificationService : Service() {
         manager.cancel(id)
     }
 
-    private fun remove(id: Int) = notifications.remove(id)
-        .also { updateForeground() }
+    protected fun remove(id: Int) = notifications.remove(id).also {
+        cancel(id)
+        updateForeground()
+    }
 
     private fun updateForeground() {
-        if (notifications.isNotEmpty())
+        if (hasNotifications)
             startForeground(notifications.keys.first(), notifications.values.first().build())
+        else
+            stopForeground(true)
     }
 
     // --

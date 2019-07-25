@@ -49,6 +49,7 @@ abstract class RemoteFileService : NotificationService() {
         .onErrorResumeNext(download(subject))
         .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.title) } }
         .observeOn(AndroidSchedulers.mainThread())
+        .doOnError { remove(subject.hashCode()) }
         .doOnSuccess {
             val id = finish(it, subject)
             runCatching { onFinished(it, subject, id) }.onFailure { Timber.e(it) }
