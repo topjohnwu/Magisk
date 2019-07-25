@@ -21,3 +21,7 @@ fun Int.res(vararg args: Any): String {
 }
 
 fun String.trimEmptyToNull(): String? = if (isBlank()) null else this
+
+fun String.legalFilename() = replace(" ", "_").replace("'", "").replace("\"", "")
+        .replace("$", "").replace("`", "").replace("*", "").replace("/", "_")
+        .replace("#", "").replace("@", "").replace("\\", "_")

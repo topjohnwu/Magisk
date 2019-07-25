@@ -70,12 +70,6 @@ object Utils {
         return info.loadLabel(pm).toString()
     }
 
-    fun getLegalFilename(filename: CharSequence): String {
-        return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
-                .replace("$", "").replace("`", "").replace("*", "").replace("/", "_")
-                .replace("#", "").replace("@", "").replace("\\", "_")
-    }
-
     @WorkerThread
     fun loadModulesLeanback(): Map<String, OldModule> {
         val moduleMap = ValueSortedMap<String, OldModule>()

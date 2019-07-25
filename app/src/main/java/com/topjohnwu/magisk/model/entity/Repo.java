@@ -7,6 +7,7 @@ import android.os.Parcelable;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.XStringKt;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -103,7 +104,7 @@ public class Repo extends BaseModule {
     }
 
     public String getDownloadFilename() {
-        return Utils.INSTANCE.getLegalFilename(getName() + "-" + getVersion() + ".zip");
+        return XStringKt.legalFilename(getName() + "-" + getVersion() + ".zip");
     }
 
     public class IllegalRepoException extends Exception {

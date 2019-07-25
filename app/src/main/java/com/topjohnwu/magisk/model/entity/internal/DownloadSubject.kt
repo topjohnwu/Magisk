@@ -27,7 +27,7 @@ sealed class DownloadSubject : Parcelable {
 
         @IgnoredOnParcel
         override val file by lazy {
-            File(Config.downloadDirectory, "${module.name}-v${module.version}(${module.versionCode}).zip")
+            File(Config.downloadDirectory, module.downloadFilename)
         }
     }
 
