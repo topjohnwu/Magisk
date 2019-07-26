@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.FileRepository
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -71,13 +70,11 @@ abstract class RemoteFileService : NotificationService() {
 
     private fun download(subject: DownloadSubject) = repo.downloadFile(subject.url)
         .map { it.toStream(subject.hashCode()) }
-        .map {
-            subject.file.apply {
-                when (subject) {
-                    is Module -> it.toModule(this,
-                            repo.downloadFile(Const.Url.MODULE_INSTALLER).blockingGet().byteStream())
-                    else -> it.writeTo(this)
-                }
+        .flatMap { stream ->
+            when (subject) {
+                is Module -> repo.downloadInstaller()
+                        .map { stream.toModule(subject.file, it.byteStream()); subject.file }
+                else -> Single.fromCallable { stream.writeTo(subject.file); subject.file }
             }
         }
 

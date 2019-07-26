@@ -37,6 +37,10 @@ interface GithubRawApiServices {
     @Streaming
     fun fetchBootctl(@Path(REVISION) revision: String = Const.BOOTCTL_REVISION): Single<ResponseBody>
 
+    @GET("$MAGISK_MASTER/scripts/module_installer.sh")
+    @Streaming
+    fun fetchInstaller(): Single<ResponseBody>
+
     //endregion
 
     /**

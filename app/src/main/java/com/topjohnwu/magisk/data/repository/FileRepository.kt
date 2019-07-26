@@ -8,4 +8,6 @@ class FileRepository(
 
     fun downloadFile(url: String) = api.fetchFile(url)
 
+    fun downloadInstaller() = api.fetchInstaller()
+
 }
