@@ -9,16 +9,16 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
-public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
+public abstract class OldBaseModule implements Comparable<OldBaseModule>, Parcelable {
 
     private String mId, mName, mVersion, mAuthor, mDescription;
     private int mVersionCode = -1;
 
-    protected BaseModule() {
+    protected OldBaseModule() {
         mId = mName = mVersion = mAuthor = mDescription = "";
     }
 
-    protected BaseModule(Cursor c) {
+    protected OldBaseModule(Cursor c) {
         mId = nonNull(c.getString(c.getColumnIndex("id")));
         mName = nonNull(c.getString(c.getColumnIndex("name")));
         mVersion = nonNull(c.getString(c.getColumnIndex("version")));
@@ -27,7 +27,7 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         mDescription = nonNull(c.getString(c.getColumnIndex("description")));
     }
 
-    protected BaseModule(Parcel p) {
+    protected OldBaseModule(Parcel p) {
         mId = p.readString();
         mName = p.readString();
         mVersion = p.readString();
@@ -36,17 +36,8 @@ public abstract class BaseModule implements Comparable<BaseModule>, Parcelable {
         mVersionCode = p.readInt();
     }
 
-    protected BaseModule(MagiskModule m) {
-        mId = m.getId();
-        mName = m.getName();
-        mVersion = m.getVersion();
-        mAuthor = m.getAuthor();
-        mDescription = m.getDescription();
-        mVersionCode = Integer.parseInt(m.getVersionCode());
-    }
-
     @Override
-    public int compareTo(@NonNull BaseModule module) {
+    public int compareTo(@NonNull OldBaseModule module) {
         return getName().toLowerCase().compareTo(module.getName().toLowerCase());
     }
 

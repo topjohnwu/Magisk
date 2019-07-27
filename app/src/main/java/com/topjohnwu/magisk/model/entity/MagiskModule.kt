@@ -1,86 +1,111 @@
 package com.topjohnwu.magisk.model.entity
 
-import android.os.Parcelable
-import androidx.annotation.AnyThread
-import androidx.annotation.NonNull
 import androidx.annotation.WorkerThread
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.data.database.base.su
-import io.reactivex.Single
-import kotlinx.android.parcel.Parcelize
-import okhttp3.ResponseBody
-import java.io.File
+import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.io.SuFile
 
-interface MagiskModule : Parcelable {
-    val id: String
-    val name: String
-    val author: String
-    val version: String
-    val versionCode: String
-    val description: String
+abstract class BaseModule : Comparable<BaseModule> {
+    abstract var id: String
+        protected set
+    abstract var name: String
+        protected set
+    abstract var author: String
+        protected set
+    abstract var version: String
+        protected set
+    abstract var versionCode: Int
+        protected set
+    abstract var description: String
+        protected set
+
+    @Throws(NumberFormatException::class)
+    protected fun parseProps(props: List<String>) {
+        for (line in props) {
+            val prop = line.split("=".toRegex(), 2).map { it.trim() }
+            if (prop.size != 2)
+                continue
+
+            val key = prop[0]
+            val value = prop[1]
+            if (key.isEmpty() || key[0] == '#')
+                continue
+
+            when (key) {
+                "id" -> id = value
+                "name" -> name = value
+                "version" -> version = value
+                "versionCode" -> versionCode = value.toInt()
+                "author" -> author = value
+                "description" -> description = value
+            }
+        }
+    }
+
+    override operator fun compareTo(other: BaseModule) = name.compareTo(other.name, true)
 }
 
-@Entity(tableName = "repos")
-@Parcelize
-data class Repository(
-    @PrimaryKey @NonNull
-    override val id: String,
-    override val name: String,
-    override val author: String,
-    override val version: String,
-    override val versionCode: String,
-    override val description: String,
-    val lastUpdate: Long
-) : MagiskModule
+class Module(path: String) : BaseModule() {
+    override var id: String = ""
+    override var name: String = ""
+    override var author: String = ""
+    override var version: String = ""
+    override var versionCode: Int = -1
+    override var description: String = ""
 
-@Parcelize
-data class Module(
-    override val id: String,
-    override val name: String,
-    override val author: String,
-    override val version: String,
-    override val versionCode: String,
-    override val description: String,
-    val path: String
-) : MagiskModule
+    private val removeFile: SuFile = SuFile(path, "remove")
+    private val disableFile: SuFile = SuFile(path, "disable")
+    private val updateFile: SuFile = SuFile(path, "update")
 
-@AnyThread
-fun File.toModule(): Single<Module> {
-    val path = "${Const.MAGISK_PATH}/$name"
-    return "dos2unix < $path/module.prop".su()
-        .map { it.first().toModule(path) }
+    val updated: Boolean = updateFile.exists()
+
+    var enable: Boolean = !disableFile.exists()
+        set(enable) {
+            field = if (enable) {
+                disableFile.delete()
+            } else {
+                !disableFile.createNewFile()
+            }
+        }
+
+    var remove: Boolean = removeFile.exists()
+        set(remove) {
+            field = if (remove) {
+                removeFile.createNewFile()
+            } else {
+                !removeFile.delete()
+            }
+        }
+
+    init {
+        runCatching {
+            parseProps(Shell.su("dos2unix < $path/module.prop").exec().out)
+        }
+
+        if (id.isEmpty()) {
+            val sep = path.lastIndexOf('/')
+            id = path.substring(sep + 1)
+        }
+
+        if (name.isEmpty()) {
+            name = id;
+        }
+    }
+
+    companion object {
+
+        @WorkerThread
+        fun loadModules(): List<Module> {
+            val moduleList = mutableListOf<Module>()
+            val path = SuFile(Const.MAGISK_PATH)
+            val modules =
+                    path.listFiles { _, name -> name != "lost+found" && name != ".core" }.orEmpty()
+            for (file in modules) {
+                if (file.isFile) continue
+                val module = Module(Const.MAGISK_PATH + "/" + file.name)
+                moduleList.add(module)
+            }
+            return moduleList
+        }
+    }
 }
-
-fun Map<String, String>.toModule(path: String): Module {
-    return Module(
-        id = get("id").orEmpty(),
-        name = get("name").orEmpty(),
-        author = get("author").orEmpty(),
-        version = get("version").orEmpty(),
-        versionCode = get("versionCode").orEmpty(),
-        description = get("description").orEmpty(),
-        path = path
-    )
-}
-
-@WorkerThread
-fun ResponseBody.toRepository(lastUpdate: Long) = string()
-    .split(Regex("\\n"))
-    .map { it.split("=", limit = 2) }
-    .filter { it.size == 2 }
-    .map { Pair(it[0], it[1]) }
-    .toMap()
-    .toRepository(lastUpdate)
-
-@AnyThread
-fun Map<String, String>.toRepository(lastUpdate: Long) = Repository(
-    id = get("id").orEmpty(),
-    name = get("name").orEmpty(),
-    author = get("author").orEmpty(),
-    version = get("version").orEmpty(),
-    versionCode = get("versionCode").orEmpty(),
-    description = get("description").orEmpty(),
-    lastUpdate = lastUpdate
-)

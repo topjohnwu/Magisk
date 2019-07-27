@@ -10,16 +10,13 @@ import android.content.res.Resources
 import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
-import androidx.annotation.WorkerThread
 import androidx.work.*
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.entity.OldModule
 import com.topjohnwu.magisk.model.update.UpdateCheckService
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import com.topjohnwu.superuser.io.SuFile
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -68,19 +65,6 @@ object Utils {
         }
 
         return info.loadLabel(pm).toString()
-    }
-
-    @WorkerThread
-    fun loadModulesLeanback(): Map<String, OldModule> {
-        val moduleMap = ValueSortedMap<String, OldModule>()
-        val path = SuFile(Const.MAGISK_PATH)
-        val modules = path.listFiles { _, name -> name != "lost+found" && name != ".core" }
-        for (file in modules!!) {
-            if (file.isFile) continue
-            val module = OldModule(Const.MAGISK_PATH + "/" + file.name)
-            moduleMap[module.id] = module
-        }
-        return moduleMap
     }
 
     fun showSuperUser(): Boolean {

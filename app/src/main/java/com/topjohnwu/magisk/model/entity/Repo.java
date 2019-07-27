@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.utils.XStringKt;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class Repo extends BaseModule {
+public class Repo extends OldBaseModule {
 
     private Date mLastUpdate;
 
@@ -28,11 +28,6 @@ public class Repo extends BaseModule {
     public Repo(Parcel p) {
         super(p);
         mLastUpdate = new Date(p.readLong());
-    }
-
-    public Repo(Repository repo) {
-        super(repo);
-        mLastUpdate = new Date(repo.getLastUpdate());
     }
 
     public static final Parcelable.Creator<Repo> CREATOR = new Parcelable.Creator<Repo>() {
@@ -107,7 +102,7 @@ public class Repo extends BaseModule {
         return XStringKt.legalFilename(getName() + "-" + getVersion() + ".zip");
     }
 
-    public class IllegalRepoException extends Exception {
+    public static class IllegalRepoException extends Exception {
         IllegalRepoException(String message) {
             super(message);
         }

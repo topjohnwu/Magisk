@@ -7,6 +7,7 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
+import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.topjohnwu.magisk.App
@@ -104,3 +105,9 @@ fun String.toFile() = File(this)
 fun Intent.chooser(title: String = "Pick an app") = Intent.createChooser(this, title)
 
 fun Context.cachedFile(name: String) = File(cacheDir, name)
+
+fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
+    val out = mutableListOf<Result>()
+    while (moveToNext()) out.add(transformer(this))
+    return out
+}

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.module
 
 import android.content.res.Resources
-import android.database.Cursor
 import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.doOnSuccessUi
@@ -11,6 +10,7 @@ import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
+import com.topjohnwu.magisk.model.entity.Module
 import com.topjohnwu.magisk.model.entity.Repo
 import com.topjohnwu.magisk.model.entity.recycler.ModuleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoRvItem
@@ -20,7 +20,7 @@ import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
 import com.topjohnwu.magisk.tasks.UpdateRepos
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.utils.toList
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.update
 import io.reactivex.Single
@@ -59,8 +59,7 @@ class ModuleViewModel(
     fun downloadPressed(item: RepoRvItem) = InstallModuleEvent(item.item).publish()
 
     fun refresh(force: Boolean) {
-        Single.fromCallable { Utils.loadModulesLeanback() }
-            .map { it.values.toList() }
+        Single.fromCallable { Module.loadModules() }
             .flattenAsFlowable { it }
             .map { ModuleRvItem(it) }
             .toList()
@@ -108,12 +107,6 @@ class ModuleViewModel(
         return groupedItems.getOrElse(MODULE_UPDATABLE) { listOf() }.withTitle(R.string.update_available) +
                 groupedItems.getOrElse(MODULE_INSTALLED) { listOf() }.withTitle(R.string.installed) +
                 groupedItems.getOrElse(MODULE_REMOTE) { listOf() }.withTitle(R.string.not_installed)
-    }
-
-    private fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
-        val out = mutableListOf<Result>()
-        while (moveToNext()) out.add(transformer(this))
-        return out
     }
 
     companion object {
