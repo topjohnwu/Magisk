@@ -41,7 +41,6 @@ object Config : PreferenceModel, DBConfig {
         const val CUSTOM_CHANNEL = "custom_channel"
         const val LOCALE = "locale"
         const val DARK_THEME = "dark_theme"
-        const val ETAG_KEY = "ETag"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
         const val DOWNLOAD_CACHE = "download_cache"
@@ -117,8 +116,6 @@ object Config : PreferenceModel, DBConfig {
 
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
     var locale by preference(Key.LOCALE, "")
-    @JvmStatic
-    var etagKey by preference(Key.ETAG_KEY, "")
 
     var rootMode by dbSettings(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB)
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
@@ -195,7 +192,6 @@ object Config : PreferenceModel, DBConfig {
                 }
             }
             config.delete()
-            remove(Key.ETAG_KEY)
         }
     }
 

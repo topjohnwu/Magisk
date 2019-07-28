@@ -13,6 +13,8 @@ import androidx.multidex.MultiDex
 import androidx.room.Room
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.WorkDatabase_Impl
+import com.topjohnwu.magisk.data.database.RepoDatabase
+import com.topjohnwu.magisk.data.database.RepoDatabase_Impl
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.RootUtils
@@ -113,6 +115,7 @@ open class App : Application(), Application.ActivityLifecycleCallbacks {
             Room.setFactory {
                 when (it) {
                     WorkDatabase::class.java -> WorkDatabase_Impl()
+                    RepoDatabase::class.java -> RepoDatabase_Impl()
                     else -> null
                 }
             }

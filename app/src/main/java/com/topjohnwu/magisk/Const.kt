@@ -53,13 +53,7 @@ object Const {
     }
 
     object Url {
-        @Deprecated("This shouldn't be used. There's literally no need for it")
-        const val REPO_URL =
-            "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed&page=%d"
-        const val FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s"
         const val ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip"
-        const val MODULE_INSTALLER =
-            "https://raw.githubusercontent.com/topjohnwu/Magisk/master/scripts/module_installer.sh"
         const val PAYPAL_URL = "https://www.paypal.me/topjohnwu"
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
         const val TWITTER_URL = "https://twitter.com/topjohnwu"
@@ -67,16 +61,19 @@ object Const {
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
         @JvmField
         val BOOTCTL_URL = getRaw("9c5dfc1b8245c0b5b524901ef0ff0f8335757b77", "bootctl")
-        const val GITHUB_RAW_API_URL = "https://raw.githubusercontent.com/"
+
+        const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
+        const val GITHUB_API_URL = "https://api.github.com/users/Magisk-Modules-Repo/"
 
         private fun getRaw(where: String, name: String) =
-            "${GITHUB_RAW_API_URL}topjohnwu/magisk_files/$where/$name"
+            "${GITHUB_RAW_URL}topjohnwu/magisk_files/$where/$name"
     }
 
     object Key {
         // others
         const val LINK_KEY = "Link"
         const val IF_NONE_MATCH = "If-None-Match"
+        const val ETAG_KEY = "ETag"
         // intents
         const val OPEN_SECTION = "section"
         const val INTENT_SET_NAME = "filename"

@@ -2,15 +2,14 @@ package com.topjohnwu.magisk.data.network
 
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.model.entity.UpdateInfo
+import com.topjohnwu.magisk.tasks.GithubRepoInfo
+import io.reactivex.Flowable
 import io.reactivex.Single
 import okhttp3.ResponseBody
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Streaming
-import retrofit2.http.Url
+import retrofit2.adapter.rxjava2.Result
+import retrofit2.http.*
 
-
-interface GithubRawApiServices {
+interface GithubRawServices {
 
     //region topjohnwu/magisk_files
 
@@ -41,6 +40,9 @@ interface GithubRawApiServices {
     @Streaming
     fun fetchInstaller(): Single<ResponseBody>
 
+    @GET("$MAGISK_MODULES/{$MODULE}/master/{$FILE}")
+    fun fetchModuleInfo(@Path(MODULE) id: String, @Path(FILE) file: String): Single<String>
+
     //endregion
 
     /**
@@ -50,6 +52,9 @@ interface GithubRawApiServices {
     @GET
     @Streaming
     fun fetchFile(@Url url: String): Single<ResponseBody>
+
+    @GET
+    fun fetchString(@Url url: String): Single<String>
 
 
     companion object {
@@ -62,5 +67,15 @@ interface GithubRawApiServices {
         private const val MAGISK_MASTER = "topjohnwu/Magisk/master"
         private const val MAGISK_MODULES = "Magisk-Modules-Repo"
     }
+
+}
+
+interface GithubApiServices {
+
+    @GET("repos")
+    fun fetchRepos(@Query("page") page: Int,
+                   @Header(Const.Key.IF_NONE_MATCH) etag: String,
+                   @Query("sort") sort: String = "pushed",
+                   @Query("per_page") count: Int = 100): Flowable<Result<List<GithubRepoInfo>>>
 
 }

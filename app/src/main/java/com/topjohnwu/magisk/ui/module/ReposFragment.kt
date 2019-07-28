@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentReposBinding
 import com.topjohnwu.magisk.model.download.DownloadService
-import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.InstallModuleEvent
@@ -89,7 +89,7 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
     }
 
     private fun openChangelog(item: Repo) {
-        MarkDownWindow.show(requireActivity(), null, item.detailUrl)
+        MarkDownWindow.show(requireActivity(), null, item.readme)
     }
 
     @SuppressLint("MissingPermission")

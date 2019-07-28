@@ -5,7 +5,7 @@ import androidx.core.app.NotificationCompat
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.repository.FileRepository
+import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
@@ -24,10 +24,10 @@ import java.io.InputStream
 
 abstract class RemoteFileService : NotificationService() {
 
-    private val repo by inject<FileRepository>()
+    private val service: GithubRawServices by inject()
 
     private val supportedFolders
-        get() = listOfNotNull(
+        get() = listOf(
             cacheDir,
             Config.downloadDirectory
         )
@@ -68,11 +68,11 @@ abstract class RemoteFileService : NotificationService() {
         }
     }
 
-    private fun download(subject: DownloadSubject) = repo.downloadFile(subject.url)
+    private fun download(subject: DownloadSubject) = service.fetchFile(subject.url)
         .map { it.toStream(subject.hashCode()) }
         .flatMap { stream ->
             when (subject) {
-                is Module -> repo.downloadInstaller()
+                is Module -> service.fetchInstaller()
                         .map { stream.toModule(subject.file, it.byteStream()); subject.file }
                 else -> Single.fromCallable { stream.writeTo(subject.file); subject.file }
             }

@@ -9,18 +9,16 @@ import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
-import com.topjohnwu.magisk.model.entity.Module
-import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.data.database.RepoDao
+import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.recycler.ModuleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoRvItem
 import com.topjohnwu.magisk.model.entity.recycler.SectionRvItem
 import com.topjohnwu.magisk.model.events.InstallModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
-import com.topjohnwu.magisk.tasks.UpdateRepos
+import com.topjohnwu.magisk.tasks.RepoUpdater
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.toList
 import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.magisk.utils.update
 import io.reactivex.Single
@@ -28,9 +26,9 @@ import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
 class ModuleViewModel(
-        private val resources: Resources,
-        private val repoDatabase: RepoDatabaseHelper,
-        private val repoUpdater: UpdateRepos
+    private val resources: Resources,
+    private val repoUpdater: RepoUpdater,
+    private val repoDB: RepoDao
 ) : MagiskViewModel() {
 
     val query = KObservableField("")
@@ -65,9 +63,10 @@ class ModuleViewModel(
             .toList()
             .map { it to itemsInstalled.calculateDiff(it) }
             .doOnSuccessUi { itemsInstalled.update(it.first, it.second) }
-            .flatMap { repoUpdater.exec(force) }
-            .flatMap { Single.fromCallable { repoDatabase.repoCursor.toList { Repo(it) } } }
-            .flattenAsFlowable { it }
+            .toFlowable()
+            .flatMap { repoUpdater(force) }
+            .collect({}, {_, _ -> })
+            .flattenAsFlowable { repoDB.repos }
             .map { RepoRvItem(it) }
             .toList()
             .doOnSuccess { allItems.update(it) }

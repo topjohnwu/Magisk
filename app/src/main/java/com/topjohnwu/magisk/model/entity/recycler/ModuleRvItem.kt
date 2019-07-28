@@ -6,8 +6,8 @@ import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.entity.Module
-import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.model.entity.module.Module
+import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.utils.get
 import com.topjohnwu.magisk.utils.toggle
 
@@ -69,11 +69,7 @@ class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
 
     override val layoutRes: Int = R.layout.item_repo
 
-    override fun contentSameAs(other: RepoRvItem): Boolean = item.version == other.item.version
-            && item.lastUpdate == other.item.lastUpdate
-            && item.versionCode == other.item.versionCode
-            && item.description == other.item.description
-            && item.detailUrl == other.item.detailUrl
+    override fun contentSameAs(other: RepoRvItem): Boolean = item == other.item
 
     override fun itemSameAs(other: RepoRvItem): Boolean = item.id == other.item.id
 }

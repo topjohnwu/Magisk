@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -20,7 +19,7 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
+import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
@@ -33,7 +32,7 @@ import java.io.File
 
 class SettingsFragment : BasePreferenceFragment() {
 
-    private val repoDatabase: RepoDatabaseHelper by inject()
+    private val repoDB: RepoDao by inject()
 
     private lateinit var updateChannel: ListPreference
     private lateinit var autoRes: ListPreference
@@ -76,10 +75,7 @@ class SettingsFragment : BasePreferenceFragment() {
             true
         }
         findPreference("clear").setOnPreferenceClickListener {
-            prefs.edit {
-                remove(Config.Key.ETAG_KEY)
-            }
-            repoDatabase.clearRepo()
+            repoDB.clear()
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
             true
         }

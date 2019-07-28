@@ -5,7 +5,7 @@ import android.os.Parcelable
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.model.entity.MagiskJson
-import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.utils.cachedFile
 import com.topjohnwu.magisk.utils.get
 import kotlinx.android.parcel.IgnoredOnParcel
@@ -20,8 +20,8 @@ sealed class DownloadSubject : Parcelable {
 
     @Parcelize
     data class Module(
-        val module: Repo,
-        val configuration: Configuration
+            val module: Repo,
+            val configuration: Configuration
     ) : DownloadSubject() {
         override val url: String get() = module.zipUrl
 
