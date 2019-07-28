@@ -9,11 +9,10 @@ abstract class RepoDao {
 
     val repoIDSet: Set<String> get() = getRepoID().map { it.id }.toSet()
 
-    val repos: List<Repo> get() = getReposWithOrder(when (Config.repoOrder) {
-            Config.Value.ORDER_NAME -> "name COLLATE NOCASE"
-            Config.Value.ORDER_DATE -> "last_update DESC"
-            else -> ""
-        })
+    val repos: List<Repo> get() = when (Config.repoOrder) {
+            Config.Value.ORDER_NAME -> getReposNameOrder()
+            else -> getReposDateOrder()
+        }
 
     var etagKey: String
         set(etag) = addEtagRaw(RepoEtag(0, etag))
@@ -24,8 +23,11 @@ abstract class RepoDao {
         clearEtag()
     }
 
-    @Query("SELECT * FROM repos ORDER BY :order")
-    protected abstract fun getReposWithOrder(order: String): List<Repo>
+    @Query("SELECT * FROM repos ORDER BY last_update DESC")
+    protected abstract fun getReposDateOrder(): List<Repo>
+
+    @Query("SELECT * FROM repos ORDER BY name COLLATE NOCASE")
+    protected abstract fun getReposNameOrder(): List<Repo>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun addRepo(repo: Repo)
