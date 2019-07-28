@@ -40,7 +40,7 @@ abstract class NotificationService : Service() {
         }
     }
 
-    protected fun finishWork(
+    protected fun finishNotify(
         id: Int,
         editBody: (NotificationCompat.Builder) -> NotificationCompat.Builder? = { null }
     ) : Int {
