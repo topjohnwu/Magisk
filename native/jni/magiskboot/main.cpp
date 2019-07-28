@@ -12,6 +12,8 @@
 #include "magiskboot.h"
 #include "compress.h"
 
+using namespace std;
+
 static void usage(char *arg0) {
 	fprintf(stderr,
 		FULL_VER(MagiskBoot) " - Boot Image Modification Tool\n"
@@ -26,11 +28,12 @@ static void usage(char *arg0) {
 		"    Return values:\n"
 		"    0:valid    1:error    2:chromeos\n"
 		"\n"
-		"  repack <origbootimg> [outbootimg]\n"
+		"  repack [-n] <origbootimg> [outbootimg]\n"
 		"    Repack boot image components from current directory\n"
 		"    to [outbootimg], or new-boot.img if not specified.\n"
-		"    It will compress ramdisk.cpio and kernel with the same method in\n"
-		"    <origbootimg> if the file provided is not already compressed.\n"
+		"    If '-n' is provided, it will not attempt to recompress ramdisk.cpio,\n"
+		"    otherwise it will compress ramdisk.cpio and kernel with the same method\n"
+		"    in <origbootimg> if the file provided is not already compressed.\n"
 		"\n"
 		"  hexpatch <file> <hexpattern1> <hexpattern2>\n"
 		"    Search <hexpattern1> in <file>, and replace with <hexpattern2>\n"
@@ -74,7 +77,7 @@ static void usage(char *arg0) {
 		"      test\n"
 		"        Check if fstab has verity/avb flags\n"
 		"        Return values:\n"
-		"        0:no flags    1:flag exists\n"
+		"        0:flag exists    1:no flags\n"
 		"      patch\n"
 		"        Search for fstab and remove verity/avb\n"
 		"\n"
@@ -113,10 +116,11 @@ int main(int argc, char *argv[]) {
 		usage(argv[0]);
 
 	// Skip '--' for backwards compatibility
-	if (strncmp(argv[1], "--", 2) == 0)
-		argv[1] += 2;
+	string_view action(argv[1]);
+	if (str_starts(action, "--"))
+		action = argv[1] + 2;
 
-	if (strcmp(argv[1], "cleanup") == 0) {
+	if (action == "cleanup") {
 		fprintf(stderr, "Cleaning up...\n");
 		unlink(HEADER_FILE);
 		unlink(KERNEL_FILE);
@@ -126,7 +130,7 @@ int main(int argc, char *argv[]) {
 		unlink(EXTRA_FILE);
 		unlink(RECV_DTBO_FILE);
 		unlink(DTB_FILE);
-	} else if (argc > 2 && strcmp(argv[1], "sha1") == 0) {
+	} else if (argc > 2 && action == "sha1") {
 		uint8_t sha1[SHA_DIGEST_SIZE];
 		void *buf;
 		size_t size;
@@ -136,28 +140,35 @@ int main(int argc, char *argv[]) {
 			printf("%02x", i);
 		printf("\n");
 		munmap(buf, size);
-	} else if (argc > 2 && strcmp(argv[1], "unpack") == 0) {
-		if (strcmp(argv[2], "-h") == 0) {
+	} else if (argc > 2 && action == "unpack") {
+		if (argv[2] == "-h"sv) {
 			if (argc == 3)
 				usage(argv[0]);
 			return unpack(argv[3], true);
 		} else {
 			return unpack(argv[2]);
 		}
-	} else if (argc > 2 && strcmp(argv[1], "repack") == 0) {
-		repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
-	} else if (argc > 2 && strcmp(argv[1], "decompress") == 0) {
+	} else if (argc > 2 && action == "repack") {
+		if (argv[2] == "-n"sv) {
+			if (argc == 3)
+				usage(argv[0]);
+			repack(argv[3], argv[4] ? argv[4] : NEW_BOOT, true);
+		} else {
+			repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
+		}
+	} else if (argc > 2 && action == "decompress") {
 		decompress(argv[2], argv[3]);
-	} else if (argc > 2 && strncmp(argv[1], "compress", 8) == 0) {
-		compress(argv[1][8] == '=' ? &argv[1][9] : "gzip", argv[2], argv[3]);
-	} else if (argc > 4 && strcmp(argv[1], "hexpatch") == 0) {
-		hexpatch(argv[2], argv[3], argv[4]);
-	} else if (argc > 2 && strcmp(argv[1], "cpio") == 0) {
-		if (cpio_commands(argc - 2, argv + 2)) usage(argv[0]);
-	} else if (argc > 2 && strncmp(argv[1], "dtb", 3) == 0) {
-		if (argv[1][3] != '-')
+	} else if (argc > 2 && str_starts(action, "compress")) {
+		compress(action[8] == '=' ? &action[9] : "gzip", argv[2], argv[3]);
+	} else if (argc > 4 && action == "hexpatch") {
+		return hexpatch(argv[2], argv[3], argv[4]);
+	} else if (argc > 2 && action == "cpio"sv) {
+		if (cpio_commands(argc - 2, argv + 2))
 			usage(argv[0]);
-		if (dtb_commands(&argv[1][4], argc - 2, argv + 2))
+	} else if (argc > 2 && str_starts(action, "dtb")) {
+		if (action[3] != '-')
+			usage(argv[0]);
+		if (dtb_commands(&action[4], argc - 2, argv + 2))
 			usage(argv[0]);
 	} else {
 		usage(argv[0]);

@@ -5,11 +5,14 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include <magisk.h>
 #include <daemon.h>
 #include <utils.h>
 
 #include "su.h"
+
+using namespace std;
+
+bool CONNECT_BROADCAST;
 
 #define START_ACTIVITY \
 "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
@@ -17,7 +20,14 @@
 
 // 0x18000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_INCLUDE_STOPPED_PACKAGES
 
-static inline const char *get_command(const struct su_request *to) {
+#define START_BROADCAST \
+"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
+"broadcast", "-n", nullptr, "--user", nullptr, "-f", "0x00000020", \
+"-a", "android.intent.action.REBOOT", "--es", "action"
+
+// 0x00000020 = FLAG_INCLUDE_STOPPED_PACKAGES
+
+static inline const char *get_command(const su_request *to) {
 	if (to->command[0])
 		return to->command;
 	if (to->shell[0])
@@ -25,23 +35,23 @@ static inline const char *get_command(const struct su_request *to) {
 	return DEFAULT_SHELL;
 }
 
-static inline void get_user(char *user, struct su_info *info) {
+static inline void get_user(char *user, const su_info *info) {
 	sprintf(user, "%d",
 			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER
 			? info->uid / 100000
 			: 0);
 }
 
-static inline void get_uid(char *uid, struct su_info *info) {
+static inline void get_uid(char *uid, const su_info *info) {
 	sprintf(uid, "%d",
 			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED
 			? info->uid % 100000
 			: info->uid);
 }
 
-static void silent_run(const char **args, struct su_info *info) {
+static void exec_am_cmd(const char **args, const su_info *info) {
 	char component[128];
-	sprintf(component, "%s/a.m", info->str[SU_MANAGER].data());
+	sprintf(component, "%s/%s", info->str[SU_MANAGER].data(), args[3][0] == 'b' ? "a.h" : "a.m");
 	char user[8];
 	get_user(user, info);
 
@@ -62,58 +72,81 @@ static void silent_run(const char **args, struct su_info *info) {
 	exec_command(exec);
 }
 
-void app_log(struct su_context *ctx) {
+#define LOG_BODY \
+"log", \
+"--ei", "from.uid", fromUid, \
+"--ei", "to.uid", toUid, \
+"--ei", "pid", pid, \
+"--ei", "policy", policy, \
+"--es", "command", get_command(&ctx.req), \
+"--ez", "notify", ctx.info->access.notify ? "true" : "false", \
+nullptr
+
+void app_log(const su_context &ctx) {
 	char fromUid[8];
-	get_uid(fromUid, ctx->info);
+	get_uid(fromUid, ctx.info.get());
 
 	char toUid[8];
-	sprintf(toUid, "%d", ctx->req.uid);
+	sprintf(toUid, "%d", ctx.req.uid);
 
 	char pid[8];
-	sprintf(pid, "%d", ctx->pid);
+	sprintf(pid, "%d", ctx.pid);
 
 	char policy[2];
-	sprintf(policy, "%d", ctx->info->access.policy);
+	sprintf(policy, "%d", ctx.info->access.policy);
 
-	const char *cmd[] = {
-		START_ACTIVITY, "log",
-		"--ei", "from.uid", fromUid,
-		"--ei", "to.uid", toUid,
-		"--ei", "pid", pid,
-		"--ei", "policy", policy,
-		"--es", "command", get_command(&ctx->req),
-		"--ez", "notify", ctx->info->access.notify ? "true" : "false",
-		nullptr
-	};
-	silent_run(cmd, ctx->info);
+	if (CONNECT_BROADCAST) {
+		const char *cmd[] = { START_BROADCAST, LOG_BODY };
+		exec_am_cmd(cmd, ctx.info.get());
+	} else {
+		const char *cmd[] = { START_ACTIVITY, LOG_BODY };
+		exec_am_cmd(cmd, ctx.info.get());
+	}
 }
 
-void app_notify(struct su_context *ctx) {
+#define NOTIFY_BODY \
+"notify", \
+"--ei", "from.uid", fromUid, \
+"--ei", "policy", policy, \
+nullptr
+
+void app_notify(const su_context &ctx) {
 	char fromUid[8];
-	get_uid(fromUid, ctx->info);
+	get_uid(fromUid, ctx.info.get());
 
 	char policy[2];
-	sprintf(policy, "%d", ctx->info->access.policy);
+	sprintf(policy, "%d", ctx.info->access.policy);
 
-	const char *cmd[] = {
-		START_ACTIVITY, "notify",
-		"--ei", "from.uid", fromUid,
-		"--ei", "policy", policy,
-		nullptr
-	};
-	silent_run(cmd, ctx->info);
+	if (CONNECT_BROADCAST) {
+		const char *cmd[] = { START_BROADCAST, NOTIFY_BODY };
+		exec_am_cmd(cmd, ctx.info.get());
+	} else {
+		const char *cmd[] = { START_ACTIVITY, NOTIFY_BODY };
+		exec_am_cmd(cmd, ctx.info.get());
+	}
+
 }
 
-void app_connect(const char *socket, struct su_info *info) {
+void app_connect(const char *socket, const shared_ptr<su_info> &info) {
 	const char *cmd[] = {
 		START_ACTIVITY, "request",
 		"--es", "socket", socket,
 		nullptr
 	};
-	silent_run(cmd, info);
+	exec_am_cmd(cmd, info.get());
 }
 
-void socket_send_request(int fd, struct su_info *info) {
+void broadcast_test() {
+	su_info info;
+	get_db_settings(info.cfg);
+	get_db_strings(info.str);
+	validate_manager(info.str[SU_MANAGER], 0, &info.mgr_st);
+
+	const char *cmd[] = { START_BROADCAST, "test", nullptr };
+	exec_am_cmd(cmd, &info);
+}
+
+void socket_send_request(int fd, const shared_ptr<su_info> &info) {
 	write_key_token(fd, "uid", info->uid);
 	write_string_be(fd, "eof");
 }

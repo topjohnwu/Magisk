@@ -1,10 +1,11 @@
 # Magisk Documentations
-(Updated on 2019.3.28)
+(Updated on 2019.5.1)
 
 - [Installation](install.md)
     - [Prerequisite](install.md#prerequisite)
     - [Custom Recovery](install.md#custom-recovery)
     - [Boot Image Patching](install.md#boot-image-patching)
+    - [Samsung (System-as-root)](install.md#samsung-system-as-root)
     - [Huawei](install.md#huawei)
 - [Tutorials](tutorials.md)
     - [OTA Installation](tutorials.md#ota-installation)

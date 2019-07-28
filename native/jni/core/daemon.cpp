@@ -54,6 +54,7 @@ static void *request_handler(void *args) {
 	case LATE_START:
 	case BOOT_COMPLETE:
 	case SQLITE_CMD:
+	case BROADCAST_ACK:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -90,6 +91,10 @@ static void *request_handler(void *args) {
 	case SQLITE_CMD:
 		exec_sql(client);
 		break;
+	case BROADCAST_ACK:
+		LOGD("* Use broadcasts for su logging and notify\n");
+		CONNECT_BROADCAST = true;
+		close(client);
 	default:
 		close(client);
 		break;
@@ -101,6 +106,16 @@ static void main_daemon() {
 	android_logging();
 	setsid();
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
+	restore_rootcon();
+
+	// Unmount pre-init patches
+	if (access(ROOTMNT, F_OK) == 0) {
+		file_readline(ROOTMNT, [](auto line) -> bool {
+			umount2(line.data(), MNT_DETACH);
+			return true;
+		}, true);
+	}
+
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);

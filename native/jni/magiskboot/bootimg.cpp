@@ -90,10 +90,6 @@ int boot_img::parse_file(const char *image) {
 		case AOSP:
 			return parse_image(head);
 
-		/* Unsupported */
-		case ELF32:
-		case ELF64:
-			exit(UNSUPP_RET);
 		default:
 			break;
 		}
@@ -109,14 +105,17 @@ int boot_img::parse_image(uint8_t *head) {
 		hdr.set_hdr(new boot_img_hdr_pxa());
 		memcpy(*hdr, head, sizeof(boot_img_hdr_pxa));
 	} else {
-		if (memcmp(hp->cmdline, NOOKHD_MAGIC, 12) == 0 ||
-			memcmp(hp->cmdline, NOOKHD_NEW_MAGIC, 26) == 0) {
+		if (memcmp(hp->cmdline, NOOKHD_RL_MAGIC, 10) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_GL_MAGIC, 12) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_GR_MAGIC, 14) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_EB_MAGIC, 26) == 0 ||
+			memcmp(hp->cmdline, NOOKHD_ER_MAGIC, 30) == 0) {
 			flags |= NOOKHD_FLAG;
-			fprintf(stderr, "NOOKHD_GREEN_LOADER\n");
+			fprintf(stderr, "NOOKHD_LOADER\n");
 			head += NOOKHD_PRE_HEADER_SZ;
 		} else if (memcmp(hp->name, ACCLAIM_MAGIC, 10) == 0) {
 			flags |= ACCLAIM_FLAG;
-			fprintf(stderr, "ACCLAIM_BAUWKSBOOT\n");
+			fprintf(stderr, "ACCLAIM_LOADER\n");
 			head += ACCLAIM_PRE_HEADER_SZ;
 		}
 		hdr.set_hdr(new boot_img_hdr());
@@ -309,6 +308,7 @@ int unpack(const char *image, bool hdr) {
 		decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size);
 		close(fd);
 	} else {
+		fprintf(stderr, "Kernel is uncompressed or not a supported compressed type!\n");
 		dump(boot.kernel, boot.hdr->kernel_size, KERNEL_FILE);
 	}
 
@@ -321,6 +321,7 @@ int unpack(const char *image, bool hdr) {
 		decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size);
 		close(fd);
 	} else {
+		fprintf(stderr, "Ramdisk is uncompressed or not a supported compressed type!\n");
 		dump(boot.ramdisk, boot.hdr->ramdisk_size, RAMDISK_FILE);
 	}
 
@@ -339,10 +340,10 @@ int unpack(const char *image, bool hdr) {
 }
 
 #define file_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - header_off, boot.hdr.page_size()))
-void repack(const char* orig_image, const char* out_image) {
+void repack(const char* orig_image, const char* out_image, bool force_nocomp) {
 	boot_img boot {};
 
-	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off;
+	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off, dtb_off;
 
 	// Parse original image
 	boot.parse_file(orig_image);
@@ -418,7 +419,7 @@ void repack(const char* orig_image, const char* out_image) {
 		size_t raw_size;
 		void *raw_buf;
 		mmap_ro(KERNEL_FILE, raw_buf, raw_size);
-		if (!COMPRESSED(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.k_fmt)) {
+		if (!COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.k_fmt)) {
 			boot.hdr->kernel_size = compress(boot.k_fmt, fd, raw_buf, raw_size);
 		} else {
 			boot.hdr->kernel_size = write(fd, raw_buf, raw_size);
@@ -441,7 +442,7 @@ void repack(const char* orig_image, const char* out_image) {
 		size_t raw_size;
 		void *raw_buf;
 		mmap_ro(RAMDISK_FILE, raw_buf, raw_size);
-		if (!COMPRESSED(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt)) {
+		if (!COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt) && !force_nocomp) {
 			boot.hdr->ramdisk_size = compress(boot.r_fmt, fd, raw_buf, raw_size);
 		} else {
 			boot.hdr->ramdisk_size = write(fd, raw_buf, raw_size);
@@ -472,6 +473,7 @@ void repack(const char* orig_image, const char* out_image) {
 	}
 
 	// dtb
+	dtb_off = lseek(fd, 0, SEEK_CUR);
 	if (access(DTB_FILE, R_OK) == 0) {
 		boot.hdr.dtb_size() = restore(DTB_FILE, fd);
 		file_align();
@@ -524,6 +526,11 @@ void repack(const char* orig_image, const char* out_image) {
 		size = boot.hdr.recovery_dtbo_size();
 		HASH_update(&ctx, boot.map_addr + boot.hdr.recovery_dtbo_offset(), size);
 		HASH_update(&ctx, &size, sizeof(size));
+		size = boot.hdr.dtb_size();
+		if (size) {
+			HASH_update(&ctx, boot.map_addr + dtb_off, size);
+			HASH_update(&ctx, &size, sizeof(size));
+		}
 	}
 	memset(boot.hdr.id(), 0, 32);
 	memcpy(boot.hdr.id(), HASH_final(&ctx),

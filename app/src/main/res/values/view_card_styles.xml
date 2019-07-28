@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">@dimen/radius_generic</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <style name="Widget.Card.Outlined">
+        <item name="cardBackgroundColor">@color/colorBackground</item>
+        <item name="strokeColor">@color/colorCardStrokeInverse</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="Widget.Card.Outlined.Tinted">
+        <item name="cardBackgroundColor">@color/colorPrimary</item>
+        <item name="strokeColor">@color/colorCardStroke</item>
+    </style>
+
+</resources>

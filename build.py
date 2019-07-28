@@ -56,11 +56,14 @@ archs = ['armeabi-v7a', 'x86']
 arch64 = ['arm64-v8a', 'x86_64']
 keystore = 'release-key.jks'
 config = {}
+support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'busybox', 'test']
+default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
 
 def mv(source, target):
     try:
         shutil.move(source, target)
+        vprint(f'mv: {source} -> {target}')
     except:
         pass
 
@@ -76,6 +79,7 @@ def cp(source, target):
 def rm(file):
     try:
         os.remove(file)
+        vprint(f'rm: {file}')
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
@@ -102,7 +106,7 @@ def zip_with_msg(zip_file, source, target):
 def collect_binary():
     for arch in archs + arch64:
         mkdir_p(os.path.join('native', 'out', arch))
-        for bin in ['magisk', 'magiskinit', 'magiskinit64', 'magiskboot', 'busybox', 'test']:
+        for bin in support_targets + ['magiskinit64']:
             source = os.path.join('native', 'libs', arch, bin)
             target = os.path.join('native', 'out', arch, bin)
             mv(source, target)
@@ -183,14 +187,12 @@ def run_ndk_build(flags):
 
 
 def build_binary(args):
-    support_targets = {'magisk', 'magiskinit', 'magiskboot', 'busybox', 'test'}
     if args.target:
-        args.target = set(args.target) & support_targets
+        args.target = set(args.target) & set(support_targets)
         if not args.target:
             return
     else:
-        # If nothing specified, build everything
-        args.target = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
+        args.target = default_targets
 
     header('* Building binaries: ' + ' '.join(args.target))
 
@@ -216,9 +218,6 @@ def build_binary(args):
                 with open(bin_file, 'rb') as src:
                     binary_dump(src, out, 'magisk_xz')
 
-    if 'busybox' in args.target:
-        run_ndk_build('B_BB=1')
-
     if 'magiskinit' in args.target:
         if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch.h')):
             error('Build "magisk" before building "magiskinit"')
@@ -227,8 +226,14 @@ def build_binary(args):
         run_ndk_build('B_INIT=1')
         run_ndk_build('B_INIT64=1')
 
+    if 'magiskpolicy' in args.target:
+        run_ndk_build('B_POLICY=1')
+
     if 'magiskboot' in args.target:
         run_ndk_build('B_BOOT=1')
+
+    if 'busybox' in args.target:
+        run_ndk_build('B_BB=1')
 
     if 'test' in args.target:
         run_ndk_build('B_TEST=1 B_64BIT=1')
@@ -422,7 +427,6 @@ def build_all(args):
     build_binary(args)
     zip_main(args)
     zip_uninstaller(args)
-    build_snet(args)
 
 
 parser = argparse.ArgumentParser(description='Magisk build script')
@@ -440,7 +444,8 @@ all_parser.set_defaults(func=build_all)
 
 binary_parser = subparsers.add_parser('binary', help='build binaries')
 binary_parser.add_argument(
-    'target', nargs='*', help='Support: magisk, magiskinit, magiskboot, busybox. Leave empty to build all.')
+    'target', nargs='*', help=f"Either {', '.join(support_targets)}, \
+    or empty for defaults ({', '.join(default_targets)})")
 binary_parser.set_defaults(func=build_binary)
 
 apk_parser = subparsers.add_parser('apk', help='build Magisk Manager APK')
@@ -464,7 +469,7 @@ un_parser.set_defaults(func=zip_uninstaller)
 
 clean_parser = subparsers.add_parser('clean', help='cleanup.')
 clean_parser.add_argument(
-    'target', nargs='*', help='Support: native, java. Leave empty to clean all.')
+    'target', nargs='*', help='Either native, java, or empty to clean both.')
 clean_parser.set_defaults(func=cleanup)
 
 if len(sys.argv) == 1:

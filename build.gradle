@@ -7,18 +7,17 @@ if (configPath.exists())
     configPath.withInputStream { is -> props.load(is) }
 
 buildscript {
-    
+
     repositories {
         google()
         jcenter()
-        maven {
-            url 'http://storage.googleapis.com/r8-releases/raw'
-        }
+        maven { url 'http://storage.googleapis.com/r8-releases/raw' }
+        maven { url 'https://kotlin.bintray.com/kotlinx' }
     }
     dependencies {
-        classpath 'com.android.tools:r8:1.4.79'
-        classpath 'com.android.tools.build:gradle:3.5.0-alpha10'
-        
+        classpath 'com.android.tools.build:gradle:3.5.0-rc01'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.40"
+
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -38,13 +37,14 @@ subprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots" }
     }
     afterEvaluate {
         if (getPlugins().hasPlugin('com.android.library') ||
             getPlugins().hasPlugin('com.android.application')) {
             android {
-                compileSdkVersion 'android-Q'
-                buildToolsVersion '29.0.0-rc2'
+                compileSdkVersion 29
+                buildToolsVersion '29.0.0'
 
                 defaultConfig {
                     if (minSdkVersion == null)

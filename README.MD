@@ -38,6 +38,27 @@ Default string resources for Magisk Manager are scattered throughout
 
 Translate each and place them in the respective locations (`<module>/src/main/res/values-<lang>/strings.xml`).
 
+## Signature Verification
+
+Official release zips and APKs are signed with my personal private key. You can verify the key certificate to make sure the binaries you downloaded are not manipulated in anyway.
+
+``` bash
+# Use the keytool command from JDK to print certificates
+keytool -printcert -jarfile <APK or Magisk zip>
+
+# The output should contain the following signature
+Owner: CN=John Wu, L=Taipei, C=TW
+Issuer: CN=John Wu, L=Taipei, C=TW
+Serial number: 50514879
+Valid from: Sun Aug 14 13:23:44 EDT 2016 until: Tue Jul 21 13:23:44 EDT 2116
+Certificate fingerprints:
+	 MD5:  CE:DA:68:C1:E1:74:71:0A:EF:58:89:7D:AE:6E:AB:4F
+	 SHA1: DC:0F:2B:61:CB:D7:E9:D3:DB:BE:06:0B:2B:87:0D:46:BB:06:02:11
+	 SHA256: B4:CB:83:B4:DA:D9:9F:99:7D:BE:87:2F:01:3A:A1:6C:14:EE:C4:1D:16:70:21:F3:71:F7:E1:33:0F:27:3E:E6
+	 Signature algorithm name: SHA256withRSA
+	 Version: 3
+```
+
 ## License
 
     Magisk, including all git submodules are free software:

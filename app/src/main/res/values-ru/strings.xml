@@ -63,7 +63,7 @@
 
     <!--About Activity-->
     <string name="app_changelog">Список изменений</string>
-    <string name="translators">Displax [4PDA], igor-dyatlov, zertyuiop</string>
+    <string name="translators" />
     <string name="app_translators">Переводчики</string>
 
     <!-- System Components, Notifications -->
@@ -73,6 +73,18 @@
     <string name="download_file_error">Ошибка загрузки файла</string>
     <string name="magisk_update_title">Доступно обновление Magisk!</string>
     <string name="manager_update_title">Доступно обновление Magisk Manager!</string>
+
+    <!-- Installation -->
+    <string name="manager_download_install">Нажмите, чтобы загрузить и установить.</string>
+    <string name="download_zip_only">Загрузка установочного ZIP</string>
+    <string name="direct_install">Прямая установка (Рекомендуется)</string>
+    <string name="install_inactive_slot">Установка в неактивный слот (После OTA)</string>
+    <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный слот!\nИспользуйте эту опцию только при установке OTA.\nПродолжить?</string>
+    <string name="select_method">Выбор способа</string>
+    <string name="setup_title">Дополнительная установка</string>
+    <string name="select_patch_file">Выбрать и пропатчить файл</string>
+    <string name="patch_file_msg">Выберите образ ядра (*.img) или архив ODIN (*.tar)</string>
+    <string name="reboot_delay_toast">Перезагрузка через 5 секунд…</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Закрыть</string>
@@ -84,19 +96,16 @@
     <string name="release_notes">О версии</string>
     <string name="repo_cache_cleared">Кэш репозитория очищен</string>
     <string name="internal_storage">Расположение архива:\n[Внутреннее Хранилище]%1$s</string>
-    <string name="manager_download_install">Нажмите, чтобы загрузить и установить.</string>
+    
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
     <string name="flashing">Прошивка</string>
+    <string name="done">Завершено!</string>
+    <string name="failure">Ошибка</string>
     <string name="hide_manager_title">Маскировка Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Не удалось замаскировать Magisk Manager</string>
-    <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки.</string>
-    <string name="download_zip_only">Загрузка установочного ZIP</string>
-    <string name="direct_install">Прямая установка (Рекомендуется)</string>
-    <string name="install_inactive_slot">Установка в неактивный слот (После OTA)</string>
+    <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки.</string> 
     <string name="warning">Предупреждение</string>
-    <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный слот!\nИспользуйте эту опцию только при установке OTA.\nПродолжить?</string>
-    <string name="select_method">Выбор способа</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
     <string name="restore_img_msg">Восстановление…</string>
@@ -107,7 +116,6 @@
     <string name="setup_fail">Ошибка установки.</string>
     <string name="env_fix_title">Требуется дополнительная установка</string>
     <string name="env_fix_msg">Вашему устройству требуется дополнительная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
-    <string name="setup_title">Дополнительная установка</string>
     <string name="setup_msg">Настройка рабочей среды…</string>
     <string name="downloading_toast">Загрузка %1$s</string>
     <string name="no_rw_storage">Требуется разрешение на запись во внешнее хранилище.</string>

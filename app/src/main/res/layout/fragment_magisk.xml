@@ -1,40 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/swipeRefreshLayout"
-    android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <ScrollView
+    <data>
+
+        <import type="com.skoumal.teanity.viewmodel.LoadingViewModel.State" />
+
+        <import type="com.topjohnwu.magisk.ui.home.SafetyNetState" />
+
+        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+
+        <import type="com.topjohnwu.magisk.ui.home.MagiskItem" />
+
+        <import type="com.topjohnwu.magisk.R" />
+
+        <import type="com.topjohnwu.magisk.extensions.XStringKt" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
+
+    </data>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical">
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        app:onRefreshListener="@{() -> viewModel.refresh()}"
+        app:refreshing="@{viewModel.loading}">
 
-        <LinearLayout
-            android:id="@+id/linearLayout"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                style="?attr/cardStyle"
-                android:layout_width="fill_parent"
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="4dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
+                android:orientation="vertical"
+                android:padding="@dimen/margin_generic">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp">
+                    android:layout_height="wrap_content">
 
                     <ImageView
                         android:id="@+id/icon"
@@ -54,8 +66,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:paddingTop="10dp"
                         android:paddingBottom="10dp"
+                        android:paddingTop="10dp"
                         android:text="@string/app_name"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -66,32 +78,65 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </androidx.cardview.widget.CardView>
+                <View
+                    style="@style/Widget.Divider.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_margin="@dimen/margin_generic" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/install_option_card"
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="4dp"
-                android:visibility="gone"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
+                <include
+                    android:id="@+id/home_magisk_version"
+                    additionalInfo="@{viewModel.magiskAdditionalInfo}"
+                    currentVersion="@{viewModel.magiskCurrentVersion}"
+                    item="@{MagiskItem.MAGISK}"
+                    latestVersion="@{viewModel.magiskLatestVersion}"
+                    layout="@layout/include_update_card"
+                    state="@{viewModel.magiskState}"
+                    text="@{viewModel.magiskStateText}"
+                    viewModel="@{viewModel}" />
+
+                <include
+                    android:id="@+id/home_manager_version"
+                    additionalInfo="@{viewModel.managerAdditionalInfo}"
+                    currentVersion="@{viewModel.managerCurrentVersion}"
+                    item="@{MagiskItem.MANAGER}"
+                    latestVersion="@{viewModel.managerLatestVersion}"
+                    layout="@layout/include_update_card"
+                    state="@{viewModel.managerState}"
+                    text="@{viewModel.managerStateText}"
+                    viewModel="@{viewModel}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_generic" />
+
+                <View
+                    style="@style/Widget.Divider.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_margin="@dimen/margin_generic" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp">
+                    android:animateLayoutChanges="true"
+                    android:onClick="@{() -> viewModel.advancedPressed()}"
+                    android:orientation="vertical">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackground"
+                        android:minHeight="48dp">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:rotation="@{viewModel.isAdvancedExpanded ? 180 : 0}"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/title"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_arrow"
+                            app:tint="?attr/imageColorTint" />
 
                         <TextView
                             android:id="@+id/title"
@@ -105,126 +150,109 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <ImageView
-                            android:id="@+id/arrow"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:tint="?attr/imageColorTint"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/title"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_arrow" />
-
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/install_option_expand"
+                        gone="@{!viewModel.isAdvancedExpanded}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
                         <CheckBox
                             android:id="@+id/keep_force_enc"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
-                            android:layout_marginEnd="50dp"
-                            android:text="@string/keep_force_encryption" />
+                            android:checked="@={viewModel.isForceEncryption}"
+                            android:text="@string/keep_force_encryption"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintWidth_default="wrap"
+                            app:layout_constraintWidth_min="300dp" />
 
                         <CheckBox
                             android:id="@+id/keep_verity"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="50dp"
-                            android:layout_marginEnd="50dp"
-                            android:text="@string/keep_dm_verity" />
+                            android:checked="@={viewModel.isKeepVerity}"
+                            android:text="@string/keep_dm_verity"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/keep_force_enc"
+                            app:layout_constraintWidth_default="wrap"
+                            app:layout_constraintWidth_min="300dp" />
 
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/safetyNet_card"
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="4dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
+                <View
+                    style="@style/Widget.Divider.Horizontal"
+                    gone="@{!viewModel.hasRoot}"
+                    android:layout_width="match_parent"
+                    android:layout_margin="@dimen/margin_generic" />
 
                 <LinearLayout
+                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="@dimen/margin_generic_half"
+                        android:paddingTop="@dimen/margin_generic_half">
 
                         <ImageView
                             android:id="@+id/sn_logo"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            android:layout_marginTop="12dp"
-                            android:layout_marginEnd="24dp"
-                            android:layout_marginBottom="12dp"
                             android:tint="@color/green500"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/safetyNet_status"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_safetynet" />
-
-                        <androidx.constraintlayout.widget.Guideline
-                            android:id="@+id/sn_status_start"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            app:layout_constraintGuide_percent="0.25" />
 
                         <TextView
                             android:id="@+id/safetyNet_status"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/margin_generic"
+                            android:layout_marginRight="@dimen/margin_generic"
                             android:gravity="center"
                             android:maxLines="1"
-                            android:minWidth="200dp"
-                            android:text="@string/safetyNet_check_text"
+                            android:text="@{XStringKt.res(viewModel.safetyNetTitle)}"
                             android:textStyle="bold"
                             app:autoSizeMaxTextSize="14sp"
                             app:autoSizeTextType="uniform"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/sn_status_end"
-                            app:layout_constraintStart_toStartOf="@+id/sn_status_start"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.constraintlayout.widget.Guideline
-                            android:id="@+id/sn_status_end"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            app:layout_constraintGuide_percent="0.75" />
+                            app:layout_constraintEnd_toStartOf="@+id/safetyNet_refresh"
+                            app:layout_constraintStart_toEndOf="@+id/sn_logo"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintWidth_min="200dp" />
 
                         <ImageView
                             android:id="@+id/safetyNet_refresh"
+                            invisible="@{viewModel.ctsState == SafetyNetState.LOADING || viewModel.basicIntegrityState == SafetyNetState.LOADING}"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
-                            android:layout_marginStart="24dp"
+                            android:onClick="@{() -> viewModel.safetyNetPressed()}"
                             app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/safetyNet_status"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_refresh" />
 
                         <ProgressBar
                             android:id="@+id/safetyNet_check_progress"
+                            style="@style/Widget.Progress"
+                            goneUnless="@{viewModel.ctsState == SafetyNetState.LOADING || viewModel.basicIntegrityState == SafetyNetState.LOADING}"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
-                            android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="@+id/safetyNet_refresh"
                             app:layout_constraintEnd_toEndOf="@+id/safetyNet_refresh"
                             app:layout_constraintStart_toStartOf="@+id/safetyNet_refresh"
@@ -234,31 +262,26 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/safetyNet_expand"
+                        gone="@{viewModel.safetyNetState == State.LOADING}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingBottom="10dp">
 
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/cts_status_icon"
+                            srcCompat="@{viewModel.ctsState == SafetyNetState.PASS ? R.drawable.ic_check_circle : R.drawable.ic_cancel}"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
                             app:layout_constraintBottom_toBottomOf="@+id/cts_status"
                             app:layout_constraintEnd_toStartOf="@+id/cts_status"
-                            app:layout_constraintTop_toTopOf="@+id/cts_status" />
+                            app:layout_constraintTop_toTopOf="@+id/cts_status"
+                            app:tint="@{viewModel.ctsState == SafetyNetState.PASS ? @color/colorCorrect : @color/colorError}"
+                            tools:srcCompat="@drawable/ic_check_circle" />
 
-                        <TextView
-                            android:id="@+id/cts_status"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:padding="6dp"
-                            android:textStyle="bold"
-                            app:layout_constraintEnd_toEndOf="@+id/basic_status"
-                            app:layout_constraintStart_toStartOf="@+id/basic_status"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/basic_status_icon"
+                            srcCompat="@{viewModel.basicIntegrityState == SafetyNetState.PASS ? R.drawable.ic_check_circle : R.drawable.ic_cancel}"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_marginEnd="8dp"
@@ -267,7 +290,21 @@
                             app:layout_constraintHorizontal_bias="0.5"
                             app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="@+id/basic_status" />
+                            app:layout_constraintTop_toTopOf="@+id/basic_status"
+                            app:tint="@{viewModel.basicIntegrityState == SafetyNetState.PASS ? @color/colorCorrect : @color/colorError}"
+                            tools:srcCompat="@drawable/ic_check_circle" />
+
+                        <TextView
+                            android:id="@+id/cts_status"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:padding="6dp"
+                            android:text="@{String.format(`ctsProfile: %b`, viewModel.ctsState == SafetyNetState.PASS)}"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="@+id/basic_status"
+                            app:layout_constraintStart_toStartOf="@+id/basic_status"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="ctsProfile: true" />
 
                         <TextView
                             android:id="@+id/basic_status"
@@ -275,65 +312,95 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:padding="6dp"
+                            android:text="@{String.format(`basicIntegrity: %b`, viewModel.basicIntegrityState == SafetyNetState.PASS)}"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_bias="0.5"
                             app:layout_constraintStart_toEndOf="@+id/basic_status_icon"
-                            app:layout_constraintTop_toBottomOf="@+id/cts_status" />
+                            app:layout_constraintTop_toBottomOf="@+id/cts_status"
+                            tools:text="basicIntegrity: true" />
 
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="4dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
+                <View
+                    style="@style/Widget.Divider.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_margin="@dimen/margin_generic" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <LinearLayout
-                        android:id="@+id/paypal"
+                    <FrameLayout
+                        android:id="@+id/twitter"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:gravity="center_horizontal"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toStartOf="@+id/patreon"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:onClick="@{() -> viewModel.twitterPressed()}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/github"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        app:layout_constraintTop_toBottomOf="@+id/paypal">
 
                         <ImageView
                             android:layout_width="35dp"
                             android:layout_height="35dp"
-                            android:layout_gravity="center"
+                            android:layout_gravity="center_horizontal"
                             android:layout_margin="10dp"
                             android:tint="?attr/imageColorTint"
-                            app:srcCompat="@drawable/ic_paypal" />
+                            app:srcCompat="@drawable/ic_twitter" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_margin="5dp"
-                            android:text="PayPal"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/github"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:onClick="@{() -> viewModel.githubPressed()}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/xda"
+                        app:layout_constraintStart_toEndOf="@+id/twitter">
+
+                        <ImageView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_margin="10dp"
+                            android:tint="?attr/imageColorTint"
+                            app:srcCompat="@drawable/ic_github" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/xda"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?android:attr/selectableItemBackground"
+                        android:onClick="@{() -> viewModel.xdaPressed()}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/github">
+
+                        <ImageView
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_margin="10dp"
+                            android:tint="?attr/imageColorTint"
+                            app:srcCompat="@drawable/ic_xda" />
+
+                    </FrameLayout>
 
                     <LinearLayout
                         android:id="@+id/patreon"
@@ -343,6 +410,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center_horizontal"
+                        android:onClick="@{() -> viewModel.patreonPressed()}"
                         android:orientation="horizontal"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/paypal"
@@ -366,107 +434,58 @@
                             android:textStyle="bold" />
                     </LinearLayout>
 
-                    <FrameLayout
-                        android:id="@+id/twitter"
+                    <LinearLayout
+                        android:id="@+id/paypal"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/github"
+                        android:gravity="center_horizontal"
+                        android:onClick="@{() -> viewModel.paypalPressed()}"
+                        android:orientation="horizontal"
+                        app:layout_constraintEnd_toStartOf="@+id/patreon"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/paypal">
+                        app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
                             android:layout_width="35dp"
                             android:layout_height="35dp"
-                            android:layout_gravity="center_horizontal"
+                            android:layout_gravity="center"
                             android:layout_margin="10dp"
                             android:tint="?attr/imageColorTint"
-                            app:srcCompat="@drawable/ic_twitter" />
+                            app:srcCompat="@drawable/ic_paypal" />
 
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:id="@+id/github"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/xda"
-                        app:layout_constraintStart_toEndOf="@+id/twitter">
-
-                        <ImageView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_margin="10dp"
-                            android:tint="?attr/imageColorTint"
-                            app:srcCompat="@drawable/ic_github" />
-
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:id="@+id/xda"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/github">
-
-                        <ImageView
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_margin="10dp"
-                            android:tint="?attr/imageColorTint"
-                            app:srcCompat="@drawable/ic_xda" />
-
-                    </FrameLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_margin="5dp"
+                            android:text="PayPal"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </androidx.cardview.widget.CardView>
+                <View
+                    style="@style/Widget.Divider.Horizontal"
+                    gone="@{!viewModel.hasRoot}"
+                    android:layout_width="match_parent"
+                    android:layout_margin="@dimen/margin_generic" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/uninstall_button"
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
-
-                <TextView
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Widget.Button.Text"
+                    gone="@{!viewModel.hasRoot}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:ems="10"
-                    android:fontFamily="sans-serif"
-                    android:gravity="center"
-                    android:text="@string/uninstall"
-                    android:textAllCaps="false"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:onClick="@{() -> viewModel.uninstallPressed()}"
+                    android:text="@string/uninstall" />
 
-            </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
-        </LinearLayout>
+        </ScrollView>
 
-    </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</layout>

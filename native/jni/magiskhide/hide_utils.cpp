@@ -1,58 +1,21 @@
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mount.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
-#include <libgen.h>
 
 #include <magisk.h>
 #include <utils.h>
-#include <resetprop.h>
 #include <db.h>
-#include <selinux.h>
 
 #include "magiskhide.h"
 
 using namespace std;
 
 static pthread_t proc_monitor_thread;
-
-static const char *prop_key[] =
-	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
-	  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
-	  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", nullptr };
-
-static const char *prop_value[] =
-	{ "locked", "green", "1",
-	  "enforcing", "0", "0", "0",
-	  "1", "user", "release-keys", "0", nullptr };
-
-void manage_selinux() {
-	char val;
-	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
-	xxread(fd, &val, sizeof(val));
-	close(fd);
-	// Permissive
-	if (val == '0') {
-		chmod(SELINUX_ENFORCE, 0640);
-		chmod(SELINUX_POLICY, 0440);
-	}
-}
-
-static void hide_sensitive_props() {
-	LOGI("hide_utils: Hiding sensitive props\n");
-
-	// Hide all sensitive props
-	for (int i = 0; prop_key[i]; ++i) {
-		auto value = getprop(prop_key[i]);
-		if (!value.empty() && value != prop_value[i])
-			setprop(prop_key[i], prop_value[i], false);
-	}
-}
 
 // Leave /proc fd opened as we're going to read from it repeatedly
 static DIR *procfp;
@@ -71,57 +34,27 @@ void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
 	}
 }
 
-bool proc_name_match(int pid, const char *name) {
+static bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
-	FILE *f;
-#if 0
-	sprintf(buf, "/proc/%d/comm", pid);
-	if ((f = fopen(buf, "re"))) {
+	sprintf(buf, "/proc/%d/cmdline", pid);
+	if (FILE *f; (f = fopen(buf, "re"))) {
 		fgets(buf, sizeof(buf), f);
 		fclose(f);
 		if (strcmp(buf, name) == 0)
 			return true;
-	} else {
-		// The PID is already killed
-		return false;
-	}
-#endif
-
-	sprintf(buf, "/proc/%d/cmdline", pid);
-	if ((f = fopen(buf, "re"))) {
-		fgets(buf, sizeof(buf), f);
-		fclose(f);
-		if (strcmp(basename(buf), name) == 0)
-			return true;
 	}
 	return false;
-
-#if 0
-	sprintf(buf, "/proc/%d/exe", pid);
-	ssize_t len;
-	if ((len = readlink(buf, buf, sizeof(buf))) < 0)
-		return false;
-	buf[len] = '\0';
-	return strcmp(basename(buf), name) == 0;
-#endif
 }
 
-static void kill_process(const char *name) {
+static void kill_process(const char *name, bool multi = false) {
 	crawl_procfs([=](int pid) -> bool {
 		if (proc_name_match(pid, name)) {
 			if (kill(pid, SIGTERM) == 0)
 				LOGD("hide_utils: killed PID=[%d] (%s)\n", pid, name);
-			return false;
+			return multi;
 		}
 		return true;
 	});
-}
-
-void clean_magisk_props() {
-	getprop([](const char *name, auto, auto) -> void {
-		if (strstr(name, "magisk"))
-			deleteprop(name);
-	}, nullptr, false);
 }
 
 static int add_list(const char *pkg, const char *proc = "") {
@@ -219,6 +152,12 @@ bool init_list() {
 		return true;
 	});
 	db_err_cmd(err, return false);
+
+	// If Android Q+, also kill blastula pool
+	if (SDK_INT >= 29) {
+		kill_process("usap32", true);
+		kill_process("usap64", true);
+	}
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {
@@ -322,9 +261,13 @@ void auto_start_magiskhide() {
 	db_settings dbs;
 	get_db_settings(dbs, HIDE_CONFIG);
 	if (dbs[HIDE_CONFIG]) {
-		new_daemon_thread([](auto) -> void* {
-			launch_magiskhide(-1);
-			return nullptr;
-		});
+		new_daemon_thread([]() -> void { launch_magiskhide(-1); });
 	}
+}
+
+void test_proc_monitor() {
+	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
+		exit(1);
+	proc_monitor();
+	exit(0);
 }

@@ -11,8 +11,8 @@ import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.uicomponents.Notifications;
+import com.topjohnwu.magisk.ui.SplashActivity;
+import com.topjohnwu.magisk.view.Notifications;
 import com.topjohnwu.signing.JarMap;
 import com.topjohnwu.signing.SignAPK;
 import com.topjohnwu.superuser.Shell;
@@ -56,7 +56,7 @@ public class PatchAPK {
         return builder.toString();
     }
 
-    private static boolean findAndPatch(byte xml[], String from, String to) {
+    private static boolean findAndPatch(byte[] xml, String from, String to) {
         if (from.length() != to.length())
             return false;
         CharBuffer buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer();
@@ -83,7 +83,7 @@ public class PatchAPK {
         return true;
     }
 
-    private static boolean findAndPatch(byte xml[], int a, int b) {
+    private static boolean findAndPatch(byte[] xml, int a, int b) {
         IntBuffer buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
         int len = xml.length / 4;
         for (int i = 0; i < len; ++i) {
@@ -110,7 +110,7 @@ public class PatchAPK {
         if (!Shell.su("pm install " + repack).exec().isSuccess())
             return false;
 
-        Config.set(Config.Key.SU_MANAGER, pkg);
+        Config.setSuManager(pkg);
         Config.export();
         RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID,
                 new ComponentName(pkg, ClassMap.get(SplashActivity.class).getName()));
@@ -122,7 +122,7 @@ public class PatchAPK {
         try {
             JarMap jar = new JarMap(in);
             JarEntry je = jar.getJarEntry(Const.ANDROID_MANIFEST);
-            byte xml[] = jar.getRawData(je);
+            byte[] xml = jar.getRawData(je);
 
             if (!findAndPatch(xml, BuildConfig.APPLICATION_ID, pkg) ||
                     !findAndPatch(xml, R.string.app_name, R.string.re_app_name))
@@ -145,7 +145,7 @@ public class PatchAPK {
                     Notifications.progress(app.getString(R.string.hide_manager_title));
             Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
             if(!patchAndHide())
-                Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
+                Utils.INSTANCE.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
         });
     }

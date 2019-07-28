@@ -17,7 +17,7 @@ enum {
 	BOOT_COMPLETE,
 	MAGISKHIDE,
 	SQLITE_CMD,
-	ZYGOTE_NOTIFY,
+	BROADCAST_ACK,
 };
 
 // Return codes for daemon
@@ -82,6 +82,10 @@ void magiskhide_handler(int client);
  *************/
 
 void su_daemon_handler(int client, struct ucred *credential);
+void broadcast_test();
 
 extern int SDK_INT;
 extern bool RECOVERY_MODE;
+extern bool CONNECT_BROADCAST;
+
+#define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")

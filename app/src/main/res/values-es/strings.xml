@@ -73,7 +73,19 @@
     <string name="download_file_error">Error descargando archivo</string>
     <string name="magisk_update_title">Actualización de Magisk disponible!</string>
     <string name="manager_update_title">Actualización de Magisk Manager disponible!</string>
-
+	
+	<!-- Installation -->
+	<string name="manager_download_install">Pulse para descargar e instalar</string>
+	<string name="download_zip_only">Descargar sólo el archivo ZIP</string>
+	<string name="direct_install">Instalación Directa (Recomendado)</string>
+	<string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
+	<string name="install_inactive_slot_msg">¡Se forzará su dispositivo para que arranque en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\nContinuar?</string>
+    <string name="select_method">Seleccionar Método</string>
+	<string name="setup_title">Configuración Adicional</string>
+	<string name="select_patch_file">Seleccionar y parchear un archivo</string>
+	<string name="patch_file_msg">Seleccione una imagen raw (* .img) o un archivo tar de ODIN (* .tar)</string>
+	<string name="reboot_delay_toast">Reiniciando en 5 segundos…</string>
+	
     <!--Toasts, Dialogs-->
     <string name="close">Cerrar</string>
     <string name="repo_install_title">Instalar %1$s</string>
@@ -84,28 +96,26 @@
     <string name="release_notes">Notas de lanzamiento</string>
     <string name="repo_cache_cleared">Caché del repositorio limpiada</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
-    <string name="manager_download_install">Pulse para descargar e instalar</string>
+    
     <string name="dtbo_patched_title">DTBO fue parchado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha parcheado dtbo.img, por favor reinicia</string>
-    <string name="flashing">Flasheando</string>
+    <string name="flashing">Flasheando…</string>
+    <string name="done">¡Hecho!</string>
+    <string name="failure">Ha fallado</string>
     <string name="hide_manager_title">Ocultando Magisk Manager…</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
-    <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
-    <string name="direct_install">Instalación Directa (Recomendado)</string>
-    <string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
-    <string name="select_method">Seleccionar Método</string>
+    <string name="warning">Advertencia</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
-    <string name="restore_done">¡Restauración Terminada!</string>
     <string name="restore_img_msg">Restaurando …</string>
+    <string name="restore_done">¡Restauración Terminada!</string>
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="proprietary_title">Descargar Código Propietario</string>
     <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para la comprobación de SafetyNet?</string>
     <string name="setup_fail">Instalación Fallida</string>
     <string name="env_fix_title">Se Requiere una Instalación Adicional</string>
     <string name="env_fix_msg">Su dispositivo requiere una instalación adicional para que Magisk funcione correctamente. Se descargará el zip de instalación de Magisk, desea continuar ahora?</string>
-    <string name="setup_title">Configuración Adicional</string>
     <string name="setup_msg">Ejecutando Configuración de Entorno</string> 
     <string name="downloading_toast">Descargando %1$s</string>
     <string name="no_rw_storage">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
@@ -131,7 +141,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Insertar una URL personalizada</string>
-
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_hosts_title">Systemless Hosts</string>

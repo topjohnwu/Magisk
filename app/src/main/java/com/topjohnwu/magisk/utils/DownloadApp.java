@@ -6,9 +6,10 @@ import com.topjohnwu.magisk.App;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.ClassMap;
 import com.topjohnwu.magisk.Config;
+import com.topjohnwu.magisk.Info;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.uicomponents.ProgressNotification;
+import com.topjohnwu.magisk.ui.SplashActivity;
+import com.topjohnwu.magisk.view.ProgressNotification;
 import com.topjohnwu.net.Networking;
 import com.topjohnwu.net.ResponseListener;
 import com.topjohnwu.superuser.Shell;
@@ -24,8 +25,8 @@ public class DownloadApp {
     }
 
     public static void restore() {
-        String name = Utils.fmt("MagiskManager v%s(%d)",
-                Config.remoteManagerVersionString, Config.remoteManagerVersionCode);
+        String name = Utils.INSTANCE.fmt("MagiskManager v%s(%d)",
+                Info.remote.getApp().getVersion(), Info.remote.getApp().getVersionCode());
         dlInstall(name, new RestoreManager());
     }
 
@@ -33,7 +34,7 @@ public class DownloadApp {
         File apk = new File(App.self.getCacheDir(), "manager.apk");
         ProgressNotification progress = new ProgressNotification(name);
         listener.progress = progress;
-        Networking.get(Config.managerLink)
+        Networking.get(Info.remote.getApp().getLink())
                 .setExecutor(App.THREAD_POOL)
                 .setDownloadProgressListener(progress)
                 .setErrorHandler((conn, e) -> progress.dlFail())

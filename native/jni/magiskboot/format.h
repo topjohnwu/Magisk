@@ -8,8 +8,6 @@ typedef enum {
 /* Boot formats */
 	CHROMEOS,
 	AOSP,
-	ELF32,
-	ELF64,
 	DHTB,
 	BLOB,
 /* Compression formats */
@@ -19,18 +17,18 @@ typedef enum {
 	BZIP2,
 	LZ4,
 	LZ4_LEGACY,
-/* Misc */
+/* Unsupported compression */
 	LZOP,
+/* Misc */
 	MTK,
 	DTB,
 } format_t;
 
 #define COMPRESSED(fmt)  ((fmt) >= GZIP && (fmt) <= LZ4_LEGACY)
+#define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
 
 #define BOOT_MAGIC      "ANDROID!"
 #define CHROMEOS_MAGIC  "CHROMEOS"
-#define ELF32_MAGIC     "\x7f""ELF\x01"
-#define ELF64_MAGIC     "\x7f""ELF\x02"
 #define GZIP1_MAGIC     "\x1f\x8b"
 #define GZIP2_MAGIC     "\x1f\x9e"
 #define LZOP_MAGIC      "\x89""LZO"
@@ -45,8 +43,11 @@ typedef enum {
 #define DHTB_MAGIC      "\x44\x48\x54\x42\x01\x00\x00\x00"
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"
 #define TEGRABLOB_MAGIC "-SIGNED-BY-SIGNBLOB-"
-#define NOOKHD_MAGIC    "Green Loader"
-#define NOOKHD_NEW_MAGIC "eMMC boot.img+secondloader"
+#define NOOKHD_RL_MAGIC "Red Loader"
+#define NOOKHD_GL_MAGIC "Green Loader"
+#define NOOKHD_GR_MAGIC "Green Recovery"
+#define NOOKHD_EB_MAGIC "eMMC boot.img+secondloader"
+#define NOOKHD_ER_MAGIC "eMMC recovery.img+secondloader"
 #define NOOKHD_PRE_HEADER_SZ 1048576
 #define ACCLAIM_MAGIC   "BauwksBoot"
 #define ACCLAIM_PRE_HEADER_SZ 262144

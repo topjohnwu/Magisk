@@ -27,10 +27,6 @@ format_t check_fmt(const void *buf, size_t len) {
 		return CHROMEOS;
 	} else if (MATCH(BOOT_MAGIC)) {
 		return AOSP;
-	} else if (MATCH(ELF32_MAGIC)) {
-		return ELF32;
-	} else if (MATCH(ELF64_MAGIC)) {
-		return ELF64;
 	} else if (MATCH(GZIP1_MAGIC) || MATCH(GZIP2_MAGIC)) {
 		return GZIP;
 	} else if (MATCH(LZOP_MAGIC)) {
@@ -93,7 +89,7 @@ const char *Fmt2Ext::operator[](format_t fmt) {
 		case GZIP:
 			return ".gz";
 		case LZOP:
-			return ".lzop";
+			return ".lzo";
 		case XZ:
 			return ".xz";
 		case LZMA:

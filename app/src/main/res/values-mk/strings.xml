@@ -1,0 +1,225 @@
+<resources>
+
+    <!--Welcome Activity-->
+    <string name="modules">Модули</string>
+    <string name="downloads">Преземања</string>
+    <string name="superuser">Супер-корисник</string>
+    <string name="log">Записник</string>
+    <string name="settings">Поставки</string>
+    <string name="install">Инсталирај</string>
+    <string name="unsupport_magisk_title">Неподдржана верзија на Magisk</string>
+    <string name="unsupport_magisk_message">Оваа верзија на Magisk Manager не ја поддржува верзијата на Magisk пониска од v18.0.\n\nМожно е да рачно да го надградите Magisk или да ја вратите апликацијата на постара верзија.</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version_error">Magisk не е инсталиран.</string>
+    <string name="checking_for_updates">Проверка за ажурирања…</string>
+    <string name="invalid_update_channel">Невалиден канал за ажурирања</string>
+    <string name="safetyNet_check_text">Притисни за проверка на SafetyNet статус</string>
+    <string name="checking_safetyNet_status">Проверка на SafetyNet статус…</string>
+    <string name="safetyNet_check_success">SafetyNet проверката е успешна</string>
+    <string name="safetyNet_api_error">Грешка со SafetyNet API</string>
+    <string name="safetyNet_res_invalid">Одговорот е невалиден.</string>
+    <string name="magisk_up_to_date">Magisk е ажуриран</string>
+    <string name="manager_up_to_date">Magisk Manager е ажуриран</string>
+    <string name="advanced_settings_title">Напредни поставки</string>
+    <string name="keep_force_encryption">Задржи ја присилната енкрипција</string>
+    <string name="keep_dm_verity">Задржи AVB 2.0/dm-verity</string>
+    <string name="current_installed">Инсталирано: %1$s</string>
+    <string name="latest_version">Најново: %1$s</string>
+    <string name="uninstall">Деинсталирај</string>
+    <string name="uninstall_magisk_title">Деинсталирај го Magisk</string>
+    <string name="uninstall_magisk_msg">Сите модули ќе бидат оневозможени/oтстранети. Рут привилегиите ќе бидат отстранети, а вашите податоци може да се енкриптираат ако моментално не се.</string>
+    <string name="update">Ажурирај</string>
+    <string name="core_only_enabled">(Овозможен е само основен режим)</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Нема информации)</string>
+    <string name="no_modules_found">Не се пронајдени модули.</string>
+    <string name="update_file_created">Модулот ќе се ажурира при следното рестартирање.</string>
+    <string name="remove_file_created">Модулот ќе биде отстранет при следното рестартирање.</string>
+    <string name="remove_file_deleted">Модулот нема да биде отстранет при следното рестартирање.</string>
+    <string name="disable_file_created">Модулот ќе биде оневозможен при следното рестартирање.</string>
+    <string name="disable_file_removed">Модулот ќе биде овозможен при следното рестартирање.</string>
+    <string name="author">Направено од %1$s</string>
+    <string name="reboot_recovery">Рестартирај во Recovery режим</string>
+    <string name="reboot_bootloader">Рестартирај во Bootloader режим</string>
+    <string name="reboot_download">Рестартирај во Download режим</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Достапно е ажурирање</string>
+    <string name="installed">Инсталирано</string>
+    <string name="not_installed">Не е инсталирано</string>
+    <string name="updated_on">Ажурирано на: %1$s</string>
+    <string name="sorting_order">Начин на подредување</string>
+    <string name="sort_by_name">Подреди по име</string>
+    <string name="sort_by_update">Подреди според последното ажурирање</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveLog">Зачувај записник</string>
+    <string name="menuReload">Вчитај повторно</string>
+    <string name="menuClearLog">Исчисти го записникот сега</string>
+    <string name="logs_cleared">Записникот е успешно исчистен.</string>
+    <string name="log_is_empty">Записникот е празен.</string>
+
+    <!--About Activity-->
+    <string name="app_changelog">Листа на промени</string>
+    <string name="translators">davidtrpcevski</string>
+    <string name="app_translators">Преведувачи</string>
+
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Magisk Ажурирања</string>
+    <string name="progress_channel">Известувања за прогресот</string>
+    <string name="download_complete">Преземањето е завршено</string>
+    <string name="download_file_error">Грешка при преземање на фајлот</string>
+    <string name="magisk_update_title">Достапно е ажурирање на Magisk!</string>
+    <string name="manager_update_title">Достапно е ажурирање на Magisk Manager!</string>
+
+    <!-- Installation -->
+    <string name="manager_download_install">Притисни за преземање и инсталирање.</string>
+    <string name="download_zip_only">Преземи само Zip датотека</string>
+    <string name="direct_install">Директна инсталација (Препорачано)</string>
+    <string name="install_inactive_slot">Инсталирај во неактивен слот (по ОТА)</string>
+    <string name="install_inactive_slot_msg">Вашиот уред ќе биде ПРИНУДЕН да се подигне на тековниот неактивен слот по рестартирањето!\nОваа опција користете ја само откако OTA ажурирање е направено.\nПродолжи?</string>
+    <string name="select_method">Избери метод</string>
+    <string name="setup_title">Дополнителни подесувања</string>
+    <string name="select_patch_file">Избери и обнови ја датотеката</string>
+    <string name="patch_file_msg">Избери само image датотека (*.img) или ODIN tar датотека (*.tar)</string>
+    <string name="reboot_delay_toast">Рестартирање за 5 секунди…</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="close">Затвори</string>
+    <string name="repo_install_title">Инсталирај %1$s</string>
+    <string name="repo_install_msg">Дали сакате да го инсталирате %1$s сега?</string>
+    <string name="download">Преземи</string>
+    <string name="reboot">Рестартирај</string>
+    <string name="settings_reboot_toast">Рестартирајте за да ги примените поставките.</string>
+    <string name="release_notes">Белешки за изданието</string>
+    <string name="repo_cache_cleared">Кешот од репозиториумот е исчистен</string>
+    <string name="internal_storage">Zip датотеката е сместена во:\n[Внатрешна меморија]%1$s</string>
+
+    <string name="dtbo_patched_title">DTBO е обновено!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager ја обнови dtbo.img датотеката. Ве молиме, рестартирајте.</string>
+    <string name="flashing">Применувам</string>
+    <string name="hide_manager_title">Сокриј го Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Сокривањето на Magisk Manager е неуспешно.</string>
+    <string name="open_link_failed_toast">Не е пронајдена апликација за отворање на врската.</string>
+    <string name="warning">Внимание</string>
+    <string name="complete_uninstall">Целосно деинсталирање</string>
+    <string name="restore_img">Врати image датотеки</string>
+    <string name="restore_img_msg">Враќање…</string>
+    <string name="restore_done">Враќањето заврши!</string>
+    <string name="restore_fail">Не постои оригинална резервна копија!</string>
+    <string name="proprietary_title">Превземи патентиран код</string>
+    <string name="proprietary_notice">Magisk Manager е FOSS апликација и затоа не содржи код од SafetyNet API кој е во сопственост на Google.\n\nДали ќе дозволите Magisk Manager да преземе проширување (содржи GoogleApiClient) за SafetyNet проверка?</string>
+    <string name="setup_fail">Поставувањето е неуспешно.</string>
+    <string name="env_fix_title">Потребни е дополнително поставување</string>
+    <string name="env_fix_msg">На Вашиот уред му е потребно дополнително поставување за Magisk да работи нормално. Ќе се преземе ZIP фајлот за поставување на Magisk, дали сакате да продолжите?</string>
+    <string name="setup_msg">Надградба на работната околина…</string>
+    <string name="downloading_toast">Преземање %1$s</string>
+    <string name="no_rw_storage">Оваа функција нема да работи без дозвола за запис на надворешната меморија.</string>
+    <string name="dl_one_module">Преземај модули еден по друг.</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">Општо</string>
+    <string name="settings_dark_theme_title">Темна тема</string>
+    <string name="settings_dark_theme_summary">Овозможи темна тема.</string>
+    <string name="settings_clear_cache_title">Исчисти го кешот од репозиториумот</string>
+    <string name="settings_clear_cache_summary">Исчисти ги кешираните информации за онлајн репозиториумот. Ова ја принудува апликацијата да се освежи онлајн.</string>
+    <string name="settings_hide_manager_title">Сокриј го Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Препакувај го Magisk Manager со случајно име на пакет.</string>
+    <string name="settings_restore_manager_title">Врати го Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Врати го Magisk Manager со оригиналното име на пакет</string>
+    <string name="language">Јазик</string>
+    <string name="system_default">(Стандарден системски)</string>
+    <string name="settings_update">Поставки за ажурирање</string>
+    <string name="settings_check_update_title">Провери за ажурирања</string>
+    <string name="settings_check_update_summary">Периодично проверувај за ажурирања во позадина.</string>
+    <string name="settings_update_channel_title">Канал за ажурирања</string>
+    <string name="settings_update_stable">Стабилен</string>
+    <string name="settings_update_beta">Бета</string>
+    <string name="settings_update_custom">Прилагодено</string>
+    <string name="settings_update_custom_msg">Внеси прилагоден URL линк</string>
+    <string name="settings_core_only_title">Само Magisk Core основен режим</string>
+    <string name="settings_core_only_summary">Овозможи ги само основните функционалности. MagiskSU и MagiskHide ќе бидет овозможени, но нема да се вчитаат модули.</string>
+    <string name="settings_magiskhide_summary">Сокриј го Magisk од различни форми на откривање.</string>
+    <string name="settings_hosts_title">Несистемски хостови</string>
+    <string name="settings_hosts_summary">Поддршка за несистемски хостови за Adblock апликации.</string>
+    <string name="settings_hosts_toast">Додаден е модул за несистемски хостови</string>
+
+    <string name="settings_su_app_adb">Апликации и АДБ</string>
+    <string name="settings_su_app">Само апликации</string>
+    <string name="settings_su_adb">Само АДБ</string>
+    <string name="settings_su_disable">Оневозможено</string>
+    <string name="settings_su_request_10">10 секунди</string>
+    <string name="settings_su_request_15">15 секунди</string>
+    <string name="settings_su_request_20">20 секунди</string>
+    <string name="settings_su_request_30">30 секунди</string>
+    <string name="settings_su_request_45">45 секунди</string>
+    <string name="settings_su_request_60">60 секунди</string>
+    <string name="superuser_access">Пристап за супер-корисник</string>
+    <string name="auto_response">Автоматски одговор</string>
+    <string name="request_timeout">Временско ограничување на барање</string>
+    <string name="superuser_notification">Супер-корисник известување</string>
+    <string name="request_timeout_summary">%1$d секунди</string>
+    <string name="settings_su_reauth_title">Повторна автентикација по надградба</string>
+    <string name="settings_su_reauth_summary">Повторна автентикација за супер-корисник дозвола по надградбата на апликацијата</string>
+    <string name="settings_su_fingerprint_title">Овозможи автентикација на отпечатоци</string>
+    <string name="settings_su_fingerprint_summary">Користете скенер за отпечатоци за да дозволите супер-корисник барања</string>
+    <string name="auth_fingerprint">Автентикација на отпечатоци</string>
+
+    <string name="multiuser_mode">Режим на повеќе корисници</string>
+    <string name="settings_owner_only">Само сопственикот на уредот</string>
+    <string name="settings_owner_manage">Управувано од сопственикот на уредот</string>
+    <string name="settings_user_independent">Независно од корисникот</string>
+    <string name="owner_only_summary">Само сопственикот има рут пристап.</string>
+    <string name="owner_manage_summary">Само сопственикот може да управува со рут пристапот и да ги прима барања за рут пристап.</string>
+    <string name="user_indepenent_summary">Секој корисник има сопствени рут правила.</string>
+
+    <string name="mount_namespace_mode">Поставете го режимот на именски простор</string>
+    <string name="settings_ns_global">Глобален именски простор</string>
+    <string name="settings_ns_requester">Наследи именски простор</string>
+    <string name="settings_ns_isolate">Изолиран именски простор</string>
+    <string name="global_summary">Сите рут сесии го користат глобалниот именски простор.</string>
+    <string name="requester_summary">Рут сесиите ќе го наследат именскиот простор на нивниот барател.</string>
+    <string name="isolate_summary">Секоја рут сесија ќе има свој изолиран именски простор.</string>
+    <string name="android_o_not_support">Не е поддржано на Android 8.0+.</string>
+    <string name="disable_fingerprint">Нема регистрирано отпечатоци од прсти или уредот не ја поддржува оваа функција.</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Супер-корисник барање</string>
+    <string name="deny_with_str">Одбиј%1$s</string>
+    <string name="deny">Одбиј</string>
+    <string name="prompt">Прашај</string>
+    <string name="grant">Одобри</string>
+    <string name="su_warning">Дава целосен пристап на вашиот уред.\nОдбијте ако не сте сигурни!</string>
+    <string name="forever">Засекогаш</string>
+    <string name="once">Еднаш</string>
+    <string name="tenmin">10 минути</string>
+    <string name="twentymin">20 минути</string>
+    <string name="thirtymin">30 минути</string>
+    <string name="sixtymin">60 минути</string>
+    <string name="su_allow_toast">На %1$s се доделени правата на супер-корисник</string>
+    <string name="su_deny_toast">На %1$s се одбиени правата на супер-корисник</string>
+    <string name="no_apps_found">Не се пронајдени апликации</string>
+    <string name="su_snack_grant">Правата за супер-корисник од %1$s се одобрени</string>
+    <string name="su_snack_deny">Правата за супер-корисник од %1$s се одбиени</string>
+    <string name="su_snack_notif_on">Известувањата од %1$s се овозможени</string>
+    <string name="su_snack_notif_off">Известувањата од %1$s се оневозможени</string>
+    <string name="su_snack_log_on">Записникот на настани е овозможен за %1$s</string>
+    <string name="su_snack_log_off">Записникот на настани е оневозможен %1$s</string>
+    <string name="su_snack_revoke">Правата за %1$s се анулирани</string>
+    <string name="su_revoke_title">Анулирај?</string>
+    <string name="su_revoke_msg">Дали потврдувате анулирање на поставките за пристап на %1$s?</string>
+    <string name="toast">Тост</string>
+    <string name="none">Ниеден</string>
+    <string name="auth_fail">Неуспешна автентикација</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Целен UID: %1$d</string>
+    <string name="command">Команда: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Прикажи ги системските апликации</string>
+
+</resources>

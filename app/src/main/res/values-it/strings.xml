@@ -16,7 +16,7 @@
 	<string name="invalid_update_channel">Canale di aggiornamento non valido</string>
 	<string name="safetyNet_check_text">Tocca per controllare SafetyNet</string>
 	<string name="checking_safetyNet_status">Controllo stato SafetyNet…</string>
-	<string name="safetyNet_check_success">Controllo SafetyNet OK</string>
+	<string name="safetyNet_check_success">Controllo SafetyNet Superato</string>
 	<string name="safetyNet_api_error">Errore API SafetyNet</string>
    	<string name="safetyNet_res_invalid">La risposta non è valida.</string>
    	<string name="magisk_up_to_date">Magisk è aggiornato</string>
@@ -28,7 +28,7 @@
 	<string name="latest_version">Ultima: %1$s</string>
 	<string name="uninstall">Disinstalla</string>
 	<string name="uninstall_magisk_title">Disinstalla Magisk</string>
-	<string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi. Il root verrà rimosso e i tuoi dati potrebbero venire criptati, nel caso non lo siano già.</string>
+	<string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi. Il root verrà rimosso e i tuoi dati potrebbero essere criptati, nel caso non lo siano già.</string>
 	<string name="update">Aggiorna</string>
         <string name="core_only_enabled">(Modalità solo Core abilitata)</string>
 
@@ -74,6 +74,18 @@
 	<string name="magisk_update_title">È disponibile un aggiornamento di Magisk!</string>
    	<string name="manager_update_title">È disponibile un aggiornamento di Magisk Manager!</string>
 
+<!-- Installation -->
+    	<string name="manager_download_install">Apri questa notifica per scaricare e installare.</string>
+	<string name="download_zip_only">Scarica solo il file zip</string>
+    	<string name="direct_install">Installazione diretta (raccomandata)</string>
+	<string name="install_inactive_slot">Installa nello slot inattivo (dopo un OTA)</string>
+	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
+	<string name="select_method">Seleziona un metodo</string>
+	<string name="setup_title">Configurazione aggiuntiva</string>
+	<string name="select_patch_file">Seleziona e aggiorna un file</string>
+   	<string name="patch_file_msg">Seleziona un\'immagine in formato .img o un file ODIN .tar</string>
+   	<string name="reboot_delay_toast">Riavvio fra 5 secondi…</string>
+	
 	<!--Toasts, Dialogs-->
 	<string name="close">Chiudi</string>
 	<string name="repo_install_title">Installazione di %1$s</string>
@@ -84,30 +96,26 @@
 	<string name="release_notes">Note di rilascio</string>
 	<string name="repo_cache_cleared">La cache delle repository è stata svuotata</string>
 	<string name="internal_storage">Il file zip si trova in:\n[Memoria Interna]%1$s</string>
-	<string name="manager_download_install">Premere per scaricare e installare.</string>
+	
 	<string name="dtbo_patched_title">DTBO è stato aggiornato!</string>
 	<string name="dtbo_patched_reboot">Magisk Manager ha aggiornato dtbo.img. Riavvia per completare.</string>
 	<string name="flashing">Flash in corso…</string>
+	<string name="done">Completato!</string>
+    	<string name="failure">Fallito</string>
 	<string name="hide_manager_title">Nascondendo Magisk Manager…</string>
 	<string name="hide_manager_fail_toast">Non è stato possibile nascondere Magisk Manager.</string>
 	<string name="open_link_failed_toast">Nessuna app disponibile per aprire il link.</string>
-	<string name="download_zip_only">Scarica solo il file zip</string>
-    <string name="direct_install">Installazione diretta (raccomandata)</string>
-	<string name="install_inactive_slot">Installa nello slot inattivo (dopo un OTA)</string>
 	<string name="warning">Attenzione</string>
-	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
-	<string name="select_method">Seleziona un metodo</string>
-    <string name="complete_uninstall">Disinstallazione completa</string>
+   	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
 	<string name="restore_img_msg">Ripristino…</string>
 	<string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
    	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS e non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi scaricare un\'estensione (contenente GoogleApiClient) per controllare lo stato di SafetyNet?</string>
-    <string name="setup_fail">Configurazione fallita.</string>
-	<string name="env_fix_title">Richiedi configurazione aggiuntiva</string>
+   	<string name="setup_fail">Configurazione fallita.</string>
+	<string name="env_fix_title">Configurazione aggiuntiva richiesta</string>
 	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
-	<string name="setup_title">Configurazione aggiuntiva</string>
 	<string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
 	<string name="downloading_toast">Download di %1$s</string>
 	<string name="no_rw_storage">Questa funzione non sarà attiva senza l\'autorizzazione di scrittura nella memoria di archiviazione.</string>
@@ -117,7 +125,7 @@
 	<string name="settings_general_category">Generale</string>
 	<string name="settings_dark_theme_title">Tema scuro</string>
 	<string name="settings_dark_theme_summary">Abilita il tema scuro.</string>
-        <string name="settings_clear_cache_title">Svuota cache repository</string>
+    	<string name="settings_clear_cache_title">Svuota cache repository</string>
 	<string name="settings_clear_cache_summary">Svuota la cache delle repository. Questa opzione forza l\'aggiornamento online dell\'app.</string>
 	<string name="settings_hide_manager_title">Nascondi Magisk Manager</string>
 	<string name="settings_hide_manager_summary">Reinstalla Magisk Manager con un nome pacchetto casuale.</string>
@@ -133,7 +141,7 @@
 	<string name="settings_update_beta">Beta</string>
 	<string name="settings_update_custom">Personalizzato</string>
 	<string name="settings_update_custom_msg">Inserisci un URL personalizzato</string>
-    <string name="settings_core_only_title">Modalità Magisk Core</string>
+    	<string name="settings_core_only_title">Modalità Magisk Core</string>
 	<string name="settings_core_only_summary">Abilita solo le funzioni principali. Nessun modulo verrà caricato. MagiskSU e MagiskHide rimarranno abilitati</string>
 	<string name="settings_magiskhide_summary">Nasconde Magisk da numerose rilevazioni.</string>
 	<string name="settings_hosts_title">Host systemless</string>

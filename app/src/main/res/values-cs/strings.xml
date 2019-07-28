@@ -160,7 +160,7 @@
     <string name="auto_response">Automatická odezva</string>
     <string name="request_timeout">Časový limit požadavku</string>
     <string name="superuser_notification">Oznámení Superuser</string>
-    <string name="request_timeout_summary">%1$s sekund</string>
+    <string name="request_timeout_summary">%1$d sekund</string>
     <string name="settings_su_reauth_title">Opětovné ověření po aktualizaci</string>
     <string name="settings_su_reauth_summary">Opětovné ověření oprávnění Superuser po aktualizaci aplikace</string>
     <string name="settings_su_fingerprint_title">Povolit ověřování otisky prstů</string>

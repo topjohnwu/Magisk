@@ -33,11 +33,13 @@ void decompress(char *infile, const char *outfile) {
 	read_file(in_file, [&](void *buf, size_t len) -> void {
 		if (out_fd < 0) {
 			format_t type = check_fmt(buf, len);
+
+			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
+
 			if (!COMPRESSED(type))
-				LOGE("Input file is not a compressed type!\n");
+				LOGE("Input file is not a supported compressed type!\n");
 
 			cmp.reset(get_decoder(type));
-			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
 
 			/* If user does not provide outfile, infile has to be either
 	 		* <path>.[ext], or '-'. Outfile will be either <path> or '-'.
@@ -422,8 +424,8 @@ void LZ4FEncoder::write_header() {
 	FilterOutStream::write(outbuf, write);
 }
 
-LZ4Decoder::LZ4Decoder() : init(false), buf_off(0), total(0), block_sz(0),
-outbuf(new char[LZ4_UNCOMPRESSED]), buf(new char[LZ4_COMPRESSED]) {}
+LZ4Decoder::LZ4Decoder() : outbuf(new char[LZ4_UNCOMPRESSED]), buf(new char[LZ4_COMPRESSED]),
+init(false), block_sz(0), buf_off(0), total(0) {}
 
 LZ4Decoder::~LZ4Decoder() {
 	delete[] outbuf;
@@ -476,8 +478,8 @@ uint64_t LZ4Decoder::finalize() {
 	return total;
 }
 
-LZ4Encoder::LZ4Encoder() : init(false), buf_off(0), out_total(0), in_total(0),
-outbuf(new char[LZ4_COMPRESSED]), buf(new char[LZ4_UNCOMPRESSED]) {}
+LZ4Encoder::LZ4Encoder() : outbuf(new char[LZ4_COMPRESSED]), buf(new char[LZ4_UNCOMPRESSED]),
+init(false), buf_off(0), out_total(0), in_total(0) {}
 
 LZ4Encoder::~LZ4Encoder() {
 	delete[] outbuf;

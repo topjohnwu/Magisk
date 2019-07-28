@@ -1,4 +1,5 @@
-#include <magisk.h>
+#include <logging.h>
+#include <flags.h>
 
 #include "magiskpolicy.h"
 #include "sepolicy.h"
@@ -47,13 +48,21 @@ void sepol_magisk_rules() {
 	sepol_attradd(SEPOL_PROC_DOMAIN, "bluetoothdomain");
 	sepol_attradd(SEPOL_FILE_DOMAIN, "mlstrustedobject");
 
-	// Let init daemon transit context
+	// Let everyone access tmpfs files (for SAR sbin overlay)
+	sepol_allow(ALL, "tmpfs", "file", ALL);
+
+	// For normal rootfs file/directory operations when rw (for SAR / overlay)
+	sepol_allow("rootfs", "labeledfs", "filesystem", "associate");
+
+	// Let init transit to SEPOL_PROC_DOMAIN
 	sepol_allow("kernel", "kernel", "process", "setcurrent");
 	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "process", "dyntransition");
 
 	// Let init run stuffs
 	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
 	sepol_allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
+	sepol_allow("init", "tmpfs", "file", "getattr");
+	sepol_allow("init", "tmpfs", "file", "execute");
 
 	// Shell, properties, logs
 	if (sepol_exists("default_prop"))
@@ -145,8 +154,9 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "mount");
 	sepol_allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "unmount");
 	sepol_allow("kernel", ALL, "file", "read");
+	sepol_allow("kernel", ALL, "file", "write");
 
-	// Allow su to do anything to any files/dir/links
+	// Allow us to do anything to any files/dir/links
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "file", ALL);
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "dir", ALL);
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "lnk_file", ALL);
@@ -154,6 +164,10 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "sock_file", ALL);
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "chr_file", ALL);
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
+
+	// Allow us to do any ioctl on all block devices
+	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
+		sepol_allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", "0x0000-0xFFFF");
 
 	// Allow all binder transactions
 	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "binder", ALL);
@@ -182,12 +196,14 @@ void sepol_magisk_rules() {
 	// Allow update engine to source addon.d.sh
 	sepol_allow("update_engine", "adb_data_file", "dir", ALL);
 
-	// Remove all dontaudit
+#ifdef MAGISK_DEBUG
+	// Remove all dontaudit in debug mode
 	avtab_ptr_t av;
 	avtab_for_each(&policydb->te_avtab, av, {
 		if (av->key.specified == AVTAB_AUDITDENY || av->key.specified == AVTAB_XPERMS_DONTAUDIT)
 			avtab_remove_node(&policydb->te_avtab, av);
 	})
+#endif
 
 	log_cb.w = bak;
 }

@@ -233,7 +233,7 @@ int get_db_strings(db_strings &str, int key) {
 	return 0;
 }
 
-int get_uid_policy(int uid, su_access &su) {
+int get_uid_policy(su_access &su, int uid) {
 	char query[256], *err;
 	sprintf(query, "SELECT policy, logging, notification FROM policies "
 			"WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));
@@ -254,12 +254,11 @@ int validate_manager(string &alt_pkg, int userid, struct stat *st) {
 		st = &tmp_st;
 
 	// Prefer DE storage
-	const char *base = access("/data/user_de", F_OK) == 0 ? "/data/user_de" : "/data/user";
 	char app_path[128];
-	sprintf(app_path, "%s/%d/%s", base, userid, alt_pkg.empty() ? "xxx" : alt_pkg.data());
+	sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, userid, alt_pkg.empty() ? "xxx" : alt_pkg.data());
 	if (stat(app_path, st)) {
 		// Check the official package name
-		sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, base, userid);
+		sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, userid);
 		if (stat(app_path, st)) {
 			LOGE("su: cannot find manager");
 			memset(st, 0, sizeof(*st));

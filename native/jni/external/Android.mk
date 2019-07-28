@@ -28,20 +28,6 @@ LOCAL_SRC_FILES := \
 	xz-embedded/xz_dec_stream.c
 include $(BUILD_STATIC_LIBRARY)
 
-# libmincrypt.a
-include $(CLEAR_VARS)
-LOCAL_MODULE:= libmincrypt
-LOCAL_C_INCLUDES := $(EXT_PATH)/include
-LOCAL_SRC_FILES := \
-	mincrypt/dsa_sig.c \
-	mincrypt/p256.c \
-	mincrypt/p256_ec.c \
-	mincrypt/p256_ecdsa.c \
-	mincrypt/rsa.c \
-	mincrypt/sha.c \
-	mincrypt/sha256.c
-include $(BUILD_STATIC_LIBRARY)
-
 # libnanopb.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libnanopb
@@ -265,3 +251,5 @@ LOCAL_SRC_FILES := \
 	selinux/libsepol/cil/src/cil_post.c
 LOCAL_CFLAGS += -Dgetline=__getline -Wno-implicit-function-declaration
 include $(BUILD_STATIC_LIBRARY)
+
+include $(EXT_PATH)/mincrypt/Android.mk
