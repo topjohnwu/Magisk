@@ -16,7 +16,7 @@ import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.extensions.now
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit.*
 
 class SuRequestViewModel(
     private val packageManager: PackageManager,
-    private val appRepo: AppRepository,
+    private val policyDB: PolicyDao,
     private val timeoutPrefs: SharedPreferences,
     private val resources: Resources
 ) : MagiskViewModel() {
@@ -121,8 +121,8 @@ class SuRequestViewModel(
             }
             val bundle = connector.readSocketInput()
             val uid = bundle.getString("uid")?.toIntOrNull() ?: return false
-            appRepo.deleteOutdated().blockingGet() // wrong!
-            policy = runCatching { appRepo.fetch(uid).blockingGet() }
+            policyDB.deleteOutdated().blockingGet() // wrong!
+            policy = runCatching { policyDB.fetch(uid).blockingGet() }
                 .getOrDefault(uid.toPolicy(packageManager))
         } catch (e: IOException) {
             e.printStackTrace()
@@ -156,7 +156,7 @@ class SuRequestViewModel(
                     policy?.until ?: 0
                 }
                 policy = policy?.copy(policy = action, until = until)?.apply {
-                    appRepo.update(this).blockingGet()
+                    policyDB.update(this).blockingGet()
                 }
 
                 handleAction()

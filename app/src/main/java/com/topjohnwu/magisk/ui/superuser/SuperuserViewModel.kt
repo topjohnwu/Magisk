@@ -10,7 +10,7 @@ import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
@@ -26,7 +26,7 @@ import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 
 class SuperuserViewModel(
-    private val appRepo: AppRepository,
+    private val policyDB: PolicyDao,
     private val packageManager: PackageManager,
     private val resources: Resources,
     rxBus: RxBus
@@ -54,7 +54,7 @@ class SuperuserViewModel(
 
     fun updatePolicies() {
         if (fetchTask?.isDisposed?.not() == true) return
-        fetchTask = appRepo.fetchAll()
+        fetchTask = policyDB.fetchAll()
             .flattenAsFlowable { it }
             .map { PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager)) }
             .toList()
@@ -140,9 +140,9 @@ class SuperuserViewModel(
     }
 
     private fun updatePolicy(policy: MagiskPolicy) =
-        appRepo.update(policy).andThen(Single.just(policy))
+        policyDB.update(policy).andThen(Single.just(policy))
 
     private fun deletePolicy(policy: MagiskPolicy) =
-        appRepo.delete(policy.uid).andThen(Single.just(policy))
+        policyDB.delete(policy.uid).andThen(Single.just(policy))
 
 }
