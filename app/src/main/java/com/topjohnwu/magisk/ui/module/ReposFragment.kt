@@ -111,7 +111,6 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
             .setCancelable(true)
             .setPositiveButton(R.string.install) { _, _ -> download(true) }
             .setNeutralButton(R.string.download) { _, _ -> download(false) }
-            .setNegativeButton(R.string.no_thanks, null)
             .show()
     }
 }
