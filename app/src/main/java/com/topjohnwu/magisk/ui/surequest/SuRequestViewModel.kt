@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.extensions.now
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
@@ -25,7 +26,6 @@ import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.FingerprintHelper
 import com.topjohnwu.magisk.utils.SuConnector
-import com.topjohnwu.magisk.utils.now
 import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import timber.log.Timber

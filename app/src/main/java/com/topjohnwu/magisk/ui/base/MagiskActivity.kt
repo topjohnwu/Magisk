@@ -22,6 +22,7 @@ import com.ncapdevi.fragnav.FragNavTransactionOptions
 import com.skoumal.teanity.view.TeanityActivity
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.extensions.set
 import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
@@ -31,7 +32,6 @@ import com.topjohnwu.magisk.model.navigation.Navigator
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.set
 import timber.log.Timber
 import kotlin.reflect.KClass
 

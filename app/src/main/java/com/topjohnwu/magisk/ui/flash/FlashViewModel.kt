@@ -15,12 +15,12 @@ import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
 import com.topjohnwu.magisk.model.flash.FlashResultListener
 import com.topjohnwu.magisk.model.flash.Flashing
 import com.topjohnwu.magisk.model.flash.Patching
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.io.File

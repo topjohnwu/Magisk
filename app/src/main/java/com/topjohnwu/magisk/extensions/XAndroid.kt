@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.extensions
 
 import android.content.Context
 import android.content.Intent
@@ -11,6 +11,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.topjohnwu.magisk.App
+import com.topjohnwu.magisk.utils.FileProvider
 import java.io.File
 import java.io.FileNotFoundException
 

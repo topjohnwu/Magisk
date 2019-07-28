@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.extensions
 
 import android.net.Uri
 import androidx.core.net.toFile
@@ -19,7 +19,7 @@ fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
 fun Uri.writeTo(file: File) = toFile().copyTo(file)
 
 fun InputStream.writeTo(file: File) =
-    withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
+        withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
 
 inline fun <In : InputStream, Out : OutputStream> withStreams(
     inStream: In,

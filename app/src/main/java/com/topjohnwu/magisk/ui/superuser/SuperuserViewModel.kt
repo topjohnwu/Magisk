@@ -11,6 +11,7 @@ import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem
@@ -18,7 +19,6 @@ import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.FingerprintHelper
-import com.topjohnwu.magisk.utils.toggle
 import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import io.reactivex.Single

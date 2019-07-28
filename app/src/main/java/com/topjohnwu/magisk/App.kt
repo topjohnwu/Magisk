@@ -16,9 +16,9 @@ import androidx.work.impl.WorkDatabase_Impl
 import com.topjohnwu.magisk.data.database.RepoDatabase
 import com.topjohnwu.magisk.data.database.RepoDatabase_Impl
 import com.topjohnwu.magisk.di.koinModules
+import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.RootUtils
-import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext

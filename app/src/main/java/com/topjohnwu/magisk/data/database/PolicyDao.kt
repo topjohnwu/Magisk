@@ -4,10 +4,10 @@ import android.content.Context
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.data.database.base.*
+import com.topjohnwu.magisk.extensions.now
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.toMap
 import com.topjohnwu.magisk.model.entity.toPolicy
-import com.topjohnwu.magisk.utils.now
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 

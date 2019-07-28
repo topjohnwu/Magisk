@@ -9,6 +9,7 @@ import androidx.annotation.StringRes
 import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.superuser.internal.InternalUtils
 import io.reactivex.Single
 import java.util.*

@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.utils.fileName
+import com.topjohnwu.magisk.extensions.fileName
 
 object SnackbarMaker {
 

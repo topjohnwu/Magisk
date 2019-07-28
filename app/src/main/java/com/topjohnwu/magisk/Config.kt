@@ -9,8 +9,12 @@ import com.topjohnwu.magisk.data.database.SettingsDao
 import com.topjohnwu.magisk.data.database.StringDao
 import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
+import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.packageName
 import com.topjohnwu.magisk.model.preference.PreferenceModel
-import com.topjohnwu.magisk.utils.*
+import com.topjohnwu.magisk.utils.FingerprintHelper
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream

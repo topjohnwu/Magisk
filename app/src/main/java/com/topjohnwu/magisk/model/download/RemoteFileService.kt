@@ -6,12 +6,12 @@ import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.extensions.firstMap
+import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.utils.ProgInputStream
-import com.topjohnwu.magisk.utils.firstMap
-import com.topjohnwu.magisk.utils.writeTo
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Single

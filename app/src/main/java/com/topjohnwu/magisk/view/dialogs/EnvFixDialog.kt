@@ -6,10 +6,10 @@ import android.widget.Toast
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.cachedFile
+import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.tasks.MagiskInstaller
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.cachedFile
-import com.topjohnwu.magisk.utils.reboot
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils

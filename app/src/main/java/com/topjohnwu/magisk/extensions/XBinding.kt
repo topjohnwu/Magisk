@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.extensions
 
 import com.skoumal.teanity.util.KObservableField
 

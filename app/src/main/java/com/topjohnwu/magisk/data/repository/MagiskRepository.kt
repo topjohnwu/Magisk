@@ -6,11 +6,11 @@ import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.toSingle
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
 

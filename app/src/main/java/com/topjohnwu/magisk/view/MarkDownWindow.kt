@@ -7,7 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.StringRepository
-import com.topjohnwu.magisk.utils.inject
+import com.topjohnwu.magisk.extensions.inject
 import io.reactivex.Single
 import ru.noties.markwon.Markwon
 import ru.noties.markwon.html.HtmlPlugin

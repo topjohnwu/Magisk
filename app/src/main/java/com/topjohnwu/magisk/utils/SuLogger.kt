@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.AppRepository
 import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.toLog

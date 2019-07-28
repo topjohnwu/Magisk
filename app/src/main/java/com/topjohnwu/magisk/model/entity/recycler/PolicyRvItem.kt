@@ -6,12 +6,12 @@ import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.rxbus.RxBus
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.toggle
 
 class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyRvItem>() {
 

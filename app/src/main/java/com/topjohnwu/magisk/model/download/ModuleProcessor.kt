@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.model.download
 
-import com.topjohnwu.magisk.utils.withStreams
+import com.topjohnwu.magisk.extensions.withStreams
 import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipEntry

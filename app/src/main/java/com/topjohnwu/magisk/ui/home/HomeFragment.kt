@@ -7,12 +7,12 @@ import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
-import com.topjohnwu.magisk.utils.writeTo
-import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.superuser.Shell

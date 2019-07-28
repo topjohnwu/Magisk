@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.data.repository.StringRepository
-import com.topjohnwu.magisk.utils.get
-import com.topjohnwu.magisk.utils.legalFilename
+import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.extensions.legalFilename
 import kotlinx.android.parcel.Parcelize
 import java.text.DateFormat
 import java.util.*

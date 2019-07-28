@@ -9,11 +9,11 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.DownloadApp
 import com.topjohnwu.magisk.utils.SuLogger
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.reboot
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell

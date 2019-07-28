@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.extensions
 
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.superuser.Shell

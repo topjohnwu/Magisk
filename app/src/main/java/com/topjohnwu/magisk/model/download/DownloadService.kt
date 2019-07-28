@@ -9,14 +9,14 @@ import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.chooser
+import com.topjohnwu.magisk.extensions.provide
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.ui.flash.FlashActivity
-import com.topjohnwu.magisk.utils.chooser
-import com.topjohnwu.magisk.utils.provide
 import java.io.File
 import kotlin.random.Random.Default.nextInt
 

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.extensions
 
 import org.koin.core.context.GlobalContext
 import org.koin.core.parameter.ParametersDefinition

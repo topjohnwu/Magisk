@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.work.*
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.update.UpdateCheckService
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
