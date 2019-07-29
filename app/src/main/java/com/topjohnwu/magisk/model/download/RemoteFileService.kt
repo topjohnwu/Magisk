@@ -11,8 +11,7 @@ import com.topjohnwu.magisk.extensions.firstMap
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.utils.ProgInputStream
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
@@ -79,6 +78,11 @@ abstract class RemoteFileService : NotificationService() {
                 is Module -> service.fetchInstaller()
                         .map { stream.toModule(subject.file, it.byteStream()); subject.file }
                 else -> Single.fromCallable { stream.writeTo(subject.file); subject.file }
+            }
+        }.map {
+            when (subject) {
+                is Manager -> handleAPK(it, subject)
+                else -> it
             }
         }
 

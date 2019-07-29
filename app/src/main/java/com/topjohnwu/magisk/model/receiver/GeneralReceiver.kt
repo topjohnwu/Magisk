@@ -11,8 +11,11 @@ import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.entity.ManagerJson
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
-import com.topjohnwu.magisk.utils.DownloadApp
 import com.topjohnwu.magisk.utils.SuLogger
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
@@ -73,9 +76,12 @@ open class GeneralReceiver : BroadcastReceiver() {
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
             Const.Key.BROADCAST_MANAGER_UPDATE -> {
-                Info.remote = Info.remote.copy(app = Info.remote.app.copy(
-                        link = intent.getStringExtra(Const.Key.INTENT_SET_LINK) ?: ""))
-                DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME))
+                intent.getParcelableExtra<ManagerJson>(Const.Key.INTENT_SET_APP)?.let {
+                    Info.remote = Info.remote.copy(app = it)
+                }
+                DownloadService(context) {
+                    subject = DownloadSubject.Manager(Configuration.APK.Upgrade)
+                }
             }
             Const.Key.BROADCAST_REBOOT -> reboot()
         }

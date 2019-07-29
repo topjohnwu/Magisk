@@ -17,7 +17,6 @@ data class UninstallerJson(
     val link: String = ""
 )
 
-@Parcelize
 @JsonSerializable
 data class MagiskJson(
     val version: String = "",
@@ -25,12 +24,13 @@ data class MagiskJson(
     val link: String = "",
     val note: String = "",
     @Json(name = "md5") val hash: String = ""
-) : Parcelable
+)
 
+@Parcelize
 @JsonSerializable
 data class ManagerJson(
     val version: String = "",
     val versionCode: Int = -1,
     val link: String = "",
     val note: String = ""
-)
+) : Parcelable

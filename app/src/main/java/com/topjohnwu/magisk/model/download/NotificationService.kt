@@ -27,7 +27,7 @@ abstract class NotificationService : Service() {
 
     // --
 
-    protected fun update(
+    fun update(
         id: Int,
         body: (NotificationCompat.Builder) -> Unit = {}
     ) {

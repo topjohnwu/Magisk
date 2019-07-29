@@ -14,9 +14,9 @@ import com.topjohnwu.magisk.extensions.provide
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashActivity
+import com.topjohnwu.magisk.utils.APKInstall
 import java.io.File
 import kotlin.random.Random.Default.nextInt
 
@@ -33,6 +33,7 @@ open class DownloadService : RemoteFileService() {
     override fun onFinished(file: File, subject: DownloadSubject, id: Int) = when (subject) {
         is Magisk -> onFinishedInternal(file, subject, id)
         is Module -> onFinishedInternal(file, subject, id)
+        is Manager -> onFinishedInternal(file, subject, id)
     }
 
     private fun onFinishedInternal(
@@ -55,6 +56,18 @@ open class DownloadService : RemoteFileService() {
         else -> Unit
     }
 
+    private fun onFinishedInternal(
+        file: File,
+        subject: Manager,
+        id: Int
+    ) {
+        remove(id)
+        when (subject.configuration)  {
+            is APK.Upgrade -> APKInstall.install(this, file)
+            else -> Unit
+        }
+    }
+
     // ---
 
     override fun NotificationCompat.Builder.addActions(
@@ -63,6 +76,7 @@ open class DownloadService : RemoteFileService() {
     ) = when (subject) {
         is Magisk -> addActionsInternal(file, subject)
         is Module -> addActionsInternal(file, subject)
+        is Manager -> addActionsInternal(file, subject)
     }
 
     private fun NotificationCompat.Builder.addActionsInternal(
@@ -84,6 +98,14 @@ open class DownloadService : RemoteFileService() {
         Download -> addAction(0, R.string.download_open_parent, fileIntent(subject.file.parentFile!!))
             .addAction(0, R.string.download_open_self, fileIntent(subject.file))
         is Flash -> setContentIntent(FlashActivity.installIntent(context, file))
+        else -> this
+    }
+
+    private fun NotificationCompat.Builder.addActionsInternal(
+            file: File,
+            subject: Manager
+    ) = when (subject.configuration) {
+        APK.Upgrade -> setContentIntent(APKInstall.installIntent(context, file))
         else -> this
     }
 

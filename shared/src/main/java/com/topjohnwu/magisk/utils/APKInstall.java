@@ -9,6 +9,10 @@ import java.io.File;
 
 public class APKInstall {
     public static void install(Context c, File apk) {
+        c.startActivity(installIntent(c, apk));
+    }
+
+    public static Intent installIntent(Context c, File apk) {
         Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
         install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -18,6 +22,6 @@ public class APKInstall {
             apk.setReadable(true, false);
             install.setData(Uri.fromFile(apk));
         }
-        c.startActivity(install);
+        return install;
     }
 }

@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.Info;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver;
 import com.topjohnwu.magisk.ui.SplashActivity;
-import com.topjohnwu.magisk.utils.Utils;
 
 public class Notifications {
 
@@ -61,13 +60,11 @@ public class Notifications {
 
     public static void managerUpdate() {
         App app = App.self;
-        String name = Utils.INSTANCE.fmt("MagiskManager v%s(%d)",
-                Info.remote.getApp().getVersion(), Info.remote.getApp().getVersionCode());
 
         Intent intent = new Intent(app, ClassMap.get(GeneralReceiver.class));
         intent.setAction(Const.Key.BROADCAST_MANAGER_UPDATE);
-        intent.putExtra(Const.Key.INTENT_SET_LINK, Info.remote.getApp().getLink());
-        intent.putExtra(Const.Key.INTENT_SET_NAME, name);
+        intent.putExtra(Const.Key.INTENT_SET_APP, Info.remote.getApp());
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(app,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

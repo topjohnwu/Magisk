@@ -76,8 +76,7 @@ object Const {
         const val ETAG_KEY = "ETag"
         // intents
         const val OPEN_SECTION = "section"
-        const val INTENT_SET_NAME = "filename"
-        const val INTENT_SET_LINK = "link"
+        const val INTENT_SET_APP = "app_json"
         const val FLASH_ACTION = "action"
         const val FLASH_DATA = "additional_data"
         const val DISMISS_ID = "dismiss_id"

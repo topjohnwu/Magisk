@@ -21,9 +21,15 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
+import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
-import com.topjohnwu.magisk.utils.*
+import com.topjohnwu.magisk.utils.FingerprintHelper
+import com.topjohnwu.magisk.utils.LocaleManager
+import com.topjohnwu.magisk.utils.PatchAPK
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
@@ -71,7 +77,9 @@ class SettingsFragment : BasePreferenceFragment() {
         }
         val restoreManager = findPreference("restore")
         restoreManager.setOnPreferenceClickListener {
-            DownloadApp.restore()
+            DownloadService(requireContext()) {
+                subject = DownloadSubject.Manager(Configuration.APK.Restore)
+            }
             true
         }
         findPreference("clear").setOnPreferenceClickListener {
