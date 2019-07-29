@@ -41,12 +41,10 @@ open class App : Application() {
 
         protectedContext = baseContext
         self = this
-        deContext = base
 
         if (Build.VERSION.SDK_INT >= 24) {
             protectedContext = base.createDeviceProtectedStorageContext()
-            deContext = protectedContext
-            deContext.moveSharedPreferencesFrom(base, base.defaultPrefsName)
+            protectedContext.moveSharedPreferencesFrom(base, base.defaultPrefsName)
         }
 
         registerActivityLifecycleCallbacks(get())
@@ -68,11 +66,6 @@ open class App : Application() {
         @Deprecated("Use dependency injection")
         @JvmStatic
         lateinit var self: App
-
-        @SuppressLint("StaticFieldLeak")
-        @Deprecated("Use dependency injection; replace with protectedContext")
-        @JvmStatic
-        lateinit var deContext: Context
 
         @Deprecated("Use Rx or similar")
         @JvmField
