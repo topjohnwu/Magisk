@@ -13,6 +13,7 @@ import androidx.work.impl.WorkDatabase
 import androidx.work.impl.WorkDatabase_Impl
 import com.topjohnwu.magisk.data.database.RepoDatabase
 import com.topjohnwu.magisk.data.database.RepoDatabase_Impl
+import com.topjohnwu.magisk.di.ActivityTracker
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.utils.LocaleManager
@@ -26,7 +27,7 @@ import java.util.concurrent.ThreadPoolExecutor
 
 open class App : Application() {
 
-    lateinit var protectedContext: Context
+    lateinit var deContext: Context
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
@@ -39,15 +40,15 @@ open class App : Application() {
             modules(koinModules)
         }
 
-        protectedContext = baseContext
+        deContext = base
         self = this
 
         if (Build.VERSION.SDK_INT >= 24) {
-            protectedContext = base.createDeviceProtectedStorageContext()
-            protectedContext.moveSharedPreferencesFrom(base, base.defaultPrefsName)
+            deContext = base.createDeviceProtectedStorageContext()
+            deContext.moveSharedPreferencesFrom(base, defaultPrefsName)
         }
 
-        registerActivityLifecycleCallbacks(get())
+        registerActivityLifecycleCallbacks(get<ActivityTracker>())
 
         Networking.init(base)
         LocaleManager.setLocale(this)

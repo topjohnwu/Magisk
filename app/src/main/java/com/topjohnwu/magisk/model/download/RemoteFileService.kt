@@ -7,6 +7,7 @@ import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.di.NullActivity
 import com.topjohnwu.magisk.extensions.firstMap
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.writeTo
@@ -56,7 +57,7 @@ abstract class RemoteFileService : NotificationService() {
             }
         }) {
             val newId = finishNotify(it, subject)
-            get<Activity?>()?.run {
+            if (get<Activity>() !is NullActivity) {
                 onFinished(it, subject, newId)
             }
         }

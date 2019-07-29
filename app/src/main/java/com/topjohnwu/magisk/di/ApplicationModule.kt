@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.di
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -14,15 +15,16 @@ val applicationModule = module {
     factory { get<Context>().resources }
     factory { get<Context>() as App }
     factory { get<Context>().packageManager }
-    factory(Protected) { get<App>().protectedContext }
+    factory(Protected) { get<App>().deContext }
     single(SUTimeout) { get<Context>(Protected).getSharedPreferences("su_timeout", 0) }
     single { PreferenceManager.getDefaultSharedPreferences(get<Context>(Protected)) }
-    single { ActivityTracker() as Application.ActivityLifecycleCallbacks }
-    factory { (get<Application.ActivityLifecycleCallbacks>() as ActivityTracker).foreground }
+    single { ActivityTracker() }
+    factory { get<ActivityTracker>().foreground ?: NullActivity }
 }
 
-private class ActivityTracker : Application.ActivityLifecycleCallbacks {
+class ActivityTracker : Application.ActivityLifecycleCallbacks {
 
+    @Volatile
     var foreground: Activity? = null
 
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
@@ -45,3 +47,6 @@ private class ActivityTracker : Application.ActivityLifecycleCallbacks {
 
     override fun onActivityDestroyed(activity: Activity) {}
 }
+
+@SuppressLint("Registered")
+object NullActivity : Activity()
