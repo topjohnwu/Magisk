@@ -4,7 +4,7 @@ import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.FilterInputStream
 import java.io.InputStream
 
-class ProgInputStream(
+class ProgressInputStream(
     base: InputStream,
     val progressEmitter: (Long) -> Unit = {}
 ) : FilterInputStream(base) {

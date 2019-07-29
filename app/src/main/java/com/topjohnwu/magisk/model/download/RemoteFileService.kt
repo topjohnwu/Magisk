@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
-import com.topjohnwu.magisk.utils.ProgInputStream
+import com.topjohnwu.magisk.utils.ProgressInputStream
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Single
@@ -100,7 +100,7 @@ abstract class RemoteFileService : NotificationService() {
         val maxRaw = contentLength()
         val max = maxRaw / 1_000_000f
 
-        return ProgInputStream(byteStream()) {
+        return ProgressInputStream(byteStream()) {
             val progress = it / 1_000_000f
             update(id) { notification ->
                 notification

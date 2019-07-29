@@ -13,7 +13,6 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-@Deprecated
 public class Networking {
 
     private static final int READ_TIMEOUT = 15000;
