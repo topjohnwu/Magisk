@@ -49,7 +49,11 @@ abstract class RemoteFileService : NotificationService() {
         .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.title) } }
         .subscribeK(onError = {
             Timber.e(it)
-            remove(subject.hashCode())
+            finishNotify(subject.hashCode()) { notification ->
+                notification.setContentText(getString(R.string.download_file_error))
+                        .setSmallIcon(android.R.drawable.stat_notify_error)
+                        .setOngoing(false)
+            }
         }) {
             val newId = finishNotify(it, subject)
             get<Activity?>()?.run {
