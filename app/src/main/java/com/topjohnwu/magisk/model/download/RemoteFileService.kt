@@ -62,7 +62,7 @@ abstract class RemoteFileService : NotificationService() {
         }
 
     private fun search(subject: DownloadSubject) = Single.fromCallable {
-        if (!Config.isDownloadCacheEnabled) {
+        if (!Config.isDownloadCacheEnabled || subject is Manager) {
             throw IllegalStateException("The download cache is disabled")
         }
 
