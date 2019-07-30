@@ -8,17 +8,17 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.net.Uri
+import android.os.Environment
 import android.widget.Toast
-import androidx.annotation.WorkerThread
 import androidx.work.*
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.entity.OldModule
+import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.update.UpdateCheckService
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import com.topjohnwu.superuser.io.SuFile
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -68,25 +68,6 @@ object Utils {
         return info.loadLabel(pm).toString()
     }
 
-    fun getLegalFilename(filename: CharSequence): String {
-        return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
-                .replace("$", "").replace("`", "").replace("*", "").replace("/", "_")
-                .replace("#", "").replace("@", "").replace("\\", "_")
-    }
-
-    @WorkerThread
-    fun loadModulesLeanback(): Map<String, OldModule> {
-        val moduleMap = ValueSortedMap<String, OldModule>()
-        val path = SuFile(Const.MAGISK_PATH)
-        val modules = path.listFiles { _, name -> name != "lost+found" && name != ".core" }
-        for (file in modules!!) {
-            if (file.isFile) continue
-            val module = OldModule(Const.MAGISK_PATH + "/" + file.name)
-            moduleMap[module.id] = module
-        }
-        return moduleMap
-    }
-
     fun showSuperUser(): Boolean {
         return Shell.rootAccess() && (Const.USER_ID == 0
                 || Config.suMultiuserMode != Config.Value.MULTIUSER_MODE_OWNER_MANAGED)
@@ -119,5 +100,10 @@ object Utils {
             toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT)
         }
     }
+
+    fun ensureDownloadPath(path : String) =
+        File(Environment.getExternalStorageDirectory(), path).run {
+            if ((exists() && isDirectory) || mkdirs()) this else null
+        }
 
 }

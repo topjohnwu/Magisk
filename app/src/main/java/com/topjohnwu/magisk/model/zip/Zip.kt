@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.model.zip
 
-import com.topjohnwu.magisk.utils.forEach
-import com.topjohnwu.magisk.utils.withStreams
+import com.topjohnwu.magisk.extensions.forEach
+import com.topjohnwu.magisk.extensions.withStreams
 import com.topjohnwu.superuser.io.SuFile
 import java.io.File
 import java.util.zip.ZipInputStream

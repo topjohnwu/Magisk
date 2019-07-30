@@ -1,45 +1,25 @@
 package com.topjohnwu.magisk.data.repository
 
-import android.content.Context
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.data.database.base.su
-import com.topjohnwu.magisk.data.network.GithubRawApiServices
+import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.toSingle
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.toSingle
-import com.topjohnwu.magisk.utils.writeToFile
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
 
 class MagiskRepository(
-    private val context: Context,
-    private val apiRaw: GithubRawApiServices,
-    private val packageManager: PackageManager
+        private val apiRaw: GithubRawServices,
+        private val packageManager: PackageManager
 ) {
 
-    fun fetchMagisk() = fetchUpdate()
-        .flatMap { apiRaw.fetchFile(it.magisk.link) }
-        .map { it.writeToFile(context, FILE_MAGISK_ZIP) }
-
-    fun fetchManager() = fetchUpdate()
-        .flatMap { apiRaw.fetchFile(it.app.link) }
-        .map { it.writeToFile(context, FILE_MAGISK_APK) }
-
-    fun fetchUninstaller() = fetchUpdate()
-        .flatMap { apiRaw.fetchFile(it.uninstaller.link) }
-        .map { it.writeToFile(context, FILE_UNINSTALLER_ZIP) }
-
     fun fetchSafetynet() = apiRaw.fetchSafetynet()
-
-    fun fetchBootctl() = apiRaw
-        .fetchBootctl()
-        .map { it.writeToFile(context, FILE_BOOTCTL_SH) }
-
 
     fun fetchUpdate() = when (Config.updateChannel) {
         Config.Value.DEFAULT_CHANNEL, Config.Value.STABLE_CHANNEL -> apiRaw.fetchStableUpdate()
@@ -83,12 +63,6 @@ class MagiskRepository(
     private val Boolean.state get() = if (this) "add" else "rm"
 
     companion object {
-        const val FILE_MAGISK_ZIP = "magisk.zip"
-        const val FILE_MAGISK_APK = "magisk.apk"
-        const val FILE_UNINSTALLER_ZIP = "uninstaller.zip"
-        const val FILE_SAFETY_NET_APK = "safetynet.apk"
-        const val FILE_BOOTCTL_SH = "bootctl"
-
         private val blacklist = listOf(
             let { val app: App by inject(); app }.packageName,
             "android",

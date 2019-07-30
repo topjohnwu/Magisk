@@ -4,9 +4,9 @@ import android.net.Uri
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.utils.fileName
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.readUri
+import com.topjohnwu.magisk.extensions.fileName
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.readUri
 import com.topjohnwu.magisk.utils.unzip
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
@@ -21,7 +21,10 @@ abstract class FlashZip(
 ) {
 
     private val app: App by inject()
-    private val tmpFile: File = File(app.cacheDir, "install.zip")
+    private val installFolder = File(app.cacheDir, "flash").apply {
+        if (!exists()) mkdirs()
+    }
+    private val tmpFile: File = File(installFolder, "install.zip")
 
     @Throws(IOException::class)
     private fun unzipAndCheck(): Boolean {

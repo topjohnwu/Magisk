@@ -4,9 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.R
-import com.topjohnwu.net.Networking
-import com.topjohnwu.net.ResponseListener
+import com.topjohnwu.magisk.data.repository.StringRepository
+import com.topjohnwu.magisk.extensions.inject
+import io.reactivex.Single
 import ru.noties.markwon.Markwon
 import ru.noties.markwon.html.HtmlPlugin
 import ru.noties.markwon.image.ImagesPlugin
@@ -16,20 +18,22 @@ import java.util.*
 
 object MarkDownWindow {
 
+    private val stringRepo: StringRepository by inject()
+
     fun show(activity: Context, title: String?, url: String) {
-        Networking.get(url).getAsString(Listener(activity, title))
+        show(activity, title, stringRepo.getString(url))
     }
 
     fun show(activity: Context, title: String?, input: InputStream) {
-        Scanner(input, "UTF-8").use {
-            it.useDelimiter("\\A")
-            Listener(activity, title).onResponse(it.next())
-        }
+        Single.just(Scanner(input, "UTF-8").apply { useDelimiter("\\A") })
+            .map { it.next() }
+            .also {
+                show(activity, title, it)
+            }
     }
 
-    internal class Listener(var activity: Context, var title: String?) : ResponseListener<String> {
-
-        override fun onResponse(md: String) {
+    fun show(activity: Context, title: String?, content: Single<String>) {
+        content.subscribeK {
             val markwon = Markwon.builder(activity)
                     .usePlugin(HtmlPlugin.create())
                     .usePlugin(ImagesPlugin.create(activity))
@@ -40,7 +44,7 @@ object MarkDownWindow {
             val mv = LayoutInflater.from(activity).inflate(R.layout.markdown_window, null)
             val tv = mv.findViewById<TextView>(R.id.md_txt)
             try {
-                markwon.setMarkdown(tv, md)
+                markwon.setMarkdown(tv, it)
             } catch (e: ExceptionInInitializerError) {
                 //Nothing we can do about this error other than show error message
                 tv.setText(R.string.download_file_error)

@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.model.preference
 
 import androidx.core.content.edit
-import com.topjohnwu.magisk.utils.trimEmptyToNull
+import com.topjohnwu.magisk.extensions.trimEmptyToNull
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 

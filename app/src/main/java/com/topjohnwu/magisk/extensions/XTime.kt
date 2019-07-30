@@ -1,5 +1,6 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.extensions
 
+import com.topjohnwu.magisk.utils.LocaleManager
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat

@@ -20,6 +20,7 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
 
     protected val prefs: SharedPreferences by inject()
     protected val app: App by inject()
+    protected val activity get() = requireActivity() as MagiskActivity<*, *>
 
     override fun onCreateView(
         inflater: LayoutInflater,

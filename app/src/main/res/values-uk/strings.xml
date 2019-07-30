@@ -44,6 +44,7 @@
     <string name="reboot_recovery">Перезавантажити в Recovery</string>
     <string name="reboot_bootloader">Перезавантажити в Bootloader</string>
     <string name="reboot_download">Перезавантажити в Download</string>
+    <string name="reboot_edl">Перезавантажити в EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступне оновлення</string>
@@ -70,7 +71,13 @@
     <string name="update_channel">Оновлення Magisk</string>
     <string name="progress_channel">Сповіщення прогресу</string>
     <string name="download_complete">Завантаження завершено</string>
+    <string name="download_local">Пошук локальних копій…</string>
+    <string name="download_progress">%1$.2f / %2$.2f МБ</string>
+    <string name="download_module">Вбудовування встановлювача…</string>
     <string name="download_file_error">Помилка завантаження файлу</string>
+    <string name="download_file_folder_error">Неможливо отримати батьківську папку для збереження завантаженого файлу, перевірте права.</string>
+    <string name="download_open_parent">Показати в батьківській папці</string>
+    <string name="download_open_self">Показати файл</string>
     <string name="magisk_update_title">Доступне оновлення Magisk!</string>
     <string name="manager_update_title">Доступне оновлення Magisk Manager!</string>
 
@@ -99,10 +106,12 @@
 
     <string name="dtbo_patched_title">DTBO пропатчено!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчив dtbo.img. Будь ласка, перезавантажте пристрій.</string>
-    <string name="flashing">Прошивання</string>
+    <string name="flashing">Прошивання…</string>
+    <string name="done">Готово!</string>
+    <string name="failure">Не вдалося</string>
     <string name="hide_manager_title">Приховування Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager…</string>
-    <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання…</string>
+    <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager.</string>
+    <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання.</string>
     <string name="warning">Попередження</string>
     <string name="complete_uninstall">Видалення виконано</string>
     <string name="restore_img">Відновити образи</string>
@@ -120,9 +129,14 @@
     <string name="dl_one_module">Завантажувати один модуль на раз.</string>
 
     <!--Settings Activity -->
+    <string name="settings_downloads_category">Завантаження</string>
     <string name="settings_general_category">Основні</string>
     <string name="settings_dark_theme_title">Темна тема</string>
     <string name="settings_dark_theme_summary">Увімкнути темне оформлення.</string>
+    <string name="settings_download_cache_title">Завантажувати кеш</string>
+    <string name="settings_download_cache_summary">Увімкнути завантаження кешу для Magisk і модулів в zip файлах.</string>
+    <string name="settings_download_path_title">Шлях завантаження</string>
+    <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
     <string name="settings_clear_cache_title">Очищення кешу</string>
     <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії. Це змусить програму примусово оновлюватися через Інтернет.</string>
     <string name="settings_hide_manager_title">Приховати Magisk Manager</string>
@@ -184,6 +198,7 @@
     <string name="isolate_summary">Кожнен сеанс Суперкористувача має власний ізольований простір імен.</string>
     <string name="android_o_not_support">Не працює на Android 8.0+.</string>
     <string name="disable_fingerprint">Немає відбитків пальця або пристрій не підтримується.</string>
+    <string name="settings_download_path_error">Помилка створення папки. Вона повинна бути доступна з кореневої директорії сховища і не повинна бути файлом.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав Суперкористувача</string>

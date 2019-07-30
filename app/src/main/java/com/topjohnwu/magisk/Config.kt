@@ -1,14 +1,20 @@
 package com.topjohnwu.magisk
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.os.Environment
 import android.util.Xml
 import androidx.core.content.edit
 import com.topjohnwu.magisk.data.database.SettingsDao
 import com.topjohnwu.magisk.data.database.StringDao
 import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
+import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.packageName
 import com.topjohnwu.magisk.model.preference.PreferenceModel
-import com.topjohnwu.magisk.utils.*
+import com.topjohnwu.magisk.utils.FingerprintHelper
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
@@ -39,9 +45,10 @@ object Config : PreferenceModel, DBConfig {
         const val CUSTOM_CHANNEL = "custom_channel"
         const val LOCALE = "locale"
         const val DARK_THEME = "dark_theme"
-        const val ETAG_KEY = "ETag"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
+        const val DOWNLOAD_CACHE = "download_cache"
+        const val DOWNLOAD_PATH = "download_path"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -91,9 +98,11 @@ object Config : PreferenceModel, DBConfig {
     }
 
     private val defaultChannel =
-            if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
-            else Value.DEFAULT_CHANNEL
+        if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
+        else Value.DEFAULT_CHANNEL
 
+    var isDownloadCacheEnabled by preference(Key.DOWNLOAD_CACHE, true)
+    var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
@@ -111,8 +120,6 @@ object Config : PreferenceModel, DBConfig {
 
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
     var locale by preference(Key.LOCALE, "")
-    @JvmStatic
-    var etagKey by preference(Key.ETAG_KEY, "")
 
     var rootMode by dbSettings(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB)
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
@@ -121,7 +128,27 @@ object Config : PreferenceModel, DBConfig {
     @JvmStatic
     var suManager by dbStrings(Key.SU_MANAGER, "")
 
+    // Always return a path in external storage where we can write
+    val downloadDirectory get() =
+        Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
+
     fun initialize() = prefs.edit {
+        parsePrefs(this)
+
+        if (!prefs.contains(Key.UPDATE_CHANNEL))
+            putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
+
+        // Get actual state
+        putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
+
+        // Write database configs
+        putString(Key.ROOT_ACCESS, rootMode.toString())
+        putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
+        putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
+        putBoolean(Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
+    }
+
+    private fun parsePrefs(editor: SharedPreferences.Editor) = editor.apply {
         val config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS)
         if (config.exists()) runCatching {
             val input = SuFileInputStream(config).buffered()
@@ -170,26 +197,16 @@ object Config : PreferenceModel, DBConfig {
             }
             config.delete()
         }
-        remove(Key.ETAG_KEY)
-        if (!prefs.contains(Key.UPDATE_CHANNEL))
-            putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
-
-        // Get actual state
-        putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
-
-        // Write database configs
-        putString(Key.ROOT_ACCESS, rootMode.toString())
-        putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
-        putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
-        putBoolean(Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
     }
 
     @JvmStatic
     fun export() {
         // Flush prefs to disk
         prefs.edit().apply()
-        val xml = File("${get<Context>(Protected).filesDir.parent}/shared_prefs",
-                "${packageName}_preferences.xml")
+        val xml = File(
+            "${get<Context>(Protected).filesDir.parent}/shared_prefs",
+            "${packageName}_preferences.xml"
+        )
         Shell.su("cat $xml > /data/adb/${Const.MANAGER_CONFIGS}").exec()
     }
 

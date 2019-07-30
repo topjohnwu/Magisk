@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.extensions
 
 import android.content.Context
 import android.content.Intent
@@ -7,9 +7,11 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
+import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.topjohnwu.magisk.App
+import com.topjohnwu.magisk.utils.FileProvider
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -50,21 +52,22 @@ val ApplicationInfo.packageInfo: PackageInfo?
         }
     }
 
-val Uri.fileName: String get() {
-    var name: String? = null
-    App.self.contentResolver.query(this, null, null, null, null)?.use { c ->
-        val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (nameIndex != -1) {
-            c.moveToFirst()
-            name = c.getString(nameIndex)
+val Uri.fileName: String
+    get() {
+        var name: String? = null
+        App.self.contentResolver.query(this, null, null, null, null)?.use { c ->
+            val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1) {
+                c.moveToFirst()
+                name = c.getString(nameIndex)
+            }
         }
+        if (name == null && path != null) {
+            val idx = path!!.lastIndexOf('/')
+            name = path!!.substring(idx + 1)
+        }
+        return name.orEmpty()
     }
-    if (name == null && path != null) {
-        val idx = path!!.lastIndexOf('/')
-        name = path!!.substring(idx + 1)
-    }
-    return name.orEmpty()
-}
 
 fun PackageManager.activities(packageName: String) =
     getPackageInfo(packageName, GET_ACTIVITIES)
@@ -80,24 +83,32 @@ fun PackageManager.providers(packageName: String) =
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
 
-fun Context.readUri(uri: Uri) = contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
+fun Context.readUri(uri: Uri) =
+    contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
 
 fun ApplicationInfo.findAppLabel(pm: PackageManager): String {
-    return pm.getApplicationLabel(this)?.toString().orEmpty()
+    return pm.getApplicationLabel(this).toString().orEmpty()
 }
 
 fun Intent.startActivity(context: Context) = context.startActivity(this)
 
-fun File.provide(): Uri {
-    val context: Context by inject()
-    return FileProvider.getUriForFile(context, "com.topjohnwu.magisk.fileprovider", this)
+fun File.provide(context: Context = get()): Uri {
+    return FileProvider.getUriForFile(context, context.packageName + ".provider", this)
 }
 
 fun File.mv(destination: File) {
-    inputStream().copyTo(destination)
+    inputStream().writeTo(destination)
     deleteRecursively()
 }
 
 fun String.toFile() = File(this)
 
 fun Intent.chooser(title: String = "Pick an app") = Intent.createChooser(this, title)
+
+fun Context.cachedFile(name: String) = File(cacheDir, name)
+
+fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
+    val out = mutableListOf<Result>()
+    while (moveToNext()) out.add(transformer(this))
+    return out
+}

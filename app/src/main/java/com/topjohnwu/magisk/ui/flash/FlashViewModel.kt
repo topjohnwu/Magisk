@@ -15,12 +15,12 @@ import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
 import com.topjohnwu.magisk.model.flash.FlashResultListener
 import com.topjohnwu.magisk.model.flash.Flashing
 import com.topjohnwu.magisk.model.flash.Patching
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.io.File
@@ -28,7 +28,8 @@ import java.util.*
 
 class FlashViewModel(
     action: String,
-    uri: Uri?,
+    installer: Uri,
+    uri: Uri,
     private val resources: Resources
 ) : MagiskViewModel(), FlashResultListener {
 
@@ -52,22 +53,21 @@ class FlashViewModel(
 
         state = State.LOADING
 
-        val uri = uri ?: Uri.EMPTY
         when (action) {
             Const.Value.FLASH_ZIP -> Flashing
-                .Install(uri, outItems, logItems, this)
+                .Install(installer, outItems, logItems, this)
                 .exec()
             Const.Value.UNINSTALL -> Flashing
-                .Uninstall(uri, outItems, logItems, this)
+                .Uninstall(installer, outItems, logItems, this)
                 .exec()
             Const.Value.FLASH_MAGISK -> Patching
-                .Direct(outItems, logItems, this)
+                .Direct(installer, outItems, logItems, this)
                 .exec()
             Const.Value.FLASH_INACTIVE_SLOT -> Patching
-                .SecondSlot(outItems, logItems, this)
+                .SecondSlot(installer, outItems, logItems, this)
                 .exec()
             Const.Value.PATCH_FILE -> Patching
-                .File(uri, outItems, logItems, this)
+                .File(installer, uri, outItems, logItems, this)
                 .exec()
         }
     }

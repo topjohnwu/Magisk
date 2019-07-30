@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.model.flash
 import android.content.Context
 import android.net.Uri
 import androidx.core.os.postDelayed
+import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.tasks.FlashZip
-import com.topjohnwu.magisk.utils.inject
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 

@@ -23,7 +23,6 @@ import java.util.concurrent.Executor;
 public class Request implements Closeable {
     private HttpURLConnection conn;
     private Executor executor = null;
-    private DownloadProgressListener progress = null;
     private int code = -1;
 
     ErrorHandler err = null;
@@ -63,11 +62,6 @@ public class Request implements Closeable {
 
     public Request addHeaders(String key, String value) {
         conn.setRequestProperty(key, value);
-        return this;
-    }
-
-    public Request setDownloadProgressListener(DownloadProgressListener listener) {
-        progress = listener;
         return this;
     }
 
@@ -169,24 +163,13 @@ public class Request implements Closeable {
 
     private BufferedInputStream getInputStream() throws IOException {
         connect0();
-        InputStream in = conn.getInputStream();
-        if (progress != null) {
-            in = new ProgressInputStream(in, conn.getContentLength(), progress) {
-                @Override
-                public void close() throws IOException {
-                    super.close();
-                    conn.disconnect();
-                }
-            };
-        } else {
-            in = new FilterInputStream(in) {
-                @Override
-                public void close() throws IOException {
-                    super.close();
-                    conn.disconnect();
-                }
-            };
-        }
+        InputStream in = new FilterInputStream(conn.getInputStream()) {
+            @Override
+            public void close() throws IOException {
+                super.close();
+                conn.disconnect();
+            }
+        };
         return new BufferedInputStream(in);
     }
 

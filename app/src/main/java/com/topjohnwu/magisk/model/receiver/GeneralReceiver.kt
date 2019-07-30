@@ -7,20 +7,23 @@ import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.data.database.base.su
-import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.entity.ManagerJson
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
-import com.topjohnwu.magisk.utils.DownloadApp
 import com.topjohnwu.magisk.utils.SuLogger
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.reboot
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 
 open class GeneralReceiver : BroadcastReceiver() {
 
-    private val appRepo: AppRepository by inject()
+    private val policyDB: PolicyDao by inject()
 
     companion object {
         const val REQUEST = "request"
@@ -65,17 +68,20 @@ open class GeneralReceiver : BroadcastReceiver() {
             Intent.ACTION_PACKAGE_REPLACED ->
                 // This will only work pre-O
                 if (Config.suReAuth)
-                    appRepo.delete(getPkg(intent)).blockingGet()
+                    policyDB.delete(getPkg(intent)).blockingGet()
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
                 val pkg = getPkg(intent)
-                appRepo.delete(pkg).blockingGet()
+                policyDB.delete(pkg).blockingGet()
                 "magiskhide --rm $pkg".su().blockingGet()
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
             Const.Key.BROADCAST_MANAGER_UPDATE -> {
-                Info.remote = Info.remote.copy(app = Info.remote.app.copy(
-                        link = intent.getStringExtra(Const.Key.INTENT_SET_LINK) ?: ""))
-                DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME))
+                intent.getParcelableExtra<ManagerJson>(Const.Key.INTENT_SET_APP)?.let {
+                    Info.remote = Info.remote.copy(app = it)
+                }
+                DownloadService(context) {
+                    subject = DownloadSubject.Manager(Configuration.APK.Upgrade)
+                }
             }
             Const.Key.BROADCAST_REBOOT -> reboot()
         }

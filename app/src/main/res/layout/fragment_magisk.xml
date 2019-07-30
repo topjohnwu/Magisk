@@ -15,7 +15,7 @@
 
         <import type="com.topjohnwu.magisk.R" />
 
-        <import type="com.topjohnwu.magisk.utils.XStringKt" />
+        <import type="com.topjohnwu.magisk.extensions.XStringKt" />
 
         <variable
             name="viewModel"

@@ -243,12 +243,13 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 	xsymlink("./magiskinit", "/sbin/supolicy");
 }
 
-#define ROOTOVL MAGISKTMP "/rootdir"
 #define ROOTMIR MIRRDIR "/system_root"
 #define ROOTBLK BLOCKDIR "/system_root"
 #define MONOPOLICY  "/sepolicy"
 #define PATCHPOLICY "/sbin/.se"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
+
+static string mount_list;
 
 static void magic_mount(int dirfd, const string &path) {
 	DIR *dir = xfdopendir(dirfd);
@@ -266,6 +267,8 @@ static void magic_mount(int dirfd, const string &path) {
 				string src = ROOTOVL + dest;
 				LOGD("Mount [%s] -> [%s]\n", src.data(), dest.data());
 				xmount(src.data(), dest.data(), nullptr, MS_BIND, nullptr);
+				mount_list += dest;
+				mount_list += '\n';
 			}
 		}
 	}
@@ -394,6 +397,9 @@ void SARCommon::patch_rootdir() {
 	src = xopen(ROOTOVL, O_RDONLY | O_CLOEXEC);
 	magic_mount(src, "");
 	close(src);
+	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
+	write(dest, mount_list.data(), mount_list.length());
+	close(dest);
 }
 
 #define FSR "/first_stage_ramdisk"

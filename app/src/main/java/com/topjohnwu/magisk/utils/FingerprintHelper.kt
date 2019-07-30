@@ -9,6 +9,8 @@ import android.os.CancellationSignal
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.extensions.inject
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator

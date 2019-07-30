@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.Info;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver;
 import com.topjohnwu.magisk.ui.SplashActivity;
-import com.topjohnwu.magisk.utils.Utils;
 
 public class Notifications {
 
@@ -26,7 +25,6 @@ public class Notifications {
 
     public static void setup(Context c) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager mgr = c.getSystemService(NotificationManager.class);
             mgr.deleteNotificationChannel("magisk_notification");
             NotificationChannel channel =
                     new NotificationChannel(Const.ID.UPDATE_NOTIFICATION_CHANNEL,
@@ -62,13 +60,11 @@ public class Notifications {
 
     public static void managerUpdate() {
         App app = App.self;
-        String name = Utils.INSTANCE.fmt("MagiskManager v%s(%d)",
-                Info.remote.getApp().getVersion(), Info.remote.getApp().getVersionCode());
 
         Intent intent = new Intent(app, ClassMap.get(GeneralReceiver.class));
         intent.setAction(Const.Key.BROADCAST_MANAGER_UPDATE);
-        intent.putExtra(Const.Key.INTENT_SET_LINK, Info.remote.getApp().getLink());
-        intent.putExtra(Const.Key.INTENT_SET_NAME, name);
+        intent.putExtra(Const.Key.INTENT_SET_APP, Info.remote.getApp());
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(app,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -101,9 +97,12 @@ public class Notifications {
         mgr.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build());
     }
 
-    public static NotificationCompat.Builder progress(String title) {
-        App app = App.self;
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(app, Const.ID.PROGRESS_NOTIFICATION_CHANNEL);
+    public static NotificationCompat.Builder progress(CharSequence title) {
+        return progress(App.self, title);
+    }
+
+    public static NotificationCompat.Builder progress(Context context, CharSequence title) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Const.ID.PROGRESS_NOTIFICATION_CHANNEL);
         builder.setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setContentTitle(title)

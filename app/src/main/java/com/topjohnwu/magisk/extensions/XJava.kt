@@ -1,9 +1,7 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.extensions
 
 import android.net.Uri
 import androidx.core.net.toFile
-import org.kamranzafar.jtar.TarInputStream
-import org.kamranzafar.jtar.TarOutputStream
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -18,12 +16,10 @@ fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
     }
 }
 
-fun Uri.copyTo(file: File) = toFile().copyTo(file)
-fun InputStream.copyTo(file: File) =
-    withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
+fun Uri.writeTo(file: File) = toFile().copyTo(file)
 
-fun File.tarInputStream() = TarInputStream(inputStream())
-fun File.tarOutputStream() = TarOutputStream(this)
+fun InputStream.writeTo(file: File) =
+        withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
 
 inline fun <In : InputStream, Out : OutputStream> withStreams(
     inStream: In,
@@ -35,4 +31,11 @@ inline fun <In : InputStream, Out : OutputStream> withStreams(
             withBoth(reader, writer)
         }
     }
+}
+
+inline fun <T, R> List<T>.firstMap(mapper: (T) -> R?): R {
+    for (item: T in this) {
+        return mapper(item) ?: continue
+    }
+    throw NoSuchElementException("Collection contains no element matching the predicate.")
 }
