@@ -1,5 +1,5 @@
 #!/sbin/sh
-
+set -x
 TMPDIR=/dev/tmp
 MOUNTPATH=/dev/magisk_img
 
