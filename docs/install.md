@@ -1,8 +1,9 @@
 # Installation
 If you already have Magisk installed, it is **strongly recommended to upgrade directly via Magisk Manager**. The following tutorial is for first time users.
 
-- If you are using a Huawei device running **EMUI 8 and higher**, please check its own section.
-- If you are using a Samsung device that is **launched with Android 9.0** (new devices in 2019), please check its own section.
+- If you are using a Huawei device running **EMUI 8 and higher**, please check [its own section](#huawei).
+- If you are using a Samsung device that is **launched with Android 9.0** (new devices in 2019), please check [its own section](#samsung-system-as-root).
+- Otherwise, follow [the normal tutorial](#boot-image-patching).
 
 ## Prerequisite
 - If you plan to install custom kernels, flash the zip **AFTER** installing Magisk
@@ -41,13 +42,13 @@ Each OEM has its own key combo to boot into recovery. For example on Samsung it 
 - **(OEM Recovery Key Combo) → (Splash screen) → (Keep pressing volume up) → (Actual recovery)**
 
 ## Samsung (System-as-root)
-**If your device is NOT launched with Android 9.0 or higher (released after 2019), follow the normal tutorial**
+**If your device is NOT launched with Android 9.0 or higher (released after 2019), follow [the normal tutorial](#boot-image-patching)**
 
 ### Before Installing Magisk
 - Installing Magisk **WILL** trip KNOX
 - Installing Magisk for the first time **REQUIRES** a full data wipe, backup before continue
 - You have to have your bootloader unlocked before following the instructions
-- Magisk will be installed to the **recovery** partition of your device. **Please read the Magisk in Recovery section before following the instructions below!**
+- Magisk will be installed to the **recovery** partition of your device. **Please read the [Magisk in Recovery](#magisk-in-recovery) section before following the instructions below!**
 - After installing Magisk, you can directly upgrade Magisk within Magisk Manager without an issue. **Flashing in custom recovery is not supported for now.**
 
 ### Unlocking Bootloader
@@ -108,7 +109,7 @@ For EMUI 8 devices, your device have a partition named `ramdisk`, which is where
 Be aware you are flashing to `ramdisk`, not `boot`!
 
 ### EMUI 9 or Higher
-For EMUI 9+ devices, the `ramdisk` partition no longer exists. As a workaround, Magisk will be installed to the `recovery_ramdisk` partition. **Please read the Magisk in Recovery section before following the instructions below!**
+For EMUI 9+ devices, the `ramdisk` partition no longer exists. As a workaround, Magisk will be installed to the `recovery_ramdisk` partition. **Please read the [Magisk in Recovery](#magisk-in-recovery) section before following the instructions below!**
 
 *Note: As I tested on my Honor View 10, Huawei's kernel does not seem to be able to capture key button press events in early boot, so long pressing Volume Up does **NOT** boot to recovery on my device. Your experience may vary.*
 
