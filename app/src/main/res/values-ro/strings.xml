@@ -44,6 +44,7 @@
     <string name="reboot_recovery">Repornește în recovery</string>
     <string name="reboot_bootloader">Repornește în bootloader</string>
     <string name="reboot_download">Repornește în download</string>
+    <string name="reboot_edl">Repornește în EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Actualizare disponibilă</string>
@@ -70,7 +71,13 @@
     <string name="update_channel">Actualizări Magisk</string>
     <string name="progress_channel">Notificări de progres</string>
     <string name="download_complete">Descărcare finalizată</string>
+    <string name="download_local">Se caută copii locale…</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">Se injectează programul de instalare…</string>
     <string name="download_file_error">Eroare la descărcarea fișierului</string>
+    <string name="download_file_folder_error">Nu se poate prelua dosarul părinte pentru a salva fișierul descărcat, verifică permisiunile.</string>
+    <string name="download_open_parent">Afișează în dosarul părinte</string>
+    <string name="download_open_self">Afișează fișierul</string>
     <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
     <string name="manager_update_title">Actualizare Magisk Manager disponibilă!</string>
 
@@ -122,9 +129,14 @@
     <string name="dl_one_module">Descarcă câte un modul odată.</string>
 
     <!--Settings Activity -->
+    <string name="settings_downloads_category">Descărcări</string>
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Temă întunecată</string>
     <string name="settings_dark_theme_summary">Activează tema întunecată.</string>
+    <string name="settings_download_cache_title">Cache pentru descărcări</string>
+    <string name="settings_download_cache_summary">Activează cache-ul pentru descărcări în cazul fișierelor Magisk și a zip-urilor modulelor.</string>
+    <string name="settings_download_path_title">Cale de descărcare</string>
+    <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
     <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online.</string>
     <string name="settings_hide_manager_title">Ascunde Magisk Manager</string>
@@ -186,6 +198,7 @@
     <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat.</string>
     <string name="android_o_not_support">Nu suportă Android 8.0+.</string>
     <string name="disable_fingerprint">Nu au fost setate amprente sau scannerul de amprentă lipsește.</string>
+    <string name="settings_download_path_error">Eroare la crearea dosarului. Acesta trebuie să fie accesibil din directorul rădăcină al stocării și nu trebuie să fie un fișier.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitare de superutilizator</string>
