@@ -33,6 +33,7 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
+import io.reactivex.Completable
 import org.koin.android.ext.android.inject
 import java.io.File
 
@@ -83,13 +84,15 @@ class SettingsFragment : BasePreferenceFragment() {
             true
         }
         findPreference("clear").setOnPreferenceClickListener {
-            repoDB.clear()
-            Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
+            Completable.fromAction { repoDB.clear() }.subscribeK {
+                Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
+            }
             true
         }
         findPreference("hosts").setOnPreferenceClickListener {
-            Shell.su("add_hosts_module").exec()
-            Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
+            Shell.su("add_hosts_module").submit {
+                Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
+            }
             true
         }
 

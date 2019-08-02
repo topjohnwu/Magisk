@@ -20,5 +20,4 @@ val databaseModule = module {
 fun createRepoDatabase(context: Context) =
         Room.databaseBuilder(context, RepoDatabase::class.java, "repo.db")
             .fallbackToDestructiveMigration()
-            .allowMainThreadQueries()
             .build()
