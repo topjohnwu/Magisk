@@ -7,7 +7,7 @@ import com.topjohnwu.magisk.model.entity.module.Repo
 @Dao
 abstract class RepoDao {
 
-    val repoIDSet: Set<String> get() = getRepoID().map { it.id }.toSet()
+    val repoIDList get() = getRepoID().map { it.id }
 
     val repos: List<Repo> get() = when (Config.repoOrder) {
             Config.Value.ORDER_NAME -> getReposNameOrder()
@@ -45,7 +45,7 @@ abstract class RepoDao {
     abstract fun removeRepo(id: String)
 
     @Query("DELETE FROM repos WHERE id IN (:idList)")
-    abstract fun removeRepos(idList: List<String>)
+    abstract fun removeRepos(idList: Collection<String>)
 
     @Query("SELECT * FROM etag")
     protected abstract fun etagRaw(): RepoEtag?
