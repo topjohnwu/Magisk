@@ -39,7 +39,7 @@ android {
         exclude '/META-INF/*.kotlin_module'
         exclude '/META-INF/rxkotlin.properties'
         exclude '/androidsupportmultidexversion.txt'
-        exclude '/org/**'
+        exclude '/org/bouncycastle/**'
         exclude '/kotlin/**'
         exclude '/kotlinx/**'
     }
