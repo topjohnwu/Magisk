@@ -71,11 +71,17 @@
     <string name="update_channel">Aktualizacja Magisk</string>
     <string name="progress_channel">Powiadomienia o Postępie</string>
     <string name="download_complete">Pobieranie zakończone</string>
+    <string name="download_local">Szukam lokalne kopie …</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">Instalator łaczenia…</string>
     <string name="download_file_error">Błąd pobierania pliku</string>
-    <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
+	<string name="download_file_folder_error">Nie można pobrać folderu nadrzędnego w celu zapisania pobranego pliku, sprawdź uprawnienia.</string>
+   <string name="download_open_parent">Pokaż w folderze nadrzędnym</string>
+    <string name="download_open_self">Pokaż pliki</string>
+   <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
     <string name="manager_update_title">Nowa Wersja Magisk Manager Dostępna!</string>
 
-	 <!-- Installation -->
+	<!-- Installation -->
 	<string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
 	<string name="download_zip_only">Pobierz Tylko Zip</string>
     <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
@@ -86,8 +92,6 @@
     <string name="select_patch_file">Wybierz i Wgraj Plik</string>
     <string name="patch_file_msg">Wybierz obraz raw (*.img) lub plik ODIN tar (*.tar)</string>
     <string name="reboot_delay_toast">Ponowne uruchomienie za 5 sekund…</string>
-   
-   
    
    <!--Toasts, Dialogs-->
     <string name="close">Zamknij</string>
@@ -125,10 +129,15 @@
     <string name="dl_one_module">Pobierz jeden moduł na raz.</string>
 	
 	<!--Settings Activity -->
-    <string name="settings_general_category">Ogólne</string>
+    <string name="settings_downloads_category">Pobieranie</string>
+	<string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
-    <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
+    <string name="settings_download_cache_title">Pobierz Cache</string>
+    <string name="settings_download_cache_summary">Włącza pobieranie pamięci podręcznej dla plików zip Magisk i Modułów.</string>
+	<string name="settings_download_path_title">Pobierz dodatek</string>
+    <string name="settings_download_path_message">Pliki zostaną zapisane w %1$s</string>
+	<string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie repozytorium online.</string>
     <string name="settings_hide_manager_title">Ukryj Magisk Manager</string>
     <string name="settings_hide_manager_summary">Przepakowanie Magisk Manager z losową nazwą pakietu</string>
@@ -189,8 +198,9 @@
     <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
     <string name="android_o_not_support">Brak wsparcia dla Androida 8.0+</string>
     <string name="disable_fingerprint">Nie ustawiono żadnych odcisków palców lub brak obsługi urządzenia</string>
-
-    <!--Superuser-->
+    <string name="settings_download_path_error">Błąd podczas tworzenia folderu. Musi być dostępny z głównego katalogu pamięci i nie może być plikiem.</string>
+   
+   <!--Superuser-->
     <string name="su_request_title">Prośba o dostęp Superusera</string>
     <string name="deny_with_str">Odmów%1$s</string>
     <string name="deny">Odmów</string>
