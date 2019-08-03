@@ -15,8 +15,8 @@ buildscript {
         maven { url 'https://kotlin.bintray.com/kotlinx' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0-rc01'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.40"
+        classpath 'com.android.tools.build:gradle:3.5.0-rc02'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.41"
 
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -44,7 +44,7 @@ subprojects {
             getPlugins().hasPlugin('com.android.application')) {
             android {
                 compileSdkVersion 29
-                buildToolsVersion '29.0.0'
+                buildToolsVersion '29.0.1'
 
                 defaultConfig {
                     if (minSdkVersion == null)
