@@ -9,6 +9,7 @@ import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.LogRepository
@@ -22,8 +23,8 @@ import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.BindingViewPagerAdapter
 import me.tatarka.bindingcollectionadapter2.OnItemBind
+import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import java.util.*
 
 class LogViewModel(
@@ -78,10 +79,11 @@ class LogViewModel(
             now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
         )
 
-        val logFile = File(Const.EXTERNAL_PATH, filename)
-        try {
+        val logFile = File(Config.downloadDirectory, filename)
+        runCatching {
             logFile.createNewFile()
-        } catch (e: IOException) {
+        }.onFailure {
+            Timber.e(it)
             return
         }
 

@@ -94,7 +94,7 @@ class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
 
     @SuppressLint("MissingPermission")
     private fun installModule(item: Repo) {
-        val context = magiskActivity
+        val context = activity
 
         fun download(install: Boolean) = context.withExternalRW {
             onSuccess {

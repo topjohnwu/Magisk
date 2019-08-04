@@ -88,7 +88,7 @@ class ModulesFragment : MagiskFragment<ModuleViewModel, FragmentModulesBinding>(
     }
 
     private fun selectFile() {
-        magiskActivity.withExternalRW {
+        activity.withExternalRW {
             onSuccess {
                 val intent = Intent(Intent.ACTION_GET_CONTENT)
                 intent.type = "application/zip"
