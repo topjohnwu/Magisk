@@ -1,4 +1,4 @@
-package com.topjohnwu.net;
+package com.topjohnwu.magisk.net;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

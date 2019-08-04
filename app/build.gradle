@@ -55,7 +55,6 @@ androidExtensions {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':net')
     implementation project(':shared')
     implementation project(':signing')
 

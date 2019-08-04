@@ -16,6 +16,5 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':net')
     implementation project(':shared')
 }

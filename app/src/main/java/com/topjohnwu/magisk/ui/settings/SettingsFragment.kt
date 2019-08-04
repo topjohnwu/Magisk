@@ -29,7 +29,7 @@ import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
-import com.topjohnwu.net.Networking
+import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Completable
 import org.koin.android.ext.android.inject
