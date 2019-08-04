@@ -77,7 +77,7 @@ dependencies {
     implementation "org.koin:koin-android:${vKoin}"
     implementation "org.koin:koin-androidx-viewmodel:${vKoin}"
 
-    def vRetrofit = "2.6.0"
+    def vRetrofit = '2.6.1'
     implementation "com.squareup.retrofit2:retrofit:${vRetrofit}"
     implementation "com.squareup.retrofit2:converter-moshi:${vRetrofit}"
     implementation "com.squareup.retrofit2:converter-scalars:${vRetrofit}"
@@ -111,5 +111,5 @@ dependencies {
     implementation 'androidx.work:work-runtime:2.1.0'
     implementation 'androidx.transition:transition:1.2.0-beta01'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.1.0-alpha08'
+    implementation 'com.google.android.material:material:1.1.0-alpha09'
 }

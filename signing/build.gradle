@@ -34,7 +34,7 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    def bcVer = '1.61'
+    def bcVer = '1.62'
     api "org.bouncycastle:bcprov-jdk15on:${bcVer}"
     api "org.bouncycastle:bcpkix-jdk15on:${bcVer}"
 }
