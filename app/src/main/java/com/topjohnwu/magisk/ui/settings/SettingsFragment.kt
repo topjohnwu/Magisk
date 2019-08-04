@@ -73,7 +73,7 @@ class SettingsFragment : BasePreferenceFragment() {
         val suCategory = findPreference("superuser") as PreferenceCategory
         val hideManager = findPreference("hide")
         hideManager.setOnPreferenceClickListener {
-            PatchAPK.hideManager()
+            PatchAPK.hideManager(requireContext())
             true
         }
         val restoreManager = findPreference("restore")

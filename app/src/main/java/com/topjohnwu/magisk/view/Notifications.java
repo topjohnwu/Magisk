@@ -97,10 +97,6 @@ public class Notifications {
         mgr.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build());
     }
 
-    public static NotificationCompat.Builder progress(CharSequence title) {
-        return progress(App.self, title);
-    }
-
     public static NotificationCompat.Builder progress(Context context, CharSequence title) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Const.ID.PROGRESS_NOTIFICATION_CHANNEL);
         builder.setPriority(NotificationCompat.PRIORITY_LOW)

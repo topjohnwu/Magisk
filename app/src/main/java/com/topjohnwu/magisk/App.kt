@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
-import android.os.AsyncTask
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
@@ -23,7 +22,6 @@ import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
-import java.util.concurrent.ThreadPoolExecutor
 
 open class App : Application() {
 
@@ -68,17 +66,12 @@ open class App : Application() {
         @JvmStatic
         lateinit var self: App
 
-        @Deprecated("Use Rx or similar")
-        @JvmField
-        var THREAD_POOL: ThreadPoolExecutor
-
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
             Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_USE_MAGISK_BUSYBOX)
             Shell.Config.verboseLogging(BuildConfig.DEBUG)
             Shell.Config.addInitializers(RootUtils::class.java)
             Shell.Config.setTimeout(2)
-            THREAD_POOL = AsyncTask.THREAD_POOL_EXECUTOR as ThreadPoolExecutor
             Room.setFactory {
                 when (it) {
                     WorkDatabase::class.java -> WorkDatabase_Impl()
