@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
@@ -39,7 +38,6 @@ open class App : Application() {
         }
 
         deContext = base
-        self = this
 
         if (Build.VERSION.SDK_INT >= 24) {
             deContext = base.createDeviceProtectedStorageContext()
@@ -60,11 +58,6 @@ open class App : Application() {
     private val Context.defaultPrefsName get() = "${packageName}_preferences"
 
     companion object {
-
-        @SuppressLint("StaticFieldLeak")
-        @Deprecated("Use dependency injection")
-        @JvmStatic
-        lateinit var self: App
 
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)

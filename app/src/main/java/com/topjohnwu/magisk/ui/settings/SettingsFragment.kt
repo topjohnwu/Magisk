@@ -21,15 +21,13 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
+import com.topjohnwu.magisk.extensions.toLangTag
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
-import com.topjohnwu.magisk.utils.FingerprintHelper
-import com.topjohnwu.magisk.utils.LocaleManager
-import com.topjohnwu.magisk.utils.PatchAPK
-import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
@@ -226,21 +224,18 @@ class SettingsFragment : BasePreferenceFragment() {
 
     private fun setLocalePreference(lp: ListPreference) {
         lp.isEnabled = false
-        LocaleManager.availableLocales
-            .map {
+        availableLocales.map {
                 val names = mutableListOf<String>()
                 val values = mutableListOf<String>()
 
                 names.add(
-                    LocaleManager.getString(
-                        LocaleManager.defaultLocale, R.string.system_default
-                    )
+                    LocaleManager.getString(defaultLocale, R.string.system_default)
                 )
                 values.add("")
 
                 it.forEach { locale ->
                     names.add(locale.getDisplayName(locale))
-                    values.add(LocaleManager.toLanguageTag(locale))
+                    values.add(locale.toLangTag())
                 }
 
                 Pair(names.toTypedArray(), values.toTypedArray())
@@ -248,7 +243,7 @@ class SettingsFragment : BasePreferenceFragment() {
                 lp.isEnabled = true
                 lp.entries = names
                 lp.entryValues = values
-                lp.summary = LocaleManager.locale.getDisplayName(LocaleManager.locale)
+                lp.summary = currentLocale.getDisplayName(currentLocale)
             }
     }
 

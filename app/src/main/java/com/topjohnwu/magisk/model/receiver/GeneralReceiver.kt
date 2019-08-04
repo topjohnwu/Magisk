@@ -47,7 +47,7 @@ open class GeneralReceiver : BroadcastReceiver() {
                     // Actual boot completed event
                     Shell.su("mm_patch_dtbo").submit { result ->
                         if (result.isSuccess)
-                            Notifications.dtboPatched()
+                            Notifications.dtboPatched(context)
                     }
                     return
                 }

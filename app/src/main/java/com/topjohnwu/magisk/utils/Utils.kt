@@ -15,7 +15,6 @@ import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.update.UpdateCheckService
-import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
@@ -24,8 +23,7 @@ import java.util.concurrent.TimeUnit
 
 object Utils {
 
-    val isCanary: Boolean
-        get() = BuildConfig.VERSION_NAME.contains("-")
+    val isCanary: Boolean = BuildConfig.VERSION_NAME.contains("-")
 
     fun toast(msg: CharSequence, duration: Int) {
         UiThreadHandler.run { Toast.makeText(get(), msg, duration).show() }
@@ -33,11 +31,6 @@ object Utils {
 
     fun toast(resId: Int, duration: Int) {
         UiThreadHandler.run { Toast.makeText(get(), resId, duration).show() }
-    }
-
-    fun dlString(url: String): String {
-        val s = Networking.get(url).execForString().result
-        return s ?: ""
     }
 
     fun getPrefsInt(prefs: SharedPreferences, key: String, def: Int = 0): Int {
@@ -58,7 +51,7 @@ object Utils {
             if (info.labelRes > 0) {
                 val res = pm.getResourcesForApplication(info)
                 val config = Configuration()
-                config.setLocale(LocaleManager.locale)
+                config.setLocale(currentLocale)
                 res.updateConfiguration(config, res.displayMetrics)
                 return res.getString(info.labelRes)
             }

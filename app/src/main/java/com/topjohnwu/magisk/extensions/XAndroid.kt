@@ -55,7 +55,7 @@ val ApplicationInfo.packageInfo: PackageInfo?
 val Uri.fileName: String
     get() {
         var name: String? = null
-        App.self.contentResolver.query(this, null, null, null, null)?.use { c ->
+        get<Context>().contentResolver.query(this, null, null, null, null)?.use { c ->
             val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             if (nameIndex != -1) {
                 c.moveToFirst()

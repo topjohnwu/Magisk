@@ -1,12 +1,17 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.viewevents.ViewEvent
-import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
+import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.events.*
@@ -114,7 +119,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
     }
 
     companion object {
-        val EXT_APK = File("${App.self.filesDir.parent}/snet", "snet.apk")
+        val EXT_APK by lazy { File("${get<Context>().filesDir.parent}/snet", "snet.apk") }
     }
 }
 
