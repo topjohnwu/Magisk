@@ -10,16 +10,11 @@ import android.content.pm.PackageManager.*
 import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.utils.FileProvider
 import java.io.File
 import java.io.FileNotFoundException
 
-val packageName: String
-    get() {
-        val app: App by inject()
-        return app.packageName
-    }
+val packageName: String get() = get<Context>().packageName
 
 val PackageInfo.processes
     get() = activities?.processNames.orEmpty() +
