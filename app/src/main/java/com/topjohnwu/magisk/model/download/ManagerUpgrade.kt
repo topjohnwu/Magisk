@@ -9,10 +9,10 @@ import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Restore
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Upgrade
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.ui.SplashActivity
+import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.PatchAPK
 import com.topjohnwu.magisk.utils.RootUtils
 import com.topjohnwu.superuser.Shell
-import dalvik.system.DexClassLoader
 import timber.log.Timber
 import java.io.File
 
@@ -27,7 +27,7 @@ private fun RemoteFileService.patchPackage(apk: File, id: Int): File {
         val patched = File(apk.parent, "patched.apk")
         try {
             // Try using the new APK to patch itself
-            val loader = DexClassLoader(apk.path, apk.parent, null, ClassLoader.getSystemClassLoader())
+            val loader = DynamicClassLoader(apk)
             loader.loadClass("a.a")
                     .getMethod("patchAPK", String::class.java, String::class.java, String::class.java)
                     .invoke(null, apk.path, patched.path, packageName)

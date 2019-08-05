@@ -18,10 +18,10 @@ import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
+import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.superuser.Shell
-import dalvik.system.DexClassLoader
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -97,8 +97,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     private fun updateSafetyNet(dieOnError: Boolean) {
         try {
-            val loader = DexClassLoader(EXT_APK.path, EXT_APK.parent, null,
-                    ISafetyNetHelper::class.java.classLoader)
+            val loader = DynamicClassLoader(EXT_APK)
             val clazz = loader.loadClass("com.topjohnwu.snet.Snet")
             val helper = clazz.getMethod("newHelper",
                     Class::class.java, String::class.java, Activity::class.java, Any::class.java)
