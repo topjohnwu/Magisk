@@ -36,7 +36,7 @@ class MagiskRepository(
         } else {
             Single.just(it)
         }
-    }.map { Info.remote = it; it }
+    }.doOnSuccess { Info.remote = it }
 
     fun fetchApps() =
         Single.fromCallable { packageManager.getInstalledApplications(0) }
