@@ -62,6 +62,7 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.github.skoumalcz:teanity:0.3.3'
     implementation 'com.ncapdevi:frag-nav:3.2.0'
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.3'
 
     def vMarkwon = '3.1.0'
     implementation "ru.noties.markwon:core:${vMarkwon}"
