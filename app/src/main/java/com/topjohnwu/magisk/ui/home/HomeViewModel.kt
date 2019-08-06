@@ -25,7 +25,10 @@ class HomeViewModel(
     val isForceEncryption = KObservableField(Info.keepEnc)
     val isKeepVerity = KObservableField(Info.keepVerity)
 
-    val magiskState = KObservableField(MagiskState.LOADING)
+    private val _magiskState = KObservableField(MagiskState.LOADING)
+    val magiskState = Observer(_magiskState, isConnected) {
+        if (isConnected.value) _magiskState.value else MagiskState.UP_TO_DATE
+    }
     val magiskStateText = Observer(magiskState) {
         when (magiskState.value) {
             MagiskState.NO_ROOT -> TODO()
@@ -44,7 +47,10 @@ class HomeViewModel(
             ""
     }
 
-    val managerState = KObservableField(MagiskState.LOADING)
+    private val _managerState = KObservableField(MagiskState.LOADING)
+    val managerState = Observer(_managerState, isConnected) {
+        if (isConnected.value) _managerState.value else MagiskState.UP_TO_DATE
+    }
     val managerStateText = Observer(managerState) {
         when (managerState.value) {
             MagiskState.NO_ROOT -> "wtf"
@@ -88,6 +94,9 @@ class HomeViewModel(
         }
         isKeepVerity.addOnPropertyChangedCallback {
             Info.keepVerity = it ?: return@addOnPropertyChangedCallback
+        }
+        isConnected.addOnPropertyChangedCallback {
+            if (it == true) refresh()
         }
 
         refresh()
@@ -154,8 +163,8 @@ class HomeViewModel(
         magiskRepo.fetchUpdate()
             .applyViewModel(this)
             .doOnSubscribeUi {
-                magiskState.value = MagiskState.LOADING
-                managerState.value = MagiskState.LOADING
+                _magiskState.value = MagiskState.LOADING
+                _managerState.value = MagiskState.LOADING
                 ctsState.value = SafetyNetState.IDLE
                 basicIntegrityState.value = SafetyNetState.IDLE
                 safetyNetTitle.value = R.string.safetyNet_check_text
@@ -170,7 +179,7 @@ class HomeViewModel(
 
     private fun updateSelf() {
         state = State.LOADED
-        magiskState.value = when (Info.magiskVersionCode) {
+        _magiskState.value = when (Info.magiskVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
             !in Info.remote.magisk.versionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
@@ -185,7 +194,7 @@ class HomeViewModel(
         magiskLatestVersion.value = version
             .format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
 
-        managerState.value = when (Info.remote.app.versionCode) {
+        _managerState.value = when (Info.remote.app.versionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
             in (BuildConfig.VERSION_CODE + 1)..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE

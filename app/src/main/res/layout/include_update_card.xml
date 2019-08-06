@@ -7,6 +7,8 @@
 
         <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
 
+        <import type="com.topjohnwu.magisk.ui.home.MagiskItem" />
+
         <import type="com.topjohnwu.magisk.R" />
 
         <variable
@@ -49,7 +51,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/install"
             style="@style/Widget.Button.Text"
-            gone="@{state == MagiskState.LOADING}"
+            gone="@{state == MagiskState.LOADING || !viewModel.isConnected}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -118,7 +120,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/latest_version"
-            gone="@{currentVersion == latestVersion}"
+            gone="@{currentVersion == latestVersion || !viewModel.isConnected}"
             android:layout_width="0dp"
             style="@style/Widget.Text.Caption.Inactive"
             android:layout_height="wrap_content"

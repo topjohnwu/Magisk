@@ -66,8 +66,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:paddingBottom="10dp"
                         android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
                         android:text="@string/app_name"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -194,7 +194,7 @@
                     android:layout_margin="@dimen/margin_generic" />
 
                 <LinearLayout
-                    gone="@{!viewModel.hasRoot}"
+                    gone="@{!viewModel.hasRoot || !viewModel.isConnected}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -202,8 +202,8 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="@dimen/margin_generic_half"
-                        android:paddingTop="@dimen/margin_generic_half">
+                        android:paddingTop="@dimen/margin_generic_half"
+                        android:paddingBottom="@dimen/margin_generic_half">
 
                         <ImageView
                             android:id="@+id/sn_logo"

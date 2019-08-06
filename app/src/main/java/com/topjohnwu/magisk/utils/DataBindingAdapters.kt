@@ -216,3 +216,8 @@ fun setScrollListener(view: RecyclerView, listener: InverseBindingListener) {
 fun getScrollPosition(view: RecyclerView) = (view.layoutManager as? LinearLayoutManager)
     ?.findLastCompletelyVisibleItemPosition()
     ?: -1
+
+@BindingAdapter("isEnabled")
+fun setEnabled(view: View, isEnabled: Boolean) {
+    view.isEnabled = isEnabled
+}
