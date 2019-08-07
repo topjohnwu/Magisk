@@ -13,7 +13,7 @@
 #include <vector>
 #include <bitset>
 
-#include <magisk.h>
+#include <logging.h>
 #include <utils.h>
 
 #include "magiskhide.h"

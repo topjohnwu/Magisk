@@ -17,21 +17,21 @@ import kotlin.reflect.KClass
 abstract class MagiskFragment<ViewModel : MagiskViewModel, Binding : ViewDataBinding> :
     TeanityFragment<ViewModel, Binding>(), Navigator {
 
-    protected val magiskActivity get() = activity as MagiskActivity<*, *>
+    protected val activity get() = requireActivity() as MagiskActivity<*, *>
 
     // We don't need nested fragments
     override val baseFragments: List<KClass<Fragment>> = listOf()
 
-    override fun navigateTo(event: MagiskNavigationEvent) = magiskActivity.navigateTo(event)
+    override fun navigateTo(event: MagiskNavigationEvent) = activity.navigateTo(event)
 
     @CallSuper
     override fun onEventDispatched(event: ViewEvent) {
         super.onEventDispatched(event)
         when (event) {
-            is BackPressEvent -> magiskActivity.onBackPressed()
+            is BackPressEvent -> activity.onBackPressed()
             is MagiskNavigationEvent -> navigateTo(event)
             is ViewActionEvent -> event.action(requireActivity())
-            is PermissionEvent -> magiskActivity.withPermissions(*event.permissions.toTypedArray()) {
+            is PermissionEvent -> activity.withPermissions(*event.permissions.toTypedArray()) {
                 onSuccess { event.callback.onNext(true) }
                 onFailure {
                     event.callback.onNext(false)
@@ -42,10 +42,10 @@ abstract class MagiskFragment<ViewModel : MagiskViewModel, Binding : ViewDataBin
     }
 
     fun withPermissions(vararg permissions: String, builder: PermissionRequestBuilder.() -> Unit) {
-        magiskActivity.withPermissions(*permissions, builder = builder)
+        activity.withPermissions(*permissions, builder = builder)
     }
 
-    fun openLink(url: String) = magiskActivity.openUrl(url)
+    fun openLink(url: String) = activity.openUrl(url)
 
     open fun onBackPressed(): Boolean = false
 

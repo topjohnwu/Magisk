@@ -22,6 +22,7 @@ import com.ncapdevi.fragnav.FragNavTransactionOptions
 import com.skoumal.teanity.view.TeanityActivity
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.extensions.set
 import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
@@ -31,7 +32,7 @@ import com.topjohnwu.magisk.model.navigation.Navigator
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.utils.currentLocale
 import timber.log.Timber
 import kotlin.reflect.KClass
 
@@ -68,12 +69,12 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
 
     override fun applyOverrideConfiguration(config: Configuration?) {
         // Force applying our preferred local
-        config?.setLocale(LocaleManager.locale)
+        config?.setLocale(currentLocale)
         super.applyOverrideConfiguration(config)
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(LocaleManager.getLocaleContext(base, LocaleManager.locale))
+        super.attachBaseContext(LocaleManager.getLocaleContext(base))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

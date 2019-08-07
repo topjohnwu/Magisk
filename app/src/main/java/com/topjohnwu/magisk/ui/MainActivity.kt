@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
+import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
@@ -20,7 +21,6 @@ import com.topjohnwu.magisk.ui.module.ReposFragment
 import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
@@ -56,6 +56,10 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
         super.onCreate(savedInstanceState)
         checkHideSection()
         setSupportActionBar(binding.mainInclude.mainToolbar)
+
+        viewModel.isConnected.addOnPropertyChangedCallback {
+            checkHideSection()
+        }
 
         if (savedInstanceState == null) {
             intent.getStringExtra(OPEN_SECTION)?.let {
@@ -110,7 +114,7 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
         menu.findItem(R.id.modulesFragment).isVisible =
             Shell.rootAccess() && Info.magiskVersionCode >= 0
         menu.findItem(R.id.reposFragment).isVisible =
-            (Networking.checkNetworkStatus(this) && Shell.rootAccess() && Info.magiskVersionCode >= 0)
+            (viewModel.isConnected.value && Shell.rootAccess() && Info.magiskVersionCode >= 0)
         menu.findItem(R.id.logFragment).isVisible =
             Shell.rootAccess()
         menu.findItem(R.id.superuserFragment).isVisible =

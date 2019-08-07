@@ -20,6 +20,8 @@ val viewModelModules = module {
     viewModel { HideViewModel(get(), get()) }
     viewModel { ModuleViewModel(get(), get(), get()) }
     viewModel { LogViewModel(get(), get()) }
-    viewModel { (action: String, uri: Uri?) -> FlashViewModel(action, uri, get()) }
+    viewModel { (action: String, file: Uri, additional: Uri) ->
+        FlashViewModel(action, file, additional, get())
+    }
     viewModel { SuRequestViewModel(get(), get(), get(SUTimeout), get()) }
 }

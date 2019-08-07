@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.data.repository
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.data.database.LogDao
 import com.topjohnwu.magisk.data.database.base.suRaw
+import com.topjohnwu.magisk.extensions.toSingle
 import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.magisk.model.entity.WrappedMagiskLog
-import com.topjohnwu.magisk.utils.toSingle
 import com.topjohnwu.superuser.Shell
 import java.util.concurrent.TimeUnit
 

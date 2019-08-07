@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.model.events
 import android.app.Activity
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.model.entity.Policy
-import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.model.entity.module.Repo
 import io.reactivex.subjects.PublishSubject
 
 

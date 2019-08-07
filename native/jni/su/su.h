@@ -1,75 +1,72 @@
-/* su.h - Store all general su info
- */
+#pragma once
 
-#ifndef _SU_H_
-#define _SU_H_
-
-#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <memory>
 
-#include "db.h"
+#include <db.h>
 
 #define DEFAULT_SHELL "/system/bin/sh"
 
 // Constants for atty
-#define ATTY_IN     1
-#define ATTY_OUT    2
-#define ATTY_ERR    4
+#define ATTY_IN    (1 << 0)
+#define ATTY_OUT   (1 << 1)
+#define ATTY_ERR   (1 << 2)
 
 class su_info {
 public:
-	unsigned uid;          /* Unique key to find su_info */
-	int count;             /* Just a count for debugging purpose */
+	/* Unique key */
+	const unsigned uid;
 
-	/* These values should be guarded with internal lock */
+	/* These should be guarded with internal lock */
 	db_settings cfg;
 	db_strings str;
 	su_access access;
 	struct stat mgr_st;
 
-	/* These should be guarded with global cache lock */
-	int ref;
-	time_t timestamp;
+	/* This should be guarded with global cache lock */
+	long timestamp;
 
 	su_info(unsigned uid = 0);
 	~su_info();
 	void lock();
 	void unlock();
-	bool isFresh();
-	void newRef();
-	void deRef();
+	bool is_fresh();
+	void refresh();
 
 private:
 	pthread_mutex_t _lock;  /* Internal lock */
 };
 
 struct su_req_base {
-	unsigned uid;
-	bool login;
-	bool keepenv;
-	bool mount_master;
-protected:
-	su_req_base();
+	unsigned uid = UID_ROOT;
+	bool login = false;
+	bool keepenv = false;
+	bool mount_master = false;
 } __attribute__((packed));
 
 struct su_request : public su_req_base {
-	const char *shell;
-	const char *command;
-	su_request();
+	const char *shell = DEFAULT_SHELL;
+	const char *command = "";
+	su_request(bool dyn = false) : dyn(dyn) {}
+	~su_request() {
+		if (dyn) {
+			free(const_cast<char*>(shell));
+			free(const_cast<char*>(command));
+		}
+	}
+
+private:
+	bool dyn;
 } __attribute__((packed));
 
 struct su_context {
-	su_info *info;
+	std::shared_ptr<su_info> info;
 	su_request req;
 	pid_t pid;
 };
 
-// connect.c
-
-void app_log(su_context *ctx);
-void app_notify(su_context *ctx);
-void app_connect(const char *socket, su_info *info);
-void socket_send_request(int fd, su_info *info);
-
-#endif
+void app_log(const su_context &ctx);
+void app_notify(const su_context &ctx);
+void app_connect(const char *socket, const std::shared_ptr<su_info> &info);
+void socket_send_request(int fd, const std::shared_ptr<su_info> &info);

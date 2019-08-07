@@ -13,10 +13,10 @@ import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModulesBinding
+import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.ui.flash.FlashActivity
-import com.topjohnwu.magisk.utils.reboot
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
@@ -88,7 +88,7 @@ class ModulesFragment : MagiskFragment<ModuleViewModel, FragmentModulesBinding>(
     }
 
     private fun selectFile() {
-        magiskActivity.withExternalRW {
+        activity.withExternalRW {
             onSuccess {
                 val intent = Intent(Intent.ACTION_GET_CONTENT)
                 intent.type = "application/zip"

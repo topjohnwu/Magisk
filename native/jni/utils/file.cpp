@@ -11,7 +11,6 @@
 #include <string.h>
 #include <libgen.h>
 
-#include <magisk.h>
 #include <utils.h>
 #include <selinux.h>
 

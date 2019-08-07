@@ -4,11 +4,11 @@ import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.timeFormatMedium
+import com.topjohnwu.magisk.extensions.toTime
+import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.magisk.model.entity.WrappedMagiskLog
-import com.topjohnwu.magisk.utils.timeFormatMedium
-import com.topjohnwu.magisk.utils.toTime
-import com.topjohnwu.magisk.utils.toggle
 
 class LogRvItem : ComparableRvItem<LogRvItem>() {
     override val layoutRes: Int = R.layout.item_page_log

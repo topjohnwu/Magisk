@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.model.entity
 
+import com.topjohnwu.magisk.extensions.timeFormatTime
+import com.topjohnwu.magisk.extensions.toTime
 import com.topjohnwu.magisk.model.entity.MagiskPolicy.Companion.ALLOW
-import com.topjohnwu.magisk.utils.timeFormatTime
-import com.topjohnwu.magisk.utils.toTime
 import java.util.*
 
 data class MagiskLog(

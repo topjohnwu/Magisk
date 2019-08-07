@@ -8,24 +8,22 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.net.Uri
+import android.os.Environment
 import android.widget.Toast
-import androidx.annotation.WorkerThread
 import androidx.work.*
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.entity.OldModule
+import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.update.UpdateCheckService
-import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import com.topjohnwu.superuser.io.SuFile
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 object Utils {
 
-    val isCanary: Boolean
-        get() = BuildConfig.VERSION_NAME.contains("-")
+    val isCanary: Boolean = BuildConfig.VERSION_NAME.contains("-")
 
     fun toast(msg: CharSequence, duration: Int) {
         UiThreadHandler.run { Toast.makeText(get(), msg, duration).show() }
@@ -33,11 +31,6 @@ object Utils {
 
     fun toast(resId: Int, duration: Int) {
         UiThreadHandler.run { Toast.makeText(get(), resId, duration).show() }
-    }
-
-    fun dlString(url: String): String {
-        val s = Networking.get(url).execForString().result
-        return s ?: ""
     }
 
     fun getPrefsInt(prefs: SharedPreferences, key: String, def: Int = 0): Int {
@@ -58,7 +51,7 @@ object Utils {
             if (info.labelRes > 0) {
                 val res = pm.getResourcesForApplication(info)
                 val config = Configuration()
-                config.setLocale(LocaleManager.locale)
+                config.setLocale(currentLocale)
                 res.updateConfiguration(config, res.displayMetrics)
                 return res.getString(info.labelRes)
             }
@@ -66,25 +59,6 @@ object Utils {
         }
 
         return info.loadLabel(pm).toString()
-    }
-
-    fun getLegalFilename(filename: CharSequence): String {
-        return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
-                .replace("$", "").replace("`", "").replace("*", "").replace("/", "_")
-                .replace("#", "").replace("@", "").replace("\\", "_")
-    }
-
-    @WorkerThread
-    fun loadModulesLeanback(): Map<String, OldModule> {
-        val moduleMap = ValueSortedMap<String, OldModule>()
-        val path = SuFile(Const.MAGISK_PATH)
-        val modules = path.listFiles { _, name -> name != "lost+found" && name != ".core" }
-        for (file in modules!!) {
-            if (file.isFile) continue
-            val module = OldModule(Const.MAGISK_PATH + "/" + file.name)
-            moduleMap[module.id] = module
-        }
-        return moduleMap
     }
 
     fun showSuperUser(): Boolean {
@@ -119,5 +93,10 @@ object Utils {
             toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT)
         }
     }
+
+    fun ensureDownloadPath(path : String) =
+        File(Environment.getExternalStorageDirectory(), path).run {
+            if ((exists() && isDirectory) || mkdirs()) this else null
+        }
 
 }

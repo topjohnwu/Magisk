@@ -9,13 +9,13 @@ import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.extensions.toSingle
+import com.topjohnwu.magisk.extensions.update
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessRvItem
 import com.topjohnwu.magisk.model.entity.recycler.HideRvItem
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import com.topjohnwu.magisk.model.events.HideProcessEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.toSingle
-import com.topjohnwu.magisk.utils.update
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 import timber.log.Timber
 

@@ -1,9 +1,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mount.h>
 #include <fcntl.h>
+#include <vector>
 
 #include <magisk.h>
+#include <magiskpolicy.h>
 #include <utils.h>
 
 #include "init.h"
@@ -19,22 +20,22 @@
 using namespace std;
 
 static void patch_socket_name(const char *path) {
-	uint8_t *buf;
-	char name[sizeof(MAIN_SOCKET)];
+	char *buf;
 	size_t size;
 	mmap_rw(path, buf, size);
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(name, sizeof(name));
-			memcpy(buf + i, name, sizeof(name));
-			i += sizeof(name);
+			gen_rand_str(buf + i, sizeof(MAIN_SOCKET));
+			i += sizeof(MAIN_SOCKET);
 		}
 	}
 	munmap(buf, size);
 }
 
+static vector<raw_data> rc_list;
+
 static void patch_init_rc(FILE *rc) {
-	file_readline("/init.rc", [&](string_view line) -> bool {
+	file_readline("/init.rc", [=](string_view line) -> bool {
 		// Do not start vaultkeeper
 		if (str_contains(line, "start vaultkeeper")) {
 			LOGD("Remove vaultkeeper\n");
@@ -50,16 +51,39 @@ static void patch_init_rc(FILE *rc) {
 		fprintf(rc, "%s", line.data());
 		return true;
 	});
-	char pfd_svc[8], ls_svc[8], bc_svc[8];
-	// Make sure to be unique
-	pfd_svc[0] = 'a';
-	ls_svc[0] = '0';
-	bc_svc[0] = 'A';
-	gen_rand_str(pfd_svc + 1, sizeof(pfd_svc) - 1);
-	gen_rand_str(ls_svc + 1, sizeof(ls_svc) - 1);
-	gen_rand_str(bc_svc + 1, sizeof(bc_svc) - 1);
+
+	fprintf(rc, "\n");
+
+	// Inject custom rc scripts
+	for (auto &d : rc_list)
+		fprintf(rc, "\n%s\n", d.buf);
+	rc_list.clear();
+
+	// Inject Magisk rc scripts
+	char pfd_svc[16], ls_svc[16], bc_svc[16];
+	gen_rand_str(pfd_svc, sizeof(pfd_svc));
+	gen_rand_str(ls_svc, sizeof(ls_svc));
+	gen_rand_str(bc_svc, sizeof(bc_svc));
 	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
 	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
+}
+
+static void load_overlay_rc(int dirfd) {
+	// Do not allow overwrite init.rc
+	unlinkat(dirfd, "init.rc", 0);
+	DIR *dir = fdopendir(dirfd);
+	for (dirent *entry; (entry = readdir(dir));) {
+		if (strend(entry->d_name, ".rc") == 0) {
+			LOGD("Found rc script [%s]\n", entry->d_name);
+			int rc = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			raw_data data;
+			fd_full_read(rc, data.buf, data.sz);
+			close(rc);
+			rc_list.push_back(std::move(data));
+			unlinkat(dirfd, entry->d_name, 0);
+		}
+	}
+	rewinddir(dir);
 }
 
 void RootFSInit::setup_rootfs() {
@@ -78,13 +102,23 @@ void RootFSInit::setup_rootfs() {
 		munmap(addr, size);
 	}
 
-	// Handle ramdisk overlays
+	// Handle legacy overlays
 	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
 	if (fd >= 0) {
 		LOGD("Merge overlay folder\n");
 		mv_dir(fd, root);
 		close(fd);
 		rmdir("/overlay");
+	}
+
+	// Handle overlays
+	fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
+	if (fd >= 0) {
+		LOGD("Merge overlay.d\n");
+		load_overlay_rc(fd);
+		mv_dir(fd, root);
+		close(fd);
+		rmdir("/overlay.d");
 	}
 
 	// Patch init.rc
@@ -185,10 +219,10 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 	char path[64];
 	for (int i = 0; applet_names[i]; ++i) {
 		sprintf(path, "/sbin/%s", applet_names[i]);
-		xsymlink("/sbin/magisk", path);
+		xsymlink("./magisk", path);
 	}
-	xsymlink("/sbin/magiskinit", "/sbin/magiskpolicy");
-	xsymlink("/sbin/magiskinit", "/sbin/supolicy");
+	xsymlink("./magiskinit", "/sbin/magiskpolicy");
+	xsymlink("./magiskinit", "/sbin/supolicy");
 }
 
 #define ROOTMIR MIRRDIR "/system_root"
@@ -197,13 +231,38 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 #define PATCHPOLICY "/sbin/.se"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 
-void SARInit::patch_rootdir() {
+static string mount_list;
+
+static void magic_mount(int dirfd, const string &path) {
+	DIR *dir = xfdopendir(dirfd);
+	for (dirent *entry; (entry = readdir(dir));) {
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
+			continue;
+		string dest = path + "/" + entry->d_name;
+		if (access(dest.data(), F_OK) == 0) {
+			if (entry->d_type == DT_DIR) {
+				// Recursive
+				int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+				magic_mount(fd, dest);
+				close(fd);
+			} else {
+				string src = ROOTOVL + dest;
+				LOGD("Mount [%s] -> [%s]\n", src.data(), dest.data());
+				xmount(src.data(), dest.data(), nullptr, MS_BIND, nullptr);
+				mount_list += dest;
+				mount_list += '\n';
+			}
+		}
+	}
+}
+
+void SARCommon::patch_rootdir() {
 	sbin_overlay(self, config);
 
 	// Mount system_root mirror
-	xmkdir(MIRRDIR, 0777);
-	xmkdir(ROOTMIR, 0777);
-	xmkdir(BLOCKDIR, 0777);
+	xmkdir(MIRRDIR, 0);
+	xmkdir(ROOTMIR, 0);
+	xmkdir(BLOCKDIR, 0);
 	mknod(ROOTBLK, S_IFBLK | 0600, system_dev);
 	if (xmount(ROOTBLK, ROOTMIR, "ext4", MS_RDONLY, nullptr))
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
@@ -223,34 +282,30 @@ void SARInit::patch_rootdir() {
 			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
 			xsymlinkat(buf, dest, entry->d_name);
 		} else {
-			char tpath[256];
+			char spath[256];
 			sprintf(buf, "/sbin/%s", entry->d_name);
-			sprintf(tpath, ROOTMIR "/sbin/%s", entry->d_name);
+			sprintf(spath, ROOTMIR "/sbin/%s", entry->d_name);
 			// Create dummy
 			if (S_ISDIR(st.st_mode))
-				xmkdir(tpath, st.st_mode & 0777);
+				xmkdir(buf, st.st_mode & 0777);
 			else
-				close(xopen(tpath, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
-			xmount(tpath, buf, nullptr, MS_BIND, nullptr);
+				close(xopen(buf, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
+			xmount(spath, buf, nullptr, MS_BIND, nullptr);
 		}
 	}
 	close(src);
 	close(dest);
 
-	/* ******************
-	 * Customize rootdir
-	 * ******************/
-
-	char *addr;
-	size_t size;
+	// Patch init
+	raw_data init;
 	file_attr attr;
 	bool redirect = false;
-	xmkdir(ROOTOVERLAY, 0);
 	src = xopen("/init", O_RDONLY | O_CLOEXEC);
+	fd_full_read(src, init.buf, init.sz);
 	fgetattr(src, &attr);
-	fd_full_read(src, (void**)&addr, &size);
 	close(src);
-	for (char *p = addr; p < addr + size; ++p) {
+	uint8_t *eof = init.buf + init.sz;
+	for (uint8_t *p = init.buf; p < eof; ++p) {
 		if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
 			// Force init to load monolithic policy
 			LOGD("Remove from init: " SPLIT_PLAT_CIL "\n");
@@ -264,18 +319,20 @@ void SARInit::patch_rootdir() {
 			p += sizeof(MONOPOLICY) - 1;
 		}
 	}
-	dest = xopen(ROOTOVERLAY "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
-	xwrite(dest, addr, size);
-	free(addr);
+	xmkdir(ROOTOVL, 0);
+	dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
+	xwrite(dest, init.buf, init.sz);
 	fsetattr(dest, &attr);
 	close(dest);
-	xmount(ROOTOVERLAY "/init", "/init", nullptr, MS_BIND, nullptr);
 
+	// Patch libselinux
 	if (!redirect) {
+		raw_data lib;
 		// init is dynamically linked, need to patch libselinux
-		full_read(LIBSELINUX, (void**)&addr, &size);
+		full_read(LIBSELINUX, lib.buf, lib.sz);
 		getattr(LIBSELINUX, &attr);
-		for (char *p = addr; p < addr + size; ++p) {
+		eof = lib.buf + lib.sz;
+		for (uint8_t *p = lib.buf; p < eof; ++p) {
 			if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
 				// Redirect /sepolicy to tmpfs
 				LOGD("Patch libselinux.so [" MONOPOLICY "] -> [" PATCHPOLICY "]\n");
@@ -283,21 +340,112 @@ void SARInit::patch_rootdir() {
 				break;
 			}
 		}
-		dest = xopen(ROOTOVERLAY "/libselinux.so", O_CREAT | O_WRONLY | O_CLOEXEC);
-		xwrite(dest, addr, size);
-		free(addr);
+		xmkdir(ROOTOVL "/system", 0755);
+		xmkdir(ROOTOVL "/system/" LIBNAME, 0755);
+		dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC);
+		xwrite(dest, lib.buf, lib.sz);
 		fsetattr(dest, &attr);
 		close(dest);
-		xmount(ROOTOVERLAY "/libselinux.so", LIBSELINUX, nullptr, MS_BIND, nullptr);
 	}
 
+	// sepolicy
 	patch_sepolicy(PATCHPOLICY);
 
-	FILE *rc = xfopen(ROOTOVERLAY "/init.rc", "we");
+	// Handle overlay
+	if ((src = xopen("/dev/overlay.d", O_RDONLY | O_CLOEXEC)) >= 0) {
+		load_overlay_rc(src);
+		if (int fd = xopen("/dev/overlay.d/sbin", O_RDONLY | O_CLOEXEC); fd >= 0) {
+			dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+			clone_dir(fd, dest);
+			close(fd);
+			close(dest);
+			xmkdir(ROOTOVL "/sbin", 0);  // Prevent copying
+		}
+		dest = xopen(ROOTOVL, O_RDONLY | O_CLOEXEC);
+		clone_dir(src, dest, false);
+		rmdir(ROOTOVL "/sbin");
+		close(src);
+		close(dest);
+		rm_rf("/dev/overlay.d");
+	}
+
+	// Patch init.rc
+	FILE *rc = xfopen(ROOTOVL "/init.rc", "we");
 	patch_init_rc(rc);
 	fclose(rc);
-	clone_attr("/init.rc", ROOTOVERLAY "/init.rc");
-	xmount(ROOTOVERLAY "/init.rc", "/init.rc", nullptr, MS_BIND, nullptr);
+	clone_attr("/init.rc", ROOTOVL "/init.rc");
+
+	// Mount rootdir
+	src = xopen(ROOTOVL, O_RDONLY | O_CLOEXEC);
+	magic_mount(src, "");
+	close(src);
+	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
+	write(dest, mount_list.data(), mount_list.length());
+	close(dest);
+}
+
+#define FSR "/first_stage_ramdisk"
+
+void FirstStageInit::prepare() {
+	// Find fstab
+	DIR *dir = xopendir(FSR);
+	if (!dir)
+		return;
+	dirent *de;
+	string fstab(FSR "/");
+	while ((de = readdir(dir))) {
+		if (strstr(de->d_name, "fstab")) {
+			fstab += de->d_name;
+			break;
+		}
+	}
+	closedir(dir);
+	if (fstab.length() == sizeof(FSR))
+		return;
+
+	// Patch fstab
+	string patched = fstab + ".p";
+	FILE *fp = xfopen(patched.data(), "we");
+	file_readline(fstab.data(), [=](string_view l) -> bool {
+		if (l[0] == '#' || l.length() == 1)
+			return true;
+		char *line = (char *) l.data();
+		int src0, src1, mnt0, mnt1, type0, type1, opt0, opt1, flag0, flag1;
+		sscanf(line, "%n%*s%n %n%*s%n %n%*s%n %n%*s%n %n%*s%n",
+			   &src0, &src1, &mnt0, &mnt1, &type0, &type1, &opt0, &opt1, &flag0, &flag1);
+		const char *src, *mnt, *type, *opt, *flag;
+		src = &line[src0];
+		line[src1] = '\0';
+		mnt = &line[mnt0];
+		line[mnt1] = '\0';
+		type = &line[type0];
+		line[type1] = '\0';
+		opt = &line[opt0];
+		line[opt1] = '\0';
+		flag = &line[flag0];
+		line[flag1] = '\0';
+
+		// Redirect system to system_root
+		if (mnt == "/system"sv)
+			mnt = "/system_root";
+
+		fprintf(fp, "%s %s %s %s %s\n", src, mnt, type, opt, flag);
+		return true;
+	});
+	fclose(fp);
+
+	// Replace old fstab
+	clone_attr(fstab.data(), patched.data());
+	rename(patched.data(), fstab.data());
+
+	// Move stuffs for next stage
+	xmkdir(FSR "/system", 0755);
+	xmkdir(FSR "/system/bin", 0755);
+	rename("/init", FSR "/system/bin/init");
+	symlink("/system/bin/init", FSR "/init");
+	xmkdir(FSR "/.backup", 0);
+	rename("/.backup/.magisk", FSR "/.backup/.magisk");
+	rename("/overlay.d", FSR "/overlay.d");
 }
 
 #ifdef MAGISK_DEBUG
@@ -323,8 +471,8 @@ int magisk_proxy_main(int argc, char *argv[]) {
 	raw_data config;
 	raw_data self;
 
-	full_read("/sbin/magisk", &self.buf, &self.sz);
-	full_read("/.backup/.magisk", &config.buf, &config.sz);
+	full_read("/sbin/magisk", self.buf, self.sz);
+	full_read("/.backup/.magisk", config.buf, config.sz);
 
 	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
@@ -334,19 +482,18 @@ int magisk_proxy_main(int argc, char *argv[]) {
 	sbin_overlay(self, config);
 
 	// Create symlinks pointing back to /root
-	{
-		char path[256];
-		int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-		unique_ptr<DIR, decltype(&closedir)> dir(xopendir("/root"), &closedir);
-		struct dirent *entry;
-		while((entry = xreaddir(dir.get()))) {
-			if (entry->d_name == "."sv || entry->d_name == ".."sv)
-				continue;
-			sprintf(path, "/root/%s", entry->d_name);
-			xsymlinkat(path, sbin, entry->d_name);
-		}
-		close(sbin);
+	char path[256];
+	int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	DIR *dir = xopendir("/root");
+	struct dirent *entry;
+	while((entry = xreaddir(dir))) {
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
+			continue;
+		sprintf(path, "/root/%s", entry->d_name);
+		xsymlinkat(path, sbin, entry->d_name);
 	}
+	close(sbin);
+	closedir(dir);
 
 	setenv("REMOUNT_ROOT", "1", 1);
 	execv("/sbin/magisk", argv);

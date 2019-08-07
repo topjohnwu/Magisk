@@ -13,6 +13,7 @@ public final class Info {
     @NonNull
     public static String magiskVersionString = "";
 
+    @NonNull
     public static UpdateInfo remote = new UpdateInfo();
 
     public static boolean keepVerity = false;

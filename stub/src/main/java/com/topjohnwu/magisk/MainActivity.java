@@ -6,8 +6,8 @@ import android.app.Application;
 import android.os.Bundle;
 
 import com.topjohnwu.magisk.utils.APKInstall;
-import com.topjohnwu.net.Networking;
-import com.topjohnwu.net.ResponseListener;
+import com.topjohnwu.magisk.net.Networking;
+import com.topjohnwu.magisk.net.ResponseListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;

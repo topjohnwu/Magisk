@@ -1,22 +1,27 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.viewevents.ViewEvent
-import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
+import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
-import com.topjohnwu.magisk.utils.copyTo
-import com.topjohnwu.magisk.utils.inject
+import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.superuser.Shell
-import dalvik.system.DexClassLoader
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -73,7 +78,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     private fun downloadSafetyNet(requiresUserInput: Boolean = true) {
         fun download() = magiskRepo.fetchSafetynet()
-                .map { it.byteStream().copyTo(EXT_FILE) }
+                .map { it.byteStream().writeTo(EXT_FILE) }
                 .subscribeK { updateSafetyNet(true) }
 
         if (!requiresUserInput) {
@@ -92,8 +97,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     private fun updateSafetyNet(dieOnError: Boolean) {
         try {
-            val loader = DexClassLoader(EXT_APK.path, EXT_APK.parent, null,
-                    ISafetyNetHelper::class.java.classLoader)
+            val loader = DynamicClassLoader(EXT_APK)
             val clazz = loader.loadClass("com.topjohnwu.snet.Snet")
             val helper = clazz.getMethod("newHelper",
                     Class::class.java, String::class.java, Activity::class.java, Any::class.java)
@@ -114,7 +118,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
     }
 
     companion object {
-        val EXT_APK = File("${App.self.filesDir.parent}/snet", "snet.apk")
+        val EXT_APK by lazy { File("${get<Context>().filesDir.parent}/snet", "snet.apk") }
     }
 }
 

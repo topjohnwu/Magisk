@@ -71,7 +71,13 @@
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Progress Notifications</string>
     <string name="download_complete">Download complete</string>
+    <string name="download_local">Looking for local copies…</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">Injecting installer…</string>
     <string name="download_file_error">Error downloading file</string>
+    <string name="download_file_folder_error">Unable to fetch parent folder in order to save the downloaded file, check permissions.</string>
+    <string name="download_open_parent">Show in parent folder</string>
+    <string name="download_open_self">Show file</string>
     <string name="magisk_update_title">Magisk Update Available!</string>
     <string name="manager_update_title">Magisk Manager Update Available!</string>
 
@@ -123,9 +129,14 @@
     <string name="dl_one_module">Download one module at a time.</string>
 
     <!--Settings Activity -->
+    <string name="settings_downloads_category">Downloads</string>
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Dark Theme</string>
     <string name="settings_dark_theme_summary">Enable dark theme.</string>
+    <string name="settings_download_cache_title">Download Cache</string>
+    <string name="settings_download_cache_summary">Enables download cache for Magisk and Module zip files.</string>
+    <string name="settings_download_path_title">Download path</string>
+    <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
     <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online.</string>
     <string name="settings_hide_manager_title">Hide Magisk Manager</string>
@@ -187,6 +198,7 @@
     <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
     <string name="android_o_not_support">Does not support Android 8.0+.</string>
     <string name="disable_fingerprint">No fingerprints were set or no device support.</string>
+    <string name="settings_download_path_error">Error creating folder. It must be accessible from storage root directory and must not be a file.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>

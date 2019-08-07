@@ -1,13 +1,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
 #include <libgen.h>
+#include <vector>
 
 #include <xz.h>
 #include <magisk.h>
@@ -48,7 +46,7 @@ static void setup_klog() {
 
 	// Prevent file descriptor confusion
 	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
-	int null = open("/null", O_RDWR | O_CLOEXEC);
+	int null = xopen("/null", O_RDWR | O_CLOEXEC);
 	unlink("/null");
 	xdup3(null, STDIN_FILENO, O_CLOEXEC);
 	xdup3(null, STDOUT_FILENO, O_CLOEXEC);
@@ -122,31 +120,6 @@ static int dump_manager(const char *path, mode_t mode) {
 	return 0;
 }
 
-void BaseInit::cleanup() {
-	umount("/sys");
-	umount("/proc");
-	umount("/dev");
-}
-
-void BaseInit::re_exec_init() {
-	LOGD("Re-exec /init\n");
-	cleanup();
-	execv("/init", argv);
-	exit(1);
-}
-
-void RootFSInit::start() {
-	early_mount();
-	setup_rootfs();
-	re_exec_init();
-}
-
-void SARInit::start() {
-	early_mount();
-	patch_rootdir();
-	re_exec_init();
-}
-
 class RecoveryInit : public BaseInit {
 public:
 	RecoveryInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
@@ -154,7 +127,7 @@ public:
 		LOGD("Ramdisk is recovery, abort\n");
 		rename("/.backup/init", "/init");
 		rm_rf("/.backup");
-		re_exec_init();
+		exec_init();
 	}
 };
 
@@ -208,6 +181,11 @@ int main(int argc, char *argv[]) {
 			return dump_manager(argv[3], 0644);
 	}
 
+	if (argc > 1 && argv[1] == "selinux_setup"sv) {
+		auto init = make_unique<SecondStageInit>(argv);
+		init->start();
+	}
+
 #ifdef MAGISK_DEBUG
 	bool run_test = getenv("INIT_TEST") != nullptr;
 #else
@@ -228,6 +206,8 @@ int main(int argc, char *argv[]) {
 	unique_ptr<BaseInit> init;
 	if (run_test) {
 		init = make_unique<TestInit>(argv, &cmd);
+	} else if (cmd.force_normal_boot) {
+		init = make_unique<FirstStageInit>(argv, &cmd);
 	} else if (cmd.system_as_root) {
 		if (access("/overlay", F_OK) == 0)  /* Compatible mode */
 			init = make_unique<SARCompatInit>(argv, &cmd);
@@ -243,4 +223,5 @@ int main(int argc, char *argv[]) {
 
 	// Run the main routine
 	init->start();
+	exit(1);
 }

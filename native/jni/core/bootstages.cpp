@@ -88,12 +88,14 @@ node_entry::~node_entry() {
 		delete node;
 }
 
+#define SPECIAL_NODE (parent->parent ? false : (name == "vendor" || name == "product"))
+
 bool node_entry::is_special() {
-	return parent ? (parent->parent ? false : name == "vendor") : false;
+	return parent ? SPECIAL_NODE : false;
 }
 
 bool node_entry::is_root() {
-	return parent ? (parent->parent ? false : name == "vendor") : true;
+	return parent ? SPECIAL_NODE : true;
 }
 
 string node_entry::get_path() {
@@ -346,8 +348,8 @@ static bool magisk_env() {
 	unlink("/data/magisk_debug.log");
 
 	// Backwards compatibility
-	symlink(MAGISKTMP, "/sbin/.core");
-	symlink(MODULEMNT, MAGISKTMP "/img");
+	symlink("./magisk", "/sbin/.core");
+	symlink("./modules", MAGISKTMP "/img");
 
 	// Directories in tmpfs overlay
 	xmkdir(MIRRDIR, 0);
@@ -374,6 +376,8 @@ static bool magisk_env() {
 			mount_mirror(system, MS_RDONLY);
 		} else if (DIR_IS(vendor)) {
 			mount_mirror(vendor, MS_RDONLY);
+		} else if (DIR_IS(product)) {
+			mount_mirror(product, MS_RDONLY);
 		} else if (DIR_IS(data) && me->mnt_type != "tmpfs"sv) {
 			mount_mirror(data, 0);
 		} else if (SDK_INT >= 24 && DIR_IS(proc) && !strstr(me->mnt_opts, "hidepid=2")) {
@@ -659,7 +663,14 @@ void post_fs_data(int client) {
 		if (access(buf, F_OK) == 0) {
 			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MODULEROOT, module);
 			unlink(buf2);
-			xsymlink(buf, buf2);
+			xsymlink("./system/vendor", buf2);
+		}
+		// If /system/product exists in module, create a link outside
+		snprintf(buf, PATH_MAX, "%s/%s/system/product", MODULEROOT, module);
+		if (access(buf, F_OK) == 0) {
+			snprintf(buf2, PATH_MAX, "%s/%s/product", MODULEROOT, module);
+			unlink(buf2);
+			xsymlink("./system/product", buf2);
 		}
 		sys_root->create_module_tree(module);
 	}
@@ -668,6 +679,10 @@ void post_fs_data(int client) {
 		// Pull out special nodes if exist
 		node_entry *special;
 		if ((special = sys_root->extract("vendor"))) {
+			special->magic_mount();
+			delete special;
+		}
+		if ((special = sys_root->extract("product"))) {
 			special->magic_mount();
 			delete special;
 		}

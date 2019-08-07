@@ -40,7 +40,7 @@ FILE *xfdopen(int fd, const char *mode) {
 	return fp;
 }
 
-int xopen2(const char *pathname, int flags) {
+int xopen(const char *pathname, int flags) {
 	int fd = open(pathname, flags);
 	if (fd < 0) {
 		PLOGE("open: %s", pathname);
@@ -48,7 +48,7 @@ int xopen2(const char *pathname, int flags) {
 	return fd;
 }
 
-int xopen3(const char *pathname, int flags, mode_t mode) {
+int xopen(const char *pathname, int flags, mode_t mode) {
 	int fd = open(pathname, flags, mode);
 	if (fd < 0) {
 		PLOGE("open: %s", pathname);

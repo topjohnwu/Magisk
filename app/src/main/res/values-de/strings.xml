@@ -29,7 +29,7 @@
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
     <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt, und Ihre Daten werden möglicherweise verschlüsselt, wenn nicht bereits der Fall.</string>
-    <string name="update">aktuallisieren</string>
+    <string name="update">aktualisieren</string>
     <string name="core_only_enabled">(Core only Modus aktiviert)</string>
 
     <!--Module Fragment-->
@@ -51,8 +51,8 @@
     <string name="not_installed">Nicht installiert</string>
     <string name="updated_on">Zuletzt aktualisiert: %1$s</string>
     <string name="sorting_order">Sortierung</string>
-    <string name="sort_by_name">Nach Namen sortiert</string>
-    <string name="sort_by_update">Nach Aktualisierungsdatum sortiert</string>
+    <string name="sort_by_name">Nach Namen sortieren</string>
+    <string name="sort_by_update">Nach Aktualisierungsdatum sortieren</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Log speichern</string>
@@ -63,7 +63,7 @@
 
     <!--About Activity-->
     <string name="app_changelog">Änderungsprotokoll</string>
-    <string name="translators">skalnet, c727, jenslody, SuperSandro2000, aney1</string>
+    <string name="translators">skalnet, c727, jenslody, SuperSandro2000, aney1, cheese</string>
     <string name="app_translators">Übersetzer</string>
 
     <!-- System Components, Notifications -->
@@ -78,8 +78,8 @@
     <string name="manager_download_install">Herunterladen und installieren</string>
     <string name="download_zip_only">Nur Zip-Datei herunterladen</string>
     <string name="direct_install">Direkt installieren (empfohlen)</string>
-    <string name="install_inactive_slot">Installiere auf inaktiven Slot (Nach OTA)</string>
-    <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem nach dem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
+    <string name="install_inactive_slot">Installiere in inaktiven Slot (Nach OTA)</string>
+    <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
     <string name="select_method">Methode auswählen</string>
     <string name="setup_title">Zusätzliche Einrichtung</string>
     <string name="select_patch_file">Auswählen und Patchen einer Datei</string>
@@ -193,7 +193,7 @@
     <string name="deny">Verweigern</string>
     <string name="prompt">Nachfragen</string>
     <string name="grant">Gewähren</string>
-    <string name="su_warning">Erlaubt den vollen Zugriff auf das Gerät.\nVerweigere, wenn du dir unsicher bist!</string>
+    <string name="su_warning">Erlaubt den vollen Zugriff auf das Gerät.\nVerweigere dies, wenn du dir unsicher bist!</string>
     <string name="forever">Dauerhaft</string>
     <string name="once">Einmalig</string>
     <string name="tenmin">10 Min.</string>
@@ -202,11 +202,11 @@
     <string name="sixtymin">60 Min.</string>
     <string name="su_allow_toast">Superuser-Rechte für %1$s gewährt</string>
     <string name="su_deny_toast">Superuser-Rechte für %1$s verweigert</string>
-    <string name="no_apps_found">Keine Apps gefunden</string>
+    <string name="no_apps_found">Keine Applikationen gefunden</string>
     <string name="su_snack_grant">Superuser-Rechte werden für %1$s gewährt</string>
     <string name="su_snack_deny">Superuser-Rechte werden für %1$s verweigert</string>
-    <string name="su_snack_notif_on">Benachrichtigungen sind für %1$s aktiviert</string>
-    <string name="su_snack_notif_off">Benachrichtigungen sind für %1$s deaktiviert</string>
+    <string name="su_snack_notif_on">Benachrichtigungen für %1$s sind aktiviert</string>
+    <string name="su_snack_notif_off">Benachrichtigungen für %1$s sind deaktiviert</string>
     <string name="su_snack_log_on">Logging ist für %1$s aktiviert</string>
     <string name="su_snack_log_off">Logging ist für %1$s deaktiviert</string>
     <string name="su_snack_revoke">Die Rechte für %1$s wurden entzogen</string>
@@ -222,6 +222,6 @@
     <string name="command">Befehl: %1$s</string>
 
     <!-- MagiskHide -->
-    <string name="show_system_app">System Apps anzeigen</string>
+    <string name="show_system_app">System Applikationen anzeigen</string>
 
 </resources>

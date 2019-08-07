@@ -18,6 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -215,3 +216,8 @@ fun setScrollListener(view: RecyclerView, listener: InverseBindingListener) {
 fun getScrollPosition(view: RecyclerView) = (view.layoutManager as? LinearLayoutManager)
     ?.findLastCompletelyVisibleItemPosition()
     ?: -1
+
+@BindingAdapter("isEnabled")
+fun setEnabled(view: View, isEnabled: Boolean) {
+    view.isEnabled = isEnabled
+}

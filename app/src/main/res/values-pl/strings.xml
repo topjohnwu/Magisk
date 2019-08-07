@@ -44,7 +44,8 @@
     <string name="reboot_recovery">Restart do Recovery</string>
     <string name="reboot_bootloader">Restart do Bootloadera</string>
     <string name="reboot_download">Restart do Download</string>
-
+    <string name="reboot_edl">Restart do EDL</string>
+	
 	<!--Repo Fragment-->
     <string name="update_available">Aktualizacja dostępna</string>
     <string name="installed">Zainstalowany</string>
@@ -74,7 +75,21 @@
     <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
     <string name="manager_update_title">Nowa Wersja Magisk Manager Dostępna!</string>
 
-    <!--Toasts, Dialogs-->
+	 <!-- Installation -->
+	<string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
+	<string name="download_zip_only">Pobierz Tylko Zip</string>
+    <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
+	<string name="install_inactive_slot">Zainstaluj do Nieaktywnego Slotu (po OTA)</string>
+    <string name="install_inactive_slot_msg">Urządzenie będzie MUSIAŁO uruchomić się z bieżącego nieaktywnego slotu po restarcie! /\nUżyj tylko tej opcji po zakończeniu OTA.\nKontynuować?</string>
+	<string name="select_method">Wybierz Metodę</string>
+	<string name="setup_title">Dodatkowa konfiguracja</string>
+    <string name="select_patch_file">Wybierz i Wgraj Plik</string>
+    <string name="patch_file_msg">Wybierz obraz raw (*.img) lub plik ODIN tar (*.tar)</string>
+    <string name="reboot_delay_toast">Ponowne uruchomienie za 5 sekund…</string>
+   
+   
+   
+   <!--Toasts, Dialogs-->
     <string name="close">Zamknij</string>
     <string name="repo_install_title">Instaluj %1$s</string>
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
@@ -84,19 +99,16 @@
     <string name="release_notes">Zmiany</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
     <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
-    <string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
-    <string name="dtbo_patched_title">DTBO został wgrany!</string>
+    
+	<string name="dtbo_patched_title">DTBO został wgrany!</string>
     <string name="dtbo_patched_reboot">Magisk Manager wgrał dtbo.img. Uruchom ponownie</string>
     <string name="flashing">Flashowanie</string>
-    <string name="hide_manager_title">Ukryj Magisk Manager…</string>
+    <string name="done">Gotowe!</string>
+	<string name="failure">Błąd</string>
+	<string name="hide_manager_title">Ukryj Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Błąd Ukrycia Magisk Managera.</string>
 	<string name="open_link_failed_toast">Nie znaleziono aplikacji pod linkiem.</string>
-    <string name="download_zip_only">Pobierz Tylko Zip</string>
-    <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
-	<string name="install_inactive_slot">Zainstaluj do Nieaktywnego Slotu (po OTA)</string>
     <string name="warning">Uwaga</string>
-    <string name="install_inactive_slot_msg">Urządzenie będzie MUSIAŁO uruchomić się z bieżącego nieaktywnego slotu po restarcie! /\nUżyj tylko tej opcji po zakończeniu OTA.\nKontynuować?</string>
-	<string name="select_method">Wybierz Metodę</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_img">Przywróć Obraz</string>
 	<string name="restore_img_msg">Przywracanie…</string>
@@ -107,7 +119,6 @@
     <string name="setup_fail">Konfiguracja nieudana.</string>
     <string name="env_fix_title">Wymaga Dodatkowej Konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie pliku instalacyjnego Magisk, czy chcesz kontynuować?</string>
-    <string name="setup_title">Dodatkowa konfiguracja</string>
     <string name="setup_msg">Uruchamianie konfiguracji środowiska…</string>
 	<string name="downloading_toast">Pobieranie %1$s</string>
     <string name="no_rw_storage">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
@@ -160,7 +171,7 @@
     <string name="settings_su_fingerprint_title">Włącz Uwierzytelnienie Odciskiem Palca</string>
     <string name="settings_su_fingerprint_summary">Użyj skanera linii papilarnych, aby zezwolić na żądania supersu</string>
     <string name="auth_fingerprint">Uwierzytelnianie Odciskiem Palca</string>
-    
+	
 	<string name="multiuser_mode">Tryb Multiusera</string>
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie Właścicielami Urządzenia</string>

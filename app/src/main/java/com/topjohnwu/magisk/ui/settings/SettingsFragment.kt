@@ -3,31 +3,41 @@ package com.topjohnwu.magisk.ui.settings
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.edit
+import androidx.databinding.DataBindingUtil
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
 import com.skoumal.teanity.extensions.subscribeK
+import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.database.RepoDatabaseHelper
+import com.topjohnwu.magisk.data.database.RepoDao
+import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
+import com.topjohnwu.magisk.extensions.toLangTag
+import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
+import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
-import com.topjohnwu.net.Networking
+import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.superuser.Shell
+import io.reactivex.Completable
 import org.koin.android.ext.android.inject
+import java.io.File
 
 class SettingsFragment : BasePreferenceFragment() {
 
-    private val repoDatabase: RepoDatabaseHelper by inject()
+    private val repoDB: RepoDao by inject()
 
     private lateinit var updateChannel: ListPreference
     private lateinit var autoRes: ListPreference
@@ -61,25 +71,40 @@ class SettingsFragment : BasePreferenceFragment() {
         val suCategory = findPreference("superuser") as PreferenceCategory
         val hideManager = findPreference("hide")
         hideManager.setOnPreferenceClickListener {
-            PatchAPK.hideManager()
+            PatchAPK.hideManager(requireContext())
             true
         }
         val restoreManager = findPreference("restore")
         restoreManager.setOnPreferenceClickListener {
-            DownloadApp.restore()
+            DownloadService(requireContext()) {
+                subject = DownloadSubject.Manager(Configuration.APK.Restore)
+            }
             true
         }
         findPreference("clear").setOnPreferenceClickListener {
-            prefs.edit {
-                remove(Config.Key.ETAG_KEY)
+            Completable.fromAction { repoDB.clear() }.subscribeK {
+                Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
             }
-            repoDatabase.clearRepo()
-            Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
             true
         }
         findPreference("hosts").setOnPreferenceClickListener {
-            Shell.su("add_hosts_module").exec()
-            Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
+            Shell.su("add_hosts_module").submit {
+                Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
+            }
+            true
+        }
+
+        findPreference(Config.Key.DOWNLOAD_PATH).apply {
+            summary = Config.downloadPath
+        }.setOnPreferenceClickListener { preference ->
+            activity.withExternalRW {
+                onSuccess {
+                    showDownloadDialog {
+                        Config.downloadPath = it
+                        preference.summary = it
+                    }
+                }
+            }
             true
         }
 
@@ -88,19 +113,11 @@ class SettingsFragment : BasePreferenceFragment() {
             val previous = Config.updateChannel
 
             if (channel == Config.Value.CUSTOM_CHANNEL) {
-                val v = LayoutInflater.from(requireActivity())
-                        .inflate(R.layout.custom_channel_dialog, null)
-                val url = v.findViewById<EditText>(R.id.custom_url)
-                url.setText(Config.customChannelUrl)
-                AlertDialog.Builder(requireActivity())
-                        .setTitle(R.string.settings_update_custom)
-                        .setView(v)
-                        .setPositiveButton(R.string.ok) { _, _ ->
-                            Config.customChannelUrl = url.text.toString() }
-                        .setNegativeButton(R.string.close) { _, _ ->
-                            Config.updateChannel = previous }
-                        .setOnCancelListener { Config.updateChannel = previous }
-                        .show()
+                showUrlDialog(Config.customChannelUrl, {
+                    Config.updateChannel = previous
+                }, {
+                    Config.customChannelUrl = it
+                })
             }
             true
         }
@@ -207,49 +224,49 @@ class SettingsFragment : BasePreferenceFragment() {
 
     private fun setLocalePreference(lp: ListPreference) {
         lp.isEnabled = false
-        LocaleManager.availableLocales
-                .map {
-                    val names = mutableListOf<String>()
-                    val values = mutableListOf<String>()
+        availableLocales.map {
+                val names = mutableListOf<String>()
+                val values = mutableListOf<String>()
 
-                    names.add(LocaleManager.getString(
-                            LocaleManager.defaultLocale, R.string.system_default))
-                    values.add("")
+                names.add(
+                    LocaleManager.getString(defaultLocale, R.string.system_default)
+                )
+                values.add("")
 
-                    it.forEach { locale ->
-                        names.add(locale.getDisplayName(locale))
-                        values.add(LocaleManager.toLanguageTag(locale))
-                    }
-
-                    Pair(names.toTypedArray(), values.toTypedArray())
-                }.subscribeK { (names, values) ->
-                    lp.isEnabled = true
-                    lp.entries = names
-                    lp.entryValues = values
-                    lp.summary = LocaleManager.locale.getDisplayName(LocaleManager.locale)
+                it.forEach { locale ->
+                    names.add(locale.getDisplayName(locale))
+                    values.add(locale.toLangTag())
                 }
+
+                Pair(names.toTypedArray(), values.toTypedArray())
+            }.subscribeK { (names, values) ->
+                lp.isEnabled = true
+                lp.entries = names
+                lp.entryValues = values
+                lp.summary = currentLocale.getDisplayName(currentLocale)
+            }
     }
 
     private fun setSummary(key: String) {
         when (key) {
             Config.Key.ROOT_ACCESS -> rootConfig.summary = resources
-                    .getStringArray(R.array.su_access)[Config.rootMode]
+                .getStringArray(R.array.su_access)[Config.rootMode]
             Config.Key.SU_MULTIUSER_MODE -> multiuserConfig.summary = resources
-                    .getStringArray(R.array.multiuser_summary)[Config.suMultiuserMode]
+                .getStringArray(R.array.multiuser_summary)[Config.suMultiuserMode]
             Config.Key.SU_MNT_NS -> nsConfig.summary = resources
-                    .getStringArray(R.array.namespace_summary)[Config.suMntNamespaceMode]
+                .getStringArray(R.array.namespace_summary)[Config.suMntNamespaceMode]
             Config.Key.UPDATE_CHANNEL -> {
                 var ch = Config.updateChannel
                 ch = if (ch < 0) Config.Value.STABLE_CHANNEL else ch
                 updateChannel.summary = resources
-                        .getStringArray(R.array.update_channel)[ch]
+                    .getStringArray(R.array.update_channel)[ch]
             }
             Config.Key.SU_AUTO_RESPONSE -> autoRes.summary = resources
-                    .getStringArray(R.array.auto_response)[Config.suAutoReponse]
+                .getStringArray(R.array.auto_response)[Config.suAutoReponse]
             Config.Key.SU_NOTIFICATION -> suNotification.summary = resources
-                    .getStringArray(R.array.su_notification)[Config.suNotification]
+                .getStringArray(R.array.su_notification)[Config.suNotification]
             Config.Key.SU_REQUEST_TIMEOUT -> requestTimeout.summary =
-                    getString(R.string.request_timeout_summary, Config.suDefaultTimeout)
+                getString(R.string.request_timeout_summary, Config.suDefaultTimeout)
         }
     }
 
@@ -261,5 +278,54 @@ class SettingsFragment : BasePreferenceFragment() {
         setSummary(Config.Key.SU_AUTO_RESPONSE)
         setSummary(Config.Key.SU_NOTIFICATION)
         setSummary(Config.Key.SU_REQUEST_TIMEOUT)
+    }
+
+    private inline fun showUrlDialog(
+        initialValue: String,
+        crossinline onCancel: () -> Unit = {},
+        crossinline onSuccess: (String) -> Unit
+    ) {
+        val v = LayoutInflater
+            .from(requireActivity())
+            .inflate(R.layout.custom_channel_dialog, null)
+
+        val url = v.findViewById<EditText>(R.id.custom_url).apply {
+            setText(initialValue)
+        }
+
+        AlertDialog.Builder(requireActivity())
+            .setTitle(R.string.settings_update_custom)
+            .setView(v)
+            .setPositiveButton(R.string.ok) { _, _ -> onSuccess(url.text.toString()) }
+            .setNegativeButton(R.string.close) { _, _ -> onCancel() }
+            .setOnCancelListener { onCancel() }
+            .show()
+    }
+
+    inner class DownloadDialogData(initialValue: String) {
+        val text = KObservableField(initialValue)
+        val path = Observer(text) {
+            File(Environment.getExternalStorageDirectory(), text.value).absolutePath
+        }
+    }
+
+    private inline fun showDownloadDialog(
+        initialValue: String = Config.downloadPath,
+        crossinline onSuccess: (String) -> Unit
+    ) {
+        val data = DownloadDialogData(initialValue)
+        val binding: CustomDownloadDialogBinding = DataBindingUtil
+            .inflate(layoutInflater, R.layout.custom_download_dialog, null, false)
+        binding.also { it.data = data }
+
+        AlertDialog.Builder(requireActivity())
+            .setTitle(R.string.settings_download_path_title)
+            .setView(binding.root)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                Utils.ensureDownloadPath(data.text.value)?.let { onSuccess(data.text.value) }
+                    ?: Utils.toast(R.string.settings_download_path_error, Toast.LENGTH_SHORT)
+            }
+            .setNegativeButton(R.string.close, null)
+            .show()
     }
 }

@@ -39,7 +39,7 @@ android {
         exclude '/META-INF/*.kotlin_module'
         exclude '/META-INF/rxkotlin.properties'
         exclude '/androidsupportmultidexversion.txt'
-        exclude '/org/**'
+        exclude '/org/bouncycastle/**'
         exclude '/kotlin/**'
         exclude '/kotlinx/**'
     }
@@ -55,7 +55,6 @@ androidExtensions {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':net')
     implementation project(':shared')
     implementation project(':signing')
 
@@ -63,8 +62,9 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.github.skoumalcz:teanity:0.3.3'
     implementation 'com.ncapdevi:frag-nav:3.2.0'
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.3'
 
-    def vMarkwon = '3.0.1'
+    def vMarkwon = '3.1.0'
     implementation "ru.noties.markwon:core:${vMarkwon}"
     implementation "ru.noties.markwon:html:${vMarkwon}"
     implementation "ru.noties.markwon:image-svg:${vMarkwon}"
@@ -78,12 +78,13 @@ dependencies {
     implementation "org.koin:koin-android:${vKoin}"
     implementation "org.koin:koin-androidx-viewmodel:${vKoin}"
 
-    def vRetrofit = "2.6.0"
+    def vRetrofit = '2.6.1'
     implementation "com.squareup.retrofit2:retrofit:${vRetrofit}"
     implementation "com.squareup.retrofit2:converter-moshi:${vRetrofit}"
+    implementation "com.squareup.retrofit2:converter-scalars:${vRetrofit}"
     implementation "com.squareup.retrofit2:adapter-rxjava2:${vRetrofit}"
 
-    def vOkHttp = "3.12.3"
+    def vOkHttp = '4.0.1'
     implementation "com.squareup.okhttp3:okhttp:${vOkHttp}"
     implementation "com.squareup.okhttp3:logging-interceptor:${vOkHttp}"
 
@@ -101,14 +102,15 @@ dependencies {
     }
     def vRoom = "2.1.0"
     implementation "com.github.topjohnwu:room-runtime:${vRoom}"
+    kapt "androidx.room:room-compiler:${vRoom}"
 
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.preference:preference:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-alpha06'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-beta01'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.work:work-runtime:2.0.1'
-    implementation 'androidx.transition:transition:1.2.0-alpha01'
+    implementation 'androidx.work:work-runtime:2.1.0'
+    implementation 'androidx.transition:transition:1.2.0-beta01'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.1.0-alpha07'
+    implementation 'com.google.android.material:material:1.1.0-alpha09'
 }

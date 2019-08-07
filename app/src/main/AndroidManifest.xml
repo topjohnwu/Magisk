@@ -3,14 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.topjohnwu.magisk">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <application
-        android:allowBackup="true"
         android:name="a.e"
+        android:allowBackup="true"
         android:theme="@style/MagiskTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
@@ -41,9 +42,9 @@
 
         <activity
             android:name="a.m"
-            android:exported="false"
             android:directBootAware="true"
             android:excludeFromRecents="true"
+            android:exported="false"
             android:theme="@style/MagiskTheme.SU" />
 
         <!-- Receiver -->
@@ -65,7 +66,8 @@
 
         <!-- Service -->
 
-        <service android:name="a.j" />
+        <service android:name="a.j"
+            android:exported="false" />
 
         <!-- Hardcode GMS version -->
         <meta-data

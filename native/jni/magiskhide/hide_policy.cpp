@@ -63,11 +63,6 @@ void hide_unmount(int pid) {
 		chmod(SELINUX_POLICY, 0440);
 	}
 
-	getprop([](const char *name, auto, auto) {
-		if (strstr(name, "magisk"))
-			deleteprop(name);
-	}, nullptr, false);
-
 	vector<string> targets;
 
 	// Unmount dummy skeletons and /sbin links

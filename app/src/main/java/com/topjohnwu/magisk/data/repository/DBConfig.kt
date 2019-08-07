@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.data.repository
 
 import com.topjohnwu.magisk.data.database.SettingsDao
 import com.topjohnwu.magisk.data.database.StringDao
-import com.topjohnwu.magisk.utils.trimEmptyToNull
+import com.topjohnwu.magisk.extensions.trimEmptyToNull
 import io.reactivex.schedulers.Schedulers
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -23,8 +23,9 @@ interface DBConfig {
 
     fun dbStrings(
         name: String,
-        default: String
-    ) = DBStringsValue(name, default)
+        default: String,
+        sync: Boolean = false
+    ) = DBStringsValue(name, default, sync)
 
 }
 
@@ -70,7 +71,8 @@ class DBBoolSettings(
 
 class DBStringsValue(
         private val name: String,
-        private val default: String
+        private val default: String,
+        private val sync: Boolean
 ) : ReadWriteProperty<DBConfig, String> {
 
     private var value: String? = null
@@ -88,8 +90,12 @@ class DBStringsValue(
         synchronized(this) {
             this.value = value
         }
-        thisRef.stringDao.put(getKey(property), value)
-                .subscribeOn(Schedulers.io())
-                .subscribe()
+        if (sync) {
+            thisRef.stringDao.put(getKey(property), value).blockingAwait()
+        } else {
+            thisRef.stringDao.put(getKey(property), value)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe()
+        }
     }
 }

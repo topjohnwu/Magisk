@@ -1,7 +1,7 @@
-#include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <string.h>
 #include <stdio.h>
+#include <vector>
 
 #include <utils.h>
 #include <logging.h>
@@ -77,6 +77,13 @@ static dev_t setup_block(const char *partname, char *block_dev = nullptr) {
 	}
 }
 
+static bool is_lnk(const char *name) {
+	struct stat st;
+	if (lstat(name, &st))
+		return false;
+	return S_ISLNK(st.st_mode);
+}
+
 bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
 	char path[128];
 	int fd;
@@ -97,6 +104,10 @@ bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
 	return false;
 }
 
+static char partname[32];
+static char fstype[32];
+static char block_dev[64];
+
 #define link_root(name) \
 if (is_lnk("/system_root" name)) \
 	cp_afc("/system_root" name, name)
@@ -111,11 +122,7 @@ if (!is_lnk("/" #name) && read_dt_fstab(#name, partname, fstype)) { \
 }
 
 void LegacyInit::early_mount() {
-	char partname[32];
-	char fstype[32];
-	char block_dev[64];
-
-	full_read("/init", &self.buf, &self.sz);
+	full_read("/init", self.buf, self.sz);
 
 	LOGD("Reverting /init\n");
 	root = xopen("/", O_RDONLY | O_CLOEXEC);
@@ -128,15 +135,11 @@ void LegacyInit::early_mount() {
 }
 
 void SARCompatInit::early_mount() {
-	char partname[32];
-	char fstype[32];
-	char block_dev[64];
-
-	full_read("/init", &self.buf, &self.sz);
+	full_read("/init", self.buf, self.sz);
 
 	LOGD("Cleaning rootfs\n");
 	root = xopen("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { ".backup", "overlay", "proc", "sys" });
+	frm_rf(root, { ".backup", "overlay", "overlay.d", "proc", "sys" });
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
@@ -159,8 +162,15 @@ static void switch_root(const string &path) {
 	LOGD("Switch root to %s\n", path.data());
 	vector<string> mounts;
 	parse_mnt("/proc/mounts", [&](mntent *me) {
-		if (me->mnt_dir != "/"sv && me->mnt_dir != path)
-			mounts.emplace_back(me->mnt_dir);
+		// Skip root and self
+		if (me->mnt_dir == "/"sv || me->mnt_dir == path)
+			return true;
+		// Do not include subtrees
+		for (const auto &m : mounts) {
+			if (strncmp(me->mnt_dir, m.data(), m.length()) == 0)
+				return true;
+		}
+		mounts.emplace_back(me->mnt_dir);
 		return true;
 	});
 	for (auto &dir : mounts) {
@@ -173,17 +183,24 @@ static void switch_root(const string &path) {
 	chroot(".");
 }
 
-void SARInit::early_mount() {
-	char partname[32];
-	char fstype[32];
-	char block_dev[64];
+void SARCommon::backup_files() {
+	if (access("/overlay.d", F_OK) == 0)
+		cp_afc("/overlay.d", "/dev/overlay.d");
 
-	full_read("/init", &self.buf, &self.sz);
-	full_read("/.backup/.magisk", &config.buf, &config.sz);
+	full_read("/init", self.buf, self.sz);
+	full_read("/.backup/.magisk", config.buf, config.sz);
+}
+
+void SARInit::early_mount() {
+	// Make dev writable
+	xmkdir("/dev", 0755);
+	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
+
+	backup_files();
 
 	LOGD("Cleaning rootfs\n");
 	int root = xopen("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { "proc", "sys" });
+	frm_rf(root, { "proc", "sys", "dev" });
 	close(root);
 
 	LOGD("Early mount system_root\n");
@@ -194,12 +211,31 @@ void SARInit::early_mount() {
 		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
 	switch_root("/system_root");
 
-	// Make dev writable
-	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
-
 	mount_root(vendor);
 	mount_root(product);
 	mount_root(odm);
+}
+
+void SecondStageInit::early_mount() {
+	// Early mounts should already be done by first stage init
+
+	backup_files();
+	rm_rf("/system");
+	rm_rf("/.backup");
+	rm_rf("/overlay.d");
+
+	// Find system_dev
+	parse_mnt("/proc/mounts", [&](mntent *me) -> bool {
+		if (me->mnt_dir == "/system_root"sv) {
+			struct stat st;
+			stat(me->mnt_fsname, &st);
+			system_dev = st.st_rdev;
+			return false;
+		}
+		return true;
+	});
+
+	switch_root("/system_root");
 }
 
 #define umount_root(name) \

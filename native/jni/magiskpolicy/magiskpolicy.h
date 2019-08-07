@@ -1,17 +1,14 @@
 /* magiskpolicy.h - Public API for policy patching
  */
 
-#ifndef _MAGISKPOLICY_H
-#define _MAGISKPOLICY_H
+#pragma once
 
 #include <stdlib.h>
 #include <selinux.h>
 
 #define ALL NULL
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 // policydb functions
 int load_policydb(const char *file);
@@ -41,8 +38,4 @@ int sepol_exists(const char *source);
 // Built in rules
 void sepol_magisk_rules();
 
-#ifdef __cplusplus
-};
-#endif
-
-#endif
+__END_DECLS

@@ -12,6 +12,7 @@ LIBFDT := $(EXT_PATH)/dtc/libfdt
 LIBNANOPB := $(EXT_PATH)/nanopb
 LIBSYSTEMPROPERTIES := jni/systemproperties/include
 LIBUTILS := jni/utils/include
+LIBMINCRYPT := $(EXT_PATH)/mincrypt/include
 
 ########################
 # Binaries
@@ -127,6 +128,7 @@ LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils
 LOCAL_C_INCLUDES := \
 	jni/include \
 	$(EXT_PATH)/include \
+	$(LIBMINCRYPT) \
 	$(LIBLZMA) \
 	$(LIBLZ4) \
 	$(LIBBZ2) \
@@ -158,6 +160,7 @@ LOCAL_C_INCLUDES := \
 	jni/include \
 	$(LIBUTILS)
 LOCAL_SRC_FILES := test.cpp
+LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
