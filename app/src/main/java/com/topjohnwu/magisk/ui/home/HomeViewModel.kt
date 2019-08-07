@@ -160,6 +160,15 @@ class HomeViewModel(
     }
 
     fun refresh() {
+        magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
+            version.format(Info.magiskVersionString, Info.magiskVersionCode)
+        } else {
+            ""
+        }
+
+        managerCurrentVersion.value = version
+            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+
         magiskRepo.fetchUpdate()
             .applyViewModel(this)
             .doOnSubscribeUi {
@@ -185,12 +194,6 @@ class HomeViewModel(
             else -> MagiskState.UP_TO_DATE
         }
 
-        magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
-            version.format(Info.magiskVersionString, Info.magiskVersionCode)
-        } else {
-            ""
-        }
-
         magiskLatestVersion.value = version
             .format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
 
@@ -199,9 +202,6 @@ class HomeViewModel(
             in (BuildConfig.VERSION_CODE + 1)..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
-
-        managerCurrentVersion.value = version
-            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
 
         managerLatestVersion.value = version
             .format(Info.remote.app.version, Info.remote.app.versionCode)
