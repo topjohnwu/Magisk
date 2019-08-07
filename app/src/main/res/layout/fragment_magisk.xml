@@ -110,6 +110,7 @@
 
                 <View
                     style="@style/Widget.Divider.Horizontal"
+                    gone="@{!viewModel.isConnected}"
                     android:layout_width="match_parent"
                     android:layout_margin="@dimen/margin_generic" />
 
@@ -117,6 +118,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:animateLayoutChanges="true"
+                    gone="@{!viewModel.isConnected}"
                     android:onClick="@{() -> viewModel.advancedPressed()}"
                     android:orientation="vertical">
 
@@ -189,7 +191,7 @@
 
                 <View
                     style="@style/Widget.Divider.Horizontal"
-                    gone="@{!viewModel.hasRoot}"
+                    gone="@{!viewModel.hasRoot || !viewModel.isConnected}"
                     android:layout_width="match_parent"
                     android:layout_margin="@dimen/margin_generic" />
 
