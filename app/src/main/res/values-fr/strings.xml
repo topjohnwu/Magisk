@@ -71,21 +71,27 @@
     <string name="update_channel">Mises à jour de Magisk</string>
     <string name="progress_channel">Progression des notifications</string>
     <string name="download_complete">Téléchargement terminé</string>
+    <string name="download_local">Recherche de copies locales…</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">Injection de l'installateur…</string>
     <string name="download_file_error">Erreur de téléchargement du fichier</string>
+    <string name="download_file_folder_error">Impossible de récupérer le dossier parent afin d'enregistrer le fichier téléchargé, vérifiez les permissions.</string>
+    <string name="download_open_parent">Afficher dans le dossier parent</string>
+    <string name="download_open_self">Afficher fichier</string>
     <string name="magisk_update_title">Une mise à jour de Magisk est disponible !</string>
     <string name="manager_update_title">Une mise à jour de Magisk Manager est disponible !</string>
 
-	<!-- Installation -->					 
-	<string name="manager_download_install">Appuyez pour le télécharger et l’installer.</string>																			   
-	<string name="download_zip_only">Télécharger le ZIP uniquement</string>														   
-	<string name="direct_install">Installation directe (recommandée)</string>																   
-	<string name="install_inactive_slot">Installer dans l’espace inactif (après mise à jour OTA)</string>
-	<string name="install_inactive_slot_msg">Votre appareil sera réamorcé à partir de l’espace actuellement inactif après un redémarrage!\nN’utilisez cette option qu’uniquement après que la mise à jour OTA ait été effectuée.\nVoulez-vous continuer?</string>																				  
-	<string name="select_method">Sélectionnez la méthode</string>																																													 
-	<string name="setup_title">Installation additionnelle</string>												   
-	<string name="select_patch_file">Sélectionner et Patcher un Fichier</string>													
-	<string name="patch_file_msg">Sélectionnez une image brute (*.img) ou un fichier tar ODIN (*.tar)</string>																 
-	<string name="reboot_delay_toast">Redémarrage dans 5 secondes...</string>																							
+    <!-- Installation -->					 
+    <string name="manager_download_install">Appuyez pour le télécharger et l’installer.</string>																			   
+    <string name="download_zip_only">Télécharger le ZIP uniquement</string>														   
+    <string name="direct_install">Installation directe (recommandée)</string>																   
+    <string name="install_inactive_slot">Installer dans l’espace inactif (après mise à jour OTA)</string>
+    <string name="install_inactive_slot_msg">Votre appareil sera réamorcé à partir de l’espace actuellement inactif après un redémarrage!\nN’utilisez cette option qu’uniquement après que la mise à jour OTA ait été effectuée.\nVoulez-vous continuer?</string>																				  
+    <string name="select_method">Sélectionnez la méthode</string>																																													 
+    <string name="setup_title">Installation additionnelle</string>												   
+    <string name="select_patch_file">Sélectionner et Patcher un Fichier</string>													
+    <string name="patch_file_msg">Sélectionnez une image brute (*.img) ou un fichier tar ODIN (*.tar)</string>																 
+    <string name="reboot_delay_toast">Redémarrage dans 5 secondes...</string>																							
 	
     <!--Toasts, Dialogs-->
     <string name="close">Fermer</string>
@@ -101,6 +107,8 @@
     <string name="dtbo_patched_title">DTBO a été modifié !</string>
     <string name="dtbo_patched_reboot">Magisk Manager vient de modifier le fichier dtbo.img, veuillez redémarrer.</string>
     <string name="flashing">Installation</string>
+    <string name="done">Terminé!</string>
+    <string name="failure">Échec</string>
     <string name="hide_manager_title">Masquer Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Le masquage de Magisk Manager a échoué.</string>
     <string name="open_link_failed_toast">Aucune application permettant d’ouvrir le lien n’a été trouvée.</string>
@@ -121,9 +129,14 @@
     <string name="dl_one_module">Un seul module peut être téléchargé à la fois.</string>
 
 	<!--Settings Activity -->
+    <string name="settings_downloads_category">Téléchargements</string>
     <string name="settings_general_category">Général</string>
     <string name="settings_dark_theme_title">Thème sombre</string>
     <string name="settings_dark_theme_summary">Activer le thème sombre.</string>
+    <string name="settings_download_cache_title">Cache de téléchargement</string>
+    <string name="settings_download_cache_summary">Activer le cache de téléchargement pour Magisk et les fichiers zip des Modules.</string>
+    <string name="settings_download_path_title">Emplacement téléchargement</string>
+    <string name="settings_download_path_message">Les fichiers seront sauvegardés dans %1$s</string>
     <string name="settings_clear_cache_title">Effacer le cache du dépôt</string>
     <string name="settings_clear_cache_summary">Effacer les informations de cache pour les dépôts en ligne. Cela force l’application à récupérer ses informations en ligne.</string>
     <string name="settings_hide_manager_title">Masquer Magisk Manager</string>
@@ -185,6 +198,7 @@
     <string name="isolate_summary">Chaque session super‐utilisateur aura son propre espace de noms isolé.</string>
     <string name="android_o_not_support">Android 8.0 et supérieurs ne sont pas pris en charge.</string>
     <string name="disable_fingerprint">Aucune empreinte digitale n’a été définie ou le lecteur d’empreinte n’est pas pris en charge.</string>
+    <string name="settings_download_path_error">Erreur lors de la création du dossier. Il doit être accessible depuis le répertoire racine du stockage et ne doit pas être un fichier.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Requête super‐utilisateur</string>
@@ -193,8 +207,8 @@
     <string name="prompt">Demander</string>
     <string name="grant">Accepter</string>
     <string name="su_warning">Autoriser l’accès complet à votre appareil.\nRefusez si vous n’êtes pas sûr !</string>
-    <string name="forever">toujours</string>
-    <string name="once">une fois</string>
+    <string name="forever">Toujours</string>
+    <string name="once">Une fois</string>
     <string name="tenmin">10 min</string>
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
