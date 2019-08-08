@@ -196,7 +196,7 @@
                     android:layout_margin="@dimen/margin_generic" />
 
                 <LinearLayout
-                    gone="@{!viewModel.hasRoot || !viewModel.isConnected}"
+                    gone="@{!viewModel.isConnected || !viewModel.hasGMS}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">

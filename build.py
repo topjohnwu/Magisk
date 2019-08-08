@@ -283,12 +283,11 @@ def build_snet(args):
         error('Build snet extention failed!')
     source = os.path.join('snet', 'build', 'outputs', 'apk',
                           'release', 'snet-release-unsigned.apk')
-    target = os.path.join(config['outdir'], 'snet.apk')
-    # Re-compress the whole APK for smaller size
+    target = os.path.join(config['outdir'], 'snet.jar')
+    # Extract classes.dex
     with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zout:
         with zipfile.ZipFile(source) as zin:
-            for item in zin.infolist():
-                zout.writestr(item.filename, zin.read(item))
+            zout.writestr('classes.dex', zin.read('classes.dex'))
     rm(source)
     header('Output: ' + target)
 

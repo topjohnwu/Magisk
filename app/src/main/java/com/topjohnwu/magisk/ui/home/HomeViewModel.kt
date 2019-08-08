@@ -1,11 +1,13 @@
 package com.topjohnwu.magisk.ui.home
 
+import android.content.pm.PackageManager
 import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.skoumal.teanity.extensions.doOnSubscribeUi
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.packageName
 import com.topjohnwu.magisk.extensions.res
 import com.topjohnwu.magisk.extensions.toggle
@@ -30,6 +32,10 @@ enum class MagiskItem {
 class HomeViewModel(
     private val magiskRepo: MagiskRepository
 ) : MagiskViewModel() {
+
+    val hasGMS = runCatching {
+        get<PackageManager>().getPackageInfo("com.google.android.gms", 0); true
+    }.getOrElse { false }
 
     val isAdvancedExpanded = KObservableField(false)
 
