@@ -36,9 +36,6 @@
 
 # Strip logging
 -assumenosideeffects class timber.log.Timber.Tree { *; }
--assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
-  public *** debug(...);
-}
 
 # Excessive obfuscation
 -repackageclasses 'a'

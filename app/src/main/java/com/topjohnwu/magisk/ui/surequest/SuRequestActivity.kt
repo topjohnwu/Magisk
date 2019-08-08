@@ -8,7 +8,7 @@ import android.view.Window
 import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import com.topjohnwu.magisk.model.entity.Policy
+import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.ui.base.MagiskActivity
@@ -21,7 +21,7 @@ open class SuRequestActivity : MagiskActivity<SuRequestViewModel, ActivityReques
     override val viewModel: SuRequestViewModel by viewModel()
 
     override fun onBackPressed() {
-        viewModel.handler?.handleAction(Policy.DENY, -1)
+        viewModel.handler?.handleAction(MagiskPolicy.DENY, -1)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

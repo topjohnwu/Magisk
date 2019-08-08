@@ -15,6 +15,17 @@ import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.superuser.Shell
 
+enum class SafetyNetState {
+    LOADING, PASS, FAILED, IDLE
+}
+
+enum class MagiskState {
+    NO_ROOT, NOT_INSTALLED, UP_TO_DATE, OBSOLETE, LOADING
+}
+
+enum class MagiskItem {
+    MANAGER, MAGISK
+}
 
 class HomeViewModel(
     private val magiskRepo: MagiskRepository

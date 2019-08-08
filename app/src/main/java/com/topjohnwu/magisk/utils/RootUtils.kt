@@ -153,7 +153,6 @@ class RootUtils : Shell.Initializer() {
 
     companion object {
 
-        @JvmStatic
         fun rmAndLaunch(rm: String, component: ComponentName) {
             Shell.su("(rm_launch $rm ${component.flattenToString()})").exec()
         }

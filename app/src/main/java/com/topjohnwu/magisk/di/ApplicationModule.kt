@@ -8,7 +8,11 @@ import android.os.Bundle
 import androidx.preference.PreferenceManager
 import com.skoumal.teanity.rxbus.RxBus
 import com.topjohnwu.magisk.App
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
+
+val SUTimeout = named("su_timeout")
+val Protected = named("protected")
 
 val applicationModule = module {
     single { RxBus() }
