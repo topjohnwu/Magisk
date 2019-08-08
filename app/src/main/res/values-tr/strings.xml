@@ -44,6 +44,7 @@
     <string name="reboot_recovery">Kurtarma modunda yeniden başlat</string>
     <string name="reboot_bootloader">Ön yükleyici modunda yeniden başlat</string>
     <string name="reboot_download">Yükleme modunda yeniden başlat</string>
+	<string name="reboot_edl">EDL için yeniden başlat</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Güncelleme Mevcut</string>
@@ -63,13 +64,19 @@
 
     <!--About Activity-->
     <string name="app_changelog">Uygulama değişiklikleri</string>
-    <string name="translators">Mevlüt TOPÇU - Muhammet Emin TURGUT - XORCAN</string>
+    <string name="translators">Fatih FIRICI - Mevlüt TOPÇU - Muhammet Emin TURGUT - XORCAN</string>
     <string name="app_translators">Çevirmenler</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk Güncellemeleri</string>
     <string name="progress_channel">İlerleme Bildirimleri</string>
     <string name="download_complete">İndirme tamamlandı</string>
+	<string name="download_local">Yerel kopyalar aranıyor…</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">Yükleyici dahil ediliyor…</string>
+	<string name="download_file_folder_error">İndirilen dosyayı kaydetmek için ana klasöre ulaşılamıyor, izinleri kontrol edin.</string>
+    <string name="download_open_parent">Üst klasörde göster</string>
+    <string name="download_open_self">Dosyayı göster</string>
     <string name="download_file_error">Dosya indirme hatası</string>
     <string name="magisk_update_title">Yeni Magisk Güncellemesi Mevcut!</string>
     <string name="manager_update_title">Yeni Magisk Manager Güncellemesi Mevcut!</string>
@@ -78,12 +85,12 @@
     <string name="manager_download_install">İndirmek ve yüklemek için tıklayın.</string>
     <string name="download_zip_only">Sadece Zip\'i indir</string>
     <string name="direct_install">Doğrudan kurulum (Önerilen)</string>
-    <string name="install_inactive_slot">İnaktif slota yükle (OTA\'dan sonra)</string>
-    <string name="install_inactive_slot_msg">Cihazınız, yeniden başlatmanın ardından inaktif slota ön yüklemek için ZORUNLU olacaktır!\nBu seçeneği yalnızca OTA yapıldıktan sonra kullanın.\nDevam?</string>
+    <string name="install_inactive_slot">Aktif olmayan yuvaya yükle (OTA\'dan sonra)</string>
+    <string name="install_inactive_slot_msg">Cihazınız, yeniden başlatmanın ardından geçerli etkin olmayan yuvaya önyüklemeye ZORLANACAK!\nBu seçeneği yalnızca OTA yapıldıktan sonra kullanın.\nDevam edilsin mi?</string>
     <string name="select_method">Yöntem seçin</string>
     <string name="setup_title">Ek kurulum</string>
     <string name="select_patch_file">Dosya seçin ve yamalayın</string>
-    <string name="patch_file_msg">Bir raw yansısı (*.img) ya da ODIN tarfile dosyası (*.tar) seçin</string>
+    <string name="patch_file_msg">Bir raw yansısı (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
 
     <!--Toasts, Dialogs-->
@@ -100,6 +107,8 @@
     <string name="dtbo_patched_title">DTBO yamalandı!</string>
     <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
     <string name="flashing">Yükleniyor</string>
+    <string name="done">Tamamlandı!</string>
+    <string name="failure">Başarısız</string>
     <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu…</string>
     <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı…</string>
@@ -117,12 +126,17 @@
     <string name="setup_msg">Ortam kurulumu çalışıyor…</string>
     <string name="downloading_toast">%1$s indiriliyor</string>
     <string name="no_rw_storage">Bu özellik harici depolamaya yazma izni olmadan çalışmaz.</string>
-    <string name="dl_one_module">Bir seferde bir modül indirin.</string>
+    <string name="dl_one_module">Tek seferde bir modül indirin.</string>
 
     <!--Settings Activity -->
+	<string name="settings_downloads_category">İndirilenler</string>
     <string name="settings_general_category">Genel</string>
     <string name="settings_dark_theme_title">Karanlık Tema</string>
     <string name="settings_dark_theme_summary">Karanlık temayı etkinleştir</string>
+    <string name="settings_download_cache_title">Önbelleği İndir</string>
+    <string name="settings_download_cache_summary">Magisk ve Module zip dosyaları için indirme önbelleğini etkinleştirir.</string>
+    <string name="settings_download_path_title">İndirme yolu</string>
+    <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
     <string name="settings_hide_manager_title">Magisk Manager\'ı Gizle</string>
@@ -184,6 +198,7 @@
     <string name="isolate_summary">Her bir kök oturumunun kendi izole ad alanı olacaktır</string>
     <string name="android_o_not_support">Android 8.0 ve üzerinde desteklenmiyor</string>
     <string name="disable_fingerprint">Parmak izi ayarlanmadı veya cihaz desteği yok</string>
+	<string name="settings_download_path_error">Klasör oluşturma hatası. Depolama kök dizininden erişilebilir olmalı ve bir dosya olmamalıdır.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Yetkili Kullanıcı İsteği</string>
