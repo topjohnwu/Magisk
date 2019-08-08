@@ -32,7 +32,7 @@ class EnvFixDialog(activity: Activity) : CustomAlertDialog(activity) {
                     installDir = SuFile("/data/adb/magisk")
                     Shell.su("rm -rf /data/adb/magisk/*").exec()
                     val zip : File = activity.cachedFile("magisk.zip")
-                    if (!ShellUtils.checkSum("MD5", zip, Info.remote.magisk.hash))
+                    if (!ShellUtils.checkSum("MD5", zip, Info.remote.magisk.md5))
                         Networking.get(Info.remote.magisk.link).execForFile(zip)
                     zipUri = zip.toUri()
                     return extractZip() && Shell.su("fix_env").exec().isSuccess

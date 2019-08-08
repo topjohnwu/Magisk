@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.model.entity
 
 import android.os.Parcelable
-import com.squareup.moshi.Json
 import kotlinx.android.parcel.Parcelize
 import se.ansman.kotshi.JsonSerializable
 
@@ -23,7 +22,7 @@ data class MagiskJson(
     val versionCode: Int = -1,
     val link: String = "",
     val note: String = "",
-    @Json(name = "md5") val hash: String = ""
+    val md5: String = ""
 )
 
 @Parcelize

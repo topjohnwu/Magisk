@@ -69,8 +69,8 @@ abstract class RemoteFileService : NotificationService() {
 
         supportedFolders.firstMap { it.find(subject.file.name) }.also {
             if (subject is Magisk) {
-                if (!ShellUtils.checkSum("MD5", it, subject.magisk.hash)) {
-                    throw IllegalStateException("The given file doesn't match the hash")
+                if (!ShellUtils.checkSum("MD5", it, subject.magisk.md5)) {
+                    throw IllegalStateException("The given file doesn't match the md5")
                 }
             }
         }

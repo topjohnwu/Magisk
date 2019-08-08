@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.tasks
 
-import com.squareup.moshi.Json
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.data.network.GithubApiServices
@@ -89,9 +88,11 @@ private val dateFormat: SimpleDateFormat =
 
 @JsonSerializable
 data class GithubRepoInfo(
-    @Json(name = "name") val id: String,
+    val name: String,
     val pushed_at: String
 ) {
+    val id get() = name
+
     @Transient
     val pushDate = dateFormat.parse(pushed_at)!!
 }
