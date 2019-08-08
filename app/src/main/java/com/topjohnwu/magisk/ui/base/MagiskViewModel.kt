@@ -6,6 +6,7 @@ import com.skoumal.teanity.extensions.doOnSubscribeUi
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.KObservableField
 import com.skoumal.teanity.viewmodel.LoadingViewModel
+import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
@@ -18,8 +19,8 @@ abstract class MagiskViewModel : LoadingViewModel() {
     val isConnected = KObservableField(true)
 
     init {
-        ReactiveNetwork.observeInternetConnectivity()
-            .subscribeK { isConnected.value = it }
+        ReactiveNetwork.observeNetworkConnectivity(get())
+            .subscribeK { isConnected.value = it.available() }
             .add()
     }
 
