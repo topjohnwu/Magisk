@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
-import com.topjohnwu.magisk.utils.ISafetyNetHelper
+import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.superuser.Shell
 
 enum class SafetyNetState {
@@ -142,8 +142,8 @@ class HomeViewModel(
 
     fun finishSafetyNetCheck(response: Int) = when {
         response and 0x0F == 0 -> {
-            val hasCtsPassed = response and ISafetyNetHelper.CTS_PASS != 0
-            val hasBasicIntegrityPassed = response and ISafetyNetHelper.BASIC_PASS != 0
+            val hasCtsPassed = response and SafetyNetHelper.CTS_PASS != 0
+            val hasBasicIntegrityPassed = response and SafetyNetHelper.BASIC_PASS != 0
             safetyNetTitle.value = R.string.safetyNet_check_success
             ctsState.value = if (hasCtsPassed) {
                 SafetyNetState.PASS
@@ -164,7 +164,7 @@ class HomeViewModel(
             ctsState.value = SafetyNetState.IDLE
             basicIntegrityState.value = SafetyNetState.IDLE
             safetyNetTitle.value = when (response) {
-                ISafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
+                SafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
                 else -> R.string.safetyNet_api_error
             }
         }

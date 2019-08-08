@@ -113,7 +113,6 @@ object Config : PreferenceModel, DBConfig {
     var darkTheme by preference(Key.DARK_THEME, true)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
-    @JvmStatic
     var magiskHide by preference(Key.MAGISKHIDE, true)
     var coreOnly by preference(Key.COREONLY, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)

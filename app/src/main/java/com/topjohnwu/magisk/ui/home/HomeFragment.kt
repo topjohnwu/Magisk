@@ -17,8 +17,8 @@ import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.base.MagiskFragment
-import com.topjohnwu.magisk.utils.ISafetyNetHelper
 import com.topjohnwu.magisk.utils.DynamicClassLoader
+import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.superuser.Shell
@@ -26,7 +26,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
 class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
-    ISafetyNetHelper.Callback {
+    SafetyNetHelper.Callback {
 
     override val layoutRes: Int = R.layout.fragment_magisk
     override val viewModel: HomeViewModel by viewModel()
@@ -101,8 +101,8 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
             val clazz = loader.loadClass("com.topjohnwu.snet.Snet")
             val helper = clazz.getMethod("newHelper",
                     Class::class.java, String::class.java, Activity::class.java, Any::class.java)
-                    .invoke(null, ISafetyNetHelper::class.java, EXT_APK.path,
-                            requireActivity(), this) as ISafetyNetHelper
+                    .invoke(null, SafetyNetHelper::class.java, EXT_APK.path,
+                            activity, this) as SafetyNetHelper
             if (helper.version < Const.SNET_EXT_VER)
                 throw Exception()
             helper.attest()

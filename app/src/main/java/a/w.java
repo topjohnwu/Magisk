@@ -2,13 +2,13 @@ package a;
 
 import android.content.Context;
 
-import com.topjohnwu.magisk.model.worker.DelegateWorker;
-
-import java.lang.reflect.ParameterizedType;
-
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+
+import com.topjohnwu.magisk.model.worker.DelegateWorker;
+
+import java.lang.reflect.ParameterizedType;
 
 public abstract class w<T extends DelegateWorker> extends Worker {
 
@@ -22,7 +22,7 @@ public abstract class w<T extends DelegateWorker> extends Worker {
         try {
             base = ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
                     .getActualTypeArguments()[0]).newInstance();
-            base.setActualWorker(this);
+            base.attachWorker(this);
         } catch (Exception ignored) {}
     }
 
