@@ -71,7 +71,13 @@
     <string name="update_channel">Обновления Magisk</string>
     <string name="progress_channel">Уведомления о прогрессе</string>
     <string name="download_complete">Загрузка завершена</string>
+    <string name="download_local">Поиск локальных копий…</string>
+    <string name="download_progress">%1$.2f / %2$.2f МБ</string>
+    <string name="download_module">Встраивание установщика…</string>
     <string name="download_file_error">Ошибка загрузки файла</string>
+    <string name="download_file_folder_error">Невозможно открыть папку для сохранения загруженного файла, проверьте права доступа.</string>
+    <string name="download_open_parent">Открыть папку с файлом</string>
+    <string name="download_open_self">Открыть файл</string>
     <string name="magisk_update_title">Доступно обновление Magisk!</string>
     <string name="manager_update_title">Доступно обновление Magisk Manager!</string>
 
@@ -123,9 +129,14 @@
     <string name="dl_one_module">Возможна загрузка только одного модуля.</string>
 
     <!--Settings Activity -->
+    <string name="settings_downloads_category">Загрузки</string>
     <string name="settings_general_category">Основные</string>
     <string name="settings_dark_theme_title">Тёмная тема</string>
     <string name="settings_dark_theme_summary">Включить тёмное оформление.</string>
+    <string name="settings_download_cache_title">Кэшироваие загрузок</string>
+    <string name="settings_download_cache_summary">Включить кэширование загрузки Zip-файлов для Magisk и модулей.</string>
+    <string name="settings_download_path_title">Папка загрузки</string>
+    <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
     <string name="settings_clear_cache_summary">Очистить кэшированную информацию репозитория. Произойдет принудительное обновление.</string>
     <string name="settings_hide_manager_title">Маскировка Magisk Manager</string>
@@ -187,6 +198,7 @@
     <string name="isolate_summary">Сессии суперпользователя используют изолированные пространства имён</string>
     <string name="android_o_not_support">Не поддерживается в Android 8.0+</string>
     <string name="disable_fingerprint">Не поддерживается устройством или не заданы отпечатки</string>
+    <string name="settings_download_path_error">Ошибка создания папки. Она должна быть доступна из корневой директории хранилища и не должна быть файлом.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав суперпользователя</string>
