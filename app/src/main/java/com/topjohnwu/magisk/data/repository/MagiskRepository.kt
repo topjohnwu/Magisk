@@ -5,11 +5,11 @@ import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.extensions.getLabel
 import com.topjohnwu.magisk.extensions.packageName
 import com.topjohnwu.magisk.extensions.toSingle
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
 
@@ -43,7 +43,7 @@ class MagiskRepository(
             .flattenAsFlowable { it }
             .filter { it.enabled && !blacklist.contains(it.packageName) }
             .map {
-                val label = Utils.getAppLabel(it, packageManager)
+                val label = it.getLabel(packageManager)
                 val icon = it.loadIcon(packageManager)
                 HideAppInfo(it, label, icon)
             }

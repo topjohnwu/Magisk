@@ -53,7 +53,7 @@ open class SplashActivity : AppCompatActivity() {
         Notifications.setup(this)
 
         // Schedule periodic update checks
-        Utils.scheduleUpdateCheck()
+        Utils.scheduleUpdateCheck(this)
 
         // Setup shortcuts
         Shortcuts.setup(this)

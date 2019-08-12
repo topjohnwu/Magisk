@@ -11,7 +11,6 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.preference.*
 import androidx.recyclerview.widget.RecyclerView
-import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.R
 import org.koin.android.ext.android.inject
 
@@ -19,7 +18,6 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     protected val prefs: SharedPreferences by inject()
-    protected val app: App by inject()
     protected val activity get() = requireActivity() as MagiskActivity<*, *>
 
     override fun onCreateView(

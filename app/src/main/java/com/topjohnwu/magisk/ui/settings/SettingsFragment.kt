@@ -26,10 +26,10 @@ import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.observer.Observer
+import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
-import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Completable
 import org.koin.android.ext.android.inject
@@ -155,7 +155,7 @@ class SettingsFragment : BasePreferenceFragment() {
         }
 
         if (Shell.rootAccess() && Const.USER_ID == 0) {
-            if (app.packageName == BuildConfig.APPLICATION_ID) {
+            if (activity.packageName == BuildConfig.APPLICATION_ID) {
                 generalCatagory.removePreference(restoreManager)
             } else {
                 if (!Networking.checkNetworkStatus(requireContext())) {
@@ -179,10 +179,12 @@ class SettingsFragment : BasePreferenceFragment() {
     }
 
     override fun onSharedPreferenceChanged(prefs: SharedPreferences, key: String) {
+        fun getStrInt() = prefs.getString(key, null)?.toInt() ?: 0
+
         when (key) {
-            Config.Key.ROOT_ACCESS -> Config.rootMode = Utils.getPrefsInt(prefs, key)
-            Config.Key.SU_MULTIUSER_MODE -> Config.suMultiuserMode = Utils.getPrefsInt(prefs, key)
-            Config.Key.SU_MNT_NS -> Config.suMntNamespaceMode = Utils.getPrefsInt(prefs, key)
+            Config.Key.ROOT_ACCESS -> Config.rootMode = getStrInt()
+            Config.Key.SU_MULTIUSER_MODE -> Config.suMultiuserMode = getStrInt()
+            Config.Key.SU_MNT_NS -> Config.suMntNamespaceMode = getStrInt()
             Config.Key.DARK_THEME -> requireActivity().recreate()
             Config.Key.COREONLY -> {
                 if (prefs.getBoolean(key, false)) {
@@ -200,10 +202,10 @@ class SettingsFragment : BasePreferenceFragment() {
                 Shell.su("magiskhide --disable").submit()
             }
             Config.Key.LOCALE -> {
-                LocaleManager.setLocale(app)
-                requireActivity().recreate()
+                LocaleManager.setLocale(activity.application)
+                activity.recreate()
             }
-            Config.Key.CHECK_UPDATES -> Utils.scheduleUpdateCheck()
+            Config.Key.CHECK_UPDATES -> Utils.scheduleUpdateCheck(activity)
         }
         setSummary(key)
     }

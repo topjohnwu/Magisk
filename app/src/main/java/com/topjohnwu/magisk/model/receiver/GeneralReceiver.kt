@@ -33,20 +33,18 @@ open class GeneralReceiver : BroadcastReceiver() {
     }
 
     private fun getPkg(intent: Intent): String {
-        return intent.data?.encodedSchemeSpecificPart ?: ""
+        return intent.data?.encodedSchemeSpecificPart.orEmpty()
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
-        if (intent == null)
-            return
-        var action: String? = intent.action ?: return
-        when (action) {
+        intent ?: return
+        when (intent.action ?: return) {
             Intent.ACTION_REBOOT, Intent.ACTION_BOOT_COMPLETED -> {
-                action = intent.getStringExtra("action")
+                val action = intent.getStringExtra("action")
                 if (action == null) {
                     // Actual boot completed event
-                    Shell.su("mm_patch_dtbo").submit { result ->
-                        if (result.isSuccess)
+                    Shell.su("mm_patch_dtbo").submit {
+                        if (it.isSuccess)
                             Notifications.dtboPatched(context)
                     }
                     return

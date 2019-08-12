@@ -7,10 +7,12 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
+import android.content.res.Configuration
 import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.topjohnwu.magisk.utils.FileProvider
+import com.topjohnwu.magisk.utils.currentLocale
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -81,10 +83,6 @@ fun Context.rawResource(id: Int) = resources.openRawResource(id)
 fun Context.readUri(uri: Uri) =
     contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
 
-fun ApplicationInfo.findAppLabel(pm: PackageManager): String {
-    return pm.getApplicationLabel(this).toString().orEmpty()
-}
-
 fun Intent.startActivity(context: Context) = context.startActivity(this)
 
 fun File.provide(context: Context = get()): Uri {
@@ -106,4 +104,18 @@ fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
     val out = mutableListOf<Result>()
     while (moveToNext()) out.add(transformer(this))
     return out
+}
+
+fun ApplicationInfo.getLabel(pm: PackageManager): String {
+    runCatching {
+        if (labelRes > 0) {
+            val res = pm.getResourcesForApplication(this)
+            val config = Configuration()
+            config.setLocale(currentLocale)
+            res.updateConfiguration(config, res.displayMetrics)
+            return res.getString(labelRes)
+        }
+    }
+
+    return loadLabel(pm).toString()
 }
