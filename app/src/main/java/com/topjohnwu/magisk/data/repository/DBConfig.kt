@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.data.repository
 
 import com.topjohnwu.magisk.data.database.SettingsDao
 import com.topjohnwu.magisk.data.database.StringDao
-import com.topjohnwu.magisk.extensions.trimEmptyToNull
 import io.reactivex.schedulers.Schedulers
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -36,12 +35,10 @@ class DBSettingsValue(
 
     private var value: Int? = null
 
-    private fun getKey(property: KProperty<*>) = name.trimEmptyToNull() ?: property.name
-
     @Synchronized
     override fun getValue(thisRef: DBConfig, property: KProperty<*>): Int {
         if (value == null)
-            value = thisRef.settingsDao.fetch(getKey(property), default).blockingGet()
+            value = thisRef.settingsDao.fetch(name, default).blockingGet()
         return value!!
     }
 
@@ -49,7 +46,7 @@ class DBSettingsValue(
         synchronized(this) {
             this.value = value
         }
-        thisRef.settingsDao.put(getKey(property), value)
+        thisRef.settingsDao.put(name, value)
                 .subscribeOn(Schedulers.io())
                 .subscribe()
     }
@@ -77,12 +74,10 @@ class DBStringsValue(
 
     private var value: String? = null
 
-    private fun getKey(property: KProperty<*>) = name.trimEmptyToNull() ?: property.name
-
     @Synchronized
     override fun getValue(thisRef: DBConfig, property: KProperty<*>): String {
         if (value == null)
-            value = thisRef.stringDao.fetch(getKey(property), default).blockingGet()
+            value = thisRef.stringDao.fetch(name, default).blockingGet()
         return value!!
     }
 
@@ -90,12 +85,22 @@ class DBStringsValue(
         synchronized(this) {
             this.value = value
         }
-        if (sync) {
-            thisRef.stringDao.put(getKey(property), value).blockingAwait()
+        if (value.isEmpty()) {
+            if (sync) {
+                thisRef.stringDao.delete(name).blockingAwait()
+            } else {
+                thisRef.stringDao.delete(name)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe()
+            }
         } else {
-            thisRef.stringDao.put(getKey(property), value)
-                    .subscribeOn(Schedulers.io())
-                    .subscribe()
+            if (sync) {
+                thisRef.stringDao.put(name, value).blockingAwait()
+            } else {
+                thisRef.stringDao.put(name, value)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe()
+            }
         }
     }
 }
