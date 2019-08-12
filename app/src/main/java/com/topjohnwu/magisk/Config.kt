@@ -199,7 +199,7 @@ object Config : PreferenceModel, DBConfig {
 
     fun export() {
         // Flush prefs to disk
-        prefs.edit().apply()
+        prefs.edit().commit()
         val xml = File(
             "${get<Context>(Protected).filesDir.parent}/shared_prefs",
             "${packageName}_preferences.xml"
