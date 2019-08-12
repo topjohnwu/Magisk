@@ -159,7 +159,7 @@ object Config : PreferenceModel, DBConfig {
                 if (parser.eventType != XmlPullParser.START_TAG)
                     continue
                 val key: String = parser.getAttributeValue(null, "name")
-                val value: String = parser.getAttributeValue(null, "value")
+                fun value() = parser.getAttributeValue(null, "value")!!
                 when (parser.name) {
                     "string" -> {
                         parser.require(XmlPullParser.START_TAG, null, "string")
@@ -168,25 +168,25 @@ object Config : PreferenceModel, DBConfig {
                     }
                     "boolean" -> {
                         parser.require(XmlPullParser.START_TAG, null, "boolean")
-                        putBoolean(key, value.toBoolean())
+                        putBoolean(key, value().toBoolean())
                         parser.nextTag()
                         parser.require(XmlPullParser.END_TAG, null, "boolean")
                     }
                     "int" -> {
                         parser.require(XmlPullParser.START_TAG, null, "int")
-                        putInt(key, value.toInt())
+                        putInt(key, value().toInt())
                         parser.nextTag()
                         parser.require(XmlPullParser.END_TAG, null, "int")
                     }
                     "long" -> {
                         parser.require(XmlPullParser.START_TAG, null, "long")
-                        putLong(key, value.toLong())
+                        putLong(key, value().toLong())
                         parser.nextTag()
                         parser.require(XmlPullParser.END_TAG, null, "long")
                     }
                     "float" -> {
                         parser.require(XmlPullParser.START_TAG, null, "int")
-                        putFloat(key, value.toFloat())
+                        putFloat(key, value().toFloat())
                         parser.nextTag()
                         parser.require(XmlPullParser.END_TAG, null, "int")
                     }
