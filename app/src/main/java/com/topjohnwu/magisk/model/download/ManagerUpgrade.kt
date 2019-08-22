@@ -60,8 +60,8 @@ private fun RemoteFileService.restore(apk: File, id: Int): File {
     return apk
 }
 
-fun RemoteFileService.handleAPK(apk: File, subject: DownloadSubject.Manager)
+fun RemoteFileService.handleAPK(subject: DownloadSubject.Manager)
     = when (subject.configuration) {
-        is Upgrade -> patchPackage(apk, subject.hashCode())
-        is Restore -> restore(apk, subject.hashCode())
+        is Upgrade -> patchPackage(subject.file, subject.hashCode())
+        is Restore -> restore(subject.file, subject.hashCode())
     }

@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.utils.ProgressInputStream
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
-import io.reactivex.Single
+import io.reactivex.Completable
 import okhttp3.ResponseBody
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -34,9 +34,7 @@ abstract class RemoteFileService : NotificationService() {
         )
 
     override val defaultNotification: NotificationCompat.Builder
-        get() = Notifications
-            .progress(this, "")
-            .setContentText(getString(R.string.download_local))
+        get() = Notifications.progress(this, "")
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.getParcelableExtra<DownloadSubject>(ARG_URL)?.let { start(it) }
@@ -46,7 +44,7 @@ abstract class RemoteFileService : NotificationService() {
     // ---
 
     private fun start(subject: DownloadSubject) = search(subject)
-        .onErrorResumeNext(download(subject))
+        .onErrorResumeNext { download(subject) }
         .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.title) } }
         .subscribeK(onError = {
             Timber.e(it)
@@ -56,13 +54,13 @@ abstract class RemoteFileService : NotificationService() {
                         .setOngoing(false)
             }
         }) {
-            val newId = finishNotify(it, subject)
+            val newId = finishNotify(subject)
             if (get<Activity>() !is NullActivity) {
-                onFinished(it, subject, newId)
+                onFinished(subject, newId)
             }
         }
 
-    private fun search(subject: DownloadSubject) = Single.fromCallable {
+    private fun search(subject: DownloadSubject) = Completable.fromAction {
         if (!Config.isDownloadCacheEnabled || subject is Manager) {
             throw IllegalStateException("The download cache is disabled")
         }
@@ -78,23 +76,22 @@ abstract class RemoteFileService : NotificationService() {
 
     private fun download(subject: DownloadSubject) = service.fetchFile(subject.url)
         .map { it.toStream(subject.hashCode()) }
-        .flatMap { stream ->
+        .flatMapCompletable { stream ->
             when (subject) {
                 is Module -> service.fetchInstaller()
-                        .map { stream.toModule(subject.file, it.byteStream()); subject.file }
-                else -> Single.fromCallable { stream.writeTo(subject.file); subject.file }
+                        .doOnSuccess { stream.toModule(subject.file, it.byteStream()) }
+                        .ignoreElement()
+                else -> Completable.fromAction { stream.writeTo(subject.file) }
             }
-        }.map {
-            when (subject) {
-                is Manager -> handleAPK(it, subject)
-                else -> it
-            }
+        }.doOnComplete {
+            if (subject is Manager)
+                handleAPK(subject)
         }
 
     // ---
 
-    private fun File.find(name: String) = list().orEmpty()
-        .firstOrNull { it == name }
+    private fun File.find(name: String) = list()
+        ?.firstOrNull { it == name }
         ?.let { File(this, it) }
 
     private fun ResponseBody.toStream(id: Int): InputStream {
@@ -104,15 +101,19 @@ abstract class RemoteFileService : NotificationService() {
         return ProgressInputStream(byteStream()) {
             val progress = it / 1_000_000f
             update(id) { notification ->
-                notification
-                    .setProgress(maxRaw.toInt(), it.toInt(), false)
-                    .setContentText(getString(R.string.download_progress, progress, max))
+                if (maxRaw > 0) {
+                    notification
+                            .setProgress(maxRaw.toInt(), it.toInt(), false)
+                            .setContentText("%.2f / %.2f MB".format(progress, max))
+                } else {
+                    notification.setContentText("%.2f MB / ??".format(progress))
+                }
             }
         }
     }
 
-    private fun finishNotify(file: File, subject: DownloadSubject) = finishNotify(subject.hashCode()) {
-        it.addActions(file, subject)
+    private fun finishNotify(subject: DownloadSubject) = finishNotify(subject.hashCode()) {
+        it.addActions(subject)
             .setContentText(getString(R.string.download_complete))
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setProgress(0, 0, false)
@@ -124,12 +125,10 @@ abstract class RemoteFileService : NotificationService() {
 
 
     @Throws(Throwable::class)
-    protected abstract fun onFinished(file: File, subject: DownloadSubject, id: Int)
+    protected abstract fun onFinished(subject: DownloadSubject, id: Int)
 
-    protected abstract fun NotificationCompat.Builder.addActions(
-        file: File,
-        subject: DownloadSubject
-    ): NotificationCompat.Builder
+    protected abstract fun NotificationCompat.Builder.addActions(subject: DownloadSubject)
+            : NotificationCompat.Builder
 
     companion object {
         const val ARG_URL = "arg_url"
