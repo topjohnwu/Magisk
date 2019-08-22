@@ -57,46 +57,46 @@ class SettingsFragment : BasePreferenceFragment() {
         preferenceManager.setStorageDeviceProtected()
         setPreferencesFromResource(R.xml.app_settings, rootKey)
 
-        updateChannel = findPref(Config.Key.UPDATE_CHANNEL)
-        rootConfig = findPref(Config.Key.ROOT_ACCESS)
-        autoRes = findPref(Config.Key.SU_AUTO_RESPONSE)
-        requestTimeout = findPref(Config.Key.SU_REQUEST_TIMEOUT)
-        suNotification = findPref(Config.Key.SU_NOTIFICATION)
-        multiuserConfig = findPref(Config.Key.SU_MULTIUSER_MODE)
-        nsConfig = findPref(Config.Key.SU_MNT_NS)
-        val reauth = findPreference(Config.Key.SU_REAUTH) as SwitchPreferenceCompat
-        val fingerprint = findPreference(Config.Key.SU_FINGERPRINT) as SwitchPreferenceCompat
-        val generalCatagory = findPreference("general") as PreferenceCategory
-        val magiskCategory = findPreference("magisk") as PreferenceCategory
-        val suCategory = findPreference("superuser") as PreferenceCategory
-        val hideManager = findPreference("hide")
+        updateChannel = findPreference(Config.Key.UPDATE_CHANNEL)!!
+        rootConfig = findPreference(Config.Key.ROOT_ACCESS)!!
+        autoRes = findPreference(Config.Key.SU_AUTO_RESPONSE)!!
+        requestTimeout = findPreference(Config.Key.SU_REQUEST_TIMEOUT)!!
+        suNotification = findPreference(Config.Key.SU_NOTIFICATION)!!
+        multiuserConfig = findPreference(Config.Key.SU_MULTIUSER_MODE)!!
+        nsConfig = findPreference(Config.Key.SU_MNT_NS)!!
+        val reauth = findPreference<SwitchPreferenceCompat>(Config.Key.SU_REAUTH)!!
+        val fingerprint = findPreference<SwitchPreferenceCompat>(Config.Key.SU_FINGERPRINT)!!
+        val generalCatagory = findPreference<PreferenceCategory>("general")!!
+        val magiskCategory = findPreference<PreferenceCategory>("magisk")!!
+        val suCategory = findPreference<PreferenceCategory>("superuser")!!
+        val hideManager = findPreference<Preference>("hide")!!
         hideManager.setOnPreferenceClickListener {
             PatchAPK.hideManager(requireContext())
             true
         }
-        val restoreManager = findPreference("restore")
-        restoreManager.setOnPreferenceClickListener {
+        val restoreManager = findPreference<Preference>("restore")
+        restoreManager?.setOnPreferenceClickListener {
             DownloadService(requireContext()) {
                 subject = DownloadSubject.Manager(Configuration.APK.Restore)
             }
             true
         }
-        findPreference("clear").setOnPreferenceClickListener {
+        findPreference<Preference>("clear")?.setOnPreferenceClickListener {
             Completable.fromAction { repoDB.clear() }.subscribeK {
                 Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
             }
             true
         }
-        findPreference("hosts").setOnPreferenceClickListener {
+        findPreference<Preference>("hosts")?.setOnPreferenceClickListener {
             Shell.su("add_hosts_module").submit {
                 Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
             }
             true
         }
 
-        findPreference(Config.Key.DOWNLOAD_PATH).apply {
+        findPreference<Preference>(Config.Key.DOWNLOAD_PATH)?.apply {
             summary = Config.downloadPath
-        }.setOnPreferenceClickListener { preference ->
+        }?.setOnPreferenceClickListener { preference ->
             activity.withExternalRW {
                 onSuccess {
                     showDownloadDialog {
@@ -122,7 +122,7 @@ class SettingsFragment : BasePreferenceFragment() {
             true
         }
 
-        setLocalePreference(findPreference(Config.Key.LOCALE) as ListPreference)
+        setLocalePreference(findPreference(Config.Key.LOCALE)!!)
 
         /* We only show canary channels if user is already on canary channel
          * or the user have already chosen canary channel */

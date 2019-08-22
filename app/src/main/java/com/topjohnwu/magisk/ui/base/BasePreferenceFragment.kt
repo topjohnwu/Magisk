@@ -59,8 +59,4 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
         else
             view.setPadding(0, view.paddingTop, view.paddingRight, view.paddingBottom)
     }
-
-    protected fun <T: Preference> findPref(key: CharSequence): T {
-        return findPreference(key) as T
-    }
 }
