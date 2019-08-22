@@ -14,7 +14,9 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 
-abstract class MagiskViewModel : LoadingViewModel() {
+abstract class MagiskViewModel(
+    initialState: State = State.LOADING
+) : LoadingViewModel(initialState) {
 
     val isConnected = KObservableField(true)
 

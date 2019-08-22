@@ -31,7 +31,7 @@ enum class MagiskItem {
 
 class HomeViewModel(
     private val magiskRepo: MagiskRepository
-) : MagiskViewModel() {
+) : MagiskViewModel(State.LOADED) {
 
     val hasGMS = runCatching {
         get<PackageManager>().getPackageInfo("com.google.android.gms", 0); true
@@ -177,14 +177,7 @@ class HomeViewModel(
     }
 
     fun refresh() {
-        magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
-            version.format(Info.magiskVersionString, Info.magiskVersionCode)
-        } else {
-            ""
-        }
-
-        managerCurrentVersion.value = version
-            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+        refreshVersions()
 
         magiskRepo.fetchUpdate()
             .applyViewModel(this)
@@ -198,13 +191,24 @@ class HomeViewModel(
             .subscribeK {
                 updateSelf()
                 ensureEnv()
+                refreshVersions()
             }
 
         hasRoot.value = Shell.rootAccess()
     }
 
+    private fun refreshVersions() {
+        magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
+            version.format(Info.magiskVersionString, Info.magiskVersionCode)
+        } else {
+            ""
+        }
+
+        managerCurrentVersion.value = version
+            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+    }
+
     private fun updateSelf() {
-        state = State.LOADED
         _magiskState.value = when (Info.magiskVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
             !in Info.remote.magisk.versionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
