@@ -10,7 +10,7 @@ Furthermore, Magisk provides a **Systemless Interface** to alter the system (or 
 
 ## Bug Reports
 
-**Make sure to install the latest [Canary Build](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337) before reporting any bugs!** **DO NOT** report bugs that is already fixed upstream. Follow the instructions in the [Canary Channel XDA Thread](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337), and report a bug either by opening an issue on GitHub or directly in the thread.
+**Make sure to install the latest [Canary Build](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337) before reporting any bugs!** **DO NOT** report bugs that are already fixed upstream. Follow the instructions in the [Canary Channel XDA Thread](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337), and report a bug either by [opening an issue on GitHub](https://github.com/topjohnwu/Magisk/issues) or directly in the thread.
 
 ## Building Environment Requirements
 
