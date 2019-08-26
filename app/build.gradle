@@ -104,6 +104,10 @@ dependencies {
     implementation "com.github.topjohnwu:room-runtime:${vRoom}"
     kapt "androidx.room:room-compiler:${vRoom}"
 
+    def kotlinVer = '1.3.50'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVer}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlinVer}"
+
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.preference:preference:1.1.0-rc01'
