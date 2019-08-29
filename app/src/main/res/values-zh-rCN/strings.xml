@@ -12,10 +12,10 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">未安装 Magisk</string>
-    <string name="checking_for_updates">正在检查更新…</string>
+    <string name="checking_for_updates">正在检查更新...</string>
     <string name="invalid_update_channel">无效的更新通道</string>
     <string name="safetyNet_check_text">点按启动 SafetyNet 检查</string>
-    <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
+    <string name="checking_safetyNet_status">正在检查 SafetyNet 状态...</string>
     <string name="safetyNet_check_success">SafetyNet 检查完成</string>
     <string name="safetyNet_api_error">SafetyNet API 错误</string>
     <string name="safetyNet_res_invalid">回传值无效</string>
@@ -44,6 +44,7 @@
     <string name="reboot_recovery">重启到 Recovery</string>
     <string name="reboot_bootloader">重启到 Bootloader</string>
     <string name="reboot_download">重启到 Download</string>
+    <string name="reboot_edl">重启到 EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">可更新</string>
@@ -63,14 +64,20 @@
 
     <!--About Activity-->
     <string name="app_changelog">应用更新日志</string>
-    <string name="translators">gh2923, vvb2060</string>
+    <string name="translators">gh2923, vvb2060, Vanilla</string>
     <string name="app_translators">翻译人员</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">更新提示</string>
     <string name="progress_channel">下载进度</string>
     <string name="download_complete">下载完成</string>
+    <string name="download_local">寻找本地副本...</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">注入安装程序...</string>
     <string name="download_file_error">下载文件时出错</string>
+    <string name="download_file_folder_error">无法获取父目录来保存下载的文件，请检查相关权限。</string>
+    <string name="download_open_parent">在父目录中显示</string>
+    <string name="download_open_self">显示文件</string>
     <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="manager_update_title">Magisk Manager 可更新！</string>
 
@@ -99,14 +106,16 @@
 
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
-    <string name="flashing">正在刷入</string>
-    <string name="hide_manager_title">正在隐藏 Magisk Manager…</string>
+    <string name="flashing">正在刷入...</string>
+    <string name="done">完成！</string>
+    <string name="failure">失败</string>
+    <string name="hide_manager_title">正在隐藏 Magisk Manager...</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
     <string name="open_link_failed_toast">找不到能够打开此链接的应用</string>
     <string name="warning">警告</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂镜像</string>
-    <string name="restore_img_msg">还原中…</string>
+    <string name="restore_img_msg">还原中...</string>
     <string name="restore_done">还原完成！</string>
     <string name="restore_fail">原厂 Boot 镜像备份不存在！</string>
     <string name="proprietary_title">下载专有代码</string>
@@ -120,9 +129,14 @@
     <string name="dl_one_module">一次只能下载一个模块</string>
 
     <!--Settings Activity -->
+    <string name="settings_downloads_category">下载</string>
     <string name="settings_general_category">常规</string>
     <string name="settings_dark_theme_title">暗色主题</string>
     <string name="settings_dark_theme_summary">使用暗色主题</string>
+    <string name="settings_download_cache_title">下载缓存</string>
+    <string name="settings_download_cache_summary">为 Magisk 和 模块 zip文件启用下载缓存</string>
+    <string name="settings_download_path_title">下载路径</string>
+    <string name="settings_download_path_message">文件将被保存至 %1$s</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新在线数据</string>
     <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>
@@ -184,6 +198,7 @@
     <string name="isolate_summary">每一个 ROOT 会话使用自己独立的命名空间</string>
     <string name="android_o_not_support">不支持 Android 8.0+</string>
     <string name="disable_fingerprint">没有设置指纹或设备不支持</string>
+    <string name="settings_download_path_error">创建文件夹失败，目录必须可以从根目录访问，并且不能是文件。</string>
 
     <!--Superuser-->
     <string name="su_request_title">超级用户请求</string>
