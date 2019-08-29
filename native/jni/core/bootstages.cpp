@@ -55,15 +55,18 @@ extern void auto_start_magiskhide();
 
 class node_entry {
 public:
-	explicit node_entry(const char *name, uint8_t status = 0, uint8_t type = 0)
-			: name(name), type(type), status(status), parent(nullptr) {}
+	explicit node_entry(const char *name, uint8_t type = DT_DIR, uint8_t status = IS_INTER)
+			: module(nullptr), name(name), type(type), status(status), parent(nullptr) {}
 	~node_entry();
 	void create_module_tree(const char *module);
 	void magic_mount();
 	node_entry *extract(const char *name);
 
+	static bool vendor_root;
+	static bool product_root;
+
 private:
-	const char *module;    /* Only used when status & IS_MODULE */
+	const char *module;    /* Only used when IS_MODULE */
 	const string name;
 	uint8_t type;
 	uint8_t status;
@@ -71,10 +74,7 @@ private:
 	vector<node_entry *> children;
 
 	node_entry(node_entry *parent, const char *module, const char *name, uint8_t type)
-			: node_entry(name, 0, type) {
-		this->parent = parent;
-		this->module = module;
-	}
+			: module(module), name(name), type(type), status(0), parent(parent) {}
 	bool is_special();
 	bool is_root();
 	string get_path();
@@ -83,12 +83,16 @@ private:
 	int get_path(char *path);
 };
 
+bool node_entry::vendor_root = false;
+bool node_entry::product_root = false;
+
 node_entry::~node_entry() {
 	for (auto &node : children)
 		delete node;
 }
 
-#define SPECIAL_NODE (parent->parent ? false : (name == "vendor" || name == "product"))
+#define SPECIAL_NODE (parent->parent ? false : \
+((vendor_root && name == "vendor") || (product_root && name == "product")))
 
 bool node_entry::is_special() {
 	return parent ? SPECIAL_NODE : false;
@@ -139,7 +143,7 @@ void node_entry::create_module_tree(const char *module) {
 		return;
 
 	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		// Create new node
 		auto node = new node_entry(this, module, entry->d_name, entry->d_type);
@@ -150,11 +154,10 @@ void node_entry::create_module_tree(const char *module) {
 				module, full_path.c_str(), entry->d_name);
 
 		/*
-		 * Clone current node directory in the following condition:
-		 * 1. We are not a root node
-		 * 2. Target does not exist or
-		 * 3. Module file is a symlink or
-		 * 4. Target file is a symlink (exclude special nodes)
+		 * Clone current directory in one of the following conditions:
+		 * - Target does not exist
+		 * - Module file is a symlink
+		 * - Target file is a symlink (exclude special nodes)
 		 */
 		bool clone = false;
 		if (IS_LNK(node) || access(buf, F_OK) == -1) {
@@ -209,7 +212,6 @@ void node_entry::create_module_tree(const char *module) {
 void node_entry::clone_skeleton() {
 	DIR *dir;
 	struct dirent *entry;
-	node_entry *dummy;
 
 	// Clone the structure
 	auto full_path = get_path();
@@ -217,10 +219,10 @@ void node_entry::clone_skeleton() {
 	if (!(dir = xopendir(buf)))
 		return;
 	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		// Create dummy node
-		dummy = new node_entry(entry->d_name, IS_DUMMY, entry->d_type);
+		auto dummy = new node_entry(entry->d_name, entry->d_type, IS_DUMMY);
 		insert(dummy);
 	}
 	closedir(dir);
@@ -422,7 +424,7 @@ static void prepare_modules() {
 	if ((dir = opendir(MODULEUPGRADE))) {
 		while ((entry = xreaddir(dir))) {
 			if (entry->d_type == DT_DIR) {
-				if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				if (entry->d_name == "."sv || entry->d_name == ".."sv)
 					continue;
 				// Cleanup old module if exists
 				snprintf(buf, sizeof(buf), "%s/%s", MODULEROOT, entry->d_name);
@@ -441,6 +443,9 @@ static void prepare_modules() {
 	xmkdir(LEGACYCORE, 0755);
 	symlink(SECURE_DIR "/post-fs-data.d", LEGACYCORE "/post-fs-data.d");
 	symlink(SECURE_DIR "/service.d", LEGACYCORE "/service.d");
+
+	restorecon();
+	chmod(SECURE_DIR, 0700);
 }
 
 static void collect_modules() {
@@ -450,9 +455,7 @@ static void collect_modules() {
 	struct dirent *entry;
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_DIR) {
-			if (strcmp(entry->d_name, ".") == 0 ||
-				strcmp(entry->d_name, "..") == 0 ||
-				strcmp(entry->d_name, ".core") == 0)
+			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
 				continue;
 			chdir(entry->d_name);
 			if (access("remove", F_OK) == 0) {
@@ -615,9 +618,6 @@ void post_fs_data(int client) {
 
 	prepare_modules();
 
-	restorecon();
-	chmod(SECURE_DIR, 0700);
-
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
 		core_only();
@@ -632,8 +632,11 @@ void post_fs_data(int client) {
 	module_list.clear();
 	collect_modules();
 
+	node_entry::vendor_root = access("/vendor", F_OK) == 0;
+	node_entry::product_root = access("/product", F_OK) == 0;
+
 	// Create the system root entry
-	auto sys_root = new node_entry("system", IS_INTER);
+	auto sys_root = new node_entry("system");
 
 	bool has_modules = false;
 
@@ -660,14 +663,14 @@ void post_fs_data(int client) {
 		LOGI("%s: constructing magic mount structure\n", module);
 		// If /system/vendor exists in module, create a link outside
 		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MODULEROOT, module);
-		if (access(buf, F_OK) == 0) {
+		if (node_entry::vendor_root && access(buf, F_OK) == 0) {
 			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MODULEROOT, module);
 			unlink(buf2);
 			xsymlink("./system/vendor", buf2);
 		}
 		// If /system/product exists in module, create a link outside
 		snprintf(buf, PATH_MAX, "%s/%s/system/product", MODULEROOT, module);
-		if (access(buf, F_OK) == 0) {
+		if (node_entry::product_root && access(buf, F_OK) == 0) {
 			snprintf(buf2, PATH_MAX, "%s/%s/product", MODULEROOT, module);
 			unlink(buf2);
 			xsymlink("./system/product", buf2);
@@ -678,11 +681,11 @@ void post_fs_data(int client) {
 	if (has_modules) {
 		// Pull out special nodes if exist
 		node_entry *special;
-		if ((special = sys_root->extract("vendor"))) {
+		if (node_entry::vendor_root && (special = sys_root->extract("vendor"))) {
 			special->magic_mount();
 			delete special;
 		}
-		if ((special = sys_root->extract("product"))) {
+		if (node_entry::product_root && (special = sys_root->extract("product"))) {
 			special->magic_mount();
 			delete special;
 		}
