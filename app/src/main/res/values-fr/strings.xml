@@ -73,9 +73,9 @@
     <string name="download_complete">Téléchargement terminé</string>
     <string name="download_local">Recherche de copies locales…</string>
     <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Injection de l'installateur…</string>
+    <string name="download_module">Injection de l\'installateur…</string>
     <string name="download_file_error">Erreur de téléchargement du fichier</string>
-    <string name="download_file_folder_error">Impossible de récupérer le dossier parent afin d'enregistrer le fichier téléchargé, vérifiez les permissions.</string>
+    <string name="download_file_folder_error">Impossible de récupérer le dossier parent afin d\'enregistrer le fichier téléchargé, vérifiez les permissions.</string>
     <string name="download_open_parent">Afficher dans le dossier parent</string>
     <string name="download_open_self">Afficher fichier</string>
     <string name="magisk_update_title">Une mise à jour de Magisk est disponible !</string>
@@ -91,7 +91,7 @@
     <string name="setup_title">Installation additionnelle</string>												   
     <string name="select_patch_file">Sélectionner et Patcher un Fichier</string>													
     <string name="patch_file_msg">Sélectionnez une image brute (*.img) ou un fichier tar ODIN (*.tar)</string>																 
-    <string name="reboot_delay_toast">Redémarrage dans 5 secondes...</string>																							
+    <string name="reboot_delay_toast">Redémarrage dans 5 secondes…</string>
 	
     <!--Toasts, Dialogs-->
     <string name="close">Fermer</string>
