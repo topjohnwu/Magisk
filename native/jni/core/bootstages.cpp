@@ -134,15 +134,25 @@ void node_entry::insert(node_entry *&node) {
 }
 
 void node_entry::create_module_tree(const char *module) {
-	DIR *dir;
-	struct dirent *entry;
-
 	auto full_path = get_path();
 	snprintf(buf, PATH_MAX, "%s/%s%s", MODULEROOT, module, full_path.c_str());
-	if (!(dir = xopendir(buf)))
+
+	unique_ptr<DIR, decltype(&closedir)> dir(xopendir(buf), closedir);
+	if (!dir)
 		return;
 
-	while ((entry = xreaddir(dir))) {
+	// Check directory replace
+	if (faccessat(dirfd(dir.get()), ".replace", F_OK, 0) == 0) {
+		if (is_root()) {
+			// Root nodes should not be replaced
+			rm_rf(buf);
+			return;
+		}
+		status = IS_MODULE;
+		return;
+	}
+
+	for (struct dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		// Create new node
@@ -150,8 +160,7 @@ void node_entry::create_module_tree(const char *module) {
 
 		// buf = real path, buf2 = module path
 		snprintf(buf, PATH_MAX, "%s/%s", full_path.c_str(), entry->d_name);
-		int eof = snprintf(buf2, PATH_MAX, MODULEROOT "/%s%s/%s",
-				module, full_path.c_str(), entry->d_name);
+		snprintf(buf2, PATH_MAX, MODULEROOT "/%s%s/%s", module, full_path.c_str(), entry->d_name);
 
 		/*
 		 * Clone current directory in one of the following conditions:
@@ -160,7 +169,7 @@ void node_entry::create_module_tree(const char *module) {
 		 * - Target file is a symlink (exclude special nodes)
 		 */
 		bool clone = false;
-		if (IS_LNK(node) || access(buf, F_OK) == -1) {
+		if (IS_LNK(node) || access(buf, F_OK) != 0) {
 			clone = true;
 		} else if (!node->is_special()) {
 			struct stat s;
@@ -169,7 +178,7 @@ void node_entry::create_module_tree(const char *module) {
 				clone = true;
 		}
 		if (clone && is_root()) {
-			// Remove both the new node and file that requires cloning ourselves
+			// Root nodes should not be cloned
 			rm_rf(buf2);
 			delete node;
 			continue;
@@ -186,15 +195,8 @@ void node_entry::create_module_tree(const char *module) {
 			// Clone attributes from real path
 			clone_attr(buf, buf2);
 			if (IS_DIR(node)) {
-				// Check if marked as replace
-				strcpy(buf2 + eof, "/.replace");
-				if (access(buf2, F_OK) == 0) {
-					// Replace everything, mark as leaf
-					node->status = IS_MODULE;
-				} else {
-					// This will be an intermediate node
-					node->status = IS_INTER;
-				}
+				// First mark as an intermediate node
+				node->status = IS_INTER;
 			} else if (IS_REG(node)) {
 				// This is a file, mark as leaf
 				node->status = IS_MODULE;
@@ -206,7 +208,6 @@ void node_entry::create_module_tree(const char *module) {
 			node->create_module_tree(module);
 		}
 	}
-	closedir(dir);
 }
 
 void node_entry::clone_skeleton() {
@@ -477,6 +478,49 @@ static void collect_modules() {
 	chdir("/");
 }
 
+static bool load_modules(node_entry *root) {
+	LOGI("* Loading modules\n");
+
+	bool has_modules = false;
+	for (const auto &m : module_list) {
+		const auto module = m.c_str();
+		// Read props
+		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MODULEROOT, module);
+		if (access(buf, F_OK) == 0) {
+			LOGI("%s: loading [system.prop]\n", module);
+			load_prop_file(buf, false);
+		}
+		// Check whether skip mounting
+		snprintf(buf, PATH_MAX, "%s/%s/skip_mount", MODULEROOT, module);
+		if (access(buf, F_OK) == 0)
+			continue;
+		// Double check whether the system folder exists
+		snprintf(buf, PATH_MAX, "%s/%s/system", MODULEROOT, module);
+		if (access(buf, F_OK) == -1)
+			continue;
+
+		// Construct structure
+		has_modules = true;
+		LOGI("%s: constructing magic mount structure\n", module);
+		// If /system/vendor exists in module, create a link outside
+		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MODULEROOT, module);
+		if (node_entry::vendor_root && access(buf, F_OK) == 0) {
+			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MODULEROOT, module);
+			unlink(buf2);
+			xsymlink("./system/vendor", buf2);
+		}
+		// If /system/product exists in module, create a link outside
+		snprintf(buf, PATH_MAX, "%s/%s/system/product", MODULEROOT, module);
+		if (node_entry::product_root && access(buf, F_OK) == 0) {
+			snprintf(buf2, PATH_MAX, "%s/%s/product", MODULEROOT, module);
+			unlink(buf2);
+			xsymlink("./system/product", buf2);
+		}
+		root->create_module_tree(module);
+	}
+	return has_modules;
+}
+
 static bool check_data() {
 	bool mnt = false;
 	bool data = false;
@@ -638,47 +682,7 @@ void post_fs_data(int client) {
 	// Create the system root entry
 	auto sys_root = new node_entry("system");
 
-	bool has_modules = false;
-
-	LOGI("* Loading modules\n");
-	for (const auto &m : module_list) {
-		const auto module = m.c_str();
-		// Read props
-		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MODULEROOT, module);
-		if (access(buf, F_OK) == 0) {
-			LOGI("%s: loading [system.prop]\n", module);
-			load_prop_file(buf, false);
-		}
-		// Check whether skip mounting
-		snprintf(buf, PATH_MAX, "%s/%s/skip_mount", MODULEROOT, module);
-		if (access(buf, F_OK) == 0)
-			continue;
-		// Double check whether the system folder exists
-		snprintf(buf, PATH_MAX, "%s/%s/system", MODULEROOT, module);
-		if (access(buf, F_OK) == -1)
-			continue;
-
-		// Construct structure
-		has_modules = true;
-		LOGI("%s: constructing magic mount structure\n", module);
-		// If /system/vendor exists in module, create a link outside
-		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MODULEROOT, module);
-		if (node_entry::vendor_root && access(buf, F_OK) == 0) {
-			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MODULEROOT, module);
-			unlink(buf2);
-			xsymlink("./system/vendor", buf2);
-		}
-		// If /system/product exists in module, create a link outside
-		snprintf(buf, PATH_MAX, "%s/%s/system/product", MODULEROOT, module);
-		if (node_entry::product_root && access(buf, F_OK) == 0) {
-			snprintf(buf2, PATH_MAX, "%s/%s/product", MODULEROOT, module);
-			unlink(buf2);
-			xsymlink("./system/product", buf2);
-		}
-		sys_root->create_module_tree(module);
-	}
-
-	if (has_modules) {
+	if (load_modules(sys_root)) {
 		// Pull out special nodes if exist
 		node_entry *special;
 		if (node_entry::vendor_root && (special = sys_root->extract("vendor"))) {
