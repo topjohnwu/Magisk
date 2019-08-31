@@ -33,6 +33,14 @@ initialize() {
 
   # Load utility functions
   . $MAGISKBIN/util_functions.sh
+
+  if $BOOTMODE; then
+    # Override ui_print when booted
+    ui_print() { log -t Magisk -- "$1"; }
+  else
+    OUTFD=
+    setup_flashable
+  fi
 }
 
 show_logo() {
@@ -85,23 +93,20 @@ finalize() {
   exit 0
 }
 
-main_v1() {
-  # Wait for post addon.d processes to finish
-  sleep 5
-  recovery_actions
+main() {
+  if ! $backuptool_ab; then
+    # Wait for post addon.d-v1 processes to finish
+    sleep 5
+  fi
+  $BOOTMODE || recovery_actions
   show_logo
   mount_partitions
+  if $backuptool_ab; then
+    # Swap the slot for addon.d-v2
+    if [ ! -z $SLOT ]; then [ $SLOT = _a ] && SLOT=_b || SLOT=_a; fi
+  fi
   installation
-  recovery_cleanup
-  finalize
-}
-
-main_v2() {
-  show_logo
-  mount_partitions
-  # Swap the slot
-  if [ ! -z $SLOT ]; then [ $SLOT = _a ] && SLOT=_b || SLOT=_a; fi
-  installation
+  $BOOTMODE || recovery_cleanup
   finalize
 }
 
@@ -122,21 +127,17 @@ case "$1" in
     # Stub
   ;;
   post-restore)
+    initialize
     if $backuptool_ab; then
-      exec su -c "sh $0 addond-v2"
+      $BOOTMODE && su=su || su=sh
+      exec $su -c "sh $0 addond-v2"
     else
-      initialize
-      OUTFD=
-      setup_flashable
       # Run in background, hack for addon.d-v1
-      (main_v1) &
+      (main) &
     fi
   ;;
   addond-v2)
     initialize
-    # Override ui_print
-    ui_print() { log -t Magisk -- "$1"; }
-    # addon.d-v2
-    main_v2
+    main
   ;;
 esac
