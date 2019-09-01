@@ -274,23 +274,24 @@ int validate_manager(string &alt_pkg, int userid, struct stat *st) {
 
 void exec_sql(int client) {
 	char *sql = read_string(client);
-	FILE *out = fdopen(recv_fd(client), "a");
 	char *err = db_exec(sql, [&](db_row &row) -> bool {
-		bool first = false;
+		string out;
+		bool first = true;
 		for (auto it : row) {
-			if (first) fprintf(out, "|");
-			else first = true;
-			fprintf(out, "%s=%s", it.first.data(), it.second.data());
+			if (first) first = false;
+			else out += '|';
+			out += it.first;
+			out += '=';
+			out += it.second;
 		}
-		fprintf(out, "\n");
+		write_int(client, out.length());
+		xwrite(client, out.data(), out.length());
 		return true;
 	});
 	free(sql);
-	fclose(out);
 	db_err_cmd(err,
-		write_int(client, 1);
+		write_int(client, 0);
 		return;
 	);
-	write_int(client, 0);
 	close(client);
 }

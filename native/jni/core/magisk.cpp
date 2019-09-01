@@ -105,8 +105,14 @@ int magisk_main(int argc, char *argv[]) {
 		int fd = connect_daemon();
 		write_int(fd, SQLITE_CMD);
 		write_string(fd, argv[2]);
-		send_fd(fd, STDOUT_FILENO);
-		return read_int(fd);
+		for (;;) {
+			char *res = read_string(fd);
+			if (res[0] == '\0') {
+				return 0;
+			}
+			printf("%s\n", res);
+			free(res);
+		}
 	} else if (argv[1] == "--use-broadcast"sv) {
 		int fd = connect_daemon();
 		write_int(fd, BROADCAST_ACK);
