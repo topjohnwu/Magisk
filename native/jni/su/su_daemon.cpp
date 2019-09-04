@@ -22,9 +22,6 @@
 
 using namespace std;
 
-#define LOCK_CACHE()   pthread_mutex_lock(&cache_lock)
-#define UNLOCK_CACHE() pthread_mutex_unlock(&cache_lock)
-
 static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static shared_ptr<su_info> cached;
 
@@ -86,53 +83,56 @@ static void database_check(const shared_ptr<su_info> &info) {
 		validate_manager(info->str[SU_MANAGER], uid / 100000, &info->mgr_st);
 }
 
-static shared_ptr<su_info> get_su_info(unsigned uid) {
-	shared_ptr<su_info> info;
+static void update_su_info(unsigned uid) {
+	LOGD("su: request from uid=[%d]\n", uid);
 
-	// Get from cache or new instance
-	LOCK_CACHE();
-	if (!cached || cached->uid != uid || !cached->is_fresh())
-		cached = make_shared<su_info>(uid);
-	info = cached;
-	info->refresh();
-	UNLOCK_CACHE();
-
-	LOGD("su: request from uid=[%d]\n", info->uid);
-
-	// Lock before the policy is determined
-	info->lock();
-	RunFinally unlock([&] {
-		info->unlock();
+	RunFinally refresh([] {
+		cached->refresh();
 	});
 
-	if (info->access.policy == QUERY) {
+	// Get from cache or new instance
+	{
+		MutexGuard lock(cache_lock);
+		if (!cached || cached->uid != uid || !cached->is_fresh())
+			cached = make_shared<su_info>(uid);
+		else
+			return;
+	}
+
+	// Lock before the policy is determined
+	cached->lock();
+	RunFinally unlock([&] {
+		cached->unlock();
+	});
+
+	if (cached->access.policy == QUERY) {
 		// Not cached, get data from database
-		database_check(info);
+		database_check(cached);
 
 		// If it's root or the manager, allow it silently
-		if (info->uid == UID_ROOT || (info->uid % 100000) == (info->mgr_st.st_uid % 100000)) {
-			info->access = SILENT_SU_ACCESS;
-			return info;
+		if (cached->uid == UID_ROOT || (cached->uid % 100000) == (cached->mgr_st.st_uid % 100000)) {
+			cached->access = SILENT_SU_ACCESS;
+			return;
 		}
 
 		// Check su access settings
-		switch (info->cfg[ROOT_ACCESS]) {
+		switch (cached->cfg[ROOT_ACCESS]) {
 			case ROOT_ACCESS_DISABLED:
 				LOGW("Root access is disabled!\n");
-				info->access = NO_SU_ACCESS;
-				return info;
+				cached->access = NO_SU_ACCESS;
+				return;
 			case ROOT_ACCESS_ADB_ONLY:
-				if (info->uid != UID_SHELL) {
+				if (cached->uid != UID_SHELL) {
 					LOGW("Root access limited to ADB only!\n");
-					info->access = NO_SU_ACCESS;
-					return info;
+					cached->access = NO_SU_ACCESS;
+					return;
 				}
 				break;
 			case ROOT_ACCESS_APPS_ONLY:
-				if (info->uid == UID_SHELL) {
+				if (cached->uid == UID_SHELL) {
 					LOGW("Root access is disabled for ADB!\n");
-					info->access = NO_SU_ACCESS;
-					return info;
+					cached->access = NO_SU_ACCESS;
+					return;
 				}
 				break;
 			case ROOT_ACCESS_APPS_AND_ADB:
@@ -140,13 +140,13 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 				break;
 		}
 
-		if (info->access.policy != QUERY)
-			return info;
+		if (cached->access.policy != QUERY)
+			return;
 
 		// If still not determined, check if manager exists
-		if (info->str[SU_MANAGER][0] == '\0') {
-			info->access = NO_SU_ACCESS;
-			return info;
+		if (cached->str[SU_MANAGER][0] == '\0') {
+			cached->access = NO_SU_ACCESS;
+			return;
 		}
 	}
 
@@ -155,19 +155,17 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 	int sockfd = create_rand_socket(&addr);
 
 	// Connect manager
-	app_connect(addr.sun_path + 1, info);
+	app_connect(addr.sun_path + 1, cached);
 	int fd = socket_accept(sockfd, 60);
 	if (fd < 0) {
-		info->access.policy = DENY;
+		cached->access.policy = DENY;
 	} else {
-		socket_send_request(fd, info);
+		socket_send_request(fd, cached);
 		int ret = read_int_be(fd);
-		info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
+		cached->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
 		close(fd);
 	}
 	close(sockfd);
-
-	return info;
 }
 
 static void set_identity(unsigned uid) {
@@ -189,8 +187,9 @@ static void set_identity(unsigned uid) {
 void su_daemon_handler(int client, struct ucred *credential) {
 	LOGD("su: request from pid=[%d], client=[%d]\n", credential->pid, client);
 
+	update_su_info(credential->uid);
 	su_context ctx = {
-		.info = get_su_info(credential->uid),
+		.info = cached,
 		.req = su_request(true),
 		.pid = credential->pid
 	};
