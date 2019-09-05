@@ -38,21 +38,21 @@ class RepoUpdater(
         etag: String = ""
     ): Flowable<Unit> = api.fetchRepos(page, etag).flatMap {
         it.error()?.also { throw it }
-            it.response()?.run {
-                if (code() == HttpURLConnection.HTTP_NOT_MODIFIED)
-                    return@run Flowable.error<Unit>(CachedException)
+        it.response()?.run {
+            if (code() == HttpURLConnection.HTTP_NOT_MODIFIED)
+                return@run Flowable.error<Unit>(CachedException)
 
-                if (page == 1)
-                    repoDB.etagKey = headers()[Const.Key.ETAG_KEY].orEmpty().trimEtag()
+            if (page == 1)
+                repoDB.etagKey = headers()[Const.Key.ETAG_KEY].orEmpty().trimEtag()
 
-                val flow = loadRepos(body()!!, cached)
-                if (headers()[Const.Key.LINK_KEY].orEmpty().contains("next")) {
-                    flow.mergeWith(loadPage(cached, page + 1))
-                } else {
-                    flow
-                }
+            val flow = loadRepos(body()!!, cached)
+            if (headers()[Const.Key.LINK_KEY].orEmpty().contains("next")) {
+                flow.mergeWith(loadPage(cached, page + 1))
+            } else {
+                flow
             }
         }
+    }
 
     private fun forcedReload(cached: MutableSet<String>) =
             cached.toFlowable().parallel().runOn(Schedulers.io()).map {
