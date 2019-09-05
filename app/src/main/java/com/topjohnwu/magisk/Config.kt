@@ -47,7 +47,6 @@ object Config : PreferenceModel, DBConfig {
         const val DARK_THEME = "dark_theme"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
-        const val DOWNLOAD_CACHE = "download_cache"
         const val DOWNLOAD_PATH = "download_path"
 
         // system state
@@ -101,7 +100,6 @@ object Config : PreferenceModel, DBConfig {
         if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
         else Value.DEFAULT_CHANNEL
 
-    var isDownloadCacheEnabled by preference(Key.DOWNLOAD_CACHE, true)
     var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 

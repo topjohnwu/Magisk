@@ -4,11 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.skoumal.teanity.extensions.subscribeK
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.NullActivity
-import com.topjohnwu.magisk.extensions.firstMap
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -20,18 +18,11 @@ import io.reactivex.Completable
 import okhttp3.ResponseBody
 import org.koin.android.ext.android.inject
 import timber.log.Timber
-import java.io.File
 import java.io.InputStream
 
 abstract class RemoteFileService : NotificationService() {
 
     private val service: GithubRawServices by inject()
-
-    private val supportedFolders
-        get() = listOf(
-            cacheDir,
-            Config.downloadDirectory
-        )
 
     override val defaultNotification: NotificationCompat.Builder
         get() = Notifications.progress(this, "")
@@ -43,7 +34,7 @@ abstract class RemoteFileService : NotificationService() {
 
     // ---
 
-    private fun start(subject: DownloadSubject) = search(subject)
+    private fun start(subject: DownloadSubject) = checkExisting(subject)
         .onErrorResumeNext { download(subject) }
         .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.title) } }
         .subscribeK(onError = {
@@ -60,16 +51,12 @@ abstract class RemoteFileService : NotificationService() {
             }
         }
 
-    private fun search(subject: DownloadSubject) = Completable.fromAction {
-        if (!Config.isDownloadCacheEnabled || subject is Manager) {
-            throw IllegalStateException("The download cache is disabled")
-        }
+    private fun checkExisting(subject: DownloadSubject) = Completable.fromAction {
+        check(subject is Magisk) { "Download cache is disabled" }
 
-        supportedFolders.firstMap { it.find(subject.file.name) }.also {
-            if (subject is Magisk) {
-                if (!ShellUtils.checkSum("MD5", it, subject.magisk.md5)) {
-                    throw IllegalStateException("The given file doesn't match the md5")
-                }
+        subject.file.also {
+            check(it.exists() && ShellUtils.checkSum("MD5", it, subject.magisk.md5)) {
+                "The given file does not match checksum"
             }
         }
     }
@@ -87,12 +74,6 @@ abstract class RemoteFileService : NotificationService() {
             if (subject is Manager)
                 handleAPK(subject)
         }
-
-    // ---
-
-    private fun File.find(name: String) = list()
-        ?.firstOrNull { it == name }
-        ?.let { File(this, it) }
 
     private fun ResponseBody.toStream(id: Int): InputStream {
         val maxRaw = contentLength()
