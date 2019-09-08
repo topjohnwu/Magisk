@@ -83,6 +83,7 @@
     <string name="reboot_bootloader">Bootloader\'ə yenidən başlat</string>
 
     <string name="reboot_download">Yükləmə rejimində yenidən başlat</string>
+    <string name="reboot_edl">EDL'ə yenidən başlat</string>
 
     <!--Repo Fragment-->
 
@@ -123,15 +124,16 @@
     <!-- System Components, Notifications -->
 
     <string name="update_channel">Magisk Yeniləmələri</string>
-
-    <string name="progress_channel">İnkişaf Bildirişləri</string>
-
+    <string name="progress_channel">Nəticə Bildirişləri</string>
     <string name="download_complete">Yükləmə bitdi</string>
-
+    <string name="download_local">Yerli kopyalar axtarılır…</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">Qurucu daxil edilir…</string>
     <string name="download_file_error">Faylı yükləmək alınmadı</string>
-
+    <string name="download_file_folder_error">Yükləmələri yadda saxlamaq üçün valideyn qovluğunu gətirmək alınmır, icazələri yoxlayın.</string>
+    <string name="download_open_parent">Valideyn qovluğunda göstər</string>
+    <string name="download_open_self">Faylı göstər</string>
     <string name="magisk_update_title">Magisk Yeniləməsi Var!</string>
-
     <string name="manager_update_title">Magisk Manager Yeniləməsi Var!</string>
 
     <!--Toasts, Dialogs-->
@@ -171,6 +173,8 @@
     <string name="download_zip_only">Yalnız Zip yüklə</string>
 
     <string name="direct_install">Birdəfəlik Yüklə (Tövsiyə olunur)</string>
+
+    <string name="select_patch_file">Fayl Seç və Yamaqla</string>
 
     <string name="install_inactive_slot">Fəal olmayan slota quraşdır (OTA\'dan sonra)</string>
 
