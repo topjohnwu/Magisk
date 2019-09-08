@@ -11,7 +11,7 @@
     <string name="unsupport_magisk_message">Эта версия Magisk Manager не поддерживает версию Magisk ниже v18.0.\n\nВы можете вручную обновить Magisk или понизить версию приложения до более старой.</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk не установлен.</string>
+    <string name="magisk_version_error">Magisk не установлен</string>
     <string name="checking_for_updates">Проверка обновлений…</string>
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
@@ -24,6 +24,7 @@
     <string name="advanced_settings_title">Расширенные опции</string>
     <string name="keep_force_encryption">Сохранить принудительное шифрование</string>
     <string name="keep_dm_verity">Сохранить AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Режим Recovery</string>
     <string name="current_installed">Установлена: %1$s</string>
     <string name="latest_version">Последняя: %1$s</string>
     <string name="uninstall">Удаление</string>
@@ -34,12 +35,12 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет информации)</string>
-    <string name="no_modules_found">Модули не найдены.</string>
-    <string name="update_file_created">Модуль будет обновлён после перезагрузки.</string>
-    <string name="remove_file_created">Модуль будет удалён после перезагрузки.</string>
-    <string name="remove_file_deleted">Модуль не будет удалён после перезагрузки.</string>
-    <string name="disable_file_created">Модуль будет отключён после перезагрузки.</string>
-    <string name="disable_file_removed">Модуль будет активирован после перезагрузки.</string>
+    <string name="no_modules_found">Модули не найдены</string>
+    <string name="update_file_created">Модуль будет обновлён после перезагрузки!</string>
+    <string name="remove_file_created">Модуль будет удалён после перезагрузки!</string>
+    <string name="remove_file_deleted">Модуль не будет удалён после перезагрузки!</string>
+    <string name="disable_file_created">Модуль будет отключён после перезагрузки!</string>
+    <string name="disable_file_removed">Модуль будет активирован после перезагрузки!</string>
     <string name="author">Автор: %1$s</string>
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
@@ -64,7 +65,7 @@
 
     <!--About Activity-->
     <string name="app_changelog">Список изменений</string>
-    <string name="translators" />
+    <string name="translators">Displax [4PDA], igor-dyatlov, zertyuiop</string>
     <string name="app_translators">Переводчики</string>
 
     <!-- System Components, Notifications -->
@@ -90,7 +91,7 @@
     <string name="select_method">Выбор способа</string>
     <string name="setup_title">Дополнительная установка</string>
     <string name="select_patch_file">Выбрать и пропатчить файл</string>
-    <string name="patch_file_msg">Выберите образ ядра (*.img) или архив ODIN (*.tar)</string>
+    <string name="patch_file_msg">Выберите файл образа (*.img) или архив ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Перезагрузка через 5 секунд…</string>
 
     <!--Toasts, Dialogs-->
@@ -106,11 +107,11 @@
     
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
-    <string name="flashing">Прошивка</string>
+    <string name="flashing">Прошивка…</string>
     <string name="done">Завершено!</string>
     <string name="failure">Ошибка</string>
     <string name="hide_manager_title">Маскировка Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Не удалось замаскировать Magisk Manager</string>
+    <string name="hide_manager_fail_toast">Не удалось пересобрать Magisk Manager</string>
     <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки.</string> 
     <string name="warning">Предупреждение</string>
     <string name="complete_uninstall">Полное удаление</string>
@@ -134,15 +135,15 @@
     <string name="settings_dark_theme_title">Тёмная тема</string>
     <string name="settings_dark_theme_summary">Включить тёмное оформление.</string>
     <string name="settings_download_cache_title">Кэшироваие загрузок</string>
-    <string name="settings_download_cache_summary">Включить кэширование загрузки Zip-файлов для Magisk и модулей.</string>
+    <string name="settings_download_cache_summary">Включить кэширование установочных ZIP Magisk.</string>
     <string name="settings_download_path_title">Папка загрузки</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
-    <string name="settings_clear_cache_summary">Очистить кэшированную информацию репозитория. Произойдет принудительное обновление.</string>
+    <string name="settings_clear_cache_summary">Очистить кэш репозитория. Будет загружен заново.</string>
     <string name="settings_hide_manager_title">Маскировка Magisk Manager</string>
     <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным именем пакета.</string>
     <string name="settings_restore_manager_title">Восстановление Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Восстановить Magisk Manager с исходным именем пакета</string>
+    <string name="settings_restore_manager_summary">Восстановить Magisk Manager с исходным именем пакета.</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (Системный)</string>
     <string name="settings_update">Настройки обновлений</string>
@@ -155,7 +156,7 @@
     <string name="settings_update_custom_msg">Укажите ссылку</string>
     <string name="settings_core_only_title">Magisk Core</string>
     <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU и Magisk Hide останутся активными.</string>
-    <string name="settings_magiskhide_summary">Замаскировать Magisk от различных обнаружений.</string>
+    <string name="settings_magiskhide_summary">Скрыть Magisk от различных обнаружений.</string>
     <string name="settings_hosts_title">Внесистемные хосты</string>
     <string name="settings_hosts_summary">Поддержка внесистемных хостов для приложений, блокирующих рекламу.</string>
     <string name="settings_hosts_toast">Добавлен модуль внесистемных хостов</string>
@@ -176,9 +177,9 @@
     <string name="superuser_notification">Уведомления суперпользователя</string>
     <string name="request_timeout_summary">%1$d секунд</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
-    <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
+    <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений.</string>
     <string name="settings_su_fingerprint_title">Биометрическая аутентификация</string>
-    <string name="settings_su_fingerprint_summary">Использовать сканер отпечатков пальцев, чтобы разрешить запросы суперпользователя</string>
+    <string name="settings_su_fingerprint_summary">Использовать сканер отпечатков пальцев для запросов прав суперпользователя.</string>
     <string name="auth_fingerprint">Аутентифицировать отпечаток пальца</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
@@ -206,7 +207,7 @@
     <string name="deny">Отказать</string>
     <string name="prompt">Запрос</string>
     <string name="grant">Предоставить</string>
-    <string name="su_warning">Предоставить полный доступ к устройству.\nЕсли не уверены, что желаете продолжить, отклоните данное действие!</string>
+    <string name="su_warning">Предоставить полный доступ к устройству.\nЕсли не уверены - отклоните данное действие!</string>
     <string name="forever">Навсегда</string>
     <string name="once">Сейчас</string>
     <string name="tenmin">10 мин.</string>
