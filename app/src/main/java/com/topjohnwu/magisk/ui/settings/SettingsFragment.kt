@@ -21,12 +21,17 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
+import com.topjohnwu.magisk.extensions.toLangTag
+import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.observer.Observer
+import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
-import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
+import io.reactivex.Completable
 import org.koin.android.ext.android.inject
 import java.io.File
 
@@ -52,42 +57,46 @@ class SettingsFragment : BasePreferenceFragment() {
         preferenceManager.setStorageDeviceProtected()
         setPreferencesFromResource(R.xml.app_settings, rootKey)
 
-        updateChannel = findPref(Config.Key.UPDATE_CHANNEL)
-        rootConfig = findPref(Config.Key.ROOT_ACCESS)
-        autoRes = findPref(Config.Key.SU_AUTO_RESPONSE)
-        requestTimeout = findPref(Config.Key.SU_REQUEST_TIMEOUT)
-        suNotification = findPref(Config.Key.SU_NOTIFICATION)
-        multiuserConfig = findPref(Config.Key.SU_MULTIUSER_MODE)
-        nsConfig = findPref(Config.Key.SU_MNT_NS)
-        val reauth = findPreference(Config.Key.SU_REAUTH) as SwitchPreferenceCompat
-        val fingerprint = findPreference(Config.Key.SU_FINGERPRINT) as SwitchPreferenceCompat
-        val generalCatagory = findPreference("general") as PreferenceCategory
-        val magiskCategory = findPreference("magisk") as PreferenceCategory
-        val suCategory = findPreference("superuser") as PreferenceCategory
-        val hideManager = findPreference("hide")
+        updateChannel = findPreference(Config.Key.UPDATE_CHANNEL)!!
+        rootConfig = findPreference(Config.Key.ROOT_ACCESS)!!
+        autoRes = findPreference(Config.Key.SU_AUTO_RESPONSE)!!
+        requestTimeout = findPreference(Config.Key.SU_REQUEST_TIMEOUT)!!
+        suNotification = findPreference(Config.Key.SU_NOTIFICATION)!!
+        multiuserConfig = findPreference(Config.Key.SU_MULTIUSER_MODE)!!
+        nsConfig = findPreference(Config.Key.SU_MNT_NS)!!
+        val reauth = findPreference<SwitchPreferenceCompat>(Config.Key.SU_REAUTH)!!
+        val fingerprint = findPreference<SwitchPreferenceCompat>(Config.Key.SU_FINGERPRINT)!!
+        val generalCatagory = findPreference<PreferenceCategory>("general")!!
+        val magiskCategory = findPreference<PreferenceCategory>("magisk")!!
+        val suCategory = findPreference<PreferenceCategory>("superuser")!!
+        val hideManager = findPreference<Preference>("hide")!!
         hideManager.setOnPreferenceClickListener {
-            PatchAPK.hideManager()
+            PatchAPK.hideManager(requireContext())
             true
         }
-        val restoreManager = findPreference("restore")
-        restoreManager.setOnPreferenceClickListener {
-            DownloadApp.restore()
+        val restoreManager = findPreference<Preference>("restore")
+        restoreManager?.setOnPreferenceClickListener {
+            DownloadService(requireContext()) {
+                subject = DownloadSubject.Manager(Configuration.APK.Restore)
+            }
             true
         }
-        findPreference("clear").setOnPreferenceClickListener {
-            repoDB.clear()
-            Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
+        findPreference<Preference>("clear")?.setOnPreferenceClickListener {
+            Completable.fromAction { repoDB.clear() }.subscribeK {
+                Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
+            }
             true
         }
-        findPreference("hosts").setOnPreferenceClickListener {
-            Shell.su("add_hosts_module").exec()
-            Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
+        findPreference<Preference>("hosts")?.setOnPreferenceClickListener {
+            Shell.su("add_hosts_module").submit {
+                Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
+            }
             true
         }
 
-        findPreference(Config.Key.DOWNLOAD_PATH).apply {
+        findPreference<Preference>(Config.Key.DOWNLOAD_PATH)?.apply {
             summary = Config.downloadPath
-        }.setOnPreferenceClickListener { preference ->
+        }?.setOnPreferenceClickListener { preference ->
             activity.withExternalRW {
                 onSuccess {
                     showDownloadDialog {
@@ -113,7 +122,7 @@ class SettingsFragment : BasePreferenceFragment() {
             true
         }
 
-        setLocalePreference(findPreference(Config.Key.LOCALE) as ListPreference)
+        setLocalePreference(findPreference(Config.Key.LOCALE)!!)
 
         /* We only show canary channels if user is already on canary channel
          * or the user have already chosen canary channel */
@@ -146,7 +155,7 @@ class SettingsFragment : BasePreferenceFragment() {
         }
 
         if (Shell.rootAccess() && Const.USER_ID == 0) {
-            if (app.packageName == BuildConfig.APPLICATION_ID) {
+            if (activity.packageName == BuildConfig.APPLICATION_ID) {
                 generalCatagory.removePreference(restoreManager)
             } else {
                 if (!Networking.checkNetworkStatus(requireContext())) {
@@ -170,10 +179,12 @@ class SettingsFragment : BasePreferenceFragment() {
     }
 
     override fun onSharedPreferenceChanged(prefs: SharedPreferences, key: String) {
+        fun getStrInt() = prefs.getString(key, null)?.toInt() ?: 0
+
         when (key) {
-            Config.Key.ROOT_ACCESS -> Config.rootMode = Utils.getPrefsInt(prefs, key)
-            Config.Key.SU_MULTIUSER_MODE -> Config.suMultiuserMode = Utils.getPrefsInt(prefs, key)
-            Config.Key.SU_MNT_NS -> Config.suMntNamespaceMode = Utils.getPrefsInt(prefs, key)
+            Config.Key.ROOT_ACCESS -> Config.rootMode = getStrInt()
+            Config.Key.SU_MULTIUSER_MODE -> Config.suMultiuserMode = getStrInt()
+            Config.Key.SU_MNT_NS -> Config.suMntNamespaceMode = getStrInt()
             Config.Key.DARK_THEME -> requireActivity().recreate()
             Config.Key.COREONLY -> {
                 if (prefs.getBoolean(key, false)) {
@@ -191,10 +202,10 @@ class SettingsFragment : BasePreferenceFragment() {
                 Shell.su("magiskhide --disable").submit()
             }
             Config.Key.LOCALE -> {
-                LocaleManager.setLocale(app)
-                requireActivity().recreate()
+                LocaleManager.setLocale(activity.application)
+                activity.recreate()
             }
-            Config.Key.CHECK_UPDATES -> Utils.scheduleUpdateCheck()
+            Config.Key.CHECK_UPDATES -> Utils.scheduleUpdateCheck(activity)
         }
         setSummary(key)
     }
@@ -215,21 +226,18 @@ class SettingsFragment : BasePreferenceFragment() {
 
     private fun setLocalePreference(lp: ListPreference) {
         lp.isEnabled = false
-        LocaleManager.availableLocales
-            .map {
+        availableLocales.map {
                 val names = mutableListOf<String>()
                 val values = mutableListOf<String>()
 
                 names.add(
-                    LocaleManager.getString(
-                        LocaleManager.defaultLocale, R.string.system_default
-                    )
+                    LocaleManager.getString(defaultLocale, R.string.system_default)
                 )
                 values.add("")
 
                 it.forEach { locale ->
                     names.add(locale.getDisplayName(locale))
-                    values.add(LocaleManager.toLanguageTag(locale))
+                    values.add(locale.toLangTag())
                 }
 
                 Pair(names.toTypedArray(), values.toTypedArray())
@@ -237,7 +245,7 @@ class SettingsFragment : BasePreferenceFragment() {
                 lp.isEnabled = true
                 lp.entries = names
                 lp.entryValues = values
-                lp.summary = LocaleManager.locale.getDisplayName(LocaleManager.locale)
+                lp.summary = currentLocale.getDisplayName(currentLocale)
             }
     }
 

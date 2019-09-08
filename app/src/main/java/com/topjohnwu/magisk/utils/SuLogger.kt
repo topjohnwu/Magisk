@@ -11,7 +11,6 @@ import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
-import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.toLog
 import com.topjohnwu.magisk.model.entity.toPolicy
 import java.util.*
@@ -20,7 +19,6 @@ object SuLogger {
 
     private val context: Context by inject()
 
-    @JvmStatic
     fun handleLogs(intent: Intent) {
 
         val fromUid = intent.getIntExtra("from.uid", -1)
@@ -72,7 +70,7 @@ object SuLogger {
         if (policy.notification && Config.suNotification == Config.Value.NOTIFICATION_TOAST) {
             Utils.toast(
                 context.getString(
-                    if (policy.policy == Policy.ALLOW)
+                    if (policy.policy == MagiskPolicy.ALLOW)
                         R.string.su_allow_toast
                     else
                         R.string.su_deny_toast, policy.appName

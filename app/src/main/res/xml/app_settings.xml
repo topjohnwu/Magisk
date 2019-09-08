@@ -29,18 +29,6 @@
             android:summary="@string/settings_restore_manager_summary"
             android:title="@string/settings_restore_manager_title" />
 
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:key="downloads"
-        android:title="@string/settings_downloads_category">
-
-        <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:key="download_cache"
-            android:summary="@string/settings_download_cache_summary"
-            android:title="@string/settings_download_cache_title" />
-
         <Preference
             android:key="download_path"
             android:title="@string/settings_download_path_title" />

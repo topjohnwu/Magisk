@@ -2,10 +2,6 @@ package com.topjohnwu.magisk.utils
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Environment
@@ -15,17 +11,14 @@ import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.update.UpdateCheckService
-import com.topjohnwu.net.Networking
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 object Utils {
 
-    val isCanary: Boolean
-        get() = BuildConfig.VERSION_NAME.contains("-")
+    val isCanary: Boolean = BuildConfig.VERSION_NAME.contains("-")
 
     fun toast(msg: CharSequence, duration: Int) {
         UiThreadHandler.run { Toast.makeText(get(), msg, duration).show() }
@@ -35,37 +28,9 @@ object Utils {
         UiThreadHandler.run { Toast.makeText(get(), resId, duration).show() }
     }
 
-    fun dlString(url: String): String {
-        val s = Networking.get(url).execForString().result
-        return s ?: ""
-    }
-
-    fun getPrefsInt(prefs: SharedPreferences, key: String, def: Int = 0): Int {
-        return prefs.getString(key, def.toString())!!.toInt()
-    }
-
     fun dpInPx(dp: Int): Int {
         val scale = get<Resources>().displayMetrics.density
         return (dp * scale + 0.5).toInt()
-    }
-
-    fun fmt(fmt: String, vararg args: Any): String {
-        return String.format(Locale.US, fmt, *args)
-    }
-
-    fun getAppLabel(info: ApplicationInfo, pm: PackageManager): String {
-        try {
-            if (info.labelRes > 0) {
-                val res = pm.getResourcesForApplication(info)
-                val config = Configuration()
-                config.setLocale(LocaleManager.locale)
-                res.updateConfiguration(config, res.displayMetrics)
-                return res.getString(info.labelRes)
-            }
-        } catch (ignored: Exception) {
-        }
-
-        return info.loadLabel(pm).toString()
     }
 
     fun showSuperUser(): Boolean {
@@ -73,7 +38,7 @@ object Utils {
                 || Config.suMultiuserMode != Config.Value.MULTIUSER_MODE_OWNER_MANAGED)
     }
 
-    fun scheduleUpdateCheck() {
+    fun scheduleUpdateCheck(context: Context) {
         if (Config.checkUpdate) {
             val constraints = Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -83,11 +48,12 @@ object Utils {
                     .Builder(ClassMap[UpdateCheckService::class.java], 12, TimeUnit.HOURS)
                     .setConstraints(constraints)
                     .build()
-            WorkManager.getInstance().enqueueUniquePeriodicWork(
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                     Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID,
                     ExistingPeriodicWorkPolicy.REPLACE, request)
         } else {
-            WorkManager.getInstance().cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID)
+            WorkManager.getInstance(context)
+                    .cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID)
         }
     }
 

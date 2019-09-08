@@ -28,7 +28,7 @@ fun createOkHttpClient(): OkHttpClient {
 
     if (BuildConfig.DEBUG) {
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = HttpLoggingInterceptor.Level.HEADERS
         }
         builder.addInterceptor(httpLoggingInterceptor)
     }

@@ -4,7 +4,7 @@
     <string name="downloads">Unduhan</string>
     <string name="superuser">Superuser</string>
     <string name="log">Log</string>
-    <string name="settings">Pengaturan</string>
+    <string name="settings">Setelan</string>
     <string name="install">Pasang</string>
     <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
     <string name="unsupport_magisk_message">Magisk Manager versi ini tidak mendukung versi Magisk di bawah v18.0.\n\nAnda dapat memperbarui Magisk secara manual, atau menurunkan aplikasi ke versi sebelumnya.</string>
@@ -13,14 +13,14 @@
     <string name="magisk_version_error">Magisk tidak terpasang.</string>
     <string name="checking_for_updates">Memeriksa pembaruan…</string>
     <string name="invalid_update_channel">Kanal Pembaruan tidak valid!</string>
-    <string name="safetyNet_check_text">Ketuk untuk memulai pemeriksaan SafetyNet</string>
+    <string name="safetyNet_check_text">Mulai pemeriksaan SafetyNet</string>
     <string name="checking_safetyNet_status">Memeriksa status SafetyNet…</string>
     <string name="safetyNet_check_success">Pemeriksaan SafetyNet Berhasil</string>
     <string name="safetyNet_api_error">Kesalahan pada API SafetyNet</string>
     <string name="safetyNet_res_invalid">Tanggapan tidak valid.</string>
-    <string name="magisk_up_to_date">Magisk sudah di versi terbaru</string>
-    <string name="manager_up_to_date">Magisk Manager sudah di versi terbaru</string>
-    <string name="advanced_settings_title">Pengaturan Lanjutan</string>
+    <string name="magisk_up_to_date">Magisk dalam versi terbaru</string>
+    <string name="manager_up_to_date">Magisk Manager dalam versi terbaru</string>
+    <string name="advanced_settings_title">Opsi Lanjutan</string>
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
     <string name="current_installed">Terpasang: %1$s</string>
@@ -29,7 +29,7 @@
     <string name="uninstall_magisk_title">Copot Magisk</string>
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus. Root akan dihapus, dan berpotensi mengenkripsi data Anda jika belum.</string>
     <string name="update">Perbarui</string>
-    <string name="core_only_enabled">(Mode inti saja aktif)</string>
+    <string name="core_only_enabled">(Mode core only aktif)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Tidak ada info tersedia)</string>
@@ -43,6 +43,7 @@
     <string name="reboot_recovery">Reboot ke Recovery</string>
     <string name="reboot_bootloader">Reboot ke Bootloader</string>
     <string name="reboot_download">Reboot ke Download</string>
+    <string name="reboot_edl">Reboot ke EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Pembaruan Tersedia</string>
@@ -65,13 +66,31 @@
     <string name="translators">Albert I (krasCGQ)</string>
     <string name="app_translators">Penerjemah</string>
 
-    <!-- System Components, Notifications -->
+    <!--System Components, Notifications-->
     <string name="update_channel">Pembaruan Magisk</string>
     <string name="progress_channel">Notifikasi Kemajuan</string>
     <string name="download_complete">Unduhan selesai</string>
+    <string name="download_local">Mencari salinan lokal…</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">Menyuntikkan pemasang…</string>
     <string name="download_file_error">Kesalahan mengunduh file</string>
+    <string name="download_file_folder_error">Tidak dapat memperoleh induk folder untuk menyimpan file yang diunduh, periksa izin.</string>
+    <string name="download_open_parent">Tampilkan dalam induk folder</string>
+    <string name="download_open_self">Tampilkan file</string>
     <string name="magisk_update_title">Pembaruan Magisk Tersedia!</string>
     <string name="manager_update_title">Pembaruan Magisk Manager Tersedia!</string>
+
+    <!--Installation-->
+    <string name="manager_download_install">Tekan untuk unduh dan pasang.</string>
+    <string name="download_zip_only">Unduh Zip Saja</string>
+    <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
+    <string name="install_inactive_slot">Pasang ke Slot Nonaktif (Setelah OTA)</string>
+    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah sebuah reboot!\nHanya gunakan opsi ini setelah OTA selesai.\nLanjutkan?</string>
+    <string name="select_method">Pilih Metode</string>
+    <string name="setup_title">Penyiapan Tambahan</string>
+    <string name="select_patch_file">Pilih dan Tambal Sebuah File</string>
+    <string name="patch_file_msg">Pilih sebuah image mentah (*.img) atau file tar ODIN (*.tar)</string>
+    <string name="reboot_delay_toast">Me-reboot dalam 5 detik…</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Tutup</string>
@@ -79,23 +98,20 @@
     <string name="repo_install_msg">Apakah Anda ingin memasang %1$s sekarang?</string>
     <string name="download">Unduh</string>
     <string name="reboot">Reboot</string>
-    <string name="settings_reboot_toast">Reboot untuk menerapkan pengaturan.</string>
+    <string name="settings_reboot_toast">Reboot untuk menerapkan perubahan.</string>
     <string name="release_notes">Catatan rilis</string>
     <string name="repo_cache_cleared">Cache repo dibersihkan</string>
     <string name="internal_storage">Zip disimpan di:\n[Penyimpanan Internal]%1$s</string>
-    <string name="manager_download_install">Tekan untuk unduh dan pasang.</string>
+
     <string name="dtbo_patched_title">DTBO telah ditambal!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silahkan reboot.</string>
-    <string name="flashing">Flashing</string>
+    <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silakan reboot.</string>
+    <string name="flashing">Flashing…</string>
+    <string name="done">Selesai!</string>
+    <string name="failure">Gagal</string>
     <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager.</string>
     <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan.</string>
-    <string name="download_zip_only">Unduh Zip Saja</string>
-    <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
-    <string name="install_inactive_slot">Pasang ke Slot Nonaktif (Setelah OTA)</string>
     <string name="warning">Peringatan</string>
-    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah sebuah reboot!\nHanya gunakan opsi ini setelah OTA selesai.\nLanjutkan?</string>
-    <string name="select_method">Pilih Metode</string>
     <string name="complete_uninstall">Copot Total</string>
     <string name="restore_img">Pulihkan Image</string>
     <string name="restore_img_msg">Memulihkan…</string>
@@ -106,16 +122,20 @@
     <string name="setup_fail">Penyiapan gagal.</string>
     <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
     <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
-    <string name="setup_title">Penyiapan Tambahan</string>
     <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
     <string name="downloading_toast">Mengunduh %1$s</string>
     <string name="no_rw_storage">Fitur ini tidak akan bekerja tanpa izin untuk menulis ke penyimpanan eksternal.</string>
     <string name="dl_one_module">Unduh satu modul pada suatu waktu.</string>
 
     <!--Settings Activity -->
+    <string name="settings_downloads_category">Unduhan</string>
     <string name="settings_general_category">Umum</string>
     <string name="settings_dark_theme_title">Tema Gelap</string>
     <string name="settings_dark_theme_summary">Aktifkan tema gelap.</string>
+    <string name="settings_download_cache_title">Cache Unduhan</string>
+    <string name="settings_download_cache_summary">Mengaktifkan cache unduhan untuk Magisk and file zip modul.</string>
+    <string name="settings_download_path_title">Lokasi unduhan</string>
+    <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
     <string name="settings_clear_cache_title">Bersihkan Cache Repo</string>
     <string name="settings_clear_cache_summary">Bersihkan informasi ter-cache untuk repo online. Ini memaksa apl untuk menyegarkan secara online.</string>
     <string name="settings_hide_manager_title">Sembunyikan Magisk Manager</string>
@@ -124,7 +144,7 @@
     <string name="settings_restore_manager_summary">Pulihkan Magisk Manager dengan paket asli</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Default Sistem)</string>
-    <string name="settings_update">Pengaturan Pembaruan</string>
+    <string name="settings_update">Setelan Pembaruan</string>
     <string name="settings_check_update_title">Periksa Pembaruan</string>
     <string name="settings_check_update_summary">Secara periodik memeriksa pembaruan di latar belakang.</string>
     <string name="settings_update_channel_title">Kanal Pembaruan</string>
@@ -132,7 +152,7 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Kustom</string>
     <string name="settings_update_custom_msg">Masukkan sebuah URL kustom</string>
-    <string name="settings_core_only_title">Magisk Mode Inti Saja</string>
+    <string name="settings_core_only_title">Magisk Mode Core Only</string>
     <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU dan MagiskHide akan tetap diaktifkan</string>
     <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai bentuk pendeteksian.</string>
     <string name="settings_hosts_title">Host tanpa sistem</string>
@@ -177,6 +197,7 @@
     <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri.</string>
     <string name="android_o_not_support">Tidak mendukung Android 8.0+.</string>
     <string name="disable_fingerprint">Tidak ada sidik jari diatur atau tidak ada dukungan perangkat.</string>
+    <string name="settings_download_path_error">Kesalahan membuat folder. Folder harus dapat diakses dari direktori penyimpanan root dan bukan merupakan file.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Permintaan Superuser</string>

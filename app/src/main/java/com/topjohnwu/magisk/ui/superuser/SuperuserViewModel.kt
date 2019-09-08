@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
-import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
@@ -118,7 +117,7 @@ class SuperuserViewModel(
             val app = item.item.copy(policy = if (enable) MagiskPolicy.ALLOW else MagiskPolicy.DENY)
 
             updatePolicy(app)
-                .map { it.policy == Policy.ALLOW }
+                .map { it.policy == MagiskPolicy.ALLOW }
                 .subscribeK {
                     val textId = if (it) R.string.su_snack_grant else R.string.su_snack_deny
                     val text = resources.getString(textId).format(item.item.appName)

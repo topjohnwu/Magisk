@@ -28,7 +28,7 @@ interface GithubRawServices {
     @GET
     fun fetchCustomUpdate(@Url url: String): Single<UpdateInfo>
 
-    @GET("$MAGISK_FILES/{$REVISION}/snet.apk")
+    @GET("$MAGISK_FILES/{$REVISION}/snet.jar")
     @Streaming
     fun fetchSafetynet(@Path(REVISION) revision: String = Const.SNET_REVISION): Single<ResponseBody>
 

@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.extensions.now
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
-import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
 import com.topjohnwu.magisk.model.entity.toPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
@@ -94,12 +93,12 @@ class SuRequestViewModel(
     }
 
     fun grantPressed() {
-        handler?.handleAction(Policy.ALLOW)
+        handler?.handleAction(MagiskPolicy.ALLOW)
         timer?.cancel()
     }
 
     fun denyPressed() {
-        handler?.handleAction(Policy.DENY)
+        handler?.handleAction(MagiskPolicy.DENY)
         timer?.cancel()
     }
 
@@ -168,18 +167,18 @@ class SuRequestViewModel(
             return false
 
         // If not interactive, response directly
-        if (policy?.policy != Policy.INTERACTIVE) {
+        if (policy?.policy != MagiskPolicy.INTERACTIVE) {
             handler?.handleAction()
             return true
         }
 
         when (Config.suAutoReponse) {
             Config.Value.SU_AUTO_DENY -> {
-                handler?.handleAction(Policy.DENY, 0)
+                handler?.handleAction(MagiskPolicy.DENY, 0)
                 return true
             }
             Config.Value.SU_AUTO_ALLOW -> {
-                handler?.handleAction(Policy.ALLOW, 0)
+                handler?.handleAction(MagiskPolicy.ALLOW, 0)
                 return true
             }
         }
@@ -199,7 +198,7 @@ class SuRequestViewModel(
 
             override fun onFinish() {
                 denyText.value = resources.getString(R.string.deny)
-                handler?.handleAction(Policy.DENY)
+                handler?.handleAction(MagiskPolicy.DENY)
             }
         }
         timer?.start()
@@ -229,7 +228,7 @@ class SuRequestViewModel(
         }
 
         override fun onAuthenticationSucceeded(result: FingerprintManager.AuthenticationResult) {
-            handler?.handleAction(Policy.ALLOW)
+            handler?.handleAction(MagiskPolicy.ALLOW)
         }
 
         override fun onAuthenticationFailed() {

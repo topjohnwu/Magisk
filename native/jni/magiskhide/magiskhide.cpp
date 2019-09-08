@@ -147,8 +147,9 @@ int magiskhide_main(int argc, char *argv[]) {
 	case HIDE_NO_NS:
 		fprintf(stderr, "Your kernel doesn't support mount namespace\n");
 		break;
-
-	/* Errors */
+	case HIDE_INVALID_PKG:
+		fprintf(stderr, "Invalid package / process name\n");
+		break;
 	case ROOT_REQUIRED:
 		fprintf(stderr, "Root is required for this operation\n");
 		break;

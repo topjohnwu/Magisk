@@ -1,16 +1,15 @@
 package com.topjohnwu.magisk.data.repository
 
 import android.content.pm.PackageManager
-import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.getLabel
+import com.topjohnwu.magisk.extensions.packageName
 import com.topjohnwu.magisk.extensions.toSingle
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
 
@@ -37,14 +36,14 @@ class MagiskRepository(
         } else {
             Single.just(it)
         }
-    }.map { Info.remote = it; it }
+    }.doOnSuccess { Info.remote = it }
 
     fun fetchApps() =
         Single.fromCallable { packageManager.getInstalledApplications(0) }
             .flattenAsFlowable { it }
             .filter { it.enabled && !blacklist.contains(it.packageName) }
             .map {
-                val label = Utils.getAppLabel(it, packageManager)
+                val label = it.getLabel(packageManager)
                 val icon = it.loadIcon(packageManager)
                 HideAppInfo(it, label, icon)
             }
@@ -63,8 +62,8 @@ class MagiskRepository(
     private val Boolean.state get() = if (this) "add" else "rm"
 
     companion object {
-        private val blacklist = listOf(
-            let { val app: App by inject(); app }.packageName,
+        private val blacklist by lazy { listOf(
+            packageName,
             "android",
             "com.android.chrome",
             "com.chrome.beta",
@@ -72,7 +71,7 @@ class MagiskRepository(
             "com.chrome.canary",
             "com.android.webview",
             "com.google.android.webview"
-        )
+        ) }
     }
 
 }

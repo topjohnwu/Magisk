@@ -47,7 +47,6 @@ object Config : PreferenceModel, DBConfig {
         const val DARK_THEME = "dark_theme"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
-        const val DOWNLOAD_CACHE = "download_cache"
         const val DOWNLOAD_PATH = "download_path"
 
         // system state
@@ -101,7 +100,6 @@ object Config : PreferenceModel, DBConfig {
         if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
         else Value.DEFAULT_CHANNEL
 
-    var isDownloadCacheEnabled by preference(Key.DOWNLOAD_CACHE, true)
     var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
@@ -113,7 +111,6 @@ object Config : PreferenceModel, DBConfig {
     var darkTheme by preference(Key.DARK_THEME, true)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
-    @JvmStatic
     var magiskHide by preference(Key.MAGISKHIDE, true)
     var coreOnly by preference(Key.COREONLY, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
@@ -125,8 +122,7 @@ object Config : PreferenceModel, DBConfig {
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     var suFingerprint by dbSettings(Key.SU_FINGERPRINT, false)
-    @JvmStatic
-    var suManager by dbStrings(Key.SU_MANAGER, "")
+    var suManager by dbStrings(Key.SU_MANAGER, "", true)
 
     // Always return a path in external storage where we can write
     val downloadDirectory get() =
@@ -161,7 +157,7 @@ object Config : PreferenceModel, DBConfig {
                 if (parser.eventType != XmlPullParser.START_TAG)
                     continue
                 val key: String = parser.getAttributeValue(null, "name")
-                val value: String = parser.getAttributeValue(null, "value")
+                fun value() = parser.getAttributeValue(null, "value")!!
                 when (parser.name) {
                     "string" -> {
                         parser.require(XmlPullParser.START_TAG, null, "string")
@@ -170,25 +166,25 @@ object Config : PreferenceModel, DBConfig {
                     }
                     "boolean" -> {
                         parser.require(XmlPullParser.START_TAG, null, "boolean")
-                        putBoolean(key, value.toBoolean())
+                        putBoolean(key, value().toBoolean())
                         parser.nextTag()
                         parser.require(XmlPullParser.END_TAG, null, "boolean")
                     }
                     "int" -> {
                         parser.require(XmlPullParser.START_TAG, null, "int")
-                        putInt(key, value.toInt())
+                        putInt(key, value().toInt())
                         parser.nextTag()
                         parser.require(XmlPullParser.END_TAG, null, "int")
                     }
                     "long" -> {
                         parser.require(XmlPullParser.START_TAG, null, "long")
-                        putLong(key, value.toLong())
+                        putLong(key, value().toLong())
                         parser.nextTag()
                         parser.require(XmlPullParser.END_TAG, null, "long")
                     }
                     "float" -> {
                         parser.require(XmlPullParser.START_TAG, null, "int")
-                        putFloat(key, value.toFloat())
+                        putFloat(key, value().toFloat())
                         parser.nextTag()
                         parser.require(XmlPullParser.END_TAG, null, "int")
                     }
@@ -199,10 +195,9 @@ object Config : PreferenceModel, DBConfig {
         }
     }
 
-    @JvmStatic
     fun export() {
         // Flush prefs to disk
-        prefs.edit().apply()
+        prefs.edit().commit()
         val xml = File(
             "${get<Context>(Protected).filesDir.parent}/shared_prefs",
             "${packageName}_preferences.xml"

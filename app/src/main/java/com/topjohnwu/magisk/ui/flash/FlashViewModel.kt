@@ -13,6 +13,7 @@ import com.skoumal.teanity.util.DiffObservableList
 import com.skoumal.teanity.util.KObservableField
 import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.*
@@ -90,7 +91,7 @@ class FlashViewModel(
         .map { now }
         .map { it.toTime(timeFormatStandard) }
         .map { Const.MAGISK_INSTALL_LOG_FILENAME.format(it) }
-        .map { File(Const.EXTERNAL_PATH, it) }
+        .map { File(Config.downloadDirectory, it) }
         .map { file ->
             file.bufferedWriter().use { writer ->
                 logItems.forEach {

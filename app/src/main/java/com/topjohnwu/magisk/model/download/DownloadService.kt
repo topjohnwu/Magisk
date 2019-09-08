@@ -14,9 +14,9 @@ import com.topjohnwu.magisk.extensions.provide
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashActivity
+import com.topjohnwu.magisk.utils.APKInstall
 import java.io.File
 import kotlin.random.Random.Default.nextInt
 
@@ -30,60 +30,71 @@ open class DownloadService : RemoteFileService() {
             .getMimeTypeFromExtension(extension)
             ?: "resource/folder"
 
-    override fun onFinished(file: File, subject: DownloadSubject, id: Int) = when (subject) {
-        is Magisk -> onFinishedInternal(file, subject, id)
-        is Module -> onFinishedInternal(file, subject, id)
+    override fun onFinished(subject: DownloadSubject, id: Int) = when (subject) {
+        is Magisk -> onFinishedInternal(subject, id)
+        is Module -> onFinishedInternal(subject, id)
+        is Manager -> onFinishedInternal(subject, id)
     }
 
     private fun onFinishedInternal(
-        file: File,
         subject: Magisk,
         id: Int
     ) = when (val conf = subject.configuration) {
-        Uninstall -> FlashActivity.uninstall(this, file, id)
-        is Patch -> FlashActivity.patch(this, file, conf.fileUri, id)
-        is Flash -> FlashActivity.flash(this, file, conf is Secondary, id)
+        Uninstall -> FlashActivity.uninstall(this, subject.file, id)
+        is Patch -> FlashActivity.patch(this, subject.file, conf.fileUri, id)
+        is Flash -> FlashActivity.flash(this, subject.file, conf is Secondary, id)
         else -> Unit
     }
 
     private fun onFinishedInternal(
-        file: File,
         subject: Module,
         id: Int
     ) = when (subject.configuration) {
-        is Flash -> FlashActivity.install(this, file, id)
+        is Flash -> FlashActivity.install(this, subject.file, id)
         else -> Unit
+    }
+
+    private fun onFinishedInternal(
+        subject: Manager,
+        id: Int
+    ) {
+        remove(id)
+        when (subject.configuration)  {
+            is APK.Upgrade -> APKInstall.install(this, subject.file)
+            else -> Unit
+        }
     }
 
     // ---
 
-    override fun NotificationCompat.Builder.addActions(
-        file: File,
-        subject: DownloadSubject
-    ) = when (subject) {
-        is Magisk -> addActionsInternal(file, subject)
-        is Module -> addActionsInternal(file, subject)
+    override fun NotificationCompat.Builder.addActions(subject: DownloadSubject)
+    = when (subject) {
+        is Magisk -> addActionsInternal(subject)
+        is Module -> addActionsInternal(subject)
+        is Manager -> addActionsInternal(subject)
     }
 
-    private fun NotificationCompat.Builder.addActionsInternal(
-        file: File,
-        subject: Magisk
-    ) = when (val conf = subject.configuration) {
+    private fun NotificationCompat.Builder.addActionsInternal(subject: Magisk)
+    = when (val conf = subject.configuration) {
         Download -> addAction(0, R.string.download_open_parent, fileIntent(subject.file.parentFile!!))
             .addAction(0, R.string.download_open_self, fileIntent(subject.file))
-        Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, file))
-        is Flash -> setContentIntent(FlashActivity.flashIntent(context, file, conf is Secondary))
-        is Patch -> setContentIntent(FlashActivity.patchIntent(context, file, conf.fileUri))
+        Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, subject.file))
+        is Flash -> setContentIntent(FlashActivity.flashIntent(context, subject.file, conf is Secondary))
+        is Patch -> setContentIntent(FlashActivity.patchIntent(context, subject.file, conf.fileUri))
         else -> this
     }
 
-    private fun NotificationCompat.Builder.addActionsInternal(
-        file: File,
-        subject: Module
-    ) = when (subject.configuration) {
+    private fun NotificationCompat.Builder.addActionsInternal(subject: Module)
+    = when (subject.configuration) {
         Download -> addAction(0, R.string.download_open_parent, fileIntent(subject.file.parentFile!!))
             .addAction(0, R.string.download_open_self, fileIntent(subject.file))
-        is Flash -> setContentIntent(FlashActivity.installIntent(context, file))
+        is Flash -> setContentIntent(FlashActivity.installIntent(context, subject.file))
+        else -> this
+    }
+
+    private fun NotificationCompat.Builder.addActionsInternal(subject: Manager)
+    = when (subject.configuration) {
+        APK.Upgrade -> setContentIntent(APKInstall.installIntent(context, subject.file))
         else -> this
     }
 
@@ -114,14 +125,15 @@ open class DownloadService : RemoteFileService() {
     companion object {
 
         inline operator fun invoke(context: Context, argBuilder: Builder.() -> Unit) {
+            val app = context.applicationContext
             val builder = Builder().apply(argBuilder)
-            val intent = Intent(context, ClassMap[DownloadService::class.java])
+            val intent = Intent(app, ClassMap[DownloadService::class.java])
                 .putExtra(ARG_URL, builder.subject)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
+                app.startForegroundService(intent)
             } else {
-                context.startService(intent)
+                app.startService(intent)
             }
         }
 

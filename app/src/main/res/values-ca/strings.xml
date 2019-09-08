@@ -34,16 +34,17 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>
-    <string name="no_modules_found">No s\’han trobat mòduls</string>
-    <string name="update_file_created">El mòdul s\’actualitzarà en el següent reinici</string>
-    <string name="remove_file_created">El mòdul s\’eliminarà en el següent reinici</string>
-    <string name="remove_file_deleted"> El mòdul no s\’eliminarà en el següent reinici </string>
+    <string name="no_modules_found">No s\'han trobat mòduls</string>
+    <string name="update_file_created">El mòdul s\'actualitzarà en el següent reinici</string>
+    <string name="remove_file_created">El mòdul s\'eliminarà en el següent reinici</string>
+    <string name="remove_file_deleted"> El mòdul no s\'eliminarà en el següent reinici </string>
     <string name="disable_file_created"> El mòdul es desactivarà en el següent reinici </string>
-    <string name="disable_file_removed"> El mòdul s\’activarà en el següent reinici </string>
+    <string name="disable_file_removed"> El mòdul s\'activarà en el següent reinici </string>
     <string name="author">Creat per %1$s</string>
     <string name="reboot_recovery">Reiniciar en Mode Recuperació</string>
     <string name="reboot_bootloader">Reiniciar en Mode Bootloader</string>
     <string name="reboot_download">Reiniciar en Mode Download</string>
+    <string name="reboot_edl">Reiniciar a EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Actualització Disponible</string>
@@ -52,10 +53,10 @@
     <string name="updated_on">Actualitzat el: %1$s</string>
     <string name="sorting_order">Ordre de Classificació</string>
     <string name="sort_by_name">Ordenar per nom</string>
-    <string name="sort_by_update">Ordenar segons l\’última actualització</string>
+    <string name="sort_by_update">Ordenar segons l\'última actualització</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveLog">Guardar registre</string>
+    <string name="menuSaveLog">Desar registre</string>
     <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Netejar registre ara</string>
     <string name="logs_cleared">Registre netejat correctament</string>
@@ -70,7 +71,13 @@
     <string name="update_channel">Actualització de Magisk</string>
     <string name="progress_channel">Notificacions de progrés</string>
     <string name="download_complete">Baixada completada</string>
+    <string name="download_local">Buscant còpies locals…</string>
+    <string name="download_progress">%1$.2f / %2$.2f MB</string>
+    <string name="download_module">Injectant instal·lador…</string>
     <string name="download_file_error">Error en baixar l\'arxiu</string>
+    <string name="download_file_folder_error">Impossible trobar el directori de descàrrega per poder desar l\'arxiu descarregat, comprova permissos.</string>
+    <string name="download_open_parent">Mostra\'l al directori principal</string>
+    <string name="download_open_self">Mostra l\'arxiu</string>
     <string name="magisk_update_title">Actualització de Magisk disponible!</string>
     <string name="manager_update_title">Actualització de Magisk Manager disponible!</string>
 
@@ -122,21 +129,26 @@
     <string name="dl_one_module">Descarrega només un mòdul a la vegada.</string>
     
     <!--Settings Activity -->
+    <string name="settings_downloads_category">Descàrregues</string>
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema obscur</string>
     <string name="settings_dark_theme_summary">Habilitar el tema obscur</string>
+    <string name="settings_download_cache_title">Descarregar memòria cau</string>
+    <string name="settings_download_cache_summary">Activa la descàrrega de memòria cau per Magisk i els arxius zip dels Móduls.</string>
+    <string name="settings_download_path_title">Directori de descàrrega</string>
+    <string name="settings_download_path_message">Els arxius es desaràn a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
-    <string name="settings_clear_cache_summary">Neteja l’informació en memòria cau per als repositoris en línia, força a l’aplicació a actualitzar-se en línia.</string>
+    <string name="settings_clear_cache_summary">Neteja l\'informació en memòria cau per als repositoris en línia, força a l\'aplicació a actualitzar-se en línia.</string>
     <string name="settings_hide_manager_title">Amagar Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Re-empaquetar Magisk Manager amb un nom de paquet a l’atzar</string>
+    <string name="settings_hide_manager_summary">Re-empaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
     <string name="settings_restore_manager_title">Restaurar Magisk Manager</string>
     <string name="settings_restore_manager_summary">Restaura Magisk Manager amb el nom de paquet original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
-    <string name="settings_update">Configuració d’Actualització</string>
+    <string name="settings_update">Configuració d\'Actualització</string>
     <string name="settings_check_update_title">Comprovar Actualitzacions</string>
     <string name="settings_check_update_summary">Comprovar periòdicament en segon pla si existeixen actualitzacions</string>
-    <string name="settings_update_channel_title">Canal d’Actualitzacions</string>
+    <string name="settings_update_channel_title">Canal d\'Actualitzacions</string>
     <string name="settings_update_stable">Estable</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalitzat</string>
@@ -166,15 +178,15 @@
     <string name="settings_su_reauth_title">Re-autenticació</string>
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació es actualitzada o reinstal·lada</string>
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
-    <string name="settings_su_fingerprint_summary">Utilitza el sensor d’Empremta Dactilar per permetre les sol·licituds de superusuari</string>
+    <string name="settings_su_fingerprint_summary">Utilitza el sensor d\'Empremta Dactilar per permetre les sol·licituds de superusuari</string>
     <string name="auth_fingerprint">Autenticar Emprempta Digital</string>
 
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
     <string name="settings_owner_manage">Administrador del Dispositiu</string>
     <string name="settings_user_independent">Usuari Independent</string>
-    <string name="owner_only_summary">Només l\’administrador té accés d\'arrel</string>
-    <string name="owner_manage_summary"> Només l\’administrador pot supervisar l’acces d\'arrel y rebre sol·licituds d’altres usuaris</string>
+    <string name="owner_only_summary">Només l\'administrador té accés d\'arrel</string>
+    <string name="owner_manage_summary"> Només l\'administrador pot supervisar l\'acces d\'arrel y rebre sol·licituds d\'altres usuaris</string>
     <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel </string>
     
     <string name="mount_namespace_mode">Muntar Namespace </string>
@@ -185,7 +197,8 @@
     <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
     <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
     <string name="android_o_not_support">No es compatible amb Android 8.0+</string>
-    <string name="disable_fingerprint">No s\’han establert empremtes dactilars o no existeix el suport del dispositiu</string>
+    <string name="disable_fingerprint">No s\'han establert empremtes dactilars o no existeix el suport del dispositiu</string>
+    <string name="settings_download_path_error">Error al crear la carpeta. El directori ha de ser accesible desde el directori arrel i no pot ser un arxiu.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Petició de superusuari</string>
@@ -202,7 +215,7 @@
     <string name="sixtymin">60 mins</string>
     <string name="su_allow_toast">Permesos els drets de superusuari de %1$s</string>
     <string name="su_deny_toast">Denegats els drets de superusuari de %1$s</string>
-    <string name="no_apps_found">No s’han trobat aplicacions</string>
+    <string name="no_apps_found">No s\'han trobat aplicacions</string>
     <string name="su_snack_grant">Drets de superusuari de %1$s permesos</string>
     <string name="su_snack_deny"> Drets de superusuari de %1$s denegats</string>
     <string name="su_snack_notif_on">Notificacions de %1$s habilitades</string>
@@ -211,14 +224,14 @@
     <string name="su_snack_log_off">Registres de %1$s deshabilitats</string>
     <string name="su_snack_revoke">Anul·lats drets de %1$s</string>
     <string name="su_revoke_title">¿Revocar?</string>
-    <string name="su_revoke_msg">Confirmi per revocar drets de %1$s</string>
+    <string name="su_revoke_msg">Confirma per revocar drets de %1$s</string>
     <string name="toast">Avís</string>
     <string name="none">Cap</string>
     <string name="auth_fail">Autenticació fallida</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
-    <string name="target_uid">UID de l\’objectiu: %1$d</string>
+    <string name="target_uid">UID de l\'objectiu: %1$d</string>
     <string name="command">Ordre: %1$s</string>
     
     <!-- MagiskHide -->

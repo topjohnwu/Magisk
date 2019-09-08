@@ -7,19 +7,16 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
+import android.content.res.Configuration
 import android.database.Cursor
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.utils.FileProvider
+import com.topjohnwu.magisk.utils.currentLocale
 import java.io.File
 import java.io.FileNotFoundException
 
-val packageName: String
-    get() {
-        val app: App by inject()
-        return app.packageName
-    }
+val packageName: String get() = get<Context>().packageName
 
 val PackageInfo.processes
     get() = activities?.processNames.orEmpty() +
@@ -55,7 +52,7 @@ val ApplicationInfo.packageInfo: PackageInfo?
 val Uri.fileName: String
     get() {
         var name: String? = null
-        App.self.contentResolver.query(this, null, null, null, null)?.use { c ->
+        get<Context>().contentResolver.query(this, null, null, null, null)?.use { c ->
             val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             if (nameIndex != -1) {
                 c.moveToFirst()
@@ -86,10 +83,6 @@ fun Context.rawResource(id: Int) = resources.openRawResource(id)
 fun Context.readUri(uri: Uri) =
     contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
 
-fun ApplicationInfo.findAppLabel(pm: PackageManager): String {
-    return pm.getApplicationLabel(this).toString().orEmpty()
-}
-
 fun Intent.startActivity(context: Context) = context.startActivity(this)
 
 fun File.provide(context: Context = get()): Uri {
@@ -111,4 +104,18 @@ fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
     val out = mutableListOf<Result>()
     while (moveToNext()) out.add(transformer(this))
     return out
+}
+
+fun ApplicationInfo.getLabel(pm: PackageManager): String {
+    runCatching {
+        if (labelRes > 0) {
+            val res = pm.getResourcesForApplication(this)
+            val config = Configuration()
+            config.setLocale(currentLocale)
+            res.updateConfiguration(config, res.displayMetrics)
+            return res.getString(labelRes)
+        }
+    }
+
+    return loadLabel(pm).toString()
 }

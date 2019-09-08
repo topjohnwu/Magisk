@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.tasks
 
+import android.content.Context
 import android.net.Uri
 import com.skoumal.teanity.extensions.subscribeK
-import com.topjohnwu.magisk.App
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.extensions.fileName
 import com.topjohnwu.magisk.extensions.inject
@@ -20,8 +20,8 @@ abstract class FlashZip(
     private val logs: MutableList<String>
 ) {
 
-    private val app: App by inject()
-    private val installFolder = File(app.cacheDir, "flash").apply {
+    private val context: Context by inject()
+    private val installFolder = File(context.cacheDir, "flash").apply {
         if (!exists()) mkdirs()
     }
     private val tmpFile: File = File(installFolder, "install.zip")
@@ -43,7 +43,7 @@ abstract class FlashZip(
         console.add("- Copying zip to temp directory")
 
         runCatching {
-            app.readUri(mUri).use { input ->
+            context.readUri(mUri).use { input ->
                 tmpFile.outputStream().use { out -> input.copyTo(out) }
             }
         }.getOrElse {

@@ -9,7 +9,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
-import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 
@@ -18,7 +17,7 @@ class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvIte
     override val layoutRes: Int = R.layout.item_policy
 
     val isExpanded = KObservableField(false)
-    val isEnabled = KObservableField(item.policy == Policy.ALLOW)
+    val isEnabled = KObservableField(item.policy == MagiskPolicy.ALLOW)
     val shouldNotify = KObservableField(item.notification)
     val shouldLog = KObservableField(item.logging)
 
@@ -28,7 +27,7 @@ class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvIte
 
     private val currentStateItem
         get() = item.copy(
-            policy = if (isEnabled.value) Policy.ALLOW else Policy.DENY,
+            policy = if (isEnabled.value) MagiskPolicy.ALLOW else MagiskPolicy.DENY,
             notification = shouldNotify.value,
             logging = shouldLog.value
         )

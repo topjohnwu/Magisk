@@ -27,10 +27,9 @@ data class Repo(
 
     val lastUpdate get() = Date(last_update)
 
-    val lastUpdateString: String get() =
-        DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(lastUpdate)
+    val lastUpdateString: String get() = dateFormat.format(lastUpdate)
 
-    val downloadFilename: String get() = "$name-$version.zip".legalFilename()
+    val downloadFilename: String get() = "$name-$version($versionCode).zip".legalFilename()
 
     val readme get() = stringRepo.getReadme(this)
 
@@ -65,4 +64,8 @@ data class Repo(
     }
 
     class IllegalRepoException(message: String) : Exception(message)
+
+    companion object {
+        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)!!
+    }
 }

@@ -62,20 +62,14 @@ class PolicyDao(
 
 
     private fun Map<String, String>.toPolicySafe(): MagiskPolicy? {
-        val taskResult = runCatching { toPolicy(context.packageManager) }
-        val result = taskResult.getOrNull()
-        val exception = taskResult.exceptionOrNull()
-
-        Timber.e(exception)
-
-        when (exception) {
-            is PackageManager.NameNotFoundException -> {
+        return runCatching { toPolicy(context.packageManager) }.getOrElse {
+            Timber.e(it)
+            if (it is PackageManager.NameNotFoundException) {
                 val uid = getOrElse("uid") { null } ?: return null
                 delete(uid).subscribe()
             }
+            null
         }
-
-        return result
     }
 
 }

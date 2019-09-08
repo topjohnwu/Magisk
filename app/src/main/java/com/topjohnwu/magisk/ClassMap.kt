@@ -20,7 +20,6 @@ object ClassMap {
         SuRequestActivity::class.java to a.m::class.java
     )
 
-    @JvmStatic
     operator fun <T : Class<*>>get(c: Class<*>): T {
         return map.getOrElse(c) { throw IllegalArgumentException() } as T
     }

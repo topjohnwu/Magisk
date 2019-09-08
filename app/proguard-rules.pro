@@ -17,9 +17,9 @@
 #}
 
 # Snet
--keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
--keep,allowobfuscation interface com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback
--keepclassmembers class * implements com.topjohnwu.magisk.utils.ISafetyNetHelper$Callback {
+-keepclassmembers class com.topjohnwu.magisk.utils.SafetyNetHelper { *; }
+-keep,allowobfuscation interface com.topjohnwu.magisk.utils.SafetyNetHelper$Callback
+-keepclassmembers class * implements com.topjohnwu.magisk.utils.SafetyNetHelper$Callback {
   void onResponse(int);
 }
 
@@ -36,9 +36,6 @@
 
 # Strip logging
 -assumenosideeffects class timber.log.Timber.Tree { *; }
--assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
-  public *** debug(...);
-}
 
 # Excessive obfuscation
 -repackageclasses 'a'

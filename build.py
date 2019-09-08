@@ -51,7 +51,7 @@ else:
         os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
 
 cpu_count = multiprocessing.cpu_count()
-gradlew = os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')
+gradlew = os.path.join('.', 'gradlew' + ('.bat' if os.name == 'nt' else ''))
 archs = ['armeabi-v7a', 'x86']
 arch64 = ['arm64-v8a', 'x86_64']
 keystore = 'release-key.jks'
@@ -96,6 +96,18 @@ def mkdir_p(path, mode=0o777):
     os.makedirs(path, mode, exist_ok=True)
 
 
+def execv(cmd, redirect=None):
+    return subprocess.run(cmd, stdout=redirect if redirect != None else STDOUT)
+
+
+def system(cmd, redirect=None):
+    return subprocess.run(cmd, shell=True, stdout=redirect if redirect != None else STDOUT)
+
+
+def xz(data):
+    return lzma.compress(data, preset=9, check=lzma.CHECK_NONE)
+
+
 def zip_with_msg(zip_file, source, target):
     if not os.path.exists(source):
         error(f'{source} does not exist! Try build \'binary\' and \'apk\' before zipping!')
@@ -112,19 +124,23 @@ def collect_binary():
             mv(source, target)
 
 
-def execv(cmd, redirect=None):
-    return subprocess.run(cmd, stdout=redirect if redirect != None else STDOUT)
-
-
-def system(cmd, redirect=None):
-    return subprocess.run(cmd, shell=True, stdout=redirect if redirect != None else STDOUT)
-
-
-def xz(data):
-    return lzma.compress(data, preset=9, check=lzma.CHECK_NONE)
+def clean_elf():
+    if os.name == 'nt':
+        elf_cleaner = os.path.join('tools', 'elf-cleaner.exe')
+    else:
+        elf_cleaner = os.path.join('native', 'out', 'elf-cleaner')
+    if not os.path.exists(elf_cleaner):
+        execv(['g++', 'tools/termux-elf-cleaner/termux-elf-cleaner.cpp', '-o', elf_cleaner])
+    args = [elf_cleaner]
+    args.extend(os.path.join('native', 'out', arch, 'magisk') for arch in archs + arch64)
+    execv(args)
 
 
 def sign_zip(unsigned, output, release):
+    if not release:
+        mv(unsigned, output)
+        return
+
     signer_name = 'zipsigner-3.0.jar'
     zipsigner = os.path.join('signing', 'build', 'libs', signer_name)
 
@@ -136,18 +152,15 @@ def sign_zip(unsigned, output, release):
 
     header('* Signing Zip')
 
-    if release:
-        proc = execv(['java', '-jar', zipsigner, keystore, config['keyStorePass'],
-                      config['keyAlias'], config['keyPass'], unsigned, output])
-    else:
-        proc = execv(['java', '-jar', zipsigner, unsigned, output])
+    proc = execv(['java', '-jar', zipsigner, keystore, config['keyStorePass'],
+                  config['keyAlias'], config['keyPass'], unsigned, output])
 
     if proc.returncode != 0:
         error('Signing zip failed!')
 
 
 def binary_dump(src, out, var_name):
-    out.write(f'const static unsigned char {var_name}[] = {{')
+    out.write(f'constexpr unsigned char {var_name}[] = {{')
     for i, c in enumerate(xz(src.read())):
         if i % 16 == 0:
             out.write('\n')
@@ -169,12 +182,12 @@ def gen_update_binary():
     with open(file, 'rb') as f:
         script = f.read()
     # Align x86 busybox to bs
-    blkCnt = (len(x86_bb) - 1) // bs + 1
-    script = script.replace(b'__X86_CNT__', b'%d' % blkCnt)
+    blk_cnt = (len(x86_bb) - 1) // bs + 1
+    script = script.replace(b'__X86_CNT__', b'%d' % blk_cnt)
     update_bin[:len(script)] = script
     update_bin.extend(x86_bb)
     # Padding for alignment
-    update_bin.extend(b'\0' * (blkCnt * bs - len(x86_bb)))
+    update_bin.extend(b'\0' * (blk_cnt * bs - len(x86_bb)))
     update_bin.extend(arm_bb)
     return update_bin
 
@@ -206,6 +219,7 @@ def build_binary(args):
 
     if 'magisk' in args.target:
         run_ndk_build('B_MAGISK=1 B_64BIT=1')
+        clean_elf()
         # Dump the binary to header
         for arch in archs:
             bin_file = os.path.join('native', 'out', arch, 'magisk')
@@ -283,12 +297,11 @@ def build_snet(args):
         error('Build snet extention failed!')
     source = os.path.join('snet', 'build', 'outputs', 'apk',
                           'release', 'snet-release-unsigned.apk')
-    target = os.path.join(config['outdir'], 'snet.apk')
-    # Re-compress the whole APK for smaller size
+    target = os.path.join(config['outdir'], 'snet.jar')
+    # Extract classes.dex
     with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zout:
         with zipfile.ZipFile(source) as zin:
-            for item in zin.infolist():
-                zout.writestr(item.filename, zin.read(item))
+            zout.writestr('classes.dex', zin.read('classes.dex'))
     rm(source)
     header('Output: ' + target)
 
@@ -299,12 +312,12 @@ def zip_main(args):
     unsigned = tempfile.mkstemp()[1]
 
     with zipfile.ZipFile(unsigned, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
-        # META-INF
         # update-binary
         target = os.path.join('META-INF', 'com', 'google',
                               'android', 'update-binary')
         vprint('zip: ' + target)
         zipf.writestr(target, gen_update_binary())
+
         # updater-script
         source = os.path.join('scripts', 'flash_script.sh')
         target = os.path.join('META-INF', 'com', 'google',
@@ -324,7 +337,6 @@ def zip_main(args):
         target = os.path.join('common', 'magisk.apk')
         zip_with_msg(zipf, source, target)
 
-        # Scripts
         # boot_patch.sh
         source = os.path.join('scripts', 'boot_patch.sh')
         target = os.path.join('common', 'boot_patch.sh')
@@ -344,10 +356,11 @@ def zip_main(args):
         target = os.path.join('common', 'addon.d.sh')
         zip_with_msg(zipf, source, target)
 
-        # Prebuilts
-        for chromeos in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:
-            source = os.path.join('chromeos', chromeos)
-            zip_with_msg(zipf, source, source)
+        # chromeos
+        for tool in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:
+            source = os.path.join('tools', tool)
+            target = os.path.join('chromeos', tool)
+            zip_with_msg(zipf, source, target)
 
         # End of zipping
 
@@ -363,7 +376,6 @@ def zip_uninstaller(args):
     unsigned = tempfile.mkstemp()[1]
 
     with zipfile.ZipFile(unsigned, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
-        # META-INF
         # update-binary
         target = os.path.join('META-INF', 'com', 'google',
                               'android', 'update-binary')
@@ -381,7 +393,6 @@ def zip_uninstaller(args):
             target = os.path.join(zip_dir, 'magiskboot')
             zip_with_msg(zipf, source, target)
 
-        # Scripts
         # util_functions.sh
         source = os.path.join('scripts', 'util_functions.sh')
         with open(source, 'r') as script:
@@ -389,14 +400,16 @@ def zip_uninstaller(args):
             vprint(f'zip: {source} -> {target}')
             zipf.writestr(target, script.read())
 
-        # Prebuilts
-        for chromeos in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:
-            source = os.path.join('chromeos', chromeos)
-            zip_with_msg(zipf, source, source)
+        # chromeos
+        for tool in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:
+            source = os.path.join('tools', tool)
+            target = os.path.join('chromeos', tool)
+            zip_with_msg(zipf, source, target)
 
         # End of zipping
 
-    output = os.path.join(config['outdir'], f'Magisk-uninstaller-{datetime.datetime.now().strftime("%Y%m%d")}.zip'
+    datestr = datetime.datetime.now().strftime("%Y%m%d")
+    output = os.path.join(config['outdir'], f'Magisk-uninstaller-{datestr}.zip'
                           if config['prettyName'] else 'magisk-uninstaller.zip')
     sign_zip(unsigned, output, args.release)
     header('Output: ' + output)
@@ -504,4 +517,6 @@ mkdir_p(config['outdir'])
 if args.release and not os.path.exists(keystore):
     error(f'Please generate a java keystore and place it in "{keystore}"')
 STDOUT = None if args.verbose else subprocess.DEVNULL
+
+# Call corresponding functions
 args.func(args)

@@ -20,7 +20,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.topjohnwu.snet.Snet { *; }
+-keep,allowobfuscation class com.topjohnwu.snet.SafetyNetHelper
+-keepclassmembers class com.topjohnwu.snet.SafetyNetHelper {
+  ** get(...);
+}
 
--repackageclasses ''
+-repackageclasses 'x'
 -allowaccessmodification

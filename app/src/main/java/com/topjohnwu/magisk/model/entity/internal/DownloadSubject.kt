@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.extensions.cachedFile
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.entity.MagiskJson
+import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.module.Repo
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
@@ -20,8 +21,8 @@ sealed class DownloadSubject : Parcelable {
 
     @Parcelize
     data class Module(
-            val module: Repo,
-            val configuration: Configuration
+        val module: Repo,
+        val configuration: Configuration
     ) : DownloadSubject() {
         override val url: String get() = module.zipUrl
 
@@ -29,6 +30,27 @@ sealed class DownloadSubject : Parcelable {
         override val file by lazy {
             File(Config.downloadDirectory, module.downloadFilename)
         }
+    }
+
+    @Parcelize
+    data class Manager(
+        val configuration: Configuration.APK
+    ) : DownloadSubject() {
+
+        @IgnoredOnParcel
+        val manager: ManagerJson = Info.remote.app
+
+        override val title: String
+            get() = "MagiskManager-v${manager.version}(${manager.versionCode})"
+
+        override val url: String
+            get() = manager.link
+
+        @IgnoredOnParcel
+        override val file by lazy {
+            get<Context>().cachedFile("manager.apk")
+        }
+
     }
 
     sealed class Magisk : DownloadSubject() {

@@ -16,6 +16,15 @@ sealed class Configuration : Parcelable {
 
     }
 
+    sealed class APK : Configuration() {
+
+        @Parcelize
+        object Upgrade : APK()
+
+        @Parcelize
+        object Restore : APK()
+    }
+
     @Parcelize
     object Download : Configuration()
 

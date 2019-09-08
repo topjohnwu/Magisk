@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.model.entity
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import com.topjohnwu.magisk.extensions.getLabel
 import com.topjohnwu.magisk.model.entity.MagiskPolicy.Companion.INTERACTIVE
 
 
@@ -50,7 +51,7 @@ fun Map<String, String>.toPolicy(pm: PackageManager): MagiskPolicy {
         logging = get("logging")?.toIntOrNull() != 0,
         notification = get("notification")?.toIntOrNull() != 0,
         applicationInfo = info,
-        appName = info.loadLabel(pm).toString()
+        appName = info.getLabel(pm)
     )
 }
 

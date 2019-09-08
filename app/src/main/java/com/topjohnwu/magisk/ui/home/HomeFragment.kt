@@ -1,10 +1,12 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.app.Activity
-import android.os.Bundle
+import android.content.Context
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.viewevents.ViewEvent
-import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
 import com.topjohnwu.magisk.extensions.inject
@@ -12,21 +14,25 @@ import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.base.MagiskFragment
-import com.topjohnwu.magisk.utils.ISafetyNetHelper
+import com.topjohnwu.magisk.utils.DynamicClassLoader
+import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.superuser.Shell
-import dalvik.system.DexClassLoader
+import dalvik.system.DexFile
+import io.reactivex.Completable
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
+import java.lang.reflect.InvocationHandler
 
 class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
-    ISafetyNetHelper.Callback {
+    SafetyNetHelper.Callback {
 
     override val layoutRes: Int = R.layout.fragment_magisk
     override val viewModel: HomeViewModel by viewModel()
-    val magiskRepo: MagiskRepository by inject()
-    lateinit var EXT_FILE: File
+
+    private val magiskRepo: MagiskRepository by inject()
+    private val EXT_APK by lazy { File("${activity.filesDir.parent}/snet", "snet.jar") }
 
     override fun onResponse(responseCode: Int) = viewModel.finishSafetyNetCheck(responseCode)
 
@@ -41,11 +47,6 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
             is EnvFixEvent -> fixEnv()
             is UpdateSafetyNetEvent -> updateSafetyNet(false)
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        EXT_FILE = File("${requireActivity().filesDir.parent}/snet", "snet.apk")
     }
 
     override fun onStart() {
@@ -73,7 +74,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     private fun downloadSafetyNet(requiresUserInput: Boolean = true) {
         fun download() = magiskRepo.fetchSafetynet()
-                .map { it.byteStream().writeTo(EXT_FILE) }
+                .map { it.byteStream().writeTo(EXT_APK) }
                 .subscribeK { updateSafetyNet(true) }
 
         if (!requiresUserInput) {
@@ -91,30 +92,40 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
     }
 
     private fun updateSafetyNet(dieOnError: Boolean) {
-        try {
-            val loader = DexClassLoader(EXT_APK.path, EXT_APK.parent, null,
-                    ISafetyNetHelper::class.java.classLoader)
-            val clazz = loader.loadClass("com.topjohnwu.snet.Snet")
-            val helper = clazz.getMethod("newHelper",
-                    Class::class.java, String::class.java, Activity::class.java, Any::class.java)
-                    .invoke(null, ISafetyNetHelper::class.java, EXT_APK.path,
-                            requireActivity(), this) as ISafetyNetHelper
+        Completable.fromAction {
+            val loader = DynamicClassLoader(EXT_APK)
+            val dex = DexFile.loadDex(EXT_APK.path, EXT_APK.parent, 0)
+
+            // Scan through the dex and find our helper class
+            var helperClass: Class<*>? = null
+            for (className in dex.entries()) {
+                if (className.startsWith("x.")) {
+                    val cls = loader.loadClass(className)
+                    if (InvocationHandler::class.java.isAssignableFrom(cls)) {
+                        helperClass = cls
+                        break
+                    }
+                }
+            }
+            helperClass ?: throw Exception()
+
+            val helper = helperClass.getMethod("get",
+                    Class::class.java, Context::class.java, Any::class.java)
+                    .invoke(null, SafetyNetHelper::class.java, activity, this) as SafetyNetHelper
+
             if (helper.version < Const.SNET_EXT_VER)
                 throw Exception()
+
             helper.attest()
-        } catch (e: Exception) {
+        }.subscribeK(onError = {
             if (dieOnError) {
                 viewModel.finishSafetyNetCheck(-1)
-                return
+            } else {
+                Shell.sh("rm -rf " + EXT_APK.parent).exec()
+                EXT_APK.parentFile?.mkdir()
+                downloadSafetyNet(!dieOnError)
             }
-            Shell.sh("rm -rf " + EXT_APK.parent).exec()
-            EXT_APK.parentFile?.mkdir()
-            downloadSafetyNet(!dieOnError)
-        }
-    }
-
-    companion object {
-        val EXT_APK = File("${App.self.filesDir.parent}/snet", "snet.apk")
+        })
     }
 }
 
