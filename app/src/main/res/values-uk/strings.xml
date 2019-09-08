@@ -24,6 +24,7 @@
     <string name="advanced_settings_title">Розширені налаштування</string>
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
     <string name="keep_dm_verity">Залишити AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Режим Recovery</string>
     <string name="current_installed">Поточна: %1$s</string>
     <string name="latest_version">Найновіша: %1$s</string>
     <string name="uninstall">Видалити</string>
