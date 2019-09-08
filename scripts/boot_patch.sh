@@ -7,7 +7,7 @@
 # Usage: boot_patch.sh <bootimage>
 #
 # The following flags can be set in environment variables:
-# KEEPVERITY, KEEPFORCEENCRYPT
+# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE
 #
 # This script should be placed in a directory with the following files:
 #
@@ -84,6 +84,8 @@ case $? in
     ;;
 esac
 
+[ -f recovery_dtbo ] && RECOVERYMODE=true
+
 ##########################################################################################
 # Ramdisk restores
 ##########################################################################################
@@ -101,7 +103,7 @@ case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
     ui_print "- Backing up stock boot image"
-    SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
+    SHA1=`./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null`
     STOCKDUMP=stock_boot_${SHA1}.img.gz
     ./magiskboot compress "$BOOTIMAGE" $STOCKDUMP
     cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
@@ -133,8 +135,8 @@ ui_print "- Patching ramdisk"
 
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
+echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
-[ -f recovery_dtbo ] && echo "RECOVERYMODE=true" >> config
 
 ./magiskboot cpio ramdisk.cpio \
 "add 750 init magiskinit" \
