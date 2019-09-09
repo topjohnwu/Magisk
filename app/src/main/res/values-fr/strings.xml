@@ -24,6 +24,7 @@
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
     <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Mode Récupération</string>
     <string name="current_installed">Version actuellement installée : %1$s</string>
     <string name="latest_version">Dernière version disponible : %1$s</string>
     <string name="uninstall">Désinstaller</string>
