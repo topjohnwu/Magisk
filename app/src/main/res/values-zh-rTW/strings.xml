@@ -59,12 +59,9 @@
     <string name="menuReload">重新載入</string>
     <string name="menuClearLog">清除記錄檔</string>
     <string name="logs_cleared">記錄檔清除完成</string>
-    <string name="log_is_empty">無記錄檔</string>
 
     <!--About Activity-->
     <string name="app_changelog">更新日誌</string>
-    <string name="translators">Hugwalk</string>
-    <string name="app_translators">譯者</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk 更新</string>
@@ -95,7 +92,6 @@
     <string name="settings_reboot_toast">重新啟動即可套用變更</string>
     <string name="release_notes">發布說明</string>
     <string name="repo_cache_cleared">已清除資源庫快取</string>
-    <string name="internal_storage">ZIP 已儲存至：\n[內部儲存空間]%1$s</string>
 
     <string name="dtbo_patched_title">已修改 DTBO！</string>
     <string name="dtbo_patched_reboot">Magisk Manager 已修改 DTBO，請重新啟動</string>
@@ -117,9 +113,6 @@
     <string name="env_fix_title">需要增量更新</string>
     <string name="env_fix_msg">為確保 Magisk 正常運作，此裝置需要安裝增量更新。將開始下載 Magisk 安裝套件，是否繼續？</string>
     <string name="setup_msg">正在設定安裝環境…</string>
-    <string name="downloading_toast">正在下載 %1$s</string>
-    <string name="no_rw_storage">未授予外部儲存空間寫入權限，此功能將無法正常運作。</string>
-    <string name="dl_one_module">僅能同時下載單個模組</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">一般</string>
@@ -189,7 +182,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser 請求</string>
-    <string name="deny_with_str">%1$s拒絕</string>
     <string name="deny">拒絕</string>
     <string name="prompt">提示</string>
     <string name="grant">允許</string>
@@ -209,7 +201,6 @@
     <string name="su_snack_notif_off">已拒絕 %1$s 發送通知</string>
     <string name="su_snack_log_on">已啟用 %1$s 寫入記錄檔</string>
     <string name="su_snack_log_off">已停用 %1$s 寫入記錄檔</string>
-    <string name="su_snack_revoke">已撤銷 %1$s 的權限</string>
     <string name="su_revoke_title">撤銷</string>
     <string name="su_revoke_msg">確定撤銷 %1$s 的權限？</string>
     <string name="toast">快顯通知</string>

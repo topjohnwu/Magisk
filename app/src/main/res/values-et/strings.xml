@@ -59,12 +59,9 @@
     <string name="menuReload">Laadi uuesti</string>
     <string name="menuClearLog">Tühjenda logi nüüd</string>
     <string name="logs_cleared">Logi edukalt tühjendatud.</string>
-    <string name="log_is_empty">Logi on tühi.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Muutuste logi</string>
-    <string name="translators">Madis0</string>
-    <string name="app_translators">Rakenduse tõlkijad</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk\'i uuendused</string>
@@ -83,7 +80,6 @@
     <string name="settings_reboot_toast">Taaskäivita seadete rakendamiseks.</string>
     <string name="release_notes">Väljalaske märkmed</string>
     <string name="repo_cache_cleared">Hoidla vahemälu tühjendatud</string>
-    <string name="internal_storage">ZIP on salvestatud:\n[Sisemälu]%1$s</string>
     <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks.</string>
     <string name="dtbo_patched_title">DTBO sai paigatud!</string>
     <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img. Palun taaskäivita.</string>
@@ -109,9 +105,6 @@
     <string name="env_fix_msg">Sinu seade vajab lisaseadistust, et Magisk töötaks korralikult. Laadime alla Magisk\'i seadistus-zip\'i, kas soovid kohe jätkata?</string>
     <string name="setup_title">Lisaseadistus</string>
     <string name="setup_msg">Käivitan keskkonnaseadistust…</string>
-    <string name="downloading_toast">%1$s allalaadimine</string>
-    <string name="no_rw_storage">See funktsioon ei tööta ilma välismälule kirjutamise õiguseta.</string>
-    <string name="dl_one_module">Laadi alla üks moodul korraga.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Üldine</string>
@@ -181,7 +174,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superkasutaja taotlus</string>
-    <string name="deny_with_str">Keela %1$s</string>
     <string name="deny">Keela</string>
     <string name="prompt">Küsi</string>
     <string name="grant">Luba</string>
@@ -201,7 +193,6 @@
     <string name="su_snack_notif_off">Teated keelatud rakendusele %1$s</string>
     <string name="su_snack_log_on">Logimine lubatud rakendusele %1$s</string>
     <string name="su_snack_log_off">Logimine keelatud rakendusele %1$s</string>
-    <string name="su_snack_revoke">Rakenduse %1$s õigused on eemaldatud</string>
     <string name="su_revoke_title">Eemaldad?</string>
     <string name="su_revoke_msg">Kinnitad rakenduse %1$s õiguste eemaldamise?</string>
     <string name="toast">Hüpik</string>

@@ -58,12 +58,9 @@
     <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Limpar registro agora</string>
     <string name="logs_cleared">Registro limpo com sucesso</string>
-    <string name="log_is_empty">Registro vazio</string>
 
     <!--About Activity-->
     <string name="app_changelog">Registro de mudanças</string>
-    <string name="translators" />
-    <string name="app_translators">Tradutores</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Fechar</string>
@@ -75,7 +72,6 @@
     <string name="settings_reboot_toast">Reinicie para aplicar as configurações</string>
     <string name="release_notes">Notas de lançamento</string>
     <string name="repo_cache_cleared">Cache de repositório limpo</string>
-    <string name="internal_storage">O zip está armazenado em:\n[Armazenamento Interno]%1$s</string>
     <string name="manager_update_title">Nova Atualização do Magisk Manager Disponível!</string>
     <string name="manager_download_install">Toque para baixar e instalar</string>
     <string name="dtbo_patched_title">DTBO foi emendado!</string>
@@ -95,8 +91,6 @@
     <string name="proprietary_title">Baixar Código Proprietário</string>
     <string name="proprietary_notice">Magisk Manager é FOSS, que não contém o código proprietário da API SafetyNet da Google.\n\nPermitir ao Magisk Manager baixar uma extensão (que contém a GoogleApiClient) para a verificação SafetyNet?</string>
     <string name="download_file_error">Erro ao baixar arquivo</string>
-    <string name="downloading_toast">Baixando %1$s</string>
-    <string name="no_rw_storage">Este recurso não funcionará sem permissão para gravar no armazenamento externo.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Geral</string>
@@ -164,7 +158,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Solicitação de Superusuário</string>
-    <string name="deny_with_str">Negar%1$s</string>
     <string name="deny">Negar</string>
     <string name="prompt">Solicitar</string>
     <string name="grant">Conceder</string>
@@ -184,7 +177,6 @@
     <string name="su_snack_notif_off">Notificações de %1$s estão desativadas</string>
     <string name="su_snack_log_on">Os logs de %1$s serão gravados</string>
     <string name="su_snack_log_off">Os logs de %1$s não serão gravados</string>
-    <string name="su_snack_revoke">Direitos de %1$s estão revogados</string>
     <string name="su_revoke_title">Revogar?</string>
     <string name="su_revoke_msg">Revogar os direitos de %1$s?</string>
     <string name="toast">Notificação toast</string>

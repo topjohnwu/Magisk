@@ -60,22 +60,15 @@
     <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Netejar registre ara</string>
     <string name="logs_cleared">Registre netejat correctament</string>
-    <string name="log_is_empty">El registre està buit</string>
 
     <!--About Activity-->
     <string name="app_changelog">Registre de canvis</string>
-    <string name="translators">JoanVC100, QuitusAnbu27</string>
-    <string name="app_translators">Traductors</string>
-    
+
     <!-- System Components, Notifications -->
     <string name="update_channel">Actualització de Magisk</string>
     <string name="progress_channel">Notificacions de progrés</string>
     <string name="download_complete">Baixada completada</string>
-    <string name="download_local">Buscant còpies locals…</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Injectant instal·lador…</string>
     <string name="download_file_error">Error en baixar l\'arxiu</string>
-    <string name="download_file_folder_error">Impossible trobar el directori de descàrrega per poder desar l\'arxiu descarregat, comprova permissos.</string>
     <string name="download_open_parent">Mostra\'l al directori principal</string>
     <string name="download_open_self">Mostra l\'arxiu</string>
     <string name="magisk_update_title">Actualització de Magisk disponible!</string>
@@ -102,7 +95,6 @@
     <string name="settings_reboot_toast">Reinicia per aplicar els canvis</string>
     <string name="release_notes">Notes de llançament</string>
     <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
-    <string name="internal_storage">El zip està emmagatzemat en:\n[Internal Storage]%1$s</string>
 
     <string name="dtbo_patched_title">S\'ha arranjat DTBO</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img. Si us plau, reinicia el telèfon.</string>
@@ -124,17 +116,11 @@
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
     <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es descarregarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instalació ara?</string>
     <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
-    <string name="downloading_toast">Descarregant %1$s</string>
-    <string name="no_rw_storage">Aquesta funció no funcionara si no es té permís per escriure a l\'emmagatzematge.</string>
-    <string name="dl_one_module">Descarrega només un mòdul a la vegada.</string>
-    
+
     <!--Settings Activity -->
-    <string name="settings_downloads_category">Descàrregues</string>
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema obscur</string>
     <string name="settings_dark_theme_summary">Habilitar el tema obscur</string>
-    <string name="settings_download_cache_title">Descarregar memòria cau</string>
-    <string name="settings_download_cache_summary">Activa la descàrrega de memòria cau per Magisk i els arxius zip dels Móduls.</string>
     <string name="settings_download_path_title">Directori de descàrrega</string>
     <string name="settings_download_path_message">Els arxius es desaràn a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
@@ -202,7 +188,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Petició de superusuari</string>
-    <string name="deny_with_str">Denegar%1$s</string>
     <string name="deny">Denegar</string>
     <string name="prompt">Preguntar</string>
     <string name="grant">Permetre</string>
@@ -222,7 +207,6 @@
     <string name="su_snack_notif_off">Notificacions de %1$s deshabilitades</string>
     <string name="su_snack_log_on">Registres de %1$s habilitats</string>
     <string name="su_snack_log_off">Registres de %1$s deshabilitats</string>
-    <string name="su_snack_revoke">Anul·lats drets de %1$s</string>
     <string name="su_revoke_title">¿Revocar?</string>
     <string name="su_revoke_msg">Confirma per revocar drets de %1$s</string>
     <string name="toast">Avís</string>

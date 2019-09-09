@@ -56,12 +56,9 @@
     <string name="menuReload">Презареждане</string>
     <string name="menuClearLog">Изчистване на дневника</string>
     <string name="logs_cleared">Успешно изчистване на дневника.</string>
-    <string name="log_is_empty">Дневникът е празен.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Списък с промени</string>
-    <string name="translators" />
-    <string name="app_translators">Преводачи</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Затваряне</string>
@@ -73,7 +70,6 @@
     <string name="settings_reboot_toast">Трябва да рестартирате устройството, за да бъдат приложени настройките.</string>
     <string name="release_notes">Бележки</string>
     <string name="repo_cache_cleared">Кешът на хранилището е изчистен.</string>
-    <string name="internal_storage">Архивът е записан във:\n[Вътрешната памет]%1$s.</string>
     <string name="manager_update_title">Налице е нова версия на Magisk Manager.</string>
     <string name="manager_download_install">Докоснете за изтегляне и инсталиране.</string>
     <string name="dtbo_patched_title">DTBO беше модифициран!</string>
@@ -102,8 +98,6 @@
     <string name="setup_title">Допълнително надстройване</string>
     <string name="setup_msg">Надстройването на средата е в ход…</string>
     <string name="download_file_error">Грешка при изтеглянето на файла.</string>
-    <string name="downloading_toast">Изтегляне на %1$s</string>
-    <string name="no_rw_storage">Тази функция няма да работи без разрешение за запис във външната памет.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Общи</string>
@@ -173,7 +167,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Запитване за Superuser достъп</string>
-    <string name="deny_with_str">Отказ%1$s</string>
     <string name="deny">Отказ</string>
     <string name="prompt">Запитване</string>
     <string name="grant">Разрешаване</string>
@@ -193,7 +186,6 @@
     <string name="su_snack_notif_off">Известията за %1$s са изключени.</string>
     <string name="su_snack_log_on">Записването в дневника за %1$s е включено.</string>
     <string name="su_snack_log_off">Записването в дневника за %1$s е изключено.</string>
-    <string name="su_snack_revoke">Настройките за достъп на %1$s са анулирани.</string>
     <string name="su_revoke_title">Анулиране?</string>
     <string name="su_revoke_msg">Потвърждавате ли анулирането на настройките за достъп на %1$s?</string>
     <string name="toast">Toast</string>

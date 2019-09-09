@@ -5,18 +5,10 @@
         <item name="android:textColor">@color/colorText</item>
     </style>
 
-    <style name="TextAppearance.Inactive">
-        <item name="android:textColor">@color/colorTextInactive</item>
-    </style>
-
     <style name="TextAppearance.Emphasize" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="TextAppearance.Emphasize.Inactive">
-        <item name="android:textColor">@color/colorTextInactive</item>
     </style>
 
     <style name="TextAppearance.Emphasize.Tinted">
@@ -27,10 +19,6 @@
         <item name="android:textColor">@color/colorText</item>
     </style>
 
-    <style name="TextAppearance.Title.Inactive">
-        <item name="android:textColor">@color/colorTextInactive</item>
-    </style>
-
     <style name="TextAppearance.Caption" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textColor">@color/colorText</item>
     </style>
@@ -39,7 +27,4 @@
         <item name="android:textColor">@color/colorTextInactive</item>
     </style>
 
-    <style name="TextAppearance.Caption.Tinted">
-        <item name="android:textColor">@color/colorTextTinted</item>
-    </style>
 </resources>

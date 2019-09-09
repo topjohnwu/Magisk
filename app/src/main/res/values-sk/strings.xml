@@ -60,12 +60,9 @@
     <string name="menuReload">Obnoviť</string>
     <string name="menuClearLog">Odstrániť záznamy</string>
     <string name="logs_cleared">Záznamy boli odstránené</string>
-    <string name="log_is_empty">Nie su žiadne záznamy</string>
 
     <!--About Activity-->
     <string name="app_changelog">Zoznam zmien</string>
-    <string name="translators" />
-    <string name="app_translators">Prekladatelia</string>
     <!-- System Components, Notifications -->
     <string name="update_channel">Aktualizácie Magisk</string>
     <string name="progress_channel">Notifkikácie priebehu</string>
@@ -83,7 +80,6 @@
     <string name="settings_reboot_toast">Pre aplikovanie nastavení je potrebný reštart</string>
     <string name="release_notes">Poznámky k vydaniu</string>
     <string name="repo_cache_cleared">Cache repo odstránená</string>
-    <string name="internal_storage">Zip je uložený v:\n[Vnútorné úložisko]%1$s</string>
     <string name="manager_download_install">Stlačte pre stiahnutie a inštaláciu</string>
     <string name="dtbo_patched_title">DTBO bol zaplátaný!</string>
     <string name="dtbo_patched_reboot">Magisk Manager zaplátal dtbo.img, prosím, reštartujte</string>
@@ -107,9 +103,6 @@
     <string name="env_fix_msg">Vaše zariadenie si vyžaduje ďalšie nastavenie pre správne fungovanie Magisk. Stiahne sa inštalačný zip súbor Magisk, chcete pokračovať teraz?</string>
     <string name="setup_title">Ďalšie nastavenie</string>
     <string name="setup_msg">Spustené prostredie nastavenia…</string>
-    <string name="downloading_toast">Sťahovanie %1$s</string>
-    <string name="no_rw_storage">Táto funkcia nebude fungovať bez povolenia na zápis na externé úložisko.</string>
-    <string name="dl_one_module">Sťahovanie jedného modulu naraz.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Všeobecné</string>
@@ -179,7 +172,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Žiadosť superuser</string>
-    <string name="deny_with_str">Zamietnuť%1$s</string>
     <string name="deny">Zamietnuť</string>
     <string name="prompt">Výzva</string>
     <string name="grant">Udeliť</string>
@@ -199,7 +191,6 @@
     <string name="su_snack_notif_off">Notifikácie pre %1$s sú zakázané</string>
     <string name="su_snack_log_on">Zaznamenávanie %1$s je povolené</string>
     <string name="su_snack_log_off">Zaznamenávanie %1$s je zakázané</string>
-    <string name="su_snack_revoke">Práva %1$s sú zrušené </string>
     <string name="su_revoke_title">Zrušiť?</string>
     <string name="su_revoke_msg">Potvrdzujete zrušenie práv %1$s?</string>
     <string name="toast">Toast</string>

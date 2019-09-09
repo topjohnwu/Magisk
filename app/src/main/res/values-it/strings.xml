@@ -59,22 +59,15 @@
 	<string name="menuReload">Ricarica</string>
 	<string name="menuClearLog">Svuota il registro eventi</string>
 	<string name="logs_cleared">Registro eventi svuotato correttamente.</string>
-	<string name="log_is_empty">Il registro eventi è vuoto.</string>
 
-	<!--About Activity-->
+    <!--About Activity-->
 	<string name="app_changelog">Novità</string>
-	<string name="translators">Auanasgheps</string>
-	<string name="app_translators">Traduttori</string>
 
-	<!-- System Components, Notifications -->
+    <!-- System Components, Notifications -->
 	<string name="update_channel">Aggiornamenti Magisk</string>
    	<string name="progress_channel">Notifiche di avanzamento</string>
    	<string name="download_complete">Download completato</string>
-	<string name="download_local">Ricerca di copie locali…</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Iniettando l\'installer…</string>
-	<string name="download_file_error">Errore durante il download del file</string>
-	 <string name="download_file_folder_error">Impossibile recuperare la cartella padre per salvare il file scaricato, controlla i permessi.</string>
+    <string name="download_file_error">Errore durante il download del file</string>
     <string name="download_open_parent">Mostra nella cartella padre</string>
     <string name="download_open_self">Mostra file</string>												
 	<string name="magisk_update_title">È disponibile un aggiornamento di Magisk!</string>
@@ -101,9 +94,8 @@
 	<string name="settings_reboot_toast">Riavvia per applicare i cambiamenti.</string>
 	<string name="release_notes">Note di rilascio</string>
 	<string name="repo_cache_cleared">La cache delle repository è stata svuotata</string>
-	<string name="internal_storage">Il file zip si trova in:\n[Memoria Interna]%1$s</string>
-	
-	<string name="dtbo_patched_title">DTBO è stato aggiornato!</string>
+
+    <string name="dtbo_patched_title">DTBO è stato aggiornato!</string>
 	<string name="dtbo_patched_reboot">Magisk Manager ha aggiornato dtbo.img. Riavvia per completare.</string>
 	<string name="flashing">Flash in corso…</string>
 	<string name="done">Completato!</string>
@@ -123,17 +115,11 @@
 	<string name="env_fix_title">Configurazione aggiuntiva richiesta</string>
 	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
 	<string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
-	<string name="downloading_toast">Download di %1$s</string>
-	<string name="no_rw_storage">Questa funzione non sarà attiva senza l\'autorizzazione di scrittura nella memoria di archiviazione.</string>
-	<string name="dl_one_module">Scarica un modulo alla volta.</string>
 
-	<!--Settings Activity -->
-	<string name="settings_downloads_category">Download</string>
-	<string name="settings_general_category">Generale</string>
+    <!--Settings Activity -->
+    <string name="settings_general_category">Generale</string>
 	<string name="settings_dark_theme_title">Tema scuro</string>
 	<string name="settings_dark_theme_summary">Abilita il tema scuro.</string>
-	<string name="settings_download_cache_title">Scarica Cache</string>
-    <string name="settings_download_cache_summary">Abilita il download della cache per Magisk e i file zip dei Moduli.</string>
     <string name="settings_download_path_title">Percorso di download</string>
     <string name="settings_download_path_message">I file verranno salvati in %1$s</string>
 	<string name="settings_clear_cache_title">Svuota cache repository</string>
@@ -201,8 +187,7 @@
 
 	<!--Superuser-->
 	<string name="su_request_title">Richiesta Superuser</string>
-	<string name="deny_with_str">Nega %1$s</string>
-	<string name="deny">Nega</string>
+    <string name="deny">Nega</string>
 	<string name="prompt">Chiedi</string>
 	<string name="grant">Concedi</string>
 	<string name="su_warning">Concede il pieno accesso al dispositivo.\nNega se non sei sicuro!</string>
@@ -221,8 +206,7 @@
 	<string name="su_snack_notif_off">Notifiche per %1$s disabilitate</string>
 	<string name="su_snack_log_on">Registro eventi abilitato per %1$s</string>
 	<string name="su_snack_log_off">Registro eventi non abilitato per %1$s</string>
-	<string name="su_snack_revoke">I diritti di %1$s sono stati revocati</string>
-	<string name="su_revoke_title">Vuoi revocare?</string>
+    <string name="su_revoke_title">Vuoi revocare?</string>
 	<string name="su_revoke_msg">Confermi la revoca dei diritti di %1$s?</string>
 	<string name="toast">Toast</string>
 	<string name="none">Nessuno</string>

@@ -61,22 +61,15 @@
     <string name="menuReload">刷新</string>
     <string name="menuClearLog">清除日志</string>
     <string name="logs_cleared">日志已清除</string>
-    <string name="log_is_empty">日志为空</string>
 
     <!--About Activity-->
     <string name="app_changelog">应用更新日志</string>
-    <string name="translators">gh2923, vvb2060, Vanilla</string>
-    <string name="app_translators">翻译人员</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">更新提示</string>
     <string name="progress_channel">下载进度</string>
     <string name="download_complete">下载完成</string>
-    <string name="download_local">等待下载</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">注入安装程序</string>
     <string name="download_file_error">下载文件时出错</string>
-    <string name="download_file_folder_error">无法在指定目录下保存文件，请检查权限</string>
     <string name="download_open_parent">在文件夹中显示</string>
     <string name="download_open_self">打开文件</string>
     <string name="magisk_update_title">Magisk 可更新！</string>
@@ -103,7 +96,6 @@
     <string name="settings_reboot_toast">重启以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
-    <string name="internal_storage">模块安装包已被储存到：\n[内部存储空间]%1$s</string>
 
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
@@ -125,17 +117,11 @@
     <string name="env_fix_title">需要修复运行环境</string>
     <string name="env_fix_msg">缺失 Magisk 正常工作所需的文件。 将下载 Magisk 安装包进行修复安装，完成后自动重启，是否继续？</string>
     <string name="setup_msg">正在修复运行环境…</string>
-    <string name="downloading_toast">正在下载 %1$s</string>
-    <string name="no_rw_storage">未授予写入存储空间权限，此功能无法正常工作</string>
-    <string name="dl_one_module">一次只能下载一个模块</string>
 
     <!--Settings Activity -->
-    <string name="settings_downloads_category">下载</string>
     <string name="settings_general_category">常规</string>
     <string name="settings_dark_theme_title">暗色主题</string>
     <string name="settings_dark_theme_summary">使用暗色主题</string>
-    <string name="settings_download_cache_title">下载缓存</string>
-    <string name="settings_download_cache_summary">为 Magisk 安装包启用下载缓存</string>
     <string name="settings_download_path_title">下载路径</string>
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
@@ -203,7 +189,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">超级用户请求</string>
-    <string name="deny_with_str">拒绝 %1$s</string>
     <string name="deny">拒绝</string>
     <string name="prompt">提示</string>
     <string name="grant">允许</string>
@@ -223,7 +208,6 @@
     <string name="su_snack_notif_off">已禁用 %1$s 的通知</string>
     <string name="su_snack_log_on">已启用对 %1$s 的日志记录</string>
     <string name="su_snack_log_off">已禁用对 %1$s 的日志记录</string>
-    <string name="su_snack_revoke">已撤销 %1$s 的权限</string>
     <string name="su_revoke_title">撤销</string>
     <string name="su_revoke_msg">确认撤销 %1$s 的权限？</string>
     <string name="toast">消息提示</string>

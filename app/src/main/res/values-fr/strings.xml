@@ -61,22 +61,15 @@
     <string name="menuReload">Actualiser</string>
     <string name="menuClearLog">Effacer le journal maintenant</string>
     <string name="logs_cleared">Journal effacé avec succès.</string>
-    <string name="log_is_empty">Journal vide.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Journal</string>
-    <string name="translators">Rom, DevDef</string>
-    <string name="app_translators">Traducteurs de l’application</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Mises à jour de Magisk</string>
     <string name="progress_channel">Progression des notifications</string>
     <string name="download_complete">Téléchargement terminé</string>
-    <string name="download_local">Recherche de copies locales…</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Injection de l\'installateur…</string>
     <string name="download_file_error">Erreur de téléchargement du fichier</string>
-    <string name="download_file_folder_error">Impossible de récupérer le dossier parent afin d\'enregistrer le fichier téléchargé, vérifiez les permissions.</string>
     <string name="download_open_parent">Afficher dans le dossier parent</string>
     <string name="download_open_self">Afficher fichier</string>
     <string name="magisk_update_title">Une mise à jour de Magisk est disponible !</string>
@@ -103,8 +96,7 @@
     <string name="settings_reboot_toast">Redémarrer afin d’appliquer les réglages.</string>
     <string name="release_notes">Notes de version</string>
     <string name="repo_cache_cleared">Cache du dépôt effacé</string>
-    <string name="internal_storage">Le ZIP est enregistré dans :\n[stockage interne]%1$s</string>
-    
+
     <string name="dtbo_patched_title">DTBO a été modifié !</string>
     <string name="dtbo_patched_reboot">Magisk Manager vient de modifier le fichier dtbo.img, veuillez redémarrer.</string>
     <string name="flashing">Installation</string>
@@ -125,17 +117,11 @@
     <string name="env_fix_title">Installation additionnelle requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d’une configuration supplémentaire pour que Magisk fonctionne correctement. Pour cela, il est nécessaire de télécharger un fichier ZIP d’installation de Magisk. Voulez‐vous le faire maintenant ?</string>
     <string name="setup_msg">Démarrer l’installation de l’environnement…</string>
-    <string name="downloading_toast">Téléchargement de %1$s</string>
-    <string name="no_rw_storage">Cette opération ne fonctionnera pas sans la permission d’écriture sur le stockage externe.</string>
-    <string name="dl_one_module">Un seul module peut être téléchargé à la fois.</string>
 
-	<!--Settings Activity -->
-    <string name="settings_downloads_category">Téléchargements</string>
+    <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
     <string name="settings_dark_theme_title">Thème sombre</string>
     <string name="settings_dark_theme_summary">Activer le thème sombre.</string>
-    <string name="settings_download_cache_title">Cache de téléchargement</string>
-    <string name="settings_download_cache_summary">Activer le cache de téléchargement pour Magisk et les fichiers zip des Modules.</string>
     <string name="settings_download_path_title">Emplacement téléchargement</string>
     <string name="settings_download_path_message">Les fichiers seront sauvegardés dans %1$s</string>
     <string name="settings_clear_cache_title">Effacer le cache du dépôt</string>
@@ -203,7 +189,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Requête super‐utilisateur</string>
-    <string name="deny_with_str">Refuser %1$s</string>
     <string name="deny">Refuser</string>
     <string name="prompt">Demander</string>
     <string name="grant">Accepter</string>
@@ -223,7 +208,6 @@
     <string name="su_snack_notif_off">Les notifications pour %1$s sont désactivées</string>
     <string name="su_snack_log_on">La journalisation pour %1$s est activée</string>
     <string name="su_snack_log_off">La journalisation pour %1$s est désactivée</string>
-    <string name="su_snack_revoke">Les droits de %1$s sont annulés</string>
     <string name="su_revoke_title">Annuler ?</string>
     <string name="su_revoke_msg">Confirmez‐vous l’annulation des droits pour %1$s ?</string>
     <string name="toast">Toast</string>

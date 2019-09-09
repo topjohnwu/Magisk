@@ -56,12 +56,9 @@
     <string name="menuReload">Tải lại</string>
     <string name="menuClearLog">Xoá nhật ký ngay</string>
     <string name="logs_cleared">Đã xoá nhật ký thành công</string>
-    <string name="log_is_empty">Nhật ký trống</string>
-    
+
     <!--About Activity-->
     <string name="app_changelog">Nhật ký thay đổi của ứng dụng</string>
-    <string name="translators">Nguyễn Thanh Tài (thanhtai2009), Nguyễn Trung Hậu (trunghau1712)</string>
-    <string name="app_translators">Người dịch ứng dụng</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Đóng</string>
@@ -73,7 +70,6 @@
     <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
     <string name="release_notes">Thay đổi</string>
     <string name="repo_cache_cleared">Đã xoá bộ đệm kho</string>
-    <string name="internal_storage">Tập tin zip được lưu vào:\n[Bộ nhớ trong]%1$s</string>
     <string name="manager_update_title">Đã có bản cập nhật Magisk Manager mới!</string>
     <string name="manager_download_install">Nhấn để tải xuống và cài đặt.</string>
     <string name="dtbo_patched_title">DTBO đã được vá!</string>
@@ -102,9 +98,7 @@
     <string name="setup_title">Thiết lập bổ sung</string>
     <string name="setup_msg">Đang chạy thiết lập môi trường…</string>
     <string name="download_file_error">Lỗi tải tập tin</string>
-    <string name="downloading_toast">Đang tải xuống %1$s</string>
-    <string name="no_rw_storage">Tính năng này không hoạt động nếu thiếu quyền ghi vào bộ nhớ ngoài.</string>
-    
+
     <!--Settings Activity -->
     <string name="settings_general_category">Chung</string>
     <string name="settings_dark_theme_title">Chủ đề tối</string>
@@ -170,7 +164,6 @@
     
     <!--Superuser-->
     <string name="su_request_title">Yêu cầu Superuser</string>
-    <string name="deny_with_str">Từ chối%1$s</string>
     <string name="deny">Từ chối</string>
     <string name="prompt">Nhắc nhở</string>
     <string name="grant">Cấp phép</string>
@@ -190,7 +183,6 @@
     <string name="su_snack_notif_off">Thông báo của %1$s đã bị vô hiệu</string>
     <string name="su_snack_log_on">Ghi nhận của %1$s đã được kích hoạt</string>
     <string name="su_snack_log_off">Ghi nhận của %1$s đã bị vô hiệu</string>
-    <string name="su_snack_revoke">Quyền của %1$s đã được thu hồi</string>
     <string name="su_revoke_title">Thu hồi?</string>
     <string name="su_revoke_msg">Xác nhận thu hồi quyền của %1$s?</string>
     <string name="toast">Thông báo ngắn</string>

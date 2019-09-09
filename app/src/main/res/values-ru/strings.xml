@@ -61,22 +61,15 @@
     <string name="menuReload">Обновить</string>
     <string name="menuClearLog">Очистить лог</string>
     <string name="logs_cleared">Лог успешно очищен</string>
-    <string name="log_is_empty">Лог пуст</string>
 
     <!--About Activity-->
     <string name="app_changelog">Список изменений</string>
-    <string name="translators">Displax [4PDA], igor-dyatlov, zertyuiop</string>
-    <string name="app_translators">Переводчики</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Обновления Magisk</string>
     <string name="progress_channel">Уведомления о прогрессе</string>
     <string name="download_complete">Загрузка завершена</string>
-    <string name="download_local">Поиск локальных копий…</string>
-    <string name="download_progress">%1$.2f / %2$.2f МБ</string>
-    <string name="download_module">Встраивание установщика…</string>
     <string name="download_file_error">Ошибка загрузки файла</string>
-    <string name="download_file_folder_error">Невозможно открыть папку для сохранения загруженного файла, проверьте права доступа.</string>
     <string name="download_open_parent">Открыть папку с файлом</string>
     <string name="download_open_self">Открыть файл</string>
     <string name="magisk_update_title">Доступно обновление Magisk!</string>
@@ -103,8 +96,7 @@
     <string name="settings_reboot_toast">Для применения настроек перезагрузите устройство.</string>
     <string name="release_notes">О версии</string>
     <string name="repo_cache_cleared">Кэш репозитория очищен</string>
-    <string name="internal_storage">Расположение архива:\n[Внутреннее Хранилище]%1$s</string>
-    
+
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
     <string name="flashing">Прошивка…</string>
@@ -125,17 +117,11 @@
     <string name="env_fix_title">Требуется дополнительная установка</string>
     <string name="env_fix_msg">Вашему устройству требуется дополнительная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
     <string name="setup_msg">Настройка рабочей среды…</string>
-    <string name="downloading_toast">Загрузка %1$s</string>
-    <string name="no_rw_storage">Требуется разрешение на запись во внешнее хранилище.</string>
-    <string name="dl_one_module">Возможна загрузка только одного модуля.</string>
 
     <!--Settings Activity -->
-    <string name="settings_downloads_category">Загрузки</string>
     <string name="settings_general_category">Основные</string>
     <string name="settings_dark_theme_title">Тёмная тема</string>
     <string name="settings_dark_theme_summary">Включить тёмное оформление.</string>
-    <string name="settings_download_cache_title">Кэшироваие загрузок</string>
-    <string name="settings_download_cache_summary">Включить кэширование установочных ZIP Magisk.</string>
     <string name="settings_download_path_title">Папка загрузки</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
@@ -203,7 +189,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав суперпользователя</string>
-    <string name="deny_with_str">Отказать %1$s</string>
     <string name="deny">Отказать</string>
     <string name="prompt">Запрос</string>
     <string name="grant">Предоставить</string>
@@ -223,7 +208,6 @@
     <string name="su_snack_notif_off">Уведомления для %1$s отключены</string>
     <string name="su_snack_log_on">Логирование для %1$s включено</string>
     <string name="su_snack_log_off">Логирование для %1$s отключено</string>
-    <string name="su_snack_revoke">Настройки для %1$s сброшены</string>
     <string name="su_revoke_title">Сброс настроек</string>
     <string name="su_revoke_msg">Сбросить настройки для %1$s?</string>
     <string name="toast">Всплывающие уведомления</string>

@@ -6,15 +6,4 @@
         <item name="cardElevation">0dp</item>
     </style>
 
-    <style name="Widget.Card.Outlined">
-        <item name="cardBackgroundColor">@color/colorBackground</item>
-        <item name="strokeColor">@color/colorCardStrokeInverse</item>
-        <item name="strokeWidth">1dp</item>
-    </style>
-
-    <style name="Widget.Card.Outlined.Tinted">
-        <item name="cardBackgroundColor">@color/colorPrimary</item>
-        <item name="strokeColor">@color/colorCardStroke</item>
-    </style>
-
 </resources>

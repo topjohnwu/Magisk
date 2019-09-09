@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="floating_height">650dp</dimen>
-    <dimen name="floating_width">500dp</dimen>
-    <dimen name="card_divider_space">5sp</dimen>
-    <dimen name="card_horizontal_margin">8dip</dimen>
-    <dimen name="card_vertical_margin">3dip</dimen>
-    <dimen name="card_corner_radius">2dp</dimen>
     <dimen name="card_elevation">2dp</dimen>
     <dimen name="fab_padding">16dp</dimen>
 
     <!--new dimens-->
 
-    <dimen name="margin_generic_quadruple">64dp</dimen>
-    <dimen name="margin_generic_triple">48dp</dimen>
     <dimen name="margin_generic_double">32dp</dimen>
     <dimen name="margin_generic">16dp</dimen>
     <dimen name="margin_generic_half">8dp</dimen>
-    <dimen name="margin_generic_quarter">4dp</dimen>
-    <dimen name="margin_generic_eighth">2dp</dimen>
 
     <dimen name="radius_generic">8dp</dimen>
-    <dimen name="supplemental_animation_height">20dp</dimen>
-
-    <dimen name="divider_size">1dp</dimen>
 
     <!--new dimens ^^-->
 </resources>

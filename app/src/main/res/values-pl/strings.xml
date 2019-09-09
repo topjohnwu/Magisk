@@ -60,23 +60,16 @@
     <string name="menuReload">Załaduj ponownie</string>
     <string name="menuClearLog">Wyczyść Log</string>
     <string name="logs_cleared">Log wyczyszczony.</string>
-    <string name="log_is_empty">Log jest pusty.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Zmiany</string>
-    <string name="translators" />
-    <string name="app_translators">Tłumacze Aplikacji</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Aktualizacja Magisk</string>
     <string name="progress_channel">Powiadomienia o Postępie</string>
     <string name="download_complete">Pobieranie zakończone</string>
-    <string name="download_local">Szukam lokalne kopie …</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Instalator łaczenia…</string>
     <string name="download_file_error">Błąd pobierania pliku</string>
-	<string name="download_file_folder_error">Nie można pobrać folderu nadrzędnego w celu zapisania pobranego pliku, sprawdź uprawnienia.</string>
-   <string name="download_open_parent">Pokaż w folderze nadrzędnym</string>
+    <string name="download_open_parent">Pokaż w folderze nadrzędnym</string>
     <string name="download_open_self">Pokaż pliki</string>
    <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
     <string name="manager_update_title">Nowa Wersja Magisk Manager Dostępna!</string>
@@ -102,9 +95,8 @@
     <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia.</string>
     <string name="release_notes">Zmiany</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
-    <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
-    
-	<string name="dtbo_patched_title">DTBO został wgrany!</string>
+
+    <string name="dtbo_patched_title">DTBO został wgrany!</string>
     <string name="dtbo_patched_reboot">Magisk Manager wgrał dtbo.img. Uruchom ponownie</string>
     <string name="flashing">Flashowanie</string>
     <string name="done">Gotowe!</string>
@@ -124,18 +116,12 @@
     <string name="env_fix_title">Wymaga Dodatkowej Konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie pliku instalacyjnego Magisk, czy chcesz kontynuować?</string>
     <string name="setup_msg">Uruchamianie konfiguracji środowiska…</string>
-	<string name="downloading_toast">Pobieranie %1$s</string>
-    <string name="no_rw_storage">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
-    <string name="dl_one_module">Pobierz jeden moduł na raz.</string>
-	
-	<!--Settings Activity -->
-    <string name="settings_downloads_category">Pobieranie</string>
-	<string name="settings_general_category">Ogólne</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
-    <string name="settings_download_cache_title">Pobierz Cache</string>
-    <string name="settings_download_cache_summary">Włącza pobieranie pamięci podręcznej dla plików zip Magisk i Modułów.</string>
-	<string name="settings_download_path_title">Pobierz dodatek</string>
+    <string name="settings_download_path_title">Pobierz dodatek</string>
     <string name="settings_download_path_message">Pliki zostaną zapisane w %1$s</string>
 	<string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie repozytorium online.</string>
@@ -202,7 +188,6 @@
    
    <!--Superuser-->
     <string name="su_request_title">Prośba o dostęp Superusera</string>
-    <string name="deny_with_str">Odmów%1$s</string>
     <string name="deny">Odmów</string>
     <string name="prompt">Zapytaj</string>
     <string name="grant">Przyznaj</string>
@@ -222,7 +207,6 @@
     <string name="su_snack_notif_off">Powiadomienia dla %1$s są wyłączone</string>
     <string name="su_snack_log_on">Logowanie dla %1$s jest włączone</string>
     <string name="su_snack_log_off">Logowanie dla %1$s jest wyłączone</string>
-    <string name="su_snack_revoke">%1$s uprawnienia są odwołane</string>
     <string name="su_revoke_title">Odwołać?</string>
     <string name="su_revoke_msg">Potwierdzasz odwołanie uprawnień %1$s?</string>
     <string name="toast">Powiadomienie</string>

@@ -61,22 +61,15 @@
     <string name="menuReload">Оновити</string>
     <string name="menuClearLog">Очистити журнал</string>
     <string name="logs_cleared">Журнал успішно очищено.</string>
-    <string name="log_is_empty">Журнал пустий.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Перелік змін</string>
-    <string name="translators">tarasyyyk</string>
-    <string name="app_translators">Перекладачі</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Оновлення Magisk</string>
     <string name="progress_channel">Сповіщення прогресу</string>
     <string name="download_complete">Завантаження завершено</string>
-    <string name="download_local">Пошук локальних копій…</string>
-    <string name="download_progress">%1$.2f / %2$.2f МБ</string>
-    <string name="download_module">Вбудовування встановлювача…</string>
     <string name="download_file_error">Помилка завантаження файлу</string>
-    <string name="download_file_folder_error">Неможливо отримати батьківську папку для збереження завантаженого файлу, перевірте права.</string>
     <string name="download_open_parent">Показати в батьківській папці</string>
     <string name="download_open_self">Показати файл</string>
     <string name="magisk_update_title">Доступне оновлення Magisk!</string>
@@ -103,7 +96,6 @@
     <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій.</string>
     <string name="release_notes">Особливості версії</string>
     <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
-    <string name="internal_storage">Архів розташований у:\n[Внутрішньому Сховищі]%1$s</string>
 
     <string name="dtbo_patched_title">DTBO пропатчено!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчив dtbo.img. Будь ласка, перезавантажте пристрій.</string>
@@ -125,17 +117,11 @@
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
     <string name="env_fix_msg">Для правильної роботи Magisk, потрібне додаткове налаштування вашого пристрою. Буде завантажено zip-архів. Розпочати негайно?</string>
     <string name="setup_msg">Налаштування робочого середовища…</string>
-    <string name="downloading_toast">Завантаження %1$s</string>
-    <string name="no_rw_storage">Ця функція не працюватиме без дозволу на запис у Внутрішнє сховище</string>
-    <string name="dl_one_module">Завантажувати один модуль на раз.</string>
 
     <!--Settings Activity -->
-    <string name="settings_downloads_category">Завантаження</string>
     <string name="settings_general_category">Основні</string>
     <string name="settings_dark_theme_title">Темна тема</string>
     <string name="settings_dark_theme_summary">Увімкнути темне оформлення.</string>
-    <string name="settings_download_cache_title">Завантажувати кеш</string>
-    <string name="settings_download_cache_summary">Увімкнути завантаження кешу для Magisk і модулів в zip файлах.</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
     <string name="settings_clear_cache_title">Очищення кешу</string>
@@ -203,7 +189,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав Суперкористувача</string>
-    <string name="deny_with_str">Відмовити %1$s</string>
     <string name="deny">Відмовити</string>
     <string name="prompt">Запитувати</string>
     <string name="grant">Надати</string>
@@ -223,7 +208,6 @@
     <string name="su_snack_notif_off">Сповіщення для %1$s вимкнено</string>
     <string name="su_snack_log_on">Журнал подій для %1$s увімкнено</string>
     <string name="su_snack_log_off">Журнал подій для %1$s вимкнено</string>
-    <string name="su_snack_revoke">Права для %1$s відкликані</string>
     <string name="su_revoke_title">Відкликати?</string>
     <string name="su_revoke_msg">Підтвердити відкликання прав для %1$s?</string>
     <string name="toast">Спливаюче сповіщення</string>

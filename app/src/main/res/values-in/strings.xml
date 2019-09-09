@@ -59,22 +59,15 @@
     <string name="menuReload">Muat ulang</string>
     <string name="menuClearLog">Bersihkan log sekarang</string>
     <string name="logs_cleared">Log berhasil dibersihkan.</string>
-    <string name="log_is_empty">Log kosong.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Log pembaruan</string>
-    <string name="translators">Albert I (krasCGQ)</string>
-    <string name="app_translators">Penerjemah</string>
 
     <!--System Components, Notifications-->
     <string name="update_channel">Pembaruan Magisk</string>
     <string name="progress_channel">Notifikasi Kemajuan</string>
     <string name="download_complete">Unduhan selesai</string>
-    <string name="download_local">Mencari salinan lokal…</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Menyuntikkan pemasang…</string>
     <string name="download_file_error">Kesalahan mengunduh file</string>
-    <string name="download_file_folder_error">Tidak dapat memperoleh induk folder untuk menyimpan file yang diunduh, periksa izin.</string>
     <string name="download_open_parent">Tampilkan dalam induk folder</string>
     <string name="download_open_self">Tampilkan file</string>
     <string name="magisk_update_title">Pembaruan Magisk Tersedia!</string>
@@ -101,7 +94,6 @@
     <string name="settings_reboot_toast">Reboot untuk menerapkan perubahan.</string>
     <string name="release_notes">Catatan rilis</string>
     <string name="repo_cache_cleared">Cache repo dibersihkan</string>
-    <string name="internal_storage">Zip disimpan di:\n[Penyimpanan Internal]%1$s</string>
 
     <string name="dtbo_patched_title">DTBO telah ditambal!</string>
     <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silakan reboot.</string>
@@ -123,17 +115,11 @@
     <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
     <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
     <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
-    <string name="downloading_toast">Mengunduh %1$s</string>
-    <string name="no_rw_storage">Fitur ini tidak akan bekerja tanpa izin untuk menulis ke penyimpanan eksternal.</string>
-    <string name="dl_one_module">Unduh satu modul pada suatu waktu.</string>
 
     <!--Settings Activity -->
-    <string name="settings_downloads_category">Unduhan</string>
     <string name="settings_general_category">Umum</string>
     <string name="settings_dark_theme_title">Tema Gelap</string>
     <string name="settings_dark_theme_summary">Aktifkan tema gelap.</string>
-    <string name="settings_download_cache_title">Cache Unduhan</string>
-    <string name="settings_download_cache_summary">Mengaktifkan cache unduhan untuk Magisk and file zip modul.</string>
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
     <string name="settings_clear_cache_title">Bersihkan Cache Repo</string>
@@ -201,7 +187,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Permintaan Superuser</string>
-    <string name="deny_with_str">Tolak%1$s</string>
     <string name="deny">Tolak</string>
     <string name="prompt">Beritahu</string>
     <string name="grant">Izinkan</string>
@@ -221,7 +206,6 @@
     <string name="su_snack_notif_off">Notifikasi dari %1$s dinonaktifkan</string>
     <string name="su_snack_log_on">Logging dari %1$s diaktifkan</string>
     <string name="su_snack_log_off">Logging dari %1$s dinonaktifkan</string>
-    <string name="su_snack_revoke">Akses %1$s dicabut</string>
     <string name="su_revoke_title">Cabut?</string>
     <string name="su_revoke_msg">Konfirmasi untuk mencabut akses %1$s?</string>
     <string name="toast">Toast</string>

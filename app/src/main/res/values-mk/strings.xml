@@ -59,12 +59,9 @@
     <string name="menuReload">Вчитај повторно</string>
     <string name="menuClearLog">Исчисти го записникот сега</string>
     <string name="logs_cleared">Записникот е успешно исчистен.</string>
-    <string name="log_is_empty">Записникот е празен.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Листа на промени</string>
-    <string name="translators">davidtrpcevski</string>
-    <string name="app_translators">Преведувачи</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk Ажурирања</string>
@@ -95,7 +92,6 @@
     <string name="settings_reboot_toast">Рестартирајте за да ги примените поставките.</string>
     <string name="release_notes">Белешки за изданието</string>
     <string name="repo_cache_cleared">Кешот од репозиториумот е исчистен</string>
-    <string name="internal_storage">Zip датотеката е сместена во:\n[Внатрешна меморија]%1$s</string>
 
     <string name="dtbo_patched_title">DTBO е обновено!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ја обнови dtbo.img датотеката. Ве молиме, рестартирајте.</string>
@@ -115,9 +111,6 @@
     <string name="env_fix_title">Потребни е дополнително поставување</string>
     <string name="env_fix_msg">На Вашиот уред му е потребно дополнително поставување за Magisk да работи нормално. Ќе се преземе ZIP фајлот за поставување на Magisk, дали сакате да продолжите?</string>
     <string name="setup_msg">Надградба на работната околина…</string>
-    <string name="downloading_toast">Преземање %1$s</string>
-    <string name="no_rw_storage">Оваа функција нема да работи без дозвола за запис на надворешната меморија.</string>
-    <string name="dl_one_module">Преземај модули еден по друг.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Општо</string>
@@ -187,7 +180,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Супер-корисник барање</string>
-    <string name="deny_with_str">Одбиј%1$s</string>
     <string name="deny">Одбиј</string>
     <string name="prompt">Прашај</string>
     <string name="grant">Одобри</string>
@@ -207,7 +199,6 @@
     <string name="su_snack_notif_off">Известувањата од %1$s се оневозможени</string>
     <string name="su_snack_log_on">Записникот на настани е овозможен за %1$s</string>
     <string name="su_snack_log_off">Записникот на настани е оневозможен %1$s</string>
-    <string name="su_snack_revoke">Правата за %1$s се анулирани</string>
     <string name="su_revoke_title">Анулирај?</string>
     <string name="su_revoke_msg">Дали потврдувате анулирање на поставките за пристап на %1$s?</string>
     <string name="toast">Тост</string>
