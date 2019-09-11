@@ -25,39 +25,39 @@
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i koru</string>
     <string name="current_installed">Yüklü: %1$s</string>
-    <string name="latest_version">Yeni: %1$s</string>
+    <string name="latest_version">Güncel: %1$s</string>
     <string name="uninstall">Kaldır</string>
     <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
-    <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verileriniz şifrelenecek</string>
+    <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacaktır ve verileriniz zaten şifrelenmemişse potansiyel olarak verileriniz şifrelenecektir.</string>
     <string name="update">Güncelle</string>
     <string name="core_only_enabled">(Yalnızca çekirdek modu etkin)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
     <string name="no_modules_found">Modül yok</string>
-    <string name="update_file_created">Modül sonraki yeniden başlatmada güncellenecek</string>
-    <string name="remove_file_created">Modül sonraki yeniden başlatmada kaldırılacak</string>
-    <string name="remove_file_deleted">Modül sonraki yeniden başlatmada kaldırılmayacak</string>
-    <string name="disable_file_created">Modül sonraki yeniden başlatmada devre dışı bırakılacak</string>
-    <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek</string>
+    <string name="update_file_created">Modül sonraki yeniden başlatmada güncellenecek!</string>
+    <string name="remove_file_created">Modül sonraki yeniden başlatmada kaldırılacak!</string>
+    <string name="remove_file_deleted">Modül sonraki yeniden başlatmada kaldırılmayacak!</string>
+    <string name="disable_file_created">Modül sonraki yeniden başlatmada devre dışı bırakılacak!</string>
+    <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek!</string>
     <string name="author">Yapımcı: %1$s</string>
-    <string name="reboot_recovery">Kurtarma modunda yeniden başlat</string>
-    <string name="reboot_bootloader">Ön yükleyici modunda yeniden başlat</string>
-    <string name="reboot_download">Yükleme modunda yeniden başlat</string>
-	<string name="reboot_edl">EDL için yeniden başlat</string>
+    <string name="reboot_recovery">Kurtarma moduna yeniden başlat</string>
+    <string name="reboot_bootloader">Ön yükleyici moduna yeniden başlat</string>
+    <string name="reboot_download">Yükleme moduna yeniden başlat</string>
+    <string name="reboot_edl">EDL moduna yeniden başlat</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Güncelleme Mevcut</string>
-    <string name="installed">Yüklenmiş</string>
-    <string name="not_installed">Yüklenmemiş</string>
-    <string name="updated_on">Güncelleme: %1$s</string>
+    <string name="installed">Yüklü</string>
+    <string name="not_installed">Yüklü Değil</string>
+    <string name="updated_on">Güncelleme zamanı: %1$s</string>
     <string name="sorting_order">Sıralama Düzeni</string>
     <string name="sort_by_name">İsme göre sırala</string>
     <string name="sort_by_update">Son güncellemeye göre sırala</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Günlüğü kaydet</string>
-    <string name="menuReload">Yenile</string>
+    <string name="menuReload">Yeniden yükle</string>
     <string name="menuClearLog">Günlüğü temizle</string>
     <string name="logs_cleared">Günlük başarıyla temizlendi</string>
 
@@ -83,7 +83,7 @@
     <string name="select_method">Yöntem seçin</string>
     <string name="setup_title">Ek kurulum</string>
     <string name="select_patch_file">Dosya seçin ve yamalayın</string>
-    <string name="patch_file_msg">Bir raw yansısı (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
+    <string name="patch_file_msg">Bir işlenmemiş görüntü (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
 
     <!--Toasts, Dialogs-->
@@ -102,8 +102,8 @@
     <string name="done">Tamamlandı!</string>
     <string name="failure">Başarısız</string>
     <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu…</string>
-    <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu.</string>
+    <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı.</string>
     <string name="warning">Uyarı</string>
     <string name="complete_uninstall">Tamamen Kaldır</string>
     <string name="restore_img">Önyükleme İmajını Geri Yükle</string>
@@ -111,7 +111,7 @@
     <string name="restore_done">Yenileme tamamlandı!</string>
     <string name="restore_fail">Stok önyükleme yedeği yok!</string>
     <string name="proprietary_title">Tescil Kodunu İndirin</string>
-    <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan Google\'ın tescilli olduğu SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için bir uzantıyı (GoogleApiClient içeriyor) indirmesine izin veriyor musunuz?</string>
+    <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan gerekli olan Google\'a ait SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için (GoogleApiClient içeren) bir uzantıyı indirmesine izin veriyor musunuz?</string>
     <string name="setup_fail">Kurulum başarısız</string>
     <string name="env_fix_title">Ek Kurulum Gerekli</string>
     <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
