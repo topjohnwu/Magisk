@@ -146,9 +146,11 @@ void node_entry::create_module_tree(const char *module) {
 		if (is_root()) {
 			// Root nodes should not be replaced
 			rm_rf(buf);
-			return;
+		} else if (status < IS_MODULE) {
+			// Upgrade current node to current module
+			this->module = module;
+			status = IS_MODULE;
 		}
-		status = IS_MODULE;
 		return;
 	}
 
