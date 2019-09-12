@@ -126,9 +126,7 @@ fun startActivity(intent: Intent) {
 
 class RootUtils : Shell.Initializer() {
 
-    override fun onInit(context: Context?, shell: Shell): Boolean {
-        context ?: return false
-
+    override fun onInit(context: Context, shell: Shell): Boolean {
         val job = shell.newJob()
         if (shell.isRoot) {
             job.add(context.rawResource(R.raw.util_functions))
