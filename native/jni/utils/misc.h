@@ -1,13 +1,12 @@
 #pragma once
 
-#define UID_SHELL  (get_shell_uid())
 #define UID_ROOT   0
+#define UID_SHELL  2000
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-unsigned get_shell_uid();
 int fork_dont_care();
 int fork_no_zombie();
 int strend(const char *s1, const char *s2);

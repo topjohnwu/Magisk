@@ -17,14 +17,6 @@
 #include <logging.h>
 #include <utils.h>
 
-unsigned get_shell_uid() {
-	struct passwd* ppwd = getpwnam("shell");
-	if (nullptr == ppwd)
-		return 2000;
-
-	return ppwd->pw_uid;
-}
-
 int fork_dont_care() {
 	int pid = xfork();
 	if (pid) {
