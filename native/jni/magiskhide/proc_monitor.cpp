@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <pthread.h>
@@ -78,16 +79,27 @@ static inline long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_
 void update_uid_map() {
 	mutex_guard lock(monitor_lock);
 	uid_proc_map.clear();
-	string data_path(APP_DATA_DIR);
-	data_path += "/0/";
-	size_t len = data_path.length();
-	struct stat st;
-	for (auto &hide : hide_set) {
-		data_path.erase(data_path.begin() + len, data_path.end());
-		data_path += hide.first;
-		if (stat(data_path.data(), &st))
-			continue;
-		uid_proc_map[st.st_uid].emplace_back(hide.second);
+	unique_ptr<DIR, decltype(&closedir)> dp(opendir(APP_DATA_DIR), &closedir);
+	if (dp) {
+		while (struct dirent *ent = readdir (dp.get())) {
+			if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, ".."))
+				continue;
+			string data_path(APP_DATA_DIR);
+			data_path += "/";
+			data_path += ent->d_name;
+			data_path += "/";
+			size_t len = data_path.length();
+			struct stat st;
+			for (const auto &hide : hide_set) {
+				data_path.erase(data_path.begin() + len, data_path.end());
+				data_path += hide.first;
+				if (stat(data_path.data(), &st))
+					continue;
+				uid_proc_map[st.st_uid].emplace_back(hide.second);
+			}
+		}
+	} else {
+		LOGD("cannot read %s contents\n", APP_DATA_DIR);
 	}
 }
 
@@ -218,7 +230,7 @@ static bool check_pid(int pid) {
 		cmdline == "usap32"sv || cmdline == "usap64"sv)
 		return false;
 
-	int uid = st.st_uid % 100000;
+	int uid = st.st_uid;
 	auto it = uid_proc_map.find(uid);
 	if (it != uid_proc_map.end()) {
 		for (auto &s : it->second) {
