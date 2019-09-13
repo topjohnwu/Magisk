@@ -321,13 +321,12 @@ void su_daemon_handler(int client, struct ucred *credential) {
 
 	// Setup environment
 	umask(022);
-	char path[32], buf[4096];
+	char path[32];
 	snprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
-	xreadlink(path, buf, sizeof(buf));
-	chdir(buf);
+	chdir(path);
 	snprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
-	memset(buf, 0, sizeof(buf));
-	int fd = open(path, O_RDONLY);
+	char buf[4096] = { 0 };
+	int fd = xopen(path, O_RDONLY);
 	read(fd, buf, sizeof(buf));
 	close(fd);
 	clearenv();
@@ -340,13 +339,14 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		pw = getpwuid(ctx.req.uid);
 		if (pw) {
 			setenv("HOME", pw->pw_dir, 1);
-			if (ctx.req.login || ctx.req.uid) {
-				setenv("USER", pw->pw_name, 1);
-				setenv("LOGNAME", pw->pw_name, 1);
-			}
+			setenv("USER", pw->pw_name, 1);
+			setenv("LOGNAME", pw->pw_name, 1);
 			setenv("SHELL", ctx.req.shell, 1);
 		}
 	}
+	const char *ld_path = getenv("LD_LIBRARY_PATH");
+	if (ld_path && strncmp(ld_path, ":/apex/com.android.runtime/lib", 30) == 0)
+		unsetenv("LD_LIBRARY_PATH");
 
 	// Unblock all signals
 	sigset_t block_set;
