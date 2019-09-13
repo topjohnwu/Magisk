@@ -83,56 +83,50 @@ static void database_check(const shared_ptr<su_info> &info) {
 		validate_manager(info->str[SU_MANAGER], uid / 100000, &info->mgr_st);
 }
 
-static void update_su_info(unsigned uid) {
+static shared_ptr<su_info> get_su_info(unsigned uid) {
 	LOGD("su: request from uid=[%d]\n", uid);
 
-	RunFinally refresh([] {
-		cached->refresh();
-	});
+	shared_ptr<su_info> info;
 
-	// Get from cache or new instance
 	{
 		MutexGuard lock(cache_lock);
 		if (!cached || cached->uid != uid || !cached->is_fresh())
 			cached = make_shared<su_info>(uid);
-		else
-			return;
+		cached->refresh();
+		info = cached;
 	}
 
-	// Lock before the policy is determined
-	cached->lock();
+	info->lock();
 	RunFinally unlock([&] {
-		cached->unlock();
+		info->unlock();
 	});
 
-	if (cached->access.policy == QUERY) {
+	if (info->access.policy == QUERY) {
 		// Not cached, get data from database
-		database_check(cached);
+		database_check(info);
 
 		// If it's root or the manager, allow it silently
-		if (cached->uid == UID_ROOT || (cached->uid % 100000) == (cached->mgr_st.st_uid % 100000)) {
-			cached->access = SILENT_SU_ACCESS;
-			return;
+		if (info->uid == UID_ROOT || (info->uid % 100000) == (info->mgr_st.st_uid % 100000)) {
+			info->access = SILENT_SU_ACCESS;
+			return info;
 		}
 
 		// Check su access settings
-		switch (cached->cfg[ROOT_ACCESS]) {
+		switch (info->cfg[ROOT_ACCESS]) {
 			case ROOT_ACCESS_DISABLED:
 				LOGW("Root access is disabled!\n");
-				cached->access = NO_SU_ACCESS;
-				return;
+				info->access = NO_SU_ACCESS;
+				break;
 			case ROOT_ACCESS_ADB_ONLY:
-				if (cached->uid != UID_SHELL) {
+				if (info->uid != UID_SHELL) {
 					LOGW("Root access limited to ADB only!\n");
-					cached->access = NO_SU_ACCESS;
-					return;
+					info->access = NO_SU_ACCESS;
 				}
 				break;
 			case ROOT_ACCESS_APPS_ONLY:
-				if (cached->uid == UID_SHELL) {
+				if (info->uid == UID_SHELL) {
 					LOGW("Root access is disabled for ADB!\n");
-					cached->access = NO_SU_ACCESS;
-					return;
+					info->access = NO_SU_ACCESS;
 				}
 				break;
 			case ROOT_ACCESS_APPS_AND_ADB:
@@ -140,14 +134,16 @@ static void update_su_info(unsigned uid) {
 				break;
 		}
 
-		if (cached->access.policy != QUERY)
-			return;
+		if (info->access.policy != QUERY)
+			return info;
 
 		// If still not determined, check if manager exists
-		if (cached->str[SU_MANAGER][0] == '\0') {
-			cached->access = NO_SU_ACCESS;
-			return;
+		if (info->str[SU_MANAGER][0] == '\0') {
+			info->access = NO_SU_ACCESS;
+			return info;
 		}
+	} else {
+		return info;
 	}
 
 	// If still not determined, ask manager
@@ -155,17 +151,19 @@ static void update_su_info(unsigned uid) {
 	int sockfd = create_rand_socket(&addr);
 
 	// Connect manager
-	app_connect(addr.sun_path + 1, cached);
+	app_connect(addr.sun_path + 1, info);
 	int fd = socket_accept(sockfd, 60);
 	if (fd < 0) {
-		cached->access.policy = DENY;
+		info->access.policy = DENY;
 	} else {
-		socket_send_request(fd, cached);
+		socket_send_request(fd, info);
 		int ret = read_int_be(fd);
-		cached->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
+		info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
 		close(fd);
 	}
 	close(sockfd);
+
+	return info;
 }
 
 static void set_identity(unsigned uid) {
@@ -187,9 +185,8 @@ static void set_identity(unsigned uid) {
 void su_daemon_handler(int client, struct ucred *credential) {
 	LOGD("su: request from pid=[%d], client=[%d]\n", credential->pid, client);
 
-	update_su_info(credential->uid);
 	su_context ctx = {
-		.info = cached,
+		.info = get_su_info(credential->uid),
 		.req = su_request(true),
 		.pid = credential->pid
 	};
