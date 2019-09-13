@@ -1,9 +1,3 @@
-/* daemon.c - Magisk Daemon
- *
- * Start the daemon and wait for requests
- * Connect the daemon and send requests through sockets
- */
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -30,12 +24,18 @@ static void verify_client(int client, pid_t pid) {
 	// Verify caller is the same as server
 	char path[32];
 	sprintf(path, "/proc/%d/exe", pid);
-	struct stat st{};
-	stat(path, &st);
-	if (st.st_dev != SERVER_STAT.st_dev || st.st_ino != SERVER_STAT.st_ino) {
+	struct stat st;
+	if (stat(path, &st) || st.st_dev != SERVER_STAT.st_dev || st.st_ino != SERVER_STAT.st_ino) {
 		close(client);
 		pthread_exit(nullptr);
 	}
+}
+
+static void remove_modules() {
+	LOGI("* Remove all modules and reboot");
+	rm_rf(MODULEROOT);
+	rm_rf(MODULEUPGRADE);
+	reboot();
 }
 
 static void *request_handler(void *args) {
@@ -95,6 +95,16 @@ static void *request_handler(void *args) {
 		LOGD("* Use broadcasts for su logging and notify\n");
 		CONNECT_BROADCAST = true;
 		close(client);
+		break;
+	case REMOVE_MODULES:
+		if (credential.uid == UID_SHELL || credential.uid == UID_ROOT) {
+			remove_modules();
+			write_int(client, 0);
+		} else {
+			write_int(client, 1);
+		}
+		close(client);
+		break;
 	default:
 		close(client);
 		break;
@@ -167,6 +177,13 @@ static void main_daemon() {
 		*client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
 		new_daemon_thread(request_handler, client);
 	}
+}
+
+void reboot() {
+	if (RECOVERY_MODE)
+		exec_command_sync("/system/bin/reboot", "recovery");
+	else
+		exec_command_sync("/system/bin/reboot");
 }
 
 int switch_mnt_ns(int pid) {

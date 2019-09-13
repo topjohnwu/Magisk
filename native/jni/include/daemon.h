@@ -18,6 +18,7 @@ enum {
 	MAGISKHIDE,
 	SQLITE_CMD,
 	BROADCAST_ACK,
+	REMOVE_MODULES,
 };
 
 // Return codes for daemon
@@ -32,6 +33,7 @@ enum {
 
 int connect_daemon(bool create = false);
 int switch_mnt_ns(int pid);
+void reboot();
 
 // socket.c
 

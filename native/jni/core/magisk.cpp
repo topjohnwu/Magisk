@@ -16,31 +16,33 @@ using namespace std::literals;
 
 [[noreturn]] static void usage() {
 	fprintf(stderr,
-		FULL_VER(Magisk) " multi-call binary\n"
-		"\n"
-		"Usage: magisk [applet [arguments]...]\n"
-		"   or: magisk [options]...\n"
-		"\n"
-		"Options:\n"
-		"   -c                        print current binary version\n"
-		"   -v                        print running daemon version\n"
-		"   -V                        print running daemon version code\n"
-		"   --list                    list all available applets\n"
-		"   --daemon                  manually start magisk daemon\n"
-		"   --[init trigger]          start service for init trigger\n"
-		"\n"
-		"Advanced Options (Internal APIs):\n"
-		"   --unlock-blocks           set BLKROSET flag to OFF for all block devices\n"
-		"   --restorecon              restore selinux context on Magisk files\n"
-		"   --clone-attr SRC DEST     clone permission, owner, and selinux context\n"
-		"   --clone SRC DEST          clone SRC to DEST\n"
-  		"   --sqlite SQL              exec SQL to Magisk database\n"
-		"   --use-broadcast           use broadcast for su logging and notify\n"
-		"\n"
-		"Supported init triggers:\n"
-		"   post-fs-data, service, boot-complete\n"
-		"\n"
-		"Supported applets:\n");
+FULL_VER(Magisk) R"EOF( multi-call binary
+
+Usage: magisk [applet [arguments]...]
+   or: magisk [options]...
+
+Options:
+   -c                        print current binary version
+   -v                        print running daemon version
+   -V                        print running daemon version code
+   --list                    list all available applets
+   --daemon                  manually start magisk daemon
+   --remove-modules          remove all modules and reboot
+   --[init trigger]          start service for init trigger
+
+Advanced Options (Internal APIs):
+   --unlock-blocks           set BLKROSET flag to OFF for all block devices
+   --restorecon              restore selinux context on Magisk files
+   --clone-attr SRC DEST     clone permission, owner, and selinux context
+   --clone SRC DEST          clone SRC to DEST
+   --sqlite SQL              exec SQL commands to Magisk database
+   --use-broadcast           use broadcast for su logging and notify
+
+Supported init triggers:
+   post-fs-data, service, boot-complete
+
+Supported applets:
+)EOF");
 
 	for (int i = 0; applet_names[i]; ++i)
 		fprintf(stderr, i ? ", %s" : "    %s", applet_names[i]);
@@ -117,6 +119,10 @@ int magisk_main(int argc, char *argv[]) {
 		int fd = connect_daemon();
 		write_int(fd, BROADCAST_ACK);
 		return 0;
+	} else if (argv[1] == "--remove-modules"sv) {
+		int fd = connect_daemon();
+		write_int(fd, REMOVE_MODULES);
+		return read_int(fd);
 	}
 #if 0
 	/* Entry point for testing stuffs */

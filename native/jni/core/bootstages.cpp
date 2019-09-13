@@ -1,10 +1,3 @@
-/* bootstages.c - Core bootstage operations
- *
- * All bootstage operations, including simple mount in post-fs,
- * magisk mount in post-fs-data, various image handling, script
- * execution, load modules, install Magisk Manager etc.
- */
-
 #include <sys/mount.h>
 #include <sys/wait.h>
 #include <stdlib.h>
@@ -718,10 +711,7 @@ void late_start(int client) {
 		if (access(SECURE_DIR, F_OK) != 0)
 			xmkdir(SECURE_DIR, 0700);
 		// And reboot to make proper setup possible
-		if (RECOVERY_MODE)
-			exec_command_sync("/system/bin/reboot", "recovery");
-		else
-			exec_command_sync("/system/bin/reboot");
+		reboot();
 	}
 
 	if (access(BBPATH, F_OK) != 0){
