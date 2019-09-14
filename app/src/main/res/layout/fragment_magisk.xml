@@ -197,6 +197,18 @@
                             app:layout_constraintWidth_default="wrap"
                             app:layout_constraintWidth_min="300dp" />
 
+                        <CheckBox
+                            android:id="@+id/force_disable"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:checked="@={viewModel.isForceDisable}"
+                            android:text="@string/force_disable"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/recovery_mode"
+                            app:layout_constraintWidth_default="wrap"
+                            app:layout_constraintWidth_min="300dp" />
+
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>

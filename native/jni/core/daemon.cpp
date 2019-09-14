@@ -18,6 +18,7 @@
 
 int SDK_INT = -1;
 bool RECOVERY_MODE = false;
+bool FORCE_DISABLE = false;
 static struct stat self_st;
 
 static void verify_client(int client, pid_t pid) {
@@ -154,6 +155,8 @@ static void main_daemon() {
 	parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
 		if (key == "RECOVERYMODE" && val == "true")
 			RECOVERY_MODE = true;
+		else if (key == "FORCEDISABLE" && val == "true")
+			FORCE_DISABLE = true;
 		return true;
 	});
 

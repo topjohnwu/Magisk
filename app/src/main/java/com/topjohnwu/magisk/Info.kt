@@ -19,6 +19,7 @@ object Info {
     var keepVerity = false
     var keepEnc = false
     var recovery = false
+    var forceDisable = false
 
     val isConnected by lazy {
         KObservableField(false).also { field ->

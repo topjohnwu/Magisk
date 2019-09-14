@@ -37,6 +37,7 @@ class HomeViewModel(
     val isForceEncryption = KObservableField(Info.keepEnc)
     val isKeepVerity = KObservableField(Info.keepVerity)
     val isRecovery = KObservableField(Info.recovery)
+    val isForceDisable = KObservableField(Info.forceDisable)
 
     val magiskState = KObservableField(MagiskState.LOADING)
     val magiskStateText = Observer(magiskState) {
@@ -105,6 +106,9 @@ class HomeViewModel(
         }
         isRecovery.addOnPropertyChangedCallback {
             Info.recovery = it ?: return@addOnPropertyChangedCallback
+        }
+        isForceDisable.addOnPropertyChangedCallback {
+            Info.forceDisable = it ?: return@addOnPropertyChangedCallback
         }
         isConnected.addOnPropertyChangedCallback {
             if (it == true) refresh(false)

@@ -253,8 +253,8 @@ abstract class MagiskInstaller {
         }
 
         if (!("KEEPFORCEENCRYPT=${Info.keepEnc} KEEPVERITY=${Info.keepVerity} " +
-                "RECOVERYMODE=${Info.recovery} sh update-binary " +
-                "sh boot_patch.sh $srcBoot").sh().isSuccess) {
+                "RECOVERYMODE=${Info.recovery} FORCEDISABLE=${Info.forceDisable} " +
+                "sh update-binary sh boot_patch.sh $srcBoot").sh().isSuccess) {
             return false
         }
 

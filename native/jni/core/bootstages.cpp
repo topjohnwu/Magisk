@@ -653,6 +653,9 @@ void post_fs_data(int client) {
 	fclose(cf);
 #endif
 
+	if (FORCE_DISABLE)
+		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
+
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
 		unblock_boot_process();
