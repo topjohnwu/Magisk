@@ -331,11 +331,15 @@ int unpack(const char *image, bool hdr) {
 	// Dump extra
 	dump(boot.extra, boot.hdr.extra_size(), EXTRA_FILE);
 
-	// Dump recovery_dtbo
-	dump(boot.recov_dtbo, boot.hdr.recovery_dtbo_size(), RECV_DTBO_FILE);
-
-	// Dump dtb
-	dump(boot.dtb, boot.hdr.dtb_size(), DTB_FILE);
+	uint32_t hdr_ver = boot.hdr.header_version();
+	if (hdr_ver > 0) {
+		// Dump recovery_dtbo
+		dump(boot.recov_dtbo, boot.hdr.recovery_dtbo_size(), RECV_DTBO_FILE);
+	}
+	if (hdr_ver > 1) {
+		// Dump dtb
+		dump(boot.dtb, boot.hdr.dtb_size(), DTB_FILE);
+	}
 	return ret;
 }
 
