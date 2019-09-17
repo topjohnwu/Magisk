@@ -214,8 +214,8 @@ static bool check_pid(int pid) {
 		return true;
 	}
 
-	// Still zygote/usap
-	if (strncmp(cmdline, "zygote", 6) == 0 || strncmp(cmdline, "usap", 4) == 0)
+	if (cmdline == "zygote"sv || cmdline == "zygote32"sv || cmdline == "zygote64"sv ||
+		cmdline == "usap32"sv || cmdline == "usap64"sv)
 		return false;
 
 	int uid = st.st_uid % 100000;
