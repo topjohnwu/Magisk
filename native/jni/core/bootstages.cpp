@@ -22,6 +22,7 @@ using namespace std;
 static char buf[PATH_MAX], buf2[PATH_MAX];
 static vector<string> module_list;
 static bool no_secure_dir = false;
+static bool pfs_done = false;
 
 static int bind_mount(const char *from, const char *to, bool log = true);
 extern void auto_start_magiskhide();
@@ -600,6 +601,7 @@ static void dump_logs() {
 }
 
 [[noreturn]] static void core_only() {
+	pfs_done = true;
 	auto_start_magiskhide();
 	unblock_boot_process();
 }
@@ -714,6 +716,9 @@ void late_start(int client) {
 		reboot();
 	}
 
+	if (!pfs_done)
+		return;
+
 	if (access(BBPATH, F_OK) != 0){
 		LOGE("* post-fs-data mode is not triggered\n");
 		unlock_blocks();
@@ -744,6 +749,9 @@ void boot_complete(int client) {
 	// ack
 	write_int(client, 0);
 	close(client);
+
+	if (!pfs_done)
+		return;
 
 	if (access(MANAGERAPK, F_OK) == 0) {
 		// Install Magisk Manager if exists

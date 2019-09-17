@@ -18,14 +18,14 @@
 
 int SDK_INT = -1;
 bool RECOVERY_MODE = false;
-static struct stat SERVER_STAT;
+static struct stat self_st;
 
 static void verify_client(int client, pid_t pid) {
 	// Verify caller is the same as server
 	char path[32];
 	sprintf(path, "/proc/%d/exe", pid);
 	struct stat st;
-	if (stat(path, &st) || st.st_dev != SERVER_STAT.st_dev || st.st_ino != SERVER_STAT.st_ino) {
+	if (stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino) {
 		close(client);
 		pthread_exit(nullptr);
 	}
@@ -137,7 +137,7 @@ static void main_daemon() {
 	LOGI(SHOW_VER(Magisk) " daemon started\n");
 
 	// Get server stat
-	stat("/proc/self/exe", &SERVER_STAT);
+	stat("/proc/self/exe", &self_st);
 
 	// Get API level
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
