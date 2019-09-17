@@ -244,15 +244,19 @@ void boot_img::find_dtb() {
 }
 
 void boot_img::print_hdr() {
-	fprintf(stderr, "HEADER_VER      [%u]\n", hdr->header_version());
+	uint32_t ver = hdr->header_version();
+	fprintf(stderr, "HEADER_VER      [%u]\n", ver);
 	fprintf(stderr, "KERNEL_SZ       [%u]\n", hdr->kernel_size());
 	fprintf(stderr, "RAMDISK_SZ      [%u]\n", hdr->ramdisk_size());
 	fprintf(stderr, "SECOND_SZ       [%u]\n", hdr->second_size());
-	fprintf(stderr, "EXTRA_SZ        [%u]\n", hdr->extra_size());
-	fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", hdr->recovery_dtbo_size());
-	fprintf(stderr, "DTB             [%u]\n", hdr->dtb_size());
+	if (ver) {
+		fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", hdr->recovery_dtbo_size());
+		fprintf(stderr, "DTB             [%u]\n", hdr->dtb_size());
+	} else {
+		fprintf(stderr, "EXTRA_SZ        [%u]\n", hdr->extra_size());
+	}
 
-	uint32_t ver = hdr->os_version();
+	ver = hdr->os_version();
 	if (ver) {
 		int a,b,c,y,m = 0;
 		int version, patch_level;
