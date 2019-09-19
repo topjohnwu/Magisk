@@ -33,11 +33,12 @@ Supported actions:
     Return values:
     0:valid    1:error    2:chromeos
 
-  repack <origbootimg> [outbootimg]
+  repack [-n] <origbootimg> [outbootimg]
     Repack boot image components from current directory
     to [outbootimg], or new-boot.img if not specified.
-    It will compress ramdisk.cpio and kernel with the same method in
-    <origbootimg> if the file provided is not already compressed.
+    If '-n' is provided, it will not attempt to recompress ramdisk.cpio,
+    otherwise it will compress ramdisk.cpio and kernel with the same method
+    in <origbootimg> if the file provided is not already compressed.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
     Search <hexpattern1> in <file>, and replace with <hexpattern2>
@@ -81,7 +82,7 @@ Supported actions:
       test
         Check if fstab has verity/avb flags
         Return values:
-        0:no flags    1:flag exists
+        0:flag exists    1:no flags
       patch
         Search for fstab and remove verity/avb
 
@@ -192,6 +193,7 @@ Options:
    -V                        print running daemon version code
    --list                    list all available applets
    --daemon                  manually start magisk daemon
+   --remove-modules          remove all modules and reboot
    --[init trigger]          start service for init trigger
 
 Advanced Options (Internal APIs):
@@ -199,13 +201,14 @@ Advanced Options (Internal APIs):
    --restorecon              restore selinux context on Magisk files
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
-   --sqlite SQL              exec SQL to Magisk database
+   --sqlite SQL              exec SQL commands to Magisk database
+   --use-broadcast           use broadcast for su logging and notify
 
 Supported init triggers:
    post-fs-data, service, boot-complete
 
 Supported applets:
-    magisk, su, resetprop, magiskhide
+    su, resetprop, magiskhide
 ```
 
 ### su
@@ -255,13 +258,16 @@ Flags:
 An applet of `magisk`, the CLI to control MagiskHide. Use this tool to communicate with the daemon to change MagiskHide settings.
 
 ```
-Usage: magiskhide [--option [arguments...] ]
+Usage: magiskhide [action [arguments...] ]
 
-Options:
-  --status          Return the status of magiskhide
-  --enable          Start magiskhide
-  --disable         Stop magiskhide
-  --add PKG [PROC]  Add a new target to the hide list
-  --rm PKG [PROC]   Remove from the hide list
-  --ls              List the current hide list
+Actions:
+   status          Return the status of magiskhide
+   enable          Start magiskhide
+   disable         Stop magiskhide
+   add PKG [PROC]  Add a new target to the hide list
+   rm PKG [PROC]   Remove target(s) from the hide list
+   ls              Print the current hide list
+   exec CMDs...    Execute commands in isolated mount
+                   namespace and do all hide unmounts
+   test            Run process monitor test
 ```
