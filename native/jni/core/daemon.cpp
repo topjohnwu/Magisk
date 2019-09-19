@@ -39,8 +39,7 @@ static void remove_modules() {
 }
 
 static void *request_handler(void *args) {
-	int client = *((int *) args);
-	delete (int *) args;
+	int client = reinterpret_cast<intptr_t>(args);
 
 	struct ucred credential;
 	get_client_cred(client, &credential);
@@ -173,9 +172,8 @@ static void main_daemon() {
 
 	// Loop forever to listen for requests
 	for (;;) {
-		int *client = new int;
-		*client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
-		new_daemon_thread(request_handler, client);
+		int client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
+		new_daemon_thread(request_handler, reinterpret_cast<void*>(client));
 	}
 }
 
