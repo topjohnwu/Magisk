@@ -7,7 +7,7 @@ If you already have Magisk installed, it is **strongly recommended to upgrade di
 
 Otherwise, follow the instructions in [Knowing Your Device](#knowing-your-device), and choose the right steps
 
-- If your device is **NOT** A/B, but **IS** using system-as-root, then you will have to install Magisk to the recovery partition of your device. Follow the instructions in [Boot Image Patching](#boot-image-patching), but instead of using your boot image, use your recovery image. **Read through the [Magisk in Recovery](magisk-in-recovery) section!**
+- If your device is **NOT** A/B, but **IS** using system-as-root, then you will have to install Magisk to the recovery partition of your device. Follow the instructions in [Boot Image Patching](#boot-image-patching), but instead of using your boot image, use your recovery image. **Read through the [Magisk in Recovery](#magisk-in-recovery) section!**
 - Otherwise, you can either follow the instructions in [Custom Recovery](#custom-recovery) (if your device have custom recovery available) or [Boot Image Patching](#boot-image-patching).
 
 Other notes:
