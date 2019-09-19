@@ -1,3 +1,4 @@
-# v7.3.2
-- Fix potential crash in superuser fragment
-- Preserve searched state in repo fragment
+# v7.3.4
+- App is now fully written in Kotlin!
+- New downloading system
+- Add new "Recovery Mode" to Advanced Settings
