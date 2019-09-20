@@ -5,36 +5,99 @@ extern "C" {
 #include <libfdt.h>
 }
 #include <utils.h>
+#include <bitset>
 
 #include "magiskboot.h"
 #include "format.h"
 
-static void print_props(const void *fdt, int node, int depth) {
-	int prop;
-	fdt_for_each_property_offset(prop, fdt, node) {
-		for (int i = 0; i < depth; ++i) printf("    ");
-		printf("  ");
-		int size;
-		const char *name;
-		const char *value = (char *) fdt_getprop_by_offset(fdt, prop, &name, &size);
-		printf("[%s]: [%s]\n", name, value);
+using namespace std;
+
+constexpr int MAX_DEPTH = 32;
+static bitset<MAX_DEPTH> depth_set;
+
+static void pretty_node(int depth) {
+	if (depth == 0)
+		return;
+
+	for (int i = 0; i < depth - 1; ++i) {
+		if (depth_set[i])
+			printf("│   ");
+		else
+			printf("    ");
 	}
+	if (depth_set[depth - 1])
+		printf("├── ");
+	else
+		printf("└── ");
 }
 
-static void print_subnode(const void *fdt, int parent, int depth) {
-	int node;
-	fdt_for_each_subnode(node, fdt, parent) {
-		for (int i = 0; i < depth; ++i) printf("    ");
-		printf("#%d: %s\n", node, fdt_get_name(fdt, node, NULL));
-		print_props(fdt, node, depth);
-		print_subnode(fdt, node, depth + 1);
+static void pretty_prop(int depth) {
+	for (int i = 0; i < depth; ++i) {
+		if (depth_set[i])
+			printf("│   ");
+		else
+			printf("    ");
+	}
+	if (depth_set[depth])
+		printf("│  ");
+	else
+		printf("   ");
+}
+
+static void print_node(const void *fdt, int node = 0, int depth = 0) {
+	// Print node itself
+	pretty_node(depth);
+	printf("#%d: %s\n", node, fdt_get_name(fdt, node, nullptr));
+
+	// Print properties
+	depth_set[depth] = fdt_first_subnode(fdt, node) >= 0;
+	int prop;
+	fdt_for_each_property_offset(prop, fdt, node) {
+		pretty_prop(depth);
+		int size;
+		const char *name;
+		auto value = static_cast<const char *>(fdt_getprop_by_offset(fdt, prop, &name, &size));
+
+		bool is_str = !(size > 1 && value[0] == 0);
+		if (is_str) {
+			// Scan through value to see if printable
+			for (int i = 0; i < size; ++i) {
+				char c = value[i];
+				if (i == size - 1) {
+					// Make sure null terminate
+					is_str = c == '\0';
+				} else if ((c > 0 && c < 32) || c >= 127) {
+					is_str = false;
+					break;
+				}
+			}
+		}
+
+		if (is_str) {
+			printf("[%s]: [%s]\n", name, value);
+		} else {
+			printf("[%s]: <bytes>(%d)\n", name, size);
+		}
+	}
+
+	// Recursive
+	if (depth_set[depth]) {
+		int child;
+		int prev = -1;
+		fdt_for_each_subnode(child, fdt, node) {
+			if (prev >= 0)
+				print_node(fdt, prev, depth + 1);
+			prev = child;
+		}
+		depth_set[depth] = false;
+		print_node(fdt, prev, depth + 1);
 	}
 }
 
 static int find_fstab(const void *fdt, int parent) {
 	int node, fstab;
 	fdt_for_each_subnode(node, fdt, parent) {
-		if (strcmp(fdt_get_name(fdt, node, NULL), "fstab") == 0)
+		if (strcmp(fdt_get_name(fdt, node, nullptr), "fstab") == 0)
 			return node;
 		fstab = find_fstab(fdt, node);
 		if (fstab != -1)
@@ -54,7 +117,7 @@ static void dtb_dump(const char *file) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
 			fdt = dtb + i;
 			fprintf(stderr, "Dumping dtb.%04d\n", dtb_num++);
-			print_subnode(fdt, 0, 0);
+			print_node(fdt);
 		}
 	}
 	fprintf(stderr, "\n");
@@ -81,7 +144,7 @@ static void dtb_patch(const char *file, int patch) {
 				fprintf(stderr, "Found fstab in dtb.%04d\n", dtb_num++);
 				int block;
 				fdt_for_each_subnode(block, fdt, fstab) {
-					fprintf(stderr, "Found block [%s] in fstab\n", fdt_get_name(fdt, block, NULL));
+					fprintf(stderr, "Found block [%s] in fstab\n", fdt_get_name(fdt, block, nullptr));
 					uint32_t value_size;
 					void *value = (void *) fdt_getprop(fdt, block, "fsmgr_flags", (int *)&value_size);
 					if (patch) {
