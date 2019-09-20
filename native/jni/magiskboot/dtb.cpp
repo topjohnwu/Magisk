@@ -94,7 +94,7 @@ static void print_node(const void *fdt, int node = 0, int depth = 0) {
 	}
 }
 
-static int find_fstab(const void *fdt, int parent) {
+static int find_fstab(const void *fdt, int parent = 0) {
 	int node, fstab;
 	fdt_for_each_subnode(node, fdt, parent) {
 		if (strcmp(fdt_get_name(fdt, node, nullptr), "fstab") == 0)
@@ -106,7 +106,7 @@ static int find_fstab(const void *fdt, int parent) {
 	return -1;
 }
 
-static void dtb_dump(const char *file) {
+static void dtb_print(const char *file, bool fstab) {
 	size_t size ;
 	uint8_t *dtb, *fdt;
 	fprintf(stderr, "Loading dtbs from [%s]\n", file);
@@ -116,8 +116,17 @@ static void dtb_dump(const char *file) {
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
 			fdt = dtb + i;
-			fprintf(stderr, "Dumping dtb.%04d\n", dtb_num++);
-			print_node(fdt);
+			if (fstab) {
+				int node = find_fstab(fdt);
+				if (node >= 0) {
+					fprintf(stderr, "Found fstab in dtb.%04d\n", dtb_num);
+					print_node(fdt, node);
+				}
+			} else {
+				fprintf(stderr, "Printing dtb.%04d\n", dtb_num);
+				print_node(fdt);
+			}
+			dtb_num++;
 		}
 	}
 	fprintf(stderr, "\n");
@@ -165,15 +174,20 @@ static void dtb_patch(const char *file, int patch) {
 	exit(!found);
 }
 
-int dtb_commands(const char *cmd, int argc, char *argv[]) {
-	if (argc == 0) return 1;
-	if (strcmp(cmd, "dump") == 0)
-		dtb_dump(argv[0]);
-	else if (strcmp(cmd, "patch") == 0)
-		dtb_patch(argv[0], 1);
-	else if (strcmp(cmd, "test") == 0)
-		dtb_patch(argv[0], 0);
+int dtb_commands(int argc, char *argv[]) {
+	char *dtb = argv[0];
+	++argv;
+	--argc;
+
+	if (argv[0] == "print"sv) {
+		dtb_print(dtb, argc > 1 && argv[1] == "-f"sv);
+	} else if (argv[0] == "patch"sv) {
+		dtb_patch(dtb, 1);
+	} else if (argv[0] == "test"sv) {
+		dtb_patch(dtb, 0);
+	} else {
+		return 1;
+	}
+
 	return 0;
 }
-
-
