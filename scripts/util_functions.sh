@@ -280,11 +280,13 @@ patch_dtbo_image() {
   find_dtbo_image
   if [ ! -z $DTBOIMAGE ]; then
     ui_print "- DTBO image: $DTBOIMAGE"
-    if $MAGISKBIN/magiskboot --dtb-test $DTBOIMAGE; then
+    local PATCHED=$TMPDIR/dtbo
+    if $MAGISKBIN/magiskboot dtb $DTBOIMAGE patch $PATCHED; then
       ui_print "- Backing up stock DTBO image"
-      $MAGISKBIN/magiskboot --compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
+      $MAGISKBIN/magiskboot compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
       ui_print "- Patching DTBO to remove avb-verity"
-      $MAGISKBIN/magiskboot --dtb-patch $DTBOIMAGE
+      cat $PATCHED /dev/zero > $DTBOIMAGE
+      rm -f $PATCHED
       return 0
     fi
   fi

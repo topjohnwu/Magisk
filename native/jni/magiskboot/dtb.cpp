@@ -6,6 +6,7 @@ extern "C" {
 }
 #include <utils.h>
 #include <bitset>
+#include <vector>
 
 #include "magiskboot.h"
 #include "format.h"
@@ -19,29 +20,17 @@ static void pretty_node(int depth) {
 	if (depth == 0)
 		return;
 
-	for (int i = 0; i < depth - 1; ++i) {
-		if (depth_set[i])
-			printf("│   ");
-		else
-			printf("    ");
-	}
-	if (depth_set[depth - 1])
-		printf("├── ");
-	else
-		printf("└── ");
+	for (int i = 0; i < depth - 1; ++i)
+		printf(depth_set[i] ? "│   " : "    ");
+
+	printf(depth_set[depth - 1] ? "├── " : "└── ");
 }
 
 static void pretty_prop(int depth) {
-	for (int i = 0; i < depth; ++i) {
-		if (depth_set[i])
-			printf("│   ");
-		else
-			printf("    ");
-	}
-	if (depth_set[depth])
-		printf("│  ");
-	else
-		printf("   ");
+	for (int i = 0; i < depth; ++i)
+		printf(depth_set[i] ? "│   " : "    ");
+
+	printf(depth_set[depth] ? "│  " : "   ");
 }
 
 static void print_node(const void *fdt, int node = 0, int depth = 0) {
@@ -94,13 +83,13 @@ static void print_node(const void *fdt, int node = 0, int depth = 0) {
 	}
 }
 
-static int find_fstab(const void *fdt, int parent = 0) {
-	int node, fstab;
-	fdt_for_each_subnode(node, fdt, parent) {
-		if (strcmp(fdt_get_name(fdt, node, nullptr), "fstab") == 0)
-			return node;
-		fstab = find_fstab(fdt, node);
-		if (fstab != -1)
+static int find_fstab(const void *fdt, int node = 0) {
+	if (fdt_get_name(fdt, node, nullptr) == "fstab"sv)
+		return node;
+	int child;
+	fdt_for_each_subnode(child, fdt, node) {
+		int fstab = find_fstab(fdt, child);
+		if (fstab >= 0)
 			return fstab;
 	}
 	return -1;
@@ -126,7 +115,7 @@ static void dtb_print(const char *file, bool fstab) {
 				fprintf(stderr, "Printing dtb.%04d\n", dtb_num);
 				print_node(fdt);
 			}
-			dtb_num++;
+			++dtb_num;
 		}
 	}
 	fprintf(stderr, "\n");
@@ -134,44 +123,50 @@ static void dtb_print(const char *file, bool fstab) {
 	exit(0);
 }
 
-static void dtb_patch(const char *file, int patch) {
-	size_t size ;
-	uint8_t *dtb, *fdt;
-	fprintf(stderr, "Loading dtbs from [%s]\n", file);
-	if (patch)
-		mmap_rw(file, dtb, size);
-	else
-		mmap_ro(file, dtb, size);
-	// Loop through all the dtbs
-	int dtb_num = 0;
-	bool found = false;
-	for (int i = 0; i < size; ++i) {
+static void dtb_patch(const char *in, const char *out) {
+	vector<uint8_t *> fdt_list;
+	size_t dtb_sz ;
+	uint8_t *dtb;
+	fprintf(stderr, "Loading dtbs from [%s]\n", in);
+	mmap_ro(in, dtb, dtb_sz);
+	bool modified = false;
+	for (int i = 0; i < dtb_sz; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
-			fdt = dtb + i;
-			int fstab = find_fstab(fdt, 0);
-			if (fstab > 0) {
-				fprintf(stderr, "Found fstab in dtb.%04d\n", dtb_num++);
-				int block;
-				fdt_for_each_subnode(block, fdt, fstab) {
-					fprintf(stderr, "Found block [%s] in fstab\n", fdt_get_name(fdt, block, nullptr));
-					uint32_t value_size;
-					void *value = (void *) fdt_getprop(fdt, block, "fsmgr_flags", (int *)&value_size);
-					if (patch) {
-						void *dup = xmalloc(value_size);
-						memcpy(dup, value, value_size);
-						memset(value, 0, value_size);
-						found |= patch_verity(&dup, &value_size);
-						memcpy(value, dup, value_size);
-						free(dup);
-					} else {
-						found |= patch_verity(&value, &value_size, false);
-					}
+			// Patched will only be smaller
+			int len = fdt_totalsize(dtb + i);
+			auto fdt = static_cast<uint8_t *>(xmalloc(len));
+			memcpy(fdt, dtb + i, len);
+			int fstab = find_fstab(fdt);
+			if (fstab < 0)
+				continue;
+			fprintf(stderr, "Found fstab in dtb.%04d\n", fdt_list.size());
+			int block;
+			fdt_for_each_subnode(block, fdt, fstab) {
+				fprintf(stderr, "Found entry [%s] in fstab\n", fdt_get_name(fdt, block, nullptr));
+				uint32_t size;
+				auto value = static_cast<const char *>(
+						fdt_getprop(fdt, block, "fsmgr_flags", reinterpret_cast<int *>(&size)));
+				char *pval = patch_verity(value, size);
+				if (pval) {
+					modified = true;
+					fdt_setprop_string(fdt, block, "fsmgr_flags", pval);
 				}
 			}
+			fdt_list.push_back(fdt);
 		}
 	}
-	munmap(dtb, size);
-	exit(!found);
+	munmap(dtb, dtb_sz);
+	if (modified) {
+		if (!out)
+			out = in;
+		int fd = xopen(out, O_WRONLY | O_CREAT | O_CLOEXEC);
+		for (auto fdt : fdt_list) {
+			fdt_pack(fdt);
+			xwrite(fd, fdt, fdt_totalsize(fdt));
+		}
+		close(fd);
+	}
+	exit(!modified);
 }
 
 int dtb_commands(int argc, char *argv[]) {
@@ -182,9 +177,7 @@ int dtb_commands(int argc, char *argv[]) {
 	if (argv[0] == "print"sv) {
 		dtb_print(dtb, argc > 1 && argv[1] == "-f"sv);
 	} else if (argv[0] == "patch"sv) {
-		dtb_patch(dtb, 1);
-	} else if (argv[0] == "test"sv) {
-		dtb_patch(dtb, 0);
+		dtb_patch(dtb, argv[1]);
 	} else {
 		return 1;
 	}
