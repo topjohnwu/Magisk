@@ -61,8 +61,9 @@ Supported actions:
         Test the current cpio's patch status
         Return values:
         0:stock    1:Magisk    2:unsupported (phh, SuperSU, Xposed)
-      patch KEEPVERITY KEEPFORCEENCRYPT
-        Ramdisk patches. KEEP**** are boolean values
+      patch
+        Apply ramdisk patches. Configure settings with env variables:
+        KEEPVERITY KEEPFORCEENCRYPT
       backup ORIG
         Create ramdisk backups from ORIG
       restore

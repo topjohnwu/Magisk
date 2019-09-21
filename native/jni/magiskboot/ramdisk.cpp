@@ -24,7 +24,7 @@ class magisk_cpio : public cpio_rw {
 public:
 	magisk_cpio() = default;
 	explicit magisk_cpio(const char *filename) : cpio_rw(filename) {}
-	void patch(bool keepverity, bool keepforceencrypt);
+	void patch();
 	int test();
 	char *sha1();
 	void restore();
@@ -33,9 +33,17 @@ public:
 	void decompress();
 };
 
-void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
+static bool check_env(const char *name) {
+	const char *val = getenv(name);
+	return val ? strcmp(val, "true") == 0 : false;
+}
+
+void magisk_cpio::patch() {
+	bool keepverity = check_env("KEEPVERITY");
+	bool keepforceencrypt = check_env("KEEPFORCEENCRYPT");
 	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s]\n",
 			keepverity ? "true" : "false", keepforceencrypt ? "true" : "false");
+
 	auto next = entries.begin();
 	decltype(next) cur;
 	while (next != entries.end()) {
@@ -46,9 +54,12 @@ void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
 					 str_contains(cur->first, "fstab") && S_ISREG(cur->second->mode);
 		if (!keepverity) {
 			if (fstab) {
+				fprintf(stderr, "Found fstab file [%s]\n", cur->first.data());
 				auto buf = patch_verity(cur->second->data, cur->second->filesize);
-				free(cur->second->data);
-				cur->second->data = buf;
+				if (buf) {
+					free(cur->second->data);
+					cur->second->data = buf;
+				}
 			} else if (cur->first == "verity_key") {
 				rm(cur);
 				continue;
@@ -293,6 +304,8 @@ int cpio_commands(int argc, char *argv[]) {
 			cpio.compress();
 		} else if (strcmp(cmdv[0], "decompress") == 0){
 			cpio.decompress();
+		} else if (strcmp(cmdv[0], "patch") == 0) {
+			cpio.patch();
 		} else if (cmdc == 2 && strcmp(cmdv[0], "exists") == 0) {
 			exit(!cpio.exists(cmdv[1]));
 		} else if (cmdc == 2 && strcmp(cmdv[0], "backup") == 0) {
@@ -302,8 +315,6 @@ int cpio_commands(int argc, char *argv[]) {
 			cpio.rm(cmdv[1 + r], r);
 		} else if (cmdc == 3 && strcmp(cmdv[0], "mv") == 0) {
 			cpio.mv(cmdv[1], cmdv[2]);
-		} else if (cmdc == 3 && strcmp(cmdv[0], "patch") == 0) {
-			cpio.patch(strcmp(cmdv[1], "true") == 0, strcmp(cmdv[2], "true") == 0);
 		} else if (strcmp(cmdv[0], "extract") == 0) {
 			if (cmdc == 3) {
 				return !cpio.extract(cmdv[1], cmdv[2]);

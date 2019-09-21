@@ -59,6 +59,8 @@ BOOTIMAGE="$1"
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+export KEEPVERITY
+export KEEPFORCEENCRYPT
 
 chmod -R 755 .
 
@@ -140,7 +142,7 @@ echo "RECOVERYMODE=$RECOVERYMODE" >> config
 
 ./magiskboot cpio ramdisk.cpio \
 "add 750 init magiskinit" \
-"patch $KEEPVERITY $KEEPFORCEENCRYPT" \
+"patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
