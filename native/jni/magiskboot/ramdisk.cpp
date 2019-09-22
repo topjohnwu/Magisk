@@ -44,11 +44,8 @@ void magisk_cpio::patch() {
 	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s]\n",
 			keepverity ? "true" : "false", keepforceencrypt ? "true" : "false");
 
-	auto next = entries.begin();
-	decltype(next) cur;
-	while (next != entries.end()) {
-		cur = next;
-		++next;
+	for (auto it = entries.begin(); it != entries.end();) {
+		auto cur = it++;
 		bool fstab = (!keepverity || !keepforceencrypt) &&
 					 !str_starts(cur->first, ".backup") &&
 					 str_contains(cur->first, "fstab") && S_ISREG(cur->second->mode);
@@ -140,18 +137,18 @@ for (str = (char *) buf; str < (char *) buf + size; str = str += strlen(str) + 1
 
 void magisk_cpio::restore() {
 	decompress();
-	char *file;
-	auto next = entries.begin();
-	decltype(next) cur;
-	while (next != entries.end()) {
-		cur = next;
-		++next;
+
+	if (auto it = entries.find(".backup/.rmlist"); it != entries.end()) {
+		char *file;
+		for_each_str(file, it->second->data, it->second->filesize)
+			rm(file, false);
+		rm(it);
+	}
+
+	for (auto it = entries.begin(); it != entries.end();) {
+		auto cur = it++;
 		if (str_starts(cur->first, ".backup")) {
 			if (cur->first.length() == 7 || cur->first.substr(8) == ".magisk") {
-				rm(cur);
-			} else if (cur->first.substr(8) == ".rmlist") {
-				for_each_str(file, cur->second->data, cur->second->filesize)
-					rm(file, false);
 				rm(cur);
 			} else {
 				mv(cur, &cur->first[8]);
