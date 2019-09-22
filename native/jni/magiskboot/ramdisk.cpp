@@ -10,7 +10,7 @@
 
 using namespace std;
 
-static const char *ramdisk_xz = "ramdisk.cpio.xz";
+constexpr char RAMDISK_XZ[] = "ramdisk.cpio.xz";
 
 static const char *UNSUPPORT_LIST[] =
 		{ "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc",
@@ -33,7 +33,7 @@ public:
 	void decompress();
 };
 
-static bool check_env(const char *name) {
+bool check_env(const char *name) {
 	const char *val = getenv(name);
 	return val ? strcmp(val, "true") == 0 : false;
 }
@@ -74,28 +74,41 @@ void magisk_cpio::patch() {
 }
 
 #define STOCK_BOOT        0
-#define MAGISK_PATCHED    1 << 0
-#define UNSUPPORTED_CPIO  1 << 1
-#define COMPRESSED_CPIO   1 << 2
-int magisk_cpio::test() {
-	if (exists(ramdisk_xz))
-		return MAGISK_PATCHED | COMPRESSED_CPIO;
+#define MAGISK_PATCHED    (1 << 0)
+#define UNSUPPORTED_CPIO  (1 << 1)
+#define COMPRESSED_CPIO   (1 << 2)
+#define TWO_STAGE_INIT    (1 << 3)
 
+int magisk_cpio::test() {
 	for (auto file : UNSUPPORT_LIST)
 		if (exists(file))
 			return UNSUPPORTED_CPIO;
 
-	for (auto file : MAGISK_LIST)
-		if (exists(file))
-			return MAGISK_PATCHED;
+	int flags = STOCK_BOOT;
 
-	return STOCK_BOOT;
+	if (exists(RAMDISK_XZ)) {
+		flags |= COMPRESSED_CPIO | MAGISK_PATCHED;
+		decompress();
+	}
+
+	if (exists("apex") || exists("first_stage_ramdisk"))
+		flags |= TWO_STAGE_INIT;
+
+	for (auto file : MAGISK_LIST) {
+		if (exists(file)) {
+			flags |= MAGISK_PATCHED;
+			break;
+		}
+	}
+
+	return flags;
 }
 
 #define for_each_line(line, buf, size) \
 for (line = (char *) buf; line < (char *) buf + size && line[0]; line = strchr(line + 1, '\n') + 1)
 
 char *magisk_cpio::sha1() {
+	decompress();
 	char sha1[41];
 	char *line;
 	for (auto &e : entries) {
@@ -231,32 +244,26 @@ void magisk_cpio::backup(const char *orig) {
 }
 
 void magisk_cpio::compress() {
-	if (exists(ramdisk_xz))
+	if (exists(RAMDISK_XZ))
 		return;
-	fprintf(stderr, "Compressing cpio -> [%s]\n", ramdisk_xz);
+	fprintf(stderr, "Compressing cpio -> [%s]\n", RAMDISK_XZ);
 	auto init = entries.extract("init");
 	XZEncoder encoder;
 	encoder.set_out(make_unique<BufOutStream>());
 	output(encoder);
 	encoder.finalize();
-	auto backup = entries.extract(".backup");
-	auto config = entries.extract(".backup/.magisk");
 	entries.clear();
 	entries.insert(std::move(init));
-	entries.insert(std::move(backup));
-	entries.insert(std::move(config));
-	auto xz = new cpio_entry(ramdisk_xz, S_IFREG);
+	auto xz = new cpio_entry(RAMDISK_XZ, S_IFREG);
 	static_cast<BufOutStream *>(encoder.get_out())->release(xz->data, xz->filesize);
 	insert(xz);
 }
 
 void magisk_cpio::decompress() {
-	auto it = entries.find(ramdisk_xz);
+	auto it = entries.find(RAMDISK_XZ);
 	if (it == entries.end())
 		return;
-	fprintf(stderr, "Decompressing cpio [%s]\n", ramdisk_xz);
-	entries.erase(".backup");
-	entries.erase(".backup/.magisk");
+	fprintf(stderr, "Decompressing cpio [%s]\n", RAMDISK_XZ);
 	LZMADecoder decoder;
 	decoder.set_out(make_unique<BufOutStream>());
 	decoder.write(it->second->data, it->second->filesize);

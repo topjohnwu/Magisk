@@ -113,7 +113,7 @@ case $((STATUS & 3)) in
   1 )  # Magisk patched
     ui_print "- Magisk patched boot image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+    [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
     ./magiskboot cpio ramdisk.cpio restore
     if ./magiskboot cpio ramdisk.cpio "exists init.rc"; then
       # Normal boot image
@@ -128,6 +128,11 @@ case $((STATUS & 3)) in
     abort "! Please restore back to stock boot image"
     ;;
 esac
+
+if [ $((STATUS & 8)) -ne 0 ]; then
+  ui_print "- 2 Stage Init ramdisk detected"
+  export REDIRSYSMNT=true
+fi
 
 ##########################################################################################
 # Ramdisk patches
@@ -149,7 +154,7 @@ echo "RECOVERYMODE=$RECOVERYMODE" >> config
 
 if [ $((STATUS & 4)) -ne 0 ]; then
   ui_print "- Compressing ramdisk"
-  ./magiskboot --cpio ramdisk.cpio compress
+  ./magiskboot cpio ramdisk.cpio compress
 fi
 
 rm -f ramdisk.cpio.orig config
@@ -158,11 +163,9 @@ rm -f ramdisk.cpio.orig config
 # Binary patches
 ##########################################################################################
 
-if ! $KEEPVERITY; then
-  for dt in dtb kernel_dtb extra recovery_dtbo; do
-    [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Removing dm(avb)-verity in $dt"
-  done
-fi
+for dt in dtb kernel_dtb extra recovery_dtbo; do
+  [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Patching fstab in $dt"
+done
 
 if [ -f kernel ]; then
   # Remove Samsung RKP

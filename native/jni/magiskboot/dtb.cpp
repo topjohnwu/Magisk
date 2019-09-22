@@ -96,15 +96,15 @@ static int find_fstab(const void *fdt, int node = 0) {
 }
 
 static void dtb_print(const char *file, bool fstab) {
-	size_t size ;
-	uint8_t *dtb, *fdt;
+	size_t size;
+	uint8_t *dtb;
 	fprintf(stderr, "Loading dtbs from [%s]\n", file);
 	mmap_ro(file, dtb, size);
 	// Loop through all the dtbs
 	int dtb_num = 0;
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
-			fdt = dtb + i;
+			auto fdt = dtb + i;
 			if (fstab) {
 				int node = find_fstab(fdt);
 				if (node >= 0) {
@@ -124,6 +124,9 @@ static void dtb_print(const char *file, bool fstab) {
 }
 
 static void dtb_patch(const char *in, const char *out) {
+	bool keepverity = check_env("KEEPVERITY");
+	bool redirect = check_env("REDIRSYSMNT");
+
 	vector<uint8_t *> fdt_list;
 	size_t dtb_sz ;
 	uint8_t *dtb;
@@ -132,24 +135,34 @@ static void dtb_patch(const char *in, const char *out) {
 	bool modified = false;
 	for (int i = 0; i < dtb_sz; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
-			// Patched will only be smaller
 			int len = fdt_totalsize(dtb + i);
-			auto fdt = static_cast<uint8_t *>(xmalloc(len));
+			auto fdt = static_cast<uint8_t *>(xmalloc(redirect ? len + 256 : len));
 			memcpy(fdt, dtb + i, len);
+			if (redirect)
+				fdt_open_into(fdt, fdt, len + 256);
+
 			int fstab = find_fstab(fdt);
 			if (fstab < 0)
 				continue;
 			fprintf(stderr, "Found fstab in dtb.%04d\n", fdt_list.size());
 			int block;
 			fdt_for_each_subnode(block, fdt, fstab) {
-				fprintf(stderr, "Found entry [%s] in fstab\n", fdt_get_name(fdt, block, nullptr));
-				uint32_t size;
-				auto value = static_cast<const char *>(
-						fdt_getprop(fdt, block, "fsmgr_flags", reinterpret_cast<int *>(&size)));
-				char *pval = patch_verity(value, size);
-				if (pval) {
+				const char *name = fdt_get_name(fdt, block, nullptr);
+				fprintf(stderr, "Found entry [%s] in fstab\n", name);
+				if (!keepverity) {
+					uint32_t size;
+					auto value = static_cast<const char *>(
+							fdt_getprop(fdt, block, "fsmgr_flags", reinterpret_cast<int *>(&size)));
+					char *pval = patch_verity(value, size);
+					if (pval) {
+						modified = true;
+						fdt_setprop_string(fdt, block, "fsmgr_flags", pval);
+					}
+				}
+				if (redirect && name == "system"sv) {
 					modified = true;
-					fdt_setprop_string(fdt, block, "fsmgr_flags", pval);
+					fprintf(stderr, "Changing mnt_point to /system_root\n");
+					fdt_setprop_string(fdt, block, "mnt_point", "/system_root");
 				}
 			}
 			fdt_list.push_back(fdt);
