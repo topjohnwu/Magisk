@@ -61,7 +61,7 @@ static bool validate(const char *s) {
 	bool dot = false;
 	for (char c; (c = *s); ++s) {
 		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-			(c >= '0' && c <= '9') || c == '_') {
+			(c >= '0' && c <= '9') || c == '_' || c == ':') {
 			dot = false;
 			continue;
 		}
