@@ -115,13 +115,7 @@ case $((STATUS & 3)) in
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
     ./magiskboot cpio ramdisk.cpio restore
-    if ./magiskboot cpio ramdisk.cpio "exists init.rc"; then
-      # Normal boot image
-      cp -af ramdisk.cpio ramdisk.cpio.orig
-    else
-      # A only system-as-root
-      rm -f ramdisk.cpio
-    fi
+    cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   2 )  # Unsupported
     ui_print "! Boot image patched by unsupported programs"
