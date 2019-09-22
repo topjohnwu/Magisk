@@ -97,18 +97,29 @@ public:
 	}
 };
 
-/* *******************
- * Logical Partitions
- * *******************/
+/* *************
+ * 2 Stage Init
+ * *************/
 
-class FirstStageInit : public BaseInit {
+class ABFirstStageInit : public BaseInit {
 protected:
 	void prepare();
 public:
-	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	ABFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 	void start() override {
 		prepare();
 		exec_init("/system/bin/init");
+	}
+};
+
+class AFirstStageInit : public BaseInit {
+protected:
+	void prepare();
+public:
+	AFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	void start() override {
+		prepare();
+		exec_init();
 	}
 };
 
@@ -121,7 +132,7 @@ public:
 };
 
 /* ***********
- * Normal SAR
+ * Legacy SAR
  * ***********/
 
 class SARInit : public SARCommon {

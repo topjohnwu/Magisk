@@ -386,7 +386,7 @@ void SARCommon::patch_rootdir() {
 
 #define FSR "/first_stage_ramdisk"
 
-void FirstStageInit::prepare() {
+void ABFirstStageInit::prepare() {
 	// Find fstab
 	DIR *dir = xopendir(FSR);
 	if (!dir)
@@ -446,6 +446,14 @@ void FirstStageInit::prepare() {
 	xmkdir(FSR "/.backup", 0);
 	rename("/.backup/.magisk", FSR "/.backup/.magisk");
 	rename("/overlay.d", FSR "/overlay.d");
+}
+
+void AFirstStageInit::prepare() {
+	// Move stuffs for next stage
+	xmkdir("/system", 0755);
+	xmkdir("/system/bin", 0755);
+	rename("/init", "/system/bin/init");
+	rename("/.backup/init", "/init");
 }
 
 #ifdef MAGISK_DEBUG
