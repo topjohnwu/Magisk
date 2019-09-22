@@ -384,26 +384,7 @@ void SARBase::patch_rootdir() {
 	close(dest);
 }
 
-#define FSR "/first_stage_ramdisk"
-
-void ABFirstStageInit::prepare() {
-	// Find fstab
-	DIR *dir = xopendir(FSR);
-	if (!dir)
-		return;
-	dirent *de;
-	string fstab(FSR "/");
-	while ((de = readdir(dir))) {
-		if (strstr(de->d_name, "fstab")) {
-			fstab += de->d_name;
-			break;
-		}
-	}
-	closedir(dir);
-	if (fstab.length() == sizeof(FSR))
-		return;
-
-	// Patch fstab
+static void patch_fstab(const string &fstab) {
 	string patched = fstab + ".p";
 	FILE *fp = xfopen(patched.data(), "we");
 	file_readline(fstab.data(), [=](string_view l) -> bool {
@@ -437,6 +418,26 @@ void ABFirstStageInit::prepare() {
 	// Replace old fstab
 	clone_attr(fstab.data(), patched.data());
 	rename(patched.data(), fstab.data());
+}
+
+#define FSR "/first_stage_ramdisk"
+
+void ABFirstStageInit::prepare() {
+	DIR *dir = xopendir(FSR);
+	if (!dir)
+		return;
+	string fstab(FSR "/");
+	for (dirent *de; (de = readdir(dir));) {
+		if (strstr(de->d_name, "fstab")) {
+			fstab += de->d_name;
+			break;
+		}
+	}
+	closedir(dir);
+	if (fstab.length() == sizeof(FSR))
+		return;
+
+	patch_fstab(fstab);
 
 	// Move stuffs for next stage
 	xmkdir(FSR "/system", 0755);
@@ -449,6 +450,15 @@ void ABFirstStageInit::prepare() {
 }
 
 void AFirstStageInit::prepare() {
+	DIR *dir = xopendir("/");
+	for (dirent *de; (de = readdir(dir));) {
+		if (strstr(de->d_name, "fstab")) {
+			patch_fstab(de->d_name);
+			break;
+		}
+	}
+	closedir(dir);
+
 	// Move stuffs for next stage
 	xmkdir("/system", 0755);
 	xmkdir("/system/bin", 0755);
