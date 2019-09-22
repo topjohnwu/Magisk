@@ -86,7 +86,7 @@ static void load_overlay_rc(int dirfd) {
 	rewinddir(dir);
 }
 
-void RootFSInit::setup_rootfs() {
+void RootFSBase::setup_rootfs() {
 	if (patch_sepolicy()) {
 		char *addr;
 		size_t size;
@@ -149,7 +149,7 @@ void SARCompatInit::setup_rootfs() {
 	clone_dir(system_root, root, false);
 	close(system_root);
 
-	RootFSInit::setup_rootfs();
+	RootFSBase::setup_rootfs();
 }
 
 bool MagiskInit::patch_sepolicy(const char *file) {
@@ -256,7 +256,7 @@ static void magic_mount(int dirfd, const string &path) {
 	}
 }
 
-void SARCommon::patch_rootdir() {
+void SARBase::patch_rootdir() {
 	sbin_overlay(self, config);
 
 	// Mount system_root mirror

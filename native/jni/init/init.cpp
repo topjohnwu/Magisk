@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
 		else if (access("/apex", F_OK) == 0)
 			init = make_unique<AFirstStageInit>(argv, &cmd);
 		else
-			init = make_unique<LegacyInit>(argv, &cmd);
+			init = make_unique<RootFSInit>(argv, &cmd);
 	}
 
 	// Run the main routine
