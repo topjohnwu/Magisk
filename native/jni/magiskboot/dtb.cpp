@@ -125,7 +125,7 @@ static void dtb_print(const char *file, bool fstab) {
 
 static void dtb_patch(const char *in, const char *out) {
 	bool keepverity = check_env("KEEPVERITY");
-	bool redirect = check_env("REDIRSYSMNT");
+	bool redirect = check_env("TWOSTAGEINIT");
 
 	vector<uint8_t *> fdt_list;
 	size_t dtb_sz ;

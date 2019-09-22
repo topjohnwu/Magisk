@@ -80,6 +80,7 @@ Supported actions:
       patch [OUT]
         Search for fstab and remove verity/avb
         If [OUT] is not specified, it will directly output to <input>
+        Configure with env variables: KEEPVERITY TWOSTAGEINIT
 
   compress[=method] <infile> [outfile]
     Compress <infile> with [method] (default: gzip), optionally to [outfile]

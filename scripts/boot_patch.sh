@@ -124,8 +124,8 @@ case $((STATUS & 3)) in
 esac
 
 if [ $((STATUS & 8)) -ne 0 ]; then
-  ui_print "- 2 Stage Init ramdisk detected"
-  export REDIRSYSMNT=true
+  # Possibly using 2SI, export env var
+  export TWOSTAGEINIT=true
 fi
 
 ##########################################################################################
