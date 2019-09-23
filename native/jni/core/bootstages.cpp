@@ -368,7 +368,7 @@ static bool magisk_env() {
 	parse_mnt("/proc/mounts", [&](mntent *me) {
 		if (DIR_IS(system_root)) {
 			mount_mirror(system_root, MS_RDONLY);
-			xsymlink(MIRRMNT(system_root) "/system", MIRRMNT(system));
+			xsymlink("./system_root/system", MIRRMNT(system));
 			VLOGI("link", MIRRMNT(system_root) "/system", MIRRMNT(system));
 			system_as_root = true;
 		} else if (!system_as_root && DIR_IS(system)) {
@@ -386,12 +386,16 @@ static bool magisk_env() {
 	});
 	if (access(MIRRMNT(system), F_OK) != 0 && access(MIRRMNT(system_root), F_OK) == 0) {
 		// Pre-init mirrors
-		xsymlink(MIRRMNT(system_root) "/system", MIRRMNT(system));
+		xsymlink("./system_root/system", MIRRMNT(system));
 		VLOGI("link", MIRRMNT(system_root) "/system", MIRRMNT(system));
 	}
 	if (access(MIRRMNT(vendor), F_OK) != 0) {
-		xsymlink(MIRRMNT(system) "/vendor", MIRRMNT(vendor));
+		xsymlink("./system/vendor", MIRRMNT(vendor));
 		VLOGI("link", MIRRMNT(system) "/vendor", MIRRMNT(vendor));
+	}
+	if (access("/system/product", F_OK) == 0 && access(MIRRMNT(product), F_OK) != 0) {
+		xsymlink("./system/product", MIRRMNT(product));
+		VLOGI("link", MIRRMNT(system) "/product", MIRRMNT(product));
 	}
 
 	// Disable/remove magiskhide, resetprop, and modules
