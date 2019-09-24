@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.chooser
+import com.topjohnwu.magisk.extensions.exists
 import com.topjohnwu.magisk.extensions.provide
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
@@ -17,6 +18,7 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.utils.APKInstall
+import org.koin.core.get
 import java.io.File
 import kotlin.random.Random.Default.nextInt
 
@@ -76,8 +78,14 @@ open class DownloadService : RemoteFileService() {
 
     private fun NotificationCompat.Builder.addActionsInternal(subject: Magisk)
     = when (val conf = subject.configuration) {
-        Download -> addAction(0, R.string.download_open_parent, fileIntent(subject.file.parentFile!!))
-            .addAction(0, R.string.download_open_self, fileIntent(subject.file))
+        Download -> this.apply {
+            fileIntent(subject.file.parentFile!!)
+                .takeIf { it.exists(get()) }
+                ?.let { addAction(0, R.string.download_open_parent, it.chooser()) }
+            fileIntent(subject.file)
+                .takeIf { it.exists(get()) }
+                ?.let { addAction(0, R.string.download_open_self, it.chooser()) }
+        }
         Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, subject.file))
         is Flash -> setContentIntent(FlashActivity.flashIntent(context, subject.file, conf is Secondary))
         is Patch -> setContentIntent(FlashActivity.patchIntent(context, subject.file, conf.fileUri))
@@ -86,8 +94,14 @@ open class DownloadService : RemoteFileService() {
 
     private fun NotificationCompat.Builder.addActionsInternal(subject: Module)
     = when (subject.configuration) {
-        Download -> addAction(0, R.string.download_open_parent, fileIntent(subject.file.parentFile!!))
-            .addAction(0, R.string.download_open_self, fileIntent(subject.file))
+        Download -> this.apply {
+            fileIntent(subject.file.parentFile!!)
+                .takeIf { it.exists(get()) }
+                ?.let { addAction(0, R.string.download_open_parent, it.chooser()) }
+            fileIntent(subject.file)
+                .takeIf { it.exists(get()) }
+                ?.let { addAction(0, R.string.download_open_self, it.chooser()) }
+        }
         is Flash -> setContentIntent(FlashActivity.installIntent(context, subject.file))
         else -> this
     }
@@ -115,7 +129,6 @@ open class DownloadService : RemoteFileService() {
             .setDataAndType(file.provide(this), file.type)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            .chooser()
     }
 
     class Builder {
