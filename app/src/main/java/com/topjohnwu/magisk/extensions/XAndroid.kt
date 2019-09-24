@@ -119,3 +119,5 @@ fun ApplicationInfo.getLabel(pm: PackageManager): String {
 
     return loadLabel(pm).toString()
 }
+
+fun Intent.exists(packageManager: PackageManager) = resolveActivity(packageManager) != null

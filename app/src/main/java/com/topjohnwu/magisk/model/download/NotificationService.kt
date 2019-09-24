@@ -6,10 +6,11 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import org.koin.core.KoinComponent
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 
-abstract class NotificationService : Service() {
+abstract class NotificationService : Service(), KoinComponent {
 
     abstract val defaultNotification: NotificationCompat.Builder
 
