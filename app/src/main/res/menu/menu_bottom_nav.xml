@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/magiskFragment"
+        android:icon="@drawable/ic_magisk_outline"
+        android:title="Home"
+        tools:showAsAction="always" />
+
+    <item
+        android:id="@+id/magiskFragment"
+        android:icon="@drawable/ic_cloud_download"
+        android:title="@string/modules"
+        tools:showAsAction="always" />
+
+    <item
+        android:id="@+id/magiskFragment"
+        android:icon="@drawable/ic_bug_report"
+        android:title="@string/log"
+        tools:showAsAction="always" />
+
+    <item
+        android:id="@+id/settingsFragment"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings"
+        tools:showAsAction="always" />
+
+</menu>

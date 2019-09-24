@@ -1,7 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="cardStyle" format="reference"/>
+    <!--region Deprecated-->
+    <attr name="cardStyle" format="reference" />
     <attr name="colorAccentFallback" format="reference" />
     <attr name="imageColorTint" format="reference" />
-    <attr name="colorControl" format="reference"/>
+    <attr name="colorControl" format="reference" />
+    <!--endregion-->
+
+    <!--region Widgets-->
+
+    <!--region Appbar-->
+    <attr name="styleAppbar" format="reference" />
+    <!--endregion-->
+    <!--region Toolbar-->
+    <attr name="styleToolbar" format="reference" />
+    <attr name="styleToolbarTitle" format="reference" />
+    <!--endregion-->
+    <!--region Card-->
+    <attr name="styleCardNormal" format="reference" />
+    <attr name="styleCardOnPrimary" format="reference" />
+    <!--endregion-->
+    <!--region Button-->
+    <attr name="styleButtonDefault" format="reference" />
+    <attr name="styleButtonFlat" format="reference" />
+    <attr name="styleButtonText" format="reference" />
+    <!--endregion-->
+
+    <!--endregion-->
+
+    <!--region Texts-->
+
+    <!--region Display-->
+    <attr name="appearanceTextDisplayNormal" format="reference" />
+    <attr name="appearanceTextDisplayVariant" format="reference" />
+    <attr name="appearanceTextDisplayOnPrimary" format="reference" />
+    <attr name="appearanceTextDisplayOnPrimaryVariant" format="reference" />
+    <!--endregion-->
+    <!--region Title-->
+    <attr name="appearanceTextTitleNormal" format="reference" />
+    <attr name="appearanceTextTitleVariant" format="reference" />
+    <attr name="appearanceTextTitleOnPrimary" format="reference" />
+    <attr name="appearanceTextTitleOnPrimaryVariant" format="reference" />
+    <!--endregion-->
+    <!--region Body-->
+    <attr name="appearanceTextBodyNormal" format="reference" />
+    <attr name="appearanceTextBodyVariant" format="reference" />
+    <attr name="appearanceTextBodyOnPrimary" format="reference" />
+    <attr name="appearanceTextBodyOnPrimaryVariant" format="reference" />
+    <!--endregion-->
+    <!--region Caption-->
+    <attr name="appearanceTextCaptionNormal" format="reference" />
+    <attr name="appearanceTextCaptionVariant" format="reference" />
+    <attr name="appearanceTextCaptionOnPrimary" format="reference" />
+    <attr name="appearanceTextCaptionOnPrimaryVariant" format="reference" />
+    <!--endregion-->
+
+    <!--endregion-->
+
+    <!--region Colors-->
+    <attr name="colorOnPrimaryVariant" format="color" />
+    <attr name="colorOnSurfaceVariant" format="color" />
+    <!--endregion-->
+
+    <!--region Dimens-->
+    <attr name="l_125" format="dimension" />
+    <attr name="l_25" format="dimension" />
+    <attr name="l_50" format="dimension" />
+    <attr name="l1" format="dimension" />
+    <attr name="l2" format="dimension" />
+    <attr name="l3" format="dimension" />
+    <attr name="l4" format="dimension" />
+    <!--endregion-->
+
 </resources>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+These widgets are implementation of corresponding attribute. Never and I mean fucking never! use
+these directly.
+
+Although it is possible, it wouldn't automatically change the style when theme changes to "night"
+variant. Make sure to use style referenced by attribute defined it attrs.xml.
+-->
+<resources>
+
+    <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface">
+        <item name="elevation">0dp</item>
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
+        <item name="contentInsetStart">0dp</item>
+        <item name="contentInsetLeft">0dp</item>
+        <item name="contentInsetRight">0dp</item>
+        <item name="contentInsetEnd">0dp</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+    </style>
+
+    <style name="WidgetFoundation.Toolbar.Title" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:textAppearance">?appearanceTextTitleNormal</item>
+        <item name="android:gravity">start</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:lines">1</item>
+        <item name="android:padding">?l1</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+        <item name="cardCornerRadius">?l_50</item>
+        <item name="cardElevation">4dp</item>
+    </style>
+
+    <style name="WidgetFoundation.Card.OnPrimary" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">?l_50</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">?attr/colorOnPrimaryVariant</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cardBackgroundColor">?attr/colorPrimary</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Button" parent="Widget.MaterialComponents.Button">
+
+    </style>
+
+    <style name="WidgetFoundation.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+
+    </style>
+
+    <style name="WidgetFoundation.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+
+    </style>
+
+</resources>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--region Display-->
+    <style name="AppearanceFoundation.Display" parent="TextAppearance.AppCompat.Display1">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="AppearanceFoundation.Display.Variant">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="AppearanceFoundation.Display.OnPrimary">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="AppearanceFoundation.Display.OnPrimary.Variant">
+        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
+    </style>
+    <!--endregion-->
+
+    <!--region Title-->
+    <style name="AppearanceFoundation.Title" parent="TextAppearance.AppCompat.Title">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="AppearanceFoundation.Title.Variant">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="AppearanceFoundation.Title.OnPrimary">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="AppearanceFoundation.Title.OnPrimary.Variant">
+        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
+    </style>
+    <!--endregion-->
+
+    <!--region Body-->
+    <style name="AppearanceFoundation.Body" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="AppearanceFoundation.Body.Variant">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="AppearanceFoundation.Body.OnPrimary">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="AppearanceFoundation.Body.OnPrimary.Variant">
+        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
+    </style>
+    <!--endregion-->
+
+    <!--region Caption-->
+    <style name="AppearanceFoundation.Caption" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="AppearanceFoundation.Caption.Variant">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="AppearanceFoundation.Caption.OnPrimary">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="AppearanceFoundation.Caption.OnPrimary.Variant">
+        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
+    </style>
+    <!--endregion-->
+
+    <!--region Tiny-->
+    <style name="AppearanceFoundation.Tiny" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="AppearanceFoundation.Tiny.Variant">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="AppearanceFoundation.Tiny.OnPrimary">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="AppearanceFoundation.Tiny.OnPrimary.Variant">
+        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
+    </style>
+    <!--endregion-->
+
+</resources>

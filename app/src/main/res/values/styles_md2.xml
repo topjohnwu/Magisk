@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Foundation" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">?colorSurface</item>
+    </style>
+
+    <!--This should be overridden in v19 for transparency, etc-->
+    <style name="Foundation.Compat" />
+
+    <!--region Do not remove-->
+    <style name="WidgetFoundation" />
+
+    <style name="AppearanceFoundation" />
+    <!--endregion-->
+
+    <style name="Foundation.Dimen" parent="Foundation.Compat">
+        <item name="l_125">2dp</item>
+        <item name="l_25">4dp</item>
+        <item name="l_50">8dp</item>
+        <item name="l1">16dp</item>
+        <item name="l2">32dp</item>
+        <item name="l3">48dp</item>
+        <item name="l4">64dp</item>
+    </style>
+
+    <style name="Foundation.Base" parent="Foundation.Dimen">
+        <item name="actionBarSize">60dp</item>
+
+        <item name="styleAppbar">@style/WidgetFoundation.Appbar</item>
+
+        <item name="styleToolbar">@style/WidgetFoundation.Toolbar</item>
+        <item name="styleToolbarTitle">@style/WidgetFoundation.Toolbar.Title</item>
+
+        <item name="styleCardNormal">@style/WidgetFoundation.Card</item>
+        <item name="styleCardOnPrimary">@style/WidgetFoundation.Card.OnPrimary</item>
+
+        <item name="styleButtonDefault">@style/WidgetFoundation.Button</item>
+        <item name="styleButtonFlat">@style/WidgetFoundation.Button.Flat</item>
+        <item name="styleButtonText">@style/WidgetFoundation.Button.Text</item>
+
+        <!--///-->
+
+        <item name="appearanceTextDisplayNormal">@style/AppearanceFoundation.Display</>
+        <item name="appearanceTextDisplayVariant">@style/AppearanceFoundation.Display.Variant</>
+        <item name="appearanceTextDisplayOnPrimary">@style/AppearanceFoundation.Display.OnPrimary</>
+        <item name="appearanceTextDisplayOnPrimaryVariant">
+            @style/AppearanceFoundation.Display.OnPrimary.Variant
+        </>
+
+        <item name="appearanceTextTitleNormal">@style/AppearanceFoundation.Title</>
+        <item name="appearanceTextTitleVariant">@style/AppearanceFoundation.Title.Variant</>
+        <item name="appearanceTextTitleOnPrimary">@style/AppearanceFoundation.Title.OnPrimary</>
+        <item name="appearanceTextTitleOnPrimaryVariant">
+            @style/AppearanceFoundation.Title.OnPrimary.Variant
+        </>
+
+        <item name="appearanceTextBodyNormal">@style/AppearanceFoundation.Body</>
+        <item name="appearanceTextBodyVariant">@style/AppearanceFoundation.Body.Variant</>
+        <item name="appearanceTextBodyOnPrimary">@style/AppearanceFoundation.Body.OnPrimary</>
+        <item name="appearanceTextBodyOnPrimaryVariant">
+            @style/AppearanceFoundation.Body.OnPrimary.Variant
+        </>
+
+        <item name="appearanceTextCaptionNormal">@style/AppearanceFoundation.Caption</>
+        <item name="appearanceTextCaptionVariant">@style/AppearanceFoundation.Caption.Variant</>
+        <item name="appearanceTextCaptionOnPrimary">@style/AppearanceFoundation.Caption.OnPrimary</>
+        <item name="appearanceTextCaptionOnPrimaryVariant">
+            @style/AppearanceFoundation.Caption.OnPrimary.Variant
+        </>
+    </style>
+
+    <style name="Foundation.Default" parent="Foundation.Base">
+        <item name="colorPrimary">#2196F3</item>
+        <item name="colorPrimaryVariant">#802196F3</item>
+        <item name="colorSecondary">#00C853</item>
+        <item name="colorSecondaryVariant">#8000C853</item>
+        <item name="colorSurface">#F2F2F2</item>
+        <item name="colorOnPrimary">#F2F2F2</item>
+        <item name="colorOnPrimaryVariant">#80F2F2F2</item>
+        <item name="colorOnSecondary">#F2F2F2</item>
+        <item name="colorOnBackground">#F2F2F2</item>
+        <item name="colorError">#CC0047</item>
+        <item name="colorOnError">#F2F2F2</item>
+        <item name="colorOnSurface">#444444</item>
+        <item name="colorOnSurfaceVariant">#80444444</item>
+    </style>
+
+</resources>
