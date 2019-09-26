@@ -52,11 +52,7 @@ void magisk_cpio::patch() {
 		if (!keepverity) {
 			if (fstab) {
 				fprintf(stderr, "Found fstab file [%s]\n", cur->first.data());
-				auto buf = patch_verity(cur->second->data, cur->second->filesize);
-				if (buf) {
-					free(cur->second->data);
-					cur->second->data = buf;
-				}
+				patch_verity(cur->second->data, cur->second->filesize, true);
 			} else if (cur->first == "verity_key") {
 				rm(cur);
 				continue;
@@ -64,7 +60,7 @@ void magisk_cpio::patch() {
 		}
 		if (!keepforceencrypt) {
 			if (fstab) {
-				patch_encryption(&cur->second->data, &cur->second->filesize);
+				patch_encryption(cur->second->data, cur->second->filesize);
 			}
 		}
 	}
