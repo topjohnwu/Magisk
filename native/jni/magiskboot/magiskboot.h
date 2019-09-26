@@ -19,5 +19,5 @@ int cpio_commands(int argc, char *argv[]);
 int dtb_commands(int argc, char *argv[]);
 
 char *patch_verity(const void *buf, uint32_t &size, bool inplace = false);
-void patch_encryption(void *&buf, uint32_t &size);
+void patch_encryption(void *buf, uint32_t &size);
 bool check_env(const char *name);

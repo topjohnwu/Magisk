@@ -55,7 +55,7 @@ char *patch_verity(const void *buf, uint32_t &size, bool inplace) {
 	return patched;
 }
 
-void patch_encryption(void *&buf, uint32_t &size) {
+void patch_encryption(void *buf, uint32_t &size) {
 	auto src = static_cast<char *>(buf);
 	int src_size = size;
 	int write = 0;
