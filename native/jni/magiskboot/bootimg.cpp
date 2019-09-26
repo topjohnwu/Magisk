@@ -22,7 +22,7 @@ uint32_t dyn_img_hdr::j32 = 0;
 uint64_t dyn_img_hdr::j64 = 0;
 
 static int64_t one_step(unique_ptr<Compression> &&ptr, int fd, const void *in, size_t size) {
-	ptr->set_out(make_unique<FDOutStream>(fd));
+	ptr->setOut(make_unique<FDOutStream>(fd));
 	if (!ptr->write(in, size))
 		return -1;
 	return ptr->finalize();

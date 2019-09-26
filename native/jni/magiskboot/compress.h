@@ -6,7 +6,7 @@
 #include <lz4.h>
 #include <lz4frame.h>
 #include <lz4hc.h>
-#include <OutStream.h>
+#include <stream.h>
 
 #include "format.h"
 

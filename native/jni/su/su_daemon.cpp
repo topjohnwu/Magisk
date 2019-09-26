@@ -89,7 +89,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 	shared_ptr<su_info> info;
 
 	{
-		MutexGuard lock(cache_lock);
+		mutex_guard lock(cache_lock);
 		if (!cached || cached->uid != uid || !cached->is_fresh())
 			cached = make_shared<su_info>(uid);
 		cached->refresh();
@@ -97,7 +97,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 	}
 
 	info->lock();
-	RunFinally unlock([&] {
+	run_finally unlock([&] {
 		info->unlock();
 	});
 

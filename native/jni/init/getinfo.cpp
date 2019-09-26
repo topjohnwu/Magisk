@@ -67,7 +67,7 @@ static bool check_key_combo() {
 	if (events.empty())
 		return false;
 
-	RunFinally fin([&]() -> void {
+	run_finally fin([&]() -> void {
 		for (const int &fd : events)
 			close(fd);
 	});

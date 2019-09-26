@@ -19,9 +19,9 @@ public:
 
 	FilterOutStream(strm_ptr &&ptr) : out(std::move(ptr)) {}
 
-	void set_out(strm_ptr &&ptr) { out = std::move(ptr); }
+	void setOut(strm_ptr &&ptr) { out = std::move(ptr); }
 
-	OutStream *get_out() { return out.get(); }
+	OutStream *getOut() { return out.get(); }
 
 	bool write(const void *buf, size_t len) override {
 		return out ? out->write(buf, len) : false;

@@ -76,7 +76,7 @@ static inline long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_
 }
 
 void update_uid_map() {
-	MutexGuard lock(monitor_lock);
+	mutex_guard lock(monitor_lock);
 	uid_proc_map.clear();
 	string data_path(APP_DATA_DIR);
 	data_path += "/0/";
@@ -336,7 +336,7 @@ void proc_monitor() {
 			continue;
 		}
 		bool detach = false;
-		RunFinally detach_task([&] {
+		run_finally f([&] {
 			if (detach)
 				// Non of our business now
 				detach_pid(pid);

@@ -62,7 +62,7 @@ void decompress(char *infile, const char *outfile) {
 
 			out_fd = strcmp(outfile, "-") == 0 ?
 					STDOUT_FILENO : xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			cmp->set_out(make_unique<FDOutStream>(out_fd));
+			cmp->setOut(make_unique<FDOutStream>(out_fd));
 			if (ext) *ext = '.';
 		}
 		if (!cmp->write(buf, len))
@@ -108,7 +108,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
 				 STDOUT_FILENO : xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	}
 
-	cmp->set_out(make_unique<FDOutStream>(out_fd));
+	cmp->setOut(make_unique<FDOutStream>(out_fd));
 
 	read_file(in_file, [&](void *buf, size_t len) -> void {
 		if (!cmp->write(buf, len))

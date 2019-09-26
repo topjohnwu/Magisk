@@ -2,41 +2,41 @@
 
 #include <pthread.h>
 #include <deque>
+#include <misc.h>
 
 template<typename T>
-class BlockingQueue {
+class blocking_queue {
 	std::deque<T> deque{};
 	pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 	bool cancelled = false;
 public:
-	~BlockingQueue();
+	~blocking_queue();
 	T take();
-	T &front();
-	T &back();
-	void put(const T&);
-	void put(T&&);
+	T &front() const;
+	T &back() const;
+	void push(const T&);
+	void push(T&&);
 	template< class... Args >
-	void emplace_back(Args&&... args);
+	void emplace(Args &&... args);
 	void clear();
 	void cancel();
 };
 
 #define run_and_notify(block) \
-pthread_mutex_lock(&this->lock); \
+mutex_guard g(this->lock); \
 block \
-pthread_cond_signal(&this->cond); \
-pthread_mutex_unlock(&this->lock);
+pthread_cond_signal(&this->cond);
 
 template<typename T>
-BlockingQueue<T>::~BlockingQueue() {
+blocking_queue<T>::~blocking_queue() {
 	pthread_mutex_destroy(&lock);
 	pthread_cond_destroy(&cond);
 }
 
 template<typename T>
-T BlockingQueue<T>::take() {
-	pthread_mutex_lock(&lock);
+T blocking_queue<T>::take() {
+	mutex_guard g(lock);
 	cancelled = false;
 	while (deque.empty() && !cancelled)
 		pthread_cond_wait(&cond, &lock);
@@ -44,55 +44,51 @@ T BlockingQueue<T>::take() {
 		pthread_exit(nullptr);
 	T ret(std::move(deque.front()));
 	deque.pop_front();
-	pthread_mutex_unlock(&lock);
 	return ret;
 }
 
 template<typename T>
-void BlockingQueue<T>::put(const T &s) {
+void blocking_queue<T>::push(const T &s) {
 	run_and_notify({ deque.push_back(s); })
 }
 
 template<typename T>
-void BlockingQueue<T>::put(T &&s) {
+void blocking_queue<T>::push(T &&s) {
 	run_and_notify({ deque.push_back(std::move(s)); })
 }
 
 template<typename T>
-T &BlockingQueue<T>::front() {
-	pthread_mutex_lock(&lock);
-	auto &ret = deque.front();
-	pthread_mutex_unlock(&lock);
-	return ret;
+T &blocking_queue<T>::front() const {
+	mutex_guard g(lock);
+	return deque.front();
 }
 
 template<typename T>
-T &BlockingQueue<T>::back() {
-	pthread_mutex_lock(&lock);
-	auto &ret = deque.back();
-	pthread_mutex_unlock(&lock);
-	return ret;
+T &blocking_queue<T>::back() const {
+	mutex_guard g(lock);
+	return deque.back();
 }
 
 template<typename T>
 template<class... Args>
-void BlockingQueue<T>::emplace_back(Args &&... args) {
+void blocking_queue<T>::emplace(Args &&... args) {
 	run_and_notify({ deque.emplace_back(std::forward<Args>(args)...); })
 }
 
 template<typename T>
-void BlockingQueue<T>::clear() {
-	pthread_mutex_lock(&lock);
+void blocking_queue<T>::clear() {
+	mutex_guard g(lock);
 	std::deque<T> t;
 	deque.swap(t);
-	pthread_mutex_unlock(&lock);
 }
 
 template<typename T>
-void BlockingQueue<T>::cancel() {
+void blocking_queue<T>::cancel() {
 	run_and_notify({
 		cancelled = true;
 		std::deque<T> t;
 		deque.swap(t);
 	})
 }
+
+#undef run_and_notify
