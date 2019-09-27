@@ -123,6 +123,62 @@ static void dtb_print(const char *file, bool fstab) {
 	exit(0);
 }
 
+static bool is_qcom_dtbtool(const uint8_t* dtimg) {
+	if (memcmp(dtimg, QCDT_MAGIC, 4 * sizeof(uint8_t)) == 0) {
+		return true;
+	}
+	return false;
+}
+
+static int get_qcom_hdr_version(const uint8_t* dtimg) {
+	uint32_t version;
+	memcpy(&version, reinterpret_cast<const uint32_t*>(dtimg + 4), sizeof(uint32_t));
+	return version;
+}
+
+static size_t get_qcom_table_entry_size(const uint8_t* dtimg) {
+	size_t size = 0;
+	switch (get_qcom_hdr_version(dtimg)) {
+		case 1:
+			size = 20;
+			break;
+		case 2:
+			size = 24;
+			break;
+		case 3:
+			size = 40;
+			break;
+		default:
+			// Error bad or unsupported dtimg
+			break;
+	}
+	return size;
+}
+
+static size_t get_qcom_hdr_size(const uint8_t* dtimg) {
+	int dtb_count;
+	memcpy(&dtb_count, reinterpret_cast<const uint32_t*>(dtimg + 8), sizeof(uint32_t));
+	return 	4 + 4 + 4 										+ 	// qcom magic + version + dtb's count
+			get_qcom_table_entry_size(dtimg) * dtb_count 	+
+			4;													// end of table indicator
+}
+
+static void set_qcom_hdr_dt_size_for(uint8_t* dtimg, int dt_num, uint32_t dt_size) {
+	size_t offset = 4 + 4 + 4; // qcom magic + version + dtb's count
+	size_t table_entry_size = get_qcom_table_entry_size(dtimg);
+	size_t dt_size_offset = table_entry_size - 4; // dt_size is the last uint32 in the table, for any version
+	offset += table_entry_size * dt_num + dt_size_offset;
+	memcpy(dtimg + offset, &dt_size, sizeof(uint32_t));
+}
+
+static void set_qcom_hdr_dt_offset_for(uint8_t* dtimg, int dt_num, uint32_t dt_offset) {
+	size_t offset = 4 + 4 + 4; // qcom magic + version + dtb's count
+	size_t table_entry_size = get_qcom_table_entry_size(dtimg);
+	size_t dt_offset_offset = table_entry_size - 8; // dt_offset is the penultimate uint32 in the table, for any version
+	offset += table_entry_size * dt_num + dt_offset_offset;
+	memcpy(dtimg + offset, &dt_offset, sizeof(uint32_t));
+}
+
 static void dtb_patch(const char *in, const char *out) {
 	bool keepverity = check_env("KEEPVERITY");
 	bool redirect = check_env("TWOSTAGEINIT");
@@ -132,6 +188,7 @@ static void dtb_patch(const char *in, const char *out) {
 	uint8_t *dtb;
 	fprintf(stderr, "Loading dtbs from [%s]\n", in);
 	mmap_ro(in, dtb, dtb_sz);
+	const bool m_is_qcom_dtbtool = is_qcom_dtbtool(dtb);
 	bool modified = false;
 	for (int i = 0; i < dtb_sz; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
@@ -168,17 +225,58 @@ static void dtb_patch(const char *in, const char *out) {
 			fdt_list.push_back(fdt);
 		}
 	}
-	munmap(dtb, dtb_sz);
 	if (modified) {
 		if (!out)
 			out = in;
 		int fd = xopen(out, O_WRONLY | O_CREAT | O_CLOEXEC);
+
+		int page_size;
+		uint8_t* filler;
+		if (m_is_qcom_dtbtool) {
+			// Parse page size
+			parse_prop_file(HEADER_FILE, [&](string_view key, string_view value) -> bool {
+				if (key == "page_size")
+					page_size = parse_int(value);
+				return true;
+			});
+			filler = (uint8_t*)calloc(page_size, sizeof(uint8_t));
+
+			// Copy the header
+			size_t header_size = get_qcom_hdr_size(dtb);
+			xwrite(fd, dtb, header_size);
+			xwrite(fd, filler, page_size - header_size % page_size);
+		}
+
 		for (auto fdt : fdt_list) {
 			fdt_pack(fdt);
-			xwrite(fd, fdt, fdt_totalsize(fdt));
+			size_t dt_size = fdt_totalsize(fdt);
+			xwrite(fd, fdt, dt_size);
+
+			if(m_is_qcom_dtbtool)
+				xwrite(fd, filler, page_size - dt_size % page_size);
 		}
 		close(fd);
+
+		if (m_is_qcom_dtbtool) {
+			// Correct sizes in qcom header
+			uint8_t* dtimg;
+			size_t dtimg_sz;
+			size_t dt_offset = get_qcom_hdr_size(dtb);
+			dt_offset += page_size - dt_offset % page_size;
+			mmap_rw(out, dtimg, dtimg_sz);
+			for (int i = 0; i < fdt_list.size(); ++i) {
+				auto fdt = fdt_list[i];
+				size_t dt_size = fdt_totalsize(fdt);
+				dt_size += page_size - dt_size % page_size;
+				set_qcom_hdr_dt_size_for(dtimg, i, dt_size);
+				set_qcom_hdr_dt_offset_for(dtimg, i, dt_offset);
+
+				dt_offset += dt_size;
+			}
+			munmap(dtimg, dtimg_sz);
+		}
 	}
+	munmap(dtb, dtb_sz);
 	exit(!modified);
 }
 

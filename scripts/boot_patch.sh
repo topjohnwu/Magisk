@@ -74,7 +74,7 @@ chmod -R 755 .
 CHROMEOS=false
 
 ui_print "- Unpacking boot image"
-./magiskboot unpack "$BOOTIMAGE"
+./magiskboot unpack -h "$BOOTIMAGE"
 
 case $? in
   1 )

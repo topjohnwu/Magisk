@@ -289,7 +289,7 @@ int unpack(const char *image, bool hdr) {
 
 	if (hdr) {
 		FILE *fp = xfopen(HEADER_FILE, "w");
-		fprintf(fp, "pagesize=%u\n", boot.hdr->page_size());
+		fprintf(fp, "page_size=%u\n", boot.hdr->page_size());
 		fprintf(fp, "name=%s\n", boot.hdr->name());
 		fprintf(fp, "cmdline=%.512s%.1024s\n", boot.hdr->cmdline(), boot.hdr->extra_cmdline());
 		uint32_t ver = boot.hdr->os_version();
