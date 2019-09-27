@@ -2,16 +2,12 @@ package com.topjohnwu.magisk.ui.base
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.children
-import androidx.core.view.isVisible
 import androidx.preference.*
 import androidx.recyclerview.widget.RecyclerView
-import com.topjohnwu.magisk.R
 import org.koin.android.ext.android.inject
 
 abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
@@ -35,28 +31,26 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
         super.onDestroyView()
     }
 
-    override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> {
-        return object : PreferenceGroupAdapter(preferenceScreen) {
-            @SuppressLint("RestrictedApi")
-            override fun onBindViewHolder(holder: PreferenceViewHolder, position: Int) {
-                super.onBindViewHolder(holder, position)
-                when (val preference = getItem(position)) {
-                    is PreferenceCategory -> setZeroPaddingToLayoutChildren(holder.itemView)
-                    else -> holder.itemView.findViewById<View>(R.id.icon_frame)?.isVisible =
-                        preference.icon != null
+    private fun setAllPreferencesToAvoidHavingExtraSpace(preference: Preference) {
+        preference.isIconSpaceReserved = false
+        if (preference is PreferenceGroup)
+            for (i in 0 until preference.preferenceCount)
+                setAllPreferencesToAvoidHavingExtraSpace(preference.getPreference(i))
+    }
+
+    override fun setPreferenceScreen(preferenceScreen: PreferenceScreen?) {
+        if (preferenceScreen != null)
+            setAllPreferencesToAvoidHavingExtraSpace(preferenceScreen)
+        super.setPreferenceScreen(preferenceScreen)
+    }
+
+    override fun onCreateAdapter(preferenceScreen: PreferenceScreen?): RecyclerView.Adapter<*> =
+            object : PreferenceGroupAdapter(preferenceScreen) {
+                @SuppressLint("RestrictedApi")
+                override fun onPreferenceHierarchyChange(preference: Preference?) {
+                    if (preference != null)
+                        setAllPreferencesToAvoidHavingExtraSpace(preference)
+                    super.onPreferenceHierarchyChange(preference)
                 }
             }
-        }
-    }
-
-    private fun setZeroPaddingToLayoutChildren(view: View) {
-        (view as? ViewGroup)?.children?.forEach {
-            setZeroPaddingToLayoutChildren(it)
-        } ?: return
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-            view.setPaddingRelative(0, view.paddingTop, view.paddingEnd, view.paddingBottom)
-        else
-            view.setPadding(0, view.paddingTop, view.paddingRight, view.paddingBottom)
-    }
 }
