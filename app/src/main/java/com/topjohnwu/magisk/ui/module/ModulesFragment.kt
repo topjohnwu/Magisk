@@ -8,7 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R

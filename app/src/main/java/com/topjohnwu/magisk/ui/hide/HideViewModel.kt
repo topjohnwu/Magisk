@@ -1,14 +1,12 @@
 package com.topjohnwu.magisk.ui.hide
 
 import android.content.pm.ApplicationInfo
-import com.skoumal.teanity.databinding.ComparableRvItem
-import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
-import com.skoumal.teanity.extensions.subscribeK
-import com.skoumal.teanity.rxbus.RxBus
-import com.skoumal.teanity.util.DiffObservableList
-import com.skoumal.teanity.util.KObservableField
+import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toSingle
 import com.topjohnwu.magisk.extensions.update
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessRvItem
@@ -16,6 +14,8 @@ import com.topjohnwu.magisk.model.entity.recycler.HideRvItem
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import com.topjohnwu.magisk.model.events.HideProcessEvent
 import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.utils.DiffObservableList
+import com.topjohnwu.magisk.utils.KObservableField
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 import timber.log.Timber
 

@@ -4,13 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
-import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityMainBinding
+import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
@@ -42,10 +42,6 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>() {
         LogFragment::class,
         SettingsFragment::class
     )
-
-    /*override fun getDarkTheme(): Int {
-        return R.style.AppTheme_Dark
-    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (!SplashActivity.DONE) {

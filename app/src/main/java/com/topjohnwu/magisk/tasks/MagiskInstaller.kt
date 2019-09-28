@@ -6,7 +6,6 @@ import android.os.Build
 import android.text.TextUtils
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.data.network.GithubRawServices

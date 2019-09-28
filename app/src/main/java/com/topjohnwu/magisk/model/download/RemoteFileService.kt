@@ -3,11 +3,11 @@ package com.topjohnwu.magisk.model.download
 import android.app.Activity
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.NullActivity
 import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*

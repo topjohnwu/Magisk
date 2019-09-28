@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.model.entity.recycler
 
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import com.skoumal.teanity.databinding.ComparableRvItem
+import com.topjohnwu.magisk.databinding.ComparableRvItem
 
 /**
  * This item addresses issues where enclosing recycler has to be invalidated or generally

@@ -6,7 +6,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.SearchView
-import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentReposBinding

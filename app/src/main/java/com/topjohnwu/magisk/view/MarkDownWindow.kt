@@ -4,10 +4,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.StringRepository
 import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.subscribeK
 import io.reactivex.Completable
 import io.reactivex.Single
 import ru.noties.markwon.Markwon

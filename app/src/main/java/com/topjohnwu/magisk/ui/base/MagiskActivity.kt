@@ -6,9 +6,11 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.annotation.CallSuper
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.SparseArrayCompat
 import androidx.core.net.toUri
+import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -19,13 +21,12 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
-import com.skoumal.teanity.view.TeanityActivity
-import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.EventHandler
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.extensions.set
-import com.topjohnwu.magisk.model.events.BackPressEvent
-import com.topjohnwu.magisk.model.events.PermissionEvent
-import com.topjohnwu.magisk.model.events.ViewActionEvent
+import com.topjohnwu.magisk.extensions.snackbar
+import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
@@ -39,17 +40,26 @@ import kotlin.reflect.KClass
 typealias RequestCallback = MagiskActivity<*, *>.(Int, Intent?) -> Unit
 
 abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBinding> :
-        TeanityActivity<ViewModel, Binding>(), FragNavController.RootFragmentListener,
+        AppCompatActivity(), FragNavController.RootFragmentListener, EventHandler,
         Navigator, FragNavController.TransactionListener {
 
-    override val numberOfRootFragments: Int get() = baseFragments.size
-    override val baseFragments: List<KClass<out Fragment>> = listOf()
-    private val resultCallbacks = SparseArrayCompat<RequestCallback>()
+    protected lateinit var binding: Binding
+    protected abstract val layoutRes: Int
+    protected abstract val viewModel: ViewModel
+    protected open val snackbarView get() = binding.root
+    protected open val navHostId: Int = 0
+    private val viewEventObserver = ViewEventObserver {
+        onEventDispatched(it)
+        if (it is SimpleViewEvent) {
+            onSimpleEventDispatched(it.event)
+        }
+    }
 
+    private val resultCallbacks = SparseArrayCompat<RequestCallback>()
 
     protected open val defaultPosition: Int = 0
 
-    protected val navigationController get() = if (navHostId == 0) null else _navigationController
+    private val navigationController get() = if (navHostId == 0) null else _navigationController
     private val _navigationController by lazy {
         if (navHostId == 0) throw IllegalStateException("Did you forget to override \"navHostId\"?")
         FragNavController(supportFragmentManager, navHostId)
@@ -57,6 +67,9 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
 
     private val isRootFragment
         get() = navigationController?.let { it.currentStackIndex != defaultPosition } ?: false
+
+    override val numberOfRootFragments: Int get() = baseFragments.size
+    override val baseFragments: List<KClass<out Fragment>> = listOf()
 
     init {
         val theme = if (Config.darkTheme) {
@@ -79,6 +92,14 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding = DataBindingUtil.setContentView<Binding>(this, layoutRes).apply {
+            setVariable(BR.viewModel, viewModel)
+            lifecycleOwner = this@MagiskActivity
+        }
+
+        viewModel.viewEvents.observe(this, viewEventObserver)
+
         navigationController?.apply {
             rootFragmentListener = this@MagiskActivity
             transactionListener = this@MagiskActivity
@@ -95,6 +116,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
     override fun onEventDispatched(event: ViewEvent) {
         super.onEventDispatched(event)
         when (event) {
+            is SnackbarEvent -> snackbar(snackbarView, event.message(this), event.length, event.f)
             is BackPressEvent -> onBackPressed()
             is MagiskNavigationEvent -> navigateTo(event)
             is ViewActionEvent -> event.action(this)
@@ -230,11 +252,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         }
     }
 
-    fun startActivityForResult(
-            intent: Intent,
-            requestCode: Int,
-            listener: RequestCallback
-    ) {
+    fun startActivityForResult(intent: Intent, requestCode: Int, listener: RequestCallback) {
         resultCallbacks[requestCode] = listener
         startActivityForResult(intent, requestCode)
     }

@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.model.binding
 
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import com.skoumal.teanity.databinding.ComparableRvItem
+import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LenientRvItem
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 

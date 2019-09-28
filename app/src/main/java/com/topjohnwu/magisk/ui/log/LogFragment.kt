@@ -6,7 +6,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentLogBinding
 import com.topjohnwu.magisk.model.events.PageChangedEvent

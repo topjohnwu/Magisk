@@ -5,7 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Window
-import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
 import com.topjohnwu.magisk.model.entity.MagiskPolicy

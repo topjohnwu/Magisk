@@ -1,16 +1,16 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import android.graphics.drawable.Drawable
-import com.skoumal.teanity.databinding.ComparableRvItem
-import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
-import com.skoumal.teanity.rxbus.RxBus
-import com.skoumal.teanity.util.KObservableField
+import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
+import com.topjohnwu.magisk.utils.KObservableField
 
 class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyRvItem>() {
 
