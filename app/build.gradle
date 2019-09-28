@@ -62,7 +62,6 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.ncapdevi:frag-nav:3.2.0'
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.6'
-    implementation 'com.karumi:dexter:6.0.0'
 
     implementation "io.reactivex.rxjava2:rxjava:2.2.12"
     implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"

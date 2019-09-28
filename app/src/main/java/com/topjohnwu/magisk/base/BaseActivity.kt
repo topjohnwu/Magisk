@@ -3,19 +3,17 @@ package com.topjohnwu.magisk.base
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.SparseArrayCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
@@ -25,6 +23,7 @@ import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.currentLocale
+import kotlin.random.Random
 
 typealias RequestCallback = BaseActivity<*, *>.(Int, Intent?) -> Unit
 
@@ -38,7 +37,7 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
     protected open val navHostId: Int = 0
     protected open val defaultPosition: Int = 0
 
-    private val resultCallbacks = SparseArrayCompat<RequestCallback>()
+    private val resultCallbacks by lazy { SparseArrayCompat<RequestCallback>() }
 
     init {
         val theme = if (Config.darkTheme) {
@@ -74,22 +73,38 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
 
     fun withPermissions(vararg permissions: String, builder: PermissionRequestBuilder.() -> Unit) {
         val request = PermissionRequestBuilder().apply(builder).build()
-        Dexter.withActivity(this)
-            .withPermissions(*permissions)
-            .withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport) {
-                    if (report.areAllPermissionsGranted()) {
-                        request.onSuccess()
-                    } else {
-                        request.onFailure()
-                    }
-                }
+        val ungranted = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
 
-                override fun onPermissionRationaleShouldBeShown(
-                    permissions: MutableList<PermissionRequest>,
-                    token: PermissionToken
-                ) = token.continuePermissionRequest()
-            }).check()
+        if (ungranted.isEmpty()) {
+            request.onSuccess()
+        } else {
+            val requestCode = Random.nextInt(256, 512)
+            resultCallbacks[requestCode] =  { result, _ ->
+                if (result > 0)
+                    request.onSuccess()
+                else
+                    request.onFailure()
+            }
+            ActivityCompat.requestPermissions(this, ungranted.toTypedArray(), requestCode)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+            requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        var success = true
+        for (res in grantResults) {
+            if (res != PackageManager.PERMISSION_GRANTED) {
+                success = false
+                break
+            }
+        }
+        resultCallbacks[requestCode]?.apply {
+            resultCallbacks.remove(requestCode)
+            invoke(this@BaseActivity, if (success) 1 else -1, null)
+        }
+
     }
 
     fun withExternalRW(builder: PermissionRequestBuilder.() -> Unit) {
