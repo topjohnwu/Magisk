@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.Window
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.MagiskActivity
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.utils.SuLogger
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-open class SuRequestActivity : MagiskActivity<SuRequestViewModel, ActivityRequestBinding>() {
+open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
     override val layoutRes: Int = R.layout.activity_request
     override val viewModel: SuRequestViewModel by viewModel()

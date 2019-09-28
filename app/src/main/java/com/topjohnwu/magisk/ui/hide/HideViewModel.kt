@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.ui.hide
 
 import android.content.pm.ApplicationInfo
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -22,7 +22,7 @@ import timber.log.Timber
 class HideViewModel(
     private val magiskRepo: MagiskRepository,
     rxBus: RxBus
-) : MagiskViewModel() {
+) : BaseViewModel() {
 
     val query = KObservableField("")
     val isShowSystem = KObservableField(false)

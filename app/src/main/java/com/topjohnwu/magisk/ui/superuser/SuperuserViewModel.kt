@@ -4,7 +4,7 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.applySchedulers
@@ -29,7 +29,7 @@ class SuperuserViewModel(
     private val packageManager: PackageManager,
     private val resources: Resources,
     rxBus: RxBus
-) : MagiskViewModel() {
+) : BaseViewModel() {
 
     val items = DiffObservableList(ComparableRvItem.callback)
     val itemBinding = ItemBinding.of<ComparableRvItem<*>> { itemBinding, _, item ->

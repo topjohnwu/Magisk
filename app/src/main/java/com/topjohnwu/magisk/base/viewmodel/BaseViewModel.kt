@@ -13,7 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 
-abstract class MagiskViewModel(
+abstract class BaseViewModel(
     initialState: State = State.LOADING
 ) : LoadingViewModel(initialState) {
 

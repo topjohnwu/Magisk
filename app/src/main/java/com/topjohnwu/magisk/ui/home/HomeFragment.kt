@@ -5,8 +5,8 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.MagiskActivity
-import com.topjohnwu.magisk.base.MagiskFragment
+import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
 import com.topjohnwu.magisk.extensions.inject
@@ -24,7 +24,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.lang.reflect.InvocationHandler
 
-class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
+class HomeFragment : BaseFragment<HomeViewModel, FragmentMagiskBinding>(),
     SafetyNetHelper.Callback {
 
     override val layoutRes: Int = R.layout.fragment_magisk
@@ -61,7 +61,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
             return
         }
 
-        MagiskInstallDialog(requireActivity() as MagiskActivity<*, *>).show()
+        MagiskInstallDialog(requireActivity() as BaseActivity<*, *>).show()
     }
 
     private fun installManager() = ManagerInstallDialog(requireActivity()).show()

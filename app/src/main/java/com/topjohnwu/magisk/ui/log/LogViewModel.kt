@@ -5,7 +5,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -30,7 +30,7 @@ import java.util.*
 class LogViewModel(
     private val resources: Resources,
     private val logRepo: LogRepository
-) : MagiskViewModel(), BindingViewPagerAdapter.PageTitles<ComparableRvItem<*>> {
+) : BaseViewModel(), BindingViewPagerAdapter.PageTitles<ComparableRvItem<*>> {
 
     val itemsAdapter = BindingAdapter()
     val items = DiffObservableList(ComparableRvItem.callback)

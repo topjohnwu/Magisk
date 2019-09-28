@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
@@ -31,7 +31,7 @@ class FlashViewModel(
     installer: Uri,
     uri: Uri,
     private val resources: Resources
-) : MagiskViewModel(), FlashResultListener {
+) : BaseViewModel(), FlashResultListener {
 
     val canShowReboot = Shell.rootAccess()
     val showRestartTitle = KObservableField(false)

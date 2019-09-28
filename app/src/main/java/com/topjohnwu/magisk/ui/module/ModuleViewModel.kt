@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.ui.module
 import android.content.res.Resources
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.*
@@ -25,7 +25,7 @@ class ModuleViewModel(
     private val resources: Resources,
     private val repoUpdater: RepoUpdater,
     private val repoDB: RepoDao
-) : MagiskViewModel() {
+) : BaseViewModel() {
 
     val query = KObservableField("")
 

@@ -18,7 +18,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.extensions.set
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
@@ -26,9 +26,9 @@ import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.currentLocale
 
-typealias RequestCallback = MagiskActivity<*, *>.(Int, Intent?) -> Unit
+typealias RequestCallback = BaseActivity<*, *>.(Int, Intent?) -> Unit
 
-abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBinding> :
+abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding> :
         AppCompatActivity(), EventHandler {
 
     protected lateinit var binding: Binding
@@ -66,7 +66,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
 
         binding = DataBindingUtil.setContentView<Binding>(this, layoutRes).apply {
             setVariable(BR.viewModel, viewModel)
-            lifecycleOwner = this@MagiskActivity
+            lifecycleOwner = this@BaseActivity
         }
     }
 
@@ -100,7 +100,7 @@ abstract class MagiskActivity<ViewModel : MagiskViewModel, Binding : ViewDataBin
         super.onActivityResult(requestCode, resultCode, data)
         resultCallbacks[requestCode]?.apply {
             resultCallbacks.remove(requestCode)
-            invoke(this@MagiskActivity, resultCode, data)
+            invoke(this@BaseActivity, resultCode, data)
         }
     }
 

@@ -12,8 +12,8 @@ import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.MagiskActivity
-import com.topjohnwu.magisk.base.MagiskFragment
+import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.databinding.ActivityMainBinding
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.extensions.snackbar
@@ -35,7 +35,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import kotlin.reflect.KClass
 
-open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>(), Navigator,
+open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Navigator,
         FragNavController.RootFragmentListener, FragNavController.TransactionListener {
 
     override val layoutRes: Int = R.layout.activity_main
@@ -102,7 +102,7 @@ open class MainActivity : MagiskActivity<MainViewModel, ActivityMainBinding>(), 
     }
 
     override fun onBackPressed() {
-        val fragment = navigationController?.currentFrag as? MagiskFragment<*, *>
+        val fragment = navigationController?.currentFrag as? BaseFragment<*, *>
 
         if (fragment?.onBackPressed() == true) {
             return

@@ -14,7 +14,7 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     protected val prefs: SharedPreferences by inject()
-    protected val activity get() = requireActivity() as MagiskActivity<*, *>
+    protected val activity get() = requireActivity() as BaseActivity<*, *>
 
     override fun onCreateView(
         inflater: LayoutInflater,

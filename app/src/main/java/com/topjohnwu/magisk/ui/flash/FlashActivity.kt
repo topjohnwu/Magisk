@@ -9,13 +9,13 @@ import androidx.core.net.toUri
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.MagiskActivity
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.databinding.ActivityFlashBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
 
-open class FlashActivity : MagiskActivity<FlashViewModel, ActivityFlashBinding>() {
+open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() {
 
     override val layoutRes: Int = R.layout.activity_flash
     override val viewModel: FlashViewModel by viewModel {
