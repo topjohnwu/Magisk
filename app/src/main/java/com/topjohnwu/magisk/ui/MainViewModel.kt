@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.ui
 
 import android.view.MenuItem
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
 
 
 class MainViewModel : MagiskViewModel() {

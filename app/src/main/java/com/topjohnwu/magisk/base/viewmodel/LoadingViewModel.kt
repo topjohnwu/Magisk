@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.viewmodel
+package com.topjohnwu.magisk.base.viewmodel
 
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
@@ -13,7 +13,7 @@ abstract class LoadingViewModel(defaultState: State = State.LOADING) :
 
     @Deprecated(
         "Direct access is recommended since 0.2. This access method will be removed in 1.0",
-        ReplaceWith("state = State.LOADING", "com.topjohnwu.magisk.viewmodel.LoadingViewModel.State"),
+        ReplaceWith("state = State.LOADING", "com.topjohnwu.magisk.base.viewmodel.LoadingViewModel.State"),
         DeprecationLevel.WARNING
     )
     fun setLoading() {
@@ -22,7 +22,7 @@ abstract class LoadingViewModel(defaultState: State = State.LOADING) :
 
     @Deprecated(
         "Direct access is recommended since 0.2. This access method will be removed in 1.0",
-        ReplaceWith("state = State.LOADED", "com.topjohnwu.magisk.viewmodel.LoadingViewModel.State"),
+        ReplaceWith("state = State.LOADED", "com.topjohnwu.magisk.base.viewmodel.LoadingViewModel.State"),
         DeprecationLevel.WARNING
     )
     fun setLoaded() {
@@ -31,7 +31,7 @@ abstract class LoadingViewModel(defaultState: State = State.LOADING) :
 
     @Deprecated(
         "Direct access is recommended since 0.2. This access method will be removed in 1.0",
-        ReplaceWith("state = State.LOADING_FAILED", "com.topjohnwu.magisk.viewmodel.LoadingViewModel.State"),
+        ReplaceWith("state = State.LOADING_FAILED", "com.topjohnwu.magisk.base.viewmodel.LoadingViewModel.State"),
         DeprecationLevel.WARNING
     )
     fun setLoadingFailed() {

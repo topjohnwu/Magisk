@@ -12,6 +12,7 @@ import android.text.TextUtils
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -20,7 +21,6 @@ import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
 import com.topjohnwu.magisk.model.entity.toPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.FingerprintHelper
 import com.topjohnwu.magisk.utils.KObservableField

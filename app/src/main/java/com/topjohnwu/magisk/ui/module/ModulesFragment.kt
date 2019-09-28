@@ -8,14 +8,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.MagiskFragment
 import com.topjohnwu.magisk.databinding.FragmentModulesBinding
 import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
-import com.topjohnwu.magisk.ui.base.MagiskFragment
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel

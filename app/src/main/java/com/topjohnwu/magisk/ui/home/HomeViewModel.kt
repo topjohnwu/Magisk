@@ -2,11 +2,11 @@ package com.topjohnwu.magisk.ui.home
 
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.observer.Observer
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.superuser.Shell

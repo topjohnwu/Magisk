@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.viewmodel
+package com.topjohnwu.magisk.base.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

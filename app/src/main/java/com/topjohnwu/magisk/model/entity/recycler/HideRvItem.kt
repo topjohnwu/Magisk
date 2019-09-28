@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
-import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -12,6 +11,7 @@ import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import com.topjohnwu.magisk.model.events.HideProcessEvent
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.magisk.utils.RxBus
 
 class HideRvItem(val item: HideAppInfo, targets: List<HideTarget>) :
     ComparableRvItem<HideRvItem>() {

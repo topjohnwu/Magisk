@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.viewmodel.LoadingViewModel.State" />
+        <import type="com.topjohnwu.magisk.base.viewmodel.LoadingViewModel.State" />
 
         <import type="com.topjohnwu.magisk.ui.home.SafetyNetState" />
 

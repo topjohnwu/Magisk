@@ -7,10 +7,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.MagiskActivity
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.utils.Utils
 
 internal class InstallMethodDialog(activity: MagiskActivity<*, *>, options: List<String>) :

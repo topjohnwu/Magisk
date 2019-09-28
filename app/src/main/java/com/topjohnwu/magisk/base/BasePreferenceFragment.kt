@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.base
+package com.topjohnwu.magisk.base
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences

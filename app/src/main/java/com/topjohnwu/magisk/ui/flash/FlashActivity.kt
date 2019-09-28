@@ -9,8 +9,8 @@ import androidx.core.net.toUri
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.MagiskActivity
 import com.topjohnwu.magisk.databinding.ActivityFlashBinding
-import com.topjohnwu.magisk.ui.base.MagiskActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File

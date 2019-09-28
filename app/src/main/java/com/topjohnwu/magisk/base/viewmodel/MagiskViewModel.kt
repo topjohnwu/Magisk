@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.base
+package com.topjohnwu.magisk.base.viewmodel
 
 import android.app.Activity
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
@@ -9,7 +9,6 @@ import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.utils.KObservableField
-import com.topjohnwu.magisk.viewmodel.LoadingViewModel
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 

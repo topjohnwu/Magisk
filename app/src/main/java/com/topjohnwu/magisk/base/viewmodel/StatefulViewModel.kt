@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.viewmodel
+package com.topjohnwu.magisk.base.viewmodel
 
 abstract class StatefulViewModel<State : Enum<*>>(
     val defaultState: State

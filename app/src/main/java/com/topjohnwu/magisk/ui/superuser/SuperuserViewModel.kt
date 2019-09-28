@@ -2,10 +2,9 @@ package com.topjohnwu.magisk.ui.superuser
 
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import com.topjohnwu.magisk.utils.RxBus
-import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.applySchedulers
@@ -15,9 +14,10 @@ import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.FingerprintHelper
+import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import io.reactivex.Single

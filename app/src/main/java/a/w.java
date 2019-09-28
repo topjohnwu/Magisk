@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.topjohnwu.magisk.model.worker.DelegateWorker;
+import com.topjohnwu.magisk.base.DelegateWorker;
 
 import java.lang.reflect.ParameterizedType;
 

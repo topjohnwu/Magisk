@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.model.events
 import android.content.Context
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
-import com.topjohnwu.magisk.model.events.ViewEvent
 
 class SnackbarEvent private constructor(
     @StringRes private val messageRes: Int,

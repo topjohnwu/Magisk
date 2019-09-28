@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.view.dialogs
 import android.net.Uri
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.ui.base.MagiskActivity
+import com.topjohnwu.magisk.base.MagiskActivity
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.superuser.Shell

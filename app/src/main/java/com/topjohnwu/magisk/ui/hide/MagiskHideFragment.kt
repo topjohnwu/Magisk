@@ -6,8 +6,8 @@ import android.view.MenuItem
 import android.widget.SearchView
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.MagiskFragment
 import com.topjohnwu.magisk.databinding.FragmentMagiskHideBinding
-import com.topjohnwu.magisk.ui.base.MagiskFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MagiskHideFragment : MagiskFragment<HideViewModel, FragmentMagiskHideBinding>(),

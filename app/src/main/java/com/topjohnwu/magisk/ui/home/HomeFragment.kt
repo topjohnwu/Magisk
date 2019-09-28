@@ -1,19 +1,18 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.content.Context
-import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.MagiskActivity
+import com.topjohnwu.magisk.base.MagiskFragment
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.events.*
-import com.topjohnwu.magisk.ui.base.MagiskActivity
-import com.topjohnwu.magisk.ui.base.MagiskFragment
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.magisk.view.MarkDownWindow
@@ -39,7 +38,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
     override fun onEventDispatched(event: ViewEvent) {
         super.onEventDispatched(event)
         when (event) {
-            is OpenLinkEvent -> openLink(event.url)
+            is OpenLinkEvent -> activity.openUrl(event.url)
             is ManagerInstallEvent -> installManager()
             is MagiskInstallEvent -> installMagisk()
             is UninstallEvent -> uninstall()

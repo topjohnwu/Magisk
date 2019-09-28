@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.ui.log
 
 import android.content.res.Resources
-import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.viewmodel.MagiskViewModel
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -17,7 +17,7 @@ import com.topjohnwu.magisk.model.entity.recycler.LogItemRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LogRvItem
 import com.topjohnwu.magisk.model.entity.recycler.MagiskLogRvItem
 import com.topjohnwu.magisk.model.events.PageChangedEvent
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell

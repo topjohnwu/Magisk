@@ -15,4 +15,11 @@ internal interface EventHandler {
      * the way how you handle them.
      */
     fun onSimpleEventDispatched(event: Int) {}
+
+    val viewEventObserver get() = ViewEventObserver {
+        onEventDispatched(it)
+        if (it is SimpleViewEvent) {
+            onSimpleEventDispatched(it.event)
+        }
+    }
 }
