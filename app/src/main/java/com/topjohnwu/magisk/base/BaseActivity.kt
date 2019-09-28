@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.SparseArrayCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
@@ -21,7 +20,6 @@ import com.topjohnwu.magisk.extensions.set
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.LocaleManager
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.currentLocale
 import kotlin.random.Random
 
@@ -69,8 +67,6 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
         }
     }
 
-    fun openUrl(url: String) = Utils.openLink(this, url.toUri())
-
     fun withPermissions(vararg permissions: String, builder: PermissionRequestBuilder.() -> Unit) {
         val request = PermissionRequestBuilder().apply(builder).build()
         val ungranted = permissions.filter {
@@ -91,6 +87,10 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
         }
     }
 
+    fun withExternalRW(builder: PermissionRequestBuilder.() -> Unit) {
+        withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, builder = builder)
+    }
+
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         var success = true
@@ -105,10 +105,6 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
             invoke(this@BaseActivity, if (success) 1 else -1, null)
         }
 
-    }
-
-    fun withExternalRW(builder: PermissionRequestBuilder.() -> Unit) {
-        withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, builder = builder)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

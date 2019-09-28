@@ -17,7 +17,9 @@ import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.topjohnwu.magisk.utils.FileProvider
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.currentLocale
 import java.io.File
 import java.io.FileNotFoundException
@@ -153,3 +155,5 @@ fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
     }
     return start to end
 }
+
+fun Context.openUrl(url: String) = Utils.openLink(this, url.toUri())

@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
 import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.openUrl
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.events.*
