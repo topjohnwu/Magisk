@@ -43,12 +43,11 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
     override val navHostId: Int = R.id.main_nav_host
     override val defaultPosition: Int = 0
 
-    private val navigationController get() = if (navHostId == 0) null else _navigationController
-    private val _navigationController by lazy {
+    private val navigationController by lazy {
         FragNavController(supportFragmentManager, navHostId)
     }
     private val isRootFragment get() =
-        navigationController?.let { it.currentStackIndex != defaultPosition } ?: false
+        navigationController.currentStackIndex != defaultPosition
 
     override val baseFragments: List<KClass<out Fragment>> = listOf(
         HomeFragment::class,
@@ -68,7 +67,7 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
         super.onCreate(savedInstanceState)
 
-        navigationController?.apply {
+        navigationController.apply {
             rootFragmentListener = this@MainActivity
             transactionListener = this@MainActivity
             initialize(defaultPosition, savedInstanceState)
@@ -90,7 +89,7 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        navigationController?.onSaveInstanceState(outState)
+        navigationController.onSaveInstanceState(outState)
     }
 
     override fun setTitle(title: CharSequence?) {
@@ -102,30 +101,28 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
     }
 
     override fun onBackPressed() {
-        val fragment = navigationController?.currentFrag as? BaseFragment<*, *>
-
-        if (fragment?.onBackPressed() == true) {
-            return
-        }
-
-        try {
-            navigationController?.popFragment() ?: throw UnsupportedOperationException()
-        } catch (e: UnsupportedOperationException) {
-            when {
-                isRootFragment -> {
-                    val options = FragNavTransactionOptions.newBuilder()
-                            .transition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                            .build()
-                    navigationController?.switchTab(defaultPosition, options)
-                }
-                else -> super.onBackPressed()
-            }
-        }
-
         if (binding.drawerLayout.isDrawerOpen(binding.navView)) {
             binding.drawerLayout.closeDrawer(binding.navView)
         } else {
-            super.onBackPressed()
+            val fragment = navigationController.currentFrag as? BaseFragment<*, *>
+
+            if (fragment?.onBackPressed() == true) {
+                return
+            }
+
+            try {
+                navigationController.popFragment()
+            } catch (e: UnsupportedOperationException) {
+                when {
+                    isRootFragment -> {
+                        val options = FragNavTransactionOptions.newBuilder()
+                                .transition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                                .build()
+                        navigationController.switchTab(defaultPosition, options)
+                    }
+                    else -> super.onBackPressed()
+                }
+            }
         }
     }
 
@@ -197,15 +194,15 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
     override fun navigateTo(event: MagiskNavigationEvent) {
         val directions = event.navDirections
 
-        navigationController?.defaultTransactionOptions = FragNavTransactionOptions.newBuilder()
+        navigationController.defaultTransactionOptions = FragNavTransactionOptions.newBuilder()
                 .customAnimations(event.animOptions)
                 .build()
 
-        navigationController?.currentStack
+        navigationController.currentStack
                 ?.indexOfFirst { it.javaClass == event.navOptions.popUpTo }
                 ?.let { if (it == -1) null else it } // invalidate if class is not found
                 ?.let { if (event.navOptions.inclusive) it + 1 else it }
-                ?.let { navigationController?.popFragments(it) }
+                ?.let { navigationController.popFragments(it) }
 
         when (directions.isActivity) {
             true -> navigateToActivity(event)
@@ -238,9 +235,9 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
         when (val index = baseFragments.indexOfFirst { it.java.name == destination.name }) {
             -1 -> destination.newInstance()
                     .apply { arguments = event.navDirections.args }
-                    .let { navigationController?.pushFragment(it) }
+                    .let { navigationController.pushFragment(it) }
             // When it's desired that fragments of same class are put on top of one another edit this
-            else -> navigationController?.switchTab(index)
+            else -> navigationController.switchTab(index)
         }
     }
 
