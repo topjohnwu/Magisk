@@ -14,17 +14,12 @@
     <style name="AppearanceFoundation" />
     <!--endregion-->
 
-    <style name="Foundation.Dimen" parent="Foundation.Compat">
-        <item name="l_125">2dp</item>
-        <item name="l_25">4dp</item>
-        <item name="l_50">8dp</item>
-        <item name="l1">16dp</item>
-        <item name="l2">32dp</item>
-        <item name="l3">48dp</item>
-        <item name="l4">64dp</item>
-    </style>
+    <style name="Foundation.Base" parent="Foundation.Compat">
+        <item name="android:fontFamily">@font/exo</item>
+        <item name="android:includeFontPadding">false</item>
 
-    <style name="Foundation.Base" parent="Foundation.Dimen">
+        <!--///-->
+
         <item name="actionBarSize">60dp</item>
 
         <item name="styleAppbar">@style/WidgetFoundation.Appbar</item>
@@ -38,6 +33,11 @@
         <item name="styleButtonDefault">@style/WidgetFoundation.Button</item>
         <item name="styleButtonFlat">@style/WidgetFoundation.Button.Flat</item>
         <item name="styleButtonText">@style/WidgetFoundation.Button.Text</item>
+        <item name="styleButtonError">@style/WidgetFoundation.Button.Error</item>
+
+        <item name="styleIconNormal">@style/WidgetFoundation.Icon</item>
+        <item name="styleIconPrimary">@style/WidgetFoundation.Icon.Primary</item>
+        <item name="styleIconError">@style/WidgetFoundation.Icon.Error</item>
 
         <!--///-->
 
@@ -76,6 +76,7 @@
         <item name="colorSecondary">#00C853</item>
         <item name="colorSecondaryVariant">#8000C853</item>
         <item name="colorSurface">#F2F2F2</item>
+        <item name="colorSurfaceVariant">#0D000000</item>
         <item name="colorOnPrimary">#F2F2F2</item>
         <item name="colorOnPrimaryVariant">#80F2F2F2</item>
         <item name="colorOnSecondary">#F2F2F2</item>
@@ -84,6 +85,10 @@
         <item name="colorOnError">#F2F2F2</item>
         <item name="colorOnSurface">#444444</item>
         <item name="colorOnSurfaceVariant">#80444444</item>
+        <item name="colorDisabled">#808080</item>
+        <item name="colorTextTransient">@color/color_text_transient</item>
+        <item name="colorPrimaryTransient">@color/color_primary_transient</item>
+        <item name="colorErrorTransient">@color/color_error_transient</item>
     </style>
 
 </resources>

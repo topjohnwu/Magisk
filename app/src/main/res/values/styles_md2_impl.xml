@@ -27,18 +27,18 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="android:gravity">start</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:lines">1</item>
-        <item name="android:padding">?l1</item>
+        <item name="android:padding">@dimen/l1</item>
     </style>
 
 
     <style name="WidgetFoundation.Card" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/colorSurface</item>
-        <item name="cardCornerRadius">?l_50</item>
+        <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">4dp</item>
     </style>
 
     <style name="WidgetFoundation.Card.OnPrimary" parent="Widget.MaterialComponents.CardView">
-        <item name="cardCornerRadius">?l_50</item>
+        <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">0dp</item>
         <item name="strokeColor">?attr/colorOnPrimaryVariant</item>
         <item name="strokeWidth">1dp</item>
@@ -47,15 +47,38 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
 
     <style name="WidgetFoundation.Button" parent="Widget.MaterialComponents.Button">
-
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="WidgetFoundation.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
-
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="WidgetFoundation.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textStyle">bold</item>
+    </style>
 
+    <style name="WidgetFoundation.Button.Error" parent="WidgetFoundation.Button.Text">
+        <item name="rippleColor">?colorError</item>
+        <item name="android:textColor">?colorError</item>
+        <item name="iconTint">?colorError</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Icon">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:padding">@dimen/l_75</item>
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+        <item name="tint">?colorTextTransient</item>
+    </style>
+
+    <style name="WidgetFoundation.Icon.Primary">
+        <item name="tint">?colorPrimaryTransient</item>
+    </style>
+
+    <style name="WidgetFoundation.Icon.Error">
+        <item name="tint">?colorErrorTransient</item>
     </style>
 
 </resources>

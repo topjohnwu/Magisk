@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/magiskFragment"
-        android:icon="@drawable/ic_magisk_outline"
+        android:icon="@drawable/ic_home"
         android:title="Home"
         tools:showAsAction="always" />
 
@@ -12,6 +12,12 @@
         android:id="@+id/magiskFragment"
         android:icon="@drawable/ic_cloud_download"
         android:title="@string/modules"
+        tools:showAsAction="always" />
+
+    <item
+        android:id="@+id/fake"
+        android:enabled="false"
+        android:title=""
         tools:showAsAction="always" />
 
     <item

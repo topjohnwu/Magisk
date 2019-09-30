@@ -3,7 +3,6 @@
 
     <!--region Display-->
     <style name="AppearanceFoundation.Display" parent="TextAppearance.AppCompat.Display1">
-        <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
@@ -22,8 +21,8 @@
 
     <!--region Title-->
     <style name="AppearanceFoundation.Title" parent="TextAppearance.AppCompat.Title">
-        <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="AppearanceFoundation.Title.Variant">
@@ -41,7 +40,6 @@
 
     <!--region Body-->
     <style name="AppearanceFoundation.Body" parent="TextAppearance.AppCompat.Body1">
-        <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
@@ -60,7 +58,6 @@
 
     <!--region Caption-->
     <style name="AppearanceFoundation.Caption" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
@@ -79,10 +76,12 @@
 
     <!--region Tiny-->
     <style name="AppearanceFoundation.Tiny" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:includeFontPadding">false</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">11sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="AppearanceFoundation.Tiny.Bold">
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="AppearanceFoundation.Tiny.Variant">

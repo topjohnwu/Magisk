@@ -10,69 +10,54 @@
         style="?styleAppbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent">
+        android:background="?colorSurfaceVariant">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/home_toolbar"
+            style="?styleToolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:contentInsetStartWithNavigation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:paddingTop="24dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="center_horizontal|bottom"
-                android:background="@drawable/bg_circle"
-                app:layout_constraintBottom_toBottomOf="@+id/home_toolbar"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/home_toolbar"
-                style="?styleToolbar"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                app:contentInsetStartWithNavigation="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:paddingTop="24dp">
+                android:paddingBottom="@dimen/l1">
 
-                <FrameLayout
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="?styleToolbarTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="?l1">
+                    android:gravity="center"
+                    tools:text="Home" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
-                        style="?styleToolbarTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textColor="?colorOnPrimary"
-                        tools:text="Home" />
+                <View
+                    android:layout_width="50dp"
+                    android:layout_height="5dp"
+                    android:layout_gravity="center|bottom"
+                    android:background="@drawable/bg_accent" />
 
-                    <View
-                        android:layout_width="50dp"
-                        android:layout_height="5dp"
-                        android:layout_gravity="center|bottom"
-                        android:background="@drawable/bg_accent" />
+            </FrameLayout>
 
-                </FrameLayout>
-
-            </com.google.android.material.appbar.MaterialToolbar>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:orientation="vertical"
-        android:padding="?l1"
+        android:padding="@dimen/l1"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/l1">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/home_magisk_wrapper"
@@ -94,7 +79,7 @@
                     android:id="@+id/title1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="?l1"
+                    android:layout_marginStart="@dimen/l1"
                     android:text="Magisk"
                     android:textAppearance="?appearanceTextTitleNormal"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -112,9 +97,13 @@
                     app:layout_constraintTop_toBottomOf="@+id/title1" />
 
                 <FrameLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/button_container1"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="?l1"
+                    android:layout_marginTop="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l_50"
+                    app:layout_constraintEnd_toStartOf="@+id/delete1"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/status1">
 
                     <com.google.android.material.button.MaterialButton
@@ -122,15 +111,31 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/update"
+                        app:icon="@drawable/ic_update_md2"
+                        app:iconGravity="textEnd"
+                        app:iconPadding="@dimen/l_50"
+                        app:iconSize="18dp"
                         tools:visibility="gone" />
 
                     <com.google.android.material.button.MaterialButton
                         style="?styleButtonText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/install" />
+                        android:text="@string/install"
+                        app:icon="@drawable/ic_install"
+                        app:iconGravity="textEnd"
+                        app:iconPadding="@dimen/l_50"
+                        app:iconSize="18dp" />
 
                 </FrameLayout>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/delete1"
+                    style="?styleIconError"
+                    app:layout_constraintBottom_toBottomOf="@+id/button_container1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/button_container1"
+                    app:srcCompat="@drawable/ic_delete_md2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -138,7 +143,7 @@
                 android:id="@+id/home_manager_wrapper"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="?l1"
+                android:layout_marginStart="@dimen/l1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
                 app:layout_constraintTop_toTopOf="parent">
@@ -155,7 +160,7 @@
                     android:id="@+id/title1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="?l1"
+                    android:layout_marginStart="@dimen/l1"
                     android:text="Manager"
                     android:textAppearance="?appearanceTextTitleNormal"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -175,20 +180,28 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="?l1"
+                    android:layout_marginTop="@dimen/l1"
                     app:layout_constraintTop_toBottomOf="@+id/status1">
 
                     <com.google.android.material.button.MaterialButton
                         style="?styleButtonDefault"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/update" />
+                        android:text="@string/update"
+                        app:icon="@drawable/ic_update_md2"
+                        app:iconGravity="textEnd"
+                        app:iconPadding="@dimen/l_50"
+                        app:iconSize="18dp" />
 
                     <com.google.android.material.button.MaterialButton
                         style="?styleButtonText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/install"
+                        app:icon="@drawable/ic_install"
+                        app:iconGravity="textEnd"
+                        app:iconPadding="@dimen/l_50"
+                        app:iconSize="18dp"
                         tools:visibility="gone" />
 
                 </FrameLayout>
@@ -197,17 +210,23 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/l2"
+            android:layout_marginBottom="@dimen/l2"
+            android:background="?colorSurfaceVariant" />
+
         <com.google.android.material.card.MaterialCardView
             style="?styleCardNormal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="?l1">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="?l1">
+                android:padding="@dimen/l1">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
@@ -230,24 +249,34 @@
 
     </LinearLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/home_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@drawable/bg_divider_top"
         android:paddingBottom="48dp"
-        app:itemIconSize="20dp"
-        app:itemIconTint="@color/color_menu_tint"
-        app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny"
-        app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny"
-        app:itemTextColor="@color/color_menu_tint"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/menu_bottom_nav" />
+        app:contentInsetEnd="0dp"
+        app:contentInsetStart="0dp"
+        app:fabCradleMargin="@dimen/l_50">
 
-    <!--<com.google.android.material.floatingactionbutton.FloatingActionButton
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:itemIconTint="@color/color_menu_tint"
+            app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
+            app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
+            app:itemTextColor="@color/color_menu_tint"
+            app:labelVisibilityMode="unlabeled"
+            app:menu="@menu/menu_bottom_nav" />
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fabSize="normal"
-        app:layout_anchor="@+id/home_bottom_bar" />-->
+        app:layout_anchor="@+id/home_bottom_bar"
+        app:srcCompat="@drawable/ic_superuser" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
