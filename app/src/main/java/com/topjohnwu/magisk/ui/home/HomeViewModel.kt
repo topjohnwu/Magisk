@@ -10,13 +10,14 @@ import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.superuser.Shell
+import io.reactivex.Completable
 
 enum class SafetyNetState {
     LOADING, PASS, FAILED, IDLE
 }
 
 enum class MagiskState {
-    NO_ROOT, NOT_INSTALLED, UP_TO_DATE, OBSOLETE, LOADING
+    NOT_INSTALLED, UP_TO_DATE, OBSOLETE, LOADING
 }
 
 enum class MagiskItem {
@@ -37,13 +38,9 @@ class HomeViewModel(
     val isKeepVerity = KObservableField(Info.keepVerity)
     val isRecovery = KObservableField(Info.recovery)
 
-    private val _magiskState = KObservableField(MagiskState.LOADING)
-    val magiskState = Observer(_magiskState, isConnected) {
-        if (isConnected.value) _magiskState.value else MagiskState.UP_TO_DATE
-    }
+    val magiskState = KObservableField(MagiskState.LOADING)
     val magiskStateText = Observer(magiskState) {
         when (magiskState.value) {
-            MagiskState.NO_ROOT -> TODO()
             MagiskState.NOT_INSTALLED -> R.string.magisk_version_error.res()
             MagiskState.UP_TO_DATE -> R.string.magisk_up_to_date.res()
             MagiskState.LOADING -> R.string.checking_for_updates.res()
@@ -65,7 +62,6 @@ class HomeViewModel(
     }
     val managerStateText = Observer(managerState) {
         when (managerState.value) {
-            MagiskState.NO_ROOT -> "wtf"
             MagiskState.NOT_INSTALLED -> R.string.invalid_update_channel.res()
             MagiskState.UP_TO_DATE -> R.string.manager_up_to_date.res()
             MagiskState.LOADING -> R.string.checking_for_updates.res()
@@ -175,24 +171,28 @@ class HomeViewModel(
     }
 
     fun refresh() {
-        refreshVersions()
-
-        magiskRepo.fetchUpdate()
-            .applyViewModel(this)
-            .doOnSubscribeUi {
-                _magiskState.value = MagiskState.LOADING
-                _managerState.value = MagiskState.LOADING
-                ctsState.value = SafetyNetState.IDLE
-                basicIntegrityState.value = SafetyNetState.IDLE
-                safetyNetTitle.value = R.string.safetyNet_check_text
-            }
-            .subscribeK {
-                updateSelf()
-                ensureEnv()
-                refreshVersions()
-            }
-
         hasRoot.value = Shell.rootAccess()
+
+        val fetchUpdate = if (isConnected.value)
+            magiskRepo.fetchUpdate().ignoreElement()
+        else
+            Completable.complete()
+
+        Completable.fromAction {
+            Info.loadMagiskInfo()
+        }.andThen(fetchUpdate)
+        .applyViewModel(this)
+        .doOnSubscribeUi {
+            magiskState.value = MagiskState.LOADING
+            _managerState.value = MagiskState.LOADING
+            ctsState.value = SafetyNetState.IDLE
+            basicIntegrityState.value = SafetyNetState.IDLE
+            safetyNetTitle.value = R.string.safetyNet_check_text
+        }.subscribeK {
+            updateSelf()
+            ensureEnv()
+            refreshVersions()
+        }
     }
 
     private fun refreshVersions() {
@@ -207,7 +207,7 @@ class HomeViewModel(
     }
 
     private fun updateSelf() {
-        _magiskState.value = when (Info.magiskVersionCode) {
+        magiskState.value = when (Info.magiskVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
             !in Info.remote.magisk.versionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
@@ -228,7 +228,7 @@ class HomeViewModel(
 
     private fun ensureEnv() {
         val invalidStates =
-            listOf(MagiskState.NOT_INSTALLED, MagiskState.NO_ROOT, MagiskState.LOADING)
+            listOf(MagiskState.NOT_INSTALLED, MagiskState.LOADING)
 
         // Don't bother checking env when magisk is not installed, loading or already has been shown
         if (invalidStates.any { it == magiskState.value } || shownDialog) return

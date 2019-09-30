@@ -17,7 +17,7 @@ abstract class BaseViewModel(
     initialState: State = State.LOADING
 ) : LoadingViewModel(initialState) {
 
-    val isConnected = KObservableField(true)
+    val isConnected = KObservableField(false)
 
     init {
         ReactiveNetwork.observeNetworkConnectivity(get())
