@@ -48,6 +48,7 @@ object Config : PreferenceModel, DBConfig {
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
         const val DOWNLOAD_PATH = "download_path"
+        const val REDESIGN = "redesign"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -108,6 +109,7 @@ object Config : PreferenceModel, DBConfig {
     var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
     var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
 
+    var redesign by preference(Key.REDESIGN, false)
     var darkTheme by preference(Key.DARK_THEME, true)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)

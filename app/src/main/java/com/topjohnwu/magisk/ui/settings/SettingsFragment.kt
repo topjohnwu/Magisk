@@ -57,6 +57,8 @@ class SettingsFragment : BasePreferenceFragment() {
         preferenceManager.setStorageDeviceProtected()
         setPreferencesFromResource(R.xml.app_settings, rootKey)
 
+        findPreference<PreferenceCategory>("redesign_cat")?.isVisible = BuildConfig.DEBUG
+
         updateChannel = findPreference(Config.Key.UPDATE_CHANNEL)!!
         rootConfig = findPreference(Config.Key.ROOT_ACCESS)!!
         autoRes = findPreference(Config.Key.SU_AUTO_RESPONSE)!!
@@ -227,26 +229,26 @@ class SettingsFragment : BasePreferenceFragment() {
     private fun setLocalePreference(lp: ListPreference) {
         lp.isEnabled = false
         availableLocales.map {
-                val names = mutableListOf<String>()
-                val values = mutableListOf<String>()
+            val names = mutableListOf<String>()
+            val values = mutableListOf<String>()
 
-                names.add(
-                    LocaleManager.getString(defaultLocale, R.string.system_default)
-                )
-                values.add("")
+            names.add(
+                LocaleManager.getString(defaultLocale, R.string.system_default)
+            )
+            values.add("")
 
-                it.forEach { locale ->
-                    names.add(locale.getDisplayName(locale))
-                    values.add(locale.toLangTag())
-                }
-
-                Pair(names.toTypedArray(), values.toTypedArray())
-            }.subscribeK { (names, values) ->
-                lp.isEnabled = true
-                lp.entries = names
-                lp.entryValues = values
-                lp.summary = currentLocale.getDisplayName(currentLocale)
+            it.forEach { locale ->
+                names.add(locale.getDisplayName(locale))
+                values.add(locale.toLangTag())
             }
+
+            Pair(names.toTypedArray(), values.toTypedArray())
+        }.subscribeK { (names, values) ->
+            lp.isEnabled = true
+            lp.entries = names
+            lp.entryValues = values
+            lp.summary = currentLocale.getDisplayName(currentLocale)
+        }
     }
 
     private fun setSummary(key: String) {

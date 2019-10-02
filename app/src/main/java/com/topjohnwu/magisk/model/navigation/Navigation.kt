@@ -1,5 +1,11 @@
 package com.topjohnwu.magisk.model.navigation
 
+import android.content.Context
+import android.content.Intent
+import com.topjohnwu.magisk.ClassMap
+import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
 import com.topjohnwu.magisk.ui.home.HomeFragment
 import com.topjohnwu.magisk.ui.log.LogFragment
@@ -7,7 +13,7 @@ import com.topjohnwu.magisk.ui.module.ModulesFragment
 import com.topjohnwu.magisk.ui.module.ReposFragment
 import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
-
+import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
 
 object Navigation {
 
@@ -50,6 +56,17 @@ object Navigation {
         else -> home()
     }
 
+    // redesign starts here
+
+    fun start(launchIntent: Intent, context: Context) {
+        val destination = when {
+            Config.redesign -> RedesignActivity::class.java
+            else -> MainActivity::class.java
+        }
+        val intent = Intent(context, ClassMap[destination])
+        intent.putExtra(Const.Key.OPEN_SECTION, launchIntent.getStringExtra(Const.Key.OPEN_SECTION))
+        context.startActivity(intent)
+    }
 
     object Main {
         const val OPEN_NAV = 1

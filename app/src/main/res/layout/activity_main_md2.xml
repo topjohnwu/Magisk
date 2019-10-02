@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.redesign.MainViewModel" />
+
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.AppBarLayout
+            style="?styleAppbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?colorSurfaceVariant">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/home_toolbar"
+                style="?styleToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:contentInsetStartWithNavigation="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:paddingTop="24dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/l1">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="?styleToolbarTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Home" />
+
+                    <View
+                        android:layout_width="50dp"
+                        android:layout_height="5dp"
+                        android:layout_gravity="center|bottom"
+                        android:background="@drawable/bg_accent" />
+
+                </FrameLayout>
+
+            </com.google.android.material.appbar.MaterialToolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="@dimen/l1"
+            android:visibility="gone"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/l1">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/home_magisk_wrapper"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toStartOf="@+id/home_manager_wrapper"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/icon1"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:alpha=".2"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:src="@tools:sample/avatars" />
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            style="?styleIconError"
+                            app:layout_constraintBottom_toBottomOf="@+id/icon1"
+                            app:layout_constraintEnd_toEndOf="@+id/icon1"
+                            app:layout_constraintStart_toStartOf="@+id/icon1"
+                            app:layout_constraintTop_toTopOf="@+id/icon1"
+                            app:srcCompat="@drawable/ic_delete_md2" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/title1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/l1"
+                            android:text="Magisk"
+                            android:textAppearance="?appearanceTextTitleNormal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/icon1"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/status1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="is up to date"
+                            android:textAppearance="?appearanceTextCaptionVariant"
+                            app:layout_constraintEnd_toEndOf="@+id/title1"
+                            app:layout_constraintStart_toStartOf="@+id/title1"
+                            app:layout_constraintTop_toBottomOf="@+id/title1" />
+
+                        <FrameLayout
+                            android:id="@+id/button_container1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/l1"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/status1">
+
+                            <com.google.android.material.button.MaterialButton
+                                style="?styleButtonDefault"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/update"
+                                app:icon="@drawable/ic_update_md2"
+                                app:iconGravity="textEnd"
+                                app:iconPadding="@dimen/l_50"
+                                app:iconSize="18dp"
+                                tools:visibility="gone" />
+
+                            <com.google.android.material.button.MaterialButton
+                                style="?styleButtonText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/install"
+                                app:icon="@drawable/ic_install"
+                                app:iconGravity="textEnd"
+                                app:iconPadding="@dimen/l_50"
+                                app:iconSize="18dp" />
+
+                        </FrameLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/home_manager_wrapper"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/l1"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/icon2"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:src="@tools:sample/avatars" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/title2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/l1"
+                            android:text="Manager"
+                            android:textAppearance="?appearanceTextTitleNormal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/icon2"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/status2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="has update available!"
+                            android:textAppearance="?appearanceTextCaptionVariant"
+                            app:layout_constraintEnd_toEndOf="@+id/title2"
+                            app:layout_constraintStart_toStartOf="@+id/title2"
+                            app:layout_constraintTop_toBottomOf="@+id/title2" />
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/l1"
+                            app:layout_constraintTop_toBottomOf="@+id/status2">
+
+                            <com.google.android.material.button.MaterialButton
+                                style="?styleButtonDefault"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/update"
+                                app:icon="@drawable/ic_update_md2"
+                                app:iconGravity="textEnd"
+                                app:iconPadding="@dimen/l_50"
+                                app:iconSize="18dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                style="?styleButtonText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/install"
+                                app:icon="@drawable/ic_install"
+                                app:iconGravity="textEnd"
+                                app:iconPadding="@dimen/l_50"
+                                app:iconSize="18dp"
+                                tools:visibility="gone" />
+
+                        </FrameLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/l2"
+                    android:layout_marginBottom="@dimen/l2"
+                    android:background="?colorSurfaceVariant" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/support_icon_john"
+                        style="?styleIconNormal"
+                        android:padding="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@null"
+                        tools:src="@tools:sample/avatars" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        style="?styleCardNormal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/l1"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/support_icon_john"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/l1">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-black"
+                                android:textAppearance="?appearanceTextCaptionNormal"
+                                android:textStyle="bold"
+                                tools:text="\@topjohnwu" />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clipToPadding="false"
+                                android:fadingEdgeLength="@dimen/l1"
+                                android:orientation="horizontal"
+                                android:paddingTop="@dimen/l1"
+                                android:requiresFadingEdge="horizontal"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                tools:listitem="@layout/item_developer" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/l1"
+                    tools:visibility="gone">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/support_icon_dia"
+                        style="?styleIconNormal"
+                        android:padding="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@null"
+                        tools:src="@tools:sample/avatars" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        style="?styleCardNormal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/l1"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/support_icon_dia"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/l1">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:fontFamily="sans-serif-black"
+                                android:textAppearance="?appearanceTextCaptionNormal"
+                                android:textStyle="bold"
+                                tools:text="\@diareuse" />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clipToPadding="false"
+                                android:fadingEdgeLength="@dimen/l1"
+                                android:orientation="horizontal"
+                                android:paddingTop="@dimen/l1"
+                                android:requiresFadingEdge="horizontal"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                app:reverseLayout="true"
+                                tools:listitem="@layout/item_developer" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/l1"
+                    android:layout_marginBottom="@dimen/l1"
+                    android:background="?colorSurfaceVariant" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/support_icon_common"
+                        style="?styleIconNormal"
+                        android:padding="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@null"
+                        tools:src="@tools:sample/avatars" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        style="?styleCardNormal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/l1"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/support_icon_common"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/l1">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-black"
+                                android:textAppearance="?appearanceTextCaptionNormal"
+                                android:textStyle="bold"
+                                tools:text="Project links" />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clipToPadding="false"
+                                android:fadingEdgeLength="@dimen/l1"
+                                android:orientation="horizontal"
+                                android:paddingTop="@dimen/l1"
+                                android:requiresFadingEdge="horizontal"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                tools:listitem="@layout/item_developer" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/home_bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="?colorSurface"
+            app:backgroundTint="?colorSurface"
+            app:contentInsetEnd="0dp"
+            app:contentInsetStart="0dp"
+            app:fabCradleMargin="@dimen/l_50"
+            tools:paddingBottom="48dp">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:elevation="0dp"
+                app:itemIconTint="@color/color_menu_tint"
+                app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
+                app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
+                app:itemTextColor="@color/color_menu_tint"
+                app:labelVisibilityMode="unlabeled"
+                app:menu="@menu/menu_bottom_nav" />
+
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="normal"
+            app:layout_anchor="@+id/home_bottom_bar"
+            app:srcCompat="@drawable/ic_superuser" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

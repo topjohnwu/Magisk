@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
+import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
 
 object ClassMap {
     private val map = mapOf(
@@ -17,7 +18,9 @@ object ClassMap {
         UpdateCheckService::class.java to a.g::class.java,
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
-        SuRequestActivity::class.java to a.m::class.java
+        SuRequestActivity::class.java to a.m::class.java,
+        //redesign
+        RedesignActivity::class.java to a.i::class.java
     )
 
     operator fun <T : Class<*>>get(c: Class<*>): T {

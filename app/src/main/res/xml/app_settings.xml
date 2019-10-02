@@ -1,4 +1,5 @@
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         android:key="general"
         android:title="@string/settings_general_category">
@@ -128,6 +129,17 @@
             android:key="su_reauth"
             android:summary="@string/settings_su_reauth_summary"
             android:title="@string/settings_su_reauth_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="redesign_cat"
+        app:title="Redesign">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="redesign"
+            app:title="Enable Redesign" />
 
     </PreferenceCategory>
 

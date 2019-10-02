@@ -45,33 +45,35 @@
 
         <!--///-->
 
-        <item name="appearanceTextDisplayNormal">@style/AppearanceFoundation.Display</>
-        <item name="appearanceTextDisplayVariant">@style/AppearanceFoundation.Display.Variant</>
-        <item name="appearanceTextDisplayOnPrimary">@style/AppearanceFoundation.Display.OnPrimary</>
+        <item name="appearanceTextDisplayNormal">@style/AppearanceFoundation.Display</item>
+        <item name="appearanceTextDisplayVariant">@style/AppearanceFoundation.Display.Variant</item>
+        <item name="appearanceTextDisplayOnPrimary">@style/AppearanceFoundation.Display.OnPrimary
+        </item>
         <item name="appearanceTextDisplayOnPrimaryVariant">
             @style/AppearanceFoundation.Display.OnPrimary.Variant
-        </>
+        </item>
 
-        <item name="appearanceTextTitleNormal">@style/AppearanceFoundation.Title</>
-        <item name="appearanceTextTitleVariant">@style/AppearanceFoundation.Title.Variant</>
-        <item name="appearanceTextTitleOnPrimary">@style/AppearanceFoundation.Title.OnPrimary</>
+        <item name="appearanceTextTitleNormal">@style/AppearanceFoundation.Title</item>
+        <item name="appearanceTextTitleVariant">@style/AppearanceFoundation.Title.Variant</item>
+        <item name="appearanceTextTitleOnPrimary">@style/AppearanceFoundation.Title.OnPrimary</item>
         <item name="appearanceTextTitleOnPrimaryVariant">
             @style/AppearanceFoundation.Title.OnPrimary.Variant
-        </>
+        </item>
 
-        <item name="appearanceTextBodyNormal">@style/AppearanceFoundation.Body</>
-        <item name="appearanceTextBodyVariant">@style/AppearanceFoundation.Body.Variant</>
-        <item name="appearanceTextBodyOnPrimary">@style/AppearanceFoundation.Body.OnPrimary</>
+        <item name="appearanceTextBodyNormal">@style/AppearanceFoundation.Body</item>
+        <item name="appearanceTextBodyVariant">@style/AppearanceFoundation.Body.Variant</item>
+        <item name="appearanceTextBodyOnPrimary">@style/AppearanceFoundation.Body.OnPrimary</item>
         <item name="appearanceTextBodyOnPrimaryVariant">
             @style/AppearanceFoundation.Body.OnPrimary.Variant
-        </>
+        </item>
 
-        <item name="appearanceTextCaptionNormal">@style/AppearanceFoundation.Caption</>
-        <item name="appearanceTextCaptionVariant">@style/AppearanceFoundation.Caption.Variant</>
-        <item name="appearanceTextCaptionOnPrimary">@style/AppearanceFoundation.Caption.OnPrimary</>
+        <item name="appearanceTextCaptionNormal">@style/AppearanceFoundation.Caption</item>
+        <item name="appearanceTextCaptionVariant">@style/AppearanceFoundation.Caption.Variant</item>
+        <item name="appearanceTextCaptionOnPrimary">@style/AppearanceFoundation.Caption.OnPrimary
+        </item>
         <item name="appearanceTextCaptionOnPrimaryVariant">
             @style/AppearanceFoundation.Caption.OnPrimary.Variant
-        </>
+        </item>
     </style>
 
     <style name="Foundation.Default" parent="Foundation.Base">

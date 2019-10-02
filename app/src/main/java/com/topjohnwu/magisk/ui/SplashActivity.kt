@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
@@ -56,10 +56,8 @@ open class SplashActivity : AppCompatActivity() {
         // Setup shortcuts
         Shortcuts.setup(this)
 
-        val intent = Intent(this, ClassMap[MainActivity::class.java])
-        intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION))
         DONE = true
-        startActivity(intent)
+        Navigation.start(intent, this)
         finish()
     }
 

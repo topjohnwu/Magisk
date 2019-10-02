@@ -23,6 +23,10 @@
             android:configChanges="orientation|screenSize"
             android:exported="true" />
         <activity
+            android:name="a.i"
+            android:exported="true"
+            android:theme="@style/Foundation.Default" />
+        <activity
             android:name="a.c"
             android:configChanges="orientation|screenSize"
             android:exported="true"
