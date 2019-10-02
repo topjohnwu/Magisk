@@ -39,6 +39,10 @@
         <item name="styleIconPrimary">@style/WidgetFoundation.Icon.Primary</item>
         <item name="styleIconError">@style/WidgetFoundation.Icon.Error</item>
 
+        <item name="styleImageBig">@style/WidgetFoundation.Image.Big</item>
+        <item name="styleImageNormal">@style/WidgetFoundation.Image</item>
+        <item name="styleImageSmall">@style/WidgetFoundation.Image.Small</item>
+
         <!--///-->
 
         <item name="appearanceTextDisplayNormal">@style/AppearanceFoundation.Display</>

@@ -65,9 +65,23 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
     </style>
 
 
-    <style name="WidgetFoundation.Icon">
+    <style name="WidgetFoundation.Image">
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+    </style>
+
+    <style name="WidgetFoundation.Image.Big">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
+    </style>
+
+    <style name="WidgetFoundation.Image.Small">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Icon" parent="WidgetFoundation.Image.Big">
         <item name="android:padding">@dimen/l_75</item>
         <item name="android:background">?selectableItemBackgroundBorderless</item>
         <item name="tint">?colorTextTransient</item>
