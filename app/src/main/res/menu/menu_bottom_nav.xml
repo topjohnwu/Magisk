@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:id="@+id/magiskFragment"
+        android:id="@+id/homeFragment"
         android:icon="@drawable/ic_home"
         android:title="Home"
         tools:showAsAction="always" />
 
     <item
-        android:id="@+id/magiskFragment"
+        android:id="@+id/modulesFragment"
         android:icon="@drawable/ic_cloud_download"
         android:title="@string/modules"
         tools:showAsAction="always" />
@@ -21,7 +21,7 @@
         tools:showAsAction="always" />
 
     <item
-        android:id="@+id/magiskFragment"
+        android:id="@+id/logFragment"
         android:icon="@drawable/ic_bug_report"
         android:title="@string/log"
         tools:showAsAction="always" />

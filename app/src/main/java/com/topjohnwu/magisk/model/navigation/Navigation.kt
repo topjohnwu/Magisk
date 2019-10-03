@@ -14,12 +14,23 @@ import com.topjohnwu.magisk.ui.module.ReposFragment
 import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
+import com.topjohnwu.magisk.redesign.home.HomeFragment as RedesignHomeFragment
 
 object Navigation {
 
     fun home() = MagiskNavigationEvent {
-        navDirections { destination = HomeFragment::class }
-        navOptions { popUpTo = HomeFragment::class }
+        navDirections {
+            destination = when {
+                Config.redesign -> RedesignHomeFragment::class
+                else -> HomeFragment::class
+            }
+        }
+        navOptions {
+            popUpTo = when {
+                Config.redesign -> RedesignHomeFragment::class
+                else -> HomeFragment::class
+            }
+        }
     }
 
     fun superuser() = MagiskNavigationEvent {

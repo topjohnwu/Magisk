@@ -6,8 +6,13 @@ import androidx.fragment.app.Fragment
 import com.ncapdevi.fragnav.FragNavController
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
+import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatActivity
 import com.topjohnwu.magisk.redesign.home.HomeFragment
+import com.topjohnwu.magisk.ui.log.LogFragment
+import com.topjohnwu.magisk.ui.module.ModulesFragment
+import com.topjohnwu.magisk.ui.settings.SettingsFragment
+import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
 
@@ -19,13 +24,29 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
     override val defaultPosition: Int = 0
 
     override val baseFragments: List<KClass<out Fragment>> = listOf(
-        HomeFragment::class
+        HomeFragment::class,
+        ModulesFragment::class,
+        SuperuserFragment::class,
+        LogFragment::class,
+        SettingsFragment::class
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setSupportActionBar(binding.mainToolbar)
+
+        binding.mainNavigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.homeFragment -> Navigation.home()
+                R.id.modulesFragment -> Navigation.modules()
+                R.id.superuserFragment -> Navigation.superuser()
+                R.id.logFragment -> Navigation.log()
+                R.id.settingsFragment -> Navigation.settings()
+                else -> throw NotImplementedError("Id ${it.itemId} is not defined as selectable")
+            }.also { onEventDispatched(it) }
+            true
+        }
     }
 
     override fun onTabTransaction(fragment: Fragment?, index: Int) {
