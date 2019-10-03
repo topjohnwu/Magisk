@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Foundation.Default" parent="Foundation.Base">
+        <item name="colorPrimary">#2196F3</item>
+        <item name="colorPrimaryVariant">#802196F3</item>
+        <item name="colorSecondary">#00C853</item>
+        <item name="colorSecondaryVariant">#8000C853</item>
+        <item name="colorSurface">#0D0D0D</item>
+        <item name="colorSurfaceVariant">#0DFFFFFF</item>
+        <item name="colorOnPrimary">#F2F2F2</item>
+        <item name="colorOnPrimaryVariant">#80F2F2F2</item>
+        <item name="colorOnSecondary">#F2F2F2</item>
+        <item name="colorOnBackground">?colorOnSurface</item>
+        <item name="colorError">#CC0047</item>
+        <item name="colorOnError">#F2F2F2</item>
+        <item name="colorOnSurface">#BABABA</item>
+        <item name="colorOnSurfaceVariant">#80BABABA</item>
+        <item name="colorDisabled">#808080</item>
+        <item name="colorTextTransient">@color/color_text_transient</item>
+        <item name="colorPrimaryTransient">@color/color_primary_transient</item>
+        <item name="colorErrorTransient">@color/color_error_transient</item>
+    </style>
+
+</resources>
