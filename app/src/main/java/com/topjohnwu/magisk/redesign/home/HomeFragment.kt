@@ -13,4 +13,10 @@ class HomeFragment : CompatFragment<HomeViewModel, FragmentHomeMd2Binding>() {
 
     override fun consumeSystemWindowInsets(insets: Insets) = insets
 
+    override fun onStart() {
+        super.onStart()
+
+        activity.title = "Home"
+    }
+
 }

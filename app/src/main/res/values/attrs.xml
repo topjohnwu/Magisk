@@ -14,7 +14,6 @@
 
     <!--Toolbar-->
     <attr name="styleToolbar" format="reference" />
-    <attr name="styleToolbarTitle" format="reference" />
 
     <!--Card-->
     <attr name="styleCardNormal" format="reference" />

@@ -24,39 +24,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?colorSurfaceVariant"
-            android:paddingTop="@{viewModel.insets.top}">
+            android:paddingTop="@{viewModel.insets.top}"
+            tools:paddingTop="24dp">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/main_toolbar"
                 style="?styleToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                app:contentInsetStartWithNavigation="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                tools:paddingTop="24dp">
+                tools:title="Home" />
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/l1">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        style="?styleToolbarTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Home" />
-
-                    <View
-                        android:layout_width="50dp"
-                        android:layout_height="5dp"
-                        android:layout_gravity="center|bottom"
-                        android:background="@drawable/bg_accent" />
-
-                </FrameLayout>
-
-            </com.google.android.material.appbar.MaterialToolbar>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_gravity="start|bottom"
+                android:background="@drawable/bg_accent" />
 
         </com.google.android.material.appbar.AppBarLayout>
 

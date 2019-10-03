@@ -1,7 +1,9 @@
 package com.topjohnwu.magisk.redesign
 
 import android.graphics.Insets
+import android.os.Bundle
 import androidx.fragment.app.Fragment
+import com.ncapdevi.fragnav.FragNavController
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.redesign.compat.CompatActivity
@@ -20,8 +22,39 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         HomeFragment::class
     )
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setSupportActionBar(binding.mainToolbar)
+    }
+
+    override fun onTabTransaction(fragment: Fragment?, index: Int) {
+        super.onTabTransaction(fragment, index)
+
+        setDisplayHomeAsUpEnabled(false)
+    }
+
+    override fun onFragmentTransaction(
+        fragment: Fragment?,
+        transactionType: FragNavController.TransactionType
+    ) {
+        super.onFragmentTransaction(fragment, transactionType)
+
+        when (transactionType) {
+            FragNavController.TransactionType.PUSH -> setDisplayHomeAsUpEnabled(true)
+            else -> Unit //dunno might be useful
+        }
+    }
+
     override fun peekSystemWindowInsets(insets: Insets) {
         viewModel.insets.value = insets
+    }
+
+    fun setDisplayHomeAsUpEnabled(isEnabled: Boolean) {
+        when {
+            isEnabled -> binding.mainToolbar.setNavigationIcon(R.drawable.ic_back_md2)
+            else -> binding.mainToolbar.navigationIcon = null
+        }
     }
 
 }

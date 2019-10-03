@@ -13,21 +13,12 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
     </style>
 
     <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
-        <item name="contentInsetStart">0dp</item>
-        <item name="contentInsetLeft">0dp</item>
-        <item name="contentInsetRight">0dp</item>
-        <item name="contentInsetEnd">0dp</item>
+        <item name="titleTextAppearance">?appearanceTextTitleNormal</item>
+        <item name="titleTextColor">?colorOnSurface</item>
+        <item name="subtitleTextAppearance">?appearanceTextCaptionNormal</item>
+        <item name="subtitleTextColor">?colorOnSurfaceVariant</item>
+        <item name="android:background">@android:color/transparent</item>
         <item name="contentInsetStartWithNavigation">0dp</item>
-    </style>
-
-    <style name="WidgetFoundation.Toolbar.Title" parent="Widget.MaterialComponents.TextView">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">?attr/actionBarSize</item>
-        <item name="android:textAppearance">?appearanceTextTitleNormal</item>
-        <item name="android:gravity">start</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:lines">1</item>
-        <item name="android:padding">@dimen/l1</item>
     </style>
 
 
