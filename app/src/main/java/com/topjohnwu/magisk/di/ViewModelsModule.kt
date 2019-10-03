@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import com.topjohnwu.magisk.redesign.MainViewModel as RedesignViewModel
+import com.topjohnwu.magisk.redesign.home.HomeViewModel as RedesignHomeViewModel
 
 
 val viewModelModules = module {
@@ -29,4 +30,5 @@ val viewModelModules = module {
     // redesign
 
     viewModel { RedesignViewModel() }
+    viewModel { RedesignHomeViewModel() }
 }
