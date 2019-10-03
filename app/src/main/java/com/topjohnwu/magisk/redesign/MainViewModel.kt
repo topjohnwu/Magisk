@@ -1,5 +1,5 @@
 package com.topjohnwu.magisk.redesign
 
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 
-class MainViewModel : MagiskViewModel()
+class MainViewModel : CompatViewModel()
