@@ -38,13 +38,14 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/icon1"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        style="?styleIconPrimary"
+                        android:padding="@dimen/l_50"
                         android:alpha=".2"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:src="@tools:sample/avatars" />
+                        app:srcCompat="@drawable/ic_magisk_outline" />
 
+                    <!--na-ah! do a transition from ic_magisk_outline to ic_delete_md2 -->
                     <androidx.appcompat.widget.AppCompatImageView
                         style="?styleIconError"
                         app:layout_constraintBottom_toBottomOf="@+id/icon1"
@@ -119,11 +120,11 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/icon2"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        style="?styleIconPrimary"
+                        android:padding="@dimen/l_50"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:src="@tools:sample/avatars" />
+                        app:srcCompat="@drawable/ic_manager" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/title2"
