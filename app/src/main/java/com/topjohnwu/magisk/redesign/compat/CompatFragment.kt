@@ -18,4 +18,10 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
         delegate.ensureInsets()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        delegate.onResume()
+    }
+
 }

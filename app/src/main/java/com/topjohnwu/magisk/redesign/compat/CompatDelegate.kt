@@ -8,6 +8,10 @@ class CompatDelegate internal constructor(
     private val view: CompatView<*>
 ) {
 
+    fun onResume() {
+        view.viewModel.requestRefresh()
+    }
+
     fun ensureInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(view.viewRoot) { _, insets ->
             insets.asInsets()
