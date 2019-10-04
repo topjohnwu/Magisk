@@ -30,5 +30,5 @@ val viewModelModules = module {
     // redesign
 
     viewModel { RedesignViewModel() }
-    viewModel { RedesignHomeViewModel() }
+    viewModel { RedesignHomeViewModel(get()) }
 }
