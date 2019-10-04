@@ -37,7 +37,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/icon1"
+                        android:id="@+id/home_magisk_icon"
                         style="?styleIconPrimary"
                         onSelectClick="@{() -> viewModel.onDeletePressed()}"
                         onSelectReset="@{10000L}"
@@ -48,36 +48,35 @@
                         app:tint="@color/color_primary_delete_transient" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/title1"
+                        android:id="@+id/home_magisk_title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/l1"
                         android:text="Magisk"
                         android:textAppearance="?appearanceTextTitleNormal"
-                        app:layout_constraintBottom_toTopOf="@+id/status1"
+                        app:layout_constraintBottom_toTopOf="@+id/home_magisk_status"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/icon1"
+                        app:layout_constraintStart_toEndOf="@+id/home_magisk_icon"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_chainStyle="packed" />
 
                     <TextSwitcher
-                        android:id="@+id/status1"
+                        android:id="@+id/home_magisk_status"
                         textCaptionVariant="@{viewModel.stateTextMagisk}"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="@+id/icon1"
-                        app:layout_constraintEnd_toEndOf="@+id/title1"
-                        app:layout_constraintStart_toStartOf="@+id/title1"
-                        app:layout_constraintTop_toBottomOf="@+id/title1" />
+                        app:layout_constraintBottom_toBottomOf="@+id/home_magisk_icon"
+                        app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
+                        app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
+                        app:layout_constraintTop_toBottomOf="@+id/home_magisk_title" />
 
                     <FrameLayout
-                        android:id="@+id/button_container1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/status1">
+                        app:layout_constraintTop_toBottomOf="@+id/home_magisk_status">
 
                         <com.google.android.material.button.MaterialButton
                             style="?styleButtonDefault"
@@ -114,7 +113,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/icon2"
+                        android:id="@+id/home_manager_icon"
                         style="?styleIconPrimary"
                         android:padding="@dimen/l_50"
                         app:layout_constraintStart_toStartOf="parent"
@@ -122,33 +121,33 @@
                         app:srcCompat="@drawable/ic_manager" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/title2"
+                        android:id="@+id/home_manager_title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/l1"
                         android:text="Manager"
                         android:textAppearance="?appearanceTextTitleNormal"
-                        app:layout_constraintBottom_toTopOf="@+id/status2"
+                        app:layout_constraintBottom_toTopOf="@+id/home_manager_status"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/icon2"
+                        app:layout_constraintStart_toEndOf="@+id/home_manager_icon"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_chainStyle="packed" />
 
                     <TextSwitcher
-                        android:id="@+id/status2"
+                        android:id="@+id/home_manager_status"
                         textCaptionVariant="@{viewModel.stateTextManager}"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="@+id/icon2"
-                        app:layout_constraintEnd_toEndOf="@+id/title2"
-                        app:layout_constraintStart_toStartOf="@+id/title2"
-                        app:layout_constraintTop_toBottomOf="@+id/title2" />
+                        app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"
+                        app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
+                        app:layout_constraintStart_toStartOf="@+id/home_manager_title"
+                        app:layout_constraintTop_toBottomOf="@+id/home_manager_title" />
 
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
-                        app:layout_constraintTop_toBottomOf="@+id/status2">
+                        app:layout_constraintTop_toBottomOf="@+id/home_manager_status">
 
                         <com.google.android.material.button.MaterialButton
                             style="?styleButtonDefault"
