@@ -83,7 +83,7 @@
             android:layout_height="wrap_content"
             app:fabSize="normal"
             app:layout_anchor="@+id/main_bottom_bar"
-            app:srcCompat="@drawable/ic_superuser" />
+            app:srcCompat="@drawable/ic_superuser_md2" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
