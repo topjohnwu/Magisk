@@ -41,7 +41,7 @@
                         style="?styleIconPrimary"
                         onSelectClick="@{() -> viewModel.onDeletePressed()}"
                         onSelectReset="@{10000L}"
-                        android:padding="@dimen/l_50"
+                        android:padding="@dimen/l_25"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_magisk_delete"
@@ -60,12 +60,11 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_chainStyle="packed" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextSwitcher
                         android:id="@+id/status1"
+                        textCaptionVariant="@{viewModel.stateTextMagisk}"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="is up to date"
-                        android:textAppearance="?appearanceTextCaptionVariant"
                         app:layout_constraintBottom_toBottomOf="@+id/icon1"
                         app:layout_constraintEnd_toEndOf="@+id/title1"
                         app:layout_constraintStart_toStartOf="@+id/title1"
@@ -135,12 +134,11 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_chainStyle="packed" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextSwitcher
                         android:id="@+id/status2"
+                        textCaptionVariant="@{viewModel.stateTextManager}"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="has update available!"
-                        android:textAppearance="?appearanceTextCaptionVariant"
                         app:layout_constraintBottom_toBottomOf="@+id/icon2"
                         app:layout_constraintEnd_toEndOf="@+id/title2"
                         app:layout_constraintStart_toStartOf="@+id/title2"
