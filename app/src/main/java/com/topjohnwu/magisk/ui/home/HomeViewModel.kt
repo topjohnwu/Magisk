@@ -22,7 +22,7 @@ enum class SafetyNetState {
 }
 
 enum class MagiskState {
-    NO_ROOT, NOT_INSTALLED, UP_TO_DATE, OBSOLETE, LOADING
+    NOT_INSTALLED, UP_TO_DATE, OBSOLETE, LOADING
 }
 
 enum class MagiskItem {
@@ -49,7 +49,6 @@ class HomeViewModel(
     }
     val magiskStateText = Observer(magiskState) {
         when (magiskState.value) {
-            MagiskState.NO_ROOT -> TODO()
             MagiskState.NOT_INSTALLED -> R.string.magisk_version_error.res()
             MagiskState.UP_TO_DATE -> R.string.magisk_up_to_date.res()
             MagiskState.LOADING -> R.string.checking_for_updates.res()
@@ -71,7 +70,6 @@ class HomeViewModel(
     }
     val managerStateText = Observer(managerState) {
         when (managerState.value) {
-            MagiskState.NO_ROOT -> "wtf"
             MagiskState.NOT_INSTALLED -> R.string.invalid_update_channel.res()
             MagiskState.UP_TO_DATE -> R.string.manager_up_to_date.res()
             MagiskState.LOADING -> R.string.checking_for_updates.res()
@@ -234,7 +232,7 @@ class HomeViewModel(
 
     private fun ensureEnv() {
         val invalidStates =
-            listOf(MagiskState.NOT_INSTALLED, MagiskState.NO_ROOT, MagiskState.LOADING)
+            listOf(MagiskState.NOT_INSTALLED, MagiskState.LOADING)
 
         // Don't bother checking env when magisk is not installed, loading or already has been shown
         if (invalidStates.any { it == magiskState.value } || shownDialog) return
