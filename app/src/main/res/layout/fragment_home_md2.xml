@@ -39,20 +39,13 @@
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/icon1"
                         style="?styleIconPrimary"
+                        onSelectClick="@{() -> viewModel.onDeletePressed()}"
+                        onSelectReset="@{10000L}"
                         android:padding="@dimen/l_50"
-                        android:alpha=".2"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_magisk_outline" />
-
-                    <!--na-ah! do a transition from ic_magisk_outline to ic_delete_md2 -->
-                    <androidx.appcompat.widget.AppCompatImageView
-                        style="?styleIconError"
-                        app:layout_constraintBottom_toBottomOf="@+id/icon1"
-                        app:layout_constraintEnd_toEndOf="@+id/icon1"
-                        app:layout_constraintStart_toStartOf="@+id/icon1"
-                        app:layout_constraintTop_toTopOf="@+id/icon1"
-                        app:srcCompat="@drawable/ic_delete_md2" />
+                        app:srcCompat="@drawable/ic_magisk_delete"
+                        app:tint="@color/color_primary_delete_transient" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/title1"
@@ -61,9 +54,11 @@
                         android:layout_marginStart="@dimen/l1"
                         android:text="Magisk"
                         android:textAppearance="?appearanceTextTitleNormal"
+                        app:layout_constraintBottom_toTopOf="@+id/status1"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/icon1"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/status1"
@@ -71,6 +66,7 @@
                         android:layout_height="wrap_content"
                         android:text="is up to date"
                         android:textAppearance="?appearanceTextCaptionVariant"
+                        app:layout_constraintBottom_toBottomOf="@+id/icon1"
                         app:layout_constraintEnd_toEndOf="@+id/title1"
                         app:layout_constraintStart_toStartOf="@+id/title1"
                         app:layout_constraintTop_toBottomOf="@+id/title1" />
@@ -133,9 +129,11 @@
                         android:layout_marginStart="@dimen/l1"
                         android:text="Manager"
                         android:textAppearance="?appearanceTextTitleNormal"
+                        app:layout_constraintBottom_toTopOf="@+id/status2"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/icon2"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/status2"
@@ -143,6 +141,7 @@
                         android:layout_height="wrap_content"
                         android:text="has update available!"
                         android:textAppearance="?appearanceTextCaptionVariant"
+                        app:layout_constraintBottom_toBottomOf="@+id/icon2"
                         app:layout_constraintEnd_toEndOf="@+id/title2"
                         app:layout_constraintStart_toStartOf="@+id/title2"
                         app:layout_constraintTop_toBottomOf="@+id/title2" />

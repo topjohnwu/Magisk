@@ -6,6 +6,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.postDelayed
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
@@ -220,4 +221,28 @@ fun getScrollPosition(view: RecyclerView) = (view.layoutManager as? LinearLayout
 @BindingAdapter("isEnabled")
 fun setEnabled(view: View, isEnabled: Boolean) {
     view.isEnabled = isEnabled
+}
+
+// md2
+
+@BindingAdapter("onSelectClick", "onSelectReset", requireAll = false)
+fun View.setOnSelectClickListener(listener: View.OnClickListener, resetTime: Long) {
+    setOnClickListener {
+        when {
+            it.isSelected -> {
+                listener.onClick(it)
+                (it.tag as? Runnable)?.let { task ->
+                    it.handler.removeCallbacks(task)
+                }
+                it.isSelected = false
+            }
+            else -> {
+                it.isSelected = true
+                it.tag = it.postDelayed(resetTime) {
+                    it.tag = null
+                    it.isSelected = false
+                }
+            }
+        }
+    }
 }
