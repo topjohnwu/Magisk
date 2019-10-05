@@ -19,4 +19,6 @@
 
     <!--l1 + fab size-->
     <dimen name="margin_fab">80dp</dimen>
+
+    <dimen name="internal_action_bar_size">56dp</dimen>
 </resources>

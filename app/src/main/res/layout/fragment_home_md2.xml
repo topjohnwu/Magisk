@@ -18,7 +18,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingStart="@dimen/l1"
-        android:paddingTop="@dimen/l1"
+        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
         android:paddingEnd="@dimen/l1"
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/margin_fab}"
         tools:layout_marginTop="24dp">

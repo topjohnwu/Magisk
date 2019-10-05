@@ -9,7 +9,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface">
         <item name="elevation">0dp</item>
-        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:background">?colorSurfaceVariant</item>
     </style>
 
     <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
@@ -19,6 +19,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="subtitleTextColor">?colorOnSurfaceVariant</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="contentInsetStartWithNavigation">0dp</item>
+        <item name="android:layout_height">?actionBarSize</item>
     </style>
 
 

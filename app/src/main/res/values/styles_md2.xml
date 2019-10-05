@@ -23,7 +23,7 @@
         <!--///-->
 
         <item name="selectableItemBackground">@drawable/bg_selectable</item>
-        <item name="actionBarSize">60dp</item>
+        <item name="actionBarSize">@dimen/internal_action_bar_size</item>
 
         <item name="styleAppbar">@style/WidgetFoundation.Appbar</item>
 
@@ -84,9 +84,9 @@
         <item name="colorSecondary">#00C853</item>
         <item name="colorSecondaryVariant">#8000C853</item>
         <item name="colorSurface">#F2F2F2</item>
-        <item name="colorSurfaceVariant">#0D000000</item>
+        <item name="colorSurfaceVariant">#D9E6E6E6</item>
         <item name="colorOnPrimary">#F2F2F2</item>
-        <item name="colorOnPrimaryVariant">#80F2F2F2</item>
+        <item name="colorOnPrimaryVariant">#D9E6E6E6</item>
         <item name="colorOnSecondary">#F2F2F2</item>
         <item name="colorOnBackground">#F2F2F2</item>
         <item name="colorError">#CC0047</item>

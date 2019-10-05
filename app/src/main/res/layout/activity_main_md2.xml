@@ -19,11 +19,15 @@
         android:paddingRight="@{viewModel.insets.right}"
         tools:ignore="RtlHardcoded">
 
+        <FrameLayout
+            android:id="@+id/main_nav_host"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <com.google.android.material.appbar.AppBarLayout
             style="?styleAppbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?colorSurfaceVariant"
             android:paddingTop="@{viewModel.insets.top}"
             tools:paddingTop="24dp">
 
@@ -31,7 +35,6 @@
                 android:id="@+id/main_toolbar"
                 style="?styleToolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?actionBarSize"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_scrollFlags="noScroll"
                 tools:title="Home" />
@@ -43,12 +46,6 @@
                 android:background="@drawable/bg_accent" />
 
         </com.google.android.material.appbar.AppBarLayout>
-
-        <FrameLayout
-            android:id="@+id/main_nav_host"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/main_bottom_bar"
