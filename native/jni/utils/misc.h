@@ -1,13 +1,12 @@
 #pragma once
 
-#define UID_SHELL  (get_shell_uid())
 #define UID_ROOT   0
+#define UID_SHELL  2000
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-unsigned get_shell_uid();
 int fork_dont_care();
 int fork_no_zombie();
 int strend(const char *s1, const char *s2);
@@ -28,17 +27,17 @@ void gen_rand_str(char *buf, int len, bool varlen = true);
 #define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != std::string::npos)
 #define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)
 
-class MutexGuard {
+class mutex_guard {
 public:
-	explicit MutexGuard(pthread_mutex_t &m): mutex(&m) {
+	explicit mutex_guard(pthread_mutex_t &m): mutex(&m) {
 		pthread_mutex_lock(mutex);
 	}
 
-	explicit MutexGuard(pthread_mutex_t *m): mutex(m) {
+	explicit mutex_guard(pthread_mutex_t *m): mutex(m) {
 		pthread_mutex_lock(mutex);
 	}
 
-	~MutexGuard() {
+	~mutex_guard() {
 		pthread_mutex_unlock(mutex);
 	}
 
@@ -46,13 +45,13 @@ private:
 	pthread_mutex_t *mutex;
 };
 
-class RunFinally {
+class run_finally {
 public:
-	explicit RunFinally(std::function<void()> &&fn): fn(std::move(fn)) {}
+	explicit run_finally(std::function<void()> &&fn): fn(std::move(fn)) {}
 
 	void disable() { fn = nullptr; }
 
-	~RunFinally() { if (fn) fn(); }
+	~run_finally() { if (fn) fn(); }
 
 private:
 	std::function<void ()> fn;

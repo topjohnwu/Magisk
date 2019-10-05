@@ -11,7 +11,7 @@
     <string name="unsupport_magisk_message">This version of Magisk Manager does not support Magisk version lower than v18.0.\n\nYou can either manually upgrade Magisk, or downgrade the app to an older version.</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk is not installed.</string>
+    <string name="magisk_version_error">Magisk is not installed</string>
     <string name="checking_for_updates">Checking for updates…</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="safetyNet_check_text">Tap to start SafetyNet check</string>
@@ -35,12 +35,12 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
-    <string name="no_modules_found">No modules found.</string>
-    <string name="update_file_created">Module will be updated at next reboot.</string>
-    <string name="remove_file_created">Module will be removed at next reboot.</string>
-    <string name="remove_file_deleted">Module will not be removed at next reboot.</string>
-    <string name="disable_file_created">Module will be disabled at next reboot.</string>
-    <string name="disable_file_removed">Module will be enabled at next reboot.</string>
+    <string name="no_modules_found">No modules found</string>
+    <string name="update_file_created">Module will be updated at next reboot!</string>
+    <string name="remove_file_created">Module will be removed at next reboot!</string>
+    <string name="remove_file_deleted">Module will not be removed at next reboot!</string>
+    <string name="disable_file_created">Module will be disabled at next reboot!</string>
+    <string name="disable_file_removed">Module will be enabled at next reboot!</string>
     <string name="author">Created by %1$s</string>
     <string name="reboot_recovery">Reboot to Recovery</string>
     <string name="reboot_bootloader">Reboot to Bootloader</string>
@@ -61,22 +61,15 @@
     <string name="menuReload">Reload</string>
     <string name="menuClearLog">Clear log now</string>
     <string name="logs_cleared">Log successfully cleared.</string>
-    <string name="log_is_empty">Log is empty.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Changelog</string>
-    <string name="translators" />
-    <string name="app_translators">Translators</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Progress Notifications</string>
     <string name="download_complete">Download complete</string>
-    <string name="download_local">Looking for local copies…</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Injecting installer…</string>
     <string name="download_file_error">Error downloading file</string>
-    <string name="download_file_folder_error">Unable to fetch parent folder in order to save the downloaded file, check permissions.</string>
     <string name="download_open_parent">Show in parent folder</string>
     <string name="download_open_self">Show file</string>
     <string name="magisk_update_title">Magisk Update Available!</string>
@@ -103,7 +96,6 @@
     <string name="settings_reboot_toast">Reboot to apply settings.</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
-    <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
 
     <string name="dtbo_patched_title">DTBO was patched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img. Please reboot.</string>
@@ -125,17 +117,11 @@
     <string name="env_fix_title">Requires Additional Setup</string>
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
     <string name="setup_msg">Running environment setup…</string>
-    <string name="downloading_toast">Downloading %1$s</string>
-    <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
-    <string name="dl_one_module">Download one module at a time.</string>
 
     <!--Settings Activity -->
-    <string name="settings_downloads_category">Downloads</string>
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Dark Theme</string>
     <string name="settings_dark_theme_summary">Enable dark theme.</string>
-    <string name="settings_download_cache_title">Download Cache</string>
-    <string name="settings_download_cache_summary">Enables download cache for Magisk and Module zip files.</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
@@ -203,7 +189,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>
-    <string name="deny_with_str">Deny%1$s</string>
     <string name="deny">Deny</string>
     <string name="prompt">Prompt</string>
     <string name="grant">Grant</string>
@@ -223,7 +208,6 @@
     <string name="su_snack_notif_off">Notifications of %1$s are disabled</string>
     <string name="su_snack_log_on">Logging of %1$s is enabled</string>
     <string name="su_snack_log_off">Logging of %1$s is disabled</string>
-    <string name="su_snack_revoke">%1$s rights are revoked</string>
     <string name="su_revoke_title">Revoke?</string>
     <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
     <string name="toast">Toast</string>

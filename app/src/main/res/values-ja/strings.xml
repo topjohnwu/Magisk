@@ -59,12 +59,9 @@
     <string name="menuReload">再読み込み</string>
     <string name="menuClearLog">ログの消去</string>
     <string name="logs_cleared">ログを消去しました</string>
-    <string name="log_is_empty">ログは空です</string>
 
     <!--About Activity-->
     <string name="app_changelog">アプリの更新履歴</string>
-    <string name="translators">小鳥遊桜 (@SakuraSa233) / hota (@lindwurm) / AndroPlus (@AndroPlus_org)</string>
-    <string name="app_translators">アプリの翻訳者</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magiskの更新</string>
@@ -83,7 +80,6 @@
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">更新履歴</string>
     <string name="repo_cache_cleared">リポジトリのキャッシュを消去しました</string>
-    <string name="internal_storage">ZIPは\n[内部ストレージ]%1$sに保存されます</string>
     <string name="manager_download_install">タップでダウンロードしてインストールします</string>
     <string name="dtbo_patched_title">DTBOをパッチしました！</string>
     <string name="dtbo_patched_reboot">Magisk Managerはdtbo.imgをパッチしました。再起動してください</string>
@@ -109,9 +105,6 @@
     <string name="env_fix_msg">Magiskを正常に機能させるには、お使いのデバイスに追加のセットアップが必要です。Magiskのセットアップ用zipをダウンロードすることになりますが、今すぐ続行しますか？</string>
     <string name="setup_title">追加セットアップ</string>
     <string name="setup_msg">環境セットアップを実行中…</string>
-    <string name="downloading_toast">%1$s をダウンロード中</string>
-    <string name="no_rw_storage">この機能は外部ストレージへの書き込み権限がないと動作しません</string>
-    <string name="dl_one_module">一度に1つのモジュールをダウンロードする</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">一般</string>
@@ -181,7 +174,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザーリクエスト</string>
-    <string name="deny_with_str">拒否 %1$s</string>
     <string name="deny">拒否</string>
     <string name="prompt">プロンプト</string>
     <string name="grant">許可</string>
@@ -201,7 +193,6 @@
     <string name="su_snack_notif_off">%1$s の通知は無効です</string>
     <string name="su_snack_log_on">%1$s のログは有効です</string>
     <string name="su_snack_log_off">%1$s のログは無効です</string>
-    <string name="su_snack_revoke">%1$s の権限は取り消されました</string>
     <string name="su_revoke_title">確認</string>
     <string name="su_revoke_msg">%1$s の権限を取り消しますか？</string>
     <string name="toast">トースト通知</string>

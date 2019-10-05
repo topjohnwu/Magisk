@@ -192,9 +192,9 @@ void sepol_magisk_rules() {
 	// Support deodexed ROM on Pie (Samsung)
 	sepol_allow("system_server", "dalvikcache_data_file", "file", "write");
 	sepol_allow("system_server", "dalvikcache_data_file", "file", "execute");
-	
-	// Allow update engine to source addon.d.sh
-	sepol_allow("update_engine", "adb_data_file", "dir", ALL);
+
+	// Allow update_engine/addon.d-v2 to run permissive on all ROMs
+	sepol_permissive("update_engine");
 
 #ifdef MAGISK_DEBUG
 	// Remove all dontaudit in debug mode

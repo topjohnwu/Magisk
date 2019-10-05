@@ -2,14 +2,14 @@ package com.topjohnwu.magisk.model.entity.recycler
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
-import com.skoumal.teanity.databinding.ComparableRvItem
-import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
-import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.module.Repo
+import com.topjohnwu.magisk.utils.KObservableField
 
 class ModuleRvItem(val item: Module) : ComparableRvItem<ModuleRvItem>() {
 

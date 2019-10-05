@@ -1,10 +1,3 @@
-/* bootstages.c - Core bootstage operations
- *
- * All bootstage operations, including simple mount in post-fs,
- * magisk mount in post-fs-data, various image handling, script
- * execution, load modules, install Magisk Manager etc.
- */
-
 #include <sys/mount.h>
 #include <sys/wait.h>
 #include <stdlib.h>
@@ -29,6 +22,7 @@ using namespace std;
 static char buf[PATH_MAX], buf2[PATH_MAX];
 static vector<string> module_list;
 static bool no_secure_dir = false;
+static bool pfs_done = false;
 
 static int bind_mount(const char *from, const char *to, bool log = true);
 extern void auto_start_magiskhide();
@@ -146,9 +140,11 @@ void node_entry::create_module_tree(const char *module) {
 		if (is_root()) {
 			// Root nodes should not be replaced
 			rm_rf(buf);
-			return;
+		} else if (status < IS_MODULE) {
+			// Upgrade current node to current module
+			this->module = module;
+			status = IS_MODULE;
 		}
-		status = IS_MODULE;
 		return;
 	}
 
@@ -372,7 +368,7 @@ static bool magisk_env() {
 	parse_mnt("/proc/mounts", [&](mntent *me) {
 		if (DIR_IS(system_root)) {
 			mount_mirror(system_root, MS_RDONLY);
-			xsymlink(MIRRMNT(system_root) "/system", MIRRMNT(system));
+			xsymlink("./system_root/system", MIRRMNT(system));
 			VLOGI("link", MIRRMNT(system_root) "/system", MIRRMNT(system));
 			system_as_root = true;
 		} else if (!system_as_root && DIR_IS(system)) {
@@ -390,12 +386,16 @@ static bool magisk_env() {
 	});
 	if (access(MIRRMNT(system), F_OK) != 0 && access(MIRRMNT(system_root), F_OK) == 0) {
 		// Pre-init mirrors
-		xsymlink(MIRRMNT(system_root) "/system", MIRRMNT(system));
+		xsymlink("./system_root/system", MIRRMNT(system));
 		VLOGI("link", MIRRMNT(system_root) "/system", MIRRMNT(system));
 	}
 	if (access(MIRRMNT(vendor), F_OK) != 0) {
-		xsymlink(MIRRMNT(system) "/vendor", MIRRMNT(vendor));
+		xsymlink("./system/vendor", MIRRMNT(vendor));
 		VLOGI("link", MIRRMNT(system) "/vendor", MIRRMNT(vendor));
+	}
+	if (access("/system/product", F_OK) == 0 && access(MIRRMNT(product), F_OK) != 0) {
+		xsymlink("./system/product", MIRRMNT(product));
+		VLOGI("link", MIRRMNT(system) "/product", MIRRMNT(product));
 	}
 
 	// Disable/remove magiskhide, resetprop, and modules
@@ -605,6 +605,7 @@ static void dump_logs() {
 }
 
 [[noreturn]] static void core_only() {
+	pfs_done = true;
 	auto_start_magiskhide();
 	unblock_boot_process();
 }
@@ -716,11 +717,11 @@ void late_start(int client) {
 		if (access(SECURE_DIR, F_OK) != 0)
 			xmkdir(SECURE_DIR, 0700);
 		// And reboot to make proper setup possible
-		if (RECOVERY_MODE)
-			exec_command_sync("/system/bin/reboot", "recovery");
-		else
-			exec_command_sync("/system/bin/reboot");
+		reboot();
 	}
+
+	if (!pfs_done)
+		return;
 
 	if (access(BBPATH, F_OK) != 0){
 		LOGE("* post-fs-data mode is not triggered\n");
@@ -752,6 +753,9 @@ void boot_complete(int client) {
 	// ack
 	write_int(client, 0);
 	close(client);
+
+	if (!pfs_done)
+		return;
 
 	if (access(MANAGERAPK, F_OK) == 0) {
 		// Install Magisk Manager if exists

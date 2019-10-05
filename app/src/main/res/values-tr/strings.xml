@@ -25,56 +25,49 @@
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i koru</string>
     <string name="current_installed">Yüklü: %1$s</string>
-    <string name="latest_version">Yeni: %1$s</string>
+    <string name="latest_version">Güncel: %1$s</string>
     <string name="uninstall">Kaldır</string>
     <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
-    <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verileriniz şifrelenecek</string>
+    <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacaktır ve verileriniz zaten şifrelenmemişse potansiyel olarak verileriniz şifrelenecektir.</string>
     <string name="update">Güncelle</string>
     <string name="core_only_enabled">(Yalnızca çekirdek modu etkin)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
     <string name="no_modules_found">Modül yok</string>
-    <string name="update_file_created">Modül sonraki yeniden başlatmada güncellenecek</string>
-    <string name="remove_file_created">Modül sonraki yeniden başlatmada kaldırılacak</string>
-    <string name="remove_file_deleted">Modül sonraki yeniden başlatmada kaldırılmayacak</string>
-    <string name="disable_file_created">Modül sonraki yeniden başlatmada devre dışı bırakılacak</string>
-    <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek</string>
+    <string name="update_file_created">Modül sonraki yeniden başlatmada güncellenecek!</string>
+    <string name="remove_file_created">Modül sonraki yeniden başlatmada kaldırılacak!</string>
+    <string name="remove_file_deleted">Modül sonraki yeniden başlatmada kaldırılmayacak!</string>
+    <string name="disable_file_created">Modül sonraki yeniden başlatmada devre dışı bırakılacak!</string>
+    <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek!</string>
     <string name="author">Yapımcı: %1$s</string>
-    <string name="reboot_recovery">Kurtarma modunda yeniden başlat</string>
-    <string name="reboot_bootloader">Ön yükleyici modunda yeniden başlat</string>
-    <string name="reboot_download">Yükleme modunda yeniden başlat</string>
-	<string name="reboot_edl">EDL için yeniden başlat</string>
+    <string name="reboot_recovery">Kurtarma moduna yeniden başlat</string>
+    <string name="reboot_bootloader">Ön yükleyici moduna yeniden başlat</string>
+    <string name="reboot_download">Yükleme moduna yeniden başlat</string>
+    <string name="reboot_edl">EDL moduna yeniden başlat</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Güncelleme Mevcut</string>
-    <string name="installed">Yüklenmiş</string>
-    <string name="not_installed">Yüklenmemiş</string>
-    <string name="updated_on">Güncelleme: %1$s</string>
+    <string name="installed">Yüklü</string>
+    <string name="not_installed">Yüklü Değil</string>
+    <string name="updated_on">Güncelleme zamanı: %1$s</string>
     <string name="sorting_order">Sıralama Düzeni</string>
     <string name="sort_by_name">İsme göre sırala</string>
     <string name="sort_by_update">Son güncellemeye göre sırala</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Günlüğü kaydet</string>
-    <string name="menuReload">Yenile</string>
+    <string name="menuReload">Yeniden yükle</string>
     <string name="menuClearLog">Günlüğü temizle</string>
     <string name="logs_cleared">Günlük başarıyla temizlendi</string>
-    <string name="log_is_empty">Günlük boş</string>
 
     <!--About Activity-->
     <string name="app_changelog">Uygulama değişiklikleri</string>
-    <string name="translators">Fatih FIRICI - Mevlüt TOPÇU - Muhammet Emin TURGUT - XORCAN</string>
-    <string name="app_translators">Çevirmenler</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk Güncellemeleri</string>
     <string name="progress_channel">İlerleme Bildirimleri</string>
     <string name="download_complete">İndirme tamamlandı</string>
-	<string name="download_local">Yerel kopyalar aranıyor…</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Yükleyici dahil ediliyor…</string>
-	<string name="download_file_folder_error">İndirilen dosyayı kaydetmek için ana klasöre ulaşılamıyor, izinleri kontrol edin.</string>
     <string name="download_open_parent">Üst klasörde göster</string>
     <string name="download_open_self">Dosyayı göster</string>
     <string name="download_file_error">Dosya indirme hatası</string>
@@ -90,7 +83,7 @@
     <string name="select_method">Yöntem seçin</string>
     <string name="setup_title">Ek kurulum</string>
     <string name="select_patch_file">Dosya seçin ve yamalayın</string>
-    <string name="patch_file_msg">Bir raw yansısı (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
+    <string name="patch_file_msg">Bir işlenmemiş görüntü (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
 
     <!--Toasts, Dialogs-->
@@ -102,7 +95,6 @@
     <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Repo önbelleği temizlendi</string>
-    <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
 
     <string name="dtbo_patched_title">DTBO yamalandı!</string>
     <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
@@ -110,8 +102,8 @@
     <string name="done">Tamamlandı!</string>
     <string name="failure">Başarısız</string>
     <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu…</string>
-    <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu.</string>
+    <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı.</string>
     <string name="warning">Uyarı</string>
     <string name="complete_uninstall">Tamamen Kaldır</string>
     <string name="restore_img">Önyükleme İmajını Geri Yükle</string>
@@ -119,22 +111,16 @@
     <string name="restore_done">Yenileme tamamlandı!</string>
     <string name="restore_fail">Stok önyükleme yedeği yok!</string>
     <string name="proprietary_title">Tescil Kodunu İndirin</string>
-    <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan Google\'ın tescilli olduğu SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için bir uzantıyı (GoogleApiClient içeriyor) indirmesine izin veriyor musunuz?</string>
+    <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan gerekli olan Google\'a ait SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için (GoogleApiClient içeren) bir uzantıyı indirmesine izin veriyor musunuz?</string>
     <string name="setup_fail">Kurulum başarısız</string>
     <string name="env_fix_title">Ek Kurulum Gerekli</string>
     <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
     <string name="setup_msg">Ortam kurulumu çalışıyor…</string>
-    <string name="downloading_toast">%1$s indiriliyor</string>
-    <string name="no_rw_storage">Bu özellik harici depolamaya yazma izni olmadan çalışmaz.</string>
-    <string name="dl_one_module">Tek seferde bir modül indirin.</string>
 
     <!--Settings Activity -->
-	<string name="settings_downloads_category">İndirilenler</string>
     <string name="settings_general_category">Genel</string>
     <string name="settings_dark_theme_title">Karanlık Tema</string>
     <string name="settings_dark_theme_summary">Karanlık temayı etkinleştir</string>
-    <string name="settings_download_cache_title">Önbelleği İndir</string>
-    <string name="settings_download_cache_summary">Magisk ve Module zip dosyaları için indirme önbelleğini etkinleştirir.</string>
     <string name="settings_download_path_title">İndirme yolu</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
@@ -202,7 +188,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Yetkili Kullanıcı İsteği</string>
-    <string name="deny_with_str">Reddet%1$s</string>
     <string name="deny">Reddet</string>
     <string name="prompt">Sor</string>
     <string name="grant">İzin ver</string>
@@ -222,7 +207,6 @@
     <string name="su_snack_notif_off">%1$s için bildirimler devre dışı</string>
     <string name="su_snack_log_on">%1$s için günlük etkin</string>
     <string name="su_snack_log_off">%1$s için günlük devre dışı</string>
-    <string name="su_snack_revoke">%1$s hakları geri alındı</string>
     <string name="su_revoke_title">Geri alınsın mı?</string>
     <string name="su_revoke_msg">%1$s hakları geri alınsın mı?</string>
     <string name="toast">Pencere</string>

@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <db.h>
+#include <utils.h>
 
 #define DEFAULT_SHELL "/system/bin/sh"
 
@@ -29,8 +30,7 @@ public:
 
 	su_info(unsigned uid = 0);
 	~su_info();
-	void lock();
-	void unlock();
+	mutex_guard lock();
 	bool is_fresh();
 	void refresh();
 

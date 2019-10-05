@@ -16,24 +16,24 @@ Here are the bare minimum commands to install Magisk into a stock boot/recovery 
 BOOTIMAGE=<path to boot>
 
 # First unpack the image
-./magiskboot --unpack $BOOTIMAGE
+./magiskboot unpack $BOOTIMAGE
 
 # In normal cases, after unpacking you should get at least kernel and ramdisk.cpio
 
 # Patch ramdisk
-./magiskboot --cpio ramdisk.cpio \
+./magiskboot cpio ramdisk.cpio \
 "mkdir 000 .backup" \          # create a folder to store our init backup
 "mv init .backup/init" \       # backup the original init
 "add 750 init magiskinit"      # replace init with magiskinit
 
 # Patch kernel to always use ramdisk as rootfs
 # You only need to do this on system-as-root devices
-./magiskboot --hexpatch kernel \
+./magiskboot hexpatch kernel \
 736B69705F696E697472616D6673 \
 77616E745F696E697472616D6673
 
 # Repack the boot image
-./magiskboot --repack $BOOTIMAGE
+./magiskboot repack $BOOTIMAGE
 
 # The patched image should be located in new-boot.img
 ```
@@ -45,6 +45,9 @@ WIP
 # Currently not available
 ```
 
+## Emulators (Official AVB Only)
+The script `scripts/emulator.sh` allows you to establish a minimal Magisk environment within the official Android Virtual Device included along with Android Studio / SDK. Please check the comments in the script for further information.
+
 ## Exploits
 **(Note: Magisk could only be used as root)**
 
@@ -53,52 +56,4 @@ Occasionally, there would be exploits in certain devices that could lead to full
 - Effective UID should be privileged (root, or `euid=0`)
 - Have the ability to reload `sepolicy` (which 99.9% of the time means SELinux permissive)
 
-Once you got a proper root shell, you should have `magiskinit` somewhere on the device. The basic idea is try to live patch `sepolicy` with `magiskpolicy`, and start `magiskd` with `magisk --daemon`. Here are some examples you could use as a reference.
-
-If dm-verity is enforced (no system r/w allowed)
-
-```
-# Assume magiskinit is in current directory
-# All commands are required to run on each reboot
-
-# Live patch selinux
-ln -s ./magiskinit magiskpolicy
-./magiskpolicy --live --magisk "allow magisk * * *"
-
-# Mount tmpfs to /sbin
-mount -t tmpfs tmpfs /sbin
-chmod 755 /sbin
-chcon u:object_r:magisk_file:s0 /sbin
-
-# Add files to /sbin
-./magiskinit -x magisk /sbin/magisk
-cp -a magiskpolicy /sbin
-/sbin/magisk --install /sbin
-
-# Launch magisk daemon
-/sbin/magisk --daemon
-
-# (Optional) switch back to enforced
-setenforce 1
-```
-
-If dm-verity is not enforced (can modify system)
-
-```
-# Assume magiskinit is in current directory
-# The following commands should only need to run once
-
-# Mount system rw
-mount -o rw,remount /system
-
-# Add files to system
-./magiskinit -x magisk /system/xbin/magisk
-cp -a magiskinit /system/xbin
-ln -s /system/xbin/magiskinit /system/xbin/magiskpolicy
-/system/xbin/magisk --install /system/xbin
-
-# The following commands should run on each reboot
-/system/xbin/magiskpolicy --live --magisk "allow magisk * * *"
-/system/xbin/magisk --daemon
-
-```
+You can check out `scripts/emulator.sh` as a reference for bringing up Magisk with a root shell. Note that these changes are not persistent, and you will need to find ways to rerun the whole process every boot.

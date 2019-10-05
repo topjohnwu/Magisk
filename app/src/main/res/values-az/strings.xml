@@ -83,6 +83,7 @@
     <string name="reboot_bootloader">Bootloader\'ə yenidən başlat</string>
 
     <string name="reboot_download">Yükləmə rejimində yenidən başlat</string>
+    <string name="reboot_edl">EDL\'ə yenidən başlat</string>
 
     <!--Repo Fragment-->
 
@@ -110,28 +111,19 @@
 
     <string name="logs_cleared">Log uğurla təmizləndi.</string>
 
-    <string name="log_is_empty">Log boşdur.</string>
-
     <!--About Activity-->
 
     <string name="app_changelog">Yeniliklər</string>
 
-    <string name="translators" />
-
-    <string name="app_translators">Tərcümələr</string>
-
     <!-- System Components, Notifications -->
 
     <string name="update_channel">Magisk Yeniləmələri</string>
-
-    <string name="progress_channel">İnkişaf Bildirişləri</string>
-
+    <string name="progress_channel">Nəticə Bildirişləri</string>
     <string name="download_complete">Yükləmə bitdi</string>
-
     <string name="download_file_error">Faylı yükləmək alınmadı</string>
-
+    <string name="download_open_parent">Valideyn qovluğunda göstər</string>
+    <string name="download_open_self">Faylı göstər</string>
     <string name="magisk_update_title">Magisk Yeniləməsi Var!</string>
-
     <string name="manager_update_title">Magisk Manager Yeniləməsi Var!</string>
 
     <!--Toasts, Dialogs-->
@@ -152,8 +144,6 @@
 
     <string name="repo_cache_cleared">Repo keşi silindi</string>
 
-    <string name="internal_storage">Zip faylının olduğu yer:\n[Daxili Yaddaş]%1$s</string>
-
     <string name="manager_download_install">Yükləyib quraşdırmaq üçün toxun.</string>
 
     <string name="dtbo_patched_title">DTBO yamaqlanıb!</string>
@@ -171,6 +161,8 @@
     <string name="download_zip_only">Yalnız Zip yüklə</string>
 
     <string name="direct_install">Birdəfəlik Yüklə (Tövsiyə olunur)</string>
+
+    <string name="select_patch_file">Fayl Seç və Yamaqla</string>
 
     <string name="install_inactive_slot">Fəal olmayan slota quraşdır (OTA\'dan sonra)</string>
 
@@ -203,12 +195,6 @@
     <string name="setup_title">Əlavə quraşdırma</string>
 
     <string name="setup_msg">Quraşdırma yerinə yetirilir…</string>
-
-    <string name="downloading_toast">%1$s yüklənir</string>
-
-    <string name="no_rw_storage">Bu xüsusiyyət xarici yaddaş icazəsi olmadan düzgün işləməyəcək.</string>
-
-    <string name="dl_one_module">Bir dəfədə bir əlavə yüklə.</string>
 
     <!--Settings Activity -->
 
@@ -338,8 +324,6 @@
 
     <string name="su_request_title">Superuser Tələbi</string>
 
-    <string name="deny_with_str">Ləğv et%1$s</string>
-
     <string name="deny">Ləğv et</string>
 
     <string name="prompt">Yönləndir</string>
@@ -377,8 +361,6 @@
     <string name="su_snack_log_on">%1$s üçün giriş açıqdır</string>
 
     <string name="su_snack_log_off">%1$s üçün giriş bağlıdır</string>
-
-    <string name="su_snack_revoke">%1$s üçün icazələr ləğv olundu</string>
 
     <string name="su_revoke_title">Ləğv olunsun?</string>
 

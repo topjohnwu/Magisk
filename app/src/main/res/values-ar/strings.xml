@@ -2,7 +2,6 @@
 <resources>
     <string name="advanced_settings_title">إعدادات متقدمة</string>
   <string name="app_changelog">تغييرات التطبيق</string>
-    <string name="app_translators">مترجم التطبيق</string>
     <string name="author">انشئ بواسطة %1$s</string>
   <string name="auto_response">استجابة تلقائية</string>
   <string name="checking_for_updates">البحث عن تحديثات…</string>
@@ -10,8 +9,7 @@
   <string name="close">إغلاق</string>
   <string name="command">الأمر: %1$s</string>
     <string name="deny">رفض</string>
-  <string name="deny_with_str">رفض%1$s</string>
-  <string name="disable_file_created">سيتم تعطيل الإضافة في إعادة التشغيل التالي</string>
+    <string name="disable_file_created">سيتم تعطيل الإضافة في إعادة التشغيل التالي</string>
   <string name="disable_file_removed">سيتم تمكين الإضافة في إعادة التشغيل التالي</string>
     <string name="download">التنزيل</string>
   <string name="downloads">التنزيلات</string>
@@ -19,13 +17,10 @@
   <string name="grant">سماح</string>
   <string name="install">التثبيت</string>
     <string name="installed">مثبت</string>
-  <string name="internal_storage">"يتم تخزين الملف المضغوط في:
-[التخزين الداخلي]%1$s"</string>
-  <string name="keep_dm_verity">إبقاء AVB 2.0/dm-verity</string>
+    <string name="keep_dm_verity">إبقاء AVB 2.0/dm-verity</string>
   <string name="keep_force_encryption">الحفاظ علي قوه التشفير</string>
   <string name="log">السجل</string>
-  <string name="log_is_empty">السجل فارغ</string>
-  <string name="logs_cleared">تم حذف السجل بنجاح</string>
+    <string name="logs_cleared">تم حذف السجل بنجاح</string>
     <string name="magisk_update_title">تحديث Magisk جديد متوفر!</string>
   <string name="magisk_version_error">Magisk غير مثبت</string>
   <string name="menuClearLog">حذف السجل الآن</string>
@@ -88,8 +83,7 @@
   <string name="su_snack_log_on">السجلات لـ %1$s تم تفعيلها</string>
   <string name="su_snack_notif_off">الإشعارات لـ %1$s تم تعطيلها</string>
   <string name="su_snack_notif_on">الإشعارات لـ %1$s تم تفعيلها</string>
-  <string name="su_snack_revoke">%1$s الصلاحيات سحبت</string>
-  <string name="su_warning">"منح حق الوصول الكامل إلى جهازك.
+    <string name="su_warning">"منح حق الوصول الكامل إلى جهازك.
 رفض إذا كنت غير متأكد!"</string>
   <string name="superuser">Superuser</string>
   <string name="superuser_access">Superuser صلاحيات</string>
@@ -98,8 +92,7 @@
   <string name="tenmin">10 دقائق</string>
   <string name="thirtymin">30 دقائق</string>
   <string name="toast">ملاحظة منبثقة</string>
-  <string name="translators">xx6600xx ,silent_6600</string>
-  <string name="twentymin">20 دقائق</string>
+    <string name="twentymin">20 دقائق</string>
   <string name="uninstall">إلغاء التثبيت</string>
   <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
   <string name="update_available">يتوفر تحديث</string>
@@ -177,7 +170,5 @@
   <string name="update">تحديث</string>
   <string name="updated_on">تم التحديث في: %1$s</string>
   <string name="warning">تحذير</string>
-    <string name="downloading_toast">جاري التنزيل %1$s</string>
-  <string name="download_file_error">خطأ تنزيل الملف</string>
-  <string name="no_rw_storage">أن هذه الميزة لا تعمل دون الحصول على إذن الكتابة على التخزين الخارجي.</string>
+    <string name="download_file_error">خطأ تنزيل الملف</string>
 </resources>

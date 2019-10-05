@@ -59,12 +59,9 @@
     <string name="menuReload">Recargar</string>
     <string name="menuClearLog">Limpiar registro ahora</string>
     <string name="logs_cleared">Registro limpiado correctamente</string>
-    <string name="log_is_empty">El registro está vacio</string>
 
     <!--About Activity-->
     <string name="app_changelog">Registro de cambios</string>
-    <string name="translators">dark-basic</string>
-    <string name="app_translators">Traductores</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Actualización de Magisk</string>
@@ -95,8 +92,7 @@
     <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
     <string name="release_notes">Notas de lanzamiento</string>
     <string name="repo_cache_cleared">Caché del repositorio limpiada</string>
-    <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
-    
+
     <string name="dtbo_patched_title">DTBO fue parchado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha parcheado dtbo.img, por favor reinicia</string>
     <string name="flashing">Flasheando…</string>
@@ -116,11 +112,8 @@
     <string name="setup_fail">Instalación Fallida</string>
     <string name="env_fix_title">Se Requiere una Instalación Adicional</string>
     <string name="env_fix_msg">Su dispositivo requiere una instalación adicional para que Magisk funcione correctamente. Se descargará el zip de instalación de Magisk, desea continuar ahora?</string>
-    <string name="setup_msg">Ejecutando Configuración de Entorno</string> 
-    <string name="downloading_toast">Descargando %1$s</string>
-    <string name="no_rw_storage">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
-    <string name="dl_one_module">Descarga un módulo a la vez.</string>
-   
+    <string name="setup_msg">Ejecutando Configuración de Entorno</string>
+
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema oscuro</string>
@@ -188,7 +181,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Petición de superusuario</string>
-    <string name="deny_with_str">Denegar%1$s</string>
     <string name="deny">Denegar</string>
     <string name="prompt">Preguntar</string>
     <string name="grant">Permitir</string>
@@ -208,7 +200,6 @@
     <string name="su_snack_notif_off">Notificaciones de %1$s deshabilitadas</string>
     <string name="su_snack_log_on">Registros de %1$s habilitados</string>
     <string name="su_snack_log_off">Registros de %1$s deshabilitados</string>
-    <string name="su_snack_revoke">Anulados derechos de %1$s</string>
     <string name="su_revoke_title">¿Revocar?</string>
     <string name="su_revoke_msg">¿Confirmar para revocar derechos de %1$s?</string>
     <string name="toast">Aviso</string>

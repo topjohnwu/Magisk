@@ -56,12 +56,9 @@
     <string name="menuReload">Omlast</string>
     <string name="menuClearLog">Tøm loggboken nå</string>
     <string name="logs_cleared">Loggboken ble vellykket tømt.</string>
-    <string name="log_is_empty">Loggboken er tom.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Endringslogg</string>
-    <string name="translators">Imre Kristoffer Eilertsen</string>
-    <string name="app_translators">Oversettere</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk-oppdateringer</string>
@@ -80,7 +77,6 @@
     <string name="settings_reboot_toast">Start på nytt for å benytte innstillingene.</string>
     <string name="release_notes">Lanseringsnyheter</string>
     <string name="repo_cache_cleared">Repomellomlageret ble tømt</string>
-    <string name="internal_storage">ZIP-filen er lagret i:\n[Internal Storage]%1$s</string>
     <string name="manager_download_install">Trykk for å laste ned og installere.</string>
     <string name="dtbo_patched_title">DTBO ble patchet!</string>
     <string name="dtbo_patched_reboot">Magisk Manager har patchet dtbo.img. Vennligst start på nytt.</string>
@@ -106,8 +102,6 @@
     <string name="env_fix_msg">Enheten din krever ekstra oppsett for at Magisk skal kunne fungere ordentlig. Den vil laste ned Magisk-oppsetts-ZIP-filen, vil du fortsette med det nå?</string>
     <string name="setup_title">Ekstra oppsett</string>
     <string name="setup_msg">Kjører appmiljøoppsettet …</string>
-    <string name="downloading_toast">Laster ned %1$s</string>
-    <string name="no_rw_storage">Denne egenskapen vil ikke fungere uten en tillatelse til å skrive til ekstern lagring.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Generelt</string>
@@ -177,7 +171,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superbruker-forespørsel</string>
-    <string name="deny_with_str">Avslå %1$s</string>
     <string name="deny">Avslå</string>
     <string name="prompt">Spør</string>
     <string name="grant">Tillat</string>
@@ -197,7 +190,6 @@
     <string name="su_snack_notif_off">Notifikasjoner for %1$s har blitt skrudd av</string>
     <string name="su_snack_log_on">Loggføring av %1$s er skrudd på</string>
     <string name="su_snack_log_off">Loggføring av %1$s er skrudd av</string>
-    <string name="su_snack_revoke">%1$s rettigheter har blitt opphevet</string>
     <string name="su_revoke_title">Vil du oppheve?</string>
     <string name="su_revoke_msg">Vil du bekrefte for å oppheve %1$s sine rettigheter?</string>
     <string name="toast">Varselfelt</string>

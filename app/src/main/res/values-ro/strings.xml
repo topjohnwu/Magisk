@@ -60,22 +60,15 @@
     <string name="menuReload">Reîncarcă</string>
     <string name="menuClearLog">Golește jurnalul acum</string>
     <string name="logs_cleared">Jurnal golit cu succes.</string>
-    <string name="log_is_empty">Jurnalul este gol.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Jurnalul modificărilor</string>
-    <string name="translators">Cristian Silaghi, Igor Sorocean</string>
-    <string name="app_translators">Traducători</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Actualizări Magisk</string>
     <string name="progress_channel">Notificări de progres</string>
     <string name="download_complete">Descărcare finalizată</string>
-    <string name="download_local">Se caută copii locale…</string>
-    <string name="download_progress">%1$.2f / %2$.2f MB</string>
-    <string name="download_module">Se injectează programul de instalare…</string>
     <string name="download_file_error">Eroare la descărcarea fișierului</string>
-    <string name="download_file_folder_error">Nu se poate prelua dosarul părinte pentru a salva fișierul descărcat, verifică permisiunile.</string>
     <string name="download_open_parent">Afișează în dosarul părinte</string>
     <string name="download_open_self">Afișează fișierul</string>
     <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
@@ -102,7 +95,6 @@
     <string name="settings_reboot_toast">Repornește pentru a aplica setările.</string>
     <string name="release_notes">Note privind versiunea</string>
     <string name="repo_cache_cleared">Cache-ul depozitelor golit</string>
-    <string name="internal_storage">Zip-ul este stocat în:\n[Stocare internă]%1$s</string>
 
     <string name="dtbo_patched_title">DTBO a fost patchuit!</string>
     <string name="dtbo_patched_reboot">Magisk Manager a patchuit dtbo.img. Te rugăm să repornești.</string>
@@ -124,17 +116,11 @@
     <string name="env_fix_title">Necesită configurare suplimentară</string>
     <string name="env_fix_msg">Dispozitivul tău are nevoie de configurări suplimentare pentru ca Magisk să funcționeze corect. Se va descărca zip-ul de configurare Magisk, vrei să continui acum?</string>
     <string name="setup_msg">Rulează configurarea mediului…</string>
-    <string name="downloading_toast">Se descarcă %1$s</string>
-    <string name="no_rw_storage">Această funcție nu va funcționa fără permisiunea de a scrie în stocarea externă.</string>
-    <string name="dl_one_module">Descarcă câte un modul odată.</string>
 
     <!--Settings Activity -->
-    <string name="settings_downloads_category">Descărcări</string>
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Temă întunecată</string>
     <string name="settings_dark_theme_summary">Activează tema întunecată.</string>
-    <string name="settings_download_cache_title">Cache pentru descărcări</string>
-    <string name="settings_download_cache_summary">Activează cache-ul pentru descărcări în cazul fișierelor Magisk și a zip-urilor modulelor.</string>
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
@@ -202,7 +188,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Solicitare de superutilizator</string>
-    <string name="deny_with_str">Refuză %1$s</string>
     <string name="deny">Refuză</string>
     <string name="prompt">Solicitare</string>
     <string name="grant">Permite</string>
@@ -222,7 +207,6 @@
     <string name="su_snack_notif_off">Notificările pentru %1$s au fost dezactivate</string>
     <string name="su_snack_log_on">Jurnalizarea pentru %1$s a fost activată</string>
     <string name="su_snack_log_off">Jurnalizarea pentru %1$s a fost dezactivată</string>
-    <string name="su_snack_revoke">Drepturile pentru %1$s sunt revocate</string>
     <string name="su_revoke_title">Revoci?</string>
     <string name="su_revoke_msg">Confirmi revocarea drepturilor pentru %1$s?</string>
     <string name="toast">Mesaj</string>

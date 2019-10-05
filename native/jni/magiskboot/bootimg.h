@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <utility>
 #include "format.h"
 
 struct boot_img_hdr_base {
@@ -55,7 +56,7 @@ struct boot_img_hdr_v2 : public boot_img_hdr_v1 {
 	uint64_t dtb_addr;  /* physical load address for DTB image */
 } __attribute__((packed));
 
-// Default to hdr v1
+// Default to hdr v2
 typedef boot_img_hdr_v2 boot_img_hdr;
 
 // Special Samsung header
@@ -138,6 +139,135 @@ struct blob_hdr {
 	uint32_t version;       /* 0x00000001 */
 } __attribute__((packed));
 
+#define drct_var(name) \
+auto &name() { return img_hdr->name; }
+#define decl_var(name, len) \
+virtual uint##len##_t &name() { j##len = 0; return j##len; }
+#define decl_val(name, type) \
+virtual type name() { return 0; }
+
+struct dyn_img_hdr {
+
+	// Direct entries
+	drct_var(kernel_size)
+	drct_var(ramdisk_size)
+	drct_var(second_size)
+
+	// Standard entries
+	decl_var(page_size, 32)
+	decl_val(header_version, uint32_t)
+	decl_var(extra_size, 32)
+	decl_var(os_version, 32)
+	decl_val(name, char *)
+	decl_val(cmdline, char *)
+	decl_val(id, char *)
+	decl_val(extra_cmdline, char *)
+
+	// v1/v2 specific
+	decl_var(recovery_dtbo_size, 32)
+	decl_var(recovery_dtbo_offset, 64)
+	decl_var(header_size, 32)
+	decl_var(dtb_size, 32)
+
+	virtual ~dyn_img_hdr() {
+		free(raw);
+	}
+
+	virtual size_t hdr_size() = 0;
+
+	boot_img_hdr_base * const &operator* () const {
+		return img_hdr;
+	}
+
+protected:
+	union {
+		/* Main header could be either AOSP or PXA,
+		 * but both of them are base headers. */
+		boot_img_hdr_base *img_hdr;  /* Common base header */
+		boot_img_hdr_v2 *v2_hdr;     /* AOSP v2 header */
+		boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
+		void *raw;                   /* Raw pointer */
+	};
+
+private:
+	// Junk for references
+	static uint32_t j32;
+	static uint64_t j64;
+};
+
+#undef drct_var
+#undef decl_var
+#undef decl_val
+
+#define impl_val(name) \
+decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_pxa->name; }
+
+struct dyn_img_pxa : public dyn_img_hdr {
+
+	impl_val(extra_size)
+	impl_val(page_size)
+	impl_val(name)
+	impl_val(cmdline)
+	impl_val(id)
+	impl_val(extra_cmdline)
+
+	dyn_img_pxa(void *ptr) {
+		raw = xmalloc(sizeof(boot_img_hdr_pxa));
+		memcpy(raw, ptr, sizeof(boot_img_hdr_pxa));
+	}
+
+	size_t hdr_size() override {
+		return sizeof(boot_img_hdr_pxa);
+	}
+};
+
+#undef impl_val
+#define impl_val(name) \
+decltype(std::declval<dyn_img_hdr>().name()) name() override { return v2_hdr->name; }
+
+struct dyn_img_v0 : public dyn_img_hdr {
+
+	impl_val(page_size)
+	impl_val(extra_size)
+	impl_val(os_version)
+	impl_val(name)
+	impl_val(cmdline)
+	impl_val(id)
+	impl_val(extra_cmdline)
+
+	dyn_img_v0(void *ptr) {
+		raw = xmalloc(sizeof(boot_img_hdr_v2));
+		memcpy(raw, ptr, sizeof(boot_img_hdr_v2));
+	}
+
+	size_t hdr_size() override {
+		return sizeof(boot_img_hdr_v2);
+	}
+};
+
+struct dyn_img_v1 : public dyn_img_v0 {
+
+	impl_val(header_version)
+	impl_val(recovery_dtbo_size)
+	impl_val(recovery_dtbo_offset)
+	impl_val(header_size)
+
+	dyn_img_v1(void *ptr) : dyn_img_v0(ptr) {}
+
+	uint32_t &extra_size() override {
+		return dyn_img_hdr::extra_size();
+	}
+};
+
+struct dyn_img_v2 : public dyn_img_v1 {
+
+	impl_val(dtb_size)
+
+	dyn_img_v2(void *ptr) : dyn_img_v1(ptr) {}
+};
+
+#undef impl_val
+
 // Flags
 #define MTK_KERNEL      1 << 1
 #define MTK_RAMDISK     1 << 2
@@ -150,95 +280,13 @@ struct blob_hdr {
 #define NOOKHD_FLAG     1 << 9
 #define ACCLAIM_FLAG    1 << 10
 
-struct dyn_img_hdr {
-
-#define dyn_access(x) (pxa ? hdr_pxa->x : v2_hdr->x)
-
-#define dyn_get(name, type) \
-type name() const { return dyn_access(name); }
-#define dyn_ref(name, type) \
-type &name() { return dyn_access(name); }
-#define v2_ref(name, type, alt) \
-type &name() { if (pxa) { alt = 0; return alt; } return v2_hdr->name; }
-
-	dyn_ref(page_size, uint32_t);
-	dyn_get(name, char *);
-	dyn_get(cmdline, char *);
-	dyn_get(id, char *);
-	dyn_get(extra_cmdline, char *);
-
-	v2_ref(os_version, uint32_t, j32);
-	v2_ref(recovery_dtbo_size, uint32_t, j32);
-	v2_ref(recovery_dtbo_offset, uint64_t, j64);
-	v2_ref(header_size, uint32_t, j32);
-	v2_ref(dtb_size, uint32_t, j32);
-
-	dyn_img_hdr() : pxa(false), img_hdr(nullptr) {}
-	~dyn_img_hdr() {
-		if (pxa)
-			delete hdr_pxa;
-		else
-			delete v2_hdr;
-	}
-
-	uint32_t header_version() {
-		// There won't be v4 header any time soon...
-		// If larger than 4, assume this field will be treated as extra_size
-		return pxa || v2_hdr->header_version > 4 ? 0 : v2_hdr->header_version;
-	}
-
-	uint32_t &extra_size() {
-		// If header version > 0, we should treat this field as header_version
-		if (header_version()) {
-			j32 = 0;
-			return j32;
-		}
-		return dyn_access(extra_size);
-	}
-
-	size_t hdr_size() {
-		return pxa ? sizeof(boot_img_hdr_pxa) : sizeof(boot_img_hdr);
-	}
-
-	void set_hdr(boot_img_hdr *h) {
-		v2_hdr = h;
-	}
-
-	void set_hdr(boot_img_hdr_pxa *h) {
-		hdr_pxa = h;
-		pxa = true;
-	}
-
-	boot_img_hdr_base *operator-> () const {
-		return img_hdr;
-	};
-
-	boot_img_hdr_base * const &operator* () const {
-		return img_hdr;
-	}
-
-private:
-	bool pxa;
-	union {
-		/* Main header could be either AOSP or PXA,
-		 * but both of them is a base header.
-		 * Same address can be interpreted in 3 ways */
-		boot_img_hdr_base *img_hdr;  /* Common base header */
-		boot_img_hdr *v2_hdr;        /* AOSP v2 header */
-		boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
-	};
-
-	static uint32_t j32;
-	static uint64_t j64;
-};
-
 struct boot_img {
 	// Memory map of the whole image
 	uint8_t *map_addr;
 	size_t map_size;
 
 	// Headers
-	dyn_img_hdr hdr;    /* Android image header */
+	dyn_img_hdr *hdr;   /* Android image header */
 	mtk_hdr *k_hdr;     /* MTK kernel header */
 	mtk_hdr *r_hdr;     /* MTK ramdisk header */
 	blob_hdr *b_hdr;    /* Tegra blob header */

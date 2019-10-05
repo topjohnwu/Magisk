@@ -60,16 +60,26 @@ dependencies {
 
     implementation 'com.github.topjohnwu:jtar:1.0.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'com.github.skoumalcz:teanity:0.3.3'
     implementation 'com.ncapdevi:frag-nav:3.2.0'
-    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.4'
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.6'
+
+    implementation "io.reactivex.rxjava2:rxjava:2.2.12"
+    implementation "io.reactivex.rxjava2:rxkotlin:2.4.0"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${vKotlin}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${vKotlin}"
+
+    def vBAdapt = '3.1.1'
+    def bindingAdapter = 'me.tatarka.bindingcollectionadapter2:bindingcollectionadapter'
+    implementation "${bindingAdapter}:${vBAdapt}"
+    implementation "${bindingAdapter}-recyclerview:${vBAdapt}"
 
     def vMarkwon = '3.1.0'
     implementation "ru.noties.markwon:core:${vMarkwon}"
     implementation "ru.noties.markwon:html:${vMarkwon}"
     implementation "ru.noties.markwon:image-svg:${vMarkwon}"
 
-    def vLibsu = '2.5.0'
+    def vLibsu = '2.5.1'
     implementation "com.github.topjohnwu.libsu:core:${vLibsu}"
     implementation "com.github.topjohnwu.libsu:io:${vLibsu}"
 
@@ -104,16 +114,18 @@ dependencies {
     implementation "com.github.topjohnwu:room-runtime:${vRoom}"
     kapt "androidx.room:room-compiler:${vRoom}"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVer}"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlinVer}"
+    def vNav = "2.1.0"
+    implementation "androidx.navigation:navigation-fragment-ktx:$vNav"
+    implementation "androidx.navigation:navigation-ui-ktx:$vNav"
 
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.browser:browser:1.0.0'
-    implementation 'androidx.preference:preference:1.1.0-rc01'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-beta03'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0-beta04'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.work:work-runtime:2.2.0'
-    implementation 'androidx.transition:transition:1.2.0-beta01'
+    implementation 'androidx.transition:transition:1.2.0-rc01'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.1.0-alpha09'
+    implementation 'androidx.core:core-ktx:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
 }

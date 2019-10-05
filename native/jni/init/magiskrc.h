@@ -6,7 +6,6 @@ constexpr char magiskrc[] =
 
 "on post-fs-data\n"
 "    start logd\n"
-"    load_persist_props\n"
 "    rm " UNBLOCKFILE "\n"
 "    start %s\n"
 "    wait " UNBLOCKFILE " 10\n"

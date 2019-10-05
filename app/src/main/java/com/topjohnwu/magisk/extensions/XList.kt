@@ -2,8 +2,7 @@ package com.topjohnwu.magisk.extensions
 
 import androidx.collection.SparseArrayCompat
 import androidx.databinding.ObservableList
-import com.skoumal.teanity.extensions.subscribeK
-import com.skoumal.teanity.util.DiffObservableList
+import com.topjohnwu.magisk.utils.DiffObservableList
 import io.reactivex.disposables.Disposable
 
 fun <T> MutableList<T>.update(newList: List<T>) {
@@ -26,8 +25,8 @@ fun List<String>.toShellCmd(): String {
 }
 
 fun <T1, T2> ObservableList<T1>.sendUpdatesTo(
-    target: DiffObservableList<T2>,
-    mapper: (List<T1>) -> List<T2>
+        target: DiffObservableList<T2>,
+        mapper: (List<T1>) -> List<T2>
 ) = addOnListChangedCallback(object :
     ObservableList.OnListChangedCallback<ObservableList<T1>>() {
     override fun onChanged(sender: ObservableList<T1>?) {

@@ -59,12 +59,9 @@
     <string name="menuReload">Znovu načíst</string>
     <string name="menuClearLog">Smazat log</string>
     <string name="logs_cleared">Log byl smazán.</string>
-    <string name="log_is_empty">Log je prázdný.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Seznam změn</string>
-    <string name="translators">gargamelek, novas78</string>
-    <string name="app_translators">Překladatelé</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Aktualizace Magisk</string>
@@ -95,7 +92,6 @@
     <string name="settings_reboot_toast">Restartovat pro použití nastavení.</string>
     <string name="release_notes">Poznámky k vydání</string>
     <string name="repo_cache_cleared">Mezipaměť smazána</string>
-    <string name="internal_storage">Zip soubor je uložen v:\n[Interním úložišti]%1$s</string>
 
     <string name="dtbo_patched_title">DTBO opraveno!</string>
     <string name="dtbo_patched_reboot">Magisk Manager opravil dtbo.img, restartujte prosím</string>
@@ -115,9 +111,6 @@
     <string name="env_fix_title">Vyžaduje se další nastavení</string>
     <string name="env_fix_msg">Vaše zařízení potřebuje další nastavení, aby Magisk fungoval správně. Stáhne se instalační zip Magisk, chcete pokračovat?</string>
     <string name="setup_msg">Nastavení je spuštěno…</string>
-    <string name="downloading_toast">Stahování %1$s</string>
-    <string name="no_rw_storage">Tato funkce nebude fungovat bez povolení k zápisu do externího úložiště.</string>
-    <string name="dl_one_module">Stáhnout vždy jeden modul.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Obecné</string>
@@ -187,7 +180,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Požadavek Superuser</string>
-    <string name="deny_with_str">Zamítnout%1$s</string>
     <string name="deny">Zamítnout</string>
     <string name="prompt">Dotaz</string>
     <string name="grant">Povolit</string>
@@ -207,7 +199,6 @@
     <string name="su_snack_notif_off">Oznámení pro %1$s jsou zakázána</string>
     <string name="su_snack_log_on">Logování %1$s je povoleno</string>
     <string name="su_snack_log_off">Logování %1$s je zakázáno</string>
-    <string name="su_snack_revoke">Záznamy oprávnění %1$s jsou smazány</string>
     <string name="su_revoke_title">Smazat?</string>
     <string name="su_revoke_msg">Smazat záznam ohledně oprávnění pro %1$s?</string>
     <string name="toast">Informační text</string>

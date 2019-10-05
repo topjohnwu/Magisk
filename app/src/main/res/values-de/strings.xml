@@ -59,12 +59,9 @@
     <string name="menuReload">Log erneut laden</string>
     <string name="menuClearLog">Log löschen</string>
     <string name="logs_cleared">Log gelöscht</string>
-    <string name="log_is_empty">Log ist leer</string>
 
     <!--About Activity-->
     <string name="app_changelog">Änderungsprotokoll</string>
-    <string name="translators">skalnet, c727, jenslody, SuperSandro2000, aney1, cheese</string>
-    <string name="app_translators">Übersetzer</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk Update</string>
@@ -95,7 +92,6 @@
     <string name="settings_reboot_toast">Neustarten, um die Änderungen zu übernehmen</string>
     <string name="release_notes">Versionshinweise</string>
     <string name="repo_cache_cleared">Repo-Cache geleert</string>
-    <string name="internal_storage">Die Zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
 
     <string name="dtbo_patched_title">DTBO wurde gepatched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatched, bitte neustarten</string>
@@ -117,9 +113,6 @@
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
     <string name="env_fix_msg">Ihr Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip wird heruntergeladen, fortfahren?</string>
     <string name="setup_msg">Umgebungseinrichtung läuft…</string>
-    <string name="downloading_toast">Herunterladen von %1$s</string>
-    <string name="no_rw_storage">Dieses Feature funktioniert nicht, ohne die Berechtigung den externen Speicher zu beschreiben.</string>
-    <string name="dl_one_module">Ein Modul nach dem anderen herunterladen.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
@@ -189,7 +182,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
-    <string name="deny_with_str">Verweigern%1$s</string>
     <string name="deny">Verweigern</string>
     <string name="prompt">Nachfragen</string>
     <string name="grant">Gewähren</string>
@@ -209,7 +201,6 @@
     <string name="su_snack_notif_off">Benachrichtigungen für %1$s sind deaktiviert</string>
     <string name="su_snack_log_on">Logging ist für %1$s aktiviert</string>
     <string name="su_snack_log_off">Logging ist für %1$s deaktiviert</string>
-    <string name="su_snack_revoke">Die Rechte für %1$s wurden entzogen</string>
     <string name="su_revoke_title">Entziehen?</string>
     <string name="su_revoke_msg">Möchtest du die Rechte für %1$s entziehen?</string>
     <string name="toast">Popup</string>

@@ -121,7 +121,7 @@ if (!is_lnk("/" #name) && read_dt_fstab(#name, partname, fstype)) { \
 	mnt_##name = true; \
 }
 
-void LegacyInit::early_mount() {
+void RootFSInit::early_mount() {
 	full_read("/init", self.buf, self.sz);
 
 	LOGD("Reverting /init\n");
@@ -183,7 +183,7 @@ static void switch_root(const string &path) {
 	chroot(".");
 }
 
-void SARCommon::backup_files() {
+void SARBase::backup_files() {
 	if (access("/overlay.d", F_OK) == 0)
 		cp_afc("/overlay.d", "/dev/overlay.d");
 

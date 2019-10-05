@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.model.update
 import androidx.work.ListenableWorker
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.base.DelegateWorker
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.inject
-import com.topjohnwu.magisk.model.worker.DelegateWorker
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.Shell
 

@@ -16,7 +16,7 @@ import com.topjohnwu.superuser.Shell
 import timber.log.Timber
 import java.io.File
 
-private fun RemoteFileService.patchPackage(apk: File, id: Int): File {
+private fun RemoteFileService.patchPackage(apk: File, id: Int) {
     if (packageName != BuildConfig.APPLICATION_ID) {
         update(id) { notification ->
             notification.setProgress(0, 0, true)
@@ -37,13 +37,11 @@ private fun RemoteFileService.patchPackage(apk: File, id: Int): File {
             PatchAPK.patch(apk.path, patched.path, packageName)
         }
         apk.delete()
-        return patched
-    } else {
-        return apk
+        patched.renameTo(apk)
     }
 }
 
-private fun RemoteFileService.restore(apk: File, id: Int): File {
+private fun RemoteFileService.restore(apk: File, id: Int) {
     update(id) { notification ->
         notification.setProgress(0, 0, true)
                 .setProgress(0, 0, true)
@@ -53,11 +51,11 @@ private fun RemoteFileService.restore(apk: File, id: Int): File {
     Config.export()
     // Make it world readable
     apk.setReadable(true, false)
-    if (Shell.su("pm install $apk").exec().isSuccess)
-        RootUtils.rmAndLaunch(packageName,
-                ComponentName(BuildConfig.APPLICATION_ID,
-                        ClassMap.get<Class<*>>(SplashActivity::class.java).name))
-    return apk
+    if (Shell.su("pm install $apk").exec().isSuccess) {
+        val component = ComponentName(BuildConfig.APPLICATION_ID,
+                ClassMap.get<Class<*>>(SplashActivity::class.java).name)
+        RootUtils.rmAndLaunch(packageName, component)
+    }
 }
 
 fun RemoteFileService.handleAPK(subject: DownloadSubject.Manager)

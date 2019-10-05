@@ -22,55 +22,50 @@ static int check_verity_pattern(const char *s) {
 }
 
 static int check_encryption_pattern(const char *s) {
-	const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe", NULL };
-	for (int i = 0 ; encrypt_list[i]; ++i) {
-		int len = strlen(encrypt_list[i]);
-		if (strncmp(s, encrypt_list[i], len) == 0)
+	static const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe" };
+	for (auto enc : encrypt_list) {
+		int len = strlen(enc);
+		if (strncmp(s, enc, len) == 0)
 			return len;
 	}
 	return -1;
 }
 
-bool patch_verity(void **buf, uint32_t *size, bool patch) {
-	int skip, src_size = *size;
+char *patch_verity(const void *buf, uint32_t &size, bool inplace) {
+	auto src = static_cast<const char *>(buf);
+	int src_size = size;
 	bool found = false;
-	char *src = (char *) *buf, *patched = patch ? (char *) xcalloc(src_size, 1) : nullptr;
-	for (int read = 0, write = 0; read < src_size; ++read, ++write) {
-		if ((skip = check_verity_pattern(src + read)) > 0) {
-			if (patch) {
-				fprintf(stderr, "Remove pattern [%.*s]\n", skip, src + read);
-				*size -= skip;
-			} else {
-				fprintf(stderr, "Found pattern [%.*s]\n", skip, src + read);
-			}
+	auto patched = (char *)(inplace ? buf : xmalloc(size));
+	int write = 0;
+	for (int read = 0; read < src_size; ++read, ++write) {
+		if (int skip; (skip = check_verity_pattern(src + read)) > 0) {
+			fprintf(stderr, "Found pattern [%.*s]\n", skip, src + read);
+			size -= skip;
 			read += skip;
 			found = true;
 		}
-		if (patch)
-			patched[write] = src[read];
-	}
-	if (patch) {
-		free(*buf);
-		*buf = patched;
-	}
-	return found;
-}
-
-void patch_encryption(void **buf, uint32_t *size) {
-	int skip, src_size = *size;
-	char *src = (char *) *buf, *patched = (char *) xcalloc(src_size, 1);
-	for (int read = 0, write = 0; read < src_size; ++read, ++write) {
-		if ((skip = check_encryption_pattern(src + read)) > 0) {
-			fprintf(stderr, "Replace pattern [%.*s] with [encryptable]\n", skip, src + read);
-			memcpy(patched + read, "encryptable", 11);
-			read += skip;
-			write += 11;
-			*size -= (skip - 11);
-		}
 		patched[write] = src[read];
 	}
-	free(*buf);
-	*buf = patched;
+	patched[write] = '\0';
+	if (!found) {
+		if (!inplace)
+			free(patched);
+		return nullptr;
+	}
+	return patched;
 }
 
-
+void patch_encryption(void *buf, uint32_t &size) {
+	auto src = static_cast<char *>(buf);
+	int src_size = size;
+	int write = 0;
+	for (int read = 0; read < src_size; ++read, ++write) {
+		if (int skip; (skip = check_encryption_pattern(src + read)) > 0) {
+			fprintf(stderr, "Found pattern [%.*s]\n", skip, src + read);
+			size -= skip;
+			read += skip;
+		}
+		src[write] = src[read];
+	}
+	src[write] = '\0';
+}

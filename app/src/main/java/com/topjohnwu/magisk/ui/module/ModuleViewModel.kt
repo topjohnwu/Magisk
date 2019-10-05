@@ -1,17 +1,12 @@
 package com.topjohnwu.magisk.ui.module
 
 import android.content.res.Resources
-import com.skoumal.teanity.databinding.ComparableRvItem
-import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
-import com.skoumal.teanity.extensions.doOnSuccessUi
-import com.skoumal.teanity.extensions.subscribeK
-import com.skoumal.teanity.util.DiffObservableList
-import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.data.database.RepoDao
-import com.topjohnwu.magisk.extensions.toSingle
-import com.topjohnwu.magisk.extensions.update
+import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.recycler.ModuleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoRvItem
@@ -20,7 +15,8 @@ import com.topjohnwu.magisk.model.events.InstallModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
 import com.topjohnwu.magisk.tasks.RepoUpdater
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.utils.DiffObservableList
+import com.topjohnwu.magisk.utils.KObservableField
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.OnItemBind
@@ -29,7 +25,7 @@ class ModuleViewModel(
     private val resources: Resources,
     private val repoUpdater: RepoUpdater,
     private val repoDB: RepoDao
-) : MagiskViewModel() {
+) : BaseViewModel() {
 
     val query = KObservableField("")
 

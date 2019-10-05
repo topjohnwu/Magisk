@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.extensions
 
-import com.skoumal.teanity.util.KObservableField
+import com.topjohnwu.magisk.utils.KObservableField
 
 
 fun KObservableField<Boolean>.toggle() {

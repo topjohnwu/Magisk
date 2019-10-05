@@ -61,7 +61,7 @@ static bool validate(const char *s) {
 	bool dot = false;
 	for (char c; (c = *s); ++s) {
 		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-			(c >= '0' && c <= '9') || c == '_') {
+			(c >= '0' && c <= '9') || c == '_' || c == ':') {
 			dot = false;
 			continue;
 		}
@@ -98,7 +98,7 @@ static int add_list(const char *pkg, const char *proc = "") {
 
 	// Critical region
 	{
-		MutexGuard lock(monitor_lock);
+		mutex_guard lock(monitor_lock);
 		hide_set.emplace(pkg, proc);
 	}
 
@@ -119,7 +119,7 @@ int add_list(int client) {
 static int rm_list(const char *pkg, const char *proc = "") {
 	{
 		// Critical region
-		MutexGuard lock(monitor_lock);
+		mutex_guard lock(monitor_lock);
 		bool remove = false;
 		auto next = hide_set.begin();
 		decltype(next) cur;

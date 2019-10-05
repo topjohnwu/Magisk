@@ -57,12 +57,9 @@
     <string name="menuReload">Herladen</string>
     <string name="menuClearLog">Log nu wissen</string>
     <string name="logs_cleared">Log succesvol gewist</string>
-    <string name="log_is_empty">Log is leeg</string>
 
     <!--About Activity-->
     <string name="app_changelog">App\'s changelog</string>
-    <string name="translators" />
-    <string name="app_translators">App\'s vertalers</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Sluiten</string>
@@ -74,7 +71,6 @@
     <string name="settings_reboot_toast">Herstarten om instellingen toe te passen</string>
     <string name="release_notes">Publicatie notities</string>
     <string name="repo_cache_cleared">Opslagcache gewist</string>
-    <string name="internal_storage">De zip is opgeslagen in:\n[Interne opslag]%1$s</string>
     <string name="manager_update_title">Nieuwe Magisk Manager update beschikbaar!</string>
     <string name="manager_download_install">Tik om te downloaden en installeren</string>
     <string name="dtbo_patched_title">DTBO is gepatched!</string>
@@ -93,8 +89,6 @@
     <string name="proprietary_title">Google\'s code downloaden</string>
     <string name="proprietary_notice">Magisk Manager is FOSS, dus bevat geen SafetyNet API code van Google.\n\nSta je Magisk Manager toe om een extensie te downloaden (bevat GoogleApiClient) voor SafetyNet controles?</string>
     <string name="download_file_error">Fout tijdens downloaden</string>
-    <string name="downloading_toast">%1$s downloaden</string>
-    <string name="no_rw_storage">Deze functie werkt niet zonder schrijfpermissie voor externe opslag.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Algemeen</string>
@@ -162,7 +156,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser verzoek</string>
-    <string name="deny_with_str">Weigeren %1$s</string>
     <string name="deny">Weigeren</string>
     <string name="prompt">Prompt</string>
     <string name="grant">Toestaan</string>
@@ -182,7 +175,6 @@
     <string name="su_snack_notif_off">Meldingen van %1$s uitgeschakeld</string>
     <string name="su_snack_log_on">Loggen van %1$s ingeschakeld</string>
     <string name="su_snack_log_off">Loggen of %1$s uitgeschakeld</string>
-    <string name="su_snack_revoke">%1$s rechten zijn ingetrokken</string>
     <string name="su_revoke_title">Intrekken?</string>
     <string name="su_revoke_msg">De rechten van %1$s intrekken?</string>
     <string name="toast">Toast</string>

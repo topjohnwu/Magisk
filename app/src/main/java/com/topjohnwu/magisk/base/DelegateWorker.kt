@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.model.worker
+package com.topjohnwu.magisk.base
 
 import android.content.Context
 import android.net.Network

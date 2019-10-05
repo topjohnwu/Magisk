@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.utils
 import android.content.ComponentName
 import android.content.Context
 import android.widget.Toast
-import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.signing.JarMap

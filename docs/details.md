@@ -1,7 +1,7 @@
 # Magisk Details
 ## File Structure
 ### Paths in "sbin tmpfs overlay"
-sbin tmpfs overlay is the key to hiding Magisk from detection. All Magisk binaries, applets, mirrors, and other trivial stuffs are all located in the `tmpfs` mounted on `/sbin`. MagiskHide can just simply unmount `/sbin` and the bind mounts to hide all modifications easily.
+One of Magisk's breakthrough designs is sbin tmpfs overlay. It is required to support system-as-root devices, and also is the key to hiding Magisk from detection. All Magisk binaries, applets, mirrors, and other trivial stuffs are all located in the `tmpfs` mounted on `/sbin`. MagiskHide can just simply unmount `/sbin` and the bind mounts to hide all modifications easily.
 
 ```
 # Binaries like magisk, magiskinit, and all symlinks to
@@ -20,17 +20,21 @@ $MAGISKTMP/modules
 # The configuration used in last installation
 $MAGISKTMP/config
 
-MIRRORDIR=$MAGISKTMP/mirror
+# Partition mirrors.
+# There would be system, vendor, data, and possibly product
+# in this directory, each is the mirror to the name of the partition
+$MAGISKTMP/mirror
 
-# System mirror
-$MIRRORDIR/system
+# Root directory patch files
+# On system-as-root devices, / is not writable.
+# All patched files are stored here and bind mounted at boot.
+$MAGISKTMP/rootdir
 
-# Vendor mirror, could be a symlink to $SYSTEMMIR/vendor
-# if vendor is not a separate partition
-$MIRRORDIR/vendor
+# The patched sepolicy file on system-as-root devices.
+# This is required as /sepolicy does not exist
+# on those devices and / is not writable.
+/sbin/.se
 
-# Data mirror to workaround nosuid flag
-$MIRRORDIR/data
 ```
 
 ### Paths in `/data`
@@ -70,19 +74,15 @@ DATABIN=$SECURE_DIR/magisk
 
 ```
 
-### Final Words
-The file structure of Magisk is designed in a weird and overly complicated way. But all of these quirks are done to properly support hiding modifications from detection. These design choices are mostly what makes Magisk difficult to implement properly and maintain.
-
 ## Magisk Booting Process
 ### Pre-Init
-`magiskinit` will replace `init` as the first program to run. It is responsible for constructing rootfs on system-as-root devices: it parses kernel cmdline, sysfs, device tree fstabs, uevents etc., recreating **early-mount** and clones rootfs files from the system. On traditional devices, it will simply revert `init` to the original one and continue on to the following steps.
+`magiskinit` will replace `init` as the first program to run.
 
+- Early mount required partitions. On system-as-root devices, we will switch root to system
 - Inject magisk services into `init.rc`
 - Load sepolicy either from `/sepolicy`, precompiled sepolicy in vendor, or compile split sepolicy
-- Patch sepolicy rules and dump to `/sepolicy` and patch `init` to always load `/sepolicy`
-- Fork a new daemon and wait for early-init trigger
+- Patch sepolicy rules and dump to `/sepolicy` or `/sbin/.se` and patch `init` or `libselinux.so` to load the patched policies
 - Execute the original `init` to start the ordinary boot process
-- The early-init daemon will construct `/sbin` `tmpfs` overlay and remove all traces of Magisk in ramdisk
 
 ### post-fs-data
 This triggers on `post-fs-data` when `/data` is properly decrypted (if required) and mounted. The daemon `magiskd` will be launched, post-fs-data scripts are executed, and module files are magic mounted.
@@ -91,21 +91,21 @@ This triggers on `post-fs-data` when `/data` is properly decrypted (if required)
 Later in the booting process, the class `late_start` will be triggered, and Magisk "service" mode will be started. In this mode, service scripts are executed, and it will try to install Magisk Manager if it doesn't exist.
 
 ## Resetprop
-Usually, system properties are designed to only be updated by a single `init` process and read-only to non-root processes. With root you can change properties by sending requests via `property_service` using commands such as `setprop`, but you are still prohibited from changing read-only props (props that start with `ro.` like `ro.build.product`) and deleting properties.
+Usually, system properties are designed to only be updated by `init` and read-only to non-root processes. With root you can change properties by sending requests to `property_service` (hosted by `init`) using commands such as `setprop`, but changing read-only props (props that start with `ro.` like `ro.build.product`) and deleting properties are still prohibited.
 
-`resetprop` is implemented by distilling out the source code related to system properties from AOSP with modifications to map the property area, or `prop_area`, r/w and some clever hacks to modify the trie structure in ways it wasn't intended, like detaching nodes. In a nut shell, it directly do modifications to `prop_area`, bypassing the need to go through `property_service`. Since we are bypassing `property_service`, there are a few caveats:
+`resetprop` is implemented by distilling out the source code related to system properties from AOSP and patched to allow direct modification to property area, or `prop_area`, bypassing the need to go through `property_service`. Since we are bypassing `property_service`, there are a few caveats:
 
-- `on property:foo=bar` actions registered in `*.rc` scripts will not be triggered if property changes does not go through `property_service`. The default set property behavior of `resetprop` matches `setprop`, which **WILL** trigger events (implemented by first deleting the property then set it via `property_service`), but there is a flag `-n` to disable it if you need this special behavior.
+- `on property:foo=bar` actions registered in `*.rc` scripts will not be triggered if property changes does not go through `property_service`. The default set property behavior of `resetprop` matches `setprop`, which **WILL** trigger events (implemented by first deleting the property then set it via `property_service`). There is a flag `-n` to disable it if you need this special behavior.
 - persist properties (props that starts with `persist.`, like `persist.sys.usb.config`) are stored in both `prop_area` and `/data/property`. By default, deleting props will **NOT** remove it from persistent storage, meaning the property will be restored after the next reboot; reading props will **NOT** read from persistent storage, as this is the behavior of `getprop`. With the flag `-p`, deleting props will remove the prop in **BOTH** `prop_area` and `/data/property`, and reading props will be read from **BOTH** `prop_area` and persistent storage.
 
 ## Magic Mount
-I will skip the details in the actual implementation of how Magic Mount works as it will become a lecture, but you can always directly dive into the source code if interested. (`bootstages.c`)
+I will skip the details in the actual implementation and algorithm of Magic Mount, but you can always directly dive into the source code if interested. (`bootstages.cpp`)
 
-Even though the mounting logic and traversal algorithm is pretty complicated, the final result of Magic Mount is actually pretty simple. For each module, the folder `$MODPATH/system` will be recursively merged into the real `/system`; that is: existing files in the real system will be replaced by the one in modules' system, and new files in modules' system will be added to the real system.
+Even though the mounting logic is pretty complicated, the final result of Magic Mount is actually pretty simple. For each module, the folder `$MODPATH/system` will be recursively merged into the real `/system`; that is: existing files in the real system will be replaced by the one in modules' system, and new files in modules' system will be added to the real system.
 
 There is one additional trick you can use: if you place an empty file named `.replace` in any of the folders in a module's system, instead of merging the contents, that folder will directly replace the one in the real system. This will be very handy in some cases, for example swapping out a system app.
 
-If you want to replace files in `/vendor`, please place it under `$MODPATH/system/vendor`. Magisk will transparently handle both cases, whether vendor is a separate partition or not.
+If you want to replace files in `/vendor` or `/product`, please place them under `$MODPATH/system/vendor` or `$MODPATH/system/product`. Magisk will transparently handle both cases, whether vendor or product is a separate partition or not.
 
 ## Miscellaneous
 Here are some tidbits in Magisk but unable to be categorized into any sections:

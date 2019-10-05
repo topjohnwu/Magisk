@@ -56,12 +56,9 @@
     <string name="menuReload">Įvykių sąrašo atnaujinmas</string>
     <string name="menuClearLog">Išvalyti įvykių sąrašą</string>
     <string name="logs_cleared">Įvykių sąrašas pašalintas</string>
-    <string name="log_is_empty">Įvykių sąrašas tuščias</string>
 
     <!--About Activity-->
     <string name="app_changelog">Pakeitimų sąrašas</string>
-    <string name="translators">Vv2233Bb</string>
-    <string name="app_translators">Vertėjai</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Uždaryti</string>
@@ -73,7 +70,6 @@
     <string name="settings_reboot_toast">Nustatymų įgalinimui prašome perkrauti telefoną</string>
     <string name="release_notes">Pakeitimai</string>
     <string name="repo_cache_cleared">Repo failai išvalyti</string>
-    <string name="internal_storage">Zip failas yra saugomas:\n[Internal Storage]%1$s</string>
     <string name="manager_update_title">Atsirado naujas Magisk Manager atnaujinimas!</string>
     <string name="manager_download_install">Paspauskite, kad atsisiųstumėte ir instaliuotumėte</string>
     <string name="dtbo_patched_title">DTBO buvo ištaisytas!</string>
@@ -98,8 +94,6 @@
     <string name="setup_title">Papildomas pasiruošimas</string>
     <string name="setup_msg">Paruošiama aplinka…</string>
     <string name="download_file_error">Atsisiunčiant failą įvyko klaida</string>
-    <string name="downloading_toast">Atsisiunčiamas %1$s</string>
-    <string name="no_rw_storage">Ši funkija neveiks be prieigos prie saugyklos</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Pagrininiai</string>
@@ -167,7 +161,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Supervartotojo prašymas</string>
-    <string name="deny_with_str">Atmesti%1$s</string>
     <string name="deny">Atmesti</string>
     <string name="prompt">Klausti</string>
     <string name="grant">Suteikti(a)</string>
@@ -187,7 +180,6 @@
     <string name="su_snack_notif_off">Buvo išjungta %1$s pranešimai</string>
     <string name="su_snack_log_on">%1$s įvykių surašymas yra įgalintas</string>
     <string name="su_snack_log_off">%1$s įvykių surašymas yra išjungtas</string>
-    <string name="su_snack_revoke">%1$s supervartotojo teisės atimtos</string>
     <string name="su_revoke_title">Neleisti?</string>
     <string name="su_revoke_msg">Neleisti %1$s naudotis supervartotojo teisėmis?</string>
     <string name="toast">Išmesti</string>

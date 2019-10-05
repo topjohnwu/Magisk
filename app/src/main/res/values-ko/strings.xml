@@ -59,12 +59,9 @@
     <string name="menuReload">다시 불러오기</string>
     <string name="menuClearLog">지금 로그 비우기</string>
     <string name="logs_cleared">로그가 성공적으로 비워짐</string>
-    <string name="log_is_empty">로그가 비어 있음</string>
 
     <!--About Activity-->
     <string name="app_changelog">앱 변경 사항</string>
-    <string name="translators">lilymaniac / Ingan121 (@Ingan121)</string>
-    <string name="app_translators">앱 번역자</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Magisk 업데이트</string>
@@ -94,8 +91,7 @@
     <string name="settings_reboot_toast">기기를 다시 시작하면 설정이 적용됩니다.</string>
     <string name="release_notes">릴리즈 노트</string>
     <string name="repo_cache_cleared">저장소 캐시 비워짐</string>
-    <string name="internal_storage">zip 파일이 다음 위치에 저장됨:\n[내부 저장소]%1$s</string>
-    
+
     <string name="dtbo_patched_title">DTBO가 패치되었습니다!</string>
     <string name="dtbo_patched_reboot">Magisk Manager가 dtbo.img를 패치했습니다. 기기를 다시 시작해 주시기 바랍니다.</string>
     <string name="flashing">플래싱 중...</string>
@@ -116,9 +112,6 @@
     <string name="env_fix_title">추가 설정 요구됨</string>
     <string name="env_fix_msg">이 기기에서 Magisk가 제대로 작동하기 위해선 추가 설정이 필요합니다. Magisk 설치 zip이 다운로드 될 것인데, 계속 진행하시겠습니까?</string>
     <string name="setup_msg">환경 설정 진행 중…</string>
-    <string name="downloading_toast">%1$s 다운로드 중</string>
-    <string name="no_rw_storage">이 기능은 외부 저장소 쓰기 권한 없이는 작동하지 않습니다.</string>
-    <string name="dl_one_module">한 번에 한 모듈만 다운로드하십시오.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">일반</string>
@@ -188,7 +181,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">슈퍼유저 요청</string>
-    <string name="deny_with_str">거부%1$s</string>
     <string name="deny">거부</string>
     <string name="prompt">메시지</string>
     <string name="grant">허용</string>
@@ -208,7 +200,6 @@
     <string name="su_snack_notif_off">%1$s의 알림이 비활성화됨</string>
     <string name="su_snack_log_on">%1$s의 로깅이 활성화됨</string>
     <string name="su_snack_log_off">%1$s의 로깅이 비활성화됨</string>
-    <string name="su_snack_revoke">%1$s의 권한이 취소됨</string>
     <string name="su_revoke_title">취소하시겠습니까?</string>
     <string name="su_revoke_msg">정말 %1$s의 권한을 취소하시겠습니까?</string>
     <string name="toast">토스트</string>

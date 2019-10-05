@@ -44,7 +44,7 @@ The [FlashFire](https://play.google.com/store/apps/details?id=eu.chainfire.flash
 
 - Press the big **Flash** button, after a few minutes it should reboot and updated with Magisk installed.
 
-### Legacy "Non A/B" Devices - General Case
+### "Non A/B" Devices - General Case
 Unfortunately, there are no real good ways to apply OTAs on these devices. The following tutorial will not preserve Magisk - you will have to manually re-root your device after the upgrade, and this will require PC access. This is a general "best practice".
 
 - To properly install OTAs, you must have your stock recovery installed on your device. If you have custom recovery installed, you can restore it from your previous backup, or dumps found online, or factory images provided by OEMs.

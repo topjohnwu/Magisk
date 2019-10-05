@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 	if (run_test) {
 		init = make_unique<TestInit>(argv, &cmd);
 	} else if (cmd.force_normal_boot) {
-		init = make_unique<FirstStageInit>(argv, &cmd);
+		init = make_unique<ABFirstStageInit>(argv, &cmd);
 	} else if (cmd.system_as_root) {
 		if (access("/overlay", F_OK) == 0)  /* Compatible mode */
 			init = make_unique<SARCompatInit>(argv, &cmd);
@@ -217,8 +217,10 @@ int main(int argc, char *argv[]) {
 		decompress_ramdisk();
 		if (access("/sbin/recovery", F_OK) == 0)
 			init = make_unique<RecoveryInit>(argv, &cmd);
+		else if (access("/apex", F_OK) == 0)
+			init = make_unique<AFirstStageInit>(argv, &cmd);
 		else
-			init = make_unique<LegacyInit>(argv, &cmd);
+			init = make_unique<RootFSInit>(argv, &cmd);
 	}
 
 	// Run the main routine

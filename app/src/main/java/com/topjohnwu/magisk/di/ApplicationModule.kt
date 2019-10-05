@@ -7,7 +7,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.preference.PreferenceManager
-import com.skoumal.teanity.rxbus.RxBus
+import com.topjohnwu.magisk.utils.RxBus
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 

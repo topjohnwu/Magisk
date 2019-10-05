@@ -29,7 +29,7 @@ void no_logging() {
 
 #define LOG_TAG "Magisk"
 
-static int log_d(const char *fmt, va_list ap) {
+[[maybe_unused]] static int log_d(const char *fmt, va_list ap) {
 	return __android_log_vprint(ANDROID_LOG_DEBUG, LOG_TAG, fmt, ap);
 }
 
