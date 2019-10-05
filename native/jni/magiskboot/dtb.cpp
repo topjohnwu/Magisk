@@ -116,6 +116,7 @@ static void dtb_print(const char *file, bool fstab) {
 				print_node(fdt);
 			}
 			++dtb_num;
+			i += fdt_totalsize(fdt) - 1;
 		}
 	}
 	fprintf(stderr, "\n");
@@ -140,6 +141,8 @@ static void dtb_patch(const char *in, const char *out) {
 			memcpy(fdt, dtb + i, len);
 			if (redirect)
 				fdt_open_into(fdt, fdt, len + 256);
+			fdt_list.push_back(fdt);
+			i += len - 1;
 
 			int fstab = find_fstab(fdt);
 			if (fstab < 0)
@@ -165,17 +168,17 @@ static void dtb_patch(const char *in, const char *out) {
 					fdt_setprop_string(fdt, block, "mnt_point", "/system_root");
 				}
 			}
-			fdt_list.push_back(fdt);
 		}
 	}
 	munmap(dtb, dtb_sz);
 	if (modified) {
 		if (!out)
 			out = in;
-		int fd = xopen(out, O_WRONLY | O_CREAT | O_CLOEXEC);
+		int fd = xopen(out, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
 		for (auto fdt : fdt_list) {
 			fdt_pack(fdt);
 			xwrite(fd, fdt, fdt_totalsize(fdt));
+			free(fdt);
 		}
 		close(fd);
 	}
