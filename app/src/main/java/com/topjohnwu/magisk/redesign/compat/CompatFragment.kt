@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.redesign.compat
 import android.os.Bundle
 import android.view.View
 import androidx.databinding.ViewDataBinding
+import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.ui.base.MagiskFragment
 
 abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBinding>
@@ -22,6 +23,12 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
         super.onResume()
 
         delegate.onResume()
+    }
+
+    override fun onEventDispatched(event: ViewEvent) {
+        super.onEventDispatched(event)
+
+        delegate.onEventExecute(event, this)
     }
 
 }
