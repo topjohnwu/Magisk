@@ -5,13 +5,13 @@
     <item
         android:id="@+id/homeFragment"
         android:icon="@drawable/ic_home_md2"
-        android:title="Home"
+        android:title="@string/section_home"
         tools:showAsAction="always" />
 
     <item
         android:id="@+id/modulesFragment"
         android:icon="@drawable/ic_module_md2"
-        android:title="@string/modules"
+        android:title="@string/section_modules"
         tools:showAsAction="always" />
 
     <item
@@ -23,13 +23,13 @@
     <item
         android:id="@+id/logFragment"
         android:icon="@drawable/ic_bug_md2"
-        android:title="@string/log"
+        android:title="@string/section_log"
         tools:showAsAction="always" />
 
     <item
         android:id="@+id/settingsFragment"
         android:icon="@drawable/ic_settings_md2"
-        android:title="@string/settings"
+        android:title="@string/section_settings"
         tools:showAsAction="always" />
 
 </menu>

@@ -22,18 +22,18 @@ class HomeViewModel(
     val stateManager = KObservableField(MagiskState.LOADING)
     val stateTextMagisk = Observer(stateMagisk) {
         when (stateMagisk.value) {
-            MagiskState.NOT_INSTALLED -> R.string.magisk_version_error.res()
-            MagiskState.UP_TO_DATE -> R.string.magisk_up_to_date.res()
-            MagiskState.LOADING -> R.string.checking_for_updates.res()
-            MagiskState.OBSOLETE -> R.string.magisk_update_title.res()
+            MagiskState.NOT_INSTALLED -> R.string.installed_error_md2.res()
+            MagiskState.UP_TO_DATE -> R.string.up_to_date_md2.res()
+            MagiskState.LOADING -> R.string.loading_md2.res()
+            MagiskState.OBSOLETE -> R.string.obsolete_md2.res()
         }
     }
     val stateTextManager = Observer(stateManager) {
         when (stateManager.value) {
-            MagiskState.NOT_INSTALLED -> R.string.invalid_update_channel.res()
-            MagiskState.UP_TO_DATE -> R.string.manager_up_to_date.res()
-            MagiskState.LOADING -> R.string.checking_for_updates.res()
-            MagiskState.OBSOLETE -> R.string.manager_update_title.res()
+            MagiskState.NOT_INSTALLED -> R.string.channel_error_md2.res()
+            MagiskState.UP_TO_DATE -> R.string.up_to_date_md2.res()
+            MagiskState.LOADING -> R.string.loading_md2.res()
+            MagiskState.OBSOLETE -> R.string.obsolete_md2.res()
         }
     }
 

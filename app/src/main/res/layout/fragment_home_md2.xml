@@ -60,7 +60,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
                         android:gravity="center"
-                        android:text="Magisk"
+                        android:text="@string/magisk"
                         android:textAppearance="?appearanceTextTitleNormal"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -151,7 +151,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
                         android:gravity="center"
-                        android:text="Manager"
+                        android:text="@string/manager"
                         android:textAppearance="?appearanceTextTitleNormal"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -207,6 +207,8 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
                 android:layout_marginTop="@dimen/l2"
                 android:layout_marginBottom="@dimen/l2"
                 android:background="?colorSurfaceVariant" />

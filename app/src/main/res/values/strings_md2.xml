@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="manager">Manager</string>
+    <string name="magisk">Magisk</string>
+
+    <string name="section_home">Home</string>
+    <string name="section_modules">@string/modules</string>
+    <string name="section_superuser">@string/superuser</string>
+    <string name="section_log">@string/log</string>
+    <string name="section_settings">@string/settings</string>
+
+    <string name="installed_error_md2">is not installed</string>
+    <string name="channel_error_md2">has invalid update channel!</string>
+    <string name="up_to_date_md2">is up to date</string>
+    <string name="obsolete_md2">can be updated!</string>
+    <string name="loading_md2">is loading…</string>
+
+</resources>

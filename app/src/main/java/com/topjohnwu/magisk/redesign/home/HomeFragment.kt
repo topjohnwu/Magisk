@@ -16,7 +16,7 @@ class HomeFragment : CompatFragment<HomeViewModel, FragmentHomeMd2Binding>() {
     override fun onStart() {
         super.onStart()
 
-        activity.title = "Home"
+        activity.title = resources.getString(R.string.section_home)
     }
 
 }
