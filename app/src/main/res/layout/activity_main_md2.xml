@@ -31,8 +31,9 @@
                 android:id="@+id/main_toolbar"
                 style="?styleToolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="?actionBarSize"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_scrollFlags="noScroll"
                 tools:title="Home" />
 
             <View
