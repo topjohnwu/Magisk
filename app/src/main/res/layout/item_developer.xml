@@ -3,13 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data></data>
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.HomeItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.redesign.home.HomeViewModel" />
+
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:onClick="@{() -> viewModel.onLinkPressed(item.link)}"
         tools:layout_gravity="center"
-        tools:paddingEnd="@dimen/l1">
+        android:padding="@dimen/l_50">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/developer_link"
@@ -17,13 +29,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_paypal" />
+            app:srcCompat="@{item.icon}"
+            tools:srcCompat="@drawable/ic_paypal" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/developer_link_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/l_50"
+            android:text="@{item.title}"
             android:textAppearance="?appearanceTextCaptionNormal"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,6 +47,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             style="?styleImageSmall"
             android:layout_marginStart="@dimen/l_50"
+            android:layout_height="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/developer_link_name"
             app:layout_constraintStart_toEndOf="@+id/developer_link_name"
             app:layout_constraintTop_toTopOf="@+id/developer_link_name"

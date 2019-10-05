@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.redesign.home
 
+import com.skoumal.teanity.databinding.ComparableRvItem
 import com.skoumal.teanity.extensions.subscribeK
 import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
@@ -10,9 +11,13 @@ import com.topjohnwu.magisk.extensions.res
 import com.topjohnwu.magisk.model.entity.MagiskJson
 import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.UpdateInfo
+import com.topjohnwu.magisk.model.entity.recycler.HomeItem
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.ui.home.MagiskState
+import me.tatarka.bindingcollectionadapter2.BR
+import me.tatarka.bindingcollectionadapter2.ItemBinding
+import me.tatarka.bindingcollectionadapter2.OnItemBind
 
 class HomeViewModel(
     private val repoMagisk: MagiskRepository
@@ -37,6 +42,16 @@ class HomeViewModel(
         }
     }
 
+    val itemsMainline =
+        listOf(HomeItem.PayPal.Mainline, HomeItem.Patreon, HomeItem.Twitter.Mainline)
+    val itemsApp =
+        listOf(HomeItem.PayPal.App, HomeItem.Twitter.App)
+    val itemsProject =
+        listOf(HomeItem.Github, HomeItem.Xda)
+    val itemBinding = itemBindingOf<HomeItem> {
+        it.bindExtra(BR.viewModel, this)
+    }
+
     override fun refresh() = repoMagisk.fetchUpdate()
         .subscribeK { updateBy(it) }
 
@@ -55,6 +70,7 @@ class HomeViewModel(
     }
 
     fun onDeletePressed() {}
+    fun onLinkPressed(link: String) {}
 
 }
 
@@ -67,3 +83,10 @@ val ManagerJson.isUpdateChannelCorrect
     get() = versionCode > 0
 val ManagerJson.isObsolete
     get() = BuildConfig.VERSION_CODE < versionCode
+
+inline fun <T : ComparableRvItem<T>> itemBindingOf(
+    crossinline body: (ItemBinding<*>) -> Unit = {}
+) = OnItemBind<T> { itemBinding, _, item ->
+    item.bind(itemBinding)
+    body(itemBinding)
+}

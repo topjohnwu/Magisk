@@ -22,6 +22,7 @@
 
         <!--///-->
 
+        <item name="selectableItemBackground">@drawable/bg_selectable</item>
         <item name="actionBarSize">60dp</item>
 
         <item name="styleAppbar">@style/WidgetFoundation.Appbar</item>
