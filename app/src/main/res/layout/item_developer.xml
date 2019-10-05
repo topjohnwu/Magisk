@@ -26,6 +26,7 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/developer_link"
             style="?styleImageNormal"
+            app:tint="?colorOnSurface"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
