@@ -17,7 +17,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:padding="@dimen/l1"
+        android:paddingStart="@dimen/l1"
+        android:paddingTop="@dimen/l1"
+        android:paddingEnd="@dimen/l1"
+        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/margin_fab}"
         tools:layout_marginTop="24dp">
 
         <LinearLayout
@@ -255,11 +258,12 @@
 
                         <androidx.recyclerview.widget.RecyclerView
                             itemBinding="@{viewModel.itemBinding}"
+                            items="@{viewModel.itemsMainline}"
+                            nestedScrollingEnabled="@{false}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:clipToPadding="false"
                             android:fadingEdgeLength="@dimen/l1"
-                            items="@{viewModel.itemsMainline}"
-                            android:layout_width="wrap_content"
                             android:orientation="horizontal"
                             android:paddingTop="@dimen/l1"
                             android:requiresFadingEdge="horizontal"
@@ -291,11 +295,11 @@
                     style="?styleCardNormal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintHorizontal_bias="1"
                     android:layout_marginEnd="@dimen/l1"
+                    app:layout_constrainedWidth="true"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/support_icon_dia"
+                    app:layout_constraintHorizontal_bias="1"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -309,17 +313,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="end"
+                            android:text="\@diareuse"
                             android:textAppearance="?appearanceTextCaptionNormal"
                             android:textStyle="bold"
-                            android:text="\@diareuse"
                             tools:ignore="HardcodedText" />
 
                         <androidx.recyclerview.widget.RecyclerView
                             itemBinding="@{viewModel.itemBinding}"
+                            items="@{viewModel.itemsApp}"
+                            nestedScrollingEnabled="@{false}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:clipToPadding="false"
-                            items="@{viewModel.itemsApp}"
-                            android:layout_width="wrap_content"
                             android:fadingEdgeLength="@dimen/l1"
                             android:orientation="horizontal"
                             android:paddingTop="@dimen/l1"
@@ -361,9 +366,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toEndOf="@+id/support_icon_common"
                     app:layout_constraintTop_toTopOf="parent">
 
@@ -377,17 +382,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-black"
+                            android:text="@string/home_links_project"
                             android:textAppearance="?appearanceTextCaptionNormal"
-                            android:textStyle="bold"
-                            android:text="@string/home_links_project" />
+                            android:textStyle="bold" />
 
                         <androidx.recyclerview.widget.RecyclerView
                             itemBinding="@{viewModel.itemBinding}"
+                            items="@{viewModel.itemsProject}"
+                            nestedScrollingEnabled="@{false}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:clipToPadding="false"
                             android:fadingEdgeLength="@dimen/l1"
-                            items="@{viewModel.itemsProject}"
-                            android:layout_width="wrap_content"
                             android:orientation="horizontal"
                             android:paddingTop="@dimen/l1"
                             android:requiresFadingEdge="horizontal"

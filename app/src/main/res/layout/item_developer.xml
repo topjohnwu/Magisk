@@ -46,7 +46,6 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             style="?styleImageSmall"
-            android:layout_marginStart="@dimen/l_50"
             android:layout_height="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/developer_link_name"
             app:layout_constraintStart_toEndOf="@+id/developer_link_name"

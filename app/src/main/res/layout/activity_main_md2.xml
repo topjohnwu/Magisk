@@ -81,6 +81,7 @@
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
             app:fabSize="normal"
             app:layout_anchor="@+id/main_bottom_bar"
             app:srcCompat="@drawable/ic_superuser_md2" />

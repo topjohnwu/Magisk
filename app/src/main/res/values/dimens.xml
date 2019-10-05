@@ -16,4 +16,7 @@
     <dimen name="l2">32dp</dimen>
 
     <dimen name="r1">8dp</dimen>
+
+    <!--l1 + fab size-->
+    <dimen name="margin_fab">80dp</dimen>
 </resources>

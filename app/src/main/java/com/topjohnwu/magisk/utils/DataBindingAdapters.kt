@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextSwitcher
 import android.widget.TextView
 import android.widget.ViewSwitcher
@@ -9,6 +10,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
@@ -265,4 +267,28 @@ fun TextSwitcher.setTextBinding(text: CharSequence) {
     if (currentText != text) {
         setText(text)
     }
+}
+
+@BindingAdapter(
+    "android:layout_marginLeft",
+    "android:layout_marginTop",
+    "android:layout_marginRight",
+    "android:layout_marginBottom",
+    requireAll = false
+)
+fun View.setMargins(
+    marginLeft: Int?,
+    marginTop: Int?,
+    marginRight: Int?,
+    marginBottom: Int?
+) = updateLayoutParams<ViewGroup.MarginLayoutParams> {
+    marginLeft?.let { leftMargin = it }
+    marginTop?.let { topMargin = it }
+    marginRight?.let { rightMargin = it }
+    marginBottom?.let { bottomMargin = it }
+}
+
+@BindingAdapter("nestedScrollingEnabled")
+fun RecyclerView.setNestedScrolling(enabled: Boolean) {
+    isNestedScrollingEnabled = enabled
 }
