@@ -5,18 +5,18 @@
     <font
         android:font="@font/exo_regular"
         android:fontStyle="normal"
-        android:fontWeight="300"
+        android:fontWeight="400"
         app:font="@font/exo_regular"
         app:fontStyle="normal"
-        app:fontWeight="300" />
+        app:fontWeight="400" />
 
     <font
         android:font="@font/exo_regular_italic"
         android:fontStyle="italic"
-        android:fontWeight="300"
+        android:fontWeight="400"
         app:font="@font/exo_regular_italic"
         app:fontStyle="italic"
-        app:fontWeight="300" />
+        app:fontWeight="400" />
 
     <font
         android:font="@font/exo_bold"

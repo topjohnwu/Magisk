@@ -23,6 +23,7 @@
     <style name="AppearanceFoundation.Title" parent="TextAppearance.AppCompat.Title">
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/exo_bold</item>
     </style>
 
     <style name="AppearanceFoundation.Title.Variant">

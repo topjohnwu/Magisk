@@ -378,7 +378,6 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-black"
                             android:text="@string/home_links_project"
                             android:textAppearance="?appearanceTextCaptionNormal"
                             android:textStyle="bold" />
