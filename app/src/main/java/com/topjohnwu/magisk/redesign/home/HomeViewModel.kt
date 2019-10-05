@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.model.entity.MagiskJson
 import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.UpdateInfo
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
+import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.ui.home.MagiskState
@@ -70,7 +71,7 @@ class HomeViewModel(
     }
 
     fun onDeletePressed() {}
-    fun onLinkPressed(link: String) {}
+    fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
 
 }
 
