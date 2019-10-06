@@ -54,6 +54,7 @@ class HomeViewModel(
     }
 
     override fun refresh() = repoMagisk.fetchUpdate()
+        .onErrorReturn { Info.remote }
         .subscribeK { updateBy(it) }
 
     private fun updateBy(info: UpdateInfo) {
@@ -64,7 +65,7 @@ class HomeViewModel(
         }
 
         stateManager.value = when {
-            !info.app.isUpdateChannelCorrect -> MagiskState.NOT_INSTALLED
+            !info.app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
             info.app.isObsolete -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }

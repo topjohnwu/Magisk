@@ -79,7 +79,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/home_magisk_title" />
 
                     <FrameLayout
-                        gone="@{viewModel.stateMagisk == MagiskState.LOADING}"
+                        gone="@{viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
@@ -154,11 +154,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
                         android:gravity="center"
-                        android:text="@string/manager"
+                        android:text="@{viewModel.stateHideManagerName}"
                         android:textAppearance="?appearanceTextTitleNormal"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/home_manager_icon" />
+                        app:layout_constraintTop_toBottomOf="@+id/home_manager_icon"
+                        tools:text="@string/manager" />
 
                     <TextSwitcher
                         android:id="@+id/home_manager_status"
@@ -170,7 +171,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/home_manager_title" />
 
                     <FrameLayout
-                        gone="@{viewModel.stateManager == MagiskState.LOADING}"
+                        gone="@{viewModel.stateManager == MagiskState.LOADING || !viewModel.isConnected}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"

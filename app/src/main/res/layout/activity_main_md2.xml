@@ -61,18 +61,38 @@
             app:hideOnScroll="true"
             tools:paddingBottom="48dp">
 
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/main_navigation"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                app:elevation="0dp"
-                app:itemIconTint="@color/color_menu_tint"
-                app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
-                app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
-                app:itemTextColor="@color/color_menu_tint"
-                app:labelVisibilityMode="unlabeled"
-                app:menu="@menu/menu_bottom_nav" />
+                android:animateLayoutChanges="true"
+                android:orientation="vertical">
+
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/main_navigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    app:elevation="0dp"
+                    app:itemIconTint="@color/color_menu_tint"
+                    app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
+                    app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
+                    app:itemTextColor="@color/color_menu_tint"
+                    app:labelVisibilityMode="unlabeled"
+                    app:menu="@menu/menu_bottom_nav" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    gone="@{viewModel.isConnected}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="@dimen/l_50"
+                    android:text="@string/no_connection"
+                    android:textAppearance="?appearanceTextCaptionNormal"
+                    android:textColor="?colorError"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
 
         </com.google.android.material.bottomappbar.BottomAppBar>
 

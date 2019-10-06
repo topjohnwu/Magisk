@@ -4,6 +4,8 @@
     <string name="manager">Manager</string>
     <string name="magisk">Magisk</string>
 
+    <string name="no_connection">No connection available</string>
+
     <string name="section_home">Home</string>
     <string name="section_modules">@string/modules</string>
     <string name="section_superuser">@string/superuser</string>
