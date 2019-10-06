@@ -126,7 +126,7 @@ Huawei devices using Kirin processors have a different partitioning method from 
 Huawei does not release official factory images, however most firmware zips can be downloaded from the [Huawei Firmware Database](http://pro-teammt.ru/firmware-database/). To extract images from `UPDATE.APP` in the zip, you have to use [Huawei Update Extractor](https://forum.xda-developers.com/showthread.php?t=2433454) (Windows only!)
 
 ### EMUI 8
-For EMUI 8 devices, your device have a partition named `ramdisk`, which is where Magisk is going to be installed.
+For EMUI 8 devices, your device has a partition named `ramdisk`, which is where Magisk is going to be installed.
 
 - If you plan to use custom recoveries, simply follow the instructions for custom recovery and you're all set.
 - If you plan not to use custom recoveries, you will have to extract `RAMDISK.img` from your firmware. Follow the instructions for boot image patching above, but use the `RAMDISK.img` file instead of a boot image.
