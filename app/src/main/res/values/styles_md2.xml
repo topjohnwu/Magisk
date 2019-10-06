@@ -33,12 +33,16 @@
         <item name="styleCardOnPrimary">@style/WidgetFoundation.Card.OnPrimary</item>
 
         <item name="styleButtonDefault">@style/WidgetFoundation.Button</item>
+        <item name="styleButtonDefaultOnPrimary">@style/WidgetFoundation.Button.OnPrimary</item>
         <item name="styleButtonFlat">@style/WidgetFoundation.Button.Flat</item>
+        <item name="styleButtonFlatOnPrimary">@style/WidgetFoundation.Button.Flat.OnPrimary</item>
         <item name="styleButtonText">@style/WidgetFoundation.Button.Text</item>
+        <item name="styleButtonTextOnPrimary">@style/WidgetFoundation.Button.Text.OnPrimary</item>
         <item name="styleButtonError">@style/WidgetFoundation.Button.Error</item>
 
         <item name="styleIconNormal">@style/WidgetFoundation.Icon</item>
         <item name="styleIconPrimary">@style/WidgetFoundation.Icon.Primary</item>
+        <item name="styleIconOnPrimary">@style/WidgetFoundation.Icon.OnPrimary</item>
         <item name="styleIconError">@style/WidgetFoundation.Icon.Error</item>
 
         <item name="styleImageBig">@style/WidgetFoundation.Image.Big</item>
@@ -97,6 +101,7 @@
         <item name="colorTextTransient">@color/color_text_transient</item>
         <item name="colorPrimaryTransient">@color/color_primary_transient</item>
         <item name="colorErrorTransient">@color/color_error_transient</item>
+        <item name="colorOnPrimaryTransient">@color/color_on_primary_transient</item>
     </style>
 
 </resources>

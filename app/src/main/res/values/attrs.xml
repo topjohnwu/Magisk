@@ -21,13 +21,17 @@
 
     <!--Button-->
     <attr name="styleButtonDefault" format="reference" />
+    <attr name="styleButtonDefaultOnPrimary" format="reference" />
     <attr name="styleButtonFlat" format="reference" />
+    <attr name="styleButtonFlatOnPrimary" format="reference" />
     <attr name="styleButtonText" format="reference" />
+    <attr name="styleButtonTextOnPrimary" format="reference" />
     <attr name="styleButtonError" format="reference" />
 
     <!--Icon-->
     <attr name="styleIconNormal" format="reference" />
     <attr name="styleIconPrimary" format="reference" />
+    <attr name="styleIconOnPrimary" format="reference" />
     <attr name="styleIconError" format="reference" />
 
     <!--Image-->
@@ -70,6 +74,7 @@
     <!--Transient-->
     <attr name="colorTextTransient" format="reference" />
     <attr name="colorPrimaryTransient" format="reference" />
+    <attr name="colorOnPrimaryTransient" format="reference" />
     <attr name="colorErrorTransient" format="reference" />
 
     <!--Static-->

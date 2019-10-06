@@ -20,6 +20,7 @@
         <item name="colorTextTransient">@color/color_text_transient</item>
         <item name="colorPrimaryTransient">@color/color_primary_transient</item>
         <item name="colorErrorTransient">@color/color_error_transient</item>
+        <item name="colorOnPrimaryTransient">@color/color_on_primary_transient</item>
     </style>
 
 </resources>

@@ -42,12 +42,32 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="WidgetFoundation.Button.OnPrimary">
+        <item name="backgroundTint">?colorOnPrimary</item>
+        <item name="rippleColor">?colorPrimary</item>
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="iconTint">?colorPrimary</item>
+    </style>
+
     <style name="WidgetFoundation.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="WidgetFoundation.Button.Flat.OnPrimary">
+        <item name="backgroundTint">?colorOnPrimary</item>
+        <item name="rippleColor">?colorPrimary</item>
+        <item name="android:textColor">?colorPrimary</item>
+        <item name="iconTint">?colorPrimary</item>
+    </style>
+
     <style name="WidgetFoundation.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="WidgetFoundation.Button.Text.OnPrimary">
+        <item name="rippleColor">?colorOnPrimary</item>
+        <item name="android:textColor">?colorOnPrimary</item>
+        <item name="iconTint">?colorOnPrimary</item>
     </style>
 
     <style name="WidgetFoundation.Button.Error" parent="WidgetFoundation.Button.Text">
@@ -81,6 +101,10 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.Icon.Primary">
         <item name="tint">?colorPrimaryTransient</item>
+    </style>
+
+    <style name="WidgetFoundation.Icon.OnPrimary">
+        <item name="tint">?colorOnPrimaryTransient</item>
     </style>
 
     <style name="WidgetFoundation.Icon.Error">
