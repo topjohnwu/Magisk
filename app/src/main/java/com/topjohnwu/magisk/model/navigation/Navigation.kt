@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.model.navigation
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
@@ -74,12 +75,23 @@ object Navigation {
             Config.redesign -> RedesignActivity::class.java
             else -> MainActivity::class.java
         }
-        val intent = Intent(context, ClassMap[destination])
-        intent.putExtra(Const.Key.OPEN_SECTION, launchIntent.getStringExtra(Const.Key.OPEN_SECTION))
-        context.startActivity(intent)
+        Intent(context, ClassMap[destination])
+            .putExtra(Const.Key.OPEN_SECTION, launchIntent.getStringExtra(Const.Key.OPEN_SECTION))
+            .putExtra(
+                Const.Key.OPEN_SETTINGS,
+                launchIntent.action == ACTION_APPLICATION_PREFERENCES
+            )
+            .also { context.startActivity(it) }
     }
 
     object Main {
         const val OPEN_NAV = 1
     }
+
+    private val ACTION_APPLICATION_PREFERENCES
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Intent.ACTION_APPLICATION_PREFERENCES
+        } else {
+            "cannot be null, cannot be empty"
+        }
 }

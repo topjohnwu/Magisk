@@ -31,4 +31,6 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
         delegate.onEventExecute(event, this)
     }
 
+    protected fun ViewEvent.dispatchOnSelf() = onEventDispatched(this)
+
 }

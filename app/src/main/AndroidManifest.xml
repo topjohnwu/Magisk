@@ -36,6 +36,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity-alias
+            android:name="a.s"
+            android:targetActivity="a.c">
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"

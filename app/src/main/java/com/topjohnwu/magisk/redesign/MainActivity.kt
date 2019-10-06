@@ -4,6 +4,7 @@ import android.graphics.Insets
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.ncapdevi.fragnav.FragNavController
+import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.model.navigation.Navigation
@@ -44,8 +45,12 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
                 R.id.logFragment -> Navigation.log()
                 R.id.settingsFragment -> Navigation.settings()
                 else -> throw NotImplementedError("Id ${it.itemId} is not defined as selectable")
-            }.also { onEventDispatched(it) }
+            }.dispatchOnSelf()
             true
+        }
+
+        if (intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false)) {
+            binding.mainNavigation.selectedItemId = R.id.settingsFragment
         }
     }
 
