@@ -7,6 +7,8 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.extensions.packageName
+import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
 import com.topjohnwu.magisk.extensions.res
 import com.topjohnwu.magisk.model.entity.MagiskJson
 import com.topjohnwu.magisk.model.entity.ManagerJson
@@ -40,6 +42,15 @@ class HomeViewModel(
             MagiskState.UP_TO_DATE -> R.string.up_to_date_md2.res()
             MagiskState.LOADING -> R.string.loading_md2.res()
             MagiskState.OBSOLETE -> R.string.obsolete_md2.res()
+        }
+    }
+
+    val stateHideManagerName = R.string.manager.res().let {
+        val result = R.string.manager.res()
+        if (packageName != BuildConfig.APPLICATION_ID) {
+            result.replaceRandomWithSpecial(3)
+        } else {
+            result
         }
     }
 
