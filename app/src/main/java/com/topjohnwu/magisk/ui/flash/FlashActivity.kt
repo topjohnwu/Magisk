@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.databinding.ActivityFlashBinding
 import com.topjohnwu.magisk.extensions.snackbar
 import com.topjohnwu.magisk.model.events.BackPressEvent
+import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -46,6 +47,13 @@ open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() 
         when (event) {
             is SnackbarEvent -> snackbar(snackbarView, event.message(this), event.length, event.f)
             is BackPressEvent -> onBackPressed()
+            is PermissionEvent -> withPermissions(*event.permissions.toTypedArray()) {
+                onSuccess { event.callback.onNext(true) }
+                onFailure {
+                    event.callback.onNext(false)
+                    event.callback.onError(SecurityException("User refused permissions"))
+                }
+            }
         }
     }
 
