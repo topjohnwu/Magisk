@@ -266,6 +266,7 @@ static int dtb_patch(const qcdt_hdr *hdr, const char *in, const char *out) {
 		val.second.len = do_align(size, page_size);
 		free(fdt);
 	}
+	write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), page_size));
 
 	// Patch tables
 	auto tables_rw = reinterpret_cast<Table *>(addr + sizeof(qcdt_hdr));
