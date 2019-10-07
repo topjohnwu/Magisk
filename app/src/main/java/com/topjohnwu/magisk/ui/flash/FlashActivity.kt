@@ -11,6 +11,8 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.databinding.ActivityFlashBinding
+import com.topjohnwu.magisk.model.events.BackPressEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
@@ -35,6 +37,13 @@ open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() 
     override fun onBackPressed() {
         if (viewModel.loading) return
         super.onBackPressed()
+    }
+
+    override fun onEventDispatched(event: ViewEvent) {
+        super.onEventDispatched(event)
+        when (event) {
+            is BackPressEvent -> onBackPressed()
+        }
     }
 
     companion object {
