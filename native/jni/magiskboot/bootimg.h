@@ -4,6 +4,47 @@
 #include <utility>
 #include "format.h"
 
+/****************
+ * Other Headers
+ ****************/
+
+struct mtk_hdr {
+	uint32_t magic;         /* MTK magic */
+	uint32_t size;          /* Size of the content */
+	char name[32];          /* The type of the header */
+
+	char padding[472];      /* Padding to 512 bytes */
+} __attribute__((packed));
+
+struct dhtb_hdr {
+	char magic[8];          /* DHTB magic */
+	uint8_t checksum[40];   /* Payload SHA256, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
+	uint32_t size;          /* Payload size, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
+
+	char padding[460];      /* Padding to 512 bytes */
+} __attribute__((packed));
+
+struct blob_hdr {
+	char secure_magic[20];  /* "-SIGNED-BY-SIGNBLOB-" */
+	uint32_t datalen;       /* 0x00000000 */
+	uint32_t signature;     /* 0x00000000 */
+	char magic[16];         /* "MSM-RADIO-UPDATE" */
+	uint32_t hdr_version;   /* 0x00010000 */
+	uint32_t hdr_size;      /* Size of header */
+	uint32_t part_offset;   /* Same as size */
+	uint32_t num_parts;     /* Number of partitions */
+	uint32_t unknown[7];    /* All 0x00000000 */
+	char name[4];           /* Name of partition */
+	uint32_t offset;        /* offset in blob where this partition starts */
+	uint32_t size;          /* Size of data */
+	uint32_t version;       /* 0x00000001 */
+} __attribute__((packed));
+
+
+/*********************
+ * Boot Image Headers
+ *********************/
+
 struct boot_img_hdr_base {
 	char magic[8];
 
@@ -57,12 +98,12 @@ struct boot_img_hdr_v2 : public boot_img_hdr_v1 {
 } __attribute__((packed));
 
 // Default to hdr v2
-typedef boot_img_hdr_v2 boot_img_hdr;
+using boot_img_hdr = boot_img_hdr_v2;
 
 // Special Samsung header
 struct boot_img_hdr_pxa : public boot_img_hdr_base {
 	uint32_t extra_size;   /* extra blob size in bytes */
-	uint32_t unknown;      /* unknown value */
+	uint32_t unknown;
 	uint32_t tags_addr;    /* physical addr for kernel tags */
 	uint32_t page_size;    /* flash page size we assume */
 
@@ -110,34 +151,6 @@ struct boot_img_hdr_pxa : public boot_img_hdr_base {
 ** 6. if second_size != 0: jump to second_addr
 **    else: jump to kernel_addr
 */
-
-struct mtk_hdr {
-	uint32_t magic;         /* MTK magic */
-	uint32_t size;          /* Size of the content */
-	char name[32];          /* The type of the header */
-} __attribute__((packed));
-
-struct dhtb_hdr {
-	char magic[8];          /* DHTB magic */
-	uint8_t checksum[40];   /* Payload SHA256, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
-	uint32_t size;          /* Payload size, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
-} __attribute__((packed));
-
-struct blob_hdr {
-	char secure_magic[20];  /* "-SIGNED-BY-SIGNBLOB-" */
-	uint32_t datalen;       /* 0x00000000 */
-	uint32_t signature;     /* 0x00000000 */
-	char magic[16];         /* "MSM-RADIO-UPDATE" */
-	uint32_t hdr_version;   /* 0x00010000 */
-	uint32_t hdr_size;      /* Size of header */
-	uint32_t part_offset;   /* Same as size */
-	uint32_t num_parts;     /* Number of partitions */
-	uint32_t unknown[7];    /* All 0x00000000 */
-	char name[4];           /* Name of partition */
-	uint32_t offset;        /* offset in blob where this partition starts */
-	uint32_t size;          /* Size of data */
-	uint32_t version;       /* 0x00000001 */
-} __attribute__((packed));
 
 #define drct_var(name) \
 auto &name() { return img_hdr->name; }
@@ -269,16 +282,16 @@ struct dyn_img_v2 : public dyn_img_v1 {
 #undef impl_val
 
 // Flags
-#define MTK_KERNEL      1 << 1
-#define MTK_RAMDISK     1 << 2
-#define CHROMEOS_FLAG   1 << 3
-#define DHTB_FLAG       1 << 4
-#define SEANDROID_FLAG  1 << 5
-#define LG_BUMP_FLAG    1 << 6
-#define SHA256_FLAG     1 << 7
-#define BLOB_FLAG       1 << 8
-#define NOOKHD_FLAG     1 << 9
-#define ACCLAIM_FLAG    1 << 10
+#define MTK_KERNEL      (1 << 0)
+#define MTK_RAMDISK     (1 << 1)
+#define CHROMEOS_FLAG   (1 << 2)
+#define DHTB_FLAG       (1 << 3)
+#define SEANDROID_FLAG  (1 << 4)
+#define LG_BUMP_FLAG    (1 << 5)
+#define SHA256_FLAG     (1 << 6)
+#define BLOB_FLAG       (1 << 7)
+#define NOOKHD_FLAG     (1 << 8)
+#define ACCLAIM_FLAG    (1 << 9)
 
 struct boot_img {
 	// Memory map of the whole image
@@ -287,9 +300,6 @@ struct boot_img {
 
 	// Headers
 	dyn_img_hdr *hdr;   /* Android image header */
-	mtk_hdr *k_hdr;     /* MTK kernel header */
-	mtk_hdr *r_hdr;     /* MTK ramdisk header */
-	blob_hdr *b_hdr;    /* Tegra blob header */
 
 	// Flags to indicate the state of current boot image
 	uint16_t flags;
@@ -297,6 +307,13 @@ struct boot_img {
 	// The format of kernel and ramdisk
 	format_t k_fmt;
 	format_t r_fmt;
+
+	/***************************************************
+	 * Following pointers points within the mmap region
+	 ***************************************************/
+
+	mtk_hdr *k_hdr;     /* MTK kernel header */
+	mtk_hdr *r_hdr;     /* MTK ramdisk header */
 
 	// Pointer to dtb that is appended after kernel
 	uint8_t *kernel_dtb;
@@ -307,17 +324,18 @@ struct boot_img {
 	size_t tail_size;
 
 	// Pointers to blocks defined in header
+	uint8_t *img_start;
 	uint8_t *kernel;
 	uint8_t *ramdisk;
 	uint8_t *second;
 	uint8_t *extra;
-	uint8_t *recov_dtbo;
+	uint8_t *recovery_dtbo;
 	uint8_t *dtb;
 
 	~boot_img();
 
-	int parse_file(const char *);
-	int parse_image(uint8_t *);
-	void find_dtb();
+	void parse_file(const char *);
+	void parse_image(uint8_t *addr);
+	void find_kernel_dtb();
 	void print_hdr();
 };
