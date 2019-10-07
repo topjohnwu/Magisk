@@ -261,8 +261,9 @@ static int dtb_patch(const qcdt_hdr *hdr, const char *in, const char *out) {
 		val.second.offset = lseek(fd, 0, SEEK_CUR);
 		auto fdt = val.second.fdt;
 		fdt_pack(fdt);
-		val.second.len = fdt_totalsize(fdt);
-		xwrite(fd, fdt, val.second.len);
+		int size = fdt_totalsize(fdt);
+		xwrite(fd, fdt, size);
+		val.second.len = do_align(size, page_size);
 		free(fdt);
 	}
 
