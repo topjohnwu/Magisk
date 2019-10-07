@@ -11,7 +11,9 @@ import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.databinding.ActivityFlashBinding
+import com.topjohnwu.magisk.extensions.snackbar
 import com.topjohnwu.magisk.model.events.BackPressEvent
+import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -42,6 +44,7 @@ open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() 
     override fun onEventDispatched(event: ViewEvent) {
         super.onEventDispatched(event)
         when (event) {
+            is SnackbarEvent -> snackbar(snackbarView, event.message(this), event.length, event.f)
             is BackPressEvent -> onBackPressed()
         }
     }
