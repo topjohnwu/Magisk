@@ -44,6 +44,10 @@ class HomeViewModel(
             MagiskState.OBSOLETE -> R.string.obsolete_md2.res()
         }
     }
+    val stateVersionMagisk = Info.magiskVersionString
+    val stateVersionManager = BuildConfig.VERSION_NAME
+    val stateVersionUpdateMagisk = KObservableField("")
+    val stateVersionUpdateManager = KObservableField("")
 
     val stateHideManagerName = R.string.manager.res().let {
         val result = R.string.manager.res()
@@ -80,6 +84,22 @@ class HomeViewModel(
             info.app.isObsolete -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
+
+        stateVersionUpdateMagisk.value = when {
+            info.magisk.isObsolete -> "%s > %s".format(
+                Info.magiskVersionString.clipVersion(),
+                info.magisk.version.clipVersion()
+            )
+            else -> ""
+        }
+
+        stateVersionUpdateManager.value = when {
+            info.app.isObsolete -> "%s > %s".format(
+                BuildConfig.VERSION_NAME.clipVersion(),
+                info.app.version.clipVersion()
+            )
+            else -> ""
+        }
     }
 
     fun onDeletePressed() {}
@@ -96,6 +116,8 @@ val ManagerJson.isUpdateChannelCorrect
     get() = versionCode > 0
 val ManagerJson.isObsolete
     get() = BuildConfig.VERSION_CODE < versionCode
+
+fun String.clipVersion() = substringAfter('-')
 
 inline fun <T : ComparableRvItem<T>> itemBindingOf(
     crossinline body: (ItemBinding<*>) -> Unit = {}

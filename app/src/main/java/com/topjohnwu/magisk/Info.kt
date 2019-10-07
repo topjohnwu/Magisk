@@ -6,8 +6,10 @@ import com.topjohnwu.superuser.ShellUtils
 
 object Info {
 
+    @JvmStatic
     var magiskVersionCode = -1
 
+    @JvmStatic
     var magiskVersionString = ""
 
     var remote = UpdateInfo()

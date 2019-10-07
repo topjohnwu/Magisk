@@ -5,6 +5,10 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.Info" />
+
+        <import type="com.topjohnwu.magisk.BuildConfig" />
+
         <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
 
         <variable
@@ -20,7 +24,7 @@
         android:paddingStart="@dimen/l1"
         android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
         android:paddingEnd="@dimen/l1"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/margin_fab}"
+        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/margin_fab + (int) @dimen/l1}"
         tools:layout_marginTop="24dp">
 
         <LinearLayout
@@ -78,6 +82,15 @@
                         app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
                         app:layout_constraintTop_toBottomOf="@+id/home_magisk_title" />
 
+                    <TextSwitcher
+                        android:id="@+id/home_magisk_version"
+                        textCaptionVariant="@{viewModel.stateVersionUpdateMagisk}"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
+                        app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
+                        app:layout_constraintTop_toBottomOf="@+id/home_magisk_status" />
+
                     <FrameLayout
                         gone="@{viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
                         android:layout_width="0dp"
@@ -86,7 +99,7 @@
                         android:animateLayoutChanges="true"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/home_magisk_status">
+                        app:layout_constraintTop_toBottomOf="@+id/home_magisk_version">
 
                         <com.google.android.material.button.MaterialButton
                             style="?styleButtonDefault"
@@ -170,12 +183,21 @@
                         app:layout_constraintStart_toStartOf="@+id/home_manager_title"
                         app:layout_constraintTop_toBottomOf="@+id/home_manager_title" />
 
+                    <TextSwitcher
+                        android:id="@+id/home_manager_version"
+                        textCaptionVariant="@{viewModel.stateVersionUpdateManager}"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
+                        app:layout_constraintStart_toStartOf="@+id/home_manager_title"
+                        app:layout_constraintTop_toBottomOf="@+id/home_manager_status" />
+
                     <FrameLayout
                         gone="@{viewModel.stateManager == MagiskState.LOADING || !viewModel.isConnected}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
-                        app:layout_constraintTop_toBottomOf="@+id/home_manager_status">
+                        app:layout_constraintTop_toBottomOf="@+id/home_manager_version">
 
                         <com.google.android.material.button.MaterialButton
                             style="?styleButtonDefault"
@@ -338,16 +360,10 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginBottom="@dimen/l1"
-                android:background="?colorSurfaceVariant" />
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/l1">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/support_icon_common"
@@ -402,6 +418,23 @@
                 </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/l2"
+                android:gravity="center"
+                android:text="@{String.format(`%s (%s)`, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)}"
+                android:textAppearance="?appearanceTextCaptionVariant"
+                tools:text="7.3.4 (12345)" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@{String.format(`%s (%s)`, Info.magiskVersionString, Info.magiskVersionCode)}"
+                android:textAppearance="?appearanceTextCaptionVariant"
+                tools:text="19.5 (12345)" />
 
         </LinearLayout>
 
