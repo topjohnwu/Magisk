@@ -42,6 +42,7 @@ typedef enum {
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
 #define DHTB_MAGIC      "\x44\x48\x54\x42\x01\x00\x00\x00"
 #define QCDT_MAGIC      "QCDT"
+#define DTBH_MAGIC      "DTBH"
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"
 #define TEGRABLOB_MAGIC "-SIGNED-BY-SIGNBLOB-"
 #define NOOKHD_RL_MAGIC "Red Loader"

@@ -41,6 +41,19 @@ struct qctable_v3 {
 	uint32_t len;           /* DTB size */
 } __attribute__((packed));
 
+struct dtbh_hdr {
+	char magic[4];          /* "DTBH" */
+	uint32_t version;       /* DTBH version */
+	uint32_t num_dtbs;      /* Number of DTBs */
+} __attribute__((packed));
+
+struct bhtable_v2 {
+	uint32_t cpu_info[5];   /* Some CPU info */
+	uint32_t offset;        /* DTB offset in DTBH */
+	uint32_t len;           /* DTB size */
+	uint32_t space;         /* 0x00000020 */
+};
+
 struct dtb_blob {
 	void *fdt;
 	uint32_t offset;
@@ -215,8 +228,8 @@ static bool fdt_patch(Iter first, Iter last) {
 	return modified;
 }
 
-template <class Table>
-static int dtb_patch(const qcdt_hdr *hdr, const char *in, const char *out) {
+template <class Table, class Header>
+static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 	map<uint32_t, dtb_blob> dtb_map;
 	auto buf = reinterpret_cast<const uint8_t *>(hdr);
 	auto tables = reinterpret_cast<const Table *>(hdr + 1);
@@ -295,11 +308,23 @@ static int dtb_patch(const char *in, const char *out) {
 		auto hdr = reinterpret_cast<qcdt_hdr*>(dtb);
 		switch (hdr->version) {
 			case 1:
+				fprintf(stderr, "QCDT v1\n");
 				return dtb_patch<qctable_v1>(hdr, in, out);
 			case 2:
+				fprintf(stderr, "QCDT v2\n");
 				return dtb_patch<qctable_v2>(hdr, in, out);
 			case 3:
+				fprintf(stderr, "QCDT v3\n");
 				return dtb_patch<qctable_v3>(hdr, in, out);
+			default:
+				return 1;
+		}
+	} else if (memcmp(dtb, DTBH_MAGIC, 4) == 0) {
+		auto hdr = reinterpret_cast<dtbh_hdr *>(dtb);
+		switch (hdr->version) {
+			case 2:
+				fprintf(stderr, "DTBH v2\n");
+				return dtb_patch<bhtable_v2>(hdr, in, out);
 			default:
 				return 1;
 		}
