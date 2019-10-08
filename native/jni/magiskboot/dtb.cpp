@@ -223,11 +223,12 @@ static int dtb_patch(const qcdt_hdr *hdr, const char *in, const char *out) {
 
 	// Collect all dtbs
 	for (int i = 0; i < hdr->num_dtbs; ++i) {
-		auto it = dtb_map.find(tables[i].offset);
-		if (it == dtb_map.end()) {
-			auto fdt = xmalloc(tables[i].len + 256);
-			memcpy(fdt, buf + tables[i].offset, tables[i].len);
-			fdt_open_into(fdt, fdt, tables[i].len + 256);
+		if (dtb_map.find(tables[i].offset) == dtb_map.end()) {
+			auto blob = buf + tables[i].offset;
+			int size = fdt_totalsize(blob);
+			auto fdt = xmalloc(size + 256);
+			memcpy(fdt, blob, size);
+			fdt_open_into(fdt, fdt, size + 256);
 			dtb_map[tables[i].offset] = { fdt, tables[i].offset };
 		}
 	}
@@ -257,16 +258,15 @@ static int dtb_patch(const qcdt_hdr *hdr, const char *in, const char *out) {
 
 	// Write dtbs
 	for (auto &val : dtb_map) {
-		write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), page_size));
 		val.second.offset = lseek(fd, 0, SEEK_CUR);
 		auto fdt = val.second.fdt;
 		fdt_pack(fdt);
 		int size = fdt_totalsize(fdt);
 		xwrite(fd, fdt, size);
 		val.second.len = do_align(size, page_size);
+		write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), page_size));
 		free(fdt);
 	}
-	write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), page_size));
 
 	// Patch tables
 	auto tables_rw = reinterpret_cast<Table *>(addr + sizeof(qcdt_hdr));
