@@ -52,7 +52,7 @@ struct bhtable_v2 {
 	uint32_t offset;        /* DTB offset in DTBH */
 	uint32_t len;           /* DTB size */
 	uint32_t space;         /* 0x00000020 */
-};
+} __attribute__((packed));
 
 struct dtb_blob {
 	void *fdt;
