@@ -436,6 +436,15 @@
                 android:textAppearance="?appearanceTextCaptionVariant"
                 tools:text="19.5 (12345)" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                gone="@{viewModel.statePackageOriginal}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@{viewModel.statePackageManager}"
+                android:textAppearance="?appearanceTextCaptionVariant"
+                tools:text="com.soqspa.xmclaeixl" />
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

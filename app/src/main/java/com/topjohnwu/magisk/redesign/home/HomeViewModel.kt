@@ -44,14 +44,14 @@ class HomeViewModel(
             MagiskState.OBSOLETE -> R.string.obsolete_md2.res()
         }
     }
-    val stateVersionMagisk = Info.magiskVersionString
-    val stateVersionManager = BuildConfig.VERSION_NAME
+    val statePackageManager = packageName
+    val statePackageOriginal = statePackageManager == BuildConfig.APPLICATION_ID
     val stateVersionUpdateMagisk = KObservableField("")
     val stateVersionUpdateManager = KObservableField("")
 
     val stateHideManagerName = R.string.manager.res().let {
         val result = R.string.manager.res()
-        if (packageName != BuildConfig.APPLICATION_ID) {
+        if (!statePackageOriginal) {
             result.replaceRandomWithSpecial(3)
         } else {
             result
