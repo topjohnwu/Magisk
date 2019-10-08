@@ -111,7 +111,7 @@ class HomeViewModel(
 val MagiskJson.isInstalled
     get() = Info.magiskVersionCode > 0
 val MagiskJson.isObsolete
-    get() = Info.magiskVersionCode < versionCode
+    get() = Info.magiskVersionCode < versionCode && isInstalled
 val ManagerJson.isUpdateChannelCorrect
     get() = versionCode > 0
 val ManagerJson.isObsolete
