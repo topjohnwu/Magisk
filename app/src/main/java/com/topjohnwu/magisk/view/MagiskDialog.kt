@@ -58,10 +58,13 @@ class MagiskDialog @JvmOverloads constructor(
         val isEnabled = KObservableField(true)
 
         var onClickAction: OnDialogButtonClickListener = {}
+        var preventDismiss = false
 
         fun clicked() {
             onClickAction(this@MagiskDialog)
-            dismiss()
+            if (!preventDismiss) {
+                dismiss()
+            }
         }
     }
 
@@ -85,6 +88,11 @@ class MagiskDialog @JvmOverloads constructor(
             get() = button.isEnabled.value
             set(value) {
                 button.isEnabled.value = value
+            }
+        var preventDismiss: Boolean
+            get() = button.preventDismiss
+            set(value) {
+                button.preventDismiss = value
             }
 
         fun onClick(listener: OnDialogButtonClickListener) {

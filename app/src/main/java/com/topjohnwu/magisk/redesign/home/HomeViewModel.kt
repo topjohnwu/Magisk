@@ -15,6 +15,8 @@ import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.UpdateInfo
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
+import com.topjohnwu.magisk.model.events.dialog.MagiskInstallDialog
+import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.ui.home.MagiskState
@@ -50,11 +52,10 @@ class HomeViewModel(
     val stateVersionUpdateManager = KObservableField("")
 
     val stateHideManagerName = R.string.manager.res().let {
-        val result = R.string.manager.res()
         if (!statePackageOriginal) {
-            result.replaceRandomWithSpecial(3)
+            it.replaceRandomWithSpecial(3)
         } else {
-            result
+            it
         }
     }
 
@@ -102,8 +103,13 @@ class HomeViewModel(
         }
     }
 
-    fun onDeletePressed() {}
     fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
+
+    fun onDeletePressed() {}
+
+    fun onManagerPressed() = ManagerInstallDialog().publish()
+
+    fun onMagiskPressed() = MagiskInstallDialog().publish()
 
 }
 
