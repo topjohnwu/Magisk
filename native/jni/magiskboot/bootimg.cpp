@@ -183,19 +183,20 @@ void boot_img::parse_image(uint8_t *addr) {
 }
 
 void boot_img::find_kernel_dtb() {
-	for (int i = 0; i < hdr->kernel_size() - 4; ++i) {
+	const int eof = static_cast<int>(hdr->kernel_size());
+	for (int i = 0; i < eof - (int) sizeof(fdt_header); ++i) {
 		auto fdt_hdr = reinterpret_cast<fdt_header *>(kernel + i);
 		if (fdt32_to_cpu(fdt_hdr->magic) != FDT_MAGIC)
 			continue;
 
 		// Check that fdt_header.totalsize does not overflow kernel image size
 		uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
-		if (totalsize + i > hdr->kernel_size())
+		if (totalsize + i > eof)
 			continue;
 
 		// Check that fdt_header.off_dt_struct does not overflow kernel image size
 		uint32_t off_dt_struct = fdt32_to_cpu(fdt_hdr->off_dt_struct);
-		if (off_dt_struct + i > hdr->kernel_size())
+		if (off_dt_struct + i > eof)
 			continue;
 
 		// Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
@@ -204,7 +205,7 @@ void boot_img::find_kernel_dtb() {
 			continue;
 
 		kernel_dtb = kernel + i;
-		kernel_dt_size = hdr->kernel_size() - i;
+		kernel_dt_size = eof - i;
 		hdr->kernel_size() = i;
 		fprintf(stderr, "KERNEL_DTB      [%u]\n", kernel_dt_size);
 		break;
