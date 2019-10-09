@@ -44,7 +44,7 @@ static void dump(void *buf, size_t size, const char *filename) {
 	close(fd);
 }
 
-static size_t restore(const char *filename, int fd) {
+static size_t restore(int fd, const char *filename) {
 	int ifd = xopen(filename, O_RDONLY);
 	size_t size = lseek(ifd, 0, SEEK_END);
 	lseek(ifd, 0, SEEK_SET);
@@ -57,12 +57,102 @@ static void restore_buf(int fd, const void *buf, size_t size) {
 	xwrite(fd, buf, size);
 }
 
-boot_img::~boot_img() {
-	munmap(map_addr, map_size);
-	delete hdr;
+void dyn_img_hdr::print() {
+	uint32_t ver = header_version();
+	fprintf(stderr, "HEADER_VER      [%u]\n", ver);
+	fprintf(stderr, "KERNEL_SZ       [%u]\n", kernel_size());
+	fprintf(stderr, "RAMDISK_SZ      [%u]\n", ramdisk_size());
+	fprintf(stderr, "SECOND_SZ       [%u]\n", second_size());
+	if (ver) {
+		fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", recovery_dtbo_size());
+		fprintf(stderr, "DTB             [%u]\n", dtb_size());
+	} else {
+		fprintf(stderr, "EXTRA_SZ        [%u]\n", extra_size());
+	}
+
+	ver = os_version();
+	if (ver) {
+		int a,b,c,y,m = 0;
+		int version, patch_level;
+		version = ver >> 11;
+		patch_level = ver & 0x7ff;
+
+		a = (version >> 14) & 0x7f;
+		b = (version >> 7) & 0x7f;
+		c = version & 0x7f;
+		fprintf(stderr, "OS_VERSION      [%d.%d.%d]\n", a, b, c);
+
+		y = (patch_level >> 4) + 2000;
+		m = patch_level & 0xf;
+		fprintf(stderr, "OS_PATCH_LEVEL  [%d-%02d]\n", y, m);
+	}
+
+	fprintf(stderr, "PAGESIZE        [%u]\n", page_size());
+	fprintf(stderr, "NAME            [%s]\n", name());
+	fprintf(stderr, "CMDLINE         [%.512s%.1024s]\n", cmdline(), extra_cmdline());
+	fprintf(stderr, "CHECKSUM        [");
+	for (int i = 0; id()[i]; ++i)
+		fprintf(stderr, "%02x", id()[i]);
+	fprintf(stderr, "]\n");
 }
 
-void boot_img::parse_file(const char *image) {
+void dyn_img_hdr::dump_hdr_file() {
+	FILE *fp = xfopen(HEADER_FILE, "w");
+	fprintf(fp, "pagesize=%u\n", page_size());
+	fprintf(fp, "name=%s\n", name());
+	fprintf(fp, "cmdline=%.512s%.1024s\n", cmdline(), extra_cmdline());
+	uint32_t ver = os_version();
+	if (ver) {
+		int a, b, c, y, m = 0;
+		int version, patch_level;
+		version = ver >> 11;
+		patch_level = ver & 0x7ff;
+
+		a = (version >> 14) & 0x7f;
+		b = (version >> 7) & 0x7f;
+		c = version & 0x7f;
+		fprintf(fp, "os_version=%d.%d.%d\n", a, b, c);
+
+		y = (patch_level >> 4) + 2000;
+		m = patch_level & 0xf;
+		fprintf(fp, "os_patch_level=%d-%02d\n", y, m);
+	}
+	fclose(fp);
+}
+
+void dyn_img_hdr::load_hdr_file() {
+	parse_prop_file(HEADER_FILE, [=](string_view key, string_view value) -> bool {
+		if (key == "page_size") {
+			page_size() = parse_int(value);
+		} else if (key == "name") {
+			memset(name(), 0, 16);
+			memcpy(name(), value.data(), value.length() > 15 ? 15 : value.length());
+		} else if (key == "cmdline") {
+			memset(cmdline(), 0, 512);
+			memset(extra_cmdline(), 0, 1024);
+			if (value.length() > 512) {
+				memcpy(cmdline(), value.data(), 512);
+				memcpy(extra_cmdline(), &value[512], value.length() - 511);
+			} else {
+				memcpy(cmdline(), value.data(), value.length());
+			}
+		} else if (key == "os_version") {
+			int patch_level = os_version() & 0x7ff;
+			int a, b, c;
+			sscanf(value.data(), "%d.%d.%d", &a, &b, &c);
+			os_version() = (((a << 14) | (b << 7) | c) << 11) | patch_level;
+		} else if (key == "os_patch_level") {
+			int os_ver = os_version() >> 11;
+			int y, m;
+			sscanf(value.data(), "%d-%d", &y, &m);
+			y -= 2000;
+			os_version() = (os_ver << 11) | (y << 4) | m;
+		}
+		return true;
+	});
+}
+
+boot_img::boot_img(const char *image) {
 	mmap_ro(image, map_addr, map_size);
 	fprintf(stderr, "Parsing boot image: [%s]\n", image);
 	for (uint8_t *addr = map_addr; addr < map_addr + map_size; ++addr) {
@@ -90,6 +180,11 @@ void boot_img::parse_file(const char *image) {
 		}
 	}
 	exit(1);
+}
+
+boot_img::~boot_img() {
+	munmap(map_addr, map_size);
+	delete hdr;
 }
 
 #define get_block(name) {\
@@ -128,7 +223,7 @@ void boot_img::parse_image(uint8_t *addr) {
 	img_start = addr;
 	flags |= hdr->id()[SHA_DIGEST_SIZE] ? SHA256_FLAG : 0;
 
-	print_hdr();
+	hdr->print();
 
 	size_t off = hdr->page_size();
 
@@ -212,107 +307,11 @@ void boot_img::find_kernel_dtb() {
 	}
 }
 
-void boot_img::print_hdr() {
-	uint32_t ver = hdr->header_version();
-	fprintf(stderr, "HEADER_VER      [%u]\n", ver);
-	fprintf(stderr, "KERNEL_SZ       [%u]\n", hdr->kernel_size());
-	fprintf(stderr, "RAMDISK_SZ      [%u]\n", hdr->ramdisk_size());
-	fprintf(stderr, "SECOND_SZ       [%u]\n", hdr->second_size());
-	if (ver) {
-		fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", hdr->recovery_dtbo_size());
-		fprintf(stderr, "DTB             [%u]\n", hdr->dtb_size());
-	} else {
-		fprintf(stderr, "EXTRA_SZ        [%u]\n", hdr->extra_size());
-	}
-
-	ver = hdr->os_version();
-	if (ver) {
-		int a,b,c,y,m = 0;
-		int version, patch_level;
-		version = ver >> 11;
-		patch_level = ver & 0x7ff;
-
-		a = (version >> 14) & 0x7f;
-		b = (version >> 7) & 0x7f;
-		c = version & 0x7f;
-		fprintf(stderr, "OS_VERSION      [%d.%d.%d]\n", a, b, c);
-
-		y = (patch_level >> 4) + 2000;
-		m = patch_level & 0xf;
-		fprintf(stderr, "OS_PATCH_LEVEL  [%d-%02d]\n", y, m);
-	}
-
-	fprintf(stderr, "PAGESIZE        [%u]\n", hdr->page_size());
-	fprintf(stderr, "NAME            [%s]\n", hdr->name());
-	fprintf(stderr, "CMDLINE         [%.512s%.1024s]\n", hdr->cmdline(), hdr->extra_cmdline());
-	fprintf(stderr, "CHECKSUM        [");
-	for (int i = 0; hdr->id()[i]; ++i)
-		fprintf(stderr, "%02x", hdr->id()[i]);
-	fprintf(stderr, "]\n");
-}
-
-static void dump_hdr_file(dyn_img_hdr *hdr) {
-	FILE *fp = xfopen(HEADER_FILE, "w");
-	fprintf(fp, "pagesize=%u\n", hdr->page_size());
-	fprintf(fp, "name=%s\n", hdr->name());
-	fprintf(fp, "cmdline=%.512s%.1024s\n", hdr->cmdline(), hdr->extra_cmdline());
-	uint32_t ver = hdr->os_version();
-	if (ver) {
-		int a, b, c, y, m = 0;
-		int version, patch_level;
-		version = ver >> 11;
-		patch_level = ver & 0x7ff;
-
-		a = (version >> 14) & 0x7f;
-		b = (version >> 7) & 0x7f;
-		c = version & 0x7f;
-		fprintf(fp, "os_version=%d.%d.%d\n", a, b, c);
-
-		y = (patch_level >> 4) + 2000;
-		m = patch_level & 0xf;
-		fprintf(fp, "os_patch_level=%d-%02d\n", y, m);
-	}
-	fclose(fp);
-}
-
-static void load_hdr_file(dyn_img_hdr *hdr) {
-	parse_prop_file(HEADER_FILE, [=](string_view key, string_view value) -> bool {
-		if (key == "page_size") {
-			hdr->page_size() = parse_int(value);
-		} else if (key == "name") {
-			memset(hdr->name(), 0, 16);
-			memcpy(hdr->name(), value.data(), value.length() > 15 ? 15 : value.length());
-		} else if (key == "cmdline") {
-			memset(hdr->cmdline(), 0, 512);
-			memset(hdr->extra_cmdline(), 0, 1024);
-			if (value.length() > 512) {
-				memcpy(hdr->cmdline(), value.data(), 512);
-				memcpy(hdr->extra_cmdline(), &value[512], value.length() - 511);
-			} else {
-				memcpy(hdr->cmdline(), value.data(), value.length());
-			}
-		} else if (key == "os_version") {
-			int patch_level = hdr->os_version() & 0x7ff;
-			int a, b, c;
-			sscanf(value.data(), "%d.%d.%d", &a, &b, &c);
-			hdr->os_version() = (((a << 14) | (b << 7) | c) << 11) | patch_level;
-		} else if (key == "os_patch_level") {
-			int os_version = hdr->os_version() >> 11;
-			int y, m;
-			sscanf(value.data(), "%d-%d", &y, &m);
-			y -= 2000;
-			hdr->os_version() = (os_version << 11) | (y << 4) | m;
-		}
-		return true;
-	});
-}
-
 int unpack(const char *image, bool hdr) {
-	boot_img boot{};
-	boot.parse_file(image);
+	boot_img boot(image);
 
 	if (hdr)
-		dump_hdr_file(boot.hdr);
+		boot.hdr->dump_hdr_file();
 
 	// Dump kernel
 	if (COMPRESSED(boot.k_fmt)) {
@@ -353,8 +352,8 @@ int unpack(const char *image, bool hdr) {
 #define file_align() \
 write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - off.header, boot.hdr->page_size()))
 
-void repack(const char* orig_image, const char* out_image, bool nocomp) {
-	boot_img boot{};
+void repack(const char* src_img, const char* out_img, bool nocomp) {
+	boot_img boot(src_img);
 
 	struct {
 		uint32_t header;
@@ -365,10 +364,7 @@ void repack(const char* orig_image, const char* out_image, bool nocomp) {
 		uint32_t dtb;
 	} off;
 
-	// Parse original image
-	boot.parse_file(orig_image);
-
-	fprintf(stderr, "Repack to boot image: [%s]\n", out_image);
+	fprintf(stderr, "Repack to boot image: [%s]\n", out_img);
 
 	// Reset sizes
 	boot.hdr->kernel_size() = 0;
@@ -378,14 +374,14 @@ void repack(const char* orig_image, const char* out_image, bool nocomp) {
 	boot.kernel_dt_size = 0;
 
 	if (access(HEADER_FILE, R_OK) == 0)
-		load_hdr_file(boot.hdr);
+		boot.hdr->load_hdr_file();
 
 	/*****************
 	 * Writing blocks
 	 *****************/
 
 	// Create new image
-	int fd = creat(out_image, 0644);
+	int fd = creat(out_img, 0644);
 
 	if (boot.flags & DHTB_FLAG) {
 		// Skip DHTB header
@@ -422,7 +418,7 @@ void repack(const char* orig_image, const char* out_image, bool nocomp) {
 
 	// kernel dtb
 	if (access(KER_DTB_FILE, R_OK) == 0)
-		boot.hdr->kernel_size() += restore(KER_DTB_FILE, fd);
+		boot.hdr->kernel_size() += restore(fd, KER_DTB_FILE);
 	file_align();
 
 	// ramdisk
@@ -447,28 +443,28 @@ void repack(const char* orig_image, const char* out_image, bool nocomp) {
 	// second
 	off.second = lseek(fd, 0, SEEK_CUR);
 	if (access(SECOND_FILE, R_OK) == 0) {
-		boot.hdr->second_size() = restore(SECOND_FILE, fd);
+		boot.hdr->second_size() = restore(fd, SECOND_FILE);
 		file_align();
 	}
 
 	// extra
 	off.extra = lseek(fd, 0, SEEK_CUR);
 	if (access(EXTRA_FILE, R_OK) == 0) {
-		boot.hdr->extra_size() = restore(EXTRA_FILE, fd);
+		boot.hdr->extra_size() = restore(fd, EXTRA_FILE);
 		file_align();
 	}
 
 	// recovery_dtbo
 	if (access(RECV_DTBO_FILE, R_OK) == 0) {
 		boot.hdr->recovery_dtbo_offset() = lseek(fd, 0, SEEK_CUR);
-		boot.hdr->recovery_dtbo_size() = restore(RECV_DTBO_FILE, fd);
+		boot.hdr->recovery_dtbo_size() = restore(fd, RECV_DTBO_FILE);
 		file_align();
 	}
 
 	// dtb
 	off.dtb = lseek(fd, 0, SEEK_CUR);
 	if (access(DTB_FILE, R_OK) == 0) {
-		boot.hdr->dtb_size() = restore(DTB_FILE, fd);
+		boot.hdr->dtb_size() = restore(fd, DTB_FILE);
 		file_align();
 	}
 
@@ -488,7 +484,7 @@ void repack(const char* orig_image, const char* out_image, bool nocomp) {
 
 	// Map output image as rw
 	munmap(boot.map_addr, boot.map_size);
-	mmap_rw(out_image, boot.map_addr, boot.map_size);
+	mmap_rw(out_img, boot.map_addr, boot.map_size);
 
 	// MTK headers
 	if (boot.flags & MTK_KERNEL) {
@@ -536,7 +532,7 @@ void repack(const char* orig_image, const char* out_image, bool nocomp) {
 		   (boot.flags & SHA256_FLAG) ? SHA256_DIGEST_SIZE : SHA_DIGEST_SIZE);
 
 	// Print new image info
-	boot.print_hdr();
+	boot.hdr->print();
 
 	// Main header
 	memcpy(boot.map_addr + off.header, **boot.hdr, boot.hdr->hdr_size());

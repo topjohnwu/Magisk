@@ -192,6 +192,10 @@ struct dyn_img_hdr {
 		return img_hdr;
 	}
 
+	void print();
+	void dump_hdr_file();
+	void load_hdr_file();
+
 protected:
 	union {
 		/* Main header could be either AOSP or PXA,
@@ -298,11 +302,11 @@ struct boot_img {
 	uint8_t *map_addr;
 	size_t map_size;
 
-	// Headers
-	dyn_img_hdr *hdr;   /* Android image header */
+	// Android image header
+	dyn_img_hdr *hdr;
 
 	// Flags to indicate the state of current boot image
-	uint16_t flags;
+	uint16_t flags = 0;
 
 	// The format of kernel and ramdisk
 	format_t k_fmt;
@@ -312,16 +316,17 @@ struct boot_img {
 	 * Following pointers points within the mmap region
 	 ***************************************************/
 
-	mtk_hdr *k_hdr;     /* MTK kernel header */
-	mtk_hdr *r_hdr;     /* MTK ramdisk header */
+	// MTK headers
+	mtk_hdr *k_hdr;
+	mtk_hdr *r_hdr;
 
 	// Pointer to dtb that is appended after kernel
 	uint8_t *kernel_dtb;
-	uint32_t kernel_dt_size;
+	uint32_t kernel_dt_size = 0;
 
 	// Pointer to end of image
 	uint8_t *tail;
-	size_t tail_size;
+	size_t tail_size = 0;
 
 	// Pointers to blocks defined in header
 	uint8_t *img_start;
@@ -332,10 +337,9 @@ struct boot_img {
 	uint8_t *recovery_dtbo;
 	uint8_t *dtb;
 
+	boot_img(const char *);
 	~boot_img();
 
-	void parse_file(const char *);
 	void parse_image(uint8_t *addr);
 	void find_kernel_dtb();
-	void print_hdr();
 };
