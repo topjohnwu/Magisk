@@ -10,12 +10,14 @@ extern "C" {
 #include <map>
 
 #include "magiskboot.h"
-#include "format.h"
 
 using namespace std;
 
-constexpr int MAX_DEPTH = 32;
-static bitset<MAX_DEPTH> depth_set;
+#define DTB_MAGIC       "\xd0\x0d\xfe\xed"
+#define QCDT_MAGIC      "QCDT"
+#define DTBH_MAGIC      "DTBH"
+#define PXADT_MAGIC     "PXA-DT"
+#define PXA_19xx_MAGIC  "PXA-19xx"
 
 struct qcdt_hdr {
 	char magic[4];          /* "QCDT" */
@@ -54,6 +56,24 @@ struct bhtable_v2 {
 	uint32_t space;         /* 0x00000020 */
 } __attribute__((packed));
 
+struct pxadt_hdr {
+	char magic[6];          /* "PXA-DT" */
+	uint32_t version;       /* PXA-DT version */
+	uint32_t num_dtbs;      /* Number of DTBs */
+} __attribute__((packed));
+
+struct pxa_19xx_hdr {
+	char magic[8];          /* "PXA-19xx" */
+	uint32_t version;       /* PXA-DT version */
+	uint32_t num_dtbs;      /* Number of DTBs */
+} __attribute__((packed));
+
+struct pxa_table_v1 {
+	uint32_t cpu_info[2];   /* Some CPU info */
+	uint32_t offset;        /* DTB offset in PXA-DT */
+	uint32_t len;           /* DTB size */
+} __attribute__((packed));
+
 struct dtb_blob {
 	void *fdt;
 	uint32_t offset;
@@ -82,6 +102,9 @@ private:
 
 template<class Iter>
 inline fdt_map_iter<Iter> make_iter(Iter j) { return fdt_map_iter<Iter>(j); }
+
+constexpr int MAX_DEPTH = 32;
+static bitset<MAX_DEPTH> depth_set;
 
 static void pretty_node(int depth) {
 	if (depth == 0)
@@ -282,7 +305,7 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 	}
 
 	// Patch tables
-	auto tables_rw = reinterpret_cast<Table *>(addr + sizeof(qcdt_hdr));
+	auto tables_rw = reinterpret_cast<Table *>(addr + sizeof(Header));
 	for (int i = 0; i < hdr->num_dtbs; ++i) {
 		auto &blob = dtb_map[tables_rw[i].offset];
 		tables_rw[i].offset = blob.offset;
@@ -295,6 +318,8 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 	return 0;
 }
 
+#define MATCH(s) (memcmp(dtb, s, sizeof(s) - 1) == 0)
+
 static int dtb_patch(const char *in, const char *out) {
 	if (!out)
 		out = in;
@@ -304,7 +329,7 @@ static int dtb_patch(const char *in, const char *out) {
 	mmap_ro(in, dtb, dtb_sz);
 	run_finally f([&]{ munmap(dtb, dtb_sz); });
 
-	if (memcmp(dtb, QCDT_MAGIC, 4) == 0) {
+	if (MATCH(QCDT_MAGIC)) {
 		auto hdr = reinterpret_cast<qcdt_hdr*>(dtb);
 		switch (hdr->version) {
 			case 1:
@@ -319,12 +344,30 @@ static int dtb_patch(const char *in, const char *out) {
 			default:
 				return 1;
 		}
-	} else if (memcmp(dtb, DTBH_MAGIC, 4) == 0) {
+	} else if (MATCH(DTBH_MAGIC)) {
 		auto hdr = reinterpret_cast<dtbh_hdr *>(dtb);
 		switch (hdr->version) {
 			case 2:
 				fprintf(stderr, "DTBH v2\n");
 				return dtb_patch<bhtable_v2>(hdr, in, out);
+			default:
+				return 1;
+		}
+	} else if (MATCH(PXADT_MAGIC)) {
+		auto hdr = reinterpret_cast<pxadt_hdr *>(dtb);
+		switch (hdr->version) {
+			case 1:
+				fprintf(stderr, "PXA-DT v1\n");
+				return dtb_patch<pxa_table_v1>(hdr, in, out);
+			default:
+				return 1;
+		}
+	} else if (MATCH(PXA_19xx_MAGIC)) {
+		auto hdr = reinterpret_cast<pxa_19xx_hdr *>(dtb);
+		switch (hdr->version) {
+			case 1:
+				fprintf(stderr, "PXA-19xx v1\n");
+				return dtb_patch<pxa_table_v1>(hdr, in, out);
 			default:
 				return 1;
 		}
