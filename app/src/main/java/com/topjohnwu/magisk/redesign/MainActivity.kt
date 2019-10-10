@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.redesign
 
 import android.graphics.Insets
 import android.os.Bundle
+import android.view.ViewTreeObserver
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import com.ncapdevi.fragnav.FragNavController
 import com.topjohnwu.magisk.Const
@@ -32,6 +34,14 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         SettingsFragment::class
     )
 
+    //This temporarily fixes unwanted feature of BottomNavigationView - where the view applies
+    //padding on itself given insets are not consumed beforehand. Unfortunately the listener
+    //implementation doesn't favor us against the design library, so on re-create it's often given
+    //upper hand.
+    private val navObserver = ViewTreeObserver.OnGlobalLayoutListener {
+        binding.mainNavigation.setPadding(0)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,9 +59,16 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
             true
         }
 
+        binding.mainNavigation.viewTreeObserver.addOnGlobalLayoutListener(navObserver)
+
         if (intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false)) {
             binding.mainNavigation.selectedItemId = R.id.settingsFragment
         }
+    }
+
+    override fun onDestroy() {
+        binding.mainNavigation.viewTreeObserver.removeOnGlobalLayoutListener(navObserver)
+        super.onDestroy()
     }
 
     override fun onTabTransaction(fragment: Fragment?, index: Int) {

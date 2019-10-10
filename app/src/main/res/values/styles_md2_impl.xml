@@ -27,6 +27,13 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="cardBackgroundColor">?colorSurfaceVariant</item>
         <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">0dp</item>
+        <item name="cardPreventCornerOverlap">true</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Card.Elevated" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?colorSurface</item>
+        <item name="cardElevation">@dimen/l_25</item>
     </style>
 
     <style name="WidgetFoundation.Card.OnPrimary" parent="Widget.MaterialComponents.CardView">
@@ -35,6 +42,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="strokeColor">?colorOnPrimaryVariant</item>
         <item name="strokeWidth">1dp</item>
         <item name="cardBackgroundColor">?colorPrimary</item>
+        <item name="cardPreventCornerOverlap">true</item>
     </style>
 
 

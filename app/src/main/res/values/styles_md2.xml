@@ -30,6 +30,7 @@
         <item name="styleToolbar">@style/WidgetFoundation.Toolbar</item>
 
         <item name="styleCardNormal">@style/WidgetFoundation.Card</item>
+        <item name="styleCardElevated">@style/WidgetFoundation.Card.Elevated</item>
         <item name="styleCardOnPrimary">@style/WidgetFoundation.Card.OnPrimary</item>
 
         <item name="styleButtonDefault">@style/WidgetFoundation.Button</item>
