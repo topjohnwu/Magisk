@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/checked"
+        android:drawable="@drawable/ic_bug_filled_md2"
+        android:state_checked="true" />
+
+    <item
+        android:id="@+id/unchecked"
+        android:drawable="@drawable/ic_bug_outlined_md2" />
+
+    <transition
+        android:drawable="@drawable/avd_bug_from_filled"
+        android:fromId="@+id/checked"
+        android:toId="@+id/unchecked" />
+
+    <transition
+        android:drawable="@drawable/avd_bug_to_filled"
+        android:fromId="@+id/unchecked"
+        android:toId="@id/checked" />
+
+</animated-selector>
