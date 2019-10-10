@@ -439,6 +439,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                gone="@{Info.magiskVersionCode &lt; 0}"
                 android:text="@{String.format(`%s (%s)`, Info.magiskVersionString, Info.magiskVersionCode)}"
                 android:textAppearance="?appearanceTextCaptionVariant"
                 tools:text="19.5 (12345)" />
