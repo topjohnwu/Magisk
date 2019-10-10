@@ -1,9 +1,6 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="?colorOnSurface"
-        android:pathData="M18.6,3l-0.7,4h4l-0.3,2h-4l-1.1,6h4l-0.3,2h-4l-0.7,4h-2l0.7,-4h-6l-0.7,4h-2l0.7,-4h-4l0.4,-2h4l1.1,-6h-4l0.4,-2h4l0.7,-4h2L9.9,7h6l0.7,-4H18.6M15.5,9h-6l-1.1,6h6L15.5,9M18.6,1.5h-2c-0.7,0 -1.3,0.5 -1.5,1.2l-0.5,2.8h-3l0.4,-2.2c0.1,-0.4 0,-0.9 -0.3,-1.2c-0.3,-0.3 -0.7,-0.5 -1.1,-0.5h-2C7.9,1.5 7.2,2 7.1,2.7L6.6,5.5H3.9C3.2,5.5 2.5,6 2.4,6.7l-0.4,2C2,9.2 2.1,9.6 2.4,10c0.3,0.3 0.7,0.5 1.1,0.5h2.2l-0.5,3H2.5c-0.7,0 -1.4,0.5 -1.5,1.2l-0.4,2c-0.1,0.4 0,0.9 0.3,1.2c0.3,0.3 0.7,0.5 1.1,0.5h2.2l-0.4,2.2c-0.1,0.4 0,0.9 0.3,1.2c0.3,0.3 0.7,0.5 1.1,0.5h2c0.7,0 1.3,-0.5 1.5,-1.2l0.5,-2.8h3l-0.4,2.2c-0.1,0.4 0,0.9 0.3,1.2c0.3,0.3 0.7,0.5 1.1,0.5h2c0.7,0 1.3,-0.5 1.5,-1.2l0.5,-2.8h2.7c0.7,0 1.4,-0.5 1.5,-1.2l0.4,-2c0.1,-0.4 0,-0.9 -0.3,-1.2c-0.3,-0.3 -0.7,-0.5 -1.1,-0.5h-2.2l0.5,-3h2.7c0.7,0 1.4,-0.5 1.5,-1.2l0.4,-2c0.1,-0.4 0,-0.9 -0.3,-1.2c-0.3,-0.3 -0.7,-0.5 -1.1,-0.5h-2.2l0.4,-2.2c0.1,-0.4 0,-0.9 -0.3,-1.2C19.5,1.7 19,1.5 18.6,1.5L18.6,1.5zM10.8,10.5h3l-0.5,3h-3L10.8,10.5L10.8,10.5z" />
-</vector>
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_superuser_filled_md2" android:state_selected="true" />
+    <item android:drawable="@drawable/ic_superuser_filled_md2" android:state_checked="true" />
+    <item android:drawable="@drawable/ic_superuser_outlined_md2" />
+</selector>
