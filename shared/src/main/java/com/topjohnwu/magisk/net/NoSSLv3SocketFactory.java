@@ -11,18 +11,18 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-class NoSSLv3SocketFactory extends SSLSocketFactory {
+public class NoSSLv3SocketFactory extends SSLSocketFactory {
 
-    private final static SSLSocketFactory base = HttpsURLConnection.getDefaultSSLSocketFactory();
+    private final static SSLSocketFactory delegate = HttpsURLConnection.getDefaultSSLSocketFactory();
 
     @Override
     public String[] getDefaultCipherSuites() {
-        return base.getDefaultCipherSuites();
+        return delegate.getDefaultCipherSuites();
     }
 
     @Override
     public String[] getSupportedCipherSuites() {
-        return base.getSupportedCipherSuites();
+        return delegate.getSupportedCipherSuites();
     }
 
     private Socket createSafeSocket(Socket socket) {
@@ -40,31 +40,31 @@ class NoSSLv3SocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-        return createSafeSocket(base.createSocket(s, host, port, autoClose));
+        return createSafeSocket(delegate.createSocket(s, host, port, autoClose));
     }
 
     @Override
     public Socket createSocket() throws IOException {
-        return createSafeSocket(base.createSocket());
+        return createSafeSocket(delegate.createSocket());
     }
 
     @Override
     public Socket createSocket(String host, int port) throws IOException {
-        return createSafeSocket(base.createSocket(host, port));
+        return createSafeSocket(delegate.createSocket(host, port));
     }
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        return createSafeSocket(base.createSocket(host, port, localHost, localPort));
+        return createSafeSocket(delegate.createSocket(host, port, localHost, localPort));
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
-        return createSafeSocket(base.createSocket(host, port));
+        return createSafeSocket(delegate.createSocket(host, port));
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        return createSafeSocket(base.createSocket(address, port, localAddress, localPort));
+        return createSafeSocket(delegate.createSocket(address, port, localAddress, localPort));
     }
 }

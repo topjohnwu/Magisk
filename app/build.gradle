@@ -94,7 +94,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:${vRetrofit}"
     implementation "com.squareup.retrofit2:adapter-rxjava2:${vRetrofit}"
 
-    def vOkHttp = '3.12.2'
+    def vOkHttp = '3.12.6'
     implementation "com.squareup.okhttp3:okhttp:${vOkHttp}"
     implementation "com.squareup.okhttp3:logging-interceptor:${vOkHttp}"
 

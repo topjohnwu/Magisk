@@ -35,7 +35,7 @@ public class Networking {
         return request(url, "GET");
     }
 
-    public static void init(Context context) {
+    public static boolean init(Context context) {
         try {
             // Try installing new SSL provider from Google Play Service
             Context gms = context.createPackageContext("com.google.android.gms",
@@ -45,10 +45,14 @@ public class Networking {
                     .getMethod("insertProvider", Context.class)
                     .invoke(null, gms);
         } catch (Exception e) {
-            // Failed to update SSL provider, use NoSSLv3SocketFactory on SDK < 21
-            if (Build.VERSION.SDK_INT < 21)
+            if (Build.VERSION.SDK_INT < 21) {
+                // Failed to update SSL provider, use NoSSLv3SocketFactory on SDK < 21
+                // and return false to notify potential issues
                 HttpsURLConnection.setDefaultSSLSocketFactory(new NoSSLv3SocketFactory());
+                return false;
+            }
         }
+        return true;
     }
 
     public static boolean checkNetworkStatus(Context context) {

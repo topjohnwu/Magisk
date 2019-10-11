@@ -1,11 +1,14 @@
 package com.topjohnwu.magisk.di
 
+import android.content.Context
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.net.Networking
+import com.topjohnwu.magisk.net.NoSSLv3SocketFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
@@ -16,14 +19,14 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 val networkingModule = module {
-    single { createOkHttpClient() }
-    single { createMoshiConverterFactory() }
-    single { createRetrofit(get(), get()) }
+    single { createOkHttpClient(get()) }
+    single { createRetrofit(get()) }
     single { createApiService<GithubRawServices>(get(), Const.Url.GITHUB_RAW_URL) }
     single { createApiService<GithubApiServices>(get(), Const.Url.GITHUB_API_URL) }
 }
 
-fun createOkHttpClient(): OkHttpClient {
+@Suppress("DEPRECATION")
+fun createOkHttpClient(context: Context): OkHttpClient {
     val builder = OkHttpClient.Builder()
 
     if (BuildConfig.DEBUG) {
@@ -31,6 +34,10 @@ fun createOkHttpClient(): OkHttpClient {
             level = HttpLoggingInterceptor.Level.HEADERS
         }
         builder.addInterceptor(httpLoggingInterceptor)
+    }
+
+    if (!Networking.init(context)) {
+        builder.sslSocketFactory(NoSSLv3SocketFactory())
     }
 
     return builder.build()
@@ -43,13 +50,10 @@ fun createMoshiConverterFactory(): MoshiConverterFactory {
     return MoshiConverterFactory.create(moshi)
 }
 
-fun createRetrofit(
-    okHttpClient: OkHttpClient,
-    converterFactory: MoshiConverterFactory
-): Retrofit.Builder {
+fun createRetrofit(okHttpClient: OkHttpClient): Retrofit.Builder {
     return Retrofit.Builder()
         .addConverterFactory(ScalarsConverterFactory.create())
-        .addConverterFactory(converterFactory)
+        .addConverterFactory(createMoshiConverterFactory())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .client(okHttpClient)
 }
