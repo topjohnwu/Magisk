@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="WidgetFoundation.Card.Elevated" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?colorSurfaceVariant</item>
+        <item name="cardElevation">@dimen/l_25</item>
+    </style>
+
+</resources>

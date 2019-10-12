@@ -37,6 +37,7 @@
                 android:id="@+id/main_toolbar"
                 style="?styleToolbar"
                 android:layout_width="match_parent"
+                android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_scrollFlags="noScroll"
                 tools:title="Home" />
