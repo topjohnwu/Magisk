@@ -17,6 +17,7 @@
 
     <!--Card-->
     <attr name="styleCardNormal" format="reference" />
+    <attr name="styleCardVariant" format="reference" />
     <attr name="styleCardElevated" format="reference" />
     <attr name="styleCardOnPrimary" format="reference" />
 
