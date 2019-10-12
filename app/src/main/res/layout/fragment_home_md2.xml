@@ -74,12 +74,13 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_magisk_title"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/l1"
                             android:gravity="center"
                             android:text="@string/magisk"
                             android:textAppearance="?appearanceTextTitleNormal"
+                            app:layout_constrainedWidth="true"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_icon" />
@@ -87,8 +88,9 @@
                         <TextSwitcher
                             android:id="@+id/home_magisk_status"
                             textCaptionVariant="@{viewModel.stateTextMagisk}"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            app:layout_constrainedWidth="true"
                             app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
                             app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_title" />
@@ -96,8 +98,9 @@
                         <TextSwitcher
                             android:id="@+id/home_magisk_version"
                             textCaptionVariant="@{viewModel.stateVersionUpdateMagisk}"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            app:layout_constrainedWidth="true"
                             app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
                             app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_status" />
@@ -179,12 +182,13 @@
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_manager_title"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/l1"
                             android:gravity="center"
                             android:text="@{viewModel.stateHideManagerName}"
                             android:textAppearance="?appearanceTextTitleNormal"
+                            app:layout_constrainedWidth="true"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_manager_icon"
@@ -193,8 +197,9 @@
                         <TextSwitcher
                             android:id="@+id/home_manager_status"
                             textCaptionVariant="@{viewModel.stateTextManager}"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            app:layout_constrainedWidth="true"
                             app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
                             app:layout_constraintStart_toStartOf="@+id/home_manager_title"
                             app:layout_constraintTop_toBottomOf="@+id/home_manager_title" />
@@ -202,8 +207,9 @@
                         <TextSwitcher
                             android:id="@+id/home_manager_version"
                             textCaptionVariant="@{viewModel.stateVersionUpdateManager}"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            app:layout_constrainedWidth="true"
                             app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
                             app:layout_constraintStart_toStartOf="@+id/home_manager_title"
                             app:layout_constraintTop_toBottomOf="@+id/home_manager_status" />
@@ -253,8 +259,8 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_marginTop="@dimen/l2"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/l2">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/support_icon_mainline"
