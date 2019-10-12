@@ -347,7 +347,7 @@ static bool magisk_env() {
 	unlink("/data/magisk_debug.log");
 
 	// Backwards compatibility
-	symlink("./magisk", "/sbin/.core");
+	symlink("./.magisk", "/sbin/.core");
 	symlink("./modules", MAGISKTMP "/img");
 
 	// Directories in tmpfs overlay
