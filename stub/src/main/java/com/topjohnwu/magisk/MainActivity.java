@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.topjohnwu.magisk.utils.APKInstall;
 import com.topjohnwu.magisk.net.Networking;
@@ -16,16 +17,19 @@ import java.io.File;
 
 public class MainActivity extends Activity {
 
+    private static final String TAG = "MMStub";
+    private static final boolean IS_CANARY = BuildConfig.VERSION_NAME.contains("-");
     private static final String URL =
-            "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/" +
-            (BuildConfig.VERSION_NAME.contains("-") ? "canary_builds/release.json" : "stable.json");
+            "https://raw.githubusercontent.com/topjohnwu/magisk_files/" +
+                    (IS_CANARY ? "canary/release.json" : "master/stable.json");
 
     private String apkLink;
 
     private void dlAPK() {
         Application app = getApplication();
         Networking.get(apkLink)
-                .getAsFile(new File(getFilesDir(), "manager.apk"), apk -> APKInstall.install(app, apk));
+                .getAsFile(new File(getFilesDir(), "manager.apk"),
+                        apk -> APKInstall.install(app, apk));
         finish();
     }
 
@@ -35,10 +39,13 @@ public class MainActivity extends Activity {
         Networking.init(this);
         if (Networking.checkNetworkStatus(this)) {
             Networking.get(URL)
-                    .setErrorHandler(((conn, e) -> finish()))
+                    .setErrorHandler(((conn, e) -> {
+                        Log.d(TAG, "network error", e);
+                        finish();
+                    }))
                     .getAsJSONObject(new JSONLoader());
         } else {
-            new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+            new AlertDialog.Builder(this)
                     .setCancelable(false)
                     .setTitle(R.string.app_name)
                     .setMessage(R.string.no_internet_msg)
@@ -54,7 +61,7 @@ public class MainActivity extends Activity {
             try {
                 JSONObject manager = json.getJSONObject("app");
                 apkLink = manager.getString("link");
-                new AlertDialog.Builder(MainActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT)
+                new AlertDialog.Builder(MainActivity.this)
                         .setCancelable(false)
                         .setTitle(R.string.app_name)
                         .setMessage(R.string.upgrade_msg)
