@@ -201,7 +201,7 @@ class SettingsFragment : BasePreferenceFragment() {
                 Shell.su("magiskhide --disable").submit()
             }
             Config.Key.LOCALE -> {
-                LocaleManager.setLocale(activity.application)
+                ResourceMgr.reload()
                 activity.recreate()
             }
             Config.Key.CHECK_UPDATES -> Utils.scheduleUpdateCheck(activity)
@@ -230,7 +230,7 @@ class SettingsFragment : BasePreferenceFragment() {
                 val values = mutableListOf<String>()
 
                 names.add(
-                    LocaleManager.getString(defaultLocale, R.string.system_default)
+                    ResourceMgr.getString(defaultLocale, R.string.system_default)
                 )
                 values.add("")
 

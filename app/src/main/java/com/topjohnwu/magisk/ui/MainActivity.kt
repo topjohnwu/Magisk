@@ -40,8 +40,8 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     override val layoutRes: Int = R.layout.activity_main
     override val viewModel: MainViewModel by viewModel()
-    override val navHostId: Int = R.id.main_nav_host
-    override val defaultPosition: Int = 0
+    private val navHostId: Int = R.id.main_nav_host
+    private val defaultPosition: Int = 0
 
     private val navigationController by lazy {
         FragNavController(supportFragmentManager, navHostId)

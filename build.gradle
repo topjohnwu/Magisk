@@ -38,7 +38,7 @@ subprojects {
         maven { url "https://jitpack.io" }
         maven { url "http://oss.sonatype.org/content/repositories/snapshots" }
     }
-    afterEvaluate {
+    afterEvaluate { module ->
         if (getPlugins().hasPlugin('com.android.library') ||
             getPlugins().hasPlugin('com.android.application')) {
             android {
@@ -58,7 +58,7 @@ subprojects {
             }
         }
 
-        if (it.name == 'app' || it.name == 'stub') {
+        if (module.name == 'app' || module.name == 'stub') {
             android {
                 signingConfigs {
                     config {
@@ -76,14 +76,22 @@ subprojects {
                             signingConfig signingConfigs.config
                     }
                     release {
-                        minifyEnabled true
-                        shrinkResources true
                         signingConfig signingConfigs.config
                     }
                 }
 
                 lintOptions {
                     disable 'MissingTranslation'
+                }
+
+                aaptOptions {
+                    // Preserve stub resource IDs
+                    File publicTxt = rootProject.file('stub-public.txt')
+                    if (publicTxt.exists()) {
+                        additionalParameters "--stable-ids", "${publicTxt.absolutePath}"
+                    } else if (module.name == 'stub') {
+                        additionalParameters "--emit-ids", "${publicTxt.absolutePath}"
+                    }
                 }
             }
         }

@@ -5,13 +5,13 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Restore
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Upgrade
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.ui.SplashActivity
-import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.PatchAPK
-import com.topjohnwu.magisk.utils.RootUtils
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import timber.log.Timber
 import java.io.File
@@ -54,7 +54,7 @@ private fun RemoteFileService.restore(apk: File, id: Int) {
     if (Shell.su("pm install $apk").exec().isSuccess) {
         val component = ComponentName(BuildConfig.APPLICATION_ID,
                 ClassMap.get<Class<*>>(SplashActivity::class.java).name)
-        RootUtils.rmAndLaunch(packageName, component)
+        Utils.rmAndLaunch(packageName, component)
     }
 }
 

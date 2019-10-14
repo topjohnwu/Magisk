@@ -23,6 +23,7 @@ import java.io.File
 open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() {
 
     override val layoutRes: Int = R.layout.activity_flash
+    override val themeRes: Int = R.style.MagiskTheme_Flashing
     override val viewModel: FlashViewModel by viewModel {
         val uri = intent.data ?: let { finish(); Uri.EMPTY }
         val additionalUri = intent.getParcelableExtra(Const.Key.FLASH_DATA) ?: uri

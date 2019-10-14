@@ -1,17 +1,23 @@
 package com.topjohnwu.magisk.ui
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.utils.wrap
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 
-open class SplashActivity : AppCompatActivity() {
+open class SplashActivity : Activity() {
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base.wrap())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

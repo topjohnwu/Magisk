@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.extensions
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
@@ -18,11 +20,13 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.FileProvider
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.currentLocale
 import java.io.File
 import java.io.FileNotFoundException
+import java.util.*
 
 val packageName: String get() = get<Context>().packageName
 
@@ -93,6 +97,105 @@ fun Context.readUri(uri: Uri) =
 
 fun Intent.startActivity(context: Context) = context.startActivity(this)
 
+fun Intent.toCommand(args: MutableList<String>) {
+    if (action != null) {
+        args.add("-a")
+        args.add(action!!)
+    }
+    if (component != null) {
+        args.add("-n")
+        args.add(component!!.flattenToString())
+    }
+    if (data != null) {
+        args.add("-d")
+        args.add(dataString!!)
+    }
+    if (categories != null) {
+        for (cat in categories) {
+            args.add("-c")
+            args.add(cat)
+        }
+    }
+    if (type != null) {
+        args.add("-t")
+        args.add(type!!)
+    }
+    val extras = extras
+    if (extras != null) {
+        loop@ for (key in extras.keySet()) {
+            val v = extras.get(key) ?: continue
+            var value: Any = v
+            val arg: String
+            when {
+                v is String -> arg = "--es"
+                v is Boolean -> arg = "--ez"
+                v is Int -> arg = "--ei"
+                v is Long -> arg = "--el"
+                v is Float -> arg = "--ef"
+                v is Uri -> arg = "--eu"
+                v is ComponentName -> {
+                    arg = "--ecn"
+                    value = v.flattenToString()
+                }
+                v is ArrayList<*> -> {
+                    if (v.size <= 0)
+                    /* Impossible to know the type due to type erasure */
+                        continue@loop
+
+                    arg = if (v[0] is Int)
+                        "--eial"
+                    else if (v[0] is Long)
+                        "--elal"
+                    else if (v[0] is Float)
+                        "--efal"
+                    else if (v[0] is String)
+                        "--esal"
+                    else
+                        continue@loop  /* Unsupported */
+
+                    val sb = StringBuilder()
+                    for (o in v) {
+                        sb.append(o.toString().replace(",", "\\,"))
+                        sb.append(',')
+                    }
+                    // Remove trailing comma
+                    sb.deleteCharAt(sb.length - 1)
+                    value = sb
+                }
+                v.javaClass.isArray -> {
+                    arg = if (v is IntArray)
+                        "--eia"
+                    else if (v is LongArray)
+                        "--ela"
+                    else if (v is FloatArray)
+                        "--efa"
+                    else if (v is Array<*> && v.isArrayOf<String>())
+                        "--esa"
+                    else
+                        continue@loop  /* Unsupported */
+
+                    val sb = StringBuilder()
+                    val len = java.lang.reflect.Array.getLength(v)
+                    for (i in 0 until len) {
+                        sb.append(java.lang.reflect.Array.get(v, i)!!.toString().replace(",", "\\,"))
+                        sb.append(',')
+                    }
+                    // Remove trailing comma
+                    sb.deleteCharAt(sb.length - 1)
+                    value = sb
+                }
+                else -> continue@loop
+            }  /* Unsupported */
+
+            args.add(arg)
+            args.add(key)
+            args.add(value.toString())
+        }
+    }
+    args.add("-f")
+    args.add(flags.toString())
+}
+
 fun File.provide(context: Context = get()): Uri {
     return FileProvider.getUriForFile(context, context.packageName + ".provider", this)
 }
@@ -157,3 +260,18 @@ fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
 }
 
 fun Context.openUrl(url: String) = Utils.openLink(this, url.toUri())
+
+@Suppress("FunctionName")
+inline fun <reified T> T.DynamicClassLoader(apk: File)
+        = DynamicClassLoader(apk, T::class.java.classLoader)
+
+fun Context.unwrap() : Context {
+    var context = this
+    while (true) {
+        if (context is ContextWrapper)
+            context = context.baseContext
+        else
+            break
+    }
+    return context
+}

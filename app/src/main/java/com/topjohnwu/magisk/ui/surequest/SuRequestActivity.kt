@@ -18,6 +18,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
     override val layoutRes: Int = R.layout.activity_request
+    override val themeRes: Int = R.style.MagiskTheme_SU
     override val viewModel: SuRequestViewModel by viewModel()
 
     override fun onBackPressed() {

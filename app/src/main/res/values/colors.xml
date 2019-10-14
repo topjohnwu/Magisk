@@ -32,10 +32,6 @@
     <color name="dark_secondary_text">#dedede</color>
     <color name="su_request_background">#e0e0e0</color>
 
-    <!-- Flashing colors -->
-
-    <color name="ic_launcher_background">#00AF9C</color>
-
     <!-- Card colors -->
     <color name="card_background_color_dark">#ff424242</color>
     <color name="card_background_color_light">#ffffffff</color>

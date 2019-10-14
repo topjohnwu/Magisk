@@ -60,8 +60,6 @@
         <item name="cardBackgroundColor">@color/card_background_color_light</item>
     </style>
 
-    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">@drawable/ic_splash_activity</item>
-    </style>
+    <style name="SplashTheme" parent="SplashThemeBase"/>
 
 </resources>

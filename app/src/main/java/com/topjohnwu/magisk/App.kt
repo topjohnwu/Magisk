@@ -13,8 +13,11 @@ import com.topjohnwu.magisk.data.database.RepoDatabase_Impl
 import com.topjohnwu.magisk.di.ActivityTracker
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.utils.LocaleManager
-import com.topjohnwu.magisk.utils.RootUtils
+import com.topjohnwu.magisk.extensions.unwrap
+import com.topjohnwu.magisk.utils.ResourceMgr
+import com.topjohnwu.magisk.utils.RootInit
+import com.topjohnwu.magisk.utils.isRunningAsStub
+import com.topjohnwu.magisk.utils.wrap
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -26,7 +29,7 @@ open class App : Application() {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_USE_MAGISK_BUSYBOX)
         Shell.Config.verboseLogging(BuildConfig.DEBUG)
-        Shell.Config.addInitializers(RootUtils::class.java)
+        Shell.Config.addInitializers(RootInit::class.java)
         Shell.Config.setTimeout(2)
         Room.setFactory {
             when (it) {
@@ -38,22 +41,42 @@ open class App : Application() {
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base)
+        // Basic setup
         if (BuildConfig.DEBUG)
             MultiDex.install(base)
         Timber.plant(Timber.DebugTree())
 
+        // Some context magic
+        val app: Application
+        val impl: Context
+        if (base is Application) {
+            isRunningAsStub = true
+            app = base
+            impl = base.baseContext
+        } else {
+            app = this
+            impl = base
+        }
+        ResourceMgr.init(impl)
+        super.attachBaseContext(impl.wrap())
+
+        // Normal startup
         startKoin {
-            androidContext(this@App)
+            androidContext(baseContext)
             modules(koinModules)
         }
+        ResourceMgr.reload()
+        app.registerActivityLifecycleCallbacks(get<ActivityTracker>())
+    }
 
-        registerActivityLifecycleCallbacks(get<ActivityTracker>())
-        LocaleManager.setLocale(this)
+    // This is required as some platforms expect ContextImpl
+    override fun getBaseContext(): Context {
+        return super.getBaseContext().unwrap()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        LocaleManager.setLocale(this)
+        ResourceMgr.reload(newConfig)
+        if (!isRunningAsStub)
+            super.onConfigurationChanged(newConfig)
     }
 }

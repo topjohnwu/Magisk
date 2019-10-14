@@ -10,6 +10,12 @@
         android:installLocation="internalOnly"
         android:label="@string/app_name"
         android:supportsRtl="true">
+
+        <activity
+            android:name="a.r"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:process=":remote" />
+
         <provider
             android:name="a.p"
             android:authorities="${applicationId}.provider"

@@ -1,4 +1,0 @@
-<resources>
-    <string name="upgrade_msg">Fes una actualització total de Magisk Manager  per finalitzar l\'instalació. Descarregar i instalar?</string>
-    <string name="no_internet_msg">Si us plau, connecta\'t a internet! Es necessari fer una actualització total de Magisk Manager.</string>
-</resources>

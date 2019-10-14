@@ -102,7 +102,7 @@ object PatchAPK {
 
         Config.suManager = pkg
         Config.export()
-        RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID,
+        Utils.rmAndLaunch(BuildConfig.APPLICATION_ID,
                 ComponentName(pkg, ClassMap.get<Class<*>>(SplashActivity::class.java).name))
 
         return true

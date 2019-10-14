@@ -2,4 +2,6 @@
     <string name="no_thanks">不，謝謝</string>
     <string name="yes">是</string>
     <string name="ok">好</string>
+    <string name="upgrade_msg">需要升級到完整版 Magisk Manager。是否下載並安裝？</string>
+    <string name="no_internet_msg">請連上網路！升級到完整版 Magisk Manager 是必須的。</string>
 </resources>

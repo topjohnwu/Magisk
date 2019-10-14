@@ -2,4 +2,6 @@
     <string name="no_thanks">Nu, mulțumesc</string>
     <string name="yes">Da</string>
     <string name="ok">Ok</string>
+    <string name="upgrade_msg">Treci la versiunea completă Magisk Manager pentru a finaliza configurarea. Descarci și instalezi?</string>
+    <string name="no_internet_msg">Te rugăm să te conectezi la internet! Este necesară actualizarea la versiunea completă Magisk Manager.</string>
 </resources>
