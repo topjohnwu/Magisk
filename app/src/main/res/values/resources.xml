@@ -9,15 +9,15 @@
     <string name="empty" translatable="false"/>
 
     <!-- Preserve 10 string slots for stub -->
-    <string name="preserve_0" translatable="false"/>
-    <string name="preserve_1" translatable="false"/>
-    <string name="preserve_2" translatable="false"/>
-    <string name="preserve_3" translatable="false"/>
-    <string name="preserve_4" translatable="false"/>
-    <string name="preserve_5" translatable="false"/>
-    <string name="preserve_6" translatable="false"/>
-    <string name="preserve_7" translatable="false"/>
-    <string name="preserve_8" translatable="false"/>
-    <string name="preserve_9" translatable="false"/>
+    <string name="stub_0" translatable="false"/>
+    <string name="stub_1" translatable="false"/>
+    <string name="stub_2" translatable="false"/>
+    <string name="stub_3" translatable="false"/>
+    <string name="stub_4" translatable="false"/>
+    <string name="stub_5" translatable="false"/>
+    <string name="stub_6" translatable="false"/>
+    <string name="stub_7" translatable="false"/>
+    <string name="stub_8" translatable="false"/>
+    <string name="stub_9" translatable="false"/>
 
 </resources>
