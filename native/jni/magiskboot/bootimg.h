@@ -182,6 +182,11 @@ struct dyn_img_hdr {
 	decl_var(header_size, 32)
 	decl_var(dtb_size, 32)
 
+	void init(void *ptr) {
+		raw = xmalloc(hdr_size());
+		memcpy(raw, ptr, hdr_size());
+	}
+
 	virtual ~dyn_img_hdr() {
 		free(raw);
 	}
@@ -228,10 +233,7 @@ struct dyn_img_pxa : public dyn_img_hdr {
 	impl_val(id)
 	impl_val(extra_cmdline)
 
-	dyn_img_pxa(void *ptr) {
-		raw = xmalloc(sizeof(boot_img_hdr_pxa));
-		memcpy(raw, ptr, sizeof(boot_img_hdr_pxa));
-	}
+	dyn_img_pxa(void *ptr) { init(ptr); }
 
 	size_t hdr_size() override {
 		return sizeof(boot_img_hdr_pxa);
@@ -252,13 +254,10 @@ struct dyn_img_v0 : public dyn_img_hdr {
 	impl_val(id)
 	impl_val(extra_cmdline)
 
-	dyn_img_v0(void *ptr) {
-		raw = xmalloc(sizeof(boot_img_hdr_v2));
-		memcpy(raw, ptr, sizeof(boot_img_hdr_v2));
-	}
+	dyn_img_v0(void *ptr) { init(ptr); }
 
 	size_t hdr_size() override {
-		return sizeof(boot_img_hdr_v2);
+		return sizeof(boot_img_hdr_v0);
 	}
 };
 
@@ -274,6 +273,10 @@ struct dyn_img_v1 : public dyn_img_v0 {
 	uint32_t &extra_size() override {
 		return dyn_img_hdr::extra_size();
 	}
+
+	size_t hdr_size() override {
+		return sizeof(boot_img_hdr_v1);
+	}
 };
 
 struct dyn_img_v2 : public dyn_img_v1 {
@@ -281,6 +284,10 @@ struct dyn_img_v2 : public dyn_img_v1 {
 	impl_val(dtb_size)
 
 	dyn_img_v2(void *ptr) : dyn_img_v1(ptr) {}
+
+	size_t hdr_size() override {
+		return sizeof(boot_img_hdr_v2);
+	}
 };
 
 #undef impl_val
@@ -329,7 +336,7 @@ struct boot_img {
 	size_t tail_size = 0;
 
 	// Pointers to blocks defined in header
-	uint8_t *img_start;
+	uint8_t *hdr_addr;
 	uint8_t *kernel;
 	uint8_t *ramdisk;
 	uint8_t *second;
