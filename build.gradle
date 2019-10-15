@@ -85,13 +85,13 @@ subprojects {
                 }
 
                 aaptOptions {
-                    // Preserve stub resource IDs
-                    File publicTxt = rootProject.file('stub-public.txt')
-                    if (publicTxt.exists()) {
-                        additionalParameters "--stable-ids", "${publicTxt.absolutePath}"
-                    } else if (module.name == 'stub') {
-                        additionalParameters "--emit-ids", "${publicTxt.absolutePath}"
-                    }
+                    // Handle resource IDs
+                    File resIds = rootProject.file('stable-ids.txt')
+                    File stubIds = rootProject.file('stub-ids.txt')
+                    if (module.name == 'app' && resIds.exists())
+                        additionalParameters "--stable-ids", "${resIds.absolutePath}"
+                    else if (module.name == 'stub')
+                        additionalParameters "--emit-ids", "${stubIds.absolutePath}"
                 }
             }
         }

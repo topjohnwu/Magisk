@@ -8,4 +8,16 @@
     <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="empty" translatable="false"/>
 
+    <!-- Preserve 10 string slots for stub -->
+    <string name="preserve_0" translatable="false"/>
+    <string name="preserve_1" translatable="false"/>
+    <string name="preserve_2" translatable="false"/>
+    <string name="preserve_3" translatable="false"/>
+    <string name="preserve_4" translatable="false"/>
+    <string name="preserve_5" translatable="false"/>
+    <string name="preserve_6" translatable="false"/>
+    <string name="preserve_7" translatable="false"/>
+    <string name="preserve_8" translatable="false"/>
+    <string name="preserve_9" translatable="false"/>
+
 </resources>
