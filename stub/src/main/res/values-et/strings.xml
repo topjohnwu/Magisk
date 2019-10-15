@@ -1,5 +1,4 @@
 <resources>
-    <!--Used in both stub and full app-->
     <string name="no_thanks">Tänan ei</string>
     <string name="yes">Jah</string>
     <string name="ok">OK</string>

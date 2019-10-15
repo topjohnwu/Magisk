@@ -1,14 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--Not translatable-->
     <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="re_app_name" translatable="false">Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
-    <string name="empty" translatable="false"/>
 
     <string name="no_thanks">No thanks</string>
     <string name="yes">Yes</string>
     <string name="ok">OK</string>
     <string name="upgrade_msg">Upgrade to full Magisk Manager to finish the setup. Download and install?</string>
     <string name="no_internet_msg">Please connect to the Internet! Upgrading to full Magisk Manager is required.</string>
+
+
 </resources>

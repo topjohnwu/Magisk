@@ -53,6 +53,9 @@
     <string name="app_changelog">Ändringslogg</string>
 
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Nej tack</string>
+    <string name="yes">Ja</string>
+    <string name="ok">OK</string>
     <string name="close">Stäng</string>
     <string name="repo_install_title">Installera %1$s</string>
     <string name="repo_install_msg">Vill du installera %1$s ?</string>

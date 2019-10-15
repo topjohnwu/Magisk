@@ -86,6 +86,9 @@
     <string name="reboot_delay_toast">Me-reboot dalam 5 detik…</string>
 
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Tidak, terima kasih</string>
+    <string name="yes">Ya</string>
+    <string name="ok">OK</string>
     <string name="close">Tutup</string>
     <string name="repo_install_title">Pasang %1$s</string>
     <string name="repo_install_msg">Apakah Anda ingin memasang %1$s sekarang?</string>

@@ -88,6 +88,9 @@
     <string name="reboot_delay_toast">Redémarrage dans 5 secondes…</string>
 	
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Non merci</string>
+    <string name="yes">Oui</string>
+    <string name="ok">OK</string>
     <string name="close">Fermer</string>
     <string name="repo_install_title">Installer %1$s</string>
     <string name="repo_install_msg">Voulez‐vous installer %1$s maintenant ?</string>

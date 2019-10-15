@@ -61,6 +61,9 @@
     <string name="app_changelog">Pakeitimų sąrašas</string>
 
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Ačiū, nereikia</string>
+    <string name="yes">Taip</string>
+    <string name="ok">Gerai</string>
     <string name="close">Uždaryti</string>
     <string name="repo_install_title">Instaliuoti %1$s</string>
     <string name="repo_install_msg">Ar jūs norite instaliuoti %1$s?</string>

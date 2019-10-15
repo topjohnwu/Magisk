@@ -69,6 +69,9 @@
     <string name="manager_update_title">En Magisk Manager-oppdatering er tilgjengelig!</string>
 
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Nei takk</string>
+    <string name="yes">Ja</string>
+    <string name="ok">OK</string>
     <string name="close">Lukk</string>
     <string name="repo_install_title">Installer %1$s</string>
     <string name="repo_install_msg">Vil du installere %1$s nå?</string>
