@@ -63,12 +63,12 @@ void dyn_img_hdr::print() {
 	fprintf(stderr, "KERNEL_SZ       [%u]\n", kernel_size());
 	fprintf(stderr, "RAMDISK_SZ      [%u]\n", ramdisk_size());
 	fprintf(stderr, "SECOND_SZ       [%u]\n", second_size());
-	if (ver) {
-		fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", recovery_dtbo_size());
-		fprintf(stderr, "DTB             [%u]\n", dtb_size());
-	} else {
+	if (ver == 0)
 		fprintf(stderr, "EXTRA_SZ        [%u]\n", extra_size());
-	}
+	if (ver >= 1)
+		fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", recovery_dtbo_size());
+	if (ver >= 2)
+		fprintf(stderr, "DTB_SZ          [%u]\n", dtb_size());
 
 	ver = os_version();
 	if (ver) {
@@ -91,8 +91,8 @@ void dyn_img_hdr::print() {
 	fprintf(stderr, "NAME            [%s]\n", name());
 	fprintf(stderr, "CMDLINE         [%.512s%.1024s]\n", cmdline(), extra_cmdline());
 	fprintf(stderr, "CHECKSUM        [");
-	for (int i = 0; id()[i]; ++i)
-		fprintf(stderr, "%02x", id()[i]);
+	for (int i = 0; i < SHA256_DIGEST_SIZE; ++i)
+		fprintf(stderr, "%02hhx", static_cast<uint8_t>(id()[i]));
 	fprintf(stderr, "]\n");
 }
 
@@ -220,13 +220,18 @@ void boot_img::parse_image(uint8_t *addr) {
 		else
 			hdr = new dyn_img_v0(addr);
 	}
-	img_start = addr;
-	flags |= hdr->id()[SHA_DIGEST_SIZE] ? SHA256_FLAG : 0;
+
+	for (int i = SHA_DIGEST_SIZE; i < SHA256_DIGEST_SIZE; ++i) {
+		if (hdr->id()[i]) {
+			flags |= SHA256_FLAG;
+			break;
+		}
+	}
 
 	hdr->print();
 
 	size_t off = hdr->page_size();
-
+	hdr_addr = addr;
 	get_block(kernel);
 	get_block(ramdisk);
 	get_block(second);
@@ -396,7 +401,7 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 
 	// Copy a page for header
 	off.header = lseek(fd, 0, SEEK_CUR);
-	restore_buf(fd, boot.img_start, boot.hdr->page_size());
+	restore_buf(fd, boot.hdr_addr, boot.hdr->page_size());
 
 	// kernel
 	off.kernel = lseek(fd, 0, SEEK_CUR);
@@ -515,21 +520,20 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 		HASH_update(&ctx, boot.map_addr + off.extra, size);
 		HASH_update(&ctx, &size, sizeof(size));
 	}
-	if (boot.hdr->header_version()) {
+	if (boot.hdr->header_version() >= 1) {
 		size = boot.hdr->recovery_dtbo_size();
 		HASH_update(&ctx, boot.map_addr + boot.hdr->recovery_dtbo_offset(), size);
 		HASH_update(&ctx, &size, sizeof(size));
+	}
+	if (boot.hdr->header_version() >= 2) {
 		size = boot.hdr->dtb_size();
-		if (size) {
-			HASH_update(&ctx, boot.map_addr + off.dtb, size);
-			HASH_update(&ctx, &size, sizeof(size));
-		}
-
-		boot.hdr->header_size() = boot.hdr->hdr_size();
+		HASH_update(&ctx, boot.map_addr + off.dtb, size);
+		HASH_update(&ctx, &size, sizeof(size));
 	}
 	memset(boot.hdr->id(), 0, 32);
 	memcpy(boot.hdr->id(), HASH_final(&ctx),
 		   (boot.flags & SHA256_FLAG) ? SHA256_DIGEST_SIZE : SHA_DIGEST_SIZE);
+	boot.hdr->header_size() = boot.hdr->hdr_size();
 
 	// Print new image info
 	boot.hdr->print();

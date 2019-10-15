@@ -216,10 +216,22 @@ private:
 #undef decl_var
 #undef decl_val
 
+#define __impl_cls(name, hdr) \
+protected: name() = default; \
+public: \
+name(void *ptr) { \
+	raw = xmalloc(sizeof(hdr)); \
+	memcpy(raw, ptr, sizeof(hdr)); \
+} \
+size_t hdr_size() override { return sizeof(hdr); }
+
+#define impl_cls(ver) __impl_cls(dyn_img_##ver, boot_img_hdr_##ver)
+
 #define impl_val(name) \
 decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_pxa->name; }
 
 struct dyn_img_pxa : public dyn_img_hdr {
+	impl_cls(pxa)
 
 	impl_val(extra_size)
 	impl_val(page_size)
@@ -227,15 +239,6 @@ struct dyn_img_pxa : public dyn_img_hdr {
 	impl_val(cmdline)
 	impl_val(id)
 	impl_val(extra_cmdline)
-
-	dyn_img_pxa(void *ptr) {
-		raw = xmalloc(sizeof(boot_img_hdr_pxa));
-		memcpy(raw, ptr, sizeof(boot_img_hdr_pxa));
-	}
-
-	size_t hdr_size() override {
-		return sizeof(boot_img_hdr_pxa);
-	}
 };
 
 #undef impl_val
@@ -243,6 +246,7 @@ struct dyn_img_pxa : public dyn_img_hdr {
 decltype(std::declval<dyn_img_hdr>().name()) name() override { return v2_hdr->name; }
 
 struct dyn_img_v0 : public dyn_img_hdr {
+	impl_cls(v0)
 
 	impl_val(page_size)
 	impl_val(extra_size)
@@ -251,25 +255,15 @@ struct dyn_img_v0 : public dyn_img_hdr {
 	impl_val(cmdline)
 	impl_val(id)
 	impl_val(extra_cmdline)
-
-	dyn_img_v0(void *ptr) {
-		raw = xmalloc(sizeof(boot_img_hdr_v2));
-		memcpy(raw, ptr, sizeof(boot_img_hdr_v2));
-	}
-
-	size_t hdr_size() override {
-		return sizeof(boot_img_hdr_v2);
-	}
 };
 
 struct dyn_img_v1 : public dyn_img_v0 {
+	impl_cls(v1)
 
 	impl_val(header_version)
 	impl_val(recovery_dtbo_size)
 	impl_val(recovery_dtbo_offset)
 	impl_val(header_size)
-
-	dyn_img_v1(void *ptr) : dyn_img_v0(ptr) {}
 
 	uint32_t &extra_size() override {
 		return dyn_img_hdr::extra_size();
@@ -277,12 +271,13 @@ struct dyn_img_v1 : public dyn_img_v0 {
 };
 
 struct dyn_img_v2 : public dyn_img_v1 {
+	impl_cls(v2)
 
 	impl_val(dtb_size)
-
-	dyn_img_v2(void *ptr) : dyn_img_v1(ptr) {}
 };
 
+#undef __impl_cls
+#undef impl_cls
 #undef impl_val
 
 // Flags
@@ -329,7 +324,7 @@ struct boot_img {
 	size_t tail_size = 0;
 
 	// Pointers to blocks defined in header
-	uint8_t *img_start;
+	uint8_t *hdr_addr;
 	uint8_t *kernel;
 	uint8_t *ramdisk;
 	uint8_t *second;
