@@ -22,7 +22,7 @@ public class DownloadActivity extends Activity {
 
     static final String TAG = "MMStub";
     private static final boolean IS_CANARY = BuildConfig.VERSION_NAME.contains("-");
-    private static final String URL =
+    private static final String URL = BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
             "https://raw.githubusercontent.com/topjohnwu/magisk_files/" +
                     (IS_CANARY ? "canary/release.json" : "master/stable.json");
 

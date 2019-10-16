@@ -5,6 +5,7 @@ android {
         applicationId 'com.topjohnwu.magisk'
         versionCode 1
         versionName props['appVersion']
+        buildConfigField 'String', 'DEV_CHANNEL', props['DEV_CHANNEL'] ?: 'null'
     }
 
     buildTypes {
