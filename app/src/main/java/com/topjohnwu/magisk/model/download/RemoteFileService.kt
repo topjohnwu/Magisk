@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.utils.ProgressInputStream
+import com.topjohnwu.magisk.utils.isRunningAsStub
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Completable
@@ -71,7 +72,7 @@ abstract class RemoteFileService : NotificationService() {
                 else -> Completable.fromAction { stream.writeTo(subject.file) }
             }
         }.doOnComplete {
-            if (subject is Manager)
+            if (!isRunningAsStub && subject is Manager)
                 handleAPK(subject)
         }
 

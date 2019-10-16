@@ -37,7 +37,9 @@ public class DelegateApplication extends Application {
             // If 9.0+, try to dynamically load the APK
             DelegateComponentFactory factory = (DelegateComponentFactory) this.factory;
             MANAGER_APK = DynAPK.current(this);
-            MANAGER_APK.getParentFile().mkdir();
+            File update = DynAPK.update(this);
+            if (update.exists())
+                update.renameTo(MANAGER_APK);
             if (MANAGER_APK.exists()) {
                 ClassLoader cl = new DynamicClassLoader(MANAGER_APK, factory.loader);
                 try {

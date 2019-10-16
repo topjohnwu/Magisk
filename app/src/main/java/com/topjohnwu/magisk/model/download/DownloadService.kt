@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
+import com.topjohnwu.magisk.ProcessPhoenix
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.chooser
 import com.topjohnwu.magisk.extensions.exists
@@ -18,6 +19,8 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.utils.APKInstall
+import com.topjohnwu.magisk.utils.DynAPK
+import com.topjohnwu.magisk.utils.isRunningAsStub
 import org.koin.core.get
 import java.io.File
 import kotlin.random.Random.Default.nextInt
@@ -62,8 +65,15 @@ open class DownloadService : RemoteFileService() {
     ) {
         remove(id)
         when (subject.configuration)  {
-            is APK.Upgrade -> APKInstall.install(this, subject.file)
-            else -> Unit
+            is APK.Upgrade -> {
+                if (isRunningAsStub) {
+                    subject.file.renameTo(DynAPK.update(this))
+                    ProcessPhoenix.triggerRebirth(this)
+                } else {
+                    APKInstall.install(this, subject.file)
+                }
+            }
+            is APK.Restore -> Unit
         }
     }
 
