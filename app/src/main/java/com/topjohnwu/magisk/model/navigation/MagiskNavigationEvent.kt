@@ -3,19 +3,27 @@ package com.topjohnwu.magisk.model.navigation
 import android.os.Bundle
 import androidx.annotation.AnimRes
 import androidx.annotation.AnimatorRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.skoumal.teanity.viewevents.NavigationDslMarker
 import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.ActivityExecutor
+import com.topjohnwu.magisk.redesign.compat.CompatActivity
 import kotlin.reflect.KClass
 
 class MagiskNavigationEvent(
     val navDirections: MagiskNavDirectionsBuilder,
     val navOptions: MagiskNavOptions,
     val animOptions: MagiskAnimBuilder
-) : ViewEvent() {
+) : ViewEvent(), ActivityExecutor {
 
     companion object {
         operator fun invoke(builder: Builder.() -> Unit) = Builder().apply(builder).build()
+    }
+
+    override fun invoke(activity: AppCompatActivity) {
+        if (activity !is CompatActivity<*, *>) return
+        activity.navigation.navigateTo(this)
     }
 
     @NavigationDslMarker

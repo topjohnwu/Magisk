@@ -10,13 +10,16 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
     : MagiskFragment<ViewModel, Binding>(), CompatView<ViewModel> {
 
     override val viewRoot: View get() = binding.root
+    override val navigation by lazy { compatActivity.navigation }
 
     private val delegate by lazy { CompatDelegate(this) }
+
+    private val compatActivity get() = requireActivity() as CompatActivity<*, *>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        delegate.ensureInsets()
+        delegate.onCreate()
     }
 
     override fun onResume() {

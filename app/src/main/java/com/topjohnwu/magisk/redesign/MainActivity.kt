@@ -29,6 +29,7 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
     override val navHostId: Int = R.id.main_nav_host
+    override val navHost: Int = R.id.main_nav_host
     override val defaultPosition: Int = 0
 
     override val baseFragments: List<KClass<out Fragment>> = listOf(
@@ -38,7 +39,6 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         LogFragment::class,
         SettingsFragment::class
     )
-
     //This temporarily fixes unwanted feature of BottomNavigationView - where the view applies
     //padding on itself given insets are not consumed beforehand. Unfortunately the listener
     //implementation doesn't favor us against the design library, so on re-create it's often given

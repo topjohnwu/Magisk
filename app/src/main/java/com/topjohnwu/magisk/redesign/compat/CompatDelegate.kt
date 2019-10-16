@@ -15,6 +15,11 @@ class CompatDelegate internal constructor(
     private val view: CompatView<*>
 ) {
 
+    fun onCreate() {
+        ensureInsets()
+
+    }
+
     fun onResume() {
         view.viewModel.requestRefresh()
     }
@@ -33,7 +38,7 @@ class CompatDelegate internal constructor(
         (event as? ActivityExecutor)?.invoke(fragment.requireActivity() as AppCompatActivity)
     }
 
-    fun ensureInsets() {
+    private fun ensureInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(view.viewRoot) { _, insets ->
             insets.asInsets()
                 .also { view.peekSystemWindowInsets(it) }

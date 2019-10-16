@@ -7,6 +7,7 @@ internal interface CompatView<ViewModel : CompatViewModel> {
 
     val viewRoot: View
     val viewModel: ViewModel
+    val navigation: CompatNavigationDelegate<*>?
 
     fun peekSystemWindowInsets(insets: Insets) = Unit
     fun consumeSystemWindowInsets(insets: Insets) = Insets.NONE
