@@ -98,7 +98,7 @@ static int add_list(const char *pkg, const char *proc = "") {
 
 	// Critical region
 	{
-		MutexGuard lock(monitor_lock);
+		mutex_guard lock(monitor_lock);
 		hide_set.emplace(pkg, proc);
 	}
 
@@ -119,7 +119,7 @@ int add_list(int client) {
 static int rm_list(const char *pkg, const char *proc = "") {
 	{
 		// Critical region
-		MutexGuard lock(monitor_lock);
+		mutex_guard lock(monitor_lock);
 		bool remove = false;
 		auto next = hide_set.begin();
 		decltype(next) cur;

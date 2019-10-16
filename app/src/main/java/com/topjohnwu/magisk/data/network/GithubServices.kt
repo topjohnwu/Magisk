@@ -19,10 +19,10 @@ interface GithubRawServices {
     @GET("$MAGISK_FILES/master/beta.json")
     fun fetchBetaUpdate(): Single<UpdateInfo>
 
-    @GET("$MAGISK_FILES/master/canary_builds/release.json")
+    @GET("$MAGISK_FILES/canary/release.json")
     fun fetchCanaryUpdate(): Single<UpdateInfo>
 
-    @GET("$MAGISK_FILES/master/canary_builds/canary.json")
+    @GET("$MAGISK_FILES/canary/debug.json")
     fun fetchCanaryDebugUpdate(): Single<UpdateInfo>
 
     @GET

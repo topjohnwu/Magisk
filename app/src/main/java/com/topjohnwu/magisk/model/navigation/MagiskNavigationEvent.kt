@@ -5,11 +5,13 @@ import androidx.annotation.AnimRes
 import androidx.annotation.AnimatorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.skoumal.teanity.viewevents.NavigationDslMarker
-import com.skoumal.teanity.viewevents.ViewEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.redesign.compat.CompatActivity
 import kotlin.reflect.KClass
+
+@DslMarker
+annotation class NavigationDslMarker
 
 class MagiskNavigationEvent(
     val navDirections: MagiskNavDirectionsBuilder,

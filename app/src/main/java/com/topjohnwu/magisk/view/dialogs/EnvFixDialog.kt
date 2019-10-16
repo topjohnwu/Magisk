@@ -8,9 +8,9 @@ import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.cachedFile
 import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.magisk.tasks.MagiskInstaller
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.internal.UiThreadHandler

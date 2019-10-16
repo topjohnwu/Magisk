@@ -1,4 +1,0 @@
-<resources>
-    <string name="upgrade_msg">Pre dokončenie inštalácie sa vyžaduje upgrade Magisk Managera. Stiahnuť a nainštalovať?</string>
-    <string name="no_internet_msg">Pripojte sa na internet! Upgrade Magisk Managera je potrebný.</string>
-</resources>

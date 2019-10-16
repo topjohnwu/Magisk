@@ -1,15 +1,16 @@
 package com.topjohnwu.magisk.model.download
 
 import android.app.Notification
-import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.topjohnwu.magisk.base.BaseService
+import org.koin.core.KoinComponent
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 
-abstract class NotificationService : Service() {
+abstract class NotificationService : BaseService(), KoinComponent {
 
     abstract val defaultNotification: NotificationCompat.Builder
 

@@ -4,4 +4,6 @@
     <string name="no_thanks">Non merci</string>
     <string name="yes">Oui</string>
     <string name="ok">OK</string>
+    <string name="upgrade_msg">Mettre à jour vers la version complête de Magisk Manager pour finir l\'installation. Télécharger et installer?</string>
+    <string name="no_internet_msg">Veuillez vous connecter à Internet! Une mise à niveau complête vers le Gestionnaire Magisk est requise.</string>
 </resources>

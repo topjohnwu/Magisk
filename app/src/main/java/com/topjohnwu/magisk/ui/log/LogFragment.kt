@@ -6,14 +6,14 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.databinding.FragmentLogBinding
 import com.topjohnwu.magisk.model.events.PageChangedEvent
-import com.topjohnwu.magisk.ui.base.MagiskFragment
+import com.topjohnwu.magisk.model.events.ViewEvent
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class LogFragment : MagiskFragment<LogViewModel, FragmentLogBinding>() {
+class LogFragment : BaseFragment<LogViewModel, FragmentLogBinding>() {
 
     override val layoutRes: Int = R.layout.fragment_log
     override val viewModel: LogViewModel by viewModel()

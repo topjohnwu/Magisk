@@ -29,7 +29,7 @@
 }
 
 # DelegateWorker
--keep,allowobfuscation class * extends com.topjohnwu.magisk.model.worker.DelegateWorker
+-keep,allowobfuscation class * extends com.topjohnwu.magisk.base.DelegateWorker
 
 # BootSigner
 -keepclassmembers class com.topjohnwu.signing.BootSigner { *; }

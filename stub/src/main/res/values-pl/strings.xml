@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">Przejdź na pełną wersję programu Magisk Manager, aby ukończyć konfigurację. Ściągnąć i zainstalować?</string>
-    <string name="no_internet_msg">Połącz się z Internetem! Wymagana jest aktualizacja do pełnego programu Magisk Manager.</string>
-</resources>

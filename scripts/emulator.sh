@@ -31,7 +31,7 @@ if [ ! -f /system/build.prop ]; then
   cd "`dirname "$0"`/.."
   adb push native/out/x86/busybox scripts/emulator.sh /data/local/tmp
   emu_arch=`adb shell uname -m`
-  if [ $emu_arch = "x86_64" ]; then
+  if [ "$emu_arch" = "x86_64" ]; then
     adb push native/out/x86/magiskinit64 /data/local/tmp/magiskinit
   else
     adb push native/out/x86/magiskinit /data/local/tmp

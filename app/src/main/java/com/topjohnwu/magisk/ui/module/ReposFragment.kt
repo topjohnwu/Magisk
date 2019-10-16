@@ -6,9 +6,9 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.SearchView
-import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.databinding.FragmentReposBinding
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
@@ -16,12 +16,12 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.model.events.InstallModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
-import com.topjohnwu.magisk.ui.base.MagiskFragment
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class ReposFragment : MagiskFragment<ModuleViewModel, FragmentReposBinding>(),
+class ReposFragment : BaseFragment<ModuleViewModel, FragmentReposBinding>(),
     SearchView.OnQueryTextListener {
 
     override val layoutRes: Int = R.layout.fragment_repos

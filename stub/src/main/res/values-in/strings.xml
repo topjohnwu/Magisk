@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">Tingkatkan ke Magisk Manager versi penuh untuk menyelesaikan penyiapan. Unduh dan pasang?</string>
-    <string name="no_internet_msg">Harap menyambungkan ke Internet! Peningkatan ke Magisk Manager versi penuh diperlukan.</string>
-</resources>

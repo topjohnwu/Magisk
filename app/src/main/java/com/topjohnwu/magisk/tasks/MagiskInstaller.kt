@@ -6,7 +6,6 @@ import android.os.Build
 import android.text.TextUtils
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import com.skoumal.teanity.extensions.subscribeK
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.data.network.GithubRawServices
@@ -25,9 +24,11 @@ import org.kamranzafar.jtar.TarHeader
 import org.kamranzafar.jtar.TarInputStream
 import org.kamranzafar.jtar.TarOutputStream
 import timber.log.Timber
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.nio.ByteBuffer
-import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -40,7 +41,7 @@ abstract class MagiskInstaller {
 
     private val console: MutableList<String>
     private val logs: MutableList<String>
-    private var isTar = false
+    private var tarOut: TarOutputStream? = null
 
     private val service: GithubRawServices by inject()
     private val context: Context by inject()
@@ -151,7 +152,9 @@ abstract class MagiskInstaller {
     private fun handleTar(input: InputStream) {
         console.add("- Processing tar file")
         var vbmeta = false
-        withStreams(TarInputStream(input), TarOutputStream(destFile)) { tarIn, tarOut ->
+        val tarOut = TarOutputStream(destFile)
+        this.tarOut = tarOut
+        TarInputStream(input).use { tarIn ->
             lateinit var entry: TarEntry
             while (tarIn.nextEntry?.let { entry = it } != null) {
                 if (entry.name.contains("boot.img") || entry.name.contains("recovery.img")) {
@@ -215,8 +218,7 @@ abstract class MagiskInstaller {
                     return false
                 }
                 it.reset()
-                if (Arrays.equals(magic, "ustar".toByteArray())) {
-                    isTar = true
+                if (magic.contentEquals("ustar".toByteArray())) {
                     destFile = File(Config.downloadDirectory, "magisk_patched.tar")
                     handleTar(it)
                 } else {
@@ -293,15 +295,13 @@ abstract class MagiskInstaller {
     protected fun storeBoot(): Boolean {
         val patched = SuFile.open(installDir, "new-boot.img")
         try {
-            val os: OutputStream
-            if (isTar) {
-                os = TarOutputStream(destFile, true)
-                os.putNextEntry(newEntry(
+            val os = tarOut?.let {
+                it.putNextEntry(newEntry(
                         if (srcBoot.contains("recovery")) "recovery.img" else "boot.img",
                         patched.length()))
-            } else {
-                os = destFile.outputStream()
-            }
+                tarOut = null
+                it
+            } ?: destFile.outputStream()
             patched.suInputStream().use { it.copyTo(os); os.close() }
         } catch (e: IOException) {
             console.add("! Failed to output to $destFile")

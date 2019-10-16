@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">Обновите Magisk Manager для завершения установки. Загрузить и установить?</string>
-    <string name="no_internet_msg">Пожалуйста, подключитесь к интернету! Требуется обновление Magisk Manager.</string>
-</resources>

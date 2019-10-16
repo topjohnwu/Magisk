@@ -33,7 +33,6 @@ Furthermore, Magisk provides a **Systemless Interface** to alter the system (or 
 Default string resources for Magisk Manager are scattered throughout
 
 - `app/src/main/res/values/strings.xml`
-- `stub/src/main/res/values/strings.xml`
 - `shared/src/main/res/values/strings.xml`
 
 Translate each and place them in the respective locations (`<module>/src/main/res/values-<lang>/strings.xml`).

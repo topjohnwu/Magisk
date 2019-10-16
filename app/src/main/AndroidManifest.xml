@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    ** Special Requirements **
+
+    This AndroidManifest.xml will be copied into the stub
+    APK to allow APK delegation. This is why these special
+    requirements exist.
+
+    * Class names *
+    Class names a.a, a.c, a.e should not be changed as they are used
+    externally. All other class names can be changed.
+
+    * Resource IDs *
+    All resource IDs referred in AndroidManifest.xml is required to be
+    included into the "shared" module to make the ID match with stub.
+
+-->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.topjohnwu.magisk">
@@ -11,31 +29,35 @@
 
     <application
         android:name="a.e"
+        android:appComponentFactory="a.a"
         android:allowBackup="true"
-        android:theme="@style/MagiskTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
+        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning"
+        tools:replace="android:appComponentFactory">
 
-        <!-- Activities -->
+        <!-- Splash -->
 
-        <activity
-            android:name="a.b"
-            android:configChanges="orientation|screenSize"
-            android:exported="true" />
-        <activity
-            android:name="a.i"
-            android:exported="true"
-            android:theme="@style/Foundation.Default" />
         <activity
             android:name="a.c"
             android:configChanges="orientation|screenSize"
-            android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Main -->
+
+        <activity
+            android:name="a.b"
+            android:configChanges="orientation|screenSize"
+            android:exported="true" />
+
+        <activity
+            android:name="a.i"
+            android:exported="true"
+            android:theme="@style/Foundation.Default" />
 
         <activity-alias
             android:name="a.s"
@@ -46,11 +68,12 @@
             </intent-filter>
         </activity-alias>
 
+        <!-- Flashing  -->
+
         <activity
             android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="nosensor"
-            android:theme="@style/MagiskTheme.Flashing" />
+            android:screenOrientation="nosensor" />
 
         <!-- Superuser -->
 
@@ -58,8 +81,7 @@
             android:name="a.m"
             android:directBootAware="true"
             android:excludeFromRecents="true"
-            android:exported="false"
-            android:theme="@style/MagiskTheme.SU" />
+            android:exported="false" />
 
         <!-- Receiver -->
 
@@ -78,9 +100,10 @@
             </intent-filter>
         </receiver>
 
-        <!-- Service -->
+        <!-- DownloadService -->
 
-        <service android:name="a.j"
+        <service
+            android:name="a.j"
             android:exported="false" />
 
         <!-- Hardcode GMS version -->

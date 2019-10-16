@@ -1,31 +1,31 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.content.Context
-import com.skoumal.teanity.extensions.subscribeK
-import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.FragmentMagiskBinding
-import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.DynamicClassLoader
+import com.topjohnwu.magisk.extensions.openUrl
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.events.*
-import com.topjohnwu.magisk.ui.base.MagiskActivity
-import com.topjohnwu.magisk.ui.base.MagiskFragment
-import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.dialogs.*
 import com.topjohnwu.superuser.Shell
 import dalvik.system.DexFile
 import io.reactivex.Completable
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.lang.reflect.InvocationHandler
 
-class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
+class HomeFragment : BaseFragment<HomeViewModel, FragmentMagiskBinding>(),
     SafetyNetHelper.Callback {
 
     override val layoutRes: Int = R.layout.fragment_magisk
@@ -33,13 +33,14 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
 
     private val magiskRepo: MagiskRepository by inject()
     private val EXT_APK by lazy { File("${activity.filesDir.parent}/snet", "snet.jar") }
+    private val EXT_DEX by lazy { File(EXT_APK.parent, "snet.dex") }
 
     override fun onResponse(responseCode: Int) = viewModel.finishSafetyNetCheck(responseCode)
 
     override fun onEventDispatched(event: ViewEvent) {
         super.onEventDispatched(event)
         when (event) {
-            is OpenLinkEvent -> openLink(event.url)
+            is OpenLinkEvent -> activity.openUrl(event.url)
             is ManagerInstallEvent -> installManager()
             is MagiskInstallEvent -> installMagisk()
             is UninstallEvent -> uninstall()
@@ -62,7 +63,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
             return
         }
 
-        MagiskInstallDialog(requireActivity() as MagiskActivity<*, *>).show()
+        MagiskInstallDialog(requireActivity() as BaseActivity<*, *>).show()
     }
 
     private fun installManager() = ManagerInstallDialog(requireActivity()).show()
@@ -94,7 +95,7 @@ class HomeFragment : MagiskFragment<HomeViewModel, FragmentMagiskBinding>(),
     private fun updateSafetyNet(dieOnError: Boolean) {
         Completable.fromAction {
             val loader = DynamicClassLoader(EXT_APK)
-            val dex = DexFile.loadDex(EXT_APK.path, EXT_APK.parent, 0)
+            val dex = DexFile.loadDex(EXT_APK.path, EXT_DEX.path, 0)
 
             // Scan through the dex and find our helper class
             var helperClass: Class<*>? = null

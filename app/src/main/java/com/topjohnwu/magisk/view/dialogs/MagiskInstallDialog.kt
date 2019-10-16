@@ -3,14 +3,14 @@ package com.topjohnwu.magisk.view.dialogs
 import android.net.Uri
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.ui.base.MagiskActivity
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import java.util.*
 
-class MagiskInstallDialog(a: MagiskActivity<*, *>) : CustomAlertDialog(a) {
+class MagiskInstallDialog(a: BaseActivity<*, *>) : CustomAlertDialog(a) {
     init {
         val filename = "Magisk v${Info.remote.magisk.version}" +
                 "(${Info.remote.magisk.versionCode})"

@@ -2,4 +2,6 @@
     <string name="no_thanks">Hayır, teşekkürler</string>
     <string name="yes">Evet</string>
     <string name="ok">Tamam</string>
+    <string name="upgrade_msg">Kurulumu tamamlamak için tam Magisk Manager\'a yükseltin. İndirip yüklensin mi?</string>
+    <string name="no_internet_msg">Lütfen internete bağlanın! Tam Magisk Manager\'a yükseltmek gerekiyor.</string>
 </resources>

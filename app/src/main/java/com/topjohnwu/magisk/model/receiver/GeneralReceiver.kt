@@ -1,15 +1,14 @@
 package com.topjohnwu.magisk.model.receiver
 
-import android.content.BroadcastReceiver
-import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.base.BaseReceiver
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.data.database.base.su
-import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.ManagerJson
@@ -20,8 +19,9 @@ import com.topjohnwu.magisk.utils.SuLogger
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
+import org.koin.core.inject
 
-open class GeneralReceiver : BroadcastReceiver() {
+open class GeneralReceiver : BaseReceiver() {
 
     private val policyDB: PolicyDao by inject()
 
@@ -36,7 +36,7 @@ open class GeneralReceiver : BroadcastReceiver() {
         return intent.data?.encodedSchemeSpecificPart.orEmpty()
     }
 
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(context: ContextWrapper, intent: Intent?) {
         intent ?: return
         when (intent.action ?: return) {
             Intent.ACTION_REBOOT, Intent.ACTION_BOOT_COMPLETED -> {

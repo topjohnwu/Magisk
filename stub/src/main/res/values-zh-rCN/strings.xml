@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">需要升级到完整的 Magisk Manager 来完成安装。 现在下载？</string>
-    <string name="no_internet_msg">请连接到互联网！ 这是升级到完整 Magisk Manager 所必需的。</string>
-</resources>

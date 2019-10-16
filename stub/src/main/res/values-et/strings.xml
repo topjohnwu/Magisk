@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">Täienda seadistuse lõpetamiseks Magisk Manager täisversioonile. Kas laadin alla ja installin?</string>
-    <string name="no_internet_msg">Palun ühendu Internetti! Nõutud on Magisk Manageri täiendamine.</string>
-</resources>

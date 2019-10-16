@@ -33,12 +33,8 @@ su_info::~su_info() {
 	pthread_mutex_destroy(&_lock);
 }
 
-void su_info::lock() {
-	pthread_mutex_lock(&_lock);
-}
-
-void su_info::unlock() {
-	pthread_mutex_unlock(&_lock);
+mutex_guard su_info::lock() {
+	return mutex_guard(_lock);
 }
 
 bool su_info::is_fresh() {
@@ -89,17 +85,14 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 	shared_ptr<su_info> info;
 
 	{
-		MutexGuard lock(cache_lock);
+		mutex_guard lock(cache_lock);
 		if (!cached || cached->uid != uid || !cached->is_fresh())
 			cached = make_shared<su_info>(uid);
 		cached->refresh();
 		info = cached;
 	}
 
-	info->lock();
-	RunFinally unlock([&] {
-		info->unlock();
-	});
+	auto g = info->lock();
 
 	if (info->access.policy == QUERY) {
 		// Not cached, get data from database

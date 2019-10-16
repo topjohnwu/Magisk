@@ -12,6 +12,16 @@ import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import io.reactivex.subjects.PublishSubject
 
+/**
+ * Class for passing events from ViewModels to Activities/Fragments
+ * Variable [handled] used so each event is handled only once
+ * (see https://medium.com/google-developers/livedata-with-snackbar-navigation-and-other-events-the-singleliveevent-case-ac2622673150)
+ * Use [ViewEventObserver] for observing these events
+ */
+abstract class ViewEvent {
+
+    var handled = false
+}
 
 data class OpenLinkEvent(val url: String) : ViewEvent()
 

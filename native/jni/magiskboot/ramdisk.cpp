@@ -52,11 +52,7 @@ void magisk_cpio::patch() {
 		if (!keepverity) {
 			if (fstab) {
 				fprintf(stderr, "Found fstab file [%s]\n", cur->first.data());
-				auto buf = patch_verity(cur->second->data, cur->second->filesize);
-				if (buf) {
-					free(cur->second->data);
-					cur->second->data = buf;
-				}
+				patch_verity(cur->second->data, cur->second->filesize, true);
 			} else if (cur->first == "verity_key") {
 				rm(cur);
 				continue;
@@ -64,7 +60,7 @@ void magisk_cpio::patch() {
 		}
 		if (!keepforceencrypt) {
 			if (fstab) {
-				patch_encryption(&cur->second->data, &cur->second->filesize);
+				patch_encryption(cur->second->data, cur->second->filesize);
 			}
 		}
 	}
@@ -246,13 +242,13 @@ void magisk_cpio::compress() {
 	fprintf(stderr, "Compressing cpio -> [%s]\n", RAMDISK_XZ);
 	auto init = entries.extract("init");
 	XZEncoder encoder;
-	encoder.set_out(make_unique<BufOutStream>());
+	encoder.setOut(make_unique<BufOutStream>());
 	output(encoder);
 	encoder.finalize();
 	entries.clear();
 	entries.insert(std::move(init));
 	auto xz = new cpio_entry(RAMDISK_XZ, S_IFREG);
-	static_cast<BufOutStream *>(encoder.get_out())->release(xz->data, xz->filesize);
+	static_cast<BufOutStream *>(encoder.getOut())->release(xz->data, xz->filesize);
 	insert(xz);
 }
 
@@ -262,13 +258,13 @@ void magisk_cpio::decompress() {
 		return;
 	fprintf(stderr, "Decompressing cpio [%s]\n", RAMDISK_XZ);
 	LZMADecoder decoder;
-	decoder.set_out(make_unique<BufOutStream>());
+	decoder.setOut(make_unique<BufOutStream>());
 	decoder.write(it->second->data, it->second->filesize);
 	decoder.finalize();
 	entries.erase(it);
 	char *buf;
 	size_t sz;
-	static_cast<BufOutStream *>(decoder.get_out())->getbuf(buf, sz);
+	static_cast<BufOutStream *>(decoder.getOut())->getbuf(buf, sz);
 	load_cpio(buf, sz);
 }
 

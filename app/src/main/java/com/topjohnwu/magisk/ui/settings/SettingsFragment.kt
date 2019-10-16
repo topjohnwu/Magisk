@@ -13,21 +13,20 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
-import com.skoumal.teanity.extensions.subscribeK
-import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.BasePreferenceFragment
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toLangTag
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.net.Networking
-import com.topjohnwu.magisk.ui.base.BasePreferenceFragment
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import com.topjohnwu.superuser.Shell
@@ -204,7 +203,7 @@ class SettingsFragment : BasePreferenceFragment() {
                 Shell.su("magiskhide --disable").submit()
             }
             Config.Key.LOCALE -> {
-                LocaleManager.setLocale(activity.application)
+                ResourceMgr.reload()
                 activity.recreate()
             }
             Config.Key.CHECK_UPDATES -> Utils.scheduleUpdateCheck(activity)
@@ -233,7 +232,7 @@ class SettingsFragment : BasePreferenceFragment() {
             val values = mutableListOf<String>()
 
             names.add(
-                LocaleManager.getString(defaultLocale, R.string.system_default)
+                ResourceMgr.getString(defaultLocale, R.string.system_default)
             )
             values.add("")
 

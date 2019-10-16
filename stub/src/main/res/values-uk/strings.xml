@@ -1,4 +1,0 @@
-<resources>
-    <string name="upgrade_msg">Оновіть Magisk Manager для завершення встановлення. Завантажити і встановити?</string>
-    <string name="no_internet_msg">Будь ласка, підключіться до Інтернету! Потрібно оновити Magisk Manager.</string>
-</resources>

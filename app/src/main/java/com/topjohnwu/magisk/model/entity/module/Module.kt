@@ -48,7 +48,7 @@ class Module(path: String) : BaseModule() {
         }
 
         if (name.isEmpty()) {
-            name = id;
+            name = id
         }
     }
 
@@ -65,7 +65,7 @@ class Module(path: String) : BaseModule() {
                 val module = Module(Const.MAGISK_PATH + "/" + file.name)
                 moduleList.add(module)
             }
-            return moduleList
+            return moduleList.sortedBy { it.name }
         }
     }
 }

@@ -2,4 +2,6 @@
     <string name="no_thanks">Ні, дякую</string>
     <string name="yes">Так</string>
     <string name="ok">OK</string>
+    <string name="upgrade_msg">Оновіть Magisk Manager для завершення встановлення. Завантажити і встановити?</string>
+    <string name="no_internet_msg">Будь ласка, підключіться до Інтернету! Потрібно оновити Magisk Manager.</string>
 </resources>
