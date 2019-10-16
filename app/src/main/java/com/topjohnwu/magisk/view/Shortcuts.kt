@@ -25,10 +25,11 @@ object Shortcuts {
     private fun getShortCuts(context: Context): List<ShortcutInfo> {
         val shortCuts = mutableListOf<ShortcutInfo>()
         val root = Shell.rootAccess()
+        val intent = context.intent(SplashActivity::class.java)
         if (Utils.showSuperUser()) {
             shortCuts.add(ShortcutInfo.Builder(context, "superuser")
                     .setShortLabel(context.getString(R.string.superuser))
-                    .setIntent(Intent(context, ClassMap[SplashActivity::class.java])
+                    .setIntent(Intent(intent)
                             .putExtra(Const.Key.OPEN_SECTION, "superuser")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
@@ -39,7 +40,7 @@ object Shortcuts {
         if (root && Config.magiskHide) {
             shortCuts.add(ShortcutInfo.Builder(context, "magiskhide")
                     .setShortLabel(context.getString(R.string.magiskhide))
-                    .setIntent(Intent(context, ClassMap[SplashActivity::class.java])
+                    .setIntent(Intent(intent)
                             .putExtra(Const.Key.OPEN_SECTION, "magiskhide")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
@@ -50,7 +51,7 @@ object Shortcuts {
         if (!Config.coreOnly && root && Info.magiskVersionCode >= 0) {
             shortCuts.add(ShortcutInfo.Builder(context, "modules")
                     .setShortLabel(context.getString(R.string.modules))
-                    .setIntent(Intent(context, ClassMap[SplashActivity::class.java])
+                    .setIntent(Intent(intent)
                             .putExtra(Const.Key.OPEN_SECTION, "modules")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
@@ -59,7 +60,7 @@ object Shortcuts {
                     .build())
             shortCuts.add(ShortcutInfo.Builder(context, "downloads")
                     .setShortLabel(context.getString(R.string.downloads))
-                    .setIntent(Intent(context, ClassMap[SplashActivity::class.java])
+                    .setIntent(Intent(intent)
                             .putExtra(Const.Key.OPEN_SECTION, "downloads")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))

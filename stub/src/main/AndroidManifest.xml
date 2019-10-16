@@ -16,8 +16,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name="a.e"
-        android:appComponentFactory="a.a"
+        android:name="a.y"
+        android:appComponentFactory="a.x"
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning" >
@@ -25,7 +25,7 @@
         <!-- Download Activity -->
 
         <activity
-            android:name="a.c"
+            android:name="a.z"
             android:configChanges="orientation|screenSize"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -37,23 +37,23 @@
         <!-- Magisk Manager Components -->
 
         <activity
-            android:name="a.b"
+            android:name="a.o"
             android:configChanges="orientation|screenSize"
             android:exported="true" />
 
         <activity
-            android:name="a.f"
+            android:name="a.x"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor" />
 
         <activity
-            android:name="a.m"
+            android:name="a.g"
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false" />
 
         <receiver
-            android:name="a.h"
+            android:name="a.w"
             android:directBootAware="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -68,7 +68,7 @@
         </receiver>
 
         <service
-            android:name="a.j"
+            android:name="a.v"
             android:exported="false" />
 
         <meta-data

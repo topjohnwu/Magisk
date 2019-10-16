@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.ui
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
@@ -62,7 +61,7 @@ open class SplashActivity : Activity() {
         // Setup shortcuts
         Shortcuts.setup(this)
 
-        val intent = Intent(this, ClassMap[MainActivity::class.java])
+        val intent = intent(MainActivity::class.java)
         intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION))
         DONE = true
         startActivity(intent)

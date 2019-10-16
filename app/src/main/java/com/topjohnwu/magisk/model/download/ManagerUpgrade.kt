@@ -1,10 +1,9 @@
 package com.topjohnwu.magisk.model.download
 
-import android.content.ComponentName
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.cmp
 import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Restore
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Upgrade
@@ -52,9 +51,7 @@ private fun RemoteFileService.restore(apk: File, id: Int) {
     // Make it world readable
     apk.setReadable(true, false)
     if (Shell.su("pm install $apk").exec().isSuccess) {
-        val component = ComponentName(BuildConfig.APPLICATION_ID,
-                ClassMap.get<Class<*>>(SplashActivity::class.java).name)
-        Utils.rmAndLaunch(packageName, component)
+        Utils.rmAndLaunch(packageName, SplashActivity::class.java.cmp())
     }
 }
 

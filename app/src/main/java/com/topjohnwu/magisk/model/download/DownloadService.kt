@@ -7,11 +7,11 @@ import android.content.Intent
 import android.os.Build
 import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
-import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.chooser
 import com.topjohnwu.magisk.extensions.exists
 import com.topjohnwu.magisk.extensions.provide
+import com.topjohnwu.magisk.intent
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -140,8 +140,7 @@ open class DownloadService : RemoteFileService() {
         inline operator fun invoke(context: Context, argBuilder: Builder.() -> Unit) {
             val app = context.applicationContext
             val builder = Builder().apply(argBuilder)
-            val intent = Intent(app, ClassMap[DownloadService::class.java])
-                .putExtra(ARG_URL, builder.subject)
+            val intent = app.intent(DownloadService::class.java).putExtra(ARG_URL, builder.subject)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 app.startForegroundService(intent)

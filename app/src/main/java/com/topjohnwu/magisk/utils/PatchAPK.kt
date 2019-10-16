@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.utils
 
-import android.content.ComponentName
 import android.content.Context
 import android.widget.Toast
 import com.topjohnwu.magisk.*
@@ -102,8 +101,7 @@ object PatchAPK {
 
         Config.suManager = pkg
         Config.export()
-        Utils.rmAndLaunch(BuildConfig.APPLICATION_ID,
-                ComponentName(pkg, ClassMap.get<Class<*>>(SplashActivity::class.java).name))
+        Utils.rmAndLaunch(BuildConfig.APPLICATION_ID, SplashActivity::class.java.cmp(pkg))
 
         return true
     }

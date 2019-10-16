@@ -7,11 +7,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
-import com.topjohnwu.magisk.ClassMap
-import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
-import com.topjohnwu.magisk.Info
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.databinding.ActivityMainBinding
@@ -61,7 +58,7 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (!SplashActivity.DONE) {
-            startActivity(Intent(this, ClassMap[SplashActivity::class.java]))
+            startActivity(intent(SplashActivity::class.java))
             finish()
         }
 

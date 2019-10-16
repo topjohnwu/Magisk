@@ -23,7 +23,12 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
-open class App : Application() {
+open class App() : Application() {
+
+    constructor(map: Map<String, String>) : this() {
+        isRunningAsStub = true
+        ClassMap.componentMap = map
+    }
 
     init {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)

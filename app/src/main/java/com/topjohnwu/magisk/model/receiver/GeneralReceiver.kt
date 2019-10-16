@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.model.receiver
 
 import android.content.ContextWrapper
 import android.content.Intent
-import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Info
@@ -10,6 +9,7 @@ import com.topjohnwu.magisk.base.BaseReceiver
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.intent
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.internal.Configuration
@@ -51,7 +51,7 @@ open class GeneralReceiver : BaseReceiver() {
                 }
                 when (action) {
                     REQUEST -> {
-                        val i = Intent(context, ClassMap[SuRequestActivity::class.java])
+                        val i = context.intent(SuRequestActivity::class.java)
                                 .setAction(action)
                                 .putExtra("socket", intent.getStringExtra("socket"))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

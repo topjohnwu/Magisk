@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.utils.DynamicClassLoader;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import static com.topjohnwu.magisk.DownloadActivity.TAG;
 
@@ -44,7 +45,8 @@ public class DelegateApplication extends Application {
                     Object df = cl.loadClass("a.a").newInstance();
 
                     // Create the delegate Application
-                    delegate = (Application) cl.loadClass("a.e").newInstance();
+                    delegate = (Application) cl.loadClass("a.e").getConstructor(Map.class)
+                            .newInstance(ComponentMap.inverseMap);
 
                     // Call attachBaseContext without ContextImpl to show it is being wrapped
                     Method m = ContextWrapper.class.getDeclaredMethod("attachBaseContext", Context.class);
