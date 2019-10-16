@@ -81,6 +81,7 @@
 
     <!--Static-->
     <attr name="colorDisabled" format="color" />
+    <attr name="colorDisabledVariant" format="color" />
     <attr name="colorSurfaceVariant" format="color" />
     <attr name="colorOnPrimaryVariant" format="color" />
     <attr name="colorOnSurfaceVariant" format="color" />

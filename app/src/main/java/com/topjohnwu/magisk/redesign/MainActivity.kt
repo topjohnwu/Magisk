@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModulesFragment
 import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
+import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
 
@@ -63,6 +64,16 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
 
         if (intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false)) {
             binding.mainNavigation.selectedItemId = R.id.settingsFragment
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.mainNavigation.menu.apply {
+            val isRoot = Shell.rootAccess()
+            findItem(R.id.modulesFragment)?.isEnabled = isRoot
+            findItem(R.id.superuserFragment)?.isEnabled = isRoot
+            findItem(R.id.logFragment)?.isEnabled = isRoot
         }
     }
 

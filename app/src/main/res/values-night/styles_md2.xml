@@ -17,6 +17,7 @@
         <item name="colorOnSurface">#BABABA</item>
         <item name="colorOnSurfaceVariant">#80BABABA</item>
         <item name="colorDisabled">#808080</item>
+        <item name="colorDisabledVariant">#66808080</item>
         <item name="colorTextTransient">@color/color_text_transient</item>
         <item name="colorPrimaryTransient">@color/color_primary_transient</item>
         <item name="colorErrorTransient">@color/color_error_transient</item>
