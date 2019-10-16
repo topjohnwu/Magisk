@@ -3,8 +3,11 @@ package com.topjohnwu.magisk.redesign
 import android.graphics.Insets
 import android.os.Bundle
 import android.view.ViewTreeObserver
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.setPadding
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import com.google.android.material.card.MaterialCardView
 import com.ncapdevi.fragnav.FragNavController
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
@@ -16,6 +19,7 @@ import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModulesFragment
 import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
+import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
@@ -48,6 +52,9 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
 
         setSupportActionBar(binding.mainToolbar)
 
+        binding.mainToolbarWrapper.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = HideTopViewOnScrollBehavior<MaterialCardView>()
+        }
         binding.mainNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.homeFragment -> Navigation.home()
