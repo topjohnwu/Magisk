@@ -1,15 +1,14 @@
 package com.topjohnwu.magisk.redesign.home
 
-import com.skoumal.teanity.databinding.ComparableRvItem
-import com.skoumal.teanity.extensions.subscribeK
-import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.packageName
 import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
 import com.topjohnwu.magisk.extensions.res
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.MagiskJson
 import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.UpdateInfo
@@ -20,6 +19,7 @@ import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.ui.home.MagiskState
+import com.topjohnwu.magisk.utils.KObservableField
 import me.tatarka.bindingcollectionadapter2.BR
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import me.tatarka.bindingcollectionadapter2.OnItemBind

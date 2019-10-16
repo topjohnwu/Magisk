@@ -3,11 +3,11 @@ package com.topjohnwu.magisk.redesign.compat
 import android.os.Bundle
 import android.view.View
 import androidx.databinding.ViewDataBinding
-import com.skoumal.teanity.viewevents.ViewEvent
-import com.topjohnwu.magisk.ui.base.MagiskFragment
+import com.topjohnwu.magisk.base.BaseFragment
+import com.topjohnwu.magisk.model.events.ViewEvent
 
 abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBinding>
-    : MagiskFragment<ViewModel, Binding>(), CompatView<ViewModel> {
+    : BaseFragment<ViewModel, Binding>(), CompatView<ViewModel> {
 
     override val viewRoot: View get() = binding.root
     override val navigation by lazy { compatActivity.navigation }

@@ -12,10 +12,10 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
+import com.topjohnwu.magisk.utils.KObservableField
 
 class MagiskDialog @JvmOverloads constructor(
     context: Context, theme: Int = 0

@@ -6,7 +6,6 @@ import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.R
 
 data class OpenInappLinkEvent(

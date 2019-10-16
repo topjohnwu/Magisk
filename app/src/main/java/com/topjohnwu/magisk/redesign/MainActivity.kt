@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatActivity
+import com.topjohnwu.magisk.redesign.compat.CompatNavigationDelegate
 import com.topjohnwu.magisk.redesign.home.HomeFragment
 import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModulesFragment
@@ -24,13 +25,14 @@ import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
 
-open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>() {
+open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(),
+    FragNavController.TransactionListener {
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
-    override val navHostId: Int = R.id.main_nav_host
     override val navHost: Int = R.id.main_nav_host
-    override val defaultPosition: Int = 0
+
+    override val navigation by lazy { CompatNavigationDelegate(this, this) }
 
     override val baseFragments: List<KClass<out Fragment>> = listOf(
         HomeFragment::class,
@@ -39,6 +41,7 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         LogFragment::class,
         SettingsFragment::class
     )
+
     //This temporarily fixes unwanted feature of BottomNavigationView - where the view applies
     //padding on itself given insets are not consumed beforehand. Unfortunately the listener
     //implementation doesn't favor us against the design library, so on re-create it's often given
@@ -90,21 +93,15 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
     }
 
     override fun onTabTransaction(fragment: Fragment?, index: Int) {
-        super.onTabTransaction(fragment, index)
-
         setDisplayHomeAsUpEnabled(false)
     }
 
     override fun onFragmentTransaction(
         fragment: Fragment?,
         transactionType: FragNavController.TransactionType
-    ) {
-        super.onFragmentTransaction(fragment, transactionType)
-
-        when (transactionType) {
-            FragNavController.TransactionType.PUSH -> setDisplayHomeAsUpEnabled(true)
-            else -> Unit //dunno might be useful
-        }
+    ) = when (transactionType) {
+        FragNavController.TransactionType.PUSH -> setDisplayHomeAsUpEnabled(true)
+        else -> Unit //dunno might be useful
     }
 
     override fun peekSystemWindowInsets(insets: Insets) {

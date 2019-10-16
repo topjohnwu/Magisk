@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
 import timber.log.Timber
 
-class CompatNavigationDelegate<Source>(
+class CompatNavigationDelegate<out Source>(
     private val source: Source,
     private val listener: FragNavController.TransactionListener? = null
 ) : FragNavController.RootFragmentListener where Source : CompatActivity<*, *>, Source : Navigator {
@@ -33,7 +33,7 @@ class CompatNavigationDelegate<Source>(
 
 
     fun onCreate(savedInstanceState: Bundle?) = controller.run {
-        rootFragmentListener = source
+        rootFragmentListener = this@CompatNavigationDelegate
         transactionListener = listener
         initialize(0, savedInstanceState)
     }

@@ -3,11 +3,11 @@ package com.topjohnwu.magisk.redesign.compat
 import android.graphics.Insets
 import androidx.annotation.CallSuper
 import androidx.databinding.Observable
-import com.skoumal.teanity.util.KObservableField
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
+import com.topjohnwu.magisk.utils.KObservableField
 import io.reactivex.disposables.Disposable
 
-abstract class CompatViewModel : MagiskViewModel() {
+abstract class CompatViewModel : BaseViewModel() {
 
     val insets = KObservableField(Insets.NONE)
 

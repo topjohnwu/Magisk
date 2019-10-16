@@ -56,8 +56,7 @@
 
         <activity
             android:name="a.i"
-            android:exported="true"
-            android:theme="@style/Foundation.Default" />
+            android:exported="true" />
 
         <activity-alias
             android:name="a.s"

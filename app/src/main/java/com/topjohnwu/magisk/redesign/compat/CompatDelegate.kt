@@ -5,10 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.ContextExecutor
 import com.topjohnwu.magisk.model.events.FragmentExecutor
+import com.topjohnwu.magisk.model.events.ViewEvent
 import timber.log.Timber
 
 class CompatDelegate internal constructor(

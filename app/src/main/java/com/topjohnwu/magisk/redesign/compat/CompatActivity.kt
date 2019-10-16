@@ -3,17 +3,23 @@ package com.topjohnwu.magisk.redesign.compat
 import android.os.Bundle
 import android.view.View
 import androidx.databinding.ViewDataBinding
-import com.skoumal.teanity.viewevents.ViewEvent
-import com.topjohnwu.magisk.ui.base.MagiskActivity
+import androidx.fragment.app.Fragment
+import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.model.events.ViewEvent
+import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
+import com.topjohnwu.magisk.model.navigation.Navigator
+import kotlin.reflect.KClass
 
 abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBinding> :
-    MagiskActivity<ViewModel, Binding>(), CompatView<ViewModel> {
+    BaseActivity<ViewModel, Binding>(), CompatView<ViewModel>, Navigator {
 
+    override val themeRes = R.style.Foundation_Default
     override val viewRoot: View get() = binding.root
     override val navigation: CompatNavigationDelegate<CompatActivity<ViewModel, Binding>>? by lazy {
         CompatNavigationDelegate(this)
     }
-
+    override val baseFragments = listOf<KClass<out Fragment>>()
     private val delegate by lazy { CompatDelegate(this) }
 
     internal abstract val navHost: Int
@@ -47,6 +53,9 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
             super.onBackPressed()
         }
     }
+
+    @Deprecated("The event is self handled.")
+    override fun navigateTo(event: MagiskNavigationEvent) = Unit
 
     protected fun ViewEvent.dispatchOnSelf() = onEventDispatched(this)
 

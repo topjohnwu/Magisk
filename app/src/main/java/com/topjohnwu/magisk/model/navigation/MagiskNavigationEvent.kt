@@ -5,8 +5,8 @@ import androidx.annotation.AnimRes
 import androidx.annotation.AnimatorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.events.ActivityExecutor
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.redesign.compat.CompatActivity
 import kotlin.reflect.KClass
 
@@ -25,7 +25,7 @@ class MagiskNavigationEvent(
 
     override fun invoke(activity: AppCompatActivity) {
         if (activity !is CompatActivity<*, *>) return
-        activity.navigation.navigateTo(this)
+        activity.navigation?.navigateTo(this)
     }
 
     @NavigationDslMarker
