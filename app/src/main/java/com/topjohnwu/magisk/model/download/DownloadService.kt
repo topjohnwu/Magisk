@@ -20,7 +20,7 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.utils.DynAPK
-import com.topjohnwu.magisk.utils.isRunningAsStub
+import com.topjohnwu.magisk.isRunningAsStub
 import org.koin.core.get
 import java.io.File
 import kotlin.random.Random.Default.nextInt

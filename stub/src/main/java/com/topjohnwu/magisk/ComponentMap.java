@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class ComponentMap {
-    private static Map<String, String> map = new HashMap<>(6);
+    private static Map<String, String> map = new HashMap<>();
 
     // This mapping will be sent into the guest app
     static Map<String, String> inverseMap;
@@ -16,7 +16,7 @@ class ComponentMap {
         map.put("a.g", "a.m");
         map.put(a.w.class.getName(), "a.h");
         map.put("a.v", "a.j");
-        map.put("a.s", "androidx.work.impl.WorkManagerInitializer");
+        map.put("a.j", "androidx.work.impl.background.systemjob.SystemJobService");
 
         inverseMap = new HashMap<>(map.size());
         for (Map.Entry<String, String> e : map.entrySet()) {

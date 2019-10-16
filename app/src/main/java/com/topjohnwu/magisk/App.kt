@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
 import androidx.room.Room
+import androidx.work.WorkManager
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.WorkDatabase_Impl
 import com.topjohnwu.magisk.data.database.RepoDatabase
@@ -14,10 +15,7 @@ import com.topjohnwu.magisk.di.ActivityTracker
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.unwrap
-import com.topjohnwu.magisk.utils.ResourceMgr
 import com.topjohnwu.magisk.utils.RootInit
-import com.topjohnwu.magisk.utils.isRunningAsStub
-import com.topjohnwu.magisk.utils.wrap
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -72,6 +70,7 @@ open class App() : Application() {
         }
         ResourceMgr.reload()
         app.registerActivityLifecycleCallbacks(get<ActivityTracker>())
+        WorkManager.initialize(impl.wrapJob(), androidx.work.Configuration.Builder().build())
     }
 
     // This is required as some platforms expect ContextImpl

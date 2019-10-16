@@ -13,10 +13,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
-import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.base.BasePreferenceFragment
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding

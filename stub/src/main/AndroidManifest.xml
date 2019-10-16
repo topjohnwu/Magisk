@@ -75,36 +75,14 @@
             android:name="com.google.android.gms.version"
             android:value="12451000" />
 
-        <!-- WorkManager -->
-
-        <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
-            android:directBootAware="false"
-            android:exported="false"
-            android:multiprocess="true"
-            tools:targetApi="n" />
+        <!-- WorkManager SystemJobService -->
 
         <service
-            android:name="androidx.work.impl.background.systemjob.SystemJobService"
+            android:name="a.j"
             android:directBootAware="false"
             android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            tools:targetApi="n" />
-
-        <receiver
-            android:name="androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver"
-            android:directBootAware="false"
-            android:enabled="true"
-            android:exported="false"
-            tools:targetApi="n" />
-
-        <!-- Room -->
-
-        <service
-            android:name="androidx.room.MultiInstanceInvalidationService"
-            android:exported="false" />
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
     </application>
 

@@ -7,7 +7,7 @@ import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.wrap
+import com.topjohnwu.magisk.wrap
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell

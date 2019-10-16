@@ -97,6 +97,12 @@
             android:name="com.google.android.gms.version"
             android:value="12451000" />
 
+        <!-- Initialize WorkManager on-demand -->
+        <provider
+            android:name="androidx.work.impl.WorkManagerInitializer"
+            android:authorities="${applicationId}.workmanager-init"
+            tools:node="remove" />
+
     </application>
 
 </manifest>

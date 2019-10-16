@@ -21,7 +21,7 @@ import com.topjohnwu.magisk.extensions.set
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.currentLocale
-import com.topjohnwu.magisk.utils.wrap
+import com.topjohnwu.magisk.wrap
 import kotlin.random.Random
 
 typealias RequestCallback = BaseActivity<*, *>.(Int, Intent?) -> Unit
