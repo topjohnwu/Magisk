@@ -23,7 +23,6 @@ import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.reflect.KClass
 
 open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(),
     FragNavController.TransactionListener {
@@ -34,7 +33,7 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
 
     override val navigation by lazy { CompatNavigationDelegate(this, this) }
 
-    override val baseFragments: List<KClass<out Fragment>> = listOf(
+    override val baseFragments = listOf(
         HomeFragment::class,
         ModulesFragment::class,
         SuperuserFragment::class,
