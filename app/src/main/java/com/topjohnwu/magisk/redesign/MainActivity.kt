@@ -100,7 +100,7 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         fragment: Fragment?,
         transactionType: FragNavController.TransactionType
     ) = when (transactionType) {
-        FragNavController.TransactionType.PUSH -> setDisplayHomeAsUpEnabled(true)
+        FragNavController.TransactionType.PUSH -> setDisplayHomeAsUpEnabled(!navigation.isRoot)
         else -> Unit //dunno might be useful
     }
 

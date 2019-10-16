@@ -89,15 +89,15 @@ class CompatNavigationDelegate<out Source>(
     }
 
     private fun navigateToFragment(event: MagiskNavigationEvent) {
-        val destination = event.navDirections.destination?.java ?: let {
+        val destination = event.navDirections.destination ?: let {
             Timber.e("Cannot navigate to null destination")
             return
         }
 
         source.baseFragments
-            .indexOfFirst { it.java.name == destination.name }
-            .takeIf { it > 0 }
-            ?.let { controller.switchTab(it) } ?: destination.newInstance()
+            .indexOfFirst { it == destination }
+            .takeIf { it >= 0 }
+            ?.let { controller.switchTab(it) } ?: destination.java.newInstance()
             .also { it.arguments = event.navDirections.args }
             .let { controller.pushFragment(it) }
     }
