@@ -5,21 +5,20 @@ import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.extensions.packageName
-import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
-import com.topjohnwu.magisk.extensions.res
-import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.entity.MagiskJson
 import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.UpdateInfo
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
+import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.model.events.dialog.MagiskInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.ui.home.MagiskState
 import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.BR
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import me.tatarka.bindingcollectionadapter2.OnItemBind
@@ -69,6 +68,8 @@ class HomeViewModel(
         it.bindExtra(BR.viewModel, this)
     }
 
+    private var shownDialog = false
+
     override fun refresh() = repoMagisk.fetchUpdate()
         .onErrorReturn { Info.remote }
         .subscribeK { updateBy(it) }
@@ -101,6 +102,8 @@ class HomeViewModel(
             )
             else -> ""
         }
+
+        ensureEnv()
     }
 
     fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
@@ -110,6 +113,27 @@ class HomeViewModel(
     fun onManagerPressed() = ManagerInstallDialog().publish()
 
     fun onMagiskPressed() = MagiskInstallDialog().publish()
+
+    private fun ensureEnv() {
+        val invalidStates = listOf(
+            MagiskState.NOT_INSTALLED,
+            MagiskState.LOADING
+        )
+
+        // Don't bother checking env when magisk is not installed, loading or already has been shown
+        if (invalidStates.any { it == stateMagisk.value } || shownDialog) {
+            return
+        }
+
+        Shell.su("env_check")
+            .toSingle()
+            .map { it.exec() }
+            .filter { !it.isSuccess }
+            .subscribeK {
+                shownDialog = true
+                EnvFixDialog().publish()
+            }
+    }
 
 }
 
