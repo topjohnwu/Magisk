@@ -43,8 +43,6 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
     }
 
     override fun onEventDispatched(event: ViewEvent) {
-        super.onEventDispatched(event)
-
         delegate.onEventExecute(event, this)
     }
 
@@ -54,7 +52,7 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
         }
     }
 
-    @Deprecated("The event is self handled.")
+    @Deprecated("The event is self handled.", level = DeprecationLevel.ERROR)
     override fun navigateTo(event: MagiskNavigationEvent) = Unit
 
     protected fun ViewEvent.dispatchOnSelf() = onEventDispatched(this)

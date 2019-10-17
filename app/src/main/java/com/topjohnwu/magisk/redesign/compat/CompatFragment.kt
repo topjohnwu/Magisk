@@ -29,8 +29,6 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
     }
 
     override fun onEventDispatched(event: ViewEvent) {
-        super.onEventDispatched(event)
-
         delegate.onEventExecute(event, this)
     }
 
