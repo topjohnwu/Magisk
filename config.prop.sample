@@ -13,8 +13,9 @@ outdir=out
 prettyName=false
 
 # Only used when building with release flag
-# These passwords are used along with release-key.jks to sign APKs and zips
+# These passwords are used along with keyStore to sign APKs and zips
 # keyPass is the pwd for the specified keyAlias
+keyStore=release-key.jks
 keyStorePass=
 keyAlias=
 keyPass=

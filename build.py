@@ -54,7 +54,6 @@ cpu_count = multiprocessing.cpu_count()
 gradlew = os.path.join('.', 'gradlew' + ('.bat' if os.name == 'nt' else ''))
 archs = ['armeabi-v7a', 'x86']
 arch64 = ['arm64-v8a', 'x86_64']
-keystore = 'release-key.jks'
 config = {}
 support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'busybox', 'test']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
@@ -96,16 +95,51 @@ def mkdir_p(path, mode=0o777):
     os.makedirs(path, mode, exist_ok=True)
 
 
-def execv(cmd, redirect=None):
-    return subprocess.run(cmd, stdout=redirect if redirect != None else STDOUT)
+def execv(cmd):
+    return subprocess.run(cmd, stdout=STDOUT)
 
 
-def system(cmd, redirect=None):
-    return subprocess.run(cmd, shell=True, stdout=redirect if redirect != None else STDOUT)
+def system(cmd):
+    return subprocess.run(cmd, shell=True, stdout=STDOUT)
 
 
 def xz(data):
     return lzma.compress(data, preset=9, check=lzma.CHECK_NONE)
+
+
+def load_config(args):
+    # Some default values
+    config['outdir'] = 'out'
+    config['prettyName'] = 'false'
+    config['keyStore'] = 'release-key.jks'
+
+    # Load prop file
+    with open(args.config, 'r') as f:
+        for line in [l.strip(' \t\r\n') for l in f]:
+            if line.startswith('#') or len(line) == 0:
+                continue
+            prop = line.split('=')
+            if len(prop) != 2:
+                continue
+            config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
+
+    config['prettyName'] = config['prettyName'].lower() == 'true'
+
+    # Sanitize configs
+    if 'version' not in config or 'versionCode' not in config:
+        error('Config error: "version" and "versionCode" is required')
+
+    try:
+        config['versionCode'] = int(config['versionCode'])
+    except ValueError:
+        error('Config error: "versionCode" is required to be an integer')
+
+    if args.release and not os.path.exists(config['keyStore']):
+        error(f'Config error: assign "keyStore" to a java keystore')
+
+    mkdir_p(config['outdir'])
+    global STDOUT
+    STDOUT = None if args.verbose else subprocess.DEVNULL
 
 
 def zip_with_msg(zip_file, source, target):
@@ -152,7 +186,7 @@ def sign_zip(unsigned, output, release):
 
     header('* Signing Zip')
 
-    proc = execv(['java', '-jar', zipsigner, keystore, config['keyStorePass'],
+    proc = execv(['java', '-jar', zipsigner, config['keyStore'], config['keyStorePass'],
                   config['keyAlias'], config['keyPass'], unsigned, output])
 
     if proc.returncode != 0:
@@ -444,28 +478,28 @@ def build_all(args):
 
 parser = argparse.ArgumentParser(description='Magisk build script')
 parser.add_argument('-r', '--release', action='store_true',
-                    help='compile Magisk for release')
+                    help='compile in release mode')
 parser.add_argument('-v', '--verbose', action='store_true',
                     help='verbose output')
 parser.add_argument('-c', '--config', default='config.prop',
-                    help='config file location')
+                    help='override config file (default: config.prop)')
 subparsers = parser.add_subparsers(title='actions')
 
 all_parser = subparsers.add_parser(
-    'all', help='build everything (binaries/apks/zips)')
+    'all', help='build binaries, apks, zips')
 all_parser.set_defaults(func=build_all)
 
 binary_parser = subparsers.add_parser('binary', help='build binaries')
 binary_parser.add_argument(
-    'target', nargs='*', help=f"Either {', '.join(support_targets)}, \
+    'target', nargs='*', help=f"{', '.join(support_targets)}, \
     or empty for defaults ({', '.join(default_targets)})")
 binary_parser.set_defaults(func=build_binary)
 
-apk_parser = subparsers.add_parser('apk', help='build Magisk Manager APK')
-apk_parser.set_defaults(func=build_app)
+app_parser = subparsers.add_parser('app', help='build Magisk Manager')
+app_parser.set_defaults(func=build_app)
 
 stub_parser = subparsers.add_parser(
-    'stub', help='build stub Magisk Manager APK')
+    'stub', help='build stub Magisk Manager')
 stub_parser.set_defaults(func=build_stub)
 
 snet_parser = subparsers.add_parser(
@@ -480,9 +514,9 @@ un_parser = subparsers.add_parser(
     'uninstaller', help='create flashable uninstaller')
 un_parser.set_defaults(func=zip_uninstaller)
 
-clean_parser = subparsers.add_parser('clean', help='cleanup.')
+clean_parser = subparsers.add_parser('clean', help='cleanup')
 clean_parser.add_argument(
-    'target', nargs='*', help='Either native, java, or empty to clean both.')
+    'target', nargs='*', help='native, java, or empty to clean both')
 clean_parser.set_defaults(func=cleanup)
 
 if len(sys.argv) == 1:
@@ -490,33 +524,7 @@ if len(sys.argv) == 1:
     sys.exit(1)
 
 args = parser.parse_args()
-
-# Some default values
-config['outdir'] = 'out'
-config['prettyName'] = 'false'
-
-with open(args.config, 'r') as f:
-    for line in [l.strip(' \t\r\n') for l in f]:
-        if line.startswith('#') or len(line) == 0:
-            continue
-        prop = line.split('=')
-        config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
-
-if 'version' not in config or 'versionCode' not in config:
-    error('"version" and "versionCode" is required in "config.prop"')
-
-try:
-    config['versionCode'] = int(config['versionCode'])
-except ValueError:
-    error('"versionCode" is required to be an integer')
-
-config['prettyName'] = config['prettyName'].lower() == 'true'
-
-mkdir_p(config['outdir'])
-
-if args.release and not os.path.exists(keystore):
-    error(f'Please generate a java keystore and place it in "{keystore}"')
-STDOUT = None if args.verbose else subprocess.DEVNULL
+load_config(args)
 
 # Call corresponding functions
 args.func(args)

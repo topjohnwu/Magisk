@@ -62,7 +62,7 @@ subprojects {
             android {
                 signingConfigs {
                     config {
-                        storeFile rootProject.file('release-key.jks')
+                        storeFile new File(props['keyStore'])
                         storePassword props['keyStorePass']
                         keyAlias props['keyAlias']
                         keyPassword props['keyPass']
