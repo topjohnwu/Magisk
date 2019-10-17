@@ -16,6 +16,10 @@ import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
 import com.topjohnwu.magisk.redesign.home.HomeFragment as RedesignHomeFragment
+import com.topjohnwu.magisk.redesign.log.LogFragment as RedesignLogFragment
+import com.topjohnwu.magisk.redesign.module.ModuleFragment as RedesignModulesFragment
+import com.topjohnwu.magisk.redesign.settings.SettingsFragment as RedesignSettingsFragment
+import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment as RedesignSuperuserFragment
 
 object Navigation {
 
@@ -35,11 +39,21 @@ object Navigation {
     }
 
     fun superuser() = MagiskNavigationEvent {
-        navDirections { destination = SuperuserFragment::class }
+        navDirections {
+            destination = when {
+                Config.redesign -> RedesignSuperuserFragment::class
+                else -> SuperuserFragment::class
+            }
+        }
     }
 
     fun modules() = MagiskNavigationEvent {
-        navDirections { destination = ModulesFragment::class }
+        navDirections {
+            destination = when {
+                Config.redesign -> RedesignModulesFragment::class
+                else -> ModulesFragment::class
+            }
+        }
     }
 
     fun repos() = MagiskNavigationEvent {
@@ -51,11 +65,21 @@ object Navigation {
     }
 
     fun log() = MagiskNavigationEvent {
-        navDirections { destination = LogFragment::class }
+        navDirections {
+            destination = when {
+                Config.redesign -> RedesignLogFragment::class
+                else -> LogFragment::class
+            }
+        }
     }
 
     fun settings() = MagiskNavigationEvent {
-        navDirections { destination = SettingsFragment::class }
+        navDirections {
+            destination = when {
+                Config.redesign -> RedesignSettingsFragment::class
+                else -> SettingsFragment::class
+            }
+        }
     }
 
     fun fromSection(section: String) = when (section) {

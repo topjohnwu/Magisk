@@ -16,13 +16,14 @@ import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatActivity
 import com.topjohnwu.magisk.redesign.compat.CompatNavigationDelegate
 import com.topjohnwu.magisk.redesign.home.HomeFragment
-import com.topjohnwu.magisk.ui.log.LogFragment
-import com.topjohnwu.magisk.ui.module.ModulesFragment
-import com.topjohnwu.magisk.ui.settings.SettingsFragment
-import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
+import com.topjohnwu.magisk.redesign.log.LogFragment
+import com.topjohnwu.magisk.redesign.module.ModuleFragment
+import com.topjohnwu.magisk.redesign.settings.SettingsFragment
+import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.reflect.KClass
 
 open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(),
     FragNavController.TransactionListener {
@@ -33,9 +34,9 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
 
     override val navigation by lazy { CompatNavigationDelegate(this, this) }
 
-    override val baseFragments = listOf(
+    override val baseFragments: List<KClass<out Fragment>> = listOf(
         HomeFragment::class,
-        ModulesFragment::class,
+        ModuleFragment::class,
         SuperuserFragment::class,
         LogFragment::class,
         SettingsFragment::class
