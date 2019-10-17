@@ -35,7 +35,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         Log.d(TAG, className);
         if (delegate != null)
-            return delegate.instantiateActivity(loader, ComponentMap.get(className), intent);
+            return delegate.instantiateActivity(loader, Mapping.get(className), intent);
         return create(className, DummyActivity.class);
     }
 
@@ -44,7 +44,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         Log.d(TAG, className);
         if (delegate != null)
-            return delegate.instantiateReceiver(loader, ComponentMap.get(className), intent);
+            return delegate.instantiateReceiver(loader, Mapping.get(className), intent);
         return create(className, DummyReceiver.class);
     }
 
@@ -53,7 +53,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         Log.d(TAG, className);
         if (delegate != null)
-            return delegate.instantiateService(loader, ComponentMap.get(className), intent);
+            return delegate.instantiateService(loader, Mapping.get(className), intent);
         return create(className, DummyService.class);
     }
 
@@ -63,7 +63,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
         Log.d(TAG, className);
         if (loader == null) loader = cl;
         if (delegate != null)
-            return delegate.instantiateProvider(loader, ComponentMap.get(className));
+            return delegate.instantiateProvider(loader, Mapping.get(className));
         return create(className, DummyProvider.class);
     }
 

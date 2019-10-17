@@ -86,12 +86,11 @@ subprojects {
 
                 aaptOptions {
                     // Handle resource IDs
-                    File resIds = rootProject.file('stable-ids.txt')
-                    File stubIds = rootProject.file('stub-ids.txt')
-                    if (module.name == 'app' && resIds.exists())
-                        additionalParameters "--stable-ids", "${resIds.absolutePath}"
-                    else if (module.name == 'stub')
-                        additionalParameters "--emit-ids", "${stubIds.absolutePath}"
+                    File resId = project.file('res-ids.txt')
+                    if (resId.exists())
+                        additionalParameters "--stable-ids", "${resId.absolutePath}"
+                    else
+                        additionalParameters "--emit-ids", "${resId.absolutePath}"
                 }
             }
         }

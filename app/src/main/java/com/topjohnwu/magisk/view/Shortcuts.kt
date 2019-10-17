@@ -9,19 +9,20 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.ui.SplashActivity
+import com.topjohnwu.magisk.utils.DynAPK
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 
 object Shortcuts {
 
     fun setup(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+        if (Build.VERSION.SDK_INT >= 25) {
             val manager = context.getSystemService(ShortcutManager::class.java)
             manager?.dynamicShortcuts = getShortCuts(context)
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N_MR1)
+    @RequiresApi(api = 25)
     private fun getShortCuts(context: Context): List<ShortcutInfo> {
         val shortCuts = mutableListOf<ShortcutInfo>()
         val root = Shell.rootAccess()
@@ -33,7 +34,7 @@ object Shortcuts {
                             .putExtra(Const.Key.OPEN_SECTION, "superuser")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(context, R.drawable.sc_superuser))
+                    .setIcon(Icon.createWithResource(context, resolveRes(DynAPK.SUPERUSER)))
                     .setRank(0)
                     .build())
         }
@@ -44,7 +45,7 @@ object Shortcuts {
                             .putExtra(Const.Key.OPEN_SECTION, "magiskhide")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(context, R.drawable.sc_magiskhide))
+                    .setIcon(Icon.createWithResource(context, resolveRes(DynAPK.MAGISKHIDE)))
                     .setRank(1)
                     .build())
         }
@@ -55,7 +56,7 @@ object Shortcuts {
                             .putExtra(Const.Key.OPEN_SECTION, "modules")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(context, R.drawable.sc_extension))
+                    .setIcon(Icon.createWithResource(context, resolveRes(DynAPK.MODULES)))
                     .setRank(3)
                     .build())
             shortCuts.add(ShortcutInfo.Builder(context, "downloads")
@@ -64,7 +65,7 @@ object Shortcuts {
                             .putExtra(Const.Key.OPEN_SECTION, "downloads")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(context, R.drawable.sc_cloud_download))
+                    .setIcon(Icon.createWithResource(context, resolveRes(DynAPK.DOWNLOAD)))
                     .setRank(2)
                     .build())
         }

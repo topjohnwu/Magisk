@@ -15,6 +15,7 @@ import com.topjohnwu.magisk.di.ActivityTracker
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.unwrap
+import com.topjohnwu.magisk.utils.DynAPK
 import com.topjohnwu.magisk.utils.RootInit
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
@@ -23,9 +24,8 @@ import timber.log.Timber
 
 open class App() : Application() {
 
-    constructor(map: Map<String, String>) : this() {
-        isRunningAsStub = true
-        ClassMap.componentMap = map
+    constructor(o: Any) : this() {
+        ClassMap.data = DynAPK.load(o)
     }
 
     init {
@@ -53,7 +53,6 @@ open class App() : Application() {
         val app: Application
         val impl: Context
         if (base is Application) {
-            isRunningAsStub = true
             app = base
             impl = base.baseContext
         } else {

@@ -4,7 +4,6 @@ out
 *.apk
 /config.prop
 /update.sh
-/stub-ids.txt
 
 # Built binaries
 native/out

@@ -12,10 +12,12 @@ import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.ui.SplashActivity
+import com.topjohnwu.magisk.utils.DynAPK
 
 object Notifications {
 
     val mgr by lazy { NotificationManagerCompat.from(get()) }
+    private val icon by lazy { resolveRes(DynAPK.NOTIFICATION) }
 
     fun setup(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -39,7 +41,7 @@ object Notifications {
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(context, Const.ID.UPDATE_NOTIFICATION_CHANNEL)
-        builder.setSmallIcon(R.drawable.ic_magisk_outline)
+        builder.setSmallIcon(icon)
                 .setContentTitle(context.getString(R.string.magisk_update_title))
                 .setContentText(context.getString(R.string.manager_download_install))
                 .setVibrate(longArrayOf(0, 100, 100, 100))
@@ -58,7 +60,7 @@ object Notifications {
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(context, Const.ID.UPDATE_NOTIFICATION_CHANNEL)
-        builder.setSmallIcon(R.drawable.ic_magisk_outline)
+        builder.setSmallIcon(icon)
                 .setContentTitle(context.getString(R.string.manager_update_title))
                 .setContentText(context.getString(R.string.manager_download_install))
                 .setVibrate(longArrayOf(0, 100, 100, 100))
@@ -75,7 +77,7 @@ object Notifications {
                 Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(context, Const.ID.UPDATE_NOTIFICATION_CHANNEL)
-        builder.setSmallIcon(R.drawable.ic_magisk_outline)
+        builder.setSmallIcon(icon)
                 .setContentTitle(context.getString(R.string.dtbo_patched_title))
                 .setContentText(context.getString(R.string.dtbo_patched_reboot))
                 .setVibrate(longArrayOf(0, 100, 100, 100))

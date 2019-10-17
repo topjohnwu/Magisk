@@ -28,7 +28,7 @@ import com.topjohnwu.magisk.utils.currentLocale
 import com.topjohnwu.magisk.utils.defaultLocale
 import java.util.*
 
-var isRunningAsStub = false
+val isRunningAsStub get() = ClassMap.data != null
 
 private val addAssetPath by lazy {
     AssetManager::class.java.getMethod("addAssetPath", String::class.java)
@@ -39,9 +39,13 @@ fun AssetManager.addAssetPath(path: String) {
 }
 
 fun Context.wrap(global: Boolean = true): Context
-        = if (!global) ResContext(this) else GlobalResContext(this)
+        = if (global) GlobalResContext(this) else ResContext(this)
 
 fun Context.wrapJob(): Context = object : GlobalResContext(this) {
+
+    override fun getApplicationContext(): Context {
+        return this
+    }
 
     @SuppressLint("NewApi")
     override fun getSystemService(name: String): Any? {
@@ -65,25 +69,31 @@ private fun Resources.patch(config: Configuration = Configuration(configuration)
 
 fun Class<*>.cmp(pkg: String = BuildConfig.APPLICATION_ID): ComponentName {
     val name = ClassMap[this].name
-    return ComponentName(pkg, ClassMap.componentMap?.get(name)
-            ?: name)
+    return ComponentName(pkg, ClassMap.data?.componentMap?.get(name) ?: name)
 }
 
 fun Context.intent(c: Class<*>): Intent {
     val cls = ClassMap[c]
-    return ClassMap.componentMap?.let {
-        val className = it.getOrElse(cls.name) { cls.name }
+    return ClassMap.data?.let {
+        val className = it.componentMap.getOrElse(cls.name) { cls.name }
         Intent().setComponent(ComponentName(this, className))
     } ?: Intent(this, cls)
+}
+
+fun resolveRes(idx: Int): Int {
+    return ClassMap.data?.resourceMap?.get(idx) ?: when(idx) {
+        DynAPK.NOTIFICATION -> R.drawable.ic_magisk_outline
+        DynAPK.DOWNLOAD -> R.drawable.sc_cloud_download
+        DynAPK.SUPERUSER -> R.drawable.sc_superuser
+        DynAPK.MODULES -> R.drawable.sc_extension
+        DynAPK.MAGISKHIDE -> R.drawable.sc_magiskhide
+        else -> -1
+    }
 }
 
 private open class GlobalResContext(base: Context) : ContextWrapper(base) {
     open val mRes: Resources get() = ResourceMgr.resource
     private val loader by lazy { javaClass.classLoader!! }
-
-    override fun getApplicationContext(): Context {
-        return this
-    }
 
     override fun getResources(): Resources {
         return mRes
@@ -162,7 +172,7 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
         // We need to patch the component of JobInfo to access WorkManager SystemJobService
 
         val name = service.className
-        val component = ComponentName(service.packageName, ClassMap.componentMap?.get(name)
+        val component = ComponentName(service.packageName, ClassMap.data?.componentMap?.get(name)
                 ?: name)
 
         // Clone the JobInfo except component
@@ -205,7 +215,7 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
 
 object ClassMap {
 
-    private val classMap = mapOf(
+    private val map = mapOf(
         App::class.java to a.e::class.java,
         MainActivity::class.java to a.b::class.java,
         SplashActivity::class.java to a.c::class.java,
@@ -216,8 +226,7 @@ object ClassMap {
         SuRequestActivity::class.java to a.m::class.java
     )
 
-    // This will be set if running as guest app
-    var componentMap: Map<String, String>? = null
+    internal var data: DynAPK.Data? = null
 
-    operator fun get(c: Class<*>) = classMap.getOrElse(c) { throw IllegalArgumentException() }
+    operator fun get(c: Class<*>) = map.getOrElse(c) { throw IllegalArgumentException() }
 }
