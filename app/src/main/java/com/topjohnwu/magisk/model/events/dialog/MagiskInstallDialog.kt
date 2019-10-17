@@ -46,8 +46,8 @@ class MagiskInstallDialog : DialogEvent() {
             applyMessage("")
             applyButton(MagiskDialog.ButtonType.POSITIVE) {
                 titleRes = R.string.download_zip_only
-                preventDismiss = false
                 onClick {
+                    preventDismiss = false
                     TODO()
                 }
             }
