@@ -10,4 +10,10 @@ class LogFragment : CompatFragment<LogViewModel, FragmentLogMd2Binding>() {
     override val layoutRes = R.layout.fragment_log_md2
     override val viewModel by viewModel<LogViewModel>()
 
+    override fun onStart() {
+        super.onStart()
+
+        activity.title = resources.getString(R.string.section_log)
+    }
+
 }

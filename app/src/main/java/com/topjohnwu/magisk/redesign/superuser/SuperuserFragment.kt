@@ -10,4 +10,10 @@ class SuperuserFragment : CompatFragment<SuperuserViewModel, FragmentSuperuserMd
     override val layoutRes = R.layout.fragment_superuser_md2
     override val viewModel by viewModel<SuperuserViewModel>()
 
+    override fun onStart() {
+        super.onStart()
+
+        activity.title = resources.getString(R.string.section_superuser)
+    }
+
 }

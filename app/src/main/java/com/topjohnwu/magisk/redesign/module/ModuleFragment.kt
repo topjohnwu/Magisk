@@ -10,4 +10,10 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
     override val layoutRes = R.layout.fragment_module_md2
     override val viewModel by viewModel<ModuleViewModel>()
 
+    override fun onStart() {
+        super.onStart()
+
+        activity.title = resources.getString(R.string.section_modules)
+    }
+
 }
