@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.utils
 import android.content.Context
 import android.widget.Toast
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.view.Notifications
@@ -46,52 +47,38 @@ object PatchAPK {
     }
 
     private fun findAndPatch(xml: ByteArray, from: String, to: String): Boolean {
-        if (from.length != to.length)
+        if (to.length > from.length)
             return false
         val buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer()
         val offList = mutableListOf<Int>()
         var i = 0
-        while (i < buf.length - from.length) {
-            var match = true
-            for (j in 0 until from.length) {
+        loop@ while (i < buf.length - from.length) {
+            for (j in from.indices) {
                 if (buf.get(i + j) != from[j]) {
-                    match = false
-                    break
+                    ++i
+                    continue@loop
                 }
             }
-            if (match) {
-                offList.add(i)
-                i += from.length
-            }
-            ++i
+            offList.add(i)
+            i += from.length
         }
         if (offList.isEmpty())
             return false
+
+        val toBuf = to.toCharArray().copyOf(from.length)
         for (off in offList) {
             buf.position(off)
-            buf.put(to)
+            buf.put(toBuf)
         }
         return true
     }
 
-    private fun findAndPatch(xml: ByteArray, a: Int, b: Int): Boolean {
-        val buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer()
-        val len = xml.size / 4
-        for (i in 0 until len) {
-            if (buf.get(i) == a) {
-                buf.put(i, b)
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun patchAndHide(context: Context): Boolean {
+    private fun patchAndHide(context: Context, label: String): Boolean {
         // Generate a new app with random package name
         val repack = File(context.filesDir, "patched.apk")
         val pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length)
 
-        if (!patch(context.packageCodePath, repack.path, pkg))
+        if (!patch(context.packageCodePath, repack.path, pkg, label))
             return false
 
         // Install the application
@@ -107,14 +94,15 @@ object PatchAPK {
     }
 
     @JvmStatic
-    fun patch(apk: String, out: String, pkg: String): Boolean {
+    @JvmOverloads
+    fun patch(apk: String, out: String, pkg: String, label: String = "Manager"): Boolean {
         try {
             val jar = JarMap(apk)
             val je = jar.getJarEntry(Const.ANDROID_MANIFEST)
             val xml = jar.getRawData(je)
 
             if (!findAndPatch(xml, BuildConfig.APPLICATION_ID, pkg) ||
-                    !findAndPatch(xml, R.string.app_name, R.string.re_app_name))
+                    !findAndPatch(xml, "Magisk Manager", label))
                 return false
 
             // Write apk changes
@@ -128,11 +116,32 @@ object PatchAPK {
         return true
     }
 
-    fun hideManager(context: Context) {
+    fun patch(apk: File, out: File, pkg: String, label: String): Boolean {
+        try {
+            // Try using the new APK to patch itself
+            val loader = DynamicClassLoader(apk)
+            val cls = loader.loadClass("a.a")
+
+            for (m in cls.declaredMethods) {
+                val pars = m.parameterTypes
+                if (pars.size == 4 && pars[0] == String::class.java) {
+                    return m.invoke(null, apk.path, out.path, pkg, label) as Boolean
+                }
+            }
+            throw Exception("No matching method found")
+        } catch (e: Exception) {
+            Timber.e(e)
+            // Fallback to use the current implementation
+            patch(apk.path, out.path, pkg, label)
+        }
+        return false
+    }
+
+    fun hideManager(context: Context, label: String) {
         Completable.fromAction {
             val progress = Notifications.progress(context, context.getString(R.string.hide_manager_title))
             Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build())
-            if (!patchAndHide(context))
+            if (!patchAndHide(context, label))
                 Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG)
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID)
         }.subscribeK()

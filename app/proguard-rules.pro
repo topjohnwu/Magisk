@@ -32,7 +32,7 @@
 -keep,allowobfuscation class * extends com.topjohnwu.magisk.base.DelegateWorker
 
 # BootSigner
--keepclassmembers class com.topjohnwu.signing.BootSigner { *; }
+-keep class a.a { *; }
 
 # Strip logging
 -assumenosideeffects class timber.log.Timber.Tree { *; }

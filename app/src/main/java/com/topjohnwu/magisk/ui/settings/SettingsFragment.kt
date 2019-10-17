@@ -67,7 +67,8 @@ class SettingsFragment : BasePreferenceFragment() {
         val suCategory = findPreference<PreferenceCategory>("superuser")!!
         val hideManager = findPreference<Preference>("hide")!!
         hideManager.setOnPreferenceClickListener {
-            PatchAPK.hideManager(requireContext())
+            // TODO: Add UI to allow user to customize app name
+            PatchAPK.hideManager(requireContext(), "Manager")
             true
         }
         val restoreManager = findPreference<Preference>("restore")
