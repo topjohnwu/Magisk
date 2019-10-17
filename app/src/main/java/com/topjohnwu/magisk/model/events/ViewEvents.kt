@@ -85,4 +85,14 @@ class BackPressEvent : ViewEvent(), ActivityExecutor {
     }
 }
 
-class DieEvent : ViewEvent()
+class DieEvent : ViewEvent(), ActivityExecutor {
+    override fun invoke(activity: AppCompatActivity) {
+        activity.finish()
+    }
+}
+
+class RecreateEvent : ViewEvent(), ActivityExecutor {
+    override fun invoke(activity: AppCompatActivity) {
+        activity.recreate()
+    }
+}
