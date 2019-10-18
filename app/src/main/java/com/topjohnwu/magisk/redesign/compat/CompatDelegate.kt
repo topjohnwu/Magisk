@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.redesign.compat
 
 import android.graphics.Insets
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -10,6 +11,7 @@ import com.topjohnwu.magisk.model.events.ContextExecutor
 import com.topjohnwu.magisk.model.events.FragmentExecutor
 import com.topjohnwu.magisk.model.events.ViewEvent
 import timber.log.Timber
+
 
 class CompatDelegate internal constructor(
     private val view: CompatView<*>
@@ -43,8 +45,18 @@ class CompatDelegate internal constructor(
             insets.asInsets()
                 .also { view.peekSystemWindowInsets(it) }
                 .let { view.consumeSystemWindowInsets(it) }
-                .also { if (it != Insets.NONE) view.viewModel.insets.value = it }
-                .subtractBy(insets)
+                ?.also { view.viewModel.insets.value = it }
+                ?.subtractBy(insets) ?: insets
+        }
+        if (ViewCompat.isAttachedToWindow(view.viewRoot)) {
+            ViewCompat.requestApplyInsets(view.viewRoot)
+        } else {
+            view.viewRoot.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                override fun onViewDetachedFromWindow(v: View) = Unit
+                override fun onViewAttachedToWindow(v: View) {
+                    ViewCompat.requestApplyInsets(v)
+                }
+            })
         }
     }
 
