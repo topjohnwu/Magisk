@@ -70,7 +70,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             app:srcCompat="@drawable/ic_magisk_delete"
-                            app:tint="@color/color_primary_delete_transient" />
+                            app:tint="@color/color_primary_error_transient" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_magisk_title"

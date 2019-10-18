@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.redesign.superuser.SuperuserViewModel" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="?styleCardNormal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:alpha="@{item.isEnabled() ? 1f : .5f}"
+        android:onClick="@{() -> item.toggleEnabled()}"
+        tools:layout_marginBottom="@dimen/l1"
+        tools:layout_marginEnd="@dimen/l1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/l2"
+            android:paddingBottom="@dimen/l2">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/app_icon"
+                style="?styleImageBig"
+                android:src="@{item.icon}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@drawable/ic_logo" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/app_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_generic"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginRight="@dimen/margin_generic"
+                android:ellipsize="middle"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@{item.item.appName}"
+                android:textAppearance="?appearanceTextTitleNormal"
+                android:textIsSelectable="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/app_icon"
+                tools:text="@string/app_name" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/package_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@{item.item.packageName}"
+                android:textAppearance="?appearanceTextCaptionVariant"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/app_name"
+                app:layout_constraintStart_toStartOf="@id/app_name"
+                app:layout_constraintTop_toBottomOf="@id/app_name"
+                tools:text="com.topjohnwu.magisk" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/expand_layout"
+            revealFix="@{item.isExpanded()}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?colorSurface"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/package_name">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/bell"
+                style="?styleIconNormal"
+                isSelected="@{item.shouldNotify}"
+                android:onClick="@{() -> item.toggleNotify()}"
+                app:layout_constraintBottom_toTopOf="@+id/delete"
+                app:layout_constraintEnd_toStartOf="@+id/bug"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:srcCompat="@drawable/ic_notifications"
+                app:tint="@color/color_error_primary_transient" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/bug"
+                style="?styleIconNormal"
+                isSelected="@{item.shouldLog}"
+                android:onClick="@{() -> item.toggleLog()}"
+                app:layout_constraintBottom_toBottomOf="@+id/bell"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/bell"
+                app:layout_constraintTop_toTopOf="@+id/bell"
+                app:srcCompat="@drawable/ic_bug_report"
+                app:tint="@color/color_error_primary_transient" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/delete"
+                style="?styleIconError"
+                android:onClick="@{() -> viewModel.deletePressed(item)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/bell"
+                app:srcCompat="@drawable/ic_delete_md2" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            style="?styleIconNormal"
+            isEnabled="@{item.isEnabled}"
+            isSelected="@{item.isExpanded}"
+            android:layout_gravity="top|end"
+            android:onClick="@{(view) -> item.toggle(view)}"
+            android:rotation="180"
+            app:srcCompat="@drawable/ic_more_collapse" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

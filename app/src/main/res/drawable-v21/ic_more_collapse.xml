@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/expanded"
+        android:drawable="@drawable/ic_chevron_down_md2"
+        android:state_selected="true" />
+
+    <item
+        android:id="@+id/collapsed"
+        android:drawable="@drawable/ic_dots_md2" />
+
+    <transition
+        android:drawable="@drawable/avd_chevron_more"
+        android:fromId="@id/expanded"
+        android:toId="@id/collapsed" />
+
+    <transition
+        android:drawable="@drawable/avd_more_chevron"
+        android:fromId="@id/collapsed"
+        android:toId="@id/expanded" />
+
+</animated-selector>

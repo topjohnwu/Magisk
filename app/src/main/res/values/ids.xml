@@ -2,5 +2,6 @@
 <resources>
 
     <item name="recyclerScrollListener" type="id" />
+    <item name="revealAnim" type="id" />
 
 </resources>

@@ -1,6 +1,10 @@
 package com.topjohnwu.magisk.utils
 
+import android.animation.Animator
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
+import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.widget.TextSwitcher
 import android.widget.TextView
@@ -9,6 +13,9 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.animation.doOnEnd
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
@@ -16,18 +23,21 @@ import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.extensions.drawableCompat
 import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
+import kotlin.math.hypot
 
 
 @BindingAdapter("onNavigationClick")
@@ -291,4 +301,72 @@ fun View.setMargins(
 @BindingAdapter("nestedScrollingEnabled")
 fun RecyclerView.setNestedScrolling(enabled: Boolean) {
     isNestedScrollingEnabled = enabled
+}
+
+@BindingAdapter("isSelected")
+fun View.isSelected(isSelected: Boolean) {
+    this.isSelected = isSelected
+}
+
+@BindingAdapter("reveal")
+fun View.setRevealed(reveal: Boolean) {
+    val x = measuredWidth
+    val y = measuredHeight
+    val maxRadius = hypot(x.toDouble(), y.toDouble()).toFloat()
+    val start = if (reveal) 0f else maxRadius
+    val end = if (reveal) maxRadius else 0f
+
+    val anim = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        isInvisible = reveal
+        return
+    } else {
+        ViewAnimationUtils.createCircularReveal(this, x, 0, start, end).apply {
+            interpolator = FastOutSlowInInterpolator()
+            setTag(R.id.revealAnim, this)
+            doOnEnd { setTag(R.id.revealAnim, null) }
+        }
+    }
+
+    post {
+        isVisible = true
+        anim.start()
+    }
+}
+
+@BindingAdapter("revealFix")
+fun View.setFixReveal(isRevealed: Boolean) {
+    (getTag(R.id.revealAnim) as? Animator)
+        ?.doOnEnd { isInvisible = !isRevealed }
+        ?.let { return }
+
+    isInvisible = !isRevealed
+}
+
+@BindingAdapter("dividerVertical", "dividerHorizontal", requireAll = false)
+fun RecyclerView.setDividers(dividerVertical: Int, dividerHorizontal: Int) {
+    val horizontal = if (dividerHorizontal > 0) {
+        context.drawableCompat(dividerHorizontal)
+    } else {
+        null
+    }
+    val vertical = if (dividerVertical > 0) {
+        context.drawableCompat(dividerVertical)
+    } else {
+        null
+    }
+    setDividers(vertical, horizontal)
+}
+
+@BindingAdapter("dividerVertical", "dividerHorizontal", requireAll = false)
+fun RecyclerView.setDividers(dividerVertical: Drawable?, dividerHorizontal: Drawable?) {
+    if (dividerHorizontal != null) {
+        DividerItemDecoration(context, LinearLayoutManager.HORIZONTAL).apply {
+            setDrawable(dividerHorizontal)
+        }.let { addItemDecoration(it) }
+    }
+    if (dividerVertical != null) {
+        DividerItemDecoration(context, LinearLayoutManager.VERTICAL).apply {
+            setDrawable(dividerVertical)
+        }.let { addItemDecoration(it) }
+    }
 }

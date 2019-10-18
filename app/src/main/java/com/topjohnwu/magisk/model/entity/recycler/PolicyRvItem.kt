@@ -1,6 +1,9 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import android.graphics.drawable.Drawable
+import android.view.View
+import android.view.ViewGroup
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -11,10 +14,14 @@ import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
+import com.topjohnwu.magisk.utils.setRevealed
 
 class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyRvItem>() {
 
-    override val layoutRes: Int = R.layout.item_policy
+    override val layoutRes: Int = when {
+        Config.redesign -> R.layout.item_policy_md2
+        else -> R.layout.item_policy
+    }
 
     val isExpanded = KObservableField(false)
     val isEnabled = KObservableField(item.policy == MagiskPolicy.ALLOW)
@@ -22,6 +29,22 @@ class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvIte
     val shouldLog = KObservableField(item.logging)
 
     fun toggle() = isExpanded.toggle()
+    fun toggleNotify() = shouldNotify.toggle()
+    fun toggleLog() = shouldLog.toggle()
+
+    fun toggleEnabled() {
+        if (isExpanded.value) {
+            return
+        }
+        isEnabled.toggle()
+    }
+
+    fun toggle(view: View) {
+        toggle()
+        (view.parent as ViewGroup)
+            .findViewById<View>(R.id.expand_layout)
+            .setRevealed(isExpanded.value)
+    }
 
     private val rxBus: RxBus by inject()
 

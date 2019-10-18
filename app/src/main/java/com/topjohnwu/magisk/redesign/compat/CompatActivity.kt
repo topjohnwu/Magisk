@@ -2,8 +2,11 @@ package com.topjohnwu.magisk.redesign.compat
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.model.events.ViewEvent
@@ -26,6 +29,13 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
+            override fun onPreBind(binding: Binding): Boolean {
+                TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
+                return super.onPreBind(binding)
+            }
+        })
 
         delegate.onCreate()
         navigation?.onCreate(savedInstanceState)

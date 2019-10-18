@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.R" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.redesign.superuser.SuperuserViewModel" />
@@ -20,9 +22,10 @@
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
         tools:layout_marginTop="24dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
                 style="?styleCardNormal"
@@ -72,7 +75,24 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                dividerHorizontal="@{R.drawable.divider_l1}"
+                dividerVertical="@{R.drawable.divider_l1}"
+                itemBinding="@{viewModel.itemBinding}"
+                items="@{viewModel.items}"
+                nestedScrollingEnabled="@{false}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/l1"
+                android:paddingTop="@dimen/l1"
+                android:paddingBottom="@dimen/l1"
+                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                app:spanCount="2"
+                tools:listitem="@layout/item_policy_md2" />
+
+        </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 

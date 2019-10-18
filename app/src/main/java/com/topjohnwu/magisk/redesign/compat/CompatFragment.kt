@@ -2,7 +2,10 @@ package com.topjohnwu.magisk.redesign.compat
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
+import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.model.events.ViewEvent
 
@@ -18,6 +21,13 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
+            override fun onPreBind(binding: Binding): Boolean {
+                TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
+                return super.onPreBind(binding)
+            }
+        })
 
         delegate.onCreate()
     }
