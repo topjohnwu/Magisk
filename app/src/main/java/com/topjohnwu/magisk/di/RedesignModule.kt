@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.di
 
 import com.topjohnwu.magisk.redesign.MainViewModel
 import com.topjohnwu.magisk.redesign.flash.FlashViewModel
+import com.topjohnwu.magisk.redesign.hide.HideViewModel
 import com.topjohnwu.magisk.redesign.home.HomeViewModel
 import com.topjohnwu.magisk.redesign.log.LogViewModel
 import com.topjohnwu.magisk.redesign.module.ModuleViewModel
@@ -15,6 +16,7 @@ import org.koin.dsl.module
 
 val redesignModule = module {
     viewModel { FlashViewModel() }
+    viewModel { HideViewModel() }
     viewModel { HomeViewModel(get()) }
     viewModel { LogViewModel() }
     viewModel { ModuleViewModel() }

@@ -2,11 +2,15 @@ package com.topjohnwu.magisk.redesign
 
 import android.graphics.Insets
 import android.os.Bundle
+import android.view.MenuItem
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.card.MaterialCardView
 import com.ncapdevi.fragnav.FragNavController
 import com.topjohnwu.magisk.Const
@@ -92,6 +96,14 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         super.onDestroy()
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> onBackPressed()
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
+    }
+
     override fun onTabTransaction(fragment: Fragment?, index: Int) {
         setDisplayHomeAsUpEnabled(false)
     }
@@ -99,9 +111,21 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
     override fun onFragmentTransaction(
         fragment: Fragment?,
         transactionType: FragNavController.TransactionType
-    ) = when (transactionType) {
-        FragNavController.TransactionType.PUSH -> setDisplayHomeAsUpEnabled(!navigation.isRoot)
-        else -> Unit //dunno might be useful
+    ) {
+        setDisplayHomeAsUpEnabled(!navigation.isRoot)
+
+        val lapam = binding.mainBottomBar.layoutParams as ViewGroup.MarginLayoutParams
+        val height = binding.mainBottomBar.measuredHeight
+        val verticalMargin = lapam.let { it.topMargin + it.bottomMargin }
+        val maxTranslation = height + verticalMargin
+        val translation = if (navigation.isRoot) 0 else maxTranslation
+
+        binding.mainBottomBar.animate()
+            .translationY(translation.toFloat())
+            .setInterpolator(FastOutSlowInInterpolator())
+            .withStartAction { if (translation == 0) binding.mainBottomBar.isVisible = true }
+            .withEndAction { if (translation > 0) binding.mainBottomBar.isVisible = false }
+            .start()
     }
 
     override fun peekSystemWindowInsets(insets: Insets) {

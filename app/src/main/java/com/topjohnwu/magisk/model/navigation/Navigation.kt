@@ -15,6 +15,7 @@ import com.topjohnwu.magisk.ui.module.ReposFragment
 import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
+import com.topjohnwu.magisk.redesign.hide.HideFragment as RedesignHideFragment
 import com.topjohnwu.magisk.redesign.home.HomeFragment as RedesignHomeFragment
 import com.topjohnwu.magisk.redesign.log.LogFragment as RedesignLogFragment
 import com.topjohnwu.magisk.redesign.module.ModuleFragment as RedesignModulesFragment
@@ -61,7 +62,12 @@ object Navigation {
     }
 
     fun hide() = MagiskNavigationEvent {
-        navDirections { destination = MagiskHideFragment::class }
+        navDirections {
+            destination = when {
+                Config.redesign -> RedesignHideFragment::class
+                else -> MagiskHideFragment::class
+            }
+        }
     }
 
     fun log() = MagiskNavigationEvent {

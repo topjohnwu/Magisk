@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.redesign.superuser
 
+import android.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
@@ -9,6 +10,8 @@ class SuperuserFragment : CompatFragment<SuperuserViewModel, FragmentSuperuserMd
 
     override val layoutRes = R.layout.fragment_superuser_md2
     override val viewModel by viewModel<SuperuserViewModel>()
+
+    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onStart() {
         super.onStart()
