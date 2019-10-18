@@ -33,7 +33,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
     <style name="WidgetFoundation.Card.Variant">
         <item name="cardBackgroundColor">?colorSurface</item>
         <item name="strokeColor">?colorSurfaceVariant</item>
-        <item name="strokeWidth">1dp</item>
+        <item name="strokeWidth">1.5dp</item>
     </style>
 
     <style name="WidgetFoundation.Card.Elevated" parent="Widget.MaterialComponents.CardView">
