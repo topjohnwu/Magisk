@@ -10,10 +10,8 @@ import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
 import com.topjohnwu.magisk.utils.KObservableField
 
@@ -21,12 +19,11 @@ class MagiskDialog @JvmOverloads constructor(
     context: Context, theme: Int = 0
 ) : AlertDialog(context, theme) {
 
-    private val binding: DialogMagiskBaseBinding
+    private val binding: DialogMagiskBaseBinding =
+        DialogMagiskBaseBinding.inflate(LayoutInflater.from(context))
     private val data = Data()
 
     init {
-        val layoutInflater = LayoutInflater.from(context)
-        binding = DataBindingUtil.inflate(layoutInflater, R.layout.dialog_magisk_base, null, false)
         binding.setVariable(BR.data, data)
         super.setView(binding.root)
     }
@@ -106,8 +103,8 @@ class MagiskDialog @JvmOverloads constructor(
     fun applyTitle(title: CharSequence) =
         apply { data.title.value = title }
 
-    fun applyMessage(@StringRes stringRes: Int) =
-        apply { data.message.value = context.getString(stringRes) }
+    fun applyMessage(@StringRes stringRes: Int, vararg args: Any) =
+        apply { data.message.value = context.getString(stringRes, *args) }
 
     fun applyMessage(message: CharSequence) =
         apply { data.message.value = message }

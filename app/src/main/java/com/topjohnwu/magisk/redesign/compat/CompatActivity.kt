@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.extensions.snackbar
+import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
@@ -54,6 +56,9 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
 
     override fun onEventDispatched(event: ViewEvent) {
         delegate.onEventExecute(event, this)
+        when (event) {
+            is SnackbarEvent -> snackbar(snackbarView, event.message(this), event.length, event.f)
+        }
     }
 
     override fun onBackPressed() {

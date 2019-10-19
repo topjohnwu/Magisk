@@ -1,26 +1,51 @@
 package com.topjohnwu.magisk.redesign.superuser
 
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.applySchedulers
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.extensions.toggle
+import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem
+import com.topjohnwu.magisk.model.events.PolicyEnableEvent
+import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
+import com.topjohnwu.magisk.model.events.SnackbarEvent
+import com.topjohnwu.magisk.model.events.dialog.FingerprintDialog
+import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.home.itemBindingOf
 import com.topjohnwu.magisk.utils.DiffObservableList
+import com.topjohnwu.magisk.utils.FingerprintHelper
+import com.topjohnwu.magisk.utils.RxBus
+import io.reactivex.Single
 
 class SuperuserViewModel(
+    private val rxBus: RxBus,
     private val db: PolicyDao,
-    private val packageManager: PackageManager
+    private val packageManager: PackageManager,
+    private val resources: Resources
 ) : CompatViewModel() {
 
     val items = diffListOf<PolicyRvItem>()
     val itemBinding = itemBindingOf<PolicyRvItem> {
         it.bindExtra(BR.viewModel, this)
     }
+
+    init {
+        rxBus.register<PolicyEnableEvent>()
+            .subscribeK { togglePolicy(it.item, it.enable) }
+            .add()
+        rxBus.register<PolicyUpdateEvent>()
+            .subscribeK { updatePolicy(it) }
+            .add()
+    }
+
+    // ---
 
     override fun refresh() = db.fetchAll()
         .flattenAsFlowable { it }
@@ -39,11 +64,76 @@ class SuperuserViewModel(
         .applyViewModel(this)
         .subscribeK { items.update(it.first, it.second) }
 
+    // ---
+
     fun hidePressed() = Navigation.hide().publish()
 
     fun deletePressed(item: PolicyRvItem) {
-        TODO()
+        fun updateState() = deletePolicy(item.item)
+            .subscribeK { items.removeAll { it.itemSameAs(item) } }
+            .add()
+
+        if (FingerprintHelper.useFingerprint()) {
+            FingerprintDialog {
+                onSuccess { updateState() }
+            }.publish()
+        } else {
+            SuperuserRevokeDialog {
+                appName = item.item.appName
+                onSuccess { updateState() }
+            }.publish()
+        }
     }
+
+    //---
+
+    private fun updatePolicy(it: PolicyUpdateEvent) = when (it) {
+        is PolicyUpdateEvent.Notification -> updatePolicy(it.item).map {
+            when {
+                it.notification -> R.string.su_snack_notif_on
+                else -> R.string.su_snack_notif_off
+            } to it.appName
+        }
+        is PolicyUpdateEvent.Log -> updatePolicy(it.item).map {
+            when {
+                it.logging -> R.string.su_snack_log_on
+                else -> R.string.su_snack_log_off
+            } to it.appName
+        }
+    }.map { resources.getString(it.first, it.second) }
+        .subscribeK { SnackbarEvent(it).publish() }
+        .add()
+
+    private fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
+        fun updateState() {
+            val policy = if (enable) MagiskPolicy.ALLOW else MagiskPolicy.DENY
+            val app = item.item.copy(policy = policy)
+
+            updatePolicy(app)
+                .map { it.policy == MagiskPolicy.ALLOW }
+                .map { if (it) R.string.su_snack_grant else R.string.su_snack_deny }
+                .map { resources.getString(it).format(item.item.appName) }
+                .subscribeK { SnackbarEvent(it).publish() }
+                .add()
+        }
+
+        if (FingerprintHelper.useFingerprint()) {
+            FingerprintDialog {
+                onSuccess { updateState() }
+                onFailure { item.isEnabled.toggle() }
+            }.publish()
+        } else {
+            updateState()
+        }
+    }
+
+    //---
+
+    private fun updatePolicy(policy: MagiskPolicy) =
+        db.update(policy).andThen(Single.just(policy))
+
+    private fun deletePolicy(policy: MagiskPolicy) =
+        db.delete(policy.uid).andThen(Single.just(policy))
 
 }
 

@@ -33,7 +33,8 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
     protected abstract val layoutRes: Int
     protected abstract val viewModel: ViewModel
     protected open val themeRes: Int = R.style.MagiskTheme
-    protected open val snackbarView get() = binding.root
+
+    open val snackbarView get() = binding.root
 
     private val resultCallbacks by lazy { SparseArrayCompat<RequestCallback>() }
 
