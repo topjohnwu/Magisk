@@ -119,14 +119,17 @@ def load_config(args):
     config['keyStore'] = 'release-key.jks'
 
     # Load prop file
-    with open(args.config, 'r') as f:
-        for line in [l.strip(' \t\r\n') for l in f]:
-            if line.startswith('#') or len(line) == 0:
-                continue
-            prop = line.split('=')
-            if len(prop) != 2:
-                continue
-            config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
+    try:
+        with open(args.config, 'r') as f:
+            for line in [l.strip(' \t\r\n') for l in f]:
+                if line.startswith('#') or len(line) == 0:
+                    continue
+                prop = line.split('=')
+                if len(prop) != 2:
+                    continue
+                config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
+    except FileNotFoundError:
+        error("Please make sure config.prop existed.")
 
     config['prettyName'] = config['prettyName'].lower() == 'true'
 
