@@ -370,3 +370,11 @@ fun RecyclerView.setDividers(dividerVertical: Drawable?, dividerHorizontal: Draw
         }.let { addItemDecoration(it) }
     }
 }
+
+@BindingAdapter("rotationAnimated")
+fun View.rotationTo(value: Int) {
+    animate()
+        .rotation(value.toFloat())
+        .setInterpolator(FastOutSlowInInterpolator())
+        .start()
+}

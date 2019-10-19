@@ -16,7 +16,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="?styleCardNormal"
+        style="?styleCardVariant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -82,7 +82,7 @@
             revealFix="@{item.isExpanded()}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?colorSurface"
+            android:background="?colorSurfaceVariant"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
+import com.topjohnwu.magisk.utils.rotationTo
 import com.topjohnwu.magisk.utils.setRevealed
 
 class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyRvItem>() {
@@ -41,6 +42,7 @@ class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvIte
 
     fun toggle(view: View) {
         toggle()
+        view.rotationTo(if (isExpanded.value) 225 else 180)
         (view.parent as ViewGroup)
             .findViewById<View>(R.id.expand_layout)
             .setRevealed(isExpanded.value)
