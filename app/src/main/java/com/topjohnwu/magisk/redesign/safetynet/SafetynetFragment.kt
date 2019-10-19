@@ -10,4 +10,9 @@ class SafetynetFragment : CompatFragment<SafetynetViewModel, FragmentSafetynetMd
     override val layoutRes = R.layout.fragment_safetynet_md2
     override val viewModel by viewModel<SafetynetViewModel>()
 
+    override fun onStart() {
+        super.onStart()
+        activity.setTitle(R.string.safetyNet)
+    }
+
 }

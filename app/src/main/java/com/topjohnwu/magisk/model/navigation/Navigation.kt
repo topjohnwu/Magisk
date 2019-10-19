@@ -6,6 +6,7 @@ import android.os.Build
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.redesign.safetynet.SafetynetFragment
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
 import com.topjohnwu.magisk.ui.home.HomeFragment
@@ -68,6 +69,10 @@ object Navigation {
                 else -> MagiskHideFragment::class
             }
         }
+    }
+
+    fun safetynet() = MagiskNavigationEvent {
+        navDirections { destination = SafetynetFragment::class }
     }
 
     fun log() = MagiskNavigationEvent {

@@ -66,6 +66,7 @@ class SuperuserViewModel(
 
     // ---
 
+    fun safetynetPressed() = Navigation.safetynet().publish()
     fun hidePressed() = Navigation.hide().publish()
 
     fun deletePressed(item: PolicyRvItem) {
