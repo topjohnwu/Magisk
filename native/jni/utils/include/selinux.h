@@ -20,7 +20,7 @@
 
 __BEGIN_DECLS
 
-extern void (*freecon)(char *con);
+#define freecon free
 extern int (*setcon)(const char *con);
 extern int (*getfilecon)(const char *path, char **con);
 extern int (*lgetfilecon)(const char *path, char **con);
@@ -32,7 +32,6 @@ void getfilecon_at(int dirfd, const char *name, char **con);
 void setfilecon_at(int dirfd, const char *name, const char *con);
 
 void selinux_builtin_impl();
-void dload_selinux();
 void restorecon();
 void restore_rootcon();
 
