@@ -20,7 +20,8 @@
         android:fillViewport="true"
         android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l2}"
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
-        tools:layout_marginTop="24dp">
+        tools:layout_marginTop="24dp"
+        tools:paddingTop="@dimen/l1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,7 +32,8 @@
                 style="?styleCardNormal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/l1"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
                 android:onClick="@{() -> viewModel.hidePressed()}"
                 app:layout_constraintTop_toTopOf="parent">
 
