@@ -41,6 +41,9 @@
     <attr name="styleImageNormal" format="reference" />
     <attr name="styleImageSmall" format="reference" />
 
+    <!--Checkbox-->
+    <attr name="styleCheckboxNormal" format="reference" />
+
     <!--endregion-->
 
     <!--region Texts-->

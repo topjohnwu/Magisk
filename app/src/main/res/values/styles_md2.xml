@@ -51,6 +51,8 @@
         <item name="styleImageNormal">@style/WidgetFoundation.Image</item>
         <item name="styleImageSmall">@style/WidgetFoundation.Image.Small</item>
 
+        <item name="styleCheckboxNormal">@style/WidgetFoundation.Checkbox</item>
+
         <!--///-->
 
         <item name="appearanceTextDisplayNormal">@style/AppearanceFoundation.Display</item>

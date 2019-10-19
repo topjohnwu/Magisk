@@ -14,8 +14,11 @@ object Info {
 
     var remote = UpdateInfo()
 
+    @JvmStatic
     var keepVerity = false
+    @JvmStatic
     var keepEnc = false
+    @JvmStatic
     var recovery = false
 
     fun loadMagiskInfo() {

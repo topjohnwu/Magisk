@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.topjohnwu.magisk.Info" />
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/l1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:layout_gravity="center">
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                style="?styleCheckboxNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:checked="@={Info.keepVerity}"
+                android:gravity="center"
+                android:text="@string/keep_dm_verity"
+                tools:checked="true" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                style="?styleCheckboxNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:checked="@={Info.keepEnc}"
+                android:gravity="center"
+                android:text="@string/keep_force_encryption"
+                app:tint="?colorPrimary" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                style="?styleCheckboxNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:checked="@={Info.recovery}"
+                android:gravity="center"
+                android:text="@string/recovery_mode"
+                app:tint="?colorPrimary" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</layout>

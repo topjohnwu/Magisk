@@ -124,4 +124,11 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="tint">?colorErrorTransient</item>
     </style>
 
+    <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:textAppearance">?appearanceTextBodyNormal</item>
+        <item name="android:paddingStart">@dimen/l1</item>
+        <item name="android:paddingEnd">@dimen/l1</item>
+        <item name="tint">?colorPrimary</item>
+    </style>
+
 </resources>

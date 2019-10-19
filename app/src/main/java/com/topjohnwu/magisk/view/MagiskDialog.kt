@@ -129,7 +129,7 @@ class MagiskDialog @JvmOverloads constructor(
         setCancelable(isCancellable)
     }
 
-    fun <Binding : ViewDataBinding> applyView(binding: Binding, body: Binding.() -> Unit) =
+    fun <Binding : ViewDataBinding> applyView(binding: Binding, body: Binding.() -> Unit = {}) =
         apply {
             this.binding.dialogBaseContainer.removeAllViews()
             this.binding.dialogBaseContainer.addView(binding.root)

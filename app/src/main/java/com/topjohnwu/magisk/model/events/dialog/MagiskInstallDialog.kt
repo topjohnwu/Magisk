@@ -1,7 +1,9 @@
 package com.topjohnwu.magisk.model.events.dialog
 
+import android.view.LayoutInflater
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.IncludeInstallOptionsBinding
 import com.topjohnwu.magisk.extensions.res
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -13,7 +15,6 @@ class MagiskInstallDialog : DialogEvent() {
 
     override fun build(dialog: MagiskDialog) {
         with(dialog) {
-
             val filename =
                 "Magisk v${Info.remote.magisk.version}(${Info.remote.magisk.versionCode})"
             applyTitle(R.string.repo_install_title.res(R.string.magisk.res()))
@@ -44,6 +45,7 @@ class MagiskInstallDialog : DialogEvent() {
         with(dialog) {
             applyTitle(R.string.select_method)
             applyMessage("")
+            applyView(IncludeInstallOptionsBinding.inflate(LayoutInflater.from(dialog.context)))
             applyButton(MagiskDialog.ButtonType.POSITIVE) {
                 titleRes = R.string.download_zip_only
                 onClick {
