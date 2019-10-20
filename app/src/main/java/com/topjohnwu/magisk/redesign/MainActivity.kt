@@ -16,6 +16,7 @@ import com.ncapdevi.fragnav.FragNavController
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
+import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatActivity
 import com.topjohnwu.magisk.redesign.compat.CompatNavigationDelegate
@@ -136,7 +137,8 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         viewModel.insets.value = insets
     }
 
-    fun setDisplayHomeAsUpEnabled(isEnabled: Boolean) {
+    private fun setDisplayHomeAsUpEnabled(isEnabled: Boolean) {
+        binding.mainToolbar.startAnimations()
         when {
             isEnabled -> binding.mainToolbar.setNavigationIcon(R.drawable.ic_back_md2)
             else -> binding.mainToolbar.navigationIcon = null
