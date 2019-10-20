@@ -51,12 +51,12 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_magiskhide" />
+                        app:srcCompat="@drawable/ic_hide_md2" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/magiskhide"
+                        android:text="@string/magisk_hide_md2"
                         android:requiresFadingEdge="horizontal"
                         android:singleLine="true"
                         android:textAppearance="?appearanceTextBodyNormal"
@@ -102,7 +102,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_safetynet" />
+                        app:srcCompat="@drawable/ic_safetynet_md2" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="0dp"

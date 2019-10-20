@@ -26,5 +26,7 @@
     <string name="home_item_xda">XDA</string>
 
     <string name="safetyNet">SafetyNet</string>
+    <!--ref. Magisk Hide-->
+    <string name="magisk_hide_md2">Hide</string>
 
 </resources>
