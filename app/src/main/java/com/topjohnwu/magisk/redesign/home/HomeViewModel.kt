@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.model.events.dialog.MagiskInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
+import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.ui.home.MagiskState
@@ -111,7 +112,7 @@ class HomeViewModel(
 
     fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
 
-    fun onDeletePressed() {}
+    fun onDeletePressed() = UninstallDialog().publish()
 
     fun onManagerPressed() = ManagerInstallDialog().publish()
 
