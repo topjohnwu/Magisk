@@ -59,7 +59,7 @@ sealed class DownloadSubject : Parcelable {
         val magisk: MagiskJson = Info.remote.magisk
 
         @Parcelize
-        protected data class Flash(
+        data class Flash(
             override val configuration: Configuration
         ) : Magisk() {
             override val url: String get() = magisk.link
@@ -72,7 +72,7 @@ sealed class DownloadSubject : Parcelable {
         }
 
         @Parcelize
-        protected class Uninstall : Magisk() {
+        class Uninstall : Magisk() {
             override val configuration: Configuration get() = Configuration.Uninstall
             override val url: String get() = Info.remote.uninstaller.link
 
@@ -83,7 +83,7 @@ sealed class DownloadSubject : Parcelable {
         }
 
         @Parcelize
-        protected class Download : Magisk() {
+        class Download : Magisk() {
             override val configuration: Configuration get() = Configuration.Download
             override val url: String get() = magisk.link
 

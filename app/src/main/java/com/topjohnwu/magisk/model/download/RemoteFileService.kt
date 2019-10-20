@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.model.download
 import android.app.Activity
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.NullActivity
@@ -17,6 +19,7 @@ import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Completable
 import okhttp3.ResponseBody
 import org.koin.android.ext.android.inject
+import org.koin.core.KoinComponent
 import timber.log.Timber
 import java.io.InputStream
 
@@ -41,8 +44,8 @@ abstract class RemoteFileService : NotificationService() {
             Timber.e(it)
             finishNotify(subject.hashCode()) { notification ->
                 notification.setContentText(getString(R.string.download_file_error))
-                        .setSmallIcon(android.R.drawable.stat_notify_error)
-                        .setOngoing(false)
+                    .setSmallIcon(android.R.drawable.stat_notify_error)
+                    .setOngoing(false)
             }
         }) {
             val newId = finishNotify(subject)
@@ -62,12 +65,12 @@ abstract class RemoteFileService : NotificationService() {
     }
 
     private fun download(subject: DownloadSubject) = service.fetchFile(subject.url)
-        .map { it.toStream(subject.hashCode()) }
+        .map { it.toStream(subject.hashCode(), subject) }
         .flatMapCompletable { stream ->
             when (subject) {
                 is Module -> service.fetchInstaller()
-                        .doOnSuccess { stream.toModule(subject.file, it.byteStream()) }
-                        .ignoreElement()
+                    .doOnSuccess { stream.toModule(subject.file, it.byteStream()) }
+                    .ignoreElement()
                 else -> Completable.fromAction { stream.writeTo(subject.file) }
             }
         }.doOnComplete {
@@ -75,7 +78,7 @@ abstract class RemoteFileService : NotificationService() {
                 handleAPK(subject)
         }
 
-    private fun ResponseBody.toStream(id: Int): InputStream {
+    private fun ResponseBody.toStream(id: Int, subject: DownloadSubject): InputStream {
         val maxRaw = contentLength()
         val max = maxRaw / 1_000_000f
 
@@ -83,9 +86,10 @@ abstract class RemoteFileService : NotificationService() {
             val progress = it / 1_000_000f
             update(id) { notification ->
                 if (maxRaw > 0) {
+                    send(progress / max, subject)
                     notification
-                            .setProgress(maxRaw.toInt(), it.toInt(), false)
-                            .setContentText("%.2f / %.2f MB".format(progress, max))
+                        .setProgress(maxRaw.toInt(), it.toInt(), false)
+                        .setContentText("%.2f / %.2f MB".format(progress, max))
                 } else {
                     notification.setContentText("%.2f MB / ??".format(progress))
                 }
@@ -94,6 +98,7 @@ abstract class RemoteFileService : NotificationService() {
     }
 
     private fun finishNotify(subject: DownloadSubject) = finishNotify(subject.hashCode()) {
+        send(1f, subject)
         it.addActions(subject)
             .setContentText(getString(R.string.download_complete))
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
@@ -111,8 +116,15 @@ abstract class RemoteFileService : NotificationService() {
     protected abstract fun NotificationCompat.Builder.addActions(subject: DownloadSubject)
             : NotificationCompat.Builder
 
-    companion object {
+    companion object : KoinComponent {
         const val ARG_URL = "arg_url"
+
+        private val internalProgressBroadcast = MutableLiveData<Pair<Float, DownloadSubject>>()
+        val progressBroadcast: LiveData<Pair<Float, DownloadSubject>> get() = internalProgressBroadcast
+
+        fun send(progress: Float, subject: DownloadSubject) {
+            internalProgressBroadcast.postValue(progress to subject)
+        }
     }
 
 }
