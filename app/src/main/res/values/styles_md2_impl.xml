@@ -131,4 +131,16 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="tint">?colorPrimary</item>
     </style>
 
+    <style name="WidgetFoundation.ProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:indeterminate">false</item>
+        <item name="android:layout_height">4dp</item>
+        <item name="android:progressDrawable">@drawable/progress_determinate</item>
+    </style>
+
+    <style name="WidgetFoundation.ProgressBar.Indeterminate" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:indeterminate">true</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">100dp</item>
+    </style>
+
 </resources>

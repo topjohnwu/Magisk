@@ -44,6 +44,10 @@
     <!--Checkbox-->
     <attr name="styleCheckboxNormal" format="reference" />
 
+    <!--Progress-->
+    <attr name="styleProgressDeterminate" format="reference" />
+    <attr name="styleProgressIndeterminate" format="reference" />
+
     <!--endregion-->
 
     <!--region Texts-->

@@ -148,6 +148,14 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+                    <ProgressBar
+                        style="?styleProgressDeterminate"
+                        gone="@{viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100}"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="bottom"
+                        android:max="100"
+                        android:progress="@{viewModel.stateMagiskProgress}" />
+
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
@@ -252,8 +260,15 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </com.google.android.material.card.MaterialCardView>
+                    <ProgressBar
+                        style="?styleProgressDeterminate"
+                        gone="@{viewModel.stateManagerProgress == 0 || viewModel.stateManagerProgress == 100}"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="bottom"
+                        android:max="100"
+                        android:progress="@{viewModel.stateManagerProgress}" />
 
+                </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
