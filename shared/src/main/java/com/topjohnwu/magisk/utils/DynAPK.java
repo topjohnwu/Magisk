@@ -7,9 +7,12 @@ import java.util.Map;
 
 public class DynAPK {
 
+    private static final int STUB_VERSION = 1;
+
     // Indices of the object array
-    private static final int COMPONENT_MAP = 0;
-    private static final int RESOURCE_MAP = 1;
+    private static final int STUB_VERSION_ENTRY = 0;
+    private static final int COMPONENT_MAP = 1;
+    private static final int RESOURCE_MAP = 2;
 
     // Indices of the resource map
     public static final int NOTIFICATION = 0;
@@ -39,19 +42,22 @@ public class DynAPK {
     public static Data load(Object o) {
         Object[] arr = (Object[]) o;
         Data data = new Data();
+        data.version = (int) arr[STUB_VERSION_ENTRY];
         data.componentMap = (Map<String, String>) arr[COMPONENT_MAP];
         data.resourceMap = (int[]) arr[RESOURCE_MAP];
         return data;
     }
 
     public static Object pack(Data data) {
-        Object[] arr = new Object[2];
+        Object[] arr = new Object[3];
+        arr[STUB_VERSION_ENTRY] = STUB_VERSION;
         arr[COMPONENT_MAP] = data.componentMap;
         arr[RESOURCE_MAP] = data.resourceMap;
         return arr;
     }
 
     public static class Data {
+        public int version;
         public Map<String, String> componentMap;
         public int[] resourceMap;
     }
