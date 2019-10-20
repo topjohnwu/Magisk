@@ -65,6 +65,7 @@
 
         <activity
             android:name="a.m"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false" />
