@@ -18,7 +18,8 @@
         android:fillViewport="true"
         android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l2}"
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
-        tools:layout_marginTop="24dp">
+        tools:layout_marginTop="24dp"
+        tools:paddingTop="@dimen/l1">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -29,34 +30,52 @@
                 style="?styleCardNormal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l2"
-                android:layout_marginTop="@dimen/l1"
-                android:onClick="@{() -> viewModel.toggle(viewModel.darkTheme)}"
+                android:layout_marginStart="@dimen/l1"
+                android:onClick="@{() -> viewModel.darkModePressed()}"
                 app:layout_constraintEnd_toStartOf="@+id/settings_card_redesign"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/l1">
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_card_dark_icon"
+                        style="?styleIconNormal"
+                        android:background="@null"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_day_night" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/settings_card_dark_pointer"
+                        style="?styleIconNormal"
+                        android:background="@null"
+                        android:rotation="180"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_back_md2" />
 
                     <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="@string/settings_dark_theme_title"
-                        android:textAppearance="?appearanceTextTitleNormal" />
+                        android:background="@null"
+                        android:gravity="start|center_vertical"
+                        android:singleLine="true"
+                        android:text="@string/settings_dark_mode_title"
+                        android:textAppearance="?appearanceTextBodyNormal"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/settings_card_dark_pointer"
+                        app:layout_constraintStart_toEndOf="@+id/settings_card_dark_icon"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:checked="@={viewModel.darkTheme}" />
-
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -65,10 +84,9 @@
                 style="?styleCardNormal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/l2"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginRight="@dimen/l2"
-                android:layout_marginBottom="@dimen/l2"
+                android:layout_marginLeft="@dimen/l1"
+                android:layout_marginRight="@dimen/l1"
+                android:layout_marginBottom="@dimen/l1"
                 android:onClick="@{() -> viewModel.toggle(viewModel.redesign)}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/settings_card_dark"

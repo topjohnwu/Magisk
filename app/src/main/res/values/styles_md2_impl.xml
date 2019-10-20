@@ -53,6 +53,8 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.Button" parent="Widget.MaterialComponents.Button">
         <item name="android:textStyle">bold</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/l1</item>
     </style>
 
     <style name="WidgetFoundation.Button.OnPrimary">
@@ -64,6 +66,8 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:textStyle">bold</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/l1</item>
     </style>
 
     <style name="WidgetFoundation.Button.Flat.OnPrimary">
@@ -75,6 +79,8 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textStyle">bold</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/l1</item>
     </style>
 
     <style name="WidgetFoundation.Button.Text.OnPrimary">
