@@ -107,7 +107,7 @@ object PatchAPK {
 
             // Write apk changes
             jar.getOutputStream(je).write(xml)
-            SignAPK.sign(jar, FileOutputStream(out).buffered())
+            SignAPK.sign(Keygen.cert, Keygen.key, jar, FileOutputStream(out).buffered())
         } catch (e: Exception) {
             Timber.e(e)
             return false

@@ -32,8 +32,9 @@ object Config : PreferenceModel, DBConfig {
         const val ROOT_ACCESS = "root_access"
         const val SU_MULTIUSER_MODE = "multiuser_mode"
         const val SU_MNT_NS = "mnt_ns"
-        const val SU_MANAGER = "requester"
         const val SU_FINGERPRINT = "su_fingerprint"
+        const val SU_MANAGER = "requester"
+        const val KEYSTORE = "keystore"
 
         // prefs
         const val SU_REQUEST_TIMEOUT = "su_request_timeout"
@@ -123,6 +124,7 @@ object Config : PreferenceModel, DBConfig {
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     var suFingerprint by dbSettings(Key.SU_FINGERPRINT, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
+    var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 
     // Always return a path in external storage where we can write
     val downloadDirectory get() =
