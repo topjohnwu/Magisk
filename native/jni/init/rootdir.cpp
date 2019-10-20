@@ -153,23 +153,24 @@ void SARCompatInit::setup_rootfs() {
 }
 
 bool MagiskInit::patch_sepolicy(const char *file) {
-	bool require_patch = false;
-
-	// Mount selinuxfs to communicate with kernel
-	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+	bool patch_init = false;
 
 	if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
 		LOGD("sepol: split policy\n");
-		load_split_cil();
-		require_patch = true;
+		patch_init = true;
 	} else if (access("/sepolicy", R_OK) == 0) {
 		LOGD("sepol: monolithic policy\n");
 		load_policydb("/sepolicy");
 	} else {
-		// Fatal error!!
 		LOGD("sepol: no selinux\n");
 		return false;
 	}
+
+	// Mount selinuxfs to communicate with kernel
+	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+
+	if (patch_init)
+		load_split_cil();
 
 	sepol_magisk_rules();
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
@@ -181,7 +182,7 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 		link("/sepolicy", "/sepolicy_debug");
 	}
 
-	return require_patch;
+	return patch_init;
 }
 
 constexpr const char wrapper[] =

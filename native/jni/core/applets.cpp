@@ -26,7 +26,7 @@ static int (*applet_main[]) (int, char *[]) =
 
 int main(int argc, char *argv[]) {
 	umask(0);
-	selinux_builtin_impl();
+	dload_selinux();
 	cmdline_logging();
 	init_argv0(argc, argv);
 

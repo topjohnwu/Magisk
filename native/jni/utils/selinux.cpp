@@ -38,6 +38,10 @@ static int stub(int, char **ctx) {
 
 // Builtin implementation
 
+static void __freecon(char *s) {
+	free(s);
+}
+
 static int __setcon(const char *ctx) {
 	int fd = open("/proc/self/attr/current", O_WRONLY | O_CLOEXEC);
 	if (fd < 0)
@@ -110,6 +114,7 @@ static int __fsetfilecon(int fd, const char *ctx) {
 
 // Function pointers
 
+void (*freecon)(char *) = __freecon;
 int (*setcon)(const char *) = stub;
 int (*getfilecon)(const char *, char **) = stub;
 int (*lgetfilecon)(const char *, char **) = stub;
@@ -139,6 +144,16 @@ void selinux_builtin_impl() {
 	setfilecon = __setfilecon;
 	lsetfilecon = __lsetfilecon;
 	fsetfilecon = __fsetfilecon;
+}
+
+void dload_selinux() {
+	if (access("/system/lib/libselinux.so", F_OK))
+		return;
+	/* We only check whether libselinux.so exists but don't dlopen.
+	 * For some reason calling symbols returned from dlsym
+	 * will result to SEGV_ACCERR on some devices.
+	 * Always use builtin implementations for SELinux stuffs. */
+	selinux_builtin_impl();
 }
 
 static void restore_syscon(int dirfd) {

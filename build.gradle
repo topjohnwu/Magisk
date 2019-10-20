@@ -47,7 +47,7 @@ subprojects {
 
                 defaultConfig {
                     if (minSdkVersion == null)
-                        minSdkVersion 18
+                        minSdkVersion 17
                     targetSdkVersion 28
                 }
 
