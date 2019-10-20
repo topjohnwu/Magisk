@@ -23,14 +23,17 @@
         tools:layout_marginTop="24dp"
         tools:paddingTop="@dimen/l1">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
                 style="?styleCardNormal"
-                android:layout_width="match_parent"
+                android:id="@+id/superuser_hide"
+                android:layout_width="0dp"
+                app:layout_constraintEnd_toStartOf="@+id/superuser_safetynet"
+                app:layout_constraintStart_toStartOf="parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
@@ -53,9 +56,9 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/l1"
-                        android:layout_marginEnd="@dimen/l1"
                         android:text="@string/magiskhide"
+                        android:requiresFadingEdge="horizontal"
+                        android:singleLine="true"
                         android:textAppearance="?appearanceTextBodyNormal"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -79,10 +82,11 @@
 
             <com.google.android.material.card.MaterialCardView
                 style="?styleCardNormal"
-                android:layout_width="match_parent"
+                android:id="@+id/superuser_safetynet"
+                android:layout_width="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/superuser_hide"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
                 android:onClick="@{() -> viewModel.safetynetPressed()}"
                 app:layout_constraintTop_toTopOf="parent">
@@ -103,9 +107,9 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/l1"
-                        android:layout_marginEnd="@dimen/l1"
                         android:text="@string/safetyNet"
+                        android:requiresFadingEdge="horizontal"
+                        android:singleLine="true"
                         android:textAppearance="?appearanceTextBodyNormal"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -127,6 +131,13 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/superuser_top_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="superuser_hide,superuser_safetynet" />
+
             <androidx.recyclerview.widget.RecyclerView
                 dividerHorizontal="@{R.drawable.divider_l1}"
                 dividerVertical="@{R.drawable.divider_l1}"
@@ -136,6 +147,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
+                app:layout_constraintTop_toBottomOf="@+id/superuser_top_barrier"
                 android:orientation="vertical"
                 android:paddingStart="@dimen/l1"
                 android:paddingTop="@dimen/l1"
@@ -144,7 +156,7 @@
                 app:spanCount="2"
                 tools:listitem="@layout/item_policy_md2" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 
