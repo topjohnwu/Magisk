@@ -24,6 +24,7 @@ import com.topjohnwu.magisk.redesign.log.LogFragment
 import com.topjohnwu.magisk.redesign.module.ModuleFragment
 import com.topjohnwu.magisk.redesign.settings.SettingsFragment
 import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment
+import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -61,6 +62,9 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
 
         binding.mainToolbarWrapper.updateLayoutParams<CoordinatorLayout.LayoutParams> {
             behavior = HideTopViewOnScrollBehavior<MaterialCardView>()
+        }
+        binding.mainBottomBar.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+            behavior = HideBottomViewOnScrollBehavior<MaterialCardView>()
         }
         binding.mainNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {

@@ -56,7 +56,6 @@
             style="?styleCardElevated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
             android:layout_gravity="bottom"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
