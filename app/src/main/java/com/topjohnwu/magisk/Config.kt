@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Environment
 import android.util.Xml
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.topjohnwu.magisk.data.database.SettingsDao
 import com.topjohnwu.magisk.data.database.StringDao
@@ -45,6 +46,7 @@ object Config : PreferenceModel, DBConfig {
         const val CUSTOM_CHANNEL = "custom_channel"
         const val LOCALE = "locale"
         const val DARK_THEME = "dark_theme"
+        const val DARK_THEME_EXTENDED = "dark_theme_extended"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
         const val DOWNLOAD_PATH = "download_path"
@@ -110,7 +112,12 @@ object Config : PreferenceModel, DBConfig {
     var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
 
     var redesign by preference(Key.REDESIGN, false)
+    @Deprecated("Use extended dark theme")
     var darkTheme by preference(Key.DARK_THEME, true)
+    var darkThemeExtended by preference(
+        Key.DARK_THEME_EXTENDED,
+        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+    )
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
     var magiskHide by preference(Key.MAGISKHIDE, true)

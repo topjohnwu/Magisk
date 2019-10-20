@@ -39,10 +39,13 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
     private val resultCallbacks by lazy { SparseArrayCompat<RequestCallback>() }
 
     init {
-        val theme = if (Config.darkTheme) {
-            AppCompatDelegate.MODE_NIGHT_YES
+        val theme = if (Config.redesign) {
+            Config.darkThemeExtended
         } else {
-            AppCompatDelegate.MODE_NIGHT_NO
+            when {
+                Config.darkTheme -> AppCompatDelegate.MODE_NIGHT_YES
+                else -> AppCompatDelegate.MODE_NIGHT_NO
+            }
         }
         AppCompatDelegate.setDefaultNightMode(theme)
     }
