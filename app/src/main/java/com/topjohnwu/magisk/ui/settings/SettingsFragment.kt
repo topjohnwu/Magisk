@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.base.BasePreferenceFragment
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
+import com.topjohnwu.magisk.databinding.DialogCustomNameBinding
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toLangTag
 import com.topjohnwu.magisk.model.download.DownloadService
@@ -67,8 +68,9 @@ class SettingsFragment : BasePreferenceFragment() {
         val suCategory = findPreference<PreferenceCategory>("superuser")!!
         val hideManager = findPreference<Preference>("hide")!!
         hideManager.setOnPreferenceClickListener {
-            // TODO: Add UI to allow user to customize app name
-            PatchAPK.hideManager(requireContext(), "Manager")
+            showManagerNameDialog {
+                PatchAPK.hideManager(requireContext(), "Manager")
+            }
             true
         }
         val restoreManager = findPreference<Preference>("restore")
@@ -224,26 +226,26 @@ class SettingsFragment : BasePreferenceFragment() {
     private fun setLocalePreference(lp: ListPreference) {
         lp.isEnabled = false
         availableLocales.map {
-                val names = mutableListOf<String>()
-                val values = mutableListOf<String>()
+            val names = mutableListOf<String>()
+            val values = mutableListOf<String>()
 
-                names.add(
-                    ResourceMgr.getString(defaultLocale, R.string.system_default)
-                )
-                values.add("")
+            names.add(
+                ResourceMgr.getString(defaultLocale, R.string.system_default)
+            )
+            values.add("")
 
-                it.forEach { locale ->
-                    names.add(locale.getDisplayName(locale))
-                    values.add(locale.toLangTag())
-                }
-
-                Pair(names.toTypedArray(), values.toTypedArray())
-            }.subscribeK { (names, values) ->
-                lp.isEnabled = true
-                lp.entries = names
-                lp.entryValues = values
-                lp.summary = currentLocale.getDisplayName(currentLocale)
+            it.forEach { locale ->
+                names.add(locale.getDisplayName(locale))
+                values.add(locale.toLangTag())
             }
+
+            Pair(names.toTypedArray(), values.toTypedArray())
+        }.subscribeK { (names, values) ->
+            lp.isEnabled = true
+            lp.entries = names
+            lp.entryValues = values
+            lp.summary = currentLocale.getDisplayName(currentLocale)
+        }
     }
 
     private fun setSummary(key: String) {
@@ -326,5 +328,28 @@ class SettingsFragment : BasePreferenceFragment() {
             }
             .setNegativeButton(R.string.close, null)
             .show()
+    }
+
+    private inline fun showManagerNameDialog(
+        crossinline onSuccess: (String) -> Unit
+    ) {
+        val data = ManagerNameData()
+        val view = DialogCustomNameBinding
+            .inflate(LayoutInflater.from(requireContext()))
+            .also { it.data = data }
+
+        AlertDialog.Builder(requireActivity())
+            .setTitle(R.string.settings_app_name)
+            .setView(view.root)
+            .setPositiveButton(R.string.ok) { _, _ ->
+                if (view.dialogNameInput.error.isNullOrBlank()) {
+                    onSuccess(data.name.value)
+                }
+            }
+            .show()
+    }
+
+    inner class ManagerNameData {
+        val name = KObservableField(resources.getString(R.string.re_app_name))
     }
 }

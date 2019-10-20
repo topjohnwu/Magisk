@@ -150,6 +150,10 @@
     <string name="settings_hosts_summary">Systemless hosts support for Adblock apps.</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>
 
+    <string name="settings_app_name">Type desired app name</string>
+    <string name="settings_app_name_hint">New name</string>
+    <string name="settings_app_name_helper">App will be repackaged to this name</string>
+    <string name="settings_app_name_error">Invalid format</string>
     <string name="settings_su_app_adb">Apps and ADB</string>
     <string name="settings_su_app">Apps only</string>
     <string name="settings_su_adb">ADB only</string>
