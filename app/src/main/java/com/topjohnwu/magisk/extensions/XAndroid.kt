@@ -177,7 +177,9 @@ fun Intent.toCommand(args: MutableList<String>) {
                     val sb = StringBuilder()
                     val len = java.lang.reflect.Array.getLength(v)
                     for (i in 0 until len) {
-                        sb.append(java.lang.reflect.Array.get(v, i)!!.toString().replace(",", "\\,"))
+                        sb.append(
+                            java.lang.reflect.Array.get(v, i)!!.toString().replace(",", "\\,")
+                        )
                         sb.append(',')
                     }
                     // Remove trailing comma
@@ -262,10 +264,10 @@ fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
 fun Context.openUrl(url: String) = Utils.openLink(this, url.toUri())
 
 @Suppress("FunctionName")
-inline fun <reified T> T.DynamicClassLoader(apk: File)
-        = DynamicClassLoader(apk, T::class.java.classLoader)
+inline fun <reified T> T.DynamicClassLoader(apk: File) =
+    DynamicClassLoader(apk, T::class.java.classLoader)
 
-fun Context.unwrap() : Context {
+fun Context.unwrap(): Context {
     var context = this
     while (true) {
         if (context is ContextWrapper)
@@ -274,4 +276,8 @@ fun Context.unwrap() : Context {
             break
     }
     return context
+}
+
+fun Context.hasPermissions(vararg permissions: String) = permissions.all {
+    ContextCompat.checkSelfPermission(this, it) == PERMISSION_GRANTED
 }

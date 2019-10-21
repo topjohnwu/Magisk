@@ -58,8 +58,20 @@ class MagiskDialog @JvmOverloads constructor(
         var preventDismiss = false
 
         fun clicked() {
+            //we might not want the click to dismiss the button to begin with
+            var prevention = preventDismiss
+
             onClickAction(this@MagiskDialog)
-            if (!preventDismiss) {
+
+            //in case we don't want the dialog to close after clicking the button
+            //ie. the input is incorrect ...
+            //otherwise we disregard the request, bcs it just might reset the button in the new
+            //instance
+            if (preventDismiss) {
+                prevention = preventDismiss
+            }
+
+            if (!prevention) {
                 dismiss()
             }
         }
@@ -131,7 +143,7 @@ class MagiskDialog @JvmOverloads constructor(
 
     fun <Binding : ViewDataBinding> applyView(binding: Binding, body: Binding.() -> Unit = {}) =
         apply {
-            this.binding.dialogBaseContainer.removeAllViews()
+            resetView()
             this.binding.dialogBaseContainer.addView(binding.root)
             binding.apply(body)
         }
@@ -143,6 +155,34 @@ class MagiskDialog @JvmOverloads constructor(
         apply { setOnShowListener(callback) }
 
     fun reveal() = apply { super.show() }
+
+    // ---
+
+    fun resetView() = apply {
+        binding.dialogBaseContainer.removeAllViews()
+    }
+
+    fun resetTitle() = applyTitle("")
+    fun resetMessage() = applyMessage("")
+    fun resetIcon() = applyIcon(0)
+
+    fun resetButtons() = apply {
+        ButtonType.values().forEach {
+            applyButton(it) {
+                title = ""
+                icon = 0
+                isEnabled = true
+                preventDismiss = false
+                onClick {}
+            }
+        }
+    }
+
+    fun reset() = resetTitle()
+        .resetMessage()
+        .resetView()
+        .resetIcon()
+        .resetButtons()
 
     //region Deprecated Members
     @Deprecated("Use applyTitle instead", ReplaceWith("applyTitle"))
