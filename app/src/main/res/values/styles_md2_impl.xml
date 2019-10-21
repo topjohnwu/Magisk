@@ -131,6 +131,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
     </style>
 
     <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textAppearance">?appearanceTextBodyNormal</item>
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
