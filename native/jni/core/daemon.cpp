@@ -54,6 +54,7 @@ static void *request_handler(void *args) {
 	case BOOT_COMPLETE:
 	case SQLITE_CMD:
 	case BROADCAST_ACK:
+	case BROADCAST_TEST:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -91,9 +92,10 @@ static void *request_handler(void *args) {
 		exec_sql(client);
 		break;
 	case BROADCAST_ACK:
-		LOGD("* Use broadcasts for su logging and notify\n");
-		CONNECT_BROADCAST = true;
-		close(client);
+		broadcast_ack(client);
+		break;
+	case BROADCAST_TEST:
+		broadcast_test(client);
 		break;
 	case REMOVE_MODULES:
 		if (credential.uid == UID_SHELL || credential.uid == UID_ROOT) {
