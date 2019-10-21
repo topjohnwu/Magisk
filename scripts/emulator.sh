@@ -36,7 +36,6 @@ if [ ! -f /system/build.prop ]; then
   else
     adb push native/out/x86/magiskinit /data/local/tmp
   fi
-  adb root || abort 'adb root failed'
   adb shell sh /data/local/tmp/emulator.sh
   exit 0
 fi
@@ -45,12 +44,10 @@ cd /data/local/tmp
 chmod 777 busybox
 chmod 777 magiskinit
 
-# Emulator's adb shell should have root
-[ `./busybox id -u` -eq 0 ] || abort 'ADB shell should have root access'
-
-# Check whether already setup
-[ -f /sbin/magisk ] && abort "Magisk is already setup"
-./busybox pgrep magiskd && abort "Magisk is already setup"
+if [ `./busybox id -u` -ne 0 ]; then
+  # Re-run script with root
+  exec /system/xbin/su 0 sh $0
+fi
 
 # First setup a good env to work with
 rm -rf bin
@@ -58,6 +55,10 @@ rm -rf bin
 ./busybox --install -s bin
 OLD_PATH="$PATH"
 PATH="/data/local/tmp/bin:$PATH"
+
+# Remove previous setup if exist
+pgrep magiskd >/dev/null && pkill -9 magiskd
+[ -f /sbin/magisk ] && umount -l /sbin
 
 # SELinux stuffs
 [ -e /sys/fs/selinux ] && SELINUX=true || SELINUX=false
