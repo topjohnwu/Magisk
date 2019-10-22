@@ -42,11 +42,7 @@ abstract class RemoteFileService : NotificationService() {
         .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.title) } }
         .subscribeK(onError = {
             Timber.e(it)
-            finishNotify(subject.hashCode()) { notification ->
-                notification.setContentText(getString(R.string.download_file_error))
-                    .setSmallIcon(android.R.drawable.stat_notify_error)
-                    .setOngoing(false)
-            }
+            failNotify(subject)
         }) {
             val newId = finishNotify(subject)
             if (get<Activity>() !is NullActivity) {
@@ -76,7 +72,7 @@ abstract class RemoteFileService : NotificationService() {
         }.doOnComplete {
             if (subject is Manager)
                 handleAPK(subject)
-        }.doOnError { send(0f, subject) }
+        }
 
     private fun ResponseBody.toStream(id: Int, subject: DownloadSubject): InputStream {
         val maxRaw = contentLength()
@@ -95,6 +91,13 @@ abstract class RemoteFileService : NotificationService() {
                 }
             }
         }
+    }
+
+    private fun failNotify(subject: DownloadSubject) = finishNotify(subject.hashCode()) {
+        send(0f, subject)
+        it.setContentText(getString(R.string.download_file_error))
+            .setSmallIcon(android.R.drawable.stat_notify_error)
+            .setOngoing(false)
     }
 
     private fun finishNotify(subject: DownloadSubject) = finishNotify(subject.hashCode()) {
