@@ -76,7 +76,7 @@ abstract class RemoteFileService : NotificationService() {
         }.doOnComplete {
             if (subject is Manager)
                 handleAPK(subject)
-        }
+        }.doOnError { send(0f, subject) }
 
     private fun ResponseBody.toStream(id: Int, subject: DownloadSubject): InputStream {
         val maxRaw = contentLength()
