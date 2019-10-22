@@ -9,7 +9,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface">
         <item name="elevation">0dp</item>
-        <item name="android:background">?colorSurfaceVariant</item>
+        <item name="android:background">@drawable/bg_appbar</item>
     </style>
 
     <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">

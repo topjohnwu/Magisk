@@ -18,7 +18,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l2}"
+        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
         tools:layout_marginTop="24dp"
         tools:paddingTop="@dimen/l1">
@@ -26,6 +26,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="@dimen/l1"
             android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
