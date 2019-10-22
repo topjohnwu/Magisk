@@ -133,7 +133,7 @@
                             <com.google.android.material.button.MaterialButton
                                 style="?styleButtonText"
                                 gone="@{viewModel.stateMagisk == MagiskState.OBSOLETE}"
-                                isEnabled="@{viewModel.stateManager == MagiskState.UP_TO_DATE}"
+                                isEnabled="@{viewModel.stateManager == MagiskState.UP_TO_DATE &amp;&amp; (viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100)}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"

@@ -1,20 +1,26 @@
 package com.topjohnwu.magisk.redesign.home
 
+import android.Manifest
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.*
+import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.MagiskJson
 import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.UpdateInfo
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
-import com.topjohnwu.magisk.model.events.dialog.MagiskInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
+import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.ui.home.MagiskState
@@ -23,6 +29,7 @@ import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.BR
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import me.tatarka.bindingcollectionadapter2.OnItemBind
+import kotlin.math.roundToInt
 
 class HomeViewModel(
     private val repoMagisk: MagiskRepository
@@ -74,6 +81,22 @@ class HomeViewModel(
 
     private var shownDialog = false
 
+    init {
+        RemoteFileService.progressBroadcast.observeForever {
+            when (it.second) {
+                is Magisk.Download,
+                is Magisk.Flash -> stateMagiskProgress.value = it.first.times(100f).roundToInt()
+                is Manager -> stateManagerProgress.value = it.first.times(100f).roundToInt()
+            }
+        }
+
+        stateMagiskProgress.addOnPropertyChangedCallback {
+            if (it == 100) {
+                Navigation.install().publish()
+            }
+        }
+    }
+
     override fun refresh() = repoMagisk.fetchUpdate()
         .onErrorReturn { Info.remote }
         .subscribeK { updateBy(it) }
@@ -116,7 +139,21 @@ class HomeViewModel(
 
     fun onManagerPressed() = ManagerInstallDialog().publish()
 
-    fun onMagiskPressed() = MagiskInstallDialog().publish()
+    fun onMagiskPressed() {
+        //pre-fix so user doesn't click twice accidentally
+        stateMagiskProgress.value = 1
+
+        withPermissions(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ).map { check(it);it }.subscribeK(onError = {
+            stateManagerProgress.value = 0
+        }) {
+            DownloadService(get()) {
+                subject = Magisk(Configuration.Download)
+            }
+        }.add()
+    }
 
     private fun ensureEnv() {
         val invalidStates = listOf(
