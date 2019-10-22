@@ -38,7 +38,7 @@ object Shortcuts {
                     .setRank(0)
                     .build())
         }
-        if (root && Config.magiskHide) {
+        if (root && Info.env.magiskHide) {
             shortCuts.add(ShortcutInfo.Builder(context, "magiskhide")
                     .setShortLabel(context.getString(R.string.magiskhide))
                     .setIntent(Intent(intent)
@@ -49,7 +49,7 @@ object Shortcuts {
                     .setRank(1)
                     .build())
         }
-        if (!Config.coreOnly && root && Info.magiskVersionCode >= 0) {
+        if (!Config.coreOnly && root && Info.env.magiskVersionCode >= 0) {
             shortCuts.add(ShortcutInfo.Builder(context, "modules")
                     .setShortLabel(context.getString(R.string.modules))
                     .setIntent(Intent(intent)

@@ -107,10 +107,10 @@ class HomeViewModel(
             Info.recovery = it ?: return@addOnPropertyChangedCallback
         }
         isConnected.addOnPropertyChangedCallback {
-            if (it == true) refresh()
+            if (it == true) refresh(false)
         }
 
-        refresh()
+        refresh(false)
     }
 
     fun paypalPressed() = OpenLinkEvent(Const.Url.PAYPAL_URL).publish()
@@ -170,7 +170,11 @@ class HomeViewModel(
         }
     }
 
-    fun refresh() {
+    @JvmOverloads
+    fun refresh(invalidate: Boolean = true) {
+        if (invalidate)
+            Info.envRef.invalidate()
+
         hasRoot.value = Shell.rootAccess()
 
         val fetchUpdate = if (isConnected.value)
@@ -179,7 +183,8 @@ class HomeViewModel(
             Completable.complete()
 
         Completable.fromAction {
-            Info.loadMagiskInfo()
+            // Ensure value is ready
+            Info.env
         }.andThen(fetchUpdate)
         .applyViewModel(this)
         .doOnSubscribeUi {
@@ -197,7 +202,7 @@ class HomeViewModel(
 
     private fun refreshVersions() {
         magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
-            version.format(Info.magiskVersionString, Info.magiskVersionCode)
+            version.format(Info.env.magiskVersionString, Info.env.magiskVersionCode)
         } else {
             ""
         }
@@ -207,7 +212,7 @@ class HomeViewModel(
     }
 
     private fun updateSelf() {
-        magiskState.value = when (Info.magiskVersionCode) {
+        magiskState.value = when (Info.env.magiskVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
             !in Info.remote.magisk.versionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE

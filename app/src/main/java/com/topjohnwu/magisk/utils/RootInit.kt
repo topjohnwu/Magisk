@@ -20,9 +20,8 @@ class RootInit : Shell.Initializer() {
         val job = shell.newJob()
         if (shell.isRoot) {
             job.add(context.rawResource(R.raw.util_functions))
-                    .add(context.rawResource(R.raw.utils))
+                .add(context.rawResource(R.raw.utils))
             Const.MAGISK_DISABLE_FILE = SuFile("/cache/.disable_magisk")
-            Info.loadMagiskInfo()
         } else {
             job.add(context.rawResource(R.raw.nonroot_utils))
         }
