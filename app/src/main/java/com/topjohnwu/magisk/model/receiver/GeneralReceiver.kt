@@ -79,6 +79,8 @@ open class GeneralReceiver : BaseReceiver() {
                     NOTIFY -> SuLogger.handleNotify(context, intent)
                     TEST -> {
                         val mode = intent.getIntExtra("mode", 1 shl 1)
+                        if (mode > Info.env.connectionMode)
+                            Info.env.connectionMode = mode
                         Shell.su("magisk --connect-mode $mode").submit()
                     }
                 }

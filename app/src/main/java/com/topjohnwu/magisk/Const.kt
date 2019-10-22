@@ -22,8 +22,9 @@ object Const {
     const val MANAGER_CONFIGS = ".tmp.magisk.config"
     val USER_ID = Process.myUid() / 100000
 
-    object MagiskVersion {
+    object Version {
         const val MIN_SUPPORT = 18000
+        const val CONNECT_MODE = 20002
     }
 
     object ID {

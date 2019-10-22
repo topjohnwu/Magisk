@@ -17,6 +17,9 @@ class RootInit : Shell.Initializer() {
     }
 
     fun init(context: Context, shell: Shell): Boolean {
+        // Invalidate env state if shell is recreated
+        Info.envRef.invalidate()
+
         val job = shell.newJob()
         if (shell.isRoot) {
             job.add(context.rawResource(R.raw.util_functions))
@@ -35,6 +38,12 @@ class RootInit : Shell.Initializer() {
         Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
         Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
         Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
+
+        if (Info.env.connectionMode == 0) {
+            // Manually trigger broadcast test
+            Shell.su("magisk --broadcast-test").exec()
+        }
+
         return true
     }
 }

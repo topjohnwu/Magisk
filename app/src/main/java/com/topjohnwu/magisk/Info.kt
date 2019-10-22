@@ -20,13 +20,17 @@ object Info {
         val str = ShellUtils.fastCmd("magisk -v").split(":".toRegex())[0]
         val code = ShellUtils.fastCmd("magisk -V").toInt()
         val hide = Shell.su("magiskhide --status").exec().isSuccess
-        Env(code, str, hide)
+        var mode = Int.MAX_VALUE
+        if (code >= Const.Version.CONNECT_MODE)
+            mode = Shell.su("magisk --connect-mode").exec().code
+        Env(code, str, hide, mode)
     }.getOrElse { Env() }
 
     class Env(
         val magiskVersionCode: Int = -1,
         val magiskVersionString: String = "",
-        hide: Boolean = false
+        hide: Boolean = false,
+        var connectionMode: Int = Int.MAX_VALUE
     ) {
         val magiskHide get() = Config.magiskHide
 
