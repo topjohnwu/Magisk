@@ -69,7 +69,7 @@ class SettingsFragment : BasePreferenceFragment() {
         val hideManager = findPreference<Preference>("hide")!!
         hideManager.setOnPreferenceClickListener {
             showManagerNameDialog {
-                PatchAPK.hideManager(requireContext(), "Manager")
+                PatchAPK.hideManager(requireContext(), it)
             }
             true
         }
@@ -346,6 +346,7 @@ class SettingsFragment : BasePreferenceFragment() {
                     onSuccess(data.name.value)
                 }
             }
+            .setNegativeButton(R.string.close, null)
             .show()
     }
 
