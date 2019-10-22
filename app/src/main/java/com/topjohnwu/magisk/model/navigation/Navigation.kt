@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.redesign.safetynet.SafetynetFragment
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
 import com.topjohnwu.magisk.ui.home.HomeFragment
+import com.topjohnwu.magisk.ui.install.InstallFragment
 import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModulesFragment
 import com.topjohnwu.magisk.ui.module.ReposFragment
@@ -91,6 +92,10 @@ object Navigation {
                 else -> SettingsFragment::class
             }
         }
+    }
+
+    fun install() = MagiskNavigationEvent {
+        navDirections { destination = InstallFragment::class }
     }
 
     fun fromSection(section: String) = when (section) {

@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.redesign.safetynet.SafetynetViewModel
 import com.topjohnwu.magisk.redesign.settings.SettingsViewModel
 import com.topjohnwu.magisk.redesign.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.redesign.theme.ThemeViewModel
+import com.topjohnwu.magisk.ui.install.InstallViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -25,6 +26,7 @@ val redesignModule = module {
     viewModel { SettingsViewModel() }
     viewModel { SuperuserViewModel(get(), get(), get(), get()) }
     viewModel { ThemeViewModel() }
+    viewModel { InstallViewModel() }
 
     viewModel { MainViewModel() }
 }
