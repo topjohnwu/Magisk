@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.topjohnwu.magisk.R
@@ -383,4 +384,9 @@ fun View.rotationTo(value: Int) {
 @BindingAdapter("app:icon")
 fun MaterialButton.setIconRes(res: Int) {
     setIconResource(res)
+}
+
+@BindingAdapter("cardElevation")
+fun MaterialCardView.setCardElevationBound(elevation: Float) {
+    cardElevation = elevation
 }

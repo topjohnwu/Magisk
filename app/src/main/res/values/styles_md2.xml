@@ -53,6 +53,8 @@
 
         <item name="styleCheckboxNormal">@style/WidgetFoundation.Checkbox</item>
 
+        <item name="styleRadioNormal">@style/WidgetFoundation.RadioButton</item>
+
         <item name="styleProgressDeterminate">@style/WidgetFoundation.ProgressBar</item>
         <item name="styleProgressIndeterminate">@style/WidgetFoundation.ProgressBar.Indeterminate
         </item>

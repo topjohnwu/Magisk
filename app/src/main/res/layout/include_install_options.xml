@@ -12,8 +12,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        android:paddingTop="@dimen/l1">
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,7 +24,7 @@
                 style="?styleCheckboxNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="start|center_vertical"
                 android:checked="@={Info.keepVerity}"
                 android:gravity="center"
                 android:text="@string/keep_dm_verity"
@@ -35,7 +34,7 @@
                 style="?styleCheckboxNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="start|center_vertical"
                 android:checked="@={Info.keepEnc}"
                 android:gravity="center"
                 android:text="@string/keep_force_encryption"
@@ -45,7 +44,7 @@
                 style="?styleCheckboxNormal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="start|center_vertical"
                 android:checked="@={Info.recovery}"
                 android:gravity="center"
                 android:text="@string/recovery_mode"
