@@ -8,7 +8,8 @@ import se.ansman.kotshi.JsonSerializable
 data class UpdateInfo(
     val app: ManagerJson = ManagerJson(),
     val uninstaller: UninstallerJson = UninstallerJson(),
-    val magisk: MagiskJson = MagiskJson()
+    val magisk: MagiskJson = MagiskJson(),
+    val stub: StubJson = StubJson()
 )
 
 @JsonSerializable
@@ -33,3 +34,9 @@ data class ManagerJson(
     val link: String = "",
     val note: String = ""
 ) : Parcelable
+
+@JsonSerializable
+data class StubJson(
+    val versionCode: Int = -1,
+    val link: String = ""
+)

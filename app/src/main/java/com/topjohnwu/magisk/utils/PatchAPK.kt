@@ -1,10 +1,14 @@
 package com.topjohnwu.magisk.utils
 
 import android.content.Context
+import android.os.Build.VERSION.SDK_INT
 import android.widget.Toast
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.extensions.DynamicClassLoader
+import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.signing.JarMap
@@ -74,11 +78,28 @@ object PatchAPK {
     }
 
     private fun patchAndHide(context: Context, label: String): Boolean {
+        // If not running as stub, and we are compatible with stub, use stub
+        val src = if (!isRunningAsStub && SDK_INT >= 28 && Info.env.connectionMode == 3) {
+            val stub = File(context.cacheDir, "stub.apk")
+            val svc = get<GithubRawServices>()
+            runCatching {
+                svc.fetchFile(Info.remote.stub.link).blockingGet().byteStream().use {
+                    it.writeTo(stub)
+                }
+            }.onFailure {
+                Timber.e(it)
+                return false
+            }
+            stub.path
+        } else {
+            context.packageCodePath
+        }
+
         // Generate a new app with random package name
-        val repack = File(context.filesDir, "patched.apk")
+        val repack = File(context.cacheDir, "patched.apk")
         val pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length)
 
-        if (!patch(context.packageCodePath, repack.path, pkg, label))
+        if (!patch(src, repack.path, pkg, label))
             return false
 
         // Install the application
