@@ -21,10 +21,8 @@ import static com.topjohnwu.magisk.DelegateApplication.MANAGER_APK;
 public class DownloadActivity extends Activity {
 
     static final String TAG = "MMStub";
-    private static final boolean IS_CANARY = BuildConfig.VERSION_NAME.contains("-");
     private static final String URL = BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
-            "https://raw.githubusercontent.com/topjohnwu/magisk_files/" +
-                    (IS_CANARY ? "canary/release.json" : "master/stable.json");
+            "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/stable.json";
 
     private String apkLink;
     private ErrorHandler err = (conn, e) -> {
@@ -34,8 +32,9 @@ public class DownloadActivity extends Activity {
 
     private void showDialog() {
         ProgressDialog.show(this,
-                "Downloading...",
-                "Downloading Magisk Manager", true);
+                getString(R.string.dling),
+                getString(R.string.dling) + " " + getString(R.string.app_name),
+                true);
     }
 
     private void dlAPK() {
