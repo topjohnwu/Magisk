@@ -1,4 +1,4 @@
-# Magisk Documentations
+# Magisk Documentation
 (Updated on 2019.9.19)
 
 - [Installation](install.md)
@@ -6,7 +6,7 @@
     - [OTA Installation](tutorials.md#ota-installation)
     - [Best Practices for MagiskHide](tutorials.md#best-practices-for-magiskhide)
 
-The followings are for developers
+The following sections are for developers
 
 - [Magisk Details](details.md)
 - [Magisk Tools](tools.md)
