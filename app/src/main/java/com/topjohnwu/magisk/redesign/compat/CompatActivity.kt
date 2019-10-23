@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.redesign.compat
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,11 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
     private val delegate by lazy { CompatDelegate(this) }
 
     internal abstract val navHost: Int
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        navigation?.onActivityResult(requestCode, resultCode, data)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

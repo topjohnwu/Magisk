@@ -143,7 +143,7 @@
                             android:id="@+id/install_step_method_button"
                             style="?styleButtonText"
                             gone="@{viewModel.step != 1}"
-                            isEnabled="@{viewModel.method != -1}"
+                            isEnabled="@{viewModel.method == @id/method_patch ? viewModel.data != null : viewModel.method != -1}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="@{() -> viewModel.step(2)}"
@@ -179,12 +179,14 @@
                             android:id="@+id/method_direct"
                             style="?styleRadioNormal"
                             android:layout_width="match_parent"
+                            gone="@{!viewModel.rooted}"
                             android:layout_height="wrap_content"
                             android:text="@string/direct_install" />
 
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/method_inactive_slot"
                             style="?styleRadioNormal"
+                            gone="@{!viewModel.rooted || !viewModel.aB}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/install_inactive_slot" />
@@ -199,6 +201,7 @@
                 style="?styleButtonText"
                 gone="@{viewModel.step != 2}"
                 android:layout_width="wrap_content"
+                android:onClick="@{() -> viewModel.install()}"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_margin="@dimen/l1"

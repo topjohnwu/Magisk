@@ -31,6 +31,9 @@ class CompatNavigationDelegate<out Source>(
         source.baseFragments[index].java.newInstance()
     //endregion
 
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        controller.currentFrag?.onActivityResult(requestCode, resultCode, data)
+    }
 
     fun onCreate(savedInstanceState: Bundle?) = controller.run {
         rootFragmentListener = this@CompatNavigationDelegate

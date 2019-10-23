@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.model.events
 
 import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -94,5 +95,22 @@ class DieEvent : ViewEvent(), ActivityExecutor {
 class RecreateEvent : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: AppCompatActivity) {
         activity.recreate()
+    }
+}
+
+class RequestFileEvent : ViewEvent(), ActivityExecutor {
+    override fun invoke(activity: AppCompatActivity) {
+        Intent(Intent.ACTION_GET_CONTENT)
+            .setType("*/*")
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .also { activity.startActivityForResult(it, REQUEST_CODE) }
+    }
+
+    companion object {
+        private const val REQUEST_CODE = 10
+        fun resolve(requestCode: Int, resultCode: Int, data: Intent?) = data
+            ?.takeIf { resultCode == Activity.RESULT_OK }
+            ?.takeIf { requestCode == REQUEST_CODE }
+            ?.data
     }
 }

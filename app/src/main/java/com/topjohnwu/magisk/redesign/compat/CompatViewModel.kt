@@ -6,8 +6,9 @@ import androidx.databinding.Observable
 import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import io.reactivex.disposables.Disposable
+import org.koin.core.KoinComponent
 
-abstract class CompatViewModel : BaseViewModel() {
+abstract class CompatViewModel : BaseViewModel(), KoinComponent {
 
     val insets = KObservableField(Insets.NONE)
 
