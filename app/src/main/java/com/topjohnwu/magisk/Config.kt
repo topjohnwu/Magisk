@@ -133,9 +133,6 @@ object Config : PreferenceModel, DBConfig {
     fun initialize() = prefs.edit {
         parsePrefs(this)
 
-        if (!prefs.contains(Key.UPDATE_CHANNEL))
-            putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
-
         // Get actual state
         putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
 
@@ -144,6 +141,9 @@ object Config : PreferenceModel, DBConfig {
         putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
         putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
         putBoolean(Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
+    }.also {
+        if (!prefs.contains(Key.UPDATE_CHANNEL))
+            prefs.edit().putString(Key.UPDATE_CHANNEL, defaultChannel.toString()).apply()
     }
 
     private fun parsePrefs(editor: SharedPreferences.Editor) = editor.apply {
