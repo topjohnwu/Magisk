@@ -15,3 +15,5 @@ sealed class PolicyUpdateEvent(val item: MagiskPolicy) : RxBus.Event {
 }
 
 class ModuleUpdatedEvent(val item: ModuleRvItem) : RxBus.Event
+
+data class SafetyNetResult(val responseCode: Int) : RxBus.Event

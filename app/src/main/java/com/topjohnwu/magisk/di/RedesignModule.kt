@@ -22,7 +22,7 @@ val redesignModule = module {
     viewModel { LogViewModel() }
     viewModel { ModuleViewModel() }
     viewModel { RequestViewModel() }
-    viewModel { SafetynetViewModel() }
+    viewModel { SafetynetViewModel(get()) }
     viewModel { SettingsViewModel() }
     viewModel { SuperuserViewModel(get(), get(), get(), get()) }
     viewModel { ThemeViewModel() }
