@@ -36,6 +36,7 @@
 
 # Workaround R8 bug
 -keep,allowobfuscation class com.topjohnwu.magisk.model.receiver.GeneralReceiver
+-keepclassmembers class a.e { *; }
 
 # Strip logging
 -assumenosideeffects class timber.log.Timber.Tree { *; }
