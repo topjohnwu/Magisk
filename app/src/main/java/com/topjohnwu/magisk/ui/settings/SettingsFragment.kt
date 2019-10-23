@@ -24,7 +24,6 @@ import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.observer.Observer
-import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import com.topjohnwu.superuser.Shell
@@ -54,6 +53,7 @@ class SettingsFragment : BasePreferenceFragment() {
         preferenceManager.setStorageDeviceProtected()
         setPreferencesFromResource(R.xml.app_settings, rootKey)
 
+        // Get preferences
         updateChannel = findPreference(Config.Key.UPDATE_CHANNEL)!!
         rootConfig = findPreference(Config.Key.ROOT_ACCESS)!!
         autoRes = findPreference(Config.Key.SU_AUTO_RESPONSE)!!
@@ -67,19 +67,68 @@ class SettingsFragment : BasePreferenceFragment() {
         val magiskCategory = findPreference<PreferenceCategory>("magisk")!!
         val suCategory = findPreference<PreferenceCategory>("superuser")!!
         val hideManager = findPreference<Preference>("hide")!!
-        hideManager.setOnPreferenceClickListener {
-            showManagerNameDialog {
-                PatchAPK.hideManager(requireContext(), it)
-            }
-            true
+        val restoreManager = findPreference<Preference>("restore")!!
+
+        // Remove/Disable entries
+
+        // Only show canary channels if user is already on canary channel
+        // or the user have already chosen canary channel
+        if (!Utils.isCanary && Config.updateChannel < Config.Value.CANARY_CHANNEL) {
+            // Remove the last 2 entries
+            val entries = updateChannel.entries
+            updateChannel.entries = entries.copyOf(entries.size - 2)
         }
-        val restoreManager = findPreference<Preference>("restore")
-        restoreManager?.setOnPreferenceClickListener {
-            DownloadService(requireContext()) {
-                subject = DownloadSubject.Manager(Configuration.APK.Restore)
-            }
-            true
+
+        // Remove dangerous settings in secondary user
+        if (Const.USER_ID > 0) {
+            suCategory.removePreference(multiuserConfig)
         }
+
+        // Remove re-authentication option on Android O, it will not work
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            suCategory.removePreference(reauth)
+        }
+
+        // Disable fingerprint option if not possible
+        if (!FingerprintHelper.canUseFingerprint()) {
+            fingerprint.isEnabled = false
+            fingerprint.isChecked = false
+            fingerprint.setSummary(R.string.disable_fingerprint)
+        }
+
+        if (Const.USER_ID == 0 && Info.isConnected.value && Shell.rootAccess()) {
+            if (activity.packageName == BuildConfig.APPLICATION_ID) {
+                generalCatagory.removePreference(restoreManager)
+                hideManager.setOnPreferenceClickListener {
+                    showManagerNameDialog {
+                        PatchAPK.hideManager(requireContext(), it)
+                    }
+                    true
+                }
+            } else {
+                generalCatagory.removePreference(hideManager)
+                restoreManager.setOnPreferenceClickListener {
+                    DownloadService(requireContext()) {
+                        subject = DownloadSubject.Manager(Configuration.APK.Restore)
+                    }
+                    true
+                }
+            }
+        } else {
+            // Remove if not primary user, no connection, or no root
+            generalCatagory.removePreference(restoreManager)
+            generalCatagory.removePreference(hideManager)
+        }
+
+        if (!Utils.showSuperUser()) {
+            preferenceScreen.removePreference(suCategory)
+        }
+
+        if (!Shell.rootAccess()) {
+            preferenceScreen.removePreference(magiskCategory)
+            generalCatagory.removePreference(hideManager)
+        }
+
         findPreference<Preference>("clear")?.setOnPreferenceClickListener {
             Completable.fromAction { repoDB.clear() }.subscribeK {
                 Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
@@ -123,58 +172,7 @@ class SettingsFragment : BasePreferenceFragment() {
 
         setLocalePreference(findPreference(Config.Key.LOCALE)!!)
 
-        /* We only show canary channels if user is already on canary channel
-         * or the user have already chosen canary channel */
-        if (!Utils.isCanary && Config.updateChannel < Config.Value.CANARY_CHANNEL) {
-            // Remove the last 2 entries
-            val entries = updateChannel.entries
-            updateChannel.entries = entries.copyOf(entries.size - 2)
-
-        }
-
         setSummary()
-
-        // Disable dangerous settings in secondary user
-        if (Const.USER_ID > 0) {
-            suCategory.removePreference(multiuserConfig)
-        }
-
-        // Disable re-authentication option on Android O, it will not work
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            reauth.isEnabled = false
-            reauth.isChecked = false
-            reauth.setSummary(R.string.android_o_not_support)
-        }
-
-        // Disable fingerprint option if not possible
-        if (!FingerprintHelper.canUseFingerprint()) {
-            fingerprint.isEnabled = false
-            fingerprint.isChecked = false
-            fingerprint.setSummary(R.string.disable_fingerprint)
-        }
-
-        if (Shell.rootAccess() && Const.USER_ID == 0) {
-            if (activity.packageName == BuildConfig.APPLICATION_ID) {
-                generalCatagory.removePreference(restoreManager)
-            } else {
-                if (!Networking.checkNetworkStatus(requireContext())) {
-                    generalCatagory.removePreference(restoreManager)
-                }
-                generalCatagory.removePreference(hideManager)
-            }
-        } else {
-            generalCatagory.removePreference(restoreManager)
-            generalCatagory.removePreference(hideManager)
-        }
-
-        if (!Utils.showSuperUser()) {
-            preferenceScreen.removePreference(suCategory)
-        }
-
-        if (!Shell.rootAccess()) {
-            preferenceScreen.removePreference(magiskCategory)
-            generalCatagory.removePreference(hideManager)
-        }
     }
 
     override fun onSharedPreferenceChanged(prefs: SharedPreferences, key: String) {

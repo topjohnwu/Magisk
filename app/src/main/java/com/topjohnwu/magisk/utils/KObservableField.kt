@@ -9,15 +9,11 @@ import java.io.Serializable
  * You can define if wrapped type is Nullable or not.
  * You can use kotlin get/set syntax for value
  */
-class KObservableField<T> : ObservableField<T>, Serializable {
+open class KObservableField<T> : ObservableField<T>, Serializable {
 
     var value: T
-        set(value) {
-            if (field != value) {
-                field = value
-                notifyChange()
-            }
-        }
+        get() = get()
+        set(value) { set(value) }
 
     constructor(init: T) {
         value = init
@@ -27,23 +23,8 @@ class KObservableField<T> : ObservableField<T>, Serializable {
         value = init
     }
 
-    @Deprecated(
-        message = "Needed for data binding, use KObservableField.value syntax from code",
-        replaceWith = ReplaceWith("value")
-    )
+    @Suppress("UNCHECKED_CAST")
     override fun get(): T {
-        return value
-    }
-
-    @Deprecated(
-        message = "Needed for data binding, use KObservableField.value = ... syntax from code",
-        replaceWith = ReplaceWith("value = newValue")
-    )
-    override fun set(newValue: T) {
-        value = newValue
-    }
-
-    override fun toString(): String {
-        return "KObservableField(value=$value)"
+        return super.get() as T
     }
 }

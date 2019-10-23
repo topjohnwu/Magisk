@@ -39,11 +39,6 @@ class RootInit : Shell.Initializer() {
         Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
         Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
 
-        if (Info.env.connectionMode == 0) {
-            // Manually trigger broadcast test
-            Shell.su("magisk --broadcast-test").exec()
-        }
-
         return true
     }
 }
