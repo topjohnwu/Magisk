@@ -140,15 +140,12 @@ class HomeViewModel(
     fun onManagerPressed() = ManagerInstallDialog().publish()
 
     fun onMagiskPressed() {
-        //pre-fix so user doesn't click twice accidentally
-        stateMagiskProgress.value = 1
-
         withPermissions(
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ).map { check(it);it }.subscribeK(onError = {
-            stateManagerProgress.value = 0
-        }) {
+        ).map { check(it);it }.subscribeK {
+            //pre-fix so user doesn't click twice accidentally
+            stateMagiskProgress.value = 1
             DownloadService(get()) {
                 subject = Magisk(Configuration.Download)
             }
