@@ -109,9 +109,3 @@ EOF
   touch hosts/auto_mount
   cd /
 }
-
-rm_launch() {
-  pm uninstall $1
-  am start -n $2
-  exit
-}

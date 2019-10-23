@@ -9,7 +9,6 @@ import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
-import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.signing.JarMap
 import com.topjohnwu.signing.SignAPK
@@ -109,7 +108,7 @@ object PatchAPK {
 
         Config.suManager = pkg
         Config.export()
-        Utils.rmAndLaunch(BuildConfig.APPLICATION_ID, SplashActivity::class.java.cmp(pkg))
+        Shell.su("pm uninstall ${BuildConfig.APPLICATION_ID}").submit()
 
         return true
     }

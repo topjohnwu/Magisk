@@ -1,12 +1,13 @@
 package com.topjohnwu.magisk.model.download
 
-import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.isRunningAsStub
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Restore
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Upgrade
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.utils.PatchAPK
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import java.io.File
 
@@ -35,9 +36,7 @@ private fun RemoteFileService.restore(apk: File, id: Int) {
     Config.export()
     // Make it world readable
     apk.setReadable(true, false)
-    if (Shell.su("pm install $apk").exec().isSuccess) {
-        Utils.rmAndLaunch(packageName, SplashActivity::class.java.cmp())
-    }
+    Shell.su("pm install $apk && pm uninstall $packageName").exec()
 }
 
 fun RemoteFileService.handleAPK(subject: DownloadSubject.Manager)
