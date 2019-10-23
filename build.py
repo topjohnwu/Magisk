@@ -119,6 +119,9 @@ def load_config(args):
     config['keyStore'] = 'release-key.jks'
 
     # Load prop file
+    if not os.path.exists(args.config):
+        error(f'Please make sure {args.config} existed')
+
     with open(args.config, 'r') as f:
         for line in [l.strip(' \t\r\n') for l in f]:
             if line.startswith('#') or len(line) == 0:
