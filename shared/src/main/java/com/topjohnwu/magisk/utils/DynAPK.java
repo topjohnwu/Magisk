@@ -5,6 +5,8 @@ import android.content.Context;
 import java.io.File;
 import java.util.Map;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 public class DynAPK {
 
     private static final int STUB_VERSION = 1;
@@ -25,6 +27,10 @@ public class DynAPK {
 
     private static File getDynDir(Context c) {
         if (dynDir == null) {
+            if (SDK_INT >= 24) {
+                // Use protected context to allow directBootAware
+                c = c.createDeviceProtectedStorageContext();
+            }
             dynDir = new File(c.getFilesDir().getParent(), "dyn");
             dynDir.mkdir();
         }
