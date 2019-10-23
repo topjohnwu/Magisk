@@ -57,6 +57,7 @@
             android:name="a.w"
             android:directBootAware="true">
             <intent-filter>
+                <action android:name="android.intent.action.REBOOT" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
             </intent-filter>
