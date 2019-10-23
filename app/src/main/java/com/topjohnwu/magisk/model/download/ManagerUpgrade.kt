@@ -1,9 +1,6 @@
 package com.topjohnwu.magisk.model.download
 
-import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.cmp
+import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Restore
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Upgrade
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -14,7 +11,7 @@ import com.topjohnwu.superuser.Shell
 import java.io.File
 
 private fun RemoteFileService.patchPackage(apk: File, id: Int) {
-    if (packageName != BuildConfig.APPLICATION_ID) {
+    if (!isRunningAsStub && packageName != BuildConfig.APPLICATION_ID) {
         update(id) { notification ->
             notification.setProgress(0, 0, true)
                     .setProgress(0, 0, true)
