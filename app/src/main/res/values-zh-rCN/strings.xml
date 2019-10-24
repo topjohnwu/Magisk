@@ -96,7 +96,7 @@
     <string name="repo_install_msg">是否安装 %1$s ？</string>
     <string name="download">下载</string>
     <string name="reboot">重启</string>
-    <string name="settings_reboot_toast">重启以应用设置</string>
+    <string name="settings_reboot_toast">重启设备以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
 
@@ -150,6 +150,10 @@
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>
 
+    <string name="settings_app_name">输入想要的应用名称</string>
+    <string name="settings_app_name_hint">新名称</string>
+    <string name="settings_app_name_helper">新应用将使用此名称</string>
+    <string name="settings_app_name_error">输入无效</string>
     <string name="settings_su_app_adb">应用和 ADB</string>
     <string name="settings_su_app">仅应用</string>
     <string name="settings_su_adb">仅 ADB</string>
