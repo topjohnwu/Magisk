@@ -138,6 +138,11 @@ object PatchAPK {
 
     fun patch(apk: File, out: File, pkg: String, label: String): Boolean {
         try {
+            if (apk.length() < 1 shl 18) {
+                // APK is smaller than 256K, must be stub
+                return patch(apk.path, out.path, pkg, label)
+            }
+
             // Try using the new APK to patch itself
             val loader = DynamicClassLoader(apk)
             val cls = loader.loadClass("a.a")
@@ -152,9 +157,8 @@ object PatchAPK {
         } catch (e: Exception) {
             Timber.e(e)
             // Fallback to use the current implementation
-            patch(apk.path, out.path, pkg, label)
+            return patch(apk.path, out.path, pkg, label)
         }
-        return false
     }
 
     fun hideManager(context: Context, label: String) {
