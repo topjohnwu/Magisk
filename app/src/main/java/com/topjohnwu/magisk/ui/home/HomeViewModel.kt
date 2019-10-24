@@ -208,7 +208,7 @@ class HomeViewModel(
         }
 
         managerCurrentVersion.value = if (isRunningAsStub) MGR_VER_FMT
-            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, ClassMap.data!!.version)
+            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, Info.stub!!.version)
         else
             VERSION_FMT.format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
     }
@@ -227,7 +227,7 @@ class HomeViewModel(
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
             in (BuildConfig.VERSION_CODE + 1) until Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> {
-                if (isRunningAsStub && ClassMap.data!!.version < Info.remote.stub.versionCode)
+                if (isRunningAsStub && Info.stub!!.version < Info.remote.stub.versionCode)
                     MagiskState.OBSOLETE
                 else
                     MagiskState.UP_TO_DATE

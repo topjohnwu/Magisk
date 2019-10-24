@@ -9,7 +9,6 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.util.Log;
 
-import com.topjohnwu.magisk.utils.DynAPK;
 import com.topjohnwu.magisk.utils.DynamicClassLoader;
 
 import java.io.File;

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.base.viewmodel
 
 import android.app.Activity
-import com.topjohnwu.magisk.Info.isConnected as gIsConnected
 import com.topjohnwu.magisk.extensions.doOnSubscribeUi
 import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
@@ -9,6 +8,7 @@ import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.utils.KObservableField
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import com.topjohnwu.magisk.Info.isConnected as gIsConnected
 
 
 abstract class BaseViewModel(

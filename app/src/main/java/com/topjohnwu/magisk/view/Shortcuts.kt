@@ -9,7 +9,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.ui.SplashActivity
-import com.topjohnwu.magisk.utils.DynAPK
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 

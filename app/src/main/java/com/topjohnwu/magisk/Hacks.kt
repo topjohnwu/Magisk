@@ -23,12 +23,9 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
-import com.topjohnwu.magisk.utils.DynAPK
 import com.topjohnwu.magisk.utils.currentLocale
 import com.topjohnwu.magisk.utils.defaultLocale
 import java.util.*
-
-val isRunningAsStub get() = ClassMap.data != null
 
 private val addAssetPath by lazy {
     AssetManager::class.java.getMethod("addAssetPath", String::class.java)
@@ -69,19 +66,19 @@ private fun Resources.patch(config: Configuration = Configuration(configuration)
 
 fun Class<*>.cmp(pkg: String = BuildConfig.APPLICATION_ID): ComponentName {
     val name = ClassMap[this].name
-    return ComponentName(pkg, ClassMap.data?.componentMap?.get(name) ?: name)
+    return ComponentName(pkg, Info.stub?.componentMap?.get(name) ?: name)
 }
 
 fun Context.intent(c: Class<*>): Intent {
     val cls = ClassMap[c]
-    return ClassMap.data?.let {
+    return Info.stub?.let {
         val className = it.componentMap.getOrElse(cls.name) { cls.name }
         Intent().setComponent(ComponentName(this, className))
     } ?: Intent(this, cls)
 }
 
 fun resolveRes(idx: Int): Int {
-    return ClassMap.data?.resourceMap?.get(idx) ?: when(idx) {
+    return Info.stub?.resourceMap?.get(idx) ?: when(idx) {
         DynAPK.NOTIFICATION -> R.drawable.ic_magisk_outline
         DynAPK.DOWNLOAD -> R.drawable.sc_cloud_download
         DynAPK.SUPERUSER -> R.drawable.sc_superuser
@@ -172,7 +169,7 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
         // We need to patch the component of JobInfo to access WorkManager SystemJobService
 
         val name = service.className
-        val component = ComponentName(service.packageName, ClassMap.data?.componentMap?.get(name)
+        val component = ComponentName(service.packageName, Info.stub?.componentMap?.get(name)
                 ?: name)
 
         // Clone the JobInfo except component
@@ -225,8 +222,6 @@ object ClassMap {
         DownloadService::class.java to a.j::class.java,
         SuRequestActivity::class.java to a.m::class.java
     )
-
-    internal var data: DynAPK.Data? = null
 
     operator fun get(c: Class<*>) = map.getOrElse(c) { throw IllegalArgumentException() }
 }

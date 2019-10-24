@@ -9,12 +9,15 @@ import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 
+val isRunningAsStub get() = Info.stub != null
+
 object Info {
 
     val envRef = CachedValue { loadState() }
 
-    val env by envRef          // Local
-    var remote = UpdateInfo()  // Remote
+    val env by envRef              // Local
+    var remote = UpdateInfo()      // Remote
+    var stub: DynAPK.Data? = null  // Stub
 
     var keepVerity = false
     var keepEnc = false

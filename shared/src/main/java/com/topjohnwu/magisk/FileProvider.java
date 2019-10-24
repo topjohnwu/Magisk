@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils;
+package com.topjohnwu.magisk;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

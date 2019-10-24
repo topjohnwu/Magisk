@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.ui.SplashActivity
-import com.topjohnwu.magisk.utils.DynAPK
 
 object Notifications {
 

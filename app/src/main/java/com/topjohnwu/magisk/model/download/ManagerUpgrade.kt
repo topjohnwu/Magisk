@@ -5,7 +5,6 @@ import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Restore
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Upgrade
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.utils.DynAPK
 import com.topjohnwu.magisk.utils.PatchAPK
 import com.topjohnwu.superuser.Shell
 import java.io.File
@@ -31,7 +30,7 @@ private fun RemoteFileService.upgrade(apk: File, id: Int) {
         // Move to upgrade location
         apk.copyTo(DynAPK.update(this), overwrite = true)
         apk.delete()
-        if (ClassMap.data!!.version < Info.remote.stub.versionCode) {
+        if (Info.stub!!.version < Info.remote.stub.versionCode) {
             // We also want to upgrade stub
             service.fetchFile(Info.remote.stub.link).blockingGet().byteStream().use {
                 it.writeTo(apk)

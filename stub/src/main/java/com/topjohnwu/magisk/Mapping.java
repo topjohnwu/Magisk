@@ -3,7 +3,7 @@ package com.topjohnwu.magisk;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.topjohnwu.magisk.utils.DynAPK.*;
+import static com.topjohnwu.magisk.DynAPK.*;
 
 class Mapping {
     private static Map<String, String> map = new HashMap<>();
