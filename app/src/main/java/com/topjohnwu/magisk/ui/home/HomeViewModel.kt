@@ -202,13 +202,15 @@ class HomeViewModel(
 
     private fun refreshVersions() {
         magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
-            version.format(Info.env.magiskVersionString, Info.env.magiskVersionCode)
+            VERSION_FMT.format(Info.env.magiskVersionString, Info.env.magiskVersionCode)
         } else {
             ""
         }
 
-        managerCurrentVersion.value = version
-            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+        managerCurrentVersion.value = if (isRunningAsStub) MGR_VER_FMT
+            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, ClassMap.data!!.version)
+        else
+            VERSION_FMT.format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
     }
 
     private fun updateSelf() {
@@ -218,8 +220,8 @@ class HomeViewModel(
             else -> MagiskState.UP_TO_DATE
         }
 
-        magiskLatestVersion.value = version
-            .format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
+        magiskLatestVersion.value =
+            VERSION_FMT.format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
 
         _managerState.value = when (Info.remote.app.versionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
@@ -227,8 +229,8 @@ class HomeViewModel(
             else -> MagiskState.UP_TO_DATE
         }
 
-        managerLatestVersion.value = version
-            .format(Info.remote.app.version, Info.remote.app.versionCode)
+        managerLatestVersion.value = MGR_VER_FMT
+            .format(Info.remote.app.version, Info.remote.app.versionCode, Info.remote.stub.versionCode)
     }
 
     private fun ensureEnv() {
@@ -245,7 +247,8 @@ class HomeViewModel(
     }
 
     companion object {
-        private const val version = "%s (%d)"
+        private const val VERSION_FMT = "%s (%d)"
+        private const val MGR_VER_FMT = "%s (%d) (%d)"
     }
 
 }
