@@ -94,9 +94,10 @@ object PatchAPK {
             context.packageCodePath
         }
 
-        // Generate a new app with random package name
+        // Generate a new random package name and signature
         val repack = File(context.cacheDir, "patched.apk")
         val pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length)
+        Config.keyStoreRaw = ""
 
         if (!patch(src, repack.path, pkg, label))
             return false
@@ -127,7 +128,8 @@ object PatchAPK {
 
             // Write apk changes
             jar.getOutputStream(je).write(xml)
-            SignAPK.sign(Keygen.cert, Keygen.key, jar, FileOutputStream(out).buffered())
+            val keys = Keygen()
+            SignAPK.sign(keys.cert, keys.key, jar, FileOutputStream(out).buffered())
         } catch (e: Exception) {
             Timber.e(e)
             return false

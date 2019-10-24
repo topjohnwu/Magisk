@@ -33,10 +33,14 @@ private interface CertKeyProvider {
 }
 
 @Suppress("DEPRECATION")
-object Keygen: CertKeyProvider {
-    private const val ALIAS = "magisk"
-    private val PASSWORD = "magisk".toCharArray()
-    private const val TESTKEY_CERT = "61ed377e85d386a8dfee6b864bd85b0bfaa5af81"
+class Keygen: CertKeyProvider {
+
+    companion object {
+        private const val ALIAS = "magisk"
+        private val PASSWORD = "magisk".toCharArray()
+        private const val TESTKEY_CERT = "61ed377e85d386a8dfee6b864bd85b0bfaa5af81"
+        private const val DNAME = "CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US"
+    }
 
     private val start get() = Calendar.getInstance()
     private val end get() = Calendar.getInstance().apply {
@@ -48,7 +52,7 @@ object Keygen: CertKeyProvider {
 
     private val provider: CertKeyProvider
 
-    class KeyStoreProvider : CertKeyProvider {
+    inner class KeyStoreProvider : CertKeyProvider {
         private val ks by lazy { init() }
         override val cert by lazy { ks.getCertificate(ALIAS) as X509Certificate }
         override val key by lazy { ks.getKey(ALIAS, PASSWORD) as PrivateKey }
@@ -113,9 +117,9 @@ object Keygen: CertKeyProvider {
 
         // Generate new private key and certificate
         val kp = KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }.genKeyPair()
-        val dn = X500Name("CN=Magisk")
-        val builder = JcaX509v3CertificateBuilder(dn,
-                BigInteger.valueOf(start.timeInMillis), start.time, end.time, dn, kp.public)
+        val dname = X500Name(DNAME)
+        val builder = JcaX509v3CertificateBuilder(dname,
+                BigInteger.valueOf(start.timeInMillis), start.time, end.time, dname, kp.public)
         val signer = JcaContentSignerBuilder("SHA256WithRSA").build(kp.private)
         val cert = JcaX509CertificateConverter().getCertificate(builder.build(signer))
 
@@ -129,5 +133,4 @@ object Keygen: CertKeyProvider {
 
         return ks
     }
-
 }
