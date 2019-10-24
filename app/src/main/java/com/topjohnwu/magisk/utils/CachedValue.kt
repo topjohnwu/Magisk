@@ -8,9 +8,7 @@ class CachedValue<T>(private val factory: () -> T) : Lazy<T> {
         get() {
             val local = _val
             return local ?: synchronized(this) {
-                val newInstance = factory()
-                _val = newInstance
-                newInstance
+                _val ?: factory().also { _val = it }
             }
         }
 
