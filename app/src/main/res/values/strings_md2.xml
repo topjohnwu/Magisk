@@ -3,6 +3,7 @@
 
     <string name="manager">Manager</string>
     <string name="magisk">Magisk</string>
+    <string name="system">System</string>
 
     <string name="no_connection">No connection available</string>
 
