@@ -109,3 +109,13 @@ EOF
   touch hosts/auto_mount
   cd /
 }
+
+force_pm_install() {
+  local APK=$1
+  local VERIFY=`settings get global package_verifier_enable`
+  [ "$VERIFY" -eq 1 ] && settings set global package_verifier_enable 0
+  pm install -r $APK
+  local res=$?
+  [ "$VERIFY" -eq 1 ] && settings set global package_verifier_enable 1
+  return $res
+}
