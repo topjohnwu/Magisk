@@ -84,6 +84,11 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         if (intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false)) {
             binding.mainNavigation.selectedItemId = R.id.settingsFragment
         }
+
+        if (savedInstanceState != null) {
+            onTabTransaction(null, -1)
+            onFragmentTransaction(null, FragNavController.TransactionType.PUSH)
+        }
     }
 
     override fun onResume() {
@@ -128,8 +133,8 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         binding.mainBottomBar.animate()
             .translationY(translation.toFloat())
             .setInterpolator(FastOutSlowInInterpolator())
-            .withStartAction { if (translation == 0) binding.mainBottomBar.isVisible = true }
-            .withEndAction { if (translation > 0) binding.mainBottomBar.isVisible = false }
+            .withStartAction { if (navigation.isRoot) binding.mainBottomBar.isVisible = true }
+            .withEndAction { if (!navigation.isRoot) binding.mainBottomBar.isVisible = false }
             .start()
     }
 
