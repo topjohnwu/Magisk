@@ -29,6 +29,11 @@
     <!--ref. Magisk Hide-->
     <string name="magisk_hide_md2">Hide</string>
 
+    <string name="safetynet_attest_success">Success!</string>
+    <string name="safetynet_attest_failure">Attestation failed!</string>
+    <string name="safetynet_attest_loading">Just a sec…</string>
+    <string name="safetynet_attest_restart">Try again</string>
+
     <string name="settings_dark_mode_title">Theme Mode</string>
     <string name="settings_dark_mode_message">Select mode which best suits your style!</string>
     <string name="settings_dark_mode_light">Always Light</string>

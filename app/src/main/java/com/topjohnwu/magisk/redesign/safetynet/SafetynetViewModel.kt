@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.redesign.safetynet
 
+import androidx.databinding.Bindable
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.events.SafetyNetResult
@@ -14,44 +16,63 @@ class SafetynetViewModel(
     rxBus: RxBus
 ) : CompatViewModel() {
 
+    private var currentState = IDLE
+        set(value) {
+            field = value
+            notifyStateChanged()
+        }
     val safetyNetTitle = KObservableField(R.string.empty)
-    val ctsState = KObservableField(IDLE)
-    val basicIntegrityState = KObservableField(IDLE)
+    val ctsState = KObservableField(false)
+    val basicIntegrityState = KObservableField(false)
+
+    val isChecking @Bindable get() = currentState == LOADING
+    val isFailed @Bindable get() = currentState == FAILED
+    val isSuccess @Bindable get() = currentState == PASS
 
     init {
         rxBus.register<SafetyNetResult>()
             .subscribeK { resolveResponse(it.responseCode) }
             .add()
+
+        attest()
     }
 
-    fun attest() = UpdateSafetyNetEvent().publish()
+    override fun notifyStateChanged() {
+        super.notifyStateChanged()
+        notifyPropertyChanged(BR.loading)
+        notifyPropertyChanged(BR.failed)
+        notifyPropertyChanged(BR.success)
+    }
+
+    private fun attest() {
+        currentState = LOADING
+        UpdateSafetyNetEvent().publish()
+    }
+
+    fun reset() = attest()
 
     private fun resolveResponse(response: Int) = when {
-        //todo animate (reveal) to result (green/error)
         response and 0x0F == 0 -> {
             val hasCtsPassed = response and SafetyNetHelper.CTS_PASS != 0
             val hasBasicIntegrityPassed = response and SafetyNetHelper.BASIC_PASS != 0
-            safetyNetTitle.value = R.string.safetyNet_check_success
-            ctsState.value = if (hasCtsPassed) {
-                PASS
-            } else {
-                FAILED
-            }
-            basicIntegrityState.value = if (hasBasicIntegrityPassed) {
-                PASS
-            } else {
-                FAILED
-            }
+            val result = hasCtsPassed && hasBasicIntegrityPassed
+            ctsState.value = hasCtsPassed
+            basicIntegrityState.value = hasBasicIntegrityPassed
+            currentState = if (result) PASS else FAILED
+            safetyNetTitle.value =
+                if (result) R.string.safetynet_attest_success
+                else R.string.safetynet_attest_failure
         }
-        //todo animate (collapse) back to initial (fade error)
         response == -2 -> {
-            ctsState.value = IDLE
-            basicIntegrityState.value = IDLE
+            currentState = FAILED
+            ctsState.value = false
+            basicIntegrityState.value = false
+            back()
         }
-        //todo animate (collapse) back to initial (surface)
         else -> {
-            ctsState.value = IDLE
-            basicIntegrityState.value = IDLE
+            currentState = FAILED
+            ctsState.value = false
+            basicIntegrityState.value = false
             safetyNetTitle.value = when (response) {
                 SafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
                 else -> R.string.safetyNet_api_error
