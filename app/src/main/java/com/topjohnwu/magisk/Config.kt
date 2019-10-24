@@ -98,7 +98,12 @@ object Config : PreferenceModel, DBConfig {
     }
 
     private val defaultChannel =
-        if (Utils.isCanary) Value.CANARY_DEBUG_CHANNEL
+        if (Utils.isCanary) {
+            if (BuildConfig.DEBUG)
+                Value.CANARY_DEBUG_CHANNEL
+            else
+                Value.CANARY_CHANNEL
+        }
         else Value.DEFAULT_CHANNEL
 
     var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)

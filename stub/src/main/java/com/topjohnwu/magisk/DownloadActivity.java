@@ -21,8 +21,10 @@ import static com.topjohnwu.magisk.DelegateApplication.MANAGER_APK;
 public class DownloadActivity extends Activity {
 
     static final String TAG = "MMStub";
-    private static final String URL = BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
-            "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/stable.json";
+    private static final String URL =
+            BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
+            "https://raw.githubusercontent.com/topjohnwu/magisk_files/" +
+            (BuildConfig.DEBUG ? "canary/debug.json" : "master/stable.json");
 
     private String apkLink;
     private ErrorHandler err = (conn, e) -> {
