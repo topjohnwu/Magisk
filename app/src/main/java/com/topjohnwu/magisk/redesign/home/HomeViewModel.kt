@@ -7,12 +7,10 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.*
-import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.MagiskJson
 import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.UpdateInfo
-import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
@@ -89,12 +87,6 @@ class HomeViewModel(
                 is Manager -> stateManagerProgress.value = it.first.times(100f).roundToInt()
             }
         }
-
-        stateMagiskProgress.addOnPropertyChangedCallback {
-            if (it == 100) {
-                Navigation.install().publish()
-            }
-        }
     }
 
     override fun refresh() = repoMagisk.fetchUpdate()
@@ -139,18 +131,12 @@ class HomeViewModel(
 
     fun onManagerPressed() = ManagerInstallDialog().publish()
 
-    fun onMagiskPressed() {
-        withPermissions(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ).map { check(it);it }.subscribeK {
-            //pre-fix so user doesn't click twice accidentally
-            stateMagiskProgress.value = 1
-            DownloadService(get()) {
-                subject = Magisk(Configuration.Download)
-            }
-        }.add()
-    }
+    fun onMagiskPressed() = withPermissions(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ).map { check(it);it }
+        .subscribeK { Navigation.install().publish() }
+        .add()
 
     private fun ensureEnv() {
         val invalidStates = listOf(
