@@ -6,11 +6,11 @@ import android.os.Build
 import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.redesign.install.InstallFragment
 import com.topjohnwu.magisk.redesign.safetynet.SafetynetFragment
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
 import com.topjohnwu.magisk.ui.home.HomeFragment
-import com.topjohnwu.magisk.ui.install.InstallFragment
 import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModulesFragment
 import com.topjohnwu.magisk.ui.module.ReposFragment

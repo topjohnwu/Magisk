@@ -136,6 +136,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
         <item name="tint">?colorPrimary</item>
+        <item name="buttonCompat">@drawable/ic_radio_check_button</item>
     </style>
 
     <style name="WidgetFoundation.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
@@ -144,6 +145,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
         <item name="tint">?colorPrimary</item>
+        <item name="buttonCompat">@drawable/ic_radio_check_button</item>
     </style>
 
     <style name="WidgetFoundation.ProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">

@@ -81,7 +81,7 @@ class HomeViewModel(
 
     init {
         RemoteFileService.progressBroadcast.observeForever {
-            when (it.second) {
+            when (it?.second) {
                 is Magisk.Download,
                 is Magisk.Flash -> stateMagiskProgress.value = it.first.times(100f).roundToInt()
                 is Manager -> stateManagerProgress.value = it.first.times(100f).roundToInt()

@@ -8,7 +8,9 @@ import com.topjohnwu.magisk.utils.KObservableField
 import io.reactivex.disposables.Disposable
 import org.koin.core.KoinComponent
 
-abstract class CompatViewModel : BaseViewModel(), KoinComponent {
+abstract class CompatViewModel(
+    initialState: State = State.LOADING
+) : BaseViewModel(initialState), KoinComponent {
 
     val insets = KObservableField(Insets.NONE)
 

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.install
+package com.topjohnwu.magisk.redesign.install
 
 import android.content.Intent
 import android.graphics.Insets

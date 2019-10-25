@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.install.InstallViewModel" />
+            type="com.topjohnwu.magisk.redesign.install.InstallViewModel" />
 
     </data>
 
@@ -20,194 +20,259 @@
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
         tools:paddingTop="24dp">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/l1">
+            android:layout_height="wrap_content">
 
-            <com.google.android.material.card.MaterialCardView
-                style="?styleCardElevated"
+            <LinearLayout
+                goneUnless="@{viewModel.loaded}"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                app:cardElevation="@{viewModel.step != 0 ? 0f : @dimen/l_25}">
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/l1">
 
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
+                    style="?styleCardElevated"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l1"
+                    app:cardCornerRadius="@dimen/l1"
+                    app:cardElevation="@{viewModel.step != 0 ? 0f : @dimen/l_25}">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="?listPreferredItemHeightSmall">
+                        android:orientation="vertical">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/install_step_options_icon"
-                            style="?styleIconNormal"
-                            isSelected="@{viewModel.step > 0}"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_check_circle_md2" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/install_step_options_title"
-                            android:layout_width="0dp"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="start"
-                            android:text="Options"
-                            android:textAppearance="?appearanceTextBodyNormal"
-                            android:textStyle="bold"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/install_step_options_button"
-                            app:layout_constraintStart_toEndOf="@+id/install_step_options_icon"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:minHeight="?listPreferredItemHeightSmall">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/install_step_options_button"
-                            style="?styleButtonText"
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/install_step_options_icon"
+                                style="?styleIconNormal"
+                                isSelected="@{viewModel.step > 0}"
+                                android:layout_marginStart="@dimen/l_25"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_check_circle_md2" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/install_step_options_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/l1"
+                                android:gravity="start"
+                                android:text="Options"
+                                android:textAppearance="?appearanceTextBodyNormal"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/install_step_options_button"
+                                app:layout_constraintStart_toEndOf="@+id/install_step_options_icon"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/install_step_options_button"
+                                style="?styleButtonText"
+                                gone="@{viewModel.step != 0}"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="@{() -> viewModel.step(1)}"
+                                android:text="Next"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <FrameLayout
                             gone="@{viewModel.step != 0}"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:onClick="@{() -> viewModel.step(1)}"
-                            android:text="Next"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <FrameLayout
-                        gone="@{viewModel.step != 0}"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <include
-                            layout="@layout/include_install_options"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/l_50" />
+                            android:layout_height="wrap_content">
 
-                    </FrameLayout>
+                            <include
+                                layout="@layout/include_install_options"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/l1"
+                                android:layout_marginTop="@dimen/l_50"
+                                android:layout_marginEnd="@dimen/l1"
+                                android:layout_marginBottom="@dimen/l_50" />
 
-                </LinearLayout>
+                        </FrameLayout>
 
-            </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
-                style="?styleCardElevated"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                app:cardElevation="@{viewModel.step != 1 ? 0f : @dimen/l_25}">
+                </com.google.android.material.card.MaterialCardView>
 
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
+                    style="?styleCardElevated"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginTop="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l1"
+                    app:cardCornerRadius="@dimen/l1"
+                    app:cardElevation="@{viewModel.step != 1 ? 0f : @dimen/l_25}">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="?listPreferredItemHeightSmall">
+                        android:orientation="vertical">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/install_step_method_icon"
-                            style="?styleIconNormal"
-                            isSelected="@{viewModel.step > 1}"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_check_circle_md2" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/install_step_method_title"
-                            android:layout_width="0dp"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="start"
-                            android:text="Method"
-                            android:textAppearance="?appearanceTextBodyNormal"
-                            android:textStyle="bold"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/install_step_method_button"
-                            app:layout_constraintStart_toEndOf="@+id/install_step_method_icon"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            android:minHeight="?listPreferredItemHeightSmall">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/install_step_method_button"
-                            style="?styleButtonText"
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/install_step_method_icon"
+                                style="?styleIconNormal"
+                                isSelected="@{viewModel.step > 1}"
+                                android:layout_marginStart="@dimen/l_25"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_check_circle_md2" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/install_step_method_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/l1"
+                                android:gravity="start"
+                                android:text="Method"
+                                android:textAppearance="?appearanceTextBodyNormal"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/install_step_method_button"
+                                app:layout_constraintStart_toEndOf="@+id/install_step_method_icon"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/install_step_method_button"
+                                style="?styleButtonText"
+                                gone="@{viewModel.step != 1}"
+                                isEnabled="@{viewModel.method == @id/method_patch ? viewModel.data != null : viewModel.method != -1}"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="@{() -> viewModel.step(2)}"
+                                android:text="Next"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <RadioGroup
                             gone="@{viewModel.step != 1}"
-                            isEnabled="@{viewModel.method == @id/method_patch ? viewModel.data != null : viewModel.method != -1}"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:onClick="@{() -> viewModel.step(2)}"
-                            android:text="Next"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <RadioGroup
-                        gone="@{viewModel.step != 1}"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/l_50"
-                        android:checkedButton="@={viewModel.method}">
-
-                        <com.google.android.material.radiobutton.MaterialRadioButton
-                            android:id="@+id/method_download"
-                            style="?styleRadioNormal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/download_zip_only" />
+                            android:layout_marginStart="@dimen/l1"
+                            android:layout_marginTop="@dimen/l_50"
+                            android:layout_marginEnd="@dimen/l1"
+                            android:layout_marginBottom="@dimen/l_50"
+                            android:checkedButton="@={viewModel.method}">
 
-                        <com.google.android.material.radiobutton.MaterialRadioButton
-                            android:id="@+id/method_patch"
-                            style="?styleRadioNormal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/select_patch_file" />
+                            <com.google.android.material.radiobutton.MaterialRadioButton
+                                android:id="@+id/method_download"
+                                style="?styleRadioNormal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/download_zip_only"
+                                tools:checked="true" />
 
-                        <com.google.android.material.radiobutton.MaterialRadioButton
-                            android:id="@+id/method_direct"
-                            style="?styleRadioNormal"
-                            android:layout_width="match_parent"
-                            gone="@{!viewModel.rooted}"
-                            android:layout_height="wrap_content"
-                            android:text="@string/direct_install" />
+                            <com.google.android.material.radiobutton.MaterialRadioButton
+                                android:id="@+id/method_patch"
+                                style="?styleRadioNormal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:button="@drawable/ic_radio_check_button"
+                                android:text="@string/select_patch_file" />
 
-                        <com.google.android.material.radiobutton.MaterialRadioButton
-                            android:id="@+id/method_inactive_slot"
-                            style="?styleRadioNormal"
-                            gone="@{!viewModel.rooted || !viewModel.aB}"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/install_inactive_slot" />
+                            <com.google.android.material.radiobutton.MaterialRadioButton
+                                android:id="@+id/method_direct"
+                                style="?styleRadioNormal"
+                                gone="@{!viewModel.rooted}"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:button="@drawable/ic_radio_check_button"
+                                android:text="@string/direct_install" />
 
-                    </RadioGroup>
+                            <com.google.android.material.radiobutton.MaterialRadioButton
+                                android:id="@+id/method_inactive_slot"
+                                style="?styleRadioNormal"
+                                gone="@{!viewModel.rooted || !viewModel.aB}"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:button="@drawable/ic_radio_check_button"
+                                android:text="@string/install_inactive_slot" />
 
-                </LinearLayout>
+                        </RadioGroup>
 
-            </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                style="?styleButtonText"
-                gone="@{viewModel.step != 2}"
-                android:layout_width="wrap_content"
-                android:onClick="@{() -> viewModel.install()}"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_margin="@dimen/l1"
-                android:text="@string/install" />
+                </com.google.android.material.card.MaterialCardView>
 
-        </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    style="?styleButtonText"
+                    gone="@{viewModel.step != 2}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_margin="@dimen/l1"
+                    android:onClick="@{() -> viewModel.install()}"
+                    android:text="Let's go"
+                    app:icon="@drawable/ic_forth_md2"
+                    app:iconGravity="textEnd" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                goneUnless="@{viewModel.loading}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/safetynet_attest_loading"
+                    android:textAppearance="?appearanceTextTitleNormal" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/l1">
+
+                    <ProgressBar
+                        style="?styleProgressDeterminate"
+                        invisible="@{viewModel.progress &lt;= 0}"
+                        android:layout_width="100dp"
+                        android:layout_gravity="center"
+                        android:progress="@{viewModel.progress}" />
+
+                    <ProgressBar
+                        style="?styleProgressIndeterminate"
+                        invisibleUnless="@{viewModel.progress &lt;= 0}"
+                        android:layout_width="100dp"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
+
+
+            </LinearLayout>
+
+        </FrameLayout>
 
     </androidx.core.widget.NestedScrollView>
 

@@ -128,6 +128,10 @@ abstract class RemoteFileService : NotificationService() {
         fun send(progress: Float, subject: DownloadSubject) {
             internalProgressBroadcast.postValue(progress to subject)
         }
+
+        fun reset() {
+            internalProgressBroadcast.value = null
+        }
     }
 
 }

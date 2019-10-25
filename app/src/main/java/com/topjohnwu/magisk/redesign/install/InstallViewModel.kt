@@ -1,9 +1,10 @@
-package com.topjohnwu.magisk.ui.install
+package com.topjohnwu.magisk.redesign.install
 
 import android.net.Uri
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.RequestFileEvent
@@ -12,8 +13,9 @@ import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import org.koin.core.get
+import kotlin.math.roundToInt
 
-class InstallViewModel : CompatViewModel() {
+class InstallViewModel : CompatViewModel(State.LOADED) {
 
     val isRooted = Shell.rootAccess()
     val isAB = isABDevice()
@@ -21,9 +23,23 @@ class InstallViewModel : CompatViewModel() {
     val step = KObservableField(0)
     val method = KObservableField(-1)
 
+    val progress = KObservableField(0)
+
     var data = KObservableField<Uri?>(null)
 
     init {
+        RemoteFileService.reset()
+        RemoteFileService.progressBroadcast.observeForever {
+            val (progress, subject) = it ?: return@observeForever
+            if (subject !is DownloadSubject.Magisk) {
+                return@observeForever
+            }
+            this.progress.value = progress.times(100).roundToInt()
+            if (this.progress.value >= 100) {
+                // this might cause issues if the flash activity launches on top of this sooner
+                back()
+            }
+        }
         method.addOnPropertyChangedCallback {
             if (method.value == R.id.method_patch) {
                 RequestFileEvent().publish()
@@ -37,7 +53,7 @@ class InstallViewModel : CompatViewModel() {
 
     fun install() = DownloadService(get()) {
         subject = DownloadSubject.Magisk(resolveConfiguration())
-    }
+    }.also { state = State.LOADING }
 
     // ---
 
