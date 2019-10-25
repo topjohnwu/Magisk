@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.redesign.safetynet
 
-import android.os.Build
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentSafetynetMd2Binding
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
@@ -13,7 +12,6 @@ class SafetynetFragment : CompatFragment<SafetynetViewModel, FragmentSafetynetMd
 
     override fun onStart() {
         super.onStart()
-        Build.VERSION.RELEASE
         activity.setTitle(R.string.safetyNet)
     }
 
