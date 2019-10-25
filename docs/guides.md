@@ -24,6 +24,7 @@ A Magisk module is a folder placed in `/data/adb/modules` with a structure below
 │   │
 │   │      *** Scripts ***
 │   │
+|   ├── install.sh          <--- This script will be executed when Magisk installs your module
 │   ├── post-fs-data.sh     <--- This script will be executed in post-fs-data
 │   ├── service.sh          <--- This script will be executed in late_start service
 |   ├── uninstall.sh        <--- This script will be executed when Magisk removes your module
