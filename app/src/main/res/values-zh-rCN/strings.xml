@@ -89,8 +89,8 @@
 
     <!--Toasts, Dialogs-->
     <string name="no_thanks">不，谢谢</string>
-    <string name="yes">是</string>
-    <string name="ok">好</string>
+    <string name="yes">确定</string>
+    <string name="ok">确定</string>
     <string name="close">关闭</string>
     <string name="repo_install_title">安装 %1$s</string>
     <string name="repo_install_msg">是否安装 %1$s ？</string>
