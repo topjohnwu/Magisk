@@ -7,8 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
-import com.topjohnwu.magisk.ClassMap
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
@@ -17,6 +15,7 @@ import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.databinding.ActivityMainBinding
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.extensions.snackbar
+import com.topjohnwu.magisk.intent
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
@@ -40,8 +39,8 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     override val layoutRes: Int = R.layout.activity_main
     override val viewModel: MainViewModel by viewModel()
-    override val navHostId: Int = R.id.main_nav_host
-    override val defaultPosition: Int = 0
+    private val navHostId: Int = R.id.main_nav_host
+    private val defaultPosition: Int = 0
 
     private val navigationController by lazy {
         FragNavController(supportFragmentManager, navHostId)
@@ -61,7 +60,7 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (!SplashActivity.DONE) {
-            startActivity(Intent(this, ClassMap[SplashActivity::class.java]))
+            startActivity(intent(SplashActivity::class.java))
             finish()
         }
 
@@ -155,11 +154,11 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
     private fun checkHideSection() {
         val menu = binding.navView.menu
         menu.findItem(R.id.magiskHideFragment).isVisible =
-            Shell.rootAccess() && Config.magiskHide
+            Shell.rootAccess() && Info.env.magiskHide
         menu.findItem(R.id.modulesFragment).isVisible =
-            Shell.rootAccess() && Info.magiskVersionCode >= 0
+            Shell.rootAccess() && Info.env.magiskVersionCode >= 0
         menu.findItem(R.id.reposFragment).isVisible =
-            (viewModel.isConnected.value && Shell.rootAccess() && Info.magiskVersionCode >= 0)
+            (viewModel.isConnected.value && Shell.rootAccess() && Info.env.magiskVersionCode >= 0)
         menu.findItem(R.id.logFragment).isVisible =
             Shell.rootAccess()
         menu.findItem(R.id.superuserFragment).isVisible =

@@ -29,7 +29,7 @@ class MagiskRepository(
         else -> throw IllegalArgumentException()
     }.flatMap {
         // If remote version is lower than current installed, try switching to beta
-        if (it.magisk.versionCode < Info.magiskVersionCode
+        if (it.magisk.versionCode < Info.env.magiskVersionCode
                 && Config.updateChannel == Config.Value.DEFAULT_CHANNEL) {
             Config.updateChannel = Config.Value.BETA_CHANNEL
             apiRaw.fetchBetaUpdate()

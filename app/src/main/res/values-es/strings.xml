@@ -24,6 +24,7 @@
     <string name="advanced_settings_title">Ajustes avanzados</string>
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Modo Recovery</string>
     <string name="current_installed">Instalada: %1$s</string>
     <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstalar</string>
@@ -44,6 +45,7 @@
     <string name="reboot_recovery">Reiniciar en Modo Recovery</string>
     <string name="reboot_bootloader">Reiniciar en Modo Bootloader</string>
     <string name="reboot_download">Reiniciar en Modo Download</string>
+    <string name="reboot_edl">Reiniciar en Modo EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Actualización Disponible</string>
@@ -70,20 +72,23 @@
     <string name="download_file_error">Error descargando archivo</string>
     <string name="magisk_update_title">Actualización de Magisk disponible!</string>
     <string name="manager_update_title">Actualización de Magisk Manager disponible!</string>
-	
-	<!-- Installation -->
-	<string name="manager_download_install">Pulse para descargar e instalar</string>
-	<string name="download_zip_only">Descargar sólo el archivo ZIP</string>
-	<string name="direct_install">Instalación Directa (Recomendado)</string>
-	<string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
-	<string name="install_inactive_slot_msg">¡Se forzará su dispositivo para que arranque en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\nContinuar?</string>
+
+    <!-- Installation -->
+    <string name="manager_download_install">Pulse para descargar e instalar</string>
+    <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
+    <string name="direct_install">Instalación Directa (Recomendado)</string>
+    <string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
+    <string name="install_inactive_slot_msg">¡Se forzará su dispositivo para que arranque en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\nContinuar?</string>
     <string name="select_method">Seleccionar Método</string>
-	<string name="setup_title">Configuración Adicional</string>
-	<string name="select_patch_file">Seleccionar y parchear un archivo</string>
-	<string name="patch_file_msg">Seleccione una imagen raw (* .img) o un archivo tar de ODIN (* .tar)</string>
-	<string name="reboot_delay_toast">Reiniciando en 5 segundos…</string>
-	
+    <string name="setup_title">Configuración Adicional</string>
+    <string name="select_patch_file">Seleccionar y parchear un archivo</string>
+    <string name="patch_file_msg">Seleccione una imagen raw (* .img) o un archivo tar de ODIN (* .tar)</string>
+    <string name="reboot_delay_toast">Reiniciando en 5 segundos…</string>
+
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">No gracias</string>
+    <string name="yes">Sí</string>
+    <string name="ok">Aceptar</string>
     <string name="close">Cerrar</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">¿Quieres instalar %1$s ahora?</string>
@@ -118,6 +123,8 @@
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema oscuro</string>
     <string name="settings_dark_theme_summary">Habilitar el tema oscuro</string>
+    <string name="settings_download_path_title">Ruta de Descarga</string>
+    <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
     <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
@@ -178,6 +185,7 @@
     <string name="isolate_summary">Cada sesión root tendrá su propia Namespace</string>
     <string name="android_o_not_support">No es compatible con Android 8.0+</string>
     <string name="disable_fingerprint">No se establecieron huellas dactilares o no existe soporte del dispositivo</string>
+    <string name="settings_download_path_error">Error al crear la carpeta. Debe ser accesible desde el directorio raíz de almacenamiento y no debe ser un archivo.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Petición de superusuario</string>
@@ -213,5 +221,5 @@
 
      <!-- MagiskHide -->
     <string name="show_system_app">Mostrar sistema</string>
-    
+
 </resources>

@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.ui.surequest
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.Window
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
@@ -18,6 +17,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
     override val layoutRes: Int = R.layout.activity_request
+    override val themeRes: Int = R.style.MagiskTheme_SU
     override val viewModel: SuRequestViewModel by viewModel()
 
     override fun onBackPressed() {
@@ -30,18 +30,16 @@ open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestB
         super.onCreate(savedInstanceState)
 
         val intent = intent
-        val action = intent.action
 
-        if (TextUtils.equals(action, GeneralReceiver.REQUEST)) {
-            if (!viewModel.handleRequest(intent))
-                finish()
-            return
+        when (intent?.action) {
+            GeneralReceiver.REQUEST -> {
+                if (!viewModel.handleRequest(intent))
+                    finish()
+                return
+            }
+            GeneralReceiver.LOG -> SuLogger.handleLogs(this, intent)
+            GeneralReceiver.NOTIFY -> SuLogger.handleNotify(this, intent)
         }
-
-        if (TextUtils.equals(action, GeneralReceiver.LOG))
-            SuLogger.handleLogs(intent)
-        else if (TextUtils.equals(action, GeneralReceiver.NOTIFY))
-            SuLogger.handleNotify(intent)
 
         finish()
     }

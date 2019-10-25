@@ -22,7 +22,7 @@ import java.io.InputStream
 
 abstract class RemoteFileService : NotificationService() {
 
-    private val service: GithubRawServices by inject()
+    val service: GithubRawServices by inject()
 
     override val defaultNotification: NotificationCompat.Builder
         get() = Notifications.progress(this, "")

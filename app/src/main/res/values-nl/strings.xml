@@ -62,6 +62,9 @@
     <string name="app_changelog">App\'s changelog</string>
 
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Nee bedankt</string>
+    <string name="yes">Ja</string>
+    <string name="ok">Oké</string>
     <string name="close">Sluiten</string>
     <string name="repo_install_title">%1$s installeren</string>
     <string name="repo_install_msg">Zeker weten %1$s installeren?</string>

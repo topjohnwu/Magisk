@@ -45,7 +45,7 @@ object Utils {
                     .setRequiresDeviceIdle(true)
                     .build()
             val request = PeriodicWorkRequest
-                    .Builder(ClassMap[UpdateCheckService::class.java], 12, TimeUnit.HOURS)
+                    .Builder(ClassMap[UpdateCheckService::class.java] as Class<Worker>, 12, TimeUnit.HOURS)
                     .setConstraints(constraints)
                     .build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(

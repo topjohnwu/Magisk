@@ -9,7 +9,6 @@
 #include <magisk.h>
 #include <daemon.h>
 #include <selinux.h>
-#include <db.h>
 #include <flags.h>
 
 using namespace std::literals;
@@ -36,7 +35,8 @@ Advanced Options (Internal APIs):
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
-   --use-broadcast           use broadcast for su logging and notify
+   --connect-mode [MODE]     get/set connect mode for su request and notify
+   --broadcast-test          manually trigger broadcast tests
 
 Supported init triggers:
    post-fs-data, service, boot-complete
@@ -79,12 +79,10 @@ int magisk_main(int argc, char *argv[]) {
 		restore_rootcon();
 		restorecon();
 		return 0;
-	} else if (argv[1] == "--clone-attr"sv) {
-		if (argc < 4) usage();
+	} else if (argc >= 4 && argv[1] == "--clone-attr"sv) {;
 		clone_attr(argv[2], argv[3]);
 		return 0;
-	} else if (argv[1] == "--clone"sv) {
-		if (argc < 4) usage();
+	} else if (argc >= 4 && argv[1] == "--clone"sv) {
 		cp_afc(argv[2], argv[3]);
 		return 0;
 	} else if (argv[1] == "--daemon"sv) {
@@ -103,7 +101,7 @@ int magisk_main(int argc, char *argv[]) {
 		int fd = connect_daemon(true);
 		write_int(fd, BOOT_COMPLETE);
 		return read_int(fd);
-	} else if (argv[1] == "--sqlite"sv) {
+	} else if (argc >= 3 && argv[1] == "--sqlite"sv) {
 		int fd = connect_daemon();
 		write_int(fd, SQLITE_CMD);
 		write_string(fd, argv[2]);
@@ -115,13 +113,22 @@ int magisk_main(int argc, char *argv[]) {
 			printf("%s\n", res);
 			free(res);
 		}
-	} else if (argv[1] == "--use-broadcast"sv) {
+	} else if (argv[1] == "--connect-mode"sv) {
 		int fd = connect_daemon();
 		write_int(fd, BROADCAST_ACK);
-		return 0;
+		if (argc >= 3) {
+			write_int(fd, parse_int(argv[2]));
+		} else {
+			write_int(fd, -1);
+		}
+		return read_int(fd);
 	} else if (argv[1] == "--remove-modules"sv) {
 		int fd = connect_daemon();
 		write_int(fd, REMOVE_MODULES);
+		return read_int(fd);
+	} else if (argv[1] == "--broadcast-test"sv) {
+		int fd = connect_daemon();
+		write_int(fd, BROADCAST_TEST);
 		return read_int(fd);
 	}
 #if 0

@@ -4,15 +4,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import com.topjohnwu.magisk.ClassMap
-import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.Info
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.ui.SplashActivity
@@ -20,6 +16,7 @@ import com.topjohnwu.magisk.ui.SplashActivity
 object Notifications {
 
     val mgr by lazy { NotificationManagerCompat.from(get()) }
+    private val icon by lazy { resolveRes(DynAPK.NOTIFICATION) }
 
     fun setup(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -34,16 +31,16 @@ object Notifications {
     }
 
     fun magiskUpdate(context: Context) {
-        val intent = Intent(context, ClassMap[SplashActivity::class.java])
-        intent.putExtra(Const.Key.OPEN_SECTION, "magisk")
+        val intent = context.intent(SplashActivity::class.java)
+                .putExtra(Const.Key.OPEN_SECTION, "magisk")
         val stackBuilder = TaskStackBuilder.create(context)
-        stackBuilder.addParentStack(ClassMap.get<Class<*>>(SplashActivity::class.java))
+        stackBuilder.addParentStack(SplashActivity::class.java.cmp(context.packageName))
         stackBuilder.addNextIntent(intent)
         val pendingIntent = stackBuilder.getPendingIntent(Const.ID.MAGISK_UPDATE_NOTIFICATION_ID,
                 PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(context, Const.ID.UPDATE_NOTIFICATION_CHANNEL)
-        builder.setSmallIcon(R.drawable.ic_magisk_outline)
+        builder.setSmallIcon(icon)
                 .setContentTitle(context.getString(R.string.magisk_update_title))
                 .setContentText(context.getString(R.string.manager_download_install))
                 .setVibrate(longArrayOf(0, 100, 100, 100))
@@ -54,15 +51,15 @@ object Notifications {
     }
 
     fun managerUpdate(context: Context) {
-        val intent = Intent(context, ClassMap[GeneralReceiver::class.java])
-        intent.action = Const.Key.BROADCAST_MANAGER_UPDATE
-        intent.putExtra(Const.Key.INTENT_SET_APP, Info.remote.app)
+        val intent = context.intent(GeneralReceiver::class.java)
+                .setAction(Const.Key.BROADCAST_MANAGER_UPDATE)
+                .putExtra(Const.Key.INTENT_SET_APP, Info.remote.app)
 
         val pendingIntent = PendingIntent.getBroadcast(context,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(context, Const.ID.UPDATE_NOTIFICATION_CHANNEL)
-        builder.setSmallIcon(R.drawable.ic_magisk_outline)
+        builder.setSmallIcon(icon)
                 .setContentTitle(context.getString(R.string.manager_update_title))
                 .setContentText(context.getString(R.string.manager_download_install))
                 .setVibrate(longArrayOf(0, 100, 100, 100))
@@ -73,13 +70,13 @@ object Notifications {
     }
 
     fun dtboPatched(context: Context) {
-        val intent = Intent(context, ClassMap[GeneralReceiver::class.java])
+        val intent = context.intent(GeneralReceiver::class.java)
                 .setAction(Const.Key.BROADCAST_REBOOT)
         val pendingIntent = PendingIntent.getBroadcast(context,
                 Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = NotificationCompat.Builder(context, Const.ID.UPDATE_NOTIFICATION_CHANNEL)
-        builder.setSmallIcon(R.drawable.ic_magisk_outline)
+        builder.setSmallIcon(icon)
                 .setContentTitle(context.getString(R.string.dtbo_patched_title))
                 .setContentText(context.getString(R.string.dtbo_patched_reboot))
                 .setVibrate(longArrayOf(0, 100, 100, 100))

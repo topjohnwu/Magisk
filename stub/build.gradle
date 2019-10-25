@@ -4,12 +4,16 @@ android {
     defaultConfig {
         applicationId 'com.topjohnwu.magisk'
         versionCode 1
-        versionName props['appVersion']
+        versionName "1.0"
+        buildConfigField 'String', 'DEV_CHANNEL', props['DEV_CHANNEL'] ?: 'null'
     }
 
     buildTypes {
         release {
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources false /* Do NOT allow resource shrinking */
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
         }
     }
 }

@@ -61,6 +61,9 @@
     <string name="app_changelog">Nhật ký thay đổi của ứng dụng</string>
 
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Không, cảm ơn</string>
+    <string name="yes">Có</string>
+    <string name="ok">OK</string>
     <string name="close">Đóng</string>
     <string name="repo_install_title">Cài đặt %1$s</string>
     <string name="repo_install_msg">Bạn muốn cài đặt %1$s ?</string>

@@ -1,11 +1,14 @@
 package com.topjohnwu.magisk.utils
 
-import android.content.ComponentName
 import android.content.Context
+import android.os.Build.VERSION.SDK_INT
 import android.widget.Toast
 import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.extensions.DynamicClassLoader
+import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.ui.SplashActivity
+import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.signing.JarMap
 import com.topjohnwu.signing.SignAPK
@@ -47,81 +50,86 @@ object PatchAPK {
     }
 
     private fun findAndPatch(xml: ByteArray, from: String, to: String): Boolean {
-        if (from.length != to.length)
+        if (to.length > from.length)
             return false
         val buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer()
         val offList = mutableListOf<Int>()
         var i = 0
-        while (i < buf.length - from.length) {
-            var match = true
-            for (j in 0 until from.length) {
+        loop@ while (i < buf.length - from.length) {
+            for (j in from.indices) {
                 if (buf.get(i + j) != from[j]) {
-                    match = false
-                    break
+                    ++i
+                    continue@loop
                 }
             }
-            if (match) {
-                offList.add(i)
-                i += from.length
-            }
-            ++i
+            offList.add(i)
+            i += from.length
         }
         if (offList.isEmpty())
             return false
+
+        val toBuf = to.toCharArray().copyOf(from.length)
         for (off in offList) {
             buf.position(off)
-            buf.put(to)
+            buf.put(toBuf)
         }
         return true
     }
 
-    private fun findAndPatch(xml: ByteArray, a: Int, b: Int): Boolean {
-        val buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer()
-        val len = xml.size / 4
-        for (i in 0 until len) {
-            if (buf.get(i) == a) {
-                buf.put(i, b)
-                return true
+    private fun patchAndHide(context: Context, label: String): Boolean {
+        // If not running as stub, and we are compatible with stub, use stub
+        val src = if (!isRunningAsStub && SDK_INT >= 28 && Info.env.connectionMode == 3) {
+            val stub = File(context.cacheDir, "stub.apk")
+            val svc = get<GithubRawServices>()
+            runCatching {
+                svc.fetchFile(Info.remote.stub.link).blockingGet().byteStream().use {
+                    it.writeTo(stub)
+                }
+            }.onFailure {
+                Timber.e(it)
+                return false
             }
+            stub.path
+        } else {
+            context.packageCodePath
         }
-        return false
-    }
 
-    private fun patchAndHide(context: Context): Boolean {
-        // Generate a new app with random package name
-        val repack = File(context.filesDir, "patched.apk")
+        // Generate a new random package name and signature
+        val repack = File(context.cacheDir, "patched.apk")
         val pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length)
+        Config.keyStoreRaw = ""
 
-        if (!patch(context.packageCodePath, repack.path, pkg))
+        if (!patch(src, repack.path, pkg, label))
             return false
 
         // Install the application
         repack.setReadable(true, false)
-        if (!Shell.su("pm install $repack").exec().isSuccess)
+        if (!Shell.su("force_pm_install $repack").exec().isSuccess)
             return false
 
         Config.suManager = pkg
         Config.export()
-        RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID,
-                ComponentName(pkg, ClassMap.get<Class<*>>(SplashActivity::class.java).name))
+        Shell.su("pm uninstall ${BuildConfig.APPLICATION_ID}").submit()
 
         return true
     }
 
     @JvmStatic
-    fun patch(apk: String, out: String, pkg: String): Boolean {
+    @JvmOverloads
+    fun patch(apk: String, out: String, pkg: String, label: String = "Manager"): Boolean {
         try {
             val jar = JarMap(apk)
             val je = jar.getJarEntry(Const.ANDROID_MANIFEST)
             val xml = jar.getRawData(je)
 
             if (!findAndPatch(xml, BuildConfig.APPLICATION_ID, pkg) ||
-                    !findAndPatch(xml, R.string.app_name, R.string.re_app_name))
+                    !findAndPatch(xml, "Magisk Manager", label))
                 return false
 
             // Write apk changes
             jar.getOutputStream(je).write(xml)
-            SignAPK.sign(jar, FileOutputStream(out).buffered())
+            val keys = Keygen()
+            SignAPK.sign(keys.cert, keys.key, jar, FileOutputStream(out).buffered())
         } catch (e: Exception) {
             Timber.e(e)
             return false
@@ -130,11 +138,36 @@ object PatchAPK {
         return true
     }
 
-    fun hideManager(context: Context) {
+    fun patch(apk: File, out: File, pkg: String, label: String): Boolean {
+        try {
+            if (apk.length() < 1 shl 18) {
+                // APK is smaller than 256K, must be stub
+                return patch(apk.path, out.path, pkg, label)
+            }
+
+            // Try using the new APK to patch itself
+            val loader = DynamicClassLoader(apk)
+            val cls = loader.loadClass("a.a")
+
+            for (m in cls.declaredMethods) {
+                val pars = m.parameterTypes
+                if (pars.size == 4 && pars[0] == String::class.java) {
+                    return m.invoke(null, apk.path, out.path, pkg, label) as Boolean
+                }
+            }
+            throw Exception("No matching method found")
+        } catch (e: Exception) {
+            Timber.e(e)
+            // Fallback to use the current implementation
+            return patch(apk.path, out.path, pkg, label)
+        }
+    }
+
+    fun hideManager(context: Context, label: String) {
         Completable.fromAction {
             val progress = Notifications.progress(context, context.getString(R.string.hide_manager_title))
             Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build())
-            if (!patchAndHide(context))
+            if (!patchAndHide(context, label))
                 Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG)
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID)
         }.subscribeK()

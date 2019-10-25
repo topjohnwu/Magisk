@@ -62,6 +62,9 @@
     <string name="app_changelog">Καταγραφή αλλαγών εφαρμογής</string>
 
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Όχι ευχαριστώ</string>
+    <string name="yes">Ναι</string>
+    <string name="ok">OK</string>
     <string name="close">Κλείσιμο</string>
     <string name="repo_install_title">Εγκατάσταση %1$s</string>
     <string name="repo_install_msg">Θέλετε να εγκαταστήσετε το %1$s τώρα;</string>

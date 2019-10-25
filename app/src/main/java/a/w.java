@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.topjohnwu.magisk.HacksKt;
 import com.topjohnwu.magisk.base.DelegateWorker;
 
 import java.lang.reflect.ParameterizedType;
@@ -18,7 +19,7 @@ public abstract class w<T extends DelegateWorker> extends Worker {
 
     @SuppressWarnings("unchecked")
     w(@NonNull Context context, @NonNull WorkerParameters workerParams) {
-        super(context, workerParams);
+        super(HacksKt.wrap(context, false), workerParams);
         try {
             base = ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
                     .getActualTypeArguments()[0]).newInstance();

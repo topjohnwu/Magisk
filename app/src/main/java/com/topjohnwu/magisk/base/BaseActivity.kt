@@ -15,12 +15,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.extensions.set
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
-import com.topjohnwu.magisk.utils.LocaleManager
 import com.topjohnwu.magisk.utils.currentLocale
+import com.topjohnwu.magisk.wrap
 import kotlin.random.Random
 
 typealias RequestCallback = BaseActivity<*, *>.(Int, Intent?) -> Unit
@@ -31,9 +32,8 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
     protected abstract val viewModel: ViewModel
+    protected open val themeRes: Int = R.style.MagiskTheme
     protected open val snackbarView get() = binding.root
-    protected open val navHostId: Int = 0
-    protected open val defaultPosition: Int = 0
 
     private val resultCallbacks by lazy { SparseArrayCompat<RequestCallback>() }
 
@@ -53,10 +53,11 @@ abstract class BaseActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(LocaleManager.getLocaleContext(base))
+        super.attachBaseContext(base.wrap(false))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(themeRes)
         super.onCreate(savedInstanceState)
 
         viewModel.viewEvents.observe(this, viewEventObserver)

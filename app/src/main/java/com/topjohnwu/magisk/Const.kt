@@ -13,8 +13,8 @@ object Const {
 
     // Versions
     const val SNET_EXT_VER = 13
-    const val SNET_REVISION = "5adbc435ce93ded953c30ebe587edfd50b5503bc"
-    const val BOOTCTL_REVISION = "9c5dfc1b8245c0b5b524901ef0ff0f8335757b77"
+    const val SNET_REVISION = "a6c47f86f10b310358afa9dbe837037dd5d561df"
+    const val BOOTCTL_REVISION = "a6c47f86f10b310358afa9dbe837037dd5d561df"
 
     // Misc
     const val ANDROID_MANIFEST = "AndroidManifest.xml"
@@ -22,8 +22,9 @@ object Const {
     const val MANAGER_CONFIGS = ".tmp.magisk.config"
     val USER_ID = Process.myUid() / 100000
 
-    object MagiskVersion {
+    object Version {
         const val MIN_SUPPORT = 18000
+        const val CONNECT_MODE = 20002
     }
 
     object ID {

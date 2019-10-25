@@ -2,13 +2,13 @@
 If you already have Magisk installed, it is **strongly recommended to upgrade directly via Magisk Manager**. The following tutorial is for first time users.
 
 ## Getting Started
-- If you are using a Huawei device running **EMUI 8 and higher**, please check [its own section](#huawei).
-- If you are using a Samsung device that is **launched with Android 9.0** (new devices in 2019), please check [its own section](#samsung-system-as-root).
+- If you are using a Huawei device running **EMUI 8 and higher**, please check [its section](#huawei).
+- If you are using a Samsung device that is **launched with Android 9.0** (new devices in 2019), please check [its section](#samsung-system-as-root).
 
 Otherwise, follow the instructions in [Knowing Your Device](#knowing-your-device), and choose the right steps
 
 - If your device is **NOT** A/B, but **IS** using system-as-root, then you will have to install Magisk to the recovery partition of your device. Follow the instructions in [Boot Image Patching](#boot-image-patching), but instead of using your boot image, use your recovery image. **Read through the [Magisk in Recovery](#magisk-in-recovery) section!**
-- Otherwise, you can either follow the instructions in [Custom Recovery](#custom-recovery) (if your device have custom recovery available) or [Boot Image Patching](#boot-image-patching).
+- Otherwise, you can either follow the instructions in [Custom Recovery](#custom-recovery) (if your device has custom recovery available) or [Boot Image Patching](#boot-image-patching).
 
 Other notes:
 
@@ -33,7 +33,7 @@ If the result is `true`, then your device is using system-as-root.
 (P.S. If you are interested more regarding system-as-root, please check [this Twitter thread](https://twitter.com/topjohnwu/status/1174392824625676288))
 
 ## Custom Recovery
-If your device have custom recovery support, the easiest way is to install it through custom recoveries, such as TWRP.
+If your device has custom recovery support, the easiest way is to install it through custom recoveries, such as TWRP.
 
 - Download the Magisk installer zip
 - Reboot to custom recovery
@@ -41,9 +41,9 @@ If your device have custom recovery support, the easiest way is to install it th
 - Check whether Magisk Manager is installed. If for some reason it isn't installed automatically, manually install the APK
 
 ## Boot Image Patching
-You would want choose this method if either your device does not have custom recoveries, your device is A/B and you don't want to mix recovery and boot images, or your device is using system-as-root without A/B partitions.
+You would want to choose this method if either your device does not have custom recoveries, your device is A/B and you don't want to mix recovery and boot images, or your device is using system-as-root without A/B partitions.
 
-In order to use this method, you are required to obtain a copy of the stock boot/recovery image, which can be found by extracting OEM provided factory images or extracting from OTA update zips. If you are unable to obtain one yourself, you might be able to find it somewhere on the internet. The following instructions will guide you through the process after you have the copy of boot/recovery image.
+To use this method, you are required to obtain a copy of the stock boot/recovery image, which can be found by extracting OEM provided factory images or extracting from OTA update zips. If you are unable to obtain one yourself, you might be able to find it somewhere on the internet. The following instructions will guide you through the process after you have the copy of boot/recovery image.
 
 - Copy the boot/recovery image to your device
 - Download and install the latest Magisk Manager
@@ -57,7 +57,7 @@ In order to use this method, you are required to obtain a copy of the stock boot
 `fastboot flash recovery /path/to/magisk_patched.img` if you are patching a recovery image
 
 ## Magisk in Recovery
-Due to the fact that some devices no longer uses ramdisk in boot images, Magisk has no choice but to be installed in the recovery partition. For these devices, you will have to **boot to recovery every time** if you want Magisk. Since both Magisk and recovery lives in the same partition, what you actually end up getting when you choose to boot to recovery will be determined by **how long you press volume up**.
+Since some devices no longer use ramdisk in boot images, Magisk has no choice but to be installed in the recovery partition. For these devices, you will have to **boot to recovery every time** if you want Magisk. Since both Magisk and recovery lives in the same partition, what you actually end up getting when you choose to boot to recovery will be determined by **how long you press volume up**.
 
 Each OEM and device has its own key combo to boot into recovery. For example on Samsung S10 it is **(Power + Bixby + Volume Up)**, and for Huawei it is **(Power + Volume Up)**. As soon as you press the combo and the device vibrates with a splash screen, the bootloader has already chosen which mode it is booting, either it be `boot`, `recovery`, or some OEM specific modes like `download`, `fastboot`, or `erecovery`. After the splash screen, release all buttons to boot into Magisk, since by default `recovery` mode will boot to the system with Magisk enabled. If you decide to boot to actual recovery, continue to press volume up until you see the recovery screen.
 
@@ -105,7 +105,7 @@ Press *Power + Volume Down* to exit download mode. As soon as the screen turns o
 10. Use volume buttons to navigate through the stock recovery menu, and the power button to select an option. Choose *Wipe data/factory reset* to wipe the data of the device.
 11. This time, we can finally boot to the system with Magisk. Select *Reboot system now*, and immediately press the combo key to recovery. After seeing the bootloader warning screen, release all buttons so it can boot to the system.
 12. The device will automatically reboot for the first time it boots. This is completely normal and done by design.
-13. After the device is booted up, do the usual initial setup. **The following steps will need internet connection.**
+13. After the device is booted up, do the usual initial setup. **The following steps will need an internet connection.**
 14. You shall see Magisk Manager in your app drawer; if not, manually install the APK you downloaded in step 3 and continue to the next step. The app would be a stub and it shall automatically upgrade to the full Magisk Manager when you open it.
 15. Magisk Manager will ask to do additional setups. Let it do its job and the app will automatically reboot your device.
 16. Voila! Enjoy Magisk :)
@@ -116,17 +116,17 @@ Press *Power + Volume Down* to exit download mode. As soon as the screen turns o
     - `boot`: remove the signature of the image to prevent soft bricks
     - `recovery`: this is where Magisk is actually installed
 - **Never, ever** try to restore either of the 3 images mentioned back to stock! You can easily brick your device by doing so, and the only way out is to do full Odin restore following with factory reset. Just don't do it.
-- If you want to upgrade your device, **never** flash the stock **AP** tar file with reasons mentioned above. **Always** pre-patch the firmware before flashing in Odin.
+- If you want to upgrade your device, **never** flash the stock **AP** tar file with the reasons mentioned above. **Always** pre-patch the firmware before flashing in Odin.
 -  If you don't need to patch the full firmware, you can manually create a tar file with **at least** `vbmeta.img`, `boot.img`, and `recovery.img` to let Magisk Manager patch your images in the proper way.
 
 ## Huawei
-Huawei devices using Kirin processors have a different partitioning method from most common devices. Magisk is usually installed to the `boot` partition of the device, however Huawei devices does not have this partition. Depending on what EMUI version your device is running, the instructions will be slightly different.
+Huawei devices using Kirin processors have a different partitioning method from most common devices. Magisk is usually installed to the `boot` partition of the device, however Huawei devices do not have this partition. Depending on what EMUI version your device is running, the instructions will be slightly different.
 
 ### Obtain Stock Images
 Huawei does not release official factory images, however most firmware zips can be downloaded from the [Huawei Firmware Database](http://pro-teammt.ru/firmware-database/). To extract images from `UPDATE.APP` in the zip, you have to use [Huawei Update Extractor](https://forum.xda-developers.com/showthread.php?t=2433454) (Windows only!)
 
 ### EMUI 8
-For EMUI 8 devices, your device have a partition named `ramdisk`, which is where Magisk is going to be installed.
+For EMUI 8 devices, your device has a partition named `ramdisk`, which is where Magisk is going to be installed.
 
 - If you plan to use custom recoveries, simply follow the instructions for custom recovery and you're all set.
 - If you plan not to use custom recoveries, you will have to extract `RAMDISK.img` from your firmware. Follow the instructions for boot image patching above, but use the `RAMDISK.img` file instead of a boot image.

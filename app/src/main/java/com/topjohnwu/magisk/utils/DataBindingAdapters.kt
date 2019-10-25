@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
 import com.topjohnwu.magisk.extensions.subscribeK
@@ -220,4 +221,11 @@ fun getScrollPosition(view: RecyclerView) = (view.layoutManager as? LinearLayout
 @BindingAdapter("isEnabled")
 fun setEnabled(view: View, isEnabled: Boolean) {
     view.isEnabled = isEnabled
+}
+
+@BindingAdapter("error")
+fun TextInputLayout.setErrorString(error: String) {
+    val newError = error.let { if (it.isEmpty()) null else it }
+    if (this.error == null && newError == null) return
+    this.error = newError
 }

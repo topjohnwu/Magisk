@@ -16,7 +16,7 @@ buildscript {
         maven { url 'https://kotlin.bintray.com/kotlinx' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:3.5.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${vKotlin}"
 
 
@@ -38,7 +38,7 @@ subprojects {
         maven { url "https://jitpack.io" }
         maven { url "http://oss.sonatype.org/content/repositories/snapshots" }
     }
-    afterEvaluate {
+    afterEvaluate { module ->
         if (getPlugins().hasPlugin('com.android.library') ||
             getPlugins().hasPlugin('com.android.application')) {
             android {
@@ -58,11 +58,11 @@ subprojects {
             }
         }
 
-        if (it.name == 'app' || it.name == 'stub') {
+        if (module.name == 'app' || module.name == 'stub') {
             android {
                 signingConfigs {
                     config {
-                        storeFile rootProject.file('release-key.jks')
+                        storeFile new File(props['keyStore'])
                         storePassword props['keyStorePass']
                         keyAlias props['keyAlias']
                         keyPassword props['keyPass']
@@ -76,14 +76,21 @@ subprojects {
                             signingConfig signingConfigs.config
                     }
                     release {
-                        minifyEnabled true
-                        shrinkResources true
                         signingConfig signingConfigs.config
                     }
                 }
 
                 lintOptions {
                     disable 'MissingTranslation'
+                }
+
+                aaptOptions {
+                    // Handle resource IDs
+                    File resId = project.file('res-ids.txt')
+                    if (resId.exists())
+                        additionalParameters "--stable-ids", "${resId.absolutePath}"
+                    else
+                        additionalParameters "--emit-ids", "${resId.absolutePath}"
                 }
             }
         }

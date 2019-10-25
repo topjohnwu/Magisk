@@ -24,6 +24,7 @@
     <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i koru</string>
+    <string name="recovery_mode">Kurtarma Modu</string>
     <string name="current_installed">Yüklü: %1$s</string>
     <string name="latest_version">Güncel: %1$s</string>
     <string name="uninstall">Kaldır</string>
@@ -87,6 +88,9 @@
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
 
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Hayır, teşekkürler</string>
+    <string name="yes">Evet</string>
+    <string name="ok">Tamam</string>
     <string name="close">Kapat</string>
     <string name="repo_install_title">%1$s yükle</string>
     <string name="repo_install_msg">%1$s yüklensin mi?</string>

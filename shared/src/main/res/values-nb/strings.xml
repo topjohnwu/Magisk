@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-     <!--Used in both stub and full app-->
-    <string name="no_thanks">Nei takk</string>
-    <string name="yes">Ja</string>
-    <string name="ok">OK</string>
- </resources>

@@ -2,8 +2,8 @@ out
 *.zip
 *.jks
 *.apk
-config.prop
-update.sh
+/config.prop
+/update.sh
 
 # Built binaries
 native/out

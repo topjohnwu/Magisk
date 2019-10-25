@@ -8,10 +8,10 @@
     <string name="settings">Seaded</string>
     <string name="install">Installi</string>
     <string name="unsupport_magisk_title">Mittetoetatud Magisk\'i versioon</string>
-    <string name="unsupport_magisk_message">See Magisk Manager\'i versioon ei toeta Magisk\'i v18.0-st vanemat versiooni.\n\nSa võid kas Magisk\'i käsitsi täiendada või alandad rakenduse vanemale versioonile.</string>
+    <string name="unsupport_magisk_message">See Magisk Manager\'i versioon ei toeta Magisk\'ist vanemat versiooni kui v18.0.\n\nSa võid kas Magisk\'i käsitsi täiendada või alandad rakenduse vanemale versioonile.</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk pole installitud.</string>
+    <string name="magisk_version_error">Magisk pole installitud</string>
     <string name="checking_for_updates">Kontrollin uuendusi…</string>
     <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
     <string name="safetyNet_check_text">Koputa SafetyNet\'i kontrolliks</string>
@@ -24,6 +24,7 @@
     <string name="advanced_settings_title">Täpsemad seaded</string>
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
     <string name="keep_dm_verity">Säilita AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Taastusrežiim</string>
     <string name="current_installed">Installitud: %1$s</string>
     <string name="latest_version">Viimatine: %1$s</string>
     <string name="uninstall">Eemalda</string>
@@ -44,6 +45,7 @@
     <string name="reboot_recovery">Taaskäivita taastusesse</string>
     <string name="reboot_bootloader">Taaskäivita käivitushaldurisse</string>
     <string name="reboot_download">Taaskäivita allalaadimisrežiimi</string>
+    <string name="reboot_edl">Taaskäivita EDL\'i</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Uuendus saadaval</string>
@@ -68,10 +70,27 @@
     <string name="progress_channel">Edenemise teated</string>
     <string name="download_complete">Allalaadimine valmis</string>
     <string name="download_file_error">Faili allalaadimisel esines viga</string>
+    <string name="download_open_parent">Kuva ülemkaustas</string>
+    <string name="download_open_self">Kuva fail</string>
     <string name="magisk_update_title">Magisk\'ile on uuendus saadaval!</string>
     <string name="manager_update_title">Magisk Manager\'ile on uuendus saadaval!</string>
+
+    <!-- Installation -->
+    <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks.</string>
+    <string name="download_zip_only">Laadi ainult ZIP alla</string>
+    <string name="direct_install">Otsene install (soovitatud)</string>
+    <string name="install_inactive_slot">Installi ebaaktiivsesse lahtrisse (pärast üle-õhu uuendust)</string>
+    <string name="install_inactive_slot_msg">Sinu seade SUNNITAKSE peale taaskäivitust käivituma praegusesse ebaaktiivsesse lahtrisse!\nKasuta seda valikut vaid peale üle-õhu uuenduse teostamist.\nJätkad?</string>
+    <string name="select_method">Vali meetod</string>
+    <string name="setup_title">Lisaseadistus</string>
+    <string name="select_patch_file">Vali ja paika fail</string>
+    <string name="patch_file_msg">Vali toortõmmis (*.img) või ODIN tar-fail (*.tar)</string>
+    <string name="reboot_delay_toast">Taaskäivitamine 5 sekundi pärast…</string>
     
     <!--Toasts, Dialogs-->
+    <string name="no_thanks">Tänan ei</string>
+    <string name="yes">Jah</string>
+    <string name="ok">OK</string>
     <string name="close">Sulge</string>
     <string name="repo_install_title">Installi %1$s</string>
     <string name="repo_install_msg">Kas soovid kohe installida %1$s?</string>
@@ -80,19 +99,16 @@
     <string name="settings_reboot_toast">Taaskäivita seadete rakendamiseks.</string>
     <string name="release_notes">Väljalaske märkmed</string>
     <string name="repo_cache_cleared">Hoidla vahemälu tühjendatud</string>
-    <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks.</string>
+
     <string name="dtbo_patched_title">DTBO sai paigatud!</string>
     <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img. Palun taaskäivita.</string>
     <string name="flashing">Välgutamine</string>
+    <string name="done">Valmis!</string>
+    <string name="failure">Ebaõnnestus</string>
     <string name="hide_manager_title">Peidan Magisk Manager\'i…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'i peitmine ebaõnnestus.</string>
     <string name="open_link_failed_toast">Lingi avamiseks sobivat rakendust ei leitud.</string>
-    <string name="download_zip_only">Laadi ainult ZIP alla</string>
-    <string name="direct_install">Otsene install (soovitatud)</string>
-    <string name="install_inactive_slot">Installi ebaaktiivsesse lahtrisse (pärast üle-õhu uuendust)</string>
     <string name="warning">Hoiatus</string>
-    <string name="install_inactive_slot_msg">Sinu seade SUNNITAKSE peale taaskäivitust käivituma praegusesse ebaaktiivsesse lahtrisse!\nKasuta seda valikut vaid peale üle-õhu uuenduse teostamist.\nJätkad?</string>
-    <string name="select_method">Vali meetod</string>
     <string name="complete_uninstall">Täielik eemaldus</string>
     <string name="restore_img">Taasta tõmmised</string>
     <string name="restore_img_msg">Taastamine…</string>
@@ -103,13 +119,14 @@
     <string name="setup_fail">Seadistus ebaõnnnestus.</string>
     <string name="env_fix_title">Vajab lisaseadistust</string>
     <string name="env_fix_msg">Sinu seade vajab lisaseadistust, et Magisk töötaks korralikult. Laadime alla Magisk\'i seadistus-zip\'i, kas soovid kohe jätkata?</string>
-    <string name="setup_title">Lisaseadistus</string>
     <string name="setup_msg">Käivitan keskkonnaseadistust…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Üldine</string>
     <string name="settings_dark_theme_title">Tume teema</string>
     <string name="settings_dark_theme_summary">Luba tume teema.</string>
+    <string name="settings_download_path_title">Allalaadimise failitee</string>
+    <string name="settings_download_path_message">Failid salvestatakse kausta %1$s</string>
     <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
     <string name="settings_clear_cache_summary">Tühjenda vahemälus olev teave võrgus olevate hoidlate kohta. See sunnib rakendust võrgust värskendama.</string>
     <string name="settings_hide_manager_title">Peida Magisk Manager</string>
@@ -171,6 +188,7 @@
     <string name="isolate_summary">Iga juurkasutaja sessioon saab oma isoleeritud nimeruumi.</string>
     <string name="android_o_not_support">Ei toeta Androidi versiooni 8.0+.</string>
     <string name="disable_fingerprint">Sõrmejälgi pole määratud või seade pole toetatud.</string>
+    <string name="settings_download_path_error">Faili loomisel esines viga.  See peab olema ligipääsetav mäluruumi juurkaustast ning ei tohi olla fail.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superkasutaja taotlus</string>

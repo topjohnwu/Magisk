@@ -6,11 +6,16 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
-import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.databinding.ActivityFlashBinding
+import com.topjohnwu.magisk.extensions.snackbar
+import com.topjohnwu.magisk.intent
+import com.topjohnwu.magisk.model.events.BackPressEvent
+import com.topjohnwu.magisk.model.events.PermissionEvent
+import com.topjohnwu.magisk.model.events.SnackbarEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
@@ -18,6 +23,7 @@ import java.io.File
 open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() {
 
     override val layoutRes: Int = R.layout.activity_flash
+    override val themeRes: Int = R.style.MagiskTheme_Flashing
     override val viewModel: FlashViewModel by viewModel {
         val uri = intent.data ?: let { finish(); Uri.EMPTY }
         val additionalUri = intent.getParcelableExtra(Const.Key.FLASH_DATA) ?: uri
@@ -37,9 +43,24 @@ open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() 
         super.onBackPressed()
     }
 
+    override fun onEventDispatched(event: ViewEvent) {
+        super.onEventDispatched(event)
+        when (event) {
+            is SnackbarEvent -> snackbar(snackbarView, event.message(this), event.length, event.f)
+            is BackPressEvent -> onBackPressed()
+            is PermissionEvent -> withPermissions(*event.permissions.toTypedArray()) {
+                onSuccess { event.callback.onNext(true) }
+                onFailure {
+                    event.callback.onNext(false)
+                    event.callback.onError(SecurityException("User refused permissions"))
+                }
+            }
+        }
+    }
+
     companion object {
 
-        private fun intent(context: Context) = Intent(context, ClassMap[FlashActivity::class.java])
+        private fun intent(context: Context) = context.intent(FlashActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         private fun intent(context: Context, file: File) = intent(context).setData(file.toUri())
 
