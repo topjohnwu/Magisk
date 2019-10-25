@@ -7,6 +7,7 @@ get_flags() {
   $SYSTEM_ROOT && KEEPVERITY=true || KEEPVERITY=false
   [ "`getprop ro.crypto.state`" = "encrypted" ] && KEEPFORCEENCRYPT=true || KEEPFORCEENCRYPT=false
   RECOVERYMODE=false
+  COREONLYMODE=false
 }
 
 run_migrations() { return; }

@@ -94,4 +94,5 @@ void broadcast_ack(int client);
 
 extern int SDK_INT;
 extern bool RECOVERY_MODE;
+extern bool COREONLYMODE;
 #define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")

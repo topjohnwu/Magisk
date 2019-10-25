@@ -103,6 +103,7 @@ void load_kernel_info(cmdline *cmd) {
 	bool enter_recovery = false;
 	bool kirin = false;
 	bool recovery_mode = false;
+	bool core_only_mode = false;
 
 	parse_cmdline([&](auto key, auto value) -> void {
 		LOGD("cmdline: [%s]=[%s]\n", key.data(), value);
@@ -125,6 +126,8 @@ void load_kernel_info(cmdline *cmd) {
 	});
 
 	parse_prop_file("/.backup/.magisk", [&](auto key, auto value) -> bool {
+		if (key == "COREONLYMODE" && value == "true")
+			core_only_mode = true;
 		if (key == "RECOVERYMODE" && value == "true")
 			recovery_mode = true;
 		return true;
@@ -140,6 +143,8 @@ void load_kernel_info(cmdline *cmd) {
 			recovery_mode = true;
 		}
 	}
+	if (core_only_mode)
+		LOGD("Running in Forced Core-Only mode, Modules will not be executed...\n");
 
 	if (recovery_mode) {
 		LOGD("Running in recovery mode, waiting for key...\n");

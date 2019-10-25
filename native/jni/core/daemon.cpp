@@ -18,6 +18,7 @@
 
 int SDK_INT = -1;
 bool RECOVERY_MODE = false;
+bool COREONLYMODE = false;
 static struct stat self_st;
 
 static void verify_client(int client, pid_t pid) {
@@ -152,6 +153,8 @@ static void main_daemon() {
 
 	// Load config status
 	parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
+		if (key == "COREONLYMODE" && val == "true")
+			COREONLYMODE = true;
 		if (key == "RECOVERYMODE" && val == "true")
 			RECOVERY_MODE = true;
 		return true;

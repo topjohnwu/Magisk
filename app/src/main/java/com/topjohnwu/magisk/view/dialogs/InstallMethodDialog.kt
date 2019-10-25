@@ -20,8 +20,8 @@ internal class InstallMethodDialog(activity: BaseActivity<*, *>, options: List<S
         setTitle(R.string.select_method)
         setItems(options.toTypedArray()) { _, idx ->
             when (idx) {
-                0 -> downloadOnly(activity)
-                1 -> patchBoot(activity)
+                0 -> patchBoot(activity)
+                1 -> downloadOnly(activity)
                 2 -> flash(activity)
                 3 -> installInactiveSlot(activity)
             }

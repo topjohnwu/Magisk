@@ -7,7 +7,7 @@
 # Usage: boot_patch.sh <bootimage>
 #
 # The following flags can be set in environment variables:
-# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE
+# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE, COREONLYMODE
 #
 # This script should be placed in a directory with the following files:
 #
@@ -59,8 +59,10 @@ BOOTIMAGE="$1"
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+[ -z $COREONLYMODE ] && COREONLYMODE=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
+export COREONLYMODE
 
 chmod -R 755 .
 
@@ -137,6 +139,7 @@ ui_print "- Patching ramdisk"
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
+echo "COREONLYMODE=$COREONLYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
 ./magiskboot cpio ramdisk.cpio \

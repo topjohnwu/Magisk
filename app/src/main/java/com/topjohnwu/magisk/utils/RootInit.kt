@@ -38,6 +38,7 @@ class RootInit : Shell.Initializer() {
         Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
         Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
         Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
+        Info.coreOnly = ShellUtils.fastCmd("echo \$COREONLYMODE").toBoolean()
 
         return true
     }

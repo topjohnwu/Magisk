@@ -210,6 +210,7 @@ get_flags() {
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar RECOVERYMODE
+  getvar COREONLYMODE
   if [ -z $KEEPVERITY ]; then
     if $SYSTEM_ROOT; then
       KEEPVERITY=true
@@ -230,6 +231,7 @@ get_flags() {
     fi
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  [ -z $COREONLYMODE ] && COREONLYMODE=false
 }
 
 find_boot_image() {

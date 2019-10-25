@@ -25,6 +25,7 @@
     <string name="keep_force_encryption">Preserve force encryption</string>
     <string name="keep_dm_verity">Preserve AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Recovery Mode</string>
+    <string name="force_core_only_mode">Create Core-Only Mode Image</string>
     <string name="current_installed">Installed: %1$s</string>
     <string name="latest_version">Latest: %1$s</string>
     <string name="uninstall">Uninstall</string>

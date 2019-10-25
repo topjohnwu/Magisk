@@ -404,6 +404,9 @@ static bool magisk_env() {
 		unlink("/sbin/resetprop");
 		unlink("/sbin/magiskhide");
 	}
+	// Trigger Forced Core-Only Mode if image configured as such
+	if (COREONLYMODE)
+		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
 
 	if (access(DATABIN "/busybox", X_OK) == -1)
 		return false;

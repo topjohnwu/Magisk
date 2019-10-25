@@ -41,8 +41,9 @@ bool check_env(const char *name) {
 void magisk_cpio::patch() {
 	bool keepverity = check_env("KEEPVERITY");
 	bool keepforceencrypt = check_env("KEEPFORCEENCRYPT");
-	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s]\n",
-			keepverity ? "true" : "false", keepforceencrypt ? "true" : "false");
+	bool forcecoreonlymode = check_env("COREONLYMODE");
+	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s] COREONLYMODE=[%s]\n",
+			keepverity ? "true" : "false", keepforceencrypt ? "true" : "false", forcecoreonlymode ? "true" : "false");
 
 	for (auto it = entries.begin(); it != entries.end();) {
 		auto cur = it++;

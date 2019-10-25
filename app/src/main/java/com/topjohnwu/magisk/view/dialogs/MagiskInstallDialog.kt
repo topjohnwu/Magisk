@@ -19,13 +19,15 @@ class MagiskInstallDialog(a: BaseActivity<*, *>) : CustomAlertDialog(a) {
         setCancelable(true)
         setPositiveButton(R.string.install) { _, _ ->
             val options = ArrayList<String>()
-            options.add(a.getString(R.string.download_zip_only))
             options.add(a.getString(R.string.select_patch_file))
-            if (Shell.rootAccess()) {
-                options.add(a.getString(R.string.direct_install))
-                val s = ShellUtils.fastCmd("grep_prop ro.build.ab_update")
-                if (s.isNotEmpty() && s.toBoolean()) {
-                    options.add(a.getString(R.string.install_inactive_slot))
+            if (!Info.coreOnly){
+                options.add(a.getString(R.string.download_zip_only))
+                if (Shell.rootAccess()) {
+                    options.add(a.getString(R.string.direct_install))
+                    val s = ShellUtils.fastCmd("grep_prop ro.build.ab_update")
+                    if (s.isNotEmpty() && s.toBoolean()) {
+                        options.add(a.getString(R.string.install_inactive_slot))
+                    }
                 }
             }
             InstallMethodDialog(a, options).show()
