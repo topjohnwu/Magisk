@@ -41,4 +41,9 @@
     <string name="settings_dark_mode_system">Follow System</string>
     <string name="settings_dark_mode_dark">Always Dark</string>
 
+    <string name="install_options_title">Options</string>
+    <string name="install_method_title">Method</string>
+    <string name="install_next">Next</string>
+    <string name="install_start">Let\'s go</string>
+
 </resources>

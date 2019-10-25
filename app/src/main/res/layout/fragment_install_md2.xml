@@ -67,7 +67,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/l1"
                                 android:gravity="start"
-                                android:text="Options"
+                                android:text="@string/install_options_title"
                                 android:textAppearance="?appearanceTextBodyNormal"
                                 android:textStyle="bold"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -82,7 +82,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:onClick="@{() -> viewModel.step(1)}"
-                                android:text="Next"
+                                android:text="@string/install_next"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -145,7 +145,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/l1"
                                 android:gravity="start"
-                                android:text="Method"
+                                android:text="@string/install_method_title"
                                 android:textAppearance="?appearanceTextBodyNormal"
                                 android:textStyle="bold"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -161,7 +161,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:onClick="@{() -> viewModel.step(2)}"
-                                android:text="Next"
+                                android:text="@string/install_next"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -226,7 +226,7 @@
                     android:layout_gravity="end"
                     android:layout_margin="@dimen/l1"
                     android:onClick="@{() -> viewModel.install()}"
-                    android:text="Let's go"
+                    android:text="@string/install_start"
                     app:icon="@drawable/ic_forth_md2"
                     app:iconGravity="textEnd" />
 
