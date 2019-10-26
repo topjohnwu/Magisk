@@ -165,35 +165,36 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
         return base.getPendingJob(jobId)
     }
 
-    fun JobInfo.patch(): JobInfo {
+    private fun JobInfo.patch(): JobInfo {
         // We need to patch the component of JobInfo to access WorkManager SystemJobService
 
         val name = service.className
-        val component = ComponentName(service.packageName, Info.stub?.componentMap?.get(name)
-                ?: name)
+        val component = ComponentName(
+            service.packageName,
+            Info.stub!!.componentMap[name] ?: name)
 
         // Clone the JobInfo except component
         val builder = JobInfo.Builder(id, component)
-                .setExtras(extras)
-                .setTransientExtras(transientExtras)
-                .setClipData(clipData, clipGrantFlags)
-                .setRequiredNetwork(requiredNetwork)
-                .setEstimatedNetworkBytes(estimatedNetworkDownloadBytes, estimatedNetworkUploadBytes)
-                .setRequiresCharging(isRequireCharging)
-                .setRequiresDeviceIdle(isRequireDeviceIdle)
-                .setRequiresBatteryNotLow(isRequireBatteryNotLow)
-                .setRequiresStorageNotLow(isRequireStorageNotLow)
-                .also {
-                    triggerContentUris?.let { uris ->
-                        for (uri in uris)
-                            it.addTriggerContentUri(uri)
-                    }
+            .setExtras(extras)
+            .setTransientExtras(transientExtras)
+            .setClipData(clipData, clipGrantFlags)
+            .setRequiredNetwork(requiredNetwork)
+            .setEstimatedNetworkBytes(estimatedNetworkDownloadBytes, estimatedNetworkUploadBytes)
+            .setRequiresCharging(isRequireCharging)
+            .setRequiresDeviceIdle(isRequireDeviceIdle)
+            .setRequiresBatteryNotLow(isRequireBatteryNotLow)
+            .setRequiresStorageNotLow(isRequireStorageNotLow)
+            .also {
+                triggerContentUris?.let { uris ->
+                    for (uri in uris)
+                        it.addTriggerContentUri(uri)
                 }
-                .setTriggerContentUpdateDelay(triggerContentUpdateDelay)
-                .setTriggerContentMaxDelay(triggerContentMaxDelay)
-                .setImportantWhileForeground(isImportantWhileForeground)
-                .setPrefetch(isPrefetch)
-                .setPersisted(isPersisted)
+            }
+            .setTriggerContentUpdateDelay(triggerContentUpdateDelay)
+            .setTriggerContentMaxDelay(triggerContentMaxDelay)
+            .setImportantWhileForeground(isImportantWhileForeground)
+            .setPrefetch(isPrefetch)
+            .setPersisted(isPersisted)
 
         if (isPeriodic) {
             builder.setPeriodic(intervalMillis, flexMillis)
