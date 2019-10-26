@@ -38,7 +38,9 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.Card.Elevated" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?colorSurface</item>
+        <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">@dimen/l_125</item>
+        <item name="cardPreventCornerOverlap">true</item>
     </style>
 
     <style name="WidgetFoundation.Card.OnPrimary" parent="Widget.MaterialComponents.CardView">

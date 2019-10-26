@@ -2,5 +2,9 @@
 <androidx.appcompat.widget.AppCompatTextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:ellipsize="middle"
+    android:gravity="start|center_vertical"
+    android:singleLine="true"
+    tools:text="@string/magisk"
     android:textAppearance="?appearanceTextCaptionVariant" />
