@@ -60,6 +60,9 @@ class HomeViewModel(
     val stateMagiskProgress = KObservableField(0)
     val stateManagerProgress = KObservableField(0)
 
+    val stateMagiskExpanded = KObservableField(false)
+    val stateManagerExpanded = KObservableField(false)
+
     val stateHideManagerName = R.string.manager.res().let {
         if (!statePackageOriginal) {
             it.replaceRandomWithSpecial(3)
@@ -136,6 +139,8 @@ class HomeViewModel(
     ).map { check(it);it }
         .subscribeK { Navigation.install().publish() }
         .add()
+
+    fun toggle(kof: KObservableField<Boolean>) = kof.toggle()
 
     private fun ensureEnv() {
         val invalidStates = listOf(

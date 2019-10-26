@@ -46,77 +46,171 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:maxWidth="200dp"
+                    android:onClick="@{() -> viewModel.toggle(viewModel.stateMagiskExpanded)}"
                     app:layout_constrainedWidth="true"
                     app:layout_constraintEnd_toStartOf="@+id/home_manager_wrapper"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:animateLayoutChanges="true"
-                        android:background="@drawable/bg_card"
-                        android:paddingStart="@dimen/l_50"
-                        android:paddingTop="@dimen/l1"
-                        android:paddingEnd="@dimen/l1"
-                        android:paddingBottom="@dimen/l1"
-                        app:layout_constraintEnd_toStartOf="@+id/home_manager_wrapper"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:orientation="vertical">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/home_magisk_icon"
-                            style="?styleIconPrimary"
-                            isEnabled="@{viewModel.stateMagisk != MagiskState.LOADING}"
-                            onSelectClick="@{() -> viewModel.onDeletePressed()}"
-                            onSelectReset="@{7000L}"
-                            android:padding="@dimen/l_25"
-                            app:layout_constraintBottom_toBottomOf="parent"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:animateLayoutChanges="true"
+                            android:background="@drawable/bg_card"
+                            android:paddingStart="@dimen/l_50"
+                            android:paddingTop="@dimen/l1"
+                            android:paddingEnd="@dimen/l1"
+                            android:paddingBottom="@dimen/l1"
+                            app:layout_constraintEnd_toStartOf="@+id/home_manager_wrapper"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_magisk_delete"
-                            app:tint="@color/color_primary_error_transient" />
+                            app:layout_constraintTop_toTopOf="parent">
 
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/home_magisk_title"
-                            android:layout_width="0dp"
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/home_magisk_icon"
+                                style="?styleIconPrimary"
+                                isEnabled="@{viewModel.stateMagisk != MagiskState.LOADING}"
+                                onSelectClick="@{() -> viewModel.onDeletePressed()}"
+                                onSelectReset="@{7000L}"
+                                android:padding="@dimen/l_25"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_magisk_delete"
+                                app:tint="@color/color_primary_error_transient" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/l_50"
+                                android:gravity="start|center_vertical"
+                                android:text="@string/magisk"
+                                android:textAppearance="?appearanceTextTitleNormal"
+                                app:layout_constrainedWidth="true"
+                                app:layout_constraintBottom_toTopOf="@+id/home_magisk_status"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_magisk_icon"
+                                app:layout_constraintTop_toTopOf="@+id/home_magisk_icon"
+                                app:layout_constraintVertical_chainStyle="packed" />
+
+                            <TextSwitcher
+                                android:id="@+id/home_magisk_status"
+                                gone="@{viewModel.stateTextMagisk.empty}"
+                                textCaptionVariant="@{viewModel.stateTextMagisk}"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constrainedWidth="true"
+                                app:layout_constraintBottom_toTopOf="@+id/home_magisk_version"
+                                app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
+                                app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
+                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_title" />
+
+                            <TextSwitcher
+                                android:id="@+id/home_magisk_version"
+                                gone="@{viewModel.stateVersionUpdateMagisk.empty}"
+                                textCaptionVariant="@{viewModel.stateVersionUpdateMagisk}"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constrainedWidth="true"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_icon"
+                                app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
+                                app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
+                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_status" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            goneUnless="@{viewModel.stateMagiskExpanded}"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/l_50"
-                            android:gravity="start|center_vertical"
-                            android:text="@string/magisk"
-                            android:textAppearance="?appearanceTextTitleNormal"
-                            app:layout_constrainedWidth="true"
-                            app:layout_constraintBottom_toTopOf="@+id/home_magisk_status"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/home_magisk_icon"
-                            app:layout_constraintTop_toTopOf="@+id/home_magisk_icon"
-                            app:layout_constraintVertical_chainStyle="packed" />
+                            android:clipToPadding="false"
+                            android:paddingStart="@dimen/l1"
+                            android:paddingEnd="@dimen/l1"
+                            android:paddingBottom="@dimen/l1"
+                            android:visibility="gone"
+                            tools:visibility="visible">
 
-                        <TextSwitcher
-                            android:id="@+id/home_magisk_status"
-                            gone="@{viewModel.stateTextMagisk.empty}"
-                            textCaptionVariant="@{viewModel.stateTextMagisk}"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            app:layout_constrainedWidth="true"
-                            app:layout_constraintBottom_toTopOf="@+id/home_magisk_version"
-                            app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
-                            app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
-                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_title" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_extra_version_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:layout_marginTop="@dimen/l1"
+                                android:text="@string/home_extra_version"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                        <TextSwitcher
-                            android:id="@+id/home_magisk_version"
-                            gone="@{viewModel.stateVersionUpdateMagisk.empty}"
-                            textCaptionVariant="@{viewModel.stateVersionUpdateMagisk}"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            app:layout_constrainedWidth="true"
-                            app:layout_constraintBottom_toBottomOf="@+id/home_magisk_icon"
-                            app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
-                            app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
-                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_status" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_extra_version_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{Info.magiskVersionString}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_version_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_version_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_magisk_extra_version_title"
+                                tools:text="20.1" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_extra_code_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_extra_code"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_extra_version_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_extra_code_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{Integer.toString(Info.magiskVersionCode)}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_code_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_code_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_magisk_extra_code_title"
+                                tools:text="12345" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_extra_mode_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_extra_mode"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_extra_code_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_extra_mode_value"
+                                style="@style/W.Home.Extra.Value"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_mode_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_mode_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_magisk_extra_mode_title"
+                                tools:text="Normal" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_extra_connection_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_extra_connection"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_extra_mode_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_magisk_extra_connection_value"
+                                style="@style/W.Home.Extra.Value"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_connection_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_connection_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_magisk_extra_connection_title"
+                                tools:text="Normal" />
+
+                            <androidx.constraintlayout.widget.Group
+                                gone="@{Info.magiskVersionCode &lt; 0}"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:constraint_referenced_ids="home_magisk_extra_version_title,home_magisk_extra_version_value,home_magisk_extra_code_title,home_magisk_extra_code_value" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </LinearLayout>
 
                     <ProgressBar
                         style="?styleProgressDeterminate"
@@ -175,6 +269,7 @@
                     style="?styleCardVariant"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:onClick="@{() -> viewModel.toggle(viewModel.stateManagerExpanded)}"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
                     android:maxWidth="200dp"
@@ -183,68 +278,163 @@
                     app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_card"
-                        android:paddingStart="@dimen/l_50"
-                        android:paddingTop="@dimen/l1"
-                        android:paddingEnd="@dimen/l1"
-                        android:paddingBottom="@dimen/l1"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
-                        app:layout_constraintTop_toTopOf="parent">
+                        android:orientation="vertical">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/home_manager_icon"
-                            style="?styleIconPrimary"
-                            android:padding="@dimen/l_50"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/ic_manager" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/home_manager_title"
-                            android:layout_width="0dp"
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/l_50"
-                            android:gravity="start|center_vertical"
-                            android:text="@{viewModel.stateHideManagerName}"
-                            android:textAppearance="?appearanceTextTitleNormal"
-                            app:layout_constrainedWidth="true"
-                            app:layout_constraintBottom_toTopOf="@+id/home_manager_status"
+                            android:background="@drawable/bg_card"
+                            android:paddingStart="@dimen/l_50"
+                            android:paddingTop="@dimen/l1"
+                            android:paddingEnd="@dimen/l1"
+                            android:paddingBottom="@dimen/l1"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/home_manager_icon"
-                            app:layout_constraintTop_toTopOf="@+id/home_manager_icon"
-                            app:layout_constraintVertical_chainStyle="packed"
-                            tools:text="@string/manager" />
+                            app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
+                            app:layout_constraintTop_toTopOf="parent">
 
-                        <TextSwitcher
-                            android:id="@+id/home_manager_status"
-                            gone="@{viewModel.stateTextManager.empty}"
-                            textCaptionVariant="@{viewModel.stateTextManager}"
-                            android:layout_width="0dp"
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/home_manager_icon"
+                                style="?styleIconPrimary"
+                                android:background="@null"
+                                android:padding="@dimen/l_50"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_manager" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_title"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/l_50"
+                                android:gravity="start|center_vertical"
+                                android:text="@{viewModel.stateHideManagerName}"
+                                android:textAppearance="?appearanceTextTitleNormal"
+                                app:layout_constrainedWidth="true"
+                                app:layout_constraintBottom_toTopOf="@+id/home_manager_status"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_manager_icon"
+                                app:layout_constraintTop_toTopOf="@+id/home_manager_icon"
+                                app:layout_constraintVertical_chainStyle="packed"
+                                tools:text="@string/manager" />
+
+                            <TextSwitcher
+                                android:id="@+id/home_manager_status"
+                                gone="@{viewModel.stateTextManager.empty}"
+                                textCaptionVariant="@{viewModel.stateTextManager}"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constrainedWidth="true"
+                                app:layout_constraintBottom_toTopOf="@+id/home_manager_version"
+                                app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
+                                app:layout_constraintStart_toStartOf="@+id/home_manager_title"
+                                app:layout_constraintTop_toBottomOf="@+id/home_manager_title" />
+
+                            <TextSwitcher
+                                android:id="@+id/home_manager_version"
+                                gone="@{viewModel.stateVersionUpdateManager.empty}"
+                                textCaptionVariant="@{viewModel.stateVersionUpdateManager}"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constrainedWidth="true"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"
+                                app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
+                                app:layout_constraintStart_toStartOf="@+id/home_manager_title"
+                                app:layout_constraintTop_toBottomOf="@+id/home_manager_status" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            goneUnless="@{viewModel.stateManagerExpanded}"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:layout_constrainedWidth="true"
-                            app:layout_constraintBottom_toTopOf="@+id/home_manager_version"
-                            app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
-                            app:layout_constraintStart_toStartOf="@+id/home_manager_title"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_title" />
+                            android:clipToPadding="false"
+                            android:paddingStart="@dimen/l1"
+                            android:paddingEnd="@dimen/l1"
+                            android:paddingBottom="@dimen/l1"
+                            android:visibility="gone"
+                            tools:visibility="visible">
 
-                        <TextSwitcher
-                            android:id="@+id/home_manager_version"
-                            gone="@{viewModel.stateVersionUpdateManager.empty}"
-                            textCaptionVariant="@{viewModel.stateVersionUpdateManager}"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            app:layout_constrainedWidth="true"
-                            app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"
-                            app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
-                            app:layout_constraintStart_toStartOf="@+id/home_manager_title"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_status" />
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_version_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:layout_marginTop="@dimen/l1"
+                                android:text="@string/home_extra_version"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_version_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{BuildConfig.VERSION_NAME}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_version_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_manager_extra_version_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_manager_extra_version_title"
+                                tools:text="8.0.0" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_code_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_extra_code"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_version_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_code_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{Integer.toString(BuildConfig.VERSION_CODE)}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_code_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_manager_extra_code_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_manager_extra_code_title"
+                                tools:text="12345" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_mode_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_extra_mode"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_code_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_mode_value"
+                                style="@style/W.Home.Extra.Value"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_mode_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_manager_extra_mode_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_manager_extra_mode_title"
+                                tools:text="@string/home_extra_mode_stub" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_package_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_extra_package"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_mode_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_package_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{viewModel.statePackageManager}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_package_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_manager_extra_package_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_manager_extra_package_title"
+                                tools:text="com.soqspa.xmclaeixl" />
+
+                            <androidx.constraintlayout.widget.Group
+                                gone="@{viewModel.statePackageOriginal}"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:constraint_referenced_ids="home_manager_extra_package_title,home_manager_extra_package_value" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </LinearLayout>
 
                     <ProgressBar
                         style="?styleProgressDeterminate"
@@ -304,40 +494,12 @@
                 items="@{viewModel.items}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l2"
+                android:layout_marginTop="@dimen/l1"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
                 android:paddingStart="@dimen/l1"
-                android:paddingEnd="@dimen/l1"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_developer" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l2"
-                android:gravity="center"
-                android:text="@{String.format(`%s (%s)`, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)}"
-                android:textAppearance="?appearanceTextCaptionVariant"
-                tools:text="7.3.4 (12345)" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                gone="@{Info.magiskVersionCode &lt; 0}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@{String.format(`%s (%s)`, Info.magiskVersionString, Info.magiskVersionCode)}"
-                android:textAppearance="?appearanceTextCaptionVariant"
-                tools:text="19.5 (12345)" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                gone="@{viewModel.statePackageOriginal}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@{viewModel.statePackageManager}"
-                android:textAppearance="?appearanceTextCaptionVariant"
-                tools:text="com.soqspa.xmclaeixl" />
 
         </LinearLayout>
 
