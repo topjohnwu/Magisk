@@ -698,19 +698,35 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/home_support_list"
-                dividerHorizontal="@{R.drawable.divider_l1}"
-                itemBinding="@{viewModel.itemDeveloperBinding}"
-                items="@{viewModel.items}"
+            <include
+                item="@{viewModel.items[0]}"
+                layout="@layout/item_developer"
+                viewModel="@{viewModel}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
                 android:layout_marginTop="@dimen/l1"
-                android:clipToPadding="false"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/l1"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_developer" />
+                android:layout_marginEnd="@dimen/l1" />
+
+            <include
+                item="@{viewModel.items[1]}"
+                layout="@layout/item_developer"
+                viewModel="@{viewModel}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1" />
+
+            <include
+                item="@{viewModel.items[2]}"
+                layout="@layout/item_developer"
+                viewModel="@{viewModel}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1" />
 
         </LinearLayout>
 

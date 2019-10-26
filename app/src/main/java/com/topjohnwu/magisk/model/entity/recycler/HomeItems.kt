@@ -106,7 +106,7 @@ sealed class DeveloperItem : ComparableRvItem<DeveloperItem>() {
     object App : DeveloperItem() {
         override val items =
             listOf(HomeItem.PayPal.App, HomeItem.Twitter.App)
-        override val icon = R.drawable.ic_mainline_dev
+        override val icon = R.drawable.ic_app_dev
         override val name = R.string.home_links_app
     }
 

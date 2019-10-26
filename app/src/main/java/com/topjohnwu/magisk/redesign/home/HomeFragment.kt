@@ -1,9 +1,6 @@
 package com.topjohnwu.magisk.redesign.home
 
 import android.graphics.Insets
-import android.os.Bundle
-import android.view.View
-import androidx.recyclerview.widget.LinearSnapHelper
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
@@ -21,8 +18,4 @@ class HomeFragment : CompatFragment<HomeViewModel, FragmentHomeMd2Binding>() {
         activity.title = resources.getString(R.string.section_home)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        LinearSnapHelper().attachToRecyclerView(binding.homeSupportList)
-    }
 }
