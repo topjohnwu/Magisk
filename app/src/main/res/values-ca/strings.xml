@@ -87,10 +87,6 @@
     <string name="reboot_delay_toast">Reinici en 5 segons…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">No, gràcies</string>     
-    <string name="yes">Sí</string>     
-    <string name="ok">Ok</string> 
-    <string name="close">Tancar</string>
     <string name="repo_install_title">Instal·lar %1$s</string>
     <string name="repo_install_msg">Vols instal·lar %1$s ara?</string>
     <string name="download">Baixar</string>
@@ -185,7 +181,6 @@
     <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
     <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
     <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
-    <string name="android_o_not_support">No es compatible amb Android 8.0+</string>
     <string name="disable_fingerprint">No s\'han establert empremtes dactilars o no existeix el suport del dispositiu</string>
     <string name="settings_download_path_error">Error al crear la carpeta. El directori ha de ser accesible desde el directori arrel i no pot ser un arxiu.</string>
 

@@ -1,7 +1,4 @@
 <resources>
     <string name="upgrade_msg">Qurmanı sonlandırmaq üçün full Magisk Manager`ə yüksəldin. Yüklənib qurulsun?</string>
     <string name="no_internet_msg">Lütfən internetə qoşulun! Full Magisk Manager\'ə yüksəltmə lazımidir.</string>
-    <string name="no_thanks">Yox, sağolun</string>
-    <string name="yes">Bəli</string>
-    <string name="ok">OK</string>
 </resources>

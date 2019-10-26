@@ -62,12 +62,12 @@ internal class InstallMethodDialog(activity: BaseActivity<*, *>, options: List<S
             .setTitle(R.string.warning)
             .setMessage(R.string.install_inactive_slot_msg)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(android.R.string.yes) { _, _ ->
                 DownloadService(activity) {
                     subject = DownloadSubject.Magisk(Configuration.Flash.Secondary)
                 }
             }
-            .setNegativeButton(R.string.no_thanks, null)
+            .setNegativeButton(android.R.string.no, null)
             .show()
     }
 }

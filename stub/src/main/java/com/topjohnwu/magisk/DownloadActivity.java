@@ -68,7 +68,7 @@ public class DownloadActivity extends Activity {
                     .setCancelable(false)
                     .setTitle(R.string.app_name)
                     .setMessage(R.string.no_internet_msg)
-                    .setNegativeButton(R.string.ok, (d, w) -> finish())
+                    .setNegativeButton(android.R.string.ok, (d, w) -> finish())
                     .show();
         }
     }
@@ -84,8 +84,8 @@ public class DownloadActivity extends Activity {
                         .setCancelable(false)
                         .setTitle(R.string.app_name)
                         .setMessage(R.string.upgrade_msg)
-                        .setPositiveButton(R.string.yes, (d, w) -> dlAPK())
-                        .setNegativeButton(R.string.no_thanks, (d, w) -> finish())
+                        .setPositiveButton(android.R.string.yes, (d, w) -> dlAPK())
+                        .setNegativeButton(android.R.string.no, (d, w) -> finish())
                         .show();
             } catch (JSONException e) {
                 finish();

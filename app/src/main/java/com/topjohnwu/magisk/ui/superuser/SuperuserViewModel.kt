@@ -84,8 +84,8 @@ class SuperuserViewModel(
                 CustomAlertDialog(this)
                     .setTitle(R.string.su_revoke_title)
                     .setMessage(getString(R.string.su_revoke_msg, item.item.appName))
-                    .setPositiveButton(R.string.yes) { _, _ -> updateState() }
-                    .setNegativeButton(R.string.no_thanks, null)
+                    .setPositiveButton(android.R.string.yes) { _, _ -> updateState() }
+                    .setNegativeButton(android.R.string.no, null)
                     .setCancelable(true)
                     .show()
             }

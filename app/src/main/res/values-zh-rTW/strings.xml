@@ -84,10 +84,6 @@
     <string name="reboot_delay_toast">將在 5 秒後重新啟動…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">不，謝謝</string>
-    <string name="yes">是</string>
-    <string name="ok">好</string>
-    <string name="close">關閉</string>
     <string name="repo_install_title">安裝 %1$s</string>
     <string name="repo_install_msg">即將安裝 %1$s</string>
     <string name="download">下載</string>
@@ -180,7 +176,6 @@
     <string name="global_summary">所有 Root 工作階段皆使用全域 Namespace</string>
     <string name="requester_summary">所有 Root 工作階段皆繼承原程式 Namespace</string>
     <string name="isolate_summary">所有 Root 工作階段個別擁有獨立 Namespace</string>
-    <string name="android_o_not_support">不支援 Android 8.0 及更新版本</string>
     <string name="disable_fingerprint">未設定指紋或無指紋辨識器</string>
 
     <!--Superuser-->

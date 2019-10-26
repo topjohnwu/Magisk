@@ -88,10 +88,6 @@
     <string name="reboot_delay_toast">5 सेकंड में रिबूट हो रहा है …</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">नहीं शुक्रिया</string>
-    <string name="yes">हां</string>
-    <string name="ok">ठीक</string>
-    <string name="close">बंद करें</string>
     <string name="repo_install_title">%1$s को स्थापित करें</string>
     <string name="repo_install_msg">क्या आप %1$s को स्थापित करना चाहते हैं ?</string>
     <string name="download">डाउनलोड</string>
@@ -186,7 +182,6 @@
     <string name="global_summary">सभी रूट सत्र वैश्विक माउंट नेमस्पेस का उपयोग करते हैं.</string>
     <string name="requester_summary">रूट सत्रों को उनके अनुरोधकर्ताओं के नेमस्पेस विरासत में मिलेंगे.</string>
     <string name="isolate_summary">प्रत्येक रूट सत्र का अपना अलग नेमस्पेस होगा.</string>
-    <string name="android_o_not_support">Android 8.0+ का समर्थन नहीं करता है.</string>
     <string name="disable_fingerprint">कोई फ़िंगरप्रिंट नहीं सेट किया गया या डिवाइस का समर्थन नहीं है.</string>
     <string name="settings_download_path_error">फोल्डर बनाने में त्रुटि. यह स्टोरेज रूट डायरेक्टरी से एक्सेस होना चाहिए और फाइल नहीं होना चाहिए.</string>
 

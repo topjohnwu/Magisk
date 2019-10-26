@@ -89,10 +89,6 @@
     <string name="reboot_delay_toast">إعادة التشغيل خلال خمس ثواني…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">لا شكراً</string>
-    <string name="yes">نعم</string>
-    <string name="ok">موافق</string>
-    <string name="close">إغلاق</string>
     <string name="repo_install_title">تثبيت %1$s</string>
     <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
     <string name="download">التنزيل</string>
@@ -187,7 +183,6 @@
     <string name="global_summary">تستخدم كافة جلسات العمل للروت مساحة الاسم ذات التركيب العامة</string>
     <string name="requester_summary">سترث جلسات العمل للروت مساحة الأسماء لطالبيها</string>
     <string name="isolate_summary">سيكون لكل جلسة عمل للروت مساحة اسم معزولة خاصة بها </string>
-    <string name="android_o_not_support">لا يدعم إصدار الأندرويد +8.0</string>
     <string name="disable_fingerprint">لم تُعين بصمات الأصابع أو لا يوجد قارئ بصمات</string>
     <string name="settings_download_path_error">خطأ عند إنشاء مجلد. عليه أن يكون سهلا الوصول إليه من خلال مجلد التخزين للروت و ألا يكون ملفا.</string>
 

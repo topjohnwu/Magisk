@@ -84,10 +84,6 @@
     <string name="reboot_delay_toast">Restartování za 5 sekund…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">Ne, díky</string>
-    <string name="yes">Ano</string>
-    <string name="ok">OK</string>
-    <string name="close">Zavřít</string>
     <string name="repo_install_title">Instalovat %1$s</string>
     <string name="repo_install_msg">Chcete nyní nainstalovat %1$s?</string>
     <string name="download">Stáhnout</string>
@@ -178,7 +174,6 @@
     <string name="global_summary">Všechny relace root používají globální připojení jmenného prostoru.</string>
     <string name="requester_summary">Kořenové relace dědí jmenný prostor žadatele.</string>
     <string name="isolate_summary">Každá relace root bude mít svůj vlastní izolovaný jmenný prostor.</string>
-    <string name="android_o_not_support">Nepodporuje Android 8.0+.</string>
     <string name="disable_fingerprint">Nebyly nastaveny žádné otisky prstů ani žádná podpora zařízení.</string>
 
     <!--Superuser-->

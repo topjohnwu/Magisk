@@ -63,10 +63,6 @@
     <string name="app_changelog">Registro de mudanças</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">Não</string>
-    <string name="yes">Sim</string>
-    <string name="ok">OK</string>
-    <string name="close">Fechar</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">Instalar %1$s agora?</string>
     <string name="download">Baixar</string>
@@ -156,7 +152,6 @@
     <string name="global_summary">Todas as sessões root usam montagem de espaço de nome global</string>
     <string name="requester_summary">As sessões root herdarão espaço de nome de seu solicitante</string>
     <string name="isolate_summary">Cada sessão root terá seu próprio espaço de nome isolado</string>
-    <string name="android_o_not_support">Não suporta Android 8.0+</string>
     <string name="disable_fingerprint">Nenhuma impressão digital foi definida ou o dispostivo não tem suporte</string>
 
     <!--Superuser-->

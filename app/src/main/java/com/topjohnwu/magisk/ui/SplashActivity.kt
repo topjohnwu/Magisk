@@ -25,7 +25,7 @@ open class SplashActivity : Activity() {
                 AlertDialog.Builder(this)
                     .setTitle(R.string.unsupport_magisk_title)
                     .setMessage(R.string.unsupport_magisk_message)
-                    .setNegativeButton(R.string.ok, null)
+                    .setNegativeButton(android.R.string.ok, null)
                     .setOnDismissListener { finish() }
                     .show()
             } else {

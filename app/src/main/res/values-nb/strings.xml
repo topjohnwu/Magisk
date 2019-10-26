@@ -69,10 +69,6 @@
     <string name="manager_update_title">En Magisk Manager-oppdatering er tilgjengelig!</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">Nei takk</string>
-    <string name="yes">Ja</string>
-    <string name="ok">OK</string>
-    <string name="close">Lukk</string>
     <string name="repo_install_title">Installer %1$s</string>
     <string name="repo_install_msg">Vil du installere %1$s nå?</string>
     <string name="download">Last ned</string>
@@ -169,7 +165,6 @@
     <string name="global_summary">Alle root-økter benytter det altdekkende monteringsnavnefeltet.</string>
     <string name="requester_summary">Root-økter vil arve forespørrerens navnefelt.</string>
     <string name="isolate_summary">Hver root-økt vil ha sitt eget isolerte navnefelt.</string>
-    <string name="android_o_not_support">Støtter ikke Android ≥8.0.</string>
     <string name="disable_fingerprint">Ingen fingeravtrykk ble gitt, eller så støttes det ikke av enheten.</string>
 
     <!--Superuser-->

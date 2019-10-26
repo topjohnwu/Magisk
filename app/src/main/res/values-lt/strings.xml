@@ -61,10 +61,6 @@
     <string name="app_changelog">Pakeitimų sąrašas</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">Ačiū, nereikia</string>
-    <string name="yes">Taip</string>
-    <string name="ok">Gerai</string>
-    <string name="close">Uždaryti</string>
     <string name="repo_install_title">Instaliuoti %1$s</string>
     <string name="repo_install_msg">Ar jūs norite instaliuoti %1$s?</string>
     <string name="download">Atsisiųsti</string>
@@ -159,7 +155,6 @@
     <string name="global_summary">Visos root sesijos naudoja globalią vardų sritį</string>
     <string name="requester_summary">Root sesijos paveldi jos išprašytojo/s vardų sritį</string>
     <string name="isolate_summary">Kiekviena root sesija turi savo izoliuotą vardų sritį</string>
-    <string name="android_o_not_support">Įrenginiai su Android 8.0+ nepalaiko šio nustatymo</string>
     <string name="disable_fingerprint">Jūsų įrenginyje nebuvo surasta pirštų antspaudų arba jūsų įrenginys neturi pirštų antspaudų skaitytuvo</string>
 
     <!--Superuser-->

@@ -86,10 +86,6 @@
     <string name="reboot_delay_toast">Riavvio fra 5 secondi…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">No, grazie</string>
-    <string name="yes">Sì</string>
-    <string name="ok">OK</string>
-    <string name="close">Chiudi</string>
     <string name="repo_install_title">Installazione di %1$s</string>
     <string name="repo_install_msg">Vuoi installare %1$s?</string>
     <string name="download">Download</string>
@@ -184,7 +180,6 @@
     <string name="global_summary">Tutte le sessioni di root erediteranno il namespace globale.</string>
     <string name="requester_summary">Le sessioni di root erediteranno il namespace del loro richiedente.</string>
     <string name="isolate_summary">Ogni sessione di root avrà il suo namespace isolato.</string>
-    <string name="android_o_not_support">Non è supportato da Android 8.0+.</string>
     <string name="disable_fingerprint">Non è presente alcuna impronta o il dispositivo non è supportato.</string>
     <string name="settings_download_path_error">Errore durante la creazione della cartella. Deve essere accessibile dalla radice della memoria di archiviazione e non essere un file.</string>
 

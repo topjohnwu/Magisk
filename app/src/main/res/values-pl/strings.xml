@@ -87,10 +87,6 @@
     <string name="reboot_delay_toast">Ponowne uruchomienie za 5 sekund…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">Nie dziękuję</string>
-    <string name="yes">Tak</string>
-    <string name="ok">OK</string>
-    <string name="close">Zamknij</string>
     <string name="repo_install_title">Instaluj %1$s</string>
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download">Pobierz</string>
@@ -185,7 +181,6 @@
     <string name="global_summary">Wszystkie sesje root za pomocą globalnej przestrzeni montowań nazw</string>
     <string name="requester_summary">Sesje Root będzie dziedziczyć prośby i nazwy</string>
     <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
-    <string name="android_o_not_support">Brak wsparcia dla Androida 8.0+</string>
     <string name="disable_fingerprint">Nie ustawiono żadnych odcisków palców lub brak obsługi urządzenia</string>
     <string name="settings_download_path_error">Błąd podczas tworzenia folderu. Musi być dostępny z głównego katalogu pamięci i nie może być plikiem.</string>
 

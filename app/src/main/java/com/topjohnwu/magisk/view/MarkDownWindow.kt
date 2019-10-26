@@ -48,7 +48,7 @@ object MarkDownWindow : KoinComponent {
             AlertDialog.Builder(activity)
                     .setTitle(title)
                     .setView(mv)
-                    .setNegativeButton(R.string.close) { dialog, _ -> dialog.dismiss() }
+                    .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
                     .show()
         }
     }

@@ -295,8 +295,8 @@ class SettingsFragment : BasePreferenceFragment() {
         AlertDialog.Builder(requireActivity())
             .setTitle(R.string.settings_update_custom)
             .setView(v)
-            .setPositiveButton(R.string.ok) { _, _ -> onSuccess(url.text.toString()) }
-            .setNegativeButton(R.string.close) { _, _ -> onCancel() }
+            .setPositiveButton(android.R.string.ok) { _, _ -> onSuccess(url.text.toString()) }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> onCancel() }
             .setOnCancelListener { onCancel() }
             .show()
     }
@@ -320,11 +320,11 @@ class SettingsFragment : BasePreferenceFragment() {
         AlertDialog.Builder(requireActivity())
             .setTitle(R.string.settings_download_path_title)
             .setView(binding.root)
-            .setPositiveButton(R.string.ok) { _, _ ->
+            .setPositiveButton(android.R.string.ok) { _, _ ->
                 Utils.ensureDownloadPath(data.text.value)?.let { onSuccess(data.text.value) }
                     ?: Utils.toast(R.string.settings_download_path_error, Toast.LENGTH_SHORT)
             }
-            .setNegativeButton(R.string.close, null)
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
@@ -339,12 +339,12 @@ class SettingsFragment : BasePreferenceFragment() {
         AlertDialog.Builder(requireActivity())
             .setTitle(R.string.settings_app_name)
             .setView(view.root)
-            .setPositiveButton(R.string.ok) { _, _ ->
+            .setPositiveButton(android.R.string.ok) { _, _ ->
                 if (view.dialogNameInput.error.isNullOrBlank()) {
                     onSuccess(data.name.value)
                 }
             }
-            .setNegativeButton(R.string.close, null)
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 

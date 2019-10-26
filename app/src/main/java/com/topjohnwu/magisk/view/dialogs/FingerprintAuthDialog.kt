@@ -31,7 +31,7 @@ class FingerprintAuthDialog(activity: Activity, private val callback: () -> Unit
         binding.message.compoundDrawablePadding = Utils.dpInPx(20)
         binding.message.gravity = Gravity.CENTER
         setMessage(R.string.auth_fingerprint)
-        setNegativeButton(R.string.close) { _, _ ->
+        setNegativeButton(android.R.string.cancel) { _, _ ->
             helper?.cancel()
             failureCallback?.invoke()
         }

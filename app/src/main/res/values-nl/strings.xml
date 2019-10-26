@@ -62,10 +62,6 @@
     <string name="app_changelog">App\'s changelog</string>
 
     <!--Toasts, Dialogs-->
-    <string name="no_thanks">Nee bedankt</string>
-    <string name="yes">Ja</string>
-    <string name="ok">Oké</string>
-    <string name="close">Sluiten</string>
     <string name="repo_install_title">%1$s installeren</string>
     <string name="repo_install_msg">Zeker weten %1$s installeren?</string>
     <string name="download">Downloaden</string>
@@ -154,7 +150,6 @@
     <string name="global_summary">Alle rootsessies gebruiken de globale naamruimte</string>
     <string name="requester_summary">Rootsessies verkrijgen de verzoeker\'s naamruimte</string>
     <string name="isolate_summary">Iedere rootsessie heeft een eigen geïsoleerde naamruimte</string>
-    <string name="android_o_not_support">Ondersteunt geen Android 8.0+</string>
     <string name="disable_fingerprint">Geen vingerafdrukken ingesteld, of geen apparaatondersteuning</string>
 
     <!--Superuser-->
