@@ -33,13 +33,12 @@
                 android:paddingTop="@dimen/l1">
 
                 <com.google.android.material.card.MaterialCardView
-                    style="?styleCardElevated"
+                    style="?styleCardVariant"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
-                    app:cardCornerRadius="@dimen/l1"
-                    app:cardElevation="@{viewModel.step != 0 ? 0f : @dimen/l_25}">
+                    app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -110,14 +109,13 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    style="?styleCardElevated"
+                    style="?styleCardVariant"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
-                    app:cardCornerRadius="@dimen/l1"
-                    app:cardElevation="@{viewModel.step != 1 ? 0f : @dimen/l_25}">
+                    app:strokeWidth="@{viewModel.step != 1 ? 0f : @dimen/l_125}">
 
                     <LinearLayout
                         android:layout_width="match_parent"

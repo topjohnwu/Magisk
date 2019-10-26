@@ -40,6 +40,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
 import kotlin.math.hypot
+import kotlin.math.roundToInt
 
 
 @BindingAdapter("onNavigationClick")
@@ -389,4 +390,9 @@ fun MaterialButton.setIconRes(res: Int) {
 @BindingAdapter("cardElevation")
 fun MaterialCardView.setCardElevationBound(elevation: Float) {
     cardElevation = elevation
+}
+
+@BindingAdapter("strokeWidth")
+fun MaterialCardView.setCardStrokeWidthBound(stroke: Float) {
+    strokeWidth = stroke.roundToInt()
 }
