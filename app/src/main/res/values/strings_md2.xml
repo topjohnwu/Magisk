@@ -5,6 +5,9 @@
     <string name="magisk">Magisk</string>
     <string name="system">System</string>
 
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
     <string name="no_connection">No connection available</string>
 
     <string name="section_home">Home</string>
@@ -27,6 +30,14 @@
     <string name="home_item_twitter">Twitter</string>
     <string name="home_item_source">Source</string>
     <string name="home_item_xda">XDA</string>
+
+    <string name="home_device_security">Security</string>
+    <string name="home_device_system">System</string>
+    <string name="home_device_build_style">A/B</string>
+    <string name="home_device_build_type">SAR</string>
+
+    <string name="home_device_security_secure">Secure</string>
+    <string name="home_device_security_outdated">Outdated</string>
 
     <string name="home_extra_version">Version</string>
     <string name="home_extra_code">Code</string>

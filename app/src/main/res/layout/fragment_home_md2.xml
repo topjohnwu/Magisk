@@ -5,13 +5,21 @@
 
     <data>
 
+        <import type="android.os.Build" />
+
         <import type="com.topjohnwu.magisk.R" />
 
         <import type="com.topjohnwu.magisk.Info" />
 
+        <import type="com.topjohnwu.magisk.Config" />
+
         <import type="com.topjohnwu.magisk.BuildConfig" />
 
         <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+
+        <import type="com.topjohnwu.magisk.extensions.XAndroidKt" />
+
+        <import type="com.topjohnwu.magisk.extensions.XSUKt" />
 
         <variable
             name="viewModel"
@@ -31,13 +39,204 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="@dimen/l1">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingTop="@dimen/l1">
+                android:clipToPadding="false">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/home_device_wrapper"
+                    style="?styleCardVariant"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l1"
+                    android:onClick="@{() -> viewModel.toggle(viewModel.stateDeviceExpanded)}"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_card"
+                        android:orientation="horizontal">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent">
+
+                            <View
+                                gone="@{XAndroidKt.isDeviceSecure()}"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:alpha=".3"
+                                android:background="?colorError"
+                                android:visibility="gone"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:id="@+id/home_device_icon"
+                                style="?styleIconPrimary"
+                                android:layout_marginStart="@dimen/l_50"
+                                android:layout_marginTop="@dimen/l1"
+                                android:layout_marginBottom="@dimen/l1"
+                                android:background="@null"
+                                android:padding="@dimen/l_50"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_device"
+                                app:tint="@color/color_primary_error_transient" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/l_50"
+                                android:layout_marginEnd="@dimen/l1"
+                                android:gravity="start|center_vertical"
+                                android:text="@{Build.MANUFACTURER}"
+                                android:textAppearance="?appearanceTextTitleNormal"
+                                app:layout_constrainedWidth="true"
+                                app:layout_constraintBottom_toTopOf="@+id/home_device_product"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0"
+                                app:layout_constraintStart_toEndOf="@+id/home_device_icon"
+                                app:layout_constraintTop_toTopOf="@+id/home_device_icon"
+                                app:layout_constraintVertical_chainStyle="packed"
+                                tools:text="Google" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_product"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{Build.DEVICE ?? Build.PRODUCT}"
+                                android:textAppearance="?appearanceTextCaptionVariant"
+                                app:layout_constraintBottom_toTopOf="@+id/home_device_board"
+                                app:layout_constraintEnd_toEndOf="@+id/home_device_title"
+                                app:layout_constraintHorizontal_bias="0"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_title"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_title"
+                                tools:text="Pixel 4" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_board"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{Build.BOARD}"
+                                android:textAppearance="?appearanceTextCaptionVariant"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_device_icon"
+                                app:layout_constraintEnd_toEndOf="@+id/home_device_title"
+                                app:layout_constraintHorizontal_bias="0"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_title"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_product"
+                                tools:text="flame" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            goneUnless="@{viewModel.stateDeviceExpanded}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/l1"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_extra_security_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_device_security"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_extra_security_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{XAndroidKt.isDeviceSecure() ? @string/home_device_security_secure : @string/home_device_security_outdated}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_security_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_security_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_security_title"
+                                tools:text="@string/home_device_security_secure" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_extra_version_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_device_system"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_extra_security_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_extra_version_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{Build.VERSION.RELEASE}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_version_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_version_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_version_title"
+                                tools:text="10" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_extra_build_style_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_device_build_style"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_extra_version_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_extra_build_style_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{XAndroidKt.isAB ? @string/yes : @string/no}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_build_style_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_build_style_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_build_style_title"
+                                tools:text="Yes" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_extra_build_type_title"
+                                style="@style/W.Home.Extra.Title"
+                                android:text="@string/home_device_build_type"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_extra_build_style_title" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_device_extra_build_type_value"
+                                style="@style/W.Home.Extra.Value"
+                                android:text="@{XAndroidKt.isSAR ? @string/yes : @string/no}"
+                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_build_type_title"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_build_type_title"
+                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_build_type_title"
+                                tools:text="Yes" />
+
+                            <!--todo(topjohnwu) Add device info here-->
+                            <!--Copy & paste "..._title" and "..._value"-->
+                            <!--Change ids to match "home_device_extra_*info-type*_value" or "..._title"-->
+                            <!--Fix constraints by replacing ids (views are always bound to "title")-->
+
+                            <androidx.constraintlayout.widget.Group
+                                goneUnless="@{XSUKt.hasRoot}"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:constraint_referenced_ids="home_device_extra_build_style_title,home_device_extra_build_style_value,home_device_extra_build_type_title,home_device_extra_build_type_value" />
+
+                            <!--todo(topjohnwu) If info requires root add id to this group-->
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/home_magisk_wrapper"
@@ -45,12 +244,15 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
+                    android:layout_marginTop="@dimen/l1"
                     android:maxWidth="200dp"
                     android:onClick="@{() -> viewModel.toggle(viewModel.stateMagiskExpanded)}"
                     app:layout_constrainedWidth="true"
                     app:layout_constraintEnd_toStartOf="@+id/home_manager_wrapper"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper"
+                    app:layout_constraintWidth_max="200dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -180,6 +382,7 @@
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_extra_mode_value"
                                 style="@style/W.Home.Extra.Value"
+                                android:text="@{Config.coreOnly ? @string/home_extra_mode_safe : @string/home_extra_mode_normal}"
                                 app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_mode_title"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_mode_title"
@@ -192,6 +395,9 @@
                                 android:text="@string/home_extra_connection"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_extra_mode_title" />
+
+                            <!--todo(topjohnwu) fix connection type-->
+                            <!--don't forget to bind verbose values to proper resources-->
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_extra_connection_value"
@@ -269,14 +475,17 @@
                     style="?styleCardVariant"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:onClick="@{() -> viewModel.toggle(viewModel.stateManagerExpanded)}"
                     android:layout_marginStart="@dimen/l1"
+                    android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
                     android:maxWidth="200dp"
+                    android:onClick="@{() -> viewModel.toggle(viewModel.stateManagerExpanded)}"
                     app:layout_constrainedWidth="true"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper"
+                    app:layout_constraintWidth_max="200dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -399,6 +608,8 @@
                                 android:text="@string/home_extra_mode"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_code_title" />
+
+                            <!--todo(diareuse) Info.isRunningAsStub ? @string/home_extra_mode_stub : @string/home_extra_mode_normal-->
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_extra_mode_value"

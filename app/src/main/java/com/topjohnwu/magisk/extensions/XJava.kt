@@ -3,9 +3,11 @@ package com.topjohnwu.magisk.extensions
 import android.net.Uri
 import android.os.Build
 import androidx.core.net.toFile
+import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -101,3 +103,6 @@ fun Locale.toLangTag(): String {
         return tag.toString()
     }
 }
+
+fun SimpleDateFormat.parseOrNull(date: String) =
+    runCatching { parse(date) }.onFailure { Timber.e(it) }.getOrNull()

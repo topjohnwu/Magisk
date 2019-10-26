@@ -121,6 +121,7 @@ object Config : PreferenceModel, DBConfig {
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
     var magiskHide by preference(Key.MAGISKHIDE, true)
+    @JvmStatic
     var coreOnly by preference(Key.COREONLY, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 

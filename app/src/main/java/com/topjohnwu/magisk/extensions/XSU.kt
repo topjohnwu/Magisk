@@ -12,3 +12,5 @@ fun reboot(reason: String = if (Info.recovery) "recovery" else "") {
 
 fun File.suOutputStream() = SuFileOutputStream(this)
 fun File.suInputStream() = SuFileInputStream(this)
+
+val hasRoot get() = Shell.rootAccess()
