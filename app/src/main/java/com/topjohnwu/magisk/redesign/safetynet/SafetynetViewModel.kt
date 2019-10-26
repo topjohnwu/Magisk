@@ -34,7 +34,11 @@ class SafetynetViewModel(
             .subscribeK { resolveResponse(it.responseCode) }
             .add()
 
-        attest()
+        if (safetyNetResult >= 0) {
+            resolveResponse(safetyNetResult)
+        } else {
+            attest()
+        }
     }
 
     override fun notifyStateChanged() {
@@ -56,6 +60,7 @@ class SafetynetViewModel(
             val hasCtsPassed = response and SafetyNetHelper.CTS_PASS != 0
             val hasBasicIntegrityPassed = response and SafetyNetHelper.BASIC_PASS != 0
             val result = hasCtsPassed && hasBasicIntegrityPassed
+            safetyNetResult = response
             ctsState.value = hasCtsPassed
             basicIntegrityState.value = hasBasicIntegrityPassed
             currentState = if (result) PASS else FAILED
@@ -78,6 +83,10 @@ class SafetynetViewModel(
                 else -> R.string.safetyNet_api_error
             }
         }
+    }
+
+    companion object {
+        private var safetyNetResult = -1
     }
 
 }
