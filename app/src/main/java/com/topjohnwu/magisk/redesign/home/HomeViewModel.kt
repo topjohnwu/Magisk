@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.UpdateInfo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
+import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
@@ -67,13 +68,11 @@ class HomeViewModel(
         }
     }
 
-    val itemsMainline =
-        listOf(HomeItem.PayPal.Mainline, HomeItem.Patreon, HomeItem.Twitter.Mainline)
-    val itemsApp =
-        listOf(HomeItem.PayPal.App, HomeItem.Twitter.App)
-    val itemsProject =
-        listOf(HomeItem.Github, HomeItem.Xda)
+    val items = listOf(DeveloperItem.Mainline, DeveloperItem.App, DeveloperItem.Project)
     val itemBinding = itemBindingOf<HomeItem> {
+        it.bindExtra(BR.viewModel, this)
+    }
+    val itemDeveloperBinding = itemBindingOf<DeveloperItem> {
         it.bindExtra(BR.viewModel, this)
     }
 

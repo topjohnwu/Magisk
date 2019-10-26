@@ -19,6 +19,8 @@
     <string name="obsolete_md2">can be updated!</string>
     <string name="loading_md2">is loading…</string>
 
+    <string name="home_links_mainline">\@topjohnwu</string>
+    <string name="home_links_app">\@diareuse</string>
     <string name="home_links_project">Project links</string>
     <string name="home_item_paypal">PayPal</string>
     <string name="home_item_patreon">Patreon</string>

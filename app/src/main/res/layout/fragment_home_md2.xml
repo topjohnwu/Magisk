@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.R" />
+
         <import type="com.topjohnwu.magisk.Info" />
 
         <import type="com.topjohnwu.magisk.BuildConfig" />
@@ -29,9 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingStart="@dimen/l1"
-            android:paddingEnd="@dimen/l1">
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -272,186 +272,20 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/home_support_list"
+                dividerHorizontal="@{R.drawable.divider_l1}"
+                itemBinding="@{viewModel.itemDeveloperBinding}"
+                items="@{viewModel.items}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l2">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/support_icon_mainline"
-                    style="?styleIconNormal"
-                    android:padding="@dimen/l_50"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_mainline_dev" />
-
-                <com.google.android.material.card.MaterialCardView
-                    style="?styleCardNormal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l1"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toEndOf="@+id/support_icon_mainline"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/l1">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="\@topjohnwu"
-                            android:textAppearance="?appearanceTextCaptionNormal"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            itemBinding="@{viewModel.itemBinding}"
-                            items="@{viewModel.itemsMainline}"
-                            nestedScrollingEnabled="@{false}"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:clipToPadding="false"
-                            android:fadingEdgeLength="@dimen/l1"
-                            android:orientation="horizontal"
-                            android:paddingTop="@dimen/l1"
-                            android:requiresFadingEdge="horizontal"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                            tools:listitem="@layout/item_developer" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/support_icon_app"
-                    style="?styleIconNormal"
-                    android:padding="@dimen/l_50"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_app_dev" />
-
-                <com.google.android.material.card.MaterialCardView
-                    style="?styleCardNormal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/l1"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/support_icon_app"
-                    app:layout_constraintHorizontal_bias="1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/l1">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="end"
-                            android:text="\@diareuse"
-                            android:textAppearance="?appearanceTextCaptionNormal"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            itemBinding="@{viewModel.itemBinding}"
-                            items="@{viewModel.itemsApp}"
-                            nestedScrollingEnabled="@{false}"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:clipToPadding="false"
-                            android:fadingEdgeLength="@dimen/l1"
-                            android:orientation="horizontal"
-                            android:paddingTop="@dimen/l1"
-                            android:requiresFadingEdge="horizontal"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                            app:reverseLayout="true"
-                            tools:listitem="@layout/item_developer" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/support_icon_common"
-                    style="?styleIconNormal"
-                    android:padding="@dimen/l_50"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_project" />
-
-                <com.google.android.material.card.MaterialCardView
-                    style="?styleCardNormal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l1"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toEndOf="@+id/support_icon_common"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/l1">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/home_links_project"
-                            android:textAppearance="?appearanceTextCaptionNormal"
-                            android:textStyle="bold" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            itemBinding="@{viewModel.itemBinding}"
-                            items="@{viewModel.itemsProject}"
-                            nestedScrollingEnabled="@{false}"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:clipToPadding="false"
-                            android:fadingEdgeLength="@dimen/l1"
-                            android:orientation="horizontal"
-                            android:paddingTop="@dimen/l1"
-                            android:requiresFadingEdge="horizontal"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                            tools:listitem="@layout/item_developer" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_marginTop="@dimen/l2"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/l1"
+                android:paddingEnd="@dimen/l1"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_developer" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"

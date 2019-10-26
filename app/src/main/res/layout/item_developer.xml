@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.HomeItem" />
+            type="com.topjohnwu.magisk.model.entity.recycler.DeveloperItem" />
 
         <variable
             name="viewModel"
@@ -18,41 +18,62 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground"
-        android:onClick="@{() -> viewModel.onLinkPressed(item.link)}"
-        tools:layout_gravity="center"
-        android:padding="@dimen/l_50">
+        tools:layout_gravity="center|start">
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/developer_link"
-            style="?styleImageNormal"
-            app:tint="?colorOnSurface"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/developer_icon"
+            style="?styleIconNormal"
+            android:padding="@dimen/l_50"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@{item.icon}"
-            tools:srcCompat="@drawable/ic_paypal" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@drawable/ic_mainline_dev" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/developer_link_name"
+        <com.google.android.material.card.MaterialCardView
+            style="?styleCardNormal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/l_50"
-            android:text="@{item.title}"
-            android:textAppearance="?appearanceTextCaptionNormal"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/developer_link"
-            tools:text="Paypal" />
+            android:layout_marginStart="@dimen/l1"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@+id/developer_icon"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            style="?styleImageSmall"
-            android:layout_height="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/developer_link_name"
-            app:layout_constraintStart_toEndOf="@+id/developer_link_name"
-            app:layout_constraintTop_toTopOf="@+id/developer_link_name"
-            app:srcCompat="@drawable/ic_more"
-            app:tint="?colorTextTransient" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/l1">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.name}"
+                    android:textAppearance="?appearanceTextCaptionNormal"
+                    android:textStyle="bold"
+                    tools:text="\@topjohnwu" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    itemBinding="@{viewModel.itemBinding}"
+                    items="@{item.items}"
+                    nestedScrollingEnabled="@{false}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:fadingEdgeLength="@dimen/l1"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/l_50"
+                    android:requiresFadingEdge="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/item_developer_link" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
