@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
 			init = make_unique<SARInit>(argv, &cmd);
 	} else {
 		decompress_ramdisk();
-		if (access("/sbin/recovery", F_OK) == 0)
+		if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)
 			init = make_unique<RecoveryInit>(argv, &cmd);
 		else if (access("/apex", F_OK) == 0)
 			init = make_unique<AFirstStageInit>(argv, &cmd);
