@@ -61,15 +61,19 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_card"
                         android:orientation="horizontal">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/home_device_overview"
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent">
+                            android:layout_height="match_parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
 
                             <View
                                 gone="@{XAndroidKt.isDeviceSecure()}"
@@ -144,11 +148,15 @@
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/home_device_details"
                             goneUnless="@{viewModel.stateDeviceExpanded}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="@dimen/l1"
                             android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/home_device_overview"
+                            app:layout_constraintTop_toTopOf="parent"
                             tools:visibility="visible">
 
                             <androidx.appcompat.widget.AppCompatTextView
@@ -228,19 +236,21 @@
                                 goneUnless="@{XSUKt.hasRoot}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                app:constraint_referenced_ids="home_device_extra_build_style_title,home_device_extra_build_style_value,home_device_extra_build_type_title,home_device_extra_build_type_value" />
+                                app:constraint_referenced_ids="home_device_extra_build_style_title,home_device_extra_build_style_value,home_device_extra_build_type_title,home_device_extra_build_type_value"
+                                tools:visibility="gone" />
 
                             <!--todo(topjohnwu) If info requires root add id to this group-->
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/home_magisk_wrapper"
                     style="?styleCardVariant"
+                    isEnabled="@{Info.magiskVersionCode >= 0}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
@@ -331,16 +341,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:clipToPadding="false"
-                            android:paddingStart="@dimen/l1"
-                            android:paddingEnd="@dimen/l1"
-                            android:paddingBottom="@dimen/l1"
+                            android:padding="@dimen/l1"
                             android:visibility="gone"
                             tools:visibility="visible">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_extra_version_title"
                                 style="@style/W.Home.Extra.Title"
-                                android:layout_marginTop="@dimen/l1"
                                 android:text="@string/home_extra_version"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -412,7 +419,7 @@
                                 gone="@{Info.magiskVersionCode &lt; 0}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                app:constraint_referenced_ids="home_magisk_extra_version_title,home_magisk_extra_version_value,home_magisk_extra_code_title,home_magisk_extra_code_value" />
+                                app:constraint_referenced_ids="home_magisk_extra_version_title,home_magisk_extra_version_value,home_magisk_extra_code_title,home_magisk_extra_code_value,home_magisk_extra_mode_title,home_magisk_extra_mode_value,home_magisk_extra_connection_title,home_magisk_extra_connection_value" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -561,16 +568,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:clipToPadding="false"
-                            android:paddingStart="@dimen/l1"
-                            android:paddingEnd="@dimen/l1"
-                            android:paddingBottom="@dimen/l1"
+                            android:padding="@dimen/l1"
                             android:visibility="gone"
                             tools:visibility="visible">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_extra_version_title"
                                 style="@style/W.Home.Extra.Title"
-                                android:layout_marginTop="@dimen/l1"
                                 android:text="@string/home_extra_version"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
