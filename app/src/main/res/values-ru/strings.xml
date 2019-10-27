@@ -126,9 +126,9 @@
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
     <string name="settings_clear_cache_summary">Очистить кэш репозитория. Будет загружен заново</string>
     <string name="settings_hide_manager_title">Скрытие Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным именем пакета и названием</string>
+    <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным названием и именем пакета</string>
     <string name="settings_restore_manager_title">Восстановление Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Восстановить Magisk Manager с исходным именем пакета и названием</string>
+    <string name="settings_restore_manager_summary">Восстановить Magisk Manager с исходным названием и именем пакета</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (Системный)</string>
     <string name="settings_update">Настройки обновлений</string>
