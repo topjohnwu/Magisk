@@ -15,7 +15,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.security.KeyPairGenerator
@@ -37,15 +36,14 @@ class Keygen: CertKeyProvider {
 
     companion object {
         private const val ALIAS = "magisk"
-        private val PASSWORD = "magisk".toCharArray()
+        private val PASSWORD get() = "magisk".toCharArray()
         private const val TESTKEY_CERT = "61ed377e85d386a8dfee6b864bd85b0bfaa5af81"
-        private const val DNAME = "CN=Android, OU=Android, O=Google Inc., L=Mountain View, ST=California, C=US"
+        private const val DNAME = "C=US,ST=California,L=Mountain View,O=Google Inc.,OU=Android,CN=Android"
+        private const val BASE64_FLAG = Base64.NO_PADDING or Base64.NO_WRAP
     }
 
-    private val start get() = Calendar.getInstance()
-    private val end get() = Calendar.getInstance().apply {
-        add(Calendar.YEAR, 20)
-    }
+    private val start = Calendar.getInstance()
+    private val end = Calendar.getInstance().apply { add(Calendar.YEAR, 30) }
 
     override val cert get() = provider.cert
     override val key get() = provider.key
@@ -104,9 +102,7 @@ class Keygen: CertKeyProvider {
         if (raw.isEmpty()) {
             ks.load(null)
         } else {
-            GZIPInputStream(ByteArrayInputStream(
-                    Base64.decode(raw, Base64.NO_PADDING or Base64.NO_WRAP)
-            )).use {
+            GZIPInputStream(Base64.decode(raw, BASE64_FLAG).inputStream()).use {
                 ks.load(it, PASSWORD)
             }
         }
@@ -116,20 +112,20 @@ class Keygen: CertKeyProvider {
             return ks
 
         // Generate new private key and certificate
-        val kp = KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }.genKeyPair()
+        val kp = KeyPairGenerator.getInstance("RSA").apply { initialize(4096) }.genKeyPair()
         val dname = X500Name(DNAME)
-        val builder = JcaX509v3CertificateBuilder(dname,
-                BigInteger.valueOf(start.timeInMillis), start.time, end.time, dname, kp.public)
+        val builder = JcaX509v3CertificateBuilder(dname, BigInteger(160, Random()),
+            start.time, end.time, dname, kp.public)
         val signer = JcaContentSignerBuilder("SHA256WithRSA").build(kp.private)
         val cert = JcaX509CertificateConverter().getCertificate(builder.build(signer))
 
         // Store them into keystore
         ks.setKeyEntry(ALIAS, kp.private, PASSWORD, arrayOf(cert))
         val bytes = ByteArrayOutputStream()
-        GZIPOutputStream(Base64OutputStream(bytes, Base64.NO_PADDING or Base64.NO_WRAP)).use {
+        GZIPOutputStream(Base64OutputStream(bytes, BASE64_FLAG)).use {
             ks.store(it, PASSWORD)
         }
-        Config.keyStoreRaw = bytes.toString()
+        Config.keyStoreRaw = bytes.toString("UTF-8")
 
         return ks
     }
