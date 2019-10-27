@@ -33,9 +33,9 @@ Furthermore, Magisk provides a **Systemless Interface** to alter the system (or 
 Default string resources for Magisk Manager and its stub APK are located here:
 
 - `app/src/main/res/values/strings.xml`
-- `stub/src/main/res/values/strings.xml`
+- `stub/res/values/strings.xml`
 
-Translate each and place them in the respective locations (`[module]/src/main/res/values-[lang]/strings.xml`).
+Translate each and place them in the respective locations (`[path]/res/values-[lang]/strings.xml`).
 
 ## Signature Verification
 
