@@ -1,8 +1,10 @@
 package com.topjohnwu.magisk;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import static android.os.Build.VERSION.SDK_INT;
@@ -24,6 +26,7 @@ public class DynAPK {
     public static final int MAGISKHIDE = 4;
 
     private static File dynDir;
+    private static Method addAssetPath;
 
     private static File getDynDir(Context c) {
         if (dynDir == null) {
@@ -60,6 +63,14 @@ public class DynAPK {
         arr[COMPONENT_MAP] = data.componentMap;
         arr[RESOURCE_MAP] = data.resourceMap;
         return arr;
+    }
+
+    public static void addAssetPath(AssetManager asset, String path) {
+        try {
+            if (addAssetPath == null)
+                addAssetPath = AssetManager.class.getMethod("addAssetPath", String.class);
+            addAssetPath.invoke(asset, path);
+        } catch (Exception ignored) {}
     }
 
     public static class Data {

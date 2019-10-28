@@ -27,12 +27,8 @@ import com.topjohnwu.magisk.utils.currentLocale
 import com.topjohnwu.magisk.utils.defaultLocale
 import java.util.*
 
-private val addAssetPath by lazy {
-    AssetManager::class.java.getMethod("addAssetPath", String::class.java)
-}
-
 fun AssetManager.addAssetPath(path: String) {
-    addAssetPath.invoke(this, path)
+    DynAPK.addAssetPath(this, path)
 }
 
 fun Context.wrap(global: Boolean = true): Context
