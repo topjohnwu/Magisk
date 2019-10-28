@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.util.Log;
 
+import com.topjohnwu.magisk.obfuscate.Mapping;
 import com.topjohnwu.magisk.utils.DynamicClassLoader;
 
 import java.io.File;
