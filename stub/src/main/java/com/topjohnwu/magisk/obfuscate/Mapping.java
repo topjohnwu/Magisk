@@ -1,15 +1,16 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.obfuscate;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.topjohnwu.magisk.DynAPK.*;
+import static com.topjohnwu.magisk.R.drawable.*;
 
-class Mapping {
+public class Mapping {
     private static Map<String, String> map = new HashMap<>();
 
     // This mapping will be sent into the guest app
-    static Data data = new Data();
+    public static Data data = new Data();
 
     static {
         map.put(a.z.class.getName(), "a.c");
@@ -25,15 +26,15 @@ class Mapping {
             data.componentMap.put(e.getValue(), e.getKey());
         }
         int[] res = new int[5];
-        res[NOTIFICATION] = R.drawable.ic_magisk_outline;
-        res[SUPERUSER] = R.drawable.sc_superuser;
-        res[MAGISKHIDE] = R.drawable.sc_magiskhide;
-        res[DOWNLOAD] = R.drawable.sc_cloud_download;
-        res[MODULES] = R.drawable.sc_extension;
+        res[NOTIFICATION] = ic_magisk_outline;
+        res[SUPERUSER] = sc_superuser;
+        res[MAGISKHIDE] = sc_magiskhide;
+        res[DOWNLOAD] = sc_cloud_download;
+        res[MODULES] = sc_extension;
         data.resourceMap = res;
     }
 
-    static String get(String name) {
+    public static String get(String name) {
         String n = map.get(name);
         return n != null ? n : name;
     }

@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.dummy.DummyActivity;
 import com.topjohnwu.magisk.dummy.DummyProvider;
 import com.topjohnwu.magisk.dummy.DummyReceiver;
 import com.topjohnwu.magisk.dummy.DummyService;
+import com.topjohnwu.magisk.obfuscate.Mapping;
 
 import static com.topjohnwu.magisk.DownloadActivity.TAG;
 
