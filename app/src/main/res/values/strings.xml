@@ -18,7 +18,7 @@
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
     <string name="safetyNet_check_success">SafetyNet Check Success</string>
     <string name="safetyNet_api_error">SafetyNet API Error</string>
-    <string name="safetyNet_res_invalid">The response is invalid.</string>
+    <string name="safetyNet_res_invalid">The response is invalid</string>
     <string name="magisk_up_to_date">Magisk is up to date</string>
     <string name="manager_up_to_date">Magisk Manager is up to date</string>
     <string name="advanced_settings_title">Advanced Settings</string>
@@ -29,7 +29,7 @@
     <string name="latest_version">Latest: %1$s</string>
     <string name="uninstall">Uninstall</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
-    <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and your data potentially encrypted if not already.</string>
+    <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
     <string name="update">Update</string>
     <string name="core_only_enabled">(Core only mode enabled)</string>
 
@@ -76,7 +76,7 @@
     <string name="manager_update_title">Magisk Manager Update Available!</string>
 
     <!-- Installation -->
-    <string name="manager_download_install">Press to download and install.</string>
+    <string name="manager_download_install">Press to download and install</string>
     <string name="download_zip_only">Download Zip Only</string>
     <string name="direct_install">Direct Install (Recommended)</string>
     <string name="install_inactive_slot">Install to Inactive Slot (After OTA)</string>
@@ -92,7 +92,7 @@
     <string name="repo_install_msg">Do you want to install %1$s now?</string>
     <string name="download">Download</string>
     <string name="reboot">Reboot</string>
-    <string name="settings_reboot_toast">Reboot to apply settings.</string>
+    <string name="settings_reboot_toast">Reboot to apply settings</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
 
@@ -103,7 +103,7 @@
     <string name="failure">Failed</string>
     <string name="hide_manager_title">Hiding Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Hide Magisk Manager failed.</string>
-    <string name="open_link_failed_toast">No application found to open the link.</string>
+    <string name="open_link_failed_toast">No application found to open the link</string>
     <string name="warning">Warning</string>
     <string name="complete_uninstall">Complete Uninstall</string>
     <string name="restore_img">Restore Images</string>
@@ -112,7 +112,7 @@
     <string name="restore_fail">Stock backup does not exist!</string>
     <string name="proprietary_title">Download Proprietary Code</string>
     <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
-    <string name="setup_fail">Setup failed.</string>
+    <string name="setup_fail">Setup failed</string>
     <string name="env_fix_title">Requires Additional Setup</string>
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
     <string name="setup_msg">Running environment setup…</string>
@@ -120,30 +120,30 @@
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Dark Theme</string>
-    <string name="settings_dark_theme_summary">Enable dark theme.</string>
+    <string name="settings_dark_theme_summary">Enable dark theme</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
-    <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online.</string>
+    <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online</string>
     <string name="settings_hide_manager_title">Hide Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package name.</string>
+    <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package and app names</string>
     <string name="settings_restore_manager_title">Restore Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package</string>
+    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package and app names</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
     <string name="settings_update">Update Settings</string>
     <string name="settings_check_update_title">Check Updates</string>
-    <string name="settings_check_update_summary">Periodically check for updates in the background.</string>
+    <string name="settings_check_update_summary">Periodically check for updates in the background</string>
     <string name="settings_update_channel_title">Update Channel</string>
     <string name="settings_update_stable">Stable</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Custom</string>
     <string name="settings_update_custom_msg">Insert a custom URL</string>
     <string name="settings_core_only_title">Magisk Core Only Mode</string>
-    <string name="settings_core_only_summary">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded.</string>
-    <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection.</string>
+    <string name="settings_core_only_summary">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded</string>
+    <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection</string>
     <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps.</string>
+    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>
 
     <string name="settings_app_name">Type desired app name</string>
@@ -175,18 +175,18 @@
     <string name="settings_owner_only">Device Owner Only</string>
     <string name="settings_owner_manage">Device Owner Managed</string>
     <string name="settings_user_independent">User-Independent</string>
-    <string name="owner_only_summary">Only owner has root access.</string>
-    <string name="owner_manage_summary">Only owner can manage root access and receive request prompts.</string>
-    <string name="user_indepenent_summary">Each user has his/her own separate root rules.</string>
+    <string name="owner_only_summary">Only owner has root access</string>
+    <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
+    <string name="user_indepenent_summary">Each user has his/her own separate root rules</string>
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>
     <string name="settings_ns_requester">Inherit Namespace</string>
     <string name="settings_ns_isolate">Isolated Namespace</string>
-    <string name="global_summary">All root sessions use the global mount namespace.</string>
-    <string name="requester_summary">Root sessions will inherit their requester\'s namespace.</string>
-    <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
-    <string name="disable_fingerprint">No fingerprints were set or no device support.</string>
+    <string name="global_summary">All root sessions use the global mount namespace</string>
+    <string name="requester_summary">Root sessions will inherit their requester\'s namespace</string>
+    <string name="isolate_summary">Each root session will have its own isolated namespace</string>
+    <string name="disable_fingerprint">No fingerprints were set or no device support</string>
     <string name="settings_download_path_error">Error creating folder. It must be accessible from storage root directory and must not be a file.</string>
 
     <!--Superuser-->

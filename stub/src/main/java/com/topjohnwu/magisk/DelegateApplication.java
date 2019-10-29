@@ -15,8 +15,6 @@ import com.topjohnwu.magisk.utils.DynamicClassLoader;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import static com.topjohnwu.magisk.DownloadActivity.TAG;
-
 public class DelegateApplication extends Application {
 
     static File MANAGER_APK;
@@ -36,7 +34,7 @@ public class DelegateApplication extends Application {
         if (Build.VERSION.SDK_INT >= 28) {
             setUpDynAPK();
         } else {
-            MANAGER_APK = new File(base.getCacheDir(), "manager.apk");
+            MANAGER_APK = new File(base.getCacheDir(), "app.apk");
         }
     }
 
@@ -72,7 +70,7 @@ public class DelegateApplication extends Application {
                 factory.delegate = (AppComponentFactory) df;
                 factory.loader = cl;
             } catch (Exception e) {
-                Log.e(TAG, "dyn load", e);
+                Log.e(getClass().getSimpleName(), "", e);
                 MANAGER_APK.delete();
             }
         }
