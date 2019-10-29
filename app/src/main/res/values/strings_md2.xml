@@ -2,7 +2,6 @@
 <resources>
 
     <string name="manager">Manager</string>
-    <string name="magisk">Magisk</string>
     <string name="system">System</string>
 
     <string name="yes">Yes</string>

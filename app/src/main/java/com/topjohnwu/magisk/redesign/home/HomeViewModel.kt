@@ -111,7 +111,7 @@ class HomeViewModel(
 
         stateVersionUpdateMagisk.value = when {
             info.magisk.isObsolete -> "%s > %s".format(
-                Info.magiskVersionString.clipVersion(),
+                Info.env.magiskVersionString.clipVersion(),
                 info.magisk.version.clipVersion()
             )
             else -> ""
@@ -168,9 +168,9 @@ class HomeViewModel(
 
 @Suppress("unused")
 val MagiskJson.isInstalled
-    get() = Info.magiskVersionCode > 0
+    get() = Info.env.magiskVersionCode > 0
 val MagiskJson.isObsolete
-    get() = Info.magiskVersionCode < versionCode && isInstalled
+    get() = Info.env.magiskVersionCode < versionCode && isInstalled
 val ManagerJson.isUpdateChannelCorrect
     get() = versionCode > 0
 val ManagerJson.isObsolete

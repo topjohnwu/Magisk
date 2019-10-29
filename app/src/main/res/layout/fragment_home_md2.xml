@@ -250,7 +250,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/home_magisk_wrapper"
                     style="?styleCardVariant"
-                    isEnabled="@{Info.magiskVersionCode >= 0}"
+                    isEnabled="@{Info.env.magiskVersionCode >= 0}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
@@ -355,7 +355,7 @@
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_extra_version_value"
                                 style="@style/W.Home.Extra.Value"
-                                android:text="@{Info.magiskVersionString}"
+                                android:text="@{Info.env.magiskVersionString}"
                                 app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_version_title"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_version_title"
@@ -372,7 +372,7 @@
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_extra_code_value"
                                 style="@style/W.Home.Extra.Value"
-                                android:text="@{Integer.toString(Info.magiskVersionCode)}"
+                                android:text="@{Integer.toString(Info.env.magiskVersionCode)}"
                                 app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_code_title"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_code_title"
@@ -416,7 +416,7 @@
                                 tools:text="Normal" />
 
                             <androidx.constraintlayout.widget.Group
-                                gone="@{Info.magiskVersionCode &lt; 0}"
+                                gone="@{Info.env.magiskVersionCode &lt; 0}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:constraint_referenced_ids="home_magisk_extra_version_title,home_magisk_extra_version_value,home_magisk_extra_code_title,home_magisk_extra_code_value,home_magisk_extra_mode_title,home_magisk_extra_mode_value,home_magisk_extra_connection_title,home_magisk_extra_connection_value" />
@@ -613,7 +613,7 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_code_title" />
 
-                            <!--todo(diareuse) Info.isRunningAsStub ? @string/home_extra_mode_stub : @string/home_extra_mode_normal-->
+                            <!--todo(diareuse) Info.env.isRunningAsStub ? @string/home_extra_mode_stub : @string/home_extra_mode_normal-->
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_extra_mode_value"

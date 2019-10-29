@@ -26,13 +26,14 @@ import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.currentLocale
 import com.topjohnwu.magisk.utils.defaultLocale
 import java.util.*
+import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
 
 fun AssetManager.addAssetPath(path: String) {
     DynAPK.addAssetPath(this, path)
 }
 
-fun Context.wrap(global: Boolean = true): Context
-        = if (global) GlobalResContext(this) else ResContext(this)
+fun Context.wrap(global: Boolean = true): Context =
+    if (global) GlobalResContext(this) else ResContext(this)
 
 fun Context.wrapJob(): Context = object : GlobalResContext(this) {
 
@@ -74,7 +75,7 @@ fun Context.intent(c: Class<*>): Intent {
 }
 
 fun resolveRes(idx: Int): Int {
-    return Info.stub?.resourceMap?.get(idx) ?: when(idx) {
+    return Info.stub?.resourceMap?.get(idx) ?: when (idx) {
         DynAPK.NOTIFICATION -> R.drawable.ic_magisk_outline
         DynAPK.DOWNLOAD -> R.drawable.sc_cloud_download
         DynAPK.SUPERUSER -> R.drawable.sc_superuser
@@ -167,7 +168,8 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
         val name = service.className
         val component = ComponentName(
             service.packageName,
-            Info.stub!!.componentMap[name] ?: name)
+            Info.stub!!.componentMap[name] ?: name
+        )
 
         // Clone the JobInfo except component
         val builder = JobInfo.Builder(id, component)
@@ -217,7 +219,8 @@ object ClassMap {
         UpdateCheckService::class.java to a.g::class.java,
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
-        SuRequestActivity::class.java to a.m::class.java
+        SuRequestActivity::class.java to a.m::class.java,
+        RedesignActivity::class.java to a.i::class.java
     )
 
     operator fun get(c: Class<*>) = map.getOrElse(c) { throw IllegalArgumentException() }

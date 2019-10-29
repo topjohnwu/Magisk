@@ -18,6 +18,6 @@ fun View.addOnGlobalLayoutListener(oneShot: Boolean = false, callback: () -> Uni
     })
 
 fun ViewGroup.startAnimations() {
-    val transition = AutoTransition().setInterpolator(FastOutSlowInInterpolator())
+    val transition = AutoTransition().setInterpolator(FastOutSlowInInterpolator()).setDuration(400)
     TransitionManager.beginDelayedTransition(this, transition)
 }

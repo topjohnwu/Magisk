@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.extensions.snackbar
+import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
@@ -40,7 +40,7 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
 
         binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
             override fun onPreBind(binding: Binding): Boolean {
-                TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
+                (binding.root as? ViewGroup)?.startAnimations()
                 return super.onPreBind(binding)
             }
         })

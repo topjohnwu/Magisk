@@ -77,7 +77,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l_50"
-                    android:text="@{Info.magiskVersionString}"
+                    android:text="@{Info.env.magiskVersionString}"
                     android:textAppearance="?appearanceTextCaptionNormal"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/safetynet_magisk_title"

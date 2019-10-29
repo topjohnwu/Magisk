@@ -42,24 +42,6 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!--<com.google.android.material.card.MaterialCardView
-            style="?styleCardElevated"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/main_toolbar_wrapper"
-            android:layout_marginStart="@dimen/l1"
-            android:layout_marginEnd="@dimen/l1">
-
-
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:layout_gravity="start|bottom"
-                android:background="@drawable/bg_accent" />
-
-        </com.google.android.material.card.MaterialCardView>-->
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/main_bottom_bar"
             style="?styleCardElevated"

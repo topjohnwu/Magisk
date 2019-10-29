@@ -42,7 +42,7 @@ class EnvFixDialog : DialogEvent() {
             }
         }
         .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-            titleRes = R.string.no_thanks
+            titleRes = android.R.string.no
         }
         .let { Unit }
 

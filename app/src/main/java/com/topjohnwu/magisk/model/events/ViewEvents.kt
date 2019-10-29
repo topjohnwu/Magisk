@@ -123,7 +123,7 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
                 onClick { downloadInternal() }
             }
             .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                titleRes = R.string.no_thanks
+                titleRes = android.R.string.no
                 onClick { rxBus.post(SafetyNetResult(-2)) }
             }
             .reveal()

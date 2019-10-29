@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
-import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.base.BaseFragment
+import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.events.ViewEvent
 
 abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBinding>
@@ -24,7 +24,7 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
 
         binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
             override fun onPreBind(binding: Binding): Boolean {
-                TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
+                (binding.root as? ViewGroup)?.startAnimations()
                 return super.onPreBind(binding)
             }
         })

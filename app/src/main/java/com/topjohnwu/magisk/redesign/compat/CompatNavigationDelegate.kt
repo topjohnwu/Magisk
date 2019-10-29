@@ -2,9 +2,9 @@ package com.topjohnwu.magisk.redesign.compat
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.FragmentTransaction
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
@@ -106,10 +106,18 @@ class CompatNavigationDelegate<out Source>(
     }
 
     private fun FragNavTransactionOptions.Builder.customAnimations(options: MagiskAnimBuilder) =
-        customAnimations(options.enter, options.exit, options.popEnter, options.popExit).apply {
-            if (!options.anySet) {
-                transition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            }
+        apply {
+            if (!options.anySet) customAnimations(
+                R.anim.fragment_enter,
+                R.anim.fragment_exit,
+                R.anim.fragment_enter_pop,
+                R.anim.fragment_exit_pop
+            ) else customAnimations(
+                options.enter,
+                options.exit,
+                options.popEnter,
+                options.popExit
+            )
         }
 
 }
