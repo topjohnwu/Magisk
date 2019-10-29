@@ -312,14 +312,14 @@ void boot_img::find_kernel_dtb() {
 	}
 }
 
-int unpack(const char *image, bool hdr) {
+int unpack(const char *image, bool nodecomp, bool hdr) {
 	boot_img boot(image);
 
 	if (hdr)
 		boot.hdr->dump_hdr_file();
 
 	// Dump kernel
-	if (COMPRESSED(boot.k_fmt)) {
+	if (COMPRESSED(boot.k_fmt) && !nodecomp) {
 		int fd = creat(KERNEL_FILE, 0644);
 		decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size());
 		close(fd);
@@ -331,7 +331,7 @@ int unpack(const char *image, bool hdr) {
 	dump(boot.kernel_dtb, boot.kernel_dt_size, KER_DTB_FILE);
 
 	// Dump ramdisk
-	if (COMPRESSED(boot.r_fmt)) {
+	if (COMPRESSED(boot.r_fmt) && !nodecomp) {
 		int fd = creat(RAMDISK_FILE, 0644);
 		decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
 		close(fd);
