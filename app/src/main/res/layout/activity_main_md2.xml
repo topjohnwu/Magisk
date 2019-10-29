@@ -19,7 +19,7 @@
         android:paddingRight="@{viewModel.insets.right}"
         tools:ignore="RtlHardcoded">
 
-        <FrameLayout
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/main_nav_host"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
