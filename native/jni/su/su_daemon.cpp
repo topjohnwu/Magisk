@@ -144,7 +144,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 	int sockfd = create_rand_socket(&addr);
 
 	// Connect manager
-	app_connect(addr.sun_path + 1, info);
+	app_socket(addr.sun_path + 1, info);
 	int fd = socket_accept(sockfd, 60);
 	if (fd < 0) {
 		info->access.policy = DENY;

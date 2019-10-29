@@ -86,7 +86,6 @@
     <string name="reboot_delay_toast">Me-reboot dalam 5 detik…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Tutup</string>
     <string name="repo_install_title">Pasang %1$s</string>
     <string name="repo_install_msg">Apakah Anda ingin memasang %1$s sekarang?</string>
     <string name="download">Unduh</string>
@@ -181,7 +180,6 @@
     <string name="global_summary">Semua sesi root menggunakan mount ruang nama global.</string>
     <string name="requester_summary">Sesi root akan mewarisi ruang nama peminta mereka.</string>
     <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri.</string>
-    <string name="android_o_not_support">Tidak mendukung Android 8.0+.</string>
     <string name="disable_fingerprint">Tidak ada sidik jari diatur atau tidak ada dukungan perangkat.</string>
     <string name="settings_download_path_error">Kesalahan membuat folder. Folder harus dapat diakses dari direktori penyimpanan root dan bukan merupakan file.</string>
 

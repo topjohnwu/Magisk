@@ -2,14 +2,14 @@ package com.topjohnwu.magisk.model.receiver
 
 import android.content.ContextWrapper
 import android.content.Intent
-import com.topjohnwu.magisk.ClassMap
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.Info
+import android.os.Build.VERSION.SDK_INT
+import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.base.BaseReceiver
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.extensions.startActivity
+import com.topjohnwu.magisk.extensions.startActivityWithRoot
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.ManagerJson
 import com.topjohnwu.magisk.model.entity.internal.Configuration
@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import org.koin.core.inject
+import timber.log.Timber
 
 open class GeneralReceiver : BaseReceiver() {
 
@@ -38,6 +39,17 @@ open class GeneralReceiver : BaseReceiver() {
 
     override fun onReceive(context: ContextWrapper, intent: Intent?) {
         intent ?: return
+
+        // Debug messages
+        if (BuildConfig.DEBUG) {
+            Timber.d(intent.action)
+            intent.extras?.let { bundle ->
+                bundle.keySet().forEach {
+                    Timber.d("[%s]=[%s]", it, bundle[it])
+                }
+            }
+        }
+
         when (intent.action ?: return) {
             Intent.ACTION_REBOOT, Intent.ACTION_BOOT_COMPLETED -> {
                 val action = intent.getStringExtra("action")
@@ -51,16 +63,26 @@ open class GeneralReceiver : BaseReceiver() {
                 }
                 when (action) {
                     REQUEST -> {
-                        val i = Intent(context, ClassMap[SuRequestActivity::class.java])
+                        val i = context.intent(SuRequestActivity::class.java)
                                 .setAction(action)
                                 .putExtra("socket", intent.getStringExtra("socket"))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-                        context.startActivity(i)
+                        if (SDK_INT >= 29) {
+                            // Android Q does not allow starting activity from background
+                            i.startActivityWithRoot()
+                        } else {
+                            i.startActivity(context)
+                        }
                     }
-                    LOG -> SuLogger.handleLogs(intent)
-                    NOTIFY -> SuLogger.handleNotify(intent)
-                    TEST -> Shell.su("magisk --use-broadcast").submit()
+                    LOG -> SuLogger.handleLogs(context, intent)
+                    NOTIFY -> SuLogger.handleNotify(context, intent)
+                    TEST -> {
+                        val mode = intent.getIntExtra("mode", 1 shl 1)
+                        if (mode > Info.env.connectionMode)
+                            Info.env.connectionMode = mode
+                        Shell.su("magisk --connect-mode $mode").submit()
+                    }
                 }
             }
             Intent.ACTION_PACKAGE_REPLACED ->

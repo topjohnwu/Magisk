@@ -23,7 +23,7 @@ class EnvFixDialog(activity: Activity) : CustomAlertDialog(activity) {
         setTitle(R.string.env_fix_title)
         setMessage(R.string.env_fix_msg)
         setCancelable(true)
-        setPositiveButton(R.string.yes) { _, _ ->
+        setPositiveButton(android.R.string.yes) { _, _ ->
             val pd = ProgressDialog.show(activity,
                     activity.getString(R.string.setup_title),
                     activity.getString(R.string.setup_msg))
@@ -46,6 +46,6 @@ class EnvFixDialog(activity: Activity) : CustomAlertDialog(activity) {
                 }
             }.exec()
         }
-        setNegativeButton(R.string.no_thanks, null)
+        setNegativeButton(android.R.string.no, null)
     }
 }

@@ -69,7 +69,6 @@
     <string name="manager_update_title">มีการอัพเดต Magisk Manager!</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">ปิด</string>
     <string name="repo_install_title">ติดตั้ง %1$s</string>
     <string name="repo_install_msg">ต้องการติดตั้ง %1$s ตอนนี้หรือไม่?</string>
     <string name="download">ดาวน์โหลด</string>
@@ -166,7 +165,6 @@
     <string name="global_summary">All root sessions use the global mount namespace.</string>
     <string name="requester_summary">Root sessions will inherit their requester\'s namespace.</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
-    <string name="android_o_not_support">ไม่รองรับ Android 8.0 ขึ้นไป</string>
     <string name="disable_fingerprint">ไม่มีลายนิ้วมือหรืออุปกรณ์แสกน</string>
 
     <!--Superuser-->

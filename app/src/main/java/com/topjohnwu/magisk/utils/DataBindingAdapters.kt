@@ -31,6 +31,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.drawableCompat
 import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
@@ -238,6 +239,13 @@ fun getScrollPosition(view: RecyclerView) = (view.layoutManager as? LinearLayout
 @BindingAdapter("isEnabled")
 fun setEnabled(view: View, isEnabled: Boolean) {
     view.isEnabled = isEnabled
+}
+
+@BindingAdapter("error")
+fun TextInputLayout.setErrorString(error: String) {
+    val newError = error.let { if (it.isEmpty()) null else it }
+    if (this.error == null && newError == null) return
+    this.error = newError
 }
 
 // md2

@@ -24,6 +24,7 @@
     <string name="advanced_settings_title">Configuració avançada</string>
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
     <string name="keep_dm_verity">Mantenir AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Mode de Recuperació</string>
     <string name="current_installed">Instal·lada: %1$s</string>
     <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstal·lar</string>
@@ -75,19 +76,18 @@
     <string name="manager_update_title">Actualització de Magisk Manager disponible!</string>
 
     <!-- Installation -->
-    <string name="manager_download_install">Prem per descarregar i instalar.</string>
-    <string name="download_zip_only">Descarrega només el ZIP</string>
+    <string name="manager_download_install">Premi per baixar i instalar.</string>
+    <string name="download_zip_only">Únicament baixa el ZIP</string>
     <string name="direct_install">Instal·lació directa (Recomanat)</string>
     <string name="install_inactive_slot">Instal·la a la ranura inactiva (Després d\'una OTA)</string>
     <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en l\'actual ranura inactiva després del reinici!\nUtilitza aquesta opció NOMÉS quan l\'OTA s\'hagi fet.\nContinuar?</string>
-    <string name="select_method">Sel·lecciona mètode</string>
+    <string name="select_method">Sel·lecciona un mètode</string>
     <string name="setup_title">Instal·lació addicional</string>
     <string name="select_patch_file">Sel·lecciona i arranja un arxiu</string>
     <string name="patch_file_msg">Sel·lecciona una imatge crua (*.img) o un ODIN tarfile (*.tar)</string>
     <string name="reboot_delay_toast">Reinici en 5 segons…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Tancar</string>
     <string name="repo_install_title">Instal·lar %1$s</string>
     <string name="repo_install_msg">Vols instal·lar %1$s ara?</string>
     <string name="download">Baixar</string>
@@ -110,23 +110,23 @@
     <string name="restore_img_msg">Restaurant…</string>
     <string name="restore_done">Restauració feta!</string>
     <string name="restore_fail">La còpia de seguretat de Stock no existeix!</string>
-    <string name="proprietary_title">Descarrega codi propietari</string>
-    <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nPot permetre que Magisk Manager descarregui una extensió que conté el GoogleApiClient per poder fer la comprobació de SafetyNet?</string>
+    <string name="proprietary_title">Baixar codi propietari</string>
+    <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nPot permetre que Magisk Manager baixi una extensió que conté el GoogleApiClient per poder fer la comprobació de SafetyNet?</string>
     <string name="setup_fail">Instal·lació fallida.</string>
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
-    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es descarregarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instalació ara?</string>
+    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instalació ara?</string>
     <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
-    <string name="settings_dark_theme_title">Tema obscur</string>
-    <string name="settings_dark_theme_summary">Habilitar el tema obscur</string>
-    <string name="settings_download_path_title">Directori de descàrrega</string>
+    <string name="settings_dark_theme_title">Tema fosc</string>
+    <string name="settings_dark_theme_summary">Habilitar el tema fosc</string>
+    <string name="settings_download_path_title">Directori de baixades</string>
     <string name="settings_download_path_message">Els arxius es desaràn a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
     <string name="settings_clear_cache_summary">Neteja l\'informació en memòria cau per als repositoris en línia, força a l\'aplicació a actualitzar-se en línia.</string>
     <string name="settings_hide_manager_title">Amagar Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Re-empaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
+    <string name="settings_hide_manager_summary">Reempaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
     <string name="settings_restore_manager_title">Restaurar Magisk Manager</string>
     <string name="settings_restore_manager_summary">Restaura Magisk Manager amb el nom de paquet original</string>
     <string name="language">Idioma</string>
@@ -146,6 +146,10 @@
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
 
+    <string name="settings_app_name">Escriu el nom desitjat per l\'App</string>
+    <string name="settings_app_name_hint">Nou nom</string>
+    <string name="settings_app_name_helper">Es refarà l\'App amb aquest nom</string>
+    <string name="settings_app_name_error">Format invàl·lid</string>
     <string name="settings_su_app_adb">Aplicacions y ADB</string>
     <string name="settings_su_app">Només aplicacions</string>
     <string name="settings_su_adb">Només ADB</string>
@@ -161,8 +165,8 @@
     <string name="request_timeout">Temps de petició</string>
     <string name="superuser_notification">Notificació de superusuari</string>
     <string name="request_timeout_summary">%1$d segons</string>
-    <string name="settings_su_reauth_title">Re-autenticació</string>
-    <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació es actualitzada o reinstal·lada</string>
+    <string name="settings_su_reauth_title">Demanar després d\'una actualització</string>
+    <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació és actualitzada o reinstal·lada</string>
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
     <string name="settings_su_fingerprint_summary">Utilitza el sensor d\'Empremta Dactilar per permetre les sol·licituds de superusuari</string>
     <string name="auth_fingerprint">Autenticar Emprempta Digital</string>
@@ -174,7 +178,7 @@
     <string name="owner_only_summary">Només l\'administrador té accés d\'arrel</string>
     <string name="owner_manage_summary"> Només l\'administrador pot supervisar l\'acces d\'arrel y rebre sol·licituds d\'altres usuaris</string>
     <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel </string>
-    
+
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>
     <string name="settings_ns_requester">Heretar Namespace</string>
@@ -182,7 +186,6 @@
     <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
     <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
     <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
-    <string name="android_o_not_support">No es compatible amb Android 8.0+</string>
     <string name="disable_fingerprint">No s\'han establert empremtes dactilars o no existeix el suport del dispositiu</string>
     <string name="settings_download_path_error">Error al crear la carpeta. El directori ha de ser accesible desde el directori arrel i no pot ser un arxiu.</string>
 
@@ -217,7 +220,7 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID de l\'objectiu: %1$d</string>
     <string name="command">Ordre: %1$s</string>
-    
+
     <!-- MagiskHide -->
     <string name="show_system_app">Mostra apps del sistema</string>
 

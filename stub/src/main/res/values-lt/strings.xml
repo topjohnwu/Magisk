@@ -1,0 +1,4 @@
+<resources>
+    <string name="upgrade_msg">Atsinaujinkite į pilną Magisk Manager versiją, kad baigtumėte pasiruošimą. Atsisiųsti ir instaliuoti?</string>
+    <string name="no_internet_msg">Prašome prisijungti prie interneto! Atsinaujinimas į pilną Magisk Manager versiją yra privalomas.</string>
+</resources>

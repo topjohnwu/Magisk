@@ -88,7 +88,6 @@
     <string name="reboot_delay_toast">Taaskäivitamine 5 sekundi pärast…</string>
     
     <!--Toasts, Dialogs-->
-    <string name="close">Sulge</string>
     <string name="repo_install_title">Installi %1$s</string>
     <string name="repo_install_msg">Kas soovid kohe installida %1$s?</string>
     <string name="download">Allalaadimine</string>
@@ -183,7 +182,6 @@
     <string name="global_summary">Kõik juurkasutaja sessioonid kasutavad globaalset monteerimise nimeruumi.</string>
     <string name="requester_summary">Juurkasutaja sessioonid võtavad üle selle taotleja nimeruumi.</string>
     <string name="isolate_summary">Iga juurkasutaja sessioon saab oma isoleeritud nimeruumi.</string>
-    <string name="android_o_not_support">Ei toeta Androidi versiooni 8.0+.</string>
     <string name="disable_fingerprint">Sõrmejälgi pole määratud või seade pole toetatud.</string>
     <string name="settings_download_path_error">Faili loomisel esines viga.  See peab olema ligipääsetav mäluruumi juurkaustast ning ei tohi olla fail.</string>
 

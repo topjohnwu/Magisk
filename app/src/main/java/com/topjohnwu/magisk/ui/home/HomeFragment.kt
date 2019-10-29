@@ -87,8 +87,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentMagiskBinding>(),
             .setTitle(R.string.proprietary_title)
             .setMessage(R.string.proprietary_notice)
             .setCancelable(false)
-            .setPositiveButton(R.string.yes) { _, _ -> download() }
-            .setNegativeButton(R.string.no_thanks) { _, _ -> viewModel.finishSafetyNetCheck(-2) }
+            .setPositiveButton(android.R.string.yes) { _, _ -> download() }
+            .setNegativeButton(android.R.string.no) { _, _ -> viewModel.finishSafetyNetCheck(-2) }
             .show()
     }
 

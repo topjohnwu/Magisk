@@ -7,12 +7,20 @@
 
 #include <daemon.h>
 #include <utils.h>
+#include <logging.h>
 
 #include "su.h"
 
 using namespace std;
 
-bool CONNECT_BROADCAST;
+enum connect_mode {
+	UNINITIALIZED = 0,
+	MODE_ACTIVITY,
+	MODE_BROADCAST_COMPONENT,
+	MODE_BROADCAST_PACKAGE
+};
+
+static connect_mode current_mode = UNINITIALIZED;
 
 #define START_ACTIVITY \
 "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
@@ -25,9 +33,28 @@ bool CONNECT_BROADCAST;
 "broadcast", "-n", nullptr, "--user", nullptr, "-f", "0x00000020", \
 "-a", "android.intent.action.REBOOT", "--es", "action"
 
+#define START_BROADCAST_PKG \
+"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
+"broadcast", "-p", nullptr, "--user", nullptr, "-f", "0x00000020", \
+"-a", "android.intent.action.REBOOT", "--es", "action"
+
 // 0x00000020 = FLAG_INCLUDE_STOPPED_PACKAGES
 
-static inline const char *get_command(const su_request *to) {
+#define am_app_info(info, ...) \
+if (current_mode == MODE_BROADCAST_PACKAGE) { \
+	const char *cmd[] = { START_BROADCAST_PKG, __VA_ARGS__, nullptr }; \
+	exec_am_cmd(cmd, info); \
+} else if (current_mode == MODE_BROADCAST_COMPONENT) { \
+	const char *cmd[] = { START_BROADCAST, __VA_ARGS__, nullptr }; \
+	exec_am_cmd(cmd, info); \
+} else { \
+	const char *cmd[] = { START_ACTIVITY, __VA_ARGS__, nullptr }; \
+	exec_am_cmd(cmd, info); \
+}
+
+#define am_app(...) am_app_info(ctx.info.get(), __VA_ARGS__)
+
+static const char *get_command(const su_request *to) {
 	if (to->command[0])
 		return to->command;
 	if (to->shell[0])
@@ -35,14 +62,14 @@ static inline const char *get_command(const su_request *to) {
 	return DEFAULT_SHELL;
 }
 
-static inline void get_user(char *user, const su_info *info) {
+static void get_user(char *user, const su_info *info) {
 	sprintf(user, "%d",
 			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER
 			? info->uid / 100000
 			: 0);
 }
 
-static inline void get_uid(char *uid, const su_info *info) {
+static void get_uid(char *uid, const su_info *info) {
 	sprintf(uid, "%d",
 			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED
 			? info->uid % 100000
@@ -50,13 +77,25 @@ static inline void get_uid(char *uid, const su_info *info) {
 }
 
 static void exec_am_cmd(const char **args, const su_info *info) {
-	char component[128];
-	sprintf(component, "%s/%s", info->str[SU_MANAGER].data(), args[3][0] == 'b' ? "a.h" : "a.m");
+	char target[128];
+	if (args[3][0] == 'b') {
+		// Broadcast
+		if (args[4][1] == 'p') {
+			// Broadcast to package (receiver can be obfuscated)
+			strcpy(target, info->str[SU_MANAGER].data());
+		} else {
+			// a.h is the broadcast receiver
+			sprintf(target, "%s/a.h", info->str[SU_MANAGER].data());
+		}
+	} else {
+		// a.m is the activity
+		sprintf(target, "%s/a.m", info->str[SU_MANAGER].data());
+	}
 	char user[8];
 	get_user(user, info);
 
-	/* Fill in dynamic arguments */
-	args[5] = component;
+	// Fill in non static arguments
+	args[5] = target;
 	args[7] = user;
 
 	exec_t exec {
@@ -79,8 +118,7 @@ static void exec_am_cmd(const char **args, const su_info *info) {
 "--ei", "pid", pid, \
 "--ei", "policy", policy, \
 "--es", "command", get_command(&ctx.req), \
-"--ez", "notify", ctx.info->access.notify ? "true" : "false", \
-nullptr
+"--ez", "notify", ctx.info->access.notify ? "true" : "false"
 
 void app_log(const su_context &ctx) {
 	char fromUid[8];
@@ -95,20 +133,13 @@ void app_log(const su_context &ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx.info->access.policy);
 
-	if (CONNECT_BROADCAST) {
-		const char *cmd[] = { START_BROADCAST, LOG_BODY };
-		exec_am_cmd(cmd, ctx.info.get());
-	} else {
-		const char *cmd[] = { START_ACTIVITY, LOG_BODY };
-		exec_am_cmd(cmd, ctx.info.get());
-	}
+	am_app(LOG_BODY)
 }
 
 #define NOTIFY_BODY \
 "notify", \
 "--ei", "from.uid", fromUid, \
-"--ei", "policy", policy, \
-nullptr
+"--ei", "policy", policy
 
 void app_notify(const su_context &ctx) {
 	char fromUid[8];
@@ -117,33 +148,59 @@ void app_notify(const su_context &ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx.info->access.policy);
 
-	if (CONNECT_BROADCAST) {
-		const char *cmd[] = { START_BROADCAST, NOTIFY_BODY };
-		exec_am_cmd(cmd, ctx.info.get());
-	} else {
-		const char *cmd[] = { START_ACTIVITY, NOTIFY_BODY };
-		exec_am_cmd(cmd, ctx.info.get());
+	am_app(NOTIFY_BODY)
+}
+
+#define SOCKET_BODY \
+"request", \
+"--es", "socket", socket
+
+void app_socket(const char *socket, const shared_ptr<su_info> &info) {
+	am_app_info(info.get(), SOCKET_BODY)
+}
+
+#define TEST_BODY \
+"test", "--ei", "mode", mode, nullptr
+
+void broadcast_test(int client) {
+	if (client >= 0) {
+		// Make it not uninitialized
+		current_mode = MODE_ACTIVITY;
+		write_int(client, 0);
+		close(client);
 	}
 
-}
-
-void app_connect(const char *socket, const shared_ptr<su_info> &info) {
-	const char *cmd[] = {
-		START_ACTIVITY, "request",
-		"--es", "socket", socket,
-		nullptr
-	};
-	exec_am_cmd(cmd, info.get());
-}
-
-void broadcast_test() {
 	su_info info;
 	get_db_settings(info.cfg);
 	get_db_strings(info.str);
 	validate_manager(info.str[SU_MANAGER], 0, &info.mgr_st);
 
-	const char *cmd[] = { START_BROADCAST, "test", nullptr };
-	exec_am_cmd(cmd, &info);
+	char mode[2];
+	{
+		sprintf(mode, "%d", MODE_BROADCAST_PACKAGE);
+		const char *cmd[] = { START_BROADCAST_PKG, TEST_BODY };
+		exec_am_cmd(cmd, &info);
+	}
+	{
+		sprintf(mode, "%d", MODE_BROADCAST_COMPONENT);
+		const char *cmd[] = { START_BROADCAST, TEST_BODY };
+		exec_am_cmd(cmd, &info);
+	}
+}
+
+void broadcast_ack(int client) {
+	int mode = read_int(client);
+	if (mode < 0) {
+		// Return connection mode to client
+		write_int(client, current_mode);
+	} else {
+		if (mode > current_mode) {
+			LOGD("* Use connect mode [%d] for su request and notify\n", mode);
+			current_mode = static_cast<connect_mode>(mode);
+		}
+		write_int(client, 0);
+	}
+	close(client);
 }
 
 void socket_send_request(int fd, const shared_ptr<su_info> &info) {

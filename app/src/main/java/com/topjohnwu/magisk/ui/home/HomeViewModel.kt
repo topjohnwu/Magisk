@@ -107,10 +107,10 @@ class HomeViewModel(
             Info.recovery = it ?: return@addOnPropertyChangedCallback
         }
         isConnected.addOnPropertyChangedCallback {
-            if (it == true) refresh()
+            if (it == true) refresh(false)
         }
 
-        refresh()
+        refresh(false)
     }
 
     fun paypalPressed() = OpenLinkEvent(Const.Url.PAYPAL_URL).publish()
@@ -170,7 +170,11 @@ class HomeViewModel(
         }
     }
 
-    fun refresh() {
+    @JvmOverloads
+    fun refresh(invalidate: Boolean = true) {
+        if (invalidate)
+            Info.envRef.invalidate()
+
         hasRoot.value = Shell.rootAccess()
 
         val fetchUpdate = if (isConnected.value)
@@ -179,7 +183,8 @@ class HomeViewModel(
             Completable.complete()
 
         Completable.fromAction {
-            Info.loadMagiskInfo()
+            // Ensure value is ready
+            Info.env
         }.andThen(fetchUpdate)
         .applyViewModel(this)
         .doOnSubscribeUi {
@@ -197,33 +202,40 @@ class HomeViewModel(
 
     private fun refreshVersions() {
         magiskCurrentVersion.value = if (magiskState.value != MagiskState.NOT_INSTALLED) {
-            version.format(Info.magiskVersionString, Info.magiskVersionCode)
+            VERSION_FMT.format(Info.env.magiskVersionString, Info.env.magiskVersionCode)
         } else {
             ""
         }
 
-        managerCurrentVersion.value = version
-            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
+        managerCurrentVersion.value = if (isRunningAsStub) MGR_VER_FMT
+            .format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, Info.stub!!.version)
+        else
+            VERSION_FMT.format(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE)
     }
 
     private fun updateSelf() {
-        magiskState.value = when (Info.magiskVersionCode) {
+        magiskState.value = when (Info.env.magiskVersionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
-            !in Info.remote.magisk.versionCode..Int.MAX_VALUE -> MagiskState.OBSOLETE
+            in 1 until (Info.remote.magisk.versionCode - 1) -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
-        magiskLatestVersion.value = version
-            .format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
+        magiskLatestVersion.value =
+            VERSION_FMT.format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
 
         _managerState.value = when (Info.remote.app.versionCode) {
             in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
-            in (BuildConfig.VERSION_CODE + 1)..Int.MAX_VALUE -> MagiskState.OBSOLETE
-            else -> MagiskState.UP_TO_DATE
+            in (BuildConfig.VERSION_CODE + 1) until Int.MAX_VALUE -> MagiskState.OBSOLETE
+            else -> {
+                if (isRunningAsStub && Info.stub!!.version < Info.remote.stub.versionCode)
+                    MagiskState.OBSOLETE
+                else
+                    MagiskState.UP_TO_DATE
+            }
         }
 
-        managerLatestVersion.value = version
-            .format(Info.remote.app.version, Info.remote.app.versionCode)
+        managerLatestVersion.value = MGR_VER_FMT
+            .format(Info.remote.app.version, Info.remote.app.versionCode, Info.remote.stub.versionCode)
     }
 
     private fun ensureEnv() {
@@ -240,7 +252,8 @@ class HomeViewModel(
     }
 
     companion object {
-        private const val version = "%s (%d)"
+        private const val VERSION_FMT = "%s (%d)"
+        private const val MGR_VER_FMT = "%s (%d) (%d)"
     }
 
 }

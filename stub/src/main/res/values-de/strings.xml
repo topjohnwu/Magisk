@@ -1,0 +1,4 @@
+<resources>
+    <string name="upgrade_msg">Upgrade zum vollständigen Magisk Manager, um das Setup abzuschließen. Herunterladen und installieren?</string>
+    <string name="no_internet_msg">Bitte eine Verbindung mit dem Internet herstellen! Upgrade zum vollständigen Magisk Manager ist erforderlich.</string>
+</resources>

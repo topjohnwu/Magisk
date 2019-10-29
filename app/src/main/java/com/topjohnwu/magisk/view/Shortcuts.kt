@@ -15,55 +15,56 @@ import com.topjohnwu.superuser.Shell
 object Shortcuts {
 
     fun setup(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+        if (Build.VERSION.SDK_INT >= 25) {
             val manager = context.getSystemService(ShortcutManager::class.java)
             manager?.dynamicShortcuts = getShortCuts(context)
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N_MR1)
+    @RequiresApi(api = 25)
     private fun getShortCuts(context: Context): List<ShortcutInfo> {
         val shortCuts = mutableListOf<ShortcutInfo>()
         val root = Shell.rootAccess()
+        val intent = context.intent(SplashActivity::class.java)
         if (Utils.showSuperUser()) {
             shortCuts.add(ShortcutInfo.Builder(context, "superuser")
                     .setShortLabel(context.getString(R.string.superuser))
-                    .setIntent(Intent(context, ClassMap[SplashActivity::class.java])
+                    .setIntent(Intent(intent)
                             .putExtra(Const.Key.OPEN_SECTION, "superuser")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(context, R.drawable.sc_superuser))
+                    .setIcon(Icon.createWithResource(context, resolveRes(DynAPK.SUPERUSER)))
                     .setRank(0)
                     .build())
         }
-        if (root && Config.magiskHide) {
+        if (root && Info.env.magiskHide) {
             shortCuts.add(ShortcutInfo.Builder(context, "magiskhide")
                     .setShortLabel(context.getString(R.string.magiskhide))
-                    .setIntent(Intent(context, ClassMap[SplashActivity::class.java])
+                    .setIntent(Intent(intent)
                             .putExtra(Const.Key.OPEN_SECTION, "magiskhide")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(context, R.drawable.sc_magiskhide))
+                    .setIcon(Icon.createWithResource(context, resolveRes(DynAPK.MAGISKHIDE)))
                     .setRank(1)
                     .build())
         }
-        if (!Config.coreOnly && root && Info.magiskVersionCode >= 0) {
+        if (!Config.coreOnly && root && Info.env.magiskVersionCode >= 0) {
             shortCuts.add(ShortcutInfo.Builder(context, "modules")
                     .setShortLabel(context.getString(R.string.modules))
-                    .setIntent(Intent(context, ClassMap[SplashActivity::class.java])
+                    .setIntent(Intent(intent)
                             .putExtra(Const.Key.OPEN_SECTION, "modules")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(context, R.drawable.sc_extension))
+                    .setIcon(Icon.createWithResource(context, resolveRes(DynAPK.MODULES)))
                     .setRank(3)
                     .build())
             shortCuts.add(ShortcutInfo.Builder(context, "downloads")
                     .setShortLabel(context.getString(R.string.downloads))
-                    .setIntent(Intent(context, ClassMap[SplashActivity::class.java])
+                    .setIntent(Intent(intent)
                             .putExtra(Const.Key.OPEN_SECTION, "downloads")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
-                    .setIcon(Icon.createWithResource(context, R.drawable.sc_cloud_download))
+                    .setIcon(Icon.createWithResource(context, resolveRes(DynAPK.DOWNLOAD)))
                     .setRank(2)
                     .build())
         }

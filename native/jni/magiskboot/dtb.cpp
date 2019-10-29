@@ -17,7 +17,8 @@ using namespace std;
 #define QCDT_MAGIC      "QCDT"
 #define DTBH_MAGIC      "DTBH"
 #define PXADT_MAGIC     "PXA-DT"
-#define PXA_19xx_MAGIC  "PXA-19xx"
+#define PXA19xx_MAGIC   "PXA-19xx"
+#define SPRD_MAGIC      "SPRD"
 
 struct qcdt_hdr {
 	char magic[4];          /* "QCDT" */
@@ -58,19 +59,31 @@ struct bhtable_v2 {
 
 struct pxadt_hdr {
 	char magic[6];          /* "PXA-DT" */
-	uint32_t version;       /* PXA-DT version */
+	uint32_t version;       /* PXA-* version */
 	uint32_t num_dtbs;      /* Number of DTBs */
 } __attribute__((packed));
 
-struct pxa_19xx_hdr {
+struct pxa19xx_hdr {
 	char magic[8];          /* "PXA-19xx" */
-	uint32_t version;       /* PXA-DT version */
+	uint32_t version;       /* PXA-* version */
 	uint32_t num_dtbs;      /* Number of DTBs */
 } __attribute__((packed));
 
-struct pxa_table_v1 {
+struct pxatable_v1 {
 	uint32_t cpu_info[2];   /* Some CPU info */
-	uint32_t offset;        /* DTB offset in PXA-DT */
+	uint32_t offset;        /* DTB offset in PXA-* */
+	uint32_t len;           /* DTB size */
+} __attribute__((packed));
+
+struct sprd_hdr {
+	char magic[4];          /* "SPRD" */
+	uint32_t version;       /* SPRD version */
+	uint32_t num_dtbs;      /* Number of DTBs */
+} __attribute__((packed));
+
+struct sprdtable_v1 {
+	uint32_t cpu_info[3];   /* Some CPU info */
+	uint32_t offset;        /* DTB offset in SPRD */
 	uint32_t len;           /* DTB size */
 } __attribute__((packed));
 
@@ -358,16 +371,25 @@ static int dtb_patch(const char *in, const char *out) {
 		switch (hdr->version) {
 			case 1:
 				fprintf(stderr, "PXA-DT v1\n");
-				return dtb_patch<pxa_table_v1>(hdr, in, out);
+				return dtb_patch<pxatable_v1>(hdr, in, out);
 			default:
 				return 1;
 		}
-	} else if (MATCH(PXA_19xx_MAGIC)) {
-		auto hdr = reinterpret_cast<pxa_19xx_hdr *>(dtb);
+	} else if (MATCH(PXA19xx_MAGIC)) {
+		auto hdr = reinterpret_cast<pxa19xx_hdr *>(dtb);
 		switch (hdr->version) {
 			case 1:
 				fprintf(stderr, "PXA-19xx v1\n");
-				return dtb_patch<pxa_table_v1>(hdr, in, out);
+				return dtb_patch<pxatable_v1>(hdr, in, out);
+			default:
+				return 1;
+		}
+	} else if (MATCH(SPRD_MAGIC)) {
+		auto hdr = reinterpret_cast<sprd_hdr *>(dtb);
+		switch (hdr->version) {
+			case 1:
+				fprintf(stderr, "SPRD v1\n");
+				return dtb_patch<sprdtable_v1>(hdr, in, out);
 			default:
 				return 1;
 		}

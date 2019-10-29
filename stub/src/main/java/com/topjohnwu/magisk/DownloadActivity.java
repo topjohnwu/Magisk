@@ -11,31 +11,34 @@ import android.util.Log;
 import com.topjohnwu.magisk.net.ErrorHandler;
 import com.topjohnwu.magisk.net.Networking;
 import com.topjohnwu.magisk.net.ResponseListener;
+import com.topjohnwu.magisk.obfuscate.RawData;
 import com.topjohnwu.magisk.utils.APKInstall;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static android.R.string.no;
+import static android.R.string.ok;
+import static android.R.string.yes;
 import static com.topjohnwu.magisk.DelegateApplication.MANAGER_APK;
 
 public class DownloadActivity extends Activity {
 
-    static final String TAG = "MMStub";
-    private static final boolean IS_CANARY = BuildConfig.VERSION_NAME.contains("-");
     private static final String URL =
-            "https://raw.githubusercontent.com/topjohnwu/magisk_files/" +
-                    (IS_CANARY ? "canary/release.json" : "master/stable.json");
+            BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
+            RawData.urlBase() + (BuildConfig.DEBUG ? RawData.canary() : RawData.stable());
 
     private String apkLink;
     private ErrorHandler err = (conn, e) -> {
-        Log.e(TAG, "network error", e);
+        Log.e(getClass().getSimpleName(), "", e);
         finish();
     };
 
     private void showDialog() {
         ProgressDialog.show(this,
-                "Downloading...",
-                "Downloading Magisk Manager", true);
+                RawData.dling(),
+                RawData.dling() + " " + RawData.appName(),
+                true);
     }
 
     private void dlAPK() {
@@ -57,7 +60,9 @@ public class DownloadActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        RawData.res = getResources();
         Networking.init(this);
+
         if (Networking.checkNetworkStatus(this)) {
             Networking.get(URL)
                     .setErrorHandler(err)
@@ -65,9 +70,9 @@ public class DownloadActivity extends Activity {
         } else {
             new AlertDialog.Builder(this)
                     .setCancelable(false)
-                    .setTitle(R.string.app_name)
-                    .setMessage(R.string.no_internet_msg)
-                    .setNegativeButton(R.string.ok, (d, w) -> finish())
+                    .setTitle(RawData.appName())
+                    .setMessage(RawData.no_internet_msg())
+                    .setNegativeButton(ok, (d, w) -> finish())
                     .show();
         }
     }
@@ -81,10 +86,10 @@ public class DownloadActivity extends Activity {
                 apkLink = manager.getString("link");
                 new AlertDialog.Builder(DownloadActivity.this)
                         .setCancelable(false)
-                        .setTitle(R.string.app_name)
-                        .setMessage(R.string.upgrade_msg)
-                        .setPositiveButton(R.string.yes, (d, w) -> dlAPK())
-                        .setNegativeButton(R.string.no_thanks, (d, w) -> finish())
+                        .setTitle(RawData.appName())
+                        .setMessage(RawData.upgrade_msg())
+                        .setPositiveButton(yes, (d, w) -> dlAPK())
+                        .setNegativeButton(no, (d, w) -> finish())
                         .show();
             } catch (JSONException e) {
                 finish();

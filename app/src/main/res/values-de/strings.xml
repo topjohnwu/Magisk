@@ -84,7 +84,6 @@
     <string name="reboot_delay_toast">Neustart in 5 Sekunden…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Schließen</string>
     <string name="repo_install_title">Installiere %1$s</string>
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download">Herunterladen</string>
@@ -177,7 +176,6 @@
     <string name="global_summary">Alle Root-Sitzungen benutzen den global angelegten Namespace</string>
     <string name="requester_summary">Root-Sitzungen erben den Namespace des Abfragenden</string>
     <string name="isolate_summary">Jede Root-Sitzung hat ihren isolierten Namespace</string>
-    <string name="android_o_not_support">Android 8.0+ wird nicht unterstützt</string>
     <string name="disable_fingerprint">Keine Fingerabdrücke gespeichert oder keine Geräteunterstützung</string>
 
     <!--Superuser-->

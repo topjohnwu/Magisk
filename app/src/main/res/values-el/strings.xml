@@ -62,7 +62,6 @@
     <string name="app_changelog">Καταγραφή αλλαγών εφαρμογής</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Κλείσιμο</string>
     <string name="repo_install_title">Εγκατάσταση %1$s</string>
     <string name="repo_install_msg">Θέλετε να εγκαταστήσετε το %1$s τώρα;</string>
     <string name="download">Λήψη</string>
@@ -144,7 +143,6 @@
     <string name="global_summary">Όλες οι συνεδρίες root χρησιμοποιούν τον καθολικό χώρο oνομάτων προσάρτησης</string>
     <string name="requester_summary">Οι συνεδρίες root θα κληρονομούν το χώρο ονομάτων του αιτούντα τους</string>
     <string name="isolate_summary">Κάθε συνεδρία root θα έχει το δικό της απομονωμένο χώρο ονομάτων</string>
-    <string name="android_o_not_support">Δεν υποστηρίζεται Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Αίτημα υπερχρήστη</string>

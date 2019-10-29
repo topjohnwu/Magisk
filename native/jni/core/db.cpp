@@ -219,7 +219,6 @@ int get_db_strings(db_strings &str, int key) {
 	char *err;
 	auto string_cb = [&](db_row &row) -> bool {
 		str[row["key"]] = row["value"];
-		LOGD("magiskdb: query %s=[%s]\n", row["key"].data(), row["value"].data());
 		return true;
 	};
 	if (key >= 0) {
@@ -273,6 +272,7 @@ int validate_manager(string &alt_pkg, int userid, struct stat *st) {
 }
 
 void exec_sql(int client) {
+	run_finally f([=]{ close(client); });
 	char *sql = read_string(client);
 	char *err = db_exec(sql, [&](db_row &row) -> bool {
 		string out;
@@ -289,9 +289,6 @@ void exec_sql(int client) {
 		return true;
 	});
 	free(sql);
-	db_err_cmd(err,
-		write_int(client, 0);
-		return;
-	);
-	close(client);
+	write_int(client, 0);
+	db_err_cmd(err, return; );
 }

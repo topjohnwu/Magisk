@@ -62,7 +62,7 @@ subprojects {
             android {
                 signingConfigs {
                     config {
-                        storeFile rootProject.file('release-key.jks')
+                        storeFile new File(props['keyStore'])
                         storePassword props['keyStorePass']
                         keyAlias props['keyAlias']
                         keyPassword props['keyPass']
@@ -85,13 +85,12 @@ subprojects {
                 }
 
                 aaptOptions {
-                    // Preserve stub resource IDs
-                    File publicTxt = rootProject.file('stub-public.txt')
-                    if (publicTxt.exists()) {
-                        additionalParameters "--stable-ids", "${publicTxt.absolutePath}"
-                    } else if (module.name == 'stub') {
-                        additionalParameters "--emit-ids", "${publicTxt.absolutePath}"
-                    }
+                    // Handle resource IDs
+                    File resId = project.file('res-ids.txt')
+                    if (resId.exists())
+                        additionalParameters "--stable-ids", "${resId.absolutePath}"
+                    else
+                        additionalParameters "--emit-ids", "${resId.absolutePath}"
                 }
             }
         }

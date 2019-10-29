@@ -88,7 +88,6 @@
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Kapat</string>
     <string name="repo_install_title">%1$s yükle</string>
     <string name="repo_install_msg">%1$s yüklensin mi?</string>
     <string name="download">İndir</string>
@@ -147,6 +146,10 @@
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
     <string name="settings_hosts_toast">Sistemsiz host modülü eklendi</string>
 
+    <string name="settings_app_name">İstediğiniz uygulama adını yazın</string>
+    <string name="settings_app_name_hint">Yeni ad</string>
+    <string name="settings_app_name_helper">Uygulama bu ad ile yeniden paketlenecek</string>
+    <string name="settings_app_name_error">Geçersiz format</string>
     <string name="settings_su_app_adb">Uygulamalar ve ADB</string>
     <string name="settings_su_app">Sadece uygulamalar</string>
     <string name="settings_su_adb">Sadece ADB</string>
@@ -183,9 +186,8 @@
     <string name="global_summary">Tüm kök oturumları genel bağlama ad alanını kullanır</string>
     <string name="requester_summary">Kök oturumları, istekte bulunanın ad alanını devralır</string>
     <string name="isolate_summary">Her bir kök oturumunun kendi izole ad alanı olacaktır</string>
-    <string name="android_o_not_support">Android 8.0 ve üzerinde desteklenmiyor</string>
     <string name="disable_fingerprint">Parmak izi ayarlanmadı veya cihaz desteği yok</string>
-	<string name="settings_download_path_error">Klasör oluşturma hatası. Depolama kök dizininden erişilebilir olmalı ve bir dosya olmamalıdır.</string>
+    <string name="settings_download_path_error">Klasör oluşturma hatası. Depolama kök dizininden erişilebilir olmalı ve bir dosya olmamalıdır.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Yetkili Kullanıcı İsteği</string>

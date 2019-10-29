@@ -110,8 +110,12 @@ EOF
   cd /
 }
 
-rm_launch() {
-  pm uninstall $1
-  am start -n $2
-  exit
+force_pm_install() {
+  local APK=$1
+  local VERIFY=`settings get global package_verifier_enable`
+  [ "$VERIFY" -eq 1 ] && settings put global package_verifier_enable 0
+  pm install -r $APK
+  local res=$?
+  [ "$VERIFY" -eq 1 ] && settings put global package_verifier_enable 1
+  return $res
 }

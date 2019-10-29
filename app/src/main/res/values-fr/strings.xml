@@ -88,7 +88,6 @@
     <string name="reboot_delay_toast">Redémarrage dans 5 secondes…</string>
 	
     <!--Toasts, Dialogs-->
-    <string name="close">Fermer</string>
     <string name="repo_install_title">Installer %1$s</string>
     <string name="repo_install_msg">Voulez‐vous installer %1$s maintenant ?</string>
     <string name="download">Télécharger</string>
@@ -183,7 +182,6 @@
     <string name="global_summary">Toutes les sessions super‐utilisateur utilisent l’espace de noms global du montage.</string>
     <string name="requester_summary">Les sessions super‐utilisateur hériteront de l’espace de noms de leur demandeur.</string>
     <string name="isolate_summary">Chaque session super‐utilisateur aura son propre espace de noms isolé.</string>
-    <string name="android_o_not_support">Android 8.0 et supérieurs ne sont pas pris en charge.</string>
     <string name="disable_fingerprint">Aucune empreinte digitale n’a été définie ou le lecteur d’empreinte n’est pas pris en charge.</string>
     <string name="settings_download_path_error">Erreur lors de la création du dossier. Il doit être accessible depuis le répertoire racine du stockage et ne doit pas être un fichier.</string>
 

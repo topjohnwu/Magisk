@@ -8,12 +8,12 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.topjohnwu.magisk.ClassMap
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.databinding.FragmentModulesBinding
 import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.intent
 import com.topjohnwu.magisk.model.events.OpenFilePickerEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.flash.FlashActivity
@@ -28,7 +28,7 @@ class ModulesFragment : BaseFragment<ModuleViewModel, FragmentModulesBinding>() 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Const.ID.FETCH_ZIP && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
-            val intent = Intent(activity, ClassMap[FlashActivity::class.java])
+            val intent = activity.intent(FlashActivity::class.java)
             intent.setData(data.data).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP)
             startActivity(intent)
         }

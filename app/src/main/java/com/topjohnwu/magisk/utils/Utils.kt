@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.utils
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -46,7 +45,7 @@ object Utils {
                     .setRequiresDeviceIdle(true)
                     .build()
             val request = PeriodicWorkRequest
-                    .Builder(ClassMap[UpdateCheckService::class.java], 12, TimeUnit.HOURS)
+                    .Builder(ClassMap[UpdateCheckService::class.java] as Class<Worker>, 12, TimeUnit.HOURS)
                     .setConstraints(constraints)
                     .build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
@@ -72,9 +71,5 @@ object Utils {
         File(Environment.getExternalStorageDirectory(), path).run {
             if ((exists() && isDirectory) || mkdirs()) this else null
         }
-
-    fun rmAndLaunch(rm: String, component: ComponentName) {
-        Shell.su("(rm_launch $rm ${component.flattenToString()})").exec()
-    }
 
 }

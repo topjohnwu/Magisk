@@ -20,15 +20,18 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.FileProvider
 import com.topjohnwu.magisk.utils.DynamicClassLoader
-import com.topjohnwu.magisk.utils.FileProvider
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.currentLocale
 import com.topjohnwu.superuser.ShellUtils
+import com.topjohnwu.superuser.Shell
 import java.io.File
 import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
 
@@ -99,33 +102,38 @@ fun Context.readUri(uri: Uri) =
 
 fun Intent.startActivity(context: Context) = context.startActivity(this)
 
-fun Intent.toCommand(args: MutableList<String>) {
-    if (action != null) {
+fun Intent.startActivityWithRoot() {
+    val args = mutableListOf("am", "start", "--user", Const.USER_ID.toString())
+    val cmd = toCommand(args).joinToString(" ")
+    Shell.su(cmd).submit()
+}
+
+fun Intent.toCommand(args: MutableList<String> = mutableListOf()): MutableList<String> {
+    action?.also {
         args.add("-a")
-        args.add(action!!)
+        args.add(it)
     }
-    if (component != null) {
+    component?.also {
         args.add("-n")
-        args.add(component!!.flattenToString())
+        args.add(it.flattenToString())
     }
-    if (data != null) {
+    data?.also {
         args.add("-d")
-        args.add(dataString!!)
+        args.add(it.toString())
     }
-    if (categories != null) {
-        for (cat in categories) {
+    categories?.also {
+        for (cat in it) {
             args.add("-c")
             args.add(cat)
         }
     }
-    if (type != null) {
+    type?.also {
         args.add("-t")
-        args.add(type!!)
+        args.add(it)
     }
-    val extras = extras
-    if (extras != null) {
-        loop@ for (key in extras.keySet()) {
-            val v = extras.get(key) ?: continue
+    extras?.also {
+        loop@ for (key in it.keySet()) {
+            val v = it[key] ?: continue
             var value: Any = v
             val arg: String
             when {
@@ -139,9 +147,8 @@ fun Intent.toCommand(args: MutableList<String>) {
                     arg = "--ecn"
                     value = v.flattenToString()
                 }
-                v is ArrayList<*> -> {
-                    if (v.size <= 0)
-                    /* Impossible to know the type due to type erasure */
+                v is List<*> -> {
+                    if (v.isEmpty())
                         continue@loop
 
                     arg = if (v[0] is Int)
@@ -177,11 +184,9 @@ fun Intent.toCommand(args: MutableList<String>) {
                         continue@loop  /* Unsupported */
 
                     val sb = StringBuilder()
-                    val len = java.lang.reflect.Array.getLength(v)
+                    val len = JArray.getLength(v)
                     for (i in 0 until len) {
-                        sb.append(
-                            java.lang.reflect.Array.get(v, i)!!.toString().replace(",", "\\,")
-                        )
+                        sb.append(JArray.get(v, i)!!.toString().replace(",", "\\,"))
                         sb.append(',')
                     }
                     // Remove trailing comma
@@ -198,6 +203,7 @@ fun Intent.toCommand(args: MutableList<String>) {
     }
     args.add("-f")
     args.add(flags.toString())
+    return args
 }
 
 fun File.provide(context: Context = get()): Uri {

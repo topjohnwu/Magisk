@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.dummy.DummyActivity;
 import com.topjohnwu.magisk.dummy.DummyProvider;
 import com.topjohnwu.magisk.dummy.DummyReceiver;
 import com.topjohnwu.magisk.dummy.DummyService;
+import com.topjohnwu.magisk.obfuscate.Mapping;
 
 @SuppressLint("NewApi")
 public class DelegateComponentFactory extends AppComponentFactory {
@@ -22,7 +23,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
 
     @Override
     public Application instantiateApplication(ClassLoader cl, String className) {
-        loader = cl;
+        if (loader == null) loader = cl;
         return new DelegateApplication(this);
     }
 
@@ -30,7 +31,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public Activity instantiateActivity(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (delegate != null)
-            return delegate.instantiateActivity(loader, className, intent);
+            return delegate.instantiateActivity(loader, Mapping.get(className), intent);
         return create(className, DummyActivity.class);
     }
 
@@ -38,7 +39,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public BroadcastReceiver instantiateReceiver(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (delegate != null)
-            return delegate.instantiateReceiver(loader, className, intent);
+            return delegate.instantiateReceiver(loader, Mapping.get(className), intent);
         return create(className, DummyReceiver.class);
     }
 
@@ -46,15 +47,16 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public Service instantiateService(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (delegate != null)
-            return delegate.instantiateService(loader, className, intent);
+            return delegate.instantiateService(loader, Mapping.get(className), intent);
         return create(className, DummyService.class);
     }
 
     @Override
     public ContentProvider instantiateProvider(ClassLoader cl, String className)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if (loader == null) loader = cl;
         if (delegate != null)
-            return delegate.instantiateProvider(loader, className);
+            return delegate.instantiateProvider(loader, Mapping.get(className));
         return create(className, DummyProvider.class);
     }
 

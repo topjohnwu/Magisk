@@ -83,7 +83,6 @@
     <string name="patch_file_msg">원시 이미지 (*.img) 또는 오딘 tar 파일 (*.tar) 선택</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">닫기</string>
     <string name="repo_install_title">%1$s 설치</string>
     <string name="repo_install_msg">정말 %1$s을(를) 설치하시겠습니까?</string>
     <string name="download">다운로드</string>
@@ -176,7 +175,6 @@
     <string name="global_summary">모든 루트 세션이 전역 마운트 이름공간을 사용합니다.</string>
     <string name="requester_summary">루트 세션은 요청자의 이름공간을 상속합니다.</string>
     <string name="isolate_summary">각각의 루트 세션은 자신만의 독립된 이름공간을 사용합니다.</string>
-    <string name="android_o_not_support">안드로이드 8.0 이상 버전에서 사용할 수 없습니다.</string>
     <string name="disable_fingerprint">지문이 등록되지 않았거나 기기가 지문 인식을 지원하지 않습니다.</string>
 
     <!--Superuser-->
