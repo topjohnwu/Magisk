@@ -215,8 +215,8 @@ class HomeViewModel(
 
     private fun updateSelf() {
         magiskState.value = when (Info.env.magiskVersionCode) {
-            in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
-            in 1 until (Info.remote.magisk.versionCode - 1) -> MagiskState.OBSOLETE
+            in Int.MIN_VALUE .. 0 -> MagiskState.NOT_INSTALLED
+            in 1 until Info.remote.magisk.versionCode -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
@@ -224,10 +224,10 @@ class HomeViewModel(
             VERSION_FMT.format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
 
         _managerState.value = when (Info.remote.app.versionCode) {
-            in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
-            in (BuildConfig.VERSION_CODE + 1) until Int.MAX_VALUE -> MagiskState.OBSOLETE
+            in Int.MIN_VALUE .. 0 -> MagiskState.NOT_INSTALLED //wrong update channel
+            in (BuildConfig.VERSION_CODE + 1) .. Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> {
-                if (isRunningAsStub && Info.stub!!.version < Info.remote.stub.versionCode)
+                if (Info.stub?.version ?: Int.MAX_VALUE < Info.remote.stub.versionCode)
                     MagiskState.OBSOLETE
                 else
                     MagiskState.UP_TO_DATE
