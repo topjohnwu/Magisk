@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <import type="com.topjohnwu.magisk.R" />
 
         <variable
             name="viewModel"
@@ -9,15 +13,20 @@
 
     </data>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        dividerVertical="@{R.drawable.divider_l1}"
+        itemBinding="@{viewModel.itemBinding}"
+        items="@{viewModel.items}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </androidx.core.widget.NestedScrollView>
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/l1"
+        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
+        android:paddingEnd="@dimen/l1"
+        android:paddingBottom="@{viewModel.insets.bottom}"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_hide_md2"
+        tools:paddingTop="40dp" />
 
 </layout>

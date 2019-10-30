@@ -14,3 +14,13 @@ class HideAppInfo(
     val processes = info.packageInfo?.processes?.distinct() ?: listOf(info.packageName)
 
 }
+
+data class StatefulProcess(
+    val name: String,
+    val isHidden: Boolean
+)
+
+class ProcessHideApp(
+    val info: HideAppInfo,
+    val processes: List<StatefulProcess>
+)

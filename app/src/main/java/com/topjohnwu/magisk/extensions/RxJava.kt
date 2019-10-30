@@ -43,35 +43,35 @@ typealias OnErrorListener = (Throwable) -> Unit
 /*=== ALIASES FOR OBSERVABLES ===*/
 
 fun <T> Observable<T>.subscribeK(
-        onError: OnErrorListener = { it.printStackTrace() },
-        onComplete: OnCompleteListener = {},
-        onNext: OnSuccessListener<T> = {}
+    onError: OnErrorListener = { it.printStackTrace() },
+    onComplete: OnCompleteListener = {},
+    onNext: OnSuccessListener<T> = {}
 ) = applySchedulers()
     .subscribe(onNext, onError, onComplete)
 
 fun <T> Single<T>.subscribeK(
-        onError: OnErrorListener = { it.printStackTrace() },
-        onNext: OnSuccessListener<T> = {}
+    onError: OnErrorListener = { it.printStackTrace() },
+    onNext: OnSuccessListener<T> = {}
 ) = applySchedulers()
     .subscribe(onNext, onError)
 
 fun <T> Maybe<T>.subscribeK(
-        onError: OnErrorListener = { it.printStackTrace() },
-        onComplete: OnCompleteListener = {},
-        onNext: OnSuccessListener<T> = {}
+    onError: OnErrorListener = { it.printStackTrace() },
+    onComplete: OnCompleteListener = {},
+    onNext: OnSuccessListener<T> = {}
 ) = applySchedulers()
     .subscribe(onNext, onError, onComplete)
 
 fun <T> Flowable<T>.subscribeK(
-        onError: OnErrorListener = { it.printStackTrace() },
-        onComplete: OnCompleteListener = {},
-        onNext: OnSuccessListener<T> = {}
+    onError: OnErrorListener = { it.printStackTrace() },
+    onComplete: OnCompleteListener = {},
+    onNext: OnSuccessListener<T> = {}
 ) = applySchedulers()
     .subscribe(onNext, onError, onComplete)
 
 fun Completable.subscribeK(
-        onError: OnErrorListener = { it.printStackTrace() },
-        onComplete: OnCompleteListener = {}
+    onError: OnErrorListener = { it.printStackTrace() },
+    onComplete: OnCompleteListener = {}
 ) = applySchedulers()
     .subscribe(onComplete, onError)
 
@@ -197,5 +197,8 @@ fun <T> ObservableField<T>.toObservable(): Observable<T> {
 
 fun <T : Any> T.toSingle() = Single.just(this)
 
-fun <T1, T2, R> zip(t1: Single<T1>, t2: Single<T2>, zipper: (T1, T2) -> R) =
-        Single.zip(t1, t2, BiFunction<T1, T2, R> { rt1, rt2 -> zipper(rt1, rt2) })
+inline fun <T1, T2, R> zip(
+    t1: Single<T1>,
+    t2: Single<T2>,
+    crossinline zipper: (T1, T2) -> R
+) = Single.zip(t1, t2, BiFunction<T1, T2, R> { rt1, rt2 -> zipper(rt1, rt2) })

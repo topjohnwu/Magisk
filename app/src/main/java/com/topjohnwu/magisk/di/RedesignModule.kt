@@ -17,7 +17,7 @@ import org.koin.dsl.module
 
 val redesignModule = module {
     viewModel { FlashViewModel() }
-    viewModel { HideViewModel() }
+    viewModel { HideViewModel(get(), get()) }
     viewModel { HomeViewModel(get()) }
     viewModel { LogViewModel() }
     viewModel { ModuleViewModel() }
