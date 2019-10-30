@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <import type="com.topjohnwu.magisk.Config" />
 
         <variable
             name="viewModel"
@@ -11,12 +15,51 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
+        android:clipToPadding="false"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
+        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
+        tools:paddingTop="24dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/module_notice"
+                style="?styleCardNormal"
+                gone="@{!Config.coreOnly}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/l1"
+                android:visibility="gone"
+                app:cardBackgroundColor="?colorError"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="@dimen/l1"
+                    android:text="@string/module_safe_mode_message"
+                    android:textAppearance="?appearanceTextCaptionOnPrimary"
+                    android:textStyle="bold" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                itemBinding="@{viewModel.itemBinding}"
+                items="@{viewModel.items}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/l1"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintTop_toBottomOf="@+id/module_notice" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
 

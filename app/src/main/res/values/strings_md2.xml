@@ -68,4 +68,6 @@
     <string name="install_next">Next</string>
     <string name="install_start">Let\'s go</string>
 
+    <string name="module_safe_mode_message">You\'re in safe mode. None of user modules will work.\nThis message will disappear once safe mode is disabled.</string>
+
 </resources>
