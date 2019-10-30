@@ -9,27 +9,15 @@
         tools:showAsAction="always" />
 
     <item
-        android:id="@+id/modulesFragment"
-        android:icon="@drawable/ic_module_md2"
-        android:title="@string/section_modules"
-        tools:showAsAction="always" />
-
-    <item
         android:id="@+id/superuserFragment"
         android:icon="@drawable/ic_superuser_md2"
         android:title="@string/section_superuser"
         tools:showAsAction="always" />
 
     <item
-        android:id="@+id/logFragment"
-        android:icon="@drawable/ic_bug_md2"
-        android:title="@string/section_log"
-        tools:showAsAction="always" />
-
-    <item
-        android:id="@+id/settingsFragment"
-        android:icon="@drawable/ic_settings_md2"
-        android:title="@string/section_settings"
+        android:id="@+id/modulesFragment"
+        android:icon="@drawable/ic_module_md2"
+        android:title="@string/section_modules"
         tools:showAsAction="always" />
 
 </menu>

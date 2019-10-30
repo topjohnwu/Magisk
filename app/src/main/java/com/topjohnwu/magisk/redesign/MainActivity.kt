@@ -21,9 +21,7 @@ import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatActivity
 import com.topjohnwu.magisk.redesign.compat.CompatNavigationDelegate
 import com.topjohnwu.magisk.redesign.home.HomeFragment
-import com.topjohnwu.magisk.redesign.log.LogFragment
 import com.topjohnwu.magisk.redesign.module.ModuleFragment
-import com.topjohnwu.magisk.redesign.settings.SettingsFragment
 import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
@@ -43,9 +41,7 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
     override val baseFragments: List<KClass<out Fragment>> = listOf(
         HomeFragment::class,
         ModuleFragment::class,
-        SuperuserFragment::class,
-        LogFragment::class,
-        SettingsFragment::class
+        SuperuserFragment::class
     )
 
     //This temporarily fixes unwanted feature of BottomNavigationView - where the view applies
@@ -72,8 +68,6 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
                 R.id.homeFragment -> Navigation.home()
                 R.id.modulesFragment -> Navigation.modules()
                 R.id.superuserFragment -> Navigation.superuser()
-                R.id.logFragment -> Navigation.log()
-                R.id.settingsFragment -> Navigation.settings()
                 else -> throw NotImplementedError("Id ${it.itemId} is not defined as selectable")
             }.dispatchOnSelf()
             true
@@ -82,7 +76,7 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         binding.mainNavigation.viewTreeObserver.addOnGlobalLayoutListener(navObserver)
 
         if (intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false)) {
-            binding.mainNavigation.selectedItemId = R.id.settingsFragment
+            Navigation.settings().dispatchOnSelf()
         }
 
         if (savedInstanceState != null) {
@@ -97,7 +91,6 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
             val isRoot = Shell.rootAccess()
             findItem(R.id.modulesFragment)?.isEnabled = isRoot
             findItem(R.id.superuserFragment)?.isEnabled = isRoot
-            findItem(R.id.logFragment)?.isEnabled = isRoot
         }
     }
 

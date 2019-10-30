@@ -47,7 +47,7 @@
             style="?styleCardElevated"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|center_horizontal"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
             android:layout_marginBottom="@{(int) @dimen/l1 + viewModel.insets.bottom}"

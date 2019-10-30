@@ -42,4 +42,6 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
         delegate.onEventExecute(event, this)
     }
 
+    protected fun ViewEvent.dispatchOnSelf() = delegate.onEventExecute(this, this@CompatFragment)
+
 }
