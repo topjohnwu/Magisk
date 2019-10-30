@@ -16,8 +16,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name="a.y"
-        android:appComponentFactory="a.x"
+        android:name="a.e"
+        android:appComponentFactory="a.a"
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning" >
@@ -25,7 +25,7 @@
         <!-- Download Activity -->
 
         <activity
-            android:name="a.z"
+            android:name="a.c"
             android:configChanges="orientation|screenSize"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -37,24 +37,24 @@
         <!-- Magisk Manager Components -->
 
         <activity
-            android:name="a.o"
+            android:name="a.b"
             android:configChanges="orientation|screenSize"
             android:exported="true" />
 
         <activity
-            android:name="a.x"
+            android:name="a.f"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor" />
 
         <activity
-            android:name="a.g"
+            android:name="a.m"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false" />
 
         <receiver
-            android:name="a.w"
+            android:name="a.h"
             android:directBootAware="true">
             <intent-filter>
                 <action android:name="android.intent.action.REBOOT" />
@@ -70,7 +70,7 @@
         </receiver>
 
         <service
-            android:name="a.v"
+            android:name="a.j"
             android:exported="false" />
 
         <meta-data
@@ -80,7 +80,7 @@
         <!-- WorkManager SystemJobService -->
 
         <service
-            android:name="a.j"
+            android:name="a.x"
             android:directBootAware="false"
             android:enabled="true"
             android:exported="true"

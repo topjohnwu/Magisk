@@ -50,7 +50,7 @@ public class DynAPK {
 
     public static Object pack(Data data) {
         Object[] arr = new Object[2];
-        arr[STUB_VERSION_ENTRY] = STUB_VERSION;
+        arr[STUB_VERSION_ENTRY] = data.version;
         arr[COMPONENT_MAP] = data.componentMap;
         return arr;
     }
@@ -64,7 +64,7 @@ public class DynAPK {
     }
 
     public static class Data {
-        public int version;
+        public int version = STUB_VERSION;
         public Map<String, String> componentMap;
     }
 }
