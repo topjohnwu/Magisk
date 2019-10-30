@@ -24,9 +24,10 @@ import static com.topjohnwu.magisk.DelegateApplication.MANAGER_APK;
 
 public class DownloadActivity extends Activity {
 
+    private static final boolean CANARY = BuildConfig.VERSION_NAME.contains("-");
     private static final String URL =
-            BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
-            RawData.urlBase() + (BuildConfig.DEBUG ? RawData.canary() : RawData.stable());
+            BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL : RawData.urlBase() +
+            (BuildConfig.DEBUG ? RawData.debug() : (CANARY ? RawData.canary() : RawData.stable()));
 
     private String apkLink;
     private ErrorHandler err = (conn, e) -> {
@@ -71,7 +72,7 @@ public class DownloadActivity extends Activity {
             new AlertDialog.Builder(this)
                     .setCancelable(false)
                     .setTitle(RawData.appName())
-                    .setMessage(RawData.no_internet_msg())
+                    .setMessage(RawData.networkError())
                     .setNegativeButton(ok, (d, w) -> finish())
                     .show();
         }
@@ -87,7 +88,7 @@ public class DownloadActivity extends Activity {
                 new AlertDialog.Builder(DownloadActivity.this)
                         .setCancelable(false)
                         .setTitle(RawData.appName())
-                        .setMessage(RawData.upgrade_msg())
+                        .setMessage(RawData.upgradeMsg())
                         .setPositiveButton(yes, (d, w) -> dlAPK())
                         .setNegativeButton(no, (d, w) -> finish())
                         .show();
