@@ -3,8 +3,7 @@ package com.topjohnwu.magisk.obfuscate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.topjohnwu.magisk.DynAPK.*;
-import static com.topjohnwu.magisk.R.drawable.*;
+import static com.topjohnwu.magisk.DynAPK.Data;
 
 public class Mapping {
     private static Map<String, String> map = new HashMap<>();
@@ -25,13 +24,6 @@ public class Mapping {
         for (Map.Entry<String, String> e : map.entrySet()) {
             data.componentMap.put(e.getValue(), e.getKey());
         }
-        int[] res = new int[5];
-        res[NOTIFICATION] = ic_magisk_outline;
-        res[SUPERUSER] = sc_superuser;
-        res[MAGISKHIDE] = sc_magiskhide;
-        res[DOWNLOAD] = sc_cloud_download;
-        res[MODULES] = sc_extension;
-        data.resourceMap = res;
     }
 
     public static String get(String name) {

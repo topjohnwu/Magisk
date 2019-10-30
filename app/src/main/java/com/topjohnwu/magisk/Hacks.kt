@@ -73,17 +73,6 @@ fun Context.intent(c: Class<*>): Intent {
     } ?: Intent(this, cls)
 }
 
-fun resolveRes(idx: Int): Int {
-    return Info.stub?.resourceMap?.get(idx) ?: when(idx) {
-        DynAPK.NOTIFICATION -> R.drawable.ic_magisk_outline
-        DynAPK.DOWNLOAD -> R.drawable.sc_cloud_download
-        DynAPK.SUPERUSER -> R.drawable.sc_superuser
-        DynAPK.MODULES -> R.drawable.sc_extension
-        DynAPK.MAGISKHIDE -> R.drawable.sc_magiskhide
-        else -> -1
-    }
-}
-
 private open class GlobalResContext(base: Context) : ContextWrapper(base) {
     open val mRes: Resources get() = ResourceMgr.resource
     private val loader by lazy { javaClass.classLoader!! }

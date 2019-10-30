@@ -12,12 +12,19 @@ import android.content.pm.PackageManager.*
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.AdaptiveIconDrawable
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.provider.OpenableColumns
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.Const
@@ -96,6 +103,23 @@ fun Context.rawResource(id: Int) = resources.openRawResource(id)
 
 fun Context.readUri(uri: Uri) =
     contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
+
+fun Context.getBitmap(id: Int): Bitmap {
+    var drawable = AppCompatResources.getDrawable(this, id)!!
+    if (drawable is BitmapDrawable)
+        return drawable.bitmap
+    if (SDK_INT >= 26 && drawable is AdaptiveIconDrawable) {
+        drawable = LayerDrawable(arrayOf(drawable.background, drawable.foreground))
+    }
+    val bitmap = Bitmap.createBitmap(
+        drawable.intrinsicWidth, drawable.intrinsicHeight,
+        Bitmap.Config.ARGB_8888
+    )
+    val canvas = Canvas(bitmap)
+    drawable.setBounds(0, 0, canvas.width, canvas.height)
+    drawable.draw(canvas)
+    return bitmap
+}
 
 fun Intent.startActivity(context: Context) = context.startActivity(this)
 
