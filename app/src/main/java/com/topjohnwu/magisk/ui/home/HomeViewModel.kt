@@ -77,7 +77,7 @@ class HomeViewModel(
             ""
     }
 
-    val safetyNetTitle = KObservableField(R.string.safetyNet_check_text)
+    val safetyNetTitle = KObservableField(R.string.safetyNet_check_text.res())
     val ctsState = KObservableField(SafetyNetState.IDLE)
     val basicIntegrityState = KObservableField(SafetyNetState.IDLE)
     val safetyNetState = Observer(ctsState, basicIntegrityState) {
@@ -135,7 +135,7 @@ class HomeViewModel(
     fun safetyNetPressed() {
         ctsState.value = SafetyNetState.LOADING
         basicIntegrityState.value = SafetyNetState.LOADING
-        safetyNetTitle.value = R.string.checking_safetyNet_status
+        safetyNetTitle.value = R.string.checking_safetyNet_status.res()
 
         UpdateSafetyNetEvent().publish()
     }
@@ -144,7 +144,7 @@ class HomeViewModel(
         response and 0x0F == 0 -> {
             val hasCtsPassed = response and SafetyNetHelper.CTS_PASS != 0
             val hasBasicIntegrityPassed = response and SafetyNetHelper.BASIC_PASS != 0
-            safetyNetTitle.value = R.string.safetyNet_check_success
+            safetyNetTitle.value = R.string.safetyNet_check_success.res()
             ctsState.value = if (hasCtsPassed) {
                 SafetyNetState.PASS
             } else {
@@ -164,8 +164,8 @@ class HomeViewModel(
             ctsState.value = SafetyNetState.IDLE
             basicIntegrityState.value = SafetyNetState.IDLE
             safetyNetTitle.value = when (response) {
-                SafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
-                else -> R.string.safetyNet_api_error
+                SafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid.res()
+                else -> R.string.safetyNet_api_error.res()
             }
         }
     }
@@ -192,7 +192,7 @@ class HomeViewModel(
             _managerState.value = MagiskState.LOADING
             ctsState.value = SafetyNetState.IDLE
             basicIntegrityState.value = SafetyNetState.IDLE
-            safetyNetTitle.value = R.string.safetyNet_check_text
+            safetyNetTitle.value = R.string.safetyNet_check_text.res()
         }.subscribeK {
             updateSelf()
             ensureEnv()

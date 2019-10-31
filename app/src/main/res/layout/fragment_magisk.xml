@@ -15,8 +15,6 @@
 
         <import type="com.topjohnwu.magisk.R" />
 
-        <import type="com.topjohnwu.magisk.extensions.XStringKt" />
-
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -239,7 +237,7 @@
                             android:layout_marginRight="@dimen/margin_generic"
                             android:gravity="center"
                             android:maxLines="1"
-                            android:text="@{XStringKt.res(viewModel.safetyNetTitle)}"
+                            android:text="@{viewModel.safetyNetTitle}"
                             android:textStyle="bold"
                             app:autoSizeMaxTextSize="14sp"
                             app:autoSizeTextType="uniform"
