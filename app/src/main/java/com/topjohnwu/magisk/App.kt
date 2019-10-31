@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.unwrap
 import com.topjohnwu.magisk.utils.RootInit
+import com.topjohnwu.magisk.utils.updateConfig
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -58,15 +59,15 @@ open class App() : Application() {
             app = this
             impl = base
         }
-        ResourceMgr.init(impl)
-        super.attachBaseContext(impl.wrap())
+        val wrapped = impl.wrap()
+        super.attachBaseContext(wrapped)
 
         // Normal startup
         startKoin {
-            androidContext(baseContext)
+            androidContext(wrapped)
             modules(koinModules)
         }
-        ResourceMgr.reload()
+        ResourceMgr.init(impl)
         app.registerActivityLifecycleCallbacks(get<ActivityTracker>())
         WorkManager.initialize(impl.wrapJob(), androidx.work.Configuration.Builder().build())
     }
@@ -77,7 +78,7 @@ open class App() : Application() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        ResourceMgr.reload(newConfig)
+        resources.updateConfig(newConfig)
         if (!isRunningAsStub)
             super.onConfigurationChanged(newConfig)
     }

@@ -25,6 +25,8 @@ import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.currentLocale
 import com.topjohnwu.magisk.utils.defaultLocale
+import com.topjohnwu.magisk.utils.refreshLocale
+import com.topjohnwu.magisk.utils.updateConfig
 import java.util.*
 
 fun AssetManager.addAssetPath(path: String) {
@@ -49,15 +51,6 @@ fun Context.wrapJob(): Context = object : GlobalResContext(this) {
                 else -> super.getSystemService(name)
             }
     }
-}
-
-// Override locale and inject resources from dynamic APK
-private fun Resources.patch(config: Configuration = Configuration(configuration)): Resources {
-    config.setLocale(currentLocale)
-    updateConfiguration(config, displayMetrics)
-    if (isRunningAsStub)
-        assets.addAssetPath(ResourceMgr.resApk)
-    return this
 }
 
 fun Class<*>.cmp(pkg: String = BuildConfig.APPLICATION_ID): ComponentName {
@@ -92,35 +85,28 @@ private open class GlobalResContext(base: Context) : ContextWrapper(base) {
 
 private class ResContext(base: Context) : GlobalResContext(base) {
     override val mRes by lazy { base.resources.patch() }
+
+    private fun Resources.patch(): Resources {
+        updateConfig()
+        if (isRunningAsStub)
+            assets.addAssetPath(ResourceMgr.resApk)
+        return this
+    }
 }
 
 object ResourceMgr {
 
-    internal lateinit var resource: Resources
-    internal lateinit var resApk: String
+    lateinit var resource: Resources
+    lateinit var resApk: String
 
     fun init(context: Context) {
         resource = context.resources
-        if (isRunningAsStub)
+        refreshLocale()
+        if (isRunningAsStub) {
             resApk = DynAPK.current(context).path
-    }
-
-    fun reload(config: Configuration = Configuration(resource.configuration)) {
-        val localeConfig = Config.locale
-        currentLocale = when {
-            localeConfig.isEmpty() -> defaultLocale
-            else -> localeConfig.langTagToLocale()
+            resource.assets.addAssetPath(resApk)
         }
-        Locale.setDefault(currentLocale)
-        resource.patch(config)
     }
-
-    fun getString(locale: Locale, @StringRes id: Int): String {
-        val config = Configuration()
-        config.setLocale(locale)
-        return Resources(resource.assets, resource.displayMetrics, config).getString(id)
-    }
-
 }
 
 @RequiresApi(api = 28)

@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.CustomDownloadDialogBinding
 import com.topjohnwu.magisk.databinding.DialogCustomNameBinding
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.extensions.toLangTag
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -199,7 +198,7 @@ class SettingsFragment : BasePreferenceFragment() {
                 Shell.su("magiskhide --disable").submit()
             }
             Config.Key.LOCALE -> {
-                ResourceMgr.reload()
+                refreshLocale()
                 activity.recreate()
             }
             Config.Key.CHECK_UPDATES -> Utils.scheduleUpdateCheck(activity)
@@ -223,22 +222,7 @@ class SettingsFragment : BasePreferenceFragment() {
 
     private fun setLocalePreference(lp: ListPreference) {
         lp.isEnabled = false
-        availableLocales.map {
-            val names = mutableListOf<String>()
-            val values = mutableListOf<String>()
-
-            names.add(
-                ResourceMgr.getString(defaultLocale, R.string.system_default)
-            )
-            values.add("")
-
-            it.forEach { locale ->
-                names.add(locale.getDisplayName(locale))
-                values.add(locale.toLangTag())
-            }
-
-            Pair(names.toTypedArray(), values.toTypedArray())
-        }.subscribeK { (names, values) ->
+        availableLocales.subscribeK { (names, values) ->
             lp.isEnabled = true
             lp.entries = names
             lp.entryValues = values
