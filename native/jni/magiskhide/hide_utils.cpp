@@ -283,7 +283,7 @@ void auto_start_magiskhide() {
 	db_settings dbs;
 	get_db_settings(dbs, HIDE_CONFIG);
 	if (dbs[HIDE_CONFIG]) {
-		new_daemon_thread([]() -> void { launch_magiskhide(-1); });
+		new_daemon_thread([]{ launch_magiskhide(-1); });
 	}
 }
 
