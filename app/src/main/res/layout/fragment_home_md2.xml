@@ -11,6 +11,8 @@
 
         <import type="com.topjohnwu.magisk.Info" />
 
+        <import type="com.topjohnwu.magisk.InfoKt" />
+
         <import type="com.topjohnwu.magisk.Config" />
 
         <import type="com.topjohnwu.magisk.BuildConfig" />
@@ -613,11 +615,10 @@
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_code_title" />
 
-                            <!--todo(diareuse) Info.env.isRunningAsStub ? @string/home_extra_mode_stub : @string/home_extra_mode_normal-->
-
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_extra_mode_value"
                                 style="@style/W.Home.Extra.Value"
+                                android:text="@{InfoKt.isRunningAsStub ? @string/home_extra_mode_stub : @string/home_extra_mode_normal}"
                                 app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_mode_title"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/home_manager_extra_mode_title"
