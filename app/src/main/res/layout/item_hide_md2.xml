@@ -59,6 +59,8 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/hide_package"
                 android:layout_width="0dp"
+                gone="@{item.item.info.info.packageName.empty}"
+                android:text="@{item.item.info.info.packageName}"
                 android:layout_height="wrap_content"
                 android:textAppearance="?appearanceTextCaptionVariant"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -90,6 +92,8 @@
                 style="?styleToolbar"
                 onNavigationClick="@{(v) -> item.collapse(v)}"
                 android:layout_width="match_parent"
+                onMenuClick="@{(it) -> item.toggle(it, viewModel)}"
+                app:menu="@menu/menu_hide_item"
                 android:layout_height="48dp"
                 app:navigationIcon="@drawable/ic_back_md2"
                 app:title="Processes"
@@ -100,6 +104,7 @@
                 items="@{item.items}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                tools:itemCount="2"
                 android:orientation="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_hide_process_md2" />

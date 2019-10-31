@@ -404,3 +404,8 @@ fun MaterialCardView.setCardElevationBound(elevation: Float) {
 fun MaterialCardView.setCardStrokeWidthBound(stroke: Float) {
     strokeWidth = stroke.roundToInt()
 }
+
+@BindingAdapter("onMenuClick")
+fun Toolbar.setOnMenuClickListener(listener: Toolbar.OnMenuItemClickListener) {
+    setOnMenuItemClickListener(listener)
+}

@@ -17,6 +17,7 @@ class HideAppInfo(
 
 data class StatefulProcess(
     val name: String,
+    val packageName: String,
     val isHidden: Boolean
 )
 

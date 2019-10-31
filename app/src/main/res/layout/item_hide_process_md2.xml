@@ -17,6 +17,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:background="?selectableItemBackground"
+        android:onClick="@{() -> item.toggle(viewModel)}"
         android:layout_height="wrap_content"
         android:layout_gravity="center">
 
@@ -41,10 +43,8 @@
             style="?styleImageSmall"
             isSelected="@{item.isHidden}"
             android:layout_marginTop="@dimen/l_50"
-            android:layout_marginEnd="@dimen/l1"
+            android:layout_marginEnd="@dimen/l_75"
             android:layout_marginBottom="@dimen/l_50"
-            android:background="?selectableItemBackgroundBorderless"
-            android:onClick="@{() -> item.toggle()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

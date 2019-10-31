@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import com.topjohnwu.magisk.R
@@ -14,6 +15,7 @@ import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import com.topjohnwu.magisk.model.events.HideProcessEvent
+import com.topjohnwu.magisk.redesign.hide.HideViewModel
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
@@ -22,14 +24,18 @@ class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
 
     override val layoutRes = R.layout.item_hide_md2
 
+    val packageName = item.info.info.packageName.orEmpty()
     val items = item.processes.map { HideProcessItem(it) }
 
     val isExpanded = KObservableField(false)
     val itemsChecked = KObservableField(0)
-    val isHidden get() = itemsChecked.value == items.size
+
+    /** [toggle] depends on this functionality */
+    private val isHidden get() = itemsChecked.value == items.size
 
     init {
         items.forEach { it.isHidden.addOnPropertyChangedCallback { recalculateChecked() } }
+        recalculateChecked()
     }
 
     fun collapse(v: View) {
@@ -40,6 +46,17 @@ class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
     fun expand(v: View) {
         (v.parent as? ViewGroup)?.startAnimations()
         isExpanded.value = true
+    }
+
+    fun toggle(menuItem: MenuItem, viewModel: HideViewModel): Boolean {
+        if (menuItem.itemId != R.id.action_toggle) return false
+        // contract implies that isHidden == all checked
+        if (!isHidden) {
+            items.filterNot { it.isHidden.value }
+        } else {
+            items
+        }.forEach { it.toggle(viewModel) }
+        return true
     }
 
     private fun recalculateChecked() {
@@ -57,7 +74,10 @@ class HideProcessItem(val item: StatefulProcess) : ComparableRvItem<HideProcessI
 
     val isHidden = KObservableField(item.isHidden)
 
-    fun toggle() = isHidden.toggle()
+    fun toggle(viewModel: HideViewModel) {
+        isHidden.toggle()
+        viewModel.toggleItem(this)
+    }
 
     override fun contentSameAs(other: HideProcessItem) = item == other.item
     override fun itemSameAs(other: HideProcessItem) = item.name == other.item.name
