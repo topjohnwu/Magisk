@@ -210,9 +210,17 @@ int connect_daemon(bool create) {
 			exit(1);
 		}
 
+		int ppid = getpid();
 		LOGD("client: launching new main daemon process\n");
 		if (fork_dont_care() == 0) {
 			close(fd);
+
+			// Make sure ppid is not in acct
+			char src[64], dest[64];
+			sprintf(src, "/acct/uid_0/pid_%d", ppid);
+			sprintf(dest, "/acct/uid_0/pid_%d", getpid());
+			rename(src, dest);
+
 			main_daemon();
 		}
 
