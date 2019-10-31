@@ -145,8 +145,7 @@
     <string name="settings_hosts_title">Fichier hosts sans système</string>
     <string name="settings_hosts_summary">Prise en charge du fichier hosts sans système pour les applications de type AdBlock.</string>
     <string name="settings_hosts_toast">Ajout d’un module hosts sans système</string>
-
-	<string name="settings_app_name">Taper le nom de l'application désirée</string>
+    <string name="settings_app_name">Taper le nom de l'application désirée</string>
     <string name="settings_app_name_hint">Nouveau nom</string>
     <string name="settings_app_name_helper">L'application sera réempacter sous ce nom</string>
     <string name="settings_app_name_error">Format invalide</string>
