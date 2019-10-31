@@ -148,29 +148,25 @@ int main(int argc, char *argv[]) {
 		printf("\n");
 		munmap(buf, size);
 	} else if (argc > 2 && action == "unpack") {
-		if (argv[2] == "-n"sv) {
-			if (argv[3] == "-h"sv) {
-				if (argc == 4)
+		int idx = 2;
+		bool nodecomp = false;
+		bool hdr = false;
+		for (;;) {
+			if (idx >= argc)
+				usage(argv[0]);
+			if (argv[idx][0] != '-')
+				break;
+			for (char *flag = &argv[idx][1]; *flag; ++flag) {
+				if (*flag == 'n')
+					nodecomp = true;
+				else if (*flag == 'h')
+					hdr = true;
+				else
 					usage(argv[0]);
-				return unpack(argv[4], true, true);
-			} else {
-				if (argc == 3)
-					usage(argv[0]);
-				return unpack(argv[3], true);
 			}
-		} else if (argv[2] == "-h"sv) {
-			if (argv[3] == "-n"sv) {
-				if (argc == 4)
-					usage(argv[0]);
-				return unpack(argv[4], true, true);
-			} else {
-				if (argc == 3)
-					usage(argv[0]);
-				return unpack(argv[3], false, true);
-			}
-		} else {
-			return unpack(argv[2]);
+			++idx;
 		}
+		return unpack(argv[idx], nodecomp, hdr);
 	} else if (argc > 2 && action == "repack") {
 		if (argv[2] == "-n"sv) {
 			if (argc == 3)
