@@ -13,20 +13,48 @@
 
     </data>
 
-    <androidx.recyclerview.widget.RecyclerView
-        dividerVertical="@{R.drawable.divider_l1}"
-        itemBinding="@{viewModel.itemBinding}"
-        items="@{viewModel.items}"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:orientation="vertical"
-        android:paddingStart="@dimen/l1"
-        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
-        android:paddingEnd="@dimen/l1"
-        android:paddingBottom="@{viewModel.insets.bottom}"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_hide_md2"
-        tools:paddingTop="40dp" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            dividerVertical="@{R.drawable.divider_l1}"
+            invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
+            itemBinding="@{viewModel.itemBinding}"
+            items="@{viewModel.items}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/l1"
+            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
+            android:paddingEnd="@dimen/l1"
+            android:paddingBottom="@{viewModel.insets.bottom}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_hide_md2"
+            tools:paddingTop="40dp" />
+
+        <LinearLayout
+            goneUnless="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/safetynet_attest_loading"
+                android:textAppearance="?appearanceTextTitleNormal"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                style="?styleProgressIndeterminate"
+                android:layout_marginTop="@dimen/l1" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </layout>

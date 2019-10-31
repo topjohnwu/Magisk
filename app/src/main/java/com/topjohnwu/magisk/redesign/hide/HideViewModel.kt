@@ -47,6 +47,7 @@ class HideViewModel(
         .toList()
         .map { it.sort() }
         .map { it to items.calculateDiff(it) }
+        .applyViewModel(this)
         .subscribeK {
             items.update(it.first, it.second)
             query()
