@@ -319,7 +319,7 @@ int unpack(const char *image, bool nodecomp, bool hdr) {
 		boot.hdr->dump_hdr_file();
 
 	// Dump kernel
-	if (COMPRESSED(boot.k_fmt) && !nodecomp) {
+	if (!nodecomp && COMPRESSED(boot.k_fmt)) {
 		int fd = creat(KERNEL_FILE, 0644);
 		decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size());
 		close(fd);
@@ -331,7 +331,7 @@ int unpack(const char *image, bool nodecomp, bool hdr) {
 	dump(boot.kernel_dtb, boot.kernel_dt_size, KER_DTB_FILE);
 
 	// Dump ramdisk
-	if (COMPRESSED(boot.r_fmt) && !nodecomp) {
+	if (!nodecomp && COMPRESSED(boot.r_fmt)) {
 		int fd = creat(RAMDISK_FILE, 0644);
 		decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
 		close(fd);
@@ -436,7 +436,7 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 		size_t raw_size;
 		void *raw_buf;
 		mmap_ro(RAMDISK_FILE, raw_buf, raw_size);
-		if (!COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt) && !nocomp) {
+		if (!nocomp && !COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt)) {
 			boot.hdr->ramdisk_size() = compress(boot.r_fmt, fd, raw_buf, raw_size);
 		} else {
 			boot.hdr->ramdisk_size() = xwrite(fd, raw_buf, raw_size);
