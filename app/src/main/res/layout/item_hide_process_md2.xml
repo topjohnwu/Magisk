@@ -41,9 +41,11 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/hide_process_checkbox"
             style="?styleImageSmall"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             isSelected="@{item.isHidden}"
             android:layout_marginTop="@dimen/l_50"
-            android:layout_marginEnd="@dimen/l_75"
+            android:layout_marginEnd="@dimen/l1"
             android:layout_marginBottom="@dimen/l_50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
