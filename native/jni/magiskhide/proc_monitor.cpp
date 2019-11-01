@@ -155,6 +155,10 @@ static void inotify_event(int) {
 	check_zygote();
 }
 
+static void check_zygote(int) {
+	check_zygote();
+}
+
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
 	LOGD("proc_monitor: cleaning up\n");
@@ -312,6 +316,8 @@ void proc_monitor() {
 	sigaction(SIGTERMTHRD, &act, nullptr);
 	act.sa_handler = inotify_event;
 	sigaction(SIGIO, &act, nullptr);
+	act.sa_handler = check_zygote;
+	sigaction(SIGZYGOTE, &act, nullptr);
 
 	setup_inotify();
 

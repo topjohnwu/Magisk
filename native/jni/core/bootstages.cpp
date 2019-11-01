@@ -757,6 +757,8 @@ void boot_complete(int client) {
 	if (!pfs_done)
 		return;
 
+	auto_start_magiskhide();
+
 	if (access(MANAGERAPK, F_OK) == 0) {
 		// Install Magisk Manager if exists
 		rename(MANAGERAPK, "/data/magisk.apk");
