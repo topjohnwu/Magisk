@@ -79,7 +79,6 @@ sealed class HomeItem : ComparableRvItem<HomeItem>() {
 sealed class DeveloperItem : ComparableRvItem<DeveloperItem>() {
 
     abstract val items: List<HomeItem>
-    abstract val icon: Int
     abstract val name: Int
 
     override val layoutRes = R.layout.item_developer
@@ -89,31 +88,27 @@ sealed class DeveloperItem : ComparableRvItem<DeveloperItem>() {
 
     override fun equals(other: Any?): Boolean {
         if (other !is DeveloperItem) return false
-        return icon == other.icon && name == other.name && items == other.items
+        return name == other.name && items == other.items
     }
 
-    override fun hashCode() =
-        icon.hashCode() + name.hashCode() + items.hashCode() + layoutRes.hashCode()
+    override fun hashCode() = name.hashCode() + items.hashCode() + layoutRes.hashCode()
 
     //region Children
     object Mainline : DeveloperItem() {
         override val items =
             listOf(HomeItem.PayPal.Mainline, HomeItem.Patreon, HomeItem.Twitter.Mainline)
-        override val icon = R.drawable.ic_mainline_dev
         override val name = R.string.home_links_mainline
     }
 
     object App : DeveloperItem() {
         override val items =
             listOf(HomeItem.PayPal.App, HomeItem.Twitter.App)
-        override val icon = R.drawable.ic_app_dev
         override val name = R.string.home_links_app
     }
 
     object Project : DeveloperItem() {
         override val items =
             listOf(HomeItem.Github, HomeItem.Xda)
-        override val icon = R.drawable.ic_project
         override val name = R.string.home_links_project
     }
     //endregion

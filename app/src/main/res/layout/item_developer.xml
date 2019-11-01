@@ -20,17 +20,6 @@
         android:layout_height="wrap_content"
         tools:layout_gravity="center|start">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/developer_icon"
-            style="?styleIconNormal"
-            android:padding="@dimen/l_50"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@{item.icon}"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@drawable/ic_mainline_dev" />
-
         <com.google.android.material.card.MaterialCardView
             style="?styleCardNormal"
             android:layout_width="wrap_content"
@@ -39,7 +28,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@+id/developer_icon"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
