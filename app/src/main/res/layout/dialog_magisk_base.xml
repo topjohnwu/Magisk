@@ -19,8 +19,8 @@
             style="?styleCardElevated"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:cardUseCompatPadding="true"
             app:cardElevation="@dimen/margin_generic"
+            app:cardUseCompatPadding="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -56,13 +56,13 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        style="?styleIconNormal"
+                        style="?styleIconPrimary"
                         gone="@{data.icon == 0}"
                         srcCompat="@{data.icon}"
+                        android:padding="0dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="@dimen/l1"
-                        app:tint="@color/colorSecondary"
-                        tools:src="@drawable/ic_delete" />
+                        tools:src="@drawable/ic_delete_md2" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         style="?styleImageBig"
@@ -70,7 +70,7 @@
                         android:layout_gravity="center"
                         android:layout_marginTop="@dimen/l1"
                         android:src="@{data.iconRaw}"
-                        tools:src="@drawable/ic_delete" />
+                        tools:src="@drawable/ic_delete_md2" />
 
                 </FrameLayout>
 
