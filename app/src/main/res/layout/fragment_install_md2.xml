@@ -91,6 +91,8 @@
                         <FrameLayout
                             gone="@{viewModel.step != 0}"
                             android:layout_width="match_parent"
+                            android:paddingStart="3dp"
+                            android:paddingEnd="3dp"
                             android:layout_height="wrap_content">
 
                             <include
@@ -170,6 +172,8 @@
                             gone="@{viewModel.step != 1}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:paddingStart="3dp"
+                            android:paddingEnd="3dp"
                             android:layout_marginStart="@dimen/l1"
                             android:layout_marginTop="@dimen/l_50"
                             android:layout_marginEnd="@dimen/l1"

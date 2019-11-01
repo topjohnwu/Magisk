@@ -6,8 +6,8 @@
         android:state_checked="true">
         <vector
             android:name="vector"
-            android:width="24dp"
-            android:height="24dp"
+            android:width="18dp"
+            android:height="18dp"
             android:viewportWidth="24"
             android:viewportHeight="24">
             <group
@@ -27,8 +27,8 @@
         android:state_selected="true">
         <vector
             android:name="vector"
-            android:width="24dp"
-            android:height="24dp"
+            android:width="18dp"
+            android:height="18dp"
             android:viewportWidth="24"
             android:viewportHeight="24">
             <group
@@ -46,8 +46,8 @@
     <item android:id="@+id/expanded">
         <vector
             android:name="vector"
-            android:width="24dp"
-            android:height="24dp"
+            android:width="18dp"
+            android:height="18dp"
             android:viewportWidth="24"
             android:viewportHeight="24">
             <group
