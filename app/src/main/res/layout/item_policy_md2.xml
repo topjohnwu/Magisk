@@ -23,7 +23,8 @@
         android:alpha="@{item.isEnabled() ? 1f : .5f}"
         android:onClick="@{() -> item.toggle(viewModel)}"
         tools:layout_marginBottom="@dimen/l1"
-        tools:layout_marginEnd="@dimen/l1">
+        tools:layout_marginEnd="@dimen/l1"
+        tools:layout_width="200dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -87,12 +88,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/package_name">
+            app:layout_constraintTop_toBottomOf="@+id/package_name"
+            tools:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/bell"
                 style="?styleIconNormal"
                 isSelected="@{item.shouldNotify}"
+                tooltipText="@{@string/superuser_toggle_notification}"
+                android:contentDescription="@string/superuser_toggle_notification"
                 android:onClick="@{() -> item.toggleNotify(viewModel)}"
                 app:layout_constraintBottom_toTopOf="@+id/delete"
                 app:layout_constraintEnd_toStartOf="@+id/bug"
@@ -107,6 +111,8 @@
                 android:id="@+id/bug"
                 style="?styleIconNormal"
                 isSelected="@{item.shouldLog}"
+                tooltipText="@{@string/superuser_toggle_log}"
+                android:contentDescription="@string/superuser_toggle_log"
                 android:onClick="@{() -> item.toggleLog(viewModel)}"
                 app:layout_constraintBottom_toBottomOf="@+id/bell"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -115,15 +121,24 @@
                 app:srcCompat="@drawable/ic_bug_report"
                 app:tint="@color/color_error_primary_transient" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/delete"
-                style="?styleIconError"
+                style="?styleButtonText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:onClick="@{() -> viewModel.deletePressed(item)}"
+                android:text="@string/superuser_toggle_revoke"
+                android:textAllCaps="false"
+                android:textColor="?colorError"
+                android:textSize="12sp"
+                app:icon="@drawable/ic_delete_md2"
+                app:iconPadding="@dimen/l_50"
+                app:iconTint="?colorError"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/bell"
-                app:srcCompat="@drawable/ic_delete_md2" />
+                app:rippleColor="?colorError" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

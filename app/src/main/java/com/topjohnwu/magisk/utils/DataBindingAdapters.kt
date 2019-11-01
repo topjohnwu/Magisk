@@ -14,10 +14,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.doOnEnd
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
-import androidx.core.view.updateLayoutParams
+import androidx.core.view.*
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
@@ -408,4 +405,9 @@ fun MaterialCardView.setCardStrokeWidthBound(stroke: Float) {
 @BindingAdapter("onMenuClick")
 fun Toolbar.setOnMenuClickListener(listener: Toolbar.OnMenuItemClickListener) {
     setOnMenuItemClickListener(listener)
+}
+
+@BindingAdapter("tooltipText")
+fun View.setTooltipTextCompat(text: String) {
+    ViewCompat.setTooltipText(this, text)
 }

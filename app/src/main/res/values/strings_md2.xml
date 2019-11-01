@@ -70,4 +70,8 @@
 
     <string name="module_safe_mode_message">You\'re in safe mode. None of user modules will work.\nThis message will disappear once safe mode is disabled.</string>
 
+    <string name="superuser_toggle_log">Toggles logging</string>
+    <string name="superuser_toggle_notification">Toggles “toast” notifications</string>
+    <string name="superuser_toggle_revoke">Revoke</string>
+
 </resources>
