@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem" />
+            type="com.topjohnwu.magisk.model.entity.recycler.PolicyItem" />
 
         <variable
             name="viewModel"
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:alpha="@{item.isEnabled() ? 1f : .5f}"
-        android:onClick="@{() -> item.toggleEnabled()}"
+        android:onClick="@{() -> item.toggle(viewModel)}"
         tools:layout_marginBottom="@dimen/l1"
         tools:layout_marginEnd="@dimen/l1">
 
@@ -93,7 +93,7 @@
                 android:id="@+id/bell"
                 style="?styleIconNormal"
                 isSelected="@{item.shouldNotify}"
-                android:onClick="@{() -> item.toggleNotify()}"
+                android:onClick="@{() -> item.toggleNotify(viewModel)}"
                 app:layout_constraintBottom_toTopOf="@+id/delete"
                 app:layout_constraintEnd_toStartOf="@+id/bug"
                 app:layout_constraintHorizontal_chainStyle="packed"
@@ -107,7 +107,7 @@
                 android:id="@+id/bug"
                 style="?styleIconNormal"
                 isSelected="@{item.shouldLog}"
-                android:onClick="@{() -> item.toggleLog()}"
+                android:onClick="@{() -> item.toggleLog(viewModel)}"
                 app:layout_constraintBottom_toBottomOf="@+id/bell"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/bell"

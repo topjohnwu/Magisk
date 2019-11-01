@@ -10,8 +10,7 @@ import com.topjohnwu.magisk.extensions.applySchedulers
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
-import com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem
-import com.topjohnwu.magisk.model.events.PolicyEnableEvent
+import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.FingerprintDialog
@@ -22,6 +21,7 @@ import com.topjohnwu.magisk.redesign.home.itemBindingOf
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.FingerprintHelper
 import com.topjohnwu.magisk.utils.RxBus
+import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Single
 
 class SuperuserViewModel(
@@ -31,15 +31,12 @@ class SuperuserViewModel(
     private val resources: Resources
 ) : CompatViewModel() {
 
-    val items = diffListOf<PolicyRvItem>()
-    val itemBinding = itemBindingOf<PolicyRvItem> {
+    val items = diffListOf<PolicyItem>()
+    val itemBinding = itemBindingOf<PolicyItem> {
         it.bindExtra(BR.viewModel, this)
     }
 
     init {
-        rxBus.register<PolicyEnableEvent>()
-            .subscribeK { togglePolicy(it.item, it.enable) }
-            .add()
         rxBus.register<PolicyUpdateEvent>()
             .subscribeK { updatePolicy(it) }
             .add()
@@ -50,11 +47,11 @@ class SuperuserViewModel(
     override fun refresh() = db.fetchAll()
         .flattenAsFlowable { it }
         .parallel()
-        .map { PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager)) }
+        .map { PolicyItem(it, it.applicationInfo.loadIcon(packageManager)) }
         .sequential()
         .sorted { o1, o2 ->
-            compareBy<PolicyRvItem>(
-                { it.item.appName.toLowerCase() },
+            compareBy<PolicyItem>(
+                { it.item.appName.toLowerCase(currentLocale) },
                 { it.item.packageName }
             ).compare(o1, o2)
         }
@@ -69,7 +66,7 @@ class SuperuserViewModel(
     fun safetynetPressed() = Navigation.safetynet().publish()
     fun hidePressed() = Navigation.hide().publish()
 
-    fun deletePressed(item: PolicyRvItem) {
+    fun deletePressed(item: PolicyItem) {
         fun updateState() = deletePolicy(item.item)
             .subscribeK { items.removeAll { it.itemSameAs(item) } }
             .add()
@@ -88,7 +85,7 @@ class SuperuserViewModel(
 
     //---
 
-    private fun updatePolicy(it: PolicyUpdateEvent) = when (it) {
+    fun updatePolicy(it: PolicyUpdateEvent) = when (it) {
         is PolicyUpdateEvent.Notification -> updatePolicy(it.item).map {
             when {
                 it.notification -> R.string.su_snack_notif_on
@@ -105,7 +102,7 @@ class SuperuserViewModel(
         .subscribeK { SnackbarEvent(it).publish() }
         .add()
 
-    private fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
+    fun togglePolicy(item: PolicyItem, enable: Boolean) {
         fun updateState() {
             val policy = if (enable) MagiskPolicy.ALLOW else MagiskPolicy.DENY
             val app = item.item.copy(policy = policy)
