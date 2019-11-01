@@ -27,23 +27,6 @@ class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvIte
     val shouldLog = KObservableField(item.logging)
 
     fun toggle() = isExpanded.toggle()
-    fun toggleNotify() = shouldNotify.toggle()
-    fun toggleLog() = shouldLog.toggle()
-
-    fun toggleEnabled() {
-        if (isExpanded.value) {
-            return
-        }
-        isEnabled.toggle()
-    }
-
-    fun toggle(view: View) {
-        toggle()
-        view.rotationTo(if (isExpanded.value) 225 else 180)
-        (view.parent as ViewGroup)
-            .findViewById<View>(R.id.expand_layout)
-            .setRevealed(isExpanded.value)
-    }
 
     private val rxBus: RxBus by inject()
 
@@ -100,7 +83,7 @@ class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<
         isExpanded.toggle()
         view.rotationTo(if (isExpanded.value) 225 else 180)
         (view.parent as ViewGroup)
-            .findViewById<View>(R.id.expand_layout)
+            .findViewById<View>(R.id.policy_expand_container)
             .setRevealed(isExpanded.value)
     }
 

@@ -33,7 +33,7 @@
             android:paddingBottom="@dimen/l2">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/app_icon"
+                android:id="@+id/policy_app_icon"
                 style="?styleImageBig"
                 android:src="@{item.icon}"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -42,7 +42,7 @@
                 tools:srcCompat="@drawable/ic_logo" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/app_name"
+                android:id="@+id/policy_app_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin_generic"
@@ -56,11 +56,11 @@
                 android:textIsSelectable="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/app_icon"
+                app:layout_constraintTop_toBottomOf="@+id/policy_app_icon"
                 tools:text="@string/app_name" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/package_name"
+                android:id="@+id/policy_package_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:ellipsize="middle"
@@ -71,58 +71,61 @@
                 android:textColor="@android:color/tertiary_text_dark"
                 android:textIsSelectable="false"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/app_name"
-                app:layout_constraintStart_toStartOf="@id/app_name"
-                app:layout_constraintTop_toBottomOf="@id/app_name"
+                app:layout_constraintEnd_toEndOf="@id/policy_app_name"
+                app:layout_constraintStart_toStartOf="@id/policy_app_name"
+                app:layout_constraintTop_toBottomOf="@id/policy_app_name"
                 tools:text="com.topjohnwu.magisk" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/expand_layout"
+            android:id="@+id/policy_expand_container"
             revealFix="@{item.isExpanded()}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layout_constraintTop_toBottomOf="@+id/policy_package_name"
             android:background="?colorSurfaceVariant"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/package_name"
+            tools:alpha="0.9"
             tools:visibility="visible">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/bell"
+                android:id="@+id/policy_notify"
                 style="?styleIconNormal"
+                android:background="?selectableItemBackground"
                 isSelected="@{item.shouldNotify}"
                 tooltipText="@{@string/superuser_toggle_notification}"
                 android:contentDescription="@string/superuser_toggle_notification"
                 android:onClick="@{() -> item.toggleNotify(viewModel)}"
-                app:layout_constraintBottom_toTopOf="@+id/delete"
-                app:layout_constraintEnd_toStartOf="@+id/bug"
+                app:layout_constraintBottom_toTopOf="@+id/policy_delete"
+                app:layout_constraintEnd_toStartOf="@+id/policy_log"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
                 app:srcCompat="@drawable/ic_notifications"
-                app:tint="@color/color_error_primary_transient" />
+                app:tint="@color/color_state_primary_transient" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/bug"
+                android:id="@+id/policy_log"
                 style="?styleIconNormal"
+                android:background="?selectableItemBackground"
                 isSelected="@{item.shouldLog}"
                 tooltipText="@{@string/superuser_toggle_log}"
                 android:contentDescription="@string/superuser_toggle_log"
                 android:onClick="@{() -> item.toggleLog(viewModel)}"
-                app:layout_constraintBottom_toBottomOf="@+id/bell"
+                app:layout_constraintBottom_toBottomOf="@+id/policy_notify"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/bell"
-                app:layout_constraintTop_toTopOf="@+id/bell"
+                app:layout_constraintStart_toEndOf="@+id/policy_notify"
+                app:layout_constraintTop_toTopOf="@+id/policy_notify"
                 app:srcCompat="@drawable/ic_bug_report"
-                app:tint="@color/color_error_primary_transient" />
+                app:tint="@color/color_state_primary_transient" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/delete"
+                android:id="@+id/policy_delete"
                 style="?styleButtonText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -137,7 +140,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/bell"
+                app:layout_constraintTop_toBottomOf="@+id/policy_notify"
                 app:rippleColor="?colorError" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
