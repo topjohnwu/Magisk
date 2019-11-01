@@ -30,6 +30,11 @@
     <string name="home_item_source">Source</string>
     <string name="home_item_xda">XDA</string>
 
+    <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions.</string>
+    <string name="home_notice_hide">Hide</string>
+    <string name="home_support_title">Support Us</string>
+    <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
+
     <string name="home_device_security">Security</string>
     <string name="home_device_system">System</string>
     <string name="home_device_build_style">A/B</string>

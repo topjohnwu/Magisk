@@ -44,6 +44,46 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/l1">
 
+            <com.google.android.material.card.MaterialCardView
+                style="?styleCardOnPrimary"
+                goneUnless="@{viewModel.noticeVisible}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:layout_marginBottom="@dimen/l1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/home_notice_content"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/l1"
+                        android:text="@string/home_notice_content"
+                        android:textAppearance="?appearanceTextCaptionOnPrimary"
+                        app:layout_constraintEnd_toStartOf="@+id/home_notice_hide"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/home_notice_hide"
+                        style="?styleButtonTextOnPrimary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:onClick="@{() -> viewModel.hideNotice()}"
+                        android:text="@string/home_notice_hide"
+                        android:textAllCaps="false"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -703,35 +743,40 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <include
-                item="@{viewModel.items[0]}"
-                layout="@layout/item_developer"
-                viewModel="@{viewModel}"
+            <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1" />
+                android:layout_marginTop="@dimen/l2"
+                android:layout_marginEnd="@dimen/l1"
+                android:text="@string/home_support_title"
+                android:textAppearance="?appearanceTextTitleNormal" />
 
-            <include
-                item="@{viewModel.items[1]}"
-                layout="@layout/item_developer"
-                viewModel="@{viewModel}"
+            <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1" />
+                android:layout_marginTop="@dimen/l_50"
+                android:layout_marginEnd="@dimen/l1"
+                android:text="@string/home_support_content"
+                android:textAppearance="?appearanceTextCaptionVariant" />
 
-            <include
-                item="@{viewModel.items[2]}"
-                layout="@layout/item_developer"
-                viewModel="@{viewModel}"
+            <androidx.recyclerview.widget.RecyclerView
+                dividerHorizontal="@{R.drawable.divider_l1}"
+                dividerVertical="@{R.drawable.divider_l1}"
+                itemBinding="@{viewModel.itemDeveloperBinding}"
+                items="@{viewModel.items}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
                 android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1" />
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:overScrollMode="ifContentScrolls"
+                android:paddingStart="@dimen/l1"
+                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                app:spanCount="2"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_developer" />
 
         </LinearLayout>
 

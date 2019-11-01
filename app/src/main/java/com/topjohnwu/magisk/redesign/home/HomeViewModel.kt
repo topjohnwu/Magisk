@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.redesign.home
 
 import android.Manifest
 import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
@@ -33,6 +34,8 @@ import kotlin.math.roundToInt
 class HomeViewModel(
     private val repoMagisk: MagiskRepository
 ) : CompatViewModel() {
+
+    val isNoticeVisible = KObservableField(Config.safetyNotice)
 
     val stateMagisk = KObservableField(MagiskState.LOADING)
     val stateManager = KObservableField(MagiskState.LOADING)
@@ -142,6 +145,11 @@ class HomeViewModel(
         .add()
 
     fun toggle(kof: KObservableField<Boolean>) = kof.toggle()
+
+    fun hideNotice() {
+        Config.safetyNotice = false
+        isNoticeVisible.value = false
+    }
 
     private fun ensureEnv() {
         val invalidStates = listOf(

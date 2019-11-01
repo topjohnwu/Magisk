@@ -52,6 +52,7 @@ object Config : PreferenceModel, DBConfig {
         const val SHOW_SYSTEM_APP = "show_system"
         const val DOWNLOAD_PATH = "download_path"
         const val REDESIGN = "redesign"
+        const val SAFETY = "safety_notice"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -117,6 +118,7 @@ object Config : PreferenceModel, DBConfig {
     var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
     var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
 
+    var safetyNotice by preference(Key.SAFETY, true)
     var redesign by preference(Key.REDESIGN, false)
     @Deprecated("Use extended dark theme")
     var darkTheme by preference(Key.DARK_THEME, true)
