@@ -42,6 +42,11 @@ class SuperuserViewModel(
 
     init {
         rxBus.register<PolicyEnableEvent>()
+            .filter {
+                val isIgnored = it.item == ignoreNext
+                if (isIgnored) ignoreNext = null
+                !isIgnored
+            }
             .subscribeK { togglePolicy(it.item, it.enable) }
             .add()
         rxBus.register<PolicyUpdateEvent>()
