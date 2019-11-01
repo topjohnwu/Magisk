@@ -449,6 +449,33 @@ static void prepare_modules() {
 	chmod(SECURE_DIR, 0700);
 }
 
+static void reboot() {
+	if (RECOVERY_MODE)
+		exec_command_sync("/system/bin/reboot", "recovery");
+	else
+		exec_command_sync("/system/bin/reboot");
+}
+
+void remove_modules() {
+	LOGI("* Remove all modules and reboot");
+	chdir(MODULEROOT);
+	rm_rf("lost+found");
+	DIR *dir = xopendir(".");
+	struct dirent *entry;
+	while ((entry = xreaddir(dir))) {
+		if (entry->d_type == DT_DIR) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
+				continue;
+			chdir(entry->d_name);
+			close(creat("remove", 0644));
+			chdir("..");
+		}
+	}
+	closedir(dir);
+	chdir("/");
+	reboot();
+}
+
 static void collect_modules() {
 	chdir(MODULEROOT);
 	rm_rf("lost+found");

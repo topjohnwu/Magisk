@@ -15,6 +15,7 @@ void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
 int parse_int(const char *s);
 uint32_t binary_gcd(uint32_t u, uint32_t v);
+int switch_mnt_ns(int pid);
 
 #ifdef __cplusplus
 }

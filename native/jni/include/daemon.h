@@ -30,13 +30,11 @@ enum {
 	DAEMON_LAST
 };
 
-// daemon.c
+// daemon.cpp
 
 int connect_daemon(bool create = false);
-int switch_mnt_ns(int pid);
-void reboot();
 
-// socket.c
+// socket.cpp
 
 socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name);
 int create_rand_socket(struct sockaddr_un *sun);
@@ -63,6 +61,7 @@ void unlock_blocks();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
+void remove_modules();
 
 /*************
  * Scripting *

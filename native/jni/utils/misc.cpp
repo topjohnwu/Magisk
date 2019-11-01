@@ -198,3 +198,17 @@ uint32_t binary_gcd(uint32_t u, uint32_t v) {
 	} while (v != 0);
 	return u << shift;
 }
+
+int switch_mnt_ns(int pid) {
+	char mnt[32];
+	snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
+	if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
+
+	int fd, ret;
+	fd = xopen(mnt, O_RDONLY);
+	if (fd < 0) return 1;
+	// Switch to its namespace
+	ret = xsetns(fd, 0);
+	close(fd);
+	return ret;
+}

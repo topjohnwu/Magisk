@@ -31,13 +31,6 @@ static void verify_client(int client, pid_t pid) {
 	}
 }
 
-static void remove_modules() {
-	LOGI("* Remove all modules and reboot");
-	rm_rf(MODULEROOT);
-	rm_rf(MODULEUPGRADE);
-	reboot();
-}
-
 static void *request_handler(void *args) {
 	int client = reinterpret_cast<intptr_t>(args);
 
@@ -177,27 +170,6 @@ static void main_daemon() {
 		int client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
 		new_daemon_thread(request_handler, reinterpret_cast<void*>(client));
 	}
-}
-
-void reboot() {
-	if (RECOVERY_MODE)
-		exec_command_sync("/system/bin/reboot", "recovery");
-	else
-		exec_command_sync("/system/bin/reboot");
-}
-
-int switch_mnt_ns(int pid) {
-	char mnt[32];
-	snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
-	if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
-
-	int fd, ret;
-	fd = xopen(mnt, O_RDONLY);
-	if (fd < 0) return 1;
-	// Switch to its namespace
-	ret = xsetns(fd, 0);
-	close(fd);
-	return ret;
 }
 
 int connect_daemon(bool create) {
