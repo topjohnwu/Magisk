@@ -59,9 +59,9 @@
                         style="?styleIconPrimary"
                         gone="@{data.icon == 0}"
                         srcCompat="@{data.icon}"
-                        android:padding="0dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="@dimen/l1"
+                        android:padding="0dp"
                         tools:src="@drawable/ic_delete_md2" />
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -130,67 +130,97 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/dialog_base_scroll" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/dialog_base_button_1"
-                    style="?styleButtonText"
-                    gone="@{data.buttonPositive.icon == 0 &amp;&amp; data.buttonPositive.title.length == 0}"
-                    isEnabled="@{data.buttonPositive.isEnabled()}"
+                <ScrollView
+                    style="?attr/buttonBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:filterTouchesWhenObscured="true"
-                    android:onClick="@{() -> data.buttonPositive.clicked()}"
-                    android:text="@{data.buttonPositive.title}"
-                    app:icon="@{data.buttonPositive.icon}"
-                    app:iconGravity="textStart"
-                    app:layout_constraintTop_toBottomOf="@+id/dialog_base_space"
-                    tools:icon="@drawable/ic_bug_md2"
-                    tools:text="Button 1" />
+                    android:fillViewport="true"
+                    android:scrollbarAlwaysDrawVerticalTrack="true"
+                    app:layout_constraintTop_toBottomOf="@+id/dialog_base_space">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/dialog_base_button_2"
-                    style="?styleButtonText"
-                    gone="@{data.buttonNeutral.icon == 0 &amp;&amp; data.buttonNeutral.title.length == 0}"
-                    isEnabled="@{data.buttonNeutral.isEnabled()}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:filterTouchesWhenObscured="true"
-                    android:onClick="@{() -> data.buttonNeutral.clicked()}"
-                    android:text="@{data.buttonNeutral.title}"
-                    app:icon="@{data.buttonNeutral.icon}"
-                    app:iconGravity="textStart"
-                    app:layout_constraintTop_toBottomOf="@+id/dialog_base_button_1"
-                    tools:icon="@drawable/ic_bug_md2"
-                    tools:text="Button 1" />
+                    <com.android.internal.widget.ButtonBarLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="bottom|center_horizontal"
+                        android:layoutDirection="locale"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingTop="4dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="4dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/dialog_base_button_3"
-                    style="?styleButtonText"
-                    gone="@{data.buttonNegative.icon == 0 &amp;&amp; data.buttonNegative.title.length == 0}"
-                    isEnabled="@{data.buttonNegative.isEnabled()}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:filterTouchesWhenObscured="true"
-                    android:onClick="@{() -> data.buttonNegative.clicked()}"
-                    android:text="@{data.buttonNegative.title}"
-                    app:icon="@{data.buttonNegative.icon}"
-                    app:layout_constraintTop_toBottomOf="@+id/dialog_base_button_2"
-                    tools:icon="@drawable/ic_bug_md2"
-                    tools:text="Button 1" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/dialog_base_button_4"
+                            style="?styleButtonText"
+                            gone="@{data.buttonIDGAF.icon == 0 &amp;&amp; data.buttonIDGAF.title.length == 0}"
+                            isEnabled="@{data.buttonIDGAF.isEnabled()}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:filterTouchesWhenObscured="true"
+                            android:onClick="@{() -> data.buttonIDGAF.clicked()}"
+                            android:text="@{data.buttonIDGAF.title}"
+                            app:icon="@{data.buttonIDGAF.icon}"
+                            tools:icon="@drawable/ic_bug_md2"
+                            tools:text="Button 1" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/dialog_base_button_4"
-                    style="?styleButtonText"
-                    gone="@{data.buttonIDGAF.icon == 0 &amp;&amp; data.buttonIDGAF.title.length == 0}"
-                    isEnabled="@{data.buttonIDGAF.isEnabled()}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:filterTouchesWhenObscured="true"
-                    android:onClick="@{() -> data.buttonIDGAF.clicked()}"
-                    android:text="@{data.buttonIDGAF.title}"
-                    app:icon="@{data.buttonIDGAF.icon}"
-                    app:layout_constraintTop_toBottomOf="@+id/dialog_base_button_3"
-                    tools:icon="@drawable/ic_bug_md2"
-                    tools:text="Button 1" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/dialog_base_button_2"
+                            style="?styleButtonText"
+                            gone="@{data.buttonNeutral.icon == 0 &amp;&amp; data.buttonNeutral.title.length == 0}"
+                            isEnabled="@{data.buttonNeutral.isEnabled()}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:filterTouchesWhenObscured="true"
+                            android:onClick="@{() -> data.buttonNeutral.clicked()}"
+                            android:text="@{data.buttonNeutral.title}"
+                            app:icon="@{data.buttonNeutral.icon}"
+                            app:iconGravity="textStart"
+                            tools:icon="@drawable/ic_bug_md2"
+                            tools:text="Button 1" />
+
+                        <Space
+                            android:id="@+id/spacer"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:visibility="invisible" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/dialog_base_button_3"
+                            style="?styleButtonText"
+                            gone="@{data.buttonNegative.icon == 0 &amp;&amp; data.buttonNegative.title.length == 0}"
+                            isEnabled="@{data.buttonNegative.isEnabled()}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:filterTouchesWhenObscured="true"
+                            android:onClick="@{() -> data.buttonNegative.clicked()}"
+                            android:text="@{data.buttonNegative.title}"
+                            app:icon="@{data.buttonNegative.icon}"
+                            tools:icon="@drawable/ic_bug_md2"
+                            tools:text="Button 1" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/dialog_base_button_1"
+                            style="?styleButtonText"
+                            gone="@{data.buttonPositive.icon == 0 &amp;&amp; data.buttonPositive.title.length == 0}"
+                            isEnabled="@{data.buttonPositive.isEnabled()}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:filterTouchesWhenObscured="true"
+                            android:onClick="@{() -> data.buttonPositive.clicked()}"
+                            android:text="@{data.buttonPositive.title}"
+                            app:icon="@{data.buttonPositive.icon}"
+                            app:iconGravity="textStart"
+                            tools:icon="@drawable/ic_bug_md2"
+                            tools:text="Button 1" />
+
+                    </com.android.internal.widget.ButtonBarLayout>
+
+                </ScrollView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
