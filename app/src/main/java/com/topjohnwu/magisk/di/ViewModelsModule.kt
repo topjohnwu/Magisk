@@ -15,11 +15,13 @@ import org.koin.dsl.module
 
 val viewModelModules = module {
     viewModel { MainViewModel() }
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel { HomeViewModel(get()) }
     viewModel { SuperuserViewModel(get(), get(), get(), get()) }
     viewModel { HideViewModel(get(), get()) }
-    viewModel { ModuleViewModel(get(), get()) }
+    viewModel { ModuleViewModel(get(), get(), get()) }
     viewModel { LogViewModel(get(), get()) }
-    viewModel { (action: String, uri: Uri?) -> FlashViewModel(action, uri, get()) }
+    viewModel { (action: String, file: Uri, additional: Uri) ->
+        FlashViewModel(action, file, additional, get())
+    }
     viewModel { SuRequestViewModel(get(), get(), get(SUTimeout), get()) }
 }

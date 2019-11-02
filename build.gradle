@@ -7,6 +7,7 @@ if (configPath.exists())
     configPath.withInputStream { is -> props.load(is) }
 
 buildscript {
+    ext.vKotlin = '1.3.50'
 
     repositories {
         google()
@@ -15,9 +16,8 @@ buildscript {
         maven { url 'https://kotlin.bintray.com/kotlinx' }
     }
     dependencies {
-        classpath 'com.android.tools:r8:1.4.96'
-        classpath 'com.android.tools.build:gradle:3.5.0-beta01'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.31"
+        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${vKotlin}"
 
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -29,24 +29,21 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-ext {
-    configProps = props
-}
+ext.props = props
 
 subprojects {
     repositories {
         google()
         jcenter()
-        maven { url "https://maven.fabric.io/public" }
         maven { url "https://jitpack.io" }
         maven { url "http://oss.sonatype.org/content/repositories/snapshots" }
     }
-    afterEvaluate {
+    afterEvaluate { module ->
         if (getPlugins().hasPlugin('com.android.library') ||
             getPlugins().hasPlugin('com.android.application')) {
             android {
-                compileSdkVersion 'android-Q'
-                buildToolsVersion '29.0.0-rc3'
+                compileSdkVersion 29
+                buildToolsVersion '29.0.2'
 
                 defaultConfig {
                     if (minSdkVersion == null)
@@ -61,11 +58,11 @@ subprojects {
             }
         }
 
-        if (it.name == 'app' || it.name == 'stub') {
+        if (module.name == 'app' || module.name == 'stub') {
             android {
                 signingConfigs {
                     config {
-                        storeFile rootProject.file('release-key.jks')
+                        storeFile new File(props['keyStore'])
                         storePassword props['keyStorePass']
                         keyAlias props['keyAlias']
                         keyPassword props['keyPass']
@@ -79,14 +76,21 @@ subprojects {
                             signingConfig signingConfigs.config
                     }
                     release {
-                        minifyEnabled true
-                        shrinkResources true
                         signingConfig signingConfigs.config
                     }
                 }
 
                 lintOptions {
                     disable 'MissingTranslation'
+                }
+
+                aaptOptions {
+                    // Handle resource IDs
+                    File resId = project.file('res-ids.txt')
+                    if (resId.exists())
+                        additionalParameters "--stable-ids", "${resId.absolutePath}"
+                    else
+                        additionalParameters "--emit-ids", "${resId.absolutePath}"
                 }
             }
         }

@@ -56,12 +56,9 @@
     <string name="menuReload">รีโหลด</string>
     <string name="menuClearLog">ล้างบันทึก</string>
     <string name="logs_cleared">บันทึกถูกล้างแล้ว</string>
-    <string name="log_is_empty">บันทึกว่าง</string>
 
     <!--About Activity-->
     <string name="app_changelog">สิ่งที่เพิ่มใหม่</string>
-    <string name="translators">paphonb</string>
-    <string name="app_translators">ผู้แปล</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">การอัพเดต Magisk</string>
@@ -72,7 +69,6 @@
     <string name="manager_update_title">มีการอัพเดต Magisk Manager!</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">ปิด</string>
     <string name="repo_install_title">ติดตั้ง %1$s</string>
     <string name="repo_install_msg">ต้องการติดตั้ง %1$s ตอนนี้หรือไม่?</string>
     <string name="download">ดาวน์โหลด</string>
@@ -80,7 +76,6 @@
     <string name="settings_reboot_toast">รีบู๊ตเพื่อนำการตั้งค่าไปใช้</string>
     <string name="release_notes">-้อมูลเพิ่มเติม</string>
     <string name="repo_cache_cleared">แคช Repo ถูกล้างแล้ว</string>
-    <string name="internal_storage">ไฟล์ zip ถูกเก็บไว้ใน:\n[Internal Storage]%1$s</string>
     <string name="manager_download_install">แตะเพื่อดาวน์โหลดและติดตั้ง</string>
     <string name="dtbo_patched_title">แพตช์ DTBO เรียบร้อย!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ได้แพตช์ไฟล์ dtbo.img แล้ว โปรดรีบู๊ต</string>
@@ -106,9 +101,6 @@
     <string name="env_fix_msg">อุปกรณ์ของคุณต้องมีการตั้งค่าเพิ่มเติมเพื่อให้ Magisk สามารถทำงานได้ จะมีการดาวน์โหลดไฟล์ติดตั้ง Magisk ต้องการทำเลยหรือไม่?</string>
     <string name="setup_title">การตั้งค่าเพิ่มเติม</string>
     <string name="setup_msg">กำลังรันการตั้งค่า…</string>
-    <string name="downloading_toast">กำลังดาวน์โหลด %1$s</string>
-    <string name="no_rw_storage">ฟีเจอร์นี้จะไม่สามารถทำงานได้เมื่อไม่มีสิทธิการเขียนพื้นที่เก็บภายนอก</string>
-    <string name="dl_one_module">ดาวน์โหลดทีละโมดูลเท่านั้น</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">ทั่วไป</string>
@@ -173,12 +165,10 @@
     <string name="global_summary">All root sessions use the global mount namespace.</string>
     <string name="requester_summary">Root sessions will inherit their requester\'s namespace.</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
-    <string name="android_o_not_support">ไม่รองรับ Android 8.0 ขึ้นไป</string>
     <string name="disable_fingerprint">ไม่มีลายนิ้วมือหรืออุปกรณ์แสกน</string>
 
     <!--Superuser-->
     <string name="su_request_title">การขอเข้าถึง Superuser</string>
-    <string name="deny_with_str">ปฏิเสธ %1$s</string>
     <string name="deny">ปฏิเสธ</string>
     <string name="prompt">ถาม</string>
     <string name="grant">อนุญาต</string>
@@ -198,7 +188,6 @@
     <string name="su_snack_notif_off">การแจ้งเตือนของ %1$s ถูกปิด</string>
     <string name="su_snack_log_on">การบันทึก %1$s ถูกเปิด</string>
     <string name="su_snack_log_off">การบันทึก %1$s ถูกปิด</string>
-    <string name="su_snack_revoke">สิทธิ์ของ %1$s ถูกลบ</string>
     <string name="su_revoke_title">ลบสิทธิ์?</string>
     <string name="su_revoke_msg">ยืนยันการลบสิทธิ์ของ %1$s?</string>
     <string name="toast">การเตือน</string>

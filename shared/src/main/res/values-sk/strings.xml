@@ -1,6 +1,0 @@
-<resources>
-    <!--Used in both stub and full app-->
-    <string name="no_thanks">Nie, ďakujem</string>
-    <string name="yes">Áno</string>
-    <string name="ok">OK</string>
-</resources>

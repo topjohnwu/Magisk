@@ -1,24 +1,23 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import android.graphics.drawable.Drawable
-import com.skoumal.teanity.databinding.ComparableRvItem
-import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
-import com.skoumal.teanity.rxbus.RxBus
-import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
-import com.topjohnwu.magisk.model.entity.Policy
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.toggle
+import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.magisk.utils.RxBus
 
 class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyRvItem>() {
 
     override val layoutRes: Int = R.layout.item_policy
 
     val isExpanded = KObservableField(false)
-    val isEnabled = KObservableField(item.policy == Policy.ALLOW)
+    val isEnabled = KObservableField(item.policy == MagiskPolicy.ALLOW)
     val shouldNotify = KObservableField(item.notification)
     val shouldLog = KObservableField(item.logging)
 
@@ -28,7 +27,7 @@ class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvIte
 
     private val currentStateItem
         get() = item.copy(
-            policy = if (isEnabled.value) Policy.ALLOW else Policy.DENY,
+            policy = if (isEnabled.value) MagiskPolicy.ALLOW else MagiskPolicy.DENY,
             notification = shouldNotify.value,
             logging = shouldLog.value
         )

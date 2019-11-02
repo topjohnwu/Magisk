@@ -33,11 +33,13 @@ void decompress(char *infile, const char *outfile) {
 	read_file(in_file, [&](void *buf, size_t len) -> void {
 		if (out_fd < 0) {
 			format_t type = check_fmt(buf, len);
+
+			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
+
 			if (!COMPRESSED(type))
-				LOGE("Input file is not a compressed type!\n");
+				LOGE("Input file is not a supported compressed type!\n");
 
 			cmp.reset(get_decoder(type));
-			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
 
 			/* If user does not provide outfile, infile has to be either
 	 		* <path>.[ext], or '-'. Outfile will be either <path> or '-'.
@@ -60,7 +62,7 @@ void decompress(char *infile, const char *outfile) {
 
 			out_fd = strcmp(outfile, "-") == 0 ?
 					STDOUT_FILENO : xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			cmp->set_out(make_unique<FDOutStream>(out_fd));
+			cmp->setOut(make_unique<FDOutStream>(out_fd));
 			if (ext) *ext = '.';
 		}
 		if (!cmp->write(buf, len))
@@ -106,7 +108,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
 				 STDOUT_FILENO : xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	}
 
-	cmp->set_out(make_unique<FDOutStream>(out_fd));
+	cmp->setOut(make_unique<FDOutStream>(out_fd));
 
 	read_file(in_file, [&](void *buf, size_t len) -> void {
 		if (!cmp->write(buf, len))

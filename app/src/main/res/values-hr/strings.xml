@@ -50,15 +50,11 @@
     <string name="menuReload">Ponovno učitaj</string>
     <string name="menuClearLog">Očisti zapisnik sada</string>
     <string name="logs_cleared">Zapisnik je uspješno izbrisan</string>
-    <string name="log_is_empty">Zapisnik je prazan</string>
 
     <!--About Activity-->
     <string name="app_changelog">Popis izmjena aplikacije</string>
-    <string name="translators" />
-    <string name="app_translators">Prevoditelji aplikacije</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Zatvori</string>
     <string name="repo_install_title">Instaliraj %1$s</string>
     <string name="repo_install_msg">Da li želite instalirati %1$s sada?</string>
     <string name="download">Preuzmi</string>
@@ -67,7 +63,6 @@
     <string name="settings_reboot_toast">Ponovno pokrenite kako biste primjenili postavke</string>
     <string name="release_notes">Bilješke o izdavanju aplikacije</string>
     <string name="repo_cache_cleared">Predmemorija repozitorija izbrisana</string>
-    <string name="internal_storage">Zip je pohranjen u:\n[Unutarnja pohrana]%1$s</string>
     <string name="manager_update_title">Dostupno je novo ažuriranje Magisk Manager aplikacije!</string>
     <string name="manager_download_install">Pritisnite za preuzimanje i instalaciju</string>
     <string name="update_channel">Magisk ažuriranja</string>
@@ -83,8 +78,6 @@
     <string name="proprietary_title">Preuzmite vlasnički kod</string>
     <string name="proprietary_notice">Magisk Manager je FOSS aplikacija te ne sadrži Googleov SafetyNet API kod.\n\nDopuštate li Magisk Manager aplikaciji da preuzme proširenje (sadrži GoogleApiClient) za SafetyNet provjere?</string>
     <string name="download_file_error">Pogreška prilikom preuzimanja datoteke</string>
-    <string name="downloading_toast">Preuzimanje %1$s</string>
-    <string name="no_rw_storage">Ova značajka neće raditi bez dopuštenja za korištenje vanjske pohrane.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Općenito</string>
@@ -143,7 +136,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser zahtjev</string>
-    <string name="deny_with_str">Odbij%1$s</string>
     <string name="deny">Odbij</string>
     <string name="prompt">Upitaj</string>
     <string name="grant">Odobri</string>
@@ -163,7 +155,6 @@
     <string name="su_snack_notif_off">Obavijesti za %1$s su odbijene</string>
     <string name="su_snack_log_on">Zapisnik događaja omogućen je za %1$s</string>
     <string name="su_snack_log_off">Zapisnik događaja onemogućen je za %1$s</string>
-    <string name="su_snack_revoke">Opozvana su prava za %1$s</string>
     <string name="su_revoke_title">Opozvati?</string>
     <string name="su_revoke_msg">Potvrdite da biste opozvali prava za %1$s?</string>
     <string name="toast">Pop-up</string>

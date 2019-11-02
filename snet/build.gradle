@@ -4,7 +4,7 @@ android {
     defaultConfig {
         applicationId 'com.topjohnwu.snet'
         minSdkVersion 14
-        versionCode 12
+        versionCode 13
         versionName 'snet'
     }
 
@@ -19,5 +19,5 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.android.gms:play-services-safetynet:16.0.0'
+    implementation 'com.google.android.gms:play-services-safetynet:17.0.0'
 }

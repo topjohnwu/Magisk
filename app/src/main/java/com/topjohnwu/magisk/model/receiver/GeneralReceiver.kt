@@ -1,26 +1,30 @@
 package com.topjohnwu.magisk.model.receiver
 
-import android.content.BroadcastReceiver
-import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
-import com.topjohnwu.magisk.ClassMap
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
+import android.os.Build.VERSION.SDK_INT
+import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.base.BaseReceiver
+import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.data.database.base.su
-import com.topjohnwu.magisk.data.repository.AppRepository
+import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.extensions.startActivity
+import com.topjohnwu.magisk.extensions.startActivityWithRoot
+import com.topjohnwu.magisk.model.download.DownloadService
+import com.topjohnwu.magisk.model.entity.ManagerJson
+import com.topjohnwu.magisk.model.entity.internal.Configuration
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
-import com.topjohnwu.magisk.utils.DownloadApp
-import com.topjohnwu.magisk.utils.RootUtils
 import com.topjohnwu.magisk.utils.SuLogger
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.get
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
+import org.koin.core.inject
+import timber.log.Timber
 
-open class GeneralReceiver : BroadcastReceiver() {
+open class GeneralReceiver : BaseReceiver() {
 
-    private val appRepo: AppRepository by inject()
+    private val policyDB: PolicyDao by inject()
 
     companion object {
         const val REQUEST = "request"
@@ -30,54 +34,76 @@ open class GeneralReceiver : BroadcastReceiver() {
     }
 
     private fun getPkg(intent: Intent): String {
-        return intent.data?.encodedSchemeSpecificPart ?: ""
+        return intent.data?.encodedSchemeSpecificPart.orEmpty()
     }
 
-    override fun onReceive(context: Context, intent: Intent?) {
-        if (intent == null)
-            return
-        var action: String? = intent.action ?: return
-        when (action) {
+    override fun onReceive(context: ContextWrapper, intent: Intent?) {
+        intent ?: return
+
+        // Debug messages
+        if (BuildConfig.DEBUG) {
+            Timber.d(intent.action)
+            intent.extras?.let { bundle ->
+                bundle.keySet().forEach {
+                    Timber.d("[%s]=[%s]", it, bundle[it])
+                }
+            }
+        }
+
+        when (intent.action ?: return) {
             Intent.ACTION_REBOOT, Intent.ACTION_BOOT_COMPLETED -> {
-                action = intent.getStringExtra("action")
+                val action = intent.getStringExtra("action")
                 if (action == null) {
                     // Actual boot completed event
-                    Shell.su("mm_patch_dtbo").submit { result ->
-                        if (result.isSuccess)
-                            Notifications.dtboPatched()
+                    Shell.su("mm_patch_dtbo").submit {
+                        if (it.isSuccess)
+                            Notifications.dtboPatched(context)
                     }
                     return
                 }
                 when (action) {
                     REQUEST -> {
-                        val i = Intent(context, ClassMap[SuRequestActivity::class.java])
+                        val i = context.intent(SuRequestActivity::class.java)
                                 .setAction(action)
                                 .putExtra("socket", intent.getStringExtra("socket"))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-                        context.startActivity(i)
+                        if (SDK_INT >= 29) {
+                            // Android Q does not allow starting activity from background
+                            i.startActivityWithRoot()
+                        } else {
+                            i.startActivity(context)
+                        }
                     }
-                    LOG -> SuLogger.handleLogs(intent)
-                    NOTIFY -> SuLogger.handleNotify(intent)
-                    TEST -> Shell.su("magisk --use-broadcast").submit()
+                    LOG -> SuLogger.handleLogs(context, intent)
+                    NOTIFY -> SuLogger.handleNotify(context, intent)
+                    TEST -> {
+                        val mode = intent.getIntExtra("mode", 1 shl 1)
+                        if (mode > Info.env.connectionMode)
+                            Info.env.connectionMode = mode
+                        Shell.su("magisk --connect-mode $mode").submit()
+                    }
                 }
             }
             Intent.ACTION_PACKAGE_REPLACED ->
                 // This will only work pre-O
-                if (Config.get<Boolean>(Config.Key.SU_REAUTH)!!) {
-                    appRepo.delete(getPkg(intent)).blockingGet()
-                }
+                if (Config.suReAuth)
+                    policyDB.delete(getPkg(intent)).blockingGet()
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
                 val pkg = getPkg(intent)
-                appRepo.delete(pkg).blockingGet()
+                policyDB.delete(pkg).blockingGet()
                 "magiskhide --rm $pkg".su().blockingGet()
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
             Const.Key.BROADCAST_MANAGER_UPDATE -> {
-                Config.managerLink = intent.getStringExtra(Const.Key.INTENT_SET_LINK)
-                DownloadApp.upgrade(intent.getStringExtra(Const.Key.INTENT_SET_NAME))
+                intent.getParcelableExtra<ManagerJson>(Const.Key.INTENT_SET_APP)?.let {
+                    Info.remote = Info.remote.copy(app = it)
+                }
+                DownloadService(context) {
+                    subject = DownloadSubject.Manager(Configuration.APK.Upgrade)
+                }
             }
-            Const.Key.BROADCAST_REBOOT -> RootUtils.reboot()
+            Const.Key.BROADCAST_REBOOT -> reboot()
         }
     }
 }

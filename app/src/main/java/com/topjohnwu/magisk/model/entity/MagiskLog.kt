@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.model.entity
 
+import com.topjohnwu.magisk.extensions.timeFormatTime
+import com.topjohnwu.magisk.extensions.toTime
 import com.topjohnwu.magisk.model.entity.MagiskPolicy.Companion.ALLOW
-import com.topjohnwu.magisk.utils.timeFormatTime
-import com.topjohnwu.magisk.utils.toTime
 import java.util.*
 
 data class MagiskLog(
@@ -38,7 +38,6 @@ fun Map<String, String>.toLog(): MagiskLog {
 
 fun Long.toDate() = Date(this)
 
-
 fun MagiskLog.toMap() = mapOf(
     "from_uid" to fromUid,
     "to_uid" to toUid,
@@ -47,8 +46,8 @@ fun MagiskLog.toMap() = mapOf(
     "app_name" to appName,
     "command" to command,
     "action" to action,
-    "time" to date
-).mapValues { it.toString() }
+    "time" to date.time
+)
 
 fun MagiskPolicy.toLog(
     toUid: Int,

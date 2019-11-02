@@ -219,7 +219,6 @@ int get_db_strings(db_strings &str, int key) {
 	char *err;
 	auto string_cb = [&](db_row &row) -> bool {
 		str[row["key"]] = row["value"];
-		LOGD("magiskdb: query %s=[%s]\n", row["key"].data(), row["value"].data());
 		return true;
 	};
 	if (key >= 0) {
@@ -254,12 +253,11 @@ int validate_manager(string &alt_pkg, int userid, struct stat *st) {
 		st = &tmp_st;
 
 	// Prefer DE storage
-	const char *base = access("/data/user_de", F_OK) == 0 ? "/data/user_de" : "/data/user";
 	char app_path[128];
-	sprintf(app_path, "%s/%d/%s", base, userid, alt_pkg.empty() ? "xxx" : alt_pkg.data());
+	sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, userid, alt_pkg.empty() ? "xxx" : alt_pkg.data());
 	if (stat(app_path, st)) {
 		// Check the official package name
-		sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, base, userid);
+		sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, userid);
 		if (stat(app_path, st)) {
 			LOGE("su: cannot find manager");
 			memset(st, 0, sizeof(*st));
@@ -274,24 +272,23 @@ int validate_manager(string &alt_pkg, int userid, struct stat *st) {
 }
 
 void exec_sql(int client) {
+	run_finally f([=]{ close(client); });
 	char *sql = read_string(client);
-	FILE *out = fdopen(recv_fd(client), "a");
 	char *err = db_exec(sql, [&](db_row &row) -> bool {
-		bool first = false;
+		string out;
+		bool first = true;
 		for (auto it : row) {
-			if (first) fprintf(out, "|");
-			else first = true;
-			fprintf(out, "%s=%s", it.first.data(), it.second.data());
+			if (first) first = false;
+			else out += '|';
+			out += it.first;
+			out += '=';
+			out += it.second;
 		}
-		fprintf(out, "\n");
+		write_int(client, out.length());
+		xwrite(client, out.data(), out.length());
 		return true;
 	});
 	free(sql);
-	fclose(out);
-	db_err_cmd(err,
-		write_int(client, 1);
-		return;
-	);
 	write_int(client, 0);
-	close(client);
+	db_err_cmd(err, return; );
 }

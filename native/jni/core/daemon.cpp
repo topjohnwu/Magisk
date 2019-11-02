@@ -1,9 +1,3 @@
-/* daemon.c - Magisk Daemon
- *
- * Start the daemon and wait for requests
- * Connect the daemon and send requests through sockets
- */
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -24,23 +18,21 @@
 
 int SDK_INT = -1;
 bool RECOVERY_MODE = false;
-static struct stat SERVER_STAT;
+static struct stat self_st;
 
 static void verify_client(int client, pid_t pid) {
 	// Verify caller is the same as server
 	char path[32];
 	sprintf(path, "/proc/%d/exe", pid);
-	struct stat st{};
-	stat(path, &st);
-	if (st.st_dev != SERVER_STAT.st_dev || st.st_ino != SERVER_STAT.st_ino) {
+	struct stat st;
+	if (stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino) {
 		close(client);
 		pthread_exit(nullptr);
 	}
 }
 
 static void *request_handler(void *args) {
-	int client = *((int *) args);
-	delete (int *) args;
+	int client = reinterpret_cast<intptr_t>(args);
 
 	struct ucred credential;
 	get_client_cred(client, &credential);
@@ -55,6 +47,7 @@ static void *request_handler(void *args) {
 	case BOOT_COMPLETE:
 	case SQLITE_CMD:
 	case BROADCAST_ACK:
+	case BROADCAST_TEST:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -92,9 +85,20 @@ static void *request_handler(void *args) {
 		exec_sql(client);
 		break;
 	case BROADCAST_ACK:
-		LOGD("* Use broadcasts for su logging and notify\n");
-		CONNECT_BROADCAST = true;
+		broadcast_ack(client);
+		break;
+	case BROADCAST_TEST:
+		broadcast_test(client);
+		break;
+	case REMOVE_MODULES:
+		if (credential.uid == UID_SHELL || credential.uid == UID_ROOT) {
+			remove_modules();
+			write_int(client, 0);
+		} else {
+			write_int(client, 1);
+		}
 		close(client);
+		break;
 	default:
 		close(client);
 		break;
@@ -108,6 +112,14 @@ static void main_daemon() {
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 	restore_rootcon();
 
+	// Unmount pre-init patches
+	if (access(ROOTMNT, F_OK) == 0) {
+		file_readline(ROOTMNT, [](auto line) -> bool {
+			umount2(line.data(), MNT_DETACH);
+			return true;
+		}, true);
+	}
+
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);
@@ -119,7 +131,7 @@ static void main_daemon() {
 	LOGI(SHOW_VER(Magisk) " daemon started\n");
 
 	// Get server stat
-	stat("/proc/self/exe", &SERVER_STAT);
+	stat("/proc/self/exe", &self_st);
 
 	// Get API level
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
@@ -155,24 +167,9 @@ static void main_daemon() {
 
 	// Loop forever to listen for requests
 	for (;;) {
-		int *client = new int;
-		*client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
-		new_daemon_thread(request_handler, client);
+		int client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
+		new_daemon_thread(request_handler, reinterpret_cast<void*>(client));
 	}
-}
-
-int switch_mnt_ns(int pid) {
-	char mnt[32];
-	snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
-	if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
-
-	int fd, ret;
-	fd = xopen(mnt, O_RDONLY);
-	if (fd < 0) return 1;
-	// Switch to its namespace
-	ret = xsetns(fd, 0);
-	close(fd);
-	return ret;
 }
 
 int connect_daemon(bool create) {
@@ -185,9 +182,17 @@ int connect_daemon(bool create) {
 			exit(1);
 		}
 
+		int ppid = getpid();
 		LOGD("client: launching new main daemon process\n");
 		if (fork_dont_care() == 0) {
 			close(fd);
+
+			// Make sure ppid is not in acct
+			char src[64], dest[64];
+			sprintf(src, "/acct/uid_0/pid_%d", ppid);
+			sprintf(dest, "/acct/uid_0/pid_%d", getpid());
+			rename(src, dest);
+
 			main_daemon();
 		}
 

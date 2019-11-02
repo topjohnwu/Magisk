@@ -50,15 +50,11 @@
     <string name="menuReload">Поново учитај</string>
     <string name="menuClearLog">Обриши дневник</string>
     <string name="logs_cleared">Дневник успешно креиран</string>
-    <string name="log_is_empty">Дневник је празан</string>
 
     <!--About Activity-->
     <string name="app_changelog">Дневник промена апликације</string>
-    <string name="translators" />
-    <string name="app_translators">Преводиоци апликације</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Затвори</string>
     <string name="repo_install_title">Инсталирај %1$s</string>
     <string name="repo_install_msg">Да ли желите да инсталирате %1$s?</string>
     <string name="download">Преузми</string>
@@ -67,7 +63,6 @@
     <string name="settings_reboot_toast">Рестартуј да примениш подешавања</string>
     <string name="release_notes">Белешке обљављивања</string>
     <string name="repo_cache_cleared">Кеш спремишта обрисан</string>
-    <string name="internal_storage">Зип је сачуван у:\n[Интерно складиште]%1$s</string>
     <string name="manager_update_title">Ново Ажурирање Магиск Менаџера Доступно!</string>
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
     <string name="dtbo_patched_title">DTBO је закрпљен!</string>
@@ -85,8 +80,6 @@
     <string name="proprietary_title">Преузми Власнички Код</string>
     <string name="proprietary_notice">Магиск Менаџер је \'FOSS\' што значи да не садржи Гуглов власнички код од СигурнаМрежа АПИ.\n\nДа ли дозвољавате да Магиск Менаџер преузме додатак (садржи GoogleApiClient) за СигурнаМрежа провере?</string>
     <string name="download_file_error">Грешка при преузимању фајла</string>
-    <string name="downloading_toast">Преузимање %1$s</string>
-    <string name="no_rw_storage">Ово својство неће радити без дозволе приступу екстерном складишту.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Генерално</string>
@@ -146,7 +139,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Супер-кориснички захтев</string>
-    <string name="deny_with_str">Забрани%1$s</string>
     <string name="deny">Забрани</string>
     <string name="prompt">Захтев</string>
     <string name="grant">Дозволи</string>
@@ -166,7 +158,6 @@
     <string name="su_snack_notif_off">Нотификације од %1$s су онемогућене</string>
     <string name="su_snack_log_on">Записивање у дневник за %1$s је омогућено</string>
     <string name="su_snack_log_off">Записивање у дневник за %1$s је онемогућено</string>
-    <string name="su_snack_revoke">%1$s права су опозвана </string>
     <string name="su_revoke_title">Опозови?</string>
     <string name="su_revoke_msg">Потврди да опозовеш права од %1$s?</string>
     <string name="toast">Тост</string>

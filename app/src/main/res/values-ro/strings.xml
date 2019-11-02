@@ -44,6 +44,7 @@
     <string name="reboot_recovery">Repornește în recovery</string>
     <string name="reboot_bootloader">Repornește în bootloader</string>
     <string name="reboot_download">Repornește în download</string>
+    <string name="reboot_edl">Repornește în EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Actualizare disponibilă</string>
@@ -59,18 +60,17 @@
     <string name="menuReload">Reîncarcă</string>
     <string name="menuClearLog">Golește jurnalul acum</string>
     <string name="logs_cleared">Jurnal golit cu succes.</string>
-    <string name="log_is_empty">Jurnalul este gol.</string>
 
     <!--About Activity-->
     <string name="app_changelog">Jurnalul modificărilor</string>
-    <string name="translators" />
-    <string name="app_translators">Traducători</string>
 
     <!-- System Components, Notifications -->
     <string name="update_channel">Actualizări Magisk</string>
     <string name="progress_channel">Notificări de progres</string>
     <string name="download_complete">Descărcare finalizată</string>
     <string name="download_file_error">Eroare la descărcarea fișierului</string>
+    <string name="download_open_parent">Afișează în dosarul părinte</string>
+    <string name="download_open_self">Afișează fișierul</string>
     <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
     <string name="manager_update_title">Actualizare Magisk Manager disponibilă!</string>
 
@@ -87,7 +87,6 @@
     <string name="reboot_delay_toast">Repornire în 5 secunde…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Închide</string>
     <string name="repo_install_title">Instalează %1$s</string>
     <string name="repo_install_msg">Vrei să instalezi acum %1$s?</string>
     <string name="download">Descarcă</string>
@@ -95,7 +94,7 @@
     <string name="settings_reboot_toast">Repornește pentru a aplica setările.</string>
     <string name="release_notes">Note privind versiunea</string>
     <string name="repo_cache_cleared">Cache-ul depozitelor golit</string>
-    <string name="internal_storage">Zip-ul este stocat în:\n[Stocare internă]%1$s</string>
+
     <string name="dtbo_patched_title">DTBO a fost patchuit!</string>
     <string name="dtbo_patched_reboot">Magisk Manager a patchuit dtbo.img. Te rugăm să repornești.</string>
     <string name="flashing">Procesare în curs…</string>
@@ -116,14 +115,13 @@
     <string name="env_fix_title">Necesită configurare suplimentară</string>
     <string name="env_fix_msg">Dispozitivul tău are nevoie de configurări suplimentare pentru ca Magisk să funcționeze corect. Se va descărca zip-ul de configurare Magisk, vrei să continui acum?</string>
     <string name="setup_msg">Rulează configurarea mediului…</string>
-    <string name="downloading_toast">Se descarcă %1$s</string>
-    <string name="no_rw_storage">Această funcție nu va funcționa fără permisiunea de a scrie în stocarea externă.</string>
-    <string name="dl_one_module">Descarcă câte un modul odată.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Temă întunecată</string>
     <string name="settings_dark_theme_summary">Activează tema întunecată.</string>
+    <string name="settings_download_path_title">Cale de descărcare</string>
+    <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
     <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online.</string>
     <string name="settings_hide_manager_title">Ascunde Magisk Manager</string>
@@ -183,12 +181,11 @@
     <string name="global_summary">Toate sesiunile de root folosesc spațiul de nume global.</string>
     <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului.</string>
     <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat.</string>
-    <string name="android_o_not_support">Nu suportă Android 8.0+.</string>
     <string name="disable_fingerprint">Nu au fost setate amprente sau scannerul de amprentă lipsește.</string>
+    <string name="settings_download_path_error">Eroare la crearea dosarului. Acesta trebuie să fie accesibil din directorul rădăcină al stocării și nu trebuie să fie un fișier.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitare de superutilizator</string>
-    <string name="deny_with_str">Refuză %1$s</string>
     <string name="deny">Refuză</string>
     <string name="prompt">Solicitare</string>
     <string name="grant">Permite</string>
@@ -208,7 +205,6 @@
     <string name="su_snack_notif_off">Notificările pentru %1$s au fost dezactivate</string>
     <string name="su_snack_log_on">Jurnalizarea pentru %1$s a fost activată</string>
     <string name="su_snack_log_off">Jurnalizarea pentru %1$s a fost dezactivată</string>
-    <string name="su_snack_revoke">Drepturile pentru %1$s sunt revocate</string>
     <string name="su_revoke_title">Revoci?</string>
     <string name="su_revoke_msg">Confirmi revocarea drepturilor pentru %1$s?</string>
     <string name="toast">Mesaj</string>

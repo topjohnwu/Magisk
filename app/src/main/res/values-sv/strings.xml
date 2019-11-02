@@ -48,15 +48,11 @@
     <string name="menuReload">Uppdatera</string>
     <string name="menuClearLog">Rensa loggen</string>
     <string name="logs_cleared">Loggen rensad</string>
-    <string name="log_is_empty">Loggen är tom</string>
 
     <!--About Activity-->
     <string name="app_changelog">Ändringslogg</string>
-    <string name="translators" />
-    <string name="app_translators">Översättare</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Stäng</string>
     <string name="repo_install_title">Installera %1$s</string>
     <string name="repo_install_msg">Vill du installera %1$s ?</string>
     <string name="download">Ladda ner</string>
@@ -65,13 +61,10 @@
     <string name="settings_reboot_toast">Starta om för att tillämpa inställningar</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo-cache rensad</string>
-    <string name="internal_storage">ZIP-filen är sparad i:\n[Internal Storage]%1$s</string>
-    <string name="manager_update_title">En uppdatering av Magisk maneger finns tillgänglig!</string>
+    <string name="manager_update_title">En uppdatering av Magisk Manager finns tillgänglig!</string>
     <string name="manager_download_install">Tryck för att ladda ner och installera</string>
     <string name="update_channel">Magiska uppdateringar</string>
     <string name="download_file_error">Fel vid nerladdning av fil</string>
-    <string name="downloading_toast">Laddar ner %1$s</string>
-    <string name="no_rw_storage">Denna funktionen måste ha behörighet att skriva till externt lagringsutrymme.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allmän</string>
@@ -122,7 +115,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-förfrågan</string>
-    <string name="deny_with_str">Neka%1$s</string>
     <string name="deny">Neka</string>
     <string name="prompt">Fråga</string>
     <string name="grant">Bevilja</string>
@@ -142,7 +134,6 @@
     <string name="su_snack_notif_off">Aviseringar från %1$s är inaktiverade</string>
     <string name="su_snack_log_on">Loggning av %1$s är aktiverad</string>
     <string name="su_snack_log_off">Loggning av %1$s är inaktiverad</string>
-    <string name="su_snack_revoke">%1$s rättigheter är upphävda</string>
     <string name="su_revoke_title">Upphäv?</string>
     <string name="su_revoke_msg">Bekräfta upphävning av %1$s rättigheter?</string>
     <string name="toast">Toast-meddelande</string>

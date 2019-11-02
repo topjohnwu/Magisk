@@ -1,11 +1,19 @@
 package com.topjohnwu.magisk.model.events
 
 import android.app.Activity
-import com.skoumal.teanity.viewevents.ViewEvent
-import com.topjohnwu.magisk.model.entity.Policy
-import com.topjohnwu.magisk.model.entity.Repo
+import com.topjohnwu.magisk.model.entity.module.Repo
 import io.reactivex.subjects.PublishSubject
 
+/**
+ * Class for passing events from ViewModels to Activities/Fragments
+ * Variable [handled] used so each event is handled only once
+ * (see https://medium.com/google-developers/livedata-with-snackbar-navigation-and-other-events-the-singleliveevent-case-ac2622673150)
+ * Use [ViewEventObserver] for observing these events
+ */
+abstract class ViewEvent {
+
+    var handled = false
+}
 
 data class OpenLinkEvent(val url: String) : ViewEvent()
 
@@ -36,5 +44,4 @@ class PermissionEvent(
 
 class BackPressEvent : ViewEvent()
 
-class SuDialogEvent(val policy: Policy) : ViewEvent()
 class DieEvent : ViewEvent()

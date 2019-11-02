@@ -24,7 +24,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
-class CryptoUtils {
+public class CryptoUtils {
 
     static final Map<String, String> ID_TO_ALG;
     static final Map<String, String> ALG_TO_ID;
@@ -81,7 +81,7 @@ class CryptoUtils {
         return new AlgorithmIdentifier(new ASN1ObjectIdentifier(id));
     }
 
-    static X509Certificate readCertificate(InputStream input)
+    public static X509Certificate readCertificate(InputStream input)
             throws IOException, GeneralSecurityException {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -92,7 +92,7 @@ class CryptoUtils {
     }
 
     /** Read a PKCS#8 format private key. */
-    static PrivateKey readPrivateKey(InputStream input)
+    public static PrivateKey readPrivateKey(InputStream input)
             throws IOException, GeneralSecurityException {
         try {
             ByteArrayStream buf = new ByteArrayStream();

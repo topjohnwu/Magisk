@@ -3,25 +3,25 @@ package com.topjohnwu.magisk.ui.surequest
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.Window
-import com.skoumal.teanity.viewevents.ViewEvent
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import com.topjohnwu.magisk.model.entity.Policy
+import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
-import com.topjohnwu.magisk.ui.base.MagiskActivity
 import com.topjohnwu.magisk.utils.SuLogger
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-open class SuRequestActivity : MagiskActivity<SuRequestViewModel, ActivityRequestBinding>() {
+open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
     override val layoutRes: Int = R.layout.activity_request
+    override val themeRes: Int = R.style.MagiskTheme_SU
     override val viewModel: SuRequestViewModel by viewModel()
 
     override fun onBackPressed() {
-        viewModel.handler?.handleAction(Policy.DENY, -1)
+        viewModel.handler?.handleAction(MagiskPolicy.DENY, -1)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,18 +30,16 @@ open class SuRequestActivity : MagiskActivity<SuRequestViewModel, ActivityReques
         super.onCreate(savedInstanceState)
 
         val intent = intent
-        val action = intent.action
 
-        if (TextUtils.equals(action, GeneralReceiver.REQUEST)) {
-            if (!viewModel.handleRequest(intent) {})
-                finish()
-            return
+        when (intent?.action) {
+            GeneralReceiver.REQUEST -> {
+                if (!viewModel.handleRequest(intent))
+                    finish()
+                return
+            }
+            GeneralReceiver.LOG -> SuLogger.handleLogs(this, intent)
+            GeneralReceiver.NOTIFY -> SuLogger.handleNotify(this, intent)
         }
-
-        if (TextUtils.equals(action, GeneralReceiver.LOG))
-            SuLogger.handleLogs(intent)
-        else if (TextUtils.equals(action, GeneralReceiver.NOTIFY))
-            SuLogger.handleNotify(intent)
 
         finish()
     }

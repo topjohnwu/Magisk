@@ -12,6 +12,7 @@ LIBFDT := $(EXT_PATH)/dtc/libfdt
 LIBNANOPB := $(EXT_PATH)/nanopb
 LIBSYSTEMPROPERTIES := jni/systemproperties/include
 LIBUTILS := jni/utils/include
+LIBMINCRYPT := $(EXT_PATH)/mincrypt/include
 
 ########################
 # Binaries
@@ -41,6 +42,7 @@ LOCAL_SRC_FILES := \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \
+	magiskhide/hide_policy.cpp \
 	resetprop/persist_properties.cpp \
 	resetprop/resetprop.cpp \
 	resetprop/system_property_api.cpp \
@@ -51,6 +53,30 @@ LOCAL_SRC_FILES := \
 	su/su_daemon.cpp
 
 LOCAL_LDLIBS := -llog
+include $(BUILD_EXECUTABLE)
+
+endif
+
+ifdef B_POLICY
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := magiskpolicy
+LOCAL_STATIC_LIBRARIES := libsepol libutils
+LOCAL_C_INCLUDES := \
+	jni/include \
+	$(LIBSEPOL) \
+	$(LIBUTILS)
+
+LOCAL_SRC_FILES := \
+	core/applet_stub.cpp \
+	magiskpolicy/api.cpp \
+	magiskpolicy/magiskpolicy.cpp \
+	magiskpolicy/rules.cpp \
+	magiskpolicy/policydb.cpp \
+	magiskpolicy/sepolicy.c
+
+LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
+LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
@@ -79,7 +105,10 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	core/init.cpp \
+	init/init.cpp \
+	init/early_mount.cpp \
+	init/rootdir.cpp \
+	init/getinfo.cpp \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
@@ -99,6 +128,7 @@ LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils
 LOCAL_C_INCLUDES := \
 	jni/include \
 	$(EXT_PATH)/include \
+	$(LIBMINCRYPT) \
 	$(LIBLZMA) \
 	$(LIBLZ4) \
 	$(LIBBZ2) \
@@ -130,6 +160,7 @@ LOCAL_C_INCLUDES := \
 	jni/include \
 	$(LIBUTILS)
 LOCAL_SRC_FILES := test.cpp
+LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif

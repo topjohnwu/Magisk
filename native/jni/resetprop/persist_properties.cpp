@@ -11,7 +11,7 @@
 #include <pb_encode.h>
 #include <utils.h>
 
-#include "_resetprop.h"
+#include "private/resetprop.h"
 
 using namespace std;
 

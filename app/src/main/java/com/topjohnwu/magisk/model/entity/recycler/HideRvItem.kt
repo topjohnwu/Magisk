@@ -1,17 +1,17 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
-import com.skoumal.teanity.databinding.ComparableRvItem
-import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
-import com.skoumal.teanity.rxbus.RxBus
-import com.skoumal.teanity.util.DiffObservableList
-import com.skoumal.teanity.util.KObservableField
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import com.topjohnwu.magisk.model.events.HideProcessEvent
-import com.topjohnwu.magisk.utils.inject
-import com.topjohnwu.magisk.utils.toggle
+import com.topjohnwu.magisk.utils.DiffObservableList
+import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.magisk.utils.RxBus
 
 class HideRvItem(val item: HideAppInfo, targets: List<HideTarget>) :
     ComparableRvItem<HideRvItem>() {

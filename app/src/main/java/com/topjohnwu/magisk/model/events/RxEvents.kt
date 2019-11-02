@@ -1,10 +1,10 @@
 package com.topjohnwu.magisk.model.events
 
-import com.skoumal.teanity.rxbus.RxBus
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessRvItem
 import com.topjohnwu.magisk.model.entity.recycler.ModuleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem
+import com.topjohnwu.magisk.utils.RxBus
 
 class HideProcessEvent(val item: HideProcessRvItem) : RxBus.Event
 

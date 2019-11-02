@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.data.database
 
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.data.database.base.*
 import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.magisk.model.entity.toLog
@@ -12,7 +11,7 @@ class LogDao : BaseDao() {
     override val table = DatabaseDefinition.Table.LOG
 
     fun deleteOutdated(
-        suTimeout: Long = Config.suLogTimeout * TimeUnit.DAYS.toMillis(1)
+        suTimeout: Long = TimeUnit.DAYS.toMillis(14)
     ) = query<Delete> {
         condition {
             lessThan("time", suTimeout.toString())

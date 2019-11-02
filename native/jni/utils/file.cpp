@@ -1,17 +1,16 @@
 /* file.cpp - Contains all files related utilities
  */
 
+#include <sys/sendfile.h>
+#include <sys/mman.h>
+#include <linux/fs.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <libgen.h>
-#include <sys/sendfile.h>
-#include <sys/mman.h>
-#include <linux/fs.h>
 
-#include <magisk.h>
 #include <utils.h>
 #include <selinux.h>
 
@@ -331,10 +330,6 @@ void *__mmap(const char *filename, size_t *size, bool rw) {
 	return buf;
 }
 
-void mmap_ro(const char *filename, void **buf, size_t *size) {
-	*buf = __mmap(filename, size, false);
-}
-
 void fd_full_read(int fd, void **buf, size_t *size) {
 	*size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
@@ -399,4 +394,16 @@ void parse_prop_file(const char *file, const function<bool (string_view, string_
 		*eql = '\0';
 		return fn(line, eql + 1);
 	}, true);
+}
+
+void parse_mnt(const char *file, const function<bool (mntent*)> &fn) {
+	unique_ptr<FILE, decltype(&endmntent)> fp(setmntent(file, "re"), &endmntent);
+	if (fp) {
+		mntent mentry{};
+		char buf[4096];
+		while (getmntent_r(fp.get(), &mentry, buf, sizeof(buf))) {
+			if (!fn(&mentry))
+				break;
+		}
+	}
 }

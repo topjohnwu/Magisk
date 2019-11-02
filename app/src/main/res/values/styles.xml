@@ -1,37 +1,56 @@
 <resources>
 
-    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="colorAccentFallback">@color/accentFallback</item>
-        <item name="windowActionModeOverlay">true</item>
+    <style name="ThemeFoundation" parent="Theme.MaterialComponents.Light.NoActionBar" />
+
+    <style name="ThemeFoundation.Colored">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorSecondary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryDark</item>
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+
+    <style name="ThemeFoundation.Colored.ExtraProps" />
+
+    <style name="MagiskTheme" parent="ThemeFoundation.Colored.ExtraProps">
+        <!--All of these attributes are deprecated and will be removed-->
         <item name="cardStyle">@style/CardViewStyle.Light</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
         <item name="imageColorTint">@color/icon_grey</item>
         <item name="colorControl">?android:attr/textColorSecondary</item>
+        <item name="colorAccentFallback">@color/accentFallback</item>
     </style>
 
-    <style name="AppTheme" parent="AppTheme.Base"/>
+    <style name="MagiskTheme.Flashing" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@android:color/black</item>
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="colorAccent">@color/colorSecondary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryDark</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
 
-    <style name="AppTheme.Dark.Base" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorAccent">@color/accent</item>
-        <item name="colorAccentFallback">@color/accentFallback</item>
-        <item name="windowActionModeOverlay">true</item>
-        <item name="cardStyle">@style/CardViewStyle.Dark</item>
+    <style name="MagiskTheme.SUFoundation" parent="Theme.MaterialComponents.Light.Dialog" />
+
+    <style name="MagiskTheme.SU" parent="MagiskTheme.SUFoundation">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:textColorSecondary">@color/dark_secondary_text</item>
-        <item name="imageColorTint">@color/dark_secondary_text</item>
-        <item name="colorControl">?android:attr/textColorSecondary</item>
     </style>
 
-    <style name="AppTheme.Dark" parent="AppTheme.Dark.Base"/>
+    <!--Overlays-->
 
-    <style name="AppTheme.NoDrawer" parent="AppTheme.Base"/>
+    <style name="AppBarLayoutTheme" parent="ThemeOverlay.AppCompat.Dark" />
 
-    <style name="AppTheme.NoDrawer.Dark" parent="AppTheme.Dark.Base"/>
+    <style name="AppBarLayoutTheme.Flashing" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="ToolbarPopupTheme" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="ToolbarPopupTheme.Flashing" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <!--CardView-->
 
     <style name="CardViewStyle.Dark" parent="CardView">
         <item name="cardBackgroundColor">@color/card_background_color_dark</item>
@@ -41,17 +60,6 @@
         <item name="cardBackgroundColor">@color/card_background_color_light</item>
     </style>
 
-    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">@drawable/ic_splash_activity</item>
-    </style>
-
-    <style name="SuRequest" parent="Theme.AppCompat.Light.Dialog">
-        <item name="android:windowCloseOnTouchOutside">false</item>
-        <item name="colorBackgroundFloating">@color/su_request_background</item>
-    </style>
-
-    <style name="SuRequest.Dark" parent="Theme.AppCompat.Dialog">
-        <item name="android:windowCloseOnTouchOutside">false</item>
-    </style>
+    <style name="SplashTheme" parent="SplashThemeBase"/>
 
 </resources>

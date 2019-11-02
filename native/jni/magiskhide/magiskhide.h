@@ -13,6 +13,7 @@
 #include <daemon.h>
 
 #define SIGTERMTHRD SIGUSR1
+#define SIGZYGOTE   SIGUSR2
 
 #define SAFETYNET_COMPONENT  "com.google.android.gms/.droidguard.DroidGuardService"
 #define SAFETYNET_PROCESS    "com.google.android.gms.unstable"
@@ -25,16 +26,20 @@ int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
+[[noreturn]] void test_proc_monitor();
 
 // Process monitoring
 void proc_monitor();
 void update_uid_map();
 
 // Utility functions
-void manage_selinux();
-void clean_magisk_props();
 void crawl_procfs(const std::function<bool (int)> &fn);
 void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
+
+// Hide policies
+void hide_daemon(int pid);
+void hide_unmount(int pid = getpid());
+void hide_sensitive_props();
 
 extern bool hide_enabled;
 extern pthread_mutex_t monitor_lock;
@@ -54,5 +59,6 @@ enum {
 	HIDE_NOT_ENABLED,
 	HIDE_ITEM_EXIST,
 	HIDE_ITEM_NOT_EXIST,
-	HIDE_NO_NS
+	HIDE_NO_NS,
+	HIDE_INVALID_PKG
 };

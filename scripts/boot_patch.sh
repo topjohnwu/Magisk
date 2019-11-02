@@ -7,7 +7,7 @@
 # Usage: boot_patch.sh <bootimage>
 #
 # The following flags can be set in environment variables:
-# KEEPVERITY, KEEPFORCEENCRYPT
+# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE
 #
 # This script should be placed in a directory with the following files:
 #
@@ -59,6 +59,8 @@ BOOTIMAGE="$1"
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+export KEEPVERITY
+export KEEPFORCEENCRYPT
 
 chmod -R 755 .
 
@@ -84,6 +86,8 @@ case $? in
     ;;
 esac
 
+[ -f recovery_dtbo ] && RECOVERYMODE=true
+
 ##########################################################################################
 # Ramdisk restores
 ##########################################################################################
@@ -101,7 +105,7 @@ case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
     ui_print "- Backing up stock boot image"
-    SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
+    SHA1=`./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null`
     STOCKDUMP=stock_boot_${SHA1}.img.gz
     ./magiskboot compress "$BOOTIMAGE" $STOCKDUMP
     cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
@@ -109,21 +113,20 @@ case $((STATUS & 3)) in
   1 )  # Magisk patched
     ui_print "- Magisk patched boot image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+    [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
     ./magiskboot cpio ramdisk.cpio restore
-    if ./magiskboot cpio ramdisk.cpio "exists init.rc"; then
-      # Normal boot image
-      cp -af ramdisk.cpio ramdisk.cpio.orig
-    else
-      # A only system-as-root
-      rm -f ramdisk.cpio
-    fi
+    cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   2 )  # Unsupported
     ui_print "! Boot image patched by unsupported programs"
     abort "! Please restore back to stock boot image"
     ;;
 esac
+
+if [ $((STATUS & 8)) -ne 0 ]; then
+  # Possibly using 2SI, export env var
+  export TWOSTAGEINIT=true
+fi
 
 ##########################################################################################
 # Ramdisk patches
@@ -133,19 +136,19 @@ ui_print "- Patching ramdisk"
 
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
+echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
-[ -f recovery_dtbo ] && echo "RECOVERYMODE=true" >> config
 
 ./magiskboot cpio ramdisk.cpio \
 "add 750 init magiskinit" \
-"patch $KEEPVERITY $KEEPFORCEENCRYPT" \
+"patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
 if [ $((STATUS & 4)) -ne 0 ]; then
   ui_print "- Compressing ramdisk"
-  ./magiskboot --cpio ramdisk.cpio compress
+  ./magiskboot cpio ramdisk.cpio compress
 fi
 
 rm -f ramdisk.cpio.orig config
@@ -154,11 +157,9 @@ rm -f ramdisk.cpio.orig config
 # Binary patches
 ##########################################################################################
 
-if ! $KEEPVERITY; then
-  for dt in dtb kernel_dtb extra recovery_dtbo; do
-    [ -f $dt ] && ./magiskboot dtb-patch $dt && ui_print "- Removing dm(avb)-verity in $dt"
-  done
-fi
+for dt in dtb kernel_dtb extra recovery_dtbo; do
+  [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Patching fstab in $dt"
+done
 
 if [ -f kernel ]; then
   # Remove Samsung RKP

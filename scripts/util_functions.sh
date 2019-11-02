@@ -166,6 +166,7 @@ find_block() {
 }
 
 mount_part() {
+  $BOOTMODE && return
   local PART=$1
   local POINT=/${PART}
   [ -L $POINT ] && rm -f $POINT
@@ -197,7 +198,8 @@ mount_partitions() {
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   else
-    grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+    grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
+    && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   fi
   [ -L /system/vendor ] && mount_part vendor
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
@@ -254,7 +256,7 @@ flash_image() {
   esac
   if $BOOTSIGNED; then
     CMD2="$BOOTSIGNER -sign"
-    ui_print "- Sign image with test keys"
+    ui_print "- Sign image with verity keys"
   else
     CMD2="cat -"
   fi
@@ -278,15 +280,56 @@ patch_dtbo_image() {
   find_dtbo_image
   if [ ! -z $DTBOIMAGE ]; then
     ui_print "- DTBO image: $DTBOIMAGE"
-    if $MAGISKBIN/magiskboot --dtb-test $DTBOIMAGE; then
+    local PATCHED=$TMPDIR/dtbo
+    if $MAGISKBIN/magiskboot dtb $DTBOIMAGE patch $PATCHED; then
       ui_print "- Backing up stock DTBO image"
-      $MAGISKBIN/magiskboot --compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
+      $MAGISKBIN/magiskboot compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
       ui_print "- Patching DTBO to remove avb-verity"
-      $MAGISKBIN/magiskboot --dtb-patch $DTBOIMAGE
+      cat $PATCHED /dev/zero > $DTBOIMAGE
+      rm -f $PATCHED
       return 0
     fi
   fi
   return 1
+}
+
+patch_boot_image() {
+  # Common installation script for flash_script.sh (updater-script) and addon.d.sh
+  eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
+  $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
+
+  SOURCEDMODE=true
+  cd $MAGISKBIN
+
+  $IS64BIT && mv -f magiskinit64 magiskinit 2>/dev/null || rm -f magiskinit64
+
+  # Source the boot patcher
+  . ./boot_patch.sh "$BOOTIMAGE"
+
+  ui_print "- Flashing new boot image"
+
+  if ! flash_image new-boot.img "$BOOTIMAGE"; then
+    ui_print "- Compressing ramdisk to fit in partition"
+    ./magiskboot cpio ramdisk.cpio compress
+    ./magiskboot repack "$BOOTIMAGE"
+    flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
+  fi
+
+  ./magiskboot cleanup
+  rm -f new-boot.img
+
+  if [ -f stock_boot* ]; then
+    rm -f /data/stock_boot* 2>/dev/null
+    $DATA && mv stock_boot* /data
+  fi
+
+  # Patch DTBO together with boot image
+  $KEEPVERITY || patch_dtbo_image
+
+  if [ -f stock_dtbo* ]; then
+    rm -f /data/stock_dtbo* 2>/dev/null
+    $DATA && mv stock_dtbo* /data
+  fi
 }
 
 sign_chromeos() {
@@ -356,13 +399,16 @@ check_data() {
 }
 
 find_manager_apk() {
-  APK=/data/adb/magisk.apk
+  [ -z $APK ] && APK=/data/adb/magisk.apk
   [ -f $APK ] || APK=/data/magisk/magisk.apk
   [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
   if [ ! -f $APK ]; then
-    DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" | cut -d= -f2`
-    [ -z "$DBAPK" ] || APK=/data/app/$DBAPK*/*.apk
+    DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" 2>/dev/null | cut -d= -f2`
+    [ -z $DBAPK ] && DBAPK=`strings /data/adb/magisk.db | grep 5requester | cut -c11-`
+    [ -z $DBAPK ] || APK=/data/user_de/*/$DBAPK/dyn/*.apk
+    [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk
   fi
+  [ -f $APK ] || ui_print "! Unable to detect Magisk Manager APK for BootSigner"
 }
 
 #################

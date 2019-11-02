@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
-import com.skoumal.teanity.databinding.ComparableRvItem
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ComparableRvItem
 
 class SpinnerRvItem(val item: String) : ComparableRvItem<SpinnerRvItem>() {
 

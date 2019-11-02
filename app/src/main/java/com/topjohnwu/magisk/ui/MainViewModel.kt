@@ -2,11 +2,11 @@ package com.topjohnwu.magisk.ui
 
 import android.view.MenuItem
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
 
 
-class MainViewModel : MagiskViewModel() {
+class MainViewModel : BaseViewModel() {
 
     fun navPressed() = Navigation.Main.OPEN_NAV.publish()
 

@@ -1,35 +1,38 @@
 package com.topjohnwu.magisk.ui.log
 
 import android.content.res.Resources
-import com.skoumal.teanity.databinding.ComparableRvItem
-import com.skoumal.teanity.extensions.addOnPropertyChangedCallback
-import com.skoumal.teanity.extensions.doOnSubscribeUi
-import com.skoumal.teanity.extensions.subscribeK
-import com.skoumal.teanity.util.DiffObservableList
-import com.skoumal.teanity.util.KObservableField
-import com.skoumal.teanity.viewevents.SnackbarEvent
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.extensions.doOnSubscribeUi
+import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.model.binding.BindingAdapter
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LogItemRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LogRvItem
 import com.topjohnwu.magisk.model.entity.recycler.MagiskLogRvItem
 import com.topjohnwu.magisk.model.events.PageChangedEvent
-import com.topjohnwu.magisk.ui.base.MagiskViewModel
+import com.topjohnwu.magisk.model.events.SnackbarEvent
+import com.topjohnwu.magisk.utils.DiffObservableList
+import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.BindingViewPagerAdapter
 import me.tatarka.bindingcollectionadapter2.OnItemBind
+import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import java.util.*
 
 class LogViewModel(
     private val resources: Resources,
     private val logRepo: LogRepository
-) : MagiskViewModel(), BindingViewPagerAdapter.PageTitles<ComparableRvItem<*>> {
+) : BaseViewModel(), BindingViewPagerAdapter.PageTitles<ComparableRvItem<*>> {
 
+    val itemsAdapter = BindingAdapter()
     val items = DiffObservableList(ComparableRvItem.callback)
     val itemBinding = OnItemBind<ComparableRvItem<*>> { itemBinding, _, item ->
         item.bind(itemBinding)
@@ -40,6 +43,8 @@ class LogViewModel(
 
     private val logItem get() = items[0] as LogRvItem
     private val magiskLogItem get() = items[1] as MagiskLogRvItem
+
+    val scrollPosition = KObservableField(0)
 
     init {
         currentPage.addOnPropertyChangedCallback {
@@ -57,6 +62,10 @@ class LogViewModel(
         else -> ""
     }
 
+    fun scrollDownPressed() {
+        scrollPosition.value = magiskLogItem.items.size - 1
+    }
+
     fun refresh() {
         fetchLogs().subscribeK { logItem.update(it) }
         fetchMagiskLog().subscribeK { magiskLogItem.update(it) }
@@ -70,10 +79,11 @@ class LogViewModel(
             now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
         )
 
-        val logFile = File(Const.EXTERNAL_PATH, filename)
-        try {
+        val logFile = File(Config.downloadDirectory, filename)
+        runCatching {
             logFile.createNewFile()
-        } catch (e: IOException) {
+        }.onFailure {
+            Timber.e(it)
             return
         }
 

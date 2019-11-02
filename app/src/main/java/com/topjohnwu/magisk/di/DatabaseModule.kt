@@ -3,19 +3,21 @@ package com.topjohnwu.magisk.di
 import android.content.Context
 import androidx.room.Room
 import com.topjohnwu.magisk.data.database.*
+import com.topjohnwu.magisk.tasks.RepoUpdater
 import org.koin.dsl.module
 
 
 val databaseModule = module {
-    single { createDatabase(get()) }
     single { LogDao() }
     single { PolicyDao(get()) }
     single { SettingsDao() }
     single { StringDao() }
-    single { createRepositoryDao(get()) }
+    single { createRepoDatabase(get()) }
+    single { get<RepoDatabase>().repoDao() }
+    single { RepoUpdater(get(), get()) }
 }
 
-fun createDatabase(context: Context): AppDatabase =
-    Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NAME).build()
-
-fun createRepositoryDao(db: AppDatabase) = db.repoDao()
+fun createRepoDatabase(context: Context) =
+        Room.databaseBuilder(context, RepoDatabase::class.java, "repo.db")
+            .fallbackToDestructiveMigration()
+            .build()

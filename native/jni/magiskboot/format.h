@@ -8,8 +8,6 @@ typedef enum {
 /* Boot formats */
 	CHROMEOS,
 	AOSP,
-	ELF32,
-	ELF64,
 	DHTB,
 	BLOB,
 /* Compression formats */
@@ -19,18 +17,18 @@ typedef enum {
 	BZIP2,
 	LZ4,
 	LZ4_LEGACY,
-/* Misc */
+/* Unsupported compression */
 	LZOP,
+/* Misc */
 	MTK,
 	DTB,
 } format_t;
 
 #define COMPRESSED(fmt)  ((fmt) >= GZIP && (fmt) <= LZ4_LEGACY)
+#define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
 
 #define BOOT_MAGIC      "ANDROID!"
 #define CHROMEOS_MAGIC  "CHROMEOS"
-#define ELF32_MAGIC     "\x7f""ELF\x01"
-#define ELF64_MAGIC     "\x7f""ELF\x02"
 #define GZIP1_MAGIC     "\x1f\x8b"
 #define GZIP2_MAGIC     "\x1f\x9e"
 #define LZOP_MAGIC      "\x89""LZO"
@@ -40,7 +38,6 @@ typedef enum {
 #define LZ41_MAGIC      "\x03\x21\x4c\x18"
 #define LZ42_MAGIC      "\x04\x22\x4d\x18"
 #define MTK_MAGIC       "\x88\x16\x88\x58"
-#define DTB_MAGIC       "\xd0\x0d\xfe\xed"
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
 #define DHTB_MAGIC      "\x44\x48\x54\x42\x01\x00\x00\x00"
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"

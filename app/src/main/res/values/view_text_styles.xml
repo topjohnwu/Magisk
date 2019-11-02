@@ -11,16 +11,8 @@
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="Widget.Text.Inactive">
-        <item name="android:textAppearance">@style/TextAppearance.Inactive</item>
-    </style>
-
     <style name="Widget.Text.Emphasize">
         <item name="android:textAppearance">@style/TextAppearance.Emphasize</item>
-    </style>
-
-    <style name="Widget.Text.Emphasize.Inactive">
-        <item name="android:textAppearance">@style/TextAppearance.Emphasize.Inactive</item>
     </style>
 
     <style name="Widget.Text.Emphasize.Tinted">
@@ -31,20 +23,12 @@
         <item name="android:textAppearance">@style/TextAppearance.Title</item>
     </style>
 
-    <style name="Widget.Text.Title.Inactive">
-        <item name="android:textAppearance">@style/TextAppearance.Title.Inactive</item>
-    </style>
-
     <style name="Widget.Text.Caption">
         <item name="android:textAppearance">@style/TextAppearance.Caption</item>
     </style>
 
     <style name="Widget.Text.Caption.Inactive">
         <item name="android:textAppearance">@style/TextAppearance.Caption.Inactive</item>
-    </style>
-
-    <style name="Widget.Text.Caption.Tinted">
-        <item name="android:textAppearance">@style/TextAppearance.Caption.Tinted</item>
     </style>
 
     <style name="Widget.Text.SectionTitle">

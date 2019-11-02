@@ -1,11 +1,15 @@
 package com.topjohnwu.magisk.data.repository
 
-import com.topjohnwu.magisk.data.database.StringDao
+import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.model.entity.module.Repo
 
-class StringRepository(private val stringDao: StringDao) {
+class StringRepository(
+    private val api: GithubRawServices
+) {
 
-    fun fetch(key: String, default: String) = stringDao.fetch(key, default)
-    fun put(key: String, value: String) = stringDao.put(key, value)
-    fun delete(key: String) = stringDao.delete(key)
+    fun getString(url: String) = api.fetchString(url)
 
+    fun getMetadata(repo: Repo) = api.fetchModuleInfo(repo.id, "module.prop")
+
+    fun getReadme(repo: Repo) = api.fetchModuleInfo(repo.id, "README.md")
 }

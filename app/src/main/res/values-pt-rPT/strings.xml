@@ -48,14 +48,11 @@
     <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Limpar registo agora</string>
     <string name="logs_cleared">Registo limpo com sucesso</string>
-    <string name="log_is_empty">Registo está vazio</string>
 
     <!--About Activity-->
     <string name="app_changelog">Lista de alterações da aplicação</string>
-    <string name="app_translators">Tradutores da Aplicação</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Fechar</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">Deseja instalar%1$s agora?</string>
     <string name="download">Transferir</string>
@@ -64,8 +61,6 @@
     <string name="settings_reboot_toast">Reinicie para aplicar definições</string>
     <string name="release_notes">Notas da atualização</string>
     <string name="repo_cache_cleared">Cache do repositório apagado</string>
-    <string name="internal_storage">O zip foi guardado em:
-\n[Armazenamento interno]%1$s</string>
     <string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
     <string name="manager_download_install">Pressione para transferir e instalar</string>
     <string name="update_channel">Atualizações do Magisk</string>
@@ -78,8 +73,6 @@
     <string name="complete_uninstall">Desinstalação Completa</string>
     <string name="restore_done">Restauração feita!</string>
     <string name="download_file_error">Erro ao transferir ficheiro</string>
-    <string name="downloading_toast">A transferir %1$s</string>
-    <string name="no_rw_storage">Esta funcionalidade não funcionará sem permissão de escrita do armazenamento externo.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Geral</string>
@@ -134,7 +127,6 @@
 
     <!--Superuser-->
     <string name="su_request_title">Pedido de root</string>
-    <string name="deny_with_str">Negar%1$s</string>
     <string name="deny">Negar</string>
     <string name="prompt">Perguntar</string>
     <string name="grant">Permitir</string>
@@ -155,7 +147,6 @@
     <string name="su_snack_notif_off">Notificações da %1$s está desativado</string>
     <string name="su_snack_log_on">Registo de %1$s está ativado</string>
     <string name="su_snack_log_off">Registo de %1$s está desativado</string>
-    <string name="su_snack_revoke">%1$s direitos foram revogados</string>
     <string name="su_revoke_title">Revogar?</string>
     <string name="su_revoke_msg">Revogar os diretos do %1$s, Confirmar?</string>
     <string name="toast">Notificação(pop-up)</string>

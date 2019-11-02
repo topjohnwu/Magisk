@@ -57,15 +57,11 @@
     <string name="menuReload">Επαναφόρτωση</string>
     <string name="menuClearLog">Εκκαθάριση αρχείου καταγραφής τώρα</string>
     <string name="logs_cleared">Το αρχείο καταγραφής εκκαθαρίστηκε επιτυχώς</string>
-    <string name="log_is_empty">Το αρχείο καταγραφής είναι κενό</string>
 
     <!--About Activity-->
     <string name="app_changelog">Καταγραφή αλλαγών εφαρμογής</string>
-    <string name="translators">GreatApo, JpegXguy</string>
-    <string name="app_translators">Μεταφραστές εφαρμογής</string>
 
     <!--Toasts, Dialogs-->
-    <string name="close">Κλείσιμο</string>
     <string name="repo_install_title">Εγκατάσταση %1$s</string>
     <string name="repo_install_msg">Θέλετε να εγκαταστήσετε το %1$s τώρα;</string>
     <string name="download">Λήψη</string>
@@ -74,7 +70,6 @@
     <string name="settings_reboot_toast">Επανεκκίνηση για εφαρμογή ρυθμίσεων</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>
     <string name="repo_cache_cleared">Η Repo cache καθαρίστηκε</string>
-    <string name="internal_storage">Το zip είναι αποθηκευμένο σε:\n[Εσωτερική μνήμη]%1$s</string>
     <string name="manager_update_title">Νέα Ενημέρωση Magisk Manager Διαθέσιμη!</string>
     <string name="manager_download_install">Πιέστε για λήψη και εγκατάσταση</string>
     <string name="dtbo_patched_title">Έγινε patch στο DTBO!</string>
@@ -92,8 +87,6 @@
     <string name="proprietary_title">Λήψη Ιδιόκτητου Κώδικα</string>
     <string name="proprietary_notice">Το Magisk Manager είναι FOSS οπότε δεν περιέχει της Google τον ιδιόκτητο κώδικα του SafetyNet API.\n\nΕπιτρέπετε στο Magisk Manager να κατεβάσει μια επέκταση (περιέχει το GoogleApiClient) για ελέγχους του SafetyNet?</string>
     <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
-    <string name="downloading_toast">Κατέβασμα %1$s</string>
-    <string name="no_rw_storage">Η λειτουργία αυτή δεν θα δουλέψει χωρίς την άδεια εγγραφής στον εξωτερικό χώρο αποθηκεύσης.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Γενικά</string>
@@ -150,11 +143,9 @@
     <string name="global_summary">Όλες οι συνεδρίες root χρησιμοποιούν τον καθολικό χώρο oνομάτων προσάρτησης</string>
     <string name="requester_summary">Οι συνεδρίες root θα κληρονομούν το χώρο ονομάτων του αιτούντα τους</string>
     <string name="isolate_summary">Κάθε συνεδρία root θα έχει το δικό της απομονωμένο χώρο ονομάτων</string>
-    <string name="android_o_not_support">Δεν υποστηρίζεται Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Αίτημα υπερχρήστη</string>
-    <string name="deny_with_str">Άρνηση%1$s</string>
     <string name="deny">Άρνηση</string>
     <string name="prompt">Προτροπή</string>
     <string name="grant">Αποδοχή</string>
@@ -174,7 +165,6 @@
     <string name="su_snack_notif_off">Οι ειδοποιήσεις του %1$s είναι απενεργοποιημένες</string>
     <string name="su_snack_log_on">Η καταγραφή του %1$s είναι ενεργοποιημένη</string>
     <string name="su_snack_log_off">Η καταγραφή του %1$s είναι απενεργοποιημένη</string>
-    <string name="su_snack_revoke">Τα δικαιώματα του %1$s ανακαλούνται</string>
     <string name="su_revoke_title">Ανάκληση;</string>
     <string name="su_revoke_msg">Επιβεβαίωση για ανάκληση δικαιωμάτων %1$s;</string>
     <string name="toast">Αναδυόμενο παράθυρο</string>

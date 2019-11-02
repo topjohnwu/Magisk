@@ -30,7 +30,6 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.security.DigestOutputStream;
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
@@ -61,29 +60,8 @@ public class SignAPK {
     private static final int USE_SHA1 = 1;
     private static final int USE_SHA256 = 2;
 
-    public static void sign(JarMap input, OutputStream output) throws Exception {
-        sign(SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem"),
-             SignAPK.class.getResourceAsStream("/keys/testkey.pk8"), input, output);
-    }
-
-    public static void sign(InputStream certIs, InputStream keyIs,
-                            JarMap input, OutputStream output) throws Exception {
-        X509Certificate cert = CryptoUtils.readCertificate(certIs);
-        PrivateKey key = CryptoUtils.readPrivateKey(keyIs);
-        sign(cert, key, input, output);
-    }
-
-    public static void sign(InputStream jks, String keyStorePass, String alias, String keyPass,
-                            JarMap input, OutputStream output) throws Exception {
-        KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(jks, keyStorePass.toCharArray());
-        X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
-        PrivateKey key = (PrivateKey) ks.getKey(alias, keyPass.toCharArray());
-        sign(cert, key, input, output);
-    }
-
-    private static void sign(X509Certificate cert, PrivateKey key,
-                             JarMap input, OutputStream output) throws Exception {
+    public static void signAndAdjust(X509Certificate cert, PrivateKey key,
+                                     JarMap input, OutputStream output) throws Exception {
         File temp1 = File.createTempFile("signAPK", null);
         File temp2 = File.createTempFile("signAPK", null);
 
@@ -101,6 +79,11 @@ public class SignAPK {
             temp1.delete();
             temp2.delete();
         }
+    }
+
+    public static void sign(X509Certificate cert, PrivateKey key,
+                            JarMap input, OutputStream output) throws Exception {
+        sign(cert, key, input, output, false);
     }
 
     private static void sign(X509Certificate cert, PrivateKey key,
@@ -498,11 +481,11 @@ public class SignAPK {
         outputStream.close();
     }
     private static void signFile(Manifest manifest, JarMap inputJar,
-                                 X509Certificate publicKey, PrivateKey privateKey,
+                                 X509Certificate cert, PrivateKey privateKey,
                                  JarOutputStream outputJar)
             throws Exception {
         // Assume the certificate is valid for at least an hour.
-        long timestamp = publicKey.getNotBefore().getTime() + 3600L * 1000;
+        long timestamp = cert.getNotBefore().getTime() + 3600L * 1000;
         // MANIFEST.MF
         JarEntry je = new JarEntry(JarFile.MANIFEST_NAME);
         je.setTime(timestamp);
@@ -512,15 +495,15 @@ public class SignAPK {
         je.setTime(timestamp);
         outputJar.putNextEntry(je);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        writeSignatureFile(manifest, baos, getDigestAlgorithm(publicKey));
+        writeSignatureFile(manifest, baos, getDigestAlgorithm(cert));
         byte[] signedData = baos.toByteArray();
         outputJar.write(signedData);
         // CERT.{EC,RSA} / CERT#.{EC,RSA}
-        final String keyType = publicKey.getPublicKey().getAlgorithm();
+        final String keyType = cert.getPublicKey().getAlgorithm();
         je = new JarEntry(String.format(CERT_SIG_NAME, keyType));
         je.setTime(timestamp);
         outputJar.putNextEntry(je);
         writeSignatureBlock(new CMSProcessableByteArray(signedData),
-                publicKey, privateKey, outputJar);
+                cert, privateKey, outputJar);
     }
 }
