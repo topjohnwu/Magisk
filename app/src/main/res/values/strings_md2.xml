@@ -79,4 +79,6 @@
     <string name="superuser_toggle_notification">Toggles “toast” notifications</string>
     <string name="superuser_toggle_revoke">Revoke</string>
 
+    <string name="hide_filter_hint">Filter by name</string>
+
 </resources>
