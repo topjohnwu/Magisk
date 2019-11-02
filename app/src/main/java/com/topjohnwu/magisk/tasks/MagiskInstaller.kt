@@ -266,7 +266,7 @@ abstract class MagiskInstaller {
 
         val patched = File(installDir, "new-boot.img")
         if (isSigned) {
-            console.add("- Signing boot image with test keys")
+            console.add("- Signing boot image with verity keys")
             val signed = File(installDir, "signed.img")
             try {
                 withStreams(SuFileInputStream(patched), signed.outputStream().buffered()) {

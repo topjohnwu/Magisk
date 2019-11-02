@@ -256,7 +256,7 @@ flash_image() {
   esac
   if $BOOTSIGNED; then
     CMD2="$BOOTSIGNER -sign"
-    ui_print "- Sign image with test keys"
+    ui_print "- Sign image with verity keys"
   else
     CMD2="cat -"
   fi
