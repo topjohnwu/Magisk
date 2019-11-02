@@ -406,7 +406,7 @@ find_manager_apk() {
     DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" 2>/dev/null | cut -d= -f2`
     [ -z $DBAPK ] && DBAPK=`strings /data/adb/magisk.db | grep 5requester | cut -c11-`
     [ -z $DBAPK ] || APK=/data/user_de/*/$DBAPK/dyn/*.apk
-    [ -f $APK ] || APK=/data/app/$DBAPK*/*.apk
+    [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk
   fi
   [ -f $APK ] || ui_print "! Unable to detect Magisk Manager APK for BootSigner"
 }
