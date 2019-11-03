@@ -33,10 +33,10 @@ public class SignBoot {
     private static final int BOOT_IMAGE_HEADER_V1_RECOVERY_DTBO_SIZE_OFFSET = 1632;
     private static final int BOOT_IMAGE_HEADER_V2_DTB_SIZE_OFFSET = 1648;
 
-    /* Arbitrary maximum header version value; when greater assume the field is dt/extra size */
+    // Arbitrary maximum header version value; when greater assume the field is dt/extra size
     private static final int BOOT_IMAGE_HEADER_VERSION_MAXIMUM = 8;
 
-    /* Maximum header size byte value to read (bootimg minimum page size) */
+    // Maximum header size byte value to read (currently the bootimg minimum page size)
     private static final int BOOT_IMAGE_HEADER_SIZE_MAXIMUM = 2048;
 
     private static class PushBackRWStream extends FilterInputStream {
@@ -121,6 +121,7 @@ public class SignBoot {
             // Read the header for size
             byte[] hdr = new byte[BOOT_IMAGE_HEADER_SIZE_MAXIMUM];
             if (imgIn.read(hdr) != hdr.length)
+                System.err.println("Unable to read image header");
                 return false;
             int signableSize = getSignableImageSize(hdr);
 
@@ -128,13 +129,16 @@ public class SignBoot {
             byte[] rawImg = Arrays.copyOf(hdr, signableSize);
             int remain = signableSize - hdr.length;
             if (imgIn.read(rawImg, hdr.length, remain) != remain) {
-                System.err.println("Invalid image: not signed");
+                System.err.println("Unable to read image");
                 return false;
             }
 
             // Read footer, which contains the signature
             byte[] signature = new byte[4096];
-            imgIn.read(signature);
+            if (imgIn.read(signature) == -1) {
+                System.err.println("Invalid image: not signed");
+                return false;
+            }
 
             BootSignature bootsig = new BootSignature(signature);
             if (certIn != null) {
