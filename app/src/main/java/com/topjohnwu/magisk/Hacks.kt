@@ -53,18 +53,12 @@ fun Context.wrapJob(): Context = object : GlobalResContext(this) {
     }
 }
 
-fun Class<*>.cmp(pkg: String = BuildConfig.APPLICATION_ID): ComponentName {
+fun Class<*>.cmp(pkg: String): ComponentName {
     val name = ClassMap[this].name
     return ComponentName(pkg, Info.stub?.componentMap?.get(name) ?: name)
 }
 
-fun Context.intent(c: Class<*>): Intent {
-    val cls = ClassMap[c]
-    return Info.stub?.let {
-        val className = it.componentMap.getOrElse(cls.name) { cls.name }
-        Intent().setComponent(ComponentName(this, className))
-    } ?: Intent(this, cls)
-}
+inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
 
 private open class GlobalResContext(base: Context) : ContextWrapper(base) {
     open val mRes: Resources get() = ResourceMgr.resource
@@ -192,8 +186,9 @@ object ClassMap {
         UpdateCheckService::class.java to a.g::class.java,
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
-        SuRequestActivity::class.java to a.m::class.java
+        SuRequestActivity::class.java to a.m::class.java,
+        ProcessPhoenix::class.java to a.r::class.java
     )
 
-    operator fun get(c: Class<*>) = map.getOrElse(c) { throw IllegalArgumentException() }
+    operator fun get(c: Class<*>) = map.getOrElse(c) { c }
 }

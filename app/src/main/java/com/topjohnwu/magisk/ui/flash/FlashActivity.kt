@@ -60,7 +60,7 @@ open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() 
 
     companion object {
 
-        private fun intent(context: Context) = context.intent(FlashActivity::class.java)
+        private fun intent(context: Context) = context.intent<FlashActivity>()
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         private fun intent(context: Context, file: File) = intent(context).setData(file.toUri())
 

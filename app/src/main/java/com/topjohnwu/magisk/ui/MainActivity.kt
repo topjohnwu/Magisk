@@ -60,7 +60,7 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (!SplashActivity.DONE) {
-            startActivity(intent(SplashActivity::class.java))
+            startActivity(intent<SplashActivity>())
             finish()
         }
 

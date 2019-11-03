@@ -38,7 +38,7 @@ private fun RemoteFileService.upgrade(apk: File, id: Int) {
             patch(apk, id)
         } else {
             // Simply relaunch the app
-            ProcessPhoenix.triggerRebirth(this)
+            ProcessPhoenix.triggerRebirth(this, intent<ProcessPhoenix>())
         }
     } else {
         patch(apk, id)

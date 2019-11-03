@@ -40,7 +40,7 @@ open class SplashActivity : Activity() {
             Config.suManager = ""
             Shell.su("pm uninstall $pkg").submit()
         }
-        if (TextUtils.equals(pkg, packageName)) {
+        if (pkg == packageName) {
             runCatching {
                 // We are the manager, remove com.topjohnwu.magisk as it could be malware
                 packageManager.getApplicationInfo(BuildConfig.APPLICATION_ID, 0)
@@ -60,10 +60,9 @@ open class SplashActivity : Activity() {
         // Setup shortcuts
         Shortcuts.setup(this)
 
-        val intent = intent(MainActivity::class.java)
-        intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION))
         DONE = true
-        startActivity(intent)
+
+        startActivity(intent<MainActivity>().apply { intent?.also { putExtras(it) } })
         finish()
     }
 

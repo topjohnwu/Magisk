@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.util.Log;
 import com.topjohnwu.magisk.net.ErrorHandler;
 import com.topjohnwu.magisk.net.Networking;
 import com.topjohnwu.magisk.net.ResponseListener;
+import com.topjohnwu.magisk.obfuscate.Mapping;
 import com.topjohnwu.magisk.obfuscate.RawData;
 import com.topjohnwu.magisk.utils.APKInstall;
 
@@ -48,7 +51,11 @@ public class DownloadActivity extends Activity {
             // Download and relaunch the app
             Networking.get(apkLink)
                     .setErrorHandler(err)
-                    .getAsFile(MANAGER_APK, f -> ProcessPhoenix.triggerRebirth(this));
+                    .getAsFile(MANAGER_APK, apk -> {
+                        Intent intent = new Intent()
+                                .setComponent(new ComponentName(this, Mapping.inverse("a.r")));
+                        ProcessPhoenix.triggerRebirth(this, intent);
+                    });
         } else {
             // Download and upgrade the app
             Application app = getApplication();

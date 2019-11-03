@@ -63,7 +63,7 @@ open class GeneralReceiver : BaseReceiver() {
                 }
                 when (action) {
                     REQUEST -> {
-                        val i = context.intent(SuRequestActivity::class.java)
+                        val i = context.intent<SuRequestActivity>()
                                 .setAction(action)
                                 .putExtra("socket", intent.getStringExtra("socket"))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
