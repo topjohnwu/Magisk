@@ -37,13 +37,8 @@ object Info {
         val code = ShellUtils.fastCmd("magisk -V").toInt()
         val hide = Shell.su("magiskhide --status").exec().isSuccess
         var mode = -1
-        if (code >= Const.Version.CONNECT_MODE) {
+        if (code >= Const.Version.CONNECT_MODE)
             mode = Shell.su("magisk --connect-mode").exec().code
-            if (mode == 0) {
-                // Manually trigger broadcast test
-                Shell.su("magisk --broadcast-test").exec()
-            }
-        }
         Env(code, str, hide, mode)
     }.getOrElse { Env() }
 

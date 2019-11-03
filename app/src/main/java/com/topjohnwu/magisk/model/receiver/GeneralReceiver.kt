@@ -51,23 +51,14 @@ open class GeneralReceiver : BaseReceiver() {
         }
 
         when (intent.action ?: return) {
-            Intent.ACTION_REBOOT, Intent.ACTION_BOOT_COMPLETED -> {
-                val action = intent.getStringExtra("action")
-                if (action == null) {
-                    // Actual boot completed event
-                    Shell.su("mm_patch_dtbo").submit {
-                        if (it.isSuccess)
-                            Notifications.dtboPatched(context)
-                    }
-                    return
-                }
-                when (action) {
+            Intent.ACTION_REBOOT -> {
+                when (val action = intent.getStringExtra("action") ?: return) {
                     REQUEST -> {
                         val i = context.intent<SuRequestActivity>()
-                                .setAction(action)
-                                .putExtra("socket", intent.getStringExtra("socket"))
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                            .setAction(action)
+                            .putExtra("socket", intent.getStringExtra("socket"))
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
                         if (SDK_INT >= 29) {
                             // Android Q does not allow starting activity from background
                             i.startActivityWithRoot()
@@ -92,7 +83,7 @@ open class GeneralReceiver : BaseReceiver() {
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
                 val pkg = getPkg(intent)
                 policyDB.delete(pkg).blockingGet()
-                "magiskhide --rm $pkg".su().blockingGet()
+                Shell.su("magiskhide --rm $pkg").submit()
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
             Const.Key.BROADCAST_MANAGER_UPDATE -> {

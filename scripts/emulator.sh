@@ -118,3 +118,4 @@ mkdir -p /data/adb/modules 2>/dev/null
 mkdir /data/adb/post-fs-data.d 2>/dev/null
 mkdir /data/adb/services.d 2>/dev/null
 /sbin/magisk --daemon
+/sbin/magisk --broadcast-test

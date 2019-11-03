@@ -60,6 +60,11 @@ open class SplashActivity : Activity() {
         // Setup shortcuts
         Shortcuts.setup(this)
 
+        Shell.su("mm_patch_dtbo").submit {
+            if (it.isSuccess)
+                Notifications.dtboPatched(this)
+        }
+
         DONE = true
 
         startActivity(intent<MainActivity>().apply { intent?.also { putExtras(it) } })

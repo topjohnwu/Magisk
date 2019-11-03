@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--
-    Try to recreate the main app's AndroidManifest.xml
--->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.topjohnwu.magisk">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name="a.e"
@@ -58,7 +52,6 @@
             android:directBootAware="true">
             <intent-filter>
                 <action android:name="android.intent.action.REBOOT" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
             </intent-filter>
             <intent-filter>
