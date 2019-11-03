@@ -118,7 +118,7 @@ object PatchAPK {
     @JvmOverloads
     fun patch(apk: String, out: String, pkg: String, label: String = "Manager"): Boolean {
         try {
-            val jar = JarMap(apk)
+            val jar = JarMap.open(apk)
             val je = jar.getJarEntry(Const.ANDROID_MANIFEST)
             val xml = jar.getRawData(je)
 

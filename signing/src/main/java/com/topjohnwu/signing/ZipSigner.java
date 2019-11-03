@@ -65,7 +65,7 @@ public class ZipSigner {
 
         Security.insertProviderAt(new BouncyCastleProvider(), 1);
 
-        try (JarMap in = new JarMap(args[args.length - 2], false);
+        try (JarMap in = JarMap.open(args[args.length - 2], false);
              OutputStream out = new FileOutputStream(args[args.length - 1])) {
             if (args.length == 2) {
                 sign(in, out);
