@@ -84,6 +84,8 @@ if [ -d /system/addon.d ]; then
 #!/sbin/sh
 # ADDOND_VERSION=2
 
+mount /data 2>/dev/null
+
 if [ -f /data/adb/magisk/addon.d.sh ]; then
   exec sh /data/adb/magisk/addon.d.sh "\$@"
 else
