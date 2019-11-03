@@ -20,9 +20,8 @@ else
 fi
 
 initialize() {
-  mount /data 2>/dev/null
-
   MAGISKBIN=/data/adb/magisk
+
   if [ ! -d $MAGISKBIN ]; then
     echo "! Cannot find Magisk binaries!"
     exit 1
@@ -45,6 +44,9 @@ main() {
     # Wait for post addon.d-v1 processes to finish
     sleep 5
   fi
+
+  # Ensure we aren't in /tmp/addon.d anymore (since it's been deleted by addon.d)
+  cd $TMPDIR
 
   $BOOTMODE || recovery_actions
 

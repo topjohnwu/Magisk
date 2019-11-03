@@ -295,11 +295,11 @@ patch_dtbo_image() {
 
 patch_boot_image() {
   # Common installation script for flash_script.sh (updater-script) and addon.d.sh
-  eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
-  $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
-
   SOURCEDMODE=true
   cd $MAGISKBIN
+
+  eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
+  $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
 
   $IS64BIT && mv -f magiskinit64 magiskinit 2>/dev/null || rm -f magiskinit64
 
