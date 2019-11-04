@@ -14,10 +14,12 @@ import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.entity.state.IndeterminateState
 import com.topjohnwu.magisk.model.events.HideProcessEvent
+import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.hide.HideViewModel
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
+import kotlin.math.roundToInt
 
 class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
 
@@ -28,6 +30,9 @@ class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
 
     val isExpanded = KObservableField(false)
     val itemsChecked = KObservableField(0)
+    val itemsCheckedPercent = Observer(itemsChecked) {
+        (itemsChecked.value.toFloat() / items.size * 100).roundToInt()
+    }
 
     /** [toggle] depends on this functionality */
     private val isHidden get() = itemsChecked.value == items.size

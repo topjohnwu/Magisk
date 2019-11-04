@@ -124,8 +124,7 @@
             style="?styleProgressDeterminate"
             android:layout_width="match_parent"
             android:layout_gravity="top"
-            android:max="@{item.items.size()}"
-            android:progress="@{item.itemsChecked}" />
+            progressAnimated="@{item.itemsCheckedPercent}" />
 
     </com.google.android.material.card.MaterialCardView>
 

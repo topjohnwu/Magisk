@@ -1,11 +1,13 @@
 package com.topjohnwu.magisk.utils
 
 import android.animation.Animator
+import android.animation.ValueAnimator
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextSwitcher
 import android.widget.TextView
 import android.widget.ViewSwitcher
@@ -429,4 +431,16 @@ fun NestedScrollView.setOnScrollStateChangeListener(listener: Runnable) {
         }
         handler.postDelayed(listener, 1000)
     }
+}
+
+@BindingAdapter("progressAnimated")
+fun ProgressBar.setProgressAnimated(newProgress: Int) {
+    val animator = tag as? ValueAnimator
+    animator?.cancel()
+
+    ValueAnimator.ofInt(progress, newProgress).apply {
+        interpolator = FastOutSlowInInterpolator()
+        addUpdateListener { progress = it.animatedValue as Int }
+        tag = this
+    }.start()
 }
