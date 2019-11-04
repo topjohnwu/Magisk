@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import com.topjohnwu.magisk.R
@@ -43,13 +42,12 @@ class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
         isExpanded.value = false
     }
 
-    fun expand(v: View) {
+    fun toggle(v: View) {
         (v.parent as? ViewGroup)?.startAnimations()
-        isExpanded.value = true
+        isExpanded.toggle()
     }
 
-    fun toggle(menuItem: MenuItem, viewModel: HideViewModel): Boolean {
-        if (menuItem.itemId != R.id.action_toggle) return false
+    fun toggle(viewModel: HideViewModel): Boolean {
         // contract implies that isHidden == all checked
         if (!isHidden) {
             items.filterNot { it.isHidden.value }
