@@ -8,7 +8,6 @@
     <string name="settings">설정</string>
     <string name="install">설치</string>
     <string name="unsupport_magisk_title">지원되지 않는 Magisk 버전</string>
-    <string name="unsupport_magisk_message">이 버전의 Magisk Manager는 v18.0보다 낮은 버전의 Magisk를 지원하지 않습니다.\n\n직접 Magisk를 업데이트 하거나 이전 버전의 앱으로 다운그레이드하십시오..</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk가 설치되지 않음</string>

@@ -8,7 +8,6 @@
     <string name="settings">Impostazioni</string>
     <string name="install">Installa</string>
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
-    <string name="unsupport_magisk_message">Questa versione di Magisk Manager non supporta versioni di Magisk inferiori alla v18.0.\n\nPuoi aggiornare manualmente Magisk o tornare a una versione meno recente dell\'app.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk non è installato.</string>

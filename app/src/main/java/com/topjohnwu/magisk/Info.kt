@@ -43,12 +43,17 @@ object Info {
     }.getOrElse { Env() }
 
     class Env(
-        val magiskVersionCode: Int = -1,
+        code: Int = -1,
         val magiskVersionString: String = "",
         hide: Boolean = false,
         var connectionMode: Int = -1
     ) {
         val magiskHide get() = Config.magiskHide
+        val magiskVersionCode = when (code) {
+            in Int.MIN_VALUE..Const.Version.MIN_VERCODE -> -1
+            else -> code
+        }
+        val unsupported = code > 0 && code < Const.Version.MIN_VERCODE
 
         init {
             Config.magiskHide = hide

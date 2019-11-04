@@ -8,7 +8,6 @@
     <string name="settings">Ustawienia</string>
     <string name="install">Instaluj</string>
     <string name="unsupport_magisk_title">Nieobsługiwana Wersja Magisk</string>
-    <string name="unsupport_magisk_message">Ta wersja Magisk Managera nie obsługuje wersji Magisk niższej niż v18.0.\n\nMożesz albo ręcznie zaktualizować Magisk lub obniżyć w aplikacji do starszej wersji.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie jest zainstalowany.</string>

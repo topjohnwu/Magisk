@@ -8,7 +8,6 @@
     <string name="settings">Configuració</string>
     <string name="install">Instal·lar</string>
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
-    <string name="unsupport_magisk_message">Aquesta versió de Magisk Manager no suporta una versió inferior a la 18.0.\n\nPots actualitzar Magisk manualment o pots instalar una versió anterior de la app.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no està instal·lat</string>

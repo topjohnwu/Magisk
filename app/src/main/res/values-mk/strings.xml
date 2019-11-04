@@ -8,7 +8,6 @@
     <string name="settings">Поставки</string>
     <string name="install">Инсталирај</string>
     <string name="unsupport_magisk_title">Неподдржана верзија на Magisk</string>
-    <string name="unsupport_magisk_message">Оваа верзија на Magisk Manager не ја поддржува верзијата на Magisk пониска од v18.0.\n\nМожно е да рачно да го надградите Magisk или да ја вратите апликацијата на постара верзија.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk не е инсталиран.</string>

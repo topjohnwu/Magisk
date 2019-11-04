@@ -3,8 +3,6 @@ package com.topjohnwu.magisk.ui
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
-import androidx.appcompat.app.AlertDialog
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
@@ -19,19 +17,7 @@ open class SplashActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Shell.getShell {
-            if (Info.env.magiskVersionCode > 0 && Info.env.magiskVersionCode < Const.Version.MIN_SUPPORT) {
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.unsupport_magisk_title)
-                    .setMessage(R.string.unsupport_magisk_message)
-                    .setNegativeButton(android.R.string.ok, null)
-                    .setOnDismissListener { finish() }
-                    .show()
-            } else {
-                initAndStart()
-            }
-        }
+        Shell.getShell { initAndStart() }
     }
 
     private fun initAndStart() {

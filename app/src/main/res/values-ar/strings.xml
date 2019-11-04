@@ -9,7 +9,6 @@
     <string name="settings">الإعدادات</string>
     <string name="install">التثبيت</string>
     <string name="unsupport_magisk_title">إصدار Magisk غير مدعوم</string>
-    <string name="unsupport_magisk_message">لا يدعم هذا الإصدار من Magisk Manager إصدارا لـ Magisk vأقل من  18\n\n بإمكانك تحديث Magisk يدويا أو تثبيت إصدار أدنى.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk غير مثبت</string>

@@ -7,7 +7,6 @@
     <string name="settings">Setelan</string>
     <string name="install">Pasang</string>
     <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
-    <string name="unsupport_magisk_message">Magisk Manager versi ini tidak mendukung versi Magisk di bawah v18.0.\n\nAnda dapat memperbarui Magisk secara manual, atau menurunkan aplikasi ke versi sebelumnya.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk tidak terpasang.</string>

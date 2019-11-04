@@ -8,7 +8,6 @@
     <string name="settings">Ayarlar</string>
     <string name="install">Yükle</string>
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
-    <string name="unsupport_magisk_message">Magisk Manager\'ın bu sürümü v18.0\'dan daha düşük Magisk versiyonlarını desteklememektedir.\n\nMagisk\'i manuel olarak yükseltebilir veya uygulamayı daha eski bir sürüme düşürebilirsiniz.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk yüklü değil</string>

@@ -8,7 +8,6 @@
     <string name="settings">Setări</string>
     <string name="install">Instalează</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
-    <string name="unsupport_magisk_message">Această versiune de Magisk Manager nu suportă versiunea Magisk mai mică de v18.0.\n\nPoți fie să actualizezi manual Magisk, fie să treci la o versiune mai veche.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nu este instalat.</string>

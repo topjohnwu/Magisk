@@ -8,7 +8,6 @@
     <string name="settings">Seaded</string>
     <string name="install">Installi</string>
     <string name="unsupport_magisk_title">Mittetoetatud Magisk\'i versioon</string>
-    <string name="unsupport_magisk_message">See Magisk Manager\'i versioon ei toeta Magisk\'ist vanemat versiooni kui v18.0.\n\nSa võid kas Magisk\'i käsitsi täiendada või alandad rakenduse vanemale versioonile.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk pole installitud</string>

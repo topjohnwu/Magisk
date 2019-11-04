@@ -2,11 +2,13 @@ package com.topjohnwu.magisk.ui
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
+import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
@@ -65,6 +67,15 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
         }
 
         super.onCreate(savedInstanceState)
+
+        if (Info.env.unsupported && !viewModel.shownUnsupportedDialog) {
+            viewModel.shownUnsupportedDialog = true
+            AlertDialog.Builder(this)
+                .setTitle(R.string.unsupport_magisk_title)
+                .setMessage(getString(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION))
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        }
 
         navigationController.apply {
             rootFragmentListener = this@MainActivity

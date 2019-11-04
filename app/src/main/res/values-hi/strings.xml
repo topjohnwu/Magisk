@@ -8,7 +8,6 @@
     <string name="settings">सेटिंग्स</string>
     <string name="install">स्थापित करें</string>
     <string name="unsupport_magisk_title">असमर्थित Magisk संस्करण</string>
-    <string name="unsupport_magisk_message">Magisk Manager का यह संस्करण Magisk के v18.0 संस्करण से कम का समर्थन नहीं करता है.\n\nआप या तो खुद से Magisk को अपग्रेड करें, या फिर एप्लीकेशन को पुराने संस्करण पे डाउनग्रेड करें .</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk स्थापित नहीं है</string>

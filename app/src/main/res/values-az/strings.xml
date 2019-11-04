@@ -8,7 +8,6 @@
     <string name="settings">Tənzimləmələr</string>
     <string name="install">Quraşdır</string>
     <string name="unsupport_magisk_title">Dəstəklənməyən Magisk Versiyası</string>
-    <string name="unsupport_magisk_message">Magisk Manager\'in bu versiyası Magisk\'in v18.0 versiyasndan aşağısını dəstəkləmir.\n\nMagisk\'i əllə yüksəldə, yaxud tətbiqi əvvəlki versiyalarına qaytara bilərsiniz.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk yüklənməyib.</string>
