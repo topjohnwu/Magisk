@@ -27,7 +27,7 @@ object PatchAPK {
     private val UPPERALPHA = LOWERALPHA.toUpperCase()
     private val ALPHA = LOWERALPHA + UPPERALPHA
     private const val DIGITS = "0123456789"
-    private val ALPHANUM = ALPHA + DIGITS
+    val ALPHANUM = ALPHA + DIGITS
     private val ALPHANUMDOTS = "$ALPHANUM............"
 
     private fun genPackageName(prefix: String, length: Int): String {

@@ -5,6 +5,7 @@ import android.util.Base64
 import android.util.Base64OutputStream
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.di.koinModules
+import com.topjohnwu.magisk.utils.PatchAPK.ALPHANUM
 import com.topjohnwu.signing.CryptoUtils.readCertificate
 import com.topjohnwu.signing.CryptoUtils.readPrivateKey
 import com.topjohnwu.superuser.internal.InternalUtils
@@ -38,7 +39,6 @@ class Keygen: CertKeyProvider {
         private const val ALIAS = "magisk"
         private val PASSWORD get() = "magisk".toCharArray()
         private const val TESTKEY_CERT = "61ed377e85d386a8dfee6b864bd85b0bfaa5af81"
-        private const val ALPHANUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         private const val BASE64_FLAG = Base64.NO_PADDING or Base64.NO_WRAP
     }
 
