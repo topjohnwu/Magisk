@@ -71,7 +71,10 @@
                                 android:layout_height="wrap_content"
                                 android:checked="@={viewModel.showSystem}"
                                 android:text="@string/show_system_app"
-                                android:textAppearance="?appearanceTextCaptionNormal" />
+                                android:textAppearance="?appearanceTextCaptionNormal"
+                                app:checkedIcon="@drawable/ic_check_md2"
+                                app:chipBackgroundColor="?colorSurfaceVariant"
+                                tools:checked="true" />
 
                             <com.google.android.material.chip.Chip
                                 style="@style/Widget.MaterialComponents.Chip.Entry"
@@ -81,7 +84,8 @@
                                 android:layout_height="wrap_content"
                                 android:checkable="false"
                                 android:text="@{viewModel.query}"
-                                android:textAppearance="?appearanceTextCaptionNormal" />
+                                android:textAppearance="?appearanceTextCaptionNormal"
+                                app:chipBackgroundColor="?colorSurfaceVariant" />
 
                         </com.google.android.material.chip.ChipGroup>
 
@@ -122,7 +126,9 @@
                                 android:paddingEnd="@dimen/l1"
                                 android:singleLine="true"
                                 android:text="@={viewModel.query}"
-                                android:textAppearance="?appearanceTextBodyNormal" />
+                                android:textAppearance="?appearanceTextBodyNormal"
+                                android:textColor="?colorTextTransient"
+                                android:textColorHint="?colorOnSurfaceVariant" />
 
                         </com.google.android.material.card.MaterialCardView>
 
