@@ -50,6 +50,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/hide_action"
                     style="?styleImageNormal"
+                    isSelected="@{item.itemsCheckedPercent == 100}"
                     goneUnless="@{item.isExpanded}"
                     android:layout_margin="@dimen/l1"
                     android:background="?selectableItemBackgroundBorderless"
@@ -59,7 +60,7 @@
                     app:layout_constraintEnd_toEndOf="@+id/hide_icon"
                     app:layout_constraintStart_toStartOf="@+id/hide_icon"
                     app:layout_constraintTop_toTopOf="@+id/hide_icon"
-                    app:srcCompat="@drawable/ic_hide_md2" />
+                    app:srcCompat="@drawable/ic_hide_select_md2" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/hide_name"
