@@ -36,10 +36,10 @@
                 <com.google.android.material.card.MaterialCardView
                     style="?styleCardVariant"
                     android:layout_width="match_parent"
-                    app:cardCornerRadius="24dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1">
+                    android:layout_marginEnd="@dimen/l1"
+                    app:cardCornerRadius="24dp">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -102,15 +102,21 @@
                             goneUnless="@{viewModel.isFilterExpanded}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_margin="@dimen/l1"
-                            app:cardCornerRadius="24dp"
+                            android:layout_marginStart="@dimen/l_50"
+                            android:layout_marginEnd="@dimen/l_50"
+                            android:layout_marginBottom="@dimen/l_50"
                             android:visibility="gone"
+                            app:cardCornerRadius="18dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/hide_filter_barrier"
                             tools:visibility="visible">
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 style="?styleIconNormal"
+                                android:layout_width="48dp"
+                                android:layout_height="36dp"
+                                android:layout_gravity="center_vertical|start"
+                                android:padding="6dp"
                                 app:srcCompat="@drawable/ic_search_md2"
                                 app:tint="?colorDisabled" />
 
@@ -121,7 +127,7 @@
                                 android:background="@null"
                                 android:hint="@string/hide_filter_hint"
                                 android:inputType="textUri"
-                                android:minHeight="48dp"
+                                android:minHeight="36dp"
                                 android:paddingStart="0dp"
                                 android:paddingEnd="@dimen/l1"
                                 android:singleLine="true"
