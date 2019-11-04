@@ -36,7 +36,7 @@
                 <com.google.android.material.card.MaterialCardView
                     style="?styleCardVariant"
                     android:layout_width="match_parent"
-
+                    app:cardCornerRadius="24dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1">
@@ -99,6 +99,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="@dimen/l1"
+                            app:cardCornerRadius="24dp"
                             android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/hide_filter_barrier"
@@ -169,18 +170,6 @@
                 android:layout_marginTop="@dimen/l1" />
 
         </LinearLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/hide_action_scroll_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
-            app:backgroundTint="?colorSurface"
-            app:srcCompat="@drawable/ic_up_md2"
-            app:tint="?colorOnSurface"
-            tools:layout_marginBottom="64dp" />
 
     </FrameLayout>
 

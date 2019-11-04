@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_focus_up"
+        android:icon="@drawable/ic_up_md2"
+        android:title="@string/hide_scroll_up"
+        app:showAsAction="ifRoom" />
+</menu>

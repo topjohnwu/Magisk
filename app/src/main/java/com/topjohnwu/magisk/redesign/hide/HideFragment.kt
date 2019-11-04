@@ -2,7 +2,9 @@ package com.topjohnwu.magisk.redesign.hide
 
 import android.content.Context
 import android.graphics.Insets
-import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHideMd2Binding
@@ -19,14 +21,18 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         activity.setTitle(R.string.magiskhide)
+        setHasOptionsMenu(true)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_hide_md2, menu)
+    }
 
-        binding.hideActionScrollUp.setOnClickListener {
-            binding.hideScrollContainer.fullScroll(View.FOCUS_UP)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_focus_up -> binding.hideScrollContainer.fullScroll(View.FOCUS_UP)
         }
+        return super.onOptionsItemSelected(item)
     }
 
 }

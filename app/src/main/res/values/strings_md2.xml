@@ -80,5 +80,6 @@
     <string name="superuser_toggle_revoke">Revoke</string>
 
     <string name="hide_filter_hint">Filter by name</string>
+    <string name="hide_scroll_up">Scroll up</string>
 
 </resources>

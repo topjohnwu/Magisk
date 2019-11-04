@@ -56,6 +56,7 @@
 
         <activity
             android:name="a.i"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true" />
 
         <activity-alias
