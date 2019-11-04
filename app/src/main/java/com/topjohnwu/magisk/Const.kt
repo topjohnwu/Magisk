@@ -26,6 +26,7 @@ object Const {
         const val MIN_VERSION = "v18.0"
         const val MIN_VERCODE = 18000
         const val CONNECT_MODE = 20100
+        const val PROVIDER_CONNECT = 20102
     }
 
     object ID {

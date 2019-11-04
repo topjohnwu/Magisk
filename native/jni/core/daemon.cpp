@@ -46,8 +46,6 @@ static void *request_handler(void *args) {
 	case LATE_START:
 	case BOOT_COMPLETE:
 	case SQLITE_CMD:
-	case BROADCAST_ACK:
-	case BROADCAST_TEST:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -83,12 +81,6 @@ static void *request_handler(void *args) {
 		break;
 	case SQLITE_CMD:
 		exec_sql(client);
-		break;
-	case BROADCAST_ACK:
-		broadcast_ack(client);
-		break;
-	case BROADCAST_TEST:
-		broadcast_test(client);
 		break;
 	case REMOVE_MODULES:
 		if (credential.uid == UID_SHELL || credential.uid == UID_ROOT) {

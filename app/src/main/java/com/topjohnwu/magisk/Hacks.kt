@@ -14,8 +14,6 @@ import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.annotation.RequiresApi
-import androidx.annotation.StringRes
-import com.topjohnwu.magisk.extensions.langTagToLocale
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.model.update.UpdateCheckService
@@ -23,11 +21,8 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
-import com.topjohnwu.magisk.utils.currentLocale
-import com.topjohnwu.magisk.utils.defaultLocale
 import com.topjohnwu.magisk.utils.refreshLocale
 import com.topjohnwu.magisk.utils.updateConfig
-import java.util.*
 
 fun AssetManager.addAssetPath(path: String) {
     DynAPK.addAssetPath(this, path)

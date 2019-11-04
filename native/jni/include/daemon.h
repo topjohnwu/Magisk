@@ -17,9 +17,7 @@ enum {
 	BOOT_COMPLETE,
 	MAGISKHIDE,
 	SQLITE_CMD,
-	BROADCAST_ACK,
 	REMOVE_MODULES,
-	BROADCAST_TEST,
 };
 
 // Return codes for daemon
@@ -84,8 +82,6 @@ void magiskhide_handler(int client);
  *************/
 
 void su_daemon_handler(int client, struct ucred *credential);
-void broadcast_test(int client = -1);
-void broadcast_ack(int client);
 
 /*********************
  * Daemon Global Vars

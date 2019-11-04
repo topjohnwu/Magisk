@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
@@ -54,6 +55,7 @@ public class FileProvider extends ContentProvider {
 
     private PathStrategy mStrategy;
 
+    public static ProviderCallHandler callHandler;
     
     @Override
     public boolean onCreate() {
@@ -154,6 +156,14 @@ public class FileProvider extends ContentProvider {
         
         final File file = mStrategy.getFileForUri(uri);
         return file.delete() ? 1 : 0;
+    }
+
+
+    @Override
+    public Bundle call(String method, String arg, Bundle extras) {
+        if (callHandler != null)
+            return callHandler.call(getContext(), method, arg, extras);
+        return null;
     }
 
     

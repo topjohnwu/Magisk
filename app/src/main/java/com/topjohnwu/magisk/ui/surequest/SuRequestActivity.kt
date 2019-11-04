@@ -10,8 +10,7 @@ import com.topjohnwu.magisk.databinding.ActivityRequestBinding
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.model.receiver.GeneralReceiver
-import com.topjohnwu.magisk.utils.SuLogger
+import com.topjohnwu.magisk.utils.SuHandler
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestBinding>() {
@@ -29,19 +28,13 @@ open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestB
         lockOrientation()
         super.onCreate(savedInstanceState)
 
-        val intent = intent
-
-        when (intent?.action) {
-            GeneralReceiver.REQUEST -> {
-                if (!viewModel.handleRequest(intent))
-                    finish()
-                return
-            }
-            GeneralReceiver.LOG -> SuLogger.handleLogs(this, intent)
-            GeneralReceiver.NOTIFY -> SuLogger.handleNotify(this, intent)
+        if (intent?.action == SuHandler.REQUEST) {
+            if (!viewModel.handleRequest(intent))
+                finish()
+        } else {
+            SuHandler(this, intent.action, intent.extras)
+            finish()
         }
-
-        finish()
     }
 
     override fun onEventDispatched(event: ViewEvent) {

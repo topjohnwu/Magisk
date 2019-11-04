@@ -3,10 +3,13 @@ package com.topjohnwu.magisk.ui
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.intent
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
+import com.topjohnwu.magisk.wrap
 import com.topjohnwu.superuser.Shell
 
 open class SplashActivity : Activity() {

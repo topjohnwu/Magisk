@@ -56,14 +56,15 @@ fun Map<String, String>.toPolicy(pm: PackageManager): MagiskPolicy {
 }
 
 @Throws(PackageManager.NameNotFoundException::class)
-fun Int.toPolicy(pm: PackageManager): MagiskPolicy {
+fun Int.toPolicy(pm: PackageManager, policy: Int = INTERACTIVE): MagiskPolicy {
     val pkg = pm.getPackagesForUid(this)?.firstOrNull()
         ?: throw PackageManager.NameNotFoundException()
     val info = pm.getApplicationInfo(pkg, 0)
     return MagiskPolicy(
         uid = this,
         packageName = pkg,
+        policy = policy,
         applicationInfo = info,
-        appName = info.loadLabel(pm).toString()
+        appName = info.getLabel(pm)
     )
 }

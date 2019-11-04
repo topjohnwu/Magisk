@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.unwrap
 import com.topjohnwu.magisk.utils.RootInit
+import com.topjohnwu.magisk.utils.SuHandler
 import com.topjohnwu.magisk.utils.updateConfig
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
@@ -34,6 +35,7 @@ open class App() : Application() {
         Shell.Config.verboseLogging(BuildConfig.DEBUG)
         Shell.Config.addInitializers(RootInit::class.java)
         Shell.Config.setTimeout(2)
+        FileProvider.callHandler = SuHandler
         Room.setFactory {
             when (it) {
                 WorkDatabase::class.java -> WorkDatabase_Impl()
