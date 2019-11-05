@@ -73,10 +73,10 @@ ex(fromUid), ex(toUid), ex(pid), ex(policy), \
 ex(command.data()), ex(notify)
 
 void app_log(const su_context &ctx) {
-	char fromUid[16];
+	char fromUid[32];
 	sprintf(fromUid, "from.uid:i:%d", get_uid(ctx.info));
 
-	char toUid[16];
+	char toUid[32];
 	sprintf(toUid, "to.uid:i:%d", ctx.req.uid);
 
 	char pid[16];
@@ -98,7 +98,7 @@ void app_log(const su_context &ctx) {
 "notify", ex(fromUid), ex(policy)
 
 void app_notify(const su_context &ctx) {
-	char fromUid[16];
+	char fromUid[32];
 	sprintf(fromUid, "from.uid:i:%d", get_uid(ctx.info));
 
 	char policy[16];
