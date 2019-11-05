@@ -151,7 +151,7 @@
             isSelected="@{item.isExpanded}"
             android:layout_gravity="top|end"
             android:onClick="@{(view) -> item.toggle(view)}"
-            android:rotation="180"
+            android:rotation="@{item.isExpanded ? 225 : 180}"
             app:srcCompat="@drawable/ic_more_collapse" />
 
     </com.google.android.material.card.MaterialCardView>

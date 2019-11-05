@@ -444,3 +444,10 @@ fun ProgressBar.setProgressAnimated(newProgress: Int) {
         tag = this
     }.start()
 }
+
+@BindingAdapter("android:rotation")
+fun View.setRotationNotAnimated(rotation: Int) {
+    if (animation != null) {
+        this.rotation = rotation.toFloat()
+    }
+}

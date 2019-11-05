@@ -74,6 +74,7 @@
     <string name="install_start">Let\'s go</string>
 
     <string name="module_safe_mode_message">You\'re in safe mode. None of user modules will work.\nThis message will disappear once safe mode is disabled.</string>
+    <string name="module_version_author">%1$s by %2$s</string>
 
     <string name="superuser_toggle_log">Toggles logging</string>
     <string name="superuser_toggle_notification">Toggles “toast” notifications</string>
