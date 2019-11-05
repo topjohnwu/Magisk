@@ -3,8 +3,9 @@
 
     <style name="WidgetFoundation.Card.Elevated" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?colorSurfaceVariant</item>
-        <!--elevation wouldn't be seen, since we change the color anyways-->
-        <item name="cardElevation">0dp</item>
+        <item name="cardCornerRadius">@dimen/l_50</item>
+        <item name="cardElevation">@dimen/l_125</item>
+        <item name="cardPreventCornerOverlap">true</item>
     </style>
 
 </resources>
