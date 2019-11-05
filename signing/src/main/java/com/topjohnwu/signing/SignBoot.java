@@ -136,7 +136,7 @@ public class SignBoot {
 
             // Read footer, which contains the signature
             byte[] signature = new byte[4096];
-            if (imgIn.read(signature) == -1) {
+            if (imgIn.read(signature) == -1 || Arrays.equals(signature, new byte [signature.length])) {
                 System.err.println("Invalid image: not signed");
                 return false;
             }
