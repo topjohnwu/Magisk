@@ -53,12 +53,18 @@ class ModuleViewModel : CompatViewModel() {
         return me
     }
 
-    fun updateState() {
-        // I don't feel like bothering with moving every single item to its updated state,
-        // so this kind of wasteful operation helps with that
-        Single.fromCallable { items + itemsPending }
-            .map { it.order() }
-            .subscribeK { it.forEach { it.update() } }
+    fun moveToState(item: ModuleItem) {
+        items.removeAll { it.itemSameAs(item) }
+        itemsPending.removeAll { it.itemSameAs(item) }
+
+        if (item.isModified) {
+            itemsPending
+        } else {
+            items
+        }.apply {
+            add(item)
+            sortWith(compareBy { it.item.name.toLowerCase(currentLocale) })
+        }
     }
 
     private enum class ModuleState {

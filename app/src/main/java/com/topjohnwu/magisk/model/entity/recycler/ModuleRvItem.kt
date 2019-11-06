@@ -107,7 +107,7 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
 
     fun delete(viewModel: ModuleViewModel) {
         isRemoved = !isRemoved
-        viewModel.updateState()
+        viewModel.moveToState(this)
     }
 
     override fun contentSameAs(other: ModuleItem): Boolean = item.version == other.item.version

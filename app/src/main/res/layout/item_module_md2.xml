@@ -93,7 +93,8 @@
                 android:alpha=".5"
                 android:onClick="@{(v) -> item.delete(viewModel)}"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
+                app:layout_constraintTop_toTopOf="@+id/module_title"
                 app:srcCompat="@drawable/ic_delete_restore" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
