@@ -21,11 +21,11 @@
 
     <com.google.android.material.card.MaterialCardView
         style="?styleCardVariant"
-        isEnabled="@{!Config.coreOnly &amp;&amp; !item.isRemoved()}"
+        isEnabled="@{!Config.coreOnly &amp;&amp; !item.removed}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="@{item.isEnabled() &amp;&amp; !Config.coreOnly ? 1f : .5f}"
-        android:onClick="@{() -> item.toggle(viewModel)}"
+        android:alpha="@{item.enabled &amp;&amp; !Config.coreOnly ? 1f : .5f}"
+        android:onClick="@{() -> item.toggle()}"
         tools:layout_gravity="center"
         tools:layout_marginBottom="@dimen/l1"
         tools:layout_marginEnd="@dimen/l1">
@@ -38,8 +38,8 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/module_state_icon"
                 style="?styleImageSmall"
-                gone="@{!item.isRemoved &amp;&amp; !item.updated}"
-                srcCompat="@{item.isRemoved ? R.drawable.ic_delete_md2 : R.drawable.ic_update_md2}"
+                gone="@{!item.removed &amp;&amp; !item.updated}"
+                srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : R.drawable.ic_update_md2}"
                 android:layout_marginStart="@dimen/l1"
                 android:background="@null"
                 app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
@@ -89,7 +89,7 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/module_remove"
                 style="?styleIconNormal"
-                isSelected="@{item.isRemoved}"
+                isSelected="@{item.removed}"
                 android:alpha=".5"
                 android:onClick="@{(v) -> item.delete(viewModel)}"
                 app:layout_constraintEnd_toEndOf="parent"

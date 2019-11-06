@@ -2,6 +2,10 @@ package com.topjohnwu.magisk.model.entity.recycler
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
+import androidx.databinding.Bindable
+import androidx.databinding.Observable
+import androidx.databinding.PropertyChangeRegistry
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -75,32 +79,34 @@ class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
     override fun itemSameAs(other: RepoRvItem): Boolean = item.id == other.item.id
 }
 
-class ModuleItem(val item: Module) : ComparableRvItem<ModuleItem>() {
+class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
 
     override val layoutRes = R.layout.item_module_md2
 
-    val isEnabled = KObservableField(item.enable)
-    val isRemoved = KObservableField(item.remove)
+    @get:Bindable
+    var isEnabled = item.enable
+        set(value) {
+            field = value
+            item.enable = value
+            notifyChange(BR.enabled)
+        }
+    @get:Bindable
+    var isRemoved = item.remove
+        set(value) {
+            field = value
+            item.remove = value
+            notifyChange(BR.removed)
+        }
+
     val isUpdated get() = item.updated
+    val isModified get() = isRemoved || item.updated
 
-    val isModified get() = item.remove || item.updated
-
-    init {
-        isEnabled.addOnPropertyChangedCallback {
-            item.enable = it ?: return@addOnPropertyChangedCallback
-        }
-        isRemoved.addOnPropertyChangedCallback {
-            item.remove = it ?: return@addOnPropertyChangedCallback
-        }
-    }
-
-    fun toggle(viewModel: ModuleViewModel) {
-        isEnabled.toggle()
-        viewModel.updateState()
+    fun toggle() {
+        isEnabled = !isEnabled
     }
 
     fun delete(viewModel: ModuleViewModel) {
-        isRemoved.toggle()
+        isRemoved = !isRemoved
         viewModel.updateState()
     }
 
@@ -110,5 +116,21 @@ class ModuleItem(val item: Module) : ComparableRvItem<ModuleItem>() {
             && item.name == other.item.name
 
     override fun itemSameAs(other: ModuleItem): Boolean = item.id == other.item.id
+
+}
+
+abstract class ObservableItem<T> : ComparableRvItem<T>(), Observable {
+
+    private val list = PropertyChangeRegistry()
+
+    override fun removeOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {
+        list.remove(callback ?: return)
+    }
+
+    override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback?) {
+        list.add(callback ?: return)
+    }
+
+    protected fun notifyChange(id: Int) = list.notifyChange(this, id)
 
 }
