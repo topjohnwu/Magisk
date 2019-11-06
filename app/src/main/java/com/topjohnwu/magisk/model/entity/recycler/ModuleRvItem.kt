@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import android.content.res.Resources
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.StringRes
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
@@ -13,8 +11,6 @@ import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.redesign.module.ModuleViewModel
 import com.topjohnwu.magisk.utils.KObservableField
-import com.topjohnwu.magisk.utils.rotationTo
-import com.topjohnwu.magisk.utils.setRevealed
 
 class ModuleRvItem(val item: Module) : ComparableRvItem<ModuleRvItem>() {
 
@@ -83,22 +79,29 @@ class ModuleItem(val item: Module) : ComparableRvItem<ModuleItem>() {
 
     override val layoutRes = R.layout.item_module_md2
 
-    val isExpanded = KObservableField(false)
     val isEnabled = KObservableField(item.enable)
+    val isRemoved = KObservableField(item.remove)
+    val isUpdated get() = item.updated
 
-    val isModified get() = item.enable != isEnabled.value
+    val isModified get() = item.remove || item.updated
+
+    init {
+        isEnabled.addOnPropertyChangedCallback {
+            item.enable = it ?: return@addOnPropertyChangedCallback
+        }
+        isRemoved.addOnPropertyChangedCallback {
+            item.remove = it ?: return@addOnPropertyChangedCallback
+        }
+    }
 
     fun toggle(viewModel: ModuleViewModel) {
         isEnabled.toggle()
-        viewModel.moveToState(this)
+        viewModel.updateState()
     }
 
-    fun toggle(view: View) {
-        isExpanded.toggle()
-        view.rotationTo(if (isExpanded.value) 225 else 180)
-        (view.parent as ViewGroup)
-            .findViewById<View>(R.id.module_expand_container)
-            .setRevealed(isExpanded.value)
+    fun delete(viewModel: ModuleViewModel) {
+        isRemoved.toggle()
+        viewModel.updateState()
     }
 
     override fun contentSameAs(other: ModuleItem): Boolean = item.version == other.item.version
