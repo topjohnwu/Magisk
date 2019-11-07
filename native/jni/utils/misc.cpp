@@ -73,7 +73,8 @@ int strend(const char *s1, const char *s2) {
 }
 
 int exec_command(exec_t &exec) {
-	int pipefd[2] = {-1, -1}, outfd = -1;
+	int pipefd[] = {-1, -1};
+	int outfd = -1;
 
 	if (exec.fd == -1) {
 		if (xpipe2(pipefd, O_CLOEXEC) == -1)
@@ -113,10 +114,10 @@ int exec_command(exec_t &exec) {
 }
 
 int exec_command_sync(exec_t &exec) {
-	int pid, status;
-	pid = exec_command(exec);
+	int pid = exec_command(exec);
 	if (pid < 0)
 		return -1;
+	int status;
 	waitpid(pid, &status, 0);
 	return WEXITSTATUS(status);
 }

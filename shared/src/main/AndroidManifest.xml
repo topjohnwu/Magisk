@@ -9,11 +9,11 @@
         android:icon="@drawable/ic_launcher"
         android:installLocation="internalOnly"
         android:label="Magisk Manager"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Translucent.NoTitleBar">
 
         <activity
             android:name="a.r"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:process=":remote" />
 
         <provider

@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.surequest
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
@@ -11,6 +12,7 @@ import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.utils.SuHandler
+import com.topjohnwu.magisk.utils.SuHandler.REQUEST
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestBinding>() {
@@ -28,12 +30,27 @@ open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestB
         lockOrientation()
         super.onCreate(savedInstanceState)
 
-        if (intent?.action == SuHandler.REQUEST) {
+        fun showRequest() {
             if (!viewModel.handleRequest(intent))
                 finish()
-        } else {
-            SuHandler(this, intent.action, intent.extras)
+        }
+
+        fun runHandler(action: String?) {
+            SuHandler(this, action, intent.extras)
             finish()
+        }
+
+        if (intent.action == Intent.ACTION_VIEW) {
+            val action = intent.getStringExtra("action")
+            if (action == REQUEST) {
+                showRequest()
+            } else {
+                runHandler(action)
+            }
+        } else if (intent.action == REQUEST) {
+            showRequest()
+        } else {
+            runHandler(intent.action)
         }
     }
 

@@ -13,107 +13,188 @@
 
 using namespace std;
 
+enum {
+	NAMED_ACTIVITY,
+	PKG_ACTIVITY,
+	CONTENT_PROVIDER
+};
+
 #define CALL_PROVIDER \
 "/system/bin/app_process", "/system/bin", "com.android.commands.content.Content", \
-"call", "--uri", nullptr, "--user", nullptr, "--method"
+"call", "--uri", target, "--user", user, "--method", action
 
-#define content_exec_info(info, ...) {\
-	const char *cmd[] = { CALL_PROVIDER, __VA_ARGS__, nullptr }; \
-	exec_content_cmd(cmd, info); \
-}
+#define START_ACTIVITY \
+"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
+"start", "-p", target, "--user", user, "-a", "android.intent.action.VIEW", \
+"-f", "0x18000020", "--es", "action", action
 
-#define content_exec(...) content_exec_info(ctx.info.get(), __VA_ARGS__)
-
-#define ex(s) "--extra", s
+// 0x18000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_INCLUDE_STOPPED_PACKAGES
 
 #define get_user(info) \
 (info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER \
-? info->uid / 100000 \
-: 0)
+? info->uid / 100000 : 0)
 
 #define get_uid(info) \
 (info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED \
-? info->uid % 100000 \
-: info->uid)
+? info->uid % 100000 : info->uid)
 
-static const char *get_command(const su_request *to) {
-	if (to->command[0])
-		return to->command;
-	if (to->shell[0])
-		return to->shell;
-	return DEFAULT_SHELL;
+#define get_cmd(to) \
+(to.command[0] ? to.command : to.shell[0] ? to.shell : DEFAULT_SHELL)
+
+class Extra {
+	const char *key;
+	enum {
+		INT,
+		BOOL,
+		STRING
+	} type;
+	union {
+		int int_val;
+		bool bool_val;
+		const char * str_val;
+	};
+	char i_buf[16];
+	char b_buf[32];
+public:
+	Extra(const char *k, int v): key(k), type(INT), int_val(v) {}
+	Extra(const char *k, bool v): key(k), type(BOOL), bool_val(v) {}
+	Extra(const char *k, const char *v): key(k), type(STRING), str_val(v) {}
+
+	void add_intent(vector<const char *> &vec) {
+		const char *val;
+		switch (type) {
+			case INT:
+				vec.push_back("--ei");
+				sprintf(i_buf, "%d", int_val);
+				val = i_buf;
+				break;
+			case BOOL:
+				vec.push_back("--ez");
+				val = bool_val ? "true" : "false";
+				break;
+			case STRING:
+				vec.push_back("--es");
+				val = str_val;
+				break;
+		}
+		vec.push_back(key);
+		vec.push_back(val);
+	}
+
+	void add_bind(vector<const char *> &vec) {
+		switch (type) {
+			case INT:
+				sprintf(b_buf, "%s:i:%d", key, int_val);
+				break;
+			case BOOL:
+				sprintf(b_buf, "%s:b:%s", key, bool_val ? "true" : "false");
+				break;
+			case STRING:
+				sprintf(b_buf, "%s:s:%s", key, str_val);
+				break;
+		}
+		vec.push_back("--extra");
+		vec.push_back(b_buf);
+	}
+};
+
+static bool check_error(int fd) {
+	char buf[1024];
+	unique_ptr<FILE, decltype(&fclose)> out(xfdopen(fd, "r"), fclose);
+	while (fgets(buf, sizeof(buf), out.get())) {
+		if (strncmp(buf, "Error", 5) == 0)
+			return false;
+	}
+	return true;
 }
 
-static void exec_content_cmd(const char **args, const su_info *info) {
+static void exec_cmd(const char *action, vector<Extra> &data,
+					 const shared_ptr<su_info> &info, int mode = CONTENT_PROVIDER) {
 	char target[128];
-	sprintf(target, "content://%s.provider", info->str[SU_MANAGER].data());
 	char user[4];
 	sprintf(user, "%d", get_user(info));
 
-	// Fill in non static arguments
-	args[5] = target;
-	args[7] = user;
+	// First try content provider call method
+	if (mode >= CONTENT_PROVIDER) {
+		sprintf(target, "content://%s.provider", info->str[SU_MANAGER].data());
+		vector<const char *> args{ CALL_PROVIDER };
+		for (auto &e : data) {
+			e.add_bind(args);
+		}
+		args.push_back(nullptr);
+		exec_t exec {
+			.err = true,
+			.fd = -1,
+			.pre_exec = [] { setenv("CLASSPATH", "/system/framework/content.jar", 1); },
+			.argv = args.data()
+		};
+		exec_command_sync(exec);
+		if (check_error(exec.fd))
+			return;
+	}
 
+	vector<const char *> args{ START_ACTIVITY };
+	for (auto &e : data) {
+		e.add_intent(args);
+	}
+	args.push_back(nullptr);
 	exec_t exec {
-		.pre_exec = [] {
-			int null = xopen("/dev/null", O_WRONLY | O_CLOEXEC);
-			dup2(null, STDOUT_FILENO);
-			dup2(null, STDERR_FILENO);
-			setenv("CLASSPATH", "/system/framework/content.jar", 1);
-		},
-		.fork = fork_dont_care,
-		.argv = args
+		.err = true,
+		.fd = -1,
+		.pre_exec = [] { setenv("CLASSPATH", "/system/framework/am.jar", 1); },
+		.argv = args.data()
 	};
+
+	if (mode >= PKG_ACTIVITY) {
+		// Then try start activity without component name
+		strcpy(target, info->str[SU_MANAGER].data());
+		exec_command_sync(exec);
+		if (check_error(exec.fd))
+			return;
+	}
+
+	// Finally, fallback to start activity with component name
+	args[4] = "-n";
+	sprintf(target, "%s/a.m", info->str[SU_MANAGER].data());
+	exec.fd = -2;
+	exec.fork = fork_dont_care;
 	exec_command(exec);
 }
 
-#define LOG_BODY \
-"log", \
-ex(fromUid), ex(toUid), ex(pid), ex(policy), \
-ex(command.data()), ex(notify)
-
 void app_log(const su_context &ctx) {
-	char fromUid[32];
-	sprintf(fromUid, "from.uid:i:%d", get_uid(ctx.info));
+	if (fork_dont_care() == 0) {
+		vector<Extra> extras;
+		extras.reserve(6);
+		extras.emplace_back("from.uid", get_uid(ctx.info));
+		extras.emplace_back("to.uid", ctx.req.uid);
+		extras.emplace_back("pid", ctx.pid);
+		extras.emplace_back("policy", ctx.info->access.policy);
+		extras.emplace_back("command", get_cmd(ctx.req));
+		extras.emplace_back("notify", (bool) ctx.info->access.notify);
 
-	char toUid[32];
-	sprintf(toUid, "to.uid:i:%d", ctx.req.uid);
-
-	char pid[16];
-	sprintf(pid, "pid:i:%d", ctx.pid);
-
-	char policy[16];
-	sprintf(policy, "policy:i:%d", ctx.info->access.policy);
-
-	string command("command:s:");
-	command += get_command(&ctx.req);
-
-	char notify[16];
-	sprintf(notify, "notify:b:%s", ctx.info->access.notify ? "true" : "false");
-
-	content_exec(LOG_BODY)
+		exec_cmd("log", extras, ctx.info);
+		exit(0);
+	}
 }
-
-#define NOTIFY_BODY \
-"notify", ex(fromUid), ex(policy)
 
 void app_notify(const su_context &ctx) {
-	char fromUid[32];
-	sprintf(fromUid, "from.uid:i:%d", get_uid(ctx.info));
+	if (fork_dont_care() == 0) {
+		vector<Extra> extras;
+		extras.reserve(2);
+		extras.emplace_back("from.uid", get_uid(ctx.info));
+		extras.emplace_back("policy", ctx.info->access.policy);
 
-	char policy[16];
-	sprintf(policy, "policy:i:%d", ctx.info->access.policy);
-
-	content_exec(NOTIFY_BODY)
+		exec_cmd("notify", extras, ctx.info);
+		exit(0);
+	}
 }
 
-#define SOCKET_BODY \
-"request", ex(sock)
-
 void app_socket(const char *socket, const shared_ptr<su_info> &info) {
-	char sock[128];
-	sprintf(sock, "socket:s:%s", socket);
-	content_exec_info(info.get(), SOCKET_BODY)
+	vector<Extra> extras;
+	extras.reserve(1);
+	extras.emplace_back("socket", socket);
+
+	exec_cmd("request", extras, info, PKG_ACTIVITY);
 }
 
 void socket_send_request(int fd, const shared_ptr<su_info> &info) {

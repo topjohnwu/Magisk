@@ -43,10 +43,15 @@
         <!-- Superuser -->
         <activity
             android:name="a.m"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:directBootAware="true"
             android:excludeFromRecents="true"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="AppLinkUrlError">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
 
         <!-- Receiver -->
         <receiver
