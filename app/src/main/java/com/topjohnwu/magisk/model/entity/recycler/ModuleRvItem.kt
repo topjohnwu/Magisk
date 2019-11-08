@@ -5,6 +5,8 @@ import androidx.annotation.StringRes
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
+import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
@@ -77,6 +79,31 @@ class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
     override fun contentSameAs(other: RepoRvItem): Boolean = item == other.item
 
     override fun itemSameAs(other: RepoRvItem): Boolean = item.id == other.item.id
+}
+
+class SectionTitle(
+    val title: Int,
+    val button: Int = 0,
+    val icon: Int = 0
+) : ComparableRvItem<SectionTitle>() {
+    override val layoutRes = R.layout.item_section_md2
+
+    override fun onBindingBound(binding: ViewDataBinding) {
+        super.onBindingBound(binding)
+        val params = binding.root.layoutParams as StaggeredGridLayoutManager.LayoutParams
+        params.isFullSpan = true
+    }
+
+    override fun itemSameAs(other: SectionTitle): Boolean = this === other
+    override fun contentSameAs(other: SectionTitle): Boolean = this === other
+}
+
+class RepoItem(val item: Repo) : ComparableRvItem<RepoItem>() {
+
+    override val layoutRes: Int = R.layout.item_repo_md2
+
+    override fun contentSameAs(other: RepoItem): Boolean = item == other.item
+    override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id
 }
 
 class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.RepoItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.redesign.module.ModuleViewModel" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="?styleCardVariant"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_gravity="center"
+        tools:layout_marginBottom="@dimen/l1"
+        tools:layout_marginEnd="@dimen/l1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/module_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:text="@{item.item.name}"
+                android:textAppearance="?appearanceTextBodyNormal"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@tools:sample/lorem" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/module_version_author"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:text="@{@string/module_version_author(item.item.version ?? `?`, item.item.author ?? `?`)}"
+                android:textAppearance="?appearanceTextCaptionVariant"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/module_title"
+                tools:text="v1 by topjohnwu" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/module_description"
+                gone="@{item.item.description.empty}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:text="@{item.item.description}"
+                android:textAppearance="?appearanceTextCaptionVariant"
+                app:layout_constraintTop_toBottomOf="@+id/module_version_author"
+                tools:lines="4"
+                tools:text="@tools:sample/lorem/random" />
+
+            <View
+                android:id="@+id/module_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/l1"
+                android:background="?colorSurfaceVariant"
+                app:layout_constraintTop_toBottomOf="@+id/module_description" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:text="@{@string/updated_on(item.item.lastUpdateString)}"
+                android:textAppearance="?appearanceTextCaptionVariant"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/module_download"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/module_divider"
+                tools:ignore="SmallSp"
+                tools:text="@string/updated_on" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/module_download"
+                style="?styleIconPrimary"
+                android:contentDescription="@string/download"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/module_divider"
+                app:srcCompat="@drawable/ic_download_md2" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ProgressBar
+            style="?styleProgressDeterminate"
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"
+            tools:progress="40" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>
+

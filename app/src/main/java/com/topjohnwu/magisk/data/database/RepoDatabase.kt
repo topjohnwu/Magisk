@@ -7,5 +7,8 @@ import com.topjohnwu.magisk.model.entity.module.Repo
 @Database(version = 6, entities = [Repo::class, RepoEtag::class])
 abstract class RepoDatabase : RoomDatabase() {
 
-    abstract fun repoDao() : RepoDao
+    abstract fun repoDao(): RepoDao
+    abstract fun repoByUpdatedDao(): RepoByUpdatedDao
+    abstract fun repoByNameDao(): RepoByNameDao
+
 }

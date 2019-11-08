@@ -451,3 +451,8 @@ fun View.setRotationNotAnimated(rotation: Int) {
         this.rotation = rotation.toFloat()
     }
 }
+
+@BindingAdapter("android:text")
+fun TextView.setTextSafe(text: Int) {
+    if (text == 0) this.text = null else setText(text)
+}

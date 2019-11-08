@@ -15,145 +15,23 @@
 
     </data>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/module_remote"
+        adapter="@{viewModel.adapter}"
+        dividerHorizontal="@{R.drawable.divider_l1}"
+        dividerVertical="@{R.drawable.divider_l1}"
+        itemBinding="@{viewModel.itemBinding}"
+        items="@{viewModel.items}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:fillViewport="true"
-        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
-        tools:paddingBottom="64dp"
-        tools:paddingTop="24dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/module_notice"
-                style="?styleCardNormal"
-                gone="@{!Config.coreOnly}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/l1"
-                android:visibility="gone"
-                app:cardBackgroundColor="?colorError"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="@dimen/l1"
-                    android:text="@string/module_safe_mode_message"
-                    android:textAppearance="?appearanceTextCaptionOnPrimary"
-                    android:textStyle="bold" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                gone="@{viewModel.itemsPending.empty}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/l1"
-                android:paddingEnd="@dimen/l1">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/l1"
-                    android:layout_marginBottom="@dimen/l1"
-                    android:text="Applied on next boot"
-                    android:textAppearance="?appearanceTextBodyNormal"
-                    android:textColor="?colorPrimaryTransient"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/module_reboot_button"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/module_reboot_button"
-                    style="?styleButtonText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/reboot"
-                    android:textAllCaps="false"
-                    app:icon="@drawable/ic_restart"
-                    app:iconPadding="@dimen/l_50"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                dividerHorizontal="@{R.drawable.divider_l1}"
-                dividerVertical="@{R.drawable.divider_l1}"
-                gone="@{viewModel.itemsPending.empty}"
-                itemBinding="@{viewModel.itemBinding}"
-                items="@{viewModel.itemsPending}"
-                nestedScrollingEnabled="@{false}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:orientation="vertical"
-                android:paddingStart="@dimen/l1"
-                android:paddingEnd="0dp"
-                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-                app:spanCount="2"
-                tools:itemCount="1"
-                tools:listitem="@layout/item_module_md2" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                gone="@{viewModel.itemsPending.empty || viewModel.items.empty}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/l1"
-                android:paddingEnd="@dimen/l1"
-                android:text="Active"
-                android:textAppearance="?appearanceTextBodyNormal"
-                android:textColor="?colorPrimaryTransient"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/module_reboot_button"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                dividerHorizontal="@{R.drawable.divider_l1}"
-                dividerVertical="@{R.drawable.divider_l1}"
-                gone="@{viewModel.items.empty}"
-                itemBinding="@{viewModel.itemBinding}"
-                items="@{viewModel.items}"
-                nestedScrollingEnabled="@{false}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:clipToPadding="false"
-                android:orientation="vertical"
-                android:paddingStart="@dimen/l1"
-                android:paddingEnd="0dp"
-                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-                app:layout_constraintTop_toBottomOf="@+id/module_notice"
-                app:spanCount="2"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_module_md2" />
-
-            <com.google.android.material.button.MaterialButton
-                style="?styleButtonText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/l1"
-                android:text="Download more"
-                android:textAllCaps="false"
-                app:icon="@drawable/ic_download_md2" />
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
+        android:orientation="vertical"
+        android:paddingStart="@dimen/l1"
+        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
+        android:paddingEnd="0dp"
+        android:paddingBottom="@{viewModel.insets.bottom}"
+        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+        app:spanCount="2"
+        tools:listitem="@layout/item_module_md2" />
 
 </layout>

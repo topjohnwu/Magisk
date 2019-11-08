@@ -135,7 +135,7 @@ class SuperuserViewModel(
 
 }
 
-inline fun <T : ComparableRvItem<T>> diffListOf(
+inline fun <T : ComparableRvItem<*>> diffListOf(
     vararg newItems: T
 ) = DiffObservableList(object : DiffObservableList.Callback<T> {
     override fun areItemsTheSame(oldItem: T, newItem: T) = oldItem.genericItemSameAs(newItem)

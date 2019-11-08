@@ -186,7 +186,7 @@ val ManagerJson.isObsolete
 
 fun String.clipVersion() = substringAfter('-')
 
-inline fun <T : ComparableRvItem<T>> itemBindingOf(
+inline fun <T : ComparableRvItem<*>> itemBindingOf(
     crossinline body: (ItemBinding<*>) -> Unit = {}
 ) = OnItemBind<T> { itemBinding, _, item ->
     item.bind(itemBinding)
