@@ -13,14 +13,12 @@
         android:name="a.e"
         android:appComponentFactory="a.a"
         android:allowBackup="true"
-        android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning" >
 
         <!-- Download Activity -->
 
         <activity
             android:name="a.c"
-            android:configChanges="orientation|screenSize"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,21 +28,16 @@
 
         <!-- Magisk Manager Components -->
 
-        <activity
-            android:name="a.b"
-            android:configChanges="orientation|screenSize"
-            android:exported="true" />
+        <activity android:name="a.b" />
 
-        <activity
-            android:name="a.f"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="nosensor" />
+        <activity android:name="a.f" />
 
         <activity
             android:name="a.m"
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             tools:ignore="AppLinkUrlError">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -67,9 +60,7 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name="a.j"
-            android:exported="false" />
+        <service android:name="a.j" />
 
         <meta-data
             android:name="com.google.android.gms.version"

@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.topjohnwu.shared">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -7,10 +8,11 @@
 
     <application
         android:icon="@drawable/ic_launcher"
-        android:installLocation="internalOnly"
         android:label="Magisk Manager"
+        android:installLocation="internalOnly"
+        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        tools:ignore="UnusedAttribute">
 
         <activity
             android:name="a.r"

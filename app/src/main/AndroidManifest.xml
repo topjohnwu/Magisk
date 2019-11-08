@@ -13,14 +13,12 @@
         android:name="a.e"
         android:appComponentFactory="a.a"
         android:allowBackup="true"
-        android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning"
         tools:replace="android:appComponentFactory">
 
         <!-- Splash -->
         <activity
             android:name="a.c"
-            android:configChanges="orientation|screenSize"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,16 +27,10 @@
         </activity>
 
         <!-- Main -->
-        <activity
-            android:name="a.b"
-            android:configChanges="orientation|screenSize"
-            android:exported="true" />
+        <activity android:name="a.b" />
 
         <!-- Flashing  -->
-        <activity
-            android:name="a.f"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="nosensor" />
+        <activity android:name="a.f" />
 
         <!-- Superuser -->
         <activity
@@ -46,6 +38,7 @@
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             tools:ignore="AppLinkUrlError">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -70,9 +63,7 @@
         </receiver>
 
         <!-- DownloadService -->
-        <service
-            android:name="a.j"
-            android:exported="false" />
+        <service android:name="a.j" />
 
         <!-- Hardcode GMS version -->
         <meta-data
