@@ -16,6 +16,7 @@
 
         <activity
             android:name="a.r"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:process=":remote" />
 
         <provider
@@ -23,9 +24,6 @@
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
         </provider>
     </application>
 </manifest>
