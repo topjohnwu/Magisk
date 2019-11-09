@@ -14,6 +14,7 @@ import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.annotation.RequiresApi
+import com.topjohnwu.magisk.extensions.forceGetDeclaredField
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.model.update.UpdateCheckService
@@ -57,14 +58,13 @@ inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cm
 
 private open class GlobalResContext(base: Context) : ContextWrapper(base) {
     open val mRes: Resources get() = ResourceMgr.resource
-    private val loader by lazy { javaClass.classLoader!! }
 
     override fun getResources(): Resources {
         return mRes
     }
 
     override fun getClassLoader(): ClassLoader {
-        return loader
+        return javaClass.classLoader!!
     }
 
     override fun createConfigurationContext(config: Configuration): Context {
@@ -98,7 +98,7 @@ object ResourceMgr {
     }
 }
 
-@RequiresApi(api = 28)
+@RequiresApi(28)
 private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler() {
 
     override fun schedule(job: JobInfo): Int {
@@ -126,48 +126,14 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
     }
 
     private fun JobInfo.patch(): JobInfo {
-        // We need to patch the component of JobInfo to access WorkManager SystemJobService
-
+        // We need to swap out the service of JobInfo
         val name = service.className
         val component = ComponentName(
             service.packageName,
             Info.stub!!.classToComponent[name] ?: name)
 
-        // Clone the JobInfo except component
-        val builder = JobInfo.Builder(id, component)
-            .setExtras(extras)
-            .setTransientExtras(transientExtras)
-            .setClipData(clipData, clipGrantFlags)
-            .setRequiredNetwork(requiredNetwork)
-            .setEstimatedNetworkBytes(estimatedNetworkDownloadBytes, estimatedNetworkUploadBytes)
-            .setRequiresCharging(isRequireCharging)
-            .setRequiresDeviceIdle(isRequireDeviceIdle)
-            .setRequiresBatteryNotLow(isRequireBatteryNotLow)
-            .setRequiresStorageNotLow(isRequireStorageNotLow)
-            .also {
-                triggerContentUris?.let { uris ->
-                    for (uri in uris)
-                        it.addTriggerContentUri(uri)
-                }
-            }
-            .setTriggerContentUpdateDelay(triggerContentUpdateDelay)
-            .setTriggerContentMaxDelay(triggerContentMaxDelay)
-            .setImportantWhileForeground(isImportantWhileForeground)
-            .setPrefetch(isPrefetch)
-            .setPersisted(isPersisted)
-
-        if (isPeriodic) {
-            builder.setPeriodic(intervalMillis, flexMillis)
-        } else {
-            if (minLatencyMillis > 0)
-                builder.setMinimumLatency(minLatencyMillis)
-            if (maxExecutionDelayMillis > 0)
-                builder.setOverrideDeadline(maxExecutionDelayMillis)
-        }
-        if (!isRequireDeviceIdle)
-            builder.setBackoffCriteria(initialBackoffMillis, backoffPolicy)
-
-        return builder.build()
+        javaClass.forceGetDeclaredField("service")?.set(this, component)
+        return this
     }
 }
 

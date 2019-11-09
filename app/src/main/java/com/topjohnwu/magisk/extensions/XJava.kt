@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.extensions
 
-import android.net.Uri
 import android.os.Build
-import androidx.core.net.toFile
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -18,8 +18,6 @@ fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
         entry = nextEntry
     }
 }
-
-fun Uri.writeTo(file: File) = toFile().copyTo(file)
 
 fun InputStream.writeTo(file: File) =
         withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
@@ -101,3 +99,32 @@ fun Locale.toLangTag(): String {
         return tag.toString()
     }
 }
+
+// Reflection hacks
+
+private val loadClass = ClassLoader::class.java.getMethod("loadClass", String::class.java)
+private val getDeclaredMethod = Class::class.java.getMethod("getDeclaredMethod",
+    String::class.java, arrayOf<Class<*>>()::class.java)
+private val getDeclaredField = Class::class.java.getMethod("getDeclaredField", String::class.java)
+
+fun ClassLoader.forceLoadClass(name: String) =
+    runCatching { loadClass.invoke(this, name) }.getOrNull() as Class<*>?
+
+fun Class<*>.forceGetDeclaredMethod(name: String, vararg types: Class<*>) =
+    (runCatching { getDeclaredMethod.invoke(this, name, *types) }.getOrNull() as Method?)?.also {
+        it.isAccessible = true
+    }
+
+fun Class<*>.forceGetDeclaredField(name: String) =
+    (runCatching { getDeclaredField.invoke(this, name) }.getOrNull() as Field?)?.also {
+        it.isAccessible = true
+    }
+
+inline fun <reified T> T.forceGetClass(name: String) =
+    T::class.java.classLoader?.forceLoadClass(name)
+
+fun Class<*>.forceGetField(name: String): Field? =
+    forceGetDeclaredField(name) ?: superclass?.forceGetField(name)
+
+fun Class<*>.forceGetMethod(name: String, vararg types: Class<*>): Method? =
+    forceGetDeclaredMethod(name, *types) ?: superclass?.forceGetMethod(name, *types)
