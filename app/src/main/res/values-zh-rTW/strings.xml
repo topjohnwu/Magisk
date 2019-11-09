@@ -8,7 +8,8 @@
     <string name="settings">設定</string>
     <string name="install">安裝</string>
     <string name="unsupport_magisk_title">不支援此 Magisk 版本</string>
-
+    <string name="unsupport_magisk_msg">此版本 Magisk Manager 不支援 Magisk %1$s 及更早的版本。\n\nMagisk 將被視為未安裝，請盡速更新。</string>
+    
     <!--Status Fragment-->
     <string name="magisk_version_error">未安裝 Magisk</string>
     <string name="checking_for_updates">正在檢查更新…</string>
@@ -23,6 +24,7 @@
     <string name="advanced_settings_title">進階設定</string>
     <string name="keep_force_encryption">保留強制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Recovery 模式</string>
     <string name="current_installed">已安裝版本：%1$s</string>
     <string name="latest_version">最新版本：%1$s</string>
     <string name="uninstall">解除安裝</string>
@@ -43,6 +45,7 @@
     <string name="reboot_recovery">重新啟動至 Recovery</string>
     <string name="reboot_bootloader">重新啟動至 Bootloader</string>
     <string name="reboot_download">重新啟動至 Download</string>
+    <string name="reboot_edl">重新啟動至 EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">可更新</string>
@@ -67,20 +70,22 @@
     <string name="progress_channel">進度通知</string>
     <string name="download_complete">下載完成</string>
     <string name="download_file_error">下載錯誤</string>
-    <string name="magisk_update_title">Magisk 已推出新版本！</string>
-    <string name="manager_update_title">Magisk Manager 已推出新版本！</string>
+    <string name="download_open_parent">在資料夾中顯示</string>
+    <string name="download_open_self">開啟檔案</string>
+    <string name="magisk_update_title">Magisk 有可用的更新！</string>
+    <string name="manager_update_title">Magisk Manager 有可用的更新！</string>
 
     <!-- Installation -->
-    <string name="manager_download_install">輕觸以下載及安裝</string>
+    <string name="manager_download_install">輕觸以下載並安裝</string>
     <string name="download_zip_only">僅下載 ZIP</string>
     <string name="direct_install">直接安裝（建議）</string>
     <string name="install_inactive_slot">安裝至未使用的分割區（OTA 後）</string>
-    <string name="install_inactive_slot_msg">下次重新啟動後，裝置將切換至未使用的分割區！\n請僅在 OTA 後使用此選項。\n是否繼續？</string>
+    <string name="install_inactive_slot_msg">下次重新啟動後，裝置將切換至未使用的分割區！\n僅限於 OTA 後可用。\n是否繼續？</string>
     <string name="select_method">選擇模式</string>
     <string name="setup_title">增量更新</string>
     <string name="select_patch_file">選擇並修改檔案</string>
-    <string name="patch_file_msg">請選取未修改過的映像檔（*.img）或 ODIN TAR 檔 (*.tar)</string>
-    <string name="reboot_delay_toast">將在 5 秒後重新啟動…</string>
+    <string name="patch_file_msg">請選取未修改的映像檔（*.img）或 ODIN TAR 檔 (*.tar)</string>
+    <string name="reboot_delay_toast">5 秒後將重新啟動…</string>
 
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">安裝 %1$s</string>
@@ -116,8 +121,10 @@
     <string name="settings_general_category">一般</string>
     <string name="settings_dark_theme_title">深色主題</string>
     <string name="settings_dark_theme_summary">啟用深色主題</string>
+    <string name="settings_download_path_title">下載位置</string>
+    <string name="settings_download_path_message">將檔案下載至 %1$s</string>
     <string name="settings_clear_cache_title">清除資源庫快取</string>
-    <string name="settings_clear_cache_summary">清除暫存資源庫快取，並強制重新載入線上資源庫。</string>
+    <string name="settings_clear_cache_summary">將強制重新載入線上資源庫</string>
     <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>
     <string name="settings_hide_manager_summary">以亂碼套件名重新安裝 Magisk Manager</string>
     <string name="settings_restore_manager_title">還原 Magisk Manager</string>
@@ -133,12 +140,16 @@
     <string name="settings_update_custom">自訂</string>
     <string name="settings_update_custom_msg">請輸入自訂網址</string>
     <string name="settings_core_only_title">Magisk 核心模式</string>
-    <string name="settings_core_only_summary">僅啟用 Magisk 核心功能。MagiskSU 及 MagiskHide 將保持開啟，模組則不會被載入。</string>
+    <string name="settings_core_only_summary">保持 MagiskSU 及 MagiskHide 開啟並停止載入模組</string>
     <string name="settings_magiskhide_summary">隱藏 Magisk 以避免偵測</string>
     <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">為廣告阻擋程式提供 Systemless hosts</string>
+    <string name="settings_hosts_summary">供廣告阻擋程式使用</string>
     <string name="settings_hosts_toast">已安裝 Systemless hosts 模組</string>
 
+    <string name="settings_app_name">請輸入欲更改的名稱</string>
+    <string name="settings_app_name_hint">新名稱</string>
+    <string name="settings_app_name_helper">應用程式將使用此名稱重新安裝</string>
+    <string name="settings_app_name_error">格式錯誤</string>
     <string name="settings_su_app_adb">應用程式及 ADB</string>
     <string name="settings_su_app">僅限應用程式</string>
     <string name="settings_su_adb">僅限 ADB</string>
@@ -162,7 +173,7 @@
 
     <string name="multiuser_mode">多使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
-    <string name="settings_owner_manage">由裝置擁有者管理</string>
+    <string name="settings_owner_manage">裝置擁有者管理</string>
     <string name="settings_user_independent">使用者獨立管理</string>
     <string name="owner_only_summary">僅限裝置擁有者可使用 Root 權限</string>
     <string name="owner_manage_summary">僅限裝置擁有者可管理及接收 Root 請求</string>
@@ -176,13 +187,14 @@
     <string name="requester_summary">所有 Root 工作階段皆繼承原程式 Namespace</string>
     <string name="isolate_summary">所有 Root 工作階段個別擁有獨立 Namespace</string>
     <string name="disable_fingerprint">未設定指紋或無指紋辨識器</string>
+    <string name="settings_download_path_error">無法建立資料夾。請確保該位置可存取且非為檔案。</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser 請求</string>
     <string name="deny">拒絕</string>
-    <string name="prompt">提示</string>
+    <string name="prompt">詢問</string>
     <string name="grant">允許</string>
-    <string name="su_warning">授予其此裝置之最高權限。\n若為不明來源，請拒絕！</string>
+    <string name="su_warning">將授予其本裝置最高權限。\n若為不明來源，請立即拒絕！</string>
     <string name="forever">一律</string>
     <string name="once">僅限本次</string>
     <string name="tenmin">10 分鐘</string>
