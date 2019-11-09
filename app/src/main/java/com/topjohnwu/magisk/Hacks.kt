@@ -50,7 +50,7 @@ fun Context.wrapJob(): Context = object : GlobalResContext(this) {
 
 fun Class<*>.cmp(pkg: String): ComponentName {
     val name = ClassMap[this].name
-    return ComponentName(pkg, Info.stub?.componentMap?.get(name) ?: name)
+    return ComponentName(pkg, Info.stub?.classToComponent?.get(name) ?: name)
 }
 
 inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
@@ -131,7 +131,7 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
         val name = service.className
         val component = ComponentName(
             service.packageName,
-            Info.stub!!.componentMap[name] ?: name)
+            Info.stub!!.classToComponent[name] ?: name)
 
         // Clone the JobInfo except component
         val builder = JobInfo.Builder(id, component)

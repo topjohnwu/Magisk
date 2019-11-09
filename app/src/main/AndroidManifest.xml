@@ -11,10 +11,8 @@
 
     <application
         android:name="a.e"
-        android:appComponentFactory="a.a"
         android:allowBackup="true"
-        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning"
-        tools:replace="android:appComponentFactory">
+        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <!-- Splash -->
         <activity

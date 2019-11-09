@@ -29,8 +29,7 @@ public class Mapping {
 
     public static Data data() {
         Data data = new Data();
-        data.componentMap = inverseMap;
+        data.classToComponent = inverseMap;
         return data;
     }
-
 }
