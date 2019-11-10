@@ -111,7 +111,7 @@ fun ClassLoader.forceLoadClass(name: String) =
     runCatching { loadClass.invoke(this, name) }.getOrNull() as Class<*>?
 
 fun Class<*>.forceGetDeclaredMethod(name: String, vararg types: Class<*>) =
-    (runCatching { getDeclaredMethod.invoke(this, name, *types) }.getOrNull() as Method?)?.also {
+    (runCatching { getDeclaredMethod.invoke(this, name, types) }.getOrNull() as Method?)?.also {
         it.isAccessible = true
     }
 
