@@ -10,12 +10,15 @@ import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.model.download.RemoteFileService
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.model.entity.recycler.LoadingItem
 import com.topjohnwu.magisk.model.entity.recycler.ModuleItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoItem
 import com.topjohnwu.magisk.model.entity.recycler.SectionTitle
+import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.home.itemBindingOf
 import com.topjohnwu.magisk.redesign.superuser.diffListOf
@@ -27,6 +30,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 class ModuleViewModel(
     private val repoName: RepoByNameDao,
@@ -69,6 +73,19 @@ class ModuleViewModel(
             Config.Value.ORDER_NAME -> repoName
             else -> throw IllegalArgumentException()
         }
+
+    // ---
+
+    init {
+        RemoteFileService.reset()
+        RemoteFileService.progressBroadcast.observeForever {
+            val (progress, subject) = it ?: return@observeForever
+            if (subject !is DownloadSubject.Module) {
+                return@observeForever
+            }
+            update(subject.module, progress.times(100).roundToInt())
+        }
+    }
 
     // ---
 
@@ -149,6 +166,11 @@ class ModuleViewModel(
         }
         return me
     }
+
+    private fun update(repo: Repo, progress: Int) = Single.fromCallable { itemsRemote }
+        .map { it.first { it.item.id == repo.id } }
+        .subscribeK { it.progress.value = progress }
+        .add()
 
     // ---
 

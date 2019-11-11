@@ -105,9 +105,28 @@
 
         <ProgressBar
             style="?styleProgressDeterminate"
+            goneUnless="@{item.progress > 0 &amp;&amp; item.progress &lt; 100}"
+            progressAnimated="@{item.progress}"
             android:layout_width="match_parent"
             android:layout_gravity="bottom"
             tools:progress="40" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom">
+
+            <androidx.core.widget.ContentLoadingProgressBar
+                style="?styleProgressIndeterminate"
+                goneUnless="@{item.progress == -100}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="-4dp"
+                android:layout_marginBottom="-5dp"
+                tools:progress="40" />
+
+        </FrameLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
