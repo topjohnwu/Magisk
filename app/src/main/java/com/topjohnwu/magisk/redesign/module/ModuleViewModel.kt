@@ -195,6 +195,10 @@ class ModuleViewModel(
             .subscribeK()
     }
 
+    fun download(item: RepoItem) {
+        ModuleInstallDialog(item.item).publish()
+    }
+
     // ---
 
     private fun cleanup() = Completable

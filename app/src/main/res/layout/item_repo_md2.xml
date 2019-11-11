@@ -96,6 +96,7 @@
                 android:id="@+id/module_download"
                 style="?styleIconPrimary"
                 android:contentDescription="@string/download"
+                android:onClick="@{() -> viewModel.download(item)}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/module_divider"
