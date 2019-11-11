@@ -90,9 +90,7 @@ class HideViewModel(
         .toList()
         .map { it to items.calculateDiff(it) }
 
-    private fun toggleItem(item: HideProcessRvItem) = magiskRepo
-        .toggleHide(item.isHidden.value, item.packageName, item.process)
-        .subscribeK()
-        .add()
+    private fun toggleItem(item: HideProcessRvItem) =
+        magiskRepo.toggleHide(item.isHidden.value, item.packageName, item.process)
 
 }

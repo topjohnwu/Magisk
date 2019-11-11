@@ -2,11 +2,11 @@ package com.topjohnwu.magisk.data.repository
 
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.data.database.LogDao
-import com.topjohnwu.magisk.data.database.base.suRaw
 import com.topjohnwu.magisk.extensions.toSingle
 import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.magisk.model.entity.WrappedMagiskLog
 import com.topjohnwu.superuser.Shell
+import io.reactivex.Single
 import java.util.concurrent.TimeUnit
 
 
@@ -18,8 +18,9 @@ class LogRepository(
         .map { it.sortByDescending { it.date.time }; it }
         .map { it.wrap() }
 
-    fun fetchMagiskLogs() = "tail -n 5000 ${Const.MAGISK_LOG}".suRaw()
-        .filter { it.isNotEmpty() }
+    fun fetchMagiskLogs() = Single.fromCallable {
+        Shell.su("tail -n 5000 ${Const.MAGISK_LOG}").exec().out
+    }.filter { it.isNotEmpty() }
 
     fun clearLogs() = logDao.deleteAll()
     fun clearOutdated() = logDao.deleteOutdated()

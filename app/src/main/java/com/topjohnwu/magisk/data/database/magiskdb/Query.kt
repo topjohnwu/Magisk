@@ -1,27 +1,17 @@
-package com.topjohnwu.magisk.data.database.base
+package com.topjohnwu.magisk.data.database.magiskdb
 
 import androidx.annotation.StringDef
-import com.topjohnwu.magisk.data.database.base.Order.Companion.ASC
-import com.topjohnwu.magisk.data.database.base.Order.Companion.DESC
 
-interface MagiskQueryBuilder {
+class Query(private val _query: String) {
+    val query get() = "magisk --sqlite '$_query'"
 
-    val requestType: String
-    var table: String
-
-    companion object {
-        inline operator fun <reified Builder : MagiskQueryBuilder> invoke(builder: Builder.() -> Unit): MagiskQuery =
-            Builder::class.java.newInstance()
-                .apply(builder)
-                .toString()
-                .let {
-                    MagiskQuery(it)
-                }
+    interface Builder {
+        val requestType: String
+        var table: String
     }
-
 }
 
-class Delete : MagiskQueryBuilder {
+class Delete : Query.Builder {
     override val requestType: String = "DELETE FROM"
     override var table = ""
 
@@ -36,7 +26,7 @@ class Delete : MagiskQueryBuilder {
     }
 }
 
-class Select : MagiskQueryBuilder {
+class Select : Query.Builder {
     override val requestType: String get() = "SELECT $fields FROM"
     override lateinit var table: String
 
@@ -69,7 +59,7 @@ class Replace : Insert() {
     override val requestType: String = "REPLACE INTO"
 }
 
-open class Insert : MagiskQueryBuilder {
+open class Insert : Query.Builder {
     override val requestType: String = "INSERT INTO"
     override lateinit var table: String
 
@@ -137,19 +127,11 @@ class Condition {
     }
 }
 
-class Order {
-
-    @set:OrderStrict
-    var order = DESC
-    var field = ""
-
-    companion object {
-        const val ASC = "ASC"
-        const val DESC = "DESC"
-    }
-
+object Order {
+    const val ASC = "ASC"
+    const val DESC = "DESC"
 }
 
-@StringDef(ASC, DESC)
+@StringDef(Order.ASC, Order.DESC)
 @Retention(AnnotationRetention.SOURCE)
 annotation class OrderStrict

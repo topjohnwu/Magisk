@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.data.database
 
-import com.topjohnwu.magisk.data.database.base.*
+import com.topjohnwu.magisk.data.database.magiskdb.*
 import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.magisk.model.entity.toLog
 import com.topjohnwu.magisk.model.entity.toMap
@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 class LogDao : BaseDao() {
 
-    override val table = DatabaseDefinition.Table.LOG
+    override val table = Table.LOG
 
     fun deleteOutdated(
         suTimeout: Long = TimeUnit.DAYS.toMillis(14)
@@ -18,7 +18,7 @@ class LogDao : BaseDao() {
         }
     }.ignoreElement()
 
-    fun deleteAll() = query<Delete> {}.ignoreElement()
+    fun deleteAll() = query<Delete>().ignoreElement()
 
     fun fetchAll() = query<Select> {
         orderBy("time", Order.DESC)
