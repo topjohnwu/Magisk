@@ -2,7 +2,7 @@
 
     <!--Welcome Activity-->
     <string name="modules">模組</string>
-    <string name="downloads">線上倉庫</string>
+    <string name="downloads">線上模組庫</string>
     <string name="superuser">超級使用者</string>
     <string name="log">紀錄</string>
     <string name="settings">設定</string>
@@ -24,18 +24,18 @@
     <string name="advanced_settings_title">安裝選項</string>
     <string name="keep_force_encryption">保持強制加密</string>
     <string name="keep_dm_verity">保持 AVB 2.0/dm-verity</string>
-    <string name="recovery_mode">安裝到 Recovery</string>	
+    <string name="recovery_mode">裝至 Recovery</string>	
     <string name="current_installed">已安裝版本：%1$s</string>
     <string name="latest_version">最新版本：%1$s</string>
     <string name="uninstall">解除安裝</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
-    <string name="uninstall_magisk_msg">所有模組將會被停用或移除！\nRoot 將會被移除！\n您若有還沒被加密過的資料將可能被加密！</string>
+    <string name="uninstall_magisk_msg">將會停用或移除所有模組！\n將會移除 Root 權限！\n可能會加密尚未加密的資料！</string>
     <string name="update">更新</string>
     <string name="core_only_enabled">（核心模式已啟用）</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供資訊）</string>
-    <string name="no_modules_found">沒有發現模組</string>
+    <string name="no_modules_found">未找到模組</string>
     <string name="update_file_created">模組將在下次重新啟動後更新！</string>
     <string name="remove_file_created">模組將在下次重新啟動後移除！</string>
     <string name="remove_file_deleted">模組將不在下次重新啟動後移除！</string>
@@ -45,7 +45,7 @@
     <string name="reboot_recovery">重新啟動至 Recovery</string>
     <string name="reboot_bootloader">重新啟動至 Bootloader</string>
     <string name="reboot_download">重新啟動至 Download</string>
-	<string name="reboot_edl">重新啟動至 EDL</string>
+    <string name="reboot_edl">重新啟動至 EDL</string>
 
     <!--Repo Fragment-->
     <string name="update_available">可更新</string>
@@ -60,7 +60,7 @@
     <string name="menuSaveLog">儲存記錄</string>
     <string name="menuReload">重新整理</string>
     <string name="menuClearLog">清除記錄</string>
-    <string name="logs_cleared">記錄已被成功清除</string>
+    <string name="logs_cleared">已成功清除記錄</string>
 
     <!--About Activity-->
     <string name="app_changelog">更新日誌</string>
@@ -94,9 +94,9 @@
     <string name="reboot">重新啟動</string>
     <string name="settings_reboot_toast">重新啟動以套用設定</string>
     <string name="release_notes">發布說明</string>
-    <string name="repo_cache_cleared">線上倉庫快取已清除</string>
+    <string name="repo_cache_cleared">已清除線上模組庫快取</string>
 
-    <string name="dtbo_patched_title">DTBO 已被修補！</string>
+    <string name="dtbo_patched_title">已對 DTBO 打上修補程式！</string>
     <string name="dtbo_patched_reboot">Magisk Manager 已修補了 DTBO.img，請立即重新啟動。</string>
     <string name="flashing">正在刷入……</string>
     <string name="done">完成！</string>
@@ -123,8 +123,8 @@
     <string name="settings_dark_theme_summary">啟用深色主題</string>
     <string name="settings_download_path_title">下載路徑</string>
     <string name="settings_download_path_message">檔案將被儲存在：%1$s</string>																	  
-    <string name="settings_clear_cache_title">清除倉庫快取</string>
-    <string name="settings_clear_cache_summary">清除已快取的線上倉庫資訊，並強制重新載入線上倉庫。</string>
+    <string name="settings_clear_cache_title">清除模組庫快取</string>
+    <string name="settings_clear_cache_summary">清除已快取的線上模組庫資訊，並強制重新載入線上模組庫。</string>
     <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>
     <string name="settings_hide_manager_summary">以隨機的包裝名稱重新安裝 Magisk Manager</string>
     <string name="settings_restore_manager_title">還原 Magisk Manager</string>
@@ -142,7 +142,7 @@
     <string name="settings_core_only_title">Magisk 核心模式</string>
     <string name="settings_core_only_summary">啟用 Magisk 核心模式，模組將不被載入。MagiskSU 及 Magisk Hide 將維持運作。</string>
     <string name="settings_magiskhide_summary">隱藏 Magisk 以避免被偵測</string>
-    <string name="settings_hosts_title">主機(Hosts) 模組化</string>
+    <string name="settings_hosts_title">主機 (Hosts) 模組化</string>
     <string name="settings_hosts_summary">為廣告阻擋程式提供主機模組</string>
     <string name="settings_hosts_toast">已安裝主機模組</string>
 
