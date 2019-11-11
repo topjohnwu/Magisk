@@ -88,6 +88,8 @@ class SectionTitle(
 ) : ComparableRvItem<SectionTitle>() {
     override val layoutRes = R.layout.item_section_md2
 
+    val hasButton = KObservableField(button != 0 || icon != 0)
+
     override fun onBindingBound(binding: ViewDataBinding) {
         super.onBindingBound(binding)
         val params = binding.root.layoutParams as StaggeredGridLayoutManager.LayoutParams
@@ -136,7 +138,7 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
 
     fun delete(viewModel: ModuleViewModel) {
         isRemoved = !isRemoved
-        viewModel.moveToState(this)
+        viewModel.moveToState()
     }
 
     override fun contentSameAs(other: ModuleItem): Boolean = item.version == other.item.version

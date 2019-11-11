@@ -8,10 +8,15 @@
             name="item"
             type="com.topjohnwu.magisk.model.entity.recycler.SectionTitle" />
 
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.redesign.module.ModuleViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:animateLayoutChanges="true"
         android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -30,7 +35,8 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/module_button"
             style="?styleButtonText"
-            gone="@{item.button == 0 || item.icon == 0}"
+            gone="@{!item.hasButton}"
+            android:onClick="@{() -> viewModel.sectionPressed(item)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/l1"

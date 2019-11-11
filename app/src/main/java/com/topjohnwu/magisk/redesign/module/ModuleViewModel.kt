@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.redesign.module
 
-import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
@@ -9,6 +8,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -24,9 +24,7 @@ import com.topjohnwu.magisk.redesign.home.itemBindingOf
 import com.topjohnwu.magisk.redesign.superuser.diffListOf
 import com.topjohnwu.magisk.tasks.RepoUpdater
 import com.topjohnwu.magisk.utils.currentLocale
-import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 import timber.log.Timber
@@ -46,22 +44,18 @@ class ModuleViewModel(
 
     companion object {
         private val sectionRemote = SectionTitle(R.string.module_section_remote)
-        private val sectionActive = SectionTitle(R.string.module_section_active)
-        private val sectionPending =
-            SectionTitle(R.string.module_section_pending, R.string.reboot, R.drawable.ic_restart)
+        private val sectionActive = SectionTitle(
+            R.string.module_section_installed,
+            R.string.reboot,
+            R.drawable.ic_restart
+        ).also { it.hasButton.value = false }
     }
 
     // ---
 
-    private val itemsPending
+    private val itemsInstalled
         @WorkerThread get() = items.asSequence()
             .filterIsInstance<ModuleItem>()
-            .filter { it.isModified }
-            .toList()
-    private val itemsActive
-        @WorkerThread get() = items.asSequence()
-            .filterIsInstance<ModuleItem>()
-            .filter { !it.isModified }
             .toList()
     private val itemsRemote
         @WorkerThread get() = items.filterIsInstance<RepoItem>()
@@ -92,29 +86,25 @@ class ModuleViewModel(
     override fun refresh() = Single.fromCallable { Module.loadModules() }
         .map { it.map { ModuleItem(it) } }
         .map { it.order() }
-        .map {
-            val pending = it.getValue(ModuleState.Modified)
-            val active = it.getValue(ModuleState.Normal)
-            build(pending = pending, active = active)
-        }
+        .map { build(active = it) }
         .map { it to items.calculateDiff(it) }
         .subscribeK {
             items.update(it.first, it.second)
             if (!items.contains(sectionRemote)) {
                 loadRemote()
             }
+            moveToState()
         }
 
     @Synchronized
     fun loadRemote() {
         // check for existing jobs
-        val size = itemsRemote.size
-        if (remoteJob?.isDisposed?.not() == true || size % 10 != 0) {
+        if (remoteJob?.isDisposed?.not() == true) {
             return
         }
-        remoteJob = loadRepos(offset = size)
+        remoteJob = Single.fromCallable { itemsRemote.size }
+            .flatMap { loadRepos(offset = it) }
             .map { it.map { RepoItem(it) } }
-            .applyViewModel(this)
             .subscribeK(onError = {
                 Timber.e(it)
                 items.remove(LoadingItem)
@@ -125,6 +115,7 @@ class ModuleViewModel(
                 }
                 items.addAll(it)
             }
+        // do on subscribe doesn't perform the action on main thread, so this is perfectly fine
         items.add(LoadingItem)
     }
 
@@ -149,23 +140,7 @@ class ModuleViewModel(
     @WorkerThread
     private fun List<ModuleItem>.order() = asSequence()
         .sortedBy { it.item.name.toLowerCase(currentLocale) }
-        .groupBy {
-            when {
-                it.isModified -> ModuleState.Modified
-                else -> ModuleState.Normal
-            }
-        }
-        .ensureAllStates()
-
-    private fun Map<ModuleState, List<ModuleItem>>.ensureAllStates(): Map<ModuleState, List<ModuleItem>> {
-        val me = this as? MutableMap<ModuleState, List<ModuleItem>> ?: this.toMutableMap()
-        ModuleState.values().forEach {
-            if (me.none { rit -> it == rit.key }) {
-                me[it] = listOf()
-            }
-        }
-        return me
-    }
+        .toList()
 
     private fun update(repo: Repo, progress: Int) = Single.fromCallable { itemsRemote }
         .map { it.first { it.item.id == repo.id } }
@@ -174,58 +149,15 @@ class ModuleViewModel(
 
     // ---
 
-    @UiThread
-    fun moveToState(item: ModuleItem) {
-        items.removeAll { it.genericItemSameAs(item) }
+    fun moveToState() = Single.fromCallable { itemsInstalled.any { it.isModified } }
+        .subscribeK { sectionActive.hasButton.value = it }
+        .add()
 
-        val isPending = item.isModified
+    fun download(item: RepoItem) = ModuleInstallDialog(item.item).publish()
 
-        Single.fromCallable { if (isPending) itemsPending else itemsActive }
-            .map { (listOf(item) + it).toMutableList() }
-            .map { it.apply { sortWith(compareBy { it.item.name.toLowerCase(currentLocale) }) } }
-            .map {
-                if (isPending) build(pending = it)
-                else build(active = it)
-            }
-            .map { it to items.calculateDiff(it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { items.update(it.first, it.second) }
-            .ignoreElement()
-            .andThen(cleanup())
-            .subscribeK()
-    }
-
-    fun download(item: RepoItem) {
-        ModuleInstallDialog(item.item).publish()
-    }
-
-    // ---
-
-    private fun cleanup() = Completable
-        .concat(listOf(cleanPending(), cleanActive(), cleanRemote()))
-
-    private fun cleanPending() = Single.fromCallable { itemsPending }
-        .filter { it.isEmpty() }
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnSuccess { items.remove(sectionPending) }
-        .ignoreElement()
-
-    private fun cleanActive() = Single.fromCallable { itemsActive }
-        .filter { it.isEmpty() }
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnSuccess { items.remove(sectionActive) }
-        .ignoreElement()
-
-    private fun cleanRemote() = Single.fromCallable { itemsRemote }
-        .filter { it.isEmpty() }
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnSuccess { items.remove(sectionRemote) }
-        .ignoreElement()
-
-    // ---
-
-    private enum class ModuleState {
-        Modified, Normal
+    fun sectionPressed(item: SectionTitle) = when (item) {
+        sectionActive -> reboot()
+        else -> Unit
     }
 
     // ---
@@ -233,11 +165,9 @@ class ModuleViewModel(
     /** Callable only from worker thread because of expensive list filtering */
     @WorkerThread
     private fun build(
-        pending: List<ModuleItem> = itemsPending,
-        active: List<ModuleItem> = itemsActive,
+        active: List<ModuleItem> = itemsInstalled,
         remote: List<RepoItem> = itemsRemote
-    ) = pending.prependIfNotEmpty { sectionPending } +
-            active.prependIfNotEmpty { sectionActive } +
+    ) = active.prependIfNotEmpty { sectionActive } +
             remote.prependIfNotEmpty { sectionRemote }
 
     private fun <T> List<T>.prependIfNotEmpty(item: () -> T) =
