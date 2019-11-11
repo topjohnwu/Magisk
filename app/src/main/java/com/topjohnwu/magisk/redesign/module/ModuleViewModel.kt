@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.module.Repo
+import com.topjohnwu.magisk.model.entity.recycler.LoadingItem
 import com.topjohnwu.magisk.model.entity.recycler.ModuleItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoItem
 import com.topjohnwu.magisk.model.entity.recycler.SectionTitle
@@ -25,6 +26,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
+import timber.log.Timber
 
 class ModuleViewModel(
     private val repoName: RepoByNameDao,
@@ -96,12 +98,17 @@ class ModuleViewModel(
         remoteJob = loadRepos(offset = size)
             .map { it.map { RepoItem(it) } }
             .applyViewModel(this)
-            .subscribeK {
+            .subscribeK(onError = {
+                Timber.e(it)
+                items.remove(LoadingItem)
+            }) {
+                items.remove(LoadingItem)
                 if (!items.contains(sectionRemote)) {
                     items.add(sectionRemote)
                 }
                 items.addAll(it)
             }
+        items.add(LoadingItem)
     }
 
     private fun loadRepos(

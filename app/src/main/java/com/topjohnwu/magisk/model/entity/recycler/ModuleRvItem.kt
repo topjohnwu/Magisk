@@ -146,6 +146,19 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
 
 }
 
+object LoadingItem : ComparableRvItem<LoadingItem>() {
+    override val layoutRes = R.layout.item_loading
+
+    override fun onBindingBound(binding: ViewDataBinding) {
+        super.onBindingBound(binding)
+        val params = binding.root.layoutParams as? StaggeredGridLayoutManager.LayoutParams ?: return
+        params.isFullSpan = true
+    }
+
+    override fun contentSameAs(other: LoadingItem) = this == other
+    override fun itemSameAs(other: LoadingItem) = this === other
+}
+
 abstract class ObservableItem<T> : ComparableRvItem<T>(), Observable {
 
     private val list = PropertyChangeRegistry()

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.LoadingItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.base.viewmodel.LoadingViewModel" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?listPreferredItemHeightSmall"
+        android:orientation="vertical"
+        android:padding="@dimen/l1">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/safetynet_attest_loading"
+            android:textAppearance="?appearanceTextTitleNormal" />
+
+        <ProgressBar
+            style="?styleProgressIndeterminate"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/l1" />
+
+
+    </LinearLayout>
+
+</layout>
