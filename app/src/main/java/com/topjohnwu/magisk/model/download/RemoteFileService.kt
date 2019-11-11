@@ -87,6 +87,7 @@ abstract class RemoteFileService : NotificationService() {
                         .setProgress(maxRaw.toInt(), it.toInt(), false)
                         .setContentText("%.2f / %.2f MB".format(progress, max))
                 } else {
+                    send(-1f, subject)
                     notification.setContentText("%.2f MB / ??".format(progress))
                 }
             }
