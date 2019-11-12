@@ -95,6 +95,7 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/module_download"
                 style="?styleIconPrimary"
+                isEnabled="@{!(item.progress == -100 || (item.progress > 0 &amp;&amp; item.progress &lt; 100))}"
                 android:contentDescription="@string/download"
                 android:onClick="@{() -> viewModel.download(item)}"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -104,18 +105,18 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ProgressBar
-            style="?styleProgressDeterminate"
-            goneUnless="@{item.progress > 0 &amp;&amp; item.progress &lt; 100}"
-            progressAnimated="@{item.progress}"
-            android:layout_width="match_parent"
-            android:layout_gravity="bottom"
-            tools:progress="40" />
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom">
+
+            <ProgressBar
+                style="?styleProgressDeterminate"
+                goneUnless="@{item.progress > 0 &amp;&amp; item.progress &lt; 100}"
+                progressAnimated="@{item.progress}"
+                android:layout_width="match_parent"
+                android:layout_gravity="bottom"
+                tools:progress="40" />
 
             <androidx.core.widget.ContentLoadingProgressBar
                 style="?styleProgressIndeterminate"
