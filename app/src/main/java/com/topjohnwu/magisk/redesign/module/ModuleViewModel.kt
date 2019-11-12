@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.module.Repo
-import com.topjohnwu.magisk.model.entity.recycler.LoadingItem
 import com.topjohnwu.magisk.model.entity.recycler.ModuleItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoItem
 import com.topjohnwu.magisk.model.entity.recycler.SectionTitle
@@ -107,16 +106,12 @@ class ModuleViewModel(
             .map { it.map { RepoItem(it) } }
             .subscribeK(onError = {
                 Timber.e(it)
-                items.remove(LoadingItem)
             }) {
-                items.remove(LoadingItem)
                 if (!items.contains(sectionRemote)) {
                     items.add(sectionRemote)
                 }
                 items.addAll(it)
             }
-        // do on subscribe doesn't perform the action on main thread, so this is perfectly fine
-        items.add(LoadingItem)
     }
 
     private fun loadRepos(
