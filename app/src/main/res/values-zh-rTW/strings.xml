@@ -29,9 +29,9 @@
     <string name="latest_version">最新版本：%1$s</string>
     <string name="uninstall">解除安裝</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
-    <string name="uninstall_magisk_msg">所有模組將會被停用並移除！\nRoot 將會被移除！\n您若有還沒被加密過的資料將可能被加密！</string>
+    <string name="uninstall_magisk_msg">所有模組將會被停用並移除！\nRoot 將會被移除且若有還沒被加密過的資料將可能被加密！</string>
     <string name="update">更新</string>
-    <string name="core_only_enabled">（核心模式已啟用）</string>
+    <string name="core_only_enabled">（已啟用核心模式）</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供資訊）</string>
