@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
-import com.topjohnwu.magisk.model.events.dialog.FingerprintDialog
+import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
@@ -72,7 +72,7 @@ class SuperuserViewModel(
             .add()
 
         if (FingerprintHelper.useFingerprint()) {
-            FingerprintDialog {
+            BiometricDialog {
                 onSuccess { updateState() }
             }.publish()
         } else {
@@ -116,7 +116,7 @@ class SuperuserViewModel(
         }
 
         if (FingerprintHelper.useFingerprint()) {
-            FingerprintDialog {
+            BiometricDialog {
                 onSuccess { updateState() }
                 onFailure { item.isEnabled.toggle() }
             }.publish()

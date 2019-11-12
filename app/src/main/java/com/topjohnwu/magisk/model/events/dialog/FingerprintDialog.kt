@@ -6,7 +6,15 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.utils.FingerprintHelper
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
+import timber.log.Timber
 
+@Deprecated(
+    "Use Biometrics instead",
+    ReplaceWith(
+        "BiometricDialog",
+        imports = ["com.topjohnwu.magisk.model.events.dialog.BiometricDialog"]
+    )
+)
 class FingerprintDialog(
     builder: Builder.() -> Unit
 ) : DialogEvent() {
@@ -15,7 +23,7 @@ class FingerprintDialog(
     private var helper: Helper? = null
         get() {
             if (field == null) {
-                runCatching { field = Helper() }
+                runCatching { field = Helper() }.onFailure { Timber.e(it) }
             }
             return field
         }
