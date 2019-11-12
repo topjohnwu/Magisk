@@ -10,8 +10,8 @@ data class MagiskPolicy(
     val uid: Int,
     val packageName: String,
     val appName: String,
-    val policy: Int = INTERACTIVE,
-    val until: Long = -1L,
+    var policy: Int = INTERACTIVE,
+    var until: Long = -1L,
     val logging: Boolean = true,
     val notification: Boolean = true,
     val applicationInfo: ApplicationInfo

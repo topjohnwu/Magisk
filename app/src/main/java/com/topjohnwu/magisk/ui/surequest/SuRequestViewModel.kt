@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.surequest
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -8,14 +7,12 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.hardware.fingerprint.FingerprintManager
 import android.os.CountDownTimer
-import android.text.TextUtils
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.data.database.PolicyDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.extensions.now
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
@@ -58,48 +55,25 @@ class SuRequestViewModel(
         setItems(items)
     }
 
+    private val cancelTasks = mutableListOf<() -> Unit>()
 
-    var handler: ActionHandler? = null
-    private var timer: CountDownTimer? = null
-    private var policy: MagiskPolicy? = null
-        set(value) {
-            field = value
-            updatePolicy(value)
-        }
-
-    init {
-        resources.getStringArray(R.array.allow_timeout)
-            .map { SpinnerRvItem(it) }
-            .let { items.update(it) }
-
-        selectedItemPosition.addOnPropertyChangedCallback {
-            Timber.e("Changed position to $it")
-        }
-    }
-
-    private fun updatePolicy(policy: MagiskPolicy?) {
-        policy ?: return
-
-        icon.value = policy.applicationInfo.loadIcon(packageManager)
-        title.value = policy.appName
-        packageName.value = policy.packageName
-
-        selectedItemPosition.value = timeoutPrefs.getInt(policy.packageName, 0)
-    }
+    private lateinit var timer: CountDownTimer
+    private lateinit var policy: MagiskPolicy
+    private lateinit var connector: SuConnector
 
     private fun cancelTimer() {
-        timer?.cancel()
+        timer.cancel()
         denyText.value = resources.getString(R.string.deny)
     }
 
     fun grantPressed() {
-        handler?.handleAction(MagiskPolicy.ALLOW)
-        timer?.cancel()
+        handleAction(MagiskPolicy.ALLOW)
+        timer.cancel()
     }
 
     fun denyPressed() {
-        handler?.handleAction(MagiskPolicy.DENY)
-        timer?.cancel()
+        handleAction(MagiskPolicy.DENY)
+        timer.cancel()
     }
 
     fun spinnerTouched(): Boolean {
@@ -110,75 +84,27 @@ class SuRequestViewModel(
     fun handleRequest(intent: Intent): Boolean {
         val socketName = intent.getStringExtra("socket") ?: return false
 
-        val connector: SuConnector
         try {
-            connector = object : SuConnector(socketName) {
-                @Throws(IOException::class)
-                override fun onResponse() {
-                    out.writeInt(policy?.policy ?: return)
-                }
-            }
-            val bundle = connector.readSocketInput()
-            val uid = bundle.getString("uid")?.toIntOrNull() ?: return false
-            policyDB.deleteOutdated().blockingGet() // wrong!
-            policy = runCatching { policyDB.fetch(uid).blockingGet() }
-                .getOrDefault(uid.toPolicy(packageManager))
-        } catch (e: IOException) {
-            e.printStackTrace()
+            connector = Connector(socketName)
+            val map = connector.readRequest()
+            val uid = map["uid"]?.toIntOrNull() ?: return false
+            policy = uid.toPolicy(packageManager)
+        } catch (e: Exception) {
+            Timber.e(e)
             return false
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-            return false
-        }
-
-        handler = object : ActionHandler() {
-            override fun handleAction() {
-                connector.response()
-                done()
-            }
-
-            @SuppressLint("ApplySharedPref")
-            override fun handleAction(action: Int) {
-                val pos = selectedItemPosition.value
-                timeoutPrefs.edit().putInt(policy?.packageName, pos).commit()
-                handleAction(action, Config.Value.TIMEOUT_LIST[pos])
-            }
-
-            override fun handleAction(action: Int, time: Int) {
-                val until = if (time >= 0) {
-                    if (time == 0) {
-                        0
-                    } else {
-                        MILLISECONDS.toSeconds(now) + MINUTES.toSeconds(time.toLong())
-                    }
-                } else {
-                    policy?.until ?: 0
-                }
-                policy = policy?.copy(policy = action, until = until)?.apply {
-                    policyDB.update(this).blockingGet()
-                }
-
-                handleAction()
-            }
         }
 
         // Never allow com.topjohnwu.magisk (could be malware)
-        if (TextUtils.equals(policy?.packageName, BuildConfig.APPLICATION_ID))
+        if (policy.packageName == BuildConfig.APPLICATION_ID)
             return false
-
-        // If not interactive, response directly
-        if (policy?.policy != MagiskPolicy.INTERACTIVE) {
-            handler?.handleAction()
-            return true
-        }
 
         when (Config.suAutoReponse) {
             Config.Value.SU_AUTO_DENY -> {
-                handler?.handleAction(MagiskPolicy.DENY, 0)
+                handleAction(MagiskPolicy.DENY, 0)
                 return true
             }
             Config.Value.SU_AUTO_ALLOW -> {
-                handler?.handleAction(MagiskPolicy.ALLOW, 0)
+                handleAction(MagiskPolicy.ALLOW, 0)
                 return true
             }
         }
@@ -187,33 +113,71 @@ class SuRequestViewModel(
         return true
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun showUI() {
+        resources.getStringArray(R.array.allow_timeout)
+            .map { SpinnerRvItem(it) }
+            .let { items.update(it) }
+
+        icon.value = policy.applicationInfo.loadIcon(packageManager)
+        title.value = policy.appName
+        packageName.value = policy.packageName
+        selectedItemPosition.value = timeoutPrefs.getInt(policy.packageName, 0)
+
         val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
         timer = object : CountDownTimer(millis, 1000) {
             override fun onTick(remains: Long) {
-                denyText.value = "%s (%d)"
-                    .format(resources.getString(R.string.deny), remains / 1000)
+                denyText.value = "${resources.getString(R.string.deny)} (${remains / 1000})"
             }
 
             override fun onFinish() {
                 denyText.value = resources.getString(R.string.deny)
-                handler?.handleAction(MagiskPolicy.DENY)
+                handleAction(MagiskPolicy.DENY)
             }
         }
-        timer?.start()
-        handler?.addCancel(Runnable { cancelTimer() })
+        timer.start()
+        cancelTasks.add { cancelTimer() }
 
-        val useFP = canUseFingerprint.value
-
-        if (useFP)
-            try {
+        if (canUseFingerprint.value)
+            runCatching {
                 val helper = SuFingerprint()
                 helper.authenticate()
-                handler?.addCancel(Runnable { helper.cancel() })
-            } catch (e: Exception) {
-                e.printStackTrace()
+                cancelTasks.add { helper.cancel() }
             }
+    }
+
+    private fun handleAction() {
+        connector.response()
+        cancelTasks.forEach { it() }
+        DieEvent().publish()
+    }
+
+    private fun handleAction(action: Int) {
+        val pos = selectedItemPosition.value
+        timeoutPrefs.edit().putInt(policy.packageName, pos).apply()
+        handleAction(action, Config.Value.TIMEOUT_LIST[pos])
+    }
+
+    private fun handleAction(action: Int, time: Int) {
+        val until = if (time > 0)
+            MILLISECONDS.toSeconds(now) + MINUTES.toSeconds(time.toLong())
+        else
+            time.toLong()
+
+        policy.policy = action
+        policy.until = until
+
+        if (until >= 0)
+            policyDB.update(policy).blockingAwait()
+
+        handleAction()
+    }
+
+    private inner class Connector @Throws(Exception::class)
+    internal constructor(name: String) : SuConnector(name) {
+        @Throws(IOException::class)
+        override fun onResponse() {
+            out.writeInt(policy.policy)
+        }
     }
 
     private inner class SuFingerprint @Throws(Exception::class)
@@ -228,36 +192,11 @@ class SuRequestViewModel(
         }
 
         override fun onAuthenticationSucceeded(result: FingerprintManager.AuthenticationResult) {
-            handler?.handleAction(MagiskPolicy.ALLOW)
+            handleAction(MagiskPolicy.ALLOW)
         }
 
         override fun onAuthenticationFailed() {
             warningText.value = resources.getString(R.string.auth_fail)
-        }
-    }
-
-    open inner class ActionHandler {
-        private val cancelTasks = mutableListOf<Runnable>()
-
-        internal open fun handleAction() {
-            done()
-        }
-
-        internal open fun handleAction(action: Int) {
-            done()
-        }
-
-        internal open fun handleAction(action: Int, time: Int) {
-            done()
-        }
-
-        internal fun addCancel(r: Runnable) {
-            cancelTasks.add(r)
-        }
-
-        internal fun done() {
-            cancelTasks.forEach { it.run() }
-            DieEvent().publish()
         }
     }
 
