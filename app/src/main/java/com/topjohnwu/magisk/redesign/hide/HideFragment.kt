@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.redesign.hide
 
 import android.content.Context
 import android.graphics.Insets
+import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -24,13 +25,21 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
         setHasOptionsMenu(true)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val lama = binding.hideContent.layoutManager ?: return
+        lama.isAutoMeasureEnabled = false
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_hide_md2, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_focus_up -> binding.hideScrollContainer.fullScroll(View.FOCUS_UP)
+            R.id.action_focus_up -> binding.hideContent
+                .also { it.scrollToPosition(10) }
+                .also { it.smoothScrollToPosition(0) }
         }
         return super.onOptionsItemSelected(item)
     }

@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.redesign.module
 import android.graphics.Insets
 import android.os.Bundle
 import android.view.View
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
@@ -37,7 +36,7 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
     }
 
     private fun setEndlessScroller() {
-        val lama = binding.moduleRemote.layoutManager as? StaggeredGridLayoutManager ?: return
+        val lama = binding.moduleRemote.layoutManager ?: return
         lama.isAutoMeasureEnabled = false
 
         listener = EndlessRecyclerScrollListener(lama, viewModel::loadRemote)
