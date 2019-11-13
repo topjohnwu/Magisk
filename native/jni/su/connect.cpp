@@ -49,8 +49,7 @@ class Extra {
 		bool bool_val;
 		const char * str_val;
 	};
-	char i_buf[16];
-	char b_buf[32];
+	char buf[32];
 public:
 	Extra(const char *k, int v): key(k), type(INT), int_val(v) {}
 	Extra(const char *k, bool v): key(k), type(BOOL), bool_val(v) {}
@@ -61,8 +60,8 @@ public:
 		switch (type) {
 			case INT:
 				vec.push_back("--ei");
-				sprintf(i_buf, "%d", int_val);
-				val = i_buf;
+				sprintf(buf, "%d", int_val);
+				val = buf;
 				break;
 			case BOOL:
 				vec.push_back("--ez");
@@ -80,17 +79,17 @@ public:
 	void add_bind(vector<const char *> &vec) {
 		switch (type) {
 			case INT:
-				sprintf(b_buf, "%s:i:%d", key, int_val);
+				sprintf(buf, "%s:i:%d", key, int_val);
 				break;
 			case BOOL:
-				sprintf(b_buf, "%s:b:%s", key, bool_val ? "true" : "false");
+				sprintf(buf, "%s:b:%s", key, bool_val ? "true" : "false");
 				break;
 			case STRING:
-				sprintf(b_buf, "%s:s:%s", key, str_val);
+				sprintf(buf, "%s:s:%s", key, str_val);
 				break;
 		}
 		vec.push_back("--extra");
-		vec.push_back(b_buf);
+		vec.push_back(buf);
 	}
 };
 
