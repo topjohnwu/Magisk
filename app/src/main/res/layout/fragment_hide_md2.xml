@@ -23,129 +23,48 @@
             invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
-            nestedScrollingEnabled="@{false}"
             android:layout_width="match_parent"
-            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
-            android:paddingBottom="@{viewModel.insets.bottom}"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingStart="@dimen/l1"
+            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
             android:paddingEnd="@dimen/l1"
+            android:paddingBottom="@{viewModel.insets.bottom}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_hide_md2"
             tools:paddingTop="40dp" />
 
-        <com.google.android.material.card.MaterialCardView
-            style="?styleCardElevated"
-            android:layout_width="match_parent"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/hide_filter_toggle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
             android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
-            app:cardCornerRadius="24dp">
+            app:backgroundTint="?colorSurface"
+            app:srcCompat="@drawable/ic_filter"
+            app:tint="?colorPrimary"
+            tools:layout_marginBottom="64dp" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+            android:id="@+id/hide_filter"
+            style="?styleCardVariant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:visibility="invisible"
+            app:cardCornerRadius="0dp">
+
+            <include
+                android:id="@+id/hide_filter_include"
+                layout="@layout/include_hide_filter"
+                viewModel="@{viewModel}"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/hide_filter_icon"
-                    style="?styleIconNormal"
-                    android:onClick="@{() -> viewModel.toggle(viewModel.isFilterExpanded)}"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_filter" />
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/hide_filter_chip_group"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="@dimen/l_50"
-                    android:paddingEnd="0dp"
-                    app:chipSpacing="2dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/hide_filter_barrier"
-                    app:layout_constraintEnd_toStartOf="@+id/hide_filter_icon"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <com.google.android.material.chip.Chip
-                        style="@style/Widget.MaterialComponents.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="@={viewModel.showSystem}"
-                        android:text="@string/show_system_app"
-                        android:textAppearance="?appearanceTextCaptionNormal"
-                        app:checkedIcon="@drawable/ic_check_md2"
-                        app:chipBackgroundColor="?colorSurfaceVariant"
-                        tools:checked="true" />
-
-                    <com.google.android.material.chip.Chip
-                        style="@style/Widget.MaterialComponents.Chip.Entry"
-                        gone="@{viewModel.query.empty}"
-                        onCloseClicked="@{() -> viewModel.resetQuery()}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checkable="false"
-                        android:text="@{viewModel.query}"
-                        android:textAppearance="?appearanceTextCaptionNormal"
-                        app:chipBackgroundColor="?colorSurfaceVariant" />
-
-                </com.google.android.material.chip.ChipGroup>
-
-                <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/hide_filter_barrier"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="bottom"
-                    app:constraint_referenced_ids="hide_filter_icon,hide_filter_chip_group" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/hide_filter_search"
-                    style="?styleCardNormal"
-                    goneUnless="@{viewModel.isFilterExpanded}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l_50"
-                    android:layout_marginEnd="@dimen/l_50"
-                    android:layout_marginBottom="@dimen/l_50"
-                    android:visibility="gone"
-                    app:cardCornerRadius="18dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/hide_filter_barrier"
-                    tools:visibility="visible">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        style="?styleIconNormal"
-                        android:layout_width="48dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="center_vertical|start"
-                        android:padding="6dp"
-                        app:srcCompat="@drawable/ic_search_md2"
-                        app:tint="?colorDisabled" />
-
-                    <androidx.appcompat.widget.AppCompatEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="48dp"
-                        android:background="@null"
-                        android:hint="@string/hide_filter_hint"
-                        android:inputType="textUri"
-                        android:minHeight="36dp"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="@dimen/l1"
-                        android:singleLine="true"
-                        android:text="@={viewModel.query}"
-                        android:textAppearance="?appearanceTextBodyNormal"
-                        android:textColor="?colorTextTransient"
-                        android:textColorHint="?colorOnSurfaceVariant" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
 
         <LinearLayout
             goneUnless="@{viewModel.loading &amp;&amp; viewModel.items.empty}"

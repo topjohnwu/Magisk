@@ -87,5 +87,7 @@
 
     <string name="hide_filter_hint">Filter by name</string>
     <string name="hide_scroll_up">Scroll up</string>
+    <string name="hide_filters">Filters</string>
+    <string name="hide_search">Search</string>
 
 </resources>
