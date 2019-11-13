@@ -12,8 +12,7 @@ val databaseModule = module {
     single { PolicyDao(get()) }
     single { SettingsDao() }
     single { StringDao() }
-    single { createRepoDatabase(get()) }
-    single { get<RepoDatabase>().repoDao() }
+    single { createRepoDatabase(get()).repoDao() }
     single { RepoUpdater(get(), get()) }
 }
 
