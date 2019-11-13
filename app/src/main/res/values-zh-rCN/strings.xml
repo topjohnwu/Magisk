@@ -8,6 +8,7 @@
     <string name="settings">设置</string>
     <string name="install">安装</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
+    <string name="unsupport_magisk_msg">此版本的 Magisk Manager 不支持低于 %1$s 的 Magisk。\n\n进入后表现为未安装状态，但升级功能可用，请尽快升级。</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">未安装 Magisk</string>
