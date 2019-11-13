@@ -7,7 +7,7 @@ import com.topjohnwu.magisk.model.entity.MagiskPolicy.Companion.INTERACTIVE
 
 
 data class MagiskPolicy(
-    val uid: Int,
+    var uid: Int,
     val packageName: String,
     val appName: String,
     var policy: Int = INTERACTIVE,

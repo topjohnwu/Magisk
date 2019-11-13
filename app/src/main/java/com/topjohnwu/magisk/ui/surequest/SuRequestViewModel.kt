@@ -9,6 +9,7 @@ import android.hardware.fingerprint.FingerprintManager
 import android.os.CountDownTimer
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.data.database.PolicyDao
@@ -165,6 +166,7 @@ class SuRequestViewModel(
 
         policy.policy = action
         policy.until = until
+        policy.uid = policy.uid % 100000 + Const.USER_ID * 100000
 
         if (until >= 0)
             policyDB.update(policy).blockingAwait()
