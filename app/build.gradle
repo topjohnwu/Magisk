@@ -113,6 +113,7 @@ dependencies {
     }
     def vRoom = '2.2.1'
     implementation "com.github.topjohnwu:room-runtime:${vRoom}"
+    implementation "androidx.room:room-rxjava2:${vRoom}"
     kapt "androidx.room:room-compiler:${vRoom}"
 
     def vNav = '2.1.0'

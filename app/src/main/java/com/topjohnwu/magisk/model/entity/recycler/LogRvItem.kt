@@ -50,13 +50,7 @@ class LogItemEntryRvItem(val item: MagiskLog) : ComparableRvItem<LogItemEntryRvI
 
     fun toggle() = isExpanded.toggle()
 
-    override fun contentSameAs(other: LogItemEntryRvItem) = item.fromUid == other.item.fromUid &&
-            item.toUid == other.item.toUid &&
-            item.fromPid == other.item.fromPid &&
-            item.packageName == other.item.packageName &&
-            item.command == other.item.command &&
-            item.action == other.item.action &&
-            item.date == other.item.date
+    override fun contentSameAs(other: LogItemEntryRvItem) = item == other.item
 
     override fun itemSameAs(other: LogItemEntryRvItem) = item.appName == other.item.appName
 }

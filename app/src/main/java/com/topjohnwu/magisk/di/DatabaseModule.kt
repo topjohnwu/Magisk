@@ -8,15 +8,20 @@ import org.koin.dsl.module
 
 
 val databaseModule = module {
-    single { LogDao() }
     single { PolicyDao(get()) }
     single { SettingsDao() }
     single { StringDao() }
     single { createRepoDatabase(get()).repoDao() }
+    single { createSuLogDatabase(get(Protected)).suLogDao() }
     single { RepoUpdater(get(), get()) }
 }
 
 fun createRepoDatabase(context: Context) =
-        Room.databaseBuilder(context, RepoDatabase::class.java, "repo.db")
-            .fallbackToDestructiveMigration()
-            .build()
+    Room.databaseBuilder(context, RepoDatabase::class.java, "repo.db")
+        .fallbackToDestructiveMigration()
+        .build()
+
+fun createSuLogDatabase(context: Context) =
+    Room.databaseBuilder(context, SuLogDatabase::class.java, "sulogs.db")
+        .fallbackToDestructiveMigration()
+        .build()

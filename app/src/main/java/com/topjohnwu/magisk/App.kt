@@ -11,6 +11,8 @@ import androidx.work.impl.WorkDatabase
 import androidx.work.impl.WorkDatabase_Impl
 import com.topjohnwu.magisk.data.database.RepoDatabase
 import com.topjohnwu.magisk.data.database.RepoDatabase_Impl
+import com.topjohnwu.magisk.data.database.SuLogDatabase
+import com.topjohnwu.magisk.data.database.SuLogDatabase_Impl
 import com.topjohnwu.magisk.di.ActivityTracker
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.extensions.get
@@ -40,6 +42,7 @@ open class App() : Application() {
             when (it) {
                 WorkDatabase::class.java -> WorkDatabase_Impl()
                 RepoDatabase::class.java -> RepoDatabase_Impl()
+                SuLogDatabase::class.java -> SuLogDatabase_Impl()
                 else -> null
             }
         }

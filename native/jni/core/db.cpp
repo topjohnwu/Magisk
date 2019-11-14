@@ -10,7 +10,7 @@
 #include <daemon.h>
 #include <utils.h>
 
-#define DB_VERSION 9
+#define DB_VERSION 10
 
 using namespace std;
 
@@ -70,13 +70,6 @@ static char *open_and_init_db(sqlite3 *&db) {
 				"CREATE TABLE IF NOT EXISTS policies "
 				"(uid INT, package_name TEXT, policy INT, until INT, "
 				"logging INT, notification INT, PRIMARY KEY(uid))",
-				nullptr, nullptr, &err);
-		err_ret(err);
-		// Logs
-		sqlite3_exec(db,
-				"CREATE TABLE IF NOT EXISTS logs "
-				"(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, "
-				"to_uid INT, action INT, time INT, command TEXT)",
 				nullptr, nullptr, &err);
 		err_ret(err);
 		// Settings
@@ -142,6 +135,12 @@ static char *open_and_init_db(sqlite3 *&db) {
 				nullptr, nullptr, &err);
 		err_ret(err);
 		ver = 9;
+		upgrade = true;
+	}
+	if (ver < 10) {
+		sqlite3_exec(db, "DROP TABLE logs", nullptr, nullptr, &err);
+		err_ret(err);
+		ver = 10;
 		upgrade = true;
 	}
 

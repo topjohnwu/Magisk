@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.model.entity.toPolicy
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
 import timber.log.Timber
-import java.util.*
 
 object SuHandler : ProviderCallHandler {
 
@@ -101,12 +100,11 @@ object SuHandler : ProviderCallHandler {
         val log = policy.toLog(
             toUid = toUid,
             fromPid = pid,
-            command = command,
-            date = Date()
+            command = command
         )
 
         val logRepo = get<LogRepository>()
-        logRepo.put(log).subscribeK(onError = { Timber.e(it) })
+        logRepo.insert(log).subscribeK(onError = { Timber.e(it) })
     }
 
     private fun handleNotify(context: Context, data: Bundle) {
