@@ -166,9 +166,6 @@
     <string name="request_timeout_summary">%1$d sekúnd</string>
     <string name="settings_su_reauth_title">Overenie autentifikácie po upgrade</string>
     <string name="settings_su_reauth_summary">Overí autentifikáciu oprávnení superuser po upgrade aplikácie</string>
-    <string name="settings_su_fingerprint_title">Povoliť autentifikáciu odtlačkom prsta</string>
-    <string name="settings_su_fingerprint_summary">Použite snímač odtlačkov prstov pre povolenie žiadostí superuser</string>
-    <string name="auth_fingerprint">Autentifikovať odtlačok prsta</string>
 
     <string name="multiuser_mode">Režim viacerých používateľov</string>
     <string name="settings_owner_only">Iba majiteľ zariadenia</string>
@@ -185,7 +182,6 @@
     <string name="global_summary">Všetky relácie root použijú globálny mount namespace</string>
     <string name="requester_summary">Relácie root zdedia namespace od žiadateľa</string>
     <string name="isolate_summary">Každá relácia root bude mať vlastný izolovaný namespace</string>
-    <string name="disable_fingerprint">Neboli odoslané žiadne odtlačky prsta alebo ich zariadenie nepodporuje</string>
     <string name="settings_download_path_error">Chyba pri vytváraní priečinka. Musí byť prístupný z koreňového adresára a nemôže to byť súbor.</string>
 
     <!--Superuser-->
@@ -213,7 +209,6 @@
     <string name="su_revoke_msg">Potvrdzujete zrušenie práv %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Nič</string>
-    <string name="auth_fail">Autentifikácia zlyhala</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:%1$d</string>

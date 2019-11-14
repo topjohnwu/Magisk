@@ -146,9 +146,6 @@
     <string name="request_timeout_summary">%1$d วินาที</string>
     <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัพเกรด</string>
     <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัพเกรด</string>
-    <string name="settings_su_fingerprint_title">ใช้การยืนยันลายนิ้วมือ</string>
-    <string name="settings_su_fingerprint_summary">ใช้ตัวแสกนลายนิ้วมือเพื่ออนุญาตารขอเข้าถึง superuser</string>
-    <string name="auth_fingerprint">ยืนยันลายนิ้วมือ</string>
 
     <string name="multiuser_mode">โหมดผู้ใช้หลายคน</string>
     <string name="settings_owner_only">เจ้าของอุปกรณ์เท่านั้น</string>
@@ -165,7 +162,6 @@
     <string name="global_summary">All root sessions use the global mount namespace.</string>
     <string name="requester_summary">Root sessions will inherit their requester\'s namespace.</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
-    <string name="disable_fingerprint">ไม่มีลายนิ้วมือหรืออุปกรณ์แสกน</string>
 
     <!--Superuser-->
     <string name="su_request_title">การขอเข้าถึง Superuser</string>
@@ -192,7 +188,6 @@
     <string name="su_revoke_msg">ยืนยันการลบสิทธิ์ของ %1$s?</string>
     <string name="toast">การเตือน</string>
     <string name="none">ไม่มี</string>
-    <string name="auth_fail">การยืนยันล้มเหลว</string>
 
     <!--Superuser logs-->
     <string name="target_uid">UID เป้าหมาย: %1$d</string>

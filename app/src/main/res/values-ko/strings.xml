@@ -155,9 +155,6 @@
     <string name="request_timeout_summary">%1$d초</string>
     <string name="settings_su_reauth_title">업데이트 후 재승인</string>
     <string name="settings_su_reauth_summary">앱 업데이트 후에 슈퍼유저 권한 재승인</string>
-    <string name="settings_su_fingerprint_title">지문 인식 사용</string>
-    <string name="settings_su_fingerprint_summary">지문 인식으로 슈퍼유저 권한을 허가합니다.</string>
-    <string name="auth_fingerprint">지문 인식</string>
 
     <string name="multiuser_mode">다중 사용자 모드</string>
     <string name="settings_owner_only">기기 소유자만</string>
@@ -174,7 +171,6 @@
     <string name="global_summary">모든 루트 세션이 전역 마운트 이름공간을 사용합니다.</string>
     <string name="requester_summary">루트 세션은 요청자의 이름공간을 상속합니다.</string>
     <string name="isolate_summary">각각의 루트 세션은 자신만의 독립된 이름공간을 사용합니다.</string>
-    <string name="disable_fingerprint">지문이 등록되지 않았거나 기기가 지문 인식을 지원하지 않습니다.</string>
 
     <!--Superuser-->
     <string name="su_request_title">슈퍼유저 요청</string>
@@ -201,7 +197,6 @@
     <string name="su_revoke_msg">정말 %1$s의 권한을 취소하시겠습니까?</string>
     <string name="toast">토스트</string>
     <string name="none">없음</string>
-    <string name="auth_fail">인증 실패</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

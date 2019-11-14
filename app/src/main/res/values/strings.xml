@@ -95,7 +95,6 @@
     <string name="settings_reboot_toast">Reboot to apply settings</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
-
     <string name="dtbo_patched_title">DTBO was patched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img. Please reboot.</string>
     <string name="flashing">Flashing…</string>
@@ -116,6 +115,7 @@
     <string name="env_fix_title">Requires Additional Setup</string>
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
     <string name="setup_msg">Running environment setup…</string>
+    <string name="authenticate">Authenticate</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -167,9 +167,9 @@
     <string name="request_timeout_summary">%1$d seconds</string>
     <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
     <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
-    <string name="settings_su_fingerprint_title">Enable Fingerprint Authentication</string>
-    <string name="settings_su_fingerprint_summary">Use fingerprint scanner to allow superuser requests</string>
-    <string name="auth_fingerprint">Authenticate Fingerprint</string>
+    <string name="settings_su_biometric_title">Enable Biometric Authentication</string>
+    <string name="settings_su_biometric_summary">Use biometric authentication to allow superuser requests</string>
+    <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>
@@ -186,7 +186,6 @@
     <string name="global_summary">All root sessions use the global mount namespace</string>
     <string name="requester_summary">Root sessions will inherit their requester\'s namespace</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace</string>
-    <string name="disable_fingerprint">No fingerprints were set or no device support</string>
     <string name="settings_download_path_error">Error creating folder. It must be accessible from storage root directory and must not be a file.</string>
 
     <!--Superuser-->
@@ -214,7 +213,6 @@
     <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
     <string name="toast">Toast</string>
     <string name="none">None</string>
-    <string name="auth_fail">Authentication Failed</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

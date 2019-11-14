@@ -119,9 +119,9 @@
 
         <SwitchPreferenceCompat
             android:defaultValue="false"
-            android:key="su_fingerprint"
-            android:summary="@string/settings_su_fingerprint_summary"
-            android:title="@string/settings_su_fingerprint_title" />
+            android:key="su_biometric"
+            android:title="@string/settings_su_biometric_title"
+            android:summary="@string/settings_su_biometric_summary" />
 
         <SwitchPreferenceCompat
             android:defaultValue="false"

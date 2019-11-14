@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
-import android.hardware.fingerprint.FingerprintManager
 import android.os.CountDownTimer
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
@@ -19,8 +18,8 @@ import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
 import com.topjohnwu.magisk.model.entity.toPolicy
 import com.topjohnwu.magisk.model.events.DieEvent
+import com.topjohnwu.magisk.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.DiffObservableList
-import com.topjohnwu.magisk.utils.FingerprintHelper
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.SuConnector
 import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
@@ -43,7 +42,6 @@ class SuRequestViewModel(
     val denyText = KObservableField(resources.getString(R.string.deny))
     val warningText = KObservableField<CharSequence>(resources.getString(R.string.su_warning))
 
-    val canUseFingerprint = KObservableField(FingerprintHelper.useFingerprint())
     val selectedItemPosition = KObservableField(0)
 
     private val items = DiffObservableList(ComparableRvItem.callback)
@@ -68,8 +66,16 @@ class SuRequestViewModel(
     }
 
     fun grantPressed() {
-        handleAction(MagiskPolicy.ALLOW)
-        timer.cancel()
+        cancelTimer()
+        if (BiometricHelper.isEnabled) {
+            withView {
+                BiometricHelper.authenticate(this) {
+                    handleAction(MagiskPolicy.ALLOW)
+                }
+            }
+        } else {
+            handleAction(MagiskPolicy.ALLOW)
+        }
     }
 
     fun denyPressed() {
@@ -137,13 +143,6 @@ class SuRequestViewModel(
         }
         timer.start()
         cancelTasks.add { cancelTimer() }
-
-        if (canUseFingerprint.value)
-            runCatching {
-                val helper = SuFingerprint()
-                helper.authenticate()
-                cancelTasks.add { helper.cancel() }
-            }
     }
 
     private fun handleAction() {
@@ -179,26 +178,6 @@ class SuRequestViewModel(
         @Throws(IOException::class)
         override fun onResponse() {
             out.writeInt(policy.policy)
-        }
-    }
-
-    private inner class SuFingerprint @Throws(Exception::class)
-    internal constructor() : FingerprintHelper() {
-
-        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-            warningText.value = errString
-        }
-
-        override fun onAuthenticationHelp(helpCode: Int, helpString: CharSequence) {
-            warningText.value = helpString
-        }
-
-        override fun onAuthenticationSucceeded(result: FingerprintManager.AuthenticationResult) {
-            handleAction(MagiskPolicy.ALLOW)
-        }
-
-        override fun onAuthenticationFailed() {
-            warningText.value = resources.getString(R.string.auth_fail)
         }
     }
 

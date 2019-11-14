@@ -165,9 +165,6 @@
     <string name="request_timeout_summary">%1$d secondes</string>
     <string name="settings_su_reauth_title">Authentifier à nouveau après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Authentifier à nouveau les autorisations super‐utilisateur après une mise à jour de l’application</string>
-    <string name="settings_su_fingerprint_title">Activer l’authentification par empreinte digitale</string>
-    <string name="settings_su_fingerprint_summary">Utiliser le lecteur d’empreintes digitales pour autoriser les demandes super‐utilisateur</string>
-    <string name="auth_fingerprint">Authentifier l’empreinte digitale</string>
 
     <string name="multiuser_mode">Mode multi‐utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
@@ -184,7 +181,6 @@
     <string name="global_summary">Toutes les sessions super‐utilisateur utilisent l’espace de noms global du montage.</string>
     <string name="requester_summary">Les sessions super‐utilisateur hériteront de l’espace de noms de leur demandeur.</string>
     <string name="isolate_summary">Chaque session super‐utilisateur aura son propre espace de noms isolé.</string>
-    <string name="disable_fingerprint">Aucune empreinte digitale n’a été définie ou le lecteur d’empreinte n’est pas pris en charge.</string>
     <string name="settings_download_path_error">Erreur lors de la création du dossier. Il doit être accessible depuis le répertoire racine du stockage et ne doit pas être un fichier.</string>
 
     <!--Superuser-->
@@ -212,7 +208,6 @@
     <string name="su_revoke_msg">Confirmez‐vous l’annulation des droits pour %1$s ?</string>
     <string name="toast">Toast</string>
     <string name="none">Aucun</string>
-    <string name="auth_fail">Échec de l’authentification</string>
 
     <!--Superuser logs-->
     <string name="pid">PID : %1$d</string>

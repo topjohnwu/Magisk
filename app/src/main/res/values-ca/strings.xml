@@ -166,9 +166,6 @@
     <string name="request_timeout_summary">%1$d segons</string>
     <string name="settings_su_reauth_title">Demanar després d\'una actualització</string>
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació és actualitzada o reinstal·lada</string>
-    <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
-    <string name="settings_su_fingerprint_summary">Utilitza el sensor d\'Empremta Dactilar per permetre les sol·licituds de superusuari</string>
-    <string name="auth_fingerprint">Autenticar Emprempta Digital</string>
 
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
@@ -185,7 +182,6 @@
     <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
     <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
     <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
-    <string name="disable_fingerprint">No s\'han establert empremtes dactilars o no existeix el suport del dispositiu</string>
     <string name="settings_download_path_error">Error al crear la carpeta. El directori ha de ser accesible desde el directori arrel i no pot ser un arxiu.</string>
 
     <!--Superuser-->
@@ -213,7 +209,6 @@
     <string name="su_revoke_msg">Confirma per revocar drets de %1$s</string>
     <string name="toast">Avís</string>
     <string name="none">Cap</string>
-    <string name="auth_fail">Autenticació fallida</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

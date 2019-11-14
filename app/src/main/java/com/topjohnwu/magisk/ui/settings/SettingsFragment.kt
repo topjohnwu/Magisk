@@ -24,7 +24,6 @@ import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.utils.*
-import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Completable
 import org.koin.android.ext.android.inject
@@ -61,7 +60,7 @@ class SettingsFragment : BasePreferenceFragment() {
         multiuserConfig = findPreference(Config.Key.SU_MULTIUSER_MODE)!!
         nsConfig = findPreference(Config.Key.SU_MNT_NS)!!
         val reauth = findPreference<SwitchPreferenceCompat>(Config.Key.SU_REAUTH)!!
-        val fingerprint = findPreference<SwitchPreferenceCompat>(Config.Key.SU_FINGERPRINT)!!
+        val biometric = findPreference<SwitchPreferenceCompat>(Config.Key.SU_BIOMETRIC)!!
         val generalCatagory = findPreference<PreferenceCategory>("general")!!
         val magiskCategory = findPreference<PreferenceCategory>("magisk")!!
         val suCategory = findPreference<PreferenceCategory>("superuser")!!
@@ -88,11 +87,11 @@ class SettingsFragment : BasePreferenceFragment() {
             suCategory.removePreference(reauth)
         }
 
-        // Disable fingerprint option if not possible
-        if (!FingerprintHelper.canUseFingerprint()) {
-            fingerprint.isEnabled = false
-            fingerprint.isChecked = false
-            fingerprint.setSummary(R.string.disable_fingerprint)
+        // Disable biometric option if not possible
+        if (!BiometricHelper.isSupported) {
+            biometric.isEnabled = false
+            biometric.isChecked = false
+            biometric.setSummary(R.string.no_biometric)
         }
 
         if (Const.USER_ID == 0 && Info.isConnected.value && Shell.rootAccess()) {
@@ -208,13 +207,13 @@ class SettingsFragment : BasePreferenceFragment() {
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         when (preference.key) {
-            Config.Key.SU_FINGERPRINT -> {
+            Config.Key.SU_BIOMETRIC -> {
                 val checked = (preference as SwitchPreferenceCompat).isChecked
                 preference.isChecked = !checked
-                FingerprintAuthDialog(requireActivity()) {
+                BiometricHelper.authenticate(requireActivity()) {
                     preference.isChecked = checked
-                    Config.suFingerprint = checked
-                }.show()
+                    Config.suBiometric = checked
+                }
             }
         }
         return true

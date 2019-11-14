@@ -11,7 +11,7 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public class DynAPK {
 
-    private static final int STUB_VERSION = 5;
+    private static final int STUB_VERSION = 6;
 
     // Indices of the object array
     private static final int STUB_VERSION_ENTRY = 0;

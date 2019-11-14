@@ -154,9 +154,6 @@
     <string name="request_timeout_summary">%1$d sekund</string>
     <string name="settings_su_reauth_title">Opětovné ověření po aktualizaci</string>
     <string name="settings_su_reauth_summary">Opětovné ověření oprávnění Superuser po aktualizaci aplikace</string>
-    <string name="settings_su_fingerprint_title">Povolit ověřování otisky prstů</string>
-    <string name="settings_su_fingerprint_summary">Chcete-li povolit požadavky Superuser, použijte snímač otisků prstů</string>
-    <string name="auth_fingerprint">Ověřování otisky prstů</string>
 
     <string name="multiuser_mode">Režim více uživatelů</string>
     <string name="settings_owner_only">Pouze vlastník zařízení</string>
@@ -173,7 +170,6 @@
     <string name="global_summary">Všechny relace root používají globální připojení jmenného prostoru.</string>
     <string name="requester_summary">Kořenové relace dědí jmenný prostor žadatele.</string>
     <string name="isolate_summary">Každá relace root bude mít svůj vlastní izolovaný jmenný prostor.</string>
-    <string name="disable_fingerprint">Nebyly nastaveny žádné otisky prstů ani žádná podpora zařízení.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Požadavek Superuser</string>
@@ -200,7 +196,6 @@
     <string name="su_revoke_msg">Smazat záznam ohledně oprávnění pro %1$s?</string>
     <string name="toast">Informační text</string>
     <string name="none">Žádný</string>
-    <string name="auth_fail">Ověření se nezdařilo</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

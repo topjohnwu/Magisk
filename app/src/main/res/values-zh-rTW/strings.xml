@@ -167,9 +167,6 @@
     <string name="request_timeout_summary">%1$d 秒</string>
     <string name="settings_su_reauth_title">更新後重新驗證</string>
     <string name="settings_su_reauth_summary">應用程式更新後，重新驗證超級使用者的請求</string>
-    <string name="settings_su_fingerprint_title">指紋驗證</string>
-    <string name="settings_su_fingerprint_summary">使用指紋辨識器允許超級使用者的請求</string>
-    <string name="auth_fingerprint">指紋驗證</string>
 
     <string name="multiuser_mode">多重使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
@@ -186,7 +183,6 @@
     <string name="global_summary">所有 Root 工作階段皆使用全域命名空間</string>
     <string name="requester_summary">所有 Root 工作階段皆繼承原程式的命名空間</string>
     <string name="isolate_summary">所有 Root 工作階段都擁有獨立的命名空間</string>
-    <string name="disable_fingerprint">未設定指紋或無指紋感測器</string>
     <string name="settings_download_path_error">建立資料夾發生錯誤。檔案存放的路徑需要位於內部儲存空間且不能有同樣名稱的檔案。</string>
 	
     <!--Superuser-->
@@ -214,7 +210,6 @@
     <string name="su_revoke_msg">確定撤銷 %1$s 的權限？</string>
     <string name="toast">快顯通知</string>
     <string name="none">無</string>
-    <string name="auth_fail">驗證失敗</string>
 
     <!--Superuser logs-->
     <string name="pid">PID：%1$d</string>

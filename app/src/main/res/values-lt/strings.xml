@@ -137,8 +137,6 @@
     <string name="request_timeout_summary">%1$d sekundžių</string>
     <string name="settings_su_reauth_title">Pakartotinai patvirtinti po atnaujinimo</string>
     <string name="settings_su_reauth_summary">Pakartotinai patvirtinti supervartotojo leidimus po programėlės atnaujinimo</string>
-    <string name="settings_su_fingerprint_title">Įgalinti patvirtinimą piršto antspaudu</string>
-    <string name="settings_su_fingerprint_summary">Naudoti piršto antspaudą supervartotojo leidimo prašymų atsakymui</string>
 
     <string name="multiuser_mode">Daugialypio vartotojo režimas</string>
     <string name="settings_owner_only">Tik įrenginio savininkas</string>
@@ -155,7 +153,6 @@
     <string name="global_summary">Visos root sesijos naudoja globalią vardų sritį</string>
     <string name="requester_summary">Root sesijos paveldi jos išprašytojo/s vardų sritį</string>
     <string name="isolate_summary">Kiekviena root sesija turi savo izoliuotą vardų sritį</string>
-    <string name="disable_fingerprint">Jūsų įrenginyje nebuvo surasta pirštų antspaudų arba jūsų įrenginys neturi pirštų antspaudų skaitytuvo</string>
 
     <!--Superuser-->
     <string name="su_request_title">Supervartotojo prašymas</string>
@@ -182,7 +179,6 @@
     <string name="su_revoke_msg">Neleisti %1$s naudotis supervartotojo teisėmis?</string>
     <string name="toast">Išmesti</string>
     <string name="none">Nėra</string>
-    <string name="auth_fail">Patvirtinimas žlugo</string>
 
     <!--Superuser logs-->
     <string name="target_uid">Target UID: %1$d</string>

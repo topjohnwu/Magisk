@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
 import com.topjohnwu.magisk.model.events.DieEvent
+import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.utils.SuHandler
 import com.topjohnwu.magisk.utils.SuHandler.REQUEST
@@ -56,6 +57,7 @@ open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestB
     override fun onEventDispatched(event: ViewEvent) {
         super.onEventDispatched(event)
         when (event) {
+            is ViewActionEvent -> event.action(this)
             is DieEvent -> finish()
         }
     }

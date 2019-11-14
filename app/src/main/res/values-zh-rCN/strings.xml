@@ -167,9 +167,6 @@
     <string name="request_timeout_summary">%1$d 秒</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
-    <string name="settings_su_fingerprint_title">启用指纹验证</string>
-    <string name="settings_su_fingerprint_summary">使用指纹识别来允许超级用户请求</string>
-    <string name="auth_fingerprint">验证指纹</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
@@ -186,7 +183,6 @@
     <string name="global_summary">所有的 ROOT 会话使用全局挂载命名空间</string>
     <string name="requester_summary">ROOT 会话继承原程序的命名空间</string>
     <string name="isolate_summary">每一个 ROOT 会话使用自己独立的命名空间</string>
-    <string name="disable_fingerprint">没有设置指纹或设备不支持</string>
     <string name="settings_download_path_error">创建文件夹出错。路径需要位于内部存储空间，并且不能有同名文件。</string>
 
     <!--Superuser-->
@@ -214,7 +210,6 @@
     <string name="su_revoke_msg">确认撤销 %1$s 的权限？</string>
     <string name="toast">消息提示</string>
     <string name="none">无</string>
-    <string name="auth_fail">验证失败</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

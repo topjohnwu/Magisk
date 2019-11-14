@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.model.events
 
-import android.app.Activity
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.model.entity.module.Repo
 import io.reactivex.subjects.PublishSubject
 
@@ -28,7 +28,7 @@ class EnvFixEvent : ViewEvent()
 
 class UpdateSafetyNetEvent : ViewEvent()
 
-class ViewActionEvent(val action: Activity.() -> Unit) : ViewEvent()
+class ViewActionEvent(val action: BaseActivity<*, *>.() -> Unit) : ViewEvent()
 
 class OpenFilePickerEvent : ViewEvent()
 

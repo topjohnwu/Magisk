@@ -167,9 +167,6 @@
     <string name="request_timeout_summary">%1$d секунд</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
-    <string name="settings_su_fingerprint_title">Биометрическая аутентификация</string>
-    <string name="settings_su_fingerprint_summary">Использовать сканер отпечатков пальцев для запросов прав суперпользователя</string>
-    <string name="auth_fingerprint">Подтвердите отпечаток пальца</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только владелец</string>
@@ -186,7 +183,6 @@
     <string name="global_summary">Сессии суперпользователя используют общее пространство имён</string>
     <string name="requester_summary">Сессии суперпользователя наследуют пространство имён запрашивающего</string>
     <string name="isolate_summary">Сессии суперпользователя используют изолированные пространства имён</string>
-    <string name="disable_fingerprint">Не поддерживается устройством или не заданы отпечатки</string>
     <string name="settings_download_path_error">Ошибка создания папки. Она должна быть доступна из корневой директории хранилища и не должна быть файлом.</string>
 
     <!--Superuser-->
@@ -214,7 +210,6 @@
     <string name="su_revoke_msg">Сбросить настройки для %1$s?</string>
     <string name="toast">Всплывающие уведомления</string>
     <string name="none">Нет</string>
-    <string name="auth_fail">Ошибка аутентификации</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

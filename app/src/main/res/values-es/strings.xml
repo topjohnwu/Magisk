@@ -159,9 +159,6 @@
     <string name="request_timeout_summary">%1$d segundos</string>
     <string name="settings_su_reauth_title">Re-autenticación</string>
     <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada o reinstalada</string>
-    <string name="settings_su_fingerprint_title">Autenticación por Huella Dactilar</string>
-    <string name="settings_su_fingerprint_summary">Utilizar el sensor de Huella Dactilar para permitir las solicitudes de superusuario</string>
-    <string name="auth_fingerprint">Autenticar Huella Dactilar</string>
 
     <string name="multiuser_mode">Modo MultiUsuario</string>
     <string name="settings_owner_only">Sólo Administrador del Dispositivo</string>
@@ -178,7 +175,6 @@
     <string name="global_summary">Todas las sesiones de root utilizan el soporte Global Namespace</string>
     <string name="requester_summary">Las sesiones de root heredarán las peticiones Namespace</string>
     <string name="isolate_summary">Cada sesión root tendrá su propia Namespace</string>
-    <string name="disable_fingerprint">No se establecieron huellas dactilares o no existe soporte del dispositivo</string>
     <string name="settings_download_path_error">Error al crear la carpeta. Debe ser accesible desde el directorio raíz de almacenamiento y no debe ser un archivo.</string>
 
     <!--Superuser-->
@@ -206,7 +202,6 @@
     <string name="su_revoke_msg">¿Confirmar para revocar derechos de %1$s?</string>
     <string name="toast">Aviso</string>
     <string name="none">Nada</string>
-    <string name="auth_fail">Autenticación fallida</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

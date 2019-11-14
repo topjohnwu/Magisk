@@ -151,9 +151,6 @@
     <string name="request_timeout_summary">%1$d saniyə</string>
     <string name="settings_su_reauth_title">Yüksəltmədən sonra Yenidən İdentifikasiya et</string>
     <string name="settings_su_reauth_summary">Tətbiq yeniləmələridən sonra superuser icazələrini yenidən identifikasiya et</string>
-    <string name="settings_su_fingerprint_title">Barmaq İzi İdentifikasiyasını Aç</string>
-    <string name="settings_su_fingerprint_summary">Barmaq izi oxuyucunu superuser icazələri üçün işlət</string>
-    <string name="auth_fingerprint">Barmaq izini İdentifikasiya et</string>
     <string name="multiuser_mode">Çox-istifadəçi modu</string>
     <string name="settings_owner_only">Yalnız cihaz sahibi</string>
     <string name="settings_owner_manage">Cihaz sahibinin idarəçiliyində</string>
@@ -168,7 +165,6 @@
     <string name="global_summary">Bütün root sessyaları qlobal qoşma namespace\'dən istifadə edir.</string>
     <string name="requester_summary">Root sessyaları soruşulan namespace\'ləri birindən digərinə keçirəcək.</string>
     <string name="isolate_summary">Hər bir root sessyasının ayrılmış namespace\'i olacaq.</string>
-    <string name="disable_fingerprint">Barmaq izi təyin edilməyib ya da dəstəklənmir.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Tələbi</string>
@@ -195,7 +191,6 @@
     <string name="su_revoke_msg">%1$s üçün haqları ləğv etməyi təsdiq edirsiniz?</string>
     <string name="toast">Tost</string>
     <string name="none">Heçnə</string>
-    <string name="auth_fail">İdentifikasiya xətası</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

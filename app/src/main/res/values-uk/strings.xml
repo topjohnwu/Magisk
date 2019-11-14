@@ -166,9 +166,6 @@
     <string name="request_timeout_summary">%1$d сек.</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програм</string>
-    <string name="settings_su_fingerprint_title">Автентифікація за відбитком</string>
-    <string name="settings_su_fingerprint_summary">Використовувати сканер відбитків пальців, щоб надавати дозвіл суперкористувача</string>
-    <string name="auth_fingerprint">Автентифікація за відбитком</string>
 
     <string name="multiuser_mode">Багатокористувацький режим</string>
     <string name="settings_owner_only">Тільки власник</string>
@@ -185,7 +182,6 @@
     <string name="global_summary">Всі сеанси Суперкористувача використовують глобальний простір імен.</string>
     <string name="requester_summary">Сеанси Суперкористувача наслідують простір імен запитувача.</string>
     <string name="isolate_summary">Кожнен сеанс Суперкористувача має власний ізольований простір імен.</string>
-    <string name="disable_fingerprint">Немає відбитків пальця або пристрій не підтримується.</string>
     <string name="settings_download_path_error">Помилка створення папки. Вона повинна бути доступна з кореневої директорії сховища і не повинна бути файлом.</string>
 
     <!--Superuser-->
@@ -213,7 +209,6 @@
     <string name="su_revoke_msg">Підтвердити відкликання прав для %1$s?</string>
     <string name="toast">Спливаюче сповіщення</string>
     <string name="none">Ні</string>
-    <string name="auth_fail">Помилка автентифікації</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
