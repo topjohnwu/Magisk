@@ -22,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHideMd2Binding
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
+import com.topjohnwu.magisk.redesign.compat.hideKeyboard
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.math.hypot
 
@@ -45,6 +46,7 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
             MotionRevealHelper.withViews(binding.hideFilter, binding.hideFilterToggle, true)
         }
         binding.hideFilterInclude.hideFilterDone.setOnClickListener {
+            hideKeyboard()
             MotionRevealHelper.withViews(binding.hideFilter, binding.hideFilterToggle, false)
         }
 

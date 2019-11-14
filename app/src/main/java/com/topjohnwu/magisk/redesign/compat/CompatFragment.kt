@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.base.BaseFragment
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.events.ViewEvent
@@ -48,4 +49,8 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
 
     protected fun ViewEvent.dispatchOnSelf() = delegate.onEventExecute(this, this@CompatFragment)
 
+}
+
+fun Fragment.hideKeyboard() {
+    activity?.hideKeyboard()
 }

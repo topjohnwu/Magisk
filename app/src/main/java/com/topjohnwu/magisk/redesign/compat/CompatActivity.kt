@@ -1,9 +1,12 @@
 package com.topjohnwu.magisk.redesign.compat
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.getSystemService
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
@@ -16,6 +19,7 @@ import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
 import kotlin.reflect.KClass
+
 
 abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBinding> :
     BaseActivity<ViewModel, Binding>(), CompatView<ViewModel>, Navigator {
@@ -78,4 +82,11 @@ abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBin
 
     protected fun ViewEvent.dispatchOnSelf() = onEventDispatched(this)
 
+}
+
+fun Activity.hideKeyboard() {
+    val view = currentFocus ?: return
+    getSystemService<InputMethodManager>()
+        ?.hideSoftInputFromWindow(view.windowToken, 0)
+    view.clearFocus()
 }
