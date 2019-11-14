@@ -65,6 +65,8 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onPreBind(binding: FragmentHideMd2Binding) = Unit
+
 }
 
 object MotionRevealHelper {

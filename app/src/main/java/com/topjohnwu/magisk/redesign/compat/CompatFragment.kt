@@ -24,8 +24,8 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
 
         binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
             override fun onPreBind(binding: Binding): Boolean {
-                (binding.root as? ViewGroup)?.startAnimations()
-                return super.onPreBind(binding)
+                this@CompatFragment.onPreBind(binding)
+                return true
             }
         })
 
@@ -40,6 +40,10 @@ abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBin
 
     override fun onEventDispatched(event: ViewEvent) {
         delegate.onEventExecute(event, this)
+    }
+
+    protected open fun onPreBind(binding: Binding) {
+        (binding.root as? ViewGroup)?.startAnimations()
     }
 
     protected fun ViewEvent.dispatchOnSelf() = delegate.onEventExecute(this, this@CompatFragment)
