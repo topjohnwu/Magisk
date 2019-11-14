@@ -50,6 +50,7 @@
     <!--Progress-->
     <attr name="styleProgressDeterminate" format="reference" />
     <attr name="styleProgressIndeterminate" format="reference" />
+    <attr name="styleProgressIndeterminateCircular" format="reference" />
 
     <!--endregion-->
 

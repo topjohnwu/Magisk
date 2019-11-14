@@ -15,23 +15,61 @@
 
     </data>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/module_remote"
-        adapter="@{viewModel.adapter}"
-        dividerHorizontal="@{R.drawable.divider_l1}"
-        dividerVertical="@{R.drawable.divider_l1}"
-        itemBinding="@{viewModel.itemBinding}"
-        items="@{viewModel.items}"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:orientation="vertical"
-        android:paddingStart="@dimen/l1"
-        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
-        android:paddingEnd="0dp"
-        android:paddingBottom="@{viewModel.insets.bottom}"
-        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-        app:spanCount="2"
-        tools:listitem="@layout/item_module_md2" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/module_remote"
+            adapter="@{viewModel.adapter}"
+            dividerHorizontal="@{R.drawable.divider_l1}"
+            dividerVertical="@{R.drawable.divider_l1}"
+            itemBinding="@{viewModel.itemBinding}"
+            items="@{viewModel.items}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/l1"
+            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
+            android:paddingEnd="0dp"
+            android:paddingBottom="@{viewModel.insets.bottom}"
+            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+            app:spanCount="2"
+            tools:listitem="@layout/item_module_md2" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/module_filter_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginStart="@dimen/l1"
+            android:layout_marginEnd="@dimen/l1"
+            android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
+            app:backgroundTint="?colorSurface"
+            app:srcCompat="@drawable/ic_filter"
+            app:tint="?colorPrimary"
+            tools:layout_marginBottom="64dp" />
+
+        <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+            android:id="@+id/module_filter"
+            style="?styleCardVariant"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:visibility="invisible"
+            app:cardCornerRadius="0dp">
+
+            <include
+                android:id="@+id/module_filter_include"
+                layout="@layout/include_module_filter"
+                viewModel="@{viewModel}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
+    </FrameLayout>
+
 
 </layout>

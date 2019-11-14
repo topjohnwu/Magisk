@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.redesign.module
 
 import androidx.annotation.WorkerThread
+import androidx.databinding.Bindable
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
@@ -19,11 +20,14 @@ import com.topjohnwu.magisk.model.entity.recycler.RepoItem
 import com.topjohnwu.magisk.model.entity.recycler.SectionTitle
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
+import com.topjohnwu.magisk.redesign.compat.Queryable
 import com.topjohnwu.magisk.redesign.home.itemBindingOf
 import com.topjohnwu.magisk.redesign.superuser.diffListOf
 import com.topjohnwu.magisk.tasks.RepoUpdater
+import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 import timber.log.Timber
@@ -33,7 +37,27 @@ class ModuleViewModel(
     private val repoName: RepoByNameDao,
     private val repoUpdated: RepoByUpdatedDao,
     private val repoUpdater: RepoUpdater
-) : CompatViewModel() {
+) : CompatViewModel(), Queryable by Queryable.impl(1000) {
+
+    override val queryRunnable = Runnable { query() }
+
+    var query = ""
+        @Bindable get
+        set(value) {
+            if (field == value) return
+            field = value
+            notifyPropertyChanged(BR.query)
+            submitQuery()
+            // Yes we do lie about the search being loaded
+            searchLoading.value = true
+        }
+
+    private var queryJob: Disposable? = null
+    val searchLoading = KObservableField(false)
+    val itemsSearch = diffListOf<RepoItem>()
+    val itemSearchBinding = itemBindingOf<RepoItem> {
+        it.bindExtra(BR.viewModel, this)
+    }
 
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = diffListOf<ComparableRvItem<*>>()
@@ -102,7 +126,7 @@ class ModuleViewModel(
             return
         }
         remoteJob = Single.fromCallable { itemsRemote.size }
-            .flatMap { loadRepos(offset = it) }
+            .flatMap { loadRemoteInternal(offset = it) }
             .map { it.map { RepoItem(it) } }
             .subscribeK(onError = {
                 Timber.e(it)
@@ -114,14 +138,49 @@ class ModuleViewModel(
             }
     }
 
-    private fun loadRepos(
+    // ---
+
+    override fun submitQuery() {
+        queryHandler.removeCallbacks(queryRunnable)
+        queryHandler.postDelayed(queryRunnable, queryDelay)
+    }
+
+    private fun queryInternal(query: String, offset: Int): Single<List<RepoItem>> {
+        if (query.isBlank()) {
+            return Single.just(listOf<RepoItem>())
+                .doOnSubscribe { itemsSearch.clear() }
+                .subscribeOn(AndroidSchedulers.mainThread())
+        }
+        return Single.fromCallable { dao.searchRepos(query, offset) }
+            .map { it.map { RepoItem(it) } }
+    }
+
+    private fun query(query: String = this.query, offset: Int = 0) {
+        queryJob?.dispose()
+        queryJob = queryInternal(query, offset)
+            .map { it to itemsSearch.calculateDiff(it) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { searchLoading.value = false }
+            .subscribeK { itemsSearch.update(it.first, it.second) }
+    }
+
+    @Synchronized
+    fun loadMoreQuery() {
+        if (queryJob?.isDisposed == false) return
+        queryJob = queryInternal(query, itemsSearch.size)
+            .subscribeK { itemsSearch.addAll(it) }
+    }
+
+    // ---
+
+    private fun loadRemoteInternal(
         offset: Int = 0,
         downloadRepos: Boolean = offset == 0
     ): Single<List<Repo>> = Single.fromCallable { dao.getRepos(offset) }.flatMap {
         when {
             // in case we find result empty and offset is initial we need to refresh the repos.
             downloadRepos && it.isEmpty() && offset == 0 -> downloadRepos()
-                .andThen(loadRepos(downloadRepos = false))
+                .andThen(loadRemoteInternal(downloadRepos = false))
             else -> Single.just(it)
         }
     }
@@ -137,10 +196,11 @@ class ModuleViewModel(
         .sortedBy { it.item.name.toLowerCase(currentLocale) }
         .toList()
 
-    private fun update(repo: Repo, progress: Int) = Single.fromCallable { itemsRemote }
-        .map { it.first { it.item.id == repo.id } }
-        .subscribeK { it.progress.value = progress }
-        .add()
+    private fun update(repo: Repo, progress: Int) =
+        Single.fromCallable { itemsRemote + itemsSearch }
+            .map { it.first { it.item.id == repo.id } }
+            .subscribeK { it.progress.value = progress }
+            .add()
 
     // ---
 

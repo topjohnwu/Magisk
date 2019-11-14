@@ -56,7 +56,11 @@
         <item name="styleRadioNormal">@style/WidgetFoundation.RadioButton</item>
 
         <item name="styleProgressDeterminate">@style/WidgetFoundation.ProgressBar</item>
-        <item name="styleProgressIndeterminate">@style/WidgetFoundation.ProgressBar.Indeterminate
+        <item name="styleProgressIndeterminate">
+            @style/WidgetFoundation.ProgressBar.Indeterminate
+        </item>
+        <item name="styleProgressIndeterminateCircular">
+            @style/WidgetFoundation.ProgressBar.Indeterminate.Circular
         </item>
 
         <!--///-->

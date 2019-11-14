@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.redesign.hide
 
 import android.content.pm.ApplicationInfo
-import android.os.Handler
-import android.os.Looper
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.data.repository.MagiskRepository
@@ -16,20 +14,18 @@ import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.entity.recycler.HideItem
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessItem
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
+import com.topjohnwu.magisk.redesign.compat.Queryable
 import com.topjohnwu.magisk.redesign.home.itemBindingOf
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.FilterableDiffObservableList
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.currentLocale
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 
 class HideViewModel(
     private val magiskRepo: MagiskRepository
-) : CompatViewModel() {
+) : CompatViewModel(), Queryable by Queryable.impl(1000) {
 
-    private val queryHandler = Handler(Looper.getMainLooper())
-    private val queryRunnable = Runnable { query() }
+    override val queryRunnable = Runnable { query() }
 
     var isShowSystem = false
         @Bindable get
@@ -67,7 +63,7 @@ class HideViewModel(
         .applyViewModel(this)
         .subscribeK {
             items.update(it.first, it.second)
-            query()
+            submitQuery()
         }
 
     // ---
@@ -87,9 +83,9 @@ class HideViewModel(
 
     // ---
 
-    private fun submitQuery() {
+    override fun submitQuery() {
         queryHandler.removeCallbacks(queryRunnable)
-        queryHandler.postDelayed(queryRunnable, 1000)
+        queryHandler.postDelayed(queryRunnable, queryDelay)
     }
 
     private fun query(
@@ -130,7 +126,7 @@ class HideViewModel(
 
 }
 
-inline fun <T : ComparableRvItem<T>> filterableListOf(
+inline fun <T : ComparableRvItem<*>> filterableListOf(
     vararg newItems: T
 ) = FilterableDiffObservableList(object : DiffObservableList.Callback<T> {
     override fun areItemsTheSame(oldItem: T, newItem: T) = oldItem.genericItemSameAs(newItem)

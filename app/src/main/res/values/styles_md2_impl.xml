@@ -162,4 +162,10 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="android:layout_width">100dp</item>
     </style>
 
+    <style name="WidgetFoundation.ProgressBar.Indeterminate.Circular" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminate">true</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+    </style>
+
 </resources>

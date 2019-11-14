@@ -116,19 +116,7 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         transactionType: FragNavController.TransactionType
     ) {
         setDisplayHomeAsUpEnabled(!navigation.isRoot)
-
-        val lapam = binding.mainBottomBar.layoutParams as ViewGroup.MarginLayoutParams
-        val height = binding.mainBottomBar.measuredHeight
-        val verticalMargin = lapam.let { it.topMargin + it.bottomMargin }
-        val maxTranslation = height + verticalMargin
-        val translation = if (navigation.isRoot) 0 else maxTranslation
-
-        binding.mainBottomBar.animate()
-            .translationY(translation.toFloat())
-            .setInterpolator(FastOutSlowInInterpolator())
-            .withStartAction { if (navigation.isRoot) binding.mainBottomBar.isVisible = true }
-            .withEndAction { if (!navigation.isRoot) binding.mainBottomBar.isVisible = false }
-            .start()
+        requestNavigationHidden(!navigation.isRoot)
     }
 
     override fun peekSystemWindowInsets(insets: Insets) {
@@ -141,6 +129,21 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
             isEnabled -> binding.mainToolbar.setNavigationIcon(R.drawable.ic_back_md2)
             else -> binding.mainToolbar.navigationIcon = null
         }
+    }
+
+    internal fun requestNavigationHidden(hide: Boolean = true) {
+        val lapam = binding.mainBottomBar.layoutParams as ViewGroup.MarginLayoutParams
+        val height = binding.mainBottomBar.measuredHeight
+        val verticalMargin = lapam.let { it.topMargin + it.bottomMargin }
+        val maxTranslation = height + verticalMargin
+        val translation = if (!hide) 0 else maxTranslation
+
+        binding.mainBottomBar.animate()
+            .translationY(translation.toFloat())
+            .setInterpolator(FastOutSlowInInterpolator())
+            .withStartAction { if (!hide) binding.mainBottomBar.isVisible = true }
+            .withEndAction { if (hide) binding.mainBottomBar.isVisible = false }
+            .start()
     }
 
 }
