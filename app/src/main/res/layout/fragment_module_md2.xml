@@ -46,7 +46,7 @@
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
             android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
-            app:backgroundTint="?colorSurface"
+            app:backgroundTint="?colorSurfaceSurfaceVariant"
             app:srcCompat="@drawable/ic_filter"
             app:tint="?colorPrimary"
             tools:layout_marginBottom="64dp" />

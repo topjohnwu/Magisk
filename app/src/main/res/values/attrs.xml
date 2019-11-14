@@ -96,6 +96,7 @@
     <attr name="colorSurfaceVariant" format="color" />
     <attr name="colorOnPrimaryVariant" format="color" />
     <attr name="colorOnSurfaceVariant" format="color" />
+    <attr name="colorSurfaceSurfaceVariant" format="color" />
 
     <!--endregion-->
 

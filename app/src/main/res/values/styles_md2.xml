@@ -103,6 +103,7 @@
         <item name="colorSecondaryVariant">#8000C853</item>
         <item name="colorSurface">#F2F2F2</item>
         <item name="colorSurfaceVariant">#E8E8E8</item>
+        <item name="colorSurfaceSurfaceVariant">?colorSurface</item>
         <item name="colorOnPrimary">#F2F2F2</item>
         <item name="colorOnPrimaryVariant">#D9E6E6E6</item>
         <item name="colorOnSecondary">#F2F2F2</item>
