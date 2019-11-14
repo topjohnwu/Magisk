@@ -95,7 +95,6 @@
     <string name="settings_reboot_toast">Для применения настроек перезагрузите устройство</string>
     <string name="release_notes">О версии</string>
     <string name="repo_cache_cleared">Кэш репозитория очищен</string>
-
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
     <string name="flashing">Прошивка…</string>
@@ -116,6 +115,7 @@
     <string name="env_fix_title">Требуется дополнительная установка</string>
     <string name="env_fix_msg">Вашему устройству требуется дополнительная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
     <string name="setup_msg">Настройка рабочей среды…</string>
+    <string name="authenticate">Аутентификация</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
@@ -167,6 +167,9 @@
     <string name="request_timeout_summary">%1$d секунд</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
+    <string name="settings_su_biometric_title">Биометрическая аутентификация</string>
+    <string name="settings_su_biometric_summary">Использовать биометрическую аутентификацию для запросов прав суперпользователя</string>
+    <string name="no_biometric">Не поддерживается устройством или не заданы ностройки защитной блокировки</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только владелец</string>
