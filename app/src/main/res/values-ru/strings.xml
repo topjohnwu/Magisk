@@ -124,7 +124,7 @@
     <string name="settings_download_path_title">Папка для загрузки</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
-    <string name="settings_clear_cache_summary">Очистить кэш репозитория. Будет загружен заново</string>
+    <string name="settings_clear_cache_summary">Очистить кэш репозитория. Кэш будет загружен заново</string>
     <string name="settings_hide_manager_title">Скрытие Magisk Manager</string>
     <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным названием и именем пакета</string>
     <string name="settings_restore_manager_title">Восстановление Magisk Manager</string>
@@ -169,7 +169,7 @@
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
     <string name="settings_su_biometric_title">Биометрическая аутентификация</string>
     <string name="settings_su_biometric_summary">Использовать биометрическую аутентификацию для запросов прав суперпользователя</string>
-    <string name="no_biometric">Не поддерживается устройством или не заданы ностройки защитной блокировки</string>
+    <string name="no_biometric">Эта функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только владелец</string>
