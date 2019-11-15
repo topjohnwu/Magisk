@@ -72,6 +72,9 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
             }.dispatchOnSelf()
             true
         }
+        binding.mainNavigation.setOnNavigationItemReselectedListener {
+            navigation.onReselected()
+        }
 
         binding.mainNavigation.viewTreeObserver.addOnGlobalLayoutListener(navObserver)
 

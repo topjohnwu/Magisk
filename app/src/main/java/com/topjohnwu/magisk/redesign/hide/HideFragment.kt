@@ -16,6 +16,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.circularreveal.CircularRevealCompat
 import com.google.android.material.circularreveal.CircularRevealWidget
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -61,8 +62,10 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_focus_up -> binding.hideContent
-                .also { it.scrollToPosition(10) }
-                .also { it.smoothScrollToPosition(0) }
+                .takeIf { (it.layoutManager as? LinearLayoutManager)?.findFirstVisibleItemPosition() ?: 0 > 10 }
+                ?.also { it.scrollToPosition(10) }
+                .let { binding.hideContent }
+                .also { it.post { it.smoothScrollToPosition(0) } }
         }
         return super.onOptionsItemSelected(item)
     }

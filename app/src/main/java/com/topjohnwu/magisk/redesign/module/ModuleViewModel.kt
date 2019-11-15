@@ -111,6 +111,7 @@ class ModuleViewModel(
         .map { it.order() }
         .map { build(active = it) }
         .map { it to items.calculateDiff(it) }
+        .applyViewModel(this)
         .subscribeK {
             items.update(it.first, it.second)
             if (!items.contains(sectionRemote)) {
@@ -118,6 +119,13 @@ class ModuleViewModel(
             }
             moveToState()
         }
+
+    fun loadRemoteImplicit() = downloadRepos()
+        .observeOn(AndroidSchedulers.mainThread())
+        .doOnComplete { items.clear(); itemsSearch.clear() }
+        .applyViewModel(this, false)
+        .subscribeK { refresh(); submitQuery() }
+        .add()
 
     @Synchronized
     fun loadRemote() {

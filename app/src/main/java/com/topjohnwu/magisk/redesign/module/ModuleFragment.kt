@@ -2,17 +2,23 @@ package com.topjohnwu.magisk.redesign.module
 
 import android.graphics.Insets
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.redesign.MainActivity
+import com.topjohnwu.magisk.redesign.ReselectionTarget
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
 import com.topjohnwu.magisk.redesign.compat.hideKeyboard
 import com.topjohnwu.magisk.redesign.hide.MotionRevealHelper
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>() {
+class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
+    ReselectionTarget {
 
     override val layoutRes = R.layout.fragment_module_md2
     override val viewModel by viewModel<ModuleViewModel>()
@@ -23,6 +29,7 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
 
     override fun onStart() {
         super.onStart()
+        setHasOptionsMenu(true)
         activity.title = resources.getString(R.string.section_modules)
     }
 
@@ -49,6 +56,35 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
         }
         super.onDestroyView()
     }
+
+    // ---
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_module_md2, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_refresh -> viewModel.loadRemoteImplicit()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    // ---
+
+    override fun onReselected() {
+        binding.moduleRemote
+            .takeIf {
+                (it.layoutManager as? StaggeredGridLayoutManager)?.let {
+                    it.findFirstVisibleItemPositions(IntArray(it.spanCount)).min()
+                } ?: 0 > 10
+            }
+            ?.also { it.scrollToPosition(10) }
+            .let { binding.moduleRemote }
+            .also { it.post { it.smoothScrollToPosition(0) } }
+    }
+
+    // ---
 
     override fun onPreBind(binding: FragmentModuleMd2Binding) = Unit
 

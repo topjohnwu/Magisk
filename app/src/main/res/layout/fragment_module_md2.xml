@@ -24,6 +24,7 @@
             adapter="@{viewModel.adapter}"
             dividerHorizontal="@{R.drawable.divider_l1}"
             dividerVertical="@{R.drawable.divider_l1}"
+            gone="@{viewModel.loading}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
             android:layout_width="match_parent"
@@ -68,6 +69,27 @@
                 android:layout_height="match_parent" />
 
         </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
+        <LinearLayout
+            goneUnless="@{viewModel.loading}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/safetynet_attest_loading"
+                android:textAppearance="?appearanceTextTitleNormal"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                style="?styleProgressIndeterminate"
+                android:layout_marginTop="@dimen/l1" />
+
+        </LinearLayout>
 
     </FrameLayout>
 

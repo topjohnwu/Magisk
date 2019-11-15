@@ -8,6 +8,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
+import com.topjohnwu.magisk.redesign.ReselectionTarget
 import timber.log.Timber
 
 class CompatNavigationDelegate<out Source>(
@@ -43,6 +44,10 @@ class CompatNavigationDelegate<out Source>(
 
     fun onSaveInstanceState(outState: Bundle) =
         controller.onSaveInstanceState(outState)
+
+    fun onReselected() {
+        (controller.currentFrag as? ReselectionTarget)?.onReselected()
+    }
 
     fun onBackPressed(): Boolean {
         val fragment = controller.currentFrag as? CompatFragment<*, *>
