@@ -37,8 +37,10 @@ class LogItemRvItem(
 
     fun toggle() = isExpanded.toggle()
 
-    override fun contentSameAs(other: LogItemRvItem): Boolean = items
-        .any { !other.items.contains(it) }
+    override fun contentSameAs(other: LogItemRvItem): Boolean {
+        if (items.size != other.items.size) return false
+        return items.all { it in other.items }
+    }
 
     override fun itemSameAs(other: LogItemRvItem): Boolean = date == other.date
 }
