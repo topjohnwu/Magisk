@@ -2,10 +2,10 @@ package com.topjohnwu.magisk.utils
 
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
-import com.topjohnwu.superuser.internal.UiThreadHandler
 import org.koin.core.KoinComponent
 import org.koin.core.get
 
@@ -32,7 +32,7 @@ object BiometricHelper: KoinComponent {
         onError: () -> Unit = {},
         onSuccess: () -> Unit): BiometricPrompt {
         val prompt = BiometricPrompt(activity,
-            { cmd: Runnable -> UiThreadHandler.run(cmd) },
+            ContextCompat.getMainExecutor(activity),
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     onError()
