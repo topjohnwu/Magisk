@@ -221,7 +221,7 @@ void boot_img::parse_image(uint8_t *addr) {
 			hdr = new dyn_img_v0(addr);
 	}
 
-	for (int i = SHA_DIGEST_SIZE; i < SHA256_DIGEST_SIZE; ++i) {
+	for (int i = SHA_DIGEST_SIZE + 4; i < SHA256_DIGEST_SIZE; ++i) {
 		if (hdr->id()[i]) {
 			flags |= SHA256_FLAG;
 			break;
