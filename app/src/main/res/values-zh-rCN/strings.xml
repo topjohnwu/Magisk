@@ -95,7 +95,6 @@
     <string name="settings_reboot_toast">重启设备以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
-
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
     <string name="flashing">正在刷入</string>
@@ -116,6 +115,7 @@
     <string name="env_fix_title">需要修复运行环境</string>
     <string name="env_fix_msg">缺失 Magisk 正常工作所需的文件。 将下载 Magisk 安装包进行修复安装，完成后自动重启，是否继续？</string>
     <string name="setup_msg">正在修复运行环境…</string>
+    <string name="authenticate">验证您的身份</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -167,6 +167,9 @@
     <string name="request_timeout_summary">%1$d 秒</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
+    <string name="settings_su_biometric_title">启用生物识别认证</string>
+    <string name="settings_su_biometric_summary">使用生物识别验证超级用户请求</string>
+    <string name="no_biometric">不支持的设备或未配置生物识别功能</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
