@@ -78,6 +78,12 @@
         android:key="superuser"
         android:title="@string/superuser">
 
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="su_biometric"
+            android:title="@string/settings_su_biometric_title"
+            android:summary="@string/settings_su_biometric_summary" />
+
         <ListPreference
             android:entries="@array/su_access"
             android:entryValues="@array/value_array"
@@ -116,12 +122,6 @@
             android:entryValues="@array/value_array"
             android:key="su_notification"
             android:title="@string/superuser_notification" />
-
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="su_biometric"
-            android:title="@string/settings_su_biometric_title"
-            android:summary="@string/settings_su_biometric_summary" />
 
         <SwitchPreferenceCompat
             android:defaultValue="false"
