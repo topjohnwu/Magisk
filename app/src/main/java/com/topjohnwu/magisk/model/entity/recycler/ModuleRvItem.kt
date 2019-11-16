@@ -90,10 +90,23 @@ object InstallModule : ComparableRvItem<InstallModule>() {
 
 class SectionTitle(
     val title: Int,
-    val button: Int = 0,
-    val icon: Int = 0
-) : ComparableRvItem<SectionTitle>() {
+    _button: Int = 0,
+    _icon: Int = 0
+) : ObservableItem<SectionTitle>() {
     override val layoutRes = R.layout.item_section_md2
+
+    @Bindable
+    var button = _button
+        set(value) {
+            field = value
+            notifyChange(BR.button)
+        }
+    @Bindable
+    var icon = _icon
+        set(value) {
+            field = value
+            notifyChange(BR.icon)
+        }
 
     val hasButton = KObservableField(button != 0 || icon != 0)
 

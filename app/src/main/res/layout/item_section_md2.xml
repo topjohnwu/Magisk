@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -27,6 +28,7 @@
             android:textAppearance="?appearanceTextBodyNormal"
             android:textColor="?colorPrimaryTransient"
             android:textStyle="bold"
+            tools:text="@tools:sample/lorem/random"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/module_button"
             app:layout_constraintStart_toStartOf="parent"
@@ -34,13 +36,14 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/module_button"
-            style="?styleButtonText"
+            style="?styleButtonTextSecondary"
             gone="@{!item.hasButton}"
             android:onClick="@{() -> viewModel.sectionPressed(item)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/l1"
             android:text="@{item.button}"
+            tools:text="@tools:sample/lorem"
             android:textAllCaps="false"
             app:icon="@{item.icon}"
             app:iconPadding="@dimen/l_50"

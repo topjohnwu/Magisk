@@ -68,12 +68,25 @@ class ModuleViewModel(
     }
 
     companion object {
-        private val sectionRemote = SectionTitle(R.string.module_section_remote)
+        private val sectionRemote =
+            SectionTitle(R.string.module_section_remote, R.string.sorting_order)
         private val sectionActive = SectionTitle(
             R.string.module_section_installed,
             R.string.reboot,
             R.drawable.ic_restart
         ).also { it.hasButton.value = false }
+
+        init {
+            updateOrderIcon()
+        }
+
+        private fun updateOrderIcon() {
+            sectionRemote.icon = when (Config.repoOrder) {
+                Config.Value.ORDER_NAME -> R.drawable.ic_order_name
+                Config.Value.ORDER_DATE -> R.drawable.ic_order_date
+                else -> return
+            }
+        }
     }
 
     // ---
@@ -221,6 +234,20 @@ class ModuleViewModel(
 
     fun sectionPressed(item: SectionTitle) = when (item) {
         sectionActive -> reboot() //TODO add reboot picker, regular reboot is not always preferred
+        sectionRemote -> {
+            Config.repoOrder = when (Config.repoOrder) {
+                Config.Value.ORDER_NAME -> Config.Value.ORDER_DATE
+                Config.Value.ORDER_DATE -> Config.Value.ORDER_NAME
+                else -> Config.Value.ORDER_NAME
+            }
+            updateOrderIcon()
+            Single.fromCallable { itemsRemote }
+                .subscribeK {
+                    items.removeAll(it)
+                    remoteJob?.dispose()
+                    loadRemote()
+                }.add()
+        }
         else -> Unit
     }
 
