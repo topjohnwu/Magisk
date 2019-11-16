@@ -11,7 +11,6 @@ import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.model.update.UpdateCheckService
-import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -34,7 +33,7 @@ object Utils {
     }
 
     fun showSuperUser(): Boolean {
-        return Shell.rootAccess() && (Const.USER_ID == 0
+        return Info.env.isActive && (Const.USER_ID == 0
                 || Config.suMultiuserMode != Config.Value.MULTIUSER_MODE_OWNER_MANAGED)
     }
 

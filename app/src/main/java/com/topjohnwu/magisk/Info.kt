@@ -36,20 +36,21 @@ object Info {
         val str = ShellUtils.fastCmd("magisk -v").split(":".toRegex())[0]
         val code = ShellUtils.fastCmd("magisk -V").toInt()
         val hide = Shell.su("magiskhide --status").exec().isSuccess
-        Env(code, str, hide)
+        Env(str, code, hide)
     }.getOrElse { Env() }
 
     class Env(
-        code: Int = -1,
         val magiskVersionString: String = "",
+        code: Int = -1,
         hide: Boolean = false
     ) {
         val magiskHide get() = Config.magiskHide
         val magiskVersionCode = when (code) {
             in Int.MIN_VALUE..Const.Version.MIN_VERCODE -> -1
-            else -> code
+            else -> if(Shell.rootAccess()) code else -1
         }
-        val unsupported = code > 0 && code < Const.Version.MIN_VERCODE
+        val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
+        val isActive = magiskVersionCode >= 0
 
         init {
             Config.magiskHide = hide

@@ -31,7 +31,6 @@ import com.topjohnwu.magisk.ui.module.ReposFragment
 import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import kotlin.reflect.KClass
@@ -68,7 +67,7 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
         super.onCreate(savedInstanceState)
 
-        if (Info.env.unsupported && !viewModel.shownUnsupportedDialog) {
+        if (Info.env.isUnsupported && !viewModel.shownUnsupportedDialog) {
             viewModel.shownUnsupportedDialog = true
             AlertDialog.Builder(this)
                 .setTitle(R.string.unsupport_magisk_title)
@@ -164,16 +163,11 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     private fun checkHideSection() {
         val menu = binding.navView.menu
-        menu.findItem(R.id.magiskHideFragment).isVisible =
-            Shell.rootAccess() && Info.env.magiskHide
-        menu.findItem(R.id.modulesFragment).isVisible =
-            Shell.rootAccess() && Info.env.magiskVersionCode >= 0
-        menu.findItem(R.id.reposFragment).isVisible =
-            (viewModel.isConnected.value && Shell.rootAccess() && Info.env.magiskVersionCode >= 0)
-        menu.findItem(R.id.logFragment).isVisible =
-            Shell.rootAccess()
-        menu.findItem(R.id.superuserFragment).isVisible =
-            Utils.showSuperUser()
+        menu.findItem(R.id.magiskHideFragment).isVisible = Info.env.isActive && Info.env.magiskHide
+        menu.findItem(R.id.modulesFragment).isVisible = Info.env.isActive
+        menu.findItem(R.id.reposFragment).isVisible = Info.isConnected.value && Info.env.isActive
+        menu.findItem(R.id.logFragment).isVisible = Info.env.isActive
+        menu.findItem(R.id.superuserFragment).isVisible = Utils.showSuperUser()
     }
 
     private fun FragNavTransactionOptions.Builder.customAnimations(options: MagiskAnimBuilder) =

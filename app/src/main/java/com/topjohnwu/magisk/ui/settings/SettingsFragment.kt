@@ -61,7 +61,7 @@ class SettingsFragment : BasePreferenceFragment() {
         nsConfig = findPreference(Config.Key.SU_MNT_NS)!!
         val reauth = findPreference<SwitchPreferenceCompat>(Config.Key.SU_REAUTH)!!
         val biometric = findPreference<SwitchPreferenceCompat>(Config.Key.SU_BIOMETRIC)!!
-        val generalCatagory = findPreference<PreferenceCategory>("general")!!
+        val generalCategory = findPreference<PreferenceCategory>("general")!!
         val magiskCategory = findPreference<PreferenceCategory>("magisk")!!
         val suCategory = findPreference<PreferenceCategory>("superuser")!!
         val hideManager = findPreference<Preference>("hide")!!
@@ -94,9 +94,9 @@ class SettingsFragment : BasePreferenceFragment() {
             biometric.setSummary(R.string.no_biometric)
         }
 
-        if (Const.USER_ID == 0 && Info.isConnected.value && Shell.rootAccess()) {
+        if (Const.USER_ID == 0 && Info.isConnected.value && Info.env.isActive) {
             if (activity.packageName == BuildConfig.APPLICATION_ID) {
-                generalCatagory.removePreference(restoreManager)
+                generalCategory.removePreference(restoreManager)
                 hideManager.setOnPreferenceClickListener {
                     showManagerNameDialog {
                         PatchAPK.hideManager(requireContext(), it)
@@ -104,7 +104,7 @@ class SettingsFragment : BasePreferenceFragment() {
                     true
                 }
             } else {
-                generalCatagory.removePreference(hideManager)
+                generalCategory.removePreference(hideManager)
                 restoreManager.setOnPreferenceClickListener {
                     DownloadService(requireContext()) {
                         subject = DownloadSubject.Manager(Configuration.APK.Restore)
@@ -114,25 +114,32 @@ class SettingsFragment : BasePreferenceFragment() {
             }
         } else {
             // Remove if not primary user, no connection, or no root
-            generalCatagory.removePreference(restoreManager)
-            generalCatagory.removePreference(hideManager)
+            generalCategory.removePreference(restoreManager)
+            generalCategory.removePreference(hideManager)
         }
 
         if (!Utils.showSuperUser()) {
             preferenceScreen.removePreference(suCategory)
         }
 
-        if (!Shell.rootAccess()) {
+        if (!Info.env.isActive) {
             preferenceScreen.removePreference(magiskCategory)
-            generalCatagory.removePreference(hideManager)
+            generalCategory.removePreference(hideManager)
         }
 
-        findPreference<Preference>("clear")?.setOnPreferenceClickListener {
-            Completable.fromAction { repoDB.clear() }.subscribeK {
-                Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
+        findPreference<Preference>("clear")?.also {
+            if (Info.env.isActive) {
+                it.setOnPreferenceClickListener {
+                    Completable.fromAction { repoDB.clear() }.subscribeK {
+                        Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
+                    }
+                    true
+                }
+            } else {
+                generalCategory.removePreference(it)
             }
-            true
         }
+
         findPreference<Preference>("hosts")?.setOnPreferenceClickListener {
             Shell.su("add_hosts_module").submit {
                 Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
@@ -142,20 +149,21 @@ class SettingsFragment : BasePreferenceFragment() {
 
         findPreference<Preference>(Config.Key.DOWNLOAD_PATH)?.apply {
             summary = Config.downloadPath
-        }?.setOnPreferenceClickListener { preference ->
-            activity.withExternalRW {
-                onSuccess {
-                    showDownloadDialog {
-                        Config.downloadPath = it
-                        preference.summary = it
+            setOnPreferenceClickListener { pref ->
+                activity.withExternalRW {
+                    onSuccess {
+                        showDownloadDialog {
+                            Config.downloadPath = it
+                            pref.summary = it
+                        }
                     }
                 }
+                true
             }
-            true
         }
 
         updateChannel.setOnPreferenceChangeListener { _, value ->
-            val channel = Integer.parseInt(value as String)
+            val channel = value.toString().toInt()
             val previous = Config.updateChannel
 
             if (channel == Config.Value.CUSTOM_CHANNEL) {
