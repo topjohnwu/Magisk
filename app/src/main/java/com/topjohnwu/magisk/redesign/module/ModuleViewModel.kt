@@ -122,9 +122,8 @@ class ModuleViewModel(
             moveToState()
         }
 
-    fun loadRemoteImplicit() = downloadRepos()
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnComplete { items.clear(); itemsSearch.clear() }
+    fun loadRemoteImplicit() = let { items.clear(); itemsSearch.clear() }
+        .run { downloadRepos() }
         .applyViewModel(this, false)
         .subscribeK { refresh(); submitQuery() }
         .add()

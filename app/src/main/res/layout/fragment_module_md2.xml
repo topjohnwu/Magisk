@@ -24,7 +24,7 @@
             adapter="@{viewModel.adapter}"
             dividerHorizontal="@{R.drawable.divider_l1}"
             dividerVertical="@{R.drawable.divider_l1}"
-            gone="@{viewModel.loading}"
+            gone="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
             android:layout_width="match_parent"
@@ -71,7 +71,7 @@
         </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
 
         <LinearLayout
-            goneUnless="@{viewModel.loading}"
+            goneUnless="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
