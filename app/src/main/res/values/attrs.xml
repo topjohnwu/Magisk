@@ -27,6 +27,7 @@
     <attr name="styleButtonFlat" format="reference" />
     <attr name="styleButtonFlatOnPrimary" format="reference" />
     <attr name="styleButtonText" format="reference" />
+    <attr name="styleButtonTextSecondary" format="reference" />
     <attr name="styleButtonTextOnPrimary" format="reference" />
     <attr name="styleButtonError" format="reference" />
 

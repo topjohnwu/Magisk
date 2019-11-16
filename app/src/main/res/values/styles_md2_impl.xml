@@ -85,6 +85,11 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="iconPadding">@dimen/l1</item>
     </style>
 
+    <style name="WidgetFoundation.Button.Text.Secondary">
+        <item name="android:textColor">?colorSecondary</item>
+        <item name="iconTint">?colorSecondary</item>
+    </style>
+
     <style name="WidgetFoundation.Button.Text.OnPrimary">
         <item name="rippleColor">?colorOnPrimary</item>
         <item name="android:textColor">?colorOnPrimary</item>

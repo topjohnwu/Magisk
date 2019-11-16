@@ -39,6 +39,7 @@
         <item name="styleButtonFlat">@style/WidgetFoundation.Button.Flat</item>
         <item name="styleButtonFlatOnPrimary">@style/WidgetFoundation.Button.Flat.OnPrimary</item>
         <item name="styleButtonText">@style/WidgetFoundation.Button.Text</item>
+        <item name="styleButtonTextSecondary">@style/WidgetFoundation.Button.Text.Secondary</item>
         <item name="styleButtonTextOnPrimary">@style/WidgetFoundation.Button.Text.OnPrimary</item>
         <item name="styleButtonError">@style/WidgetFoundation.Button.Error</item>
 
@@ -99,8 +100,8 @@
     <style name="Foundation.Default" parent="Foundation.Base">
         <item name="colorPrimary">#2196F3</item>
         <item name="colorPrimaryVariant">#802196F3</item>
-        <item name="colorSecondary">#00C853</item>
-        <item name="colorSecondaryVariant">#8000C853</item>
+        <item name="colorSecondary">#1766A6</item>
+        <item name="colorSecondaryVariant">#801766A6</item>
         <item name="colorSurface">#F2F2F2</item>
         <item name="colorSurfaceVariant">#E8E8E8</item>
         <item name="colorSurfaceSurfaceVariant">?colorSurface</item>
