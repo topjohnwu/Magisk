@@ -46,12 +46,10 @@
                 android:id="@+id/module_version_author"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
                 android:text="@{@string/module_version_author(item.item.version ?? `?`, item.item.author ?? `?`)}"
                 android:textAppearance="?appearanceTextCaptionVariant"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/module_title"
+                app:layout_constraintStart_toStartOf="@+id/module_title"
                 app:layout_constraintTop_toBottomOf="@+id/module_title"
                 tools:text="v1 by topjohnwu" />
 
@@ -81,20 +79,33 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                android:text="@{@string/updated_on(item.item.lastUpdateString)}"
+                android:text="@{item.item.lastUpdateString}"
                 android:textAppearance="?appearanceTextCaptionVariant"
                 android:textSize="11sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/module_download"
+                app:layout_constraintEnd_toStartOf="@+id/module_info"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/module_divider"
                 tools:ignore="SmallSp"
-                tools:text="@string/updated_on" />
+                tools:text="@tools:sample/date/ddmmyy" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/module_info"
+                style="?styleIconNormal"
+                android:layout_width="wrap_content"
+                android:alpha=".5"
+                android:onClick="@{() -> viewModel.infoPressed(item)}"
+                android:paddingEnd="@dimen/l_50"
+                app:layout_constraintBottom_toBottomOf="@+id/module_download"
+                app:layout_constraintEnd_toStartOf="@+id/module_download"
+                app:layout_constraintTop_toTopOf="@+id/module_download"
+                app:srcCompat="@drawable/ic_info" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/module_download"
+                android:layout_width="wrap_content"
                 style="?styleIconPrimary"
+                android:paddingStart="@dimen/l_50"
                 isEnabled="@{!(item.progress == -100 || (item.progress > 0 &amp;&amp; item.progress &lt; 100))}"
                 android:contentDescription="@string/download"
                 android:onClick="@{() -> viewModel.download(item)}"

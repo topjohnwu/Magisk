@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.magisk.view.MagiskDialog
+import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.superuser.Shell
 import dalvik.system.DexFile
 import io.reactivex.Completable
@@ -140,7 +141,12 @@ class ViewActionEvent(val action: Activity.() -> Unit) : ViewEvent(), ActivityEx
 
 class OpenFilePickerEvent : ViewEvent()
 
-class OpenChangelogEvent(val item: Repo) : ViewEvent()
+class OpenChangelogEvent(val item: Repo) : ViewEvent(), ContextExecutor {
+    override fun invoke(context: Context) {
+        MarkDownWindow.show(context, null, item.readme)
+    }
+}
+
 class InstallModuleEvent(val item: Repo) : ViewEvent()
 
 class PageChangedEvent : ViewEvent()

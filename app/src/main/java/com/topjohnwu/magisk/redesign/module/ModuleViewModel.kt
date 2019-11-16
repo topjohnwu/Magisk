@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.model.entity.recycler.ModuleItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoItem
 import com.topjohnwu.magisk.model.entity.recycler.SectionTitle
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
+import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.compat.Queryable
@@ -252,6 +253,7 @@ class ModuleViewModel(
     }
 
     fun installPressed() = InstallExternalModuleEvent().publish()
+    fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
 
     // ---
 
