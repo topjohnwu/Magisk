@@ -15,9 +15,11 @@ import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.module.Repo
+import com.topjohnwu.magisk.model.entity.recycler.InstallModule
 import com.topjohnwu.magisk.model.entity.recycler.ModuleItem
 import com.topjohnwu.magisk.model.entity.recycler.RepoItem
 import com.topjohnwu.magisk.model.entity.recycler.SectionTitle
+import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.compat.Queryable
@@ -219,9 +221,11 @@ class ModuleViewModel(
     fun download(item: RepoItem) = ModuleInstallDialog(item.item).publish()
 
     fun sectionPressed(item: SectionTitle) = when (item) {
-        sectionActive -> reboot()
+        sectionActive -> reboot() //TODO add reboot picker, regular reboot is not always preferred
         else -> Unit
     }
+
+    fun installPressed() = InstallExternalModuleEvent().publish()
 
     // ---
 
@@ -230,7 +234,7 @@ class ModuleViewModel(
     private fun build(
         active: List<ModuleItem> = itemsInstalled,
         remote: List<RepoItem> = itemsRemote
-    ) = active.prependIfNotEmpty { sectionActive } +
+    ) = (active + InstallModule).prependIfNotEmpty { sectionActive } +
             remote.prependIfNotEmpty { sectionRemote }
 
     private fun <T> List<T>.prependIfNotEmpty(item: () -> T) =

@@ -81,6 +81,13 @@ class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
     override fun itemSameAs(other: RepoRvItem): Boolean = item.id == other.item.id
 }
 
+object InstallModule : ComparableRvItem<InstallModule>() {
+    override val layoutRes = R.layout.item_module_download
+
+    override fun contentSameAs(other: InstallModule) = this == other
+    override fun itemSameAs(other: InstallModule) = this === other
+}
+
 class SectionTitle(
     val title: Int,
     val button: Int = 0,

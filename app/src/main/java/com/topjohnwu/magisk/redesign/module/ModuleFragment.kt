@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.redesign.module
 
+import android.content.Intent
 import android.graphics.Insets
 import android.os.Bundle
 import android.view.Menu
@@ -9,6 +10,7 @@ import android.view.View
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
+import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.redesign.MainActivity
 import com.topjohnwu.magisk.redesign.ReselectionTarget
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
@@ -26,6 +28,11 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
     private val listeners = hashSetOf<EndlessRecyclerScrollListener>()
 
     override fun consumeSystemWindowInsets(insets: Insets) = insets
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        InstallExternalModuleEvent.onActivityResult(requireContext(), requestCode, resultCode, data)
+    }
 
     override fun onStart() {
         super.onStart()
