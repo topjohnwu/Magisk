@@ -114,16 +114,16 @@ class HomeViewModel(
 
         stateVersionUpdateMagisk.value = when {
             info.magisk.isObsolete -> "%s > %s".format(
-                Info.env.magiskVersionString.clipVersion(),
-                info.magisk.version.clipVersion()
+                Info.env.magiskVersionString.clipVersion(info.magisk.version),
+                info.magisk.version.clipVersion(Info.env.magiskVersionString)
             )
             else -> ""
         }
 
         stateVersionUpdateManager.value = when {
             info.app.isObsolete -> "%s > %s".format(
-                BuildConfig.VERSION_NAME.clipVersion(),
-                info.app.version.clipVersion()
+                BuildConfig.VERSION_NAME.clipVersion(info.app.version),
+                info.app.version.clipVersion(BuildConfig.VERSION_NAME)
             )
             else -> ""
         }
@@ -184,7 +184,11 @@ val ManagerJson.isUpdateChannelCorrect
 val ManagerJson.isObsolete
     get() = BuildConfig.VERSION_CODE < versionCode
 
-fun String.clipVersion() = substringAfter('-')
+fun String.clipVersion(other: String = ""): String {
+    val thisVersion = substringBefore('-')
+    val otherVersion = other.substringBefore('-')
+    return if (thisVersion != otherVersion) thisVersion else substringAfter('-')
+}
 
 inline fun <T : ComparableRvItem<*>> itemBindingOf(
     crossinline body: (ItemBinding<*>) -> Unit = {}
