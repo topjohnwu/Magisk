@@ -55,6 +55,18 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
         lama.isAutoMeasureEnabled = false
     }
 
+    override fun onPreBind(binding: FragmentHideMd2Binding) = Unit
+
+    override fun onBackPressed(): Boolean {
+        if (binding.hideFilter.isVisible) {
+            binding.hideFilterInclude.hideFilterDone.performClick()
+            return true
+        }
+        return super.onBackPressed()
+    }
+
+    // ---
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_hide_md2, menu)
     }
@@ -69,8 +81,6 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-    override fun onPreBind(binding: FragmentHideMd2Binding) = Unit
 
 }
 

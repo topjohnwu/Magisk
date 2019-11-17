@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
@@ -62,6 +63,14 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
             binding.moduleFilterInclude.moduleFilterList.removeOnScrollListener(it)
         }
         super.onDestroyView()
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (binding.moduleFilter.isVisible) {
+            binding.moduleFilterInclude.moduleFilterDone.performClick()
+            return true
+        }
+        return super.onBackPressed()
     }
 
     // ---
