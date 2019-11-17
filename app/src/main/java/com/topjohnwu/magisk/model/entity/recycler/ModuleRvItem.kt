@@ -121,10 +121,10 @@ class SectionTitle(
 }
 
 class RepoItem(val item: Repo) : ComparableRvItem<RepoItem>() {
-
     override val layoutRes: Int = R.layout.item_repo_md2
 
     val progress = KObservableField(0)
+    val isUpdate = KObservableField(false)
 
     override fun contentSameAs(other: RepoItem): Boolean = item == other.item
     override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id

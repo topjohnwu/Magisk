@@ -33,6 +33,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
+import org.jetbrains.annotations.NotNull
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -132,6 +133,10 @@ class ModuleViewModel(
             items.update(it.first, it.second)
             if (!items.contains(sectionRemote)) {
                 loadRemote()
+            } else {
+                Single.fromCallable { itemsRemote }
+                    .subscribeK { it.ensureUpdateState() }
+                    .add()
             }
             moveToState()
         }
@@ -150,10 +155,7 @@ class ModuleViewModel(
         }
         remoteJob = Single.fromCallable { itemsRemote.size }
             .flatMap { loadRemoteInternal(offset = it) }
-            .map { it.map { RepoItem(it) } }
-            .subscribeK(onError = {
-                Timber.e(it)
-            }) {
+            .subscribeK(onError = Timber::e) {
                 if (!items.contains(sectionRemote)) {
                     items.add(sectionRemote)
                 }
@@ -176,6 +178,7 @@ class ModuleViewModel(
         }
         return Single.fromCallable { dao.searchRepos(query, offset) }
             .map { it.map { RepoItem(it) } }
+            .doOnSuccess { it.ensureUpdateState() }
     }
 
     private fun query(query: String = this.query, offset: Int = 0) {
@@ -199,14 +202,17 @@ class ModuleViewModel(
     private fun loadRemoteInternal(
         offset: Int = 0,
         downloadRepos: Boolean = offset == 0
-    ): Single<List<Repo>> = Single.fromCallable { dao.getRepos(offset) }.flatMap {
-        when {
-            // in case we find result empty and offset is initial we need to refresh the repos.
-            downloadRepos && it.isEmpty() && offset == 0 -> downloadRepos()
-                .andThen(loadRemoteInternal(downloadRepos = false))
-            else -> Single.just(it)
+    ): Single<List<RepoItem>> = Single.fromCallable { dao.getRepos(offset) }
+        .map { it.map { RepoItem(it) } }
+        .flatMap {
+            when {
+                // in case we find result empty and offset is initial we need to refresh the repos.
+                downloadRepos && it.isEmpty() && offset == 0 -> downloadRepos()
+                    .andThen(loadRemoteInternal(downloadRepos = false))
+                else -> Single.just(it)
+            }
         }
-    }
+        .doOnSuccess { it.ensureUpdateState() }
 
     private fun downloadRepos() = Single.just(Unit)
         .flatMap { repoUpdater() }
@@ -227,11 +233,57 @@ class ModuleViewModel(
 
     // ---
 
+    /**
+     * Dynamically allocated list of [itemsInstalled]. It might be invalidated any time on any
+     * thread hence it needs to be volatile.
+     *
+     * There might be a state where this field gets assigned `null` whilst being used by another
+     * instance of any job, so the list will be immediately reinstated back.
+     *
+     * ### Note:
+     *
+     * It is caller's responsibility to invalidate this variable at the end of every job to save
+     * memory.
+     * */
+    @Volatile
+    private var cachedItemsInstalled: List<ModuleItem>? = null
+        @WorkerThread @NotNull get() = field ?: itemsInstalled.also { field = it }
+
+    private val Repo.isUpdatable: Boolean
+        @WorkerThread get() {
+            val installed = cachedItemsInstalled!!
+                .firstOrNull { it.item.id == id }
+                ?: return false
+            return installed.item.versionCode < versionCode
+        }
+
+    /**
+     * Asynchronously updates state of all repo items so the loading speed is not impaired by this
+     * seemingly unnecessary operation. Because of the nature of this operation, the "update" status
+     * is not guaranteed for all items and can change any time.
+     *
+     * It is permitted running this function in parallel; it will also attempt to run in parallel
+     * by itself to finish the job as quickly as possible.
+     *
+     * No list manipulations should be done in this method whatsoever! By being heavily parallelized
+     * is will inevitably throw exceptions by simultaneously accessing the same list.
+     *
+     * In order to save time it uses helper [cachedItemsInstalled].
+     * */
+    private fun List<RepoItem>.ensureUpdateState() = Single.just(this)
+        .flattenAsFlowable { it }
+        .parallel()
+        .map { it to it.item.isUpdatable }
+        .sequential()
+        .doOnComplete { cachedItemsInstalled = null }
+        .subscribeK { it.first.isUpdate.value = it.second }
+        .add()
+
+    // ---
+
     fun moveToState() = Single.fromCallable { itemsInstalled.any { it.isModified } }
         .subscribeK { sectionActive.hasButton.value = it }
         .add()
-
-    fun download(item: RepoItem) = ModuleInstallDialog(item.item).publish()
 
     fun sectionPressed(item: SectionTitle) = when (item) {
         sectionActive -> reboot() //TODO add reboot picker, regular reboot is not always preferred
@@ -252,6 +304,7 @@ class ModuleViewModel(
         else -> Unit
     }
 
+    fun downloadPressed(item: RepoItem) = ModuleInstallDialog(item.item).publish()
     fun installPressed() = InstallExternalModuleEvent().publish()
     fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
 

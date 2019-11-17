@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.R" />
+
         <variable
             name="item"
             type="com.topjohnwu.magisk.model.entity.recycler.RepoItem" />
@@ -108,11 +110,12 @@
                 android:paddingStart="@dimen/l_50"
                 isEnabled="@{!(item.progress == -100 || (item.progress > 0 &amp;&amp; item.progress &lt; 100))}"
                 android:contentDescription="@string/download"
-                android:onClick="@{() -> viewModel.download(item)}"
+                srcCompat="@{item.isUpdate() ? R.drawable.ic_update_md2 : R.drawable.ic_download_md2}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/module_divider"
-                app:srcCompat="@drawable/ic_download_md2" />
+                android:onClick="@{() -> viewModel.downloadPressed(item)}"
+                tools:srcCompat="@drawable/ic_download_md2" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
