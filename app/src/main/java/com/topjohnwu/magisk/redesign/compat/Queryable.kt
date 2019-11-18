@@ -17,10 +17,7 @@ interface Queryable {
             override val queryHandler = Handler(Looper.getMainLooper())
             override val queryRunnable = Runnable { TODO() }
 
-            override fun submitQuery() {
-                queryHandler.removeCallbacks(queryRunnable)
-                queryHandler.postDelayed(queryRunnable, queryDelay)
-            }
+            override fun submitQuery() {}
         }
     }
 }
