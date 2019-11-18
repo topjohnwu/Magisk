@@ -66,6 +66,21 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
         <item name="iconTint">?colorPrimary</item>
     </style>
 
+    <style name="WidgetFoundation.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textStyle">bold</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/l1</item>
+        <item name="strokeColor">?colorPrimary</item>
+        <item name="android:textColor">?colorPrimary</item>
+    </style>
+
+    <style name="WidgetFoundation.Button.Outlined.OnPrimary">
+        <item name="strokeColor">?colorOnPrimary</item>
+        <item name="rippleColor">?colorOnPrimary</item>
+        <item name="android:textColor">?colorOnPrimary</item>
+        <item name="iconTint">?colorOnPrimary</item>
+    </style>
+
     <style name="WidgetFoundation.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:textStyle">bold</item>
         <item name="iconGravity">textStart</item>

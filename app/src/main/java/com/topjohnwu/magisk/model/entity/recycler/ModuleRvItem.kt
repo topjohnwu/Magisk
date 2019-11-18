@@ -84,6 +84,12 @@ class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
 object InstallModule : ComparableRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download
 
+    override fun onBindingBound(binding: ViewDataBinding) {
+        super.onBindingBound(binding)
+        val params = binding.root.layoutParams as? StaggeredGridLayoutManager.LayoutParams
+        params?.isFullSpan = true
+    }
+
     override fun contentSameAs(other: InstallModule) = this == other
     override fun itemSameAs(other: InstallModule) = this === other
 }
@@ -116,8 +122,8 @@ class SectionTitle(
 
     override fun onBindingBound(binding: ViewDataBinding) {
         super.onBindingBound(binding)
-        val params = binding.root.layoutParams as StaggeredGridLayoutManager.LayoutParams
-        params.isFullSpan = true
+        val params = binding.root.layoutParams as? StaggeredGridLayoutManager.LayoutParams
+        params?.isFullSpan = true
     }
 
     override fun itemSameAs(other: SectionTitle): Boolean = this === other

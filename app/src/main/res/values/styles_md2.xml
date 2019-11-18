@@ -36,6 +36,10 @@
 
         <item name="styleButtonDefault">@style/WidgetFoundation.Button</item>
         <item name="styleButtonDefaultOnPrimary">@style/WidgetFoundation.Button.OnPrimary</item>
+        <item name="styleButtonOutlined">@style/WidgetFoundation.Button.Outlined</item>
+        <item name="styleButtonOutlinedOnPrimary">
+            @style/WidgetFoundation.Button.Outlined.OnPrimary
+        </item>
         <item name="styleButtonFlat">@style/WidgetFoundation.Button.Flat</item>
         <item name="styleButtonFlatOnPrimary">@style/WidgetFoundation.Button.Flat.OnPrimary</item>
         <item name="styleButtonText">@style/WidgetFoundation.Button.Text</item>

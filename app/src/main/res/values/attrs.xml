@@ -24,6 +24,8 @@
     <!--Button-->
     <attr name="styleButtonDefault" format="reference" />
     <attr name="styleButtonDefaultOnPrimary" format="reference" />
+    <attr name="styleButtonOutlined" format="reference" />
+    <attr name="styleButtonOutlinedOnPrimary" format="reference" />
     <attr name="styleButtonFlat" format="reference" />
     <attr name="styleButtonFlatOnPrimary" format="reference" />
     <attr name="styleButtonText" format="reference" />

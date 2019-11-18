@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -16,15 +15,15 @@
     </data>
 
     <com.google.android.material.button.MaterialButton
-        style="?styleButtonTextSecondary"
+        style="?styleButtonOutlined"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="@{() -> viewModel.installPressed()}"
         android:text="@string/module_action_install_external"
         android:textAllCaps="false"
         android:textSize="12sp"
+        app:cornerRadius="@dimen/r1"
         app:icon="@drawable/ic_module_storage_md2"
-        app:iconPadding="@dimen/l_50"
-        tools:layout_width="150dp" />
+        app:iconPadding="@dimen/l_50" />
 
 </layout>
