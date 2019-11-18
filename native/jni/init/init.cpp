@@ -31,31 +31,44 @@ constexpr int (*init_applet_main[])(int, char *[]) =
 
 #ifdef MAGISK_DEBUG
 static FILE *kmsg;
+static char kmsg_buf[4096];
 static int vprintk(const char *fmt, va_list ap) {
-	fprintf(kmsg, "magiskinit: ");
-	return vfprintf(kmsg, fmt, ap);
+	vsnprintf(kmsg_buf + 12, sizeof(kmsg_buf) - 12, fmt, ap);
+	return fprintf(kmsg, "%s", kmsg_buf);
 }
-static void setup_klog() {
-	mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
-	int fd = xopen("/kmsg", O_WRONLY | O_CLOEXEC);
-	kmsg = fdopen(fd, "w");
-	setbuf(kmsg, nullptr);
-	unlink("/kmsg");
-	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
-	log_cb.ex = nop_ex;
-
-	// Prevent file descriptor confusion
-	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
-	int null = xopen("/null", O_RDWR | O_CLOEXEC);
-	unlink("/null");
+void setup_klog() {
+	// Shut down first 3 fds
+	int null;
+	if (access("/dev/null", W_OK) == 0) {
+		null = xopen("/dev/null", O_RDWR | O_CLOEXEC);
+	} else {
+		mknod("/null", S_IFCHR | 0666, makedev(1, 3));
+		null = xopen("/null", O_RDWR | O_CLOEXEC);
+		unlink("/null");
+	}
 	xdup3(null, STDIN_FILENO, O_CLOEXEC);
 	xdup3(null, STDOUT_FILENO, O_CLOEXEC);
 	xdup3(null, STDERR_FILENO, O_CLOEXEC);
 	if (null > STDERR_FILENO)
 		close(null);
+
+	int fd;
+	if (access("/proc/kmsg", W_OK) == 0) {
+		fd = xopen("/proc/kmsg", O_WRONLY | O_CLOEXEC);
+	} else {
+		mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
+		fd = xopen("/kmsg", O_WRONLY | O_CLOEXEC);
+		unlink("/kmsg");
+	}
+
+	kmsg = fdopen(fd, "w");
+	setbuf(kmsg, nullptr);
+	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
+	log_cb.ex = nop_ex;
+	strcpy(kmsg_buf, "magiskinit: ");
 }
 #else
-#define setup_klog(...)
+void setup_klog() {}
 #endif
 
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
@@ -131,13 +144,11 @@ public:
 	}
 };
 
-class TestInit : public SARInit {
+class TestInit : public BaseInit {
 public:
-	TestInit(char *argv[], cmdline *cmd) : SARInit(argv, cmd) {};
+	TestInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 	void start() override {
-		early_mount();
-		patch_rootdir();
-		cleanup();
+		// Write init tests here
 	}
 };
 

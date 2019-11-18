@@ -8,7 +8,6 @@
 #include <utils.h>
 
 #include "init.h"
-#include "flags.h"
 #include "magiskrc.h"
 
 #ifdef USE_64BIT
@@ -465,23 +464,6 @@ void AFirstStageInit::prepare() {
 	rename("/init", "/system/bin/init");
 	rename("/.backup/init", "/init");
 }
-
-#ifdef MAGISK_DEBUG
-static FILE *kmsg;
-static int vprintk(const char *fmt, va_list ap) {
-	fprintf(kmsg, "magiskinit: ");
-	return vfprintf(kmsg, fmt, ap);
-}
-static void setup_klog() {
-	int fd = xopen("/proc/kmsg", O_WRONLY | O_CLOEXEC);
-	kmsg = fdopen(fd, "w");
-	setbuf(kmsg, nullptr);
-	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
-	log_cb.ex = nop_ex;
-}
-#else
-#define setup_klog(...)
-#endif
 
 int magisk_proxy_main(int argc, char *argv[]) {
 	setup_klog();
