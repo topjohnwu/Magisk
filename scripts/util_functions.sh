@@ -323,9 +323,6 @@ patch_boot_image() {
     $DATA && mv stock_boot* /data
   fi
 
-  # Patch DTBO together with boot image
-  $KEEPVERITY || patch_dtbo_image
-
   if [ -f stock_dtbo* ]; then
     rm -f /data/stock_dtbo* 2>/dev/null
     $DATA && mv stock_dtbo* /data

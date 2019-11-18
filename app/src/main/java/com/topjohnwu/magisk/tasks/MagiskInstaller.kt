@@ -287,8 +287,6 @@ abstract class MagiskInstaller {
     protected fun flashBoot(): Boolean {
         if (!"direct_install $installDir $srcBoot".sh().isSuccess)
             return false
-        if (!Info.keepVerity)
-            "patch_dtbo_image".sh()
         return true
     }
 

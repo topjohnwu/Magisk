@@ -157,7 +157,7 @@ rm -f ramdisk.cpio.orig config
 # Binary patches
 ##########################################################################################
 
-for dt in dtb kernel_dtb extra recovery_dtbo; do
+for dt in dtb kernel_dtb extra; do
   [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Patching fstab in $dt"
 done
 

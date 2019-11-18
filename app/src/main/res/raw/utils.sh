@@ -44,7 +44,7 @@ direct_install() {
 }
 
 mm_patch_dtbo() {
-  $KEEPVERITY && return 1 || patch_dtbo_image
+  $KEEPVERITY && return 1
 }
 
 restore_imgs() {
