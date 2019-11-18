@@ -95,20 +95,24 @@ class SectionTitle(
 ) : ObservableItem<SectionTitle>() {
     override val layoutRes = R.layout.item_section_md2
 
-    @Bindable
     var button = _button
+        @Bindable get
         set(value) {
             field = value
             notifyChange(BR.button)
         }
-    @Bindable
     var icon = _icon
+        @Bindable get
         set(value) {
             field = value
             notifyChange(BR.icon)
         }
-
-    val hasButton = KObservableField(button != 0 || icon != 0)
+    var hasButton = button != 0 || icon != 0
+        @Bindable get
+        set(value) {
+            field = value
+            notifyChange(BR.hasButton)
+        }
 
     override fun onBindingBound(binding: ViewDataBinding) {
         super.onBindingBound(binding)
@@ -120,14 +124,27 @@ class SectionTitle(
     override fun contentSameAs(other: SectionTitle): Boolean = this === other
 }
 
-class RepoItem(val item: Repo) : ComparableRvItem<RepoItem>() {
+sealed class RepoItem(val item: Repo) : ObservableItem<RepoItem>() {
     override val layoutRes: Int = R.layout.item_repo_md2
 
     val progress = KObservableField(0)
-    val isUpdate = KObservableField(false)
+    var isUpdate = false
+        @Bindable get
+        protected set(value) {
+            field = value
+            notifyChange(BR.update)
+        }
 
     override fun contentSameAs(other: RepoItem): Boolean = item == other.item
     override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id
+
+    class Update(item: Repo) : RepoItem(item) {
+        init {
+            isUpdate = true
+        }
+    }
+
+    class Remote(item: Repo) : RepoItem(item)
 }
 
 class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
@@ -158,7 +175,7 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
 
     fun delete(viewModel: ModuleViewModel) {
         isRemoved = !isRemoved
-        viewModel.moveToState()
+        viewModel.updateActiveState()
     }
 
     override fun contentSameAs(other: ModuleItem): Boolean = item.version == other.item.version

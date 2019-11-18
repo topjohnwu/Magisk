@@ -33,7 +33,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
-import org.jetbrains.annotations.NotNull
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -70,13 +69,23 @@ class ModuleViewModel(
     }
 
     companion object {
-        private val sectionRemote =
-            SectionTitle(R.string.module_section_remote, R.string.sorting_order)
+        private val sectionRemote = SectionTitle(
+            R.string.module_section_remote,
+            R.string.sorting_order
+        )
+
+        private val sectionUpdate = SectionTitle(
+            R.string.module_section_pending,
+            R.string.module_section_pending_action,
+            R.drawable.ic_update_md2
+            // enable with implementation of https://github.com/topjohnwu/Magisk/issues/2036
+        ).also { it.hasButton = false }
+
         private val sectionActive = SectionTitle(
             R.string.module_section_installed,
             R.string.reboot,
             R.drawable.ic_restart
-        ).also { it.hasButton.value = false }
+        ).also { it.hasButton = false }
 
         init {
             updateOrderIcon()
@@ -94,11 +103,13 @@ class ModuleViewModel(
     // ---
 
     private val itemsInstalled
-        @WorkerThread get() = items.asSequence()
-            .filterIsInstance<ModuleItem>()
-            .toList()
+        @WorkerThread get() = items.filterIsInstance<ModuleItem>()
+
+    private val itemsUpdatable: List<RepoItem>
+        @WorkerThread get() = items.filterIsInstance<RepoItem.Update>()
+
     private val itemsRemote
-        @WorkerThread get() = items.filterIsInstance<RepoItem>()
+        @WorkerThread get() = items.filterIsInstance<RepoItem.Remote>()
 
     private var remoteJob: Disposable? = null
     private val dao
@@ -126,19 +137,15 @@ class ModuleViewModel(
     override fun refresh() = Single.fromCallable { Module.loadModules() }
         .map { it.map { ModuleItem(it) } }
         .map { it.order() }
-        .map { build(active = it) }
+        .map { build(active = it, updatable = loadUpdates(it)) }
         .map { it to items.calculateDiff(it) }
         .applyViewModel(this)
         .subscribeK {
             items.update(it.first, it.second)
             if (!items.contains(sectionRemote)) {
                 loadRemote()
-            } else {
-                Single.fromCallable { itemsRemote }
-                    .subscribeK { it.ensureUpdateState() }
-                    .add()
             }
-            moveToState()
+            updateActiveState()
         }
 
     fun loadRemoteImplicit() = let { items.clear(); itemsSearch.clear() }
@@ -181,8 +188,7 @@ class ModuleViewModel(
                 .subscribeOn(AndroidSchedulers.mainThread())
         }
         return Single.fromCallable { dao.searchRepos(query, offset) }
-            .map { it.map { RepoItem(it) } }
-            .doOnSuccess { it.ensureUpdateState() }
+            .map { it.map { RepoItem.Remote(it) } }
     }
 
     private fun query(query: String = this.query, offset: Int = 0) {
@@ -207,7 +213,7 @@ class ModuleViewModel(
         offset: Int = 0,
         downloadRepos: Boolean = offset == 0
     ): Single<List<RepoItem>> = Single.fromCallable { dao.getRepos(offset) }
-        .map { it.map { RepoItem(it) } }
+        .map { it.map { RepoItem.Remote(it) } }
         .flatMap {
             when {
                 // in case we find result empty and offset is initial we need to refresh the repos.
@@ -216,7 +222,6 @@ class ModuleViewModel(
                 else -> Single.just(it)
             }
         }
-        .doOnSuccess { it.ensureUpdateState() }
 
     private fun downloadRepos() = Single.just(Unit)
         .flatMap { repoUpdater() }
@@ -237,56 +242,15 @@ class ModuleViewModel(
 
     // ---
 
-    /**
-     * Dynamically allocated list of [itemsInstalled]. It might be invalidated any time on any
-     * thread hence it needs to be volatile.
-     *
-     * There might be a state where this field gets assigned `null` whilst being used by another
-     * instance of any job, so the list will be immediately reinstated back.
-     *
-     * ### Note:
-     *
-     * It is caller's responsibility to invalidate this variable at the end of every job to save
-     * memory.
-     * */
-    @Volatile
-    private var cachedItemsInstalled: List<ModuleItem>? = null
-        @WorkerThread @NotNull get() = field ?: itemsInstalled.also { field = it }
-
-    private val Repo.isUpdatable: Boolean
-        @WorkerThread get() {
-            val installed = cachedItemsInstalled!!
-                .firstOrNull { it.item.id == id }
-                ?: return false
-            return installed.item.versionCode < versionCode
-        }
-
-    /**
-     * Asynchronously updates state of all repo items so the loading speed is not impaired by this
-     * seemingly unnecessary operation. Because of the nature of this operation, the "update" status
-     * is not guaranteed for all items and can change any time.
-     *
-     * It is permitted running this function in parallel; it will also attempt to run in parallel
-     * by itself to finish the job as quickly as possible.
-     *
-     * No list manipulations should be done in this method whatsoever! By being heavily parallelized
-     * is will inevitably throw exceptions by simultaneously accessing the same list.
-     *
-     * In order to save time it uses helper [cachedItemsInstalled].
-     * */
-    private fun List<RepoItem>.ensureUpdateState() = Single.just(this)
-        .flattenAsFlowable { it }
-        .parallel()
-        .map { it to it.item.isUpdatable }
-        .sequential()
-        .doOnComplete { cachedItemsInstalled = null }
-        .subscribeK { it.first.isUpdate.value = it.second }
-        .add()
+    @WorkerThread
+    private fun loadUpdates(installed: List<ModuleItem>) = installed
+        .mapNotNull { dao.getUpdatableRepoById(it.item.id, it.item.versionCode) }
+        .map { RepoItem.Update(it) }
 
     // ---
 
-    fun moveToState() = Single.fromCallable { itemsInstalled.any { it.isModified } }
-        .subscribeK { sectionActive.hasButton.value = it }
+    fun updateActiveState() = Single.fromCallable { itemsInstalled.any { it.isModified } }
+        .subscribeK { sectionActive.hasButton = it }
         .add()
 
     fun sectionPressed(item: SectionTitle) = when (item) {
@@ -318,8 +282,10 @@ class ModuleViewModel(
     @WorkerThread
     private fun build(
         active: List<ModuleItem> = itemsInstalled,
+        updatable: List<RepoItem> = itemsUpdatable,
         remote: List<RepoItem> = itemsRemote
     ) = (active + InstallModule).prependIfNotEmpty { sectionActive } +
+            updatable.prependIfNotEmpty { sectionUpdate } +
             remote.prependIfNotEmpty { sectionRemote }
 
     private fun <T> List<T>.prependIfNotEmpty(item: () -> T) =
