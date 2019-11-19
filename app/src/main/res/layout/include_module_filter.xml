@@ -103,7 +103,7 @@
                 android:singleLine="true"
                 android:text="@={viewModel.query}"
                 android:textAppearance="?appearanceTextBodyNormal"
-                android:textColor="?colorTextTransient"
+                android:textColor="@color/color_text_transient"
                 android:textColorHint="?colorOnSurfaceVariant" />
 
         </com.google.android.material.card.MaterialCardView>

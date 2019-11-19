@@ -41,7 +41,7 @@
             app:layout_constraintStart_toEndOf="@+id/developer_link"
             app:layout_constraintTop_toTopOf="@+id/developer_link"
             app:srcCompat="@drawable/ic_more"
-            app:tint="?colorTextTransient" />
+            app:tint="@color/color_text_transient" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

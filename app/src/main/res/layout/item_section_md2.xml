@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:text="@{item.title}"
             android:textAppearance="?appearanceTextBodyNormal"
-            android:textColor="?colorPrimaryTransient"
+            android:textColor="@color/color_primary_transient"
             android:textStyle="bold"
             tools:text="@tools:sample/lorem/random"
             app:layout_constraintBottom_toBottomOf="parent"

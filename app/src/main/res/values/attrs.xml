@@ -87,12 +87,6 @@
 
     <!--region Colors-->
 
-    <!--Transient-->
-    <attr name="colorTextTransient" format="reference" />
-    <attr name="colorPrimaryTransient" format="reference" />
-    <attr name="colorOnPrimaryTransient" format="reference" />
-    <attr name="colorErrorTransient" format="reference" />
-
     <!--Static-->
     <attr name="colorDisabled" format="color" />
     <attr name="colorDisabledVariant" format="color" />

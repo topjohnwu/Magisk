@@ -137,19 +137,19 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
     <style name="WidgetFoundation.Icon" parent="WidgetFoundation.Image.Big">
         <item name="android:padding">@dimen/l_75</item>
         <item name="android:background">?selectableItemBackgroundBorderless</item>
-        <item name="tint">?colorTextTransient</item>
+        <item name="tint">@color/color_text_transient</item>
     </style>
 
     <style name="WidgetFoundation.Icon.Primary">
-        <item name="tint">?colorPrimaryTransient</item>
+        <item name="tint">@color/color_primary_transient</item>
     </style>
 
     <style name="WidgetFoundation.Icon.OnPrimary">
-        <item name="tint">?colorOnPrimaryTransient</item>
+        <item name="tint">@color/color_on_primary_transient</item>
     </style>
 
     <style name="WidgetFoundation.Icon.Error">
-        <item name="tint">?colorErrorTransient</item>
+        <item name="tint">@color/color_error_transient</item>
     </style>
 
     <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">

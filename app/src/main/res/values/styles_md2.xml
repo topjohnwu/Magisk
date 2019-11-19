@@ -103,28 +103,9 @@
     </style>
 
     <style name="Foundation.Default" parent="Foundation.Base">
-        <item name="android:theme">@style/Theme.Rayquaza</item>
-        <item name="colorPrimary">#2196F3</item>
-        <item name="colorPrimaryVariant">#802196F3</item>
-        <item name="colorSecondary">#1766A6</item>
-        <item name="colorSecondaryVariant">#801766A6</item>
-        <item name="colorSurface">#F2F2F2</item>
-        <item name="colorSurfaceVariant">#E8E8E8</item>
-        <item name="colorSurfaceSurfaceVariant">?colorSurface</item>
-        <item name="colorOnPrimary">#F2F2F2</item>
-        <item name="colorOnPrimaryVariant">#D9E6E6E6</item>
-        <item name="colorOnSecondary">#F2F2F2</item>
-        <item name="colorOnBackground">#F2F2F2</item>
-        <item name="colorError">#CC0047</item>
-        <item name="colorOnError">#F2F2F2</item>
-        <item name="colorOnSurface">#444444</item>
-        <item name="colorOnSurfaceVariant">#80444444</item>
-        <item name="colorDisabled">#808080</item>
-        <item name="colorDisabledVariant">#66808080</item>
-        <item name="colorTextTransient">@color/color_text_transient</item>
-        <item name="colorPrimaryTransient">@color/color_primary_transient</item>
-        <item name="colorErrorTransient">@color/color_error_transient</item>
-        <item name="colorOnPrimaryTransient">@color/color_on_primary_transient</item>
+        <item name="android:theme">@style/ThemeFoundationMD2.Default</item>
+        <!--setting window background to transparent should reduce overdraw-->
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
 </resources>

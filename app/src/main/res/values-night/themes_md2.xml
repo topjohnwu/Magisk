@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Foundation.Default" parent="Foundation.Base">
+    <style name="ThemeFoundationMD2.Default">
         <item name="colorPrimary">#2196F3</item>
         <item name="colorPrimaryVariant">#802196F3</item>
         <item name="colorSecondary">#63B9FF</item>
@@ -19,10 +19,6 @@
         <item name="colorOnSurfaceVariant">#80BABABA</item>
         <item name="colorDisabled">#808080</item>
         <item name="colorDisabledVariant">#66808080</item>
-        <item name="colorTextTransient">@color/color_text_transient</item>
-        <item name="colorPrimaryTransient">@color/color_primary_transient</item>
-        <item name="colorErrorTransient">@color/color_error_transient</item>
-        <item name="colorOnPrimaryTransient">@color/color_on_primary_transient</item>
     </style>
 
 </resources>

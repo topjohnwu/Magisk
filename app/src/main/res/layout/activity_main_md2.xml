@@ -14,6 +14,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?colorSurface"
         android:orientation="vertical"
         android:paddingLeft="@{viewModel.insets.left}"
         android:paddingRight="@{viewModel.insets.right}"
