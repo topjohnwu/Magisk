@@ -8,8 +8,6 @@
 
 #define ALL NULL
 
-__BEGIN_DECLS
-
 // policydb functions
 int load_policydb(const char *file);
 int load_split_cil();
@@ -37,5 +35,3 @@ int sepol_exists(const char *source);
 
 // Built in rules
 void sepol_magisk_rules();
-
-__END_DECLS

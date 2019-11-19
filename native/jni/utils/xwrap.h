@@ -1,11 +1,9 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 FILE *xfopen(const char *pathname, const char *mode);
 FILE *xfdopen(int fd, const char *mode);
+int xopen(const char *pathname, int flags);
+int xopen(const char *pathname, int flags, mode_t mode);
 int xopenat(int dirfd, const char *pathname, int flags);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t xread(int fd, void *buf, size_t count);
@@ -22,9 +20,9 @@ int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int xconnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int xlisten(int sockfd, int backlog);
 int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags);
-void *xmalloc(size_t size);
-void *xcalloc(size_t nmemb, size_t size);
-void *xrealloc(void *ptr, size_t size);
+extern "C" void *xmalloc(size_t size);
+extern "C" void *xcalloc(size_t nmemb, size_t size);
+extern "C" void *xrealloc(void *ptr, size_t size);
 ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
 ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
 int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
@@ -53,12 +51,4 @@ ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
 int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 int xinotify_init1(int flags);
-
-#ifdef __cplusplus
-}
-
-int xopen(const char *pathname, int flags);
-int xopen(const char *pathname, int flags, mode_t mode);
-
-#endif
 

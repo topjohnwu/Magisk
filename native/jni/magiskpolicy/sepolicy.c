@@ -1,12 +1,13 @@
 #include <stdlib.h>
 #include <sepol/policydb/expand.h>
 
-#include <utils.h>
 #include <logging.h>
 
-#include "magiskpolicy.h"
 #include "sepolicy.h"
 
+extern void *xmalloc(size_t size);
+extern void *xcalloc(size_t nmemb, size_t size);
+extern void *xrealloc(void *ptr, size_t size);
 extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
 
 static int get_attr(const char *type, int value) {
@@ -39,9 +40,9 @@ static int set_attr(const char *type, int value) {
 	if (attr->flavor != TYPE_ATTRIB)
 		return 1;
 
-	if(ebitmap_set_bit(&policydb->type_attr_map[value-1], attr->s.value-1, 1))
+	if(ebitmap_set_bit(&policydb->type_attr_map[value - 1], attr->s.value - 1, 1))
 		return 1;
-	if(ebitmap_set_bit(&policydb->attr_type_map[attr->s.value-1], value-1, 1))
+	if(ebitmap_set_bit(&policydb->attr_type_map[attr->s.value - 1], value - 1, 1))
 		return 1;
 
 	return 0;
@@ -223,7 +224,7 @@ int create_domain(const char *d) {
 		return 0;
 	}
 
-	type_datum_t *typedatum = (type_datum_t *) malloc(sizeof(type_datum_t));
+	type_datum_t *typedatum = (type_datum_t *) xmalloc(sizeof(type_datum_t));
 	type_datum_init(typedatum);
 	typedatum->primary = 1;
 	typedatum->flavor = TYPE_TYPE;
@@ -236,8 +237,8 @@ int create_domain(const char *d) {
 		return 1;
 	}
 
-	policydb->type_attr_map = realloc(policydb->type_attr_map, sizeof(ebitmap_t) * policydb->p_types.nprim);
-	policydb->attr_type_map = realloc(policydb->attr_type_map, sizeof(ebitmap_t) * policydb->p_types.nprim);
+	policydb->type_attr_map = xrealloc(policydb->type_attr_map, sizeof(ebitmap_t) * policydb->p_types.nprim);
+	policydb->attr_type_map = xrealloc(policydb->attr_type_map, sizeof(ebitmap_t) * policydb->p_types.nprim);
 	ebitmap_init(&policydb->type_attr_map[value-1]);
 	ebitmap_init(&policydb->attr_type_map[value-1]);
 	ebitmap_set_bit(&policydb->type_attr_map[value-1], value-1, 1);
@@ -292,7 +293,7 @@ int set_domain_state(const char *s, int state) {
 	return 0;
 }
 
-int sepol_nametrans(const char *s, const char *t, const char *c, const char *d, const char *o) {
+int add_filename_trans(const char *s, const char *t, const char *c, const char *d, const char *o) {
 	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
@@ -350,12 +351,12 @@ int add_typeattribute(const char *domainS, const char *attr) {
 	int typeId = get_attr_id(attr);
 	//Now let's update all constraints!
 	//(kernel doesn't support (yet?) type_names rules)
-	for(int i=0; i<policydb->p_classes.nprim; ++i) {
+	for(int i = 0; i < policydb->p_classes.nprim; ++i) {
 		class_datum_t *cl = policydb->class_val_to_struct[i];
 		for(constraint_node_t *n = cl->constraints; n ; n=n->next) {
-			for(constraint_expr_t *e = n->expr; e; e=e->next) {
+			for(constraint_expr_t *e = n->expr; e; e = e->next) {
 				if(e->expr_type == CEXPR_NAMES) {
-					if(ebitmap_get_bit(&e->type_names->types, typeId-1)) {
+					if(ebitmap_get_bit(&e->type_names->types, typeId - 1)) {
 						ebitmap_set_bit(&e->names, domain->s.value-1, 1);
 					}
 				}

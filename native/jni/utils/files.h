@@ -1,5 +1,8 @@
 #pragma once
 
+#include <functional>
+#include <string_view>
+
 #define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (do_align(p, a) - (p))
 
@@ -7,10 +10,6 @@ struct file_attr {
 	struct stat st;
 	char con[128];
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 ssize_t fd_path(int fd, char *path, size_t size);
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
@@ -31,12 +30,6 @@ void clone_attr(const char *source, const char *target);
 void fd_full_read(int fd, void **buf, size_t *size);
 void full_read(const char *filename, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
-
-#ifdef __cplusplus
-}
-
-#include <functional>
-#include <string_view>
 
 void file_readline(const char *file, const std::function<bool (std::string_view)> &fn, bool trim = false);
 void parse_prop_file(const char *file, const std::function
@@ -81,5 +74,3 @@ void mmap_rw(const char *filename, B &buf, L &sz) {
 	buf = (B) __mmap(filename, &__sz, true);
 	sz = __sz;
 }
-
-#endif

@@ -19,8 +19,6 @@
 #define endmntent     __endmntent
 #define hasmntopt     __hasmntopt
 
-__BEGIN_DECLS
-
 ssize_t __getline(char **lineptr, size_t *n, FILE *stream);
 ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 struct mntent *__getmntent_r(FILE* fp, struct mntent* e, char* buf, int buf_len);
@@ -60,5 +58,3 @@ static inline int __linkat(int olddirfd, const char *oldpath,
 static inline int __inotify_init1(int flags) {
 	return syscall(__NR_inotify_init1, flags);
 }
-
-__END_DECLS

@@ -1,30 +1,11 @@
 #pragma once
 
-#define UID_ROOT   0
-#define UID_SHELL  2000
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int fork_dont_care();
-int fork_no_zombie();
-int strend(const char *s1, const char *s2);
-char *rtrim(char *str);
-void init_argv0(int argc, char **argv);
-void set_nice_name(const char *name);
-int parse_int(const char *s);
-uint32_t binary_gcd(uint32_t u, uint32_t v);
-int switch_mnt_ns(int pid);
-
-#ifdef __cplusplus
-}
-
 #include <string>
 #include <functional>
 #include <string_view>
 
-void gen_rand_str(char *buf, int len, bool varlen = true);
+#define UID_ROOT   0
+#define UID_SHELL  2000
 
 #define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != std::string::npos)
 #define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)
@@ -78,8 +59,8 @@ reversed_container<T> reversed(T &base) {
 	return reversed_container<T>(base);
 }
 
+int parse_int(const char *s);
 static inline int parse_int(std::string s) { return parse_int(s.data()); }
-
 static inline int parse_int(std::string_view s) { return parse_int(s.data()); }
 
 int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
@@ -115,5 +96,12 @@ int exec_command_sync(Args &&...args) {
 }
 
 bool ends_with(const std::string_view &s1, const std::string_view &s2);
-
-#endif
+int fork_dont_care();
+int fork_no_zombie();
+int strend(const char *s1, const char *s2);
+char *rtrim(char *str);
+void init_argv0(int argc, char **argv);
+void set_nice_name(const char *name);
+uint32_t binary_gcd(uint32_t u, uint32_t v);
+int switch_mnt_ns(int pid);
+void gen_rand_str(char *buf, int len, bool varlen = true);

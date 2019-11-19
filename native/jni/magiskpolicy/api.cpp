@@ -51,6 +51,11 @@ int sepol_typemember(const char *s, const char *t, const char *c, const char *d)
 	return add_type_rule(s, t, c, d, AVTAB_MEMBER);
 }
 
+int sepol_nametrans(const char *s, const char *t, const char *c, const char *d, const char *o) {
+	// printf("name_trans %s %s %s %s %s\n", s, t, c, d, o);
+	return add_filename_trans(s, t, c, d, o);
+}
+
 int sepol_permissive(const char *s) {
 	// printf("permissive %s\n", s);
 	return set_domain_state(s, 1);
