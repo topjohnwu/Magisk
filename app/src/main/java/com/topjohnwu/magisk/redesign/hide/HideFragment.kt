@@ -17,6 +17,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.circularreveal.CircularRevealCompat
 import com.google.android.material.circularreveal.CircularRevealWidget
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -50,6 +51,11 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
             hideKeyboard()
             MotionRevealHelper.withViews(binding.hideFilter, binding.hideFilterToggle, false)
         }
+        binding.hideContent.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
+            }
+        })
 
         val lama = binding.hideContent.layoutManager ?: return
         lama.isAutoMeasureEnabled = false

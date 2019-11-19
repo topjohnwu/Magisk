@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
@@ -55,6 +56,12 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
             hideKeyboard()
             MotionRevealHelper.withViews(binding.moduleFilter, binding.moduleFilterToggle, false)
         }
+        binding.moduleFilterInclude.moduleFilterList.addOnScrollListener(object :
+            RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
+            }
+        })
     }
 
     override fun onDestroyView() {

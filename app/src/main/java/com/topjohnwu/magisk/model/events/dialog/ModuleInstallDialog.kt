@@ -22,10 +22,12 @@ class ModuleInstallDialog(private val item: Repo) : DialogEvent() {
                 .cancellable(true)
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) {
                     titleRes = R.string.install
+                    icon = R.drawable.ic_install
                     onClick { download(true) }
                 }
                 .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
                     titleRes = R.string.download
+                    icon = R.drawable.ic_download_md2
                     onClick { download(false) }
                 }
                 .reveal()
