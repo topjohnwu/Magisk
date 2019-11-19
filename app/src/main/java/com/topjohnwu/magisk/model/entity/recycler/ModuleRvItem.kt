@@ -81,6 +81,19 @@ class RepoRvItem(val item: Repo) : ComparableRvItem<RepoRvItem>() {
     override fun itemSameAs(other: RepoRvItem): Boolean = item.id == other.item.id
 }
 
+object SafeModeNotice : ComparableRvItem<SafeModeNotice>() {
+    override val layoutRes = R.layout.item_safe_mode_notice
+
+    override fun onBindingBound(binding: ViewDataBinding) {
+        super.onBindingBound(binding)
+        val params = binding.root.layoutParams as? StaggeredGridLayoutManager.LayoutParams
+        params?.isFullSpan = true
+    }
+
+    override fun contentSameAs(other: SafeModeNotice) = this == other
+    override fun itemSameAs(other: SafeModeNotice) = this === other
+}
+
 object InstallModule : ComparableRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download
 

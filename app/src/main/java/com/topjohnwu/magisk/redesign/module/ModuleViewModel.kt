@@ -15,10 +15,7 @@ import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.module.Repo
-import com.topjohnwu.magisk.model.entity.recycler.InstallModule
-import com.topjohnwu.magisk.model.entity.recycler.ModuleItem
-import com.topjohnwu.magisk.model.entity.recycler.RepoItem
-import com.topjohnwu.magisk.model.entity.recycler.SectionTitle
+import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
@@ -284,12 +281,17 @@ class ModuleViewModel(
         active: List<ModuleItem> = itemsInstalled,
         updatable: List<RepoItem.Update> = itemsUpdatable,
         remote: List<RepoItem.Remote> = itemsRemote
-    ) = (active + InstallModule).prependIfNotEmpty { sectionActive } +
+    ) = (active + InstallModule)
+        .prependIfNotEmpty { sectionActive }
+        .prependIf(Config.coreOnly) { SafeModeNotice } +
             updatable.prependIfNotEmpty { sectionUpdate } +
             remote.prependIfNotEmpty { sectionRemote }
 
+    private fun <T> List<T>.prependIf(condition: Boolean, item: () -> T) =
+        if (condition) listOf(item()) + this else this
+
     private fun <T> List<T>.prependIfNotEmpty(item: () -> T) =
-        if (isNotEmpty()) listOf(item()) + this else this
+        prependIf(isNotEmpty(), item)
 
 }
 
