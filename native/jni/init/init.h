@@ -1,6 +1,7 @@
 #include <sys/mount.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <vector>
 
 struct cmdline {
 	bool system_as_root;
@@ -34,19 +35,17 @@ class BaseInit {
 protected:
 	cmdline *cmd;
 	char **argv;
+	std::vector<std::string> mount_list;
 
 	void exec_init(const char *init = "/init") {
 		cleanup();
 		execv(init, argv);
 		exit(1);
 	}
-	virtual void cleanup() {
-		umount("/sys");
-		umount("/proc");
-		umount("/dev");
-	}
+	virtual void cleanup();
 public:
-	BaseInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv) {}
+	BaseInit(char *argv[], cmdline *cmd) :
+	cmd(cmd), argv(argv), mount_list{"/sys", "/proc", "/dev"} {}
 	virtual ~BaseInit() = default;
 	virtual void start() = 0;
 };
@@ -54,15 +53,10 @@ public:
 class MagiskInit : public BaseInit {
 protected:
 	raw_data self;
-	bool mnt_system = false;
-	bool mnt_vendor = false;
-	bool mnt_product = false;
-	bool mnt_odm = false;
 
 	virtual void early_mount() = 0;
 	bool read_dt_fstab(const char *name, char *partname, char *fstype);
 	bool patch_sepolicy(const char *file = "/sepolicy");
-	void cleanup() override;
 public:
 	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 };

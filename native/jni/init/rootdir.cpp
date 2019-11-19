@@ -167,6 +167,7 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 
 	// Mount selinuxfs to communicate with kernel
 	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+	mount_list.emplace_back(SELINUX_MNT);
 
 	if (patch_init)
 		load_split_cil();
@@ -230,7 +231,7 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 #define PATCHPOLICY "/sbin/.se"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 
-static string mount_list;
+static string magic_mount_list;
 
 static void magic_mount(int dirfd, const string &path) {
 	DIR *dir = xfdopendir(dirfd);
@@ -248,8 +249,8 @@ static void magic_mount(int dirfd, const string &path) {
 				string src = ROOTOVL + dest;
 				LOGD("Mount [%s] -> [%s]\n", src.data(), dest.data());
 				xmount(src.data(), dest.data(), nullptr, MS_BIND, nullptr);
-				mount_list += dest;
-				mount_list += '\n';
+				magic_mount_list += dest;
+				magic_mount_list += '\n';
 			}
 		}
 	}
@@ -379,7 +380,7 @@ void SARBase::patch_rootdir() {
 	magic_mount(src, "");
 	close(src);
 	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
-	write(dest, mount_list.data(), mount_list.length());
+	write(dest, magic_mount_list.data(), magic_mount_list.length());
 	close(dest);
 }
 
