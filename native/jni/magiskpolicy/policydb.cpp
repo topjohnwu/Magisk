@@ -11,10 +11,8 @@
 #include "magiskpolicy.h"
 #include "sepolicy.h"
 
-policydb_t *policydb = nullptr;
-
 int load_policydb(const char *file) {
-	if (policydb)
+	if (magisk_policydb)
 		destroy_policydb();
 
 	struct policy_file pf;
@@ -22,8 +20,8 @@ int load_policydb(const char *file) {
 	pf.fp = xfopen(file, "re");
 	pf.type = PF_USE_STDIO;
 
-	policydb = new policydb_t();
-	if (policydb_init(policydb) || policydb_read(policydb, &pf, 0))
+	magisk_policydb = static_cast<policydb_t *>(xmalloc(sizeof(policydb_t)));
+	if (policydb_init(magisk_policydb) || policydb_read(magisk_policydb, &pf, 0))
 		return 1;
 
 	fclose(pf.fp);
@@ -169,7 +167,7 @@ int compile_split_cil() {
 		return 1;
 
 	cil_db_destroy(&db);
-	policydb = &pdb->p;
+	magisk_policydb = &pdb->p;
 	return 0;
 }
 
@@ -177,7 +175,7 @@ int dump_policydb(const char *file) {
 	int fd, ret;
 	void *data = nullptr;
 	size_t len;
-	policydb_to_image(nullptr, policydb, &data, &len);
+	policydb_to_image(nullptr, magisk_policydb, &data, &len);
 	if (data == nullptr) {
 		LOGE("Fail to dump policy image!\n");
 		return 1;
@@ -194,9 +192,9 @@ int dump_policydb(const char *file) {
 }
 
 void destroy_policydb() {
-	if (policydb) {
-		policydb_destroy(policydb);
-		delete policydb;
-		policydb = nullptr;
+	if (magisk_policydb) {
+		policydb_destroy(magisk_policydb);
+		free(magisk_policydb);
+		magisk_policydb = nullptr;
 	}
 }

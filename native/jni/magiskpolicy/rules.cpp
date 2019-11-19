@@ -21,7 +21,7 @@ static void allowSuClient(const char *target) {
 	sepol_allow(target, "untrusted_app_devpts", "chr_file", "ioctl");
 	sepol_allow(target, "untrusted_app_25_devpts", "chr_file", "ioctl");
 	sepol_allow(target, "untrusted_app_all_devpts", "chr_file", "ioctl");
-	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
+	if (magisk_policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
 		sepol_allowxperm(target, "devpts", "chr_file", "0x5400-0x54FF");
 		sepol_allowxperm(target, "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
 		sepol_allowxperm(target, "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
@@ -166,7 +166,7 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
 
 	// Allow us to do any ioctl on all block devices
-	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
+	if (magisk_policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
 		sepol_allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", "0x0000-0xFFFF");
 
 	// Allow all binder transactions
@@ -198,11 +198,7 @@ void sepol_magisk_rules() {
 
 #ifdef MAGISK_DEBUG
 	// Remove all dontaudit in debug mode
-	avtab_ptr_t av;
-	avtab_for_each(&policydb->te_avtab, av, {
-		if (av->key.specified == AVTAB_AUDITDENY || av->key.specified == AVTAB_XPERMS_DONTAUDIT)
-			avtab_remove_node(&policydb->te_avtab, av);
-	})
+	strip_dontaudit();
 #endif
 
 	log_cb.w = bak;
