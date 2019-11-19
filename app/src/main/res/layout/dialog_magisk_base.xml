@@ -92,6 +92,8 @@
                     android:id="@+id/dialog_base_scroll"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constraintBottom_toTopOf="@+id/dialog_base_space"
                     app:layout_constraintLeft_toLeftOf="@+id/dialog_base_start"
                     app:layout_constraintRight_toRightOf="@+id/dialog_base_end"
                     app:layout_constraintTop_toBottomOf="@+id/dialog_base_title">
@@ -128,15 +130,16 @@
                     android:layout_height="@dimen/l1"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/dialog_base_scroll" />
+                    app:layout_constraintBottom_toTopOf="@+id/dialog_base_buttons" />
 
                 <ScrollView
+                    android:id="@+id/dialog_base_buttons"
                     style="?attr/buttonBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fillViewport="true"
                     android:scrollbarAlwaysDrawVerticalTrack="true"
-                    app:layout_constraintTop_toBottomOf="@+id/dialog_base_space">
+                    app:layout_constraintBottom_toBottomOf="parent">
 
                     <com.android.internal.widget.ButtonBarLayout
                         android:layout_width="match_parent"
