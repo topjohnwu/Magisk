@@ -62,7 +62,7 @@ subprojects {
             android {
                 signingConfigs {
                     config {
-                        storeFile new File(props['keyStore'])
+                        storeFile file(props['keyStore'])
                         storePassword props['keyStorePass']
                         keyAlias props['keyAlias']
                         keyPassword props['keyPass']
