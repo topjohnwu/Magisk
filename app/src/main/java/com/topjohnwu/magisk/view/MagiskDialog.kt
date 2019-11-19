@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -147,6 +148,11 @@ class MagiskDialog @JvmOverloads constructor(
             this.binding.dialogBaseContainer.addView(binding.root)
             binding.apply(body)
         }
+
+    fun applyView(view: View) = apply {
+        resetView()
+        this.binding.dialogBaseContainer.addView(view)
+    }
 
     fun onDismiss(callback: OnDialogButtonClickListener) =
         apply { setOnDismissListener(callback) }
