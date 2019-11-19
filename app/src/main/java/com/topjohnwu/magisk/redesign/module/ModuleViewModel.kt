@@ -105,7 +105,7 @@ class ModuleViewModel(
     private val itemsInstalled
         @WorkerThread get() = items.filterIsInstance<ModuleItem>()
 
-    private val itemsUpdatable: List<RepoItem>
+    private val itemsUpdatable
         @WorkerThread get() = items.filterIsInstance<RepoItem.Update>()
 
     private val itemsRemote
@@ -282,8 +282,8 @@ class ModuleViewModel(
     @WorkerThread
     private fun build(
         active: List<ModuleItem> = itemsInstalled,
-        updatable: List<RepoItem> = itemsUpdatable,
-        remote: List<RepoItem> = itemsRemote
+        updatable: List<RepoItem.Update> = itemsUpdatable,
+        remote: List<RepoItem.Remote> = itemsRemote
     ) = (active + InstallModule).prependIfNotEmpty { sectionActive } +
             updatable.prependIfNotEmpty { sectionUpdate } +
             remote.prependIfNotEmpty { sectionRemote }
