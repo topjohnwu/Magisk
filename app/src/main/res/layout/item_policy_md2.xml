@@ -135,7 +135,6 @@
                 android:textColor="?colorError"
                 android:textSize="12sp"
                 app:icon="@drawable/ic_delete_md2"
-                app:iconPadding="@dimen/l_50"
                 app:iconTint="?colorError"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

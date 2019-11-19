@@ -46,7 +46,6 @@
             tools:text="@tools:sample/lorem"
             android:textAllCaps="false"
             app:icon="@{item.icon}"
-            app:iconPadding="@dimen/l_50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/module_title"

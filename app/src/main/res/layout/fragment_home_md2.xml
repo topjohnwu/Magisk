@@ -499,7 +499,6 @@
                         android:text="@string/update"
                         app:icon="@drawable/ic_update_md2"
                         app:iconGravity="textEnd"
-                        app:iconPadding="@dimen/l_50"
                         app:iconSize="18dp"
                         tools:visibility="gone" />
 
@@ -514,7 +513,6 @@
                         android:text="@string/install"
                         app:icon="@drawable/ic_install"
                         app:iconGravity="textEnd"
-                        app:iconPadding="@dimen/l_50"
                         app:iconSize="18dp" />
 
                 </FrameLayout>
@@ -722,7 +720,6 @@
                         android:text="@string/update"
                         app:icon="@drawable/ic_update_md2"
                         app:iconGravity="textEnd"
-                        app:iconPadding="@dimen/l_50"
                         app:iconSize="18dp" />
 
                     <com.google.android.material.button.MaterialButton
@@ -735,7 +732,6 @@
                         android:text="@string/install"
                         app:icon="@drawable/ic_install"
                         app:iconGravity="textEnd"
-                        app:iconPadding="@dimen/l_50"
                         app:iconSize="18dp"
                         tools:visibility="gone" />
 

@@ -23,7 +23,6 @@
         android:textAllCaps="false"
         android:textSize="12sp"
         app:cornerRadius="@dimen/r1"
-        app:icon="@drawable/ic_module_storage_md2"
-        app:iconPadding="@dimen/l_50" />
+        app:icon="@drawable/ic_module_storage_md2" />
 
 </layout>

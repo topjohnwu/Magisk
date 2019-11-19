@@ -106,7 +106,6 @@
                 android:textAllCaps="false"
                 app:icon="@{item.removed ? R.drawable.ic_restart : R.drawable.ic_delete_md2}"
                 app:iconGravity="textEnd"
-                app:iconPadding="@dimen/l_50"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/module_divider"
                 tools:icon="@drawable/ic_delete_md2"
