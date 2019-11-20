@@ -27,6 +27,7 @@ Options:
    --list                    list all available applets
    --daemon                  manually start magisk daemon
    --remove-modules          remove all modules and reboot
+   --remove-magisk-data      remove all Magisk data and reboot
    --[init trigger]          start service for init trigger
 
 Advanced Options (Internal APIs):
@@ -114,6 +115,10 @@ int magisk_main(int argc, char *argv[]) {
 	} else if (argv[1] == "--remove-modules"sv) {
 		int fd = connect_daemon();
 		write_int(fd, REMOVE_MODULES);
+		return read_int(fd);
+	} else if (argv[1] == "--remove-magisk-data"sv) {
+		int fd = connect_daemon();
+		write_int(fd, REMOVE_MAGISKDATA);
 		return read_int(fd);
 	}
 #if 0

@@ -91,6 +91,15 @@ static void *request_handler(void *args) {
 		}
 		close(client);
 		break;
+	case REMOVE_MAGISKDATA:
+		if (credential.uid == UID_SHELL || credential.uid == UID_ROOT) {
+			remove_magiskdata();
+			write_int(client, 0);
+		} else {
+			write_int(client, 1);
+		}
+		close(client);
+		break;
 	default:
 		close(client);
 		break;

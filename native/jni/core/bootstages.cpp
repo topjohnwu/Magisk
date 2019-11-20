@@ -476,6 +476,14 @@ void remove_modules() {
 	reboot();
 }
 
+void remove_magiskdata() {
+	LOGI("* Remove all Magisk data and reboot");
+	chdir(SECURE_DIR);
+	rm_rf("./*");
+	chdir("/");
+	reboot();
+}
+
 static void collect_modules() {
 	chdir(MODULEROOT);
 	rm_rf("lost+found");
