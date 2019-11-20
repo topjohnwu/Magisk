@@ -21,11 +21,12 @@ int load_policydb(const char *file) {
 	pf.type = PF_USE_STDIO;
 
 	magisk_policydb = static_cast<policydb_t *>(xmalloc(sizeof(policydb_t)));
-	if (policydb_init(magisk_policydb) || policydb_read(magisk_policydb, &pf, 0))
+	if (policydb_init(magisk_policydb) || policydb_read(magisk_policydb, &pf, 0)) {
+		LOGE("Fail to load policy from %s\n", file);
 		return 1;
+	}
 
 	fclose(pf.fp);
-
 	return 0;
 }
 
@@ -172,22 +173,27 @@ int compile_split_cil() {
 }
 
 int dump_policydb(const char *file) {
-	int fd, ret;
-	void *data = nullptr;
+	struct policy_file pf;
+	policy_file_init(&pf);
+
+	uint8_t *data;
 	size_t len;
-	policydb_to_image(nullptr, magisk_policydb, &data, &len);
-	if (data == nullptr) {
-		LOGE("Fail to dump policy image!\n");
+
+	pf.type = PF_USE_STDIO;
+	pf.fp = open_memfile(data, len);
+	if (policydb_write(magisk_policydb, &pf)) {
+		LOGE("Fail to create policy image\n");
 		return 1;
 	}
+	fclose(pf.fp);
 
-	fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
+	int fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
 	if (fd < 0)
 		return 1;
-	ret = xwrite(fd, data, len);
+	xwrite(fd, data, len);
+
 	close(fd);
-	if (ret < 0)
-		return 1;
+	free(data);
 	return 0;
 }
 

@@ -407,3 +407,87 @@ void parse_mnt(const char *file, const function<bool (mntent*)> &fn) {
 		}
 	}
 }
+
+struct io_buf {
+	uint8_t *&buf;
+	size_t &len;
+	size_t cap = 0;
+	size_t pos = 0;
+
+	io_buf(uint8_t *&buf, size_t &len) : buf(buf), len(len) {
+		buf = nullptr;
+		len = 0;
+	}
+	uint8_t *cur() {
+		return buf + pos;
+	}
+	int max_read() {
+		return len - pos;
+	}
+	void resize(int new_pos, bool zero = false) {
+		bool resize = false;
+		size_t old_cap = cap;
+		while (new_pos > cap) {
+			cap = cap ? (cap << 1) - (cap >> 1) : 1 << 12;
+			resize = true;
+		}
+		if (resize) {
+			buf = (uint8_t *) xrealloc(buf, cap);
+			if (zero)
+				memset(buf + old_cap, 0, cap - old_cap);
+		}
+	}
+};
+
+static int mem_read(void *v, char *buf, int len) {
+	auto io = reinterpret_cast<io_buf *>(v);
+	len = std::min(len, io->max_read());
+	memcpy(buf, io->cur(), len);
+	return len;
+}
+
+static int mem_write(void *v, const char *buf, int len) {
+	auto io = reinterpret_cast<io_buf *>(v);
+	io->resize(io->pos + len);
+	memcpy(io->cur(), buf, len);
+	io->pos += len;
+	io->len = std::max(io->len, io->pos);
+	return len;
+}
+
+static fpos_t mem_seek(void *v, fpos_t off, int whence) {
+	auto io = reinterpret_cast<io_buf *>(v);
+	off_t new_pos;
+	switch (whence) {
+		case SEEK_CUR:
+			new_pos = io->pos + off;
+			break;
+		case SEEK_END:
+			new_pos = io->len + off;
+			break;
+		case SEEK_SET:
+			new_pos = off;
+			break;
+		default:
+			return -1;
+	}
+	if (new_pos < 0)
+		return -1;
+
+	io->resize(new_pos, true);
+	io->pos = new_pos;
+	return new_pos;
+}
+
+static int mem_close(void *v) {
+	auto io = reinterpret_cast<io_buf *>(v);
+	delete io;
+	return 0;
+}
+
+FILE *open_memfile(uint8_t *&buf, size_t &len) {
+	auto io = new io_buf(buf, len);
+	FILE *fp = funopen(io, mem_read, mem_write, mem_seek, mem_close);
+	setbuf(fp, nullptr);
+	return fp;
+}

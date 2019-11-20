@@ -38,6 +38,7 @@ void *__mmap(const char *filename, size_t *size, bool rw);
 void frm_rf(int dirfd, std::initializer_list<const char *> excl = std::initializer_list<const char *>());
 void clone_dir(int src, int dest, bool overwrite = true);
 void parse_mnt(const char *file, const std::function<bool (mntent*)> &fn);
+FILE *open_memfile(uint8_t *&buf, size_t &len);
 
 template <typename T>
 void full_read(const char *filename, T &buf, size_t &size) {
