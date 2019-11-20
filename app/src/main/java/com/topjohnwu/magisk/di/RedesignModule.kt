@@ -19,7 +19,7 @@ val redesignModule = module {
     viewModel { FlashViewModel() }
     viewModel { HideViewModel(get()) }
     viewModel { HomeViewModel(get()) }
-    viewModel { LogViewModel() }
+    viewModel { LogViewModel(get()) }
     viewModel { ModuleViewModel(get(), get(), get()) }
     viewModel { RequestViewModel() }
     viewModel { SafetynetViewModel(get()) }

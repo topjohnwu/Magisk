@@ -14,8 +14,10 @@ class LogRepository(
     private val logDao: LogDao
 ) {
 
-    fun fetchLogs() = logDao.fetchAll()
-        .map { it.sortByDescending { it.date.time }; it }
+    fun fetchLogsNowrap() = logDao.fetchAll()
+        .map { it.sortedByDescending { it.date.time } }
+
+    fun fetchLogs() = fetchLogsNowrap()
         .map { it.wrap() }
 
     fun fetchMagiskLogs() = "tail -n 5000 ${Const.MAGISK_LOG}".suRaw()

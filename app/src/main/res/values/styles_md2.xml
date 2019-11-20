@@ -105,7 +105,7 @@
     <style name="Foundation.Default" parent="Foundation.Base">
         <item name="android:theme">@style/ThemeFoundationMD2.Default</item>
         <!--setting window background to transparent should reduce overdraw-->
-        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--<item name="android:windowBackground">@android:color/transparent</item>-->
     </style>
 
 </resources>
