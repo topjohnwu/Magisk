@@ -1,3 +1,4 @@
+#include <utils.h>
 #include <logging.h>
 #include <stream.h>
 
@@ -68,22 +69,17 @@ void filter_stream::set_base(FILE *f) {
 	fp = f;
 }
 
-off_t seekable_stream::new_pos(off_t off, int whence) {
-	off_t new_pos;
+off_t seekable_stream::seek_pos(off_t off, int whence) {
 	switch (whence) {
 		case SEEK_CUR:
-			new_pos = _pos + off;
-			break;
+			return _pos + off;
 		case SEEK_END:
-			new_pos = end_pos() + off;
-			break;
+			return end_pos() + off;
 		case SEEK_SET:
-			new_pos = off;
-			break;
+			return off;
 		default:
 			return -1;
 	}
-	return new_pos;
 }
 
 byte_stream::byte_stream(uint8_t *&buf, size_t &len) : _buf(buf), _len(len) {
@@ -106,7 +102,7 @@ int byte_stream::write(const void *buf, size_t len) {
 }
 
 off_t byte_stream::seek(off_t off, int whence) {
-	off_t np = new_pos(off, whence);
+	off_t np = seek_pos(off, whence);
 	if (np < 0)
 		return -1;
 	resize(np, true);

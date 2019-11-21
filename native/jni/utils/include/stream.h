@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <memory>
 
-#include <utils.h>
+// #include <utils.h>
 
 class stream;
 
@@ -49,7 +49,7 @@ class seekable_stream : public stream {
 protected:
 	size_t _pos = 0;
 
-	off_t new_pos(off_t off, int whence);
+	off_t seek_pos(off_t off, int whence);
 	virtual size_t end_pos() = 0;
 };
 
