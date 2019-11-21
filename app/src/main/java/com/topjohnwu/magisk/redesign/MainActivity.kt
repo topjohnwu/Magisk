@@ -85,6 +85,10 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         if (savedInstanceState != null) {
             onTabTransaction(null, -1)
             onFragmentTransaction(null, FragNavController.TransactionType.PUSH)
+
+            if (!navigation.isRoot) {
+                requestNavigationHidden(animate = false)
+            }
         }
     }
 
@@ -118,6 +122,11 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         fragment: Fragment?,
         transactionType: FragNavController.TransactionType
     ) {
+        binding.mainToolbarWrapper.animate()
+            .translationY(0f)
+            .setInterpolator(FastOutSlowInInterpolator())
+            .start()
+
         setDisplayHomeAsUpEnabled(!navigation.isRoot)
         requestNavigationHidden(!navigation.isRoot)
     }
@@ -134,12 +143,18 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         }
     }
 
-    internal fun requestNavigationHidden(hide: Boolean = true) {
+    internal fun requestNavigationHidden(hide: Boolean = true, animate: Boolean = true) {
         val lapam = binding.mainBottomBar.layoutParams as ViewGroup.MarginLayoutParams
         val height = binding.mainBottomBar.measuredHeight
         val verticalMargin = lapam.let { it.topMargin + it.bottomMargin }
         val maxTranslation = height + verticalMargin
         val translation = if (!hide) 0 else maxTranslation
+
+        if (!animate) {
+            binding.mainBottomBar.translationY = translation.toFloat()
+            binding.mainBottomBar.isVisible = !hide
+            return
+        }
 
         binding.mainBottomBar.animate()
             .translationY(translation.toFloat())
