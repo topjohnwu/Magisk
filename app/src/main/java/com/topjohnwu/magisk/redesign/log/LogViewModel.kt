@@ -8,7 +8,7 @@ import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.binding.BindingAdapter
-import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
+import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
@@ -58,8 +58,8 @@ class LogViewModel(
             .ignoreElement()
 
         val console = repo.fetchMagiskLogs()
+            .map { ConsoleItem(it) }
             .toList()
-            .map { it.map { ConsoleRvItem(it) } }
             .observeOn(Schedulers.computation())
             .map { it to itemsConsole.calculateDiff(it) }
             .observeOn(AndroidSchedulers.mainThread())
