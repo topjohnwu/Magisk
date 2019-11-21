@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <memory>
 
-// #include <utils.h>
-
 class stream;
 
 FILE *open_stream(stream *strm);

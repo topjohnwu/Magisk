@@ -51,11 +51,11 @@ int stream::close() {
 }
 
 int filter_stream::read(void *buf, size_t len) {
-	return fread(buf, len, 1, fp);
+	return fread(buf, 1, len, fp);
 }
 
 int filter_stream::write(const void *buf, size_t len) {
-	return fwrite(buf, len, 1, fp);
+	return fwrite(buf, 1, len, fp);
 }
 
 int filter_stream::close() {
