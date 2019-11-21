@@ -33,6 +33,13 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
     override val layoutRes = R.layout.fragment_hide_md2
     override val viewModel by viewModel<HideViewModel>()
 
+    private var isFilterVisible
+        get() = binding.hideFilter.isVisible
+        set(value) {
+            if (!value) hideKeyboard()
+            MotionRevealHelper.withViews(binding.hideFilter, binding.hideFilterToggle, value)
+        }
+
     override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onAttach(context: Context) {
@@ -45,11 +52,10 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.hideFilterToggle.setOnClickListener {
-            MotionRevealHelper.withViews(binding.hideFilter, binding.hideFilterToggle, true)
+            isFilterVisible = true
         }
         binding.hideFilterInclude.hideFilterDone.setOnClickListener {
-            hideKeyboard()
-            MotionRevealHelper.withViews(binding.hideFilter, binding.hideFilterToggle, false)
+            isFilterVisible = false
         }
         binding.hideContent.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -64,8 +70,8 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
     override fun onPreBind(binding: FragmentHideMd2Binding) = Unit
 
     override fun onBackPressed(): Boolean {
-        if (binding.hideFilter.isVisible) {
-            binding.hideFilterInclude.hideFilterDone.performClick()
+        if (isFilterVisible) {
+            isFilterVisible = false
             return true
         }
         return super.onBackPressed()

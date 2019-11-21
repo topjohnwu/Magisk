@@ -29,6 +29,14 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
 
     private val listeners = hashSetOf<EndlessRecyclerScrollListener>()
 
+    private var isFilterVisible
+        get() = binding.moduleFilter.isVisible
+        set(value) {
+            if (!value) hideKeyboard()
+            (activity as? MainActivity)?.requestNavigationHidden(value)
+            MotionRevealHelper.withViews(binding.moduleFilter, binding.moduleFilterToggle, value)
+        }
+
     override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -48,13 +56,10 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
         setEndlessSearch()
 
         binding.moduleFilterToggle.setOnClickListener {
-            (activity as? MainActivity)?.requestNavigationHidden()
-            MotionRevealHelper.withViews(binding.moduleFilter, binding.moduleFilterToggle, true)
+            isFilterVisible = true
         }
         binding.moduleFilterInclude.moduleFilterDone.setOnClickListener {
-            (activity as? MainActivity)?.requestNavigationHidden(false)
-            hideKeyboard()
-            MotionRevealHelper.withViews(binding.moduleFilter, binding.moduleFilterToggle, false)
+            isFilterVisible = false
         }
         binding.moduleFilterInclude.moduleFilterList.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
@@ -73,8 +78,8 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
     }
 
     override fun onBackPressed(): Boolean {
-        if (binding.moduleFilter.isVisible) {
-            binding.moduleFilterInclude.moduleFilterDone.performClick()
+        if (isFilterVisible) {
+            isFilterVisible = false
             return true
         }
         return super.onBackPressed()
