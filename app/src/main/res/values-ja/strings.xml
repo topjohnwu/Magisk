@@ -8,7 +8,6 @@
     <string name="settings">設定</string>
     <string name="install">ｲﾝｽﾄｰﾙ</string>
     <string name="unsupport_magisk_title">対応していないMagiskバージョン</string>
-    <string name="unsupport_magisk_message">このバージョンのMagisk ManagerはMagisk v18.0以下には対応していません。\n\n手動でMagiskを更新するか、または古いバージョンのMagisk Managerをインストールしてください。</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magiskがインストールされていません</string>
@@ -149,9 +148,6 @@
     <string name="request_timeout_summary">%1$d秒</string>
     <string name="settings_su_reauth_title">アップグレード後の再認証</string>
     <string name="settings_su_reauth_summary">アプリのアップグレード後にスーパーユーザー権限を再認証します</string>
-    <string name="settings_su_fingerprint_title">指紋認証の有効化</string>
-    <string name="settings_su_fingerprint_summary">スーパーユーザー権限のリクエストの許可に指紋認証を使います</string>
-    <string name="auth_fingerprint">指紋認証</string>
 
     <string name="multiuser_mode">マルチユーザーモード</string>
     <string name="settings_owner_only">端末の管理者のみ</string>
@@ -168,7 +164,6 @@
     <string name="global_summary">すべてのrootセッションがグローバル名前空間を使用します</string>
     <string name="requester_summary">rootセッションはリクエスト者の名前空間を継承します</string>
     <string name="isolate_summary">rootセッション毎に分離された名前空間を使用します</string>
-    <string name="disable_fingerprint">指紋が登録されていないか、お使いの端末でサポートされていません。</string>
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザーリクエスト</string>
@@ -195,7 +190,6 @@
     <string name="su_revoke_msg">%1$s の権限を取り消しますか？</string>
     <string name="toast">トースト通知</string>
     <string name="none">なし</string>
-    <string name="auth_fail">認証に失敗しました</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

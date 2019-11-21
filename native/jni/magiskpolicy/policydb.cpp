@@ -7,14 +7,13 @@
 
 #include <utils.h>
 #include <logging.h>
+#include <stream.h>
 
 #include "magiskpolicy.h"
 #include "sepolicy.h"
 
-policydb_t *policydb = nullptr;
-
 int load_policydb(const char *file) {
-	if (policydb)
+	if (magisk_policydb)
 		destroy_policydb();
 
 	struct policy_file pf;
@@ -22,12 +21,13 @@ int load_policydb(const char *file) {
 	pf.fp = xfopen(file, "re");
 	pf.type = PF_USE_STDIO;
 
-	policydb = new policydb_t();
-	if (policydb_init(policydb) || policydb_read(policydb, &pf, 0))
+	magisk_policydb = static_cast<policydb_t *>(xmalloc(sizeof(policydb_t)));
+	if (policydb_init(magisk_policydb) || policydb_read(magisk_policydb, &pf, 0)) {
+		LOGE("Fail to load policy from %s\n", file);
 		return 1;
+	}
 
 	fclose(pf.fp);
-
 	return 0;
 }
 
@@ -169,34 +169,39 @@ int compile_split_cil() {
 		return 1;
 
 	cil_db_destroy(&db);
-	policydb = &pdb->p;
+	magisk_policydb = &pdb->p;
 	return 0;
 }
 
 int dump_policydb(const char *file) {
-	int fd, ret;
-	void *data = nullptr;
+	struct policy_file pf;
+	policy_file_init(&pf);
+
+	uint8_t *data;
 	size_t len;
-	policydb_to_image(nullptr, policydb, &data, &len);
-	if (data == nullptr) {
-		LOGE("Fail to dump policy image!\n");
+
+	pf.type = PF_USE_STDIO;
+	pf.fp = open_stream<byte_stream>(data, len);
+	if (policydb_write(magisk_policydb, &pf)) {
+		LOGE("Fail to create policy image\n");
 		return 1;
 	}
+	fclose(pf.fp);
 
-	fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
+	int fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
 	if (fd < 0)
 		return 1;
-	ret = xwrite(fd, data, len);
+	xwrite(fd, data, len);
+
 	close(fd);
-	if (ret < 0)
-		return 1;
+	free(data);
 	return 0;
 }
 
 void destroy_policydb() {
-	if (policydb) {
-		policydb_destroy(policydb);
-		delete policydb;
-		policydb = nullptr;
+	if (magisk_policydb) {
+		policydb_destroy(magisk_policydb);
+		free(magisk_policydb);
+		magisk_policydb = nullptr;
 	}
 }

@@ -73,7 +73,8 @@ int strend(const char *s1, const char *s2) {
 }
 
 int exec_command(exec_t &exec) {
-	int pipefd[2] = {-1, -1}, outfd = -1;
+	int pipefd[] = {-1, -1};
+	int outfd = -1;
 
 	if (exec.fd == -1) {
 		if (xpipe2(pipefd, O_CLOEXEC) == -1)
@@ -113,10 +114,10 @@ int exec_command(exec_t &exec) {
 }
 
 int exec_command_sync(exec_t &exec) {
-	int pid, status;
-	pid = exec_command(exec);
+	int pid = exec_command(exec);
 	if (pid < 0)
 		return -1;
+	int status;
 	waitpid(pid, &status, 0);
 	return WEXITSTATUS(status);
 }
@@ -197,4 +198,18 @@ uint32_t binary_gcd(uint32_t u, uint32_t v) {
 		v -= u;
 	} while (v != 0);
 	return u << shift;
+}
+
+int switch_mnt_ns(int pid) {
+	char mnt[32];
+	snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
+	if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
+
+	int fd, ret;
+	fd = xopen(mnt, O_RDONLY);
+	if (fd < 0) return 1;
+	// Switch to its namespace
+	ret = xsetns(fd, 0);
+	close(fd);
+	return ret;
 }

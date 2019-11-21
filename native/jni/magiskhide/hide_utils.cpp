@@ -217,7 +217,7 @@ static void set_hide_config() {
 	db_err(err);
 }
 
-static inline void launch_err(int client, int code = DAEMON_ERROR) {
+[[noreturn]] static void launch_err(int client, int code = DAEMON_ERROR) {
 	if (code != HIDE_IS_ENABLED)
 		hide_enabled = false;
 	if (client >= 0) {
@@ -280,10 +280,14 @@ int stop_magiskhide() {
 }
 
 void auto_start_magiskhide() {
-	db_settings dbs;
-	get_db_settings(dbs, HIDE_CONFIG);
-	if (dbs[HIDE_CONFIG]) {
-		new_daemon_thread([]() -> void { launch_magiskhide(-1); });
+	if (hide_enabled) {
+		pthread_kill(proc_monitor_thread, SIGZYGOTE);
+	} else if (SDK_INT >= 19) {
+		db_settings dbs;
+		get_db_settings(dbs, HIDE_CONFIG);
+		if (dbs[HIDE_CONFIG]) {
+			new_daemon_thread([]{ launch_magiskhide(-1); });
+		}
 	}
 }
 

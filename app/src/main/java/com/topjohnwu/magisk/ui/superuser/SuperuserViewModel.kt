@@ -15,11 +15,10 @@ import com.topjohnwu.magisk.model.entity.recycler.PolicyRvItem
 import com.topjohnwu.magisk.model.events.PolicyEnableEvent
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
+import com.topjohnwu.magisk.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.DiffObservableList
-import com.topjohnwu.magisk.utils.FingerprintHelper
 import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.view.dialogs.CustomAlertDialog
-import com.topjohnwu.magisk.view.dialogs.FingerprintAuthDialog
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import me.tatarka.bindingcollectionadapter2.ItemBinding
@@ -42,6 +41,11 @@ class SuperuserViewModel(
 
     init {
         rxBus.register<PolicyEnableEvent>()
+            .filter {
+                val isIgnored = it.item == ignoreNext
+                if (isIgnored) ignoreNext = null
+                !isIgnored
+            }
             .subscribeK { togglePolicy(it.item, it.enable) }
             .add()
         rxBus.register<PolicyUpdateEvent>()
@@ -78,8 +82,8 @@ class SuperuserViewModel(
             .add()
 
         withView {
-            if (FingerprintHelper.useFingerprint()) {
-                FingerprintAuthDialog(this) { updateState() }.show()
+            if (BiometricHelper.isEnabled) {
+                BiometricHelper.authenticate(this) { updateState() }
             } else {
                 CustomAlertDialog(this)
                     .setTitle(R.string.su_revoke_title)
@@ -126,12 +130,12 @@ class SuperuserViewModel(
                 .add()
         }
 
-        if (FingerprintHelper.useFingerprint()) {
+        if (BiometricHelper.isEnabled) {
             withView {
-                FingerprintAuthDialog(this, { updateState() }, {
+                BiometricHelper.authenticate(this, onError = {
                     ignoreNext = item
                     item.isEnabled.toggle()
-                }).show()
+                }) { updateState() }
             }
         } else {
             updateState()

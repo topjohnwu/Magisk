@@ -8,7 +8,6 @@
     <string name="settings">Einstellungen</string>
     <string name="install">Installieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk Version</string>
-    <string name="unsupport_magisk_message">Diese Version von Magisk Manager unterstützt keine Magisk-Version kleiner als 18.0. \n\nSie können entweder Magisk manuell aktualisieren oder die App auf eine ältere Version herabstufen.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
@@ -157,9 +156,6 @@
     <string name="request_timeout_summary">%1$d Sekunden</string>
     <string name="settings_su_reauth_title">Nach Aktualisierung erneut authentifizieren</string>
     <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Aktualisierung erneut abfragen</string>
-    <string name="settings_su_fingerprint_title">Aktiviere Authentifizierung durch Fingerabdruck</string>
-    <string name="settings_su_fingerprint_summary">Fingerabdrucksensor benutzen um Superuser-Anfragen zu erlauben</string>
-    <string name="auth_fingerprint">Authentifiziere Fingerabdruck</string>
 
     <string name="multiuser_mode">Mehrbenutzermodus</string>
     <string name="settings_owner_only">Nur der Gerätebesitzer</string>
@@ -176,7 +172,6 @@
     <string name="global_summary">Alle Root-Sitzungen benutzen den global angelegten Namespace</string>
     <string name="requester_summary">Root-Sitzungen erben den Namespace des Abfragenden</string>
     <string name="isolate_summary">Jede Root-Sitzung hat ihren isolierten Namespace</string>
-    <string name="disable_fingerprint">Keine Fingerabdrücke gespeichert oder keine Geräteunterstützung</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
@@ -203,7 +198,6 @@
     <string name="su_revoke_msg">Möchtest du die Rechte für %1$s entziehen?</string>
     <string name="toast">Popup</string>
     <string name="none">Keine</string>
-    <string name="auth_fail">Authentifizierung fehlgeschlagen</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

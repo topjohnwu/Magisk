@@ -8,7 +8,6 @@
 #include <utils.h>
 
 #include "init.h"
-#include "flags.h"
 #include "magiskrc.h"
 
 #ifdef USE_64BIT
@@ -168,6 +167,7 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 
 	// Mount selinuxfs to communicate with kernel
 	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+	mount_list.emplace_back(SELINUX_MNT);
 
 	if (patch_init)
 		load_split_cil();
@@ -231,7 +231,7 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 #define PATCHPOLICY "/sbin/.se"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 
-static string mount_list;
+static string magic_mount_list;
 
 static void magic_mount(int dirfd, const string &path) {
 	DIR *dir = xfdopendir(dirfd);
@@ -249,8 +249,8 @@ static void magic_mount(int dirfd, const string &path) {
 				string src = ROOTOVL + dest;
 				LOGD("Mount [%s] -> [%s]\n", src.data(), dest.data());
 				xmount(src.data(), dest.data(), nullptr, MS_BIND, nullptr);
-				mount_list += dest;
-				mount_list += '\n';
+				magic_mount_list += dest;
+				magic_mount_list += '\n';
 			}
 		}
 	}
@@ -380,7 +380,7 @@ void SARBase::patch_rootdir() {
 	magic_mount(src, "");
 	close(src);
 	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
-	write(dest, mount_list.data(), mount_list.length());
+	write(dest, magic_mount_list.data(), magic_mount_list.length());
 	close(dest);
 }
 
@@ -465,23 +465,6 @@ void AFirstStageInit::prepare() {
 	rename("/init", "/system/bin/init");
 	rename("/.backup/init", "/init");
 }
-
-#ifdef MAGISK_DEBUG
-static FILE *kmsg;
-static int vprintk(const char *fmt, va_list ap) {
-	fprintf(kmsg, "magiskinit: ");
-	return vfprintf(kmsg, fmt, ap);
-}
-static void setup_klog() {
-	int fd = xopen("/proc/kmsg", O_WRONLY | O_CLOEXEC);
-	kmsg = fdopen(fd, "w");
-	setbuf(kmsg, nullptr);
-	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
-	log_cb.ex = nop_ex;
-}
-#else
-#define setup_klog(...)
-#endif
 
 int magisk_proxy_main(int argc, char *argv[]) {
 	setup_klog();

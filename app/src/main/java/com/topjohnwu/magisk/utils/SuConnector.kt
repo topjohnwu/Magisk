@@ -2,11 +2,9 @@ package com.topjohnwu.magisk.utils
 
 import android.net.LocalSocket
 import android.net.LocalSocketAddress
-import android.os.Bundle
-import android.text.TextUtils
+import androidx.collection.ArrayMap
 import timber.log.Timber
 import java.io.*
-import java.nio.charset.Charset
 
 abstract class SuConnector @Throws(IOException::class)
 protected constructor(name: String) {
@@ -21,24 +19,23 @@ protected constructor(name: String) {
         input = DataInputStream(BufferedInputStream(socket.inputStream))
     }
 
-    @Throws(IOException::class)
     private fun readString(): String {
         val len = input.readInt()
         val buf = ByteArray(len)
         input.readFully(buf)
-        return String(buf, Charset.forName("UTF-8"))
+        return String(buf, Charsets.UTF_8)
     }
 
     @Throws(IOException::class)
-    fun readSocketInput(): Bundle {
-        val bundle = Bundle()
+    fun readRequest(): Map<String, String> {
+        val ret = ArrayMap<String, String>()
         while (true) {
             val name = readString()
-            if (TextUtils.equals(name, "eof"))
+            if (name == "eof")
                 break
-            bundle.putString(name, readString())
+            ret[name] = readString()
         }
-        return bundle
+        return ret
     }
 
     fun response() {

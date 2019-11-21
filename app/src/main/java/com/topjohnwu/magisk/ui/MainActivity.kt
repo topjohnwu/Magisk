@@ -2,11 +2,13 @@ package com.topjohnwu.magisk.ui
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavTransactionOptions
+import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.Const.Key.OPEN_SECTION
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
@@ -29,7 +31,6 @@ import com.topjohnwu.magisk.ui.module.ReposFragment
 import com.topjohnwu.magisk.ui.settings.SettingsFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import kotlin.reflect.KClass
@@ -60,11 +61,20 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (!SplashActivity.DONE) {
-            startActivity(intent(SplashActivity::class.java))
+            startActivity(intent<SplashActivity>())
             finish()
         }
 
         super.onCreate(savedInstanceState)
+
+        if (Info.env.isUnsupported && !viewModel.shownUnsupportedDialog) {
+            viewModel.shownUnsupportedDialog = true
+            AlertDialog.Builder(this)
+                .setTitle(R.string.unsupport_magisk_title)
+                .setMessage(getString(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION))
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        }
 
         navigationController.apply {
             rootFragmentListener = this@MainActivity
@@ -153,16 +163,11 @@ open class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>(), Na
 
     private fun checkHideSection() {
         val menu = binding.navView.menu
-        menu.findItem(R.id.magiskHideFragment).isVisible =
-            Shell.rootAccess() && Info.env.magiskHide
-        menu.findItem(R.id.modulesFragment).isVisible =
-            Shell.rootAccess() && Info.env.magiskVersionCode >= 0
-        menu.findItem(R.id.reposFragment).isVisible =
-            (viewModel.isConnected.value && Shell.rootAccess() && Info.env.magiskVersionCode >= 0)
-        menu.findItem(R.id.logFragment).isVisible =
-            Shell.rootAccess()
-        menu.findItem(R.id.superuserFragment).isVisible =
-            Utils.showSuperUser()
+        menu.findItem(R.id.magiskHideFragment).isVisible = Info.env.isActive && Info.env.magiskHide
+        menu.findItem(R.id.modulesFragment).isVisible = Info.env.isActive
+        menu.findItem(R.id.reposFragment).isVisible = Info.isConnected.value && Info.env.isActive
+        menu.findItem(R.id.logFragment).isVisible = Info.env.isActive
+        menu.findItem(R.id.superuserFragment).isVisible = Utils.showSuperUser()
     }
 
     private fun FragNavTransactionOptions.Builder.customAnimations(options: MagiskAnimBuilder) =

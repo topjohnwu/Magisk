@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.model.download
 
 import android.app.Activity
+import android.app.Notification
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LiveData
@@ -27,7 +28,7 @@ abstract class RemoteFileService : NotificationService() {
 
     val service: GithubRawServices by inject()
 
-    override val defaultNotification: NotificationCompat.Builder
+    override val defaultNotification
         get() = Notifications.progress(this, "")
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -117,8 +118,8 @@ abstract class RemoteFileService : NotificationService() {
     @Throws(Throwable::class)
     protected abstract fun onFinished(subject: DownloadSubject, id: Int)
 
-    protected abstract fun NotificationCompat.Builder.addActions(subject: DownloadSubject)
-            : NotificationCompat.Builder
+    protected abstract fun Notification.Builder.addActions(subject: DownloadSubject)
+            : Notification.Builder
 
     companion object : KoinComponent {
         const val ARG_URL = "arg_url"

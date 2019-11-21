@@ -35,8 +35,6 @@ Advanced Options (Internal APIs):
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
-   --connect-mode [MODE]     get/set connect mode for su request and notify
-   --broadcast-test          manually trigger broadcast tests
 
 Supported init triggers:
    post-fs-data, service, boot-complete
@@ -113,22 +111,9 @@ int magisk_main(int argc, char *argv[]) {
 			printf("%s\n", res);
 			free(res);
 		}
-	} else if (argv[1] == "--connect-mode"sv) {
-		int fd = connect_daemon();
-		write_int(fd, BROADCAST_ACK);
-		if (argc >= 3) {
-			write_int(fd, parse_int(argv[2]));
-		} else {
-			write_int(fd, -1);
-		}
-		return read_int(fd);
 	} else if (argv[1] == "--remove-modules"sv) {
 		int fd = connect_daemon();
 		write_int(fd, REMOVE_MODULES);
-		return read_int(fd);
-	} else if (argv[1] == "--broadcast-test"sv) {
-		int fd = connect_daemon();
-		write_int(fd, BROADCAST_TEST);
 		return read_int(fd);
 	}
 #if 0

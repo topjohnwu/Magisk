@@ -11,4 +11,4 @@
 #endif
 #define getline __getline
 #define fsetxattr(...) syscall(__NR_fsetxattr, __VA_ARGS__)
-extern "C" ssize_t __getline(char **, size_t *, FILE *);
+ssize_t __getline(char **, size_t *, FILE *);

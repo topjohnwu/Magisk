@@ -1,11 +1,9 @@
 package a;
 
-import androidx.core.app.AppComponentFactory;
-
 import com.topjohnwu.magisk.utils.PatchAPK;
 import com.topjohnwu.signing.BootSigner;
 
-public class a extends AppComponentFactory {
+public class a {
 
     @Deprecated
     public static boolean patchAPK(String in, String out, String pkg) {

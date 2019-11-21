@@ -9,7 +9,6 @@
     <string name="settings">الإعدادات</string>
     <string name="install">التثبيت</string>
     <string name="unsupport_magisk_title">إصدار Magisk غير مدعوم</string>
-    <string name="unsupport_magisk_message">لا يدعم هذا الإصدار من Magisk Manager إصدارا لـ Magisk vأقل من  18\n\n بإمكانك تحديث Magisk يدويا أو تثبيت إصدار أدنى.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk غير مثبت</string>
@@ -164,9 +163,6 @@
     <string name="request_timeout_summary">%1$d ثانية</string>
     <string name="settings_su_reauth_title">إعادة المصادقة بعد الترقية</string>
     <string name="settings_su_reauth_summary">أعد المصادقة على صلاحيات المستخدم المتميز بعد إجراء ترقيات للتطبيق</string>
-    <string name="settings_su_fingerprint_summary">استخدام قارئ بصمات الأصابع للسماح بطلبات المستخدم المتميز</string>
-    <string name="settings_su_fingerprint_title">تمكين مصادقة البصمة</string>
-    <string name="auth_fingerprint">مصادقة البصمة</string>
 
     <string name="multiuser_mode">نمط تعدد المستخدمين</string>
     <string name="settings_owner_only">مالك الجهاز فقط</string>
@@ -183,7 +179,6 @@
     <string name="global_summary">تستخدم كافة جلسات العمل للروت مساحة الاسم ذات التركيب العامة</string>
     <string name="requester_summary">سترث جلسات العمل للروت مساحة الأسماء لطالبيها</string>
     <string name="isolate_summary">سيكون لكل جلسة عمل للروت مساحة اسم معزولة خاصة بها </string>
-    <string name="disable_fingerprint">لم تُعين بصمات الأصابع أو لا يوجد قارئ بصمات</string>
     <string name="settings_download_path_error">خطأ عند إنشاء مجلد. عليه أن يكون سهلا الوصول إليه من خلال مجلد التخزين للروت و ألا يكون ملفا.</string>
 
     <!--Superuser-->
@@ -211,7 +206,6 @@
     <string name="su_revoke_msg">تأكيد لسحب صلاحيات %1$s ?</string>
     <string name="toast">ملاحظة منبثقة</string>
     <string name="none">بدون</string>
-    <string name="auth_fail">فشل المصادقة</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

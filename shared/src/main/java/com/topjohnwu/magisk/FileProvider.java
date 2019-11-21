@@ -3,18 +3,20 @@ package com.topjohnwu.magisk;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
+
+import com.topjohnwu.shared.R;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -34,9 +36,6 @@ public class FileProvider extends ContentProvider {
     private static final String[] COLUMNS = {
             OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE };
 
-    private static final String
-            META_DATA_FILE_PROVIDER_PATHS = "android.support.FILE_PROVIDER_PATHS";
-
     private static final String TAG_ROOT_PATH = "root-path";
     private static final String TAG_FILES_PATH = "files-path";
     private static final String TAG_CACHE_PATH = "cache-path";
@@ -54,13 +53,13 @@ public class FileProvider extends ContentProvider {
 
     private PathStrategy mStrategy;
 
-    
+    public static ProviderCallHandler callHandler;
+
     @Override
     public boolean onCreate() {
         return true;
     }
 
-    
     @Override
     public void attachInfo(Context context, ProviderInfo info) {
         super.attachInfo(context, info);
@@ -83,7 +82,6 @@ public class FileProvider extends ContentProvider {
         return strategy.getUriForFile(file);
     }
 
-    
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs,
@@ -116,7 +114,6 @@ public class FileProvider extends ContentProvider {
         return cursor;
     }
 
-    
     @Override
     public String getType(Uri uri) {
         
@@ -134,20 +131,17 @@ public class FileProvider extends ContentProvider {
         return "application/octet-stream";
     }
 
-    
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         throw new UnsupportedOperationException("No external inserts");
     }
 
-    
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
         throw new UnsupportedOperationException("No external updates");
     }
 
-    
     @Override
     public int delete(Uri uri, String selection,
                       String[] selectionArgs) {
@@ -156,7 +150,13 @@ public class FileProvider extends ContentProvider {
         return file.delete() ? 1 : 0;
     }
 
-    
+    @Override
+    public Bundle call(String method, String arg, Bundle extras) {
+        if (callHandler != null)
+            return callHandler.call(getContext(), method, arg, extras);
+        return null;
+    }
+
     @Override
     public ParcelFileDescriptor openFile(Uri uri, String mode)
             throws FileNotFoundException {
@@ -166,7 +166,6 @@ public class FileProvider extends ContentProvider {
         return ParcelFileDescriptor.open(file, fileMode);
     }
 
-    
     private static PathStrategy getPathStrategy(Context context, String authority) {
         PathStrategy strat;
         synchronized (sCache) {
@@ -175,11 +174,9 @@ public class FileProvider extends ContentProvider {
                 try {
                     strat = parsePathStrategy(context, authority);
                 } catch (IOException e) {
-                    throw new IllegalArgumentException(
-                            "Failed to parse " + META_DATA_FILE_PROVIDER_PATHS + " meta-data", e);
+                    throw new IllegalArgumentException("Failed to parse xml", e);
                 } catch (XmlPullParserException e) {
-                    throw new IllegalArgumentException(
-                            "Failed to parse " + META_DATA_FILE_PROVIDER_PATHS + " meta-data", e);
+                    throw new IllegalArgumentException("Failed to parse xml", e);
                 }
                 sCache.put(authority, strat);
             }
@@ -187,19 +184,11 @@ public class FileProvider extends ContentProvider {
         return strat;
     }
 
-    
     private static PathStrategy parsePathStrategy(Context context, String authority)
             throws IOException, XmlPullParserException {
         final SimplePathStrategy strat = new SimplePathStrategy(authority);
 
-        final ProviderInfo info = context.getPackageManager()
-                .resolveContentProvider(authority, PackageManager.GET_META_DATA);
-        final XmlResourceParser in = info.loadXmlMetaData(
-                context.getPackageManager(), META_DATA_FILE_PROVIDER_PATHS);
-        if (in == null) {
-            throw new IllegalArgumentException(
-                    "Missing " + META_DATA_FILE_PROVIDER_PATHS + " meta-data");
-        }
+        final XmlResourceParser in = context.getResources().getXml(R.xml.file_paths);
 
         int type;
         while ((type = in.next()) != END_DOCUMENT) {
@@ -245,16 +234,13 @@ public class FileProvider extends ContentProvider {
         return strat;
     }
 
-    
     interface PathStrategy {
         
         Uri getUriForFile(File file);
 
-        
         File getFileForUri(Uri uri);
     }
 
-    
     static class SimplePathStrategy implements PathStrategy {
         private final String mAuthority;
         private final HashMap<String, File> mRoots = new HashMap<>();
@@ -263,7 +249,6 @@ public class FileProvider extends ContentProvider {
             mAuthority = authority;
         }
 
-        
         void addRoot(String name, File root) {
             if (TextUtils.isEmpty(name)) {
                 throw new IllegalArgumentException("Name must not be empty");

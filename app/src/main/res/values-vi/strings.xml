@@ -141,9 +141,6 @@
     <string name="request_timeout_summary">%1$d giây</string>
     <string name="settings_su_reauth_title">Xác thực lại sau khi nâng cấp</string>
     <string name="settings_su_reauth_summary">Xác thực lại quyền superuser sau khi nâng cấp ứng dụng</string>
-    <string name="settings_su_fingerprint_title">Bật xác thực vân tay</string>
-    <string name="settings_su_fingerprint_summary">Sử dụng quét vân tay để cho phép quyền superuser</string>
-    <string name="auth_fingerprint">Xác thực vân tay</string>
     <string name="multiuser_mode">Chế độ đa người dùng</string>
     <string name="settings_owner_only">Chỉ chủ sở hữu thiết bị</string>
     <string name="settings_owner_manage">Chủ sở hữu thiết bị được quản lý</string>
@@ -158,8 +155,7 @@
     <string name="global_summary">Tất cả các phiên root sử dụng không gian tên gắn kết chung.</string>
     <string name="requester_summary">Các phiên root sẽ kế thừa không gian tên của người yêu cầu.</string>
     <string name="isolate_summary">Mỗi phiên root sẽ có không gian tên riêng biệt.</string>
-    <string name="disable_fingerprint">Không có dấu vân tay nào được thiết lập hoặc thiết bị không hỗ trợ.</string>
-    
+
     <!--Superuser-->
     <string name="su_request_title">Yêu cầu Superuser</string>
     <string name="deny">Từ chối</string>
@@ -185,8 +181,7 @@
     <string name="su_revoke_msg">Xác nhận thu hồi quyền của %1$s?</string>
     <string name="toast">Thông báo ngắn</string>
     <string name="none">Không có</string>
-    <string name="auth_fail">Xác thực thất bại</string>
-    
+
     <!--Superuser logs-->
     <string name="target_uid">Mục UID: %1$d</string>
     <string name="command">Điều khiển: %1$s</string>

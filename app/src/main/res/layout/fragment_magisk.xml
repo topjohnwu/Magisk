@@ -15,8 +15,6 @@
 
         <import type="com.topjohnwu.magisk.R" />
 
-        <import type="com.topjohnwu.magisk.extensions.XStringKt" />
-
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -203,7 +201,7 @@
 
                 <View
                     style="@style/Widget.Divider.Horizontal"
-                    gone="@{!viewModel.hasRoot || !viewModel.isConnected}"
+                    gone="@{!viewModel.isActive || !viewModel.isConnected}"
                     android:layout_width="match_parent"
                     android:layout_margin="@dimen/margin_generic" />
 
@@ -239,7 +237,7 @@
                             android:layout_marginRight="@dimen/margin_generic"
                             android:gravity="center"
                             android:maxLines="1"
-                            android:text="@{XStringKt.res(viewModel.safetyNetTitle)}"
+                            android:text="@{viewModel.safetyNetTitle}"
                             android:textStyle="bold"
                             app:autoSizeMaxTextSize="14sp"
                             app:autoSizeTextType="uniform"
@@ -484,13 +482,13 @@
 
                 <View
                     style="@style/Widget.Divider.Horizontal"
-                    gone="@{!viewModel.hasRoot}"
+                    gone="@{!viewModel.isActive}"
                     android:layout_width="match_parent"
                     android:layout_margin="@dimen/margin_generic" />
 
                 <com.google.android.material.button.MaterialButton
                     style="@style/Widget.Button.Text"
-                    gone="@{!viewModel.hasRoot}"
+                    gone="@{!viewModel.isActive}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> viewModel.uninstallPressed()}"

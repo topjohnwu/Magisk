@@ -31,13 +31,6 @@ static void verify_client(int client, pid_t pid) {
 	}
 }
 
-static void remove_modules() {
-	LOGI("* Remove all modules and reboot");
-	rm_rf(MODULEROOT);
-	rm_rf(MODULEUPGRADE);
-	reboot();
-}
-
 static void *request_handler(void *args) {
 	int client = reinterpret_cast<intptr_t>(args);
 
@@ -53,8 +46,6 @@ static void *request_handler(void *args) {
 	case LATE_START:
 	case BOOT_COMPLETE:
 	case SQLITE_CMD:
-	case BROADCAST_ACK:
-	case BROADCAST_TEST:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -90,12 +81,6 @@ static void *request_handler(void *args) {
 		break;
 	case SQLITE_CMD:
 		exec_sql(client);
-		break;
-	case BROADCAST_ACK:
-		broadcast_ack(client);
-		break;
-	case BROADCAST_TEST:
-		broadcast_test(client);
 		break;
 	case REMOVE_MODULES:
 		if (credential.uid == UID_SHELL || credential.uid == UID_ROOT) {
@@ -179,27 +164,6 @@ static void main_daemon() {
 	}
 }
 
-void reboot() {
-	if (RECOVERY_MODE)
-		exec_command_sync("/system/bin/reboot", "recovery");
-	else
-		exec_command_sync("/system/bin/reboot");
-}
-
-int switch_mnt_ns(int pid) {
-	char mnt[32];
-	snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
-	if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
-
-	int fd, ret;
-	fd = xopen(mnt, O_RDONLY);
-	if (fd < 0) return 1;
-	// Switch to its namespace
-	ret = xsetns(fd, 0);
-	close(fd);
-	return ret;
-}
-
 int connect_daemon(bool create) {
 	struct sockaddr_un sun;
 	socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
@@ -210,9 +174,17 @@ int connect_daemon(bool create) {
 			exit(1);
 		}
 
+		int ppid = getpid();
 		LOGD("client: launching new main daemon process\n");
 		if (fork_dont_care() == 0) {
 			close(fd);
+
+			// Make sure ppid is not in acct
+			char src[64], dest[64];
+			sprintf(src, "/acct/uid_0/pid_%d", ppid);
+			sprintf(dest, "/acct/uid_0/pid_%d", getpid());
+			rename(src, dest);
+
 			main_daemon();
 		}
 

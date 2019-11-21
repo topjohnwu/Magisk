@@ -146,9 +146,6 @@
     <string name="request_timeout_summary">%1$d sekunder</string>
     <string name="settings_su_reauth_title">Autentiser på nytt etter oppdateringer after upgrade</string>
     <string name="settings_su_reauth_summary">Autentiser superbruker-tillatelser på nytt etter at en app har blitt oppdatert</string>
-    <string name="settings_su_fingerprint_title">Skru på fingeravtrykksautentisering</string>
-    <string name="settings_su_fingerprint_summary">Bruk fingeravtrykksskanneren for å godkjenne superbruker-forespørsler</string>
-    <string name="auth_fingerprint">Autentiser fingeravtrykk</string>
 
     <string name="multiuser_mode">Flerbrukermoduse</string>
     <string name="settings_owner_only">Kun enhetens eier</string>
@@ -165,7 +162,6 @@
     <string name="global_summary">Alle root-økter benytter det altdekkende monteringsnavnefeltet.</string>
     <string name="requester_summary">Root-økter vil arve forespørrerens navnefelt.</string>
     <string name="isolate_summary">Hver root-økt vil ha sitt eget isolerte navnefelt.</string>
-    <string name="disable_fingerprint">Ingen fingeravtrykk ble gitt, eller så støttes det ikke av enheten.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superbruker-forespørsel</string>
@@ -192,7 +188,6 @@
     <string name="su_revoke_msg">Vil du bekrefte for å oppheve %1$s sine rettigheter?</string>
     <string name="toast">Varselfelt</string>
     <string name="none">Ingen</string>
-    <string name="auth_fail">Autentisering mislyktes</string>
 
     <!--Superuser logs-->
     <string name="target_uid">Mål-UID: %1$d</string>

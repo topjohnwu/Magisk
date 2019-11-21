@@ -134,8 +134,6 @@
     <string name="request_timeout_summary">%1$d segundos</string>
     <string name="settings_su_reauth_title">Reautenticar após atualizar</string>
     <string name="settings_su_reauth_summary">Reautenticar permissões de superusuário após um app atualizar</string>
-    <string name="settings_su_fingerprint_title">Ativar Autenticação de Impressão Digital</string>
-    <string name="settings_su_fingerprint_summary">Usar escaneador de impressão digital para permitir solicitações de superusuário</string>
 
     <string name="multiuser_mode">Modo de Multiusuário</string>
     <string name="settings_owner_only">Proprietário do Dispositivo Apenas</string>
@@ -152,7 +150,6 @@
     <string name="global_summary">Todas as sessões root usam montagem de espaço de nome global</string>
     <string name="requester_summary">As sessões root herdarão espaço de nome de seu solicitante</string>
     <string name="isolate_summary">Cada sessão root terá seu próprio espaço de nome isolado</string>
-    <string name="disable_fingerprint">Nenhuma impressão digital foi definida ou o dispostivo não tem suporte</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitação de Superusuário</string>
@@ -179,7 +176,6 @@
     <string name="su_revoke_msg">Revogar os direitos de %1$s?</string>
     <string name="toast">Notificação toast</string>
     <string name="none">Nenhuma</string>
-    <string name="auth_fail">Falha de Autenticação</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

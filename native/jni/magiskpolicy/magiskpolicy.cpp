@@ -487,7 +487,7 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	}
 
 	// Use current policy if nothing is loaded
-	if (policydb == nullptr && load_policydb(SELINUX_POLICY)) {
+	if (magisk_policydb == nullptr && load_policydb(SELINUX_POLICY)) {
 		fprintf(stderr, "Cannot load policy from " SELINUX_POLICY "\n");
 		return 1;
 	}

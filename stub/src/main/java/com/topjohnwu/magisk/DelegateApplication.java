@@ -19,12 +19,12 @@ public class DelegateApplication extends Application {
 
     static File MANAGER_APK;
 
-    private Object factory;
+    private DelegateComponentFactory factory;
     private Application delegate;
 
     public DelegateApplication() {}
 
-    public DelegateApplication(Object o) {
+    public DelegateApplication(DelegateComponentFactory o) {
         factory = o;
     }
 
@@ -46,7 +46,6 @@ public class DelegateApplication extends Application {
 
     @SuppressLint("NewApi")
     private void setUpDynAPK() {
-        DelegateComponentFactory factory = (DelegateComponentFactory) this.factory;
         MANAGER_APK = DynAPK.current(this);
         File update = DynAPK.update(this);
         if (update.exists())
@@ -55,11 +54,12 @@ public class DelegateApplication extends Application {
             ClassLoader cl = new DynamicClassLoader(MANAGER_APK, factory.loader);
             try {
                 // Create the delegate AppComponentFactory
-                Object df = cl.loadClass("a.a").newInstance();
+                AppComponentFactory df = (AppComponentFactory)
+                        cl.loadClass("androidx.core.app.CoreComponentFactory").newInstance();
 
                 // Create the delegate Application
                 delegate = (Application) cl.loadClass("a.e").getConstructor(Object.class)
-                        .newInstance(DynAPK.pack(Mapping.data));
+                        .newInstance(DynAPK.pack(Mapping.data()));
 
                 // Call attachBaseContext without ContextImpl to show it is being wrapped
                 Method m = ContextWrapper.class.getDeclaredMethod("attachBaseContext", Context.class);
@@ -67,7 +67,7 @@ public class DelegateApplication extends Application {
                 m.invoke(delegate, this);
 
                 // If everything went well, set our loader and delegate
-                factory.delegate = (AppComponentFactory) df;
+                factory.delegate = df;
                 factory.loader = cl;
             } catch (Exception e) {
                 Log.e(getClass().getSimpleName(), "", e);

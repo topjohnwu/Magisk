@@ -7,9 +7,13 @@ import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.model.navigation.Navigation
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.intent
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
+import com.topjohnwu.magisk.wrap
 import com.topjohnwu.superuser.Shell
 
 open class SplashActivity : Activity() {
@@ -20,19 +24,7 @@ open class SplashActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Shell.getShell {
-            if (Info.env.magiskVersionCode > 0 && Info.env.magiskVersionCode < Const.Version.MIN_SUPPORT) {
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.unsupport_magisk_title)
-                    .setMessage(R.string.unsupport_magisk_message)
-                    .setNegativeButton(android.R.string.ok, null)
-                    .setOnDismissListener { finish() }
-                    .show()
-            } else {
-                initAndStart()
-            }
-        }
+        Shell.getShell { initAndStart() }
     }
 
     private fun initAndStart() {
@@ -41,7 +33,7 @@ open class SplashActivity : Activity() {
             Config.suManager = ""
             Shell.su("pm uninstall $pkg").submit()
         }
-        if (TextUtils.equals(pkg, packageName)) {
+        if (pkg == packageName) {
             runCatching {
                 // We are the manager, remove com.topjohnwu.magisk as it could be malware
                 packageManager.getApplicationInfo(BuildConfig.APPLICATION_ID, 0)
@@ -60,6 +52,11 @@ open class SplashActivity : Activity() {
 
         // Setup shortcuts
         Shortcuts.setup(this)
+
+        Shell.su("mm_patch_dtbo").submit {
+            if (it.isSuccess)
+                Notifications.dtboPatched(this)
+        }
 
         DONE = true
         Navigation.start(intent, this)

@@ -20,6 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepclassmembers class * implements javax.net.ssl.SSLSocketFactory {
+-keepclassmembers class * extends javax.net.ssl.SSLSocketFactory {
     ** delegate;
 }

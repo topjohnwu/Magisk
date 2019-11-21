@@ -1,12 +1,12 @@
 package com.topjohnwu.magisk.model.download
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.webkit.MimeTypeMap
-import androidx.core.app.NotificationCompat
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.chooser
 import com.topjohnwu.magisk.extensions.exists
@@ -69,14 +69,14 @@ open class DownloadService : RemoteFileService() {
 
     // ---
 
-    override fun NotificationCompat.Builder.addActions(subject: DownloadSubject)
+    override fun Notification.Builder.addActions(subject: DownloadSubject)
     = when (subject) {
         is Magisk -> addActionsInternal(subject)
         is Module -> addActionsInternal(subject)
         is Manager -> addActionsInternal(subject)
     }
 
-    private fun NotificationCompat.Builder.addActionsInternal(subject: Magisk)
+    private fun Notification.Builder.addActionsInternal(subject: Magisk)
     = when (val conf = subject.configuration) {
         Download -> this.apply {
             fileIntent(subject.file.parentFile!!)
@@ -92,7 +92,7 @@ open class DownloadService : RemoteFileService() {
         else -> this
     }
 
-    private fun NotificationCompat.Builder.addActionsInternal(subject: Module)
+    private fun Notification.Builder.addActionsInternal(subject: Module)
     = when (subject.configuration) {
         Download -> this.apply {
             fileIntent(subject.file.parentFile!!)
@@ -106,19 +106,19 @@ open class DownloadService : RemoteFileService() {
         else -> this
     }
 
-    private fun NotificationCompat.Builder.addActionsInternal(subject: Manager)
+    private fun Notification.Builder.addActionsInternal(subject: Manager)
     = when (subject.configuration) {
         APK.Upgrade -> setContentIntent(APKInstall.installIntent(context, subject.file))
         else -> this
     }
 
     @Suppress("ReplaceSingleLineLet")
-    private fun NotificationCompat.Builder.setContentIntent(intent: Intent) =
+    private fun Notification.Builder.setContentIntent(intent: Intent) =
         PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
             .let { setContentIntent(it) }
 
     @Suppress("ReplaceSingleLineLet")
-    private fun NotificationCompat.Builder.addAction(icon: Int, title: Int, intent: Intent) =
+    private fun Notification.Builder.addAction(icon: Int, title: Int, intent: Intent) =
         PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
             .let { addAction(icon, getString(title), it) }
 
@@ -140,7 +140,7 @@ open class DownloadService : RemoteFileService() {
         inline operator fun invoke(context: Context, argBuilder: Builder.() -> Unit) {
             val app = context.applicationContext
             val builder = Builder().apply(argBuilder)
-            val intent = app.intent(DownloadService::class.java).putExtra(ARG_URL, builder.subject)
+            val intent = app.intent<DownloadService>().putExtra(ARG_URL, builder.subject)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 app.startForegroundService(intent)

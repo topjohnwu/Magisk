@@ -11,11 +11,15 @@ import androidx.work.impl.WorkDatabase
 import androidx.work.impl.WorkDatabase_Impl
 import com.topjohnwu.magisk.data.database.RepoDatabase
 import com.topjohnwu.magisk.data.database.RepoDatabase_Impl
+import com.topjohnwu.magisk.data.database.SuLogDatabase
+import com.topjohnwu.magisk.data.database.SuLogDatabase_Impl
 import com.topjohnwu.magisk.di.ActivityTracker
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.unwrap
 import com.topjohnwu.magisk.utils.RootInit
+import com.topjohnwu.magisk.utils.SuHandler
+import com.topjohnwu.magisk.utils.updateConfig
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -33,10 +37,12 @@ open class App() : Application() {
         Shell.Config.verboseLogging(BuildConfig.DEBUG)
         Shell.Config.addInitializers(RootInit::class.java)
         Shell.Config.setTimeout(2)
+        FileProvider.callHandler = SuHandler
         Room.setFactory {
             when (it) {
                 WorkDatabase::class.java -> WorkDatabase_Impl()
                 RepoDatabase::class.java -> RepoDatabase_Impl()
+                SuLogDatabase::class.java -> SuLogDatabase_Impl()
                 else -> null
             }
         }
@@ -58,15 +64,15 @@ open class App() : Application() {
             app = this
             impl = base
         }
-        ResourceMgr.init(impl)
-        super.attachBaseContext(impl.wrap())
+        val wrapped = impl.wrap()
+        super.attachBaseContext(wrapped)
 
         // Normal startup
         startKoin {
-            androidContext(baseContext)
+            androidContext(wrapped)
             modules(koinModules)
         }
-        ResourceMgr.reload()
+        ResourceMgr.init(impl)
         app.registerActivityLifecycleCallbacks(get<ActivityTracker>())
         WorkManager.initialize(impl.wrapJob(), androidx.work.Configuration.Builder().build())
     }
@@ -77,7 +83,7 @@ open class App() : Application() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        ResourceMgr.reload(newConfig)
+        resources.updateConfig(newConfig)
         if (!isRunningAsStub)
             super.onConfigurationChanged(newConfig)
     }

@@ -3,22 +3,20 @@ package com.topjohnwu.magisk.model.download
 import android.app.Notification
 import android.content.Intent
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.topjohnwu.magisk.base.BaseService
+import com.topjohnwu.magisk.view.Notifications
 import org.koin.core.KoinComponent
 import java.util.*
 import kotlin.random.Random.Default.nextInt
 
 abstract class NotificationService : BaseService(), KoinComponent {
 
-    abstract val defaultNotification: NotificationCompat.Builder
+    abstract val defaultNotification: Notification.Builder
 
-    private val manager by lazy { NotificationManagerCompat.from(this) }
     private val hasNotifications get() = notifications.isNotEmpty()
 
     private val notifications =
-        Collections.synchronizedMap(mutableMapOf<Int, NotificationCompat.Builder>())
+        Collections.synchronizedMap(mutableMapOf<Int, Notification.Builder>())
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
@@ -30,7 +28,7 @@ abstract class NotificationService : BaseService(), KoinComponent {
 
     fun update(
         id: Int,
-        body: (NotificationCompat.Builder) -> Unit = {}
+        body: (Notification.Builder) -> Unit = {}
     ) {
         val notification = notifications.getOrPut(id) { defaultNotification }
 
@@ -43,7 +41,7 @@ abstract class NotificationService : BaseService(), KoinComponent {
 
     protected fun finishNotify(
         id: Int,
-        editBody: (NotificationCompat.Builder) -> NotificationCompat.Builder? = { null }
+        editBody: (Notification.Builder) -> Notification.Builder? = { null }
     ) : Int {
         val currentNotification = remove(id)?.run(editBody)
 
@@ -62,11 +60,11 @@ abstract class NotificationService : BaseService(), KoinComponent {
     // ---
 
     private fun notify(id: Int, notification: Notification) {
-        manager.notify(id, notification)
+        Notifications.mgr.notify(id, notification)
     }
 
     private fun cancel(id: Int) {
-        manager.cancel(id)
+        Notifications.mgr.cancel(id)
     }
 
     protected fun remove(id: Int) = notifications.remove(id).also {

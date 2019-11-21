@@ -132,8 +132,6 @@
     <string name="request_timeout_summary">%1$d seconden</string>
     <string name="settings_su_reauth_title">Opnieuw verzoeken na bijwerken</string>
     <string name="settings_su_reauth_summary">Superuser rechten opnieuw opvragen na bijwerken applicatie</string>
-    <string name="settings_su_fingerprint_title">Vingerafdruk authenticatie inschakelen</string>
-    <string name="settings_su_fingerprint_summary">Vingerafdruk gebruiken om superuser verzoeken toe te staan</string>
 
     <string name="multiuser_mode">Multi-gebruiker modus</string>
     <string name="settings_owner_only">Alleen apparaateigenaar</string>
@@ -150,7 +148,6 @@
     <string name="global_summary">Alle rootsessies gebruiken de globale naamruimte</string>
     <string name="requester_summary">Rootsessies verkrijgen de verzoeker\'s naamruimte</string>
     <string name="isolate_summary">Iedere rootsessie heeft een eigen geïsoleerde naamruimte</string>
-    <string name="disable_fingerprint">Geen vingerafdrukken ingesteld, of geen apparaatondersteuning</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser verzoek</string>
@@ -177,7 +174,6 @@
     <string name="su_revoke_msg">De rechten van %1$s intrekken?</string>
     <string name="toast">Toast</string>
     <string name="none">Geen</string>
-    <string name="auth_fail">Authenticatie mislukt</string>
 
     <!--Superuser logs-->
     <string name="target_uid">Doel UID: %1$d</string>

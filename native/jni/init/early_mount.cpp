@@ -84,6 +84,14 @@ static bool is_lnk(const char *name) {
 	return S_ISLNK(st.st_mode);
 }
 
+void BaseInit::cleanup() {
+	// Unmount in reverse order
+	for (auto &p : reversed(mount_list)) {
+		LOGD("Unmount [%s]\n", p.data());
+		umount(p.data());
+	}
+}
+
 bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
 	char path[128];
 	int fd;
@@ -118,7 +126,7 @@ if (!is_lnk("/" #name) && read_dt_fstab(#name, partname, fstype)) { \
 	setup_block(partname, block_dev); \
 	xmkdir("/" #name, 0755); \
 	xmount(block_dev, "/" #name, fstype, MS_RDONLY, nullptr); \
-	mnt_##name = true; \
+	mount_list.emplace_back("/" #name); \
 }
 
 void RootFSInit::early_mount() {
@@ -236,17 +244,4 @@ void SecondStageInit::early_mount() {
 	});
 
 	switch_root("/system_root");
-}
-
-#define umount_root(name) \
-if (mnt_##name) \
-	umount("/" #name);
-
-void MagiskInit::cleanup() {
-	umount(SELINUX_MNT);
-	BaseInit::cleanup();
-	umount_root(system);
-	umount_root(vendor);
-	umount_root(product);
-	umount_root(odm);
 }

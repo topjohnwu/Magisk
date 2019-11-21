@@ -1,7 +1,7 @@
 #MAGISK
 ##########################################################################################
 #
-# Magisk Flash Script
+# Magisk Flash Script (updater-script)
 # by topjohnwu
 #
 # This script will detect, construct the environment for Magisk
@@ -84,6 +84,8 @@ if [ -d /system/addon.d ]; then
 #!/sbin/sh
 # ADDOND_VERSION=2
 
+mount /data 2>/dev/null
+
 if [ -f /data/adb/magisk/addon.d.sh ]; then
   exec sh /data/adb/magisk/addon.d.sh "\$@"
 else
@@ -103,43 +105,10 @@ fi
 $BOOTMODE || recovery_actions
 
 ##########################################################################################
-# Boot patching
+# Boot/DTBO Patching
 ##########################################################################################
 
-eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
-$BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
-
-SOURCEDMODE=true
-cd $MAGISKBIN
-
-$IS64BIT && mv -f magiskinit64 magiskinit || rm -f magiskinit64
-
-# Source the boot patcher
-. ./boot_patch.sh "$BOOTIMAGE"
-
-ui_print "- Flashing new boot image"
-
-if ! flash_image new-boot.img "$BOOTIMAGE"; then
-  ui_print "- Compressing ramdisk to fit in partition"
-  ./magiskboot cpio ramdisk.cpio compress
-  ./magiskboot repack "$BOOTIMAGE"
-  flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
-fi
-
-./magiskboot cleanup
-rm -f new-boot.img
-
-if [ -f stock_boot* ]; then
-  rm -f /data/stock_boot* 2>/dev/null
-  $DATA && mv stock_boot* /data
-fi
-
-$KEEPVERITY || patch_dtbo_image
-
-if [ -f stock_dtbo* ]; then
-  rm -f /data/stock_dtbo* 2>/dev/null
-  $DATA && mv stock_dtbo* /data
-fi
+patch_boot_image
 
 cd /
 # Cleanups

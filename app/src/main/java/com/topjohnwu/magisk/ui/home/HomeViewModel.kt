@@ -77,7 +77,7 @@ class HomeViewModel(
             ""
     }
 
-    val safetyNetTitle = KObservableField(R.string.safetyNet_check_text)
+    val safetyNetTitle = KObservableField(R.string.safetyNet_check_text.res())
     val ctsState = KObservableField(SafetyNetState.IDLE)
     val basicIntegrityState = KObservableField(SafetyNetState.IDLE)
     val safetyNetState = Observer(ctsState, basicIntegrityState) {
@@ -92,7 +92,7 @@ class HomeViewModel(
         }
     }
 
-    val hasRoot = KObservableField(false)
+    val isActive = KObservableField(false)
 
     private var shownDialog = false
 
@@ -135,7 +135,7 @@ class HomeViewModel(
     fun safetyNetPressed() {
         ctsState.value = SafetyNetState.LOADING
         basicIntegrityState.value = SafetyNetState.LOADING
-        safetyNetTitle.value = R.string.checking_safetyNet_status
+        safetyNetTitle.value = R.string.checking_safetyNet_status.res()
 
         UpdateSafetyNetEvent().publish()
     }
@@ -144,7 +144,7 @@ class HomeViewModel(
         response and 0x0F == 0 -> {
             val hasCtsPassed = response and SafetyNetHelper.CTS_PASS != 0
             val hasBasicIntegrityPassed = response and SafetyNetHelper.BASIC_PASS != 0
-            safetyNetTitle.value = R.string.safetyNet_check_success
+            safetyNetTitle.value = R.string.safetyNet_check_success.res()
             ctsState.value = if (hasCtsPassed) {
                 SafetyNetState.PASS
             } else {
@@ -164,8 +164,8 @@ class HomeViewModel(
             ctsState.value = SafetyNetState.IDLE
             basicIntegrityState.value = SafetyNetState.IDLE
             safetyNetTitle.value = when (response) {
-                SafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
-                else -> R.string.safetyNet_api_error
+                SafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid.res()
+                else -> R.string.safetyNet_api_error.res()
             }
         }
     }
@@ -175,7 +175,7 @@ class HomeViewModel(
         if (invalidate)
             Info.envRef.invalidate()
 
-        hasRoot.value = Shell.rootAccess()
+        isActive.value = Info.env.isActive
 
         val fetchUpdate = if (isConnected.value)
             magiskRepo.fetchUpdate().ignoreElement()
@@ -192,7 +192,7 @@ class HomeViewModel(
             _managerState.value = MagiskState.LOADING
             ctsState.value = SafetyNetState.IDLE
             basicIntegrityState.value = SafetyNetState.IDLE
-            safetyNetTitle.value = R.string.safetyNet_check_text
+            safetyNetTitle.value = R.string.safetyNet_check_text.res()
         }.subscribeK {
             updateSelf()
             ensureEnv()
@@ -215,8 +215,8 @@ class HomeViewModel(
 
     private fun updateSelf() {
         magiskState.value = when (Info.env.magiskVersionCode) {
-            in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED
-            in 1 until (Info.remote.magisk.versionCode - 1) -> MagiskState.OBSOLETE
+            in Int.MIN_VALUE .. 0 -> MagiskState.NOT_INSTALLED
+            in 1 until Info.remote.magisk.versionCode -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
@@ -224,10 +224,10 @@ class HomeViewModel(
             VERSION_FMT.format(Info.remote.magisk.version, Info.remote.magisk.versionCode)
 
         _managerState.value = when (Info.remote.app.versionCode) {
-            in Int.MIN_VALUE until 0 -> MagiskState.NOT_INSTALLED //wrong update channel
-            in (BuildConfig.VERSION_CODE + 1) until Int.MAX_VALUE -> MagiskState.OBSOLETE
+            in Int.MIN_VALUE .. 0 -> MagiskState.NOT_INSTALLED //wrong update channel
+            in (BuildConfig.VERSION_CODE + 1) .. Int.MAX_VALUE -> MagiskState.OBSOLETE
             else -> {
-                if (isRunningAsStub && Info.stub!!.version < Info.remote.stub.versionCode)
+                if (Info.stub?.version ?: Int.MAX_VALUE < Info.remote.stub.versionCode)
                     MagiskState.OBSOLETE
                 else
                     MagiskState.UP_TO_DATE

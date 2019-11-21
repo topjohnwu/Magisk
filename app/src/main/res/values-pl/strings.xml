@@ -8,7 +8,6 @@
     <string name="settings">Ustawienia</string>
     <string name="install">Instaluj</string>
     <string name="unsupport_magisk_title">Nieobsługiwana Wersja Magisk</string>
-    <string name="unsupport_magisk_message">Ta wersja Magisk Managera nie obsługuje wersji Magisk niższej niż v18.0.\n\nMożesz albo ręcznie zaktualizować Magisk lub obniżyć w aplikacji do starszej wersji.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie jest zainstalowany.</string>
@@ -24,6 +23,7 @@
     <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
     <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
     <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity (weryfikację procesu bootowania)</string>
+    <string name="recovery_mode">Tryb Recovery</string>
     <string name="current_installed">Zainstalowana: %1$s</string>
     <string name="latest_version">Ostatnia: %1$s</string>
     <string name="uninstall">Odinstaluj</string>
@@ -145,6 +145,10 @@
     <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
     <string name="settings_hosts_toast">Dodano moduł systemless hosts</string>
 
+    <string name="settings_app_name">Wpisz żądaną nazwę aplikacji</string>
+    <string name="settings_app_name_hint">Nowa Nazwa</string>
+    <string name="settings_app_name_helper">Aplikacja zostanie ponownie spakowana do tej nazwy</string>
+    <string name="settings_app_name_error">Zły format</string>
     <string name="settings_su_app_adb">Aplikacje i ADB</string>
     <string name="settings_su_app">Tylko Aplikacje</string>
     <string name="settings_su_adb">Tylko ADB</string>
@@ -162,9 +166,6 @@
     <string name="request_timeout_summary">%1$d sekund</string>
     <string name="settings_su_reauth_title">Ponowienie uwierzytelnienia po aktualizacji</string>
     <string name="settings_su_reauth_summary">Ponowne uwierzytelnianie uprawnienia superużytkownika po aktualizacji aplikacji</string>
-    <string name="settings_su_fingerprint_title">Włącz Uwierzytelnienie Odciskiem Palca</string>
-    <string name="settings_su_fingerprint_summary">Użyj skanera linii papilarnych, aby zezwolić na żądania supersu</string>
-    <string name="auth_fingerprint">Uwierzytelnianie Odciskiem Palca</string>
 
     <string name="multiuser_mode">Tryb Multiusera</string>
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
@@ -181,7 +182,6 @@
     <string name="global_summary">Wszystkie sesje root za pomocą globalnej przestrzeni montowań nazw</string>
     <string name="requester_summary">Sesje Root będzie dziedziczyć prośby i nazwy</string>
     <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
-    <string name="disable_fingerprint">Nie ustawiono żadnych odcisków palców lub brak obsługi urządzenia</string>
     <string name="settings_download_path_error">Błąd podczas tworzenia folderu. Musi być dostępny z głównego katalogu pamięci i nie może być plikiem.</string>
 
     <!--Superuser-->
@@ -209,7 +209,6 @@
     <string name="su_revoke_msg">Potwierdzasz odwołanie uprawnień %1$s?</string>
     <string name="toast">Powiadomienie</string>
     <string name="none">Brak</string>
-    <string name="auth_fail">Uwierzytelnienie Nieudane</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

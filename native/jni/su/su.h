@@ -17,7 +17,7 @@
 class su_info {
 public:
 	/* Unique key */
-	const unsigned uid;
+	const int uid;
 
 	/* These should be guarded with internal lock */
 	db_settings cfg;
@@ -39,7 +39,7 @@ private:
 };
 
 struct su_req_base {
-	unsigned uid = UID_ROOT;
+	int uid = UID_ROOT;
 	bool login = false;
 	bool keepenv = false;
 	bool mount_master = false;
@@ -63,7 +63,7 @@ private:
 struct su_context {
 	std::shared_ptr<su_info> info;
 	su_request req;
-	pid_t pid;
+	int pid;
 };
 
 void app_log(const su_context &ctx);

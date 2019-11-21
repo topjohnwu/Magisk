@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.extensions
 
 import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposables
@@ -53,14 +54,14 @@ fun <T> Single<T>.subscribeK(
     onError: OnErrorListener = { it.printStackTrace() },
     onNext: OnSuccessListener<T> = {}
 ) = applySchedulers()
-    .subscribe(onNext, onError)
+    .subscribe(onSuccess, onError)
 
 fun <T> Maybe<T>.subscribeK(
     onError: OnErrorListener = { it.printStackTrace() },
     onComplete: OnCompleteListener = {},
-    onNext: OnSuccessListener<T> = {}
+    onSuccess: OnSuccessListener<T> = {}
 ) = applySchedulers()
-    .subscribe(onNext, onError, onComplete)
+    .subscribe(onSuccess, onError, onComplete)
 
 fun <T> Flowable<T>.subscribeK(
     onError: OnErrorListener = { it.printStackTrace() },
@@ -104,54 +105,54 @@ fun Completable.updateBy(
 
 
 fun <T> Observable<T>.doOnSubscribeUi(body: () -> Unit) =
-    doOnSubscribe { ui { body() } }
+    doOnSubscribe { UiThreadHandler.run { body() } }
 
 fun <T> Single<T>.doOnSubscribeUi(body: () -> Unit) =
-    doOnSubscribe { ui { body() } }
+    doOnSubscribe { UiThreadHandler.run { body() } }
 
 fun <T> Maybe<T>.doOnSubscribeUi(body: () -> Unit) =
-    doOnSubscribe { ui { body() } }
+    doOnSubscribe { UiThreadHandler.run { body() } }
 
 fun <T> Flowable<T>.doOnSubscribeUi(body: () -> Unit) =
-    doOnSubscribe { ui { body() } }
+    doOnSubscribe { UiThreadHandler.run { body() } }
 
 fun Completable.doOnSubscribeUi(body: () -> Unit) =
-    doOnSubscribe { ui { body() } }
+    doOnSubscribe { UiThreadHandler.run { body() } }
 
 
 fun <T> Observable<T>.doOnErrorUi(body: (Throwable) -> Unit) =
-    doOnError { ui { body(it) } }
+    doOnError { UiThreadHandler.run { body(it) } }
 
 fun <T> Single<T>.doOnErrorUi(body: (Throwable) -> Unit) =
-    doOnError { ui { body(it) } }
+    doOnError { UiThreadHandler.run { body(it) } }
 
 fun <T> Maybe<T>.doOnErrorUi(body: (Throwable) -> Unit) =
-    doOnError { ui { body(it) } }
+    doOnError { UiThreadHandler.run { body(it) } }
 
 fun <T> Flowable<T>.doOnErrorUi(body: (Throwable) -> Unit) =
-    doOnError { ui { body(it) } }
+    doOnError { UiThreadHandler.run { body(it) } }
 
 fun Completable.doOnErrorUi(body: (Throwable) -> Unit) =
-    doOnError { ui { body(it) } }
+    doOnError { UiThreadHandler.run { body(it) } }
 
 
 fun <T> Observable<T>.doOnNextUi(body: (T) -> Unit) =
-    doOnNext { ui { body(it) } }
+    doOnNext { UiThreadHandler.run { body(it) } }
 
 fun <T> Flowable<T>.doOnNextUi(body: (T) -> Unit) =
-    doOnNext { ui { body(it) } }
+    doOnNext { UiThreadHandler.run { body(it) } }
 
 fun <T> Single<T>.doOnSuccessUi(body: (T) -> Unit) =
-    doOnSuccess { ui { body(it) } }
+    doOnSuccess { UiThreadHandler.run { body(it) } }
 
 fun <T> Maybe<T>.doOnSuccessUi(body: (T) -> Unit) =
-    doOnSuccess { ui { body(it) } }
+    doOnSuccess { UiThreadHandler.run { body(it) } }
 
 fun <T> Maybe<T>.doOnCompleteUi(body: () -> Unit) =
-    doOnComplete { ui { body() } }
+    doOnComplete { UiThreadHandler.run { body() } }
 
 fun Completable.doOnCompleteUi(body: () -> Unit) =
-    doOnComplete { ui { body() } }
+    doOnComplete { UiThreadHandler.run { body() } }
 
 
 fun <T, R> Observable<List<T>>.mapList(

@@ -21,19 +21,18 @@ using namespace std;
 uint32_t dyn_img_hdr::j32 = 0;
 uint64_t dyn_img_hdr::j64 = 0;
 
-static int64_t one_step(unique_ptr<Compression> &&ptr, int fd, const void *in, size_t size) {
-	ptr->setOut(make_unique<FDOutStream>(fd));
-	if (!ptr->write(in, size))
-		return -1;
-	return ptr->finalize();
-}
-
-static int64_t decompress(format_t type, int fd, const void *in, size_t size) {
-	return one_step(unique_ptr<Compression>(get_decoder(type)), fd, in, size);
+static void decompress(format_t type, int fd, const void *in, size_t size) {
+	unique_ptr<stream> ptr(get_decoder(type, open_stream<fd_stream>(fd)));
+	ptr->write(in, size);
 }
 
 static int64_t compress(format_t type, int fd, const void *in, size_t size) {
-	return one_step(unique_ptr<Compression>(get_encoder(type)), fd, in, size);
+	auto prev = lseek(fd, 0, SEEK_CUR);
+	unique_ptr<stream> ptr(get_encoder(type, open_stream<fd_stream>(fd)));
+	ptr->write(in, size);
+	ptr->close();
+	auto now = lseek(fd, 0, SEEK_CUR);
+	return now - prev;
 }
 
 static void dump(void *buf, size_t size, const char *filename) {
@@ -221,7 +220,7 @@ void boot_img::parse_image(uint8_t *addr) {
 			hdr = new dyn_img_v0(addr);
 	}
 
-	for (int i = SHA_DIGEST_SIZE; i < SHA256_DIGEST_SIZE; ++i) {
+	for (int i = SHA_DIGEST_SIZE + 4; i < SHA256_DIGEST_SIZE; ++i) {
 		if (hdr->id()[i]) {
 			flags |= SHA256_FLAG;
 			break;
@@ -312,14 +311,14 @@ void boot_img::find_kernel_dtb() {
 	}
 }
 
-int unpack(const char *image, bool hdr) {
+int unpack(const char *image, bool nodecomp, bool hdr) {
 	boot_img boot(image);
 
 	if (hdr)
 		boot.hdr->dump_hdr_file();
 
 	// Dump kernel
-	if (COMPRESSED(boot.k_fmt)) {
+	if (!nodecomp && COMPRESSED(boot.k_fmt)) {
 		int fd = creat(KERNEL_FILE, 0644);
 		decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size());
 		close(fd);
@@ -331,7 +330,7 @@ int unpack(const char *image, bool hdr) {
 	dump(boot.kernel_dtb, boot.kernel_dt_size, KER_DTB_FILE);
 
 	// Dump ramdisk
-	if (COMPRESSED(boot.r_fmt)) {
+	if (!nodecomp && COMPRESSED(boot.r_fmt)) {
 		int fd = creat(RAMDISK_FILE, 0644);
 		decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
 		close(fd);
@@ -436,7 +435,7 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 		size_t raw_size;
 		void *raw_buf;
 		mmap_ro(RAMDISK_FILE, raw_buf, raw_size);
-		if (!COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt) && !nocomp) {
+		if (!nocomp && !COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.r_fmt)) {
 			boot.hdr->ramdisk_size() = compress(boot.r_fmt, fd, raw_buf, raw_size);
 		} else {
 			boot.hdr->ramdisk_size() = xwrite(fd, raw_buf, raw_size);

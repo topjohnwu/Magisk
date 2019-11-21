@@ -27,7 +27,7 @@ object PatchAPK {
     private val UPPERALPHA = LOWERALPHA.toUpperCase()
     private val ALPHA = LOWERALPHA + UPPERALPHA
     private const val DIGITS = "0123456789"
-    private val ALPHANUM = ALPHA + DIGITS
+    val ALPHANUM = ALPHA + DIGITS
     private val ALPHANUMDOTS = "$ALPHANUM............"
 
     private fun genPackageName(prefix: String, length: Int): String {
@@ -77,8 +77,9 @@ object PatchAPK {
     }
 
     private fun patchAndHide(context: Context, label: String): Boolean {
-        // If not running as stub, and we are compatible with stub, use stub
-        val src = if (!isRunningAsStub && SDK_INT >= 28 && Info.env.connectionMode == 3) {
+        val src = if (!isRunningAsStub && SDK_INT >= 28 &&
+            Info.env.magiskVersionCode >= Const.Version.PROVIDER_CONNECT) {
+            // If not running as stub, and we are compatible with stub, use stub
             val stub = File(context.cacheDir, "stub.apk")
             val svc = get<GithubRawServices>()
             runCatching {
@@ -118,7 +119,7 @@ object PatchAPK {
     @JvmOverloads
     fun patch(apk: String, out: String, pkg: String, label: String = "Manager"): Boolean {
         try {
-            val jar = JarMap(apk)
+            val jar = JarMap.open(apk)
             val je = jar.getJarEntry(Const.ANDROID_MANIFEST)
             val xml = jar.getRawData(je)
 

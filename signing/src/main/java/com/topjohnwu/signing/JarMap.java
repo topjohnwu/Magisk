@@ -15,117 +15,149 @@ import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/*
-* A universal random access interface for both JarFile and JarInputStream
-*
-* In the case when JarInputStream is provided to constructor, the whole stream
-* will be loaded into memory for random access purposes.
-* On the other hand, when a JarFile is provided, it simply works as a wrapper.
-* */
+public abstract class JarMap implements Closeable {
 
-public class JarMap implements Closeable {
+    LinkedHashMap<String, JarEntry> entryMap;
 
-    private JarFile jarFile;
-    private JarInputStream jis;
-    private LinkedHashMap<String, JarEntry> bufMap;
-    private Manifest manifest;
-
-    public JarMap(File file) throws IOException {
-        this(file, true);
+    public static JarMap open(String file) throws IOException {
+        return new FileMap(new File(file), true, ZipFile.OPEN_READ);
     }
 
-    public JarMap(File file, boolean verify) throws IOException {
-        this(file, verify, ZipFile.OPEN_READ);
+    public static JarMap open(File file, boolean verify) throws IOException {
+        return new FileMap(file, verify, ZipFile.OPEN_READ);
     }
 
-    public JarMap(File file, boolean verify, int mode) throws IOException {
-        jarFile = new JarFile(file, verify, mode);
-        manifest = jarFile.getManifest();
+    public static JarMap open(String file, boolean verify) throws IOException {
+        return new FileMap(new File(file), verify, ZipFile.OPEN_READ);
     }
 
-    public JarMap(String name) throws IOException {
-        this(new File(name));
-    }
-
-    public JarMap(String name, boolean verify) throws IOException {
-        this(new File(name), verify);
-    }
-
-    public JarMap(InputStream is) throws IOException {
-        this(is, true);
-    }
-
-    public JarMap(InputStream is, boolean verify) throws IOException {
-        jis = new JarInputStream(is, verify);
-        bufMap = new LinkedHashMap<>();
-        JarEntry entry;
-        while ((entry = jis.getNextJarEntry()) != null) {
-            bufMap.put(entry.getName(), new JarMapEntry(entry, jis));
-        }
-        manifest = jis.getManifest();
+    public static JarMap open(InputStream is, boolean verify) throws IOException {
+        return new StreamMap(is, verify);
     }
 
     public File getFile() {
-        return jarFile == null ? null : new File(jarFile.getName());
+        return null;
     }
 
-    public Manifest getManifest() {
-        return manifest;
-    }
+    public abstract Manifest getManifest() throws IOException;
 
     public InputStream getInputStream(ZipEntry ze) throws IOException {
-        if (bufMap != null) {
-            JarMapEntry e = (JarMapEntry) bufMap.get(ze.getName());
-            if (e != null)
-                return e.data.getInputStream();
-        }
-        return jarFile.getInputStream(ze);
+        JarMapEntry e = getMapEntry(ze.getName());
+        return e != null ? e.data.getInputStream() : null;
     }
 
     public OutputStream getOutputStream(ZipEntry ze) {
-        manifest = null; /* Invalidate the manifest */
-        if (bufMap == null)
-            bufMap = new LinkedHashMap<>();
+        if (entryMap == null)
+            entryMap = new LinkedHashMap<>();
         JarMapEntry e = new JarMapEntry(ze.getName());
-        bufMap.put(ze.getName(), e);
+        entryMap.put(ze.getName(), e);
         return e.data;
     }
 
     public byte[] getRawData(ZipEntry ze) throws IOException {
-        if (bufMap != null) {
-            JarMapEntry e = (JarMapEntry) bufMap.get(ze.getName());
-            if (e != null)
-                return e.data.toByteArray();
-        }
-        ByteArrayStream bytes = new ByteArrayStream();
-        bytes.readFrom(jarFile.getInputStream(ze));
-        return bytes.toByteArray();
+        JarMapEntry e = getMapEntry(ze.getName());
+        return e != null ? e.data.toByteArray() : null;
     }
 
-    public Enumeration<JarEntry> entries() {
-        return jarFile == null ? Collections.enumeration(bufMap.values()) : jarFile.entries();
-    }
+    public abstract Enumeration<JarEntry> entries();
 
-    public ZipEntry getEntry(String name) {
+    public final ZipEntry getEntry(String name) {
         return getJarEntry(name);
     }
 
     public JarEntry getJarEntry(String name) {
-        JarEntry e = jarFile == null ? bufMap.get(name) : jarFile.getJarEntry(name);
-        if (e == null && bufMap != null)
-            return bufMap.get(name);
+        return getMapEntry(name);
+    }
+
+    JarMapEntry getMapEntry(String name) {
+        JarMapEntry e = null;
+        if (entryMap != null)
+            e = (JarMapEntry) entryMap.get(name);
         return e;
     }
 
-    @Override
-    public void close() throws IOException {
-        if (jarFile != null)
+    private static class FileMap extends JarMap {
+
+        private JarFile jarFile;
+
+        FileMap(File file, boolean verify, int mode) throws IOException {
+            jarFile = new JarFile(file, verify, mode);
+        }
+
+        @Override
+        public File getFile() {
+            return new File(jarFile.getName());
+        }
+
+        @Override
+        public Manifest getManifest() throws IOException {
+            return jarFile.getManifest();
+        }
+
+        @Override
+        public InputStream getInputStream(ZipEntry ze) throws IOException {
+            InputStream is = super.getInputStream(ze);
+            return is != null ? is : jarFile.getInputStream(ze);
+        }
+
+        @Override
+        public byte[] getRawData(ZipEntry ze) throws IOException {
+            byte[] b = super.getRawData(ze);
+            if (b != null)
+                return b;
+            ByteArrayStream bytes = new ByteArrayStream();
+            bytes.readFrom(jarFile.getInputStream(ze));
+            return bytes.toByteArray();
+        }
+
+        @Override
+        public Enumeration<JarEntry> entries() {
+            return jarFile.entries();
+        }
+
+        @Override
+        public JarEntry getJarEntry(String name) {
+            JarEntry e = getMapEntry(name);
+            return e != null ? e : jarFile.getJarEntry(name);
+        }
+
+        @Override
+        public void close() throws IOException {
             jarFile.close();
-        else
+        }
+    }
+
+    private static class StreamMap extends JarMap {
+
+        private JarInputStream jis;
+
+        StreamMap(InputStream is, boolean verify) throws IOException {
+            jis = new JarInputStream(is, verify);
+            entryMap = new LinkedHashMap<>();
+            JarEntry entry;
+            while ((entry = jis.getNextJarEntry()) != null) {
+                entryMap.put(entry.getName(), new JarMapEntry(entry, jis));
+            }
+        }
+
+        @Override
+        public Manifest getManifest() {
+            return jis.getManifest();
+        }
+
+        @Override
+        public Enumeration<JarEntry> entries() {
+            return Collections.enumeration(entryMap.values());
+        }
+
+        @Override
+        public void close() throws IOException {
             jis.close();
+        }
     }
 
     private static class JarMapEntry extends JarEntry {
+
         ByteArrayStream data;
 
         JarMapEntry(JarEntry je, InputStream is) {

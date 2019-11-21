@@ -12,9 +12,8 @@ import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.inject
-import com.topjohnwu.magisk.extensions.packageName
 import com.topjohnwu.magisk.model.preference.PreferenceModel
-import com.topjohnwu.magisk.utils.FingerprintHelper
+import com.topjohnwu.magisk.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
@@ -33,7 +32,7 @@ object Config : PreferenceModel, DBConfig {
         const val ROOT_ACCESS = "root_access"
         const val SU_MULTIUSER_MODE = "multiuser_mode"
         const val SU_MNT_NS = "mnt_ns"
-        const val SU_FINGERPRINT = "su_fingerprint"
+        const val SU_BIOMETRIC = "su_biometric"
         const val SU_MANAGER = "requester"
         const val KEYSTORE = "keystore"
 
@@ -139,7 +138,7 @@ object Config : PreferenceModel, DBConfig {
     var rootMode by dbSettings(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB)
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
-    var suFingerprint by dbSettings(Key.SU_FINGERPRINT, false)
+    var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 
@@ -147,8 +146,17 @@ object Config : PreferenceModel, DBConfig {
     val downloadDirectory get() =
         Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
 
-    fun initialize() = prefs.edit {
+    private const val SU_FINGERPRINT = "su_fingerprint"
+
+    fun initialize() = prefs.also {
+        if (it.getBoolean(SU_FINGERPRINT, false)) {
+            suBiometric = true
+        }
+    }.edit {
         parsePrefs(this)
+
+        // Legacy stuff
+        remove(SU_FINGERPRINT)
 
         // Get actual state
         putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
@@ -157,7 +165,7 @@ object Config : PreferenceModel, DBConfig {
         putString(Key.ROOT_ACCESS, rootMode.toString())
         putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
         putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
-        putBoolean(Key.SU_FINGERPRINT, FingerprintHelper.useFingerprint())
+        putBoolean(Key.SU_BIOMETRIC, BiometricHelper.isEnabled)
     }.also {
         if (!prefs.contains(Key.UPDATE_CHANNEL))
             prefs.edit().putString(Key.UPDATE_CHANNEL, defaultChannel.toString()).apply()
@@ -166,7 +174,7 @@ object Config : PreferenceModel, DBConfig {
     private fun parsePrefs(editor: SharedPreferences.Editor) = editor.apply {
         val config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS)
         if (config.exists()) runCatching {
-            val input = SuFileInputStream(config).buffered()
+            val input = SuFileInputStream(config)
             val parser = Xml.newPullParser()
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
             parser.setInput(input, "UTF-8")
@@ -217,9 +225,10 @@ object Config : PreferenceModel, DBConfig {
     fun export() {
         // Flush prefs to disk
         prefs.edit().commit()
+        val context = get<Context>(Protected)
         val xml = File(
-            "${get<Context>(Protected).filesDir.parent}/shared_prefs",
-            "${packageName}_preferences.xml"
+            "${context.filesDir.parent}/shared_prefs",
+            "${context.packageName}_preferences.xml"
         )
         Shell.su("cat $xml > /data/adb/${Const.MANAGER_CONFIGS}").exec()
     }

@@ -17,9 +17,7 @@ enum {
 	BOOT_COMPLETE,
 	MAGISKHIDE,
 	SQLITE_CMD,
-	BROADCAST_ACK,
 	REMOVE_MODULES,
-	BROADCAST_TEST,
 };
 
 // Return codes for daemon
@@ -30,13 +28,11 @@ enum {
 	DAEMON_LAST
 };
 
-// daemon.c
+// daemon.cpp
 
 int connect_daemon(bool create = false);
-int switch_mnt_ns(int pid);
-void reboot();
 
-// socket.c
+// socket.cpp
 
 socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name);
 int create_rand_socket(struct sockaddr_un *sun);
@@ -63,6 +59,7 @@ void unlock_blocks();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
+void remove_modules();
 
 /*************
  * Scripting *
@@ -85,8 +82,6 @@ void magiskhide_handler(int client);
  *************/
 
 void su_daemon_handler(int client, struct ucred *credential);
-void broadcast_test(int client = -1);
-void broadcast_ack(int client);
 
 /*********************
  * Daemon Global Vars

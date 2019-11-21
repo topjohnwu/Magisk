@@ -21,9 +21,11 @@ FULL_VER(MagiskBoot) R"EOF(  - Boot Image Modification Tool
 Usage: %s <action> [args...]
 
 Supported actions:
-  unpack [-h] <bootimg>
+  unpack [-n] [-h] <bootimg>
     Unpack <bootimg> to, if available, kernel, kernel_dtb, ramdisk.cpio,
     second, dtb, extra, and recovery_dtbo into current directory.
+    If '-n' is provided, it will not attempt to decompress kernel or
+    ramdisk.cpio from their original formats.
     If '-h' is provided, it will dump header info to 'header',
     which will be parsed when repacking.
     Return values:
@@ -146,13 +148,25 @@ int main(int argc, char *argv[]) {
 		printf("\n");
 		munmap(buf, size);
 	} else if (argc > 2 && action == "unpack") {
-		if (argv[2] == "-h"sv) {
-			if (argc == 3)
+		int idx = 2;
+		bool nodecomp = false;
+		bool hdr = false;
+		for (;;) {
+			if (idx >= argc)
 				usage(argv[0]);
-			return unpack(argv[3], true);
-		} else {
-			return unpack(argv[2]);
+			if (argv[idx][0] != '-')
+				break;
+			for (char *flag = &argv[idx][1]; *flag; ++flag) {
+				if (*flag == 'n')
+					nodecomp = true;
+				else if (*flag == 'h')
+					hdr = true;
+				else
+					usage(argv[0]);
+			}
+			++idx;
 		}
+		return unpack(argv[idx], nodecomp, hdr);
 	} else if (argc > 2 && action == "repack") {
 		if (argv[2] == "-n"sv) {
 			if (argc == 3)

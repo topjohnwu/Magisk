@@ -65,7 +65,7 @@ class Module(path: String) : BaseModule() {
                 val module = Module(Const.MAGISK_PATH + "/" + file.name)
                 moduleList.add(module)
             }
-            return moduleList.sortedBy { it.name }
+            return moduleList.sortedBy { it.name.toLowerCase() }
         }
     }
 }

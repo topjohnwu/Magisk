@@ -7,11 +7,11 @@ import com.topjohnwu.magisk.model.entity.MagiskPolicy.Companion.INTERACTIVE
 
 
 data class MagiskPolicy(
-    val uid: Int,
+    var uid: Int,
     val packageName: String,
     val appName: String,
-    val policy: Int = INTERACTIVE,
-    val until: Long = -1L,
+    var policy: Int = INTERACTIVE,
+    var until: Long = -1L,
     val logging: Boolean = true,
     val notification: Boolean = true,
     val applicationInfo: ApplicationInfo
@@ -38,7 +38,7 @@ fun MagiskPolicy.toMap() = mapOf(
 fun Map<String, String>.toPolicy(pm: PackageManager): MagiskPolicy {
     val uid = get("uid")?.toIntOrNull() ?: -1
     val packageName = get("package_name").orEmpty()
-    val info = pm.getApplicationInfo(packageName, 0)
+    val info = pm.getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES)
 
     if (info.uid != uid)
         throw PackageManager.NameNotFoundException()
@@ -56,14 +56,15 @@ fun Map<String, String>.toPolicy(pm: PackageManager): MagiskPolicy {
 }
 
 @Throws(PackageManager.NameNotFoundException::class)
-fun Int.toPolicy(pm: PackageManager): MagiskPolicy {
+fun Int.toPolicy(pm: PackageManager, policy: Int = INTERACTIVE): MagiskPolicy {
     val pkg = pm.getPackagesForUid(this)?.firstOrNull()
         ?: throw PackageManager.NameNotFoundException()
-    val info = pm.getApplicationInfo(pkg, 0)
+    val info = pm.getApplicationInfo(pkg, PackageManager.GET_UNINSTALLED_PACKAGES)
     return MagiskPolicy(
-        uid = this,
+        uid = info.uid,
         packageName = pkg,
+        policy = policy,
         applicationInfo = info,
-        appName = info.loadLabel(pm).toString()
+        appName = info.getLabel(pm)
     )
 }
