@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.redesign.home
 
 import android.Manifest
+import android.os.Build
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
@@ -158,7 +159,13 @@ class HomeViewModel(
         )
 
         // Don't bother checking env when magisk is not installed, loading or already has been shown
-        if (invalidStates.any { it == stateMagisk.value } || shownDialog) {
+        if (
+            invalidStates.any { it == stateMagisk.value } ||
+            shownDialog ||
+            // don't care for emulators either
+            Build.DEVICE.orEmpty().contains("generic") ||
+            Build.PRODUCT.orEmpty().contains("generic")
+        ) {
             return
         }
 
