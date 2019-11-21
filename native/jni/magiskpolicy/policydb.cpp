@@ -7,6 +7,7 @@
 
 #include <utils.h>
 #include <logging.h>
+#include <stream.h>
 
 #include "magiskpolicy.h"
 #include "sepolicy.h"
@@ -180,7 +181,7 @@ int dump_policydb(const char *file) {
 	size_t len;
 
 	pf.type = PF_USE_STDIO;
-	pf.fp = open_memfile(data, len);
+	pf.fp = open_stream<byte_stream>(data, len);
 	if (policydb_write(magisk_policydb, &pf)) {
 		LOGE("Fail to create policy image\n");
 		return 1;
