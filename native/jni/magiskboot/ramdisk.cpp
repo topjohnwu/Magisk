@@ -241,14 +241,17 @@ void magisk_cpio::compress() {
 		return;
 	fprintf(stderr, "Compressing cpio -> [%s]\n", RAMDISK_XZ);
 	auto init = entries.extract("init");
-	XZEncoder encoder;
-	encoder.setOut(make_unique<BufOutStream>());
-	output(encoder);
-	encoder.finalize();
+
+	uint8_t *data;
+	size_t len;
+	FILE *fp = open_stream(get_encoder(XZ, open_stream<byte_stream>(data, len)));
+	dump(fp);
+
 	entries.clear();
 	entries.insert(std::move(init));
 	auto xz = new cpio_entry(RAMDISK_XZ, S_IFREG);
-	static_cast<BufOutStream *>(encoder.getOut())->release(xz->data, xz->filesize);
+	xz->data = data;
+	xz->filesize = len;
 	insert(xz);
 }
 
@@ -257,15 +260,16 @@ void magisk_cpio::decompress() {
 	if (it == entries.end())
 		return;
 	fprintf(stderr, "Decompressing cpio [%s]\n", RAMDISK_XZ);
-	LZMADecoder decoder;
-	decoder.setOut(make_unique<BufOutStream>());
-	decoder.write(it->second->data, it->second->filesize);
-	decoder.finalize();
+
+	char *data;
+	size_t len;
+	auto strm = get_decoder(XZ, open_stream<byte_stream>(data, len));
+	strm->write(it->second->data, it->second->filesize);
+	delete strm;
+
 	entries.erase(it);
-	char *buf;
-	size_t sz;
-	static_cast<BufOutStream *>(decoder.getOut())->getbuf(buf, sz);
-	load_cpio(buf, sz);
+	load_cpio(data, len);
+	free(data);
 }
 
 int cpio_commands(int argc, char *argv[]) {

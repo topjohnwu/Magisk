@@ -21,19 +21,18 @@ using namespace std;
 uint32_t dyn_img_hdr::j32 = 0;
 uint64_t dyn_img_hdr::j64 = 0;
 
-static int64_t one_step(unique_ptr<Compression> &&ptr, int fd, const void *in, size_t size) {
-	ptr->setOut(make_unique<FDOutStream>(fd));
-	if (!ptr->write(in, size))
-		return -1;
-	return ptr->finalize();
-}
-
-static int64_t decompress(format_t type, int fd, const void *in, size_t size) {
-	return one_step(unique_ptr<Compression>(get_decoder(type)), fd, in, size);
+static void decompress(format_t type, int fd, const void *in, size_t size) {
+	unique_ptr<stream> ptr(get_decoder(type, open_stream<fd_stream>(fd)));
+	ptr->write(in, size);
 }
 
 static int64_t compress(format_t type, int fd, const void *in, size_t size) {
-	return one_step(unique_ptr<Compression>(get_encoder(type)), fd, in, size);
+	auto prev = lseek(fd, 0, SEEK_CUR);
+	unique_ptr<stream> ptr(get_encoder(type, open_stream<fd_stream>(fd)));
+	ptr->write(in, size);
+	ptr->close();
+	auto now = lseek(fd, 0, SEEK_CUR);
+	return now - prev;
 }
 
 static void dump(void *buf, size_t size, const char *filename) {

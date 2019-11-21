@@ -49,6 +49,25 @@ int stream::close() {
 	return 0;
 }
 
+int filter_stream::read(void *buf, size_t len) {
+	return fread(buf, len, 1, fp);
+}
+
+int filter_stream::write(const void *buf, size_t len) {
+	return fwrite(buf, len, 1, fp);
+}
+
+int filter_stream::close() {
+	int ret = fclose(fp);
+	fp = nullptr;
+	return ret;
+}
+
+void filter_stream::set_base(FILE *f) {
+	if (fp) fclose(fp);
+	fp = f;
+}
+
 off_t seekable_stream::new_pos(off_t off, int whence) {
 	off_t new_pos;
 	switch (whence) {
