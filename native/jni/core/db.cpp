@@ -138,7 +138,7 @@ static char *open_and_init_db(sqlite3 *&db) {
 		upgrade = true;
 	}
 	if (ver < 10) {
-		sqlite3_exec(db, "DROP TABLE logs", nullptr, nullptr, &err);
+		sqlite3_exec(db, "DROP TABLE IF EXISTS logs", nullptr, nullptr, &err);
 		err_ret(err);
 		ver = 10;
 		upgrade = true;
