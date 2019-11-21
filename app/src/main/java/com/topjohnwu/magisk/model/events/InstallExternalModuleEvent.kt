@@ -27,7 +27,7 @@ class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
         fun onActivityResult(context: Context, requestCode: Int, resultCode: Int, data: Intent?) {
             if (requestCode == Const.ID.FETCH_ZIP && resultCode == Activity.RESULT_OK && data != null) {
                 // Get the URI of the selected file
-                val intent = context.intent(FlashActivity::class.java)
+                val intent = context.intent<FlashActivity>()
                 intent.setData(data.data).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP)
                 context.startActivity(intent)
             }

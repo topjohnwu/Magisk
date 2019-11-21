@@ -54,7 +54,7 @@ fun <T> Single<T>.subscribeK(
     onError: OnErrorListener = { it.printStackTrace() },
     onNext: OnSuccessListener<T> = {}
 ) = applySchedulers()
-    .subscribe(onSuccess, onError)
+    .subscribe(onNext, onError)
 
 fun <T> Maybe<T>.subscribeK(
     onError: OnErrorListener = { it.printStackTrace() },

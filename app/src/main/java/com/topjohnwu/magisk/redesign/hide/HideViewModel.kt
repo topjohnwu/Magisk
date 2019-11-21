@@ -114,9 +114,6 @@ class HideViewModel(
 
     fun toggleItem(item: HideProcessItem) = magiskRepo
         .toggleHide(item.isHidden.value, item.item.packageName, item.item.name)
-        // might wanna reorder the list to display the item at the top
-        .subscribeK()
-        .add()
 
     fun toggle(item: KObservableField<Boolean>) = item.toggle()
 

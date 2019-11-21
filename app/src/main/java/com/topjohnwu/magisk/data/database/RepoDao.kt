@@ -8,6 +8,8 @@ import com.topjohnwu.magisk.model.entity.module.Repo
 abstract class RepoDatabase : RoomDatabase() {
 
     abstract fun repoDao() : RepoDao
+    abstract fun repoByUpdatedDao(): RepoByUpdatedDao
+    abstract fun repoByNameDao(): RepoByNameDao
 }
 
 @Dao

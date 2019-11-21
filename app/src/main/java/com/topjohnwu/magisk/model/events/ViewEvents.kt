@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.model.events
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -10,11 +11,11 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
-import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.RxBus
@@ -136,7 +137,7 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
 }
 
 class ViewActionEvent(val action: BaseActivity<*, *>.() -> Unit) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: AppCompatActivity) = activity.run(action)
+    override fun invoke(activity: AppCompatActivity) = (activity as BaseActivity<*, *>).run(action)
 }
 
 class OpenFilePickerEvent : ViewEvent()

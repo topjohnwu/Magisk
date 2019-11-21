@@ -58,6 +58,7 @@ class LogViewModel(
             .ignoreElement()
 
         val console = repo.fetchMagiskLogs()
+            .toList()
             .map { it.map { ConsoleRvItem(it) } }
             .observeOn(Schedulers.computation())
             .map { it to itemsConsole.calculateDiff(it) }
@@ -90,7 +91,6 @@ class LogViewModel(
     }
 
     fun clearMagiskLog() = repo.clearMagiskLogs()
-        .ignoreElement()
         .subscribeK {
             SnackbarEvent(R.string.logs_cleared).publish()
             requestRefresh()

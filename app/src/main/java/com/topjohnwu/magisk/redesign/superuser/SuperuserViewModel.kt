@@ -18,8 +18,8 @@ import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.home.itemBindingOf
+import com.topjohnwu.magisk.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.DiffObservableList
-import com.topjohnwu.magisk.utils.FingerprintHelper
 import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Single
@@ -71,7 +71,7 @@ class SuperuserViewModel(
             .subscribeK { items.removeAll { it.itemSameAs(item) } }
             .add()
 
-        if (FingerprintHelper.useFingerprint()) {
+        if (BiometricHelper.isEnabled) {
             BiometricDialog {
                 onSuccess { updateState() }
             }.publish()
@@ -115,7 +115,7 @@ class SuperuserViewModel(
                 .add()
         }
 
-        if (FingerprintHelper.useFingerprint()) {
+        if (BiometricHelper.isEnabled) {
             BiometricDialog {
                 onSuccess { updateState() }
                 onFailure { item.isEnabled.toggle() }

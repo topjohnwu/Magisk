@@ -111,12 +111,10 @@ object Navigation {
     // redesign starts here
 
     fun start(launchIntent: Intent, context: Context) {
-        val destination = when {
-            Config.redesign -> RedesignActivity::class.java
-            else -> MainActivity::class.java
-        }
-        context.intent(destination)
-            .putExtra(Const.Key.OPEN_SECTION, launchIntent.getStringExtra(Const.Key.OPEN_SECTION))
+        when {
+            Config.redesign -> context.intent<RedesignActivity>()
+            else -> context.intent<MainActivity>()
+        }.putExtra(Const.Key.OPEN_SECTION, launchIntent.getStringExtra(Const.Key.OPEN_SECTION))
             .putExtra(
                 Const.Key.OPEN_SETTINGS,
                 launchIntent.action == ACTION_APPLICATION_PREFERENCES

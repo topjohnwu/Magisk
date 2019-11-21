@@ -81,7 +81,7 @@ class LogItem(val item: MagiskLog) : ObservableItem<LogItem>() {
 
     override val layoutRes = R.layout.item_log_access_md2
 
-    val date = item.date.time.toTime(timeDateFormat)
+    val date = item.time.toTime(timeDateFormat)
     var isTop = false
         @Bindable get
         set(value) {
@@ -103,7 +103,7 @@ class LogItem(val item: MagiskLog) : ObservableItem<LogItem>() {
             item.packageName == other.item.packageName &&
             item.command == other.item.command &&
             item.action == other.item.action &&
-            item.date == other.item.date &&
+            item.time == other.item.time &&
             isTop == other.isTop &&
             isBottom == other.isBottom
 }
