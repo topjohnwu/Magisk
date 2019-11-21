@@ -164,4 +164,9 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
             .start()
     }
 
+    fun invalidateToolbar() {
+        //binding.mainToolbar.startAnimations()
+        binding.mainToolbar.invalidate()
+    }
+
 }
