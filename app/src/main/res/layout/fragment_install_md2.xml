@@ -33,7 +33,7 @@
                 android:paddingTop="@dimen/l1">
 
                 <com.google.android.material.card.MaterialCardView
-                    style="?styleCardVariant"
+                    style="@style/WidgetFoundation.Card.Variant"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
@@ -52,7 +52,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/install_step_options_icon"
-                                style="?styleIconNormal"
+                                style="@style/WidgetFoundation.Icon"
                                 isSelected="@{viewModel.step > 0}"
                                 android:layout_marginStart="@dimen/l_25"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -67,7 +67,7 @@
                                 android:layout_marginStart="@dimen/l1"
                                 android:gravity="start"
                                 android:text="@string/install_options_title"
-                                android:textAppearance="?appearanceTextBodyNormal"
+                                android:textAppearance="@style/AppearanceFoundation.Body"
                                 android:textStyle="bold"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@+id/install_step_options_button"
@@ -76,7 +76,7 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/install_step_options_button"
-                                style="?styleButtonText"
+                                style="@style/WidgetFoundation.Button.Text"
                                 gone="@{viewModel.step != 0}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    style="?styleCardVariant"
+                    style="@style/WidgetFoundation.Card.Variant"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
@@ -131,7 +131,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/install_step_method_icon"
-                                style="?styleIconNormal"
+                                style="@style/WidgetFoundation.Icon"
                                 isSelected="@{viewModel.step > 1}"
                                 android:layout_marginStart="@dimen/l_25"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -146,7 +146,7 @@
                                 android:layout_marginStart="@dimen/l1"
                                 android:gravity="start"
                                 android:text="@string/install_method_title"
-                                android:textAppearance="?appearanceTextBodyNormal"
+                                android:textAppearance="@style/AppearanceFoundation.Body"
                                 android:textStyle="bold"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@+id/install_step_method_button"
@@ -155,7 +155,7 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/install_step_method_button"
-                                style="?styleButtonText"
+                                style="@style/WidgetFoundation.Button.Text"
                                 gone="@{viewModel.step != 1}"
                                 isEnabled="@{viewModel.method == @id/method_patch ? viewModel.data != null : viewModel.method != -1}"
                                 android:layout_width="wrap_content"
@@ -182,7 +182,7 @@
 
                             <com.google.android.material.radiobutton.MaterialRadioButton
                                 android:id="@+id/method_download"
-                                style="?styleRadioNormal"
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/download_zip_only"
@@ -190,7 +190,7 @@
 
                             <com.google.android.material.radiobutton.MaterialRadioButton
                                 android:id="@+id/method_patch"
-                                style="?styleRadioNormal"
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:button="@drawable/ic_radio_check_button"
@@ -198,7 +198,7 @@
 
                             <com.google.android.material.radiobutton.MaterialRadioButton
                                 android:id="@+id/method_direct"
-                                style="?styleRadioNormal"
+                                style="@style/WidgetFoundation.RadioButton"
                                 gone="@{!viewModel.rooted}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -207,7 +207,7 @@
 
                             <com.google.android.material.radiobutton.MaterialRadioButton
                                 android:id="@+id/method_inactive_slot"
-                                style="?styleRadioNormal"
+                                style="@style/WidgetFoundation.RadioButton"
                                 gone="@{!viewModel.rooted || !viewModel.aB}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -221,7 +221,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.button.MaterialButton
-                    style="?styleButtonText"
+                    style="@style/WidgetFoundation.Button.Text"
                     gone="@{viewModel.step != 2}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -249,7 +249,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/safetynet_attest_loading"
-                    android:textAppearance="?appearanceTextTitleNormal" />
+                    android:textAppearance="@style/AppearanceFoundation.Title" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -257,14 +257,14 @@
                     android:layout_marginTop="@dimen/l1">
 
                     <ProgressBar
-                        style="?styleProgressDeterminate"
+                        style="@style/WidgetFoundation.ProgressBar"
                         invisible="@{viewModel.progress &lt;= 0}"
                         android:layout_width="100dp"
                         android:layout_gravity="center"
                         android:progress="@{viewModel.progress}" />
 
                     <ProgressBar
-                        style="?styleProgressIndeterminate"
+                        style="@style/WidgetFoundation.ProgressBar.Indeterminate"
                         invisibleUnless="@{viewModel.progress &lt;= 0}"
                         android:layout_width="100dp"
                         android:layout_gravity="center" />

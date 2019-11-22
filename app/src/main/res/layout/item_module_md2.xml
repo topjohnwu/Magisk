@@ -20,7 +20,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="?styleCardVariant"
+        style="@style/WidgetFoundation.Card.Variant"
         isEnabled="@{!Config.coreOnly &amp;&amp; !item.removed}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/module_state_icon"
-                style="?styleImageSmall"
+                style="@style/WidgetFoundation.Image.Small"
                 gone="@{!item.removed &amp;&amp; !item.updated}"
                 srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : (item.updated ? R.drawable.ic_update_md2 : 0)}"
                 android:layout_marginStart="@dimen/l1"
@@ -55,7 +55,7 @@
                 android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
                 android:text="@{item.item.name}"
-                android:textAppearance="?appearanceTextBodyNormal"
+                android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/module_state_icon"
@@ -69,7 +69,7 @@
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
                 android:text="@{@string/module_version_author(item.item.version, item.item.author)}"
-                android:textAppearance="?appearanceTextCaptionVariant"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/module_state_icon"
                 app:layout_constraintTop_toBottomOf="@+id/module_title"
@@ -84,7 +84,7 @@
                 android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
                 android:text="@{item.item.description}"
-                android:textAppearance="?appearanceTextCaptionVariant"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                 app:layout_constraintTop_toBottomOf="@+id/module_version_author"
                 tools:lines="4"
                 tools:text="@tools:sample/lorem/random" />
@@ -98,7 +98,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/module_description" />
 
             <com.google.android.material.button.MaterialButton
-                style="?styleButtonText"
+                style="@style/WidgetFoundation.Button.Text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="@{(v) -> item.delete(viewModel)}"

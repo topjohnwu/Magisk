@@ -16,7 +16,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="?styleCardVariant"
+        style="@style/WidgetFoundation.Card.Variant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -34,7 +34,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/policy_app_icon"
-                style="?styleImageBig"
+                style="@style/WidgetFoundation.Image.Big"
                 android:src="@{item.icon}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -52,7 +52,7 @@
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="@{item.item.appName}"
-                android:textAppearance="?appearanceTextTitleNormal"
+                android:textAppearance="@style/AppearanceFoundation.Title"
                 android:textIsSelectable="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +67,7 @@
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="@{item.item.packageName}"
-                android:textAppearance="?appearanceTextCaptionVariant"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                 android:textColor="@android:color/tertiary_text_dark"
                 android:textIsSelectable="false"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -94,7 +94,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/policy_notify"
-                style="?styleIconNormal"
+                style="@style/WidgetFoundation.Icon"
                 android:background="?selectableItemBackground"
                 isSelected="@{item.shouldNotify}"
                 tooltipText="@{@string/superuser_toggle_notification}"
@@ -111,7 +111,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/policy_log"
-                style="?styleIconNormal"
+                style="@style/WidgetFoundation.Icon"
                 android:background="?selectableItemBackground"
                 isSelected="@{item.shouldLog}"
                 tooltipText="@{@string/superuser_toggle_log}"
@@ -126,7 +126,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/policy_delete"
-                style="?styleButtonText"
+                style="@style/WidgetFoundation.Button.Text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="@{() -> viewModel.deletePressed(item)}"
@@ -145,7 +145,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
-            style="?styleIconNormal"
+            style="@style/WidgetFoundation.Icon"
             isEnabled="@{item.isEnabled}"
             isSelected="@{item.isExpanded}"
             android:layout_gravity="top|end"

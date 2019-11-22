@@ -18,7 +18,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="?styleCardNormal"
+        style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:layout_gravity="center"
@@ -37,7 +37,7 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/hide_icon"
-                    style="?styleImageNormal"
+                    style="@style/WidgetFoundation.Image"
                     android:layout_margin="@dimen/l1"
                     android:alpha="@{item.isExpanded ? 0.1f : 1f}"
                     android:src="@{item.item.info.icon}"
@@ -49,7 +49,7 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/hide_action"
-                    style="?styleImageNormal"
+                    style="@style/WidgetFoundation.Image"
                     isSelected="@{item.itemsCheckedPercent == 100}"
                     goneUnless="@{item.isExpanded}"
                     android:layout_margin="@dimen/l1"
@@ -70,7 +70,7 @@
                     android:ellipsize="middle"
                     android:singleLine="true"
                     android:text="@{item.item.info.name}"
-                    android:textAppearance="?appearanceTextBodyNormal"
+                    android:textAppearance="@style/AppearanceFoundation.Body"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@+id/hide_package"
                     app:layout_constraintEnd_toStartOf="@+id/hide_expand_icon"
@@ -85,7 +85,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="@{item.item.info.info.packageName}"
-                    android:textAppearance="?appearanceTextCaptionVariant"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/hide_name"
                     app:layout_constraintStart_toStartOf="@+id/hide_name"
@@ -94,7 +94,7 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/hide_expand_icon"
-                    style="?styleIconNormal"
+                    style="@style/WidgetFoundation.Icon"
                     invisible="@{item.item.processes.empty}"
                     srcCompat="@{item.isExpanded ? R.drawable.ic_close : R.drawable.ic_back_md2}"
                     android:background="@null"
@@ -122,7 +122,7 @@
         </LinearLayout>
 
         <ProgressBar
-            style="?styleProgressDeterminate"
+            style="@style/WidgetFoundation.ProgressBar"
             android:layout_width="match_parent"
             android:layout_gravity="top"
             android:progress="@{item.itemsCheckedPercent}" />

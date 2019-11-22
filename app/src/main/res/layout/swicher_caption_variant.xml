@@ -7,4 +7,4 @@
     android:gravity="start|center_vertical"
     android:singleLine="true"
     tools:text="@string/magisk"
-    android:textAppearance="?appearanceTextCaptionVariant" />
+    android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />

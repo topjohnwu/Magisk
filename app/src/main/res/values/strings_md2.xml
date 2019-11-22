@@ -14,6 +14,7 @@
     <string name="section_superuser">@string/superuser</string>
     <string name="section_log">@string/log</string>
     <string name="section_settings">@string/settings</string>
+    <string name="section_theme">Themes</string>
 
     <string name="installed_error_md2">is not installed</string>
     <string name="channel_error_md2">has invalid update channel!</string>

@@ -45,7 +45,7 @@
             android:paddingTop="@dimen/l1">
 
             <com.google.android.material.card.MaterialCardView
-                style="?styleCardOnPrimary"
+                style="@style/WidgetFoundation.Card.OnPrimary"
                 goneUnless="@{viewModel.noticeVisible}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -63,14 +63,14 @@
                         android:layout_height="wrap_content"
                         android:padding="@dimen/l1"
                         android:text="@string/home_notice_content"
-                        android:textAppearance="?appearanceTextCaptionOnPrimary"
+                        android:textAppearance="@style/AppearanceFoundation.Caption.OnPrimary"
                         app:layout_constraintEnd_toStartOf="@+id/home_notice_hide"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/home_notice_hide"
-                        style="?styleButtonTextOnPrimary"
+                        style="@style/WidgetFoundation.Button.Text.OnPrimary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:onClick="@{() -> viewModel.hideNotice()}"
@@ -91,7 +91,7 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/home_device_wrapper"
-                    style="?styleCardVariant"
+                    style="@style/WidgetFoundation.Card.Variant"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -131,7 +131,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/home_device_icon"
-                                style="?styleIconPrimary"
+                                style="@style/WidgetFoundation.Icon.Primary"
                                 android:layout_marginStart="@dimen/l_50"
                                 android:layout_marginTop="@dimen/l1"
                                 android:layout_marginBottom="@dimen/l1"
@@ -151,7 +151,7 @@
                                 android:layout_marginEnd="@dimen/l1"
                                 android:gravity="start|center_vertical"
                                 android:text="@{Build.MANUFACTURER}"
-                                android:textAppearance="?appearanceTextTitleNormal"
+                                android:textAppearance="@style/AppearanceFoundation.Title"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toTopOf="@+id/home_device_product"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -166,7 +166,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@{Build.DEVICE ?? Build.PRODUCT}"
-                                android:textAppearance="?appearanceTextCaptionVariant"
+                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                                 app:layout_constraintBottom_toTopOf="@+id/home_device_board"
                                 app:layout_constraintEnd_toEndOf="@+id/home_device_title"
                                 app:layout_constraintHorizontal_bias="0"
@@ -179,7 +179,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@{Build.BOARD}"
-                                android:textAppearance="?appearanceTextCaptionVariant"
+                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                                 app:layout_constraintBottom_toBottomOf="@+id/home_device_icon"
                                 app:layout_constraintEnd_toEndOf="@+id/home_device_title"
                                 app:layout_constraintHorizontal_bias="0"
@@ -291,7 +291,7 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/home_magisk_wrapper"
-                    style="?styleCardVariant"
+                    style="@style/WidgetFoundation.Card.Variant"
                     isEnabled="@{Info.env.magiskVersionCode >= 0}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -326,7 +326,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/home_magisk_icon"
-                                style="?styleIconPrimary"
+                                style="@style/WidgetFoundation.Icon.Primary"
                                 isEnabled="@{viewModel.stateMagisk != MagiskState.LOADING}"
                                 onSelectClick="@{() -> viewModel.onDeletePressed()}"
                                 onSelectReset="@{7000L}"
@@ -344,7 +344,7 @@
                                 android:layout_marginStart="@dimen/l_50"
                                 android:gravity="start|center_vertical"
                                 android:text="@string/magisk"
-                                android:textAppearance="?appearanceTextTitleNormal"
+                                android:textAppearance="@style/AppearanceFoundation.Title"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toTopOf="@+id/home_magisk_status"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -468,7 +468,7 @@
                     </LinearLayout>
 
                     <ProgressBar
-                        style="?styleProgressDeterminate"
+                        style="@style/WidgetFoundation.ProgressBar"
                         gone="@{viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100}"
                         android:layout_width="match_parent"
                         android:layout_gravity="bottom"
@@ -489,7 +489,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper">
 
                     <com.google.android.material.button.MaterialButton
-                        style="?styleButtonDefault"
+                        style="@style/WidgetFoundation.Button"
                         gone="@{viewModel.stateMagisk != MagiskState.OBSOLETE}"
                         isEnabled="@{viewModel.stateManager == MagiskState.UP_TO_DATE &amp;&amp; (viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100)}"
                         android:layout_width="wrap_content"
@@ -503,7 +503,7 @@
                         tools:visibility="gone" />
 
                     <com.google.android.material.button.MaterialButton
-                        style="?styleButtonText"
+                        style="@style/WidgetFoundation.Button.Text"
                         gone="@{viewModel.stateMagisk == MagiskState.OBSOLETE}"
                         isEnabled="@{viewModel.stateManager == MagiskState.UP_TO_DATE &amp;&amp; (viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100)}"
                         android:layout_width="wrap_content"
@@ -519,7 +519,7 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/home_manager_wrapper"
-                    style="?styleCardVariant"
+                    style="@style/WidgetFoundation.Card.Variant"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
@@ -553,7 +553,7 @@
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/home_manager_icon"
-                                style="?styleIconPrimary"
+                                style="@style/WidgetFoundation.Icon.Primary"
                                 android:background="@null"
                                 android:padding="@dimen/l_50"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -568,7 +568,7 @@
                                 android:layout_marginStart="@dimen/l_50"
                                 android:gravity="start|center_vertical"
                                 android:text="@{viewModel.stateHideManagerName}"
-                                android:textAppearance="?appearanceTextTitleNormal"
+                                android:textAppearance="@style/AppearanceFoundation.Title"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toTopOf="@+id/home_manager_status"
                                 app:layout_constraintEnd_toEndOf="parent"
@@ -691,7 +691,7 @@
                     </LinearLayout>
 
                     <ProgressBar
-                        style="?styleProgressDeterminate"
+                        style="@style/WidgetFoundation.ProgressBar"
                         gone="@{viewModel.stateManagerProgress == 0 || viewModel.stateManagerProgress == 100}"
                         android:layout_width="match_parent"
                         android:layout_gravity="bottom"
@@ -711,7 +711,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/home_manager_wrapper">
 
                     <com.google.android.material.button.MaterialButton
-                        style="?styleButtonDefault"
+                        style="@style/WidgetFoundation.Button"
                         gone="@{viewModel.stateManager != MagiskState.OBSOLETE}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -723,7 +723,7 @@
                         app:iconSize="18dp" />
 
                     <com.google.android.material.button.MaterialButton
-                        style="?styleButtonText"
+                        style="@style/WidgetFoundation.Button.Text"
                         gone="@{viewModel.stateManager == MagiskState.OBSOLETE}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -746,7 +746,7 @@
                 android:layout_marginTop="@dimen/l2"
                 android:layout_marginEnd="@dimen/l1"
                 android:text="@string/home_support_title"
-                android:textAppearance="?appearanceTextTitleNormal" />
+                android:textAppearance="@style/AppearanceFoundation.Title" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="match_parent"
@@ -755,7 +755,7 @@
                 android:layout_marginTop="@dimen/l_50"
                 android:layout_marginEnd="@dimen/l1"
                 android:text="@string/home_support_content"
-                android:textAppearance="?appearanceTextCaptionVariant" />
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />
 
             <androidx.recyclerview.widget.RecyclerView
                 dividerHorizontal="@{R.drawable.divider_l1}"

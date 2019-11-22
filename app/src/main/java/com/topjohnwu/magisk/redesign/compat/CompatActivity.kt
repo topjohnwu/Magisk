@@ -10,7 +10,6 @@ import androidx.core.content.getSystemService
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.extensions.snackbar
 import com.topjohnwu.magisk.extensions.startAnimations
@@ -18,13 +17,14 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
+import com.topjohnwu.magisk.redesign.theme.Theme
 import kotlin.reflect.KClass
 
 
 abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBinding> :
     BaseActivity<ViewModel, Binding>(), CompatView<ViewModel>, Navigator {
 
-    override val themeRes = R.style.Foundation_Default
+    override val themeRes = Theme.selected.themeRes
     override val viewRoot: View get() = binding.root
     override val navigation: CompatNavigationDelegate<CompatActivity<ViewModel, Binding>>? by lazy {
         CompatNavigationDelegate(this)

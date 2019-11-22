@@ -18,7 +18,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="?styleCardVariant"
+        style="@style/WidgetFoundation.Card.Variant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:layout_gravity="center"
@@ -37,7 +37,7 @@
                 android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
                 android:text="@{item.item.name}"
-                android:textAppearance="?appearanceTextBodyNormal"
+                android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +49,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@{@string/module_version_author(item.item.version ?? `?`, item.item.author ?? `?`)}"
-                android:textAppearance="?appearanceTextCaptionVariant"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                 app:layout_constraintEnd_toEndOf="@+id/module_title"
                 app:layout_constraintStart_toStartOf="@+id/module_title"
                 app:layout_constraintTop_toBottomOf="@+id/module_title"
@@ -64,7 +64,7 @@
                 android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
                 android:text="@{item.item.description}"
-                android:textAppearance="?appearanceTextCaptionVariant"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                 app:layout_constraintTop_toBottomOf="@+id/module_version_author"
                 tools:lines="4"
                 tools:text="@tools:sample/lorem/random" />
@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
                 android:text="@{item.item.lastUpdateString}"
-                android:textAppearance="?appearanceTextCaptionVariant"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                 android:textSize="11sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/module_info"
@@ -93,7 +93,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/module_info"
-                style="?styleIconNormal"
+                style="@style/WidgetFoundation.Icon"
                 android:layout_width="wrap_content"
                 android:alpha=".5"
                 android:onClick="@{() -> viewModel.infoPressed(item)}"
@@ -106,7 +106,7 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/module_download"
                 android:layout_width="wrap_content"
-                style="?styleIconPrimary"
+                style="@style/WidgetFoundation.Icon.Primary"
                 android:paddingStart="@dimen/l_50"
                 isEnabled="@{!(item.progress == -100 || (item.progress > 0 &amp;&amp; item.progress &lt; 100))}"
                 android:contentDescription="@string/download"
@@ -125,7 +125,7 @@
             android:layout_gravity="bottom">
 
             <ProgressBar
-                style="?styleProgressDeterminate"
+                style="@style/WidgetFoundation.ProgressBar"
                 goneUnless="@{item.progress > 0 &amp;&amp; item.progress &lt; 100}"
                 progressAnimated="@{item.progress}"
                 android:layout_width="match_parent"
@@ -133,7 +133,7 @@
                 tools:progress="40" />
 
             <androidx.core.widget.ContentLoadingProgressBar
-                style="?styleProgressIndeterminate"
+                style="@style/WidgetFoundation.ProgressBar.Indeterminate"
                 goneUnless="@{item.progress == -100}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

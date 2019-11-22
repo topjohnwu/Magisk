@@ -10,6 +10,6 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:paddingTop="10dp"
-        android:textAppearance="?appearanceTextCaptionNormal" />
+        android:textAppearance="@style/AppearanceFoundation.Caption" />
 
 </ScrollView>

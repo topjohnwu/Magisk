@@ -25,87 +25,10 @@
         <item name="selectableItemBackground">@drawable/bg_selectable</item>
         <item name="selectableItemBackgroundBorderless">@drawable/bg_selectable_borderless</item>
         <item name="actionBarSize">@dimen/internal_action_bar_size</item>
-
-        <item name="styleAppbar">@style/WidgetFoundation.Appbar</item>
-
-        <item name="styleToolbar">@style/WidgetFoundation.Toolbar</item>
-
-        <item name="styleCardNormal">@style/WidgetFoundation.Card</item>
-        <item name="styleCardVariant">@style/WidgetFoundation.Card.Variant</item>
-        <item name="styleCardElevated">@style/WidgetFoundation.Card.Elevated</item>
-        <item name="styleCardOnPrimary">@style/WidgetFoundation.Card.OnPrimary</item>
-
-        <item name="styleButtonDefault">@style/WidgetFoundation.Button</item>
-        <item name="styleButtonDefaultOnPrimary">@style/WidgetFoundation.Button.OnPrimary</item>
-        <item name="styleButtonOutlined">@style/WidgetFoundation.Button.Outlined</item>
-        <item name="styleButtonOutlinedOnPrimary">
-            @style/WidgetFoundation.Button.Outlined.OnPrimary
-        </item>
-        <item name="styleButtonFlat">@style/WidgetFoundation.Button.Flat</item>
-        <item name="styleButtonFlatOnPrimary">@style/WidgetFoundation.Button.Flat.OnPrimary</item>
-        <item name="styleButtonText">@style/WidgetFoundation.Button.Text</item>
-        <item name="styleButtonTextSecondary">@style/WidgetFoundation.Button.Text.Secondary</item>
-        <item name="styleButtonTextOnPrimary">@style/WidgetFoundation.Button.Text.OnPrimary</item>
-        <item name="styleButtonError">@style/WidgetFoundation.Button.Error</item>
-
-        <item name="styleIconNormal">@style/WidgetFoundation.Icon</item>
-        <item name="styleIconPrimary">@style/WidgetFoundation.Icon.Primary</item>
-        <item name="styleIconOnPrimary">@style/WidgetFoundation.Icon.OnPrimary</item>
-        <item name="styleIconError">@style/WidgetFoundation.Icon.Error</item>
-
-        <item name="styleImageBig">@style/WidgetFoundation.Image.Big</item>
-        <item name="styleImageNormal">@style/WidgetFoundation.Image</item>
-        <item name="styleImageSmall">@style/WidgetFoundation.Image.Small</item>
-
-        <item name="styleCheckboxNormal">@style/WidgetFoundation.Checkbox</item>
-
-        <item name="styleRadioNormal">@style/WidgetFoundation.RadioButton</item>
-
-        <item name="styleProgressDeterminate">@style/WidgetFoundation.ProgressBar</item>
-        <item name="styleProgressIndeterminate">
-            @style/WidgetFoundation.ProgressBar.Indeterminate
-        </item>
-        <item name="styleProgressIndeterminateCircular">
-            @style/WidgetFoundation.ProgressBar.Indeterminate.Circular
-        </item>
-
-        <!--///-->
-
-        <item name="appearanceTextDisplayNormal">@style/AppearanceFoundation.Display</item>
-        <item name="appearanceTextDisplayVariant">@style/AppearanceFoundation.Display.Variant</item>
-        <item name="appearanceTextDisplayOnPrimary">@style/AppearanceFoundation.Display.OnPrimary
-        </item>
-        <item name="appearanceTextDisplayOnPrimaryVariant">
-            @style/AppearanceFoundation.Display.OnPrimary.Variant
-        </item>
-
-        <item name="appearanceTextTitleNormal">@style/AppearanceFoundation.Title</item>
-        <item name="appearanceTextTitleVariant">@style/AppearanceFoundation.Title.Variant</item>
-        <item name="appearanceTextTitleOnPrimary">@style/AppearanceFoundation.Title.OnPrimary</item>
-        <item name="appearanceTextTitleOnPrimaryVariant">
-            @style/AppearanceFoundation.Title.OnPrimary.Variant
-        </item>
-
-        <item name="appearanceTextBodyNormal">@style/AppearanceFoundation.Body</item>
-        <item name="appearanceTextBodyVariant">@style/AppearanceFoundation.Body.Variant</item>
-        <item name="appearanceTextBodyOnPrimary">@style/AppearanceFoundation.Body.OnPrimary</item>
-        <item name="appearanceTextBodyOnPrimaryVariant">
-            @style/AppearanceFoundation.Body.OnPrimary.Variant
-        </item>
-
-        <item name="appearanceTextCaptionNormal">@style/AppearanceFoundation.Caption</item>
-        <item name="appearanceTextCaptionVariant">@style/AppearanceFoundation.Caption.Variant</item>
-        <item name="appearanceTextCaptionOnPrimary">@style/AppearanceFoundation.Caption.OnPrimary
-        </item>
-        <item name="appearanceTextCaptionOnPrimaryVariant">
-            @style/AppearanceFoundation.Caption.OnPrimary.Variant
-        </item>
     </style>
 
     <style name="Foundation.Default" parent="Foundation.Base">
-        <item name="android:theme">@style/ThemeFoundationMD2.Default</item>
-        <!--setting window background to transparent should reduce overdraw-->
-        <!--<item name="android:windowBackground">@android:color/transparent</item>-->
+        <item name="android:windowBackground">?colorSurface</item>
     </style>
 
 </resources>

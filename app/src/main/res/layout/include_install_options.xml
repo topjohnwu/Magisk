@@ -21,7 +21,7 @@
             tools:layout_gravity="center">
 
             <com.google.android.material.checkbox.MaterialCheckBox
-                style="?styleCheckboxNormal"
+                style="@style/WidgetFoundation.Checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
@@ -31,7 +31,7 @@
                 tools:checked="true" />
 
             <com.google.android.material.checkbox.MaterialCheckBox
-                style="?styleCheckboxNormal"
+                style="@style/WidgetFoundation.Checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
@@ -41,7 +41,7 @@
                 app:tint="?colorPrimary" />
 
             <com.google.android.material.checkbox.MaterialCheckBox
-                style="?styleCheckboxNormal"
+                style="@style/WidgetFoundation.Checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"

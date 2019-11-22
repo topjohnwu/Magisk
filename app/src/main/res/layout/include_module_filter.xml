@@ -63,14 +63,14 @@
             android:layout_marginBottom="@dimen/l1"
             android:text="@string/hide_search"
             android:textAllCaps="true"
-            android:textAppearance="?appearanceTextCaptionNormal"
+            android:textAppearance="@style/AppearanceFoundation.Caption"
             android:textColor="?colorPrimary"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/module_filter_search" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/module_filter_search"
-            style="?styleCardNormal"
+            style="@style/WidgetFoundation.Card"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/l1"
@@ -82,7 +82,7 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <androidx.appcompat.widget.AppCompatImageView
-                style="?styleIconNormal"
+                style="@style/WidgetFoundation.Icon"
                 android:layout_width="48dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center_vertical|start"
@@ -102,7 +102,7 @@
                 android:paddingEnd="@dimen/l1"
                 android:singleLine="true"
                 android:text="@={viewModel.query}"
-                android:textAppearance="?appearanceTextBodyNormal"
+                android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textColor="@color/color_text_transient"
                 android:textColorHint="?colorOnSurfaceVariant" />
 
@@ -115,6 +115,7 @@
             android:layout_marginEnd="@dimen/l1"
             app:backgroundTint="?colorPrimary"
             app:elevation="0dp"
+            app:tint="?colorOnPrimary"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="@+id/module_filter_search"
             app:layout_constraintEnd_toEndOf="parent"
@@ -122,7 +123,7 @@
             app:srcCompat="@drawable/ic_check_md2" />
 
         <ProgressBar
-            style="?styleProgressIndeterminateCircular"
+            style="@style/WidgetFoundation.ProgressBar.Indeterminate.Circular"
             goneUnless="@{viewModel.searchLoading}"
             android:layout_width="56dp"
             android:layout_height="56dp"

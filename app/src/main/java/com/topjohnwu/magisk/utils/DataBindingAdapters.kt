@@ -456,3 +456,8 @@ fun View.setRotationNotAnimated(rotation: Int) {
 fun TextView.setTextSafe(text: Int) {
     if (text == 0) this.text = null else setText(text)
 }
+
+@BindingAdapter("android:theme")
+fun View.setThemeCompat(theme: Int) {
+
+}

@@ -31,7 +31,7 @@
             android:layout_marginBottom="@dimen/l_50"
             android:singleLine="true"
             android:text="@{item.item.name}"
-            android:textAppearance="?appearanceTextCaptionVariant"
+            android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/hide_process_checkbox"
             app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/hide_process_checkbox"
-            style="?styleImageSmall"
+            style="@style/WidgetFoundation.Image.Small"
             android:layout_width="18dp"
             android:layout_height="18dp"
             isSelected="@{item.isHidden}"

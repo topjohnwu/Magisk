@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.model.preference.PreferenceModel
+import com.topjohnwu.magisk.redesign.theme.Theme
 import com.topjohnwu.magisk.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
@@ -52,6 +53,7 @@ object Config : PreferenceModel, DBConfig {
         const val DOWNLOAD_PATH = "download_path"
         const val REDESIGN = "redesign"
         const val SAFETY = "safety_notice"
+        const val THEME_ORDINAL = "theme_ordinal"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -125,6 +127,7 @@ object Config : PreferenceModel, DBConfig {
         Key.DARK_THEME_EXTENDED,
         AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     )
+    var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
     var magiskHide by preference(Key.MAGISKHIDE, true)

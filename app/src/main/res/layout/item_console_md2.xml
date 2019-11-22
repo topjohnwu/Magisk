@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
         android:text="@{item.item}"
-        android:textAppearance="?appearanceTextCaptionNormal"
+        android:textAppearance="@style/AppearanceFoundation.Caption"
         android:textSize="10sp"
         tools:text="@tools:sample/lorem/random" />
 

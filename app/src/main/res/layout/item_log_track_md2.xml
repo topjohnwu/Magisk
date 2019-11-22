@@ -44,7 +44,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/track_bullet"
-            style="?styleImageSmall"
+            style="@style/WidgetFoundation.Image.Small"
             isSelected="@{isSelected}"
             srcCompat="@{bullet}"
             app:layout_constraintBottom_toBottomOf="parent"

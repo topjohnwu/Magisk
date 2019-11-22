@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@{item.title}"
-            android:textAppearance="?appearanceTextBodyNormal"
+            android:textAppearance="@style/AppearanceFoundation.Body"
             android:textColor="@color/color_primary_transient"
             android:textStyle="bold"
             tools:text="@tools:sample/lorem/random"
@@ -36,7 +36,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/module_button"
-            style="?styleButtonTextSecondary"
+            style="@style/WidgetFoundation.Button.Text.Secondary"
             gone="@{!item.hasButton}"
             android:onClick="@{() -> viewModel.sectionPressed(item)}"
             android:layout_width="wrap_content"

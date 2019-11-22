@@ -27,14 +27,14 @@
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/main_toolbar_wrapper"
-            style="?styleAppbar"
+            style="@style/WidgetFoundation.Appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="@{viewModel.insets.top}">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/main_toolbar"
-                style="?styleToolbar"
+                style="@style/WidgetFoundation.Toolbar"
                 android:layout_width="match_parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_scrollFlags="noScroll"
@@ -45,7 +45,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/main_bottom_bar"
-            style="?styleCardElevated"
+            style="@style/WidgetFoundation.Card.Elevated"
             android:layout_width="192dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
@@ -80,7 +80,7 @@
                     android:gravity="center"
                     android:paddingBottom="@dimen/l_50"
                     android:text="@string/no_connection"
-                    android:textAppearance="?appearanceTextCaptionNormal"
+                    android:textAppearance="@style/AppearanceFoundation.Caption"
                     android:textColor="?colorError"
                     android:visibility="gone"
                     tools:visibility="visible" />

@@ -9,11 +9,9 @@
     ## Inheritance
 
     You might want to inherit default values from "base" theme. You can do so implicitly by just
-    writing `<style name="ThemeFoundationMD2.MySuperAwesomeTheme" parent="ThemeFoundationMD2.Default">`.
+    writing `<style name="ThemeFoundationMD2.MySuperAwesomeTheme" parent="ThemeFoundationMD2.Piplup">`.
     With this approach you can only change values you (don't) like - such as `colorPrimary` or
     `colorSecondary`.
-    There's also an option to define theme completely from ground up and that's done just by
-    omitting `parent="..."`. It will inherit _nothing_ from the base.
 
     ## Day / Night ? How do I define both in one theme?
 
@@ -22,8 +20,7 @@
     on user's requested configuration. (Always light, Always dark, Follow system)
 
     You might choose to define only "Day" theme with Dark colors to have dark theme regardless.
-    That's super lazy approach and is discouraged but the framework permits it. If not inherited
-    from default theme, you must define all colors yourself in both day AND night variants.
+    That's super lazy approach and is discouraged but the framework permits it.
 
     ## What to theme
 
@@ -41,30 +38,80 @@
     !! notice. In repeated attempts to push such themes you will be automatically blacklisted.
     -->
 
-    <style name="ThemeFoundationMD2" parent="" />
+    <style name="ThemeFoundationMD2" parent="Foundation.Default" />
 
     <!--1st party themes-->
 
-    <style name="ThemeFoundationMD2.Default">
-        <item name="colorPrimary">#2196F3</item>
-        <item name="colorPrimaryVariant">#802196F3</item>
-        <item name="colorSecondary">#1766A6</item>
-        <item name="colorSecondaryVariant">#801766A6</item>
-        <item name="colorSurface">#F2F2F2</item>
+    <style name="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#4EAFF5</item>
+        <item name="colorPrimaryVariant">#804EAFF5</item>
+        <item name="colorSecondary">#3E78AF</item>
+        <item name="colorSecondaryVariant">#803E78AF</item>
+        <item name="colorSurface">#F9F9F9</item>
         <item name="colorSurfaceVariant">#E8E8E8</item>
         <item name="colorSurfaceSurfaceVariant">?colorSurface</item>
-        <item name="colorOnPrimary">#F2F2F2</item>
+        <item name="colorOnPrimary">#F9F9F9</item>
         <item name="colorOnPrimaryVariant">#D9E6E6E6</item>
-        <item name="colorOnSecondary">#F2F2F2</item>
-        <item name="colorOnBackground">#F2F2F2</item>
+        <item name="colorOnSecondary">#F9F9F9</item>
+        <item name="colorOnBackground">?colorOnSurface</item>
         <item name="colorError">#CC0047</item>
-        <item name="colorOnError">#F2F2F2</item>
+        <item name="colorOnError">#F9F9F9</item>
         <item name="colorOnSurface">#444444</item>
         <item name="colorOnSurfaceVariant">#80444444</item>
         <item name="colorDisabled">#808080</item>
         <item name="colorDisabledVariant">#66808080</item>
     </style>
 
+    <style name="ThemeFoundationMD2.Amoled" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorSurface">#FFF</item>
+        <item name="colorOnPrimary">#FFF</item>
+        <item name="colorOnSecondary">#FFF</item>
+        <item name="colorOnBackground">#FFF</item>
+        <item name="colorOnError">#FFF</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Rayquaza" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#68A17F</item>
+        <item name="colorPrimaryVariant">#8068A17F</item>
+        <item name="colorSecondary">#2F6D43</item>
+        <item name="colorSecondaryVariant">#802F6D43</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Zapdos" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#FBD179</item>
+        <item name="colorPrimaryVariant">#80FBD179</item>
+        <item name="colorSecondary">#B29667</item>
+        <item name="colorSecondaryVariant">#80B29667</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="colorOnPrimaryVariant">#D9222222</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Charmeleon" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#DB7366</item>
+        <item name="colorPrimaryVariant">#80DB7366</item>
+        <item name="colorSecondary">#B65247</item>
+        <item name="colorSecondaryVariant">#80B65247</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="colorOnPrimaryVariant">#D9222222</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Mew" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#D9ADB7</item>
+        <item name="colorPrimaryVariant">#80E9BBC5</item>
+        <item name="colorSecondary">#B5889B</item>
+        <item name="colorSecondaryVariant">#80B5889B</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="colorOnPrimaryVariant">#D9222222</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Salamence" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#70B2C6</item>
+        <item name="colorPrimaryVariant">#8070B2C6</item>
+        <item name="colorSecondary">#C06A75</item>
+        <item name="colorSecondaryVariant">#80C06A75</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="colorOnPrimaryVariant">#D9222222</item>
+    </style>
 
     <!--3rd party themes-->
 

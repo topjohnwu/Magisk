@@ -16,7 +16,7 @@
         android:layout_height="match_parent">
 
         <com.google.android.material.card.MaterialCardView
-            style="?styleCardElevated"
+            style="@style/WidgetFoundation.Card.Elevated"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:cardElevation="@dimen/margin_generic"
@@ -56,7 +56,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        style="?styleIconPrimary"
+                        style="@style/WidgetFoundation.Icon.Primary"
                         gone="@{data.icon == 0}"
                         srcCompat="@{data.icon}"
                         android:layout_gravity="center"
@@ -65,7 +65,7 @@
                         tools:src="@drawable/ic_delete_md2" />
 
                     <androidx.appcompat.widget.AppCompatImageView
-                        style="?styleImageBig"
+                        style="@style/WidgetFoundation.Image.Big"
                         gone="@{data.iconRaw == null}"
                         android:layout_gravity="center"
                         android:layout_marginTop="@dimen/l1"
@@ -81,7 +81,7 @@
                     android:layout_marginTop="@dimen/l1"
                     android:gravity="center"
                     android:text="@{data.title}"
-                    android:textAppearance="?appearanceTextTitleNormal"
+                    android:textAppearance="@style/AppearanceFoundation.Title"
                     app:layout_constraintLeft_toLeftOf="@+id/dialog_base_start"
                     app:layout_constraintRight_toRightOf="@+id/dialog_base_end"
                     app:layout_constraintTop_toBottomOf="@+id/dialog_base_icon"
@@ -111,7 +111,7 @@
                             android:layout_marginTop="@dimen/l_50"
                             android:gravity="center"
                             android:text="@{data.message}"
-                            android:textAppearance="?appearanceTextBodyNormal"
+                            android:textAppearance="@style/AppearanceFoundation.Body"
                             tools:lines="3"
                             tools:text="@tools:sample/lorem/random" />
 
@@ -154,7 +154,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/dialog_base_button_4"
-                            style="?styleButtonText"
+                            style="@style/WidgetFoundation.Button.Text"
                             gone="@{data.buttonIDGAF.icon == 0 &amp;&amp; data.buttonIDGAF.title.length == 0}"
                             isEnabled="@{data.buttonIDGAF.isEnabled()}"
                             android:layout_width="wrap_content"
@@ -169,7 +169,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/dialog_base_button_2"
-                            style="?styleButtonText"
+                            style="@style/WidgetFoundation.Button.Text"
                             gone="@{data.buttonNeutral.icon == 0 &amp;&amp; data.buttonNeutral.title.length == 0}"
                             isEnabled="@{data.buttonNeutral.isEnabled()}"
                             android:layout_width="wrap_content"
@@ -192,7 +192,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/dialog_base_button_3"
-                            style="?styleButtonText"
+                            style="@style/WidgetFoundation.Button.Text"
                             gone="@{data.buttonNegative.icon == 0 &amp;&amp; data.buttonNegative.title.length == 0}"
                             isEnabled="@{data.buttonNegative.isEnabled()}"
                             android:layout_width="wrap_content"
@@ -207,7 +207,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/dialog_base_button_1"
-                            style="?styleButtonText"
+                            style="@style/WidgetFoundation.Button.Text"
                             gone="@{data.buttonPositive.icon == 0 &amp;&amp; data.buttonPositive.title.length == 0}"
                             isEnabled="@{data.buttonPositive.isEnabled()}"
                             android:layout_width="wrap_content"

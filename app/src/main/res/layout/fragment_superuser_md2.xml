@@ -31,7 +31,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/superuser_hide"
-                style="?styleCardNormal"
+                style="@style/WidgetFoundation.Card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
@@ -47,7 +47,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/superuser_hide_icon"
-                        style="?styleIconNormal"
+                        style="@style/WidgetFoundation.Icon"
                         android:background="@null"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +60,7 @@
                         android:requiresFadingEdge="horizontal"
                         android:singleLine="true"
                         android:text="@string/magisk_hide_md2"
-                        android:textAppearance="?appearanceTextBodyNormal"
+                        android:textAppearance="@style/AppearanceFoundation.Body"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/superuser_hide_icon_pointer"
@@ -69,7 +69,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/superuser_hide_icon_pointer"
-                        style="?styleIconNormal"
+                        style="@style/WidgetFoundation.Icon"
                         android:background="@null"
                         android:rotation="180"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -83,7 +83,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/superuser_safetynet"
-                style="?styleCardNormal"
+                style="@style/WidgetFoundation.Card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/l1"
@@ -98,7 +98,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/superuser_safetynet_icon"
-                        style="?styleIconNormal"
+                        style="@style/WidgetFoundation.Icon"
                         android:background="@null"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -111,7 +111,7 @@
                         android:requiresFadingEdge="horizontal"
                         android:singleLine="true"
                         android:text="@string/safetyNet"
-                        android:textAppearance="?appearanceTextBodyNormal"
+                        android:textAppearance="@style/AppearanceFoundation.Body"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/superuser_safetynet_icon_pointer"
@@ -120,7 +120,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/superuser_safetynet_icon_pointer"
-                        style="?styleIconNormal"
+                        style="@style/WidgetFoundation.Icon"
                         android:background="@null"
                         android:rotation="180"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -172,11 +172,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/safetynet_attest_loading"
-                    android:textAppearance="?appearanceTextTitleNormal"
+                    android:textAppearance="@style/AppearanceFoundation.Title"
                     android:textStyle="bold" />
 
                 <ProgressBar
-                    style="?styleProgressIndeterminate"
+                    style="@style/WidgetFoundation.ProgressBar.Indeterminate"
                     android:layout_marginTop="@dimen/l1" />
 
             </LinearLayout>

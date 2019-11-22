@@ -1,10 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-These widgets are implementation of corresponding attribute. Never and I mean fucking never! use
-these directly.
-
-Although it is possible, it wouldn't automatically change the style when theme changes to "night"
-variant. Make sure to use style referenced by attribute defined it attrs.xml.
--->
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface">
@@ -13,9 +7,9 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
     </style>
 
     <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
-        <item name="titleTextAppearance">?appearanceTextTitleNormal</item>
+        <item name="titleTextAppearance">@style/AppearanceFoundation.Title</item>
         <item name="titleTextColor">?colorOnSurface</item>
-        <item name="subtitleTextAppearance">?appearanceTextCaptionNormal</item>
+        <item name="subtitleTextAppearance">@style/AppearanceFoundation.Caption</item>
         <item name="subtitleTextColor">?colorOnSurfaceVariant</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="contentInsetStartWithNavigation">0dp</item>
@@ -154,7 +148,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textAppearance">?appearanceTextBodyNormal</item>
+        <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
         <item name="tint">?colorPrimary</item>
@@ -163,7 +157,7 @@ variant. Make sure to use style referenced by attribute defined it attrs.xml.
 
     <style name="WidgetFoundation.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textAppearance">?appearanceTextBodyNormal</item>
+        <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
         <item name="tint">?colorPrimary</item>

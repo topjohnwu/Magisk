@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:text="@string/hide_filters"
             android:textAllCaps="true"
-            android:textAppearance="?appearanceTextCaptionNormal"
+            android:textAppearance="@style/AppearanceFoundation.Caption"
             android:textColor="?colorPrimary"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent" />
@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:checked="@={viewModel.showSystem}"
                 android:text="@string/show_system_app"
-                android:textAppearance="?appearanceTextCaptionNormal"
+                android:textAppearance="@style/AppearanceFoundation.Caption"
                 app:checkedIcon="@drawable/ic_check_md2"
                 app:chipBackgroundColor="?colorSurfaceVariant"
                 tools:checked="true" />
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:checkable="false"
                 android:text="@{viewModel.query}"
-                android:textAppearance="?appearanceTextCaptionNormal"
+                android:textAppearance="@style/AppearanceFoundation.Caption"
                 app:chipBackgroundColor="?colorSurfaceVariant" />
 
         </com.google.android.material.chip.ChipGroup>
@@ -77,14 +77,14 @@
             android:layout_marginTop="@dimen/l1"
             android:text="@string/hide_search"
             android:textAllCaps="true"
-            android:textAppearance="?appearanceTextCaptionNormal"
+            android:textAppearance="@style/AppearanceFoundation.Caption"
             android:textColor="?colorPrimary"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/hide_filter_chip_group" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/hide_filter_search"
-            style="?styleCardNormal"
+            style="@style/WidgetFoundation.Card"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/l1"
@@ -97,7 +97,7 @@
             app:layout_constraintTop_toBottomOf="@+id/hide_filter_title_search">
 
             <androidx.appcompat.widget.AppCompatImageView
-                style="?styleIconNormal"
+                style="@style/WidgetFoundation.Icon"
                 android:layout_width="48dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center_vertical|start"
@@ -117,7 +117,7 @@
                 android:paddingEnd="@dimen/l1"
                 android:singleLine="true"
                 android:text="@={viewModel.query}"
-                android:textAppearance="?appearanceTextBodyNormal"
+                android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textColor="@color/color_text_transient"
                 android:textColorHint="?colorOnSurfaceVariant" />
 
@@ -128,6 +128,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:backgroundTint="?colorPrimary"
+            app:tint="?colorOnPrimary"
             app:elevation="0dp"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="@+id/hide_filter_search"

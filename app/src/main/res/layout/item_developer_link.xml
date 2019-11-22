@@ -25,7 +25,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/developer_link"
-            style="?styleImageSmall"
+            style="@style/WidgetFoundation.Image.Small"
             app:layout_constraintEnd_toStartOf="@+id/developer_more"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -35,7 +35,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/developer_more"
-            style="?styleImageSmall"
+            style="@style/WidgetFoundation.Image.Small"
             android:layout_height="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/developer_link"
             app:layout_constraintStart_toEndOf="@+id/developer_link"

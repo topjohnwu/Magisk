@@ -50,7 +50,7 @@
 
         <com.google.android.material.circularreveal.cardview.CircularRevealCardView
             android:id="@+id/hide_filter"
-            style="?styleCardVariant"
+            style="@style/WidgetFoundation.Card.Variant"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -78,11 +78,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/safetynet_attest_loading"
-                android:textAppearance="?appearanceTextTitleNormal"
+                android:textAppearance="@style/AppearanceFoundation.Title"
                 android:textStyle="bold" />
 
             <ProgressBar
-                style="?styleProgressIndeterminate"
+                style="@style/WidgetFoundation.ProgressBar.Indeterminate"
                 android:layout_marginTop="@dimen/l1" />
 
         </LinearLayout>

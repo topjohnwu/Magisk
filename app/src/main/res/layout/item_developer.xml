@@ -21,7 +21,7 @@
         tools:layout_gravity="center|start">
 
         <com.google.android.material.card.MaterialCardView
-            style="?styleCardNormal"
+            style="@style/WidgetFoundation.Card"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constrainedWidth="true"
@@ -41,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{item.name}"
-                    android:textAppearance="?appearanceTextCaptionNormal"
+                    android:textAppearance="@style/AppearanceFoundation.Caption"
                     android:textStyle="bold"
                     tools:text="\@topjohnwu" />
 

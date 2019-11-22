@@ -4,7 +4,7 @@ import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.events.DieEvent
-import com.topjohnwu.magisk.model.events.dialog.DarkThemeDialog
+import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 
@@ -21,6 +21,6 @@ class SettingsViewModel : CompatViewModel() {
     }
 
     fun toggle(item: KObservableField<Boolean>) = item.toggle()
-    fun darkModePressed() = DarkThemeDialog().publish()
+    fun themePressed() = Navigation.theme().publish()
 
 }
