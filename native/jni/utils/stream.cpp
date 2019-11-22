@@ -19,9 +19,8 @@ static fpos_t strm_seek(void *v, fpos_t off, int whence) {
 
 static int strm_close(void *v) {
 	auto strm = reinterpret_cast<stream *>(v);
-	int ret = strm->close();
 	delete strm;
-	return ret;
+	return 0;
 }
 
 FILE *open_stream(stream *strm) {
@@ -46,8 +45,8 @@ off_t stream::seek(off_t off, int whence) {
 	return -1;
 }
 
-int stream::close() {
-	return 0;
+filter_stream::~filter_stream() {
+	if (fp) fclose(fp);
 }
 
 int filter_stream::read(void *buf, size_t len) {
@@ -56,12 +55,6 @@ int filter_stream::read(void *buf, size_t len) {
 
 int filter_stream::write(const void *buf, size_t len) {
 	return fwrite(buf, 1, len, fp);
-}
-
-int filter_stream::close() {
-	int ret = fclose(fp);
-	fp = nullptr;
-	return ret;
 }
 
 void filter_stream::set_base(FILE *f) {

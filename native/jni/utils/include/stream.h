@@ -18,7 +18,6 @@ public:
 	virtual int read(void *buf, size_t len);
 	virtual int write(const void *buf, size_t len);
 	virtual off_t seek(off_t off, int whence);
-	virtual int close();
 	virtual ~stream() = default;
 };
 
@@ -26,11 +25,10 @@ public:
 class filter_stream : public stream {
 public:
 	filter_stream(FILE *fp) : fp(fp) {}
-	~filter_stream() override { if (fp) close(); }
+	~filter_stream() override;
 
 	int read(void *buf, size_t len) override;
 	int write(const void *buf, size_t len) override;
-	int close() override;
 
 	void set_base(FILE *f);
 	template <class T, class... Args >

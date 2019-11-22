@@ -22,7 +22,6 @@
 using namespace std;
 
 #define bwrite filter_stream::write
-#define bclose filter_stream::close
 
 constexpr size_t CHUNK = 0x40000;
 constexpr size_t LZ4_UNCOMPRESSED = 0x800000;
@@ -35,24 +34,24 @@ public:
 	int read(void *buf, size_t len) final {
 		return stream::read(buf, len);
 	}
-
-	int close() final {
-		finish();
-		return bclose();
-	}
-
-protected:
-	// If finish is overridden, destroy should be called in the destructor
-	virtual void finish() {}
-	void destroy() { if (fp) finish(); }
 };
 
 class gz_strm : public cpr_stream {
 public:
-	~gz_strm() override { destroy(); }
-
 	int write(const void *buf, size_t len) override {
 		return len ? write(buf, len, Z_NO_FLUSH) : 0;
+	}
+
+	~gz_strm() override {
+		write(nullptr, 0, Z_FINISH);
+		switch(mode) {
+			case DECODE:
+				inflateEnd(&strm);
+				break;
+			case ENCODE:
+				deflateEnd(&strm);
+				break;
+		}
 	}
 
 protected:
@@ -68,18 +67,6 @@ protected:
 				break;
 			case ENCODE:
 				deflateInit2(&strm, 9, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY);
-				break;
-		}
-	}
-
-	void finish() override {
-		write(nullptr, 0, Z_FINISH);
-		switch(mode) {
-			case DECODE:
-				inflateEnd(&strm);
-				break;
-			case ENCODE:
-				deflateEnd(&strm);
 				break;
 		}
 	}
@@ -125,10 +112,20 @@ public:
 
 class bz_strm : public cpr_stream {
 public:
-	~bz_strm() override { destroy(); }
-
 	int write(const void *buf, size_t len) override {
 		return len ? write(buf, len, BZ_RUN) : 0;
+	}
+
+	~bz_strm() override {
+		switch(mode) {
+			case DECODE:
+				BZ2_bzDecompressEnd(&strm);
+				break;
+			case ENCODE:
+				write(nullptr, 0, BZ_FINISH);
+				BZ2_bzCompressEnd(&strm);
+				break;
+		}
 	}
 
 protected:
@@ -144,18 +141,6 @@ protected:
 				break;
 			case ENCODE:
 				BZ2_bzCompressInit(&strm, 9, 0, 0);
-				break;
-		}
-	}
-
-	void finish() override {
-		switch(mode) {
-			case DECODE:
-				BZ2_bzDecompressEnd(&strm);
-				break;
-			case ENCODE:
-				write(nullptr, 0, BZ_FINISH);
-				BZ2_bzCompressEnd(&strm);
 				break;
 		}
 	}
@@ -201,10 +186,13 @@ public:
 
 class lzma_strm : public cpr_stream {
 public:
-	~lzma_strm() override { destroy(); }
-
 	int write(const void *buf, size_t len) override {
 		return len ? write(buf, len, LZMA_RUN) : 0;
+	}
+
+	~lzma_strm() override {
+		write(nullptr, 0, LZMA_FINISH);
+		lzma_end(&strm);
 	}
 
 protected:
@@ -238,11 +226,6 @@ protected:
 		}
 	}
 
-	void finish() override {
-		write(nullptr, 0, LZMA_FINISH);
-		lzma_end(&strm);
-	}
-
 private:
 	lzma_stream strm;
 	uint8_t outbuf[CHUNK];
@@ -266,17 +249,17 @@ private:
 
 class lzma_decoder : public lzma_strm {
 public:
-	lzma_decoder(FILE *fp) : lzma_strm(DECODE, fp) {}
+	explicit lzma_decoder(FILE *fp) : lzma_strm(DECODE, fp) {}
 };
 
 class xz_encoder : public lzma_strm {
 public:
-	xz_encoder(FILE *fp) : lzma_strm(ENCODE_XZ, fp) {}
+	explicit xz_encoder(FILE *fp) : lzma_strm(ENCODE_XZ, fp) {}
 };
 
 class lzma_encoder : public lzma_strm {
 public:
-	lzma_encoder(FILE *fp) : lzma_strm(ENCODE_LZMA, fp) {}
+	explicit lzma_encoder(FILE *fp) : lzma_strm(ENCODE_LZMA, fp) {}
 };
 
 class LZ4F_decoder : public cpr_stream {
@@ -340,12 +323,6 @@ public:
 		LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
 	}
 
-	~LZ4F_encoder() override {
-		destroy();
-		LZ4F_freeCompressionContext(ctx);
-		delete[] outbuf;
-	}
-
 	int write(const void *buf, size_t len) override {
 		auto ret = len;
 		if (!outbuf)
@@ -368,10 +345,11 @@ public:
 		return ret;
 	}
 
-protected:
-	void finish() override {
+	~LZ4F_encoder() override {
 		size_t len = LZ4F_compressEnd(ctx, outbuf, outCapacity, nullptr);
 		bwrite(outbuf, len);
+		LZ4F_freeCompressionContext(ctx);
+		delete[] outbuf;
 	}
 
 private:
@@ -466,12 +444,6 @@ public:
 	: cpr_stream(fp), outbuf(new char[LZ4_COMPRESSED]), buf(new char[LZ4_UNCOMPRESSED]),
 	init(false), buf_off(0), in_total(0) {}
 
-	~LZ4_encoder() override {
-		destroy();
-		delete[] outbuf;
-		delete[] buf;
-	}
-
 	int write(const void *in, size_t size) override {
 		if (!init) {
 			bwrite("\x02\x21\x4c\x18", 4);
@@ -510,14 +482,15 @@ public:
 		return true;
 	}
 
-protected:
-	void finish() override {
+	~LZ4_encoder() override {
 		if (buf_off) {
 			int write = LZ4_compress_HC(buf, outbuf, buf_off, LZ4_COMPRESSED, 9);
 			bwrite(&write, sizeof(write));
 			bwrite(outbuf, write);
 		}
 		bwrite(&in_total, sizeof(in_total));
+		delete[] outbuf;
+		delete[] buf;
 	}
 
 private:
@@ -608,7 +581,7 @@ void decompress(char *infile, const char *outfile) {
 			LOGE("Decompression error!\n");
 	}
 
-	strm->close();
+	strm.reset(nullptr);
 	fclose(in_fp);
 
 	if (rm_in)
@@ -651,7 +624,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
 			LOGE("Compression error!\n");
 	};
 
-	strm->close();
+	strm.reset(nullptr);
 	fclose(in_fp);
 
 	if (rm_in)

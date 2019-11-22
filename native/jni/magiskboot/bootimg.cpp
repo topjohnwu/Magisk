@@ -28,9 +28,10 @@ static void decompress(format_t type, int fd, const void *in, size_t size) {
 
 static int64_t compress(format_t type, int fd, const void *in, size_t size) {
 	auto prev = lseek(fd, 0, SEEK_CUR);
-	unique_ptr<stream> ptr(get_encoder(type, open_stream<fd_stream>(fd)));
-	ptr->write(in, size);
-	ptr->close();
+	{
+		unique_ptr<stream> ptr(get_encoder(type, open_stream<fd_stream>(fd)));
+		ptr->write(in, size);
+	}
 	auto now = lseek(fd, 0, SEEK_CUR);
 	return now - prev;
 }
