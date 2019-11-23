@@ -27,8 +27,7 @@ public:
 // Delegates all operations to the base FILE pointer
 class filter_stream : public stream {
 public:
-	filter_stream() = default;
-	filter_stream(sFILE &&fp) : fp(std::move(fp)) {}
+	filter_stream(sFILE &&fp = make_sFILE()) : fp(std::move(fp)) {}
 
 	int read(void *buf, size_t len) override;
 	int write(const void *buf, size_t len) override;

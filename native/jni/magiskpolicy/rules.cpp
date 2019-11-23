@@ -196,7 +196,7 @@ void sepol_magisk_rules() {
 	// Allow update_engine/addon.d-v2 to run permissive on all ROMs
 	sepol_permissive("update_engine");
 
-#ifdef MAGISK_DEBUG
+#if 0
 	// Remove all dontaudit in debug mode
 	strip_dontaudit();
 #endif
