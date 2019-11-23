@@ -22,15 +22,15 @@ uint32_t dyn_img_hdr::j32 = 0;
 uint64_t dyn_img_hdr::j64 = 0;
 
 static void decompress(format_t type, int fd, const void *in, size_t size) {
-	unique_ptr<stream> ptr(get_decoder(type, open_stream<fd_stream>(fd)));
+	auto ptr = get_decoder(type, make_stream<fd_stream>(fd));
 	ptr->write(in, size);
 }
 
-static int64_t compress(format_t type, int fd, const void *in, size_t size) {
+static off_t compress(format_t type, int fd, const void *in, size_t size) {
 	auto prev = lseek(fd, 0, SEEK_CUR);
 	{
-		unique_ptr<stream> ptr(get_encoder(type, open_stream<fd_stream>(fd)));
-		ptr->write(in, size);
+		auto strm = get_encoder(type, make_stream<fd_stream>(fd));
+		strm->write(in, size);
 	}
 	auto now = lseek(fd, 0, SEEK_CUR);
 	return now - prev;

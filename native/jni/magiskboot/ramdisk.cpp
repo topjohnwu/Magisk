@@ -244,8 +244,8 @@ void magisk_cpio::compress() {
 
 	uint8_t *data;
 	size_t len;
-	FILE *fp = open_stream(get_encoder(XZ, open_stream<byte_stream>(data, len)));
-	dump(fp);
+	auto strm = make_stream(get_encoder(XZ, make_stream<byte_stream>(data, len)));
+	dump(strm.release());
 
 	entries.clear();
 	entries.insert(std::move(init));
@@ -263,9 +263,10 @@ void magisk_cpio::decompress() {
 
 	char *data;
 	size_t len;
-	auto strm = get_decoder(XZ, open_stream<byte_stream>(data, len));
-	strm->write(it->second->data, it->second->filesize);
-	delete strm;
+	{
+		auto strm = get_decoder(XZ, make_stream<byte_stream>(data, len));
+		strm->write(it->second->data, it->second->filesize);
+	}
 
 	entries.erase(it);
 	load_cpio(data, len);

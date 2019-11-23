@@ -29,11 +29,8 @@ constexpr size_t LZ4_COMPRESSED = LZ4_COMPRESSBOUND(LZ4_UNCOMPRESSED);
 
 class cpr_stream : public filter_stream {
 public:
-	explicit cpr_stream(FILE *fp) : filter_stream(fp) {}
-
-	int read(void *buf, size_t len) final {
-		return stream::read(buf, len);
-	}
+	using filter_stream::filter_stream;
+	using stream::read;
 };
 
 class gz_strm : public cpr_stream {
@@ -60,7 +57,7 @@ protected:
 		ENCODE
 	} mode;
 
-	gz_strm(mode_t mode, FILE *fp) : cpr_stream(fp), mode(mode) {
+	gz_strm(mode_t mode, sFILE &&fp) : cpr_stream(std::move(fp)), mode(mode) {
 		switch(mode) {
 			case DECODE:
 				inflateInit2(&strm, 15 | 16);
@@ -102,12 +99,12 @@ private:
 
 class gz_decoder : public gz_strm {
 public:
-	explicit gz_decoder(FILE *fp) : gz_strm(DECODE, fp) {};
+	explicit gz_decoder(sFILE &&fp) : gz_strm(DECODE, std::move(fp)) {};
 };
 
 class gz_encoder : public gz_strm {
 public:
-	explicit gz_encoder(FILE *fp) : gz_strm(ENCODE, fp) {};
+	explicit gz_encoder(sFILE &&fp) : gz_strm(ENCODE, std::move(fp)) {};
 };
 
 class bz_strm : public cpr_stream {
@@ -134,7 +131,7 @@ protected:
 		ENCODE
 	} mode;
 
-	bz_strm(mode_t mode, FILE *fp) : cpr_stream(fp), mode(mode) {
+	bz_strm(mode_t mode, sFILE &&fp) : cpr_stream(std::move(fp)), mode(mode) {
 		switch(mode) {
 			case DECODE:
 				BZ2_bzDecompressInit(&strm, 0, 0);
@@ -176,12 +173,12 @@ private:
 
 class bz_decoder : public bz_strm {
 public:
-	explicit bz_decoder(FILE *fp) : bz_strm(DECODE, fp) {};
+	explicit bz_decoder(sFILE &&fp) : bz_strm(DECODE, std::move(fp)) {};
 };
 
 class bz_encoder : public bz_strm {
 public:
-	explicit bz_encoder(FILE *fp) : bz_strm(ENCODE, fp) {};
+	explicit bz_encoder(sFILE &&fp) : bz_strm(ENCODE, std::move(fp)) {};
 };
 
 class lzma_strm : public cpr_stream {
@@ -202,7 +199,8 @@ protected:
 		ENCODE_LZMA
 	} mode;
 
-	lzma_strm(mode_t mode, FILE *fp) : cpr_stream(fp), mode(mode), strm(LZMA_STREAM_INIT) {
+	lzma_strm(mode_t mode, sFILE &&fp)
+	: cpr_stream(std::move(fp)), mode(mode), strm(LZMA_STREAM_INIT) {
 		lzma_options_lzma opt;
 
 		// Initialize preset
@@ -249,22 +247,22 @@ private:
 
 class lzma_decoder : public lzma_strm {
 public:
-	explicit lzma_decoder(FILE *fp) : lzma_strm(DECODE, fp) {}
+	explicit lzma_decoder(sFILE &&fp) : lzma_strm(DECODE, std::move(fp)) {}
 };
 
 class xz_encoder : public lzma_strm {
 public:
-	explicit xz_encoder(FILE *fp) : lzma_strm(ENCODE_XZ, fp) {}
+	explicit xz_encoder(sFILE &&fp) : lzma_strm(ENCODE_XZ, std::move(fp)) {}
 };
 
 class lzma_encoder : public lzma_strm {
 public:
-	explicit lzma_encoder(FILE *fp) : lzma_strm(ENCODE_LZMA, fp) {}
+	explicit lzma_encoder(sFILE &&fp) : lzma_strm(ENCODE_LZMA, std::move(fp)) {}
 };
 
 class LZ4F_decoder : public cpr_stream {
 public:
-	explicit LZ4F_decoder(FILE *fp) : cpr_stream(fp), outbuf(nullptr) {
+	explicit LZ4F_decoder(sFILE &&fp) : cpr_stream(std::move(fp)), outbuf(nullptr) {
 		LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
 	}
 
@@ -319,7 +317,8 @@ private:
 
 class LZ4F_encoder : public cpr_stream {
 public:
-	explicit LZ4F_encoder(FILE *fp) : cpr_stream(fp), outbuf(nullptr), outCapacity(0) {
+	explicit LZ4F_encoder(sFILE &&fp)
+	: cpr_stream(std::move(fp)), outbuf(nullptr), outCapacity(0) {
 		LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
 	}
 
@@ -379,9 +378,9 @@ private:
 
 class LZ4_decoder : public cpr_stream {
 public:
-	explicit LZ4_decoder(FILE *fp)
-	: cpr_stream(fp), out_buf(new char[LZ4_UNCOMPRESSED]), buffer(new char[LZ4_COMPRESSED]),
-	init(false), block_sz(0), buf_off(0) {}
+	explicit LZ4_decoder(sFILE &&fp)
+	: cpr_stream(std::move(fp)), out_buf(new char[LZ4_UNCOMPRESSED]),
+	buffer(new char[LZ4_COMPRESSED]), init(false), block_sz(0), buf_off(0) {}
 
 	~LZ4_decoder() override {
 		delete[] out_buf;
@@ -440,8 +439,8 @@ private:
 
 class LZ4_encoder : public cpr_stream {
 public:
-	explicit LZ4_encoder(FILE *fp)
-	: cpr_stream(fp), outbuf(new char[LZ4_COMPRESSED]), buf(new char[LZ4_UNCOMPRESSED]),
+	explicit LZ4_encoder(sFILE &&fp)
+	: cpr_stream(std::move(fp)), outbuf(new char[LZ4_COMPRESSED]), buf(new char[LZ4_UNCOMPRESSED]),
 	init(false), buf_off(0), in_total(0) {}
 
 	int write(const void *in, size_t size) override {
@@ -501,38 +500,38 @@ private:
 	unsigned in_total;
 };
 
-filter_stream *get_encoder(format_t type, FILE *fp) {
+stream_ptr get_encoder(format_t type, sFILE &&fp) {
 	switch (type) {
 		case XZ:
-			return new xz_encoder(fp);
+			return make_unique<xz_encoder>(std::move(fp));
 		case LZMA:
-			return new lzma_encoder(fp);
+			return make_unique<lzma_encoder>(std::move(fp));
 		case BZIP2:
-			return new bz_encoder(fp);
+			return make_unique<bz_encoder>(std::move(fp));
 		case LZ4:
-			return new LZ4F_encoder(fp);
+			return make_unique<LZ4F_encoder>(std::move(fp));
 		case LZ4_LEGACY:
-			return new LZ4_encoder(fp);
+			return make_unique<LZ4_encoder>(std::move(fp));
 		case GZIP:
 		default:
-			return new gz_encoder(fp);
+			return make_unique<gz_encoder>(std::move(fp));
 	}
 }
 
-filter_stream *get_decoder(format_t type, FILE *fp) {
+stream_ptr get_decoder(format_t type, sFILE &&fp) {
 	switch (type) {
 		case XZ:
 		case LZMA:
-			return new lzma_decoder(fp);
+			return make_unique<lzma_decoder>(std::move(fp));
 		case BZIP2:
-			return new bz_decoder(fp);
+			return make_unique<bz_decoder>(std::move(fp));
 		case LZ4:
-			return new LZ4F_decoder(fp);
+			return make_unique<LZ4F_decoder>(std::move(fp));
 		case LZ4_LEGACY:
-			return new LZ4_decoder(fp);
+			return make_unique<LZ4_decoder>(std::move(fp));
 		case GZIP:
 		default:
-			return new gz_decoder(fp);
+			return make_unique<gz_decoder>(std::move(fp));
 	}
 }
 
@@ -541,7 +540,7 @@ void decompress(char *infile, const char *outfile) {
 	bool rm_in = false;
 
 	FILE *in_fp = in_std ? stdin : xfopen(infile, "re");
-	unique_ptr<stream> strm;
+	stream_ptr strm;
 
 	char buf[4096];
 	size_t len;
@@ -574,7 +573,7 @@ void decompress(char *infile, const char *outfile) {
 			}
 
 			FILE *out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
-			strm.reset(get_decoder(type, out_fp));
+			strm = get_decoder(type, make_sFILE(out_fp));
 			if (ext) *ext = '.';
 		}
 		if (strm->write(buf, len) < 0)
@@ -615,7 +614,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
 		out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
 	}
 
-	unique_ptr<stream> strm(get_encoder(it->second, out_fp));
+	auto strm = get_encoder(it->second, make_sFILE(out_fp));
 
 	char buf[4096];
 	size_t len;

@@ -6,6 +6,11 @@
 #define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (do_align(p, a) - (p))
 
+using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
+static inline sFILE make_sFILE(FILE *fp = nullptr) {
+	return sFILE(fp, fclose);
+}
+
 struct file_attr {
 	struct stat st;
 	char con[128];
