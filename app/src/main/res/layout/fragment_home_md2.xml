@@ -46,7 +46,7 @@
             android:paddingTop="@dimen/l1">
 
             <com.google.android.material.card.MaterialCardView
-                style="@style/WidgetFoundation.Card.OnPrimary"
+                style="@style/WidgetFoundation.Card.Primary"
                 goneUnless="@{viewModel.noticeVisible}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
