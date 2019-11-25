@@ -33,13 +33,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
+        android:fillViewport="true"
         android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
         tools:layout_marginTop="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingTop="@dimen/l1">
@@ -739,40 +740,57 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <com.google.android.material.card.MaterialCardView
+                style="@style/WidgetFoundation.Card.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l2"
-                android:layout_marginEnd="@dimen/l1"
-                android:text="@string/home_support_title"
-                android:textAppearance="@style/AppearanceFoundation.Title" />
+                android:layout_gravity="bottom"
+                android:layout_margin="@dimen/l1">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l_50"
-                android:layout_marginEnd="@dimen/l1"
-                android:text="@string/home_support_content"
-                android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/l1">
 
-            <androidx.recyclerview.widget.RecyclerView
-                dividerHorizontal="@{R.drawable.divider_l1}"
-                dividerVertical="@{R.drawable.divider_l1}"
-                itemBinding="@{viewModel.itemDeveloperBinding}"
-                items="@{viewModel.items}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:clipToPadding="false"
-                android:orientation="horizontal"
-                android:overScrollMode="ifContentScrolls"
-                android:paddingStart="@dimen/l1"
-                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-                app:spanCount="2"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_developer" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/l1"
+                        android:layout_marginEnd="@dimen/l1"
+                        android:text="@string/home_support_title"
+                        android:textAppearance="@style/AppearanceFoundation.Title.OnPrimary" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/l1"
+                        android:layout_marginTop="@dimen/l_50"
+                        android:layout_marginEnd="@dimen/l1"
+                        android:text="@string/home_support_content"
+                        android:textAppearance="@style/AppearanceFoundation.Caption.OnPrimary.Variant" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        dividerHorizontal="@{R.drawable.divider_l1}"
+                        dividerVertical="@{R.drawable.divider_l1}"
+                        itemBinding="@{viewModel.itemDeveloperBinding}"
+                        items="@{viewModel.items}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/l1"
+                        android:clipToPadding="false"
+                        android:nestedScrollingEnabled="@{false}"
+                        android:orientation="horizontal"
+                        android:overScrollMode="ifContentScrolls"
+                        android:paddingStart="@dimen/l1"
+                        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                        app:spanCount="2"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_developer" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

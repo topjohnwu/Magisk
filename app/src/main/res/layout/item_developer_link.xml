@@ -30,7 +30,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@{item.icon}"
-            app:tint="?colorOnSurface"
+            app:tint="?colorOnPrimary"
             tools:srcCompat="@drawable/ic_paypal" />
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -41,7 +41,7 @@
             app:layout_constraintStart_toEndOf="@+id/developer_link"
             app:layout_constraintTop_toTopOf="@+id/developer_link"
             app:srcCompat="@drawable/ic_more"
-            app:tint="@color/color_text_transient" />
+            app:tint="?colorOnPrimary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

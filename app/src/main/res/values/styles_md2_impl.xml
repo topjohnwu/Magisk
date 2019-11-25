@@ -24,6 +24,14 @@
         <item name="cardPreventCornerOverlap">true</item>
     </style>
 
+    <style name="WidgetFoundation.Card.Primary">
+        <item name="cardBackgroundColor">?colorPrimary</item>
+    </style>
+
+    <style name="WidgetFoundation.Card.Secondary">
+        <item name="cardBackgroundColor">?colorSecondary</item>
+    </style>
+
     <style name="WidgetFoundation.Card.Variant">
         <item name="cardBackgroundColor">?colorSurface</item>
         <item name="strokeColor">?colorSurfaceVariant</item>
