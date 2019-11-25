@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
+import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
@@ -20,26 +21,26 @@ import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.home.itemBindingOf
 import com.topjohnwu.magisk.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.DiffObservableList
-import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Single
 
 class SuperuserViewModel(
-    private val rxBus: RxBus,
     private val db: PolicyDao,
     private val packageManager: PackageManager,
     private val resources: Resources
-) : CompatViewModel() {
+) : CompatViewModel(), TappableHeadlineItem.Listener {
 
-    val items = diffListOf<PolicyItem>()
-    val itemBinding = itemBindingOf<PolicyItem> {
+    val items = diffListOf<ComparableRvItem<*>>()
+    val itemBinding = itemBindingOf<ComparableRvItem<*>> {
         it.bindExtra(BR.viewModel, this)
+        it.bindExtra(BR.listener, this)
     }
 
-    init {
-        rxBus.register<PolicyUpdateEvent>()
-            .subscribeK { updatePolicy(it) }
-            .add()
+    companion object {
+        private val menuOptions = listOf(
+            TappableHeadlineItem.Hide,
+            TappableHeadlineItem.Safetynet
+        )
     }
 
     // ---
@@ -56,6 +57,7 @@ class SuperuserViewModel(
             ).compare(o1, o2)
         }
         .toList()
+        .map { menuOptions + it }
         .map { it to items.calculateDiff(it) }
         .applySchedulers()
         .applyViewModel(this)
@@ -63,12 +65,19 @@ class SuperuserViewModel(
 
     // ---
 
-    fun safetynetPressed() = Navigation.safetynet().publish()
-    fun hidePressed() = Navigation.hide().publish()
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
+    override fun onItemPressed(item: TappableHeadlineItem) = when (item) {
+        TappableHeadlineItem.Hide -> hidePressed()
+        TappableHeadlineItem.Safetynet -> safetynetPressed()
+        else -> Unit
+    }
+
+    private fun safetynetPressed() = Navigation.safetynet().publish()
+    private fun hidePressed() = Navigation.hide().publish()
 
     fun deletePressed(item: PolicyItem) {
         fun updateState() = deletePolicy(item.item)
-            .subscribeK { items.removeAll { it.itemSameAs(item) } }
+            .subscribeK { items.removeAll { it.genericItemSameAs(item) } }
             .add()
 
         if (BiometricHelper.isEnabled) {

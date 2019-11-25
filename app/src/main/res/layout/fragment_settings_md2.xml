@@ -28,7 +28,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/settings_card_redesign"
-                style="@style/WidgetFoundation.Card"
+                style="@style/WidgetFoundation.Card.Variant.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/l1"
@@ -51,7 +51,7 @@
                         android:gravity="start"
                         android:paddingStart="@dimen/l1"
                         android:text="Redesign"
-                        android:textAppearance="@style/AppearanceFoundation.Body"
+                        android:textAppearance="@style/AppearanceFoundation.Body.Secondary"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/settings_card_redesign_switch"
@@ -75,7 +75,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/settings_card_theme"
-                style="@style/WidgetFoundation.Card"
+                style="@style/WidgetFoundation.Card.Variant.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
@@ -91,7 +91,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_card_theme_dark_icon"
-                        style="@style/WidgetFoundation.Icon"
+                        style="@style/WidgetFoundation.Icon.Secondary"
                         android:background="@null"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -100,7 +100,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_card_theme_dark_pointer"
-                        style="@style/WidgetFoundation.Icon"
+                        style="@style/WidgetFoundation.Icon.Secondary"
                         android:background="@null"
                         android:rotation="180"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -116,7 +116,7 @@
                         android:gravity="start|center_vertical"
                         android:singleLine="true"
                         android:text="@string/section_theme"
-                        android:textAppearance="@style/AppearanceFoundation.Body"
+                        android:textAppearance="@style/AppearanceFoundation.Body.Secondary"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/settings_card_theme_dark_pointer"

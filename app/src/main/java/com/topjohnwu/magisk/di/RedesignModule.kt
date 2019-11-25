@@ -24,7 +24,7 @@ val redesignModule = module {
     viewModel { RequestViewModel() }
     viewModel { SafetynetViewModel(get()) }
     viewModel { SettingsViewModel() }
-    viewModel { SuperuserViewModel(get(), get(), get(), get()) }
+    viewModel { SuperuserViewModel(get(), get(), get()) }
     viewModel { ThemeViewModel() }
     viewModel { InstallViewModel() }
 

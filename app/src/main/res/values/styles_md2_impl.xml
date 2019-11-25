@@ -30,6 +30,14 @@
         <item name="strokeWidth">1.5dp</item>
     </style>
 
+    <style name="WidgetFoundation.Card.Variant.Primary">
+        <item name="strokeColor">?colorPrimary</item>
+    </style>
+
+    <style name="WidgetFoundation.Card.Variant.Secondary">
+        <item name="strokeColor">?colorSecondary</item>
+    </style>
+
     <style name="WidgetFoundation.Card.Elevated" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?colorSurfaceSurfaceVariant</item>
         <item name="cardCornerRadius">@dimen/l_50</item>
@@ -136,6 +144,10 @@
 
     <style name="WidgetFoundation.Icon.Primary">
         <item name="tint">@color/color_primary_transient</item>
+    </style>
+
+    <style name="WidgetFoundation.Icon.Secondary">
+        <item name="tint">@color/color_secondary_transient</item>
     </style>
 
     <style name="WidgetFoundation.Icon.OnPrimary">

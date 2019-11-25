@@ -48,6 +48,14 @@
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
+    <style name="AppearanceFoundation.Body.Primary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="AppearanceFoundation.Body.Secondary">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
     <style name="AppearanceFoundation.Body.OnPrimary">
         <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
