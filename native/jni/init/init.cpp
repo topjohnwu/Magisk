@@ -38,23 +38,22 @@ static int vprintk(const char *fmt, va_list ap) {
 }
 void setup_klog() {
 	// Shut down first 3 fds
-	int null;
+	int fd;
 	if (access("/dev/null", W_OK) == 0) {
-		null = xopen("/dev/null", O_RDWR | O_CLOEXEC);
+		fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	} else {
 		mknod("/null", S_IFCHR | 0666, makedev(1, 3));
-		null = xopen("/null", O_RDWR | O_CLOEXEC);
+		fd = xopen("/null", O_RDWR | O_CLOEXEC);
 		unlink("/null");
 	}
-	xdup3(null, STDIN_FILENO, O_CLOEXEC);
-	xdup3(null, STDOUT_FILENO, O_CLOEXEC);
-	xdup3(null, STDERR_FILENO, O_CLOEXEC);
-	if (null > STDERR_FILENO)
-		close(null);
+	xdup3(fd, STDIN_FILENO, O_CLOEXEC);
+	xdup3(fd, STDOUT_FILENO, O_CLOEXEC);
+	xdup3(fd, STDERR_FILENO, O_CLOEXEC);
+	if (fd > STDERR_FILENO)
+		close(fd);
 
-	int fd;
-	if (access("/proc/kmsg", W_OK) == 0) {
-		fd = xopen("/proc/kmsg", O_WRONLY | O_CLOEXEC);
+	if (access("/dev/kmsg", W_OK) == 0) {
+		fd = xopen("/dev/kmsg", O_WRONLY | O_CLOEXEC);
 	} else {
 		mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
 		fd = xopen("/kmsg", O_WRONLY | O_CLOEXEC);

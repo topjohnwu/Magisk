@@ -28,7 +28,7 @@ object SuHandler : ProviderCallHandler {
 
     override fun call(context: Context, method: String, arg: String?, extras: Bundle?): Bundle? {
         invoke(context.wrap(), method, extras)
-        return null
+        return Bundle.EMPTY
     }
 
     operator fun invoke(context: Context, action: String?, data: Bundle?) {

@@ -1,10 +1,16 @@
 #pragma once
 
+#include <mntent.h>
 #include <functional>
 #include <string_view>
 
 #define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (do_align(p, a) - (p))
+
+using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
+static inline sFILE make_sFILE(FILE *fp = nullptr) {
+	return sFILE(fp, fclose);
+}
 
 struct file_attr {
 	struct stat st;
@@ -37,7 +43,7 @@ void parse_prop_file(const char *file, const std::function
 void *__mmap(const char *filename, size_t *size, bool rw);
 void frm_rf(int dirfd, std::initializer_list<const char *> excl = std::initializer_list<const char *>());
 void clone_dir(int src, int dest, bool overwrite = true);
-void parse_mnt(const char *file, const std::function<bool (mntent*)> &fn);
+void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
 
 template <typename T>
 void full_read(const char *filename, T &buf, size_t &size) {

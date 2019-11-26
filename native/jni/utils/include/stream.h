@@ -1,18 +1,19 @@
 #pragma once
 
-#include <unistd.h>
 #include <stdio.h>
 #include <memory>
 
-// #include <utils.h>
+#include "../files.h"
 
 class stream;
 
-FILE *open_stream(stream *strm);
+using stream_ptr = std::unique_ptr<stream>;
+
+sFILE make_stream(stream_ptr &&strm);
 
 template <class T, class... Args>
-FILE *open_stream(Args &&... args) {
-	return open_stream(new T(args...));
+sFILE make_stream(Args &&... args) {
+	return make_stream(stream_ptr(new T(std::forward<Args>(args)...)));
 }
 
 class stream {
@@ -20,28 +21,25 @@ public:
 	virtual int read(void *buf, size_t len);
 	virtual int write(const void *buf, size_t len);
 	virtual off_t seek(off_t off, int whence);
-	virtual int close();
 	virtual ~stream() = default;
 };
 
 // Delegates all operations to the base FILE pointer
 class filter_stream : public stream {
 public:
-	filter_stream(FILE *fp) : fp(fp) {}
-	~filter_stream() override { if (fp) close(); }
+	filter_stream(sFILE &&fp = make_sFILE()) : fp(std::move(fp)) {}
 
 	int read(void *buf, size_t len) override;
 	int write(const void *buf, size_t len) override;
-	int close() override;
 
-	void set_base(FILE *f);
+	void set_base(sFILE &&f);
 	template <class T, class... Args >
 	void set_base(Args&&... args) {
-		set_base(open_stream<T>(args...));
+		set_base(make_stream<T>(std::forward<Args>(args)...));
 	}
 
 protected:
-	FILE *fp;
+	sFILE fp;
 };
 
 // Handy interface for classes that need custom seek logic
@@ -69,7 +67,7 @@ private:
 	size_t _cap = 0;
 
 	void resize(size_t new_pos, bool zero = false);
-	size_t end_pos() override { return _len; }
+	size_t end_pos() final { return _len; }
 };
 
 // File stream but does not close the file descriptor at any time

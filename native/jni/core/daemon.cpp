@@ -100,6 +100,18 @@ static void *request_handler(void *args) {
 
 static void main_daemon() {
 	android_logging();
+
+	int fd = xopen("/dev/null", O_WRONLY);
+	xdup2(fd, STDOUT_FILENO);
+	xdup2(fd, STDERR_FILENO);
+	if (fd > STDERR_FILENO)
+		close(fd);
+	fd = xopen("/dev/zero", O_RDONLY);
+	xdup2(fd, STDIN_FILENO);
+	if (fd > STDERR_FILENO)
+		close(fd);
+	close(fd);
+
 	setsid();
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 	restore_rootcon();
@@ -111,14 +123,6 @@ static void main_daemon() {
 			return true;
 		}, true);
 	}
-
-	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
-	xdup2(fd, STDOUT_FILENO);
-	xdup2(fd, STDERR_FILENO);
-	close(fd);
-	fd = xopen("/dev/zero", O_RDWR | O_CLOEXEC);
-	xdup2(fd, STDIN_FILENO);
-	close(fd);
 
 	LOGI(SHOW_VER(Magisk) " daemon started\n");
 

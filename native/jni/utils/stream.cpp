@@ -19,15 +19,13 @@ static fpos_t strm_seek(void *v, fpos_t off, int whence) {
 
 static int strm_close(void *v) {
 	auto strm = reinterpret_cast<stream *>(v);
-	int ret = strm->close();
 	delete strm;
-	return ret;
+	return 0;
 }
 
-FILE *open_stream(stream *strm) {
-	FILE *fp = funopen(strm, strm_read, strm_write, strm_seek, strm_close);
-	// Disable buffering
-	setbuf(fp, nullptr);
+sFILE make_stream(stream_ptr &&strm) {
+	sFILE fp(funopen(strm.release(), strm_read, strm_write, strm_seek, strm_close), fclose);
+	setbuf(fp.get(), nullptr);
 	return fp;
 }
 
@@ -46,27 +44,16 @@ off_t stream::seek(off_t off, int whence) {
 	return -1;
 }
 
-int stream::close() {
-	return 0;
-}
-
 int filter_stream::read(void *buf, size_t len) {
-	return fread(buf, len, 1, fp);
+	return fread(buf, 1, len, fp.get());
 }
 
 int filter_stream::write(const void *buf, size_t len) {
-	return fwrite(buf, len, 1, fp);
+	return fwrite(buf, 1, len, fp.get());
 }
 
-int filter_stream::close() {
-	int ret = fclose(fp);
-	fp = nullptr;
-	return ret;
-}
-
-void filter_stream::set_base(FILE *f) {
-	if (fp) fclose(fp);
-	fp = f;
+void filter_stream::set_base(sFILE &&f) {
+	fp = std::move(f);
 }
 
 off_t seekable_stream::seek_pos(off_t off, int whence) {

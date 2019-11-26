@@ -109,7 +109,7 @@ bool cpio::exists(const char *name) {
 	return entries.count(name) != 0;
 }
 
-#define do_out(buf, len) pos += fwrite(buf, len, 1, out);
+#define do_out(buf, len) pos += fwrite(buf, 1, len, out);
 #define out_align() do_out(zeros, align_off(pos, 4))
 void cpio::dump(FILE *out) {
 	size_t pos = 0;
@@ -142,7 +142,7 @@ void cpio::dump(FILE *out) {
 	}
 	// Write trailer
 	sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
-			inode++, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0);
+			inode++, 0755, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0);
 	do_out(header, 110);
 	do_out("TRAILER!!!\0", 11);
 	out_align();

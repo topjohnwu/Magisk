@@ -174,19 +174,20 @@ int compile_split_cil() {
 }
 
 int dump_policydb(const char *file) {
-	struct policy_file pf;
-	policy_file_init(&pf);
-
 	uint8_t *data;
 	size_t len;
 
-	pf.type = PF_USE_STDIO;
-	pf.fp = open_stream<byte_stream>(data, len);
-	if (policydb_write(magisk_policydb, &pf)) {
-		LOGE("Fail to create policy image\n");
-		return 1;
+	{
+		auto fp = make_stream<byte_stream>(data, len);
+		struct policy_file pf;
+		policy_file_init(&pf);
+		pf.type = PF_USE_STDIO;
+		pf.fp = fp.get();
+		if (policydb_write(magisk_policydb, &pf)) {
+			LOGE("Fail to create policy image\n");
+			return 1;
+		}
 	}
-	fclose(pf.fp);
 
 	int fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
 	if (fd < 0)
