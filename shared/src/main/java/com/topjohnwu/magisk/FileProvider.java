@@ -154,7 +154,7 @@ public class FileProvider extends ContentProvider {
     public Bundle call(String method, String arg, Bundle extras) {
         if (callHandler != null)
             return callHandler.call(getContext(), method, arg, extras);
-        return null;
+        return Bundle.EMPTY;
     }
 
     @Override
