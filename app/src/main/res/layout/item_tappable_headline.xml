@@ -16,7 +16,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="@style/WidgetFoundation.Card.Variant.Secondary"
+        style="@style/WidgetFoundation.Card.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="@{() -> listener.onItemPressed(item)}"
@@ -28,7 +28,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/tappable_icon"
-                style="@style/WidgetFoundation.Icon.Secondary"
+                style="@style/WidgetFoundation.Icon.OnPrimary"
                 android:background="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +42,7 @@
                 android:requiresFadingEdge="horizontal"
                 android:singleLine="true"
                 android:text="@{item.title}"
-                android:textAppearance="@style/AppearanceFoundation.Body.Secondary"
+                android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/headline_icon_pointer"
@@ -52,7 +52,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/headline_icon_pointer"
-                style="@style/WidgetFoundation.Icon.Secondary"
+                style="@style/WidgetFoundation.Icon.OnPrimary"
                 android:background="@null"
                 android:rotation="180"
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -31,7 +31,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/theme_card_dark"
-                style="@style/WidgetFoundation.Card.Variant.Secondary"
+                style="@style/WidgetFoundation.Card.Primary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:onClick="@{() -> viewModel.darkModePressed()}"
@@ -46,7 +46,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_card_dark_icon"
-                        style="@style/WidgetFoundation.Icon.Secondary"
+                        style="@style/WidgetFoundation.Icon.OnPrimary"
                         android:background="@null"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -55,7 +55,7 @@
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/settings_card_dark_pointer"
-                        style="@style/WidgetFoundation.Icon.Secondary"
+                        style="@style/WidgetFoundation.Icon.OnPrimary"
                         android:background="@null"
                         android:rotation="180"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -71,7 +71,7 @@
                         android:gravity="start|center_vertical"
                         android:singleLine="true"
                         android:text="@string/settings_dark_mode_title"
-                        android:textAppearance="@style/AppearanceFoundation.Body.Secondary"
+                        android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/settings_card_dark_pointer"

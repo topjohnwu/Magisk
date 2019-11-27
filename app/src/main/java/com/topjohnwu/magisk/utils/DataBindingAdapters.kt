@@ -296,18 +296,24 @@ fun TextSwitcher.setTextBinding(text: CharSequence) {
     "android:layout_marginTop",
     "android:layout_marginRight",
     "android:layout_marginBottom",
+    "android:layout_marginStart",
+    "android:layout_marginEnd",
     requireAll = false
 )
 fun View.setMargins(
     marginLeft: Int?,
     marginTop: Int?,
     marginRight: Int?,
-    marginBottom: Int?
+    marginBottom: Int?,
+    marginStart: Int?,
+    marginEnd: Int?
 ) = updateLayoutParams<ViewGroup.MarginLayoutParams> {
     marginLeft?.let { leftMargin = it }
     marginTop?.let { topMargin = it }
     marginRight?.let { rightMargin = it }
     marginBottom?.let { bottomMargin = it }
+    marginStart?.let { this.marginStart = it }
+    marginEnd?.let { this.marginEnd = it }
 }
 
 @BindingAdapter("nestedScrollingEnabled")
@@ -455,9 +461,4 @@ fun View.setRotationNotAnimated(rotation: Int) {
 @BindingAdapter("android:text")
 fun TextView.setTextSafe(text: Int) {
     if (text == 0) this.text = null else setText(text)
-}
-
-@BindingAdapter("android:theme")
-fun View.setThemeCompat(theme: Int) {
-
 }

@@ -5,130 +5,33 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.R" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.redesign.settings.SettingsViewModel" />
 
     </data>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        adapter="@{viewModel.adapter}"
+        dividerHorizontal="@{R.drawable.divider_l_50}"
+        dividerVertical="@{R.drawable.divider_l_50}"
+        itemBinding="@{viewModel.itemBinding}"
+        items="@{viewModel.items}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusableInTouchMode="false"
         android:clipToPadding="false"
-        android:fillViewport="true"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/l1"
         android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
+        android:paddingEnd="@dimen/l_50"
+        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
+        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+        app:spanCount="2"
         tools:layout_marginTop="24dp"
-        tools:paddingTop="@dimen/l1">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/l1">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/settings_card_redesign"
-                style="@style/WidgetFoundation.Card.Variant.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/l1"
-                android:layout_marginRight="@dimen/l1"
-                android:layout_marginBottom="@dimen/l1"
-                android:onClick="@{() -> viewModel.toggle(viewModel.redesign)}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/settings_card_theme"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="start"
-                        android:paddingStart="@dimen/l1"
-                        android:text="Redesign"
-                        android:textAppearance="@style/AppearanceFoundation.Body.Secondary"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/settings_card_redesign_switch"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/settings_card_redesign_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginEnd="@dimen/l_50"
-                        android:checked="@={viewModel.redesign}"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/settings_card_theme"
-                style="@style/WidgetFoundation.Card.Variant.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:onClick="@{() -> viewModel.themePressed()}"
-                app:layout_constraintEnd_toStartOf="@+id/settings_card_redesign"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_card_theme_dark_icon"
-                        style="@style/WidgetFoundation.Icon.Secondary"
-                        android:background="@null"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_paint" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_card_theme_dark_pointer"
-                        style="@style/WidgetFoundation.Icon.Secondary"
-                        android:background="@null"
-                        android:rotation="180"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_back_md2" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@null"
-                        android:gravity="start|center_vertical"
-                        android:singleLine="true"
-                        android:text="@string/section_theme"
-                        android:textAppearance="@style/AppearanceFoundation.Body.Secondary"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/settings_card_theme_dark_pointer"
-                        app:layout_constraintStart_toEndOf="@+id/settings_card_theme_dark_icon"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.core.widget.NestedScrollView>
+        tools:listitem="@layout/item_settings_toggle"
+        tools:paddingTop="@dimen/l1" />
 
 </layout>

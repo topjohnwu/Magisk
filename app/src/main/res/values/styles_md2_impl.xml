@@ -42,10 +42,6 @@
         <item name="strokeColor">?colorPrimary</item>
     </style>
 
-    <style name="WidgetFoundation.Card.Variant.Secondary">
-        <item name="strokeColor">?colorSecondary</item>
-    </style>
-
     <style name="WidgetFoundation.Card.Elevated" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?colorSurfaceSurfaceVariant</item>
         <item name="cardCornerRadius">@dimen/l_50</item>
@@ -200,6 +196,11 @@
         <item name="android:indeterminate">true</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
+    </style>
+
+
+    <style name="WidgetFoundation.Switch" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="thumbTint">@color/color_primary_transient</item>
     </style>
 
 </resources>

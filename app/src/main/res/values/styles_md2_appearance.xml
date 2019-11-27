@@ -6,6 +6,10 @@
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
+    <style name="AppearanceFoundation.Display.Secondary">
+        <item name="android:textColor">?colorSecondary</item>
+    </style>
+
     <style name="AppearanceFoundation.Display.Variant">
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
@@ -72,6 +76,14 @@
 
     <style name="AppearanceFoundation.Caption.Variant">
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="AppearanceFoundation.Caption.Primary">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="AppearanceFoundation.Caption.Secondary">
+        <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
     <style name="AppearanceFoundation.Caption.OnPrimary">
