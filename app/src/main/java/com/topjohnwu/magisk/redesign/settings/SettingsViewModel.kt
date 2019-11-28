@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.redesign.settings
 
+import android.content.res.Resources
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.CallSuper
@@ -17,6 +18,8 @@ import com.topjohnwu.magisk.redesign.module.adapterOf
 import com.topjohnwu.magisk.redesign.superuser.diffListOf
 import com.topjohnwu.magisk.utils.TransitiveText
 import com.topjohnwu.magisk.view.MagiskDialog
+import org.koin.core.KoinComponent
+import org.koin.core.get
 import kotlin.properties.ObservableProperty
 import kotlin.reflect.KProperty
 
@@ -25,15 +28,18 @@ class SettingsViewModel : CompatViewModel(), SettingsItem.Callback {
     val adapter = adapterOf<SettingsItem>()
     val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
     val items = diffListOf(
-        // General
-        // Customization
-        Customization, Theme, Redesign,
-        // Manager
-        Manager, ClearRepoCache, HideOrRestore(), UpdateChecker, SystemlessHosts, Biometrics,
-        // Magisk
-        Magisk, SafeMode, MagiskHide,
-        // Superuser
-        Superuser
+        Customization,
+        Theme, Language, Redesign,
+
+        Manager,
+        ClearRepoCache, HideOrRestore(), UpdateChecker, SystemlessHosts, Biometrics,
+
+        Magisk,
+        SafeMode, MagiskHide,
+
+        Superuser,
+        AccessMode, MultiuserMode, MountNamespaceMode, AutomaticResponse, RequestTimeout,
+        SUNotification
     )
 
     override fun onItemPressed(view: View, item: SettingsItem) = when (item) {
@@ -121,14 +127,49 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
     }
 
-    abstract class Selector : Value<Int>() {
+    abstract class Selector : Value<Int>(), KoinComponent {
 
         override val layoutRes = R.layout.item_settings_selector
 
+        protected val resources get() = get<Resources>()
+
+        @Bindable
+        var entries: Array<out CharSequence> = arrayOf()
+            private set
+        @Bindable
+        var entryValues: Array<out CharSequence> = arrayOf()
+            private set
+
+        val selectedEntry
+            @Bindable get() = entries.getOrNull(value)
+
+        fun setValues(
+            entries: Array<out CharSequence>,
+            values: Array<out CharSequence>
+        ) {
+            check(entries.size <= values.size) { "List sizes must match" }
+
+            this.entries = entries
+            this.entryValues = values
+
+            notifyChange(BR.entries)
+            notifyChange(BR.entryValues)
+            notifyChange(BR.selectedEntry)
+        }
+
         override fun onPressed(view: View, callback: Callback) {
+            if (entries.isEmpty() || entryValues.isEmpty()) return
             MagiskDialog(view.context)
-            //.applyAdapter()
-            super.onPressed(view, callback)
+                .applyTitle(title.getText(resources))
+                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    titleRes = android.R.string.cancel
+                }
+                .applyAdapter(entries) {
+                    value = it
+                    notifyChange(BR.selectedEntry)
+                    super.onPressed(view, callback)
+                }
+                .reveal()
         }
 
     }

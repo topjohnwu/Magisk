@@ -8,13 +8,22 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.updateLayoutParams
 import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
+import com.topjohnwu.magisk.redesign.home.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
+import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
+import me.tatarka.bindingcollectionadapter2.ItemBinding
 
 class MagiskDialog @JvmOverloads constructor(
     context: Context, theme: Int = 0
@@ -138,20 +147,57 @@ class MagiskDialog @JvmOverloads constructor(
         ButtonBuilder(button).apply(builder)
     }
 
+    class DialogItem(
+        val item: CharSequence,
+        val position: Int
+    ) : ComparableRvItem<DialogItem>() {
+        override val layoutRes = R.layout.item_list_single_line
+        override fun itemSameAs(other: DialogItem) = item == other.item
+        override fun contentSameAs(other: DialogItem) = itemSameAs(other)
+    }
+
+    interface ActualOnDialogClickListener {
+        fun onClick(position: Int)
+    }
+
+    fun applyAdapter(
+        list: Array<out CharSequence>,
+        listener: OnDialogClickListener
+    ) = applyView(
+        RecyclerView(context).also {
+            it.isNestedScrollingEnabled = false
+            it.layoutManager = LinearLayoutManager(context)
+
+            val actualListener = object : ActualOnDialogClickListener {
+                override fun onClick(position: Int) {
+                    listener(position)
+                    dismiss()
+                }
+            }
+            val items = list.mapIndexed { i, it -> DialogItem(it, i) }
+            val binding = itemBindingOf<DialogItem> { it.bindExtra(BR.listener, actualListener) }
+                .let { ItemBinding.of(it) }
+
+            BindingRecyclerViewAdapters.setAdapter(it, binding, items, null, null, null, null)
+        }
+    )
+
     fun cancellable(isCancellable: Boolean) = apply {
         setCancelable(isCancellable)
     }
 
-    fun <Binding : ViewDataBinding> applyView(binding: Binding, body: Binding.() -> Unit = {}) =
-        apply {
-            resetView()
-            this.binding.dialogBaseContainer.addView(binding.root)
-            binding.apply(body)
-        }
+    fun <Binding : ViewDataBinding> applyView(
+        binding: Binding,
+        body: Binding.() -> Unit = {}
+    ) = applyView(binding.root).also { binding.apply(body) }
 
     fun applyView(view: View) = apply {
         resetView()
-        this.binding.dialogBaseContainer.addView(view)
+        binding.dialogBaseContainer.addView(view)
+        view.updateLayoutParams<ViewGroup.LayoutParams> {
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            height = ViewGroup.LayoutParams.WRAP_CONTENT
+        }
     }
 
     fun onDismiss(callback: OnDialogButtonClickListener) =
@@ -204,3 +250,4 @@ class MagiskDialog @JvmOverloads constructor(
 }
 
 typealias OnDialogButtonClickListener = (DialogInterface) -> Unit
+typealias OnDialogClickListener = (position: Int) -> Unit
