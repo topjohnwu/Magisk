@@ -1,0 +1,224 @@
+<resources>
+    <!--Universal-->
+
+    <!--Welcome Activity-->
+    <string name="modules">Módulos</string>
+    <string name="downloads">Downloads</string>
+    <string name="superuser">Superusuário</string>
+    <string name="log">Registro</string>
+    <string name="settings">Configurações</string>
+    <string name="install">Instalar</string>
+    <string name="unsupport_magisk_title">Versão não suportada do Magisk</string>
+    <string name="unsupport_magisk_msg">Esta versão do Magisk Manager não suporta versões do Magisk menores que %1$s.\n\nO aplicativo se comportará como se nenhum Magisk estivesse instalado, por favor, atualize o Magisk o mais rápido possível.</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version_error">Magisk não está instalado</string>
+    <string name="checking_for_updates">Procurando por atualizações…</string>
+    <string name="invalid_update_channel">Canal de Atualizações Inválido</string>
+    <string name="safetyNet_check_text">Toque para iniciar a verificação do SafetyNet</string>
+    <string name="checking_safetyNet_status">Verificando o status do SafetyNet…</string>
+    <string name="safetyNet_check_success">SafetyNet verificado com sucesso</string>
+    <string name="safetyNet_api_error">Erro na API do SafetyNet</string>
+    <string name="safetyNet_res_invalid">A resposta é inválida</string>
+    <string name="magisk_up_to_date">Magisk está atualizado</string>
+    <string name="manager_up_to_date">Magisk Manager está atualizado</string>
+    <string name="advanced_settings_title">Configurações Avançadas</string>
+    <string name="keep_force_encryption">Manter encriptação forçada</string>
+    <string name="keep_dm_verity">Manter AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Modo Recuperação</string>
+    <string name="current_installed">Instalado: %1$s</string>
+    <string name="latest_version">Mais recente: %1$s</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="uninstall_magisk_title">Desinstalar o Magisk</string>
+    <string name="uninstall_magisk_msg">Todos os módulos serão desativados/removidos. O acesso Root será removido, e seus dados provavelmente serão criptografados se já não estiverem.</string>
+    <string name="update">Atualizar</string>
+    <string name="core_only_enabled">(Modo somente núcleo ativado)</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Nenhuma informação fornecida)</string>
+    <string name="no_modules_found">Nenhum módulo encontrado</string>
+    <string name="update_file_created">O módulo será atualizado na próxima reinicialização</string>
+    <string name="remove_file_created">O módulo será removido na próxima reinicialização</string>
+    <string name="remove_file_deleted">O módulo não será removido na próxima reinicialização</string>
+    <string name="disable_file_created">O módulo será desativado na próxima reinicialização</string>
+    <string name="disable_file_removed">O módulo será ativado na próxima reinicialização</string>
+    <string name="author">Criado por %1$s</string>
+    <string name="reboot_recovery">Reiniciar em Recuperação</string>
+    <string name="reboot_bootloader">Reiniciar em Bootloader</string>
+    <string name="reboot_download">Reiniciar em Download</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Atualização Disponível</string>
+    <string name="installed">Instalado</string>
+    <string name="not_installed">Não Instalado</string>
+    <string name="updated_on">Atualizado em: %1$s</string>
+    <string name="sorting_order">Ordenar</string>
+    <string name="sort_by_name">Ordenar por nome</string>
+    <string name="sort_by_update">Ordenar por última atualização</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveLog">Salvar registro</string>
+    <string name="menuReload">Recarregar</string>
+    <string name="menuClearLog">Limpar registro agora</string>
+    <string name="logs_cleared">Registro limpo com sucesso</string>
+
+    <!--About Activity-->
+    <string name="app_changelog">Registro de mudanças</string>
+
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Atualizações do Magisk</string>
+    <string name="progress_channel">Notificações de Progresso</string>
+    <string name="download_complete">Download completo</string>
+    <string name="download_file_error">Erro ao baixar o aquivo</string>
+    <string name="download_open_parent">Mostrar na pasta</string>
+    <string name="download_open_self">Mostrar arquivo</string>
+    <string name="magisk_update_title">Atualização do Magisk Disponível!</string>
+    <string name="manager_update_title">Atualização do Magisk Manager Disponível!</string>
+
+    <!-- Installation -->
+    <string name="manager_download_install">Toque para baixar e instalar</string>
+    <string name="download_zip_only">Apenas baixar o zip</string>
+    <string name="direct_install">Instalação direta (Recomendado)</string>
+    <string name="install_inactive_slot">Instalar no Slot Inativo (Após o OTA)</string>
+    <string name="install_inactive_slot_msg">Seu dispositivo será FORÇADO a inicializar no slot inativo atual após uma reinicialização!\nSó use esta opção após a conclusão do OTA.\nContinuar?</string>
+    <string name="select_method">Selecione o Método</string>
+    <string name="setup_title">Configuração Adicional</string>
+    <string name="select_patch_file">Selecionar e Patchear um Arquivo</string>
+    <string name="patch_file_msg">Selecione uma imagem raw (*.img) ou um arquivo tar do ODIN (*.tar)</string>
+    <string name="reboot_delay_toast">Reiniciando em 5 segundos…</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="repo_install_title">Instalar %1$s</string>
+    <string name="repo_install_msg">Você quer instalar %1$s agora?</string>
+    <string name="download">Baixar</string>
+    <string name="reboot">Reiniciar</string>
+    <string name="settings_reboot_toast">Reinicie para aplicar as mudanças</string>
+    <string name="release_notes">Notas de lançamento</string>
+    <string name="repo_cache_cleared">Cache do repositório limpo</string>
+    <string name="dtbo_patched_title">DTBO foi patcheado!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager foi patcheado para o dtbo.img. Por favor, reinicie.</string>
+    <string name="flashing">Flasheando…</string>
+    <string name="done">Pronto!</string>
+    <string name="failure">Falha</string>
+    <string name="hide_manager_title">Ocultando o Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Falha ao ocultar o Magisk Manager.</string>
+    <string name="open_link_failed_toast">Nenhum aplicativo encontrado para abrir o link</string>
+    <string name="warning">Aviso</string>
+    <string name="complete_uninstall">Completar Desinstalação</string>
+    <string name="restore_img">Restaurar Imagens</string>
+    <string name="restore_img_msg">Restaurando…</string>
+    <string name="restore_done">Restauração completa!</string>
+    <string name="restore_fail">Backup stock não existe!</string>
+    <string name="proprietary_title">Baixar Código Proprietário</string>
+    <string name="proprietary_notice">Magisk Manager é um software livre e de código aberto (FOSS) e não contém código proprietário da API SafetyNet do Google.\n\Permitir o Magisk Manager baixar uma extensão (contém GoogleApiClient) para verificações do SafetyNet?</string>
+    <string name="setup_fail">Configuração falhou</string>
+    <string name="env_fix_title">Requer configuração adicional</string>
+    <string name="env_fix_msg">Seu dispositivo precisa de uma configuração adicional para que o Magisk funcione corretamente. Ele fará o download do zip de instalação do Magisk. Deseja continuar agora?</string>
+    <string name="setup_msg">Executando a configuração do ambiente…</string>
+    <string name="authenticate">Autenticar</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">Geral</string>
+    <string name="settings_dark_theme_title">Tema Escuro</string>
+    <string name="settings_dark_theme_summary">Ativar o tema escuro</string>
+    <string name="settings_download_path_title">Caminho de download</string>
+    <string name="settings_download_path_message">Arquivos serão salvos em %1$s</string>
+    <string name="settings_clear_cache_title">Limpar cache do repositório</string>
+    <string name="settings_clear_cache_summary">Limpar as informações em cache para repositórios online. Isso força o aplicativo a atualizar online</string>
+    <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Reempacotar o Magisk Manager com nome de pacote e nome do app aleatórios</string>
+    <string name="settings_restore_manager_title">Restaurar Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Restaurar o Magisk Manager com o nome de pacote e nome do app originais</string>
+    <string name="language">Idioma</string>
+    <string name="system_default">(Padrão do Sistema)</string>
+    <string name="settings_update">Configurações de Atualizações</string>
+    <string name="settings_check_update_title">Verificar Atualizações</string>
+    <string name="settings_check_update_summary">Verificar atualizações em segundo plano periodicamente</string>
+    <string name="settings_update_channel_title">Canal de Atualização</string>
+    <string name="settings_update_stable">Estável</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Personalizado</string>
+    <string name="settings_update_custom_msg">Inserir uma URL personalizada</string>
+    <string name="settings_core_only_title">Modo Magisk de Núcleo Apenas</string>
+    <string name="settings_core_only_summary">Ativar apenas recursos de núcleo. MagiskSU e MagiskHide ainda serão ativados, mas nenhum módulo será carregado.</string>
+    <string name="settings_magiskhide_summary">Ocultar Magisk de várias detecções</string>
+    <string name="settings_hosts_title">Hosts sem sistema</string>
+    <string name="settings_hosts_summary">Suporte de hosts sem sistema para apps de Adblock</string>
+
+    <string name="settings_app_name">Digite o nome do app desejado</string>
+    <string name="settings_app_name_hint">Novo nome</string>
+    <string name="settings_app_name_helper">O aplicativo será reempacotado para esse nome</string>
+    <string name="settings_app_name_error">Formato inválido</string>
+    <string name="settings_su_app_adb">Aplicativos e ADB</string>
+    <string name="settings_su_app">Somente aplicativos</string>
+    <string name="settings_su_adb">Somente ADB</string>
+    <string name="settings_su_disable">Desativado</string>
+    <string name="settings_su_request_10">10 segundos</string>
+    <string name="settings_su_request_15">15 segundos</string>
+    <string name="settings_su_request_20">20 segundos</string>
+    <string name="settings_su_request_30">30 segundos</string>
+    <string name="settings_su_request_45">45 segundos</string>
+    <string name="settings_su_request_60">60 segundos</string>
+    <string name="superuser_access">Acesso de Superusuário</string>
+    <string name="auto_response">Resposta Automática</string>
+    <string name="request_timeout">Tempo Limite de Solicitação</string>
+    <string name="superuser_notification">Notificação de Superusuário</string>
+    <string name="request_timeout_summary">%1$d segundos</string>
+    <string name="settings_su_reauth_title">Reautenticar após uma atualização</string>
+    <string name="settings_su_reauth_summary">Reautenticar permissões de superusuário após a atualização de um aplicativo</string>
+    <string name="settings_su_biometric_title">Habilitar autenticação biométrica</string>
+    <string name="settings_su_biometric_summary">Usar autenticação biométrica para permitir solicitações de superusuário</string>
+    <string name="no_biometric">Dispositivo não suportado ou nenhuma configuração biométrica está ativada</string>
+
+    <string name="multiuser_mode">Modo de Multiusuário</string>
+    <string name="settings_owner_only">Proprietário do Dispositivo Apenas</string>
+    <string name="settings_owner_manage">Proprietário do Dispositivo Gerenciado</string>
+    <string name="settings_user_independent">Usuário Independente</string>
+    <string name="owner_only_summary">Apenas proprietário tem acesso root</string>
+    <string name="owner_manage_summary">Apenas proprietário pode gerenciar acesso root e receber expedições de solicitações</string>
+    <string name="user_indepenent_summary">Cada usuário tem suas próprias regras root separadas</string>
+
+    <string name="mount_namespace_mode">Modo de montar o namespace</string>
+    <string name="settings_ns_global">Namespace Global</string>
+    <string name="settings_ns_requester">Herdar Namespace</string>
+    <string name="settings_ns_isolate">Namespace isolado</string>
+    <string name="global_summary">Todas as sessões de root usam a montagem de namespace global</string>
+    <string name="requester_summary">As sessões de root herdarão o namespace do seu solicitante</string>
+    <string name="isolate_summary">Cada sessão root terá seu próprio namespace isolado</string>
+    <string name="settings_download_path_error">Erro ao criar pasta. Ele deve estar acessível no diretório raiz do armazenamento e não deve ser um arquivo.</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Solicitação de Superusuário</string>
+    <string name="deny">Negar</string>
+    <string name="prompt">Perguntar</string>
+    <string name="grant">Conceder</string>
+    <string name="su_warning">Concede acesso total ao seu dispositivo.\nNegue se você não tem certeza!</string>
+    <string name="forever">Sempre</string>
+    <string name="once">Uma Vez</string>
+    <string name="tenmin">10 mins</string>
+    <string name="twentymin">20 mins</string>
+    <string name="thirtymin">30 mins</string>
+    <string name="sixtymin">60 mins</string>
+    <string name="su_allow_toast">%1$s teve concedido direitos de Superusuário</string>
+    <string name="su_deny_toast">%1$s teve negado direitos de Superusuário</string>
+    <string name="no_apps_found">Nenhum app encontrado</string>
+    <string name="su_snack_grant">Direitos de Superusuário de %1$s estão concedidos</string>
+    <string name="su_snack_deny">Direitos de Superusuário de %1$s estão negados</string>
+    <string name="su_snack_notif_on">Notificações de %1$s estão ativadas</string>
+    <string name="su_snack_notif_off">Notificações de %1$s estão desativadas</string>
+    <string name="su_snack_log_on">Os logs de %1$s serão gravados</string>
+    <string name="su_snack_log_off">Os logs de %1$s não serão gravados</string>
+    <string name="su_revoke_title">Revogar?</string>
+    <string name="su_revoke_msg">Revogar os direitos de %1$s?</string>
+    <string name="toast">Notificação toast</string>
+    <string name="none">Nenhuma</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Alvo UID: %1$d</string>
+    <string name="command">Comando: %1$s</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Exibir apps de sistema</string>
+
+</resources>

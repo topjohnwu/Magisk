@@ -1,0 +1,196 @@
+<resources>
+
+    <!--Welcome Activity-->
+    <string name="modules">โมดูล</string>
+    <string name="downloads">ดาวน์โหลด</string>
+    <string name="superuser">Superuser</string>
+    <string name="log">บันทึก</string>
+    <string name="settings">ตั้งค่า</string>
+    <string name="install">ติดตั้ง</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version_error">Magisk ไม่ได้ถูกติดตั้ง</string>
+    <string name="checking_for_updates">กำลังตรวจสอบการอัพเดต…</string>
+    <string name="invalid_update_channel">ช่องทางการอัพเดตไม่ถูกต้อง</string>
+    <string name="safetyNet_check_text">แตะเพื่อเริ่มการตรวจสอบ SafetyNet</string>
+    <string name="checking_safetyNet_status">กำลังตรวจสอบสถานะ SafetyNet…</string>
+    <string name="safetyNet_check_success">สถานะ SafetyNet สมบูรณ์</string>
+    <string name="safetyNet_api_error">SafetyNet API เกิดข้อผิดพลาด</string>
+    <string name="safetyNet_res_invalid">คำตอบรับไม่ถูกต้อง</string>
+    <string name="magisk_up_to_date">Magisk เวอร์ชันล่าสุดแล้ว</string>
+    <string name="manager_up_to_date">Magisk Manager เวอร์ชันล่าสุดแล้ว</string>
+    <string name="advanced_settings_title">ขั้นสูง</string>
+    <string name="keep_force_encryption">เก็บค่าบังคับการเข้ารหัส</string>
+    <string name="keep_dm_verity">เก็บค่า AVB 2.0/dm-verity</string>
+    <string name="current_installed">ที่ถูกติดตั้ง: %1$s</string>
+    <string name="latest_version">ล่าสุด: %1$s</string>
+    <string name="uninstall">ถอนการติดตั้ง</string>
+    <string name="uninstall_magisk_title">ถอนการติดตั้ง Magisk</string>
+    <string name="uninstall_magisk_msg">โมดูลทั้งหมดจะถูกปิดการใช้งาน/ถูกลบ, สิทธิการเข้าถึง Root จะถูกลบ และข้อมูลของคุณอาจถูกเข้ารหัส</string>
+    <string name="update">อัพเดต</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(ไม่มีข้อมูล)</string>
+    <string name="no_modules_found">ไม่พบโมดูล</string>
+    <string name="update_file_created">โมดูลจะถูกอัพเดตในการรีบู๊ตครั้งหน้า</string>
+    <string name="remove_file_created">โมดูลจะถูกลบในการรีบู๊ตครั้งหน้า</string>
+    <string name="remove_file_deleted">โมดูลจะไม่ถูกลบในการรีบู๊ตครั้งหน้า</string>
+    <string name="disable_file_created">โมดูลจะถูกเปิดใช้งานในการรีบู๊ตครั้งหน้า</string>
+    <string name="disable_file_removed">โมดูลจะถูกปิดใช้งานในการรีบู๊ตครั้งหน้า</string>
+    <string name="author">สร้างโดย %1$s</string>
+    <string name="reboot_recovery">รีบู๊ตไปโหมดกู้คืน</string>
+    <string name="reboot_bootloader">รีบู๊ตไป Bootloader</string>
+    <string name="reboot_download">รีบู๊ตไป Download</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">มีการอัพเดต</string>
+    <string name="installed">ติดตั้งแล้ว</string>
+    <string name="not_installed">ไม่ได้ติดตั้ง</string>
+    <string name="updated_on">อัพเดตเมื่อ %1$s</string>
+    <string name="sorting_order">การเรียง</string>
+    <string name="sort_by_name">เรียงตามชื่อ</string>
+    <string name="sort_by_update">เรียงตามการอัพเดตล่าสุด</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveLog">เก็บบันทึก</string>
+    <string name="menuReload">รีโหลด</string>
+    <string name="menuClearLog">ล้างบันทึก</string>
+    <string name="logs_cleared">บันทึกถูกล้างแล้ว</string>
+
+    <!--About Activity-->
+    <string name="app_changelog">สิ่งที่เพิ่มใหม่</string>
+
+    <!-- System Components, Notifications -->
+    <string name="update_channel">การอัพเดต Magisk</string>
+    <string name="progress_channel">สถานะ</string>
+    <string name="download_complete">ดาวน์โหลดสำเร็จ</string>
+    <string name="download_file_error">เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์</string>
+    <string name="magisk_update_title">มีการอัพเดต Magisk!</string>
+    <string name="manager_update_title">มีการอัพเดต Magisk Manager!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="repo_install_title">ติดตั้ง %1$s</string>
+    <string name="repo_install_msg">ต้องการติดตั้ง %1$s ตอนนี้หรือไม่?</string>
+    <string name="download">ดาวน์โหลด</string>
+    <string name="reboot">รีบู๊ต</string>
+    <string name="settings_reboot_toast">รีบู๊ตเพื่อนำการตั้งค่าไปใช้</string>
+    <string name="release_notes">-้อมูลเพิ่มเติม</string>
+    <string name="repo_cache_cleared">แคช Repo ถูกล้างแล้ว</string>
+    <string name="manager_download_install">แตะเพื่อดาวน์โหลดและติดตั้ง</string>
+    <string name="dtbo_patched_title">แพตช์ DTBO เรียบร้อย!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager ได้แพตช์ไฟล์ dtbo.img แล้ว โปรดรีบู๊ต</string>
+    <string name="flashing">กำลังแฟลช</string>
+    <string name="hide_manager_title">กำลังซ่อน Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">การซ่อน Magisk Manager ล้มเหลว</string>
+    <string name="open_link_failed_toast">ไม่พบแอปพลิเคชันสำหรับเปิดลิ้งค์</string>
+    <string name="download_zip_only">ดาวน์โหลด Zip เท่านั้น</string>
+    <string name="direct_install">การติดตั้งโดยตรง (แนะนำ)</string>
+    <string name="install_inactive_slot">ติดตั้งไปยัง Slot ที่ไม่ใช้งาน (หลังจาก OTA)</string>
+    <string name="warning">คำเตือน</string>
+    <string name="install_inactive_slot_msg">อุปกรณ์ของคุณจะถูกบังคับให้บู๊ตไป Slot ที่ไม่ใช่งานหลังจากรีบูต!\nใช้ตัวเลือกนี้หลังจาก OTA เสร็จเท่านั้น\nดำเนินการต่อ?</string>
+    <string name="select_method">เลือกวิธี</string>
+    <string name="complete_uninstall">ถอนการติดตั้งแบบสมบูรณ์</string>
+    <string name="restore_img">กู้คืน Images</string>
+    <string name="restore_img_msg">กำลังกู้คืน…</string>
+    <string name="restore_done">การกู้คืนสำเร็จ!</string>
+    <string name="restore_fail">ไม่มีไฟล์แบ็คอัพ!</string>
+    <string name="proprietary_title">Download Proprietary Code</string>
+    <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
+    <string name="setup_fail">การตั้งค่าล้มเหลว</string>
+    <string name="env_fix_title">ต้องมีการตั้งค่าเพิ่มเติม</string>
+    <string name="env_fix_msg">อุปกรณ์ของคุณต้องมีการตั้งค่าเพิ่มเติมเพื่อให้ Magisk สามารถทำงานได้ จะมีการดาวน์โหลดไฟล์ติดตั้ง Magisk ต้องการทำเลยหรือไม่?</string>
+    <string name="setup_title">การตั้งค่าเพิ่มเติม</string>
+    <string name="setup_msg">กำลังรันการตั้งค่า…</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">ทั่วไป</string>
+    <string name="settings_dark_theme_title">โหมดมืด</string>
+    <string name="settings_dark_theme_summary">เปิดใช้โหมดมืด</string>
+    <string name="settings_clear_cache_title">ล้างแคช Repo</string>
+    <string name="settings_clear_cache_summary">ล้างข้อมูล repo ออนไลน์ที่ถูกแคชไว้</string>
+    <string name="settings_hide_manager_title">ซ่อน Magisk Manager</string>
+    <string name="settings_hide_manager_summary">แพ็คเกจ Magisk Manager ด้วยชื่อที่ถูกสุ่ม</string>
+    <string name="settings_restore_manager_title">กู้คืน Magisk Manager</string>
+    <string name="settings_restore_manager_summary">กู้คืนชื่อเดิมของ Magisk Manager</string>
+    <string name="language">ภาษา</string>
+    <string name="system_default">(มาตรฐานระบบ)</string>
+    <string name="settings_update">การอัพเดต</string>
+    <string name="settings_check_update_title">ตรวจสอบการอัพเดต</string>
+    <string name="settings_check_update_summary">ตรวจสอบการอัพเดตเป็นระยะในพื้นหลัง</string>
+    <string name="settings_update_channel_title">ช่องทางการอัพเดต</string>
+    <string name="settings_update_stable">เสถียร</string>
+    <string name="settings_update_beta">เบต้า</string>
+    <string name="settings_update_custom">กำหนดเอง</string>
+    <string name="settings_update_custom_msg">ใส่ URL</string>
+    <string name="settings_core_only_title">โหมดคอร์เท่านั้น</string>
+    <string name="settings_core_only_summary">ใช้งานฟีเจอร์หลักเท่านั้น MagiskSU และ MagiskHide จะถูกเปิดใช้งาน แต่โมดูลต่างๆจะไม่ถูกโหลด</string>
+    <string name="settings_magiskhide_summary">ซ่อน Magisk จากการตรวจสอบในหลากหลายรูปแบบ</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">การรองรับ Systemless hosts เพื่อแอพ Adblock ต่างๆ</string>
+    <string name="settings_hosts_toast">ทำการเพิ่มโมดูล systemless hosts แล้ว</string>
+
+    <string name="settings_su_app_adb">แอปและ ADB</string>
+    <string name="settings_su_app">แอปเท่านั้น</string>
+    <string name="settings_su_adb">ADB เท่านั้น</string>
+    <string name="settings_su_disable">ปิด</string>
+    <string name="settings_su_request_10">10 วินาที</string>
+    <string name="settings_su_request_15">15 วินาที</string>
+    <string name="settings_su_request_20">20 วินาที</string>
+    <string name="settings_su_request_30">30 วินาที</string>
+    <string name="settings_su_request_45">45 วินาที</string>
+    <string name="settings_su_request_60">60 วินาที</string>
+    <string name="superuser_access">การเข้าถึง Superuser</string>
+    <string name="auto_response">การตอบกลับ</string>
+    <string name="request_timeout">เวลาการขอใช้งาน</string>
+    <string name="superuser_notification">การแจ้งเตือน Superuser</string>
+    <string name="request_timeout_summary">%1$d วินาที</string>
+    <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัพเกรด</string>
+    <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัพเกรด</string>
+
+    <string name="multiuser_mode">โหมดผู้ใช้หลายคน</string>
+    <string name="settings_owner_only">เจ้าของอุปกรณ์เท่านั้น</string>
+    <string name="settings_owner_manage">จัดการโดยเจ้าของอุปกรณ์</string>
+    <string name="settings_user_independent">ตามผู้ใช้</string>
+    <string name="owner_only_summary">เฉพาะเจ้าของที่มีสิทธิ์การเข้าถึง root</string>
+    <string name="owner_manage_summary">เจ้าของสามารถจัดการสิทธิ์การเข้าถึง root</string>
+    <string name="user_indepenent_summary">ผู้ใช้แต่ละคนสามารถจัดการกฏของตนเอง</string>
+
+    <string name="mount_namespace_mode">Mount Namespace Mode</string>
+    <string name="settings_ns_global">Global Namespace</string>
+    <string name="settings_ns_requester">Inherit Namespace</string>
+    <string name="settings_ns_isolate">Isolated Namespace</string>
+    <string name="global_summary">All root sessions use the global mount namespace.</string>
+    <string name="requester_summary">Root sessions will inherit their requester\'s namespace.</string>
+    <string name="isolate_summary">Each root session will have its own isolated namespace.</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">การขอเข้าถึง Superuser</string>
+    <string name="deny">ปฏิเสธ</string>
+    <string name="prompt">ถาม</string>
+    <string name="grant">อนุญาต</string>
+    <string name="su_warning">จะให้การเข้าถึงอุปกรณ์ในทุกรูปแบบ กรุณาปฏิเสธหากคุณไม่มั่นใจ!</string>
+    <string name="forever">ตลอดกาล</string>
+    <string name="once">คั้งเดียว</string>
+    <string name="tenmin">10 นาที</string>
+    <string name="twentymin">20 นาที</string>
+    <string name="thirtymin">30 นาที</string>
+    <string name="sixtymin">60 นาที</string>
+    <string name="su_allow_toast">%1$s ถูกอนุญาตสิทธิ์ Superuser</string>
+    <string name="su_deny_toast">%1$s ถูกปฏิเสธสิทธิ์ Superuser</string>
+    <string name="no_apps_found">ไม่พบแอป</string>
+    <string name="su_snack_grant">สิทธิ์ Superuser ของ %1$s ถูกอนุญาต</string>
+    <string name="su_snack_deny">สิทธิ์ Superuser ของ %1$s ถูกปฏิเสธ</string>
+    <string name="su_snack_notif_on">การแจ้งเตือนของ %1$s ถูกเปิด</string>
+    <string name="su_snack_notif_off">การแจ้งเตือนของ %1$s ถูกปิด</string>
+    <string name="su_snack_log_on">การบันทึก %1$s ถูกเปิด</string>
+    <string name="su_snack_log_off">การบันทึก %1$s ถูกปิด</string>
+    <string name="su_revoke_title">ลบสิทธิ์?</string>
+    <string name="su_revoke_msg">ยืนยันการลบสิทธิ์ของ %1$s?</string>
+    <string name="toast">การเตือน</string>
+    <string name="none">ไม่มี</string>
+
+    <!--Superuser logs-->
+    <string name="target_uid">UID เป้าหมาย: %1$d</string>
+    <string name="command">คำสั่ง: %1$s</string>
+
+</resources>

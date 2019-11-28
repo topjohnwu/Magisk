@@ -1,0 +1,27 @@
+[submodule "selinux"]
+	path = native/jni/external/selinux
+	url = https://github.com/topjohnwu/selinux.git
+[submodule "busybox"]
+	path = native/jni/external/busybox
+	url = https://github.com/topjohnwu/ndk-busybox.git
+[submodule "dtc"]
+	path = native/jni/external/dtc
+	url = https://github.com/dgibson/dtc
+[submodule "lz4"]
+	path = native/jni/external/lz4
+	url = https://github.com/lz4/lz4.git
+[submodule "bzip2"]
+	path = native/jni/external/bzip2
+	url = https://github.com/nemequ/bzip2.git
+[submodule "xz"]
+	path = native/jni/external/xz
+	url = https://github.com/xz-mirror/xz.git
+[submodule "nanopb"]
+	path = native/jni/external/nanopb
+	url = https://github.com/nanopb/nanopb.git
+[submodule "mincrypt"]
+	path = native/jni/external/mincrypt
+	url = https://github.com/topjohnwu/mincrypt.git
+[submodule "termux-elf-cleaner"]
+	path = tools/termux-elf-cleaner
+	url = https://github.com/termux/termux-elf-cleaner.git

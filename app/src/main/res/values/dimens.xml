@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="fab_padding">16dp</dimen>
+
+    <!--new dimens-->
+
+    <dimen name="margin_generic_double">32dp</dimen>
+    <dimen name="margin_generic">16dp</dimen>
+    <dimen name="margin_generic_half">8dp</dimen>
+
+    <dimen name="radius_generic">8dp</dimen>
+
+    <!--new dimens ^^-->
+</resources>

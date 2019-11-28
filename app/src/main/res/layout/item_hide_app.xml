@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.HideRvItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.hide.HideViewModel" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:foreground="?attr/selectableItemBackground"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:onClick="@{() -> item.toggleExpansion()}"
+        app:cardElevation="@dimen/card_elevation">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/margin_generic_half">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/hide_app_icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:gravity="end"
+                android:src="@{item.item.icon}"
+                app:layout_constraintBottom_toTopOf="@+id/hide_app_processes"
+                app:layout_constraintEnd_toStartOf="@+id/hide_app_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/ic_magisk" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/hide_app_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_generic"
+                android:layout_marginEnd="@dimen/margin_generic"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{item.item.name}"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toTopOf="@+id/hide_app_package"
+                app:layout_constraintEnd_toStartOf="@+id/hide_app_checkbox"
+                app:layout_constraintStart_toEndOf="@+id/hide_app_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="Magisk" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/hide_app_package"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{item.packageName}"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                app:layout_constraintBottom_toTopOf="@+id/hide_app_processes"
+                app:layout_constraintEnd_toStartOf="@id/hide_app_arrow"
+                app:layout_constraintStart_toStartOf="@+id/hide_app_name"
+                app:layout_constraintTop_toBottomOf="@+id/hide_app_name"
+                tools:text="com.topjohnwu.magisk" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/hide_app_arrow"
+                gone="@{item.items.size == 1}"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:background="@android:color/transparent"
+                android:rotation="@{item.isExpanded() ? 180 : 0}"
+                app:layout_constraintBottom_toBottomOf="@+id/hide_app_package"
+                app:layout_constraintEnd_toEndOf="@+id/hide_app_name"
+                app:layout_constraintStart_toEndOf="@+id/hide_app_package"
+                app:layout_constraintTop_toTopOf="@+id/hide_app_package"
+                app:srcCompat="@drawable/ic_arrow"
+                app:tint="?attr/imageColorTint" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/hide_app_checkbox"
+                style="@style/Widget.Icon"
+                isChecked="@{item.isHiddenState}"
+                android:onClick="@{() -> item.toggle()}"
+                app:layout_constraintBottom_toTopOf="@+id/hide_app_processes"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/hide_app_name"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/imageColorTint"
+                tools:src="@drawable/ic_checked" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/hide_app_processes"
+                gone="@{!item.isExpanded}"
+                itemBinding="@{viewModel.itemBinding}"
+                items="@{item.items}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/margin_generic_half"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:listitem="@layout/item_hide_process" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

@@ -1,0 +1,24 @@
+apply plugin: 'com.android.application'
+
+android {
+    defaultConfig {
+        applicationId 'com.topjohnwu.magisk'
+        versionCode 1
+        versionName props['appVersion']
+        buildConfigField 'String', 'DEV_CHANNEL', props['DEV_CHANNEL'] ?: 'null'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources false /* Do NOT allow resource shrinking */
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':shared')
+}

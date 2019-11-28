@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.flash.FlashViewModel" />
+
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppBarLayoutTheme.Flashing">
+
+            <androidx.appcompat.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:contentInsetLeft="0dp"
+                app:contentInsetStart="0dp"
+                app:popupTheme="@style/ToolbarPopupTheme.Flashing">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:animateLayoutChanges="true">
+
+                    <FrameLayout
+                        invisibleScale="@{viewModel.loading}"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:onClick="@{() -> viewModel.backPressed()}"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintLeft_toLeftOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            style="@style/Widget.Icon"
+                            android:layout_gravity="center"
+                            android:background="@android:color/transparent"
+                            app:srcCompat="@drawable/ic_back"
+                            app:tint="@android:color/white" />
+
+                    </FrameLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/Widget.Text.Emphasize"
+                        movieBehavior="@{viewModel.loading}"
+                        movieBehaviorText="@{viewModel.behaviorText}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:textColor="@android:color/white"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Flashing..." />
+
+                    <FrameLayout
+                        invisibleScale="@{viewModel.loading}"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:onClick="@{() -> viewModel.savePressed()}"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintRight_toRightOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            style="@style/Widget.Icon"
+                            android:layout_gravity="center"
+                            android:background="@android:color/transparent"
+                            app:srcCompat="@drawable/ic_save_compat"
+                            app:tint="@android:color/white" />
+
+                    </FrameLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.recyclerview.widget.RecyclerView
+                itemBinding="@{viewModel.itemBinding}"
+                items="@{viewModel.items}"
+                android:id="@+id/flash_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                scrollToLast="@{true}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_console" />
+
+            <com.google.android.material.card.MaterialCardView
+                invisibleScale="@{!viewModel.loaded || !viewModel.canShowReboot}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_generic"
+                app:cardBackgroundColor="@color/colorSecondary"
+                app:cardCornerRadius="26dp"
+                app:cardPreventCornerOverlap="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:onClick="@{() -> viewModel.restartPressed()}"
+                    android:padding="@dimen/margin_generic_half">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        style="@style/Widget.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        app:srcCompat="@drawable/ic_restart"
+                        app:tint="@color/colorTextTinted" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        style="@style/Widget.Text.Emphasize.Tinted"
+                        gone="@{!viewModel.showRestartTitle}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/margin_generic_half"
+                        android:paddingRight="@dimen/margin_generic_half"
+                        android:text="@string/reboot" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

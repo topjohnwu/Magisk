@@ -1,0 +1,196 @@
+<resources>
+
+    <!--Welcome Activity-->
+    <string name="modules">Moduler</string>
+    <string name="downloads">Nedlastinger</string>
+    <string name="superuser">Superbruker</string>
+    <string name="log">Logg</string>
+    <string name="settings">Innstillinger</string>
+    <string name="install">Installer</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version_error">Magisk er ikke installert.</string>
+    <string name="checking_for_updates">Ser etter oppdateringer …</string>
+    <string name="invalid_update_channel">Ugyldig oppdateringskanal</string>
+    <string name="safetyNet_check_text">Trykk for å begynne SafetyNet-sjekken.</string>
+    <string name="checking_safetyNet_status">Sjekker SafetyNet-statusen …</string>
+    <string name="safetyNet_check_success">SafetyNet-sjekken var vellykket</string>
+    <string name="safetyNet_api_error">SafetyNet-API-feil</string>
+    <string name="safetyNet_res_invalid">Tilbakemeldingen er ugyldig.</string>
+
+    <!--Install Fragment-->
+    <string name="advanced_settings_title">Avanserte innstillinger</string>
+    <string name="keep_force_encryption">Preserver tvunget kryptering</string>
+    <string name="keep_dm_verity">Preserver AVB 2.0/dm-verity</string>
+    <string name="current_installed">Installert: %1$s</string>
+    <string name="latest_version">Nyeste: %1$s</string>
+    <string name="uninstall">Avinstaller</string>
+    <string name="uninstall_magisk_title">Avinstaller Magisk</string>
+    <string name="uninstall_magisk_msg">Alle moduler vil bli avskrudd/fjernet. Root vil bli fjernet, og dataene dine blir kanskje kryptert dersom de ikke allerede er det.</string>
+    <string name="update">Oppdater</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Ingen info er oppgitt)</string>
+    <string name="no_modules_found">Ingen moduler ble funnet</string>
+    <string name="update_file_created">Modulen vil bli oppdatert ved neste omstart.</string>
+    <string name="remove_file_created">Modulen vil bli fjernet ved neste omstart.</string>
+    <string name="remove_file_deleted">Modulen vil bli ikke bli fjernet ved neste omstart.</string>
+    <string name="disable_file_created">Modulen vil bli skrudd av ved neste omstart.</string>
+    <string name="disable_file_removed">Modulen vil bli skrudd på ved neste omstart.</string>
+    <string name="author">Laget av %1$s</string>
+    <string name="reboot_recovery">Omstart til gjenoppretting</string>
+    <string name="reboot_bootloader">Omstart til oppstartslaster</string>
+    <string name="reboot_download">Omstart til nedlasting</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Oppdatering tilgjengelig</string>
+    <string name="installed">Installert</string>
+    <string name="not_installed">Ikke installert</string>
+    <string name="updated_on">Oppdatert den: %1$s</string>
+    <string name="sorting_order">Sorteringsrekkefølge</string>
+    <string name="sort_by_name">Sorter etter navn</string>
+    <string name="sort_by_update">Sorter etter seneste oppdatering</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveLog">Lagre loggboken</string>
+    <string name="menuReload">Omlast</string>
+    <string name="menuClearLog">Tøm loggboken nå</string>
+    <string name="logs_cleared">Loggboken ble vellykket tømt.</string>
+
+    <!--About Activity-->
+    <string name="app_changelog">Endringslogg</string>
+
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Magisk-oppdateringer</string>
+    <string name="progress_channel">Fremgangsnotifikasjoner</string>
+    <string name="download_complete">Nedlastingen er fullført</string>
+    <string name="download_file_error">Feil under nedlasting av fil</string>
+    <string name="magisk_update_title">En Magisk-oppdatering er tilgjengelig!</string>
+    <string name="manager_update_title">En Magisk Manager-oppdatering er tilgjengelig!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="repo_install_title">Installer %1$s</string>
+    <string name="repo_install_msg">Vil du installere %1$s nå?</string>
+    <string name="download">Last ned</string>
+    <string name="reboot">Omstart</string>
+    <string name="settings_reboot_toast">Start på nytt for å benytte innstillingene.</string>
+    <string name="release_notes">Lanseringsnyheter</string>
+    <string name="repo_cache_cleared">Repomellomlageret ble tømt</string>
+    <string name="manager_download_install">Trykk for å laste ned og installere.</string>
+    <string name="dtbo_patched_title">DTBO ble patchet!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager har patchet dtbo.img. Vennligst start på nytt.</string>
+    <string name="flashing">Flashing</string>
+    <string name="hide_manager_title">Skjuler Magisk Manager …</string>
+    <string name="hide_manager_fail_toast">Skjulingen av Magisk Manager mislyktes.</string>
+    <string name="open_link_failed_toast">Ingen apper som kunne åpne denne lenken ble funnet.</string>
+    <string name="download_zip_only">Bare last ned ZIPen</string>
+    <string name="direct_install">Direkteinstallasjon (Anbefalt)</string>
+    <string name="install_inactive_slot">Installer til et inaktivt felt (Etter OTA)</string>
+    <string name="warning">Advarsel</string>
+    <string name="install_inactive_slot_msg">Enheten din vil bli TVUNGET til å starte opp på det som for øyeblikket er et inaktivt felt, etter en omstart!\nBare bruk dette alternativet etter at OTA-oppdateringen er ferdig.\nVil du fortsette?</string>
+    <string name="select_method">Velg metode</string>
+    <string name="complete_uninstall">Fullstendig avinstallering</string>
+    <string name="restore_img">Gjenopprett oppstartsbilde</string>
+    <string name="restore_img_msg">Gjenoppretter …</string>
+    <string name="restore_done">Gjenopprettingen er fullført!</string>
+    <string name="restore_fail">Sikkerhetskopien av mobilens eget oppstartsbilde!</string>
+    <string name="proprietary_title">Last ned proprietær kode</string>
+    <string name="proprietary_notice">Magisk Manager bruker FOSSS, og kommer ikke med Googles proprietære SafetyNet-API-kode.\n\nVil du tillate Magisk Manager å laste ned utvidelse (som inneholder GoogleApiClient) for å kjøre SafetyNet-sjekker?</string>
+    <string name="setup_fail">Oppsettet mislyktes.</string>
+    <string name="env_fix_title">Krever ekstra oppsett</string>
+    <string name="env_fix_msg">Enheten din krever ekstra oppsett for at Magisk skal kunne fungere ordentlig. Den vil laste ned Magisk-oppsetts-ZIP-filen, vil du fortsette med det nå?</string>
+    <string name="setup_title">Ekstra oppsett</string>
+    <string name="setup_msg">Kjører appmiljøoppsettet …</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">Generelt</string>
+    <string name="settings_dark_theme_title">Mørkt tema</string>
+    <string name="settings_dark_theme_summary">Skru på det mørke temaet.</string>
+    <string name="settings_clear_cache_title">Tøm repomellomlageret</string>
+    <string name="settings_clear_cache_summary">Tøm den mellomlagrede informasjonen til nettrepoer. Dette tvinger appen til å oppfriskes på nett.</string>
+    <string name="settings_hide_manager_title">Skjul Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Pakk inn Magisk Manager på nytt med et tilfeldig pakkenavn.</string>
+    <string name="settings_restore_manager_title">Gjenopprett Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Gjenopprett Magisk Manager med den opprinnelige pakken</string>
+    <string name="language">Språk</string>
+    <string name="system_default">(Systemets standard)</string>
+    <string name="settings_update">Oppdateringsinnstillinger</string>
+    <string name="settings_check_update_title">Let etter oppdateringer</string>
+    <string name="settings_check_update_summary">Let jevnlig etter oppdateringer i bakgrunnen.</string>
+    <string name="settings_update_channel_title">Oppdateringskanal</string>
+    <string name="settings_update_stable">Stabil</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Tilpasset</string>
+    <string name="settings_update_custom_msg">Skriv inn en egendefinert URL</string>
+    <string name="settings_core_only_title">Kun Magisk-kjernefunksjoner</string>
+    <string name="settings_core_only_summary">Bare aktiver kjernefunksjonene. MagiskSU og MagiskHide vil fortsatt være skrudd på, men ingen moduler vil bli lastet inn</string>
+    <string name="settings_magiskhide_summary">Skjul Magisk fra diverse måter å bli oppdaget på.</string>
+    <string name="settings_hosts_title">Systemløs «hosts»-fil</string>
+    <string name="settings_hosts_summary">Systemløs «hosts»-filstøtte for reklameblokkeringsapper.</string>
+    <string name="settings_hosts_toast">La til en modul for systemløs «hosts»-filtilgang</string>
+
+    <string name="settings_su_app_adb">Apper og ADB</string>
+    <string name="settings_su_app">Bare apper</string>
+    <string name="settings_su_adb">Bare ADB</string>
+    <string name="settings_su_disable">Skrudd av</string>
+    <string name="settings_su_request_10">10 sekunder</string>
+    <string name="settings_su_request_15">15 sekunder</string>
+    <string name="settings_su_request_20">20 sekunder</string>
+    <string name="settings_su_request_30">30 sekunder</string>
+    <string name="settings_su_request_45">45 sekunder</string>
+    <string name="settings_su_request_60">60 sekunder</string>
+    <string name="superuser_access">Superbruker-tilgang</string>
+    <string name="auto_response">Automatisk tilbakemelding</string>
+    <string name="request_timeout">Tidsgrense for tilbakemelding Timeout</string>
+    <string name="superuser_notification">Superbruker-notifikasjon</string>
+    <string name="request_timeout_summary">%1$d sekunder</string>
+    <string name="settings_su_reauth_title">Autentiser på nytt etter oppdateringer after upgrade</string>
+    <string name="settings_su_reauth_summary">Autentiser superbruker-tillatelser på nytt etter at en app har blitt oppdatert</string>
+
+    <string name="multiuser_mode">Flerbrukermoduse</string>
+    <string name="settings_owner_only">Kun enhetens eier</string>
+    <string name="settings_owner_manage">Styrt av enhetens eier</string>
+    <string name="settings_user_independent">Uavhengig av brukere</string>
+    <string name="owner_only_summary">Bare eieren har root-tilgang.</string>
+    <string name="owner_manage_summary">Bare eieren kan behandle root-tilgang og motta forespørsler.</string>
+    <string name="user_indepenent_summary">Hver bruker har hans/hennes egne root-regler.</string>
+
+    <string name="mount_namespace_mode">Monterings-navnefeltsmodus</string>
+    <string name="settings_ns_global">Altdekkende navnefelt</string>
+    <string name="settings_ns_requester">Arv navnefelt</string>
+    <string name="settings_ns_isolate">Isolert navnefelt</string>
+    <string name="global_summary">Alle root-økter benytter det altdekkende monteringsnavnefeltet.</string>
+    <string name="requester_summary">Root-økter vil arve forespørrerens navnefelt.</string>
+    <string name="isolate_summary">Hver root-økt vil ha sitt eget isolerte navnefelt.</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superbruker-forespørsel</string>
+    <string name="deny">Avslå</string>
+    <string name="prompt">Spør</string>
+    <string name="grant">Tillat</string>
+    <string name="su_warning">Gir full tilgang til enheten din.\nAvslå det dersom du ikke er sikker!</string>
+    <string name="forever">For alltid</string>
+    <string name="once">Én gang</string>
+    <string name="tenmin">10min</string>
+    <string name="twentymin">20min</string>
+    <string name="thirtymin">30min</string>
+    <string name="sixtymin">60min</string>
+    <string name="su_allow_toast">%1$s ble tildelt superbruker-rettigheter</string>
+    <string name="su_deny_toast">%1$s ble nektet superbruker-rettigheter</string>
+    <string name="no_apps_found">Ingen apper ble funnet</string>
+    <string name="su_snack_grant">Superbruker-rettigheter for %1$s har blitt tildelt</string>
+    <string name="su_snack_deny">Superbruker-rettigheter for %1$s har blitt avslått</string>
+    <string name="su_snack_notif_on">Notifikasjoner for %1$s har blitt skrudd på</string>
+    <string name="su_snack_notif_off">Notifikasjoner for %1$s har blitt skrudd av</string>
+    <string name="su_snack_log_on">Loggføring av %1$s er skrudd på</string>
+    <string name="su_snack_log_off">Loggføring av %1$s er skrudd av</string>
+    <string name="su_revoke_title">Vil du oppheve?</string>
+    <string name="su_revoke_msg">Vil du bekrefte for å oppheve %1$s sine rettigheter?</string>
+    <string name="toast">Varselfelt</string>
+    <string name="none">Ingen</string>
+
+    <!--Superuser logs-->
+    <string name="target_uid">Mål-UID: %1$d</string>
+    <string name="command">Kommando: %1$s</string>
+
+</resources>

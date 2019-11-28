@@ -1,0 +1,4 @@
+<resources>
+    <string name="upgrade_msg">Надградете до пълната версия на Magisk Manager, за да довършите първоначалната настройка. Изтегляне и инсталиране сега?</string>
+    <string name="no_internet_msg">Моля да се свържете към работеща интернет мрежа, защото надграждането до пълната версия на Magisk Manager е задължително.</string>
+</resources>
