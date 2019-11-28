@@ -200,7 +200,7 @@
 
 
     <style name="WidgetFoundation.Switch" parent="Widget.AppCompat.CompoundButton.Switch">
-        <item name="thumbTint">@color/color_primary_transient</item>
+        <item name="thumbTint">@color/color_checkbox_primary</item>
     </style>
 
 </resources>
