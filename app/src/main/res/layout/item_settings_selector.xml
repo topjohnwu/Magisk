@@ -17,9 +17,9 @@
 
     <com.google.android.material.card.MaterialCardView
         style="@style/WidgetFoundation.Card"
+        isEnabled="@{item.enabled}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        isEnabled="@{item.enabled}"
         android:alpha="@{item.enabled ? 1f : .5f}"
         android:onClick="@{(view) -> item.onPressed(view, callback)}"
         tools:layout_gravity="center">
@@ -27,7 +27,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="?listPreferredItemHeightSmall"
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatImageView

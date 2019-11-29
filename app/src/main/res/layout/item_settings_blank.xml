@@ -17,17 +17,16 @@
 
     <com.google.android.material.card.MaterialCardView
         style="@style/WidgetFoundation.Card"
-        android:layout_width="match_parent"
         isEnabled="@{item.enabled}"
-        android:alpha="@{item.enabled ? 1f : .5f}"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:alpha="@{item.enabled ? 1f : .5f}"
         android:onClick="@{(view) -> callback.onItemPressed(view, item)}"
         tools:layout_gravity="center">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="?listPreferredItemHeightSmall"
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -75,7 +74,7 @@
                     android:text="@{item.title}"
                     android:textAppearance="@style/AppearanceFoundation.Body"
                     android:textStyle="bold"
-                    tools:lines="1"
+                    tools:lines="2"
                     tools:text="@tools:sample/lorem/random" />
 
                 <androidx.appcompat.widget.AppCompatTextView

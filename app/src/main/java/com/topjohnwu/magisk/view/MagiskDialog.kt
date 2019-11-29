@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.updateLayoutParams
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -193,11 +192,11 @@ class MagiskDialog @JvmOverloads constructor(
 
     fun applyView(view: View) = apply {
         resetView()
-        binding.dialogBaseContainer.addView(view)
-        view.updateLayoutParams<ViewGroup.LayoutParams> {
-            width = ViewGroup.LayoutParams.MATCH_PARENT
-            height = ViewGroup.LayoutParams.WRAP_CONTENT
-        }
+        binding.dialogBaseContainer.addView(
+            view,
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     fun onDismiss(callback: OnDialogButtonClickListener) =
