@@ -21,6 +21,7 @@
 #define MAGISKDB        SECURE_DIR "/magisk.db"
 #define BOOTCOUNT       SECURE_DIR "/.boot_count"
 #define MANAGERAPK      DATABIN "/magisk.apk"
+#define PROC_NET_UNIX   "/proc/net/unix"
 
 // Legacy crap
 #define LEGACYCORE      MODULEROOT "/.core"

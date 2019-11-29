@@ -36,6 +36,10 @@ static inline void lazy_unmount(const char* mountpoint) {
 }
 
 void hide_daemon(int pid) {
+	// Make the file /proc/net/unix unreadable because it
+	// would otherwise allow apps to find out about Magisk,
+	// even if hidden
+	chmod(PROC_NET_UNIX, 0440);
 	run_finally fin([=]() -> void {
 		// Send resume signal
 		kill(pid, SIGCONT);
