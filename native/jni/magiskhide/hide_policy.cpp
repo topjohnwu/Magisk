@@ -12,12 +12,12 @@ using namespace std;
 static const char *prop_key[] =
 		{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
 		  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
-		  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", "ro.bootmode", nullptr };
+		  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", "ro.bootmode", "ro.boot.mode", nullptr };
 
 static const char *prop_value[] =
 		{ "locked", "green", "1",
 		  "enforcing", "0", "0", "0",
-		  "1", "user", "release-keys", "0", "unknown", nullptr };
+		  "1", "user", "release-keys", "0", "unknown", "unknown", nullptr };
 
 void hide_sensitive_props() {
 	LOGI("hide_policy: Hiding sensitive props\n");
