@@ -113,6 +113,17 @@ ensure_bb() {
 }
 
 recovery_actions() {
+  # Fix for Android Q
+  if [ -d /system/apex ]; then
+    [ -L /apex ] && rm -f /apex
+    for i in /system/apex/*; do
+      local APEX=$(basename $i)
+      case $APEX in
+        "com.android.runtime.release") mkdir -p /apex/com.android.runtime 2>/dev/null; mount -o bind $i /apex/com.android.runtime;;
+        *) mkdir -p /apex/$APEX 2>/dev/null; mount -o bind $i /apex/$APEX;;
+      esac
+    done
+  fi
   # Make sure random don't get blocked
   mount -o bind /dev/urandom /dev/random
   # Unset library paths
@@ -133,6 +144,12 @@ recovery_cleanup() {
   [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
   [ -z $OLD_LD_CFG ] || export LD_CONFIG_FILE=$OLD_LD_CFG
   ui_print "- Unmounting partitions"
+  # Fix for Android Q
+  if [ -d /system/apex ]; then
+    for i in /apex/*; do
+      umount -l $i 2>/dev/null
+    done
+  fi
   umount -l /system_root 2>/dev/null
   umount -l /system 2>/dev/null
   umount -l /vendor 2>/dev/null
