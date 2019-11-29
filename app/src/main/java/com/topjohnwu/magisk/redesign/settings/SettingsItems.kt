@@ -129,6 +129,14 @@ object UpdateChannelUrl : SettingsItem.Input() {
             notifyChange(BR.result)
         }
 
+    init {
+        updateState()
+    }
+
+    fun updateState() {
+        isEnabled = UpdateChannel.value == Config.Value.CUSTOM_CHANNEL
+    }
+
     override fun getView(context: Context) = DialogSettingsUpdateChannelBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
 }

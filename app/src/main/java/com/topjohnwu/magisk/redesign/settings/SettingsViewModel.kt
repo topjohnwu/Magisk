@@ -9,7 +9,6 @@ import androidx.databinding.Bindable
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.recycler.ObservableItem
 import com.topjohnwu.magisk.model.events.DieEvent
@@ -49,18 +48,14 @@ class SettingsViewModel : CompatViewModel(), SettingsItem.Callback {
         // use only instances you want, don't declare everything
         is Theme -> Navigation.theme().publish()
         is Redesign -> DieEvent().publish()
-        is UpdateChannel -> item.openUrlIfNecessary(view)
+        is UpdateChannel -> openUrlIfNecessary(view)
         else -> Unit
     }
 
-    private fun UpdateChannel.openUrlIfNecessary(view: View) {
-        if (value == Config.Value.CUSTOM_CHANNEL) {
-            if (UpdateChannelUrl.value.isBlank()) {
-                UpdateChannelUrl.onPressed(view, this@SettingsViewModel)
-            }
-            UpdateChannelUrl.isEnabled = true
-        } else {
-            UpdateChannelUrl.isEnabled = false
+    private fun openUrlIfNecessary(view: View) {
+        UpdateChannelUrl.updateState()
+        if (UpdateChannelUrl.value.isBlank()) {
+            UpdateChannelUrl.onPressed(view, this@SettingsViewModel)
         }
     }
 
