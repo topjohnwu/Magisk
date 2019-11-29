@@ -20,6 +20,8 @@
     <com.google.android.material.card.MaterialCardView
         style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
+        isEnabled="@{item.enabled}"
+        android:alpha="@{item.enabled ? 1f : .5f}"
         android:layout_height="wrap_content"
         android:onClick="@{(view) -> item.onPressed(view, callback)}"
         tools:layout_gravity="center">
@@ -49,6 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/l_25"
                 android:checked="@{item.value}"
+                isEnabled="@{item.enabled}"
                 android:text=""
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

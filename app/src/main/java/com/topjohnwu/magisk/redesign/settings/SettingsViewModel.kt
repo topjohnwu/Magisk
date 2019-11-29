@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.redesign.settings
 
+import android.content.Context
 import android.content.res.Resources
 import android.view.MotionEvent
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.databinding.Bindable
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.entity.recycler.ObservableItem
 import com.topjohnwu.magisk.model.events.DieEvent
@@ -29,10 +31,11 @@ class SettingsViewModel : CompatViewModel(), SettingsItem.Callback {
     val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
     val items = diffListOf(
         Customization,
-        Theme, Language, Redesign,
+        Theme, Language, Redesign, DownloadPath,
 
         Manager,
-        ClearRepoCache, HideOrRestore(), UpdateChecker, SystemlessHosts, Biometrics,
+        UpdateChannel, UpdateChannelUrl, ClearRepoCache, HideOrRestore(), UpdateChecker,
+        SystemlessHosts, Biometrics,
 
         Magisk,
         SafeMode, MagiskHide,
@@ -44,9 +47,21 @@ class SettingsViewModel : CompatViewModel(), SettingsItem.Callback {
 
     override fun onItemPressed(view: View, item: SettingsItem) = when (item) {
         // use only instances you want, don't declare everything
-        Theme -> Navigation.theme().publish()
-        Redesign -> DieEvent().publish()
+        is Theme -> Navigation.theme().publish()
+        is Redesign -> DieEvent().publish()
+        is UpdateChannel -> item.openUrlIfNecessary(view)
         else -> Unit
+    }
+
+    private fun UpdateChannel.openUrlIfNecessary(view: View) {
+        if (value == Config.Value.CUSTOM_CHANNEL) {
+            if (UpdateChannelUrl.value.isBlank()) {
+                UpdateChannelUrl.onPressed(view, this@SettingsViewModel)
+            }
+            UpdateChannelUrl.isEnabled = true
+        } else {
+            UpdateChannelUrl.isEnabled = false
+        }
     }
 
 }
@@ -59,6 +74,13 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     open val title: TransitiveText = TransitiveText.empty
     @Bindable
     open val description: TransitiveText = TransitiveText.empty
+
+    var isEnabled = true
+        @Bindable get
+        set(value) {
+            field = value
+            notifyChange(BR.enabled)
+        }
 
     protected open val isFullSpan: Boolean = false
 
@@ -124,6 +146,40 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
             }
             return true
         }
+
+    }
+
+    abstract class Input : Value<String>(), KoinComponent {
+
+        override val layoutRes = R.layout.item_settings_input
+
+        protected val resources get() = get<Resources>()
+        protected abstract val intermediate: String?
+
+        override fun onPressed(view: View, callback: Callback) {
+            MagiskDialog(view.context)
+                .applyTitle(title.getText(resources))
+                .applyView(getView(view.context))
+                .applyButton(MagiskDialog.ButtonType.POSITIVE) {
+                    titleRes = android.R.string.ok
+                    onClick {
+                        intermediate?.let { result ->
+                            preventDismiss = false
+                            value = result
+                            it.dismiss()
+                            super.onPressed(view, callback)
+                            return@onClick
+                        }
+                        preventDismiss = true
+                    }
+                }
+                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    titleRes = android.R.string.cancel
+                }
+                .reveal()
+        }
+
+        abstract fun getView(context: Context): View
 
     }
 

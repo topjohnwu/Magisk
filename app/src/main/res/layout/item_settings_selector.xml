@@ -19,6 +19,8 @@
         style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        isEnabled="@{item.enabled}"
+        android:alpha="@{item.enabled ? 1f : .5f}"
         android:onClick="@{(view) -> item.onPressed(view, callback)}"
         tools:layout_gravity="center">
 

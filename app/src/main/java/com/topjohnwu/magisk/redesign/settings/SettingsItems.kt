@@ -1,14 +1,22 @@
 package com.topjohnwu.magisk.redesign.settings
 
 import android.content.Context
+import android.os.Environment
+import android.view.LayoutInflater
+import androidx.databinding.Bindable
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
+import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.magisk.utils.availableLocales
 import com.topjohnwu.magisk.utils.currentLocale
+import java.io.File
 
 // --- Customization
 
@@ -69,16 +77,61 @@ object Restore : SettingsItem.Blank() {
 fun HideOrRestore() =
     if (get<Context>().packageName == BuildConfig.APPLICATION_ID) Hide else Restore
 
-//todo new dialog
-object DownloadPath
+object DownloadPath : SettingsItem.Input() {
+    override var value: String by dataObservable(Config.downloadPath) { Config.downloadPath = it }
+    override val title = R.string.settings_download_path_title.asTransitive()
+    override val intermediate: String?
+        get() = if (Utils.ensureDownloadPath(result) != null) result else null
+    var result = value
+        @Bindable get
+        set(value) {
+            field = value
+            notifyChange(BR.result)
+            notifyChange(BR.path)
+        }
+    val path
+        @Bindable get() = File(
+            Environment.getExternalStorageDirectory(),
+            result
+        ).absolutePath.orEmpty()
 
-//fixme this
-object UpdateChannel : SettingsItem.Selector() {
-    override var value by dataObservable(Config.updateChannel) { Config.updateChannel = it }
+    override fun getView(context: Context) = DialogSettingsDownloadPathBinding
+        .inflate(LayoutInflater.from(context)).also { it.data = this }.root
 }
 
-//fixme new dialog
-object UpdateChannelUrl
+object UpdateChannel : SettingsItem.Selector() {
+    override var value by dataObservable(Config.updateChannel) { Config.updateChannel = it }
+    override val title = R.string.settings_update_channel_title.asTransitive()
+
+    init {
+        val entries = resources.getStringArray(R.array.update_channel).let {
+            if (!Utils.isCanary && Config.updateChannel < Config.Value.CANARY_CHANNEL)
+                it.take(it.size - 2).toTypedArray() else it
+        }
+        setValues(
+            entries,
+            resources.getStringArray(R.array.value_array)
+        )
+    }
+}
+
+object UpdateChannelUrl : SettingsItem.Input() {
+    override val title = R.string.settings_update_custom.asTransitive()
+    override var value: String by dataObservable(Config.customChannelUrl) {
+        Config.customChannelUrl = it
+    }
+    override val intermediate: String? get() = result
+
+    var result = value
+        @Bindable get
+        set(value) {
+            field = value
+            notifyChange(BR.result)
+        }
+
+    override fun getView(context: Context) = DialogSettingsUpdateChannelBinding
+        .inflate(LayoutInflater.from(context)).also { it.data = this }.root
+}
 
 object UpdateChecker : SettingsItem.Toggle() {
     override val title = R.string.settings_check_update_title.asTransitive()
