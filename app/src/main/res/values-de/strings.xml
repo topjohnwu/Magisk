@@ -79,7 +79,7 @@
     <string name="manager_download_install">Herunterladen und installieren</string>
     <string name="download_zip_only">Nur Zip-Datei herunterladen</string>
     <string name="direct_install">Direkt installieren (empfohlen)</string>
-    <string name="install_inactive_slot">Installiere in inaktiven Slot (Nach OTA)</string>
+    <string name="install_inactive_slot">In inaktiven Slot installieren (Nach OTA)</string>
     <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
     <string name="select_method">Methode auswählen</string>
     <string name="setup_title">Zusätzliche Einrichtung</string>
