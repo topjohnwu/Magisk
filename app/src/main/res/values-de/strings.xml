@@ -113,7 +113,7 @@
     <string name="proprietary_notice">Magisk Manager ist FOSS und enthält keinen proprietären SafetyNet API Code von Google. Magisk Manager erlauben eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Checks herunterzuladen?</string>
     <string name="setup_fail">Einrichtung fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
-    <string name="env_fix_msg">Dein Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip heruntergeladen, fortfahren?</string>
+    <string name="env_fix_msg">Dein Gerät benötigt eine zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip heruntergeladen. Fortfahren?</string>
     <string name="setup_msg">Umgebungseinrichtung läuft…</string>
     <string name="authenticate">Authentifizieren</string>
 
@@ -169,7 +169,7 @@
     <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Aktualisierung erneut abfragen</string>
     <string name="settings_su_biometric_title">Biometrische Authentifizierung aktivieren</string>
     <string name="settings_su_biometric_summary">Biometrische Authentifizierung verwenden, um Superuser-Anfragen zu ermöglichen</string>
-    <string name="no_biometric">Nicht unterstütztes Gerät oder keine biometrischen Einstellungen sind aktiviert</string>
+    <string name="no_biometric">Nicht unterstütztes Gerät oder keine biometrischen Einstellungen aktiviert</string>
 
     <string name="multiuser_mode">Mehrbenutzermodus</string>
     <string name="settings_owner_only">Nur der Gerätebesitzer</string>
