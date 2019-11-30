@@ -8,7 +8,7 @@
     <string name="settings">Einstellungen</string>
     <string name="install">Installieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk Version</string>
-    <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Versionen unter %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert wäre. Bitte Magisk so schnell wie möglich aktualisieren.</string>
+    <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Versionen unter %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert ist. Bitte Magisk so schnell wie möglich aktualisieren.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
