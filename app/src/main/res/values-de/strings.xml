@@ -8,7 +8,7 @@
     <string name="settings">Einstellungen</string>
     <string name="install">Installieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk Version</string>
-    <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Versionen unter %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert wäre, bitte aktualisiere Magisk so schnell wie möglich.</string>
+    <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Versionen unter %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert wäre. Bitte Magisk so schnell wie möglich aktualisieren.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
@@ -101,7 +101,7 @@
     <string name="done">Erledigt!</string>
     <string name="failure">Fehler</string>
     <string name="hide_manager_title">Magisk Manager verbergen…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager verbergen fehlgeschlagen…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager verbergen ist fehlgeschlagen…</string>
     <string name="open_link_failed_toast">Es wurde keine App gefunden, um diesen Link zu öffnen…</string>
     <string name="warning">Warnung</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
@@ -113,7 +113,7 @@
     <string name="proprietary_notice">Magisk Manager ist FOSS und enthält keinen proprietären SafetyNet API Code von Google. Magisk Manager erlauben eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Checks herunterzuladen?</string>
     <string name="setup_fail">Einrichtung fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
-    <string name="env_fix_msg">Dein Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip wird heruntergeladen, fortfahren?</string>
+    <string name="env_fix_msg">Dein Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip heruntergeladen, fortfahren?</string>
     <string name="setup_msg">Umgebungseinrichtung läuft…</string>
     <string name="authenticate">Authentifizieren</string>
 
@@ -128,7 +128,7 @@
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
     <string name="settings_hide_manager_summary">Magisk Manager mit zufälligem Paketnamen neu packen</string>
     <string name="settings_restore_manager_title">Magisk Manager wiederherstellen</string>
-    <string name="settings_restore_manager_summary">Magisk Manager mit ursprünglichem Paketnamen wieder herstellen</string>
+    <string name="settings_restore_manager_summary">Magisk Manager mit ursprünglichem Paketnamen wiederherstellen</string>
     <string name="language">Sprache</string>
     <string name="system_default">(Systemstandard)</string>
     <string name="settings_update">Aktualisierungs-Einstellungen</string>
