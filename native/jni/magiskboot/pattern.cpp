@@ -8,7 +8,13 @@
 static int check_verity_pattern(const char *s) {
 	int skip = 0;
 	if (s[0] == ',') ++skip;
-	if (strncmp(s + skip, "verify", 6) == 0)
+	if (strncmp(s + skip, "support_scfs,verify", 19) == 0)
+			skip += 19;
+	else if (strncmp(s + skip, "verify,support_scfs", 19) == 0)
+			skip += 19;
+	else if (strncmp(s + skip, "support_scfs", 12) == 0)
+		skip += 12;
+	else if (strncmp(s + skip, "verify", 6) == 0)
 		skip += 6;
 	else if (strncmp(s + skip, "avb", 3) == 0)
 		skip += 3;
@@ -22,7 +28,7 @@ static int check_verity_pattern(const char *s) {
 }
 
 static int check_encryption_pattern(const char *s) {
-	static const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe" };
+	static const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe", "fileencryption" };
 	for (auto enc : encrypt_list) {
 		int len = strlen(enc);
 		if (strncmp(s, enc, len) == 0)
