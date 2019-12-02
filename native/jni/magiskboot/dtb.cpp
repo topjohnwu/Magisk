@@ -1,93 +1,20 @@
 #include <unistd.h>
 #include <sys/mman.h>
+#include <bitset>
+#include <vector>
+#include <map>
 
 extern "C" {
 #include <libfdt.h>
 }
 #include <utils.h>
-#include <bitset>
-#include <vector>
-#include <map>
 
 #include "magiskboot.h"
+#include "dtb.h"
 
 using namespace std;
 
-#define DTB_MAGIC       "\xd0\x0d\xfe\xed"
-#define QCDT_MAGIC      "QCDT"
-#define DTBH_MAGIC      "DTBH"
-#define PXADT_MAGIC     "PXA-DT"
-#define PXA19xx_MAGIC   "PXA-19xx"
-#define SPRD_MAGIC      "SPRD"
-
-struct qcdt_hdr {
-	char magic[4];          /* "QCDT" */
-	uint32_t version;       /* QCDT version */
-	uint32_t num_dtbs;      /* Number of DTBs */
-} __attribute__((packed));
-
-struct qctable_v1 {
-	uint32_t cpu_info[3];   /* Some CPU info */
-	uint32_t offset;        /* DTB offset in QCDT */
-	uint32_t len;           /* DTB size */
-} __attribute__((packed));
-
-struct qctable_v2 {
-	uint32_t cpu_info[4];   /* Some CPU info */
-	uint32_t offset;        /* DTB offset in QCDT */
-	uint32_t len;           /* DTB size */
-} __attribute__((packed));
-
-struct qctable_v3 {
-	uint32_t cpu_info[8];   /* Some CPU info */
-	uint32_t offset;        /* DTB offset in QCDT */
-	uint32_t len;           /* DTB size */
-} __attribute__((packed));
-
-struct dtbh_hdr {
-	char magic[4];          /* "DTBH" */
-	uint32_t version;       /* DTBH version */
-	uint32_t num_dtbs;      /* Number of DTBs */
-} __attribute__((packed));
-
-struct bhtable_v2 {
-	uint32_t cpu_info[5];   /* Some CPU info */
-	uint32_t offset;        /* DTB offset in DTBH */
-	uint32_t len;           /* DTB size */
-	uint32_t space;         /* 0x00000020 */
-} __attribute__((packed));
-
-struct pxadt_hdr {
-	char magic[6];          /* "PXA-DT" */
-	uint32_t version;       /* PXA-* version */
-	uint32_t num_dtbs;      /* Number of DTBs */
-} __attribute__((packed));
-
-struct pxa19xx_hdr {
-	char magic[8];          /* "PXA-19xx" */
-	uint32_t version;       /* PXA-* version */
-	uint32_t num_dtbs;      /* Number of DTBs */
-} __attribute__((packed));
-
-struct pxatable_v1 {
-	uint32_t cpu_info[2];   /* Some CPU info */
-	uint32_t offset;        /* DTB offset in PXA-* */
-	uint32_t len;           /* DTB size */
-} __attribute__((packed));
-
-struct sprd_hdr {
-	char magic[4];          /* "SPRD" */
-	uint32_t version;       /* SPRD version */
-	uint32_t num_dtbs;      /* Number of DTBs */
-} __attribute__((packed));
-
-struct sprdtable_v1 {
-	uint32_t cpu_info[3];   /* Some CPU info */
-	uint32_t offset;        /* DTB offset in SPRD */
-	uint32_t len;           /* DTB size */
-} __attribute__((packed));
-
-struct dtb_blob {
+struct fdt_blob {
 	void *fdt;
 	uint32_t offset;
 	uint32_t len;
@@ -206,7 +133,7 @@ static void dtb_print(const char *file, bool fstab) {
 	// Loop through all the dtbs
 	int dtb_num = 0;
 	for (int i = 0; i < size; ++i) {
-		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
+		if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
 			auto fdt = dtb + i;
 			if (fstab) {
 				int node = find_fstab(fdt);
@@ -266,19 +193,33 @@ static bool fdt_patch(Iter first, Iter last) {
 
 template <class Table, class Header>
 static int dtb_patch(const Header *hdr, const char *in, const char *out) {
-	map<uint32_t, dtb_blob> dtb_map;
+	map<uint32_t, fdt_blob> dtb_map;
 	auto buf = reinterpret_cast<const uint8_t *>(hdr);
 	auto tables = reinterpret_cast<const Table *>(hdr + 1);
 
+	constexpr bool is_dt_table = std::is_same_v<Header, dt_table_header>;
+
+	using endian_conv = uint32_t (*)(uint32_t);
+	endian_conv be_to_le;
+	endian_conv le_to_be;
+	if constexpr (is_dt_table) {
+		be_to_le = fdt32_to_cpu;
+		le_to_be = cpu_to_fdt32;
+	} else {
+		be_to_le = le_to_be = [](uint32_t x) -> auto { return x; };
+	}
+
 	// Collect all dtbs
-	for (int i = 0; i < hdr->num_dtbs; ++i) {
-		if (dtb_map.find(tables[i].offset) == dtb_map.end()) {
-			auto blob = buf + tables[i].offset;
-			int size = fdt_totalsize(blob);
+	auto num_dtb = be_to_le(hdr->num_dtbs);
+	for (int i = 0; i < num_dtb; ++i) {
+		auto offset = be_to_le(tables[i].offset);
+		if (dtb_map.count(offset) == 0) {
+			auto blob = buf + offset;
+			uint32_t size = fdt_totalsize(blob);
 			auto fdt = xmalloc(size + 256);
 			memcpy(fdt, blob, size);
 			fdt_open_into(fdt, fdt, size + 256);
-			dtb_map[tables[i].offset] = { fdt, tables[i].offset };
+			dtb_map[offset] = { fdt, offset };
 		}
 	}
 	if (dtb_map.empty())
@@ -292,18 +233,23 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 		unlink(in);
 	int fd = xopen(out, O_RDWR | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
 
+	uint32_t total_size = 0;
+
 	// Copy headers and tables
-	xwrite(fd, buf, dtb_map.begin()->first);
+	total_size += xwrite(fd, buf, dtb_map.begin()->first);
 
 	// mmap rw to patch table values retroactively
 	auto mmap_sz = lseek(fd, 0, SEEK_CUR);
 	auto addr = (uint8_t *) xmmap(nullptr, mmap_sz, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
-	// Guess page size using gcd
-	auto it = dtb_map.begin();
-	uint32_t page_size = (it++)->first;
-	for (; it != dtb_map.end(); ++it)
-		page_size = binary_gcd(page_size, it->first);
+	// Guess alignment using gcd
+	uint32_t align = 1;
+	if constexpr (!is_dt_table) {
+		auto it = dtb_map.begin();
+		align = (it++)->first;
+		for (; it != dtb_map.end(); ++it)
+			align = binary_gcd(align, it->first);
+	}
 
 	// Write dtbs
 	for (auto &val : dtb_map) {
@@ -311,18 +257,23 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 		auto fdt = val.second.fdt;
 		fdt_pack(fdt);
 		int size = fdt_totalsize(fdt);
-		xwrite(fd, fdt, size);
-		val.second.len = do_align(size, page_size);
-		write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), page_size));
+		total_size += xwrite(fd, fdt, size);
+		val.second.len = do_align(size, align);
+		write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), align));
+		// total_size += align_off(lseek(fd, 0, SEEK_CUR), align);  /* Not needed */
 		free(fdt);
 	}
 
-	// Patch tables
+	// Patch headers
+	if constexpr (is_dt_table) {
+		auto hdr_rw = reinterpret_cast<Header *>(addr);
+		hdr_rw->total_size = le_to_be(total_size);
+	}
 	auto tables_rw = reinterpret_cast<Table *>(addr + sizeof(Header));
-	for (int i = 0; i < hdr->num_dtbs; ++i) {
-		auto &blob = dtb_map[tables_rw[i].offset];
-		tables_rw[i].offset = blob.offset;
-		tables_rw[i].len = blob.len;
+	for (int i = 0; i < num_dtb; ++i) {
+		auto &blob = dtb_map[be_to_le(tables_rw[i].offset)];
+		tables_rw[i].offset = le_to_be(blob.offset);
+		tables_rw[i].len = le_to_be(blob.len);
 	}
 
 	munmap(addr, mmap_sz);
@@ -393,10 +344,19 @@ static int dtb_patch(const char *in, const char *out) {
 			default:
 				return 1;
 		}
+	} else if (MATCH(DT_TABLE_MAGIC)) {
+		auto hdr = reinterpret_cast<dt_table_header *>(dtb);
+		switch (hdr->version) {
+			case 0:
+				fprintf(stderr, "DT_TABLE v0\n");
+				return dtb_patch<dt_table_entry>(hdr, in, out);
+			default:
+				return 1;
+		}
 	} else {
 		vector<uint8_t *> fdt_list;
 		for (int i = 0; i < dtb_sz; ++i) {
-			if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
+			if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
 				int len = fdt_totalsize(dtb + i);
 				auto fdt = static_cast<uint8_t *>(xmalloc(len + 256));
 				memcpy(fdt, dtb + i, len);

@@ -16,13 +16,14 @@ static int check_verity_pattern(const char *s) {
 		return -1;
 
 	if (s[skip] == '=') {
-		while (s[skip] != '\0' && s[skip] != ' ' && s[skip] != '\n' && s[skip] != ',') ++skip;
+		while (s[skip] != '\0' && s[skip] != ' ' && s[skip] != '\n' && s[skip] != ',')
+			++skip;
 	}
 	return skip;
 }
 
 static int check_encryption_pattern(const char *s) {
-	static const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe" };
+	constexpr const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe" };
 	for (auto enc : encrypt_list) {
 		int len = strlen(enc);
 		if (strncmp(s, enc, len) == 0)
@@ -33,26 +34,27 @@ static int check_encryption_pattern(const char *s) {
 
 char *patch_verity(const void *buf, uint32_t &size, bool inplace) {
 	auto src = static_cast<const char *>(buf);
+	auto dest = (char *)(inplace ? buf : xmalloc(size));
 	int src_size = size;
 	bool found = false;
-	auto patched = (char *)(inplace ? buf : xmalloc(size));
 	int write = 0;
-	for (int read = 0; read < src_size; ++read, ++write) {
+	for (int read = 0; read < src_size;) {
 		if (int skip; (skip = check_verity_pattern(src + read)) > 0) {
 			fprintf(stderr, "Found pattern [%.*s]\n", skip, src + read);
 			size -= skip;
 			read += skip;
 			found = true;
+		} else {
+			dest[write++] = src[read++];
 		}
-		patched[write] = src[read];
 	}
-	patched[write] = '\0';
+	dest[write] = '\0';
 	if (!found) {
 		if (!inplace)
-			free(patched);
+			free(dest);
 		return nullptr;
 	}
-	return patched;
+	return dest;
 }
 
 void patch_encryption(void *buf, uint32_t &size) {
