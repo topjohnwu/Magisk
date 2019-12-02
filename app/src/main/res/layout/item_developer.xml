@@ -21,7 +21,7 @@
         tools:layout_gravity="center|start">
 
         <com.google.android.material.card.MaterialCardView
-            style="@style/WidgetFoundation.Card.Secondary"
+            style="@style/WidgetFoundation.Card.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constrainedWidth="true"

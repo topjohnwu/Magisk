@@ -741,7 +741,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.card.MaterialCardView
-                style="@style/WidgetFoundation.Card.Primary"
+                style="@style/WidgetFoundation.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
@@ -759,7 +759,7 @@
                         android:layout_marginStart="@dimen/l1"
                         android:layout_marginEnd="@dimen/l1"
                         android:text="@string/home_support_title"
-                        android:textAppearance="@style/AppearanceFoundation.Title.OnPrimary" />
+                        android:textAppearance="@style/AppearanceFoundation.Title" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="match_parent"
@@ -768,7 +768,7 @@
                         android:layout_marginTop="@dimen/l_50"
                         android:layout_marginEnd="@dimen/l1"
                         android:text="@string/home_support_content"
-                        android:textAppearance="@style/AppearanceFoundation.Caption.OnPrimary.Variant" />
+                        android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         dividerHorizontal="@{R.drawable.divider_l1}"
