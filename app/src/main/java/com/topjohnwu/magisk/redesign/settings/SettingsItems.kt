@@ -1,21 +1,19 @@
 package com.topjohnwu.magisk.redesign.settings
 
 import android.content.Context
+import android.os.Build
 import android.os.Environment
 import android.view.LayoutInflater
+import android.widget.Toast
 import androidx.databinding.Bindable
-import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.asTransitive
-import com.topjohnwu.magisk.utils.availableLocales
-import com.topjohnwu.magisk.utils.currentLocale
+import com.topjohnwu.magisk.utils.*
+import com.topjohnwu.superuser.Shell
 import java.io.File
 
 // --- Customization
@@ -27,6 +25,7 @@ object Customization : SettingsItem.Section() {
 object Language : SettingsItem.Selector() {
     override var value by dataObservable(0) {
         Config.locale = entryValues.getOrNull(it)?.toString() ?: return@dataObservable
+        refreshLocale()
     }
 
     override val title = R.string.language.asTransitive()
@@ -61,11 +60,34 @@ object Manager : SettingsItem.Section() {
 object ClearRepoCache : SettingsItem.Blank() {
     override val title = R.string.settings_clear_cache_title.asTransitive()
     override val description = R.string.settings_clear_cache_summary.asTransitive()
+
+    override fun refresh() {
+        isEnabled = Info.env.isActive
+    }
 }
 
-object Hide : SettingsItem.Blank() {
+object Hide : SettingsItem.Input() {
     override val title = R.string.settings_hide_manager_title.asTransitive()
     override val description = R.string.settings_hide_manager_summary.asTransitive()
+    override val showStrip = false
+    override var value: String = resources.getString(R.string.re_app_name)
+        set(value) {
+            field = value
+            notifyChange(BR.value)
+            notifyChange(BR.error)
+        }
+    val isError
+        @Bindable get() = value.length > 14 || value.isBlank()
+
+    override val intermediate: String?
+        get() = if (isError) null else value
+
+    override fun getView(context: Context) = DialogSettingsAppNameBinding
+        .inflate(LayoutInflater.from(context)).also { it.data = this }.root
+
+    override fun refresh() {
+        isEnabled = Info.env.isActive
+    }
 }
 
 object Restore : SettingsItem.Blank() {
@@ -129,11 +151,7 @@ object UpdateChannelUrl : SettingsItem.Input() {
             notifyChange(BR.result)
         }
 
-    init {
-        updateState()
-    }
-
-    fun updateState() {
+    override fun refresh() {
         isEnabled = UpdateChannel.value == Config.Value.CUSTOM_CHANNEL
     }
 
@@ -144,19 +162,43 @@ object UpdateChannelUrl : SettingsItem.Input() {
 object UpdateChecker : SettingsItem.Toggle() {
     override val title = R.string.settings_check_update_title.asTransitive()
     override val description = R.string.settings_check_update_summary.asTransitive()
-    override var value by dataObservable(Config.checkUpdate) { Config.checkUpdate = it }
+    override var value by dataObservable(Config.checkUpdate) {
+        Config.checkUpdate = it
+        Utils.scheduleUpdateCheck(get())
+    }
 }
 
 // check whether is module already installed beforehand?
 object SystemlessHosts : SettingsItem.Blank() {
     override val title = R.string.settings_hosts_title.asTransitive()
     override val description = R.string.settings_hosts_summary.asTransitive()
+
+    override fun refresh() {
+        isEnabled = Info.env.isActive
+    }
 }
 
 object Biometrics : SettingsItem.Toggle() {
     override val title = R.string.settings_su_biometric_title.asTransitive()
     override val description = R.string.settings_su_biometric_summary.asTransitive()
     override var value by dataObservable(Config.suBiometric) { Config.suBiometric = it }
+
+    override fun refresh() {
+        isEnabled = BiometricHelper.isSupported && Utils.showSuperUser()
+        if (!isEnabled) {
+            value = false
+        }
+    }
+}
+
+object Reauthenticate : SettingsItem.Toggle() {
+    override val title = R.string.settings_su_reauth_title.asTransitive()
+    override val description = R.string.settings_su_reauth_summary.asTransitive()
+    override var value by dataObservable(Config.suReAuth) { Config.suReAuth = it }
+
+    override fun refresh() {
+        isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && Utils.showSuperUser()
+    }
 }
 
 // --- Magisk
@@ -168,13 +210,35 @@ object Magisk : SettingsItem.Section() {
 object SafeMode : SettingsItem.Toggle() {
     override val title = R.string.settings_core_only_title.asTransitive()
     override val description = R.string.settings_core_only_summary.asTransitive()
-    override var value by dataObservable(Config.coreOnly) { Config.coreOnly = it }
+    override var value by dataObservable(Config.coreOnly) {
+        if (Config.coreOnly == it) return@dataObservable
+        Config.coreOnly = it
+        when {
+            it -> runCatching { Const.MAGISK_DISABLE_FILE.createNewFile() }
+            else -> Const.MAGISK_DISABLE_FILE.delete()
+        }
+        Utils.toast(R.string.settings_reboot_toast, Toast.LENGTH_LONG)
+    }
+
+    override fun refresh() {
+        isEnabled = Info.env.isActive
+    }
 }
 
 object MagiskHide : SettingsItem.Toggle() {
     override val title = R.string.magiskhide.asTransitive()
     override val description = R.string.settings_magiskhide_summary.asTransitive()
-    override var value by dataObservable(Config.magiskHide) { Config.magiskHide = it }
+    override var value by dataObservable(Config.magiskHide) {
+        Config.magiskHide = it
+        when {
+            it -> Shell.su("magiskhide --enable").submit()
+            else -> Shell.su("magiskhide --disable").submit()
+        }
+    }
+
+    override fun refresh() {
+        isEnabled = Info.env.isActive
+    }
 }
 
 // --- Superuser
@@ -197,6 +261,10 @@ object AccessMode : SettingsItem.Selector() {
             resources.getStringArray(R.array.value_array)
         )
     }
+
+    override fun refresh() {
+        isEnabled = Utils.showSuperUser()
+    }
 }
 
 object MultiuserMode : SettingsItem.Selector() {
@@ -212,6 +280,10 @@ object MultiuserMode : SettingsItem.Selector() {
             resources.getStringArray(R.array.multiuser_mode),
             resources.getStringArray(R.array.value_array)
         )
+    }
+
+    override fun refresh() {
+        isEnabled = Const.USER_ID <= 0 && Utils.showSuperUser()
     }
 }
 
@@ -229,6 +301,10 @@ object MountNamespaceMode : SettingsItem.Selector() {
             resources.getStringArray(R.array.value_array)
         )
     }
+
+    override fun refresh() {
+        isEnabled = Utils.showSuperUser()
+    }
 }
 
 object AutomaticResponse : SettingsItem.Selector() {
@@ -244,6 +320,10 @@ object AutomaticResponse : SettingsItem.Selector() {
             resources.getStringArray(R.array.auto_response),
             resources.getStringArray(R.array.value_array)
         )
+    }
+
+    override fun refresh() {
+        isEnabled = Utils.showSuperUser()
     }
 }
 
@@ -263,6 +343,10 @@ object RequestTimeout : SettingsItem.Selector() {
         val currentValue = Config.suDefaultTimeout.toString()
         value = entryValues.indexOfFirst { it == currentValue }
     }
+
+    override fun refresh() {
+        isEnabled = Utils.showSuperUser()
+    }
 }
 
 object SUNotification : SettingsItem.Selector() {
@@ -278,5 +362,9 @@ object SUNotification : SettingsItem.Selector() {
             resources.getStringArray(R.array.su_notification),
             resources.getStringArray(R.array.value_array)
         )
+    }
+
+    override fun refresh() {
+        isEnabled = Utils.showSuperUser()
     }
 }

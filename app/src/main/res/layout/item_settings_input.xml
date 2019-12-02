@@ -92,7 +92,7 @@
 
             <View
                 android:id="@+id/input_divider"
-                gone="@{item.value.empty}"
+                gone="@{item.value.empty || !item.showStrip}"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:alpha=".5"
@@ -102,7 +102,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/input_selection"
-                gone="@{item.value.empty}"
+                gone="@{item.value.empty || !item.showStrip}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/l1"

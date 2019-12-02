@@ -19,4 +19,9 @@ class SettingsFragment : CompatFragment<SettingsViewModel, FragmentSettingsMd2Bi
         activity.title = resources.getString(R.string.section_settings)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.items.forEach { it.refresh() }
+    }
+
 }
