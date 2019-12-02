@@ -29,58 +29,11 @@
             android:orientation="vertical"
             android:useDefaultMargins="true">
 
-            <com.google.android.material.card.MaterialCardView
+            <include
+                item="@{viewModel.themeHeadline}"
                 android:id="@+id/theme_card_dark"
-                style="@style/WidgetFoundation.Card.Primary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.darkModePressed()}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_card_dark_icon"
-                        style="@style/WidgetFoundation.Icon.OnPrimary"
-                        android:background="@null"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_day_night" />
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/settings_card_dark_pointer"
-                        style="@style/WidgetFoundation.Icon.OnPrimary"
-                        android:background="@null"
-                        android:rotation="180"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_back_md2" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@null"
-                        android:gravity="start|center_vertical"
-                        android:singleLine="true"
-                        android:text="@string/settings_dark_mode_title"
-                        android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/settings_card_dark_pointer"
-                        app:layout_constraintStart_toEndOf="@+id/settings_card_dark_icon"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                layout="@layout/item_tappable_headline"
+                listener="@{viewModel}" />
 
             <FrameLayout
                 android:id="@+id/theme_default"
