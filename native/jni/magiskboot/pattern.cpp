@@ -5,15 +5,16 @@
 
 #include "magiskboot.h"
 
+#define MATCH(p) else if (strncmp(s + skip, p, sizeof(p) - 1) == 0) skip += (sizeof(p) - 1)
+
 static int check_verity_pattern(const char *s) {
-	int skip = 0;
-	if (s[0] == ',') ++skip;
-	if (strncmp(s + skip, "verify", 6) == 0)
-		skip += 6;
-	else if (strncmp(s + skip, "avb", 3) == 0)
-		skip += 3;
-	else
-		return -1;
+	int skip = s[0] == ',';
+
+	if (0) {}
+	MATCH("verify");
+	MATCH("avb");
+	MATCH("support_scfs");
+	else return -1;
 
 	if (s[skip] == '=') {
 		while (s[skip] != '\0' && s[skip] != ' ' && s[skip] != '\n' && s[skip] != ',')
@@ -22,14 +23,15 @@ static int check_verity_pattern(const char *s) {
 	return skip;
 }
 
+#undef MATCH
+#define MATCH(p) else if (strncmp(s, p, sizeof(p) - 1) == 0) return (sizeof(p) - 1)
+
 static int check_encryption_pattern(const char *s) {
-	constexpr const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe" };
-	for (auto enc : encrypt_list) {
-		int len = strlen(enc);
-		if (strncmp(s, enc, len) == 0)
-			return len;
-	}
-	return -1;
+	if (0) {}
+	MATCH("forceencrypt");
+	MATCH("forcefdeorfbe");
+	MATCH("fileencryption");
+	else return -1;
 }
 
 char *patch_verity(const void *buf, uint32_t &size, bool inplace) {
