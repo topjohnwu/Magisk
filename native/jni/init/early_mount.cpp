@@ -43,7 +43,7 @@ static void parse_device(devinfo *dev, const char *uevent) {
 static void collect_devices() {
 	char path[128];
 	struct dirent *entry;
-	devinfo dev;
+	devinfo dev{};
 	DIR *dir = xopendir("/sys/dev/block");
 	if (dir == nullptr)
 		return;
@@ -57,13 +57,14 @@ static void collect_devices() {
 	closedir(dir);
 }
 
-static dev_t setup_block(char *block_dev = nullptr) {
+static int64_t setup_block(char *block_dev = nullptr) {
 	if (dev_list.empty())
 		collect_devices();
-	for (;;) {
+	xmkdir("/dev", 0755);
+
+	for (int tries = 0; tries < 3; ++tries) {
 		for (auto &dev : dev_list) {
 			if (strcasecmp(dev.partname, partname) == 0) {
-				xmkdir("/dev", 0755);
 				if (block_dev) {
 					sprintf(block_dev, "/dev/block/%s", dev.devname);
 					xmkdir("/dev/block", 0755);
@@ -79,6 +80,9 @@ static dev_t setup_block(char *block_dev = nullptr) {
 		dev_list.clear();
 		collect_devices();
 	}
+
+	// The requested partname does not exist
+	return -1;
 }
 
 static bool is_lnk(const char *name) {
@@ -205,7 +209,18 @@ void SARInit::early_mount() {
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
-	system_dev = setup_block();
+	auto dev = setup_block();
+	if (dev < 0) {
+		// Try NVIDIA naming scheme
+		strcpy(partname, "APP");
+		dev = setup_block();
+		if (dev < 0) {
+			// We don't really know what to do at this point...
+			LOGE("Cannot find root partition, abort\n");
+			exit(1);
+		}
+	}
+	system_dev = dev;
 	xmkdir("/system_root", 0755);
 	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
