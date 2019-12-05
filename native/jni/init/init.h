@@ -55,7 +55,6 @@ protected:
 	raw_data self;
 
 	virtual void early_mount() = 0;
-	bool read_dt_fstab(const char *name, char *partname, char *fstype);
 	bool patch_sepolicy(const char *file = "/sepolicy");
 public:
 	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};

@@ -55,61 +55,37 @@ static int __setcon(const char *ctx) {
 static int __getfilecon(const char *path, char **ctx) {
 	char buf[1024];
 	int rc = syscall(__NR_getxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-	if (rc < 0) {
-		errno = -rc;
-		return -1;
-	}
-	*ctx = strdup(buf);
+	if (rc == 0)
+		*ctx = strdup(buf);
 	return rc;
 }
 
 static int __lgetfilecon(const char *path, char **ctx) {
 	char buf[1024];
 	int rc = syscall(__NR_lgetxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-	if (rc < 0) {
-		errno = -rc;
-		return -1;
-	}
-	*ctx = strdup(buf);
+	if (rc == 0)
+		*ctx = strdup(buf);
 	return rc;
 }
 
 static int __fgetfilecon(int fd, char **ctx) {
 	char buf[1024];
 	int rc = syscall(__NR_fgetxattr, fd, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-	if (rc < 0) {
-		errno = -rc;
-		return -1;
-	}
-	*ctx = strdup(buf);
+	if (rc == 0)
+		*ctx = strdup(buf);
 	return rc;
 }
 
 static int __setfilecon(const char *path, const char *ctx) {
-	int rc = syscall(__NR_setxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
-	if (rc) {
-		errno = -rc;
-		return -1;
-	}
-	return 0;
+	return syscall(__NR_setxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
 }
 
 static int __lsetfilecon(const char *path, const char *ctx) {
-	int rc = syscall(__NR_lsetxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
-	if (rc) {
-		errno = -rc;
-		return -1;
-	}
-	return 0;
+	return syscall(__NR_lsetxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
 }
 
 static int __fsetfilecon(int fd, const char *ctx) {
-	int rc = syscall(__NR_fsetxattr, fd, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
-	if (rc) {
-		errno = -rc;
-		return -1;
-	}
-	return 0;
+	return syscall(__NR_fsetxattr, fd, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
 }
 
 // Function pointers

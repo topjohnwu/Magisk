@@ -20,13 +20,17 @@ struct devinfo {
 
 static vector<devinfo> dev_list;
 
+static char partname[32];
+static char fstype[32];
+static char block_dev[64];
+
 static void parse_device(devinfo *dev, const char *uevent) {
 	dev->partname[0] = '\0';
 	parse_prop_file(uevent, [=](string_view key, string_view value) -> bool {
 		if (key == "MAJOR")
-			dev->major = atoi(value.data());
+			dev->major = parse_int(value.data());
 		else if (key == "MINOR")
-			dev->minor = atoi(value.data());
+			dev->minor = parse_int(value.data());
 		else if (key == "DEVNAME")
 			strcpy(dev->devname, value.data());
 		else if (key == "PARTNAME")
@@ -53,7 +57,7 @@ static void collect_devices() {
 	closedir(dir);
 }
 
-static dev_t setup_block(const char *partname, char *block_dev = nullptr) {
+static dev_t setup_block(char *block_dev = nullptr) {
 	if (dev_list.empty())
 		collect_devices();
 	for (;;) {
@@ -84,15 +88,7 @@ static bool is_lnk(const char *name) {
 	return S_ISLNK(st.st_mode);
 }
 
-void BaseInit::cleanup() {
-	// Unmount in reverse order
-	for (auto &p : reversed(mount_list)) {
-		LOGD("Unmount [%s]\n", p.data());
-		umount(p.data());
-	}
-}
-
-bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
+static bool read_dt_fstab(cmdline *cmd, const char *name) {
 	char path[128];
 	int fd;
 	sprintf(path, "%s/fstab/%s/dev", cmd->dt_dir, name);
@@ -112,18 +108,14 @@ bool MagiskInit::read_dt_fstab(const char *name, char *partname, char *fstype) {
 	return false;
 }
 
-static char partname[32];
-static char fstype[32];
-static char block_dev[64];
-
 #define link_root(name) \
 if (is_lnk("/system_root" name)) \
 	cp_afc("/system_root" name, name)
 
 #define mount_root(name) \
-if (!is_lnk("/" #name) && read_dt_fstab(#name, partname, fstype)) { \
+if (!is_lnk("/" #name) && read_dt_fstab(cmd, #name)) { \
 	LOGD("Early mount " #name "\n"); \
-	setup_block(partname, block_dev); \
+	setup_block(block_dev); \
 	xmkdir("/" #name, 0755); \
 	xmount(block_dev, "/" #name, fstype, MS_RDONLY, nullptr); \
 	mount_list.emplace_back("/" #name); \
@@ -151,7 +143,7 @@ void SARCompatInit::early_mount() {
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
-	setup_block(partname, block_dev);
+	setup_block(block_dev);
 	xmkdir("/system_root", 0755);
 	if (xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount(block_dev, "/system_root", "erofs", MS_RDONLY, nullptr);
@@ -213,7 +205,7 @@ void SARInit::early_mount() {
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
-	system_dev = setup_block(partname);
+	system_dev = setup_block();
 	xmkdir("/system_root", 0755);
 	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
@@ -244,4 +236,12 @@ void SecondStageInit::early_mount() {
 	});
 
 	switch_root("/system_root");
+}
+
+void BaseInit::cleanup() {
+	// Unmount in reverse order
+	for (auto &p : reversed(mount_list)) {
+		LOGD("Unmount [%s]\n", p.data());
+		umount(p.data());
+	}
 }
