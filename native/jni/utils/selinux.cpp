@@ -55,7 +55,7 @@ static int __setcon(const char *ctx) {
 static int __getfilecon(const char *path, char **ctx) {
 	char buf[1024];
 	int rc = syscall(__NR_getxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-	if (rc == 0)
+	if (rc >= 0)
 		*ctx = strdup(buf);
 	return rc;
 }
@@ -63,7 +63,7 @@ static int __getfilecon(const char *path, char **ctx) {
 static int __lgetfilecon(const char *path, char **ctx) {
 	char buf[1024];
 	int rc = syscall(__NR_lgetxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-	if (rc == 0)
+	if (rc >= 0)
 		*ctx = strdup(buf);
 	return rc;
 }
@@ -71,7 +71,7 @@ static int __lgetfilecon(const char *path, char **ctx) {
 static int __fgetfilecon(int fd, char **ctx) {
 	char buf[1024];
 	int rc = syscall(__NR_fgetxattr, fd, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-	if (rc == 0)
+	if (rc >= 0)
 		*ctx = strdup(buf);
 	return rc;
 }
