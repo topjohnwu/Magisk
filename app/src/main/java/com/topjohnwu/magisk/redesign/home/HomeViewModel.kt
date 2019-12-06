@@ -7,7 +7,6 @@ import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.MagiskJson
@@ -24,12 +23,11 @@ import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
+import com.topjohnwu.magisk.redesign.compat.itemBindingOf
 import com.topjohnwu.magisk.ui.home.MagiskState
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.BR
-import me.tatarka.bindingcollectionadapter2.ItemBinding
-import me.tatarka.bindingcollectionadapter2.OnItemBind
 import kotlin.math.roundToInt
 
 class HomeViewModel(
@@ -179,6 +177,12 @@ class HomeViewModel(
             }
     }
 
+    private fun String.clipVersion(other: String = ""): String {
+        val thisVersion = substringBefore('-')
+        val otherVersion = other.substringBefore('-')
+        return if (thisVersion != otherVersion) thisVersion else substringAfter('-')
+    }
+
 }
 
 @Suppress("unused")
@@ -190,16 +194,3 @@ val ManagerJson.isUpdateChannelCorrect
     get() = versionCode > 0
 val ManagerJson.isObsolete
     get() = BuildConfig.VERSION_CODE < versionCode
-
-fun String.clipVersion(other: String = ""): String {
-    val thisVersion = substringBefore('-')
-    val otherVersion = other.substringBefore('-')
-    return if (thisVersion != otherVersion) thisVersion else substringAfter('-')
-}
-
-inline fun <T : ComparableRvItem<*>> itemBindingOf(
-    crossinline body: (ItemBinding<*>) -> Unit = {}
-) = OnItemBind<T> { itemBinding, _, item ->
-    item.bind(itemBinding)
-    body(itemBinding)
-}

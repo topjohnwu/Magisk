@@ -12,8 +12,8 @@ import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
-import com.topjohnwu.magisk.redesign.home.itemBindingOf
-import com.topjohnwu.magisk.redesign.superuser.diffListOf
+import com.topjohnwu.magisk.redesign.compat.diffListOf
+import com.topjohnwu.magisk.redesign.compat.itemBindingOf
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers

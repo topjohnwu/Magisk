@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
 import com.topjohnwu.magisk.redesign.MainActivity
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
-import com.topjohnwu.magisk.redesign.hide.MotionRevealHelper
+import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LogFragment : CompatFragment<LogViewModel, FragmentLogMd2Binding>() {

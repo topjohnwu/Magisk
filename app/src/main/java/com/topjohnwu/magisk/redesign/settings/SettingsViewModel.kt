@@ -17,9 +17,9 @@ import com.topjohnwu.magisk.model.events.RecreateEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
-import com.topjohnwu.magisk.redesign.home.itemBindingOf
-import com.topjohnwu.magisk.redesign.module.adapterOf
-import com.topjohnwu.magisk.redesign.superuser.diffListOf
+import com.topjohnwu.magisk.redesign.compat.adapterOf
+import com.topjohnwu.magisk.redesign.compat.diffListOf
+import com.topjohnwu.magisk.redesign.compat.itemBindingOf
 import com.topjohnwu.magisk.utils.PatchAPK
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell

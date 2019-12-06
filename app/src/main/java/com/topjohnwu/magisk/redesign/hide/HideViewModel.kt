@@ -4,7 +4,6 @@ import android.content.pm.ApplicationInfo
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.HideAppInfo
@@ -15,9 +14,8 @@ import com.topjohnwu.magisk.model.entity.recycler.HideItem
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessItem
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.compat.Queryable
-import com.topjohnwu.magisk.redesign.home.itemBindingOf
-import com.topjohnwu.magisk.utils.DiffObservableList
-import com.topjohnwu.magisk.utils.FilterableDiffObservableList
+import com.topjohnwu.magisk.redesign.compat.filterableListOf
+import com.topjohnwu.magisk.redesign.compat.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.currentLocale
 
@@ -127,9 +125,3 @@ class HideViewModel(
 
 }
 
-inline fun <T : ComparableRvItem<*>> filterableListOf(
-    vararg newItems: T
-) = FilterableDiffObservableList(object : DiffObservableList.Callback<T> {
-    override fun areItemsTheSame(oldItem: T, newItem: T) = oldItem.genericItemSameAs(newItem)
-    override fun areContentsTheSame(oldItem: T, newItem: T) = oldItem.genericContentSameAs(newItem)
-}).also { it.update(newItems.toList()) }

@@ -17,8 +17,8 @@ import com.topjohnwu.magisk.redesign.MainActivity
 import com.topjohnwu.magisk.redesign.ReselectionTarget
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
 import com.topjohnwu.magisk.redesign.compat.hideKeyboard
-import com.topjohnwu.magisk.redesign.hide.MotionRevealHelper
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
+import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>(),

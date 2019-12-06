@@ -18,9 +18,9 @@ import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
-import com.topjohnwu.magisk.redesign.home.itemBindingOf
+import com.topjohnwu.magisk.redesign.compat.diffListOf
+import com.topjohnwu.magisk.redesign.compat.itemBindingOf
 import com.topjohnwu.magisk.utils.BiometricHelper
-import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Single
 
@@ -143,10 +143,3 @@ class SuperuserViewModel(
         db.delete(policy.uid).andThen(Single.just(policy))
 
 }
-
-inline fun <T : ComparableRvItem<*>> diffListOf(
-    vararg newItems: T
-) = DiffObservableList(object : DiffObservableList.Callback<T> {
-    override fun areItemsTheSame(oldItem: T, newItem: T) = oldItem.genericItemSameAs(newItem)
-    override fun areContentsTheSame(oldItem: T, newItem: T) = oldItem.genericContentSameAs(newItem)
-}).also { it.update(newItems.toList()) }

@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.redesign.module
 
 import androidx.annotation.WorkerThread
 import androidx.databinding.Bindable
-import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
@@ -19,17 +18,13 @@ import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
-import com.topjohnwu.magisk.redesign.compat.CompatViewModel
-import com.topjohnwu.magisk.redesign.compat.Queryable
-import com.topjohnwu.magisk.redesign.home.itemBindingOf
-import com.topjohnwu.magisk.redesign.superuser.diffListOf
+import com.topjohnwu.magisk.redesign.compat.*
 import com.topjohnwu.magisk.tasks.RepoUpdater
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -293,17 +288,4 @@ class ModuleViewModel(
     private fun <T> List<T>.prependIfNotEmpty(item: () -> T) =
         prependIf(isNotEmpty(), item)
 
-}
-
-fun <T : ComparableRvItem<*>> adapterOf() = object : BindingRecyclerViewAdapter<T>() {
-    override fun onBindBinding(
-        binding: ViewDataBinding,
-        variableId: Int,
-        layoutRes: Int,
-        position: Int,
-        item: T
-    ) {
-        super.onBindBinding(binding, variableId, layoutRes, position, item)
-        item.onBindingBound(binding)
-    }
 }
