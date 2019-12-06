@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
 import com.topjohnwu.magisk.utils.*
 import com.topjohnwu.superuser.Shell
 import java.io.File

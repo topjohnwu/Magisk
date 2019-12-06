@@ -218,6 +218,6 @@ abstract class ObservableItem<T> : ComparableRvItem<T>(), Observable {
         list.add(callback ?: return)
     }
 
-    protected fun notifyChange(id: Int) = list.notifyChange(this, id)
+    fun notifyChange(id: Int) = list.notifyChange(this, id)
 
 }

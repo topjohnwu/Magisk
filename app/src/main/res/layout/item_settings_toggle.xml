@@ -9,11 +9,11 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.redesign.settings.SettingsItem.Toggle" />
+            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem.Toggle" />
 
         <variable
             name="callback"
-            type="com.topjohnwu.magisk.redesign.settings.SettingsItem.Callback" />
+            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem.Callback" />
 
     </data>
 
