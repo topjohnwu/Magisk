@@ -225,6 +225,48 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 	xsymlink("./magiskinit", "/sbin/supolicy");
 }
 
+static void recreate_sbin(const char *mirror) {
+	int src = xopen(mirror, O_RDONLY | O_CLOEXEC);
+	int dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	DIR *fp = fdopendir(src);
+	char buf[256];
+	bool use_bind_mount = true;
+	for (dirent *entry; (entry = xreaddir(fp));) {
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
+			continue;
+		struct stat st;
+		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
+		if (S_ISLNK(st.st_mode)) {
+			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
+			xsymlinkat(buf, dest, entry->d_name);
+		} else {
+			char sbin_path[256];
+			sprintf(buf, "%s/%s", mirror, entry->d_name);
+			sprintf(sbin_path, "/sbin/%s", entry->d_name);
+
+			if (use_bind_mount) {
+				// Create dummy
+				if (S_ISDIR(st.st_mode))
+					xmkdir(sbin_path, st.st_mode & 0777);
+				else
+					close(xopen(sbin_path, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
+
+				if (xmount(buf, sbin_path, nullptr, MS_BIND, nullptr)) {
+					// Bind mount failed, fallback to symlink
+					remove(sbin_path);
+					use_bind_mount = false;
+				} else {
+					continue;
+				}
+			}
+
+			xsymlink(buf, sbin_path);
+		}
+	}
+	close(src);
+	close(dest);
+}
+
 #define ROOTMIR MIRRDIR "/system_root"
 #define ROOTBLK BLOCKDIR "/system_root"
 #define MONOPOLICY  "/sepolicy"
@@ -268,39 +310,13 @@ void SARBase::patch_rootdir() {
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
 
 	// Recreate original sbin structure
-	int src = xopen(ROOTMIR "/sbin", O_RDONLY | O_CLOEXEC);
-	int dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	DIR *fp = fdopendir(src);
-	struct dirent *entry;
-	struct stat st;
-	char buf[256];
-	while ((entry = xreaddir(fp))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
-		if (S_ISLNK(st.st_mode)) {
-			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
-			xsymlinkat(buf, dest, entry->d_name);
-		} else {
-			char spath[256];
-			sprintf(buf, "/sbin/%s", entry->d_name);
-			sprintf(spath, ROOTMIR "/sbin/%s", entry->d_name);
-			// Create dummy
-			if (S_ISDIR(st.st_mode))
-				xmkdir(buf, st.st_mode & 0777);
-			else
-				close(xopen(buf, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
-			xmount(spath, buf, nullptr, MS_BIND, nullptr);
-		}
-	}
-	close(src);
-	close(dest);
+	recreate_sbin(ROOTMIR "/sbin");
 
 	// Patch init
 	raw_data init;
 	file_attr attr;
 	bool redirect = false;
-	src = xopen("/init", O_RDONLY | O_CLOEXEC);
+	int src = xopen("/init", O_RDONLY | O_CLOEXEC);
 	fd_full_read(src, init.buf, init.sz);
 	fgetattr(src, &attr);
 	close(src);
@@ -320,7 +336,7 @@ void SARBase::patch_rootdir() {
 		}
 	}
 	xmkdir(ROOTOVL, 0);
-	dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
+	int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
 	xwrite(dest, init.buf, init.sz);
 	fsetattr(dest, &attr);
 	close(dest);
@@ -483,18 +499,7 @@ int magisk_proxy_main(int argc, char *argv[]) {
 	sbin_overlay(self, config);
 
 	// Create symlinks pointing back to /root
-	char path[256];
-	int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	DIR *dir = xopendir("/root");
-	struct dirent *entry;
-	while((entry = xreaddir(dir))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		sprintf(path, "/root/%s", entry->d_name);
-		xsymlinkat(path, sbin, entry->d_name);
-	}
-	close(sbin);
-	closedir(dir);
+	recreate_sbin("/root");
 
 	setenv("REMOUNT_ROOT", "1", 1);
 	execv("/sbin/magisk", argv);
