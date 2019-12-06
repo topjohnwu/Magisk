@@ -8,6 +8,7 @@
     <string name="settings">Configuració</string>
     <string name="install">Instal·lar</string>
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
+    <string name="unsupport_magisk_message">Aquesta versió de Magisk Manager no suporta una versió inferior a la 18.0.\n\nPots actualitzar Magisk manualment o pots instal·lar una versió anterior de la App.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no està instal·lat</string>
@@ -80,10 +81,10 @@
     <string name="direct_install">Instal·lació directa (Recomanat)</string>
     <string name="install_inactive_slot">Instal·la a la ranura inactiva (Després d\'una OTA)</string>
     <string name="install_inactive_slot_msg">El teu dispositiu serà FORÇAT a arrancar en l\'actual ranura inactiva després del reinici!\nUtilitza aquesta opció NOMÉS quan l\'OTA s\'hagi fet.\nContinuar?</string>
-    <string name="select_method">Sel·lecciona un mètode</string>
+    <string name="select_method">Selecciona un mètode</string>
     <string name="setup_title">Instal·lació addicional</string>
-    <string name="select_patch_file">Sel·lecciona i arranja un arxiu</string>
-    <string name="patch_file_msg">Sel·lecciona una imatge crua (*.img) o un ODIN tarfile (*.tar)</string>
+    <string name="select_patch_file">Selecciona i arranja un arxiu</string>
+    <string name="patch_file_msg">Selecciona una imatge crua (*.img) o un ODIN tarfile (*.tar)</string>
     <string name="reboot_delay_toast">Reinici en 5 segons…</string>
 
     <!--Toasts, Dialogs-->
@@ -94,7 +95,6 @@
     <string name="settings_reboot_toast">Reinicia per aplicar els canvis</string>
     <string name="release_notes">Notes de llançament</string>
     <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
-
     <string name="dtbo_patched_title">S\'ha arranjat DTBO</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img. Si us plau, reinicia el telèfon.</string>
     <string name="flashing">Arranjament…</string>
@@ -110,18 +110,19 @@
     <string name="restore_done">Restauració feta!</string>
     <string name="restore_fail">La còpia de seguretat de Stock no existeix!</string>
     <string name="proprietary_title">Baixar codi propietari</string>
-    <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nPot permetre que Magisk Manager baixi una extensió que conté el GoogleApiClient per poder fer la comprobació de SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nVot permetre que Magisk Manager baixi una extensió que conté el GoogleApiClient per poder fer la comprovació de SafetyNet?</string>
     <string name="setup_fail">Instal·lació fallida.</string>
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
-    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instalació ara?</string>
+    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instal·lació ara?</string>
     <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
+    <string name="authenticate">Autenticar</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema fosc</string>
     <string name="settings_dark_theme_summary">Habilitar el tema fosc</string>
     <string name="settings_download_path_title">Directori de baixades</string>
-    <string name="settings_download_path_message">Els arxius es desaràn a %1$s</string>
+    <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
     <string name="settings_clear_cache_summary">Neteja l\'informació en memòria cau per als repositoris en línia, força a l\'aplicació a actualitzar-se en línia.</string>
     <string name="settings_hide_manager_title">Amagar Magisk Manager</string>
@@ -139,7 +140,7 @@
     <string name="settings_update_custom">Personalitzat</string>
     <string name="settings_update_custom_msg">Inserta una URL personalitzada</string>
     <string name="settings_core_only_title">Mode nucli de Magisk</string>
-    <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU y MagiskHide seguirán habilitats</string>
+    <string name="settings_core_only_summary">Habilitar només les funcions principals, no es carregaran tots els mòduls. MagiskSU y MagiskHide seguiran habilitats</string>
     <string name="settings_magiskhide_summary">Amagar Magisk de varies deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
@@ -148,7 +149,7 @@
     <string name="settings_app_name">Escriu el nom desitjat per l\'App</string>
     <string name="settings_app_name_hint">Nou nom</string>
     <string name="settings_app_name_helper">Es refarà l\'App amb aquest nom</string>
-    <string name="settings_app_name_error">Format invàl·lid</string>
+    <string name="settings_app_name_error">Format invàlid</string>
     <string name="settings_su_app_adb">Aplicacions y ADB</string>
     <string name="settings_su_app">Només aplicacions</string>
     <string name="settings_su_adb">Només ADB</string>
@@ -166,6 +167,9 @@
     <string name="request_timeout_summary">%1$d segons</string>
     <string name="settings_su_reauth_title">Demanar després d\'una actualització</string>
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació és actualitzada o reinstal·lada</string>
+    <string name="settings_su_biometric_title">Activar autenticació biomètrica</string>
+    <string name="settings_su_biometric_summary">Utilitza l\'autenticació biomètrica per permetre solicituds de superusuari</string>
+    <string name="no_biometric">El dispositiu no suporta o no té establerta configuració biomètrica</string>
 
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
@@ -182,7 +186,7 @@
     <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
     <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
     <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
-    <string name="settings_download_path_error">Error al crear la carpeta. El directori ha de ser accesible desde el directori arrel i no pot ser un arxiu.</string>
+    <string name="settings_download_path_error">Error al crear la carpeta. El directori ha de ser accessible des de el directori arrel i no pot ser un arxiu.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Petició de superusuari</string>
@@ -216,6 +220,6 @@
     <string name="command">Ordre: %1$s</string>
 
     <!-- MagiskHide -->
-    <string name="show_system_app">Mostra apps del sistema</string>
+    <string name="show_system_app">Mostra Apps del sistema</string>
 
 </resources>
