@@ -5,6 +5,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.view.View
 import androidx.core.animation.addListener
+import androidx.core.text.layoutDirection
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
@@ -61,9 +62,9 @@ object MotionRevealHelper {
         it.interpolator = FastOutSlowInInterpolator()
         it.addListener(onStart = { show() }, onEnd = { if (revealInfo.radius != 0f) hide() })
 
-        // fixme rtl
+        val rtlMod = if (currentLocale.layoutDirection == View.LAYOUT_DIRECTION_RTL) 1f else -1f
         val maxX = revealInfo.centerX - marginEnd - measuredWidth / 2f
-        val targetX = if (revealInfo.radius == 0f) 0f else -maxX
+        val targetX = if (revealInfo.radius == 0f) 0f else maxX * rtlMod
         val moveX = ObjectAnimator.ofFloat(this, View.TRANSLATION_X, targetX)
 
         val maxY = revealInfo.centerY - marginBottom - measuredHeight / 2f
