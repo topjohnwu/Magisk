@@ -208,8 +208,8 @@ object Magisk : SettingsItem.Section() {
 }
 
 object SafeMode : SettingsItem.Toggle() {
-    override val title = R.string.settings_core_only_title.asTransitive()
-    override val description = R.string.settings_core_only_summary.asTransitive()
+    override val title = R.string.settings_safe_mode_title.asTransitive()
+    override val description = R.string.settings_safe_mode_summary.asTransitive()
     override var value by dataObservable(Config.coreOnly) {
         if (Config.coreOnly == it) return@dataObservable
         Config.coreOnly = it
