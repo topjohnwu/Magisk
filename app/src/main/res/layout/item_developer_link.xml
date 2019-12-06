@@ -29,6 +29,7 @@
             app:layout_constraintEnd_toStartOf="@+id/developer_more"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@{item.icon}"
             app:tint="?colorOnPrimary"
             tools:srcCompat="@drawable/ic_paypal" />
@@ -37,6 +38,7 @@
             android:id="@+id/developer_more"
             style="@style/WidgetFoundation.Image.Small"
             android:layout_height="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/developer_link"
             app:layout_constraintStart_toEndOf="@+id/developer_link"
             app:layout_constraintTop_toTopOf="@+id/developer_link"

@@ -113,6 +113,7 @@
                 android:hint="@string/hide_filter_hint"
                 android:inputType="textUri"
                 android:minHeight="36dp"
+                android:gravity="start|center_vertical"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/l1"
                 android:singleLine="true"

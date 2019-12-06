@@ -148,10 +148,11 @@
             style="@style/WidgetFoundation.Icon"
             isEnabled="@{item.isEnabled}"
             isSelected="@{item.isExpanded}"
-            android:layout_gravity="top|end"
+            android:layout_gravity="top|right"
             android:onClick="@{(view) -> item.toggle(view)}"
             android:rotation="@{item.isExpanded ? 225 : 180}"
-            app:srcCompat="@drawable/ic_more_collapse" />
+            app:srcCompat="@drawable/ic_more_collapse"
+            tools:ignore="RtlHardcoded" />
 
     </com.google.android.material.card.MaterialCardView>
 
