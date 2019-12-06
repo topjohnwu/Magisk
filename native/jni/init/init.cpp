@@ -75,12 +75,12 @@ static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	xz_crc32_init();
 	struct xz_dec *dec = xz_dec_init(XZ_DYNALLOC, 1 << 26);
 	struct xz_buf b = {
-			.in = buf,
-			.in_pos = 0,
-			.in_size = size,
-			.out = out,
-			.out_pos = 0,
-			.out_size = sizeof(out)
+		.in = buf,
+		.in_pos = 0,
+		.in_size = size,
+		.out = out,
+		.out_pos = 0,
+		.out_size = sizeof(out)
 	};
 	enum xz_ret ret;
 	do {
@@ -147,11 +147,11 @@ class TestInit : public BaseInit {
 public:
 	TestInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 	void start() override {
-		// Write init tests here
+		// Place init tests here
 	}
 };
 
-static void setup_test(const char *dir) {
+[[maybe_unused]] static int test_main(int argc, char *argv[]) {
 	// Log to console
 	cmdline_logging();
 	log_cb.ex = nop_ex;
@@ -167,13 +167,21 @@ static void setup_test(const char *dir) {
 			mounts.emplace_back(me->mnt_dir);
 		return true;
 	});
-	for (auto m = mounts.rbegin(); m != mounts.rend(); ++m)
-		xumount(m->data());
+	for (auto &m : reversed(mounts))
+		xumount(m.data());
 
 	// chroot jail
-	chdir(dir);
+	chdir(dirname(argv[0]));
 	chroot(".");
 	chdir("/");
+
+	cmdline cmd{};
+	load_kernel_info(&cmd);
+
+	auto init = make_unique<TestInit>(argv, &cmd);
+	init->start();
+
+	return 1;
 }
 
 int main(int argc, char *argv[]) {
@@ -184,6 +192,11 @@ int main(int argc, char *argv[]) {
 			return (*init_applet_main[i])(argc, argv);
 	}
 
+#ifdef MAGISK_DEBUG
+	if (getenv("INIT_TEST") != nullptr)
+		return test_main(argc, argv);
+#endif
+
 	if (argc > 1 && strcmp(argv[1], "-x") == 0) {
 		if (strcmp(argv[2], "magisk") == 0)
 			return dump_magisk(argv[3], 0755);
@@ -191,34 +204,22 @@ int main(int argc, char *argv[]) {
 			return dump_manager(argv[3], 0644);
 	}
 
+	if (getpid() != 1)
+		return 1;
+	setup_klog();
+
 	if (argc > 1 && argv[1] == "selinux_setup"sv) {
 		auto init = make_unique<SecondStageInit>(argv);
 		init->start();
-	}
-
-#ifdef MAGISK_DEBUG
-	bool run_test = getenv("INIT_TEST") != nullptr;
-#else
-	constexpr bool run_test = false;
-#endif
-
-	if (run_test) {
-		setup_test(dirname(argv[0]));
-	} else {
-		if (getpid() != 1)
-			return 1;
-		setup_klog();
 	}
 
 	cmdline cmd{};
 	load_kernel_info(&cmd);
 
 	unique_ptr<BaseInit> init;
-	if (run_test) {
-		init = make_unique<TestInit>(argv, &cmd);
-	} else if (cmd.force_normal_boot) {
+	if (cmd.force_normal_boot) {
 		init = make_unique<ABFirstStageInit>(argv, &cmd);
-	} else if (cmd.system_as_root) {
+	} else if (cmd.skip_initramfs) {
 		if (access("/overlay", F_OK) == 0)  /* Compatible mode */
 			init = make_unique<SARCompatInit>(argv, &cmd);
 		else

@@ -106,7 +106,7 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	init/init.cpp \
-	init/early_mount.cpp \
+	init/mount.cpp \
 	init/rootdir.cpp \
 	init/getinfo.cpp \
 	magiskpolicy/api.cpp \

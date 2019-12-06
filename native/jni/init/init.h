@@ -4,7 +4,7 @@
 #include <vector>
 
 struct cmdline {
-	bool system_as_root;
+	bool skip_initramfs;
 	bool force_normal_boot;
 	char slot[3];
 	char dt_dir[128];
