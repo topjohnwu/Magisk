@@ -13,6 +13,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:id="@+id/dialog_base_outside_container"
         android:layout_height="match_parent">
 
         <com.google.android.material.card.MaterialCardView
@@ -20,10 +21,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:cardElevation="@dimen/margin_generic"
+            app:layout_constrainedHeight="true"
             app:cardUseCompatPadding="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_default="percent"
             app:layout_constraintWidth_max="400dp"
@@ -51,8 +53,9 @@
                     android:id="@+id/dialog_base_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/dialog_base_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
@@ -82,64 +85,64 @@
                     android:gravity="center"
                     android:text="@{data.title}"
                     android:textAppearance="@style/AppearanceFoundation.Title"
-                    app:layout_constraintLeft_toLeftOf="@+id/dialog_base_start"
-                    app:layout_constraintRight_toRightOf="@+id/dialog_base_end"
+                    app:layout_constraintEnd_toEndOf="@+id/dialog_base_end"
+                    app:layout_constraintStart_toStartOf="@+id/dialog_base_start"
                     app:layout_constraintTop_toBottomOf="@+id/dialog_base_icon"
                     tools:lines="1"
                     tools:text="@tools:sample/lorem/random" />
 
-                <androidx.core.widget.NestedScrollView
+                <FrameLayout
                     android:id="@+id/dialog_base_scroll"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:layout_constrainedHeight="true"
                     android:layout_marginTop="@dimen/l_50"
+                    app:layout_constrainedHeight="true"
                     app:layout_constraintBottom_toTopOf="@+id/dialog_base_space"
-                    app:layout_constraintLeft_toLeftOf="@+id/dialog_base_start"
-                    app:layout_constraintRight_toRightOf="@+id/dialog_base_end"
+                    app:layout_constraintEnd_toEndOf="@+id/dialog_base_end"
+                    app:layout_constraintStart_toStartOf="@+id/dialog_base_start"
                     app:layout_constraintTop_toBottomOf="@+id/dialog_base_title">
 
-                    <LinearLayout
+                    <androidx.core.widget.NestedScrollView
+                        gone="@{data.message.length == 0}"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_height="wrap_content">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/dialog_base_message"
-                            gone="@{data.message.length == 0}"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:layout_height="match_parent"
                             android:gravity="center"
                             android:text="@{data.message}"
                             android:textAppearance="@style/AppearanceFoundation.Body"
                             tools:lines="3"
                             tools:text="@tools:sample/lorem/random" />
 
-                        <FrameLayout
-                            android:id="@+id/dialog_base_container"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                    </androidx.core.widget.NestedScrollView>
 
-                    </LinearLayout>
+                    <FrameLayout
+                        android:id="@+id/dialog_base_container"
+                        gone="@{data.message.length != 0}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                </androidx.core.widget.NestedScrollView>
+                </FrameLayout>
 
                 <Space
                     android:id="@+id/dialog_base_space"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/l1"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/dialog_base_buttons" />
+                    app:layout_constraintBottom_toTopOf="@+id/dialog_base_buttons"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
-                <ScrollView
+                <FrameLayout
                     android:id="@+id/dialog_base_buttons"
                     style="?attr/buttonBarStyle"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fillViewport="true"
-                    android:scrollbarAlwaysDrawVerticalTrack="true"
-                    app:layout_constraintBottom_toBottomOf="parent">
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
 
                     <com.android.internal.widget.ButtonBarLayout
                         android:layout_width="match_parent"
@@ -223,7 +226,7 @@
 
                     </com.android.internal.widget.ButtonBarLayout>
 
-                </ScrollView>
+                </FrameLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

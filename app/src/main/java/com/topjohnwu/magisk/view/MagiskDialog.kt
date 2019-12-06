@@ -9,9 +9,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDialog
+import androidx.core.view.ViewCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +29,7 @@ import me.tatarka.bindingcollectionadapter2.ItemBinding
 
 class MagiskDialog @JvmOverloads constructor(
     context: Context, theme: Int = 0
-) : AlertDialog(context, theme) {
+) : AppCompatDialog(context, theme) {
 
     private val binding: DialogMagiskBaseBinding =
         DialogMagiskBaseBinding.inflate(LayoutInflater.from(context))
@@ -34,12 +37,30 @@ class MagiskDialog @JvmOverloads constructor(
 
     init {
         binding.setVariable(BR.data, data)
-        super.setView(binding.root)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        super.setContentView(binding.root)
+        window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT
+            )
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            view.updatePadding(
+                top = view.paddingTop + insets.systemWindowInsetTop,
+                bottom = view.paddingBottom + insets.systemWindowInsetBottom
+            )
+            insets
+        }
+
+        binding.dialogBaseOutsideContainer.setOnClickListener {
+            setCanceledOnTouchOutside(true)
+        }
     }
 
     inner class Data {
