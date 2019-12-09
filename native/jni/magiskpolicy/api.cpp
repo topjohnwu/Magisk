@@ -1,4 +1,5 @@
-#include "magiskpolicy.h"
+#include <magiskpolicy.h>
+
 #include "sepolicy.h"
 
 //#define vprint(fmt, ...) printf(fmt, __VA_ARGS__)

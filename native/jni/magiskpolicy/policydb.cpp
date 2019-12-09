@@ -8,8 +8,8 @@
 #include <utils.h>
 #include <logging.h>
 #include <stream.h>
+#include <magiskpolicy.h>
 
-#include "magiskpolicy.h"
 #include "sepolicy.h"
 
 int load_policydb(const char *file) {
