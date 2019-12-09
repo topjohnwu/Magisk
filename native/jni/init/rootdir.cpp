@@ -192,8 +192,7 @@ constexpr const char wrapper[] =
 ;
 
 static void sbin_overlay(const raw_data &self, const raw_data &config) {
-	LOGD("Mount /sbin tmpfs overlay\n");
-	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
+	mount_sbin();
 
 	// Dump binaries
 	xmkdir(MAGISKTMP, 0755);
@@ -302,9 +301,7 @@ void SARBase::patch_rootdir() {
 	sbin_overlay(self, config);
 
 	// Mount system_root mirror
-	xmkdir(MIRRDIR, 0);
-	xmkdir(ROOTMIR, 0);
-	xmkdir(BLOCKDIR, 0);
+	xmkdir(ROOTMIR, 0755);
 	mknod(ROOTBLK, S_IFBLK | 0600, system_dev);
 	if (xmount(ROOTBLK, ROOTMIR, "ext4", MS_RDONLY, nullptr))
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);

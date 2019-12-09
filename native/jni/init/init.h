@@ -162,3 +162,4 @@ void load_kernel_info(cmdline *cmd);
 int dump_magisk(const char *path, mode_t mode);
 int magisk_proxy_main(int argc, char *argv[]);
 void setup_klog();
+void mount_sbin();

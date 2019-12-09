@@ -6,6 +6,7 @@
 #include <utils.h>
 #include <logging.h>
 #include <selinux.h>
+#include <magisk.h>
 
 #include "init.h"
 
@@ -42,12 +43,11 @@ static void parse_device(devinfo *dev, const char *uevent) {
 
 static void collect_devices() {
 	char path[128];
-	struct dirent *entry;
 	devinfo dev{};
 	DIR *dir = xopendir("/sys/dev/block");
 	if (dir == nullptr)
 		return;
-	while ((entry = readdir(dir))) {
+	for (dirent *entry; (entry = readdir(dir));) {
 		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
@@ -57,21 +57,21 @@ static void collect_devices() {
 	closedir(dir);
 }
 
-static int64_t setup_block(char *block_dev = nullptr) {
+static int64_t setup_block(bool write_block = true) {
 	if (dev_list.empty())
 		collect_devices();
 	xmkdir("/dev", 0755);
+	xmkdir("/dev/block", 0755);
 
 	for (int tries = 0; tries < 3; ++tries) {
 		for (auto &dev : dev_list) {
 			if (strcasecmp(dev.partname, partname) == 0) {
-				if (block_dev) {
+				if (write_block) {
 					sprintf(block_dev, "/dev/block/%s", dev.devname);
-					xmkdir("/dev/block", 0755);
 				}
 				LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
 				dev_t rdev = makedev(dev.major, dev.minor);
-				mknod(block_dev ? block_dev : "/dev/root", S_IFBLK | 0600, rdev);
+				mknod(block_dev, S_IFBLK | 0600, rdev);
 				return rdev;
 			}
 		}
@@ -119,7 +119,7 @@ if (is_lnk("/system_root" name)) \
 #define mount_root(name) \
 if (!is_lnk("/" #name) && read_dt_fstab(cmd, #name)) { \
 	LOGD("Early mount " #name "\n"); \
-	setup_block(block_dev); \
+	setup_block(); \
 	xmkdir("/" #name, 0755); \
 	xmount(block_dev, "/" #name, fstype, MS_RDONLY, nullptr); \
 	mount_list.emplace_back("/" #name); \
@@ -147,7 +147,7 @@ void SARCompatInit::early_mount() {
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
-	setup_block(block_dev);
+	setup_block();
 	xmkdir("/system_root", 0755);
 	if (xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount(block_dev, "/system_root", "erofs", MS_RDONLY, nullptr);
@@ -209,7 +209,8 @@ void SARInit::early_mount() {
 
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
-	auto dev = setup_block();
+	strcpy(block_dev, "/dev/root");
+	auto dev = setup_block(false);
 	if (dev < 0) {
 		// Try NVIDIA naming scheme
 		strcpy(partname, "APP");
@@ -259,4 +260,29 @@ void BaseInit::cleanup() {
 		LOGD("Unmount [%s]\n", p.data());
 		umount(p.data());
 	}
+}
+
+void mount_sbin() {
+	LOGD("Mount /sbin tmpfs overlay\n");
+	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
+
+	xmkdir(MAGISKTMP, 0755);
+	xmkdir(MIRRDIR, 0);
+	xmkdir(BLOCKDIR, 0);
+
+	// Mount persist partition
+	strcpy(partname, "persist");
+	strcpy(block_dev, BLOCKDIR "/persist");
+	const char *mnt_point = MIRRDIR "/persist";
+	if (setup_block(false) < 0) {
+		// Fallback to cache
+		strcpy(partname, "cache");
+		strcpy(block_dev, BLOCKDIR "/cache");
+		if (setup_block(false) < 0)
+			return;
+		mnt_point = MIRRDIR "/cache";
+		xsymlink("./cache", MIRRDIR "/persist");
+	}
+	xmkdir(mnt_point, 0755);
+	xmount(block_dev, mnt_point, "ext4", 0, nullptr);
 }
