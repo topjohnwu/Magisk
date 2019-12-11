@@ -8,6 +8,7 @@
     <string name="settings">Paramètres</string>
     <string name="install">Installer</string>
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
+    <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne supporte pas de version de Magisk inférieure à la %1$s.\n\nL\'application se comportera comme si Magisk n'était pas installé, veuillez mettre à jour Magisk dès que possible.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk n’est pas installé.</string>
@@ -28,7 +29,7 @@
     <string name="latest_version">Dernière version disponible : %1$s</string>
     <string name="uninstall">Désinstaller</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
-    <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés. Les permissions de super‐utilisateur seront perdues et vos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
+    <string name="uninstall_magisk_msg">Tous les modules seront désactivés/supprimés!\nL'enracinement sera retiré!\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
     <string name="update">Mise à jour</string>
     <string name="core_only_enabled">(Mode « sans modules » activé)</string>
 
@@ -94,7 +95,6 @@
     <string name="settings_reboot_toast">Redémarrer afin d’appliquer les réglages.</string>
     <string name="release_notes">Notes de version</string>
     <string name="repo_cache_cleared">Cache du dépôt effacé</string>
-
     <string name="dtbo_patched_title">DTBO a été modifié !</string>
     <string name="dtbo_patched_reboot">Magisk Manager vient de modifier le fichier dtbo.img, veuillez redémarrer.</string>
     <string name="flashing">Installation</string>
@@ -113,8 +113,9 @@
     <string name="proprietary_notice">Magisk Manager est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google.Voulez‐vous autoriser Magisk Manager à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet ?</string>
     <string name="setup_fail">Échec de l’installation</string>
     <string name="env_fix_title">Installation additionnelle requise</string>
-    <string name="env_fix_msg">Votre appareil a besoin d’une configuration supplémentaire pour que Magisk fonctionne correctement. Pour cela, il est nécessaire de télécharger un fichier ZIP d’installation de Magisk. Voulez‐vous le faire maintenant ?</string>
+    <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire pour que Magisk fonctionne correctement. Celà téléchargera le fichier ZIP d’installation de Magisk. Voulez-vous le faire maintenant ?</string>
     <string name="setup_msg">Démarrer l’installation de l’environnement…</string>
+    <string name="authenticate">Authentifier</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
@@ -144,9 +145,10 @@
     <string name="settings_hosts_title">Fichier hosts sans système</string>
     <string name="settings_hosts_summary">Prise en charge du fichier hosts sans système pour les applications de type AdBlock.</string>
     <string name="settings_hosts_toast">Ajout d’un module hosts sans système</string>
-    <string name="settings_app_name">Taper le nom de l\'application désirée</string>
+
+    <string name="settings_app_name">Taper le nom de l'application désirée</string>
     <string name="settings_app_name_hint">Nouveau nom</string>
-    <string name="settings_app_name_helper">L\'application sera réempacter sous ce nom</string>
+    <string name="settings_app_name_helper">L'application sera réempacter sous ce nom</string>
     <string name="settings_app_name_error">Format invalide</string>
     <string name="settings_su_app_adb">Applications et ADB</string>
     <string name="settings_su_app">Applications uniquement</string>
@@ -165,6 +167,9 @@
     <string name="request_timeout_summary">%1$d secondes</string>
     <string name="settings_su_reauth_title">Authentifier à nouveau après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Authentifier à nouveau les autorisations super‐utilisateur après une mise à jour de l’application</string>
+    <string name="settings_su_biometric_title">Activer l'authentification Biométrique</string>
+    <string name="settings_su_biometric_summary">Utiliser l'authentification biométrique pour autoriser les accès super-utilisateur</string>
+    <string name="no_biometric">Périphérique non supporté ou les réglages biométriques ne sont pas actifs</string>
 
     <string name="multiuser_mode">Mode multi‐utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
