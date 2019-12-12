@@ -60,20 +60,6 @@ public:
 	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 };
 
-class RootFSBase : public MagiskInit {
-protected:
-	int root = -1;
-
-	virtual void setup_rootfs();
-public:
-	RootFSBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
-	void start() override {
-		early_mount();
-		setup_rootfs();
-		exec_init();
-	}
-};
-
 class SARBase : public MagiskInit {
 protected:
 	raw_data config;
@@ -95,7 +81,7 @@ public:
  * *************/
 
 class ABFirstStageInit : public BaseInit {
-protected:
+private:
 	void prepare();
 public:
 	ABFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
@@ -106,7 +92,7 @@ public:
 };
 
 class AFirstStageInit : public BaseInit {
-protected:
+private:
 	void prepare();
 public:
 	AFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
@@ -139,23 +125,20 @@ public:
  * Initramfs
  * **********/
 
-class RootFSInit : public RootFSBase {
+class RootFSInit : public MagiskInit {
+private:
+	int root = -1;
+	void setup_rootfs();
 protected:
 	void early_mount() override;
 public:
-	RootFSInit(char *argv[], cmdline *cmd) : RootFSBase(argv, cmd) {};
-};
+	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
 
-/* ****************
- * Compat-mode SAR
- * ****************/
-
-class SARCompatInit : public RootFSBase {
-protected:
-	void early_mount() override;
-	void setup_rootfs() override;
-public:
-	SARCompatInit(char *argv[], cmdline *cmd) : RootFSBase(argv, cmd) {};
+	void start() override {
+		early_mount();
+		setup_rootfs();
+		exec_init();
+	}
 };
 
 void load_kernel_info(cmdline *cmd);

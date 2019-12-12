@@ -112,10 +112,6 @@ static bool read_dt_fstab(cmdline *cmd, const char *name) {
 	return false;
 }
 
-#define link_root(name) \
-if (is_lnk("/system_root" name)) \
-	cp_afc("/system_root" name, name)
-
 #define mount_root(name) \
 if (!is_lnk("/" #name) && read_dt_fstab(cmd, #name)) { \
 	LOGD("Early mount " #name "\n"); \
@@ -133,30 +129,6 @@ void RootFSInit::early_mount() {
 	rename("/.backup/init", "/init");
 
 	mount_root(system);
-	mount_root(vendor);
-	mount_root(product);
-	mount_root(odm);
-}
-
-void SARCompatInit::early_mount() {
-	full_read("/init", self.buf, self.sz);
-
-	LOGD("Cleaning rootfs\n");
-	root = xopen("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { ".backup", "overlay", "overlay.d", "proc", "sys" });
-
-	LOGD("Early mount system_root\n");
-	sprintf(partname, "system%s", cmd->slot);
-	setup_block();
-	xmkdir("/system_root", 0755);
-	if (xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr))
-		xmount(block_dev, "/system_root", "erofs", MS_RDONLY, nullptr);
-	xmkdir("/system", 0755);
-	xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
-
-	link_root("/vendor");
-	link_root("/product");
-	link_root("/odm");
 	mount_root(vendor);
 	mount_root(product);
 	mount_root(odm);

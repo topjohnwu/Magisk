@@ -85,7 +85,7 @@ static void load_overlay_rc(int dirfd) {
 	rewinddir(dir);
 }
 
-void RootFSBase::setup_rootfs() {
+void RootFSInit::setup_rootfs() {
 	if (patch_sepolicy()) {
 		char *addr;
 		size_t size;
@@ -139,16 +139,6 @@ void RootFSBase::setup_rootfs() {
 	fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
 	write(fd, self.buf, self.sz);
 	close(fd);
-}
-
-void SARCompatInit::setup_rootfs() {
-	// Clone rootfs
-	LOGD("Clone root dir from system to rootfs\n");
-	int system_root = xopen("/system_root", O_RDONLY | O_CLOEXEC);
-	clone_dir(system_root, root, false);
-	close(system_root);
-
-	RootFSBase::setup_rootfs();
 }
 
 bool MagiskInit::patch_sepolicy(const char *file) {

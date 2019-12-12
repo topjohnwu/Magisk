@@ -220,10 +220,7 @@ int main(int argc, char *argv[]) {
 	if (cmd.force_normal_boot) {
 		init = make_unique<ABFirstStageInit>(argv, &cmd);
 	} else if (cmd.skip_initramfs) {
-		if (access("/overlay", F_OK) == 0)  /* Compatible mode */
-			init = make_unique<SARCompatInit>(argv, &cmd);
-		else
-			init = make_unique<SARInit>(argv, &cmd);
+		init = make_unique<SARInit>(argv, &cmd);
 	} else {
 		decompress_ramdisk();
 		if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)
