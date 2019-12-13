@@ -44,17 +44,15 @@ static void parse_device(devinfo *dev, const char *uevent) {
 static void collect_devices() {
 	char path[128];
 	devinfo dev{};
-	DIR *dir = xopendir("/sys/dev/block");
-	if (dir == nullptr)
-		return;
-	for (dirent *entry; (entry = readdir(dir));) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
-		parse_device(&dev, path);
-		dev_list.push_back(dev);
+	if (auto dir = xopen_dir("/sys/dev/block"); dir) {
+		for (dirent *entry; (entry = readdir(dir.get()));) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv)
+				continue;
+			sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
+			parse_device(&dev, path);
+			dev_list.push_back(dev);
+		}
 	}
-	closedir(dir);
 }
 
 static int64_t setup_block(bool write_block = true) {

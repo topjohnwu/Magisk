@@ -207,11 +207,10 @@ void restore_rootcon() {
 	setfilecon(MIRRDIR, ROOT_CON);
 	setfilecon(BLOCKDIR, ROOT_CON);
 
-	struct dirent *entry;
-	DIR *dir = xopendir("/sbin");
-	int dfd = dirfd(dir);
+	auto dir = xopen_dir("/sbin");
+	int dfd = dirfd(dir.get());
 
-	while ((entry = xreaddir(dir))) {
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		setfilecon_at(dfd, entry->d_name, ROOT_CON);
@@ -220,6 +219,4 @@ void restore_rootcon() {
 	setfilecon("/sbin/magisk.bin", MAGISK_CON);
 	setfilecon("/sbin/magisk", MAGISK_CON);
 	setfilecon("/sbin/magiskinit", MAGISK_CON);
-
-	closedir(dir);
 }

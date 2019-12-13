@@ -178,7 +178,7 @@ int dump_policydb(const char *file) {
 	size_t len;
 
 	{
-		auto fp = make_stream<byte_stream>(data, len);
+		auto fp = make_stream_fp<byte_stream>(data, len);
 		struct policy_file pf;
 		policy_file_init(&pf);
 		pf.type = PF_USE_STDIO;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <pthread.h>
 #include <string>
 #include <functional>
 #include <string_view>

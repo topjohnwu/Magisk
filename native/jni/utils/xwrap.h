@@ -1,5 +1,10 @@
 #pragma once
 
+#include <dirent.h>
+#include <stdio.h>
+#include <poll.h>
+#include <fcntl.h>
+
 FILE *xfopen(const char *pathname, const char *mode);
 FILE *xfdopen(int fd, const char *mode);
 int xopen(const char *pathname, int flags);

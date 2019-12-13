@@ -1,17 +1,6 @@
-/* xwrap.cpp - wrappers around existing library functions.
- *
- * Functions with the x prefix are wrappers that either succeed or log the
- * error message. They usually have the same arguments and return value
- * as the function they wrap.
- *
- */
-
 #include <sched.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <dirent.h>
 #include <errno.h>
 #include <pthread.h>
 #include <sys/socket.h>
