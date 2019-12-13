@@ -13,6 +13,7 @@
 #include "sepolicy.h"
 
 int load_policydb(const char *file) {
+	LOGD("Load policy from: %s\n", file);
 	if (magisk_policydb)
 		destroy_policydb();
 
@@ -101,7 +102,7 @@ static void load_cil(struct cil_db *db, const char *file) {
 	size_t size;
 	mmap_ro(file, addr, size);
 	cil_add_file(db, (char *) file, addr, size);
-	LOGD("cil_add[%s]\n", file);
+	LOGD("cil_add [%s]\n", file);
 	munmap(addr, size);
 }
 

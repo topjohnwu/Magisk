@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <vector>
 
+#include <magisk.h>
+
 struct cmdline {
 	bool skip_initramfs;
 	bool force_normal_boot;
@@ -45,7 +47,7 @@ protected:
 	virtual void cleanup();
 public:
 	BaseInit(char *argv[], cmdline *cmd) :
-	cmd(cmd), argv(argv), mount_list{"/sys", "/proc", "/dev"} {}
+	cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
 	virtual ~BaseInit() = default;
 	virtual void start() = 0;
 };
@@ -53,6 +55,7 @@ public:
 class MagiskInit : public BaseInit {
 protected:
 	raw_data self;
+	const char *persist_dir;
 
 	virtual void early_mount() = 0;
 	bool patch_sepolicy(const char *file = "/sepolicy");
@@ -68,7 +71,9 @@ protected:
 	void backup_files();
 	void patch_rootdir();
 public:
-	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
+	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
+		persist_dir = MIRRDIR "/persist/magisk";
+	}
 	void start() override {
 		early_mount();
 		patch_rootdir();
@@ -132,7 +137,9 @@ private:
 protected:
 	void early_mount() override;
 public:
-	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
+	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
+		persist_dir = "/dev/.magisk/mirror/persist/magisk";
+	}
 
 	void start() override {
 		early_mount();

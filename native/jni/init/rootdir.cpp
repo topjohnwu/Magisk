@@ -164,7 +164,23 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 
 	sepol_magisk_rules();
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
+
+	// Custom rules
+	if (auto dir = xopen_dir(persist_dir); dir) {
+		char path[4096];
+		for (dirent *entry; (entry = xreaddir(dir.get()));) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv)
+				continue;
+			snprintf(path, sizeof(path), "%s/%s/sepolicy.rule", persist_dir, entry->d_name);
+			if (access(path, R_OK) == 0) {
+				LOGD("Loading custom sepolicy patch: %s\n", path);
+				load_rule_file(path);
+			}
+		}
+	}
+
 	dump_policydb(file);
+	destroy_policydb();
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
