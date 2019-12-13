@@ -101,17 +101,8 @@ void RootFSInit::setup_rootfs() {
 		munmap(addr, size);
 	}
 
-	// Handle legacy overlays
-	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
-	if (fd >= 0) {
-		LOGD("Merge overlay folder\n");
-		mv_dir(fd, root);
-		close(fd);
-		rmdir("/overlay");
-	}
-
 	// Handle overlays
-	fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
+	int fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
 	if (fd >= 0) {
 		LOGD("Merge overlay.d\n");
 		load_overlay_rc(fd);
