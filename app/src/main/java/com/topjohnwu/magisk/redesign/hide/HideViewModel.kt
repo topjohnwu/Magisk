@@ -82,12 +82,8 @@ class HideViewModel(
     // ---
 
     override fun submitQuery() {
-        if (!queryHandler.hasCallbacks(queryRunnable)) {
-            queryHandler.post(queryRunnable)
-        } else {
-            queryHandler.removeCallbacks(queryRunnable)
-            queryHandler.postDelayed(queryRunnable, queryDelay)
-        }
+        queryHandler.removeCallbacks(queryRunnable)
+        queryHandler.postDelayed(queryRunnable, queryDelay)
     }
 
     private fun query(

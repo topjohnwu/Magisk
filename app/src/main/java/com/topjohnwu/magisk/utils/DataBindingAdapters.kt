@@ -17,7 +17,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.animation.doOnEnd
 import androidx.core.view.*
-import androidx.core.widget.NestedScrollView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
@@ -425,18 +424,6 @@ fun View.setTooltipTextCompat(text: String) {
 @BindingAdapter("onCloseClicked")
 fun Chip.setOnCloseClickedListenerBinding(listener: View.OnClickListener) {
     setOnCloseIconClickListener(listener)
-}
-
-@BindingAdapter("onScrollStateChanged")
-fun NestedScrollView.setOnScrollStateChangeListener(listener: Runnable) {
-    setOnScrollChangeListener { _: NestedScrollView?, _: Int, _: Int, _: Int, _: Int ->
-        if (!handler.hasCallbacks(listener)) {
-            listener.run()
-        } else {
-            handler.removeCallbacksAndMessages(null)
-        }
-        handler.postDelayed(listener, 1000)
-    }
 }
 
 @BindingAdapter("progressAnimated")
