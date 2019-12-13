@@ -129,6 +129,7 @@ class ModuleViewModel(
     override fun refresh() = Single.fromCallable { Module.loadModules() }
         .map { it.map { ModuleItem(it) } }
         .map { it.order() }
+        .map { it.loadDetail() }
         .map { build(active = it, updatable = loadUpdates(it)) }
         .map { it to items.calculateDiff(it) }
         .applyViewModel(this)
@@ -222,6 +223,13 @@ class ModuleViewModel(
         .sortedBy { it.item.name.toLowerCase(currentLocale) }
         .toList()
 
+    @WorkerThread
+    private fun List<ModuleItem>.loadDetail() = onEach { module ->
+        Single.fromCallable { dao.getRepoById(module.item.id)!! }
+            .subscribeK { module.repo = it }
+            .add()
+    }
+
     private fun update(repo: Repo, progress: Int) =
         Single.fromCallable { itemsRemote + itemsSearch }
             .map { it.first { it.item.id == repo.id } }
@@ -263,6 +271,9 @@ class ModuleViewModel(
     fun downloadPressed(item: RepoItem) = ModuleInstallDialog(item.item).publish()
     fun installPressed() = InstallExternalModuleEvent().publish()
     fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
+    fun infoPressed(item: ModuleItem) {
+        OpenChangelogEvent(item.repo ?: return).publish()
+    }
 
     // ---
 

@@ -14,6 +14,9 @@ interface RepoBase {
     @Query("SELECT * FROM repos WHERE id = :id AND versionCode > :versionCode LIMIT 1")
     fun getUpdatableRepoById(id: String, versionCode: Int): Repo?
 
+    @Query("SELECT * FROM repos WHERE id = :id LIMIT 1")
+    fun getRepoById(id: String): Repo?
+
     companion object {
         const val LIMIT = 10
     }

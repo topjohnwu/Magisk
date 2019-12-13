@@ -171,6 +171,13 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
     override val layoutRes = R.layout.item_module_md2
 
     @get:Bindable
+    var repo: Repo? = null
+        set(value) {
+            field = value
+            notifyChange(BR.repo)
+        }
+
+    @get:Bindable
     var isEnabled = item.enable
         set(value) {
             field = value
