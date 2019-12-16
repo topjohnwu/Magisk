@@ -85,7 +85,7 @@ static void load_overlay_rc(int dirfd) {
 	rewinddir(dir);
 }
 
-void RootFSBase::setup_rootfs() {
+void RootFSInit::setup_rootfs() {
 	if (patch_sepolicy()) {
 		char *addr;
 		size_t size;
@@ -101,17 +101,8 @@ void RootFSBase::setup_rootfs() {
 		munmap(addr, size);
 	}
 
-	// Handle legacy overlays
-	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
-	if (fd >= 0) {
-		LOGD("Merge overlay folder\n");
-		mv_dir(fd, root);
-		close(fd);
-		rmdir("/overlay");
-	}
-
 	// Handle overlays
-	fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
+	int fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
 	if (fd >= 0) {
 		LOGD("Merge overlay.d\n");
 		load_overlay_rc(fd);
@@ -141,16 +132,6 @@ void RootFSBase::setup_rootfs() {
 	close(fd);
 }
 
-void SARCompatInit::setup_rootfs() {
-	// Clone rootfs
-	LOGD("Clone root dir from system to rootfs\n");
-	int system_root = xopen("/system_root", O_RDONLY | O_CLOEXEC);
-	clone_dir(system_root, root, false);
-	close(system_root);
-
-	RootFSBase::setup_rootfs();
-}
-
 bool MagiskInit::patch_sepolicy(const char *file) {
 	bool patch_init = false;
 
@@ -174,7 +155,23 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 
 	sepol_magisk_rules();
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
+
+	// Custom rules
+	if (auto dir = xopen_dir(persist_dir); dir) {
+		char path[4096];
+		for (dirent *entry; (entry = xreaddir(dir.get()));) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv)
+				continue;
+			snprintf(path, sizeof(path), "%s/%s/sepolicy.rule", persist_dir, entry->d_name);
+			if (access(path, R_OK) == 0) {
+				LOGD("Loading custom sepolicy patch: %s\n", path);
+				load_rule_file(path);
+			}
+		}
+	}
+
 	dump_policydb(file);
+	destroy_policydb();
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
@@ -436,17 +433,16 @@ static void patch_fstab(const string &fstab) {
 #define FSR "/first_stage_ramdisk"
 
 void ABFirstStageInit::prepare() {
-	DIR *dir = xopendir(FSR);
+	auto dir = xopen_dir(FSR);
 	if (!dir)
 		return;
 	string fstab(FSR "/");
-	for (dirent *de; (de = readdir(dir));) {
+	for (dirent *de; (de = xreaddir(dir.get()));) {
 		if (strstr(de->d_name, "fstab")) {
 			fstab += de->d_name;
 			break;
 		}
 	}
-	closedir(dir);
 	if (fstab.length() == sizeof(FSR))
 		return;
 
@@ -463,14 +459,13 @@ void ABFirstStageInit::prepare() {
 }
 
 void AFirstStageInit::prepare() {
-	DIR *dir = xopendir("/");
-	for (dirent *de; (de = readdir(dir));) {
+	auto dir = xopen_dir("/");
+	for (dirent *de; (de = xreaddir(dir.get()));) {
 		if (strstr(de->d_name, "fstab")) {
 			patch_fstab(de->d_name);
 			break;
 		}
 	}
-	closedir(dir);
 
 	// Move stuffs for next stage
 	xmkdir("/system", 0755);

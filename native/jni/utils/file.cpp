@@ -1,8 +1,4 @@
-/* file.cpp - Contains all files related utilities
- */
-
 #include <sys/sendfile.h>
-#include <sys/mman.h>
 #include <linux/fs.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -359,7 +355,7 @@ void write_zero(int fd, size_t size) {
 	}
 }
 
-void file_readline(const char *file, const function<bool (string_view)> &fn, bool trim) {
+void file_readline(bool trim, const char *file, const std::function<bool(std::string_view)> &fn) {
 	FILE *fp = xfopen(file, "re");
 	if (fp == nullptr)
 		return;
@@ -384,7 +380,7 @@ void file_readline(const char *file, const function<bool (string_view)> &fn, boo
 }
 
 void parse_prop_file(const char *file, const function<bool (string_view, string_view)> &fn) {
-	file_readline(file, [&](string_view line_view) -> bool {
+	file_readline(true, file, [&](string_view line_view) -> bool {
 		char *line = (char *) line_view.data();
 		if (line[0] == '#')
 			return true;
@@ -393,7 +389,7 @@ void parse_prop_file(const char *file, const function<bool (string_view, string_
 			return true;
 		*eql = '\0';
 		return fn(line, eql + 1);
-	}, true);
+	});
 }
 
 void parse_mnt(const char *file, const function<bool (mntent*)> &fn) {

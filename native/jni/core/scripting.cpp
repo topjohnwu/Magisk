@@ -26,15 +26,14 @@ void exec_script(const char *script) {
 
 void exec_common_script(const char *stage) {
 	char path[4096];
-	DIR *dir;
-	struct dirent *entry;
 	sprintf(path, SECURE_DIR "/%s.d", stage);
-	if (!(dir = xopendir(path)))
+	auto dir = xopen_dir(path);
+	if (!dir)
 		return;
 	chdir(path);
 
-	bool pfs = strcmp(stage, "post-fs-data") == 0;
-	while ((entry = xreaddir(dir))) {
+	bool pfs = stage == "post-fs-data"sv;
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_REG) {
 			if (access(entry->d_name, X_OK) == -1)
 				continue;
@@ -50,13 +49,12 @@ void exec_common_script(const char *stage) {
 		}
 	}
 
-	closedir(dir);
 	chdir("/");
 }
 
 void exec_module_script(const char *stage, const vector<string> &module_list) {
 	char path[4096];
-	bool pfs = strcmp(stage, "post-fs-data") == 0;
+	bool pfs = stage == "post-fs-data"sv;
 	for (auto &m : module_list) {
 		const char* module = m.c_str();
 		sprintf(path, MODULEROOT "/%s/%s.sh", module, stage);

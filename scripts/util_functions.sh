@@ -446,23 +446,6 @@ request_zip_size_check() {
   reqSizeM=`unzip -l "$1" | tail -n 1 | awk '{ print int(($1 - 1) / 1048576 + 1) }'`
 }
 
-##################################
-# Backwards Compatibile Functions
-##################################
-
-get_outfd() { setup_flashable; }
-
-mount_magisk_img() {
-  $BOOTMODE && MODULE_BASE=modules_update || MODULE_BASE=modules
-  MODULEPATH=$NVBASE/$MODULE_BASE
-  mkdir -p $MODULEPATH 2>/dev/null
-  ln -s $MODULEPATH $MOUNTPATH
-}
-
-unmount_magisk_img() {
-  rm -f $MOUNTPATH 2>/dev/null
-}
-
 boot_actions() { return; }
 
 ########

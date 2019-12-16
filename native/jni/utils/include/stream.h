@@ -5,17 +5,6 @@
 
 #include "../files.h"
 
-class stream;
-
-using stream_ptr = std::unique_ptr<stream>;
-
-sFILE make_stream(stream_ptr &&strm);
-
-template <class T, class... Args>
-sFILE make_stream(Args &&... args) {
-	return make_stream(stream_ptr(new T(std::forward<Args>(args)...)));
-}
-
 class stream {
 public:
 	virtual int read(void *buf, size_t len);
@@ -24,35 +13,22 @@ public:
 	virtual ~stream() = default;
 };
 
-// Delegates all operations to the base FILE pointer
+using stream_ptr = std::unique_ptr<stream>;
+
+// Delegates all operations to base stream
 class filter_stream : public stream {
 public:
-	filter_stream(sFILE &&fp = make_sFILE()) : fp(std::move(fp)) {}
+	filter_stream(stream_ptr &&base) : base(std::move(base)) {}
 
 	int read(void *buf, size_t len) override;
 	int write(const void *buf, size_t len) override;
 
-	void set_base(sFILE &&f);
-	template <class T, class... Args >
-	void set_base(Args&&... args) {
-		set_base(make_stream<T>(std::forward<Args>(args)...));
-	}
-
 protected:
-	sFILE fp;
-};
-
-// Handy interface for classes that need custom seek logic
-class seekable_stream : public stream {
-protected:
-	size_t _pos = 0;
-
-	off_t seek_pos(off_t off, int whence);
-	virtual size_t end_pos() = 0;
+	stream_ptr base;
 };
 
 // Byte stream that dynamically allocates memory
-class byte_stream : public seekable_stream {
+class byte_stream : public stream {
 public:
 	byte_stream(uint8_t *&buf, size_t &len);
 	template <class byte>
@@ -64,10 +40,10 @@ public:
 private:
 	uint8_t *&_buf;
 	size_t &_len;
+	size_t _pos = 0;
 	size_t _cap = 0;
 
 	void resize(size_t new_pos, bool zero = false);
-	size_t end_pos() final { return _len; }
 };
 
 // File stream but does not close the file descriptor at any time
@@ -81,3 +57,28 @@ public:
 private:
 	int fd;
 };
+
+/* ****************************************
+ * Bridge between stream class and C stdio
+ * ****************************************/
+
+// sFILE -> stream_ptr
+class fp_stream final : public stream {
+public:
+	fp_stream(FILE *fp = nullptr) : fp(fp, fclose) {}
+	fp_stream(sFILE &&fp) : fp(std::move(fp)) {}
+	int read(void *buf, size_t len) override;
+	int write(const void *buf, size_t len) override;
+	off_t seek(off_t off, int whence) override;
+
+private:
+	sFILE fp;
+};
+
+// stream_ptr -> sFILE
+sFILE make_stream_fp(stream_ptr &&strm);
+
+template <class T, class... Args>
+sFILE make_stream_fp(Args &&... args) {
+	return make_stream_fp(stream_ptr(new T(std::forward<Args>(args)...)));
+}

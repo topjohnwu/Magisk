@@ -416,10 +416,10 @@ void parse_statement(const char *statement) {
 }
 
 void load_rule_file(const char *file) {
-	file_readline(file, [](string_view line) -> bool {
+	file_readline(true, file, [](string_view line) -> bool {
 		if (line.empty() || line[0] == '#')
 			return true;
 		parse_statement(line.data());
 		return true;
-	}, true);
+	});
 }

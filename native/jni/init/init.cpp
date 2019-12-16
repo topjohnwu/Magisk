@@ -197,10 +197,10 @@ int main(int argc, char *argv[]) {
 		return test_main(argc, argv);
 #endif
 
-	if (argc > 1 && strcmp(argv[1], "-x") == 0) {
-		if (strcmp(argv[2], "magisk") == 0)
+	if (argc > 1 && argv[1] == "-x"sv) {
+		if (argv[2] == "magisk"sv)
 			return dump_magisk(argv[3], 0755);
-		else if (strcmp(argv[2], "manager") == 0)
+		else if (argv[2] == "manager"sv)
 			return dump_manager(argv[3], 0644);
 	}
 
@@ -208,30 +208,28 @@ int main(int argc, char *argv[]) {
 		return 1;
 	setup_klog();
 
-	if (argc > 1 && argv[1] == "selinux_setup"sv) {
-		auto init = make_unique<SecondStageInit>(argv);
-		init->start();
-	}
-
-	cmdline cmd{};
-	load_kernel_info(&cmd);
-
 	unique_ptr<BaseInit> init;
-	if (cmd.force_normal_boot) {
-		init = make_unique<ABFirstStageInit>(argv, &cmd);
-	} else if (cmd.skip_initramfs) {
-		if (access("/overlay", F_OK) == 0)  /* Compatible mode */
-			init = make_unique<SARCompatInit>(argv, &cmd);
-		else
-			init = make_unique<SARInit>(argv, &cmd);
+	cmdline cmd{};
+
+	if (argc > 1 && argv[1] == "selinux_setup"sv) {
+		init = make_unique<SecondStageInit>(argv);
 	} else {
-		decompress_ramdisk();
-		if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)
-			init = make_unique<RecoveryInit>(argv, &cmd);
-		else if (access("/apex", F_OK) == 0)
-			init = make_unique<AFirstStageInit>(argv, &cmd);
-		else
-			init = make_unique<RootFSInit>(argv, &cmd);
+		// This will also mount /sys and /proc
+		load_kernel_info(&cmd);
+
+		if (cmd.force_normal_boot) {
+			init = make_unique<ABFirstStageInit>(argv, &cmd);
+		} else if (cmd.skip_initramfs) {
+			init = make_unique<SARInit>(argv, &cmd);
+		} else {
+			decompress_ramdisk();
+			if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)
+				init = make_unique<RecoveryInit>(argv, &cmd);
+			else if (access("/apex", F_OK) == 0)
+				init = make_unique<AFirstStageInit>(argv, &cmd);
+			else
+				init = make_unique<RootFSInit>(argv, &cmd);
+		}
 	}
 
 	// Run the main routine

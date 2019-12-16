@@ -131,7 +131,7 @@ void node_entry::create_module_tree(const char *module) {
 	auto full_path = get_path();
 	snprintf(buf, PATH_MAX, "%s/%s%s", MODULEROOT, module, full_path.c_str());
 
-	unique_ptr<DIR, decltype(&closedir)> dir(xopendir(buf), closedir);
+	auto dir = xopen_dir(buf);
 	if (!dir)
 		return;
 
@@ -148,7 +148,7 @@ void node_entry::create_module_tree(const char *module) {
 		return;
 	}
 
-	for (struct dirent *entry; (entry = xreaddir(dir.get()));) {
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		// Create new node
@@ -207,22 +207,18 @@ void node_entry::create_module_tree(const char *module) {
 }
 
 void node_entry::clone_skeleton() {
-	DIR *dir;
-	struct dirent *entry;
-
 	// Clone the structure
 	auto full_path = get_path();
-	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path.c_str());
-	if (!(dir = xopendir(buf)))
-		return;
-	while ((entry = xreaddir(dir))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		// Create dummy node
-		auto dummy = new node_entry(entry->d_name, entry->d_type, IS_DUMMY);
-		insert(dummy);
-	}
-	closedir(dir);
+	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path.data());
+	if (auto dir = xopen_dir(buf); dir) {
+		for (dirent *entry; (entry = xreaddir(dir.get()));) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv)
+				continue;
+			// Create dummy node
+			auto dummy = new node_entry(entry->d_name, entry->d_type, IS_DUMMY);
+			insert(dummy);
+		}
+	} else { return; }
 
 	if (status & IS_SKEL) {
 		file_attr attr;
@@ -460,9 +456,8 @@ void remove_modules() {
 	LOGI("* Remove all modules and reboot");
 	chdir(MODULEROOT);
 	rm_rf("lost+found");
-	DIR *dir = xopendir(".");
-	struct dirent *entry;
-	while ((entry = xreaddir(dir))) {
+	auto dir = xopen_dir(".");
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR) {
 			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
 				continue;
@@ -471,7 +466,6 @@ void remove_modules() {
 			chdir("..");
 		}
 	}
-	closedir(dir);
 	chdir("/");
 	reboot();
 }
@@ -479,9 +473,8 @@ void remove_modules() {
 static void collect_modules() {
 	chdir(MODULEROOT);
 	rm_rf("lost+found");
-	DIR *dir = xopendir(".");
-	struct dirent *entry;
-	while ((entry = xreaddir(dir))) {
+	auto dir = xopen_dir(".");
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR) {
 			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
 				continue;
@@ -501,7 +494,6 @@ static void collect_modules() {
 			chdir("..");
 		}
 	}
-	closedir(dir);
 	chdir("/");
 }
 
@@ -575,15 +567,14 @@ static bool check_data() {
 }
 
 void unlock_blocks() {
-	DIR *dir;
-	struct dirent *entry;
 	int fd, dev, OFF = 0;
 
-	if (!(dir = xopendir("/dev/block")))
+	auto dir = xopen_dir("/dev/block");
+	if (!dir)
 		return;
-	dev = dirfd(dir);
+	dev = dirfd(dir.get());
 
-	while((entry = readdir(dir))) {
+	for (dirent *entry; (entry = readdir(dir.get()));) {
 		if (entry->d_type == DT_BLK) {
 			if ((fd = openat(dev, entry->d_name, O_RDONLY | O_CLOEXEC)) < 0)
 				continue;
@@ -592,7 +583,6 @@ void unlock_blocks() {
 			close(fd);
 		}
 	}
-	closedir(dir);
 }
 
 static bool log_dump = false;

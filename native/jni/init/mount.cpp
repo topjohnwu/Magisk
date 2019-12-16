@@ -44,17 +44,15 @@ static void parse_device(devinfo *dev, const char *uevent) {
 static void collect_devices() {
 	char path[128];
 	devinfo dev{};
-	DIR *dir = xopendir("/sys/dev/block");
-	if (dir == nullptr)
-		return;
-	for (dirent *entry; (entry = readdir(dir));) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
-		parse_device(&dev, path);
-		dev_list.push_back(dev);
+	if (auto dir = xopen_dir("/sys/dev/block"); dir) {
+		for (dirent *entry; (entry = readdir(dir.get()));) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv)
+				continue;
+			sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
+			parse_device(&dev, path);
+			dev_list.push_back(dev);
+		}
 	}
-	closedir(dir);
 }
 
 static int64_t setup_block(bool write_block = true) {
@@ -112,10 +110,6 @@ static bool read_dt_fstab(cmdline *cmd, const char *name) {
 	return false;
 }
 
-#define link_root(name) \
-if (is_lnk("/system_root" name)) \
-	cp_afc("/system_root" name, name)
-
 #define mount_root(name) \
 if (!is_lnk("/" #name) && read_dt_fstab(cmd, #name)) { \
 	LOGD("Early mount " #name "\n"); \
@@ -132,31 +126,14 @@ void RootFSInit::early_mount() {
 	root = xopen("/", O_RDONLY | O_CLOEXEC);
 	rename("/.backup/init", "/init");
 
+	// Mount sbin overlay for persist, but move it and add to cleanup list
+	mount_sbin();
+	xmount("/sbin", "/dev", nullptr, MS_MOVE, nullptr);
+	mount_list.emplace_back("/dev");
+	mount_list.emplace_back("/dev/.magisk/mirror/persist");
+	mount_list.emplace_back("/dev/.magisk/mirror/cache");
+
 	mount_root(system);
-	mount_root(vendor);
-	mount_root(product);
-	mount_root(odm);
-}
-
-void SARCompatInit::early_mount() {
-	full_read("/init", self.buf, self.sz);
-
-	LOGD("Cleaning rootfs\n");
-	root = xopen("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { ".backup", "overlay", "overlay.d", "proc", "sys" });
-
-	LOGD("Early mount system_root\n");
-	sprintf(partname, "system%s", cmd->slot);
-	setup_block();
-	xmkdir("/system_root", 0755);
-	if (xmount(block_dev, "/system_root", "ext4", MS_RDONLY, nullptr))
-		xmount(block_dev, "/system_root", "erofs", MS_RDONLY, nullptr);
-	xmkdir("/system", 0755);
-	xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
-
-	link_root("/vendor");
-	link_root("/product");
-	link_root("/odm");
 	mount_root(vendor);
 	mount_root(product);
 	mount_root(odm);
@@ -199,6 +176,7 @@ void SARInit::early_mount() {
 	// Make dev writable
 	xmkdir("/dev", 0755);
 	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
+	mount_list.emplace_back("/dev");
 
 	backup_files();
 
@@ -257,9 +235,11 @@ void SecondStageInit::early_mount() {
 void BaseInit::cleanup() {
 	// Unmount in reverse order
 	for (auto &p : reversed(mount_list)) {
-		LOGD("Unmount [%s]\n", p.data());
-		umount(p.data());
+		if (xumount(p.data()) == 0)
+			LOGD("Unmount [%s]\n", p.data());
 	}
+	mount_list.clear();
+	mount_list.shrink_to_fit();
 }
 
 void mount_sbin() {
@@ -278,8 +258,12 @@ void mount_sbin() {
 		// Fallback to cache
 		strcpy(partname, "cache");
 		strcpy(block_dev, BLOCKDIR "/cache");
-		if (setup_block(false) < 0)
-			return;
+		if (setup_block(false) < 0) {
+			// Try NVIDIA's BS
+			strcpy(partname, "CAC");
+			if (setup_block(false) < 0)
+				return;
+		}
 		mnt_point = MIRRDIR "/cache";
 		xsymlink("./cache", MIRRDIR "/persist");
 	}
