@@ -14,15 +14,10 @@ mkdir -p $TMPDIR
 ui_print() { echo "$1"; }
 
 require_new_magisk() {
-  ui_print "***********************************"
-  ui_print " Please install the latest Magisk! "
-  ui_print "***********************************"
+  ui_print "*******************************"
+  ui_print " Please install Magisk v19.0+! "
+  ui_print "*******************************"
   exit 1
-}
-
-imageless_magisk() {
-  [ $MAGISK_VER_CODE -gt 18100 ]
-  return $?
 }
 
 ##########################################################################################
@@ -38,6 +33,7 @@ mount /data 2>/dev/null
 if [ -f /data/adb/magisk/util_functions.sh ]; then
   . /data/adb/magisk/util_functions.sh
   NVBASE=/data/adb
+  [ $MAGISK_VER_CODE -gt 18100 ] || require_new_magisk
 else
   require_new_magisk
 fi
@@ -65,16 +61,8 @@ unzip -oj "$ZIPFILE" module.prop install.sh uninstall.sh 'common/*' -d $TMPDIR >
 # Load install script
 . $TMPDIR/install.sh
 
-if imageless_magisk; then
-  $BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
-  MODULEROOT=$NVBASE/$MODDIRNAME
-else
-  $BOOTMODE && IMGNAME=magisk_merge.img || IMGNAME=magisk.img
-  IMG=$NVBASE/$IMGNAME
-  request_zip_size_check "$ZIPFILE"
-  mount_magisk_img
-  MODULEROOT=$MOUNTPATH
-fi
+$BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
+MODULEROOT=$NVBASE/$MODDIRNAME
 
 MODID=`grep_prop id $TMPDIR/module.prop`
 MODPATH=$MODULEROOT/$MODID
@@ -102,11 +90,7 @@ rm -f $MODPATH/system/placeholder 2>/dev/null
 [ -f $TMPDIR/uninstall.sh ] && cp -af $TMPDIR/uninstall.sh $MODPATH/uninstall.sh
 
 # Auto Mount
-if imageless_magisk; then
-  $SKIPMOUNT && touch $MODPATH/skip_mount
-else
-  $SKIPMOUNT || touch $MODPATH/auto_mount
-fi
+$SKIPMOUNT && touch $MODPATH/skip_mount
 
 # prop files
 $PROPFILE && cp -af $TMPDIR/system.prop $MODPATH/system.prop
@@ -115,13 +99,8 @@ $PROPFILE && cp -af $TMPDIR/system.prop $MODPATH/system.prop
 cp -af $TMPDIR/module.prop $MODPATH/module.prop
 if $BOOTMODE; then
   # Update info for Magisk Manager
-  if imageless_magisk; then
-    mktouch $NVBASE/modules/$MODID/update
-    cp -af $TMPDIR/module.prop $NVBASE/modules/$MODID/module.prop
-  else
-    mktouch /sbin/.magisk/img/$MODID/update
-    cp -af $TMPDIR/module.prop /sbin/.magisk/img/$MODID/module.prop
-  fi
+  mktouch $NVBASE/modules/$MODID/update
+  cp -af $TMPDIR/module.prop $NVBASE/modules/$MODID/module.prop
 fi
 
 # post-fs-data mode scripts
@@ -143,7 +122,6 @@ set_permissions
 ##########################################################################################
 
 cd /
-imageless_magisk || unmount_magisk_img
 $BOOTMODE || recovery_cleanup
 rm -rf $TMPDIR $MOUNTPATH
 
