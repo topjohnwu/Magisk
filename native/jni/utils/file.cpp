@@ -73,6 +73,7 @@ static void post_order_walk(int dirfd, initializer_list<const char *> excl,
 		}
 		fn(dirfd, entry);
 	}
+	closedir(dir);
 }
 
 static int remove_at(int dirfd, struct dirent *entry) {
