@@ -72,33 +72,6 @@ void exec_module_script(const char *stage, const vector<string> &module_list) {
 	}
 }
 
-constexpr char migrate_script[] =
-"MODULEROOT=" MODULEROOT R"EOF(
-IMG=%s
-MNT=/dev/img_mnt
-e2fsck -yf $IMG
-mkdir -p $MNT
-for num in 0 1 2 3 4 5 6 7; do
-  losetup /dev/block/loop${num} $IMG || continue
-  mount -t ext4 /dev/block/loop${num} $MNT
-  rm -rf $MNT/lost+found $MNT/.core
-  magisk --clone $MNT $MODULEROOT
-  umount $MNT
-  rm -rf $MNT
-  losetup -d /dev/block/loop${num}
-  break
-done
-rm -rf $IMG
-)EOF";
-
-void migrate_img(const char *img) {
-	LOGI("* Migrating %s\n", img);
-	exec_t exec { .pre_exec = set_path };
-	char cmds[sizeof(migrate_script) + 128];
-	sprintf(cmds, migrate_script, img);
-	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
-}
-
 constexpr char install_script[] = R"EOF(
 APK=%s
 log -t Magisk "apk_install: $APK"

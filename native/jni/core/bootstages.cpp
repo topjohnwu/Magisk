@@ -413,11 +413,6 @@ static bool magisk_env() {
 }
 
 static void prepare_modules() {
-	const char *legacy_imgs[] = {SECURE_DIR "/magisk.img", SECURE_DIR "/magisk_merge.img"};
-	for (auto img : legacy_imgs) {
-		if (access(img, F_OK) == 0)
-			migrate_img(img);
-	}
 	DIR *dir;
 	struct dirent *entry;
 	if ((dir = opendir(MODULEUPGRADE))) {
