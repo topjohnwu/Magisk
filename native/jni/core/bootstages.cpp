@@ -317,13 +317,15 @@ static int bind_mount(const char *from, const char *to, bool log) {
 static bool magisk_env() {
 	LOGI("* Initializing Magisk environment\n");
 
+	string pkg;
+	check_manager(&pkg);
+
+	char install_dir[128];
+	sprintf(install_dir, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
+
 	// Alternative binaries paths
-	constexpr const char *alt_bin[] = {
-		"/cache/data_adb/magisk", "/data/magisk",
-		"/data/data/com.topjohnwu.magisk/install",
-		"/data/user_de/0/com.topjohnwu.magisk/install"
-	};
-	for (auto &alt : alt_bin) {
+	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", install_dir };
+	for (auto alt : alt_bin) {
 		struct stat st;
 		if (lstat(alt, &st) != -1) {
 			if (S_ISLNK(st.st_mode)) {
@@ -781,11 +783,9 @@ void boot_complete(int client) {
 		rename(MANAGERAPK, "/data/magisk.apk");
 		install_apk("/data/magisk.apk");
 	} else {
-		// Check whether we have a valid manager installed
-		db_strings str;
-		get_db_strings(str, SU_MANAGER);
-		if (validate_manager(str[SU_MANAGER], 0, nullptr)) {
-			// There is no manager installed, install the stub
+		// Check whether we have manager installed
+		if (!check_manager()) {
+			// Install stub
 			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk");
 			install_apk("/data/magisk.apk");
 		}
