@@ -113,16 +113,37 @@ ensure_bb() {
 }
 
 recovery_actions() {
-  # Fix for Android Q
+  # Mount apex files so dynamic linked stuff works
   if [ -d /system/apex ]; then
     [ -L /apex ] && rm -f /apex
-    for i in /system/apex/*; do
-      local APEX=$(basename $i)
-      case $APEX in
-        "com.android.runtime.release") mkdir -p /apex/com.android.runtime 2>/dev/null; mount -o bind $i /apex/com.android.runtime;;
-        *) mkdir -p /apex/$APEX 2>/dev/null; mount -o bind $i /apex/$APEX;;
-      esac
-    done
+    # Apex files present - needs to extract and mount the payload imgs
+    if [ -f "/system/apex/com.android.runtime.release.apex" ]; then
+      local j=0
+      for i in /system/apex/*.apex; do
+        local DEST="/apex/$(basename $i | sed 's/.apex$//')"
+        [ "$DEST" == "/apex/com.android.runtime.release" ] && DEST="/apex/com.android.runtime"
+        mkdir -p $DEST
+        unzip -qo $i apex_payload.img -d /apex
+        mv -f /apex/apex_payload.img $DEST.img
+        while [ $j -lt 50 ]; do
+          local loop=/dev/loop$j
+          mknod $loop b 7 $j 2>/dev/null
+          losetup $loop $DEST.img 2>/dev/null
+          j=$((j + 1))
+          losetup $loop | grep -q $DEST.img && break
+        done;
+        [ -z $floop ] && floop=$((j - 1))
+        mount -t ext4 -o loop,noatime,ro $loop $DEST || return 1
+      done
+    # Already extracted payload imgs present, just mount the folders
+    elif [ -d "/system/apex/com.android.runtime.release" ]; then
+      for i in /system/apex/*; do
+        local DEST="/apex/$(basename $i)"
+        [ "$DEST" == "/apex/com.android.runtime.release" ] && DEST="/apex/com.android.runtime"
+        mkdir -p $DEST
+        mount -o bind,ro $i $DEST
+      done
+    fi
   fi
   # Make sure random don't get blocked
   mount -o bind /dev/urandom /dev/random
@@ -144,11 +165,20 @@ recovery_cleanup() {
   [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
   [ -z $OLD_LD_CFG ] || export LD_CONFIG_FILE=$OLD_LD_CFG
   ui_print "- Unmounting partitions"
-  # Fix for Android Q
+  # Unmount apex
   if [ -d /system/apex ]; then
     for i in /apex/*; do
       umount -l $i 2>/dev/null
     done
+    if [ -f "/system/apex/com.android.runtime.release.apex" ]; then
+      local j=$floop
+      while [ $j -lt 50 ]; do
+        local loop=/dev/loop$j
+        losetup -d $loop || break
+        j=$((j + 1))
+      done
+    fi
+    rm -rf /apex
   fi
   umount -l /system_root 2>/dev/null
   umount -l /system 2>/dev/null
