@@ -451,47 +451,47 @@ static void reboot() {
 
 void remove_modules() {
 	LOGI("* Remove all modules and reboot");
-	chdir(MODULEROOT);
-	rm_rf("lost+found");
-	auto dir = xopen_dir(".");
+	auto dir = xopen_dir(MODULEROOT);
+	int dfd = dirfd(dir.get());
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR) {
 			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
 				continue;
-			chdir(entry->d_name);
-			close(creat("remove", 0644));
-			chdir("..");
+
+			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			close(xopenat(modfd, "remove", O_RDONLY | O_CREAT | O_CLOEXEC));
+			close(modfd);
 		}
 	}
-	chdir("/");
 	reboot();
 }
 
 static void collect_modules() {
-	chdir(MODULEROOT);
-	rm_rf("lost+found");
-	auto dir = xopen_dir(".");
+	auto dir = xopen_dir(MODULEROOT);
+	int dfd = dirfd(dir.get());
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR) {
 			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
 				continue;
-			chdir(entry->d_name);
-			if (access("remove", F_OK) == 0) {
-				chdir("..");
+
+			int modfd = xopenat(dfd, entry->d_name, O_RDONLY);
+			run_finally f([=]{ close(modfd); });
+
+			if (faccessat(modfd, "remove", F_OK, 0) == 0) {
 				LOGI("%s: remove\n", entry->d_name);
-				sprintf(buf, "%s/uninstall.sh", entry->d_name);
+				fd_pathat(modfd, "uninstall.sh", buf, sizeof(buf));
 				if (access(buf, F_OK) == 0)
 					exec_script(buf);
-				rm_rf(entry->d_name);
+				frm_rf(modfd);
 				continue;
 			}
-			unlink("update");
-			if (access("disable", F_OK))
+
+			unlinkat(modfd, "update", 0);
+
+			if (faccessat(modfd, "disable", F_OK, 0) != 0)
 				module_list.emplace_back(entry->d_name);
-			chdir("..");
 		}
 	}
-	chdir("/");
 }
 
 static bool load_modules(node_entry *root) {

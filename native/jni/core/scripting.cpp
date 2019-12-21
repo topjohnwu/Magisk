@@ -26,30 +26,31 @@ void exec_script(const char *script) {
 
 void exec_common_script(const char *stage) {
 	char path[4096];
-	sprintf(path, SECURE_DIR "/%s.d", stage);
+	char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage);
 	auto dir = xopen_dir(path);
 	if (!dir)
 		return;
-	chdir(path);
 
+	int dfd = dirfd(dir.get());
 	bool pfs = stage == "post-fs-data"sv;
+	*(name++) = '/';
+
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_REG) {
-			if (access(entry->d_name, X_OK) == -1)
+			if (faccessat(dfd, entry->d_name, X_OK, 0) != 0)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
+			strcpy(name, entry->d_name);
 			exec_t exec {
 				.pre_exec = set_path,
 				.fork = pfs ? fork_no_zombie : fork_dont_care
 			};
 			if (pfs)
-				exec_command_sync(exec, "/system/bin/sh", entry->d_name);
+				exec_command_sync(exec, "/system/bin/sh", path);
 			else
-				exec_command(exec, "/system/bin/sh", entry->d_name);
+				exec_command(exec, "/system/bin/sh", path);
 		}
 	}
-
-	chdir("/");
 }
 
 void exec_module_script(const char *stage, const vector<string> &module_list) {
