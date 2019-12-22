@@ -413,10 +413,9 @@ static bool magisk_env() {
 }
 
 static void prepare_modules() {
-	DIR *dir;
-	struct dirent *entry;
-	if ((dir = opendir(MODULEUPGRADE))) {
-		while ((entry = xreaddir(dir))) {
+	// Upgrade modules
+	if (auto dir = xopen_dir(MODULEUPGRADE); dir) {
+		for (dirent *entry; (entry = xreaddir(dir.get()));) {
 			if (entry->d_type == DT_DIR) {
 				if (entry->d_name == "."sv || entry->d_name == ".."sv)
 					continue;
@@ -429,7 +428,6 @@ static void prepare_modules() {
 				rename(buf2, buf);
 			}
 		}
-		closedir(dir);
 		rm_rf(MODULEUPGRADE);
 	}
 	bind_mount(MIRRDIR MODULEROOT, MODULEMNT, false);
@@ -499,36 +497,47 @@ static bool load_modules(node_entry *root) {
 
 	bool has_modules = false;
 	for (const auto &m : module_list) {
-		const auto module = m.c_str();
+		const auto module = m.data();
+		char *name = buf + snprintf(buf, sizeof(buf), MODULEROOT "/%s/", module);
+
 		// Read props
-		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MODULEROOT, module);
+		strcpy(name, "system.prop");
 		if (access(buf, F_OK) == 0) {
 			LOGI("%s: loading [system.prop]\n", module);
 			load_prop_file(buf, false);
 		}
+		// Copy sepolicy rules
+		strcpy(name, "sepolicy.rule");
+		if (access(MIRRDIR "/persist", F_OK) == 0 && access(buf, F_OK) == 0) {
+			char *p = buf2 + snprintf(buf2, sizeof(buf2), MIRRDIR "/persist/magisk/%s", module);
+			xmkdirs(buf2, 0755);
+			strcpy(p, "/sepolicy.rule");
+			cp_afc(buf, buf2);
+		}
+
 		// Check whether skip mounting
-		snprintf(buf, PATH_MAX, "%s/%s/skip_mount", MODULEROOT, module);
+		strcpy(name, "skip_mount");
 		if (access(buf, F_OK) == 0)
 			continue;
 		// Double check whether the system folder exists
-		snprintf(buf, PATH_MAX, "%s/%s/system", MODULEROOT, module);
-		if (access(buf, F_OK) == -1)
+		strcpy(name, "system");
+		if (access(buf, F_OK) != 0)
 			continue;
 
 		// Construct structure
 		has_modules = true;
 		LOGI("%s: constructing magic mount structure\n", module);
 		// If /system/vendor exists in module, create a link outside
-		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MODULEROOT, module);
+		strcpy(name, "system/vendor");
 		if (node_entry::vendor_root && access(buf, F_OK) == 0) {
-			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MODULEROOT, module);
+			snprintf(buf2, sizeof(buf2), "%s/%s/vendor", MODULEROOT, module);
 			unlink(buf2);
 			xsymlink("./system/vendor", buf2);
 		}
 		// If /system/product exists in module, create a link outside
-		snprintf(buf, PATH_MAX, "%s/%s/system/product", MODULEROOT, module);
+		strcpy(name, "system/product");
 		if (node_entry::product_root && access(buf, F_OK) == 0) {
-			snprintf(buf2, PATH_MAX, "%s/%s/product", MODULEROOT, module);
+			snprintf(buf2, sizeof(buf2), "%s/%s/product", MODULEROOT, module);
 			unlink(buf2);
 			xsymlink("./system/product", buf2);
 		}
@@ -651,22 +660,6 @@ void post_fs_data(int client) {
 		unblock_boot_process();
 	}
 
-#if 0
-	// Increment boot count
-	int boot_count = 0;
-	FILE *cf = fopen(BOOTCOUNT, "r");
-	if (cf) {
-		fscanf(cf, "%d", &boot_count);
-		fclose(cf);
-	}
-	boot_count++;
-	if (boot_count > 2)
-		creat(DISABLEFILE, 0644);
-	cf = xfopen(BOOTCOUNT, "w");
-	fprintf(cf, "%d", boot_count);
-	fclose(cf);
-#endif
-
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
 		unblock_boot_process();
@@ -747,7 +740,6 @@ void late_start(int client) {
 
 	auto_start_magiskhide();
 
-	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");
 	exec_common_script("service");
 
