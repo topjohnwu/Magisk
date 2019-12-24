@@ -105,6 +105,8 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/download"
+                android:focusable="true"
+                android:clickable="true"
                 style="@style/Widget.Icon"
                 isEnabled="@{viewModel.isConnected}"
                 android:alpha="@{viewModel.isConnected ? 1f : .2f}"

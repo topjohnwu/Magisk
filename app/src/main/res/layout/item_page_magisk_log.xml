@@ -29,6 +29,7 @@
                 items="@{item.items}"
                 scrollPosition="@={viewModel.scrollPosition}"
                 scrollPositionSmooth="@{true}"
+                android:focusable="true"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
@@ -39,6 +40,8 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             hide="@{viewModel.scrollPosition == item.items.size - 1 || item.items.size == 0}"
+            android:focusable="true"
+            android:clickable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
