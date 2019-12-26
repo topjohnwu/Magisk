@@ -118,7 +118,8 @@ recovery_actions() {
     [ -L /apex ] && rm -f /apex
     # Apex files present - needs to extract and mount the payload imgs
     if [ -f "/system/apex/com.android.runtime.release.apex" ]; then
-      local j=0 k=0
+      local j=0
+      [ -e /dev/block/loop1 ] && local minorx=$(ls -l /dev/block/loop1 | awk '{print $6}') || local minorx=1
       for i in /system/apex/*.apex; do
         local DEST="/apex/$(basename $i | sed 's/.apex$//')"
         [ "$DEST" == "/apex/com.android.runtime.release" ] && DEST="/apex/com.android.runtime"
@@ -127,10 +128,9 @@ recovery_actions() {
         mv -f /apex/apex_payload.img $DEST.img
         while [ $j -lt 50 ]; do
           local loop=/dev/loop$j
-          mknod $loop b 7 $k 2>/dev/null
+          mknod $loop b 7 $((j * minorx)) 2>/dev/null
           losetup $loop $DEST.img 2>/dev/null
           j=$((j + 1))
-          k=$((k + 8))
           losetup $loop | grep -q $DEST.img && break
         done;
         [ -z $floop ] && floop=$((j - 1))
