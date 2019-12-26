@@ -107,7 +107,7 @@ There is one additional trick you can use: if you place an empty file named `.re
 
 If you want to replace files in `/vendor` or `/product`, please place them under `$MODPATH/system/vendor` or `$MODPATH/system/product`. Magisk will transparently handle both cases, whether vendor or product is a separate partition or not.
 
-## Miscellaneous
+## Miscellaneous .replace
 Here are some tidbits in Magisk but unable to be categorized into any sections:
 
 - Socket name randomization: when you call `su`, `magiskhide`, and some commands in `magisk`, it connects to the magisk daemon `magiskd` running in the background. The connections are established through an abstract Unix socket. Any process can go through all active Unix sockets and see if the specifc name used by Magisk is in the list to determine whether `magiskd` is running. Starting from v15.4, the abstract name used in `magiskd` and `magisklogd` are randomized by `magiskinit` on each boot.
