@@ -5,26 +5,7 @@
 #
 #########################################
 
-##########
-# Presets
-##########
-
 #MAGISK_VERSION_STUB
-
-# Detect whether in boot mode
-[ -z $BOOTMODE ] && BOOTMODE=false
-$BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
-$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -qv grep && BOOTMODE=true
-
-# Presets
-MAGISKTMP=/sbin/.magisk
-NVBASE=/data/adb
-[ -z $TMPDIR ] && TMPDIR=/dev/tmp
-
-# Bootsigner related stuff
-BOOTSIGNERCLASS=a.a
-BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
-BOOTSIGNED=false
 
 ###################
 # Helper Functions
@@ -128,15 +109,15 @@ recovery_actions() {
 }
 
 recovery_cleanup() {
-  export PATH=$OLD_PATH
-  [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
-  [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
-  [ -z $OLD_LD_CFG ] || export LD_CONFIG_FILE=$OLD_LD_CFG
   ui_print "- Unmounting partitions"
   umount -l /system_root 2>/dev/null
   umount -l /system 2>/dev/null
   umount -l /vendor 2>/dev/null
   umount -l /dev/random 2>/dev/null
+  export PATH=$OLD_PATH
+  [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
+  [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
+  [ -z $OLD_LD_CFG ] || export LD_CONFIG_FILE=$OLD_LD_CFG
 }
 
 #######################
@@ -165,19 +146,29 @@ find_block() {
   return 1
 }
 
-mount_part() {
-  $BOOTMODE && return
+# mount_name <partname> <mountpoint> <flag>
+mount_name() {
   local PART=$1
-  local POINT=/${PART}
+  local POINT=$2
+  local FLAG=$3
   [ -L $POINT ] && rm -f $POINT
-  mkdir $POINT 2>/dev/null
+  mkdir -p $POINT 2>/dev/null
   is_mounted $POINT && return
-  ui_print "- Mounting $PART"
-  mount -o ro $POINT 2>/dev/null
+  ui_print "- Mounting $POINT"
+  # First try mounting with fstab
+  mount $FLAG $POINT 2>/dev/null
   if ! is_mounted $POINT; then
-    local BLOCK=`find_block $PART$SLOT`
-    mount -o ro $BLOCK $POINT
+    local BLOCK=`find_block $PART`
+    mount $FLAG $BLOCK $POINT
   fi
+}
+
+mount_ro_ensure() {
+  # We handle ro partitions only in recovery
+  $BOOTMODE && return
+  local PART=$1$SLOT
+  local POINT=/$1
+  mount_name $PART $POINT '-o ro'
   is_mounted $POINT || abort "! Cannot mount $POINT"
 }
 
@@ -190,7 +181,8 @@ mount_partitions() {
   fi
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
-  mount_part system
+  # Mount ro partitions
+  mount_ro_ensure system
   if [ -f /system/init.rc ]; then
     SYSTEM_ROOT=true
     [ -L /system_root ] && rm -f /system_root
@@ -201,8 +193,20 @@ mount_partitions() {
     grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
     && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   fi
-  [ -L /system/vendor ] && mount_part vendor
+  [ -L /system/vendor ] && mount_ro_ensure vendor
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
+
+  # Persist partitions for module install in recovery
+  if ! $BOOTMODE && [ ! -z $PERSISTDIR ]; then
+    # Try to mount persist
+    PERSISTDIR=/persist
+    mount_name persist /persist
+    if ! is_mounted /persist; then
+      # Fallback to cache
+      mount_name cache /cache
+      is_mounted /cache && PERSISTDIR=/cache || PERSISTDIR=
+    fi
+  fi
 }
 
 get_flags() {
@@ -293,8 +297,8 @@ patch_dtbo_image() {
   return 1
 }
 
+# Common installation script for flash_script.sh and addon.d.sh
 patch_boot_image() {
-  # Common installation script for flash_script.sh (updater-script) and addon.d.sh
   SOURCEDMODE=true
   cd $MAGISKBIN
 
@@ -448,8 +452,22 @@ request_zip_size_check() {
 
 boot_actions() { return; }
 
-########
-# Setup
-########
+##########
+# Presets
+##########
+
+# Detect whether in boot mode
+[ -z $BOOTMODE ] && ps | grep zygote | grep -qv grep && BOOTMODE=true
+[ -z $BOOTMODE ] && ps -A 2>/dev/null | grep zygote | grep -qv grep && BOOTMODE=true
+[ -z $BOOTMODE ] && BOOTMODE=false
+
+MAGISKTMP=/sbin/.magisk
+NVBASE=/data/adb
+[ -z $TMPDIR ] && TMPDIR=/dev/tmp
+
+# Bootsigner related stuff
+BOOTSIGNERCLASS=a.a
+BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
+BOOTSIGNED=false
 
 resolve_vars
