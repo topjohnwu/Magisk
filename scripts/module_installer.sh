@@ -123,7 +123,7 @@ else
   print_modname
 
   ui_print "- Extracting module files"
-  unzip -o "$ZIPFILE" -d $MODPATH >&2
+  unzip -o "$ZIPFILE" -x 'META-INF/*' -d $MODPATH >&2
 
   # Default permissions
   set_perm_recursive $MODPATH 0 0 0755 0644
@@ -155,8 +155,7 @@ fi
 # Remove stuffs that don't belong to modules
 rm -rf \
 $MODPATH/system/placeholder $MODPATH/customize.sh \
-$MODPATH/META-INF $MODPATH/README.md $MODPATH/.git* \
-2>/dev/null
+$MODPATH/README.md $MODPATH/.git* 2>/dev/null
 
 ##############
 # Finalizing
