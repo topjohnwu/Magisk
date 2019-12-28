@@ -28,6 +28,11 @@ is_legacy_script() {
   return $?
 }
 
+is_customize_script() {
+  unzip -l "$ZIPFILE" customize.sh | grep -q customize.sh
+  return $?
+}
+
 print_modname() {
   local len
   len=`echo -n $MODNAME | wc -c`
@@ -89,6 +94,8 @@ mkdir -p $MODPATH
 # Install
 ##########
 
+print_modname
+
 if is_legacy_script; then
   unzip -oj "$ZIPFILE" module.prop install.sh uninstall.sh 'common/*' -d $TMPDIR >&2
 
@@ -119,17 +126,20 @@ if is_legacy_script; then
 
   ui_print "- Setting permissions"
   set_permissions
+elif is_customize_script; then 
+  unzip -oj "$ZIPFILE" module.prop customize.sh uninstall.sh -d $MODPATH >&2
+  
+  # Default permissions
+  set_perm_recursive $MODPATH 0 0 0755 0644
+  
+  # Load customized installation script
+  . $MODPATH/customize.sh
 else
-  print_modname
-
   ui_print "- Extracting module files"
   unzip -o "$ZIPFILE" -x 'META-INF/*' -d $MODPATH >&2
 
   # Default permissions
   set_perm_recursive $MODPATH 0 0 0755 0644
-
-  # Load customization script
-  [ -f $MODPATH/customize.sh ] && . $MODPATH/customize.sh
 fi
 
 # Handle replace folders
