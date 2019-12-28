@@ -47,8 +47,11 @@ void magisk_cpio::patch() {
 	for (auto it = entries.begin(); it != entries.end();) {
 		auto cur = it++;
 		bool fstab = (!keepverity || !keepforceencrypt) &&
-					 !str_starts(cur->first, ".backup") &&
-					 str_contains(cur->first, "fstab") && S_ISREG(cur->second->mode);
+					 S_ISREG(cur->second->mode) &&
+					 !str_starts(cur->first, ".backup") && 
+					 !str_contains(cur->first, "twrp") && 
+					 !str_contains(cur->first, "recovery") &&
+					 str_contains(cur->first, "fstab");
 		if (!keepverity) {
 			if (fstab) {
 				fprintf(stderr, "Found fstab file [%s]\n", cur->first.data());
