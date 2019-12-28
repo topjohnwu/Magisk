@@ -122,11 +122,15 @@ if is_legacy_script; then
 else
   print_modname
 
-  ui_print "- Extracting module files"
-  unzip -o "$ZIPFILE" -x 'META-INF/*' -d $MODPATH >&2
+  unzip -o "$ZIPFILE" customize.sh -d $MODPATH >&2
 
-  # Default permissions
-  set_perm_recursive $MODPATH 0 0 0755 0644
+  if ! grep -q '^SKIPUNZIP=' $MODPATH/customize.sh 2>/dev/null; then
+    ui_print "- Extracting module files"
+    unzip -o "$ZIPFILE" -x 'META-INF/*' -d $MODPATH >&2
+
+    # Default permissions
+    set_perm_recursive $MODPATH 0 0 0755 0644
+  fi
 
   # Load customization script
   [ -f $MODPATH/customize.sh ] && . $MODPATH/customize.sh
