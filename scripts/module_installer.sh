@@ -124,7 +124,7 @@ else
 
   unzip -o "$ZIPFILE" customize.sh -d $MODPATH >&2
 
-  if ! grep -q '^SKIPUNZIP=' $MODPATH/customize.sh 2>/dev/null; then
+  if ! grep -q '^SKIPUNZIP=1$' $MODPATH/customize.sh 2>/dev/null; then
     ui_print "- Extracting module files"
     unzip -o "$ZIPFILE" -x 'META-INF/*' -d $MODPATH >&2
 
