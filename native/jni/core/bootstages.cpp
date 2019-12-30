@@ -414,7 +414,7 @@ static bool magisk_env() {
 
 static void prepare_modules() {
 	// Upgrade modules
-	if (auto dir = xopen_dir(MODULEUPGRADE); dir) {
+	if (auto dir = open_dir(MODULEUPGRADE); dir) {
 		for (dirent *entry; (entry = xreaddir(dir.get()));) {
 			if (entry->d_type == DT_DIR) {
 				if (entry->d_name == "."sv || entry->d_name == ".."sv)
@@ -481,6 +481,7 @@ static void collect_modules() {
 				if (access(buf, F_OK) == 0)
 					exec_script(buf);
 				frm_rf(modfd);
+				unlinkat(dfd, entry->d_name, AT_REMOVEDIR);
 				continue;
 			}
 
