@@ -282,33 +282,61 @@ void boot_img::parse_image(uint8_t *addr) {
 	fprintf(stderr, "RAMDISK_FMT     [%s]\n", fmt2name[r_fmt]);
 }
 
-void boot_img::find_kernel_dtb() {
-	const int eof = static_cast<int>(hdr->kernel_size());
-	for (int i = 0; i < eof - (int) sizeof(fdt_header); ++i) {
-		auto fdt_hdr = reinterpret_cast<fdt_header *>(kernel + i);
+static int find_dtb_offset(uint8_t *buf, int sz) {
+	for (int off = 0; off < sz - (int) sizeof(fdt_header); ++off) {
+		auto fdt_hdr = reinterpret_cast<fdt_header *>(buf + off);
 		if (fdt32_to_cpu(fdt_hdr->magic) != FDT_MAGIC)
 			continue;
 
 		// Check that fdt_header.totalsize does not overflow kernel image size
 		uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
-		if (totalsize + i > eof)
+		if (totalsize + off > sz)
 			continue;
 
 		// Check that fdt_header.off_dt_struct does not overflow kernel image size
 		uint32_t off_dt_struct = fdt32_to_cpu(fdt_hdr->off_dt_struct);
-		if (off_dt_struct + i > eof)
+		if (off_dt_struct + off > sz)
 			continue;
 
 		// Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
-		auto fdt_node_hdr = reinterpret_cast<fdt_node_header *>(kernel + i + off_dt_struct);
+		auto fdt_node_hdr = reinterpret_cast<fdt_node_header *>(buf + off + off_dt_struct);
 		if (fdt32_to_cpu(fdt_node_hdr->tag) != FDT_BEGIN_NODE)
 			continue;
 
-		kernel_dtb = kernel + i;
-		kernel_dt_size = eof - i;
-		hdr->kernel_size() = i;
+		return off;
+	}
+	return -1;
+}
+
+void boot_img::find_kernel_dtb() {
+	if (int off = find_dtb_offset(kernel, hdr->kernel_size()); off > 0) {
+		kernel_dtb = kernel + off;
+		kernel_dt_size = hdr->kernel_size() - off;
+		hdr->kernel_size() = off;
 		fprintf(stderr, "KERNEL_DTB      [%u]\n", kernel_dt_size);
-		break;
+	}
+}
+
+int split_image_dtb(const char *filename) {
+	uint8_t *buf;
+	size_t sz;
+	mmap_ro(filename, buf, sz);
+	run_finally f([=]{ munmap(buf, sz); });
+
+	if (int off = find_dtb_offset(buf, sz); off > 0) {
+		format_t fmt = check_fmt(buf, sz);
+		if (COMPRESSED(fmt)) {
+			int fd = creat(KERNEL_FILE, 0644);
+			decompress(fmt, fd, buf, off);
+			close(fd);
+		} else {
+			dump(buf, off, KERNEL_FILE);
+		}
+		dump(buf + off, sz - off, KER_DTB_FILE);
+		return 0;
+	} else {
+		fprintf(stderr, "Cannot find DTB in %s\n", filename);
+		return 1;
 	}
 }
 
