@@ -167,7 +167,7 @@
     <string name="request_timeout_summary">%1$d 秒</string>
     <string name="settings_su_reauth_title">更新後重新驗證</string>
     <string name="settings_su_reauth_summary">應用程式更新後，重新驗證超級使用者的請求</string>
-
+    <string name="settings_su_biometric_title">啟用生物特徵驗證</string>
     <string name="multiuser_mode">多重使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
     <string name="settings_owner_manage">由裝置擁有者管理</string>
