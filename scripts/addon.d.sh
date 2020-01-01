@@ -70,9 +70,8 @@ main() {
 
   remove_system_su
   find_manager_apk
-  patch_boot_image
+  install_magisk
 
-  cd /
   # Cleanups
   $BOOTMODE || recovery_cleanup
   rm -rf $TMPDIR

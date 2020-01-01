@@ -29,11 +29,12 @@ class RootInit : Shell.Initializer() {
             job.add(context.rawResource(R.raw.nonroot_utils))
         }
 
-        job.add("mount_partitions",
-                "get_flags",
-                "run_migrations",
-                "export BOOTMODE=true")
-                .exec()
+        job.add(
+            "mount_partitions",
+            "get_flags",
+            "run_migrations",
+            "export BOOTMODE=true"
+        ).exec()
 
         Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
         Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()

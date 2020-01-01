@@ -110,8 +110,8 @@ recovery_actions() {
 
 recovery_cleanup() {
   ui_print "- Unmounting partitions"
-  umount -l /system_root 2>/dev/null
   umount -l /system 2>/dev/null
+  umount -l /system_root 2>/dev/null
   umount -l /vendor 2>/dev/null
   umount -l /dev/random 2>/dev/null
   export PATH=$OLD_PATH
@@ -196,7 +196,7 @@ mount_partitions() {
   [ -L /system/vendor ] && mount_ro_ensure vendor
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
 
-  # Persist partitions for module install in recovery
+  # Mount persist partition in recovery
   if ! $BOOTMODE && [ ! -z $PERSISTDIR ]; then
     # Try to mount persist
     PERSISTDIR=/persist
@@ -276,30 +276,29 @@ flash_image() {
   return 0
 }
 
-find_dtbo_image() {
-  DTBOIMAGE=`find_block dtbo$SLOT`
-}
-
-patch_dtbo_image() {
-  find_dtbo_image
-  if [ ! -z $DTBOIMAGE ]; then
-    ui_print "- DTBO image: $DTBOIMAGE"
-    local PATCHED=$TMPDIR/dtbo
-    if $MAGISKBIN/magiskboot dtb $DTBOIMAGE patch $PATCHED; then
-      ui_print "- Backing up stock DTBO image"
-      $MAGISKBIN/magiskboot compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
-      ui_print "- Patching DTBO to remove avb-verity"
-      cat $PATCHED /dev/zero > $DTBOIMAGE
-      rm -f $PATCHED
-      return 0
+patch_dtb_partitions() {
+  local result=1
+  cd $MAGISKBIN
+  for name in dtb dtbo; do
+    local IMAGE=`find_block $name$SLOT`
+    if [ ! -z $IMAGE ]; then
+      ui_print "- $name image: $IMAGE"
+      if ./magiskboot dtb $IMAGE patch dt.patched; then
+        result=0
+        ui_print "- Backing up stock $name image"
+        cat $IMAGE > stock_${name}.img
+        ui_print "- Flashing patched $name"
+        cat dt.patched /dev/zero > $IMAGE
+        rm -f dt.patched
+      fi
     fi
-  fi
-  return 1
+  done
+  cd /
+  return $result
 }
 
 # Common installation script for flash_script.sh and addon.d.sh
-patch_boot_image() {
-  SOURCEDMODE=true
+install_magisk() {
   cd $MAGISKBIN
 
   eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
@@ -308,6 +307,7 @@ patch_boot_image() {
   $IS64BIT && mv -f magiskinit64 magiskinit 2>/dev/null || rm -f magiskinit64
 
   # Source the boot patcher
+  SOURCEDMODE=true
   . ./boot_patch.sh "$BOOTIMAGE"
 
   ui_print "- Flashing new boot image"
@@ -322,18 +322,8 @@ patch_boot_image() {
   ./magiskboot cleanup
   rm -f new-boot.img
 
-  if [ -f stock_boot* ]; then
-    rm -f /data/stock_boot* 2>/dev/null
-    $DATA && mv stock_boot* /data
-  fi
-
-  # Patch DTBO together with boot image
-  $KEEPVERITY || patch_dtbo_image
-
-  if [ -f stock_dtbo* ]; then
-    rm -f /data/stock_dtbo* 2>/dev/null
-    $DATA && mv stock_dtbo* /data
-  fi
+  patch_dtb_partitions
+  run_migrations
 }
 
 sign_chromeos() {
@@ -413,6 +403,41 @@ find_manager_apk() {
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk
   fi
   [ -f $APK ] || ui_print "! Unable to detect Magisk Manager APK for BootSigner"
+}
+
+run_migrations() {
+  local LOCSHA1
+  local TARGET
+  # Legacy app installation
+  local BACKUP=/data/adb/magisk/stock_boot*.gz
+  if [ -f $BACKUP ]; then
+    cp $BACKUP /data
+    rm -f $BACKUP
+  fi
+
+  # Legacy backup
+  for gz in /data/stock_boot*.gz; do
+    [ -f $gz ] || break
+    LOCSHA1=`basename $gz | sed -e 's/stock_boot_//' -e 's/.img.gz//'`
+    [ -z $LOCSHA1 ] && break
+    mkdir /data/magisk_backup_${LOCSHA1} 2>/dev/null
+    mv $gz /data/magisk_backup_${LOCSHA1}/boot.img.gz
+  done
+
+  # Stock backups
+  LOCSHA1=$SHA1
+  for name in boot dtb dtbo; do
+    BACKUP=/data/adb/magisk/stock_${name}.img
+    [ -f $BACKUP ] || continue
+    if [ $name = 'boot' ]; then
+      LOCSHA1=`$MAGISKBIN/magiskboot sha1 $BACKUP`
+      mkdir /data/magisk_backup_${LOCSHA1} 2>/dev/null
+    fi
+    TARGET=/data/magisk_backup_${LOCSHA1}/${name}.img
+    cp $BACKUP $TARGET
+    rm -f $BACKUP
+    gzip -9f $TARGET
+  done
 }
 
 #################

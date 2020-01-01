@@ -17,16 +17,6 @@ fix_env() {
   cd /
 }
 
-run_migrations() {
-  # Move the stock backups
-  if [ -f /data/magisk/stock_boot* ]; then
-    mv /data/magisk/stock_boot* /data 2>/dev/null
-  fi
-  if [ -f /data/adb/magisk/stock_boot* ]; then
-    mv /data/adb/magisk/stock_boot* /data 2>/dev/null
-  fi
-}
-
 direct_install() {
   rm -rf $MAGISKBIN/* 2>/dev/null
   mkdir -p $MAGISKBIN 2>/dev/null
@@ -43,30 +33,43 @@ direct_install() {
   return 0
 }
 
-mm_patch_dtbo() {
-  $KEEPVERITY && return 1 || patch_dtbo_image
+mm_patch_dtb() {
+  local result=1
+  local PATCHED=$TMPDIR/dt.patched
+  for name in dtb dtbo; do
+    local IMAGE=`find_block $name$SLOT`
+    if [ ! -z $IMAGE ]; then
+      if $MAGISKBIN/magiskboot dtb $IMAGE patch $PATCHED; then
+        result=0
+        if [ ! -z $SHA1 ]; then
+          # Backup stuffs
+          mkdir /data/magisk_backup_${SHA1} 2>/dev/null
+          cat $IMAGE | gzip -9 > /data/magisk_backup_${SHA1}/${name}.img.gz
+        fi
+        cat $PATCHED /dev/zero > $IMAGE
+        rm -f $PATCHED
+      fi
+    fi
+  done
+  return $result
 }
 
 restore_imgs() {
-  local SHA1=`grep_prop SHA1 /sbin/.magisk/config`
-  [ -z $SHA1 ] && local SHA1=`cat /.backup/.sha1`
   [ -z $SHA1 ] && return 1
-  local STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
-  local STOCKDTBO=/data/stock_dtbo.img.gz
-  [ -f $STOCKBOOT ] || return 1
+  local BACKUPDIR=/data/magisk_backup_$SHA1
+  [ -d $BACKUPDIR ] || return 1
 
   get_flags
   find_boot_image
-  find_dtbo_image
 
-  if [ -f $STOCKDTBO -a -b "$DTBOIMAGE" ]; then
-    flash_image $STOCKDTBO $DTBOIMAGE
-  fi
-  if [ -f $STOCKBOOT -a -b "$BOOTIMAGE" ]; then
-    flash_image $STOCKBOOT $BOOTIMAGE
-    return 0
-  fi
-  return 1
+  for name in dtb dtbo; do
+    [ -f $BACKUPDIR/${name}.img.gz ] || continue
+    local IMAGE=`find_block $name$SLOT`
+    [ -z $IMAGE ] && continue
+    flash_image $BACKUPDIR/${name}.img.gz $IMAGE
+  done
+  [ -f $BACKUPDIR/boot.img.gz ] || return 1
+  flash_image $BACKUPDIR/boot.img.gz $BOOTIMAGE
 }
 
 post_ota() {
@@ -119,3 +122,5 @@ force_pm_install() {
   [ "$VERIFY" -eq 1 ] && settings put global package_verifier_enable 1
   return $res
 }
+
+SHA1=`grep_prop SHA1 /sbin/.magisk/config`

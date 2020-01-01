@@ -15,6 +15,7 @@ TMPDIR=/dev/tmp
 
 INSTALLER=$TMPDIR/install
 CHROMEDIR=$INSTALLER/chromeos
+PERSISTDIR=/sbin/.magisk/mirror/persist
 
 # Default permissions
 umask 022
@@ -50,6 +51,7 @@ chmod -R 755 $MAGISKBIN
 check_data
 $DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
 $BOOTMODE || recovery_actions
+run_migrations
 
 ##########################################################################################
 # Uninstall
@@ -57,7 +59,6 @@ $BOOTMODE || recovery_actions
 
 get_flags
 find_boot_image
-find_dtbo_image
 
 [ -e $BOOTIMAGE ] || abort "! Unable to detect boot image"
 ui_print "- Found target image: $BOOTIMAGE"
@@ -96,16 +97,18 @@ case $((STATUS & 3)) in
   1 )  # Magisk patched
     ui_print "- Magisk patched image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
-    STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
-    STOCKDTBO=/data/stock_dtbo.img.gz
-    if [ -f $STOCKBOOT ]; then
+    SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
+    BACKUPDIR=/data/magisk_backup_$SHA1
+    if [ -d $BACKUPDIR ]; then
       ui_print "- Restoring stock boot image"
-      flash_image $STOCKBOOT $BOOTIMAGE
-      if [ -f $STOCKDTBO -a -b "$DTBOIMAGE" ]; then
-        ui_print "- Restoring stock dtbo image"
-        flash_image $STOCKDTBO $DTBOIMAGE
-      fi
+      flash_image $BACKUPDIR/boot.img.gz $BOOTIMAGE
+      for name in dtb dtbo; do
+        [ -f $BACKUPDIR/${name}.img.gz ] || continue
+        IMAGE=`find_block $name$SLOT`
+        [ -z $IMAGE ] && continue
+        ui_print "- Restoring stock $name image"
+        flash_image $BACKUPDIR/${name}.img.gz $IMAGE
+      done
     else
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
@@ -128,9 +131,10 @@ case $((STATUS & 3)) in
 esac
 
 ui_print "- Removing Magisk files"
-rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
-        /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*magisk* \
-        /data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* 2>/dev/null
+rm -rf \
+/cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
+/data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*magisk* \
+/data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* $PERSISTDIR/magisk 2>/dev/null
 
 if [ -f /system/addon.d/99-magisk.sh ]; then
   mount -o rw,remount /system

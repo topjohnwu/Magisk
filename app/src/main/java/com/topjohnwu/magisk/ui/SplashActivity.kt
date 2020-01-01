@@ -49,7 +49,7 @@ open class SplashActivity : Activity() {
         // Setup shortcuts
         Shortcuts.setup(this)
 
-        Shell.su("mm_patch_dtbo").submit {
+        Shell.su("mm_patch_dtb").submit {
             if (it.isSuccess)
                 Notifications.dtboPatched(this)
         }
