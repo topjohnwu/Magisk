@@ -48,6 +48,7 @@ object Config : PreferenceModel, DBConfig {
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
         const val DOWNLOAD_PATH = "download_path"
+        const val BOOT_ID = "boot_id"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -104,6 +105,8 @@ object Config : PreferenceModel, DBConfig {
                 Value.CANARY_CHANNEL
         }
         else Value.DEFAULT_CHANNEL
+
+    var bootId by preference(Key.BOOT_ID, "")
 
     var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
