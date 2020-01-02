@@ -1,5 +1,5 @@
 # Magisk Documentation
-(Updated on 2019.12.29)
+(Updated on 2020.1.2)
 
 - [Installation](install.md)
 - [Tutorials](tutorials.md)

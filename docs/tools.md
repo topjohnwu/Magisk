@@ -119,20 +119,22 @@ Usage: magiskpolicy [--options...] [policy statements...]
 Options:
    --help            show help message for policy statements
    --load FILE       load policies from FILE
-   --load-split      load from preloaded sepolicy or compile
+   --load-split      load from precompiled sepolicy or compile
                      split policies
    --compile-split   compile split cil policies
    --save FILE       save policies to FILE
    --live            directly apply sepolicy live
    --magisk          inject built-in rules for a minimal
                      Magisk selinux environment
+   --apply FILE      apply rules from FILE, read and parsed
+                     line by line as policy statements
 
 If neither --load or --compile-split is specified, it will load
 from current live policies (/sys/fs/selinux/policy)
 
 One policy statement should be treated as one parameter;
-this means a full policy statement should be enclosed in quotes;
-multiple policy statements can be provided in a single command
+this means a full policy statement should be enclosed in quotes.
+Multiple policy statements can be provided in a single command.
 
 The statements has a format of "<rule_name> [args...]"
 Multiple types and permissions can be grouped into collections
@@ -173,10 +175,10 @@ Notes:
 Example: allow { s1 s2 } { t1 t2 } class *
 Will be expanded to:
 
-allow s1 t1 class { all permissions }
-allow s1 t2 class { all permissions }
-allow s2 t1 class { all permissions }
-allow s2 t2 class { all permissions }
+allow s1 t1 class { all-permissions }
+allow s1 t2 class { all-permissions }
+allow s2 t1 class { all-permissions }
+allow s2 t2 class { all-permissions }
 ```
 
 
@@ -202,7 +204,6 @@ Advanced Options (Internal APIs):
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
-   --use-broadcast           use broadcast for su logging and notify
 
 Supported init triggers:
    post-fs-data, service, boot-complete
@@ -269,5 +270,4 @@ Actions:
    ls              Print the current hide list
    exec CMDs...    Execute commands in isolated mount
                    namespace and do all hide unmounts
-   test            Run process monitor test
 ```
