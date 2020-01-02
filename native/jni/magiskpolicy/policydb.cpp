@@ -8,11 +8,12 @@
 #include <utils.h>
 #include <logging.h>
 #include <stream.h>
+#include <magiskpolicy.h>
 
-#include "magiskpolicy.h"
 #include "sepolicy.h"
 
 int load_policydb(const char *file) {
+	LOGD("Load policy from: %s\n", file);
 	if (magisk_policydb)
 		destroy_policydb();
 
@@ -101,7 +102,7 @@ static void load_cil(struct cil_db *db, const char *file) {
 	size_t size;
 	mmap_ro(file, addr, size);
 	cil_add_file(db, (char *) file, addr, size);
-	LOGD("cil_add[%s]\n", file);
+	LOGD("cil_add [%s]\n", file);
 	munmap(addr, size);
 }
 
@@ -178,7 +179,7 @@ int dump_policydb(const char *file) {
 	size_t len;
 
 	{
-		auto fp = make_stream<byte_stream>(data, len);
+		auto fp = make_stream_fp<byte_stream>(data, len);
 		struct policy_file pf;
 		policy_file_init(&pf);
 		pf.type = PF_USE_STDIO;

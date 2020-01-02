@@ -24,9 +24,6 @@ import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.refreshLocale
 import com.topjohnwu.magisk.utils.updateConfig
-import com.topjohnwu.magisk.utils.currentLocale
-import com.topjohnwu.magisk.utils.defaultLocale
-import java.util.*
 import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
 
 fun AssetManager.addAssetPath(path: String) {

@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.data.database
 
-import com.topjohnwu.magisk.data.database.magiskdb.Delete
 import com.topjohnwu.magisk.data.database.magiskdb.BaseDao
+import com.topjohnwu.magisk.data.database.magiskdb.Delete
 import com.topjohnwu.magisk.data.database.magiskdb.Replace
 import com.topjohnwu.magisk.data.database.magiskdb.Select
 

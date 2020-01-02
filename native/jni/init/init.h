@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include <vector>
 
+#include <magisk.h>
+
 struct cmdline {
-	bool system_as_root;
+	bool skip_initramfs;
 	bool force_normal_boot;
 	char slot[3];
 	char dt_dir[128];
@@ -45,7 +47,7 @@ protected:
 	virtual void cleanup();
 public:
 	BaseInit(char *argv[], cmdline *cmd) :
-	cmd(cmd), argv(argv), mount_list{"/sys", "/proc", "/dev"} {}
+	cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
 	virtual ~BaseInit() = default;
 	virtual void start() = 0;
 };
@@ -53,26 +55,12 @@ public:
 class MagiskInit : public BaseInit {
 protected:
 	raw_data self;
+	const char *persist_dir;
 
 	virtual void early_mount() = 0;
-	bool read_dt_fstab(const char *name, char *partname, char *fstype);
 	bool patch_sepolicy(const char *file = "/sepolicy");
 public:
 	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
-};
-
-class RootFSBase : public MagiskInit {
-protected:
-	int root = -1;
-
-	virtual void setup_rootfs();
-public:
-	RootFSBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
-	void start() override {
-		early_mount();
-		setup_rootfs();
-		exec_init();
-	}
 };
 
 class SARBase : public MagiskInit {
@@ -83,7 +71,9 @@ protected:
 	void backup_files();
 	void patch_rootdir();
 public:
-	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {};
+	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
+		persist_dir = MIRRDIR "/persist/magisk";
+	}
 	void start() override {
 		early_mount();
 		patch_rootdir();
@@ -96,7 +86,7 @@ public:
  * *************/
 
 class ABFirstStageInit : public BaseInit {
-protected:
+private:
 	void prepare();
 public:
 	ABFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
@@ -107,7 +97,7 @@ public:
 };
 
 class AFirstStageInit : public BaseInit {
-protected:
+private:
 	void prepare();
 public:
 	AFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
@@ -140,26 +130,26 @@ public:
  * Initramfs
  * **********/
 
-class RootFSInit : public RootFSBase {
+class RootFSInit : public MagiskInit {
+private:
+	int root = -1;
+	void setup_rootfs();
 protected:
 	void early_mount() override;
 public:
-	RootFSInit(char *argv[], cmdline *cmd) : RootFSBase(argv, cmd) {};
-};
+	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
+		persist_dir = "/dev/.magisk/mirror/persist/magisk";
+	}
 
-/* ****************
- * Compat-mode SAR
- * ****************/
-
-class SARCompatInit : public RootFSBase {
-protected:
-	void early_mount() override;
-	void setup_rootfs() override;
-public:
-	SARCompatInit(char *argv[], cmdline *cmd) : RootFSBase(argv, cmd) {};
+	void start() override {
+		early_mount();
+		setup_rootfs();
+		exec_init();
+	}
 };
 
 void load_kernel_info(cmdline *cmd);
 int dump_magisk(const char *path, mode_t mode);
 int magisk_proxy_main(int argc, char *argv[]);
 void setup_klog();
+void mount_sbin();

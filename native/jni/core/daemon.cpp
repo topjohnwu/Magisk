@@ -118,10 +118,10 @@ static void main_daemon() {
 
 	// Unmount pre-init patches
 	if (access(ROOTMNT, F_OK) == 0) {
-		file_readline(ROOTMNT, [](auto line) -> bool {
+		file_readline(true, ROOTMNT, [](auto line) -> bool {
 			umount2(line.data(), MNT_DETACH);
 			return true;
-		}, true);
+		});
 	}
 
 	LOGI(SHOW_VER(Magisk) " daemon started\n");

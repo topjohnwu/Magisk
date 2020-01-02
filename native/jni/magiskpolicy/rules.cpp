@@ -1,7 +1,7 @@
 #include <logging.h>
 #include <flags.h>
+#include <magiskpolicy.h>
 
-#include "magiskpolicy.h"
 #include "sepolicy.h"
 
 static void allowSuClient(const char *target) {

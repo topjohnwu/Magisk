@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.data.database
 import android.content.Context
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.data.database.magiskdb.Delete
 import com.topjohnwu.magisk.data.database.magiskdb.BaseDao
+import com.topjohnwu.magisk.data.database.magiskdb.Delete
 import com.topjohnwu.magisk.data.database.magiskdb.Replace
 import com.topjohnwu.magisk.data.database.magiskdb.Select
 import com.topjohnwu.magisk.extensions.now

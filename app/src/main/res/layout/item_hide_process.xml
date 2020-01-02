@@ -38,6 +38,8 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/hide_process_icon"
+            android:focusable="true"
+            android:clickable="true"
             style="@style/Widget.Icon"
             isChecked="@{item.isHidden}"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -16,7 +16,7 @@ using namespace std;
 
 static void usage(char *arg0) {
 	fprintf(stderr,
-FULL_VER(MagiskBoot) R"EOF(  - Boot Image Modification Tool
+FULL_VER(MagiskBoot) R"EOF( - Boot Image Modification Tool
 
 Usage: %s <action> [args...]
 
@@ -84,6 +84,15 @@ Supported actions:
         If [OUT] is not specified, it will directly output to <input>
         Configure with env variables: KEEPVERITY TWOSTAGEINIT
 
+  split <input>
+    Split image.*-dtb into kernel + kernel_dtb
+
+  sha1 <file>
+    Print the SHA1 checksum for <file>
+
+  cleanup
+    Cleanup the current working directory
+
   compress[=method] <infile> [outfile]
     Compress <infile> with [method] (default: gzip), optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
@@ -102,16 +111,7 @@ Supported actions:
 	for (auto &it : name2fmt)
 		fprintf(stderr, "%s ", it.first.data());
 
-	fprintf(stderr, R"EOF(
-
-  sha1 <file>
-    Print the SHA1 checksum for <file>
-
-  cleanup
-    Cleanup the current working directory
-
-)EOF");
-
+	fprintf(stderr, "\n\n");
 	exit(1);
 }
 
@@ -147,6 +147,8 @@ int main(int argc, char *argv[]) {
 			printf("%02x", i);
 		printf("\n");
 		munmap(buf, size);
+	} else if (argc > 2 && action == "split") {
+		return split_image_dtb(argv[2]);
 	} else if (argc > 2 && action == "unpack") {
 		int idx = 2;
 		bool nodecomp = false;

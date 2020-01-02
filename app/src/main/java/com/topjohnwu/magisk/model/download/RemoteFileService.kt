@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.model.download
 import android.app.Activity
 import android.app.Notification
 import android.content.Intent
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R

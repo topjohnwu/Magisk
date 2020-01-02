@@ -73,6 +73,7 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
 	magiskpolicy/policydb.cpp \
+	magiskpolicy/statement.cpp \
 	magiskpolicy/sepolicy.c
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
@@ -97,7 +98,6 @@ ifdef BB_INIT
 LOCAL_STATIC_LIBRARIES := libsepol libxz libutils
 LOCAL_C_INCLUDES := \
 	jni/include \
-	jni/magiskpolicy \
 	$(EXT_PATH)/include \
 	out \
 	out/$(TARGET_ARCH_ABI) \
@@ -106,13 +106,14 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	init/init.cpp \
-	init/early_mount.cpp \
+	init/mount.cpp \
 	init/rootdir.cpp \
 	init/getinfo.cpp \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
 	magiskpolicy/policydb.cpp \
+	magiskpolicy/statement.cpp \
 	magiskpolicy/sepolicy.c
 
 LOCAL_LDFLAGS := -static

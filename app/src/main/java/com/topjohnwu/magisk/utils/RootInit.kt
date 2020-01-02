@@ -2,12 +2,10 @@ package com.topjohnwu.magisk.utils
 
 import android.content.Context
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.Info
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.rawResource
 import com.topjohnwu.magisk.wrap
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.io.SuFile
 
 class RootInit : Shell.Initializer() {
@@ -17,9 +15,6 @@ class RootInit : Shell.Initializer() {
     }
 
     fun init(context: Context, shell: Shell): Boolean {
-        // Invalidate env state if shell is recreated
-        Info.envRef.invalidate()
-
         val job = shell.newJob()
         if (shell.isRoot) {
             job.add(context.rawResource(R.raw.util_functions))
@@ -29,15 +24,12 @@ class RootInit : Shell.Initializer() {
             job.add(context.rawResource(R.raw.nonroot_utils))
         }
 
-        job.add("mount_partitions",
-                "get_flags",
-                "run_migrations",
-                "export BOOTMODE=true")
-                .exec()
-
-        Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
-        Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
-        Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
+        job.add(
+            "mount_partitions",
+            "get_flags",
+            "run_migrations",
+            "export BOOTMODE=true"
+        ).exec()
 
         return true
     }

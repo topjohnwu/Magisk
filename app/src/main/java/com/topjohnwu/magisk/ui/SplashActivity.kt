@@ -3,18 +3,16 @@ package com.topjohnwu.magisk.ui
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
-import androidx.appcompat.app.AlertDialog
-import com.topjohnwu.magisk.*
-import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.intent
+import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.magisk.wrap
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ShellUtils
 
 open class SplashActivity : Activity() {
 
@@ -41,6 +39,10 @@ open class SplashActivity : Activity() {
             }
         }
 
+        Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
+        Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
+        Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
+
         // Set default configs
         Config.initialize()
 
@@ -53,9 +55,13 @@ open class SplashActivity : Activity() {
         // Setup shortcuts
         Shortcuts.setup(this)
 
-        Shell.su("mm_patch_dtbo").submit {
-            if (it.isSuccess)
-                Notifications.dtboPatched(this)
+        if (Info.isNewReboot) {
+            val shell = Shell.newInstance()
+            shell.newJob().add("mm_patch_dtb").submit {
+                if (it.isSuccess)
+                    Notifications.dtboPatched(this)
+                shell.close()
+            }
         }
 
         DONE = true

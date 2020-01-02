@@ -33,8 +33,8 @@ import com.topjohnwu.magisk.FileProvider
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.currentLocale
-import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ShellUtils
 import java.io.File
 import java.io.FileNotFoundException
 import java.text.SimpleDateFormat

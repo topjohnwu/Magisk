@@ -8,6 +8,7 @@
     <string name="settings">Ayarlar</string>
     <string name="install">Yükle</string>
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
+	<string name="unsupport_magisk_msg">Magisk Manager\'ın bu sürümü, %1$s daha düşük Magisk versiyonlarını desteklememektedir.\n\nUygulama hiçbir Magisk kurulu değil gibi davranacak, lütfen en kısa zamanda Magisk\'i yükseltin.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk yüklü değil</string>
@@ -94,8 +95,7 @@
     <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Repo önbelleği temizlendi</string>
-
-    <string name="dtbo_patched_title">DTBO yamalandı!</string>
+	<string name="dtbo_patched_title">DTBO yamalandı!</string>
     <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
     <string name="flashing">Yükleniyor</string>
     <string name="done">Tamamlandı!</string>
@@ -115,6 +115,7 @@
     <string name="env_fix_title">Ek Kurulum Gerekli</string>
     <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
     <string name="setup_msg">Ortam kurulumu çalışıyor…</string>
+	<string name="authenticate">Kimlik doğrulaması</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
@@ -166,6 +167,9 @@
     <string name="request_timeout_summary">%1$d saniye</string>
     <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrula</string>
     <string name="settings_su_reauth_summary">Uygulama yükseltmeleri sonrasında yetkili kullanıcı izinlerini yeniden doğrula</string>
+    <string name="settings_su_biometric_title">Biyometrik Kimlik Doğrulamayı Etkinleştir</string>
+    <string name="settings_su_biometric_summary">Superuser isteklerine izin vermek için biyometrik kimlik doğrulamayı kullanın</string>
+    <string name="no_biometric">Desteklenmeyen cihaz veya biyometrik ayar etkinleştirilmemiş</string>
 
     <string name="multiuser_mode">Çok Kullanıcılı Mod</string>
     <string name="settings_owner_only">Yalnızca Cihaz Sahibi</string>

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.extensions
 
 import android.os.Build
-import androidx.core.net.toFile
 import timber.log.Timber
 import java.io.File
 import java.io.InputStream

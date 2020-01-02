@@ -8,6 +8,8 @@ import com.topjohnwu.magisk.utils.CachedValue
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
+import java.io.FileInputStream
+import java.io.IOException
 
 val isRunningAsStub get() = Info.stub != null
 
@@ -33,6 +35,22 @@ object Info {
                 .subscribeK {
                     field.value = it.available()
                 }
+        }
+    }
+
+    val isNewReboot by lazy {
+        try {
+            FileInputStream("/proc/sys/kernel/random/boot_id").bufferedReader().use {
+                val id = it.readLine()
+                if (id != Config.bootId) {
+                    Config.bootId = id
+                    true
+                } else {
+                    false
+                }
+            }
+        } catch (e: IOException) {
+            false
         }
     }
 

@@ -131,7 +131,7 @@ void node_entry::create_module_tree(const char *module) {
 	auto full_path = get_path();
 	snprintf(buf, PATH_MAX, "%s/%s%s", MODULEROOT, module, full_path.c_str());
 
-	unique_ptr<DIR, decltype(&closedir)> dir(xopendir(buf), closedir);
+	auto dir = xopen_dir(buf);
 	if (!dir)
 		return;
 
@@ -148,7 +148,7 @@ void node_entry::create_module_tree(const char *module) {
 		return;
 	}
 
-	for (struct dirent *entry; (entry = xreaddir(dir.get()));) {
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
 		// Create new node
@@ -207,22 +207,18 @@ void node_entry::create_module_tree(const char *module) {
 }
 
 void node_entry::clone_skeleton() {
-	DIR *dir;
-	struct dirent *entry;
-
 	// Clone the structure
 	auto full_path = get_path();
-	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path.c_str());
-	if (!(dir = xopendir(buf)))
-		return;
-	while ((entry = xreaddir(dir))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		// Create dummy node
-		auto dummy = new node_entry(entry->d_name, entry->d_type, IS_DUMMY);
-		insert(dummy);
-	}
-	closedir(dir);
+	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path.data());
+	if (auto dir = xopen_dir(buf); dir) {
+		for (dirent *entry; (entry = xreaddir(dir.get()));) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv)
+				continue;
+			// Create dummy node
+			auto dummy = new node_entry(entry->d_name, entry->d_type, IS_DUMMY);
+			insert(dummy);
+		}
+	} else { return; }
 
 	if (status & IS_SKEL) {
 		file_attr attr;
@@ -321,13 +317,15 @@ static int bind_mount(const char *from, const char *to, bool log) {
 static bool magisk_env() {
 	LOGI("* Initializing Magisk environment\n");
 
+	string pkg;
+	check_manager(&pkg);
+
+	char install_dir[128];
+	sprintf(install_dir, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
+
 	// Alternative binaries paths
-	constexpr const char *alt_bin[] = {
-		"/cache/data_adb/magisk", "/data/magisk",
-		"/data/data/com.topjohnwu.magisk/install",
-		"/data/user_de/0/com.topjohnwu.magisk/install"
-	};
-	for (auto &alt : alt_bin) {
+	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", install_dir };
+	for (auto alt : alt_bin) {
 		struct stat st;
 		if (lstat(alt, &st) != -1) {
 			if (S_ISLNK(st.st_mode)) {
@@ -415,15 +413,9 @@ static bool magisk_env() {
 }
 
 static void prepare_modules() {
-	const char *legacy_imgs[] = {SECURE_DIR "/magisk.img", SECURE_DIR "/magisk_merge.img"};
-	for (auto img : legacy_imgs) {
-		if (access(img, F_OK) == 0)
-			migrate_img(img);
-	}
-	DIR *dir;
-	struct dirent *entry;
-	if ((dir = opendir(MODULEUPGRADE))) {
-		while ((entry = xreaddir(dir))) {
+	// Upgrade modules
+	if (auto dir = open_dir(MODULEUPGRADE); dir) {
+		for (dirent *entry; (entry = xreaddir(dir.get()));) {
 			if (entry->d_type == DT_DIR) {
 				if (entry->d_name == "."sv || entry->d_name == ".."sv)
 					continue;
@@ -436,7 +428,6 @@ static void prepare_modules() {
 				rename(buf2, buf);
 			}
 		}
-		closedir(dir);
 		rm_rf(MODULEUPGRADE);
 	}
 	bind_mount(MIRRDIR MODULEROOT, MODULEMNT, false);
@@ -458,51 +449,48 @@ static void reboot() {
 
 void remove_modules() {
 	LOGI("* Remove all modules and reboot");
-	chdir(MODULEROOT);
-	rm_rf("lost+found");
-	DIR *dir = xopendir(".");
-	struct dirent *entry;
-	while ((entry = xreaddir(dir))) {
+	auto dir = xopen_dir(MODULEROOT);
+	int dfd = dirfd(dir.get());
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR) {
 			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
 				continue;
-			chdir(entry->d_name);
-			close(creat("remove", 0644));
-			chdir("..");
+
+			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			close(xopenat(modfd, "remove", O_RDONLY | O_CREAT | O_CLOEXEC));
+			close(modfd);
 		}
 	}
-	closedir(dir);
-	chdir("/");
 	reboot();
 }
 
 static void collect_modules() {
-	chdir(MODULEROOT);
-	rm_rf("lost+found");
-	DIR *dir = xopendir(".");
-	struct dirent *entry;
-	while ((entry = xreaddir(dir))) {
+	auto dir = xopen_dir(MODULEROOT);
+	int dfd = dirfd(dir.get());
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR) {
 			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
 				continue;
-			chdir(entry->d_name);
-			if (access("remove", F_OK) == 0) {
-				chdir("..");
+
+			int modfd = xopenat(dfd, entry->d_name, O_RDONLY);
+			run_finally f([=]{ close(modfd); });
+
+			if (faccessat(modfd, "remove", F_OK, 0) == 0) {
 				LOGI("%s: remove\n", entry->d_name);
-				sprintf(buf, "%s/uninstall.sh", entry->d_name);
+				fd_pathat(modfd, "uninstall.sh", buf, sizeof(buf));
 				if (access(buf, F_OK) == 0)
 					exec_script(buf);
-				rm_rf(entry->d_name);
+				frm_rf(modfd);
+				unlinkat(dfd, entry->d_name, AT_REMOVEDIR);
 				continue;
 			}
-			unlink("update");
-			if (access("disable", F_OK))
+
+			unlinkat(modfd, "update", 0);
+
+			if (faccessat(modfd, "disable", F_OK, 0) != 0)
 				module_list.emplace_back(entry->d_name);
-			chdir("..");
 		}
 	}
-	closedir(dir);
-	chdir("/");
 }
 
 static bool load_modules(node_entry *root) {
@@ -510,36 +498,47 @@ static bool load_modules(node_entry *root) {
 
 	bool has_modules = false;
 	for (const auto &m : module_list) {
-		const auto module = m.c_str();
+		const auto module = m.data();
+		char *name = buf + snprintf(buf, sizeof(buf), MODULEROOT "/%s/", module);
+
 		// Read props
-		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MODULEROOT, module);
+		strcpy(name, "system.prop");
 		if (access(buf, F_OK) == 0) {
 			LOGI("%s: loading [system.prop]\n", module);
 			load_prop_file(buf, false);
 		}
+		// Copy sepolicy rules
+		strcpy(name, "sepolicy.rule");
+		if (access(MIRRDIR "/persist", F_OK) == 0 && access(buf, F_OK) == 0) {
+			char *p = buf2 + snprintf(buf2, sizeof(buf2), MIRRDIR "/persist/magisk/%s", module);
+			xmkdirs(buf2, 0755);
+			strcpy(p, "/sepolicy.rule");
+			cp_afc(buf, buf2);
+		}
+
 		// Check whether skip mounting
-		snprintf(buf, PATH_MAX, "%s/%s/skip_mount", MODULEROOT, module);
+		strcpy(name, "skip_mount");
 		if (access(buf, F_OK) == 0)
 			continue;
 		// Double check whether the system folder exists
-		snprintf(buf, PATH_MAX, "%s/%s/system", MODULEROOT, module);
-		if (access(buf, F_OK) == -1)
+		strcpy(name, "system");
+		if (access(buf, F_OK) != 0)
 			continue;
 
 		// Construct structure
 		has_modules = true;
 		LOGI("%s: constructing magic mount structure\n", module);
 		// If /system/vendor exists in module, create a link outside
-		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MODULEROOT, module);
+		strcpy(name, "system/vendor");
 		if (node_entry::vendor_root && access(buf, F_OK) == 0) {
-			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MODULEROOT, module);
+			snprintf(buf2, sizeof(buf2), "%s/%s/vendor", MODULEROOT, module);
 			unlink(buf2);
 			xsymlink("./system/vendor", buf2);
 		}
 		// If /system/product exists in module, create a link outside
-		snprintf(buf, PATH_MAX, "%s/%s/system/product", MODULEROOT, module);
+		strcpy(name, "system/product");
 		if (node_entry::product_root && access(buf, F_OK) == 0) {
-			snprintf(buf2, PATH_MAX, "%s/%s/product", MODULEROOT, module);
+			snprintf(buf2, sizeof(buf2), "%s/%s/product", MODULEROOT, module);
 			unlink(buf2);
 			xsymlink("./system/product", buf2);
 		}
@@ -575,15 +574,14 @@ static bool check_data() {
 }
 
 void unlock_blocks() {
-	DIR *dir;
-	struct dirent *entry;
 	int fd, dev, OFF = 0;
 
-	if (!(dir = xopendir("/dev/block")))
+	auto dir = xopen_dir("/dev/block");
+	if (!dir)
 		return;
-	dev = dirfd(dir);
+	dev = dirfd(dir.get());
 
-	while((entry = readdir(dir))) {
+	for (dirent *entry; (entry = readdir(dir.get()));) {
 		if (entry->d_type == DT_BLK) {
 			if ((fd = openat(dev, entry->d_name, O_RDONLY | O_CLOEXEC)) < 0)
 				continue;
@@ -592,7 +590,6 @@ void unlock_blocks() {
 			close(fd);
 		}
 	}
-	closedir(dir);
 }
 
 static bool log_dump = false;
@@ -663,22 +660,6 @@ void post_fs_data(int client) {
 		no_secure_dir = true;
 		unblock_boot_process();
 	}
-
-#if 0
-	// Increment boot count
-	int boot_count = 0;
-	FILE *cf = fopen(BOOTCOUNT, "r");
-	if (cf) {
-		fscanf(cf, "%d", &boot_count);
-		fclose(cf);
-	}
-	boot_count++;
-	if (boot_count > 2)
-		creat(DISABLEFILE, 0644);
-	cf = xfopen(BOOTCOUNT, "w");
-	fprintf(cf, "%d", boot_count);
-	fclose(cf);
-#endif
 
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
@@ -760,7 +741,6 @@ void late_start(int client) {
 
 	auto_start_magiskhide();
 
-	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");
 	exec_common_script("service");
 
@@ -791,11 +771,9 @@ void boot_complete(int client) {
 		rename(MANAGERAPK, "/data/magisk.apk");
 		install_apk("/data/magisk.apk");
 	} else {
-		// Check whether we have a valid manager installed
-		db_strings str;
-		get_db_strings(str, SU_MANAGER);
-		if (validate_manager(str[SU_MANAGER], 0, nullptr)) {
-			// There is no manager installed, install the stub
+		// Check whether we have manager installed
+		if (!check_manager()) {
+			// Install stub
 			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk");
 			install_apk("/data/magisk.apk");
 		}

@@ -23,7 +23,7 @@ static int strm_close(void *v) {
 	return 0;
 }
 
-sFILE make_stream(stream_ptr &&strm) {
+sFILE make_stream_fp(stream_ptr &&strm) {
 	sFILE fp(funopen(strm.release(), strm_read, strm_write, strm_seek, strm_close), fclose);
 	setbuf(fp.get(), nullptr);
 	return fp;
@@ -44,29 +44,24 @@ off_t stream::seek(off_t off, int whence) {
 	return -1;
 }
 
-int filter_stream::read(void *buf, size_t len) {
+int fp_stream::read(void *buf, size_t len) {
 	return fread(buf, 1, len, fp.get());
 }
 
-int filter_stream::write(const void *buf, size_t len) {
+int fp_stream::write(const void *buf, size_t len) {
 	return fwrite(buf, 1, len, fp.get());
 }
 
-void filter_stream::set_base(sFILE &&f) {
-	fp = std::move(f);
+off_t fp_stream::seek(off_t off, int whence) {
+	return fseek(fp.get(), off, whence);
 }
 
-off_t seekable_stream::seek_pos(off_t off, int whence) {
-	switch (whence) {
-		case SEEK_CUR:
-			return _pos + off;
-		case SEEK_END:
-			return end_pos() + off;
-		case SEEK_SET:
-			return off;
-		default:
-			return -1;
-	}
+int filter_stream::read(void *buf, size_t len) {
+	return base->read(buf, len);
+}
+
+int filter_stream::write(const void *buf, size_t len) {
+	return base->write(buf, len);
 }
 
 byte_stream::byte_stream(uint8_t *&buf, size_t &len) : _buf(buf), _len(len) {
@@ -89,9 +84,20 @@ int byte_stream::write(const void *buf, size_t len) {
 }
 
 off_t byte_stream::seek(off_t off, int whence) {
-	off_t np = seek_pos(off, whence);
-	if (np < 0)
-		return -1;
+	off_t np;
+	switch (whence) {
+		case SEEK_CUR:
+			np = _pos + off;
+			break;
+		case SEEK_END:
+			np = _len + off;
+			break;
+		case SEEK_SET:
+			np = off;
+			break;
+		default:
+			return -1;
+	}
 	resize(np, true);
 	_pos = np;
 	return np;

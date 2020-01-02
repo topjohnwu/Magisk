@@ -1,4 +1,4 @@
-# Magisk Details
+# Internal Details
 ## File Structure
 ### Paths in "sbin tmpfs overlay"
 One of Magisk's breakthrough designs is sbin tmpfs overlay. It is required to support system-as-root devices, and also is the key to hiding Magisk from detection. All Magisk binaries, applets, mirrors, and other trivial stuffs are all located in the `tmpfs` mounted on `/sbin`. MagiskHide can just simply unmount `/sbin` and the bind mounts to hide all modifications easily.

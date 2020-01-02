@@ -25,9 +25,11 @@ The concept of `magiskboot` is to make boot image modification simpler. For unpa
 Usage: magiskboot <action> [args...]
 
 Supported actions:
-  unpack [-h] <bootimg>
+  unpack [-n] [-h] <bootimg>
     Unpack <bootimg> to, if available, kernel, kernel_dtb, ramdisk.cpio,
     second, dtb, extra, and recovery_dtbo into current directory.
+    If '-n' is provided, it will not attempt to decompress kernel or
+    ramdisk.cpio from their original formats.
     If '-h' is provided, it will dump header info to 'header',
     which will be parsed when repacking.
     Return values:
@@ -45,7 +47,7 @@ Supported actions:
 
   cpio <incpio> [commands...]
     Do cpio commands to <incpio> (modifications are done directly)
-    Each command is a single argument, use quotes if necessary
+    Each command is a single argument, add quotes for each command
     Supported commands:
       exists ENTRY
         Return 0 if ENTRY exists, else return 1
@@ -65,8 +67,9 @@ Supported actions:
         Test the current cpio's patch status
         Return values:
         0:stock    1:Magisk    2:unsupported (phh, SuperSU, Xposed)
-      patch KEEPVERITY KEEPFORCEENCRYPT
-        Ramdisk patches. KEEP**** are boolean values
+      patch
+        Apply ramdisk patches. Configure settings with env variables:
+        KEEPVERITY KEEPFORCEENCRYPT
       backup ORIG
         Create ramdisk backups from ORIG
       restore
@@ -74,17 +77,25 @@ Supported actions:
       sha1
         Print stock boot SHA1 if previously backed up in ramdisk
 
-  dtb-<cmd> <dtb>
-    Do dtb related cmds to <dtb> (modifications are done directly)
-    Supported commands:
-      dump
-        Dump all contents from dtb for debugging
-      test
-        Check if fstab has verity/avb flags
-        Return values:
-        0:flag exists    1:no flags
-      patch
+  dtb <input> <action> [args...]
+    Do dtb related actions to <input>
+    Supported actions:
+      print [-f]
+        Print all contents of dtb for debugging
+        Specify [-f] to only print fstab nodes
+      patch [OUT]
         Search for fstab and remove verity/avb
+        If [OUT] is not specified, it will directly output to <input>
+        Configure with env variables: KEEPVERITY TWOSTAGEINIT
+
+  split <input>
+    Split image.*-dtb into kernel + kernel_dtb
+
+  sha1 <file>
+    Print the SHA1 checksum for <file>
+
+  cleanup
+    Cleanup the current working directory
 
   compress[=method] <infile> [outfile]
     Compress <infile> with [method] (default: gzip), optionally to [outfile]
@@ -95,12 +106,6 @@ Supported actions:
     Detect method and decompress <infile>, optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
     Supported methods: bzip2 gzip lz4 lz4_legacy lzma xz
-
-  sha1 <file>
-    Print the SHA1 checksum for <file>
-
-  cleanup
-    Cleanup the current working directory
 ```
 
 ### magiskinit
@@ -119,20 +124,22 @@ Usage: magiskpolicy [--options...] [policy statements...]
 Options:
    --help            show help message for policy statements
    --load FILE       load policies from FILE
-   --load-split      load from preloaded sepolicy or compile
+   --load-split      load from precompiled sepolicy or compile
                      split policies
    --compile-split   compile split cil policies
    --save FILE       save policies to FILE
    --live            directly apply sepolicy live
    --magisk          inject built-in rules for a minimal
                      Magisk selinux environment
+   --apply FILE      apply rules from FILE, read and parsed
+                     line by line as policy statements
 
 If neither --load or --compile-split is specified, it will load
 from current live policies (/sys/fs/selinux/policy)
 
 One policy statement should be treated as one parameter;
-this means a full policy statement should be enclosed in quotes;
-multiple policy statements can be provided in a single command
+this means a full policy statement should be enclosed in quotes.
+Multiple policy statements can be provided in a single command.
 
 The statements has a format of "<rule_name> [args...]"
 Multiple types and permissions can be grouped into collections
@@ -173,10 +180,10 @@ Notes:
 Example: allow { s1 s2 } { t1 t2 } class *
 Will be expanded to:
 
-allow s1 t1 class { all permissions }
-allow s1 t2 class { all permissions }
-allow s2 t1 class { all permissions }
-allow s2 t2 class { all permissions }
+allow s1 t1 class { all-permissions }
+allow s1 t2 class { all-permissions }
+allow s2 t1 class { all-permissions }
+allow s2 t2 class { all-permissions }
 ```
 
 
@@ -202,7 +209,6 @@ Advanced Options (Internal APIs):
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
-   --use-broadcast           use broadcast for su logging and notify
 
 Supported init triggers:
    post-fs-data, service, boot-complete
@@ -269,5 +275,4 @@ Actions:
    ls              Print the current hide list
    exec CMDs...    Execute commands in isolated mount
                    namespace and do all hide unmounts
-   test            Run process monitor test
 ```
