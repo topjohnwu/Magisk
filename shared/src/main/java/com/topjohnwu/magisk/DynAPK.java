@@ -11,8 +11,6 @@ import static android.os.Build.VERSION.SDK_INT;
 
 public class DynAPK {
 
-    private static final int STUB_VERSION = 6;
-
     // Indices of the object array
     private static final int STUB_VERSION_ENTRY = 0;
     private static final int CLASS_COMPONENT_MAP = 1;
@@ -64,7 +62,7 @@ public class DynAPK {
     }
 
     public static class Data {
-        public int version = STUB_VERSION;
+        public int version;
         public Map<String, String> classToComponent;
     }
 }
