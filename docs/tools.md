@@ -25,9 +25,11 @@ The concept of `magiskboot` is to make boot image modification simpler. For unpa
 Usage: magiskboot <action> [args...]
 
 Supported actions:
-  unpack [-h] <bootimg>
+  unpack [-n] [-h] <bootimg>
     Unpack <bootimg> to, if available, kernel, kernel_dtb, ramdisk.cpio,
     second, dtb, extra, and recovery_dtbo into current directory.
+    If '-n' is provided, it will not attempt to decompress kernel or
+    ramdisk.cpio from their original formats.
     If '-h' is provided, it will dump header info to 'header',
     which will be parsed when repacking.
     Return values:
@@ -45,7 +47,7 @@ Supported actions:
 
   cpio <incpio> [commands...]
     Do cpio commands to <incpio> (modifications are done directly)
-    Each command is a single argument, use quotes if necessary
+    Each command is a single argument, add quotes for each command
     Supported commands:
       exists ENTRY
         Return 0 if ENTRY exists, else return 1
@@ -65,8 +67,9 @@ Supported actions:
         Test the current cpio's patch status
         Return values:
         0:stock    1:Magisk    2:unsupported (phh, SuperSU, Xposed)
-      patch KEEPVERITY KEEPFORCEENCRYPT
-        Ramdisk patches. KEEP**** are boolean values
+      patch
+        Apply ramdisk patches. Configure settings with env variables:
+        KEEPVERITY KEEPFORCEENCRYPT
       backup ORIG
         Create ramdisk backups from ORIG
       restore
@@ -74,17 +77,25 @@ Supported actions:
       sha1
         Print stock boot SHA1 if previously backed up in ramdisk
 
-  dtb-<cmd> <dtb>
-    Do dtb related cmds to <dtb> (modifications are done directly)
-    Supported commands:
-      dump
-        Dump all contents from dtb for debugging
-      test
-        Check if fstab has verity/avb flags
-        Return values:
-        0:flag exists    1:no flags
-      patch
+  dtb <input> <action> [args...]
+    Do dtb related actions to <input>
+    Supported actions:
+      print [-f]
+        Print all contents of dtb for debugging
+        Specify [-f] to only print fstab nodes
+      patch [OUT]
         Search for fstab and remove verity/avb
+        If [OUT] is not specified, it will directly output to <input>
+        Configure with env variables: KEEPVERITY TWOSTAGEINIT
+
+  split <input>
+    Split image.*-dtb into kernel + kernel_dtb
+
+  sha1 <file>
+    Print the SHA1 checksum for <file>
+
+  cleanup
+    Cleanup the current working directory
 
   compress[=method] <infile> [outfile]
     Compress <infile> with [method] (default: gzip), optionally to [outfile]
@@ -95,12 +106,6 @@ Supported actions:
     Detect method and decompress <infile>, optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
     Supported methods: bzip2 gzip lz4 lz4_legacy lzma xz
-
-  sha1 <file>
-    Print the SHA1 checksum for <file>
-
-  cleanup
-    Cleanup the current working directory
 ```
 
 ### magiskinit
