@@ -2,10 +2,10 @@ package com.topjohnwu.magisk.redesign.compat
 
 import android.graphics.Insets
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.ContextExecutor
 import com.topjohnwu.magisk.model.events.FragmentExecutor
@@ -26,7 +26,7 @@ class CompatDelegate internal constructor(
         view.viewModel.requestRefresh()
     }
 
-    fun onEventExecute(event: ViewEvent, activity: AppCompatActivity) {
+    fun onEventExecute(event: ViewEvent, activity: BaseActivity<*, *>) {
         (event as? ContextExecutor)?.invoke(activity)
         (event as? ActivityExecutor)?.invoke(activity)
         (event as? FragmentExecutor)?.let {
@@ -37,7 +37,7 @@ class CompatDelegate internal constructor(
     fun onEventExecute(event: ViewEvent, fragment: Fragment) {
         (event as? ContextExecutor)?.invoke(fragment.requireContext())
         (event as? FragmentExecutor)?.invoke(fragment)
-        (event as? ActivityExecutor)?.invoke(fragment.requireActivity() as AppCompatActivity)
+        (event as? ActivityExecutor)?.invoke(fragment.requireActivity() as BaseActivity<*, *>)
     }
 
     private fun ensureInsets() {

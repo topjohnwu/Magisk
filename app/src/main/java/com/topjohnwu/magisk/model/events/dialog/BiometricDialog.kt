@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.model.events.dialog
 
-import androidx.appcompat.app.AppCompatActivity
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.utils.BiometricHelper
@@ -16,7 +16,7 @@ class BiometricDialog(
         builder(Builder())
     }
 
-    override fun invoke(activity: AppCompatActivity) {
+    override fun invoke(activity: BaseActivity<*, *>) {
         BiometricHelper.authenticate(
             activity,
             onError = listenerOnFailure,

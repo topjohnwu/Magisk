@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.model.events
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.intent
@@ -11,7 +10,7 @@ import com.topjohnwu.magisk.ui.flash.FlashActivity
 
 class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
 
-    override fun invoke(activity: AppCompatActivity) {
+    override fun invoke(activity: BaseActivity<*, *>) {
         activity as BaseActivity<*, *>
         activity.withExternalRW {
             onSuccess {

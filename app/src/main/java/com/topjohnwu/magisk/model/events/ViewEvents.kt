@@ -3,12 +3,6 @@ package com.topjohnwu.magisk.model.events
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.base.BaseActivity
@@ -17,7 +11,6 @@ import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.module.Repo
-import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.utils.SafetyNetHelper
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -137,7 +130,7 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
 }
 
 class ViewActionEvent(val action: BaseActivity<*, *>.() -> Unit) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: AppCompatActivity) = (activity as BaseActivity<*, *>).run(action)
+    override fun invoke(activity: BaseActivity<*, *>) = (activity as BaseActivity<*, *>).run(action)
 }
 
 class OpenFilePickerEvent : ViewEvent()
@@ -157,54 +150,38 @@ class PermissionEvent(
     val callback: PublishSubject<Boolean>
 ) : ViewEvent(), ActivityExecutor {
 
-    private val permissionRequest = PermissionRequestBuilder().apply {
-        onSuccess {
-            callback.onNext(true)
-        }
-        onFailure {
-            callback.onNext(false)
-            callback.onError(SecurityException("User refused permissions"))
-        }
-    }.build()
-
-    override fun invoke(activity: AppCompatActivity) = Dexter.withActivity(activity)
-        .withPermissions(permissions)
-        .withListener(object : MultiplePermissionsListener {
-            override fun onPermissionRationaleShouldBeShown(
-                permissions: MutableList<PermissionRequest>,
-                token: PermissionToken
-            ) = token.continuePermissionRequest()
-
-            override fun onPermissionsChecked(
-                report: MultiplePermissionsReport
-            ) = if (report.areAllPermissionsGranted()) {
-                permissionRequest.onSuccess()
-            } else {
-                permissionRequest.onFailure()
+    override fun invoke(activity: BaseActivity<*, *>) =
+        activity.withPermissions(*permissions.toTypedArray()) {
+            onSuccess {
+                callback.onNext(true)
             }
-        }).check()
+            onFailure {
+                callback.onNext(false)
+                callback.onError(SecurityException("User refused permissions"))
+            }
+        }
 }
 
 class BackPressEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: AppCompatActivity) {
+    override fun invoke(activity: BaseActivity<*, *>) {
         activity.onBackPressed()
     }
 }
 
 class DieEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: AppCompatActivity) {
+    override fun invoke(activity: BaseActivity<*, *>) {
         activity.finish()
     }
 }
 
 class RecreateEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: AppCompatActivity) {
+    override fun invoke(activity: BaseActivity<*, *>) {
         activity.recreate()
     }
 }
 
 class RequestFileEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: AppCompatActivity) {
+    override fun invoke(activity: BaseActivity<*, *>) {
         Intent(Intent.ACTION_GET_CONTENT)
             .setType("*/*")
             .addCategory(Intent.CATEGORY_OPENABLE)

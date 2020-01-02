@@ -132,5 +132,4 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'com.google.android.material:material:1.2.0-alpha01'
-    implementation 'com.karumi:dexter:6.0.0'
 }
