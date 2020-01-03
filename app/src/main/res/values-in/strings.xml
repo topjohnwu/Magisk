@@ -7,6 +7,7 @@
     <string name="settings">Setelan</string>
     <string name="install">Pasang</string>
     <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
+    <string name="unsupport_magisk_msg">Magisk Manager versi ini tidak mendukung versi Magisk di bawah %1$s.\n\nAplikasi akan bertingkah seperti tidak ada Magisk terpasang, silakan perbarui Magisk sesegera mungkin.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk tidak terpasang.</string>
@@ -16,17 +17,18 @@
     <string name="checking_safetyNet_status">Memeriksa status SafetyNet…</string>
     <string name="safetyNet_check_success">Pemeriksaan SafetyNet Berhasil</string>
     <string name="safetyNet_api_error">Kesalahan pada API SafetyNet</string>
-    <string name="safetyNet_res_invalid">Tanggapan tidak valid.</string>
+    <string name="safetyNet_res_invalid">Tanggapan tidak valid</string>
     <string name="magisk_up_to_date">Magisk dalam versi terbaru</string>
     <string name="manager_up_to_date">Magisk Manager dalam versi terbaru</string>
     <string name="advanced_settings_title">Opsi Lanjutan</string>
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Mode Pemulihan</string>
     <string name="current_installed">Terpasang: %1$s</string>
     <string name="latest_version">Terbaru: %1$s</string>
     <string name="uninstall">Copot</string>
     <string name="uninstall_magisk_title">Copot Magisk</string>
-    <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus. Root akan dihapus, dan berpotensi mengenkripsi data Anda jika belum.</string>
+    <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus!\nRoot akan dihapus!\nData Anda berpotensi terenkripsi jika belum!</string>
     <string name="update">Perbarui</string>
     <string name="core_only_enabled">(Mode core only aktif)</string>
 
@@ -73,7 +75,7 @@
     <string name="manager_update_title">Pembaruan Magisk Manager Tersedia!</string>
 
     <!--Installation-->
-    <string name="manager_download_install">Tekan untuk unduh dan pasang.</string>
+    <string name="manager_download_install">Tekan untuk unduh dan pasang</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
     <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
     <string name="install_inactive_slot">Pasang ke Slot Nonaktif (Setelah OTA)</string>
@@ -89,7 +91,7 @@
     <string name="repo_install_msg">Apakah Anda ingin memasang %1$s sekarang?</string>
     <string name="download">Unduh</string>
     <string name="reboot">Reboot</string>
-    <string name="settings_reboot_toast">Reboot untuk menerapkan perubahan.</string>
+    <string name="settings_reboot_toast">Reboot untuk menerapkan perubahan</string>
     <string name="release_notes">Catatan rilis</string>
     <string name="repo_cache_cleared">Cache repo dibersihkan</string>
 
@@ -100,7 +102,7 @@
     <string name="failure">Gagal</string>
     <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager.</string>
-    <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan.</string>
+    <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan</string>
     <string name="warning">Peringatan</string>
     <string name="complete_uninstall">Copot Total</string>
     <string name="restore_img">Pulihkan Image</string>
@@ -109,28 +111,29 @@
     <string name="restore_fail">Cadangan stock tidak ada!</string>
     <string name="proprietary_title">Unduh Kode Proprieter</string>
     <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS dan tidak menyertakan kode API proprieter Google SafetyNet.\n\nAkankah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
-    <string name="setup_fail">Penyiapan gagal.</string>
+    <string name="setup_fail">Penyiapan gagal</string>
     <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
     <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
     <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
+    <string name="authenticate">Otentikasi</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Umum</string>
     <string name="settings_dark_theme_title">Tema Gelap</string>
-    <string name="settings_dark_theme_summary">Aktifkan tema gelap.</string>
+    <string name="settings_dark_theme_summary">Aktifkan tema gelap</string>
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
     <string name="settings_clear_cache_title">Bersihkan Cache Repo</string>
-    <string name="settings_clear_cache_summary">Bersihkan informasi ter-cache untuk repo online. Ini memaksa apl untuk menyegarkan secara online.</string>
+    <string name="settings_clear_cache_summary">Bersihkan informasi ter-cache untuk repo online. Ini memaksa apl untuk menyegarkan secara online</string>
     <string name="settings_hide_manager_title">Sembunyikan Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Pak ulang Magisk Manager dengan nama paket acak.</string>
+    <string name="settings_hide_manager_summary">Pak ulang Magisk Manager dengan nama paket dan apl acak</string>
     <string name="settings_restore_manager_title">Pulihkan Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Pulihkan Magisk Manager dengan paket asli</string>
+    <string name="settings_restore_manager_summary">Pulihkan Magisk Manager dengan paket dan nama asli</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Default Sistem)</string>
     <string name="settings_update">Setelan Pembaruan</string>
     <string name="settings_check_update_title">Periksa Pembaruan</string>
-    <string name="settings_check_update_summary">Secara periodik memeriksa pembaruan di latar belakang.</string>
+    <string name="settings_check_update_summary">Secara periodik memeriksa pembaruan di latar belakang</string>
     <string name="settings_update_channel_title">Kanal Pembaruan</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
@@ -138,11 +141,15 @@
     <string name="settings_update_custom_msg">Masukkan sebuah URL kustom</string>
     <string name="settings_core_only_title">Magisk Mode Core Only</string>
     <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU dan MagiskHide akan tetap diaktifkan</string>
-    <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai bentuk pendeteksian.</string>
+    <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai bentuk pendeteksian</string>
     <string name="settings_hosts_title">Host tanpa sistem</string>
-    <string name="settings_hosts_summary">Dukungan host tanpa sistem untuk apl pemblokir iklan.</string>
+    <string name="settings_hosts_summary">Dukungan host tanpa sistem untuk apl pemblokir iklan</string>
     <string name="settings_hosts_toast">Ditambahkan modul host tanpa sistem</string>
 
+    <string name="settings_app_name">Ketik nama apl yang diinginkan</string>
+    <string name="settings_app_name_hint">Nama baru</string>
+    <string name="settings_app_name_helper">Apl akan dipak ulang ke nama ini</string>
+    <string name="settings_app_name_error">Format tidak valid</string>
     <string name="settings_su_app_adb">Apl dan ADB</string>
     <string name="settings_su_app">Apl saja</string>
     <string name="settings_su_adb">ADB saja</string>
@@ -160,22 +167,25 @@
     <string name="request_timeout_summary">%1$d detik</string>
     <string name="settings_su_reauth_title">Otentikasi ulang setelah pembaruan</string>
     <string name="settings_su_reauth_summary">Otentikasi ulang izin superuser setelah pembaruan sebuah aplikasi</string>
+    <string name="settings_su_biometric_title">Aktifkan Otentikasi Biometrik</string>
+    <string name="settings_su_biometric_summary">Gunakan otentikasi biometrik untuk mengizinkan permintaan superuser</string>
+    <string name="no_biometric">Perangkat tidak didukung atau tidak ada opsi biometrik yang diaktifkan</string>
 
     <string name="multiuser_mode">Mode Multipengguna</string>
     <string name="settings_owner_only">Pemilik Perangkat Saja</string>
     <string name="settings_owner_manage">Pemilik Perangkat Mengelola</string>
     <string name="settings_user_independent">Pengguna-Independen</string>
-    <string name="owner_only_summary">Hanya pemilik yang memiliki akses root.</string>
-    <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima permintaan.</string>
-    <string name="user_indepenent_summary">Setiap pengguna memiliki aturan root-nya sendiri.</string>
+    <string name="owner_only_summary">Hanya pemilik yang memiliki akses root</string>
+    <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima permintaan</string>
+    <string name="user_indepenent_summary">Setiap pengguna memiliki aturan root-nya sendiri</string>
 
     <string name="mount_namespace_mode">Mode Mount Ruang Nama</string>
     <string name="settings_ns_global">Ruang Nama Global</string>
     <string name="settings_ns_requester">Ruang Nama Warisan</string>
     <string name="settings_ns_isolate">Ruang Nama Terisolasi</string>
-    <string name="global_summary">Semua sesi root menggunakan mount ruang nama global.</string>
-    <string name="requester_summary">Sesi root akan mewarisi ruang nama peminta mereka.</string>
-    <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri.</string>
+    <string name="global_summary">Semua sesi root menggunakan mount ruang nama global</string>
+    <string name="requester_summary">Sesi root akan mewarisi ruang nama peminta mereka</string>
+    <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri</string>
     <string name="settings_download_path_error">Kesalahan membuat folder. Folder harus dapat diakses dari direktori penyimpanan root dan bukan merupakan file.</string>
 
     <!--Superuser-->
