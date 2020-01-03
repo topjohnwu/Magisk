@@ -20,6 +20,10 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <!-- Main -->
@@ -29,15 +33,6 @@
             android:name="a.i"
             android:windowSoftInputMode="adjustResize"
             android:exported="true" />
-
-        <activity-alias
-            android:name="a.s"
-            android:targetActivity="a.c">
-            <intent-filter>
-                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity-alias>
 
         <!-- Flashing  -->
         <activity android:name="a.f" />
