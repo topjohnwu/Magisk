@@ -63,6 +63,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/policy_app_name"
+                    strikeThrough="@{!item.enabled}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/margin_generic"
@@ -81,6 +82,7 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/policy_package_name"
+                    strikeThrough="@{!item.enabled}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/l1"

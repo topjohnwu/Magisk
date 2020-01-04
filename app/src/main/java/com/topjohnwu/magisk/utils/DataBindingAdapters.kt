@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.utils
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
@@ -455,5 +456,14 @@ fun View.setOnLongClickListenerBinding(listener: () -> Unit) {
     setOnLongClickListener {
         listener()
         true
+    }
+}
+
+@BindingAdapter("strikeThrough")
+fun TextView.setStrikeThroughEnabled(useStrikeThrough: Boolean) {
+    paintFlags = if (useStrikeThrough) {
+        paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+    } else {
+        paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
     }
 }

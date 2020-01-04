@@ -49,6 +49,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/module_title"
+                strikeThrough="@{!item.enabled}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
@@ -64,6 +65,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/module_version_author"
+                strikeThrough="@{!item.enabled}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
@@ -78,6 +80,7 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/module_description"
                 gone="@{item.item.description.empty}"
+                strikeThrough="@{!item.enabled}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
