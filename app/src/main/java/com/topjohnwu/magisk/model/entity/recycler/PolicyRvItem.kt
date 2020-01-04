@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import android.graphics.drawable.Drawable
-import android.view.View
-import android.view.ViewGroup
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -14,8 +12,6 @@ import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.redesign.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
-import com.topjohnwu.magisk.utils.rotationTo
-import com.topjohnwu.magisk.utils.setRevealed
 
 class PolicyRvItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyRvItem>() {
 
@@ -73,18 +69,15 @@ class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<
 
     fun toggle(viewModel: SuperuserViewModel) {
         if (isExpanded.value) {
+            toggle()
             return
         }
         isEnabled.toggle()
         viewModel.togglePolicy(this, isEnabled.value)
     }
 
-    fun toggle(view: View) {
+    fun toggle() {
         isExpanded.toggle()
-        view.rotationTo(if (isExpanded.value) 225 else 180)
-        (view.parent as ViewGroup)
-            .findViewById<View>(R.id.policy_expand_container)
-            .setRevealed(isExpanded.value)
     }
 
     fun toggleNotify(viewModel: SuperuserViewModel) {

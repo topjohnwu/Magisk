@@ -1,9 +1,12 @@
 package com.topjohnwu.magisk.redesign.settings
 
 import android.graphics.Insets
+import android.os.Bundle
+import android.view.View
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentSettingsMd2Binding
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
+import com.topjohnwu.magisk.utils.PinchZoomTouchListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : CompatFragment<SettingsViewModel, FragmentSettingsMd2Binding>() {
@@ -17,6 +20,16 @@ class SettingsFragment : CompatFragment<SettingsViewModel, FragmentSettingsMd2Bi
         super.onStart()
 
         activity.title = resources.getString(R.string.section_settings)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        PinchZoomTouchListener.attachTo(binding.settingsList)
+    }
+
+    override fun onDestroyView() {
+        PinchZoomTouchListener.clear(binding.settingsList)
+        super.onDestroyView()
     }
 
     override fun onResume() {

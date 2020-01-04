@@ -19,6 +19,7 @@ import com.topjohnwu.magisk.redesign.compat.CompatFragment
 import com.topjohnwu.magisk.redesign.compat.hideKeyboard
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
+import com.topjohnwu.magisk.utils.PinchZoomTouchListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
@@ -67,13 +68,18 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
                 if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
             }
         })
+
+        PinchZoomTouchListener.attachTo(binding.moduleFilterInclude.moduleFilterList)
+        PinchZoomTouchListener.attachTo(binding.moduleList)
     }
 
     override fun onDestroyView() {
         listeners.forEach {
-            binding.moduleRemote.removeOnScrollListener(it)
+            binding.moduleList.removeOnScrollListener(it)
             binding.moduleFilterInclude.moduleFilterList.removeOnScrollListener(it)
         }
+        PinchZoomTouchListener.clear(binding.moduleList)
+        PinchZoomTouchListener.clear(binding.moduleFilterInclude.moduleFilterList)
         super.onDestroyView()
     }
 
@@ -101,14 +107,14 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
     // ---
 
     override fun onReselected() {
-        binding.moduleRemote
+        binding.moduleList
             .takeIf {
                 (it.layoutManager as? StaggeredGridLayoutManager)?.let {
                     it.findFirstVisibleItemPositions(IntArray(it.spanCount)).min()
                 } ?: 0 > 10
             }
             ?.also { it.scrollToPosition(10) }
-            .let { binding.moduleRemote }
+            .let { binding.moduleList }
             .also { it.post { it.smoothScrollToPosition(0) } }
     }
 
@@ -117,11 +123,11 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
     override fun onPreBind(binding: FragmentModuleMd2Binding) = Unit
 
     private fun setEndlessScroller() {
-        val lama = binding.moduleRemote.layoutManager ?: return
+        val lama = binding.moduleList.layoutManager ?: return
         lama.isAutoMeasureEnabled = false
 
         val listener = EndlessRecyclerScrollListener(lama, viewModel::loadRemote)
-        binding.moduleRemote.addOnScrollListener(listener)
+        binding.moduleList.addOnScrollListener(listener)
         listeners.add(listener)
     }
 

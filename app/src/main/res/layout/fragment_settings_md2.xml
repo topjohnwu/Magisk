@@ -19,6 +19,7 @@
         dividerVertical="@{R.drawable.divider_l_50}"
         itemBinding="@{viewModel.itemBinding}"
         items="@{viewModel.items}"
+        android:id="@+id/settings_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusableInTouchMode="false"

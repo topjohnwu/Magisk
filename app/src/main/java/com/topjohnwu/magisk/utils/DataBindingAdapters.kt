@@ -449,3 +449,11 @@ fun View.setRotationNotAnimated(rotation: Int) {
 fun TextView.setTextSafe(text: Int) {
     if (text == 0) this.text = null else setText(text)
 }
+
+@BindingAdapter("android:onLongClick")
+fun View.setOnLongClickListenerBinding(listener: () -> Unit) {
+    setOnLongClickListener {
+        listener()
+        true
+    }
+}

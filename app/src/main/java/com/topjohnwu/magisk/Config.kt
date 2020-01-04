@@ -55,6 +55,7 @@ object Config : PreferenceModel, DBConfig {
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
+        const val LIST_SPAN_COUNT = "list_span_count"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -109,8 +110,7 @@ object Config : PreferenceModel, DBConfig {
                 Value.CANARY_DEBUG_CHANNEL
             else
                 Value.CANARY_CHANNEL
-        }
-        else Value.DEFAULT_CHANNEL
+        } else Value.DEFAULT_CHANNEL
 
     var bootId by preference(Key.BOOT_ID, "")
 
@@ -137,6 +137,7 @@ object Config : PreferenceModel, DBConfig {
     @JvmStatic
     var coreOnly by preference(Key.COREONLY, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
+    var listSpanCount by preference(Key.LIST_SPAN_COUNT, 2)
 
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
     var locale by preference(Key.LOCALE, "")
@@ -149,8 +150,9 @@ object Config : PreferenceModel, DBConfig {
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 
     // Always return a path in external storage where we can write
-    val downloadDirectory get() =
-        Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
+    val downloadDirectory
+        get() =
+            Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 
