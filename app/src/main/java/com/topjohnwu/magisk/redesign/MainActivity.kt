@@ -3,14 +3,12 @@ package com.topjohnwu.magisk.redesign
 import android.graphics.Insets
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.ViewGroup
+import android.view.View
 import android.view.ViewTreeObserver
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.card.MaterialCardView
 import com.ncapdevi.fragnav.FragNavController
 import com.topjohnwu.magisk.Const
@@ -25,6 +23,7 @@ import com.topjohnwu.magisk.redesign.module.ModuleFragment
 import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
+import com.topjohnwu.magisk.utils.HideableBehavior
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
@@ -84,10 +83,9 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
 
         if (savedInstanceState != null) {
             onTabTransaction(null, -1)
-            onFragmentTransaction(null, FragNavController.TransactionType.PUSH)
 
             if (!navigation.isRoot) {
-                requestNavigationHidden(animate = false)
+                requestNavigationHidden()
             }
         }
     }
@@ -114,19 +112,13 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         return true
     }
 
-    override fun onTabTransaction(fragment: Fragment?, index: Int) {
-        setDisplayHomeAsUpEnabled(false)
-    }
+    override fun onTabTransaction(fragment: Fragment?, index: Int) =
+        onFragmentTransaction(fragment, FragNavController.TransactionType.PUSH)
 
     override fun onFragmentTransaction(
         fragment: Fragment?,
         transactionType: FragNavController.TransactionType
     ) {
-        binding.mainToolbarWrapper.animate()
-            .translationY(0f)
-            .setInterpolator(FastOutSlowInInterpolator())
-            .start()
-
         setDisplayHomeAsUpEnabled(!navigation.isRoot)
         requestNavigationHidden(!navigation.isRoot)
     }
@@ -143,25 +135,19 @@ open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(
         }
     }
 
-    internal fun requestNavigationHidden(hide: Boolean = true, animate: Boolean = true) {
-        val lapam = binding.mainBottomBar.layoutParams as ViewGroup.MarginLayoutParams
-        val height = binding.mainBottomBar.measuredHeight
-        val verticalMargin = lapam.let { it.topMargin + it.bottomMargin }
-        val maxTranslation = height + verticalMargin
-        val translation = if (!hide) 0 else maxTranslation
+    @Suppress("UNCHECKED_CAST")
+    internal fun requestNavigationHidden(hide: Boolean = true) {
+        val topView = binding.mainToolbarWrapper
+        val bottomView = binding.mainBottomBar
 
-        if (!animate) {
-            binding.mainBottomBar.translationY = translation.toFloat()
-            binding.mainBottomBar.isVisible = !hide
-            return
-        }
+        val topParams = topView.layoutParams as? CoordinatorLayout.LayoutParams
+        val bottomParams = bottomView.layoutParams as? CoordinatorLayout.LayoutParams
 
-        binding.mainBottomBar.animate()
-            .translationY(translation.toFloat())
-            .setInterpolator(FastOutSlowInInterpolator())
-            .withStartAction { if (!hide) binding.mainBottomBar.isVisible = true }
-            .withEndAction { if (hide) binding.mainBottomBar.isVisible = false }
-            .start()
+        val topBehavior = topParams?.behavior as? HideableBehavior<View>
+        val bottomBehavior = bottomParams?.behavior as? HideableBehavior<View>
+
+        topBehavior?.setHidden(topView, hide = false, lockState = false)
+        bottomBehavior?.setHidden(bottomView, hide, hide)
     }
 
     fun invalidateToolbar() {

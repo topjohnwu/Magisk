@@ -11,14 +11,17 @@ import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.R
 import kotlin.math.roundToInt
 
-class HideBottomViewOnScrollBehavior<T : View> : HideBottomViewOnScrollBehavior<T>() {
+class HideBottomViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(),
+    HideableBehavior<V> {
 
-    override fun layoutDependsOn(parent: CoordinatorLayout, child: T, dependency: View) =
+    private var lockState: Boolean = false
+
+    override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View) =
         super.layoutDependsOn(parent, child, dependency) or (dependency is Snackbar.SnackbarLayout)
 
     override fun onDependentViewChanged(
         parent: CoordinatorLayout,
-        child: T,
+        child: V,
         dependency: View
     ) = when (dependency) {
         is Snackbar.SnackbarLayout -> onDependentViewChanged(parent, child, dependency)
@@ -27,7 +30,7 @@ class HideBottomViewOnScrollBehavior<T : View> : HideBottomViewOnScrollBehavior<
 
     override fun onDependentViewRemoved(
         parent: CoordinatorLayout,
-        child: T,
+        child: V,
         dependency: View
     ) = when (dependency) {
         is Snackbar.SnackbarLayout -> onDependentViewRemoved(parent, child, dependency)
@@ -38,7 +41,7 @@ class HideBottomViewOnScrollBehavior<T : View> : HideBottomViewOnScrollBehavior<
 
     private fun onDependentViewChanged(
         parent: CoordinatorLayout,
-        child: T,
+        child: V,
         dependency: Snackbar.SnackbarLayout
     ): Boolean {
         val viewMargin = (child.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
@@ -58,13 +61,43 @@ class HideBottomViewOnScrollBehavior<T : View> : HideBottomViewOnScrollBehavior<
 
     private fun onDependentViewRemoved(
         parent: CoordinatorLayout,
-        child: T,
+        child: V,
         dependency: Snackbar.SnackbarLayout
     ) {
         // checks whether the navigation is not hidden via scroll
         if (child.isVisible && child.translationY <= 0) {
             child.translationY(0f)
         }
+    }
+
+    //---
+
+    override fun slideUp(child: V) {
+        if (lockState) return
+        super.slideUp(child)
+    }
+
+    override fun slideDown(child: V) {
+        if (lockState) return
+        super.slideDown(child)
+    }
+
+    override fun setHidden(
+        view: V,
+        hide: Boolean,
+        lockState: Boolean
+    ) {
+        if (!lockState) {
+            this.lockState = lockState
+        }
+
+        if (hide) {
+            slideDown(view)
+        } else {
+            slideUp(view)
+        }
+
+        this.lockState = lockState
     }
 
     //---

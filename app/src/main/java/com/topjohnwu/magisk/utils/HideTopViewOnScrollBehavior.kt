@@ -10,7 +10,8 @@ import androidx.core.view.ViewCompat
 import com.google.android.material.animation.AnimationUtils
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 
-class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>() {
+class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(),
+    HideableBehavior<V> {
 
     companion object {
         private const val STATE_SCROLLED_DOWN = 1
@@ -21,6 +22,7 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
     private var currentState = STATE_SCROLLED_UP
     private var additionalHiddenOffsetY = 0
     private var currentAnimator: ViewPropertyAnimator? = null
+    private var lockState: Boolean = false
 
     override fun onLayoutChild(
         parent: CoordinatorLayout,
@@ -63,10 +65,30 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
         dxUnconsumed: Int,
         dyUnconsumed: Int
     ) {
-        when {
-            dyConsumed > 0 -> slideUp(child)
-            dyConsumed < 0 -> slideDown(child)
+        // when initiating scroll while the view is at the bottom or at the top and pushing it
+        // further, the parent will report consumption of 0
+        if (dyConsumed == 0) return
+
+        setHidden(child, dyConsumed > 0, false)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun setHidden(
+        view: V,
+        hide: Boolean,
+        lockState: Boolean
+    ) {
+        if (!lockState) {
+            this.lockState = lockState
         }
+
+        if (hide) {
+            slideUp(view)
+        } else {
+            slideDown(view)
+        }
+
+        this.lockState = lockState
     }
 
     /**
@@ -74,7 +96,7 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
      * screen.
      */
     override fun slideDown(child: V) {
-        if (currentState == STATE_SCROLLED_UP) {
+        if (currentState == STATE_SCROLLED_UP || lockState) {
             return
         }
 
@@ -97,7 +119,7 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
      * screen.
      */
     override fun slideUp(child: V) {
-        if (currentState == STATE_SCROLLED_DOWN) {
+        if (currentState == STATE_SCROLLED_DOWN || lockState) {
             return
         }
 
