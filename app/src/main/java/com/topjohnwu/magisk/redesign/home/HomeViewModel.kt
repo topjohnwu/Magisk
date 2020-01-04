@@ -64,7 +64,6 @@ class HomeViewModel(
 
     val stateMagiskExpanded = KObservableField(false)
     val stateManagerExpanded = KObservableField(false)
-    val stateDeviceExpanded = KObservableField(false)
 
     val stateHideManagerName = R.string.manager.res().let {
         if (!statePackageOriginal) {

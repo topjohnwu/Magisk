@@ -98,7 +98,6 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
-                    android:onClick="@{() -> viewModel.toggle(viewModel.stateDeviceExpanded)}"
                     app:layout_constrainedWidth="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -192,15 +191,12 @@
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/home_device_details"
-                            goneUnless="@{viewModel.stateDeviceExpanded}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="@dimen/l1"
-                            android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/home_device_overview"
-                            app:layout_constraintTop_toTopOf="parent"
-                            tools:visibility="visible">
+                            app:layout_constraintTop_toTopOf="parent">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_device_extra_security_title"
