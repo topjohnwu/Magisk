@@ -380,11 +380,11 @@ class LZ4_decoder : public cpr_stream {
 public:
 	explicit LZ4_decoder(stream_ptr &&base)
 	: cpr_stream(std::move(base)), out_buf(new char[LZ4_UNCOMPRESSED]),
-	buffer(new char[LZ4_COMPRESSED]), init(false), block_sz(0), buf_off(0) {}
+	buf(new char[LZ4_COMPRESSED]), init(false), block_sz(0), buf_off(0) {}
 
 	~LZ4_decoder() override {
 		delete[] out_buf;
-		delete[] buffer;
+		delete[] buf;
 	}
 
 	int write(const void *in, size_t size) override {
@@ -396,20 +396,26 @@ public:
 			size -= 4;
 			init = true;
 		}
-		int write;
-		size_t consumed;
-		do {
+		for (int consumed; size != 0;) {
 			if (block_sz == 0) {
-				block_sz = *((unsigned *) inbuf);
-				inbuf += sizeof(unsigned);
-				size -= sizeof(unsigned);
+				if (buf_off + size >= sizeof(block_sz)) {
+					consumed = sizeof(block_sz) - buf_off;
+					memcpy(buf + buf_off, inbuf, consumed);
+					memcpy(&block_sz, buf, sizeof(block_sz));
+					buf_off = 0;
+				} else {
+					consumed = size;
+					memcpy(buf + buf_off, inbuf, size);
+				}
+				inbuf += consumed;
+				size -= consumed;
 			} else if (buf_off + size >= block_sz) {
 				consumed = block_sz - buf_off;
-				memcpy(buffer + buf_off, inbuf, consumed);
+				memcpy(buf + buf_off, inbuf, consumed);
 				inbuf += consumed;
 				size -= consumed;
 
-				write = LZ4_decompress_safe(buffer, out_buf, block_sz, LZ4_UNCOMPRESSED);
+				int write = LZ4_decompress_safe(buf, out_buf, block_sz, LZ4_UNCOMPRESSED);
 				if (write < 0) {
 					LOGW("LZ4HC decompression failure (%d)\n", write);
 					return -1;
@@ -421,17 +427,17 @@ public:
 				block_sz = 0;
 			} else {
 				// Copy to internal buffer
-				memcpy(buffer + buf_off, inbuf, size);
+				memcpy(buf + buf_off, inbuf, size);
 				buf_off += size;
-				size = 0;
+				break;
 			}
-		} while (size != 0);
+		}
 		return ret;
 	}
 
 private:
 	char *out_buf;
-	char *buffer;
+	char *buf;
 	bool init;
 	unsigned block_sz;
 	int buf_off;
