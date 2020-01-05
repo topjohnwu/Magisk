@@ -144,7 +144,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
 
-                    <com.android.internal.widget.ButtonBarLayout
+                    <androidx.appcompat.widget.ButtonBarLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="bottom|center_horizontal"
@@ -224,7 +224,7 @@
                             tools:icon="@drawable/ic_bug_md2"
                             tools:text="Button 1" />
 
-                    </com.android.internal.widget.ButtonBarLayout>
+                    </androidx.appcompat.widget.ButtonBarLayout>
 
                 </FrameLayout>
 
