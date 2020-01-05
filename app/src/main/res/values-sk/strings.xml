@@ -8,6 +8,7 @@
     <string name="settings">Nastavenia</string>
     <string name="install">Inštalovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
+    <string name="unsupport_magisk_message">Táto verzia Magisk Managera podporuje Magisk od verzie v18.0.\n\nBuď upgradujte Magisk manuálne alebo nainštalujte staršiu verziu aplikácie.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie je nainštalovaný</string>
@@ -90,11 +91,10 @@
     <string name="repo_install_title">Nainštalovať %1$s</string>
     <string name="repo_install_msg">Chcete teraz nainštalovať %1$s?</string>
     <string name="download">Stiahnuť</string>
-    <string name="reboot">Reštart</string>
+    <string name="reboot">Reštartovať</string>
     <string name="settings_reboot_toast">Pre aplikovanie nastavení je potrebný reštart</string>
     <string name="release_notes">Poznámky k vydaniu</string>
     <string name="repo_cache_cleared">Cache repo odstránená</string>
-
     <string name="dtbo_patched_title">DTBO bol zaplátaný!</string>
     <string name="dtbo_patched_reboot">Magisk Manager zaplátal dtbo.img, prosím, reštartujte.</string>
     <string name="flashing">Flashovanie</string>
@@ -115,6 +115,7 @@
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>
     <string name="env_fix_msg">Vaše zariadenie si vyžaduje ďalšie nastavenie pre správne fungovanie Magisk. Stiahne sa inštalačný zip súbor Magisk, chcete pokračovať teraz?</string>
     <string name="setup_msg">Nastavenie je spustené…</string>
+    <string name="authenticate">Autentifikácia</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Všeobecné</string>
@@ -166,6 +167,9 @@
     <string name="request_timeout_summary">%1$d sekúnd</string>
     <string name="settings_su_reauth_title">Overenie autentifikácie po upgrade</string>
     <string name="settings_su_reauth_summary">Overí autentifikáciu oprávnení superuser po upgrade aplikácie</string>
+    <string name="settings_su_biometric_title">Povoliť biometrickú autentifikáciu</string>
+    <string name="settings_su_biometric_summary">Použite biometrickú autentifikáciu pre povolenie žiadostí superuser</string>
+    <string name="no_biometric">Nepodporované zariadenia alebo biometria nie je povolená v nastaveniach</string>
 
     <string name="multiuser_mode">Režim viacerých používateľov</string>
     <string name="settings_owner_only">Iba majiteľ zariadenia</string>
@@ -209,6 +213,7 @@
     <string name="su_revoke_msg">Potvrdzujete zrušenie práv %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Nič</string>
+    <string name="auth_fail">Autentifikácia zlyhala</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:%1$d</string>
