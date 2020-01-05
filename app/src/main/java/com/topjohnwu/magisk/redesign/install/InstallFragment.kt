@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.redesign.install
 
 import android.content.Intent
-import android.graphics.Insets
+import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
 import com.topjohnwu.magisk.model.events.RequestFileEvent

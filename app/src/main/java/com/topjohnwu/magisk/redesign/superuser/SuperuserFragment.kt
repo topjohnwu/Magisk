@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.redesign.superuser
 
-import android.graphics.Insets
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
 import com.topjohnwu.magisk.model.navigation.Navigation

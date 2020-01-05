@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.redesign.compat
 
-import android.graphics.Insets
 import androidx.annotation.CallSuper
+import androidx.core.graphics.Insets
 import androidx.databinding.Observable
 import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField

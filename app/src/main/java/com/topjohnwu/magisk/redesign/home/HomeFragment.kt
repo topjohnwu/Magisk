@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.redesign.home
 
-import android.graphics.Insets
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 import com.topjohnwu.magisk.model.navigation.Navigation

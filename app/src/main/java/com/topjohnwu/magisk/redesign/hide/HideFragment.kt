@@ -1,12 +1,12 @@
 package com.topjohnwu.magisk.redesign.hide
 
 import android.content.Context
-import android.graphics.Insets
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView

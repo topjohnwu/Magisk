@@ -1,12 +1,12 @@
 package com.topjohnwu.magisk.redesign.module
 
 import android.content.Intent
-import android.graphics.Insets
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager

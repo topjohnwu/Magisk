@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.redesign.theme
 
-import android.graphics.Insets
+import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentThemeMd2Binding
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
