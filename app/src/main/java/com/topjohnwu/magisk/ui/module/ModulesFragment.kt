@@ -28,7 +28,7 @@ class ModulesFragment : BaseFragment<ModuleViewModel, FragmentModulesBinding>() 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Const.ID.FETCH_ZIP && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
-            val intent = activity.intent(FlashActivity::class.java)
+            val intent = activity.intent<FlashActivity>()
             intent.setData(data.data).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP)
             startActivity(intent)
         }

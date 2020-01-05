@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -37,27 +36,11 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * Trigger process recreation by calling {@link #triggerRebirth} with a {@link Context} instance.
  */
 public class ProcessPhoenix extends Activity {
-    private static final String KEY_RESTART_INTENTS = "phoenix_restart_intents";
+    private static final String KEY_RESTART_INTENT = "phoenix_restart_intent";
 
-    /**
-     * Call to restart the application process using the {@linkplain Intent#CATEGORY_DEFAULT default}
-     * activity as an intent.
-     * <p>
-     * Behavior of the current process after invoking this method is undefined.
-     */
-    public static void triggerRebirth(Context context) {
-        triggerRebirth(context, getRestartIntent(context));
-    }
-
-    /**
-     * Call to restart the application process using the specified intents.
-     * <p>
-     * Behavior of the current process after invoking this method is undefined.
-     */
-    public static void triggerRebirth(Context context, Intent... nextIntents) {
-        Intent intent = new Intent(context, a.r.class);
+    public static void triggerRebirth(Context context, Intent intent) {
         intent.addFlags(FLAG_ACTIVITY_NEW_TASK); // In case we are called with non-Activity context.
-        intent.putParcelableArrayListExtra(KEY_RESTART_INTENTS, new ArrayList<>(Arrays.asList(nextIntents)));
+        intent.putExtra(KEY_RESTART_INTENT, getRestartIntent(context));
         context.startActivity(intent);
         if (context instanceof Activity) {
             ((Activity) context).finish();
@@ -73,17 +56,15 @@ public class ProcessPhoenix extends Activity {
             return defaultIntent;
         }
 
-        throw new IllegalStateException("Unable to determine default activity for "
-                + packageName
-                + ". Does an activity specify the DEFAULT category in its intent filter?");
+        throw new IllegalStateException();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ArrayList<Intent> intents = getIntent().getParcelableArrayListExtra(KEY_RESTART_INTENTS);
-        startActivities(intents.toArray(new Intent[0]));
+        Intent intent = getIntent().getParcelableExtra(KEY_RESTART_INTENT);
+        startActivity(intent);
         finish();
         Runtime.getRuntime().exit(0);
     }

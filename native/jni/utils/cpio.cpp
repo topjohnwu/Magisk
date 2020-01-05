@@ -49,8 +49,7 @@ cpio_entry_base::cpio_entry_base(const cpio_newc_header *h)
 
 void cpio::dump(const char *file) {
 	fprintf(stderr, "Dump cpio: [%s]\n", file);
-	FDOutStream fd_out(xopen(file, O_WRONLY | O_CREAT | O_TRUNC, 0644), true);
-	output(fd_out);
+	dump(xfopen(file, "we"));
 }
 
 void cpio::rm(entry_map::iterator &it) {
@@ -110,9 +109,9 @@ bool cpio::exists(const char *name) {
 	return entries.count(name) != 0;
 }
 
-#define do_out(b, l) out.write(b, l); pos += (l)
-#define out_align() out.write(zeros, align_off(pos, 4)); pos = do_align(pos, 4)
-void cpio::output(OutStream &out) {
+#define do_out(buf, len) pos += fwrite(buf, 1, len, out);
+#define out_align() do_out(zeros, align_off(pos, 4))
+void cpio::dump(FILE *out) {
 	size_t pos = 0;
 	unsigned inode = 300000;
 	char header[111];
@@ -143,10 +142,11 @@ void cpio::output(OutStream &out) {
 	}
 	// Write trailer
 	sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
-			inode++, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0);
+			inode++, 0755, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0);
 	do_out(header, 110);
 	do_out("TRAILER!!!\0", 11);
 	out_align();
+	fclose(out);
 }
 
 cpio_rw::cpio_rw(const char *file) {
@@ -221,12 +221,12 @@ bool cpio_rw::mv(const char *from, const char *to) {
 
 #define pos_align(p) p = do_align(p, 4)
 
-void cpio_rw::load_cpio(char *buf, size_t sz) {
+void cpio_rw::load_cpio(const char *buf, size_t sz) {
 	size_t pos = 0;
-	cpio_newc_header *header;
+	const cpio_newc_header *header;
 	unique_ptr<cpio_entry> entry;
 	while (pos < sz) {
-		header = (cpio_newc_header *)(buf + pos);
+		header = reinterpret_cast<const cpio_newc_header *>(buf + pos);
 		entry = make_unique<cpio_entry>(header);
 		pos += sizeof(*header);
 		string_view name_view(buf + pos);

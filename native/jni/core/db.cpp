@@ -10,7 +10,7 @@
 #include <daemon.h>
 #include <utils.h>
 
-#define DB_VERSION 9
+#define DB_VERSION 10
 
 using namespace std;
 
@@ -70,13 +70,6 @@ static char *open_and_init_db(sqlite3 *&db) {
 				"CREATE TABLE IF NOT EXISTS policies "
 				"(uid INT, package_name TEXT, policy INT, until INT, "
 				"logging INT, notification INT, PRIMARY KEY(uid))",
-				nullptr, nullptr, &err);
-		err_ret(err);
-		// Logs
-		sqlite3_exec(db,
-				"CREATE TABLE IF NOT EXISTS logs "
-				"(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, "
-				"to_uid INT, action INT, time INT, command TEXT)",
 				nullptr, nullptr, &err);
 		err_ret(err);
 		// Settings
@@ -142,6 +135,12 @@ static char *open_and_init_db(sqlite3 *&db) {
 				nullptr, nullptr, &err);
 		err_ret(err);
 		ver = 9;
+		upgrade = true;
+	}
+	if (ver < 10) {
+		sqlite3_exec(db, "DROP TABLE IF EXISTS logs", nullptr, nullptr, &err);
+		err_ret(err);
+		ver = 10;
 		upgrade = true;
 	}
 
@@ -247,28 +246,41 @@ int get_uid_policy(su_access &su, int uid) {
 	return 0;
 }
 
-int validate_manager(string &alt_pkg, int userid, struct stat *st) {
+bool check_manager(string *pkg) {
+	db_strings str;
+	get_db_strings(str, SU_MANAGER);
+	bool ret = validate_manager(str[SU_MANAGER], 0, nullptr);
+	if (pkg) {
+		if (ret)
+			pkg->swap(str[SU_MANAGER]);
+		else
+			*pkg = "xxx";  /* Make sure the return pkg can never exist */
+	}
+	return ret;
+}
+
+bool validate_manager(string &pkg, int userid, struct stat *st) {
 	struct stat tmp_st;
 	if (st == nullptr)
 		st = &tmp_st;
 
 	// Prefer DE storage
 	char app_path[128];
-	sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, userid, alt_pkg.empty() ? "xxx" : alt_pkg.data());
-	if (stat(app_path, st)) {
+	sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, userid, pkg.data());
+	if (pkg.empty() || stat(app_path, st)) {
 		// Check the official package name
 		sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, userid);
 		if (stat(app_path, st)) {
 			LOGE("su: cannot find manager");
 			memset(st, 0, sizeof(*st));
-			alt_pkg.clear();
-			return 1;
+			pkg.clear();
+			return false;
 		} else {
 			// Switch to official package if exists
-			alt_pkg = JAVA_PACKAGE_NAME;
+			pkg = JAVA_PACKAGE_NAME;
 		}
 	}
-	return 0;
+	return true;
 }
 
 void exec_sql(int client) {

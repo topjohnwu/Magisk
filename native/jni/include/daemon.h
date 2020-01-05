@@ -17,9 +17,7 @@ enum {
 	BOOT_COMPLETE,
 	MAGISKHIDE,
 	SQLITE_CMD,
-	BROADCAST_ACK,
 	REMOVE_MODULES,
-	BROADCAST_TEST,
 };
 
 // Return codes for daemon
@@ -70,7 +68,6 @@ void remove_modules();
 void exec_script(const char *script);
 void exec_common_script(const char *stage);
 void exec_module_script(const char *stage, const std::vector<std::string> &module_list);
-void migrate_img(const char *img);
 void install_apk(const char *apk);
 
 /**************
@@ -84,8 +81,6 @@ void magiskhide_handler(int client);
  *************/
 
 void su_daemon_handler(int client, struct ucred *credential);
-void broadcast_test(int client = -1);
-void broadcast_ack(int client);
 
 /*********************
  * Daemon Global Vars

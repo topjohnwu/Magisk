@@ -14,8 +14,7 @@ import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.annotation.RequiresApi
-import androidx.annotation.StringRes
-import com.topjohnwu.magisk.extensions.langTagToLocale
+import com.topjohnwu.magisk.extensions.forceGetDeclaredField
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.model.update.UpdateCheckService
@@ -23,11 +22,8 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
-import com.topjohnwu.magisk.utils.currentLocale
-import com.topjohnwu.magisk.utils.defaultLocale
 import com.topjohnwu.magisk.utils.refreshLocale
 import com.topjohnwu.magisk.utils.updateConfig
-import java.util.*
 
 fun AssetManager.addAssetPath(path: String) {
     DynAPK.addAssetPath(this, path)
@@ -53,29 +49,22 @@ fun Context.wrapJob(): Context = object : GlobalResContext(this) {
     }
 }
 
-fun Class<*>.cmp(pkg: String = BuildConfig.APPLICATION_ID): ComponentName {
+fun Class<*>.cmp(pkg: String): ComponentName {
     val name = ClassMap[this].name
-    return ComponentName(pkg, Info.stub?.componentMap?.get(name) ?: name)
+    return ComponentName(pkg, Info.stub?.classToComponent?.get(name) ?: name)
 }
 
-fun Context.intent(c: Class<*>): Intent {
-    val cls = ClassMap[c]
-    return Info.stub?.let {
-        val className = it.componentMap.getOrElse(cls.name) { cls.name }
-        Intent().setComponent(ComponentName(this, className))
-    } ?: Intent(this, cls)
-}
+inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
 
 private open class GlobalResContext(base: Context) : ContextWrapper(base) {
     open val mRes: Resources get() = ResourceMgr.resource
-    private val loader by lazy { javaClass.classLoader!! }
 
     override fun getResources(): Resources {
         return mRes
     }
 
     override fun getClassLoader(): ClassLoader {
-        return loader
+        return javaClass.classLoader!!
     }
 
     override fun createConfigurationContext(config: Configuration): Context {
@@ -109,7 +98,7 @@ object ResourceMgr {
     }
 }
 
-@RequiresApi(api = 28)
+@RequiresApi(28)
 private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler() {
 
     override fun schedule(job: JobInfo): Int {
@@ -137,48 +126,14 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
     }
 
     private fun JobInfo.patch(): JobInfo {
-        // We need to patch the component of JobInfo to access WorkManager SystemJobService
-
+        // We need to swap out the service of JobInfo
         val name = service.className
         val component = ComponentName(
             service.packageName,
-            Info.stub!!.componentMap[name] ?: name)
+            Info.stub!!.classToComponent[name] ?: name)
 
-        // Clone the JobInfo except component
-        val builder = JobInfo.Builder(id, component)
-            .setExtras(extras)
-            .setTransientExtras(transientExtras)
-            .setClipData(clipData, clipGrantFlags)
-            .setRequiredNetwork(requiredNetwork)
-            .setEstimatedNetworkBytes(estimatedNetworkDownloadBytes, estimatedNetworkUploadBytes)
-            .setRequiresCharging(isRequireCharging)
-            .setRequiresDeviceIdle(isRequireDeviceIdle)
-            .setRequiresBatteryNotLow(isRequireBatteryNotLow)
-            .setRequiresStorageNotLow(isRequireStorageNotLow)
-            .also {
-                triggerContentUris?.let { uris ->
-                    for (uri in uris)
-                        it.addTriggerContentUri(uri)
-                }
-            }
-            .setTriggerContentUpdateDelay(triggerContentUpdateDelay)
-            .setTriggerContentMaxDelay(triggerContentMaxDelay)
-            .setImportantWhileForeground(isImportantWhileForeground)
-            .setPrefetch(isPrefetch)
-            .setPersisted(isPersisted)
-
-        if (isPeriodic) {
-            builder.setPeriodic(intervalMillis, flexMillis)
-        } else {
-            if (minLatencyMillis > 0)
-                builder.setMinimumLatency(minLatencyMillis)
-            if (maxExecutionDelayMillis > 0)
-                builder.setOverrideDeadline(maxExecutionDelayMillis)
-        }
-        if (!isRequireDeviceIdle)
-            builder.setBackoffCriteria(initialBackoffMillis, backoffPolicy)
-
-        return builder.build()
+        javaClass.forceGetDeclaredField("service")?.set(this, component)
+        return this
     }
 }
 
@@ -192,8 +147,9 @@ object ClassMap {
         UpdateCheckService::class.java to a.g::class.java,
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
-        SuRequestActivity::class.java to a.m::class.java
+        SuRequestActivity::class.java to a.m::class.java,
+        ProcessPhoenix::class.java to a.r::class.java
     )
 
-    operator fun get(c: Class<*>) = map.getOrElse(c) { throw IllegalArgumentException() }
+    operator fun get(c: Class<*>) = map.getOrElse(c) { c }
 }

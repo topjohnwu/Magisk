@@ -104,7 +104,6 @@ class LogViewModel(
         .add()
 
     private fun clearMagiskLogs(callback: () -> Unit) = logRepo.clearMagiskLogs()
-        .ignoreElement()
         .doOnComplete(callback)
         .subscribeK { SnackbarEvent(R.string.logs_cleared).publish() }
         .add()
@@ -115,7 +114,6 @@ class LogViewModel(
         .toList()
 
     private fun fetchMagiskLog() = logRepo.fetchMagiskLogs()
-        .flattenAsFlowable { it }
         .map { ConsoleRvItem(it) }
         .toList()
 

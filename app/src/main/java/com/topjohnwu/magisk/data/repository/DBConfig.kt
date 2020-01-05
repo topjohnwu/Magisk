@@ -29,8 +29,8 @@ interface DBConfig {
 }
 
 class DBSettingsValue(
-        private val name: String,
-        private val default: Int
+    private val name: String,
+    private val default: Int
 ) : ReadWriteProperty<DBConfig, Int> {
 
     private var value: Int? = null
@@ -47,29 +47,29 @@ class DBSettingsValue(
             this.value = value
         }
         thisRef.settingsDao.put(name, value)
-                .subscribeOn(Schedulers.io())
-                .subscribe()
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 }
 
 class DBBoolSettings(
-        name: String,
-        default: Boolean
+    name: String,
+    default: Boolean
 ) : ReadWriteProperty<DBConfig, Boolean> {
 
     val base = DBSettingsValue(name, if (default) 1 else 0)
 
-    override fun getValue(thisRef: DBConfig, property: KProperty<*>): Boolean
-            = base.getValue(thisRef, property) != 0
+    override fun getValue(thisRef: DBConfig, property: KProperty<*>): Boolean =
+        base.getValue(thisRef, property) != 0
 
     override fun setValue(thisRef: DBConfig, property: KProperty<*>, value: Boolean) =
-            base.setValue(thisRef, property, if (value) 1 else 0)
+        base.setValue(thisRef, property, if (value) 1 else 0)
 }
 
 class DBStringsValue(
-        private val name: String,
-        private val default: String,
-        private val sync: Boolean
+    private val name: String,
+    private val default: String,
+    private val sync: Boolean
 ) : ReadWriteProperty<DBConfig, String> {
 
     private var value: String? = null
@@ -90,16 +90,16 @@ class DBStringsValue(
                 thisRef.stringDao.delete(name).blockingAwait()
             } else {
                 thisRef.stringDao.delete(name)
-                        .subscribeOn(Schedulers.io())
-                        .subscribe()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe()
             }
         } else {
             if (sync) {
                 thisRef.stringDao.put(name, value).blockingAwait()
             } else {
                 thisRef.stringDao.put(name, value)
-                        .subscribeOn(Schedulers.io())
-                        .subscribe()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe()
             }
         }
     }

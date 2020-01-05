@@ -8,6 +8,8 @@ import com.topjohnwu.magisk.utils.CachedValue
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
+import java.io.FileInputStream
+import java.io.IOException
 
 val isRunningAsStub get() = Info.stub != null
 
@@ -32,28 +34,41 @@ object Info {
         }
     }
 
+    val isNewReboot by lazy {
+        try {
+            FileInputStream("/proc/sys/kernel/random/boot_id").bufferedReader().use {
+                val id = it.readLine()
+                if (id != Config.bootId) {
+                    Config.bootId = id
+                    true
+                } else {
+                    false
+                }
+            }
+        } catch (e: IOException) {
+            false
+        }
+    }
+
     private fun loadState() = runCatching {
         val str = ShellUtils.fastCmd("magisk -v").split(":".toRegex())[0]
         val code = ShellUtils.fastCmd("magisk -V").toInt()
         val hide = Shell.su("magiskhide --status").exec().isSuccess
-        var mode = -1
-        if (code >= Const.Version.CONNECT_MODE) {
-            mode = Shell.su("magisk --connect-mode").exec().code
-            if (mode == 0) {
-                // Manually trigger broadcast test
-                Shell.su("magisk --broadcast-test").exec()
-            }
-        }
-        Env(code, str, hide, mode)
+        Env(str, code, hide)
     }.getOrElse { Env() }
 
     class Env(
-        val magiskVersionCode: Int = -1,
         val magiskVersionString: String = "",
-        hide: Boolean = false,
-        var connectionMode: Int = -1
+        code: Int = -1,
+        hide: Boolean = false
     ) {
         val magiskHide get() = Config.magiskHide
+        val magiskVersionCode = when (code) {
+            in Int.MIN_VALUE..Const.Version.MIN_VERCODE -> -1
+            else -> if(Shell.rootAccess()) code else -1
+        }
+        val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
+        val isActive = magiskVersionCode >= 0
 
         init {
             Config.magiskHide = hide

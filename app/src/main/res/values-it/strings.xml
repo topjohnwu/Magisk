@@ -8,7 +8,6 @@
     <string name="settings">Impostazioni</string>
     <string name="install">Installa</string>
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
-    <string name="unsupport_magisk_message">Questa versione di Magisk Manager non supporta versioni di Magisk inferiori alla v18.0.\n\nPuoi aggiornare manualmente Magisk o tornare a una versione meno recente dell\'app.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk non è installato.</string>
@@ -165,9 +164,6 @@
     <string name="request_timeout_summary">%1$d secondi</string>
     <string name="settings_su_reauth_title">Riautentica dopo aggiornamento</string>
     <string name="settings_su_reauth_summary">Riautentica i permessi Superuser dopo un aggiornamento dell\'app</string>
-    <string name="settings_su_fingerprint_title">Abilita autenticazione impronta</string>
-    <string name="settings_su_fingerprint_summary">Utilizza il sensore di impronte per accettare le richieste Superuser</string>
-    <string name="auth_fingerprint">Conferma impronta</string>
 
     <string name="multiuser_mode">Modalità multiutente</string>
     <string name="settings_owner_only">Solo proprietario del dispositivo</string>
@@ -184,7 +180,6 @@
     <string name="global_summary">Tutte le sessioni di root erediteranno il namespace globale</string>
     <string name="requester_summary">Le sessioni di root erediteranno il namespace del loro richiedente</string>
     <string name="isolate_summary">Ogni sessione di root avrà il suo namespace isolato</string>
-    <string name="disable_fingerprint">Non è presente alcuna impronta o il dispositivo non è supportato</string>
     <string name="settings_download_path_error">Errore durante la creazione della cartella. Deve essere accessibile dalla radice della memoria di archiviazione e non essere un file.</string>
 
     <!--Superuser-->
@@ -212,7 +207,6 @@
     <string name="su_revoke_msg">Confermi la revoca dei diritti di %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Nessuno</string>
-    <string name="auth_fail">Autenticatione fallita</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

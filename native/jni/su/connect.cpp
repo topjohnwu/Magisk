@@ -13,194 +13,183 @@
 
 using namespace std;
 
-enum connect_mode {
-	UNINITIALIZED = 0,
-	MODE_ACTIVITY,
-	MODE_BROADCAST_COMPONENT,
-	MODE_BROADCAST_PACKAGE
+enum {
+	NAMED_ACTIVITY,
+	PKG_ACTIVITY,
+	CONTENT_PROVIDER
 };
 
-static connect_mode current_mode = UNINITIALIZED;
+#define CALL_PROVIDER \
+"/system/bin/app_process", "/system/bin", "com.android.commands.content.Content", \
+"call", "--uri", target, "--user", user, "--method", action
 
 #define START_ACTIVITY \
 "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
-"start", "-n", nullptr, "--user", nullptr, "-f", "0x18000020", "-a"
+"start", "-p", target, "--user", user, "-a", "android.intent.action.VIEW", \
+"-f", "0x18000020", "--es", "action", action
 
 // 0x18000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_INCLUDE_STOPPED_PACKAGES
 
-#define START_BROADCAST \
-"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
-"broadcast", "-n", nullptr, "--user", nullptr, "-f", "0x00000020", \
-"-a", "android.intent.action.REBOOT", "--es", "action"
+#define get_user(info) \
+(info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER \
+? info->uid / 100000 : 0)
 
-#define START_BROADCAST_PKG \
-"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
-"broadcast", "-p", nullptr, "--user", nullptr, "-f", "0x00000020", \
-"-a", "android.intent.action.REBOOT", "--es", "action"
+#define get_cmd(to) \
+(to.command[0] ? to.command : to.shell[0] ? to.shell : DEFAULT_SHELL)
 
-// 0x00000020 = FLAG_INCLUDE_STOPPED_PACKAGES
-
-#define am_app_info(info, ...) \
-if (current_mode == MODE_BROADCAST_PACKAGE) { \
-	const char *cmd[] = { START_BROADCAST_PKG, __VA_ARGS__, nullptr }; \
-	exec_am_cmd(cmd, info); \
-} else if (current_mode == MODE_BROADCAST_COMPONENT) { \
-	const char *cmd[] = { START_BROADCAST, __VA_ARGS__, nullptr }; \
-	exec_am_cmd(cmd, info); \
-} else { \
-	const char *cmd[] = { START_ACTIVITY, __VA_ARGS__, nullptr }; \
-	exec_am_cmd(cmd, info); \
-}
-
-#define am_app(...) am_app_info(ctx.info.get(), __VA_ARGS__)
-
-static const char *get_command(const su_request *to) {
-	if (to->command[0])
-		return to->command;
-	if (to->shell[0])
-		return to->shell;
-	return DEFAULT_SHELL;
-}
-
-static void get_user(char *user, const su_info *info) {
-	sprintf(user, "%d",
-			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER
-			? info->uid / 100000
-			: 0);
-}
-
-static void get_uid(char *uid, const su_info *info) {
-	sprintf(uid, "%d",
-			info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED
-			? info->uid % 100000
-			: info->uid);
-}
-
-static void exec_am_cmd(const char **args, const su_info *info) {
-	char target[128];
-	if (args[3][0] == 'b') {
-		// Broadcast
-		if (args[4][1] == 'p') {
-			// Broadcast to package (receiver can be obfuscated)
-			strcpy(target, info->str[SU_MANAGER].data());
-		} else {
-			// a.h is the broadcast receiver
-			sprintf(target, "%s/a.h", info->str[SU_MANAGER].data());
-		}
-	} else {
-		// a.m is the activity
-		sprintf(target, "%s/a.m", info->str[SU_MANAGER].data());
-	}
-	char user[8];
-	get_user(user, info);
-
-	// Fill in non static arguments
-	args[5] = target;
-	args[7] = user;
-
-	exec_t exec {
-		.pre_exec = []() -> void {
-			int null = xopen("/dev/null", O_WRONLY | O_CLOEXEC);
-			dup2(null, STDOUT_FILENO);
-			dup2(null, STDERR_FILENO);
-			setenv("CLASSPATH", "/system/framework/am.jar", 1);
-		},
-		.fork = fork_dont_care,
-		.argv = args
+class Extra {
+	const char *key;
+	enum {
+		INT,
+		BOOL,
+		STRING
+	} type;
+	union {
+		int int_val;
+		bool bool_val;
+		const char * str_val;
 	};
+	char buf[32];
+public:
+	Extra(const char *k, int v): key(k), type(INT), int_val(v) {}
+	Extra(const char *k, bool v): key(k), type(BOOL), bool_val(v) {}
+	Extra(const char *k, const char *v): key(k), type(STRING), str_val(v) {}
+
+	void add_intent(vector<const char *> &vec) {
+		const char *val;
+		switch (type) {
+			case INT:
+				vec.push_back("--ei");
+				sprintf(buf, "%d", int_val);
+				val = buf;
+				break;
+			case BOOL:
+				vec.push_back("--ez");
+				val = bool_val ? "true" : "false";
+				break;
+			case STRING:
+				vec.push_back("--es");
+				val = str_val;
+				break;
+		}
+		vec.push_back(key);
+		vec.push_back(val);
+	}
+
+	void add_bind(vector<const char *> &vec) {
+		switch (type) {
+			case INT:
+				sprintf(buf, "%s:i:%d", key, int_val);
+				break;
+			case BOOL:
+				sprintf(buf, "%s:b:%s", key, bool_val ? "true" : "false");
+				break;
+			case STRING:
+				sprintf(buf, "%s:s:%s", key, str_val);
+				break;
+		}
+		vec.push_back("--extra");
+		vec.push_back(buf);
+	}
+};
+
+static bool check_error(int fd) {
+	char buf[1024];
+	unique_ptr<FILE, decltype(&fclose)> out(xfdopen(fd, "r"), fclose);
+	while (fgets(buf, sizeof(buf), out.get())) {
+		if (strncmp(buf, "Error", 5) == 0)
+			return false;
+	}
+	return true;
+}
+
+static void exec_cmd(const char *action, vector<Extra> &data,
+					 const shared_ptr<su_info> &info, int mode = CONTENT_PROVIDER) {
+	char target[128];
+	char user[4];
+	sprintf(user, "%d", get_user(info));
+
+	// First try content provider call method
+	if (mode >= CONTENT_PROVIDER) {
+		sprintf(target, "content://%s.provider", info->str[SU_MANAGER].data());
+		vector<const char *> args{ CALL_PROVIDER };
+		for (auto &e : data) {
+			e.add_bind(args);
+		}
+		args.push_back(nullptr);
+		exec_t exec {
+			.err = true,
+			.fd = -1,
+			.pre_exec = [] { setenv("CLASSPATH", "/system/framework/content.jar", 1); },
+			.argv = args.data()
+		};
+		exec_command_sync(exec);
+		if (check_error(exec.fd))
+			return;
+	}
+
+	vector<const char *> args{ START_ACTIVITY };
+	for (auto &e : data) {
+		e.add_intent(args);
+	}
+	args.push_back(nullptr);
+	exec_t exec {
+		.err = true,
+		.fd = -1,
+		.pre_exec = [] { setenv("CLASSPATH", "/system/framework/am.jar", 1); },
+		.argv = args.data()
+	};
+
+	if (mode >= PKG_ACTIVITY) {
+		// Then try start activity without component name
+		strcpy(target, info->str[SU_MANAGER].data());
+		exec_command_sync(exec);
+		if (check_error(exec.fd))
+			return;
+	}
+
+	// Finally, fallback to start activity with component name
+	args[4] = "-n";
+	sprintf(target, "%s/a.m", info->str[SU_MANAGER].data());
+	exec.fd = -2;
+	exec.fork = fork_dont_care;
 	exec_command(exec);
 }
 
-#define LOG_BODY \
-"log", \
-"--ei", "from.uid", fromUid, \
-"--ei", "to.uid", toUid, \
-"--ei", "pid", pid, \
-"--ei", "policy", policy, \
-"--es", "command", get_command(&ctx.req), \
-"--ez", "notify", ctx.info->access.notify ? "true" : "false"
-
 void app_log(const su_context &ctx) {
-	char fromUid[8];
-	get_uid(fromUid, ctx.info.get());
+	if (fork_dont_care() == 0) {
+		vector<Extra> extras;
+		extras.reserve(6);
+		extras.emplace_back("from.uid", ctx.info->uid);
+		extras.emplace_back("to.uid", ctx.req.uid);
+		extras.emplace_back("pid", ctx.pid);
+		extras.emplace_back("policy", ctx.info->access.policy);
+		extras.emplace_back("command", get_cmd(ctx.req));
+		extras.emplace_back("notify", (bool) ctx.info->access.notify);
 
-	char toUid[8];
-	sprintf(toUid, "%d", ctx.req.uid);
-
-	char pid[8];
-	sprintf(pid, "%d", ctx.pid);
-
-	char policy[2];
-	sprintf(policy, "%d", ctx.info->access.policy);
-
-	am_app(LOG_BODY)
+		exec_cmd("log", extras, ctx.info);
+		exit(0);
+	}
 }
-
-#define NOTIFY_BODY \
-"notify", \
-"--ei", "from.uid", fromUid, \
-"--ei", "policy", policy
 
 void app_notify(const su_context &ctx) {
-	char fromUid[8];
-	get_uid(fromUid, ctx.info.get());
+	if (fork_dont_care() == 0) {
+		vector<Extra> extras;
+		extras.reserve(2);
+		extras.emplace_back("from.uid", ctx.info->uid);
+		extras.emplace_back("policy", ctx.info->access.policy);
 
-	char policy[2];
-	sprintf(policy, "%d", ctx.info->access.policy);
-
-	am_app(NOTIFY_BODY)
+		exec_cmd("notify", extras, ctx.info);
+		exit(0);
+	}
 }
-
-#define SOCKET_BODY \
-"request", \
-"--es", "socket", socket
 
 void app_socket(const char *socket, const shared_ptr<su_info> &info) {
-	am_app_info(info.get(), SOCKET_BODY)
-}
+	vector<Extra> extras;
+	extras.reserve(1);
+	extras.emplace_back("socket", socket);
 
-#define TEST_BODY \
-"test", "--ei", "mode", mode, nullptr
-
-void broadcast_test(int client) {
-	if (client >= 0) {
-		// Make it not uninitialized
-		current_mode = MODE_ACTIVITY;
-		write_int(client, 0);
-		close(client);
-	}
-
-	su_info info;
-	get_db_settings(info.cfg);
-	get_db_strings(info.str);
-	validate_manager(info.str[SU_MANAGER], 0, &info.mgr_st);
-
-	char mode[2];
-	{
-		sprintf(mode, "%d", MODE_BROADCAST_PACKAGE);
-		const char *cmd[] = { START_BROADCAST_PKG, TEST_BODY };
-		exec_am_cmd(cmd, &info);
-	}
-	{
-		sprintf(mode, "%d", MODE_BROADCAST_COMPONENT);
-		const char *cmd[] = { START_BROADCAST, TEST_BODY };
-		exec_am_cmd(cmd, &info);
-	}
-}
-
-void broadcast_ack(int client) {
-	int mode = read_int(client);
-	if (mode < 0) {
-		// Return connection mode to client
-		write_int(client, current_mode);
-	} else {
-		if (mode > current_mode) {
-			LOGD("* Use connect mode [%d] for su request and notify\n", mode);
-			current_mode = static_cast<connect_mode>(mode);
-		}
-		write_int(client, 0);
-	}
-	close(client);
+	exec_cmd("request", extras, info, PKG_ACTIVITY);
 }
 
 void socket_send_request(int fd, const shared_ptr<su_info> &info) {

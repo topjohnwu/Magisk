@@ -3,7 +3,10 @@ package com.topjohnwu.magisk.data.database
 import android.content.Context
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.data.database.base.*
+import com.topjohnwu.magisk.data.database.magiskdb.BaseDao
+import com.topjohnwu.magisk.data.database.magiskdb.Delete
+import com.topjohnwu.magisk.data.database.magiskdb.Replace
+import com.topjohnwu.magisk.data.database.magiskdb.Select
 import com.topjohnwu.magisk.extensions.now
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.toMap
@@ -16,7 +19,7 @@ class PolicyDao(
     private val context: Context
 ) : BaseDao() {
 
-    override val table: String = DatabaseDefinition.Table.POLICY
+    override val table: String = Table.POLICY
 
     fun deleteOutdated(
         nowSeconds: Long = TimeUnit.MILLISECONDS.toSeconds(now)

@@ -94,6 +94,8 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/hide_app_checkbox"
+                android:focusable="true"
+                android:clickable="true"
                 style="@style/Widget.Icon"
                 isChecked="@{item.isHiddenState}"
                 android:onClick="@{() -> item.toggle()}"

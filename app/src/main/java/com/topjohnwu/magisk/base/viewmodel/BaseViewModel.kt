@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.base.viewmodel
 
-import android.app.Activity
+import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.extensions.doOnSubscribeUi
 import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
@@ -21,7 +21,7 @@ abstract class BaseViewModel(
         }
     }
 
-    fun withView(action: Activity.() -> Unit) {
+    fun withView(action: BaseActivity<*, *>.() -> Unit) {
         ViewActionEvent(action).publish()
     }
 

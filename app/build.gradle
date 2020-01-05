@@ -35,13 +35,12 @@ android {
     }
 
     packagingOptions {
-        exclude '/META-INF/*.version'
-        exclude '/META-INF/*.kotlin_module'
-        exclude '/META-INF/rxkotlin.properties'
+        exclude '/META-INF/**'
         exclude '/androidsupportmultidexversion.txt'
         exclude '/org/bouncycastle/**'
         exclude '/kotlin/**'
         exclude '/kotlinx/**'
+        exclude '/okhttp3/**'
     }
 
     kotlinOptions {
@@ -75,7 +74,7 @@ dependencies {
     implementation "${bindingAdapter}:${vBAdapt}"
     implementation "${bindingAdapter}-recyclerview:${vBAdapt}"
 
-    def vMarkwon = '4.1.2'
+    def vMarkwon = '4.2.0'
     implementation "io.noties.markwon:core:${vMarkwon}"
     implementation "io.noties.markwon:html:${vMarkwon}"
     implementation "io.noties.markwon:image:${vMarkwon}"
@@ -85,7 +84,7 @@ dependencies {
     implementation "com.github.topjohnwu.libsu:core:${vLibsu}"
     implementation "com.github.topjohnwu.libsu:io:${vLibsu}"
 
-    def vKoin = "2.0.1"
+    def vKoin = '2.0.1'
     implementation "org.koin:koin-core:${vKoin}"
     implementation "org.koin:koin-android:${vKoin}"
     implementation "org.koin:koin-androidx-viewmodel:${vKoin}"
@@ -100,10 +99,10 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:${vOkHttp}"
     implementation "com.squareup.okhttp3:logging-interceptor:${vOkHttp}"
 
-    def vMoshi = "1.8.0"
+    def vMoshi = '1.9.2'
     implementation "com.squareup.moshi:moshi:${vMoshi}"
 
-    def vKotshi = "2.0.1"
+    def vKotshi = '2.0.2'
     implementation "se.ansman.kotshi:api:${vKotshi}"
     kapt "se.ansman.kotshi:compiler:${vKotshi}"
 
@@ -112,23 +111,25 @@ dependencies {
             replacedBy('com.github.topjohnwu:room-runtime')
         }
     }
-    def vRoom = "2.2.1"
+    def vRoom = '2.2.2'
     implementation "com.github.topjohnwu:room-runtime:${vRoom}"
+    implementation "androidx.room:room-rxjava2:${vRoom}"
     kapt "androidx.room:room-compiler:${vRoom}"
 
-    def vNav = "2.1.0"
-    implementation "androidx.navigation:navigation-fragment-ktx:$vNav"
-    implementation "androidx.navigation:navigation-ui-ktx:$vNav"
+    def vNav = '2.1.0'
+    implementation "androidx.navigation:navigation-fragment-ktx:${vNav}"
+    implementation "androidx.navigation:navigation-ui-ktx:${vNav}"
 
+    implementation 'androidx.biometric:biometric:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha03'
     implementation 'androidx.preference:preference:1.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0-rc01'
-    implementation 'androidx.fragment:fragment-ktx:1.2.0-rc01'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.fragment:fragment-ktx:1.2.0-rc03'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.work:work-runtime:2.2.0'
-    implementation 'androidx.transition:transition:1.3.0-rc01'
+    implementation 'androidx.transition:transition:1.3.0-rc02'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.core:core-ktx:1.1.0'
-    implementation 'com.google.android.material:material:1.2.0-alpha01'
+    implementation 'com.google.android.material:material:1.2.0-alpha02'
 }

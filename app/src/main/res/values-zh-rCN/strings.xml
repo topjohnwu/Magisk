@@ -8,7 +8,7 @@
     <string name="settings">设置</string>
     <string name="install">安装</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
-    <string name="unsupport_magisk_message">此版本的 Magisk Manager 不支持低于 v18.0 的 Magisk。\n\n请手动升级 Magisk，或将应用降级到旧版本。</string>
+    <string name="unsupport_magisk_msg">此版本的 Magisk Manager 不支持低于 %1$s 的 Magisk。\n\n进入后表现为未安装状态，但升级功能可用，请尽快升级。</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">未安装 Magisk</string>
@@ -95,7 +95,6 @@
     <string name="settings_reboot_toast">重启设备以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
-
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
     <string name="flashing">正在刷入</string>
@@ -116,6 +115,7 @@
     <string name="env_fix_title">需要修复运行环境</string>
     <string name="env_fix_msg">缺失 Magisk 正常工作所需的文件。 将下载 Magisk 安装包进行修复安装，完成后自动重启，是否继续？</string>
     <string name="setup_msg">正在修复运行环境…</string>
+    <string name="authenticate">验证您的身份</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -167,9 +167,9 @@
     <string name="request_timeout_summary">%1$d 秒</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
-    <string name="settings_su_fingerprint_title">启用指纹验证</string>
-    <string name="settings_su_fingerprint_summary">使用指纹识别来允许超级用户请求</string>
-    <string name="auth_fingerprint">验证指纹</string>
+    <string name="settings_su_biometric_title">启用生物识别认证</string>
+    <string name="settings_su_biometric_summary">使用生物识别验证超级用户请求</string>
+    <string name="no_biometric">不支持的设备或未配置生物识别功能</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
@@ -186,7 +186,6 @@
     <string name="global_summary">所有的 ROOT 会话使用全局挂载命名空间</string>
     <string name="requester_summary">ROOT 会话继承原程序的命名空间</string>
     <string name="isolate_summary">每一个 ROOT 会话使用自己独立的命名空间</string>
-    <string name="disable_fingerprint">没有设置指纹或设备不支持</string>
     <string name="settings_download_path_error">创建文件夹出错。路径需要位于内部存储空间，并且不能有同名文件。</string>
 
     <!--Superuser-->
@@ -214,7 +213,6 @@
     <string name="su_revoke_msg">确认撤销 %1$s 的权限？</string>
     <string name="toast">消息提示</string>
     <string name="none">无</string>
-    <string name="auth_fail">验证失败</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

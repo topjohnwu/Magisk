@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.data.repository
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Info
-import com.topjohnwu.magisk.data.database.base.su
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.extensions.getLabel
 import com.topjohnwu.magisk.extensions.packageName
@@ -57,7 +56,7 @@ class MagiskRepository(
         .toList()
 
     fun toggleHide(isEnabled: Boolean, packageName: String, process: String) =
-        "magiskhide --%s %s %s".format(isEnabled.state, packageName, process).su().ignoreElement()
+        Shell.su("magiskhide --${isEnabled.state} $packageName $process").submit()
 
     private val Boolean.state get() = if (this) "add" else "rm"
 

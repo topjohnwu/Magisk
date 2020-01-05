@@ -8,7 +8,6 @@
 #include <utils.h>
 
 #include "init.h"
-#include "flags.h"
 #include "magiskrc.h"
 
 #ifdef USE_64BIT
@@ -25,7 +24,7 @@ static void patch_socket_name(const char *path) {
 	mmap_rw(path, buf, size);
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(buf + i, sizeof(MAIN_SOCKET));
+			gen_rand_str(buf + i, 16);
 			i += sizeof(MAIN_SOCKET);
 		}
 	}
@@ -86,7 +85,7 @@ static void load_overlay_rc(int dirfd) {
 	rewinddir(dir);
 }
 
-void RootFSBase::setup_rootfs() {
+void RootFSInit::setup_rootfs() {
 	if (patch_sepolicy()) {
 		char *addr;
 		size_t size;
@@ -102,17 +101,8 @@ void RootFSBase::setup_rootfs() {
 		munmap(addr, size);
 	}
 
-	// Handle legacy overlays
-	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
-	if (fd >= 0) {
-		LOGD("Merge overlay folder\n");
-		mv_dir(fd, root);
-		close(fd);
-		rmdir("/overlay");
-	}
-
 	// Handle overlays
-	fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
+	int fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
 	if (fd >= 0) {
 		LOGD("Merge overlay.d\n");
 		load_overlay_rc(fd);
@@ -142,16 +132,6 @@ void RootFSBase::setup_rootfs() {
 	close(fd);
 }
 
-void SARCompatInit::setup_rootfs() {
-	// Clone rootfs
-	LOGD("Clone root dir from system to rootfs\n");
-	int system_root = xopen("/system_root", O_RDONLY | O_CLOEXEC);
-	clone_dir(system_root, root, false);
-	close(system_root);
-
-	RootFSBase::setup_rootfs();
-}
-
 bool MagiskInit::patch_sepolicy(const char *file) {
 	bool patch_init = false;
 
@@ -168,13 +148,30 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 
 	// Mount selinuxfs to communicate with kernel
 	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+	mount_list.emplace_back(SELINUX_MNT);
 
 	if (patch_init)
 		load_split_cil();
 
 	sepol_magisk_rules();
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
+
+	// Custom rules
+	if (auto dir = xopen_dir(persist_dir); dir) {
+		char path[4096];
+		for (dirent *entry; (entry = xreaddir(dir.get()));) {
+			if (entry->d_name == "."sv || entry->d_name == ".."sv)
+				continue;
+			snprintf(path, sizeof(path), "%s/%s/sepolicy.rule", persist_dir, entry->d_name);
+			if (access(path, R_OK) == 0) {
+				LOGD("Loading custom sepolicy patch: %s\n", path);
+				load_rule_file(path);
+			}
+		}
+	}
+
 	dump_policydb(file);
+	destroy_policydb();
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
@@ -192,8 +189,7 @@ constexpr const char wrapper[] =
 ;
 
 static void sbin_overlay(const raw_data &self, const raw_data &config) {
-	LOGD("Mount /sbin tmpfs overlay\n");
-	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
+	mount_sbin();
 
 	// Dump binaries
 	xmkdir(MAGISKTMP, 0755);
@@ -225,13 +221,55 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 	xsymlink("./magiskinit", "/sbin/supolicy");
 }
 
+static void recreate_sbin(const char *mirror) {
+	int src = xopen(mirror, O_RDONLY | O_CLOEXEC);
+	int dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	DIR *fp = fdopendir(src);
+	char buf[256];
+	bool use_bind_mount = true;
+	for (dirent *entry; (entry = xreaddir(fp));) {
+		if (entry->d_name == "."sv || entry->d_name == ".."sv)
+			continue;
+		struct stat st;
+		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
+		if (S_ISLNK(st.st_mode)) {
+			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
+			xsymlinkat(buf, dest, entry->d_name);
+		} else {
+			char sbin_path[256];
+			sprintf(buf, "%s/%s", mirror, entry->d_name);
+			sprintf(sbin_path, "/sbin/%s", entry->d_name);
+
+			if (use_bind_mount) {
+				// Create dummy
+				if (S_ISDIR(st.st_mode))
+					xmkdir(sbin_path, st.st_mode & 0777);
+				else
+					close(xopen(sbin_path, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
+
+				if (xmount(buf, sbin_path, nullptr, MS_BIND, nullptr)) {
+					// Bind mount failed, fallback to symlink
+					remove(sbin_path);
+					use_bind_mount = false;
+				} else {
+					continue;
+				}
+			}
+
+			xsymlink(buf, sbin_path);
+		}
+	}
+	close(src);
+	close(dest);
+}
+
 #define ROOTMIR MIRRDIR "/system_root"
 #define ROOTBLK BLOCKDIR "/system_root"
 #define MONOPOLICY  "/sepolicy"
 #define PATCHPOLICY "/sbin/.se"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 
-static string mount_list;
+static string magic_mount_list;
 
 static void magic_mount(int dirfd, const string &path) {
 	DIR *dir = xfdopendir(dirfd);
@@ -249,8 +287,8 @@ static void magic_mount(int dirfd, const string &path) {
 				string src = ROOTOVL + dest;
 				LOGD("Mount [%s] -> [%s]\n", src.data(), dest.data());
 				xmount(src.data(), dest.data(), nullptr, MS_BIND, nullptr);
-				mount_list += dest;
-				mount_list += '\n';
+				magic_mount_list += dest;
+				magic_mount_list += '\n';
 			}
 		}
 	}
@@ -260,47 +298,19 @@ void SARBase::patch_rootdir() {
 	sbin_overlay(self, config);
 
 	// Mount system_root mirror
-	xmkdir(MIRRDIR, 0);
-	xmkdir(ROOTMIR, 0);
-	xmkdir(BLOCKDIR, 0);
+	xmkdir(ROOTMIR, 0755);
 	mknod(ROOTBLK, S_IFBLK | 0600, system_dev);
 	if (xmount(ROOTBLK, ROOTMIR, "ext4", MS_RDONLY, nullptr))
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
 
 	// Recreate original sbin structure
-	int src = xopen(ROOTMIR "/sbin", O_RDONLY | O_CLOEXEC);
-	int dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	DIR *fp = fdopendir(src);
-	struct dirent *entry;
-	struct stat st;
-	char buf[256];
-	while ((entry = xreaddir(fp))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
-		if (S_ISLNK(st.st_mode)) {
-			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
-			xsymlinkat(buf, dest, entry->d_name);
-		} else {
-			char spath[256];
-			sprintf(buf, "/sbin/%s", entry->d_name);
-			sprintf(spath, ROOTMIR "/sbin/%s", entry->d_name);
-			// Create dummy
-			if (S_ISDIR(st.st_mode))
-				xmkdir(buf, st.st_mode & 0777);
-			else
-				close(xopen(buf, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
-			xmount(spath, buf, nullptr, MS_BIND, nullptr);
-		}
-	}
-	close(src);
-	close(dest);
+	recreate_sbin(ROOTMIR "/sbin");
 
 	// Patch init
 	raw_data init;
 	file_attr attr;
 	bool redirect = false;
-	src = xopen("/init", O_RDONLY | O_CLOEXEC);
+	int src = xopen("/init", O_RDONLY | O_CLOEXEC);
 	fd_full_read(src, init.buf, init.sz);
 	fgetattr(src, &attr);
 	close(src);
@@ -320,7 +330,7 @@ void SARBase::patch_rootdir() {
 		}
 	}
 	xmkdir(ROOTOVL, 0);
-	dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
+	int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
 	xwrite(dest, init.buf, init.sz);
 	fsetattr(dest, &attr);
 	close(dest);
@@ -380,7 +390,7 @@ void SARBase::patch_rootdir() {
 	magic_mount(src, "");
 	close(src);
 	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
-	write(dest, mount_list.data(), mount_list.length());
+	write(dest, magic_mount_list.data(), magic_mount_list.length());
 	close(dest);
 }
 
@@ -423,17 +433,16 @@ static void patch_fstab(const string &fstab) {
 #define FSR "/first_stage_ramdisk"
 
 void ABFirstStageInit::prepare() {
-	DIR *dir = xopendir(FSR);
+	auto dir = xopen_dir(FSR);
 	if (!dir)
 		return;
 	string fstab(FSR "/");
-	for (dirent *de; (de = readdir(dir));) {
+	for (dirent *de; (de = xreaddir(dir.get()));) {
 		if (strstr(de->d_name, "fstab")) {
 			fstab += de->d_name;
 			break;
 		}
 	}
-	closedir(dir);
 	if (fstab.length() == sizeof(FSR))
 		return;
 
@@ -450,14 +459,13 @@ void ABFirstStageInit::prepare() {
 }
 
 void AFirstStageInit::prepare() {
-	DIR *dir = xopendir("/");
-	for (dirent *de; (de = readdir(dir));) {
+	auto dir = xopen_dir("/");
+	for (dirent *de; (de = xreaddir(dir.get()));) {
 		if (strstr(de->d_name, "fstab")) {
 			patch_fstab(de->d_name);
 			break;
 		}
 	}
-	closedir(dir);
 
 	// Move stuffs for next stage
 	xmkdir("/system", 0755);
@@ -465,23 +473,6 @@ void AFirstStageInit::prepare() {
 	rename("/init", "/system/bin/init");
 	rename("/.backup/init", "/init");
 }
-
-#ifdef MAGISK_DEBUG
-static FILE *kmsg;
-static int vprintk(const char *fmt, va_list ap) {
-	fprintf(kmsg, "magiskinit: ");
-	return vfprintf(kmsg, fmt, ap);
-}
-static void setup_klog() {
-	int fd = xopen("/proc/kmsg", O_WRONLY | O_CLOEXEC);
-	kmsg = fdopen(fd, "w");
-	setbuf(kmsg, nullptr);
-	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
-	log_cb.ex = nop_ex;
-}
-#else
-#define setup_klog(...)
-#endif
 
 int magisk_proxy_main(int argc, char *argv[]) {
 	setup_klog();
@@ -500,18 +491,7 @@ int magisk_proxy_main(int argc, char *argv[]) {
 	sbin_overlay(self, config);
 
 	// Create symlinks pointing back to /root
-	char path[256];
-	int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	DIR *dir = xopendir("/root");
-	struct dirent *entry;
-	while((entry = xreaddir(dir))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
-		sprintf(path, "/root/%s", entry->d_name);
-		xsymlinkat(path, sbin, entry->d_name);
-	}
-	close(sbin);
-	closedir(dir);
+	recreate_sbin("/root");
 
 	setenv("REMOUNT_ROOT", "1", 1);
 	execv("/sbin/magisk", argv);

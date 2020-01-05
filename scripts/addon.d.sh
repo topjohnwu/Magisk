@@ -20,9 +20,8 @@ else
 fi
 
 initialize() {
-  mount /data 2>/dev/null
-
   MAGISKBIN=/data/adb/magisk
+
   if [ ! -d $MAGISKBIN ]; then
     echo "! Cannot find Magisk binaries!"
     exit 1
@@ -46,6 +45,9 @@ main() {
     sleep 5
   fi
 
+  # Ensure we aren't in /tmp/addon.d anymore (since it's been deleted by addon.d)
+  cd $TMPDIR
+
   $BOOTMODE || recovery_actions
 
   ui_print "************************"
@@ -68,9 +70,8 @@ main() {
 
   remove_system_su
   find_manager_apk
-  patch_boot_image
+  install_magisk
 
-  cd /
   # Cleanups
   $BOOTMODE || recovery_cleanup
   rm -rf $TMPDIR

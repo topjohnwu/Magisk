@@ -30,7 +30,7 @@ struct cpio_entry : public cpio_entry_base {
 	explicit cpio_entry(const char *name, uint32_t mode) : filename(name) {
 		this->mode = mode;
 	}
-	explicit cpio_entry(cpio_newc_header *h) : cpio_entry_base(h) {}
+	explicit cpio_entry(const cpio_newc_header *h) : cpio_entry_base(h) {}
 
 	~cpio_entry() override { free(data); };
 };
@@ -48,7 +48,7 @@ public:
 protected:
 	entry_map entries;
 	void rm(entry_map::iterator &it);
-	void output(OutStream &out);
+	void dump(FILE *out);
 };
 
 class cpio_rw : public cpio {
@@ -64,7 +64,7 @@ public:
 protected:
 	void insert(cpio_entry *e);
 	void mv(entry_map::iterator &it, const char *to);
-	void load_cpio(char *buf, size_t sz);
+	void load_cpio(const char *buf, size_t sz);
 };
 
 class cpio_mmap : public cpio {

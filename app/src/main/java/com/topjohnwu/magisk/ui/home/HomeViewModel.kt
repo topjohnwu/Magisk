@@ -92,7 +92,7 @@ class HomeViewModel(
         }
     }
 
-    val hasRoot = KObservableField(false)
+    val isActive = KObservableField(false)
 
     private var shownDialog = false
 
@@ -175,7 +175,7 @@ class HomeViewModel(
         if (invalidate)
             Info.envRef.invalidate()
 
-        hasRoot.value = Shell.rootAccess()
+        isActive.value = Info.env.isActive
 
         val fetchUpdate = if (isConnected.value)
             magiskRepo.fetchUpdate().ignoreElement()

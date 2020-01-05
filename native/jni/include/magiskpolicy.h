@@ -1,14 +1,9 @@
-/* magiskpolicy.h - Public API for policy patching
- */
-
 #pragma once
 
 #include <stdlib.h>
 #include <selinux.h>
 
 #define ALL NULL
-
-__BEGIN_DECLS
 
 // policydb functions
 int load_policydb(const char *file);
@@ -38,4 +33,7 @@ int sepol_exists(const char *source);
 // Built in rules
 void sepol_magisk_rules();
 
-__END_DECLS
+// Statement parsing
+void parse_statement(const char *statement);
+void load_rule_file(const char *file);
+void statement_help();

@@ -1,5 +1,13 @@
 #pragma once
 
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <mntent.h>
+#include <functional>
+#include <string_view>
+
+#include "xwrap.h"
+
 #define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (do_align(p, a) - (p))
 
@@ -7,10 +15,6 @@ struct file_attr {
 	struct stat st;
 	char con[128];
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 ssize_t fd_path(int fd, char *path, size_t size);
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
@@ -31,20 +35,17 @@ void clone_attr(const char *source, const char *target);
 void fd_full_read(int fd, void **buf, size_t *size);
 void full_read(const char *filename, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
-
-#ifdef __cplusplus
+void file_readline(bool trim, const char *file, const std::function<bool(std::string_view)> &fn);
+static inline void file_readline(const char *file,
+		const std::function<bool(std::string_view)> &fn) {
+	file_readline(false, file, fn);
 }
-
-#include <functional>
-#include <string_view>
-
-void file_readline(const char *file, const std::function<bool (std::string_view)> &fn, bool trim = false);
-void parse_prop_file(const char *file, const std::function
-		<bool(std::string_view, std::string_view)> &fn);
+void parse_prop_file(const char *file,
+		const std::function<bool(std::string_view, std::string_view)> &fn);
 void *__mmap(const char *filename, size_t *size, bool rw);
-void frm_rf(int dirfd, std::initializer_list<const char *> excl = std::initializer_list<const char *>());
+void frm_rf(int dirfd, std::initializer_list<const char *> excl = {});
 void clone_dir(int src, int dest, bool overwrite = true);
-void parse_mnt(const char *file, const std::function<bool (mntent*)> &fn);
+void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
 
 template <typename T>
 void full_read(const char *filename, T &buf, size_t &size) {
@@ -82,4 +83,21 @@ void mmap_rw(const char *filename, B &buf, L &sz) {
 	sz = __sz;
 }
 
-#endif
+using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
+using sDIR = std::unique_ptr<DIR, decltype(&closedir)>;
+
+static inline sDIR open_dir(const char *path) {
+	return sDIR(opendir(path), closedir);
+}
+
+static inline sDIR xopen_dir(const char *path) {
+	return sDIR(xopendir(path), closedir);
+}
+
+static inline sFILE open_file(const char *path, const char *mode) {
+	return sFILE(fopen(path, mode), fclose);
+}
+
+static inline sFILE xopen_file(const char *path, const char *mode) {
+	return sFILE(xfopen(path, mode), fclose);
+}

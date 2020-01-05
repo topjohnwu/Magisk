@@ -72,7 +72,7 @@ public class SignAPK {
 
             ZipAdjust.adjust(temp1, temp2);
 
-            try (JarMap map = new JarMap(temp2, false)) {
+            try (JarMap map = JarMap.open(temp2, false)) {
                 sign(cert, key, map, output, true);
             }
         } finally {

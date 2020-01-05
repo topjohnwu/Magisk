@@ -2,9 +2,9 @@ package com.topjohnwu.magisk.ui.flash
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
+import com.topjohnwu.magisk.view.Notifications
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
@@ -32,10 +33,11 @@ open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
         super.onCreate(savedInstanceState)
         val id = intent.getIntExtra(Const.Key.DISMISS_ID, -1)
         if (id != -1)
-            NotificationManagerCompat.from(this).cancel(id)
+            Notifications.mgr.cancel(id)
     }
 
     override fun onBackPressed() {
@@ -60,7 +62,7 @@ open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() 
 
     companion object {
 
-        private fun intent(context: Context) = context.intent(FlashActivity::class.java)
+        private fun intent(context: Context) = context.intent<FlashActivity>()
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         private fun intent(context: Context, file: File) = intent(context).setData(file.toUri())
 

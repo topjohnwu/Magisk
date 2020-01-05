@@ -26,37 +26,36 @@ void exec_script(const char *script) {
 
 void exec_common_script(const char *stage) {
 	char path[4096];
-	DIR *dir;
-	struct dirent *entry;
-	sprintf(path, SECURE_DIR "/%s.d", stage);
-	if (!(dir = xopendir(path)))
+	char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage);
+	auto dir = xopen_dir(path);
+	if (!dir)
 		return;
-	chdir(path);
 
-	bool pfs = strcmp(stage, "post-fs-data") == 0;
-	while ((entry = xreaddir(dir))) {
+	int dfd = dirfd(dir.get());
+	bool pfs = stage == "post-fs-data"sv;
+	*(name++) = '/';
+
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_REG) {
-			if (access(entry->d_name, X_OK) == -1)
+			if (faccessat(dfd, entry->d_name, X_OK, 0) != 0)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
+			strcpy(name, entry->d_name);
 			exec_t exec {
 				.pre_exec = set_path,
 				.fork = pfs ? fork_no_zombie : fork_dont_care
 			};
 			if (pfs)
-				exec_command_sync(exec, "/system/bin/sh", entry->d_name);
+				exec_command_sync(exec, "/system/bin/sh", path);
 			else
-				exec_command(exec, "/system/bin/sh", entry->d_name);
+				exec_command(exec, "/system/bin/sh", path);
 		}
 	}
-
-	closedir(dir);
-	chdir("/");
 }
 
 void exec_module_script(const char *stage, const vector<string> &module_list) {
 	char path[4096];
-	bool pfs = strcmp(stage, "post-fs-data") == 0;
+	bool pfs = stage == "post-fs-data"sv;
 	for (auto &m : module_list) {
 		const char* module = m.c_str();
 		sprintf(path, MODULEROOT "/%s/%s.sh", module, stage);
@@ -72,33 +71,6 @@ void exec_module_script(const char *stage, const vector<string> &module_list) {
 		else
 			exec_command(exec, "/system/bin/sh", path);
 	}
-}
-
-constexpr char migrate_script[] =
-"MODULEROOT=" MODULEROOT R"EOF(
-IMG=%s
-MNT=/dev/img_mnt
-e2fsck -yf $IMG
-mkdir -p $MNT
-for num in 0 1 2 3 4 5 6 7; do
-  losetup /dev/block/loop${num} $IMG || continue
-  mount -t ext4 /dev/block/loop${num} $MNT
-  rm -rf $MNT/lost+found $MNT/.core
-  magisk --clone $MNT $MODULEROOT
-  umount $MNT
-  rm -rf $MNT
-  losetup -d /dev/block/loop${num}
-  break
-done
-rm -rf $IMG
-)EOF";
-
-void migrate_img(const char *img) {
-	LOGI("* Migrating %s\n", img);
-	exec_t exec { .pre_exec = set_path };
-	char cmds[sizeof(migrate_script) + 128];
-	sprintf(cmds, migrate_script, img);
-	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
 }
 
 constexpr char install_script[] = R"EOF(

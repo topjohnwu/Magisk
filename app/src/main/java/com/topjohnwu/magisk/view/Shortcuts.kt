@@ -7,19 +7,19 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toAdaptiveIcon
 import androidx.core.graphics.drawable.toIcon
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.extensions.getBitmap
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.superuser.Shell
 
 object Shortcuts {
 
     fun setup(context: Context) {
         if (Build.VERSION.SDK_INT >= 25) {
-            val manager = context.getSystemService(ShortcutManager::class.java)
+            val manager = context.getSystemService<ShortcutManager>()
             manager?.dynamicShortcuts = getShortCuts(context)
         }
     }
@@ -27,8 +27,7 @@ object Shortcuts {
     @RequiresApi(api = 25)
     private fun getShortCuts(context: Context): List<ShortcutInfo> {
         val shortCuts = mutableListOf<ShortcutInfo>()
-        val root = Shell.rootAccess()
-        val intent = context.intent(SplashActivity::class.java)
+        val intent = context.intent<SplashActivity>()
 
         fun getIcon(id: Int): Icon {
             return if (Build.VERSION.SDK_INT >= 26)
@@ -52,7 +51,7 @@ object Shortcuts {
                     .build()
             )
         }
-        if (root && Info.env.magiskHide) {
+        if (Info.env.magiskHide) {
             shortCuts.add(
                 ShortcutInfo.Builder(context, "magiskhide")
                     .setShortLabel(context.getString(R.string.magiskhide))
@@ -67,7 +66,7 @@ object Shortcuts {
                     .build()
             )
         }
-        if (!Config.coreOnly && root && Info.env.magiskVersionCode >= 0) {
+        if (!Config.coreOnly && Info.env.isActive) {
             shortCuts.add(
                 ShortcutInfo.Builder(context, "modules")
                     .setShortLabel(context.getString(R.string.modules))

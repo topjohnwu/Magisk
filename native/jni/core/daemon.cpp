@@ -46,8 +46,6 @@ static void *request_handler(void *args) {
 	case LATE_START:
 	case BOOT_COMPLETE:
 	case SQLITE_CMD:
-	case BROADCAST_ACK:
-	case BROADCAST_TEST:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -84,12 +82,6 @@ static void *request_handler(void *args) {
 	case SQLITE_CMD:
 		exec_sql(client);
 		break;
-	case BROADCAST_ACK:
-		broadcast_ack(client);
-		break;
-	case BROADCAST_TEST:
-		broadcast_test(client);
-		break;
 	case REMOVE_MODULES:
 		if (credential.uid == UID_SHELL || credential.uid == UID_ROOT) {
 			remove_modules();
@@ -108,25 +100,29 @@ static void *request_handler(void *args) {
 
 static void main_daemon() {
 	android_logging();
+
+	int fd = xopen("/dev/null", O_WRONLY);
+	xdup2(fd, STDOUT_FILENO);
+	xdup2(fd, STDERR_FILENO);
+	if (fd > STDERR_FILENO)
+		close(fd);
+	fd = xopen("/dev/zero", O_RDONLY);
+	xdup2(fd, STDIN_FILENO);
+	if (fd > STDERR_FILENO)
+		close(fd);
+	close(fd);
+
 	setsid();
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 	restore_rootcon();
 
 	// Unmount pre-init patches
 	if (access(ROOTMNT, F_OK) == 0) {
-		file_readline(ROOTMNT, [](auto line) -> bool {
+		file_readline(true, ROOTMNT, [](auto line) -> bool {
 			umount2(line.data(), MNT_DETACH);
 			return true;
-		}, true);
+		});
 	}
-
-	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
-	xdup2(fd, STDOUT_FILENO);
-	xdup2(fd, STDERR_FILENO);
-	close(fd);
-	fd = xopen("/dev/zero", O_RDWR | O_CLOEXEC);
-	xdup2(fd, STDIN_FILENO);
-	close(fd);
 
 	LOGI(SHOW_VER(Magisk) " daemon started\n");
 

@@ -47,7 +47,7 @@ object Notifications {
     }
 
     fun magiskUpdate(context: Context) {
-        val intent = context.intent(SplashActivity::class.java)
+        val intent = context.intent<SplashActivity>()
                 .putExtra(Const.Key.OPEN_SECTION, "magisk")
         val stackBuilder = TaskStackBuilder.create(context)
         stackBuilder.addParentStack(SplashActivity::class.java.cmp(context.packageName))
@@ -65,7 +65,7 @@ object Notifications {
     }
 
     fun managerUpdate(context: Context) {
-        val intent = context.intent(GeneralReceiver::class.java)
+        val intent = context.intent<GeneralReceiver>()
                 .setAction(Const.Key.BROADCAST_MANAGER_UPDATE)
                 .putExtra(Const.Key.INTENT_SET_APP, Info.remote.app)
 
@@ -82,7 +82,7 @@ object Notifications {
     }
 
     fun dtboPatched(context: Context) {
-        val intent = context.intent(GeneralReceiver::class.java)
+        val intent = context.intent<GeneralReceiver>()
                 .setAction(Const.Key.BROADCAST_REBOOT)
         val pendingIntent = PendingIntent.getBroadcast(context,
                 Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)

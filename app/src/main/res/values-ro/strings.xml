@@ -8,7 +8,6 @@
     <string name="settings">Setări</string>
     <string name="install">Instalează</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
-    <string name="unsupport_magisk_message">Această versiune de Magisk Manager nu suportă versiunea Magisk mai mică de v18.0.\n\nPoți fie să actualizezi manual Magisk, fie să treci la o versiune mai veche.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nu este instalat.</string>
@@ -162,9 +161,6 @@
     <string name="request_timeout_summary">%1$d secunde</string>
     <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
     <string name="settings_su_reauth_summary">Reautentifică permisiunile pentru superutilizator după o actualizare a aplicației</string>
-    <string name="settings_su_fingerprint_title">Activează autentificarea cu amprenta</string>
-    <string name="settings_su_fingerprint_summary">Folosește scannerul de amprente pentru a permite solicitările de superutilizator</string>
-    <string name="auth_fingerprint">Autentifică amprenta</string>
 
     <string name="multiuser_mode">Mod de multiutilizator</string>
     <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
@@ -181,7 +177,6 @@
     <string name="global_summary">Toate sesiunile de root folosesc spațiul de nume global.</string>
     <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului.</string>
     <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat.</string>
-    <string name="disable_fingerprint">Nu au fost setate amprente sau scannerul de amprentă lipsește.</string>
     <string name="settings_download_path_error">Eroare la crearea dosarului. Acesta trebuie să fie accesibil din directorul rădăcină al stocării și nu trebuie să fie un fișier.</string>
 
     <!--Superuser-->
@@ -209,7 +204,6 @@
     <string name="su_revoke_msg">Confirmi revocarea drepturilor pentru %1$s?</string>
     <string name="toast">Mesaj</string>
     <string name="none">Nimic</string>
-    <string name="auth_fail">Autentificare eșuată</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

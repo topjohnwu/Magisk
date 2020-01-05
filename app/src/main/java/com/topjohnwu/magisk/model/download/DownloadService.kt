@@ -140,7 +140,7 @@ open class DownloadService : RemoteFileService() {
         inline operator fun invoke(context: Context, argBuilder: Builder.() -> Unit) {
             val app = context.applicationContext
             val builder = Builder().apply(argBuilder)
-            val intent = app.intent(DownloadService::class.java).putExtra(ARG_URL, builder.subject)
+            val intent = app.intent<DownloadService>().putExtra(ARG_URL, builder.subject)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 app.startForegroundService(intent)

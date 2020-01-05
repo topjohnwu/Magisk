@@ -1,10 +1,13 @@
 package com.topjohnwu.magisk.data.database
 
-import com.topjohnwu.magisk.data.database.base.*
+import com.topjohnwu.magisk.data.database.magiskdb.BaseDao
+import com.topjohnwu.magisk.data.database.magiskdb.Delete
+import com.topjohnwu.magisk.data.database.magiskdb.Replace
+import com.topjohnwu.magisk.data.database.magiskdb.Select
 
 class SettingsDao : BaseDao() {
 
-    override val table = DatabaseDefinition.Table.SETTINGS
+    override val table = Table.SETTINGS
 
     fun delete(key: String) = query<Delete> {
         condition { equals("key", key) }

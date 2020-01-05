@@ -26,6 +26,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.FileProvider
@@ -306,3 +307,5 @@ fun Context.unwrap() : Context {
     }
     return context
 }
+
+fun Uri.writeTo(file: File) = toFile().copyTo(file)

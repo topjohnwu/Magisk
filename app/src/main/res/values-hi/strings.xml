@@ -8,7 +8,6 @@
     <string name="settings">सेटिंग्स</string>
     <string name="install">स्थापित करें</string>
     <string name="unsupport_magisk_title">असमर्थित Magisk संस्करण</string>
-    <string name="unsupport_magisk_message">Magisk Manager का यह संस्करण Magisk के v18.0 संस्करण से कम का समर्थन नहीं करता है.\n\nआप या तो खुद से Magisk को अपग्रेड करें, या फिर एप्लीकेशन को पुराने संस्करण पे डाउनग्रेड करें .</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk स्थापित नहीं है</string>
@@ -163,9 +162,6 @@
     <string name="request_timeout_summary">%1$d सेकंड्‌स</string>
     <string name="settings_su_reauth_title">अपग्रेड के बाद फिर से प्रमाणित करें</string>
     <string name="settings_su_reauth_summary">एप्लीकेशन अपग्रेड होने के बाद उत्तम उपयोगकर्ता की अनुमतियों को फिर से प्रमाणित करें</string>
-    <string name="settings_su_fingerprint_title">फिंगरप्रिंट प्रमाणीकरण सक्षम करें</string>
-    <string name="settings_su_fingerprint_summary">उत्तम उपयोगकर्ता के अनुरोधों की अनुमति के लिए फिंगरप्रिंट स्कैनर का उपयोग करें</string>
-    <string name="auth_fingerprint">फिंगरप्रिंट को प्रमाणित करें</string>
 
     <string name="multiuser_mode">बहु उपयोगकर्ता मोड</string>
     <string name="settings_owner_only">केवल डिवाइस का मालिक</string>
@@ -182,7 +178,6 @@
     <string name="global_summary">सभी रूट सत्र वैश्विक माउंट नेमस्पेस का उपयोग करते हैं.</string>
     <string name="requester_summary">रूट सत्रों को उनके अनुरोधकर्ताओं के नेमस्पेस विरासत में मिलेंगे.</string>
     <string name="isolate_summary">प्रत्येक रूट सत्र का अपना अलग नेमस्पेस होगा.</string>
-    <string name="disable_fingerprint">कोई फ़िंगरप्रिंट नहीं सेट किया गया या डिवाइस का समर्थन नहीं है.</string>
     <string name="settings_download_path_error">फोल्डर बनाने में त्रुटि. यह स्टोरेज रूट डायरेक्टरी से एक्सेस होना चाहिए और फाइल नहीं होना चाहिए.</string>
 
     <!--Superuser-->
@@ -210,7 +205,6 @@
     <string name="su_revoke_msg">%1$s के अधिकारों को वापस लेने की पुष्टि करें?</string>
     <string name="toast">पॉप-अप नोट</string>
     <string name="none">कोई नहीं</string>
-    <string name="auth_fail">प्रमाणीकरण विफल हुआ</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

@@ -53,7 +53,7 @@ ui_print "- Target image: $BOOTIMAGE"
 # Detect version and architecture
 api_level_arch_detect
 
-[ $API -lt 17 ] && abort "! Magisk is only for Android 4.2 and above"
+[ $API -lt 17 ] && abort "! Magisk only support Android 4.2 and above"
 
 ui_print "- Device platform: $ARCH"
 
@@ -84,6 +84,8 @@ if [ -d /system/addon.d ]; then
 #!/sbin/sh
 # ADDOND_VERSION=2
 
+mount /data 2>/dev/null
+
 if [ -f /data/adb/magisk/addon.d.sh ]; then
   exec sh /data/adb/magisk/addon.d.sh "\$@"
 else
@@ -106,9 +108,8 @@ $BOOTMODE || recovery_actions
 # Boot/DTBO Patching
 ##########################################################################################
 
-patch_boot_image
+install_magisk
 
-cd /
 # Cleanups
 $BOOTMODE || recovery_cleanup
 rm -rf $TMPDIR

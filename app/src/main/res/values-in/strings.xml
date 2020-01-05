@@ -7,7 +7,6 @@
     <string name="settings">Setelan</string>
     <string name="install">Pasang</string>
     <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
-    <string name="unsupport_magisk_message">Magisk Manager versi ini tidak mendukung versi Magisk di bawah v18.0.\n\nAnda dapat memperbarui Magisk secara manual, atau menurunkan aplikasi ke versi sebelumnya.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk tidak terpasang.</string>
@@ -161,9 +160,6 @@
     <string name="request_timeout_summary">%1$d detik</string>
     <string name="settings_su_reauth_title">Otentikasi ulang setelah pembaruan</string>
     <string name="settings_su_reauth_summary">Otentikasi ulang izin superuser setelah pembaruan sebuah aplikasi</string>
-    <string name="settings_su_fingerprint_title">Aktifkan Otentikasi Sidik Jari</string>
-    <string name="settings_su_fingerprint_summary">Gunakan pemindai sidik jari untuk mengizinkan permintaan superuser</string>
-    <string name="auth_fingerprint">Otentikasi Sidik Jari</string>
 
     <string name="multiuser_mode">Mode Multipengguna</string>
     <string name="settings_owner_only">Pemilik Perangkat Saja</string>
@@ -180,7 +176,6 @@
     <string name="global_summary">Semua sesi root menggunakan mount ruang nama global.</string>
     <string name="requester_summary">Sesi root akan mewarisi ruang nama peminta mereka.</string>
     <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri.</string>
-    <string name="disable_fingerprint">Tidak ada sidik jari diatur atau tidak ada dukungan perangkat.</string>
     <string name="settings_download_path_error">Kesalahan membuat folder. Folder harus dapat diakses dari direktori penyimpanan root dan bukan merupakan file.</string>
 
     <!--Superuser-->
@@ -208,7 +203,6 @@
     <string name="su_revoke_msg">Konfirmasi untuk mencabut akses %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Tidak ada</string>
-    <string name="auth_fail">Otentikasi Gagal</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

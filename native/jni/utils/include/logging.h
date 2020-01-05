@@ -1,15 +1,10 @@
-/* logging.h - Error handling and logging
- */
-
 #pragma once
 
 #include <errno.h>
 #include <stdarg.h>
 #include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 typedef enum {
 	L_DEBUG,
@@ -43,6 +38,4 @@ void cmdline_logging();
 
 int log_handler(log_type t, const char *fmt, ...);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS

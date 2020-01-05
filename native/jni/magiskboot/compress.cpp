@@ -6,6 +6,13 @@
 #include <memory>
 #include <functional>
 
+#include <zlib.h>
+#include <bzlib.h>
+#include <lzma.h>
+#include <lz4.h>
+#include <lz4frame.h>
+#include <lz4hc.h>
+
 #include <logging.h>
 #include <utils.h>
 
@@ -14,32 +21,537 @@
 
 using namespace std;
 
-static bool read_file(FILE *fp, const function<void (void *, size_t)> &fn) {
-	char buf[4096];
-	size_t len;
-	while ((len = fread(buf, 1, sizeof(buf), fp)))
-		fn(buf, len);
-	return true;
+#define bwrite filter_stream::write
+
+constexpr size_t CHUNK = 0x40000;
+constexpr size_t LZ4_UNCOMPRESSED = 0x800000;
+constexpr size_t LZ4_COMPRESSED = LZ4_COMPRESSBOUND(LZ4_UNCOMPRESSED);
+
+class cpr_stream : public filter_stream {
+public:
+	using filter_stream::filter_stream;
+	using stream::read;
+};
+
+class gz_strm : public cpr_stream {
+public:
+	int write(const void *buf, size_t len) override {
+		return len ? write(buf, len, Z_NO_FLUSH) : 0;
+	}
+
+	~gz_strm() override {
+		write(nullptr, 0, Z_FINISH);
+		switch(mode) {
+			case DECODE:
+				inflateEnd(&strm);
+				break;
+			case ENCODE:
+				deflateEnd(&strm);
+				break;
+		}
+	}
+
+protected:
+	enum mode_t {
+		DECODE,
+		ENCODE
+	} mode;
+
+	gz_strm(mode_t mode, stream_ptr &&base) : cpr_stream(std::move(base)), mode(mode) {
+		switch(mode) {
+			case DECODE:
+				inflateInit2(&strm, 15 | 16);
+				break;
+			case ENCODE:
+				deflateInit2(&strm, 9, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY);
+				break;
+		}
+	}
+
+private:
+	z_stream strm;
+	uint8_t outbuf[CHUNK];
+
+	int write(const void *buf, size_t len, int flush) {
+		strm.next_in = (Bytef *) buf;
+		strm.avail_in = len;
+		do {
+			int code;
+			strm.next_out = outbuf;
+			strm.avail_out = sizeof(outbuf);
+			switch(mode) {
+				case DECODE:
+					code = inflate(&strm, flush);
+					break;
+				case ENCODE:
+					code = deflate(&strm, flush);
+					break;
+			}
+			if (code == Z_STREAM_ERROR) {
+				LOGW("gzip %s failed (%d)\n", mode ? "encode" : "decode", code);
+				return -1;
+			}
+			bwrite(outbuf, sizeof(outbuf) - strm.avail_out);
+		} while (strm.avail_out == 0);
+		return len;
+	}
+};
+
+class gz_decoder : public gz_strm {
+public:
+	explicit gz_decoder(stream_ptr &&base) : gz_strm(DECODE, std::move(base)) {};
+};
+
+class gz_encoder : public gz_strm {
+public:
+	explicit gz_encoder(stream_ptr &&base) : gz_strm(ENCODE, std::move(base)) {};
+};
+
+class bz_strm : public cpr_stream {
+public:
+	int write(const void *buf, size_t len) override {
+		return len ? write(buf, len, BZ_RUN) : 0;
+	}
+
+	~bz_strm() override {
+		switch(mode) {
+			case DECODE:
+				BZ2_bzDecompressEnd(&strm);
+				break;
+			case ENCODE:
+				write(nullptr, 0, BZ_FINISH);
+				BZ2_bzCompressEnd(&strm);
+				break;
+		}
+	}
+
+protected:
+	enum mode_t {
+		DECODE,
+		ENCODE
+	} mode;
+
+	bz_strm(mode_t mode, stream_ptr &&base) : cpr_stream(std::move(base)), mode(mode) {
+		switch(mode) {
+			case DECODE:
+				BZ2_bzDecompressInit(&strm, 0, 0);
+				break;
+			case ENCODE:
+				BZ2_bzCompressInit(&strm, 9, 0, 0);
+				break;
+		}
+	}
+
+private:
+	bz_stream strm;
+	char outbuf[CHUNK];
+
+	int write(const void *buf, size_t len, int flush) {
+		strm.next_in = (char *) buf;
+		strm.avail_in = len;
+		do {
+			int code;
+			strm.avail_out = sizeof(outbuf);
+			strm.next_out = outbuf;
+			switch(mode) {
+				case DECODE:
+					code = BZ2_bzDecompress(&strm);
+					break;
+				case ENCODE:
+					code = BZ2_bzCompress(&strm, flush);
+					break;
+			}
+			if (code < 0) {
+				LOGW("bzip2 %s failed (%d)\n", mode ? "encode" : "decode", code);
+				return -1;
+			}
+			bwrite(outbuf, sizeof(outbuf) - strm.avail_out);
+		} while (strm.avail_out == 0);
+		return len;
+	}
+};
+
+class bz_decoder : public bz_strm {
+public:
+	explicit bz_decoder(stream_ptr &&base) : bz_strm(DECODE, std::move(base)) {};
+};
+
+class bz_encoder : public bz_strm {
+public:
+	explicit bz_encoder(stream_ptr &&base) : bz_strm(ENCODE, std::move(base)) {};
+};
+
+class lzma_strm : public cpr_stream {
+public:
+	int write(const void *buf, size_t len) override {
+		return len ? write(buf, len, LZMA_RUN) : 0;
+	}
+
+	~lzma_strm() override {
+		write(nullptr, 0, LZMA_FINISH);
+		lzma_end(&strm);
+	}
+
+protected:
+	enum mode_t {
+		DECODE,
+		ENCODE_XZ,
+		ENCODE_LZMA
+	} mode;
+
+	lzma_strm(mode_t mode, stream_ptr &&base)
+	: cpr_stream(std::move(base)), mode(mode), strm(LZMA_STREAM_INIT) {
+		lzma_options_lzma opt;
+
+		// Initialize preset
+		lzma_lzma_preset(&opt, 9);
+		lzma_filter filters[] = {
+			{ .id = LZMA_FILTER_LZMA2, .options = &opt },
+			{ .id = LZMA_VLI_UNKNOWN, .options = nullptr },
+		};
+
+		lzma_ret ret;
+		switch(mode) {
+			case DECODE:
+				ret = lzma_auto_decoder(&strm, UINT64_MAX, 0);
+				break;
+			case ENCODE_XZ:
+				ret = lzma_stream_encoder(&strm, filters, LZMA_CHECK_CRC32);
+				break;
+			case ENCODE_LZMA:
+				ret = lzma_alone_encoder(&strm, &opt);
+				break;
+		}
+	}
+
+private:
+	lzma_stream strm;
+	uint8_t outbuf[CHUNK];
+
+	int write(const void *buf, size_t len, lzma_action flush) {
+		strm.next_in = (uint8_t *) buf;
+		strm.avail_in = len;
+		do {
+			strm.avail_out = sizeof(outbuf);
+			strm.next_out = outbuf;
+			int code = lzma_code(&strm, flush);
+			if (code != LZMA_OK && code != LZMA_STREAM_END) {
+				LOGW("LZMA %s failed (%d)\n", mode ? "encode" : "decode", code);
+				return -1;
+			}
+			bwrite(outbuf, sizeof(outbuf) - strm.avail_out);
+		} while (strm.avail_out == 0);
+		return len;
+	}
+};
+
+class lzma_decoder : public lzma_strm {
+public:
+	explicit lzma_decoder(stream_ptr &&base) : lzma_strm(DECODE, std::move(base)) {}
+};
+
+class xz_encoder : public lzma_strm {
+public:
+	explicit xz_encoder(stream_ptr &&base) : lzma_strm(ENCODE_XZ, std::move(base)) {}
+};
+
+class lzma_encoder : public lzma_strm {
+public:
+	explicit lzma_encoder(stream_ptr &&base) : lzma_strm(ENCODE_LZMA, std::move(base)) {}
+};
+
+class LZ4F_decoder : public cpr_stream {
+public:
+	explicit LZ4F_decoder(stream_ptr &&base) : cpr_stream(std::move(base)), outbuf(nullptr) {
+		LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
+	}
+
+	~LZ4F_decoder() override {
+		LZ4F_freeDecompressionContext(ctx);
+		delete[] outbuf;
+	}
+
+	int write(const void *buf, size_t len) override {
+		auto ret = len;
+		auto inbuf = reinterpret_cast<const uint8_t *>(buf);
+		if (!outbuf)
+			read_header(inbuf, len);
+		size_t read, write;
+		LZ4F_errorCode_t code;
+		do {
+			read = len;
+			write = outCapacity;
+			code = LZ4F_decompress(ctx, outbuf, &write, inbuf, &read, nullptr);
+			if (LZ4F_isError(code)) {
+				LOGW("LZ4F decode error: %s\n", LZ4F_getErrorName(code));
+				return -1;
+			}
+			len -= read;
+			inbuf += read;
+			bwrite(outbuf, write);
+		} while (len != 0 || write != 0);
+		return ret;
+	}
+
+private:
+	LZ4F_decompressionContext_t ctx;
+	uint8_t *outbuf;
+	size_t outCapacity;
+
+	void read_header(const uint8_t *&in, size_t &size) {
+		size_t read = size;
+		LZ4F_frameInfo_t info;
+		LZ4F_getFrameInfo(ctx, &info, in, &read);
+		switch (info.blockSizeID) {
+			case LZ4F_default:
+			case LZ4F_max64KB:  outCapacity = 1 << 16; break;
+			case LZ4F_max256KB: outCapacity = 1 << 18; break;
+			case LZ4F_max1MB:   outCapacity = 1 << 20; break;
+			case LZ4F_max4MB:   outCapacity = 1 << 22; break;
+		}
+		outbuf = new uint8_t[outCapacity];
+		in += read;
+		size -= read;
+	}
+};
+
+class LZ4F_encoder : public cpr_stream {
+public:
+	explicit LZ4F_encoder(stream_ptr &&base)
+	: cpr_stream(std::move(base)), outbuf(nullptr), outCapacity(0) {
+		LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
+	}
+
+	int write(const void *buf, size_t len) override {
+		auto ret = len;
+		if (!outbuf)
+			write_header();
+		if (len == 0)
+			return 0;
+		auto inbuf = reinterpret_cast<const uint8_t *>(buf);
+		size_t read, write;
+		do {
+			read = len > BLOCK_SZ ? BLOCK_SZ : len;
+			write = LZ4F_compressUpdate(ctx, outbuf, outCapacity, inbuf, read, nullptr);
+			if (LZ4F_isError(write)) {
+				LOGW("LZ4F encode error: %s\n", LZ4F_getErrorName(write));
+				return -1;
+			}
+			len -= read;
+			inbuf += read;
+			bwrite(outbuf, write);
+		} while (len != 0);
+		return ret;
+	}
+
+	~LZ4F_encoder() override {
+		size_t len = LZ4F_compressEnd(ctx, outbuf, outCapacity, nullptr);
+		bwrite(outbuf, len);
+		LZ4F_freeCompressionContext(ctx);
+		delete[] outbuf;
+	}
+
+private:
+	LZ4F_compressionContext_t ctx;
+	uint8_t *outbuf;
+	size_t outCapacity;
+
+	static constexpr size_t BLOCK_SZ = 1 << 22;
+
+	void write_header() {
+		LZ4F_preferences_t prefs {
+			.autoFlush = 1,
+			.compressionLevel = 9,
+			.frameInfo = {
+				.blockMode = LZ4F_blockIndependent,
+				.blockSizeID = LZ4F_max4MB,
+				.blockChecksumFlag = LZ4F_noBlockChecksum,
+				.contentChecksumFlag = LZ4F_contentChecksumEnabled
+			}
+		};
+		outCapacity = LZ4F_compressBound(BLOCK_SZ, &prefs);
+		outbuf = new uint8_t[outCapacity];
+		size_t write = LZ4F_compressBegin(ctx, outbuf, outCapacity, &prefs);
+		bwrite(outbuf, write);
+	}
+};
+
+class LZ4_decoder : public cpr_stream {
+public:
+	explicit LZ4_decoder(stream_ptr &&base)
+	: cpr_stream(std::move(base)), out_buf(new char[LZ4_UNCOMPRESSED]),
+	buffer(new char[LZ4_COMPRESSED]), init(false), block_sz(0), buf_off(0) {}
+
+	~LZ4_decoder() override {
+		delete[] out_buf;
+		delete[] buffer;
+	}
+
+	int write(const void *in, size_t size) override {
+		auto ret = size;
+		auto inbuf = static_cast<const char *>(in);
+		if (!init) {
+			// Skip magic
+			inbuf += 4;
+			size -= 4;
+			init = true;
+		}
+		int write;
+		size_t consumed;
+		do {
+			if (block_sz == 0) {
+				block_sz = *((unsigned *) inbuf);
+				inbuf += sizeof(unsigned);
+				size -= sizeof(unsigned);
+			} else if (buf_off + size >= block_sz) {
+				consumed = block_sz - buf_off;
+				memcpy(buffer + buf_off, inbuf, consumed);
+				inbuf += consumed;
+				size -= consumed;
+
+				write = LZ4_decompress_safe(buffer, out_buf, block_sz, LZ4_UNCOMPRESSED);
+				if (write < 0) {
+					LOGW("LZ4HC decompression failure (%d)\n", write);
+					return -1;
+				}
+				bwrite(out_buf, write);
+
+				// Reset
+				buf_off = 0;
+				block_sz = 0;
+			} else {
+				// Copy to internal buffer
+				memcpy(buffer + buf_off, inbuf, size);
+				buf_off += size;
+				size = 0;
+			}
+		} while (size != 0);
+		return ret;
+	}
+
+private:
+	char *out_buf;
+	char *buffer;
+	bool init;
+	unsigned block_sz;
+	int buf_off;
+};
+
+class LZ4_encoder : public cpr_stream {
+public:
+	explicit LZ4_encoder(stream_ptr &&base)
+	: cpr_stream(std::move(base)), outbuf(new char[LZ4_COMPRESSED]), buf(new char[LZ4_UNCOMPRESSED]),
+	init(false), buf_off(0), in_total(0) {}
+
+	int write(const void *in, size_t size) override {
+		if (!init) {
+			bwrite("\x02\x21\x4c\x18", 4);
+			init = true;
+		}
+		if (size == 0)
+			return 0;
+		in_total += size;
+		const char *inbuf = (const char *) in;
+		size_t consumed;
+		int write;
+		do {
+			if (buf_off + size >= LZ4_UNCOMPRESSED) {
+				consumed = LZ4_UNCOMPRESSED - buf_off;
+				memcpy(buf + buf_off, inbuf, consumed);
+				inbuf += consumed;
+				size -= consumed;
+
+				write = LZ4_compress_HC(buf, outbuf, LZ4_UNCOMPRESSED, LZ4_COMPRESSED, 9);
+				if (write == 0) {
+					LOGW("LZ4HC compression failure\n");
+					return false;
+				}
+				bwrite(&write, sizeof(write));
+				bwrite(outbuf, write);
+
+				// Reset buffer
+				buf_off = 0;
+			} else {
+				// Copy to internal buffer
+				memcpy(buf + buf_off, inbuf, size);
+				buf_off += size;
+				size = 0;
+			}
+		} while (size != 0);
+		return true;
+	}
+
+	~LZ4_encoder() override {
+		if (buf_off) {
+			int write = LZ4_compress_HC(buf, outbuf, buf_off, LZ4_COMPRESSED, 9);
+			bwrite(&write, sizeof(write));
+			bwrite(outbuf, write);
+		}
+		bwrite(&in_total, sizeof(in_total));
+		delete[] outbuf;
+		delete[] buf;
+	}
+
+private:
+	char *outbuf;
+	char *buf;
+	bool init;
+	int buf_off;
+	unsigned in_total;
+};
+
+stream_ptr get_encoder(format_t type, stream_ptr &&base) {
+	switch (type) {
+		case XZ:
+			return make_unique<xz_encoder>(std::move(base));
+		case LZMA:
+			return make_unique<lzma_encoder>(std::move(base));
+		case BZIP2:
+			return make_unique<bz_encoder>(std::move(base));
+		case LZ4:
+			return make_unique<LZ4F_encoder>(std::move(base));
+		case LZ4_LEGACY:
+			return make_unique<LZ4_encoder>(std::move(base));
+		case GZIP:
+		default:
+			return make_unique<gz_encoder>(std::move(base));
+	}
+}
+
+stream_ptr get_decoder(format_t type, stream_ptr &&base) {
+	switch (type) {
+		case XZ:
+		case LZMA:
+			return make_unique<lzma_decoder>(std::move(base));
+		case BZIP2:
+			return make_unique<bz_decoder>(std::move(base));
+		case LZ4:
+			return make_unique<LZ4F_decoder>(std::move(base));
+		case LZ4_LEGACY:
+			return make_unique<LZ4_decoder>(std::move(base));
+		case GZIP:
+		default:
+			return make_unique<gz_decoder>(std::move(base));
+	}
 }
 
 void decompress(char *infile, const char *outfile) {
-	bool in_std = strcmp(infile, "-") == 0;
+	bool in_std = infile == "-"sv;
 	bool rm_in = false;
 
-	FILE *in_file = in_std ? stdin : xfopen(infile, "re");
-	int out_fd = -1;
-	unique_ptr<Compression> cmp;
+	FILE *in_fp = in_std ? stdin : xfopen(infile, "re");
+	stream_ptr strm;
 
-	read_file(in_file, [&](void *buf, size_t len) -> void {
-		if (out_fd < 0) {
+	char buf[4096];
+	size_t len;
+	while ((len = fread(buf, 1, sizeof(buf), in_fp))) {
+		if (!strm) {
 			format_t type = check_fmt(buf, len);
-
-			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
 
 			if (!COMPRESSED(type))
 				LOGE("Input file is not a supported compressed type!\n");
 
-			cmp.reset(get_decoder(type));
+			fprintf(stderr, "Detected format: [%s]\n", fmt2name[type]);
 
 			/* If user does not provide outfile, infile has to be either
 	 		* <path>.[ext], or '-'. Outfile will be either <path> or '-'.
@@ -60,18 +572,16 @@ void decompress(char *infile, const char *outfile) {
 				}
 			}
 
-			out_fd = strcmp(outfile, "-") == 0 ?
-					STDOUT_FILENO : xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			cmp->setOut(make_unique<FDOutStream>(out_fd));
+			FILE *out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
+			strm = get_decoder(type, make_unique<fp_stream>(out_fp));
 			if (ext) *ext = '.';
 		}
-		if (!cmp->write(buf, len))
+		if (strm->write(buf, len) < 0)
 			LOGE("Decompression error!\n");
-	});
+	}
 
-	cmp->finalize();
-	fclose(in_file);
-	close(out_fd);
+	strm.reset(nullptr);
+	fclose(in_fp);
 
 	if (rm_in)
 		unlink(infile);
@@ -80,458 +590,42 @@ void decompress(char *infile, const char *outfile) {
 void compress(const char *method, const char *infile, const char *outfile) {
 	auto it = name2fmt.find(method);
 	if (it == name2fmt.end())
-		LOGE("Unsupported compression method: [%s]\n", method);
+		LOGE("Unknown compression method: [%s]\n", method);
 
-	unique_ptr<Compression> cmp(get_encoder(it->second));
-
-	bool in_std = strcmp(infile, "-") == 0;
+	bool in_std = infile == "-"sv;
 	bool rm_in = false;
 
-	FILE *in_file = in_std ? stdin : xfopen(infile, "re");
-	int out_fd;
+	FILE *in_fp = in_std ? stdin : xfopen(infile, "re");
+	FILE *out_fp;
 
 	if (outfile == nullptr) {
 		if (in_std) {
-			out_fd = STDOUT_FILENO;
+			out_fp = stdout;
 		} else {
 			/* If user does not provide outfile and infile is not
 			 * STDIN, output to <infile>.[ext] */
-			char *tmp = new char[strlen(infile) + 5];
-			sprintf(tmp, "%s%s", infile, fmt2ext[it->second]);
-			out_fd = xopen(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			fprintf(stderr, "Compressing to [%s]\n", tmp);
-			delete[] tmp;
+			string tmp(infile);
+			tmp += fmt2ext[it->second];
+			out_fp = xfopen(tmp.data(), "we");
+			fprintf(stderr, "Compressing to [%s]\n", tmp.data());
 			rm_in = true;
 		}
 	} else {
-		out_fd = strcmp(outfile, "-") == 0 ?
-				 STDOUT_FILENO : xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
 	}
 
-	cmp->setOut(make_unique<FDOutStream>(out_fd));
+	auto strm = get_encoder(it->second, make_unique<fp_stream>(out_fp));
 
-	read_file(in_file, [&](void *buf, size_t len) -> void {
-		if (!cmp->write(buf, len))
+	char buf[4096];
+	size_t len;
+	while ((len = fread(buf, 1, sizeof(buf), in_fp))) {
+		if (strm->write(buf, len) < 0)
 			LOGE("Compression error!\n");
-	});
+	};
 
-	cmp->finalize();
-	fclose(in_file);
-	close(out_fd);
+	strm.reset(nullptr);
+	fclose(in_fp);
 
 	if (rm_in)
 		unlink(infile);
-}
-
-Compression *get_encoder(format_t type) {
-	switch (type) {
-		case XZ:
-			return new XZEncoder();
-		case LZMA:
-			return new LZMAEncoder();
-		case BZIP2:
-			return new BZEncoder();
-		case LZ4:
-			return new LZ4FEncoder();
-		case LZ4_LEGACY:
-			return new LZ4Encoder();
-		case GZIP:
-		default:
-			return new GZEncoder();
-	}
-}
-
-Compression *get_decoder(format_t type) {
-	switch (type) {
-		case XZ:
-		case LZMA:
-			return new LZMADecoder();
-		case BZIP2:
-			return new BZDecoder();
-		case LZ4:
-			return new LZ4FDecoder();
-		case LZ4_LEGACY:
-			return new LZ4Decoder();
-		case GZIP:
-		default:
-			return new GZDecoder();
-	}
-}
-
-GZStream::GZStream(int mode) : mode(mode), strm({}) {
-	switch(mode) {
-		case 0:
-			inflateInit2(&strm, 15 | 16);
-			break;
-		case 1:
-			deflateInit2(&strm, 9, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY);
-			break;
-	}
-}
-
-bool GZStream::write(const void *in, size_t size) {
-	return size ? write(in, size, Z_NO_FLUSH) : true;
-}
-
-uint64_t GZStream::finalize() {
-	write(nullptr, 0, Z_FINISH);
-	uint64_t total = strm.total_out;
-	switch(mode) {
-		case 0:
-			inflateEnd(&strm);
-			break;
-		case 1:
-			deflateEnd(&strm);
-			break;
-	}
-	return total;
-}
-
-bool GZStream::write(const void *in, size_t size, int flush) {
-	int ret;
-	strm.next_in = (Bytef *) in;
-	strm.avail_in = size;
-	do {
-		strm.next_out = outbuf;
-		strm.avail_out = sizeof(outbuf);
-		switch(mode) {
-			case 0:
-				ret = inflate(&strm, flush);
-				break;
-			case 1:
-				ret = deflate(&strm, flush);
-				break;
-		}
-		if (ret == Z_STREAM_ERROR) {
-			LOGW("Gzip %s failed (%d)\n", mode ? "encode" : "decode", ret);
-			return false;
-		}
-		FilterOutStream::write(outbuf, sizeof(outbuf) - strm.avail_out);
-	} while (strm.avail_out == 0);
-	return true;
-}
-
-BZStream::BZStream(int mode) : mode(mode), strm({}) {
-	switch(mode) {
-		case 0:
-			BZ2_bzDecompressInit(&strm, 0, 0);
-			break;
-		case 1:
-			BZ2_bzCompressInit(&strm, 9, 0, 0);
-			break;
-	}
-}
-
-bool BZStream::write(const void *in, size_t size) {
-	return size ? write(in, size, BZ_RUN) : true;
-}
-
-uint64_t BZStream::finalize() {
-	if (mode)
-		write(nullptr, 0, BZ_FINISH);
-	uint64_t total = ((uint64_t) strm.total_out_hi32 << 32) + strm.total_out_lo32;
-	switch(mode) {
-		case 0:
-			BZ2_bzDecompressEnd(&strm);
-			break;
-		case 1:
-			BZ2_bzCompressEnd(&strm);
-			break;
-	}
-	return total;
-}
-
-bool BZStream::write(const void *in, size_t size, int flush) {
-	int ret;
-	strm.next_in = (char *) in;
-	strm.avail_in = size;
-	do {
-		strm.avail_out = sizeof(outbuf);
-		strm.next_out = outbuf;
-		switch(mode) {
-			case 0:
-				ret = BZ2_bzDecompress(&strm);
-				break;
-			case 1:
-				ret = BZ2_bzCompress(&strm, flush);
-				break;
-		}
-		if (ret < 0) {
-			LOGW("Bzip2 %s failed (%d)\n", mode ? "encode" : "decode", ret);
-			return false;
-		}
-		FilterOutStream::write(outbuf, sizeof(outbuf) - strm.avail_out);
-	} while (strm.avail_out == 0);
-	return true;
-}
-
-LZMAStream::LZMAStream(int mode) : mode(mode), strm(LZMA_STREAM_INIT) {
-	lzma_options_lzma opt;
-	int ret;
-
-	// Initialize preset
-	lzma_lzma_preset(&opt, 9);
-	lzma_filter filters[] = {
-			{ .id = LZMA_FILTER_LZMA2, .options = &opt },
-			{ .id = LZMA_VLI_UNKNOWN, .options = nullptr },
-	};
-
-	switch(mode) {
-		case 0:
-			ret = lzma_auto_decoder(&strm, UINT64_MAX, 0);
-			break;
-		case 1:
-			ret = lzma_stream_encoder(&strm, filters, LZMA_CHECK_CRC32);
-			break;
-		case 2:
-			ret = lzma_alone_encoder(&strm, &opt);
-			break;
-	}
-}
-
-bool LZMAStream::write(const void *in, size_t size) {
-	return size ? write(in, size, LZMA_RUN) : true;
-}
-
-uint64_t LZMAStream::finalize() {
-	write(nullptr, 0, LZMA_FINISH);
-	uint64_t total = strm.total_out;
-	lzma_end(&strm);
-	return total;
-}
-
-bool LZMAStream::write(const void *in, size_t size, lzma_action flush) {
-	int ret;
-	strm.next_in = (uint8_t *) in;
-	strm.avail_in = size;
-	do {
-		strm.avail_out = sizeof(outbuf);
-		strm.next_out = outbuf;
-		ret = lzma_code(&strm, flush);
-		if (ret != LZMA_OK && ret != LZMA_STREAM_END) {
-			LOGW("LZMA %s failed (%d)\n", mode ? "encode" : "decode", ret);
-			return false;
-		}
-		FilterOutStream::write(outbuf, sizeof(outbuf) - strm.avail_out);
-	} while (strm.avail_out == 0);
-	return true;
-}
-
-LZ4FDecoder::LZ4FDecoder() : outbuf(nullptr), total(0) {
-	LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
-}
-
-LZ4FDecoder::~LZ4FDecoder() {
-	LZ4F_freeDecompressionContext(ctx);
-	delete[] outbuf;
-}
-
-bool LZ4FDecoder::write(const void *in, size_t size) {
-	auto inbuf = (const uint8_t *) in;
-	if (!outbuf)
-		read_header(inbuf, size);
-	size_t read, write;
-	LZ4F_errorCode_t ret;
-	do {
-		read = size;
-		write = outCapacity;
-		ret = LZ4F_decompress(ctx, outbuf, &write, inbuf, &read, nullptr);
-		if (LZ4F_isError(ret)) {
-			LOGW("LZ4 decode error: %s\n", LZ4F_getErrorName(ret));
-			return false;
-		}
-		size -= read;
-		inbuf += read;
-		total += write;
-		FilterOutStream::write(outbuf, write);
-	} while (size != 0 || write != 0);
-	return true;
-}
-
-uint64_t LZ4FDecoder::finalize() {
-	return total;
-}
-
-void LZ4FDecoder::read_header(const uint8_t *&in, size_t &size) {
-	size_t read = size;
-	LZ4F_frameInfo_t info;
-	LZ4F_getFrameInfo(ctx, &info, in, &read);
-	switch (info.blockSizeID) {
-		case LZ4F_default:
-		case LZ4F_max64KB:  outCapacity = 1 << 16; break;
-		case LZ4F_max256KB: outCapacity = 1 << 18; break;
-		case LZ4F_max1MB:   outCapacity = 1 << 20; break;
-		case LZ4F_max4MB:   outCapacity = 1 << 22; break;
-	}
-	outbuf = new uint8_t[outCapacity];
-	in += read;
-	size -= read;
-}
-
-LZ4FEncoder::LZ4FEncoder() : outbuf(nullptr), outCapacity(0), total(0) {
-	LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
-}
-
-LZ4FEncoder::~LZ4FEncoder() {
-	LZ4F_freeCompressionContext(ctx);
-	delete[] outbuf;
-}
-
-bool LZ4FEncoder::write(const void *in, size_t size) {
-	if (!outbuf)
-		write_header();
-	if (size == 0)
-		return true;
-	auto inbuf = (const uint8_t *) in;
-	size_t read, write;
-	do {
-		read = size > BLOCK_SZ ? BLOCK_SZ : size;
-		write = LZ4F_compressUpdate(ctx, outbuf, outCapacity, inbuf, read, nullptr);
-		if (LZ4F_isError(write)) {
-			LOGW("LZ4 encode error: %s\n", LZ4F_getErrorName(write));
-			return false;
-		}
-		size -= read;
-		inbuf += read;
-		total += write;
-		FilterOutStream::write(outbuf, write);
-	} while (size != 0);
-	return true;
-}
-
-uint64_t LZ4FEncoder::finalize() {
-	size_t write = LZ4F_compressEnd(ctx, outbuf, outCapacity, nullptr);
-	total += write;
-	FilterOutStream::write(outbuf, write);
-	return total;
-}
-
-void LZ4FEncoder::write_header() {
-	LZ4F_preferences_t prefs {
-		.autoFlush = 1,
-		.compressionLevel = 9,
-		.frameInfo = {
-			.blockMode = LZ4F_blockIndependent,
-			.blockSizeID = LZ4F_max4MB,
-			.blockChecksumFlag = LZ4F_noBlockChecksum,
-			.contentChecksumFlag = LZ4F_contentChecksumEnabled
-		}
-	};
-	outCapacity = LZ4F_compressBound(BLOCK_SZ, &prefs);
-	outbuf = new uint8_t[outCapacity];
-	size_t write = LZ4F_compressBegin(ctx, outbuf, outCapacity, &prefs);
-	total += write;
-	FilterOutStream::write(outbuf, write);
-}
-
-LZ4Decoder::LZ4Decoder() : outbuf(new char[LZ4_UNCOMPRESSED]), buf(new char[LZ4_COMPRESSED]),
-init(false), block_sz(0), buf_off(0), total(0) {}
-
-LZ4Decoder::~LZ4Decoder() {
-	delete[] outbuf;
-	delete[] buf;
-}
-
-bool LZ4Decoder::write(const void *in, size_t size) {
-	const char *inbuf = (const char *) in;
-	if (!init) {
-		// Skip magic
-		inbuf += 4;
-		size -= 4;
-		init = true;
-	}
-	int write;
-	size_t consumed;
-	do {
-		if (block_sz == 0) {
-			block_sz = *((unsigned *) inbuf);
-			inbuf += sizeof(unsigned);
-			size -= sizeof(unsigned);
-		} else if (buf_off + size >= block_sz) {
-			consumed = block_sz - buf_off;
-			memcpy(buf + buf_off, inbuf, consumed);
-			inbuf += consumed;
-			size -= consumed;
-
-			write = LZ4_decompress_safe(buf, outbuf, block_sz, LZ4_UNCOMPRESSED);
-			if (write < 0) {
-				LOGW("LZ4HC decompression failure (%d)\n", write);
-				return false;
-			}
-			FilterOutStream::write(outbuf, write);
-			total += write;
-
-			// Reset
-			buf_off = 0;
-			block_sz = 0;
-		} else {
-			// Copy to internal buffer
-			memcpy(buf + buf_off, inbuf, size);
-			buf_off += size;
-			size = 0;
-		}
-	} while (size != 0);
-	return true;
-}
-
-uint64_t LZ4Decoder::finalize() {
-	return total;
-}
-
-LZ4Encoder::LZ4Encoder() : outbuf(new char[LZ4_COMPRESSED]), buf(new char[LZ4_UNCOMPRESSED]),
-init(false), buf_off(0), out_total(0), in_total(0) {}
-
-LZ4Encoder::~LZ4Encoder() {
-	delete[] outbuf;
-	delete[] buf;
-}
-
-bool LZ4Encoder::write(const void *in, size_t size) {
-	if (!init) {
-		FilterOutStream::write("\x02\x21\x4c\x18", 4);
-		init = true;
-	}
-	if (size == 0)
-		return true;
-	in_total += size;
-	const char *inbuf = (const char *) in;
-	size_t consumed;
-	int write;
-	do {
-		if (buf_off + size >= LZ4_UNCOMPRESSED) {
-			consumed = LZ4_UNCOMPRESSED - buf_off;
-			memcpy(buf + buf_off, inbuf, consumed);
-			inbuf += consumed;
-			size -= consumed;
-
-			write = LZ4_compress_HC(buf, outbuf, LZ4_UNCOMPRESSED, LZ4_COMPRESSED, 9);
-			if (write == 0) {
-				LOGW("LZ4HC compression failure\n");
-				return false;
-			}
-			FilterOutStream::write(&write, sizeof(write));
-			FilterOutStream::write(outbuf, write);
-			out_total += write + sizeof(write);
-
-			// Reset buffer
-			buf_off = 0;
-		} else {
-			// Copy to internal buffer
-			memcpy(buf + buf_off, inbuf, size);
-			buf_off += size;
-			size = 0;
-		}
-	} while (size != 0);
-	return true;
-}
-
-uint64_t LZ4Encoder::finalize() {
-	if (buf_off) {
-		int write = LZ4_compress_HC(buf, outbuf, buf_off, LZ4_COMPRESSED, 9);
-		FilterOutStream::write(&write, sizeof(write));
-		FilterOutStream::write(outbuf, write);
-		out_total += write + sizeof(write);
-	}
-	FilterOutStream::write(&in_total, sizeof(in_total));
-	return out_total + sizeof(in_total);
 }

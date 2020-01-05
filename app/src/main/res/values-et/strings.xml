@@ -8,7 +8,6 @@
     <string name="settings">Seaded</string>
     <string name="install">Installi</string>
     <string name="unsupport_magisk_title">Mittetoetatud Magisk\'i versioon</string>
-    <string name="unsupport_magisk_message">See Magisk Manager\'i versioon ei toeta Magisk\'ist vanemat versiooni kui v18.0.\n\nSa võid kas Magisk\'i käsitsi täiendada või alandad rakenduse vanemale versioonile.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk pole installitud</string>
@@ -163,9 +162,6 @@
     <string name="request_timeout_summary">%1$d sekundit</string>
     <string name="settings_su_reauth_title">Taas-autendi peale täiendust</string>
     <string name="settings_su_reauth_summary">Taas-autendi superkasutaja õigused peale rakenduse täiendamist</string>
-    <string name="settings_su_fingerprint_title">Luba sõrmejäljega autentimine</string>
-    <string name="settings_su_fingerprint_summary">Kasuta sõrmejäljelugejat superkasutaja taotluste lubamiseks</string>
-    <string name="auth_fingerprint">Autendi sõrmejälg</string>
 
     <string name="multiuser_mode">Mitmikkasutaja režiim</string>
     <string name="settings_owner_only">Ainult seadme omanik</string>
@@ -182,7 +178,6 @@
     <string name="global_summary">Kõik juurkasutaja sessioonid kasutavad globaalset monteerimise nimeruumi.</string>
     <string name="requester_summary">Juurkasutaja sessioonid võtavad üle selle taotleja nimeruumi.</string>
     <string name="isolate_summary">Iga juurkasutaja sessioon saab oma isoleeritud nimeruumi.</string>
-    <string name="disable_fingerprint">Sõrmejälgi pole määratud või seade pole toetatud.</string>
     <string name="settings_download_path_error">Faili loomisel esines viga.  See peab olema ligipääsetav mäluruumi juurkaustast ning ei tohi olla fail.</string>
 
     <!--Superuser-->
@@ -210,7 +205,6 @@
     <string name="su_revoke_msg">Kinnitad rakenduse %1$s õiguste eemaldamise?</string>
     <string name="toast">Hüpik</string>
     <string name="none">Puudub</string>
-    <string name="auth_fail">Autentimine ebaõnnestus</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>

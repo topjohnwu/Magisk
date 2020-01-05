@@ -67,7 +67,7 @@ void hide_unmount(int pid) {
 
 	// Unmount dummy skeletons and /sbin links
 	parse_mnt("/proc/self/mounts", [&](mntent *mentry) {
-		if (TMPFS_MNT(system) || TMPFS_MNT(vendor) || TMPFS_MNT(sbin))
+		if (TMPFS_MNT(system) || TMPFS_MNT(vendor) || TMPFS_MNT(sbin) || TMPFS_MNT(product))
 			targets.emplace_back(mentry->mnt_dir);
 		return true;
 	});

@@ -59,6 +59,8 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_margin="@dimen/fab_padding"
             android:onClick="@{() -> viewModel.fabPressed()}"
+            android:focusable="true"
+            android:clickable="true"
             app:fabSize="normal"
             app:layout_behavior="com.google.android.material.floatingactionbutton.FloatingActionButton$Behavior"
             app:srcCompat="@drawable/ic_add" />

@@ -8,6 +8,8 @@ import com.topjohnwu.magisk.model.navigation.Navigation
 
 class MainViewModel : BaseViewModel() {
 
+    var shownUnsupportedDialog = false
+
     fun navPressed() = Navigation.Main.OPEN_NAV.publish()
 
     fun navigationItemPressed(item: MenuItem): Boolean {

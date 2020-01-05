@@ -3,13 +3,12 @@ package com.topjohnwu.magisk.ui
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
-import androidx.appcompat.app.AlertDialog
 import com.topjohnwu.magisk.*
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ShellUtils
 
 open class SplashActivity : Activity() {
 
@@ -19,19 +18,7 @@ open class SplashActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Shell.getShell {
-            if (Info.env.magiskVersionCode > 0 && Info.env.magiskVersionCode < Const.Version.MIN_SUPPORT) {
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.unsupport_magisk_title)
-                    .setMessage(R.string.unsupport_magisk_message)
-                    .setNegativeButton(android.R.string.ok, null)
-                    .setOnDismissListener { finish() }
-                    .show()
-            } else {
-                initAndStart()
-            }
-        }
+        Shell.getShell { initAndStart() }
     }
 
     private fun initAndStart() {
@@ -40,13 +27,17 @@ open class SplashActivity : Activity() {
             Config.suManager = ""
             Shell.su("pm uninstall $pkg").submit()
         }
-        if (TextUtils.equals(pkg, packageName)) {
+        if (pkg == packageName) {
             runCatching {
                 // We are the manager, remove com.topjohnwu.magisk as it could be malware
                 packageManager.getApplicationInfo(BuildConfig.APPLICATION_ID, 0)
                 Shell.su("pm uninstall " + BuildConfig.APPLICATION_ID).submit()
             }
         }
+
+        Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
+        Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
+        Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
 
         // Set default configs
         Config.initialize()
@@ -60,10 +51,18 @@ open class SplashActivity : Activity() {
         // Setup shortcuts
         Shortcuts.setup(this)
 
-        val intent = intent(MainActivity::class.java)
-        intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION))
+        if (Info.isNewReboot) {
+            val shell = Shell.newInstance()
+            shell.newJob().add("mm_patch_dtb").submit {
+                if (it.isSuccess)
+                    Notifications.dtboPatched(this)
+                shell.close()
+            }
+        }
+
         DONE = true
-        startActivity(intent)
+
+        startActivity(intent<MainActivity>().apply { intent?.also { putExtras(it) } })
         finish()
     }
 

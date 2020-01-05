@@ -1,91 +1,84 @@
 #pragma once
 
-#include <unistd.h>
+#include <stdio.h>
 #include <memory>
 
-#include "utils.h"
+#include "../files.h"
 
-class OutStream {
+class stream {
 public:
-	virtual bool write(const void *buf, size_t len) = 0;
-	virtual ~OutStream() = default;
+	virtual int read(void *buf, size_t len);
+	virtual int write(const void *buf, size_t len);
+	virtual off_t seek(off_t off, int whence);
+	virtual ~stream() = default;
 };
 
-typedef std::unique_ptr<OutStream> strm_ptr;
+using stream_ptr = std::unique_ptr<stream>;
 
-class FilterOutStream : public OutStream {
+// Delegates all operations to base stream
+class filter_stream : public stream {
 public:
-	FilterOutStream() = default;
+	filter_stream(stream_ptr &&base) : base(std::move(base)) {}
 
-	FilterOutStream(strm_ptr &&ptr) : out(std::move(ptr)) {}
-
-	void setOut(strm_ptr &&ptr) { out = std::move(ptr); }
-
-	OutStream *getOut() { return out.get(); }
-
-	bool write(const void *buf, size_t len) override {
-		return out ? out->write(buf, len) : false;
-	}
+	int read(void *buf, size_t len) override;
+	int write(const void *buf, size_t len) override;
 
 protected:
-	strm_ptr out;
+	stream_ptr base;
 };
 
-class FDOutStream : public OutStream {
+// Byte stream that dynamically allocates memory
+class byte_stream : public stream {
 public:
-	FDOutStream(int fd, bool close = false) : fd(fd), close(close) {}
+	byte_stream(uint8_t *&buf, size_t &len);
+	template <class byte>
+	byte_stream(byte *&buf, size_t &len) : byte_stream(reinterpret_cast<uint8_t *&>(buf), len) {}
+	int read(void *buf, size_t len) override;
+	int write(const void *buf, size_t len) override;
+	off_t seek(off_t off, int whence) override;
 
-	bool write(const void *buf, size_t len) override {
-		return ::write(fd, buf, len) == len;
-	}
+private:
+	uint8_t *&_buf;
+	size_t &_len;
+	size_t _pos = 0;
+	size_t _cap = 0;
 
-	~FDOutStream() override {
-		if (close)
-			::close(fd);
-	}
+	void resize(size_t new_pos, bool zero = false);
+};
 
-protected:
+// File stream but does not close the file descriptor at any time
+class fd_stream : public stream {
+public:
+	fd_stream(int fd) : fd(fd) {}
+	int read(void *buf, size_t len) override;
+	int write(const void *buf, size_t len) override;
+	off_t seek(off_t off, int whence) override;
+
+private:
 	int fd;
-	bool close;
 };
 
-class BufOutStream : public OutStream {
+/* ****************************************
+ * Bridge between stream class and C stdio
+ * ****************************************/
+
+// sFILE -> stream_ptr
+class fp_stream final : public stream {
 public:
-	BufOutStream() : buf(nullptr), off(0), cap(0) {};
+	fp_stream(FILE *fp = nullptr) : fp(fp, fclose) {}
+	fp_stream(sFILE &&fp) : fp(std::move(fp)) {}
+	int read(void *buf, size_t len) override;
+	int write(const void *buf, size_t len) override;
+	off_t seek(off_t off, int whence) override;
 
-	bool write(const void *b, size_t len) override {
-		bool resize = false;
-		while (off + len > cap) {
-			cap = cap ? cap << 1 : 1 << 19;
-			resize = true;
-		}
-		if (resize)
-			buf = (char *) xrealloc(buf, cap);
-		memcpy(buf + off, b, len);
-		off += len;
-		return true;
-	}
-
-	template <typename bytes, typename length>
-	void release(bytes *&b, length &len) {
-		b = buf;
-		len = off;
-		buf = nullptr;
-		off = cap = 0;
-	}
-
-	template <typename bytes, typename length>
-	void getbuf(bytes *&b, length &len) const {
-		b = buf;
-		len = off;
-	}
-
-	~BufOutStream() override {
-		free(buf);
-	}
-
-protected:
-	char *buf;
-	size_t off;
-	size_t cap;
+private:
+	sFILE fp;
 };
+
+// stream_ptr -> sFILE
+sFILE make_stream_fp(stream_ptr &&strm);
+
+template <class T, class... Args>
+sFILE make_stream_fp(Args &&... args) {
+	return make_stream_fp(stream_ptr(new T(std::forward<Args>(args)...)));
+}

@@ -106,6 +106,8 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/checkbox"
+                android:focusable="true"
+                android:clickable="true"
                 style="@style/Widget.Icon"
                 isChecked="@{item.isChecked}"
                 android:layout_marginEnd="@dimen/margin_generic"
@@ -127,6 +129,8 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/delete"
+                android:focusable="true"
+                android:clickable="true"
                 style="@style/Widget.Icon"
                 srcCompat="@{item.isDeletable ? R.drawable.ic_undelete : R.drawable.ic_delete}"
                 android:onClick="@{() -> item.toggleDelete()}"

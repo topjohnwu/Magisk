@@ -8,7 +8,6 @@
     <string name="settings">Поставки</string>
     <string name="install">Инсталирај</string>
     <string name="unsupport_magisk_title">Неподдржана верзија на Magisk</string>
-    <string name="unsupport_magisk_message">Оваа верзија на Magisk Manager не ја поддржува верзијата на Magisk пониска од v18.0.\n\nМожно е да рачно да го надградите Magisk или да ја вратите апликацијата на постара верзија.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk не е инсталиран.</string>
@@ -155,9 +154,6 @@
     <string name="request_timeout_summary">%1$d секунди</string>
     <string name="settings_su_reauth_title">Повторна автентикација по надградба</string>
     <string name="settings_su_reauth_summary">Повторна автентикација за супер-корисник дозвола по надградбата на апликацијата</string>
-    <string name="settings_su_fingerprint_title">Овозможи автентикација на отпечатоци</string>
-    <string name="settings_su_fingerprint_summary">Користете скенер за отпечатоци за да дозволите супер-корисник барања</string>
-    <string name="auth_fingerprint">Автентикација на отпечатоци</string>
 
     <string name="multiuser_mode">Режим на повеќе корисници</string>
     <string name="settings_owner_only">Само сопственикот на уредот</string>
@@ -174,7 +170,6 @@
     <string name="global_summary">Сите рут сесии го користат глобалниот именски простор.</string>
     <string name="requester_summary">Рут сесиите ќе го наследат именскиот простор на нивниот барател.</string>
     <string name="isolate_summary">Секоја рут сесија ќе има свој изолиран именски простор.</string>
-    <string name="disable_fingerprint">Нема регистрирано отпечатоци од прсти или уредот не ја поддржува оваа функција.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Супер-корисник барање</string>
@@ -201,7 +196,6 @@
     <string name="su_revoke_msg">Дали потврдувате анулирање на поставките за пристап на %1$s?</string>
     <string name="toast">Тост</string>
     <string name="none">Ниеден</string>
-    <string name="auth_fail">Неуспешна автентикација</string>
 
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
