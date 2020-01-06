@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.topjohnwu.magisk.model.events.ViewEvent
 
 class EndlessRecyclerScrollListener(
     private val layoutManager: RecyclerView.LayoutManager,
@@ -110,4 +111,6 @@ class EndlessRecyclerScrollListener(
         previousTotalItemCount = 0
         loading = true
     }
+
+    class ResetState : ViewEvent()
 }

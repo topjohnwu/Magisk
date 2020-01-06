@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.redesign.compat.*
 import com.topjohnwu.magisk.tasks.RepoUpdater
+import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Completable
@@ -174,6 +175,9 @@ class ModuleViewModel(
         // check for existing jobs
         if (remoteJob?.isDisposed?.not() == true) {
             return
+        }
+        if (itemsRemote.isEmpty()) {
+            EndlessRecyclerScrollListener.ResetState().publish()
         }
         remoteJob = Single.fromCallable { itemsRemote.size }
             .flatMap { loadRemoteInternal(offset = it) }

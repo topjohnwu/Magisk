@@ -20,11 +20,11 @@ abstract class TeanityViewModel : ViewModel() {
     }
 
     fun <Event : ViewEvent> Event.publish() {
-        _viewEvents.value = this
+        _viewEvents.postValue(this)
     }
 
     fun Int.publish() {
-        _viewEvents.value = SimpleViewEvent(this)
+        _viewEvents.postValue(SimpleViewEvent(this))
     }
 
     fun Disposable.add() {

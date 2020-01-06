@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.redesign.MainActivity
 import com.topjohnwu.magisk.redesign.ReselectionTarget
 import com.topjohnwu.magisk.redesign.compat.CompatFragment
@@ -89,6 +90,13 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
             return true
         }
         return super.onBackPressed()
+    }
+
+    // ---
+
+    override fun onEventDispatched(event: ViewEvent) = when (event) {
+        is EndlessRecyclerScrollListener.ResetState -> listeners.forEach { it.resetState() }
+        else -> super.onEventDispatched(event)
     }
 
     // ---
