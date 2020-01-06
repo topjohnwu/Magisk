@@ -253,9 +253,21 @@ fun TextInputLayout.setErrorString(error: String) {
 
 @BindingAdapter("onSelectClick", "onSelectReset", requireAll = false)
 fun View.setOnSelectClickListener(listener: View.OnClickListener, resetTime: Long) {
+
+    fun getHideTarget() = (parent as? ViewGroup)?.findViewWithTag<View>(R.id.hideWhenSelected)
+    fun animateVisibility(hide: Boolean, target: View? = getHideTarget()) {
+        target ?: return
+        val targetScale = if (hide) 0f else 1f
+        target.animate()
+            .scaleY(targetScale)
+            .scaleX(targetScale)
+            .start()
+    }
+
     setOnClickListener {
         when {
             it.isSelected -> {
+                animateVisibility(false)
                 listener.onClick(it)
                 (it.tag as? Runnable)?.let { task ->
                     it.handler.removeCallbacks(task)
@@ -263,8 +275,10 @@ fun View.setOnSelectClickListener(listener: View.OnClickListener, resetTime: Lon
                 it.isSelected = false
             }
             else -> {
+                animateVisibility(true)
                 it.isSelected = true
                 it.tag = it.postDelayed(resetTime) {
+                    animateVisibility(false)
                     it.tag = null
                     it.isSelected = false
                 }

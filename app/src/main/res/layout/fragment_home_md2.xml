@@ -334,6 +334,15 @@
                                 app:srcCompat="@drawable/ic_magisk_delete"
                                 app:tint="@color/color_primary_error_transient" />
 
+                            <androidx.appcompat.widget.AppCompatImageView
+                                android:layout_width="@dimen/l1"
+                                android:layout_height="@dimen/l1"
+                                android:tag="@{@id/hideWhenSelected}"
+                                app:layout_constraintEnd_toEndOf="@+id/home_magisk_icon"
+                                app:layout_constraintTop_toTopOf="@+id/home_magisk_icon"
+                                app:srcCompat="@drawable/ic_delete_md2"
+                                app:tint="?colorPrimary" />
+
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_title"
                                 android:layout_width="0dp"
