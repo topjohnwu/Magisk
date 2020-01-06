@@ -22,9 +22,12 @@ import com.topjohnwu.magisk.redesign.compat.*
 import com.topjohnwu.magisk.tasks.RepoUpdater
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.currentLocale
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -54,8 +57,24 @@ class ModuleViewModel(
         it.bindExtra(BR.viewModel, this)
     }
 
+    private val itemNoneInstalled = TextItem(R.string.module_install_none)
+    private val itemNoneUpdatable = TextItem(R.string.module_update_none)
+
+    private val itemsInstalled = diffListOf<ModuleItem>()
+    private val itemsUpdatable = diffListOf<RepoItem.Update>()
+    private val itemsRemote = diffListOf<RepoItem.Remote>()
+
     val adapter = adapterOf<ComparableRvItem<*>>()
-    val items = diffListOf<ComparableRvItem<*>>()
+    val items = MergeObservableList<ComparableRvItem<*>>()
+        .insertItem(sectionActive)
+        .insertItem(itemNoneInstalled)
+        .insertList(itemsInstalled)
+        .insertItem(InstallModule)
+        .insertItem(sectionUpdate)
+        .insertItem(itemNoneUpdatable)
+        .insertList(itemsUpdatable)
+        .insertItem(sectionRemote)
+        .insertList(itemsRemote)!!
     val itemBinding = itemBindingOf<ComparableRvItem<*>> {
         it.bindExtra(BR.viewModel, this)
     }
@@ -94,15 +113,6 @@ class ModuleViewModel(
 
     // ---
 
-    private val itemsInstalled
-        @WorkerThread get() = items.filterIsInstance<ModuleItem>()
-
-    private val itemsUpdatable
-        @WorkerThread get() = items.filterIsInstance<RepoItem.Update>()
-
-    private val itemsRemote
-        @WorkerThread get() = items.filterIsInstance<RepoItem.Remote>()
-
     private var remoteJob: Disposable? = null
     private val dao
         get() = when (Config.repoOrder) {
@@ -126,22 +136,34 @@ class ModuleViewModel(
 
     // ---
 
-    override fun refresh() = Single.fromCallable { Module.loadModules() }
+    override fun refresh(): Disposable {
+        val installedTask = loadInstalled()
+        val remoteTask = if (itemsRemote.isEmpty()) {
+            Completable.fromAction { loadRemote() }
+        } else {
+            Completable.complete()
+        }
+        return Completable.merge(listOf(installedTask, remoteTask)).subscribeK()
+    }
+
+    private fun loadInstalled() = Single.fromCallable { Module.loadModules() }
         .map { it.map { ModuleItem(it) } }
         .map { it.order() }
         .map { it.loadDetail() }
-        .map { build(active = it, updatable = loadUpdates(it)) }
-        .map { it to items.calculateDiff(it) }
+        .map { it to itemsInstalled.calculateDiff(it) }
         .applyViewModel(this)
-        .subscribeK {
-            items.update(it.first, it.second)
-            if (!items.contains(sectionRemote)) {
-                loadRemote()
-            }
-            updateActiveState()
-        }
+        .observeOn(AndroidSchedulers.mainThread())
+        .doOnSuccess { itemsInstalled.update(it.first, it.second) }
+        .doOnSuccess { if (itemsInstalled.isNotEmpty()) items.remove(itemNoneInstalled) }
+        .observeOn(Schedulers.io())
+        .map { loadUpdates(it.first) }
+        .observeOn(AndroidSchedulers.mainThread())
+        .map { it to itemsUpdatable.calculateDiff(it) }
+        .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
+        .doOnSuccess { if (itemsUpdatable.isNotEmpty()) items.remove(itemNoneUpdatable) }
+        .ignoreElement()!!
 
-    fun loadRemoteImplicit() = let { items.clear(); itemsSearch.clear() }
+    fun loadRemoteImplicit() = let { itemsRemote.clear(); itemsSearch.clear() }
         .run { downloadRepos() }
         .applyViewModel(this, false)
         .subscribeK { refresh(); submitQuery() }
@@ -156,10 +178,7 @@ class ModuleViewModel(
         remoteJob = Single.fromCallable { itemsRemote.size }
             .flatMap { loadRemoteInternal(offset = it) }
             .subscribeK(onError = Timber::e) {
-                if (!items.contains(sectionRemote)) {
-                    items.add(sectionRemote)
-                }
-                items.addAll(it)
+                itemsRemote.addAll(it)
             }
     }
 
@@ -201,7 +220,7 @@ class ModuleViewModel(
     private fun loadRemoteInternal(
         offset: Int = 0,
         downloadRepos: Boolean = offset == 0
-    ): Single<List<RepoItem>> = Single.fromCallable { dao.getRepos(offset) }
+    ): Single<List<RepoItem.Remote>> = Single.fromCallable { dao.getRepos(offset) }
         .map { it.map { RepoItem.Remote(it) } }
         .flatMap {
             when {
@@ -260,7 +279,7 @@ class ModuleViewModel(
             updateOrderIcon()
             Single.fromCallable { itemsRemote }
                 .subscribeK {
-                    items.removeAll(it)
+                    itemsRemote.removeAll(it)
                     remoteJob?.dispose()
                     loadRemote()
                 }.add()
@@ -274,25 +293,5 @@ class ModuleViewModel(
     fun infoPressed(item: ModuleItem) {
         OpenChangelogEvent(item.repo ?: return).publish()
     }
-
-    // ---
-
-    /** Callable only from worker thread because of expensive list filtering */
-    @WorkerThread
-    private fun build(
-        active: List<ModuleItem> = itemsInstalled,
-        updatable: List<RepoItem.Update> = itemsUpdatable,
-        remote: List<RepoItem.Remote> = itemsRemote
-    ) = (active + InstallModule)
-        .prependIfNotEmpty { sectionActive }
-        .prependIf(Config.coreOnly) { SafeModeNotice } +
-            updatable.prependIfNotEmpty { sectionUpdate } +
-            remote.prependIfNotEmpty { sectionRemote }
-
-    private fun <T> List<T>.prependIf(condition: Boolean, item: () -> T) =
-        if (condition) listOf(item()) + this else this
-
-    private fun <T> List<T>.prependIfNotEmpty(item: () -> T) =
-        prependIf(isNotEmpty(), item)
 
 }

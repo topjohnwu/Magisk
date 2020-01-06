@@ -85,6 +85,8 @@
     <string name="module_state_remove">Remove</string>
     <string name="module_state_restore">Restore</string>
     <string name="module_action_install_external">Install from storage</string>
+    <string name="module_update_none">Your modules are up to date!</string>
+    <string name="module_install_none">No modules detected, try installing one from the list below.</string>
 
     <string name="superuser_toggle_log">Logs</string>
     <string name="superuser_toggle_notification">Notifications</string>
