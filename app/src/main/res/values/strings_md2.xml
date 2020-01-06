@@ -70,6 +70,11 @@
     <string name="settings_dark_mode_dark">Always Dark</string>
     <string name="settings_safe_mode_title">Safe Mode</string>
     <string name="settings_safe_mode_summary">Disables everything but essential functionality within Magisk and Magisk Manager. Magisk Hide, as a separate subsystem, will stand unaffected.</string>
+    <string name="settings_grid_span_count_title">Grid Column Size</string>
+    <string name="settings_grid_span_count_summary">Sets column size for all eligible grid lists. You can set this outside settings by performing pinch gesture.</string>
+    <string name="settings_grid_span_count_1">One item per line (Small Screens)</string>
+    <string name="settings_grid_span_count_2">Two items per line (Recommended)</string>
+    <string name="settings_grid_span_count_3">Three item per line (Tablet/TV)</string>
 
     <string name="install_options_title">Options</string>
     <string name="install_method_title">Method</string>

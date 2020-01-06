@@ -35,7 +35,7 @@ class SettingsViewModel(
     val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
     val items = diffListOf(
         Customization,
-        Theme, Language, Redesign, DownloadPath,
+        Theme, Language, Redesign, DownloadPath, GridSize,
 
         Manager,
         UpdateChannel, UpdateChannelUrl, ClearRepoCache, HideOrRestore(), UpdateChecker,
