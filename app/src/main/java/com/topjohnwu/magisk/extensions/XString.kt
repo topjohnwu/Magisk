@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.extensions
 
 import android.content.res.Resources
 
-val specialChars = arrayOf('!', '@', '#', '$', '%', '&', '?')
+val specialChars = arrayOf('！', '＠', '＃', '＄', '％', '＆', '？')
 
 fun String.replaceRandomWithSpecial(passes: Int): String {
     var string = this
