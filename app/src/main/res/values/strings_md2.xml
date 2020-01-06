@@ -91,10 +91,14 @@
     <string name="superuser_toggle_log">Logs</string>
     <string name="superuser_toggle_notification">Notifications</string>
     <string name="superuser_toggle_revoke">Revoke</string>
+    <string name="superuser_policy_none">No app has asked for superuser permission yet.</string>
 
     <string name="hide_filter_hint">Filter by name</string>
     <string name="hide_scroll_up">Scroll up</string>
     <string name="hide_filters">Filters</string>
     <string name="hide_search">Search</string>
+
+    <string name="log_data_none">You\'re log-free, try using your SU enabled apps more.</string>
+    <string name="log_data_magisk_none">Magisk logs are empty, that\'s weird.</string>
 
 </resources>

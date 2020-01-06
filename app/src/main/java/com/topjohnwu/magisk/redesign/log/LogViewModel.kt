@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.binding.BindingAdapter
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
+import com.topjohnwu.magisk.model.entity.recycler.TextItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.compat.diffListOf
@@ -26,6 +27,11 @@ import java.util.*
 class LogViewModel(
     private val repo: LogRepository
 ) : CompatViewModel() {
+
+    // --- empty view
+
+    val itemEmpty = TextItem(R.string.log_data_none)
+    val itemMagiskEmpty = TextItem(R.string.log_data_magisk_none)
 
     // --- main view
 

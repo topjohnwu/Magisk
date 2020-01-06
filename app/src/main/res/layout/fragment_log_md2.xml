@@ -61,6 +61,20 @@
 
         </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
 
+        <FrameLayout
+            gone="@{!viewModel.items.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <include
+                item="@{viewModel.itemEmpty}"
+                layout="@layout/item_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </FrameLayout>
+
     </FrameLayout>
 
 </layout>

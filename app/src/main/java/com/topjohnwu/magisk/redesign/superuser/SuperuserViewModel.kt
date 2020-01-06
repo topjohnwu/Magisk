@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.redesign.superuser
 
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import androidx.databinding.ObservableArrayList
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.database.PolicyDao
@@ -12,17 +13,20 @@ import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
 import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
+import com.topjohnwu.magisk.model.entity.recycler.TextItem
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
+import com.topjohnwu.magisk.redesign.compat.adapterOf
 import com.topjohnwu.magisk.redesign.compat.diffListOf
 import com.topjohnwu.magisk.redesign.compat.itemBindingOf
 import com.topjohnwu.magisk.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Single
+import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
 class SuperuserViewModel(
     private val db: PolicyDao,
@@ -30,17 +34,22 @@ class SuperuserViewModel(
     private val resources: Resources
 ) : CompatViewModel(), TappableHeadlineItem.Listener {
 
-    val items = diffListOf<ComparableRvItem<*>>()
+    private val itemNoData = TextItem(R.string.superuser_policy_none)
+
+    private val itemsPolicies = diffListOf<PolicyItem>()
+    private val itemsHelpers = ObservableArrayList<TextItem>().also {
+        it.add(itemNoData)
+    }
+
+    val adapter = adapterOf<ComparableRvItem<*>>()
+    val items = MergeObservableList<ComparableRvItem<*>>()
+        .insertItem(TappableHeadlineItem.Hide)
+        .insertItem(TappableHeadlineItem.Safetynet)
+        .insertList(itemsHelpers)
+        .insertList(itemsPolicies)
     val itemBinding = itemBindingOf<ComparableRvItem<*>> {
         it.bindExtra(BR.viewModel, this)
         it.bindExtra(BR.listener, this)
-    }
-
-    companion object {
-        private val menuOptions = listOf(
-            TappableHeadlineItem.Hide,
-            TappableHeadlineItem.Safetynet
-        )
     }
 
     // ---
@@ -57,11 +66,15 @@ class SuperuserViewModel(
             ).compare(o1, o2)
         }
         .toList()
-        .map { menuOptions + it }
-        .map { it to items.calculateDiff(it) }
+        .map { it to itemsPolicies.calculateDiff(it) }
         .applySchedulers()
         .applyViewModel(this)
-        .subscribeK { items.update(it.first, it.second) }
+        .subscribeK {
+            itemsPolicies.update(it.first, it.second)
+            if (itemsPolicies.isNotEmpty()) {
+                itemsHelpers.remove(itemNoData)
+            }
+        }
 
     // ---
 
@@ -77,7 +90,12 @@ class SuperuserViewModel(
 
     fun deletePressed(item: PolicyItem) {
         fun updateState() = deletePolicy(item.item)
-            .subscribeK { items.removeAll { it.genericItemSameAs(item) } }
+            .subscribeK {
+                itemsPolicies.removeAll { it.genericItemSameAs(item) }
+                if (itemsPolicies.isEmpty() && itemsHelpers.isEmpty()) {
+                    itemsHelpers.add(itemNoData)
+                }
+            }
             .add()
 
         if (BiometricHelper.isEnabled) {

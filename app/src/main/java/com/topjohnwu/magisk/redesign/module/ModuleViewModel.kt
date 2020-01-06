@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.redesign.module
 
 import androidx.annotation.WorkerThread
 import androidx.databinding.Bindable
+import androidx.databinding.ObservableArrayList
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
@@ -61,6 +62,13 @@ class ModuleViewModel(
     private val itemNoneInstalled = TextItem(R.string.module_install_none)
     private val itemNoneUpdatable = TextItem(R.string.module_update_none)
 
+    private val itemsInstalledHelpers = ObservableArrayList<TextItem>().also {
+        it.add(itemNoneInstalled)
+    }
+    private val itemsUpdatableHelpers = ObservableArrayList<TextItem>().also {
+        it.add(itemNoneUpdatable)
+    }
+
     private val itemsInstalled = diffListOf<ModuleItem>()
     private val itemsUpdatable = diffListOf<RepoItem.Update>()
     private val itemsRemote = diffListOf<RepoItem.Remote>()
@@ -68,11 +76,11 @@ class ModuleViewModel(
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = MergeObservableList<ComparableRvItem<*>>()
         .insertItem(sectionActive)
-        .insertItem(itemNoneInstalled)
+        .insertList(itemsInstalledHelpers)
         .insertList(itemsInstalled)
         .insertItem(InstallModule)
         .insertItem(sectionUpdate)
-        .insertItem(itemNoneUpdatable)
+        .insertList(itemsUpdatableHelpers)
         .insertList(itemsUpdatable)
         .insertItem(sectionRemote)
         .insertList(itemsRemote)!!
@@ -155,13 +163,17 @@ class ModuleViewModel(
         .applyViewModel(this)
         .observeOn(AndroidSchedulers.mainThread())
         .doOnSuccess { itemsInstalled.update(it.first, it.second) }
-        .doOnSuccess { if (itemsInstalled.isNotEmpty()) items.remove(itemNoneInstalled) }
+        .doOnSuccess {
+            if (itemsInstalled.isNotEmpty()) itemsInstalledHelpers.remove(itemNoneInstalled)
+        }
         .observeOn(Schedulers.io())
         .map { loadUpdates(it.first) }
         .observeOn(AndroidSchedulers.mainThread())
         .map { it to itemsUpdatable.calculateDiff(it) }
         .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
-        .doOnSuccess { if (itemsUpdatable.isNotEmpty()) items.remove(itemNoneUpdatable) }
+        .doOnSuccess {
+            if (itemsUpdatable.isNotEmpty()) itemsUpdatableHelpers.remove(itemNoneUpdatable)
+        }
         .ignoreElement()!!
 
     fun loadRemoteImplicit() = let { itemsRemote.clear(); itemsSearch.clear() }

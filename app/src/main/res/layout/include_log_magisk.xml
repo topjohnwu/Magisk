@@ -11,24 +11,44 @@
 
     </data>
 
-    <HorizontalScrollView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            adapter="@{viewModel.consoleAdapter}"
-            itemBinding="@{viewModel.itemConsoleBinding}"
-            items="@{viewModel.itemsConsole}"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-            android:paddingBottom="@{viewModel.insets.bottom}"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_console"
-            tools:paddingTop="24dp" />
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </HorizontalScrollView>
+            <androidx.recyclerview.widget.RecyclerView
+                adapter="@{viewModel.consoleAdapter}"
+                itemBinding="@{viewModel.itemConsoleBinding}"
+                items="@{viewModel.itemsConsole}"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
+                android:paddingBottom="@{viewModel.insets.bottom}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_console"
+                tools:paddingTop="24dp" />
+
+        </HorizontalScrollView>
+
+        <FrameLayout
+            gone="@{!viewModel.itemsConsole.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <include
+                item="@{viewModel.itemMagiskEmpty}"
+                layout="@layout/item_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </FrameLayout>
+
+    </FrameLayout>
 
 </layout>
