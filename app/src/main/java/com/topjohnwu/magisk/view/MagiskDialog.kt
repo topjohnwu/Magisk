@@ -37,6 +37,7 @@ class MagiskDialog @JvmOverloads constructor(
 
     init {
         binding.setVariable(BR.data, data)
+        setCancelable(true)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,10 +58,16 @@ class MagiskDialog @JvmOverloads constructor(
             )
             insets
         }
+    }
 
-        binding.dialogBaseOutsideContainer.setOnClickListener {
+    override fun setCancelable(flag: Boolean) {
+        val listener = if (!flag) {
+            null
+        } else {
             setCanceledOnTouchOutside(true)
+            View.OnClickListener { dismiss() }
         }
+        binding.dialogBaseOutsideContainer.setOnClickListener(listener)
     }
 
     inner class Data {
