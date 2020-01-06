@@ -4,23 +4,24 @@ import android.animation.TimeInterpolator
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
-import androidx.annotation.Dimension
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import com.google.android.material.animation.AnimationUtils
-import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 
-class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(),
+class HideTopViewOnScrollBehavior<V : View> :
+    CoordinatorLayout.Behavior<V>(),
     HideableBehavior<V> {
 
     companion object {
         private const val STATE_SCROLLED_DOWN = 1
         private const val STATE_SCROLLED_UP = 2
+
+        private const val ENTER_ANIMATION_DURATION = 225
+        private const val EXIT_ANIMATION_DURATION = 175
     }
 
     private var height = 0
     private var currentState = STATE_SCROLLED_UP
-    private var additionalHiddenOffsetY = 0
     private var currentAnimator: ViewPropertyAnimator? = null
     private var lockState: Boolean = false
 
@@ -34,26 +35,13 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
         return super.onLayoutChild(parent, child, layoutDirection)
     }
 
-    /**
-     * Sets an additional offset for the y position used to hide the view.
-     *
-     * @param child the child view that is hidden by this behavior
-     * @param offset the additional offset in pixels that should be added when the view slides away
-     */
-    override fun setAdditionalHiddenOffsetY(child: V, @Dimension offset: Int) {
-        additionalHiddenOffsetY = offset
-
-        if (currentState == STATE_SCROLLED_DOWN) {
-            child.translationY = (height + additionalHiddenOffsetY).toFloat()
-        }
-    }
-
     override fun onStartNestedScroll(
         coordinatorLayout: CoordinatorLayout,
         child: V,
         directTargetChild: View,
         target: View,
-        nestedScrollAxes: Int
+        nestedScrollAxes: Int,
+        type: Int
     ) = nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL
 
     override fun onNestedScroll(
@@ -63,7 +51,9 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
         dxConsumed: Int,
         dyConsumed: Int,
         dxUnconsumed: Int,
-        dyUnconsumed: Int
+        dyUnconsumed: Int,
+        type: Int,
+        consumed: IntArray
     ) {
         // when initiating scroll while the view is at the bottom or at the top and pushing it
         // further, the parent will report consumption of 0
@@ -95,7 +85,7 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
      * Perform an animation that will slide the child from it's current position to be totally on the
      * screen.
      */
-    override fun slideDown(child: V) {
+    private fun slideDown(child: V) {
         if (currentState == STATE_SCROLLED_UP || lockState) {
             return
         }
@@ -118,7 +108,7 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
      * Perform an animation that will slide the child from it's current position to be totally off the
      * screen.
      */
-    override fun slideUp(child: V) {
+    private fun slideUp(child: V) {
         if (currentState == STATE_SCROLLED_DOWN || lockState) {
             return
         }
@@ -131,7 +121,7 @@ class HideTopViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(
         currentState = STATE_SCROLLED_DOWN
         animateChildTo(
             child,
-            -(height + additionalHiddenOffsetY),
+            -height,
             EXIT_ANIMATION_DURATION.toLong(),
             AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
         )

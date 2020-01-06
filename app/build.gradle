@@ -121,7 +121,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:${vNav}"
 
     implementation 'androidx.biometric:biometric:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha03'
     implementation 'androidx.browser:browser:1.0.0'
     implementation 'androidx.preference:preference:1.1.0'
@@ -132,5 +132,5 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.core:core-ktx:1.2.0-rc01'
     // DO NOT UPDATE, 1.2.x has bunch of things broken in functionality against 1.1.x
-    implementation 'com.google.android.material:material:1.1.0-beta02'
+    implementation 'com.google.android.material:material:1.2.0-alpha03'
 }
