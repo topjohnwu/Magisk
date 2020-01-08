@@ -138,7 +138,7 @@ protected:
 	void early_mount() override;
 public:
 	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
-		persist_dir = "/dev/.magisk/mirror/persist/magisk";
+		persist_dir = "/dev/mnt/persist/magisk";
 	}
 
 	void start() override {
