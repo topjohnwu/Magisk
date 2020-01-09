@@ -8,7 +8,6 @@
     <string name="settings">Nastavenia</string>
     <string name="install">Inštalovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
-    <string name="unsupport_magisk_message">Táto verzia Magisk Managera podporuje Magisk od verzie v18.0.\n\nBuď upgradujte Magisk manuálne alebo nainštalujte staršiu verziu aplikácie.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie je nainštalovaný</string>
@@ -213,7 +212,6 @@
     <string name="su_revoke_msg">Potvrdzujete zrušenie práv %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Nič</string>
-    <string name="auth_fail">Autentifikácia zlyhala</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:%1$d</string>
