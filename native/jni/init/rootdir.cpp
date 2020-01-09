@@ -221,46 +221,35 @@ static void sbin_overlay(const raw_data &self, const raw_data &config) {
 	xsymlink("./magiskinit", "/sbin/supolicy");
 }
 
-static void recreate_sbin(const char *mirror) {
-	int src = xopen(mirror, O_RDONLY | O_CLOEXEC);
-	int dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	DIR *fp = fdopendir(src);
-	char buf[256];
-	bool use_bind_mount = true;
-	for (dirent *entry; (entry = xreaddir(fp));) {
+static void recreate_sbin(const char *mirror, bool use_bind_mount) {
+	auto dp = xopen_dir(mirror);
+	int src = dirfd(dp.get());
+	char buf[4096];
+	for (dirent *entry; (entry = xreaddir(dp.get()));) {
 		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
+		string sbin_path = "/sbin/"s + entry->d_name;
 		struct stat st;
 		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
 		if (S_ISLNK(st.st_mode)) {
 			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
-			xsymlinkat(buf, dest, entry->d_name);
+			xsymlink(buf, sbin_path.data());
 		} else {
-			char sbin_path[256];
 			sprintf(buf, "%s/%s", mirror, entry->d_name);
-			sprintf(sbin_path, "/sbin/%s", entry->d_name);
-
 			if (use_bind_mount) {
+				auto mode = st.st_mode & 0777;
 				// Create dummy
 				if (S_ISDIR(st.st_mode))
-					xmkdir(sbin_path, st.st_mode & 0777);
+					xmkdir(sbin_path.data(), mode);
 				else
-					close(xopen(sbin_path, O_CREAT | O_WRONLY | O_CLOEXEC, st.st_mode & 0777));
+					close(xopen(sbin_path.data(), O_CREAT | O_WRONLY | O_CLOEXEC, mode));
 
-				if (xmount(buf, sbin_path, nullptr, MS_BIND, nullptr)) {
-					// Bind mount failed, fallback to symlink
-					remove(sbin_path);
-					use_bind_mount = false;
-				} else {
-					continue;
-				}
+				xmount(buf, sbin_path.data(), nullptr, MS_BIND, nullptr);
+			} else {
+				xsymlink(buf, sbin_path.data());
 			}
-
-			xsymlink(buf, sbin_path);
 		}
 	}
-	close(src);
-	close(dest);
 }
 
 #define ROOTMIR MIRRDIR "/system_root"
@@ -304,7 +293,7 @@ void SARBase::patch_rootdir() {
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
 
 	// Recreate original sbin structure
-	recreate_sbin(ROOTMIR "/sbin");
+	recreate_sbin(ROOTMIR "/sbin", true);
 
 	// Patch init
 	raw_data init;
@@ -491,7 +480,7 @@ int magisk_proxy_main(int argc, char *argv[]) {
 	sbin_overlay(self, config);
 
 	// Create symlinks pointing back to /root
-	recreate_sbin("/root");
+	recreate_sbin("/root", false);
 
 	setenv("REMOUNT_ROOT", "1", 1);
 	execv("/sbin/magisk", argv);
