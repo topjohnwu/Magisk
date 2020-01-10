@@ -96,17 +96,7 @@ else
 fi
 
 # Magisk stuffs
-if [ -e /apex ]; then
-  ./magiskinit -x magisk /sbin/magisk.bin
-  [ -e /system/lib64 ] && LIB=lib64 || LIB=lib
-  cat <<EOF > /sbin/magisk
-#!/system/bin/sh
-export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:/apex/com.android.runtime/$LIB"
-exec /sbin/magisk.bin "\$0" "\$@"
-EOF
-else
-  ./magiskinit -x magisk /sbin/magisk
-fi
+./magiskinit -x magisk /sbin/magisk
 chmod 755 /sbin/magisk
 ln -s ./magisk /sbin/su
 ln -s ./magisk /sbin/resetprop
