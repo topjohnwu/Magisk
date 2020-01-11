@@ -211,7 +211,7 @@ void SARInit::early_mount() {
 	if (dev < 0) {
 		// Try NVIDIA naming scheme
 		strcpy(partname, "APP");
-		dev = setup_block();
+		dev = setup_block(false);
 		if (dev < 0) {
 			// We don't really know what to do at this point...
 			LOGE("Cannot find root partition, abort\n");
