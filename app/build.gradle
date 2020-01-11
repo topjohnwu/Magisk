@@ -19,6 +19,12 @@ android {
         multiDexEnabled true
         versionName props['appVersion']
         versionCode props['appVersionCode'] as Integer
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.incremental":"true"]
+            }
+        }
     }
 
     buildTypes {
