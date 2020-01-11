@@ -8,6 +8,7 @@
     <string name="settings">Ustawienia</string>
     <string name="install">Instaluj</string>
     <string name="unsupport_magisk_title">Nieobsługiwana Wersja Magisk</string>
+    <string name="unsupport_magisk_msg">Ta wersja Magisk Managera nie obsługuje wersji Magiska poniżej %1$s.\n\nZaktualizuj Magisk.</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie jest zainstalowany.</string>
@@ -166,7 +167,10 @@
     <string name="request_timeout_summary">%1$d sekund</string>
     <string name="settings_su_reauth_title">Ponowienie uwierzytelnienia po aktualizacji</string>
     <string name="settings_su_reauth_summary">Ponowne uwierzytelnianie uprawnienia superużytkownika po aktualizacji aplikacji</string>
-
+    <string name="settings_su_biometric_title">Uwierzytelnianie odciskiem palca</string>
+    <string name="settings_su_biometric_summary">Użyj odcisku palca aby przyznać uprawnienia superużytkownika</string>
+    <string name="no_biometric">Niewspierane urządzenie lub brak odcisku palca</string>
+    
     <string name="multiuser_mode">Tryb Multiusera</string>
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie Właścicielami Urządzenia</string>

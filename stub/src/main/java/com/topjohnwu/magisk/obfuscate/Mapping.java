@@ -6,6 +6,8 @@ import java.util.Map;
 import static com.topjohnwu.magisk.DynAPK.Data;
 
 public class Mapping {
+    private static final int STUB_VERSION = 7;
+
     private static Map<String, String> map = new HashMap<>();
     private static Map<String, String> inverseMap;
 
@@ -29,6 +31,7 @@ public class Mapping {
 
     public static Data data() {
         Data data = new Data();
+        data.version = STUB_VERSION;
         data.classToComponent = inverseMap;
         return data;
     }

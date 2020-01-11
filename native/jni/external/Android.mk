@@ -1,27 +1,9 @@
 LOCAL_PATH := $(call my-dir)
 
-ifdef B_MAGISK
-
-# libsqlite.so (stub)
-include $(CLEAR_VARS)
-LOCAL_MODULE:= libsqlite
-LOCAL_C_INCLUDES := $(EXT_PATH)/include
-LOCAL_SRC_FILES := stubs/sqlite3_stub.c
-include $(BUILD_SHARED_LIBRARY)
-
-endif
-
-# libselinux.so (stub)
-#include $(CLEAR_VARS)
-#LOCAL_MODULE:= libselinux
-#LOCAL_C_INCLUDES := $(LIBSELINUX)
-#LOCAL_SRC_FILES := stubs/selinux_stub.c
-#include $(BUILD_SHARED_LIBRARY)
-
 # libxz.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libxz
-LOCAL_C_INCLUDES := $(EXT_PATH)/include
+LOCAL_C_INCLUDES := $(LIBXZ)
 LOCAL_SRC_FILES := \
 	xz-embedded/xz_crc32.c \
 	xz-embedded/xz_dec_lzma2.c \
@@ -83,7 +65,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := liblzma
 LOCAL_C_INCLUDES += \
-	$(EXT_PATH)/include/xz_config \
+	$(EXT_PATH)/xz_config \
 	$(EXT_PATH)/xz/src/common \
 	$(EXT_PATH)/xz/src/liblzma/api \
 	$(EXT_PATH)/xz/src/liblzma/check \

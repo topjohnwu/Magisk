@@ -89,8 +89,8 @@ EOF
 
 add_hosts_module() {
   # Do not touch existing hosts module
-  [ -d /sbin/.magisk/img/hosts ] && return
-  cd /sbin/.magisk/img
+  [ -d /sbin/.magisk/modules/hosts ] && return
+  cd /sbin/.magisk/modules
   mkdir -p hosts/system/etc
   cat << EOF > hosts/module.prop
 id=hosts
@@ -99,17 +99,10 @@ version=1.0
 versionCode=1
 author=Magisk Manager
 description=Magisk Manager built-in systemless hosts module
-minMagisk=17000
 EOF
-  if [ -f .core/hosts ]; then
-    # Migrate old hosts file to new module
-    mv -f .core/hosts hosts/system/etc/hosts
-  else
-    cp -f /system/etc/hosts hosts/system/etc/hosts
-  fi
+  cp -f /system/etc/hosts hosts/system/etc/hosts
   magisk --clone-attr /system/etc/hosts hosts/system/etc/hosts
   touch hosts/update
-  touch hosts/auto_mount
   cd /
 }
 

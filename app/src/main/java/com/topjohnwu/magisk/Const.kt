@@ -6,7 +6,7 @@ import java.io.File
 object Const {
 
     // Paths
-    const val MAGISK_PATH = "/sbin/.magisk/img"
+    const val MAGISK_PATH = "/sbin/.magisk/modules"
     var MAGISK_DISABLE_FILE = File("xxx")
     const val TMP_FOLDER_PATH = "/dev/tmp"
     const val MAGISK_LOG = "/cache/magisk.log"
@@ -23,8 +23,8 @@ object Const {
     val USER_ID = Process.myUid() / 100000
 
     object Version {
-        const val MIN_VERSION = "v18.0"
-        const val MIN_VERCODE = 18000
+        const val MIN_VERSION = "v19.0"
+        const val MIN_VERCODE = 19000
         const val CONNECT_MODE = 20100
         const val PROVIDER_CONNECT = 20102
     }
