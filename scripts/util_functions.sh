@@ -94,7 +94,7 @@ ensure_bb() {
 }
 
 recovery_actions() {
-  # Make sure random don't get blocked
+  # Make sure random won't get blocked
   mount -o bind /dev/urandom /dev/random
   # Unset library paths
   OLD_LD_LIB=$LD_LIBRARY_PATH
@@ -110,10 +110,12 @@ recovery_actions() {
 
 recovery_cleanup() {
   ui_print "- Unmounting partitions"
-  umount -l /system 2>/dev/null
-  umount -l /system_root 2>/dev/null
-  umount -l /vendor 2>/dev/null
-  umount -l /dev/random 2>/dev/null
+  (umount_apex
+  umount -l /system
+  umount -l /system_root
+  umount -l /vendor
+  umount -l /persist
+  umount -l /dev/random) 2>/dev/null
   export PATH=$OLD_PATH
   [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
   [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
@@ -166,9 +168,9 @@ mount_name() {
 mount_ro_ensure() {
   # We handle ro partitions only in recovery
   $BOOTMODE && return
-  local PART=$1$SLOT
-  local POINT=/$1
-  mount_name $PART $POINT '-o ro'
+  local PART=$1
+  local POINT=$2
+  mount_name "$PART" $POINT '-o ro'
   is_mounted $POINT || abort "! Cannot mount $POINT"
 }
 
@@ -182,7 +184,7 @@ mount_partitions() {
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
   # Mount ro partitions
-  mount_ro_ensure system
+  mount_ro_ensure "system$SLOT app$SLOT" /system
   if [ -f /system/init.rc ]; then
     SYSTEM_ROOT=true
     [ -L /system_root ] && rm -f /system_root
@@ -193,8 +195,11 @@ mount_partitions() {
     grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
     && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   fi
-  [ -L /system/vendor ] && mount_ro_ensure vendor
+  [ -L /system/vendor ] && mount_ro_ensure vendor$SLOT /vendor
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
+
+  # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
+  $BOOTMODE || mount_apex
 
   # Mount persist partition in recovery
   if ! $BOOTMODE && [ ! -z $PERSISTDIR ]; then
@@ -203,10 +208,64 @@ mount_partitions() {
     mount_name persist /persist
     if ! is_mounted /persist; then
       # Fallback to cache
-      mount_name cache /cache
+      mount_name "cache cac" /cache
       is_mounted /cache && PERSISTDIR=/cache || PERSISTDIR=
     fi
   fi
+}
+
+mount_apex() {
+  [ -d /system/apex ] || return
+  # APEX files present; need to extract and mount the payload imgs or if already extracted, mount folders
+  local APEX DEST LOOP MINORX NUM
+  [ -L /apex ] && rm -f /apex
+  [ -e /dev/block/loop1 ] && MINORX=$(ls -l /dev/block/loop1 | awk '{ print $6 }') || MINORX=1
+  NUM=0
+  for APEX in /system/apex/*; do
+    DEST=/apex/$(basename $APEX .apex)
+    [ "$DEST" == /apex/com.android.runtime.release ] && DEST=/apex/com.android.runtime
+    mkdir -p $DEST
+    case $APEX in
+      *.apex)
+        unzip -qo $APEX apex_payload.img -d /apex
+        mv -f /apex/apex_payload.img $DEST.img
+        mount -t ext4 -o ro,noatime $DEST.img $DEST 2>/dev/null
+        if [ $? != 0 ]; then
+          while [ $NUM -lt 64 ]; do
+            LOOP=/dev/block/loop$NUM;
+            (mknod $LOOP b 7 $((NUM * MINORX))
+            losetup $LOOP $DEST.img) 2>/dev/null
+            NUM=$((NUM + 1))
+            losetup $LOOP | grep -q $DEST.img && break
+          done
+          mount -t ext4 -o ro,loop,noatime $LOOP $DEST
+          if [ $? != 0 ]; then
+            losetup -d $LOOP 2>/dev/null
+          fi
+        fi
+      ;;
+      *) mount -o bind $APEX $DEST;;
+    esac
+  done
+  export ANDROID_RUNTIME_ROOT=/apex/com.android.runtime
+  export ANDROID_TZDATA_ROOT=/apex/com.android.tzdata
+  export BOOTCLASSPATH=/apex/com.android.runtime/javalib/core-oj.jar:/apex/com.android.runtime/javalib/core-libart.jar:/apex/com.android.runtime/javalib/okhttp.jar:/apex/com.android.runtime/javalib/bouncycastle.jar:/apex/com.android.runtime/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/android.test.base.jar:/apex/com.android.conscrypt/javalib/conscrypt.jar:/apex/com.android.media/javalib/updatable-media.jar
+}
+
+umount_apex() {
+  [ -d /apex ] || return
+  local DEST LOOP
+  for DEST in $(find /apex -type d -mindepth 1 -maxdepth 1); do
+    if [ -f $DEST.img ]; then
+      LOOP=$(mount | grep $DEST | cut -d" " -f1)
+    fi
+    (umount -l $DEST;
+    losetup -d $LOOP) 2>/dev/null
+  done
+  rm -rf /apex
+  unset ANDROID_RUNTIME_ROOT
+  unset ANDROID_TZDATA_ROOT
+  unset BOOTCLASSPATH
 }
 
 get_flags() {
@@ -239,7 +298,7 @@ get_flags() {
 find_boot_image() {
   BOOTIMAGE=
   if $RECOVERYMODE; then
-    BOOTIMAGE=`find_block recovery_ramdisk$SLOT recovery`
+    BOOTIMAGE=`find_block recovery_ramdisk$SLOT recovery sos`
   elif [ ! -z $SLOT ]; then
     BOOTIMAGE=`find_block ramdisk$SLOT recovery_ramdisk$SLOT boot$SLOT`
   else
@@ -359,7 +418,12 @@ remove_system_su() {
     /system/bin/app_process_init /system/bin/su /cache/su /system/lib/libsupol.so /system/lib64/libsupol.so \
     /system/su.d /system/etc/install-recovery.sh /system/etc/init.d/99SuperSUDaemon /cache/install-recovery.sh \
     /system/.supersu /cache/.supersu /data/.supersu \
-    /system/app/Superuser.apk /system/app/SuperSU /cache/Superuser.apk  2>/dev/null
+    /system/app/Superuser.apk /system/app/SuperSU /cache/Superuser.apk
+  elif [ -f /cache/su.img -o -f /data/su.img -o -d /data/adb/su -o -d /data/su ]; then
+    ui_print "- Removing systemless installed root"
+    umount -l /su 2>/dev/null
+    rm -rf /cache/su.img /data/su.img /data/adb/su /data/adb/suhide /data/su /cache/.supersu /data/.supersu \
+    /cache/supersu_install /data/supersu_install
   fi
 }
 
@@ -492,7 +556,7 @@ NVBASE=/data/adb
 
 # Bootsigner related stuff
 BOOTSIGNERCLASS=a.a
-BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
+BOOTSIGNER="/system/bin/dalvikvm -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
 BOOTSIGNED=false
 
 resolve_vars
