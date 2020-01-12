@@ -286,7 +286,7 @@ fun Context.drawableCompat(@DrawableRes id: Int) = ContextCompat.getDrawable(thi
  * with respect to RTL layout direction
  */
 fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 &&
+    if (SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 &&
         resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
     ) {
         return end to start
@@ -330,7 +330,7 @@ val isDeviceSecure: Boolean
     }
 val securityLevelDate get() = securityLevelFormatter.parseOrNull(securityLevel) ?: Date(0)
 val securityLevel
-    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    get() = if (SDK_INT >= Build.VERSION_CODES.M) {
         Build.VERSION.SECURITY_PATCH
     } else {
         null

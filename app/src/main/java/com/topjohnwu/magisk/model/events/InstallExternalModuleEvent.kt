@@ -11,7 +11,6 @@ import com.topjohnwu.magisk.ui.flash.FlashActivity
 class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
 
     override fun invoke(activity: BaseActivity<*, *>) {
-        activity as BaseActivity<*, *>
         activity.withExternalRW {
             onSuccess {
                 val intent = Intent(Intent.ACTION_GET_CONTENT)

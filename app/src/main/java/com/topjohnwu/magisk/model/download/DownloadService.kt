@@ -114,13 +114,15 @@ open class DownloadService : RemoteFileService() {
 
     @Suppress("ReplaceSingleLineLet")
     private fun Notification.Builder.setContentIntent(intent: Intent) =
-        PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
-            .let { setContentIntent(it) }
+        setContentIntent(
+            PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
+        )
 
     @Suppress("ReplaceSingleLineLet")
     private fun Notification.Builder.addAction(icon: Int, title: Int, intent: Intent) =
-        PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
-            .let { addAction(icon, getString(title), it) }
+        addAction(icon, getString(title),
+            PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
+        )
 
     // ---
 

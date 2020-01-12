@@ -12,10 +12,10 @@ interface SafetyNetHelper {
 
     companion object {
 
-        val RESPONSE_ERR = 0x01
-        val CONNECTION_FAIL = 0x02
+        const val RESPONSE_ERR = 0x01
+        const val CONNECTION_FAIL = 0x02
 
-        val BASIC_PASS = 0x10
-        val CTS_PASS = 0x20
+        const val BASIC_PASS = 0x10
+        const val CTS_PASS = 0x20
     }
 }

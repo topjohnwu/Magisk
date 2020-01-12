@@ -35,17 +35,6 @@ abstract class ViewEvent {
     var handled = false
 }
 
-data class OpenLinkEvent(val url: String) : ViewEvent()
-
-class ManagerInstallEvent : ViewEvent()
-class MagiskInstallEvent : ViewEvent()
-
-class ManagerChangelogEvent : ViewEvent()
-class MagiskChangelogEvent : ViewEvent()
-
-class UninstallEvent : ViewEvent()
-class EnvFixEvent : ViewEvent()
-
 class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, SafetyNetHelper.Callback {
 
     private val magiskRepo by inject<MagiskRepository>()
@@ -130,20 +119,14 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
 }
 
 class ViewActionEvent(val action: BaseActivity<*, *>.() -> Unit) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity<*, *>) = (activity as BaseActivity<*, *>).run(action)
+    override fun invoke(activity: BaseActivity<*, *>) = activity.run(action)
 }
-
-class OpenFilePickerEvent : ViewEvent()
 
 class OpenChangelogEvent(val item: Repo) : ViewEvent(), ContextExecutor {
     override fun invoke(context: Context) {
         MarkDownWindow.show(context, null, item.readme)
     }
 }
-
-class InstallModuleEvent(val item: Repo) : ViewEvent()
-
-class PageChangedEvent : ViewEvent()
 
 class PermissionEvent(
     val permissions: List<String>,

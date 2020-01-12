@@ -42,7 +42,7 @@
 -assumenosideeffects class timber.log.Timber.Tree { *; }
 
 # Excessive obfuscation
--repackageclasses 'a'
+-repackageclasses a
 -allowaccessmodification
 
 # QOL

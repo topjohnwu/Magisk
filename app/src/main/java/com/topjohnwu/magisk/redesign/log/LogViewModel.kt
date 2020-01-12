@@ -47,7 +47,7 @@ class LogViewModel(
     val itemConsoleBinding = itemBindingOf<ComparableRvItem<*>> {}
 
     override fun refresh(): Disposable {
-        val logs = repo.fetchLogsNowrap()
+        val logs = repo.fetchLogs()
             .map { it.map { LogItem(it) } }
             .observeOn(Schedulers.computation())
             .map { it to items.calculateDiff(it) }

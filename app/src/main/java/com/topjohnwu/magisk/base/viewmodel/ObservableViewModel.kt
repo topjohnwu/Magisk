@@ -5,7 +5,7 @@ import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.ViewModel
 
 /**
- * Copy of [android.databinding.BaseObservable] which extends [ViewModel]
+ * Copy of [androidx.databinding.BaseObservable] which extends [ViewModel]
  */
 abstract class ObservableViewModel : TeanityViewModel(), Observable {
 
@@ -35,7 +35,7 @@ abstract class ObservableViewModel : TeanityViewModel(), Observable {
 
     /**
      * Notifies listeners that a specific property has changed. The getter for the property
-     * that changes should be marked with [android.databinding.Bindable] to generate a field in
+     * that changes should be marked with [androidx.databinding.Bindable] to generate a field in
      * `BR` to be used as `fieldId`.
      *
      * @param fieldId The generated BR id for the Bindable field.

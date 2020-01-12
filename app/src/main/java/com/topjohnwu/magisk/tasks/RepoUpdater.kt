@@ -63,6 +63,7 @@ class RepoUpdater(
 
     private fun String.trimEtag() = substring(indexOf('\"'), lastIndexOf('\"') + 1)
 
+    @Suppress("RedundantLambdaArrow")
     operator fun invoke(forced: Boolean = false) : Single<Unit> {
         val cached = Collections.synchronizedSet(HashSet(repoDB.repoIDList))
         return loadPage(cached, etag = repoDB.etagKey).doOnComplete {
