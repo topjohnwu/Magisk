@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.extensions.snackbar
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
 import com.topjohnwu.magisk.model.navigation.Navigator
 import com.topjohnwu.magisk.ui.theme.Theme
 import kotlin.reflect.KClass
@@ -77,9 +76,6 @@ abstract class CompatActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
             super.onBackPressed()
         }
     }
-
-    @Deprecated("The event is self handled.", level = DeprecationLevel.ERROR)
-    override fun navigateTo(event: MagiskNavigationEvent) = Unit
 
     protected fun ViewEvent.dispatchOnSelf() = onEventDispatched(this)
 
