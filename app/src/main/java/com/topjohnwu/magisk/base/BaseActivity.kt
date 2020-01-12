@@ -16,7 +16,6 @@ import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.viewmodel.BaseViewModel
 import com.topjohnwu.magisk.extensions.set
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder

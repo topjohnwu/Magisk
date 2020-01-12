@@ -22,7 +22,7 @@ import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.model.observer.Observer
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.ui.compat.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
@@ -35,7 +35,7 @@ enum class MagiskState {
 
 class HomeViewModel(
     private val repoMagisk: MagiskRepository
-) : CompatViewModel() {
+) : BaseViewModel() {
 
     val isNoticeVisible = KObservableField(Config.safetyNotice)
 

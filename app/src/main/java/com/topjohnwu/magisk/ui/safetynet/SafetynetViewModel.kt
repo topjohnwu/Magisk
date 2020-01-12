@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.events.SafetyNetResult
 import com.topjohnwu.magisk.model.events.UpdateSafetyNetEvent
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
@@ -18,7 +18,7 @@ enum class SafetyNetState {
 
 class SafetynetViewModel(
     rxBus: RxBus
-) : CompatViewModel() {
+) : BaseViewModel() {
 
     private var currentState = IDLE
         set(value) {

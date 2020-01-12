@@ -19,7 +19,7 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.ui.compat.adapterOf
 import com.topjohnwu.magisk.ui.compat.diffListOf
 import com.topjohnwu.magisk.ui.compat.itemBindingOf
@@ -32,7 +32,7 @@ class SuperuserViewModel(
     private val db: PolicyDao,
     private val packageManager: PackageManager,
     private val resources: Resources
-) : CompatViewModel(), TappableHeadlineItem.Listener {
+) : BaseViewModel(), TappableHeadlineItem.Listener {
 
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 

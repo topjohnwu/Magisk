@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.ui.theme
 import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
 import com.topjohnwu.magisk.model.events.RecreateEvent
 import com.topjohnwu.magisk.model.events.dialog.DarkThemeDialog
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 
-class ThemeViewModel : CompatViewModel(), TappableHeadlineItem.Listener {
+class ThemeViewModel : BaseViewModel(), TappableHeadlineItem.Listener {
 
     val themeHeadline = TappableHeadlineItem.ThemeMode
 

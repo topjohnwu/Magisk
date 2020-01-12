@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.RecreateEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.ui.compat.adapterOf
 import com.topjohnwu.magisk.ui.compat.diffListOf
 import com.topjohnwu.magisk.ui.compat.itemBindingOf
@@ -28,7 +28,7 @@ import org.koin.core.get
 
 class SettingsViewModel(
     private val repositoryDao: RepoDao
-) : CompatViewModel(), SettingsItem.Callback {
+) : BaseViewModel(), SettingsItem.Callback {
 
     val adapter = adapterOf<SettingsItem>()
     val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }

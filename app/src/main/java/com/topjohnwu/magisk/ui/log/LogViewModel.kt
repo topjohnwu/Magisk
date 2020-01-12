@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.ui.compat.diffListOf
 import com.topjohnwu.magisk.ui.compat.itemBindingOf
 import com.topjohnwu.superuser.Shell
@@ -26,7 +26,7 @@ import java.util.*
 
 class LogViewModel(
     private val repo: LogRepository
-) : CompatViewModel() {
+) : BaseViewModel() {
 
     // --- empty view
 

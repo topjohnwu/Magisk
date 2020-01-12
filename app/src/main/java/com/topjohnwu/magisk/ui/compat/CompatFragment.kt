@@ -7,10 +7,11 @@ import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.base.BaseFragment
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.events.ViewEvent
 
-abstract class CompatFragment<ViewModel : CompatViewModel, Binding : ViewDataBinding>
+abstract class CompatFragment<ViewModel : BaseViewModel, Binding : ViewDataBinding>
     : BaseFragment<ViewModel, Binding>(), CompatView<ViewModel> {
 
     override val viewRoot: View get() = binding.root

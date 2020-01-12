@@ -11,6 +11,7 @@ import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.extensions.snackbar
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.events.SnackbarEvent
@@ -21,7 +22,7 @@ import com.topjohnwu.magisk.ui.theme.Theme
 import kotlin.reflect.KClass
 
 
-abstract class CompatActivity<ViewModel : CompatViewModel, Binding : ViewDataBinding> :
+abstract class CompatActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding> :
     BaseActivity<ViewModel, Binding>(), CompatView<ViewModel>, Navigator {
 
     override val themeRes = Theme.selected.themeRes

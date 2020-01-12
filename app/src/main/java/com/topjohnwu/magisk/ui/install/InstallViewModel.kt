@@ -8,14 +8,14 @@ import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.RequestFileEvent
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import org.koin.core.get
 import kotlin.math.roundToInt
 
-class InstallViewModel : CompatViewModel(State.LOADED) {
+class InstallViewModel : BaseViewModel(State.LOADED) {
 
     val isRooted = Shell.rootAccess()
     val isAB = isABDevice()

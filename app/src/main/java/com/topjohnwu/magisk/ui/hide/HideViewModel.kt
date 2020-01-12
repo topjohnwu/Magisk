@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.entity.recycler.HideItem
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessItem
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.ui.compat.Queryable
 import com.topjohnwu.magisk.ui.compat.filterableListOf
 import com.topjohnwu.magisk.ui.compat.itemBindingOf
@@ -21,7 +21,7 @@ import com.topjohnwu.magisk.utils.currentLocale
 
 class HideViewModel(
     private val magiskRepo: MagiskRepository
-) : CompatViewModel(), Queryable by Queryable.impl(1000) {
+) : BaseViewModel(), Queryable by Queryable.impl(1000) {
 
     override val queryRunnable = Runnable { query() }
 

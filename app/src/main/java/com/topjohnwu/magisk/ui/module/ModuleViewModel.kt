@@ -6,6 +6,7 @@ import androidx.databinding.ObservableArrayList
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.base.BaseViewModel
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
@@ -37,7 +38,7 @@ class ModuleViewModel(
     private val repoName: RepoByNameDao,
     private val repoUpdated: RepoByUpdatedDao,
     private val repoUpdater: RepoUpdater
-) : CompatViewModel(), Queryable by Queryable.impl(1000) {
+) : BaseViewModel(), Queryable by Queryable.impl(1000) {
 
     override val queryRunnable = Runnable { query() }
 

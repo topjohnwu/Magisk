@@ -1,5 +1,5 @@
 package com.topjohnwu.magisk.ui.flash
 
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 
-class FlashViewModel : CompatViewModel()
+class FlashViewModel : BaseViewModel()

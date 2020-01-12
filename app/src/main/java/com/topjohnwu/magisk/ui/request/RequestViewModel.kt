@@ -1,5 +1,5 @@
 package com.topjohnwu.magisk.ui.request
 
-import com.topjohnwu.magisk.ui.compat.CompatViewModel
+import com.topjohnwu.magisk.base.BaseViewModel
 
-class RequestViewModel : CompatViewModel()
+class RequestViewModel : BaseViewModel()
