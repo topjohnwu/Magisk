@@ -18,6 +18,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:clickable="false"
+        android:focusable="false"
         android:onClick="@{() -> item.toggle()}">
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -38,10 +41,11 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/hide_process_icon"
-            android:focusable="true"
-            android:clickable="true"
             style="@style/Widget.Icon"
             isChecked="@{item.isHidden}"
+            android:background="@null"
+            android:clickable="false"
+            android:focusable="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

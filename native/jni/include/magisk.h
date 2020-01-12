@@ -19,11 +19,7 @@
 #define MODULEUPGRADE   SECURE_DIR "/modules_update"
 #define DATABIN         SECURE_DIR "/magisk"
 #define MAGISKDB        SECURE_DIR "/magisk.db"
-#define BOOTCOUNT       SECURE_DIR "/.boot_count"
 #define MANAGERAPK      DATABIN "/magisk.apk"
-
-// Legacy crap
-#define LEGACYCORE      MODULEROOT "/.core"
 
 constexpr const char *applet_names[] = { "su", "resetprop", "magiskhide", nullptr };
 

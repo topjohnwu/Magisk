@@ -3,6 +3,7 @@
 #include <time.h>
 #include <string.h>
 #include <unistd.h>
+#include <dlfcn.h>
 #include <sys/stat.h>
 
 #include <magisk.h>
@@ -14,7 +15,92 @@
 
 using namespace std;
 
+typedef struct sqlite3 sqlite3;
+
 static sqlite3 *mDB = nullptr;
+
+// SQLite APIs
+
+#define SQLITE_OPEN_READWRITE        0x00000002  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
+#define SQLITE_OPEN_FULLMUTEX        0x00010000  /* Ok for sqlite3_open_v2() */
+
+static int (*sqlite3_open_v2)(
+		const char *filename,
+		sqlite3 **ppDb,
+		int flags,
+		const char *zVfs);
+static const char *(*sqlite3_errmsg)(sqlite3 *db);
+static int (*sqlite3_close)(sqlite3 *db);
+static void (*sqlite3_free)(void *v);
+static int (*sqlite3_exec)(
+		sqlite3 *db,
+		const char *sql,
+		int (*callback)(void*, int, char**, char**),
+		void *v,
+		char **errmsg);
+
+// Internal Android linker APIs
+
+static void (*android_get_LD_LIBRARY_PATH)(char *buffer, size_t buffer_size);
+static void (*android_update_LD_LIBRARY_PATH)(const char *ld_library_path);
+
+#define DLERR(ptr) if (!(ptr)) { \
+	LOGE("db: %s\n", dlerror()); \
+	return false; \
+}
+
+#define DLOAD(handle, arg) {\
+	auto f = dlsym(handle, #arg); \
+	DLERR(f) \
+	*(void **) &(arg) = f; \
+}
+
+#if defined(__aarch64__) || defined(__x86_64__)
+constexpr char apex_path[] = ":/apex/com.android.runtime/lib64";
+#else
+constexpr char apex_path[] = ":/apex/com.android.runtime/lib";
+#endif
+
+static int dl_init = 0;
+
+static bool dload_sqlite() {
+	if (dl_init)
+		return dl_init > 0;
+	dl_init = -1;
+
+	auto sqlite = dlopen("libsqlite.so", RTLD_LAZY);
+	if (!sqlite) {
+		// Should only happen on Android 10+
+		auto dl = dlopen("libdl_android.so", RTLD_LAZY);
+		DLERR(dl);
+
+		DLOAD(dl, android_get_LD_LIBRARY_PATH);
+		DLOAD(dl, android_update_LD_LIBRARY_PATH);
+
+		// Inject APEX into LD_LIBRARY_PATH
+		char ld_path[4096];
+		android_get_LD_LIBRARY_PATH(ld_path, sizeof(ld_path));
+		int len = strlen(ld_path);
+		strcpy(ld_path + len, apex_path);
+		android_update_LD_LIBRARY_PATH(ld_path);
+		sqlite = dlopen("libsqlite.so", RTLD_LAZY);
+
+		// Revert LD_LIBRARY_PATH just in case
+		ld_path[len] = '\0';
+		android_update_LD_LIBRARY_PATH(ld_path);
+	}
+	DLERR(sqlite);
+
+	DLOAD(sqlite, sqlite3_open_v2);
+	DLOAD(sqlite, sqlite3_errmsg);
+	DLOAD(sqlite, sqlite3_close);
+	DLOAD(sqlite, sqlite3_exec);
+	DLOAD(sqlite, sqlite3_free);
+
+	dl_init = 1;
+	return true;
+}
 
 int db_strings::getKeyIdx(string_view key) const {
 	int idx = DB_STRING_NUM;
@@ -50,6 +136,9 @@ static int ver_cb(void *ver, int, char **data, char **) {
 #define err_ret(e) if (e) return e;
 
 static char *open_and_init_db(sqlite3 *&db) {
+	if (!dload_sqlite())
+		return strdup("Cannot load libsqlite.so");
+
 	int ret = sqlite3_open_v2(MAGISKDB, &db,
 			SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
 	if (ret)
@@ -303,4 +392,13 @@ void exec_sql(int client) {
 	free(sql);
 	write_int(client, 0);
 	db_err_cmd(err, return; );
+}
+
+bool db_err(char *e) {
+	if (e) {
+		LOGE("sqlite3_exec: %s\n", e);
+		sqlite3_free(e);
+		return true;
+	}
+	return false;
 }

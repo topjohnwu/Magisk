@@ -341,12 +341,9 @@ static bool magisk_env() {
 
 	// Remove stuffs
 	rm_rf("/cache/data_adb");
+	rm_rf("/data/adb/modules/.core");
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
-
-	// Backwards compatibility
-	symlink("./.magisk", "/sbin/.core");
-	symlink("./modules", MAGISKTMP "/img");
 
 	// Directories in tmpfs overlay
 	xmkdir(MIRRDIR, 0);
@@ -431,10 +428,6 @@ static void prepare_modules() {
 		rm_rf(MODULEUPGRADE);
 	}
 	bind_mount(MIRRDIR MODULEROOT, MODULEMNT, false);
-	// Legacy support
-	xmkdir(LEGACYCORE, 0755);
-	symlink(SECURE_DIR "/post-fs-data.d", LEGACYCORE "/post-fs-data.d");
-	symlink(SECURE_DIR "/service.d", LEGACYCORE "/service.d");
 
 	restorecon();
 	chmod(SECURE_DIR, 0700);

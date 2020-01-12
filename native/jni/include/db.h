@@ -1,18 +1,10 @@
 #pragma once
 
-#include <sqlite3.h>
 #include <sys/stat.h>
 #include <map>
 #include <string>
 #include <string_view>
 #include <functional>
-
-#define db_err(e) db_err_cmd(e, )
-#define db_err_cmd(e, cmd) if (e) { \
-	LOGE("sqlite3_exec: %s\n", e); \
-	sqlite3_free(e); \
-	cmd;\
-}
 
 template <class T, size_t num>
 class db_data_base {
@@ -160,4 +152,6 @@ bool validate_manager(std::string &pkg, int userid, struct stat *st);
 void exec_sql(int client);
 char *db_exec(const char *sql);
 char *db_exec(const char *sql, const db_row_cb &fn);
+bool db_err(char *e);
 
+#define db_err_cmd(e, cmd) if (db_err(e)) { cmd; }

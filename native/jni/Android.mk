@@ -13,6 +13,7 @@ LIBNANOPB := $(EXT_PATH)/nanopb
 LIBSYSTEMPROPERTIES := jni/systemproperties/include
 LIBUTILS := jni/utils/include
 LIBMINCRYPT := $(EXT_PATH)/mincrypt/include
+LIBXZ := $(EXT_PATH)/xz-embedded
 
 ########################
 # Binaries
@@ -22,11 +23,9 @@ ifdef B_MAGISK
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_SHARED_LIBRARIES := libsqlite
 LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
 LOCAL_C_INCLUDES := \
 	jni/include \
-	$(EXT_PATH)/include \
 	$(LIBNANOPB) \
 	$(LIBSYSTEMPROPERTIES) \
 	$(LIBUTILS)
@@ -98,9 +97,9 @@ ifdef BB_INIT
 LOCAL_STATIC_LIBRARIES := libsepol libxz libutils
 LOCAL_C_INCLUDES := \
 	jni/include \
-	$(EXT_PATH)/include \
 	out \
 	out/$(TARGET_ARCH_ABI) \
+	$(LIBXZ) \
 	$(LIBSEPOL) \
 	$(LIBUTILS)
 
