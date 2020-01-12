@@ -42,13 +42,6 @@ object Language : SettingsItem.Selector() {
     }
 }
 
-object Redesign : SettingsItem.Toggle() {
-    override val title = "Redesign".asTransitive()
-    override val description =
-        "Select this to disable redesign. App will automatically shut down".asTransitive()
-    override var value: Boolean by dataObservable(Config.redesign) { Config.redesign = it }
-}
-
 object Theme : SettingsItem.Blank() {
     override val icon = R.drawable.ic_paint
     override val title = R.string.section_theme.asTransitive()

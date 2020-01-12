@@ -3,60 +3,40 @@ package com.topjohnwu.magisk.model.navigation
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.intent
+import com.topjohnwu.magisk.redesign.MainActivity
+import com.topjohnwu.magisk.redesign.hide.HideFragment
+import com.topjohnwu.magisk.redesign.home.HomeFragment
 import com.topjohnwu.magisk.redesign.install.InstallFragment
+import com.topjohnwu.magisk.redesign.log.LogFragment
 import com.topjohnwu.magisk.redesign.safetynet.SafetynetFragment
+import com.topjohnwu.magisk.redesign.settings.SettingsFragment
+import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment
 import com.topjohnwu.magisk.redesign.theme.ThemeFragment
-import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.hide.MagiskHideFragment
-import com.topjohnwu.magisk.ui.home.HomeFragment
-import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModulesFragment
 import com.topjohnwu.magisk.ui.module.ReposFragment
-import com.topjohnwu.magisk.ui.settings.SettingsFragment
-import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
-import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
-import com.topjohnwu.magisk.redesign.hide.HideFragment as RedesignHideFragment
-import com.topjohnwu.magisk.redesign.home.HomeFragment as RedesignHomeFragment
-import com.topjohnwu.magisk.redesign.log.LogFragment as RedesignLogFragment
-import com.topjohnwu.magisk.redesign.module.ModuleFragment as RedesignModulesFragment
-import com.topjohnwu.magisk.redesign.settings.SettingsFragment as RedesignSettingsFragment
-import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment as RedesignSuperuserFragment
 
 object Navigation {
 
     fun home() = MagiskNavigationEvent {
         navDirections {
-            destination = when {
-                Config.redesign -> RedesignHomeFragment::class
-                else -> HomeFragment::class
-            }
+            destination = HomeFragment::class
         }
         navOptions {
-            popUpTo = when {
-                Config.redesign -> RedesignHomeFragment::class
-                else -> HomeFragment::class
-            }
+            popUpTo = HomeFragment::class
         }
     }
 
     fun superuser() = MagiskNavigationEvent {
         navDirections {
-            destination = when {
-                Config.redesign -> RedesignSuperuserFragment::class
-                else -> SuperuserFragment::class
-            }
+            destination = SuperuserFragment::class
         }
     }
 
     fun modules() = MagiskNavigationEvent {
         navDirections {
-            destination = when {
-                Config.redesign -> RedesignModulesFragment::class
-                else -> ModulesFragment::class
-            }
+            destination = ModulesFragment::class
         }
     }
 
@@ -66,10 +46,7 @@ object Navigation {
 
     fun hide() = MagiskNavigationEvent {
         navDirections {
-            destination = when {
-                Config.redesign -> RedesignHideFragment::class
-                else -> MagiskHideFragment::class
-            }
+            destination = HideFragment::class
         }
     }
 
@@ -79,19 +56,13 @@ object Navigation {
 
     fun log() = MagiskNavigationEvent {
         navDirections {
-            destination = when {
-                Config.redesign -> RedesignLogFragment::class
-                else -> LogFragment::class
-            }
+            destination = LogFragment::class
         }
     }
 
     fun settings() = MagiskNavigationEvent {
         navDirections {
-            destination = when {
-                Config.redesign -> RedesignSettingsFragment::class
-                else -> SettingsFragment::class
-            }
+            destination = SettingsFragment::class
         }
     }
 
@@ -116,10 +87,8 @@ object Navigation {
     // redesign starts here
 
     fun start(launchIntent: Intent, context: Context) {
-        when {
-            Config.redesign -> context.intent<RedesignActivity>()
-            else -> context.intent<MainActivity>()
-        }.putExtra(Const.Key.OPEN_SECTION, launchIntent.getStringExtra(Const.Key.OPEN_SECTION))
+        context.intent<MainActivity>()
+            .putExtra(Const.Key.OPEN_SECTION, launchIntent.getStringExtra(Const.Key.OPEN_SECTION))
             .putExtra(
                 Const.Key.OPEN_SETTINGS,
                 launchIntent.action == ACTION_APPLICATION_PREFERENCES

@@ -151,7 +151,7 @@ object ClassMap {
         DownloadService::class.java to a.j::class.java,
         SuRequestActivity::class.java to a.m::class.java,
         ProcessPhoenix::class.java to a.r::class.java,
-        RedesignActivity::class.java to a.i::class.java
+        RedesignActivity::class.java to a.b::class.java
     )
 
     operator fun get(c: Class<*>) = map.getOrElse(c) { c }

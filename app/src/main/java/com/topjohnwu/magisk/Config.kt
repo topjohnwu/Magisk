@@ -123,9 +123,6 @@ object Config : PreferenceModel, DBConfig {
     var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
 
     var safetyNotice by preference(Key.SAFETY, true)
-    var redesign by preference(Key.REDESIGN, false)
-    @Deprecated("Use extended dark theme")
-    var darkTheme by preference(Key.DARK_THEME, true)
     var darkThemeExtended by preference(
         Key.DARK_THEME_EXTENDED,
         AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM

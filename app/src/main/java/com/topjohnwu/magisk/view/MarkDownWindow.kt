@@ -3,8 +3,6 @@ package com.topjohnwu.magisk.view
 import android.content.Context
 import android.view.LayoutInflater
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.data.repository.StringRepository
 import com.topjohnwu.magisk.extensions.subscribeK
@@ -35,7 +33,7 @@ object MarkDownWindow : KoinComponent {
     }
 
     fun show(activity: Context, title: String?, content: Single<String>) {
-        val mdRes = if (Config.redesign) R.layout.markdown_window_md2 else R.layout.markdown_window
+        val mdRes = R.layout.markdown_window_md2
         val mv = LayoutInflater.from(activity).inflate(mdRes, null)
         val tv = mv.findViewById<TextView>(R.id.md_txt)
 
@@ -47,21 +45,14 @@ object MarkDownWindow : KoinComponent {
             tv.setText(R.string.download_file_error)
             Completable.complete()
         }.subscribeK {
-            if (Config.redesign) {
-                MagiskDialog(activity)
-                    .applyTitle(title ?: "")
-                    .applyView(mv)
-                    .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                        titleRes = android.R.string.cancel
-                    }
-                    .reveal()
-                return@subscribeK
-            }
-            AlertDialog.Builder(activity)
-                .setTitle(title)
-                .setView(mv)
-                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-                .show()
+            MagiskDialog(activity)
+                .applyTitle(title ?: "")
+                .applyView(mv)
+                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    titleRes = android.R.string.cancel
+                }
+                .reveal()
+            return@subscribeK
         }
     }
 }

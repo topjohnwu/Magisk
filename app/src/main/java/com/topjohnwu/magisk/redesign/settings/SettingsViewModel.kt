@@ -11,7 +11,6 @@ import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
-import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.RecreateEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
@@ -35,7 +34,7 @@ class SettingsViewModel(
     val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
     val items = diffListOf(
         Customization,
-        Theme, Language, Redesign, DownloadPath, GridSize,
+        Theme, Language, DownloadPath, GridSize,
 
         Manager,
         UpdateChannel, UpdateChannelUrl, ClearRepoCache, HideOrRestore(), UpdateChecker,
@@ -57,7 +56,6 @@ class SettingsViewModel(
     override fun onItemChanged(view: View, item: SettingsItem) = when (item) {
         // use only instances you want, don't declare everything
         is Theme -> Navigation.theme().publish()
-        is Redesign -> DieEvent().publish()
         is Language -> RecreateEvent().publish()
 
         is UpdateChannel -> openUrlIfNecessary(view)
