@@ -6,7 +6,7 @@ import android.content.Intent
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.intent
-import com.topjohnwu.magisk.ui.flash.FlashActivity
+import com.topjohnwu.magisk.legacy.flash.FlashActivity
 
 class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
 

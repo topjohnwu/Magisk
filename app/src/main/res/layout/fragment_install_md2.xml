@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.redesign.install.InstallViewModel" />
+            type="com.topjohnwu.magisk.ui.install.InstallViewModel" />
 
     </data>
 

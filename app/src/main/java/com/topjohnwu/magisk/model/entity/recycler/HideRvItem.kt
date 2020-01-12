@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.observer.Observer
-import com.topjohnwu.magisk.redesign.hide.HideViewModel
+import com.topjohnwu.magisk.ui.hide.HideViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import kotlin.math.roundToInt
 

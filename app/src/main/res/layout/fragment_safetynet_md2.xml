@@ -12,7 +12,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.redesign.safetynet.SafetynetViewModel" />
+            type="com.topjohnwu.magisk.ui.safetynet.SafetynetViewModel" />
 
     </data>
 

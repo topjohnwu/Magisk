@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="com.topjohnwu.magisk.redesign.settings.DownloadPath" />
+            type="com.topjohnwu.magisk.ui.settings.DownloadPath" />
 
     </data>
 

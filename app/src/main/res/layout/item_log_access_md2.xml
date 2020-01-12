@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.redesign.log.LogViewModel" />
+            type="com.topjohnwu.magisk.ui.log.LogViewModel" />
 
     </data>
 

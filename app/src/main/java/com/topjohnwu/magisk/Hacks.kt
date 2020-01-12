@@ -18,10 +18,10 @@ import com.topjohnwu.magisk.extensions.forceGetDeclaredField
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.model.update.UpdateCheckService
-import com.topjohnwu.magisk.redesign.MainActivity
+import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.SplashActivity
-import com.topjohnwu.magisk.ui.flash.FlashActivity
-import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
+import com.topjohnwu.magisk.legacy.flash.FlashActivity
+import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.refreshLocale
 import com.topjohnwu.magisk.utils.updateConfig
 

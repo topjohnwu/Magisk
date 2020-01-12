@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.redesign.hide.HideViewModel" />
+            type="com.topjohnwu.magisk.ui.hide.HideViewModel" />
 
     </data>
 

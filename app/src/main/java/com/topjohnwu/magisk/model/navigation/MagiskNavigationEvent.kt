@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.base.BaseActivity
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.redesign.compat.CompatActivity
+import com.topjohnwu.magisk.ui.compat.CompatActivity
 import kotlin.reflect.KClass
 
 @DslMarker

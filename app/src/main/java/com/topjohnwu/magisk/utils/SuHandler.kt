@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.toLog
 import com.topjohnwu.magisk.model.entity.toPolicy
-import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
+import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
 import timber.log.Timber
 

@@ -1,5 +1,5 @@
 package a
 
-import com.topjohnwu.magisk.redesign.MainActivity
+import com.topjohnwu.magisk.ui.MainActivity
 
 class b : MainActivity()

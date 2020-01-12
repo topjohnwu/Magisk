@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.redesign.superuser.SuperuserViewModel" />
+            type="com.topjohnwu.magisk.ui.superuser.SuperuserViewModel" />
 
     </data>
 

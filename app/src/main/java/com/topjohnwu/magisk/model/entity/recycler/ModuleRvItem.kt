@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.model.entity.module.Module
 import com.topjohnwu.magisk.model.entity.module.Repo
-import com.topjohnwu.magisk.redesign.module.ModuleViewModel
+import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 
 object SafeModeNotice : ComparableRvItem<SafeModeNotice>() {

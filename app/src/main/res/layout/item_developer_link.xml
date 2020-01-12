@@ -11,7 +11,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.redesign.home.HomeViewModel" />
+            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
 
     </data>
 

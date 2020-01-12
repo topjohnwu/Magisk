@@ -5,7 +5,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.redesign.request.RequestViewModel" />
+            type="com.topjohnwu.magisk.ui.request.RequestViewModel" />
 
     </data>
 

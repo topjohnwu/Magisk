@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.model.preference.PreferenceModel
-import com.topjohnwu.magisk.redesign.theme.Theme
+import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell

@@ -5,16 +5,16 @@ import android.content.Intent
 import android.os.Build
 import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.intent
-import com.topjohnwu.magisk.redesign.MainActivity
-import com.topjohnwu.magisk.redesign.hide.HideFragment
-import com.topjohnwu.magisk.redesign.home.HomeFragment
-import com.topjohnwu.magisk.redesign.install.InstallFragment
-import com.topjohnwu.magisk.redesign.log.LogFragment
-import com.topjohnwu.magisk.redesign.module.ModuleFragment
-import com.topjohnwu.magisk.redesign.safetynet.SafetynetFragment
-import com.topjohnwu.magisk.redesign.settings.SettingsFragment
-import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment
-import com.topjohnwu.magisk.redesign.theme.ThemeFragment
+import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.hide.HideFragment
+import com.topjohnwu.magisk.ui.home.HomeFragment
+import com.topjohnwu.magisk.ui.install.InstallFragment
+import com.topjohnwu.magisk.ui.log.LogFragment
+import com.topjohnwu.magisk.ui.module.ModuleFragment
+import com.topjohnwu.magisk.ui.safetynet.SafetynetFragment
+import com.topjohnwu.magisk.ui.settings.SettingsFragment
+import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
+import com.topjohnwu.magisk.ui.theme.ThemeFragment
 
 object Navigation {
 

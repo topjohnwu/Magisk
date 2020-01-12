@@ -7,11 +7,11 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.redesign.theme.ThemeViewModel" />
+            type="com.topjohnwu.magisk.ui.theme.ThemeViewModel" />
 
         <variable
             name="theme"
-            type="com.topjohnwu.magisk.redesign.theme.Theme" />
+            type="com.topjohnwu.magisk.ui.theme.Theme" />
 
     </data>
 

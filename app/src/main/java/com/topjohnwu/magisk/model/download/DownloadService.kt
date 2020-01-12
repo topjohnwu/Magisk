@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
-import com.topjohnwu.magisk.ui.flash.FlashActivity
+import com.topjohnwu.magisk.legacy.flash.FlashActivity
 import com.topjohnwu.magisk.utils.APKInstall
 import org.koin.core.get
 import java.io.File
