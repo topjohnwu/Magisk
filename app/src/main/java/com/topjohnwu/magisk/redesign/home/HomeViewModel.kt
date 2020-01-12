@@ -24,11 +24,14 @@ import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
 import com.topjohnwu.magisk.redesign.compat.itemBindingOf
-import com.topjohnwu.magisk.ui.home.MagiskState
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.BR
 import kotlin.math.roundToInt
+
+enum class MagiskState {
+    NOT_INSTALLED, UP_TO_DATE, OBSOLETE, LOADING
+}
 
 class HomeViewModel(
     private val repoMagisk: MagiskRepository

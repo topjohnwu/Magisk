@@ -17,7 +17,7 @@
 
         <import type="com.topjohnwu.magisk.BuildConfig" />
 
-        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+        <import type="com.topjohnwu.magisk.redesign.home.MagiskState" />
 
         <import type="com.topjohnwu.magisk.extensions.XAndroidKt" />
 

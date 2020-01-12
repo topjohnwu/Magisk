@@ -7,10 +7,14 @@ import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.events.SafetyNetResult
 import com.topjohnwu.magisk.model.events.UpdateSafetyNetEvent
 import com.topjohnwu.magisk.redesign.compat.CompatViewModel
-import com.topjohnwu.magisk.ui.home.SafetyNetState.*
+import com.topjohnwu.magisk.redesign.safetynet.SafetyNetState.*
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
 import com.topjohnwu.magisk.utils.SafetyNetHelper
+
+enum class SafetyNetState {
+    LOADING, PASS, FAILED, IDLE
+}
 
 class SafetynetViewModel(
     rxBus: RxBus

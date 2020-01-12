@@ -10,12 +10,11 @@ import com.topjohnwu.magisk.redesign.hide.HideFragment
 import com.topjohnwu.magisk.redesign.home.HomeFragment
 import com.topjohnwu.magisk.redesign.install.InstallFragment
 import com.topjohnwu.magisk.redesign.log.LogFragment
+import com.topjohnwu.magisk.redesign.module.ModuleFragment
 import com.topjohnwu.magisk.redesign.safetynet.SafetynetFragment
 import com.topjohnwu.magisk.redesign.settings.SettingsFragment
 import com.topjohnwu.magisk.redesign.superuser.SuperuserFragment
 import com.topjohnwu.magisk.redesign.theme.ThemeFragment
-import com.topjohnwu.magisk.ui.module.ModulesFragment
-import com.topjohnwu.magisk.ui.module.ReposFragment
 
 object Navigation {
 
@@ -36,12 +35,8 @@ object Navigation {
 
     fun modules() = MagiskNavigationEvent {
         navDirections {
-            destination = ModulesFragment::class
+            destination = ModuleFragment::class
         }
-    }
-
-    fun repos() = MagiskNavigationEvent {
-        navDirections { destination = ReposFragment::class }
     }
 
     fun hide() = MagiskNavigationEvent {
@@ -77,7 +72,6 @@ object Navigation {
     fun fromSection(section: String) = when (section) {
         "superuser" -> superuser()
         "modules" -> modules()
-        "downloads" -> repos()
         "magiskhide" -> hide()
         "log" -> log()
         "settings" -> settings()

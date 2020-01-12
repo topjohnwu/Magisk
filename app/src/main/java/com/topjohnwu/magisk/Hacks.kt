@@ -18,13 +18,12 @@ import com.topjohnwu.magisk.extensions.forceGetDeclaredField
 import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.receiver.GeneralReceiver
 import com.topjohnwu.magisk.model.update.UpdateCheckService
-import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.redesign.MainActivity
 import com.topjohnwu.magisk.ui.SplashActivity
 import com.topjohnwu.magisk.ui.flash.FlashActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.refreshLocale
 import com.topjohnwu.magisk.utils.updateConfig
-import com.topjohnwu.magisk.redesign.MainActivity as RedesignActivity
 
 fun AssetManager.addAssetPath(path: String) {
     DynAPK.addAssetPath(this, path)
@@ -150,8 +149,7 @@ object ClassMap {
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
         SuRequestActivity::class.java to a.m::class.java,
-        ProcessPhoenix::class.java to a.r::class.java,
-        RedesignActivity::class.java to a.b::class.java
+        ProcessPhoenix::class.java to a.r::class.java
     )
 
     operator fun get(c: Class<*>) = map.getOrElse(c) { c }
