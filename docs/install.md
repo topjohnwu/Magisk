@@ -141,7 +141,7 @@ For EMUI 9+ devices, the `ramdisk` partition no longer exists. As a workaround, 
 
 - If you plan to use custom recoveries, simply follow the instructions for custom recovery and you're all set. <br>
 **Warning: Magisk will overwrite the custom recovery.**
-- If you plan not to use custom recoveries, you will have to extract `RECOVERY_RAMDIS.img` from your firmware. Follow the instructions for boot image patching above, but use the `RECOVERY_RAMDIS.img` file instead of a boot image.
+- If you plan not to use custom recoveries, you will have to extract `RECOVERY_RAMDIS.img` from your firmware. Follow the instructions for boot image patching above, but use the `RECOVERY_RAMDISK.img` file instead of a boot image.
 - To flash the patched image to your device, here is the fastboot command: <br>
 `fastboot flash recovery_ramdisk /path/to/magisk_patched.img` <br>
 Be aware you are flashing to `recovery_ramdisk`, not `boot`!
