@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.model.events.dialog
 
-import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.extensions.res
-import com.topjohnwu.magisk.model.download.DownloadService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.view.MagiskDialog

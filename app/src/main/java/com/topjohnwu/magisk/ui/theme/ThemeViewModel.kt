@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.ui.theme
 import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
 import com.topjohnwu.magisk.model.events.RecreateEvent
 import com.topjohnwu.magisk.model.events.dialog.DarkThemeDialog
-import com.topjohnwu.magisk.base.BaseViewModel
+import com.topjohnwu.magisk.ui.base.BaseViewModel
 
 class ThemeViewModel : BaseViewModel(), TappableHeadlineItem.Listener {
 

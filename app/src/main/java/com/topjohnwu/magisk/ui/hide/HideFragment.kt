@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHideMd2Binding
-import com.topjohnwu.magisk.ui.compat.CompatFragment
-import com.topjohnwu.magisk.ui.compat.hideKeyboard
+import com.topjohnwu.magisk.ui.base.CompatFragment
+import com.topjohnwu.magisk.ui.base.hideKeyboard
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

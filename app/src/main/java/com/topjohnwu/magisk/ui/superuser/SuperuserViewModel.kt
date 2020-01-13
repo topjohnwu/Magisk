@@ -5,12 +5,13 @@ import android.content.res.Resources
 import androidx.databinding.ObservableArrayList
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.database.PolicyDao
+import com.topjohnwu.magisk.core.magiskdb.PolicyDao
+import com.topjohnwu.magisk.core.model.MagiskPolicy
+import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.applySchedulers
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toggle
-import com.topjohnwu.magisk.model.entity.MagiskPolicy
 import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
 import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem
@@ -19,12 +20,11 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.base.BaseViewModel
-import com.topjohnwu.magisk.ui.compat.adapterOf
-import com.topjohnwu.magisk.ui.compat.diffListOf
-import com.topjohnwu.magisk.ui.compat.itemBindingOf
-import com.topjohnwu.magisk.utils.BiometricHelper
-import com.topjohnwu.magisk.utils.currentLocale
+import com.topjohnwu.magisk.ui.base.BaseViewModel
+import com.topjohnwu.magisk.ui.base.adapterOf
+import com.topjohnwu.magisk.ui.base.diffListOf
+import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.core.utils.BiometricHelper
 import io.reactivex.Single
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 

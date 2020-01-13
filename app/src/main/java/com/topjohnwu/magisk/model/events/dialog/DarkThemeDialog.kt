@@ -2,9 +2,9 @@ package com.topjohnwu.magisk.model.events.dialog
 
 import android.app.Activity
 import androidx.appcompat.app.AppCompatDelegate
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.view.MagiskDialog
 import java.lang.ref.WeakReference
@@ -13,7 +13,7 @@ class DarkThemeDialog : DialogEvent(), ActivityExecutor {
 
     private var activity: WeakReference<Activity>? = null
 
-    override fun invoke(activity: BaseActivity<*, *>) {
+    override fun invoke(activity: BaseActivity) {
         this.activity = WeakReference(activity)
     }
 

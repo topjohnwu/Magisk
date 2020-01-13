@@ -7,7 +7,7 @@ import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.compat.CompatFragment
+import com.topjohnwu.magisk.ui.base.CompatFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : CompatFragment<HomeViewModel, FragmentHomeMd2Binding>() {

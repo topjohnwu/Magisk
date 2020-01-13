@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.model.events
 
 import android.content.Context
 import androidx.fragment.app.Fragment
-import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.core.base.BaseActivity
 
 interface ContextExecutor {
 
@@ -12,7 +12,7 @@ interface ContextExecutor {
 
 interface ActivityExecutor {
 
-    operator fun invoke(activity: BaseActivity<*, *>)
+    operator fun invoke(activity: BaseActivity)
 
 }
 

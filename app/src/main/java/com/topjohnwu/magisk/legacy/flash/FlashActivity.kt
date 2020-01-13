@@ -6,22 +6,22 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import androidx.core.net.toUri
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.databinding.ActivityFlashBinding
 import com.topjohnwu.magisk.extensions.snackbar
-import com.topjohnwu.magisk.intent
 import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.view.Notifications
+import com.topjohnwu.magisk.ui.base.BaseUIActivity
+import com.topjohnwu.magisk.core.view.Notifications
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
 
-open class FlashActivity : BaseActivity<FlashViewModel, ActivityFlashBinding>() {
+open class FlashActivity : BaseUIActivity<FlashViewModel, ActivityFlashBinding>() {
 
     override val layoutRes: Int = R.layout.activity_flash
     override val themeRes: Int = R.style.MagiskTheme_Flashing

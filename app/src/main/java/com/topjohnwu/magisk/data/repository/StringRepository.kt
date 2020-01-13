@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.data.repository
 
+import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.model.entity.module.Repo
 
 class StringRepository(
     private val api: GithubRawServices

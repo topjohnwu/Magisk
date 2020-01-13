@@ -28,11 +28,11 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.FileProvider
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.DynamicClassLoader
-import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.currentLocale
+import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import java.io.File
@@ -317,7 +317,9 @@ fun Context.hasPermissions(vararg permissions: String) = permissions.all {
     ContextCompat.checkSelfPermission(this, it) == PERMISSION_GRANTED
 }
 
-private val securityLevelFormatter get() = SimpleDateFormat("yyyy-MM-dd", currentLocale)
+private val securityLevelFormatter get() = SimpleDateFormat("yyyy-MM-dd",
+    currentLocale
+)
 
 /** Friendly reminder to seek newer roms or install oem updates. */
 val isDeviceSecure: Boolean

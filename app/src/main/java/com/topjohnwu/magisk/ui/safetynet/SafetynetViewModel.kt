@@ -6,11 +6,11 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.events.SafetyNetResult
 import com.topjohnwu.magisk.model.events.UpdateSafetyNetEvent
-import com.topjohnwu.magisk.base.BaseViewModel
+import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
-import com.topjohnwu.magisk.utils.SafetyNetHelper
+import com.topjohnwu.magisk.core.utils.SafetyNetHelper
 
 enum class SafetyNetState {
     LOADING, PASS, FAILED, IDLE

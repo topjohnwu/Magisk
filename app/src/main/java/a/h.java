@@ -1,6 +1,6 @@
 package a;
 
-import com.topjohnwu.magisk.model.receiver.GeneralReceiver;
+import com.topjohnwu.magisk.core.GeneralReceiver;
 
 public class h extends GeneralReceiver {
     /* stub */

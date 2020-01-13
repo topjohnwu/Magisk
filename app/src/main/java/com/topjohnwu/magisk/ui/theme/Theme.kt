@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.ui.theme
 
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Config
 
 enum class Theme(
     val themeName: String,

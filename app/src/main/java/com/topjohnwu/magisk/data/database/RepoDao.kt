@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.data.database
 
 import androidx.room.*
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.model.entity.module.Repo
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.model.module.Repo
 
 @Database(version = 6, entities = [Repo::class, RepoEtag::class])
 abstract class RepoDatabase : RoomDatabase() {

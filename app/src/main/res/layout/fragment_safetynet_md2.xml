@@ -6,7 +6,7 @@
     <data>
 
         <import type="android.os.Build" />
-        <import type="com.topjohnwu.magisk.Info" />
+        <import type="com.topjohnwu.magisk.core.Info" />
 
         <import type="com.topjohnwu.magisk.BuildConfig" />
 

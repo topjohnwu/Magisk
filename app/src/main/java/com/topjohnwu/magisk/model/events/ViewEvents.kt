@@ -3,16 +3,16 @@ package com.topjohnwu.magisk.model.events
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
-import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.utils.RxBus
-import com.topjohnwu.magisk.utils.SafetyNetHelper
+import com.topjohnwu.magisk.core.utils.SafetyNetHelper
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.superuser.Shell
@@ -118,8 +118,8 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
     }
 }
 
-class ViewActionEvent(val action: BaseActivity<*, *>.() -> Unit) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity<*, *>) = activity.run(action)
+class ViewActionEvent(val action: BaseActivity.() -> Unit) : ViewEvent(), ActivityExecutor {
+    override fun invoke(activity: BaseActivity) = activity.run(action)
 }
 
 class OpenChangelogEvent(val item: Repo) : ViewEvent(), ContextExecutor {
@@ -133,7 +133,7 @@ class PermissionEvent(
     val callback: PublishSubject<Boolean>
 ) : ViewEvent(), ActivityExecutor {
 
-    override fun invoke(activity: BaseActivity<*, *>) =
+    override fun invoke(activity: BaseActivity) =
         activity.withPermissions(*permissions.toTypedArray()) {
             onSuccess {
                 callback.onNext(true)
@@ -146,25 +146,25 @@ class PermissionEvent(
 }
 
 class BackPressEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity<*, *>) {
+    override fun invoke(activity: BaseActivity) {
         activity.onBackPressed()
     }
 }
 
 class DieEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity<*, *>) {
+    override fun invoke(activity: BaseActivity) {
         activity.finish()
     }
 }
 
 class RecreateEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity<*, *>) {
+    override fun invoke(activity: BaseActivity) {
         activity.recreate()
     }
 }
 
 class RequestFileEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity<*, *>) {
+    override fun invoke(activity: BaseActivity) {
         Intent(Intent.ACTION_GET_CONTENT)
             .setType("*/*")
             .addCategory(Intent.CATEGORY_OPENABLE)

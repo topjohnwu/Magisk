@@ -12,13 +12,13 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import com.google.android.material.card.MaterialCardView
 import com.ncapdevi.fragnav.FragNavController
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.compat.CompatActivity
-import com.topjohnwu.magisk.ui.compat.CompatNavigationDelegate
+import com.topjohnwu.magisk.ui.base.CompatActivity
+import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
 import com.topjohnwu.magisk.ui.home.HomeFragment
 import com.topjohnwu.magisk.ui.module.ModuleFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment

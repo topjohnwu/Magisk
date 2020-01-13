@@ -4,7 +4,7 @@ package com.topjohnwu.magisk.data.database
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.topjohnwu.magisk.model.entity.module.Repo
+import com.topjohnwu.magisk.core.model.module.Repo
 
 interface RepoBase {
 

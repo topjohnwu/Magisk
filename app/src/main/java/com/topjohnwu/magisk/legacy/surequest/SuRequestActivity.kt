@@ -6,16 +6,16 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Window
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.core.su.SuCallbackHandler
+import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.utils.SuHandler
-import com.topjohnwu.magisk.utils.SuHandler.REQUEST
+import com.topjohnwu.magisk.ui.base.BaseUIActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestBinding>() {
+open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
     override val layoutRes: Int = R.layout.activity_request
     override val themeRes: Int = R.style.MagiskTheme_SU
@@ -36,7 +36,11 @@ open class SuRequestActivity : BaseActivity<SuRequestViewModel, ActivityRequestB
         }
 
         fun runHandler(action: String?) {
-            SuHandler(this, action, intent.extras)
+            SuCallbackHandler(
+                this,
+                action,
+                intent.extras
+            )
             finish()
         }
 

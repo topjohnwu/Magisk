@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.model.events
 
-import com.topjohnwu.magisk.model.entity.MagiskPolicy
+import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.utils.RxBus
 
 sealed class PolicyUpdateEvent(val item: MagiskPolicy) : RxBus.Event {

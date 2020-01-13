@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.data.repository
 
-import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.database.SuLogDao
 import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.superuser.Shell

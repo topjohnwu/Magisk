@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.transition.TransitionManager
-import com.topjohnwu.magisk.Config
+import com.topjohnwu.magisk.core.Config
 import kotlin.math.max
 import kotlin.math.min
 

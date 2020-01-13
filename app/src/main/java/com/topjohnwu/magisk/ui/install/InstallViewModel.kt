@@ -2,13 +2,13 @@ package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.download.DownloadService
+import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
-import com.topjohnwu.magisk.model.download.DownloadService
-import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.RequestFileEvent
-import com.topjohnwu.magisk.base.BaseViewModel
+import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils

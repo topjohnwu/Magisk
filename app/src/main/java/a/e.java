@@ -1,6 +1,6 @@
 package a;
 
-import com.topjohnwu.magisk.App;
+import com.topjohnwu.magisk.core.App;
 
 public class e extends App {
     public e() {

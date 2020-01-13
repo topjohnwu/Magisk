@@ -3,14 +3,14 @@ package com.topjohnwu.magisk.model.events
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import com.topjohnwu.magisk.Const
-import com.topjohnwu.magisk.base.BaseActivity
-import com.topjohnwu.magisk.intent
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.legacy.flash.FlashActivity
 
 class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
 
-    override fun invoke(activity: BaseActivity<*, *>) {
+    override fun invoke(activity: BaseActivity) {
         activity.withExternalRW {
             onSuccess {
                 val intent = Intent(Intent.ACTION_GET_CONTENT)

@@ -9,11 +9,11 @@
 
         <import type="com.topjohnwu.magisk.R" />
 
-        <import type="com.topjohnwu.magisk.Info" />
+        <import type="com.topjohnwu.magisk.core.Info" />
 
-        <import type="com.topjohnwu.magisk.InfoKt" />
+        <import type="com.topjohnwu.magisk.core.InfoKt" />
 
-        <import type="com.topjohnwu.magisk.Config" />
+        <import type="com.topjohnwu.magisk.core.Config" />
 
         <import type="com.topjohnwu.magisk.BuildConfig" />
 

@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 
 sealed class HomeItem : ComparableRvItem<HomeItem>() {

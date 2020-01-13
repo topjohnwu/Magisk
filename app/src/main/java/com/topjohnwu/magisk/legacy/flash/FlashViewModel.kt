@@ -8,10 +8,9 @@ import android.os.Handler
 import androidx.core.os.postDelayed
 import androidx.databinding.ObservableArrayList
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.BaseViewModel
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
@@ -19,6 +18,7 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.flash.FlashResultListener
 import com.topjohnwu.magisk.model.flash.Flashing
 import com.topjohnwu.magisk.model.flash.Patching
+import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell

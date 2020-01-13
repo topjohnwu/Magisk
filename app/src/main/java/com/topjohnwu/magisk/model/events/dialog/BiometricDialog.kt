@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.model.events.dialog
 
-import com.topjohnwu.magisk.base.BaseActivity
+import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.utils.BiometricHelper
+import com.topjohnwu.magisk.core.utils.BiometricHelper
 
 class BiometricDialog(
     builder: Builder.() -> Unit
@@ -16,7 +16,7 @@ class BiometricDialog(
         builder(Builder())
     }
 
-    override fun invoke(activity: BaseActivity<*, *>) {
+    override fun invoke(activity: BaseActivity) {
         BiometricHelper.authenticate(
             activity,
             onError = listenerOnFailure,

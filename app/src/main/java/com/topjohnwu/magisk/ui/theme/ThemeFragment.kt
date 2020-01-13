@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.ui.theme
 import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentThemeMd2Binding
-import com.topjohnwu.magisk.ui.compat.CompatFragment
+import com.topjohnwu.magisk.ui.base.CompatFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ThemeFragment : CompatFragment<ThemeViewModel, FragmentThemeMd2Binding>() {

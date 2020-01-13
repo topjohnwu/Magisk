@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.ui.flash
 
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentFlashMd2Binding
-import com.topjohnwu.magisk.ui.compat.CompatFragment
+import com.topjohnwu.magisk.ui.base.CompatFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class FlashFragment : CompatFragment<FlashViewModel, FragmentFlashMd2Binding>() {

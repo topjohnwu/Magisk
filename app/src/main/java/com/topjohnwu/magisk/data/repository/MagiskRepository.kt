@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.data.repository
 
 import android.content.pm.PackageManager
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.extensions.getLabel
 import com.topjohnwu.magisk.extensions.packageName
@@ -24,7 +24,8 @@ class MagiskRepository(
         Config.Value.BETA_CHANNEL -> apiRaw.fetchBetaUpdate()
         Config.Value.CANARY_CHANNEL -> apiRaw.fetchCanaryUpdate()
         Config.Value.CANARY_DEBUG_CHANNEL -> apiRaw.fetchCanaryDebugUpdate()
-        Config.Value.CUSTOM_CHANNEL -> apiRaw.fetchCustomUpdate(Config.customChannelUrl)
+        Config.Value.CUSTOM_CHANNEL -> apiRaw.fetchCustomUpdate(
+            Config.customChannelUrl)
         else -> throw IllegalArgumentException()
     }.flatMap {
         // If remote version is lower than current installed, try switching to beta

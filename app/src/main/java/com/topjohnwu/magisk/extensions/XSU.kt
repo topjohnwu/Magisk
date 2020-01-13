@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.extensions
 
-import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream

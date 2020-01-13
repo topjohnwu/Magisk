@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.Info" />
+        <import type="com.topjohnwu.magisk.core.Info" />
 
     </data>
 

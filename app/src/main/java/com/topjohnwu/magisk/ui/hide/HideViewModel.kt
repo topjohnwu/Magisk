@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.hide
 import android.content.pm.ApplicationInfo
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toggle
@@ -12,12 +13,11 @@ import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.entity.recycler.HideItem
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessItem
-import com.topjohnwu.magisk.base.BaseViewModel
-import com.topjohnwu.magisk.ui.compat.Queryable
-import com.topjohnwu.magisk.ui.compat.filterableListOf
-import com.topjohnwu.magisk.ui.compat.itemBindingOf
+import com.topjohnwu.magisk.ui.base.BaseViewModel
+import com.topjohnwu.magisk.ui.base.Queryable
+import com.topjohnwu.magisk.ui.base.filterableListOf
+import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
-import com.topjohnwu.magisk.utils.currentLocale
 
 class HideViewModel(
     private val magiskRepo: MagiskRepository

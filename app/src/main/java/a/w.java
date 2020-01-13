@@ -6,11 +6,11 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.topjohnwu.magisk.base.DelegateWorker;
+import com.topjohnwu.magisk.core.base.BaseWorkerWrapper;
 
 import java.lang.reflect.ParameterizedType;
 
-public abstract class w<T extends DelegateWorker> extends Worker {
+public abstract class w<T extends BaseWorkerWrapper> extends Worker {
 
     /* Wrapper class to workaround Proguard -keep class * extends Worker */
 

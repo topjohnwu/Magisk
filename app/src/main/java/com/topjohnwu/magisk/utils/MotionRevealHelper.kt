@@ -14,6 +14,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.circularreveal.CircularRevealCompat
 import com.google.android.material.circularreveal.CircularRevealWidget
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.topjohnwu.magisk.core.utils.currentLocale
 import kotlin.math.hypot
 
 object MotionRevealHelper {

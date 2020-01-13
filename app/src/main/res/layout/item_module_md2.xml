@@ -7,7 +7,7 @@
 
         <import type="com.topjohnwu.magisk.R" />
 
-        <import type="com.topjohnwu.magisk.Config" />
+        <import type="com.topjohnwu.magisk.core.Config" />
 
         <variable
             name="item"

@@ -4,27 +4,26 @@ import androidx.annotation.WorkerThread
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.Config
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.BaseViewModel
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.download.RemoteFileService
+import com.topjohnwu.magisk.core.model.module.Module
+import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.tasks.RepoUpdater
+import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.model.download.RemoteFileService
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.module.Module
-import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
-import com.topjohnwu.magisk.tasks.RepoUpdater
-import com.topjohnwu.magisk.ui.compat.*
+import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.KObservableField
-import com.topjohnwu.magisk.utils.currentLocale
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -248,9 +247,7 @@ class ModuleViewModel(
             }
         }
 
-    private fun downloadRepos() = Single.just(Unit)
-        .flatMap { repoUpdater() }
-        .ignoreElement()
+    private fun downloadRepos() = repoUpdater()
 
     // ---
 

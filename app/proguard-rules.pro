@@ -17,9 +17,9 @@
 #}
 
 # Snet
--keepclassmembers class com.topjohnwu.magisk.utils.SafetyNetHelper { *; }
--keep,allowobfuscation interface com.topjohnwu.magisk.utils.SafetyNetHelper$Callback
--keepclassmembers class * implements com.topjohnwu.magisk.utils.SafetyNetHelper$Callback {
+-keepclassmembers class com.topjohnwu.magisk.core.utils.SafetyNetHelper { *; }
+-keep,allowobfuscation interface com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback
+-keepclassmembers class * implements com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback {
   void onResponse(int);
 }
 
@@ -29,13 +29,13 @@
 }
 
 # DelegateWorker
--keep,allowobfuscation class * extends com.topjohnwu.magisk.base.DelegateWorker
+-keep,allowobfuscation class * extends com.topjohnwu.magisk.core.base.BaseWorkerWrapper
 
 # BootSigner
 -keep class a.a { *; }
 
 # Workaround R8 bug
--keep,allowobfuscation class com.topjohnwu.magisk.model.receiver.GeneralReceiver
+-keep,allowobfuscation class com.topjohnwu.magisk.core.GeneralReceiver
 -keepclassmembers class a.e { *; }
 
 # Strip logging

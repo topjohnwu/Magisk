@@ -2,8 +2,12 @@ package com.topjohnwu.magisk.di
 
 import android.content.Context
 import androidx.room.Room
-import com.topjohnwu.magisk.data.database.*
-import com.topjohnwu.magisk.tasks.RepoUpdater
+import com.topjohnwu.magisk.core.magiskdb.PolicyDao
+import com.topjohnwu.magisk.core.magiskdb.SettingsDao
+import com.topjohnwu.magisk.core.magiskdb.StringDao
+import com.topjohnwu.magisk.core.tasks.RepoUpdater
+import com.topjohnwu.magisk.data.database.RepoDatabase
+import com.topjohnwu.magisk.data.database.SuLogDatabase
 import org.koin.dsl.module
 
 

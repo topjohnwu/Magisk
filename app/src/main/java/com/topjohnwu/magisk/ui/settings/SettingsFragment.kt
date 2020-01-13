@@ -5,7 +5,7 @@ import android.view.View
 import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentSettingsMd2Binding
-import com.topjohnwu.magisk.ui.compat.CompatFragment
+import com.topjohnwu.magisk.ui.base.CompatFragment
 import com.topjohnwu.magisk.utils.PinchZoomTouchListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

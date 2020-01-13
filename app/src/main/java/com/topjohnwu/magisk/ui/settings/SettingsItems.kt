@@ -6,14 +6,24 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.databinding.Bindable
-import com.topjohnwu.magisk.*
+import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.utils.availableLocales
+import com.topjohnwu.magisk.core.utils.currentLocale
+import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
-import com.topjohnwu.magisk.utils.*
+import com.topjohnwu.magisk.core.utils.BiometricHelper
+import com.topjohnwu.magisk.core.utils.Utils
+import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.superuser.Shell
 import java.io.File
 import kotlin.math.max
@@ -36,7 +46,9 @@ object Language : SettingsItem.Selector() {
     init {
         availableLocales.subscribeK { (names, values) ->
             setValues(names, values)
-            val selectedLocale = currentLocale.getDisplayName(currentLocale)
+            val selectedLocale = currentLocale.getDisplayName(
+                currentLocale
+            )
             value = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
         }
     }

@@ -7,9 +7,9 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.model.module.Module
+import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.model.entity.module.Module
-import com.topjohnwu.magisk.model.entity.module.Repo
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 
