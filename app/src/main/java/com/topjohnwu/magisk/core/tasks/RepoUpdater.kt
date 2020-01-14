@@ -39,7 +39,7 @@ class RepoUpdater(
         it.error()?.also { throw it }
         it.response()?.run {
             if (code() == HttpURLConnection.HTTP_NOT_MODIFIED)
-                return@run Flowable.error<Unit>(CachedException)
+                return@run Flowable.error<Unit>(CachedException())
 
             if (page == 1)
                 repoDB.etagKey = headers()[Const.Key.ETAG_KEY].orEmpty().trimEtag()
@@ -64,21 +64,23 @@ class RepoUpdater(
 
     @Suppress("RedundantLambdaArrow")
     operator fun invoke(forced: Boolean = false) : Completable {
-        val cached = Collections.synchronizedSet(HashSet(repoDB.repoIDList))
-        return loadPage(cached, etag = repoDB.etagKey).doOnComplete {
-            repoDB.removeRepos(cached)
-        }.onErrorResumeNext { it: Throwable ->
-            if (it is CachedException) {
-                if (forced)
-                    return@onErrorResumeNext forcedReload(cached)
-            } else {
-                Timber.e(it)
-            }
-            Flowable.empty()
-        }.ignoreElements()
+        return Flowable.fromCallable { Collections.synchronizedSet(HashSet(repoDB.repoIDList)) }
+            .flatMap { cached ->
+                loadPage(cached, etag = repoDB.etagKey).doOnComplete {
+                    repoDB.removeRepos(cached)
+                }.onErrorResumeNext { it: Throwable ->
+                    if (it is CachedException) {
+                        if (forced)
+                            return@onErrorResumeNext forcedReload(cached)
+                    } else {
+                        Timber.e(it)
+                    }
+                    Flowable.empty()
+                }
+            }.ignoreElements()
     }
 
-    object CachedException : Exception()
+    class CachedException : Exception()
 }
 
 private val dateFormat: SimpleDateFormat =
