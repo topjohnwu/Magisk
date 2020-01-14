@@ -102,7 +102,9 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava2:${vRetrofit}"
 
     def vOkHttp = '3.12.7'
-    implementation "com.squareup.okhttp3:okhttp:${vOkHttp}"
+    implementation("com.squareup.okhttp3:okhttp:${vOkHttp}") {
+        force = true
+    }
     implementation "com.squareup.okhttp3:logging-interceptor:${vOkHttp}"
 
     def vMoshi = '1.9.2'

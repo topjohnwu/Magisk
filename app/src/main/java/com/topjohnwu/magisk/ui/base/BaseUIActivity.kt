@@ -15,7 +15,7 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
 
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
-    protected abstract val viewModel: ViewModel
+    abstract val viewModel: ViewModel
     protected open val themeRes: Int = R.style.MagiskTheme
 
     open val snackbarView get() = binding.root

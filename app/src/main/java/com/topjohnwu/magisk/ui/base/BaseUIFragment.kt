@@ -17,7 +17,7 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
     protected val activity get() = requireActivity() as BaseUIActivity<*, *>
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
-    protected abstract val viewModel: ViewModel
+    abstract val viewModel: ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
