@@ -23,20 +23,14 @@
   void onResponse(int);
 }
 
-# Keep all fragment constructors
--keepclassmembers class * extends androidx.fragment.app.Fragment {
-  public <init>(...);
-}
+# Fragments
+-keep,allowobfuscation class * extends androidx.fragment.app.Fragment
 
-# DelegateWorker
+# BaseWorkerWrapper
 -keep,allowobfuscation class * extends com.topjohnwu.magisk.core.base.BaseWorkerWrapper
 
 # BootSigner
 -keep class a.a { *; }
-
-# Workaround R8 bug
--keep,allowobfuscation class com.topjohnwu.magisk.core.GeneralReceiver
--keepclassmembers class a.e { *; }
 
 # Strip logging
 -assumenosideeffects class timber.log.Timber.Tree { *; }
