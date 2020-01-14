@@ -27,6 +27,7 @@ import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
+import kotlin.system.exitProcess
 
 open class App() : Application() {
 
@@ -49,13 +50,19 @@ open class App() : Application() {
                 else -> null
             }
         }
+
+        // Always log full stack trace with Timber
+        Timber.plant(Timber.DebugTree())
+        Thread.setDefaultUncaughtExceptionHandler { _, e ->
+            Timber.e(e)
+            exitProcess(1)
+        }
     }
 
     override fun attachBaseContext(base: Context) {
         // Basic setup
         if (BuildConfig.DEBUG)
             MultiDex.install(base)
-        Timber.plant(Timber.DebugTree())
 
         // Some context magic
         val app: Application
