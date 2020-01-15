@@ -218,6 +218,7 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
 		if (S_ISLNK(st.st_mode)) {
 			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
+			buf[st.st_size] = '\0';
 			xsymlink(buf, sbin_path.data());
 		} else {
 			sprintf(buf, "%s/%s", mirror, entry->d_name);
