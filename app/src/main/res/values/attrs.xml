@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <attr name="cardStyle" format="reference"/>
-    <attr name="colorAccentFallback" format="reference" />
-    <attr name="imageColorTint" format="reference" />
-    <attr name="colorControl" format="reference"/>
-</resources>
