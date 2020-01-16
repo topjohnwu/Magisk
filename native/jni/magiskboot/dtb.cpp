@@ -284,6 +284,17 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 
 #define MATCH(s) (memcmp(dtb, s, sizeof(s) - 1) == 0)
 
+static int get_fdt_extra_padding(uint8_t *buf) {
+	int len = fdt_totalsize(buf);
+	auto fdt = static_cast<uint8_t *>(xmalloc(len + 256));
+	memcpy(fdt, buf, len);
+	fdt_open_into(fdt, fdt, len + 256);
+	fdt_pack(fdt);
+	int size = fdt_totalsize(fdt);
+	free(fdt);
+	return len - size;
+}
+
 static int dtb_patch(const char *in, const char *out) {
 	if (!out)
 		out = in;
@@ -355,6 +366,7 @@ static int dtb_patch(const char *in, const char *out) {
 		}
 	} else {
 		vector<uint8_t *> fdt_list;
+		vector<uint32_t> padding_list;
 		for (int i = 0; i < dtb_sz; ++i) {
 			if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
 				int len = fdt_totalsize(dtb + i);
@@ -362,15 +374,23 @@ static int dtb_patch(const char *in, const char *out) {
 				memcpy(fdt, dtb + i, len);
 				fdt_open_into(fdt, fdt, len + 256);
 				fdt_list.push_back(fdt);
+				int padding = get_fdt_extra_padding(dtb + i);
+				padding_list.push_back(padding);
 				i += len - 1;
 			}
 		}
 		if (!fdt_patch(fdt_list.begin(), fdt_list.end()))
 			return 1;
 		int fd = xopen(out, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
-		for (auto fdt : fdt_list) {
+		auto it_fdt = fdt_list.begin();
+		auto it_padding = padding_list.begin();
+		for (; it_fdt != fdt_list.end(); ++it_fdt, ++it_padding) {
+			auto fdt = *it_fdt;
+			auto padding = *it_padding;
 			fdt_pack(fdt);
-			xwrite(fd, fdt, fdt_totalsize(fdt));
+			int fdt_size = fdt_totalsize(fdt) + padding;
+			if (padding != 0) fdt_set_totalsize(fdt, fdt_size);
+			xwrite(fd, fdt, fdt_size);
 			free(fdt);
 		}
 		close(fd);
