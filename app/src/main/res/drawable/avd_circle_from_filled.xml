@@ -59,7 +59,7 @@
         <aapt:attr name="android:animation">
             <objectAnimator
                 android:duration="100"
-                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:interpolator="@interpolator/fast_out_slow_in"
                 android:propertyName="fillAlpha"
                 android:startOffset="200"
                 android:valueFrom="0.3"

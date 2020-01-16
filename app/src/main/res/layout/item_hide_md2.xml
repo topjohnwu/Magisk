@@ -96,7 +96,7 @@
                     android:id="@+id/hide_expand_icon"
                     style="@style/WidgetFoundation.Icon"
                     invisible="@{item.item.processes.empty}"
-                    srcCompat="@{item.isExpanded ? R.drawable.ic_close : R.drawable.ic_back_md2}"
+                    srcCompat="@{item.isExpanded ? R.drawable.ic_close_md2 : R.drawable.ic_back_md2}"
                     android:background="@null"
                     android:rotation="180"
                     android:rotationX="@{item.isExpanded ? 180 : 0}"
