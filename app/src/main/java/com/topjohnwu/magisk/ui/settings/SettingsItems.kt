@@ -12,17 +12,13 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.utils.availableLocales
-import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.core.utils.refreshLocale
+import com.topjohnwu.magisk.core.utils.*
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
-import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.superuser.Shell
 import java.io.File
@@ -36,8 +32,8 @@ object Customization : SettingsItem.Section() {
 }
 
 object Language : SettingsItem.Selector() {
-    override var value by dataObservable(0) {
-        Config.locale = entryValues.getOrNull(it)?.toString() ?: return@dataObservable
+    override var value by bindableValue(0) {
+        Config.locale = entryValues.getOrNull(it)?.toString() ?: return@bindableValue
         refreshLocale()
     }
 
@@ -108,7 +104,7 @@ fun HideOrRestore() =
     if (get<Context>().packageName == BuildConfig.APPLICATION_ID) Hide else Restore
 
 object DownloadPath : SettingsItem.Input() {
-    override var value: String by dataObservable(Config.downloadPath) { Config.downloadPath = it }
+    override var value: String by bindableValue(Config.downloadPath) { Config.downloadPath = it }
     override val title = R.string.settings_download_path_title.asTransitive()
     override val intermediate: String?
         get() = if (Utils.ensureDownloadPath(result) != null) result else null
@@ -130,7 +126,7 @@ object DownloadPath : SettingsItem.Input() {
 }
 
 object GridSize : SettingsItem.Selector() {
-    override var value by dataObservable(Config.listSpanCount - 1) {
+    override var value by bindableValue(Config.listSpanCount - 1) {
         Config.listSpanCount = max(1, min(3, it + 1))
     }
 
@@ -146,7 +142,7 @@ object GridSize : SettingsItem.Selector() {
 }
 
 object UpdateChannel : SettingsItem.Selector() {
-    override var value by dataObservable(Config.updateChannel) { Config.updateChannel = it }
+    override var value by bindableValue(Config.updateChannel) { Config.updateChannel = it }
     override val title = R.string.settings_update_channel_title.asTransitive()
 
     init {
@@ -163,7 +159,7 @@ object UpdateChannel : SettingsItem.Selector() {
 
 object UpdateChannelUrl : SettingsItem.Input() {
     override val title = R.string.settings_update_custom.asTransitive()
-    override var value: String by dataObservable(Config.customChannelUrl) {
+    override var value: String by bindableValue(Config.customChannelUrl) {
         Config.customChannelUrl = it
     }
     override val intermediate: String? get() = result
@@ -186,7 +182,7 @@ object UpdateChannelUrl : SettingsItem.Input() {
 object UpdateChecker : SettingsItem.Toggle() {
     override val title = R.string.settings_check_update_title.asTransitive()
     override val description = R.string.settings_check_update_summary.asTransitive()
-    override var value by dataObservable(Config.checkUpdate) {
+    override var value by bindableValue(Config.checkUpdate) {
         Config.checkUpdate = it
         Utils.scheduleUpdateCheck(get())
     }
@@ -204,13 +200,14 @@ object SystemlessHosts : SettingsItem.Blank() {
 
 object Biometrics : SettingsItem.Toggle() {
     override val title = R.string.settings_su_biometric_title.asTransitive()
-    override val description = R.string.settings_su_biometric_summary.asTransitive()
-    override var value by dataObservable(Config.suBiometric) { Config.suBiometric = it }
+    override var value by bindableValue(Config.suBiometric) { Config.suBiometric = it }
+    override var description = R.string.settings_su_biometric_summary.asTransitive()
 
     override fun refresh() {
         isEnabled = BiometricHelper.isSupported && Utils.showSuperUser()
         if (!isEnabled) {
             value = false
+            description = R.string.no_biometric.asTransitive()
         }
     }
 }
@@ -218,7 +215,7 @@ object Biometrics : SettingsItem.Toggle() {
 object Reauthenticate : SettingsItem.Toggle() {
     override val title = R.string.settings_su_reauth_title.asTransitive()
     override val description = R.string.settings_su_reauth_summary.asTransitive()
-    override var value by dataObservable(Config.suReAuth) { Config.suReAuth = it }
+    override var value by bindableValue(Config.suReAuth) { Config.suReAuth = it }
 
     override fun refresh() {
         isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && Utils.showSuperUser()
@@ -233,9 +230,10 @@ object Magisk : SettingsItem.Section() {
 
 object SafeMode : SettingsItem.Toggle() {
     override val title = R.string.settings_safe_mode_title.asTransitive()
-    override val description = R.string.settings_safe_mode_summary.asTransitive()
-    override var value by dataObservable(Config.coreOnly) {
-        if (Config.coreOnly == it) return@dataObservable
+    // Use old placeholder for now, will update text once native implementation is changed
+    override val description = R.string.settings_core_only_summary.asTransitive()
+    override var value by bindableValue(Config.coreOnly) {
+        if (Config.coreOnly == it) return@bindableValue
         Config.coreOnly = it
         when {
             it -> runCatching { Const.MAGISK_DISABLE_FILE.createNewFile() }
@@ -252,7 +250,7 @@ object SafeMode : SettingsItem.Toggle() {
 object MagiskHide : SettingsItem.Toggle() {
     override val title = R.string.magiskhide.asTransitive()
     override val description = R.string.settings_magiskhide_summary.asTransitive()
-    override var value by dataObservable(Config.magiskHide) {
+    override var value by bindableValue(Config.magiskHide) {
         Config.magiskHide = it
         when {
             it -> Shell.su("magiskhide --enable").submit()
@@ -273,10 +271,10 @@ object Superuser : SettingsItem.Section() {
 
 object AccessMode : SettingsItem.Selector() {
     override val title = R.string.superuser_access.asTransitive()
-    override var value by dataObservable(Config.rootMode) {
+    override var value by bindableValue(Config.rootMode) {
         Config.rootMode = entryValues.getOrNull(it)
             ?.toString()
-            ?.toInt() ?: return@dataObservable
+            ?.toInt() ?: return@bindableValue
     }
 
     init {
@@ -293,11 +291,14 @@ object AccessMode : SettingsItem.Selector() {
 
 object MultiuserMode : SettingsItem.Selector() {
     override val title = R.string.multiuser_mode.asTransitive()
-    override var value by dataObservable(Config.suMultiuserMode) {
+    override var value by bindableValue(Config.suMultiuserMode) {
         Config.suMultiuserMode = entryValues.getOrNull(it)
             ?.toString()
-            ?.toInt() ?: return@dataObservable
+            ?.toInt() ?: return@bindableValue
     }
+    private val descArray = resources.getStringArray(R.array.multiuser_summary)
+    override val description
+        get() = descArray[value].asTransitive()
 
     init {
         setValues(
@@ -313,11 +314,14 @@ object MultiuserMode : SettingsItem.Selector() {
 
 object MountNamespaceMode : SettingsItem.Selector() {
     override val title = R.string.mount_namespace_mode.asTransitive()
-    override var value by dataObservable(Config.suMntNamespaceMode) {
+    override var value by bindableValue(Config.suMntNamespaceMode) {
         Config.suMntNamespaceMode = entryValues.getOrNull(it)
             ?.toString()
-            ?.toInt() ?: return@dataObservable
+            ?.toInt() ?: return@bindableValue
     }
+    private val descArray = resources.getStringArray(R.array.namespace_summary)
+    override val description
+        get() = descArray[value].asTransitive()
 
     init {
         setValues(
@@ -333,10 +337,10 @@ object MountNamespaceMode : SettingsItem.Selector() {
 
 object AutomaticResponse : SettingsItem.Selector() {
     override val title = R.string.auto_response.asTransitive()
-    override var value by dataObservable(Config.suAutoReponse) {
+    override var value by bindableValue(Config.suAutoReponse) {
         Config.suAutoReponse = entryValues.getOrNull(it)
             ?.toString()
-            ?.toInt() ?: return@dataObservable
+            ?.toInt() ?: return@bindableValue
     }
 
     init {
@@ -353,10 +357,10 @@ object AutomaticResponse : SettingsItem.Selector() {
 
 object RequestTimeout : SettingsItem.Selector() {
     override val title = R.string.request_timeout.asTransitive()
-    override var value by dataObservable(-1) {
+    override var value by bindableValue(-1) {
         Config.suDefaultTimeout = entryValues.getOrNull(it)
             ?.toString()
-            ?.toInt() ?: return@dataObservable
+            ?.toInt() ?: return@bindableValue
     }
 
     init {
@@ -375,10 +379,10 @@ object RequestTimeout : SettingsItem.Selector() {
 
 object SUNotification : SettingsItem.Selector() {
     override val title = R.string.superuser_notification.asTransitive()
-    override var value by dataObservable(Config.suNotification) {
+    override var value by bindableValue(Config.suNotification) {
         Config.suNotification = entryValues.getOrNull(it)
             ?.toString()
-            ?.toInt() ?: return@dataObservable
+            ?.toInt() ?: return@bindableValue
     }
 
     init {

@@ -19,19 +19,14 @@ import kotlin.reflect.KProperty
 
 sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
-    @Bindable
-    open val icon: Int = 0
-    @Bindable
-    open val title: TransitiveText = TransitiveText.empty
-    @Bindable
-    open val description: TransitiveText = TransitiveText.empty
+    open val icon: Int get() = 0
+    open val title: TransitiveText get() = TransitiveText.EMPTY
 
-    var isEnabled = true
-        @Bindable get
-        set(value) {
-            field = value
-            notifyChange(BR.enabled)
-        }
+    @get:Bindable
+    open val description: TransitiveText get() = TransitiveText.EMPTY
+
+    @get:Bindable
+    var isEnabled by bindable(true, BR.enabled)
 
     protected open val isFullSpan: Boolean = false
 
@@ -41,8 +36,6 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
         // notify only after the callback invocation; callback can invalidate the backing data,
         // which wouldn't be recognized with reverse approach
-        notifyChange(BR.icon)
-        notifyChange(BR.title)
         notifyChange(BR.description)
     }
 
@@ -59,6 +52,17 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     override fun itemSameAs(other: SettingsItem) = this === other
     override fun contentSameAs(other: SettingsItem) = itemSameAs(other)
 
+    protected inline fun <T> bindable(
+        initialValue: T,
+        fieldId: Int,
+        crossinline setter: (T) -> Unit = {}
+    ) = object : ObservableProperty<T>(initialValue) {
+        override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
+            setter(newValue)
+            notifyChange(fieldId)
+        }
+    }
+
     // ---
 
     interface Callback {
@@ -70,18 +74,13 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
     abstract class Value<T> : SettingsItem() {
 
+        @get:Bindable
         abstract var value: T
-            @Bindable get
 
-        protected inline fun dataObservable(
+        protected inline fun bindableValue(
             initialValue: T,
             crossinline setter: (T) -> Unit
-        ) = object : ObservableProperty<T>(initialValue) {
-            override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
-                setter(newValue)
-                notifyChange(BR.value)
-            }
-        }
+        ) = bindable(initialValue, BR.value, setter)
 
     }
 
@@ -146,15 +145,15 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
         protected val resources get() = get<Resources>()
 
-        @Bindable
         var entries: Array<out CharSequence> = arrayOf()
             private set
-        @Bindable
+
         var entryValues: Array<out CharSequence> = arrayOf()
             private set
 
+        @get:Bindable
         val selectedEntry
-            @Bindable get() = entries.getOrNull(value)
+            get() = entries.getOrNull(value)
 
         fun setValues(
             entries: Array<out CharSequence>,
@@ -165,8 +164,6 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
             this.entries = entries
             this.entryValues = values
 
-            notifyChange(BR.entries)
-            notifyChange(BR.entryValues)
             notifyChange(BR.selectedEntry)
         }
 
