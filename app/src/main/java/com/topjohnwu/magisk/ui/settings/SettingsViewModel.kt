@@ -1,12 +1,16 @@
 package com.topjohnwu.magisk.ui.settings
 
 import android.Manifest
+import android.os.Build
 import android.view.View
 import android.widget.Toast
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.PatchAPK
+import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.internal.Configuration
@@ -20,7 +24,6 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.adapterOf
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
@@ -32,21 +35,58 @@ class SettingsViewModel(
 
     val adapter = adapterOf<SettingsItem>()
     val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
-    val items = diffListOf(
-        Customization,
-        Theme, Language, DownloadPath, GridSize,
+    val items = diffListOf(createItems())
 
-        Manager,
-        UpdateChannel, UpdateChannelUrl, ClearRepoCache, HideOrRestore(), UpdateChecker,
-        Biometrics, Reauthenticate,
+    private fun createItems(): List<SettingsItem> {
+        // Customization
+        val list = mutableListOf(
+            Customization,
+            Theme, Language, GridSize
+        )
+        if (Build.VERSION.SDK_INT < 21) {
+            // Pre 5.0 does not support getting colors from attributes,
+            // making theming a pain in the ass. Just forget about it
+            list.remove(Theme)
+        }
 
-        Magisk,
-        SafeMode, MagiskHide, SystemlessHosts,
+        // Manager
+        list.addAll(listOf(
+            Manager,
+            UpdateChannel, UpdateChannelUrl, UpdateChecker, DownloadPath
+        ))
+        if (Info.env.isActive) {
+            list.add(ClearRepoCache)
+            if (Const.USER_ID == 0 && Info.isConnected.value)
+                list.add(HideOrRestore())
+        }
 
-        Superuser,
-        AccessMode, MultiuserMode, MountNamespaceMode, AutomaticResponse, RequestTimeout,
-        SUNotification
-    )
+        // Magisk
+        if (Info.env.isActive) {
+            list.addAll(listOf(
+                Magisk,
+                MagiskHide, SystemlessHosts, SafeMode
+            ))
+        }
+
+        // Superuser
+        if (Utils.showSuperUser()) {
+            list.addAll(listOf(
+                Superuser,
+                Biometrics, AccessMode, MultiuserMode, MountNamespaceMode,
+                AutomaticResponse, RequestTimeout, SUNotification
+            ))
+            if (Build.VERSION.SDK_INT < 23) {
+                // Biometric is only available on 6.0+
+                list.remove(Biometrics)
+            }
+            if (Build.VERSION.SDK_INT < 26) {
+                // Re-authenticate is not feasible on 8.0+
+                list.add(Reauthenticate)
+            }
+        }
+
+        return list
+    }
 
     override fun onItemPressed(view: View, item: SettingsItem) = when (item) {
         is DownloadPath -> requireRWPermission()

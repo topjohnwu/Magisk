@@ -91,10 +91,6 @@ object Hide : SettingsItem.Input() {
 
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
-
-    override fun refresh() {
-        isEnabled = Info.env.isActive
-    }
 }
 
 object Restore : SettingsItem.Blank() {
@@ -183,10 +179,6 @@ object UpdateChecker : SettingsItem.Toggle() {
 object SystemlessHosts : SettingsItem.Blank() {
     override val title = R.string.settings_hosts_title.asTransitive()
     override val description = R.string.settings_hosts_summary.asTransitive()
-
-    override fun refresh() {
-        isEnabled = Info.env.isActive
-    }
 }
 
 object Biometrics : SettingsItem.Toggle() {
@@ -195,7 +187,7 @@ object Biometrics : SettingsItem.Toggle() {
     override var description = R.string.settings_su_biometric_summary.asTransitive()
 
     override fun refresh() {
-        isEnabled = BiometricHelper.isSupported && Utils.showSuperUser()
+        isEnabled = BiometricHelper.isSupported
         if (!isEnabled) {
             value = false
             description = R.string.no_biometric.asTransitive()
@@ -232,10 +224,6 @@ object SafeMode : SettingsItem.Toggle() {
         }
         Utils.toast(R.string.settings_reboot_toast, Toast.LENGTH_LONG)
     }
-
-    override fun refresh() {
-        isEnabled = Info.env.isActive
-    }
 }
 
 object MagiskHide : SettingsItem.Toggle() {
@@ -247,10 +235,6 @@ object MagiskHide : SettingsItem.Toggle() {
             it -> Shell.su("magiskhide --enable").submit()
             else -> Shell.su("magiskhide --disable").submit()
         }
-    }
-
-    override fun refresh() {
-        isEnabled = Info.env.isActive
     }
 }
 
@@ -268,10 +252,6 @@ object AccessMode : SettingsItem.Selector() {
     override var value by bindableValue(Config.rootMode) {
         Config.rootMode = entryValues[it].toInt()
     }
-
-    override fun refresh() {
-        isEnabled = Utils.showSuperUser()
-    }
 }
 
 object MultiuserMode : SettingsItem.Selector() {
@@ -288,7 +268,7 @@ object MultiuserMode : SettingsItem.Selector() {
         get() = descArray[value].asTransitive()
 
     override fun refresh() {
-        isEnabled = Const.USER_ID <= 0 && Utils.showSuperUser()
+        isEnabled = Const.USER_ID == 0
     }
 }
 
@@ -304,10 +284,6 @@ object MountNamespaceMode : SettingsItem.Selector() {
 
     override val description
         get() = descArray[value].asTransitive()
-
-    override fun refresh() {
-        isEnabled = Utils.showSuperUser()
-    }
 }
 
 object AutomaticResponse : SettingsItem.Selector() {
@@ -317,10 +293,6 @@ object AutomaticResponse : SettingsItem.Selector() {
 
     override var value by bindableValue(Config.suAutoReponse) {
         Config.suAutoReponse = entryValues[it].toInt()
-    }
-
-    override fun refresh() {
-        isEnabled = Utils.showSuperUser()
     }
 }
 
@@ -335,10 +307,6 @@ object RequestTimeout : SettingsItem.Selector() {
 
     private val selected: Int
         get() = entryValues.indexOfFirst { it.toInt() == Config.suDefaultTimeout }
-
-    override fun refresh() {
-        isEnabled = Utils.showSuperUser()
-    }
 }
 
 object SUNotification : SettingsItem.Selector() {
@@ -348,9 +316,5 @@ object SUNotification : SettingsItem.Selector() {
 
     override var value by bindableValue(Config.suNotification) {
         Config.suNotification = entryValues[it].toInt()
-    }
-
-    override fun refresh() {
-        isEnabled = Utils.showSuperUser()
     }
 }
