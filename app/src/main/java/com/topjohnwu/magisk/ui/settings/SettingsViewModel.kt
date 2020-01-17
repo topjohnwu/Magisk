@@ -110,7 +110,7 @@ class SettingsViewModel(
 
     private fun openUrlIfNecessary(view: View) {
         UpdateChannelUrl.refresh()
-        if (UpdateChannelUrl.value.isBlank()) {
+        if (UpdateChannelUrl.isEnabled && UpdateChannelUrl.value.isBlank()) {
             UpdateChannelUrl.onPressed(view, this@SettingsViewModel)
         }
     }
