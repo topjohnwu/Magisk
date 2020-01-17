@@ -33,19 +33,21 @@ object Customization : SettingsItem.Section() {
 
 object Language : SettingsItem.Selector() {
     override var value by bindableValue(0) {
-        Config.locale = entryValues.getOrNull(it)?.toString() ?: return@bindableValue
+        Config.locale = entryValues[it]
         refreshLocale()
     }
 
     override val title = R.string.language.asTransitive()
+    override var entries = arrayOf<String>()
+    override var entryValues = arrayOf<String>()
 
     init {
         availableLocales.subscribeK { (names, values) ->
-            setValues(names, values)
-            val selectedLocale = currentLocale.getDisplayName(
-                currentLocale
-            )
+            entries = names
+            entryValues = values
+            val selectedLocale = currentLocale.getDisplayName(currentLocale)
             value = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
+            notifyChange(BR.selectedEntry)
         }
     }
 }
@@ -80,8 +82,9 @@ object Hide : SettingsItem.Input() {
             notifyChange(BR.value)
             notifyChange(BR.error)
         }
-    val isError
-        @Bindable get() = value.length > 14 || value.isBlank()
+
+    @get:Bindable
+    val isError get() = value.length > 14 || value.isBlank()
 
     override val intermediate: String?
         get() = if (isError) null else value
@@ -108,18 +111,18 @@ object DownloadPath : SettingsItem.Input() {
     override val title = R.string.settings_download_path_title.asTransitive()
     override val intermediate: String?
         get() = if (Utils.ensureDownloadPath(result) != null) result else null
+
+    @get:Bindable
     var result = value
-        @Bindable get
         set(value) {
             field = value
             notifyChange(BR.result)
             notifyChange(BR.path)
         }
+
+    @get:Bindable
     val path
-        @Bindable get() = File(
-            Environment.getExternalStorageDirectory(),
-            result
-        ).absolutePath.orEmpty()
+        get() = File(Environment.getExternalStorageDirectory(), result).absolutePath.orEmpty()
 
     override fun getView(context: Context) = DialogSettingsDownloadPathBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
@@ -132,40 +135,28 @@ object GridSize : SettingsItem.Selector() {
 
     override val title = R.string.settings_grid_span_count_title.asTransitive()
     override val description = R.string.settings_grid_span_count_summary.asTransitive()
-
-    init {
-        setValues(
-            resources.getStringArray(R.array.span_count),
-            resources.getStringArray(R.array.value_array)
-        )
-    }
+    override val entries = resources.getStringArray(R.array.span_count)
+    override val entryValues = resources.getStringArray(R.array.value_array)
 }
 
 object UpdateChannel : SettingsItem.Selector() {
     override var value by bindableValue(Config.updateChannel) { Config.updateChannel = it }
-    override val title = R.string.settings_update_channel_title.asTransitive()
 
-    init {
-        val entries = resources.getStringArray(R.array.update_channel).let {
-            if (!Utils.isCanary && Config.updateChannel < Config.Value.CANARY_CHANNEL)
-                it.take(it.size - 2).toTypedArray() else it
-        }
-        setValues(
-            entries,
-            resources.getStringArray(R.array.value_array)
-        )
+    override val title = R.string.settings_update_channel_title.asTransitive()
+    override val entries = resources.getStringArray(R.array.update_channel).let {
+        if (!Utils.isCanary && Config.updateChannel < Config.Value.CANARY_CHANNEL)
+            it.take(it.size - 2).toTypedArray() else it
     }
+    override val entryValues = resources.getStringArray(R.array.value_array)
 }
 
 object UpdateChannelUrl : SettingsItem.Input() {
     override val title = R.string.settings_update_custom.asTransitive()
-    override var value: String by bindableValue(Config.customChannelUrl) {
-        Config.customChannelUrl = it
-    }
+    override var value by bindableValue(Config.customChannelUrl) { Config.customChannelUrl = it }
     override val intermediate: String? get() = result
 
+    @get:Bindable
     var result = value
-        @Bindable get
         set(value) {
             field = value
             notifyChange(BR.result)
@@ -271,17 +262,11 @@ object Superuser : SettingsItem.Section() {
 
 object AccessMode : SettingsItem.Selector() {
     override val title = R.string.superuser_access.asTransitive()
-    override var value by bindableValue(Config.rootMode) {
-        Config.rootMode = entryValues.getOrNull(it)
-            ?.toString()
-            ?.toInt() ?: return@bindableValue
-    }
+    override val entries = resources.getStringArray(R.array.su_access)
+    override val entryValues = resources.getStringArray(R.array.value_array)
 
-    init {
-        setValues(
-            resources.getStringArray(R.array.su_access),
-            resources.getStringArray(R.array.value_array)
-        )
+    override var value by bindableValue(Config.rootMode) {
+        Config.rootMode = entryValues[it].toInt()
     }
 
     override fun refresh() {
@@ -291,21 +276,16 @@ object AccessMode : SettingsItem.Selector() {
 
 object MultiuserMode : SettingsItem.Selector() {
     override val title = R.string.multiuser_mode.asTransitive()
-    override var value by bindableValue(Config.suMultiuserMode) {
-        Config.suMultiuserMode = entryValues.getOrNull(it)
-            ?.toString()
-            ?.toInt() ?: return@bindableValue
-    }
+    override val entries = resources.getStringArray(R.array.multiuser_mode)
+    override val entryValues = resources.getStringArray(R.array.value_array)
     private val descArray = resources.getStringArray(R.array.multiuser_summary)
+
+    override var value by bindableValue(Config.suMultiuserMode) {
+        Config.suMultiuserMode = entryValues[it].toInt()
+    }
+
     override val description
         get() = descArray[value].asTransitive()
-
-    init {
-        setValues(
-            resources.getStringArray(R.array.multiuser_mode),
-            resources.getStringArray(R.array.value_array)
-        )
-    }
 
     override fun refresh() {
         isEnabled = Const.USER_ID <= 0 && Utils.showSuperUser()
@@ -314,21 +294,16 @@ object MultiuserMode : SettingsItem.Selector() {
 
 object MountNamespaceMode : SettingsItem.Selector() {
     override val title = R.string.mount_namespace_mode.asTransitive()
-    override var value by bindableValue(Config.suMntNamespaceMode) {
-        Config.suMntNamespaceMode = entryValues.getOrNull(it)
-            ?.toString()
-            ?.toInt() ?: return@bindableValue
-    }
+    override val entries = resources.getStringArray(R.array.namespace)
+    override val entryValues = resources.getStringArray(R.array.value_array)
     private val descArray = resources.getStringArray(R.array.namespace_summary)
+
+    override var value by bindableValue(Config.suMntNamespaceMode) {
+        Config.suMntNamespaceMode = entryValues[it].toInt()
+    }
+
     override val description
         get() = descArray[value].asTransitive()
-
-    init {
-        setValues(
-            resources.getStringArray(R.array.namespace),
-            resources.getStringArray(R.array.value_array)
-        )
-    }
 
     override fun refresh() {
         isEnabled = Utils.showSuperUser()
@@ -337,17 +312,11 @@ object MountNamespaceMode : SettingsItem.Selector() {
 
 object AutomaticResponse : SettingsItem.Selector() {
     override val title = R.string.auto_response.asTransitive()
-    override var value by bindableValue(Config.suAutoReponse) {
-        Config.suAutoReponse = entryValues.getOrNull(it)
-            ?.toString()
-            ?.toInt() ?: return@bindableValue
-    }
+    override val entries = resources.getStringArray(R.array.auto_response)
+    override val entryValues = resources.getStringArray(R.array.value_array)
 
-    init {
-        setValues(
-            resources.getStringArray(R.array.auto_response),
-            resources.getStringArray(R.array.value_array)
-        )
+    override var value by bindableValue(Config.suAutoReponse) {
+        Config.suAutoReponse = entryValues[it].toInt()
     }
 
     override fun refresh() {
@@ -357,20 +326,15 @@ object AutomaticResponse : SettingsItem.Selector() {
 
 object RequestTimeout : SettingsItem.Selector() {
     override val title = R.string.request_timeout.asTransitive()
-    override var value by bindableValue(-1) {
-        Config.suDefaultTimeout = entryValues.getOrNull(it)
-            ?.toString()
-            ?.toInt() ?: return@bindableValue
+    override val entries = resources.getStringArray(R.array.request_timeout)
+    override val entryValues = resources.getStringArray(R.array.request_timeout_value)
+
+    override var value by bindableValue(selected) {
+        Config.suDefaultTimeout = entryValues[it].toInt()
     }
 
-    init {
-        setValues(
-            resources.getStringArray(R.array.request_timeout),
-            resources.getStringArray(R.array.request_timeout_value)
-        )
-        val currentValue = Config.suDefaultTimeout.toString()
-        value = entryValues.indexOfFirst { it == currentValue }
-    }
+    private val selected: Int
+        get() = entryValues.indexOfFirst { it.toInt() == Config.suDefaultTimeout }
 
     override fun refresh() {
         isEnabled = Utils.showSuperUser()
@@ -379,17 +343,11 @@ object RequestTimeout : SettingsItem.Selector() {
 
 object SUNotification : SettingsItem.Selector() {
     override val title = R.string.superuser_notification.asTransitive()
-    override var value by bindableValue(Config.suNotification) {
-        Config.suNotification = entryValues.getOrNull(it)
-            ?.toString()
-            ?.toInt() ?: return@bindableValue
-    }
+    override val entries = resources.getStringArray(R.array.su_notification)
+    override val entryValues = resources.getStringArray(R.array.value_array)
 
-    init {
-        setValues(
-            resources.getStringArray(R.array.su_notification),
-            resources.getStringArray(R.array.value_array)
-        )
+    override var value by bindableValue(Config.suNotification) {
+        Config.suNotification = entryValues[it].toInt()
     }
 
     override fun refresh() {

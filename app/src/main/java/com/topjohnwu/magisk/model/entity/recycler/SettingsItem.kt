@@ -28,7 +28,7 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     @get:Bindable
     var isEnabled by bindable(true, BR.enabled)
 
-    protected open val isFullSpan: Boolean = false
+    protected open val isFullSpan get() = false
 
     @CallSuper
     open fun onPressed(view: View, callback: Callback) {
@@ -145,27 +145,12 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
         protected val resources get() = get<Resources>()
 
-        var entries: Array<out CharSequence> = arrayOf()
-            private set
-
-        var entryValues: Array<out CharSequence> = arrayOf()
-            private set
+        abstract val entries: Array<out CharSequence>
+        abstract val entryValues: Array<out CharSequence>
 
         @get:Bindable
         val selectedEntry
             get() = entries.getOrNull(value)
-
-        fun setValues(
-            entries: Array<out CharSequence>,
-            values: Array<out CharSequence>
-        ) {
-            check(entries.size <= values.size) { "List sizes must match" }
-
-            this.entries = entries
-            this.entryValues = values
-
-            notifyChange(BR.selectedEntry)
-        }
 
         override fun onPressed(view: View, callback: Callback) {
             if (entries.isEmpty() || entryValues.isEmpty()) return
@@ -199,7 +184,7 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     abstract class Section : SettingsItem() {
 
         override val layoutRes = R.layout.item_settings_section
-        override val isFullSpan = true
+        override val isFullSpan get() = true
 
     }
 
