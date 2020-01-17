@@ -139,6 +139,18 @@ static void main_daemon() {
 		return true;
 	});
 
+	// Try to get API level for Realme devices if the main function didn't worked
+	if (SDK_INT == -1) {
+		parse_prop_file("/system/build_default.prop", [](auto skey, auto sval) -> bool {
+			if (skey == "ro.build.version.sdk") {
+				LOGI("* Device API level: %s\n", sval.data());
+				SDK_INT = parse_int(sval);
+				return false;
+			}
+			return true;
+		});
+	}
+
 	// Load config status
 	parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
 		if (key == "RECOVERYMODE" && val == "true")
