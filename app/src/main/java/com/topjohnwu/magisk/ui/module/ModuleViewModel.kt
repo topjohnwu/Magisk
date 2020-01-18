@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.module.Module
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.core.tasks.RepoUpdater
-import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
@@ -24,7 +23,6 @@ import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.KObservableField
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -32,6 +30,20 @@ import io.reactivex.schedulers.Schedulers
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 import timber.log.Timber
 import kotlin.math.roundToInt
+
+/*
+* The repo fetching behavior should follow these rules:
+*
+* For the first time the repo list is queried in the app, it should ALWAYS fetch for
+* updates. However, this particular fetch should go through RepoUpdater.invoke(false),
+* which internally will set ETAGs when doing GET requests to GitHub's API and will
+* only update repo DB only if the GitHub API shows that something is changed remotely.
+*
+* When a user explicitly requests a full DB refresh, it should ALWAYS do a full force
+* refresh, which in code can be done with RepoUpdater.invoke(true). This will update
+* every single repo's information regardless whether GitHub's API shows if there is
+* anything changed or not.
+* */
 
 class ModuleViewModel(
     private val repoName: RepoByNameDao,
@@ -123,6 +135,7 @@ class ModuleViewModel(
     // ---
 
     private var remoteJob: Disposable? = null
+    private var refetch = false
     private val dao
         get() = when (Config.repoOrder) {
             Config.Value.ORDER_DATE -> repoUpdated
@@ -146,41 +159,33 @@ class ModuleViewModel(
     // ---
 
     override fun refresh(): Disposable {
-        val installedTask = loadInstalled()
-        val remoteTask = if (itemsRemote.isEmpty()) {
-            Completable.fromAction { loadRemote() }
-        } else {
-            Completable.complete()
-        }
-        return Completable.merge(listOf(installedTask, remoteTask)).subscribeK()
+        if (itemsRemote.isEmpty())
+            loadRemote()
+        return loadInstalled().subscribeK()
     }
 
     private fun loadInstalled() = Single.fromCallable { Module.loadModules() }
         .map { it.map { ModuleItem(it) } }
-        .map { it.order() }
         .map { it.loadDetail() }
         .map { it to itemsInstalled.calculateDiff(it) }
         .applyViewModel(this)
         .observeOn(AndroidSchedulers.mainThread())
-        .doOnSuccess { itemsInstalled.update(it.first, it.second) }
-        .doOnSuccess {
-            if (itemsInstalled.isNotEmpty()) itemsInstalledHelpers.remove(itemNoneInstalled)
+        .map {
+            itemsInstalled.update(it.first, it.second)
+            if (itemsInstalled.isNotEmpty())
+                itemsInstalledHelpers.remove(itemNoneInstalled)
+            it.first
         }
         .observeOn(Schedulers.io())
-        .map { loadUpdates(it.first) }
-        .observeOn(AndroidSchedulers.mainThread())
+        .map { loadUpdates(it) }
         .map { it to itemsUpdatable.calculateDiff(it) }
-        .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
+        .observeOn(AndroidSchedulers.mainThread())
         .doOnSuccess {
-            if (itemsUpdatable.isNotEmpty()) itemsUpdatableHelpers.remove(itemNoneUpdatable)
+            itemsUpdatable.update(it.first, it.second)
+            if (itemsUpdatable.isNotEmpty())
+                itemsUpdatableHelpers.remove(itemNoneUpdatable)
         }
         .ignoreElement()!!
-
-    fun loadRemoteImplicit() = let { itemsRemote.clear(); itemsSearch.clear() }
-        .run { downloadRepos() }
-        .applyViewModel(this, false)
-        .subscribeK { refresh(); submitQuery() }
-        .add()
 
     @Synchronized
     fun loadRemote() {
@@ -191,11 +196,28 @@ class ModuleViewModel(
         if (itemsRemote.isEmpty()) {
             EndlessRecyclerScrollListener.ResetState().publish()
         }
-        remoteJob = Single.fromCallable { itemsRemote.size }
-            .flatMap { loadRemoteInternal(offset = it) }
-            .subscribeK(onError = Timber::e) {
-                itemsRemote.addAll(it)
-            }
+
+        fun loadRemoteDB(offset: Int) = Single
+            .fromCallable { dao.getRepos(offset) }
+            .map { it.map { RepoItem.Remote(it) } }
+
+        remoteJob = if (itemsRemote.isEmpty()) {
+            repoUpdater(refetch).andThen(loadRemoteDB(0))
+        } else {
+            loadRemoteDB(itemsRemote.size)
+        }.subscribeK(onError = Timber::e) {
+            itemsRemote.addAll(it)
+        }
+
+        refetch = false
+    }
+
+    fun forceRefresh() {
+        itemsRemote.clear()
+        itemsSearch.clear()
+        refetch = true
+        refresh()
+        submitQuery()
     }
 
     // ---
@@ -232,29 +254,6 @@ class ModuleViewModel(
     }
 
     // ---
-
-    private fun loadRemoteInternal(
-        offset: Int = 0,
-        downloadRepos: Boolean = offset == 0
-    ): Single<List<RepoItem.Remote>> = Single.fromCallable { dao.getRepos(offset) }
-        .map { it.map { RepoItem.Remote(it) } }
-        .flatMap {
-            when {
-                // in case we find result empty and offset is initial we need to refresh the repos.
-                downloadRepos && it.isEmpty() && offset == 0 -> downloadRepos()
-                    .andThen(loadRemoteInternal(downloadRepos = false))
-                else -> Single.just(it)
-            }
-        }
-
-    private fun downloadRepos() = repoUpdater()
-
-    // ---
-
-    @WorkerThread
-    private fun List<ModuleItem>.order() = asSequence()
-        .sortedBy { it.item.name.toLowerCase(currentLocale) }
-        .toList()
 
     @WorkerThread
     private fun List<ModuleItem>.loadDetail() = onEach { module ->

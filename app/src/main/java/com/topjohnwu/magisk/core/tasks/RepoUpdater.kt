@@ -24,11 +24,11 @@ class RepoUpdater(
             // Skip submission
             if (it.id == "submission")
                 return@map
-            (repoDB.getRepo(it.id)?.apply { cached.remove(it.id) } ?:
-            Repo(it.id)).runCatching {
+            val repo = repoDB.getRepo(it.id)?.apply { cached.remove(it.id) } ?: Repo(it.id)
+            repo.runCatching {
                 update(it.pushDate)
                 repoDB.addRepo(this)
-            }.getOrElse { Timber.e(it) }
+            }.getOrElse(Timber::e)
         }.sequential()
 
     private fun loadPage(
@@ -57,14 +57,15 @@ class RepoUpdater(
         cached.toFlowable().parallel().runOn(Schedulers.io()).map {
             runCatching {
                 Repo(it).update()
-            }.getOrElse { Timber.e(it) }
+            }.getOrElse(Timber::e)
         }.sequential()
 
     private fun String.trimEtag() = substring(indexOf('\"'), lastIndexOf('\"') + 1)
 
     @Suppress("RedundantLambdaArrow")
-    operator fun invoke(forced: Boolean = false) : Completable {
-        return Flowable.fromCallable { Collections.synchronizedSet(HashSet(repoDB.repoIDList)) }
+    operator fun invoke(forced: Boolean) : Completable {
+        return Flowable
+            .fromCallable { Collections.synchronizedSet(HashSet(repoDB.repoIDList)) }
             .flatMap { cached ->
                 loadPage(cached, etag = repoDB.etagKey).doOnComplete {
                     repoDB.removeRepos(cached)

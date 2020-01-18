@@ -107,7 +107,7 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_refresh -> viewModel.loadRemoteImplicit()
+            R.id.action_refresh -> viewModel.forceRefresh()
         }
         return super.onOptionsItemSelected(item)
     }
