@@ -114,6 +114,7 @@ recovery_cleanup() {
   umount -l /system_root 2>/dev/null
   umount -l /vendor 2>/dev/null
   umount -l /dev/random 2>/dev/null
+  [ -L /system_link ] && (rmdir /system; mv -f /system_link /system;) 2>/dev/null
   export PATH=$OLD_PATH
   [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
   [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
@@ -151,7 +152,7 @@ mount_name() {
   local PART=$1
   local POINT=$2
   local FLAG=$3
-  [ -L $POINT ] && rm -f $POINT
+  [ -L $POINT ] && mv -f $POINT ${POINT}_link
   mkdir -p $POINT 2>/dev/null
   is_mounted $POINT && return
   ui_print "- Mounting $POINT"
