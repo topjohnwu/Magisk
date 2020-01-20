@@ -57,31 +57,6 @@ include $(BUILD_EXECUTABLE)
 
 endif
 
-ifdef B_POLICY
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := magiskpolicy
-LOCAL_STATIC_LIBRARIES := libsepol libutils
-LOCAL_C_INCLUDES := \
-	jni/include \
-	$(LIBSEPOL) \
-	$(LIBUTILS)
-
-LOCAL_SRC_FILES := \
-	core/applet_stub.cpp \
-	magiskpolicy/api.cpp \
-	magiskpolicy/magiskpolicy.cpp \
-	magiskpolicy/rules.cpp \
-	magiskpolicy/policydb.cpp \
-	magiskpolicy/statement.cpp \
-	magiskpolicy/sepolicy.c
-
-LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
-LOCAL_LDFLAGS := -static
-include $(BUILD_EXECUTABLE)
-
-endif
-
 include $(CLEAR_VARS)
 
 ifdef B_INIT
@@ -147,6 +122,55 @@ LOCAL_SRC_FILES := \
 	magiskboot/pattern.cpp
 
 LOCAL_LDLIBS := -lz
+LOCAL_LDFLAGS := -static
+include $(BUILD_EXECUTABLE)
+
+endif
+
+ifdef B_POLICY
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := magiskpolicy
+LOCAL_STATIC_LIBRARIES := libsepol libutils
+LOCAL_C_INCLUDES := \
+	jni/include \
+	$(LIBSEPOL) \
+	$(LIBUTILS)
+
+LOCAL_SRC_FILES := \
+	core/applet_stub.cpp \
+	magiskpolicy/api.cpp \
+	magiskpolicy/magiskpolicy.cpp \
+	magiskpolicy/rules.cpp \
+	magiskpolicy/policydb.cpp \
+	magiskpolicy/statement.cpp \
+	magiskpolicy/sepolicy.c
+
+LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
+LOCAL_LDFLAGS := -static
+include $(BUILD_EXECUTABLE)
+
+endif
+
+ifdef B_PROP
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := resetprop
+LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
+LOCAL_C_INCLUDES := \
+	jni/include \
+	$(LIBNANOPB) \
+	$(LIBSYSTEMPROPERTIES) \
+	$(LIBUTILS)
+
+LOCAL_SRC_FILES := \
+	core/applet_stub.cpp \
+	resetprop/persist_properties.cpp \
+	resetprop/resetprop.cpp \
+	resetprop/system_property_api.cpp \
+	resetprop/system_property_set.cpp
+
+LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=resetprop_main
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
