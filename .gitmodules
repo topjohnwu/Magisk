@@ -22,6 +22,9 @@
 [submodule "mincrypt"]
 	path = native/jni/external/mincrypt
 	url = https://github.com/topjohnwu/mincrypt.git
+[submodule "pcre"]
+	path = native/jni/external/pcre
+	url = https://android.googlesource.com/platform/external/pcre
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git

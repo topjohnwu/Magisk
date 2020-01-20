@@ -14,6 +14,7 @@ LIBSYSTEMPROPERTIES := jni/systemproperties/include
 LIBUTILS := jni/utils/include
 LIBMINCRYPT := $(EXT_PATH)/mincrypt/include
 LIBXZ := $(EXT_PATH)/xz-embedded
+LIBPCRE2 := $(EXT_PATH)/pcre/include
 
 ########################
 # Binaries
