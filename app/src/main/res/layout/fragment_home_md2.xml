@@ -289,59 +289,45 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/home_magisk_wrapper"
                     style="@style/WidgetFoundation.Card.Variant"
-                    isEnabled="@{Info.env.magiskVersionCode >= 0}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
-                    android:maxWidth="200dp"
-                    android:onClick="@{() -> viewModel.toggle(viewModel.stateMagiskExpanded)}"
+                    android:layout_marginEnd="@dimen/l_50"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@+id/home_manager_wrapper"
+                    app:layout_constraintEnd_toStartOf="@+id/home_magisk_buttons"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper"
-                    app:layout_constraintWidth_max="200dp">
+                    app:layout_constraintWidth_max="400dp">
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_card"
                         android:orientation="vertical">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:animateLayoutChanges="true"
-                            android:background="@drawable/bg_card"
                             android:paddingStart="@dimen/l_50"
                             android:paddingTop="@dimen/l1"
-                            android:paddingEnd="@dimen/l1"
                             android:paddingBottom="@dimen/l1"
-                            app:layout_constraintEnd_toStartOf="@+id/home_manager_wrapper"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/home_magisk_info"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
 
                             <androidx.appcompat.widget.AppCompatImageView
                                 android:id="@+id/home_magisk_icon"
                                 style="@style/WidgetFoundation.Icon.Primary"
-                                isEnabled="@{viewModel.stateMagisk != MagiskState.LOADING}"
-                                onSelectClick="@{() -> viewModel.onDeletePressed()}"
-                                onSelectReset="@{7000L}"
+                                android:background="@null"
                                 android:padding="@dimen/l_25"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-                                app:srcCompat="@drawable/ic_magisk_delete"
-                                app:tint="@color/color_primary_error_transient" />
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:layout_width="@dimen/l1"
-                                android:layout_height="@dimen/l1"
-                                android:tag="@{@id/hideWhenSelected}"
-                                app:layout_constraintEnd_toEndOf="@+id/home_magisk_icon"
-                                app:layout_constraintTop_toTopOf="@+id/home_magisk_icon"
-                                app:srcCompat="@drawable/ic_delete_md2"
-                                app:tint="?colorPrimary" />
+                                app:srcCompat="@drawable/ic_magisk_delete" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_title"
@@ -358,40 +344,46 @@
                                 app:layout_constraintTop_toTopOf="@+id/home_magisk_icon"
                                 app:layout_constraintVertical_chainStyle="packed" />
 
-                            <TextSwitcher
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_status"
                                 gone="@{viewModel.stateTextMagisk.empty}"
-                                textCaptionVariant="@{viewModel.stateTextMagisk}"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:text="@{viewModel.stateTextMagisk}"
+                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toTopOf="@+id/home_magisk_version"
                                 app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
                                 app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
-                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_title" />
+                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_title"
+                                tools:text="@string/up_to_date_md2" />
 
-                            <TextSwitcher
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_version"
                                 gone="@{viewModel.stateVersionUpdateMagisk.empty}"
-                                textCaptionVariant="@{viewModel.stateVersionUpdateMagisk}"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:text="@{viewModel.stateVersionUpdateMagisk}"
+                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toBottomOf="@+id/home_magisk_icon"
                                 app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
                                 app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
+                                tools:visibility="gone"
                                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_status" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            goneUnless="@{viewModel.stateMagiskExpanded}"
-                            android:layout_width="match_parent"
+                            android:id="@+id/home_magisk_info"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:clipToPadding="false"
                             android:padding="@dimen/l1"
-                            android:visibility="gone"
-                            tools:visibility="visible">
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintWidth_max="150dp">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_magisk_extra_version_title"
@@ -471,7 +463,7 @@
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <ProgressBar
                         style="@style/WidgetFoundation.ProgressBar"
@@ -484,18 +476,20 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <FrameLayout
+                    android:id="@+id/home_magisk_buttons"
                     gone="@{viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/l_50"
+                    android:layout_marginEnd="@dimen/l_50"
                     android:animateLayoutChanges="true"
-                    app:layout_constraintEnd_toEndOf="@+id/home_magisk_wrapper"
-                    app:layout_constraintHorizontal_bias="1"
-                    app:layout_constraintStart_toStartOf="@+id/home_magisk_wrapper"
-                    app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper">
+                    app:layout_constraintBottom_toBottomOf="@+id/home_magisk_wrapper"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
+                    app:layout_constraintTop_toTopOf="@+id/home_magisk_wrapper"
+                    app:layout_constraintVertical_bias=".5">
 
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/WidgetFoundation.Button"
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         gone="@{viewModel.stateMagisk != MagiskState.OBSOLETE}"
                         isEnabled="@{viewModel.stateManager == MagiskState.UP_TO_DATE &amp;&amp; (viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100)}"
                         android:layout_width="wrap_content"
@@ -503,13 +497,14 @@
                         android:layout_gravity="center"
                         android:onClick="@{() -> viewModel.onMagiskPressed()}"
                         android:text="@string/update"
-                        app:icon="@drawable/ic_update_md2"
-                        app:iconGravity="textEnd"
-                        app:iconSize="18dp"
+                        app:backgroundTint="?colorPrimary"
+                        app:elevation="0dp"
+                        app:fabSize="mini"
+                        app:srcCompat="@drawable/ic_update_md2"
+                        app:tint="?colorOnPrimary"
                         tools:visibility="gone" />
 
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/WidgetFoundation.Button.Text"
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         gone="@{viewModel.stateMagisk == MagiskState.OBSOLETE}"
                         isEnabled="@{viewModel.stateManager == MagiskState.UP_TO_DATE &amp;&amp; (viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100)}"
                         android:layout_width="wrap_content"
@@ -517,9 +512,11 @@
                         android:layout_gravity="center"
                         android:onClick="@{() -> viewModel.onMagiskPressed()}"
                         android:text="@string/install"
-                        app:icon="@drawable/ic_install"
-                        app:iconGravity="textEnd"
-                        app:iconSize="18dp" />
+                        app:backgroundTint="?colorSurface"
+                        app:elevation="0dp"
+                        app:fabSize="mini"
+                        app:srcCompat="@drawable/ic_install"
+                        app:tint="?colorPrimary" />
 
                 </FrameLayout>
 
@@ -530,31 +527,29 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1"
-                    android:maxWidth="200dp"
-                    android:onClick="@{() -> viewModel.toggle(viewModel.stateManagerExpanded)}"
+                    android:layout_marginEnd="@dimen/l_50"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/home_manager_buttons"
                     app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
-                    app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper"
-                    app:layout_constraintWidth_max="200dp">
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper"
+                    app:layout_constraintWidth_max="400dp">
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_card"
                         android:orientation="vertical">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_card"
                             android:paddingStart="@dimen/l_50"
                             android:paddingTop="@dimen/l1"
-                            android:paddingEnd="@dimen/l1"
                             android:paddingBottom="@dimen/l1"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/home_manager_info"
+                            app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
 
                             <androidx.appcompat.widget.AppCompatImageView
@@ -583,40 +578,47 @@
                                 app:layout_constraintVertical_chainStyle="packed"
                                 tools:text="@string/manager" />
 
-                            <TextSwitcher
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_status"
                                 gone="@{viewModel.stateTextManager.empty}"
-                                textCaptionVariant="@{viewModel.stateTextManager}"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:text="@{viewModel.stateTextManager}"
+                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toTopOf="@+id/home_manager_version"
                                 app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
                                 app:layout_constraintStart_toStartOf="@+id/home_manager_title"
-                                app:layout_constraintTop_toBottomOf="@+id/home_manager_title" />
+                                app:layout_constraintTop_toBottomOf="@+id/home_manager_title"
+                                tools:text="@string/obsolete_md2" />
 
-                            <TextSwitcher
+                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_version"
                                 gone="@{viewModel.stateVersionUpdateManager.empty}"
-                                textCaptionVariant="@{viewModel.stateVersionUpdateManager}"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:text="@{viewModel.stateVersionUpdateManager}"
+                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                                 app:layout_constrainedWidth="true"
                                 app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"
                                 app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
                                 app:layout_constraintStart_toStartOf="@+id/home_manager_title"
-                                app:layout_constraintTop_toBottomOf="@+id/home_manager_status" />
+                                app:layout_constraintTop_toBottomOf="@+id/home_manager_status"
+                                tools:text="10.0.0 > 10.0.1" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
-                            goneUnless="@{viewModel.stateManagerExpanded}"
-                            android:layout_width="match_parent"
+                            android:id="@+id/home_manager_info"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:clipToPadding="false"
                             android:padding="@dimen/l1"
-                            android:visibility="gone"
-                            tools:visibility="visible">
+                            app:layout_constrainedWidth="true"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintWidth_max="150dp">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_extra_version_title"
@@ -694,7 +696,7 @@
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <ProgressBar
                         style="@style/WidgetFoundation.ProgressBar"
@@ -707,38 +709,41 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <FrameLayout
+                    android:id="@+id/home_manager_buttons"
                     gone="@{viewModel.stateManager == MagiskState.LOADING || !viewModel.isConnected}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/l_50"
-                    app:layout_constraintEnd_toEndOf="@+id/home_manager_wrapper"
-                    app:layout_constraintHorizontal_bias="1"
-                    app:layout_constraintStart_toStartOf="@+id/home_manager_wrapper"
-                    app:layout_constraintTop_toBottomOf="@+id/home_manager_wrapper">
+                    android:layout_marginEnd="@dimen/l_50"
+                    app:layout_constraintBottom_toBottomOf="@+id/home_manager_wrapper"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@+id/home_manager_wrapper"
+                    app:layout_constraintTop_toTopOf="@+id/home_manager_wrapper"
+                    app:layout_constraintVertical_bias=".5">
 
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/WidgetFoundation.Button"
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         gone="@{viewModel.stateManager != MagiskState.OBSOLETE}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:onClick="@{() -> viewModel.onManagerPressed()}"
-                        android:text="@string/update"
-                        app:icon="@drawable/ic_update_md2"
-                        app:iconGravity="textEnd"
-                        app:iconSize="18dp" />
+                        app:backgroundTint="?colorPrimary"
+                        app:elevation="0dp"
+                        app:fabSize="mini"
+                        app:srcCompat="@drawable/ic_update_md2"
+                        app:tint="?colorOnPrimary" />
 
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/WidgetFoundation.Button.Text"
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
                         gone="@{viewModel.stateManager == MagiskState.OBSOLETE}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:onClick="@{() -> viewModel.onManagerPressed()}"
-                        android:text="@string/install"
-                        app:icon="@drawable/ic_install"
-                        app:iconGravity="textEnd"
-                        app:iconSize="18dp"
+                        app:backgroundTint="?colorSurface"
+                        app:elevation="0dp"
+                        app:fabSize="mini"
+                        app:srcCompat="@drawable/ic_install"
+                        app:tint="?colorPrimary"
                         tools:visibility="gone" />
 
                 </FrameLayout>
@@ -796,6 +801,17 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/WidgetFoundation.Button.Error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:onClick="@{() -> viewModel.onDeletePressed()}"
+                android:text="@string/uninstall"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_delete_md2" />
 
         </LinearLayout>
 
