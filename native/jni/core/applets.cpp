@@ -10,8 +10,9 @@
 
 using namespace std::literals;
 
-static int (*applet_main[]) (int, char *[]) =
-		{ su_client_main, resetprop_main, magiskhide_main, nullptr };
+using main_fun = int (*)(int, char *[]);
+
+static main_fun applet_main[] = { su_client_main, resetprop_main, magiskhide_main, nullptr };
 
 [[noreturn]] static void call_applet(int argc, char **argv) {
 	// Applets
@@ -29,14 +30,6 @@ int main(int argc, char *argv[]) {
 	dload_selinux();
 	cmdline_logging();
 	init_argv0(argc, argv);
-
-	if (basename(argv[0]) == "magisk.bin"sv) {
-		if (argc == 1)
-			return 1;
-		// Running through wrapper
-		--argc;
-		++argv;
-	}
 
 	if (basename(argv[0]) == "magisk"sv) {
 		if (argc > 1 && argv[1][0] != '-') {
