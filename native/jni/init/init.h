@@ -68,7 +68,7 @@ protected:
 	raw_data config;
 	dev_t system_dev;
 
-	void backup_files();
+	void backup_files(const char *self_path);
 	void patch_rootdir();
 public:
 	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {

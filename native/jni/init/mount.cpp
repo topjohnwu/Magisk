@@ -183,11 +183,11 @@ void RootFSInit::early_mount() {
 	mount_list.emplace_back("/dev/mnt/cache");
 }
 
-void SARBase::backup_files() {
+void SARBase::backup_files(const char *self_path) {
 	if (access("/overlay.d", F_OK) == 0)
 		cp_afc("/overlay.d", "/dev/overlay.d");
 
-	full_read("/init", self.buf, self.sz);
+	full_read(self_path, self.buf, self.sz);
 	full_read("/.backup/.magisk", config.buf, config.sz);
 }
 
@@ -197,7 +197,7 @@ void SARInit::early_mount() {
 	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
 	mount_list.emplace_back("/dev");
 
-	backup_files();
+	backup_files("/init");
 
 	LOGD("Cleaning rootfs\n");
 	int root = xopen("/", O_RDONLY | O_CLOEXEC);
@@ -232,7 +232,7 @@ void SARInit::early_mount() {
 void SecondStageInit::early_mount() {
 	// Early mounts should already be done by first stage init
 
-	backup_files();
+	backup_files("/system/bin/init");
 	rm_rf("/system");
 	rm_rf("/.backup");
 	rm_rf("/overlay.d");
