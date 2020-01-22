@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.R" />
-
         <import type="com.topjohnwu.magisk.core.Config" />
 
         <variable
@@ -22,8 +20,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_list"
             adapter="@{viewModel.adapter}"
-            dividerHorizontal="@{R.drawable.divider_l1}"
-            dividerVertical="@{R.drawable.divider_l1}"
+            dividerHorizontal="@{@drawable/divider_l1}"
+            dividerVertical="@{@drawable/divider_l1}"
             gone="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"

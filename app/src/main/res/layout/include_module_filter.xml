@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.R" />
-
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.module.ModuleViewModel" />
@@ -24,8 +22,8 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_filter_list"
-            dividerHorizontal="@{R.drawable.divider_l1}"
-            dividerVertical="@{R.drawable.divider_l1}"
+            dividerHorizontal="@{@drawable/divider_l1}"
+            dividerVertical="@{@drawable/divider_l1}"
             itemBinding="@{viewModel.itemSearchBinding}"
             items="@{viewModel.itemsSearch}"
             android:layout_width="match_parent"

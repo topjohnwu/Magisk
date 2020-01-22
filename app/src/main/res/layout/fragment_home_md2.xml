@@ -7,8 +7,6 @@
 
         <import type="android.os.Build" />
 
-        <import type="com.topjohnwu.magisk.R" />
-
         <import type="com.topjohnwu.magisk.core.Info" />
 
         <import type="com.topjohnwu.magisk.core.InfoKt" />
@@ -781,8 +779,8 @@
                         android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />
 
                     <androidx.recyclerview.widget.RecyclerView
-                        dividerHorizontal="@{R.drawable.divider_l1}"
-                        dividerVertical="@{R.drawable.divider_l1}"
+                        dividerHorizontal="@{@drawable/divider_l1}"
+                        dividerVertical="@{@drawable/divider_l1}"
                         itemBinding="@{viewModel.itemDeveloperBinding}"
                         items="@{viewModel.items}"
                         android:layout_width="match_parent"

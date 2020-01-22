@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.R" />
-
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.settings.SettingsViewModel" />
@@ -15,8 +13,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         adapter="@{viewModel.adapter}"
-        dividerHorizontal="@{R.drawable.divider_l_50}"
-        dividerVertical="@{R.drawable.divider_l_50}"
+        dividerHorizontal="@{@drawable/divider_l_50}"
+        dividerVertical="@{@drawable/divider_l_50}"
         itemBinding="@{viewModel.itemBinding}"
         items="@{viewModel.items}"
         android:id="@+id/settings_list"
