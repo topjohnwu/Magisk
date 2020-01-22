@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <group
+        android:pivotX="256"
+        android:pivotY="256"
+        android:rotation="180">
+        <path
+            android:fillColor="?colorOnSurface"
+            tools:fillColor="#000"
+            android:pathData="m256.238,430.145 l-89.77,-94.898 29.059,-27.488 60.633,64.098 60.273,-64.059 29.133,27.41zM422,392v-272c0,-66.168 -53.832,-120 -120,-120h-92c-66.168,0 -120,53.832 -120,120v272c0,66.168 53.832,120 120,120h92c66.168,0 120,-53.832 120,-120zM302,40c44.113,0 80,35.887 80,80v272c0,44.113 -35.887,80 -80,80h-92c-44.113,0 -80,-35.887 -80,-80v-272c0,-44.113 35.887,-80 80,-80zM256,81c-11.047,0 -20,8.953 -20,20s8.953,20 20,20 20,-8.953 20,-20 -8.953,-20 -20,-20zM256,161c-11.047,0 -20,8.953 -20,20s8.953,20 20,20 20,-8.953 20,-20 -8.953,-20 -20,-20zM256,241c-11.047,0 -20,8.953 -20,20s8.953,20 20,20 20,-8.953 20,-20 -8.953,-20 -20,-20zM256,241" />
+    </group>
+</vector>

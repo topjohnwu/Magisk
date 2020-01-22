@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Pre Android 5.0 does not support accessing colors from attributes in drawables
+    These values are from the default theme (Piplup light)
+-->
+<resources>
+    <color name="defColorPrimary">#4EAFF5</color>
+    <color name="defColorPrimaryVariant">#804EAFF5</color>
+    <color name="defColorSecondary">#3E78AF</color>
+    <color name="defColorSecondaryVariant">#803E78AF</color>
+    <color name="defColorSurface">#F9F9F9</color>
+    <color name="defColorSurfaceVariant">#E8E8E8</color>
+    <color name="defColorSurfaceSurfaceVariant">@color/defColorOnSurface</color>
+    <color name="defColorOnPrimary">#F9F9F9</color>
+    <color name="defColorOnPrimaryVariant">#D9E6E6E6</color>
+    <color name="defColorOnSecondary">#F9F9F9</color>
+    <color name="defColorOnBackground">@color/defColorOnSurface</color>
+    <color name="defColorError">#CC0047</color>
+    <color name="defColorOnError">#F9F9F9</color>
+    <color name="defColorOnSurface">#444444</color>
+    <color name="defColorOnSurfaceVariant">#80444444</color>
+    <color name="defColorDisabled">#808080</color>
+    <color name="defColorDisabledVariant">#66808080</color>
+</resources>

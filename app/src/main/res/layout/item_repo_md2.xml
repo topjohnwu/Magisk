@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.topjohnwu.magisk.R" />
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.RepoItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.module.ModuleViewModel" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card.Variant"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_gravity="center"
+        tools:layout_marginBottom="@dimen/l1"
+        tools:layout_marginEnd="@dimen/l1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/module_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:text="@{item.item.name}"
+                android:textAppearance="@style/AppearanceFoundation.Body"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@tools:sample/lorem" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/module_version_author"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{@string/module_version_author(item.item.version ?? `?`, item.item.author ?? `?`)}"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                app:layout_constraintEnd_toEndOf="@+id/module_title"
+                app:layout_constraintStart_toStartOf="@+id/module_title"
+                app:layout_constraintTop_toBottomOf="@+id/module_title"
+                tools:text="v1 by topjohnwu" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/module_description"
+                gone="@{item.item.description.empty}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:text="@{item.item.description}"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                app:layout_constraintTop_toBottomOf="@+id/module_version_author"
+                tools:lines="4"
+                tools:text="@tools:sample/lorem/random" />
+
+            <View
+                android:id="@+id/module_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/l1"
+                android:background="?colorSurfaceVariant"
+                app:layout_constraintTop_toBottomOf="@+id/module_description" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:text="@{item.item.lastUpdateString}"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/module_info"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/module_divider"
+                tools:ignore="SmallSp"
+                tools:text="@tools:sample/date/ddmmyy" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/module_info"
+                style="@style/WidgetFoundation.Icon"
+                android:layout_width="wrap_content"
+                android:alpha=".5"
+                android:onClick="@{() -> viewModel.infoPressed(item)}"
+                android:paddingEnd="@dimen/l_50"
+                app:layout_constraintBottom_toBottomOf="@+id/module_download"
+                app:layout_constraintEnd_toStartOf="@+id/module_download"
+                app:layout_constraintTop_toTopOf="@+id/module_download"
+                app:srcCompat="@drawable/ic_info" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/module_download"
+                android:layout_width="wrap_content"
+                style="@style/WidgetFoundation.Icon.Primary"
+                android:paddingStart="@dimen/l_50"
+                isEnabled="@{!(item.progress == -100 || (item.progress > 0 &amp;&amp; item.progress &lt; 100))}"
+                android:contentDescription="@string/download"
+                srcCompat="@{item.isUpdate ? R.drawable.ic_update_md2 : R.drawable.ic_download_md2}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/module_divider"
+                android:onClick="@{() -> viewModel.downloadPressed(item)}"
+                tools:srcCompat="@drawable/ic_download_md2" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom">
+
+            <ProgressBar
+                style="@style/WidgetFoundation.ProgressBar"
+                goneUnless="@{item.progress > 0 &amp;&amp; item.progress &lt; 100}"
+                progressAnimated="@{item.progress}"
+                android:layout_width="match_parent"
+                android:layout_gravity="bottom"
+                tools:progress="40" />
+
+            <androidx.core.widget.ContentLoadingProgressBar
+                style="@style/WidgetFoundation.ProgressBar.Indeterminate"
+                goneUnless="@{item.progress == -100}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="-4dp"
+                android:layout_marginBottom="-5dp"
+                tools:progress="40" />
+
+        </FrameLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>
+

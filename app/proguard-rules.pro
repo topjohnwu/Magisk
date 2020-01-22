@@ -17,32 +17,26 @@
 #}
 
 # Snet
--keepclassmembers class com.topjohnwu.magisk.utils.SafetyNetHelper { *; }
--keep,allowobfuscation interface com.topjohnwu.magisk.utils.SafetyNetHelper$Callback
--keepclassmembers class * implements com.topjohnwu.magisk.utils.SafetyNetHelper$Callback {
+-keepclassmembers class com.topjohnwu.magisk.core.utils.SafetyNetHelper { *; }
+-keep,allowobfuscation interface com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback
+-keepclassmembers class * implements com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback {
   void onResponse(int);
 }
 
-# Keep all fragment constructors
--keepclassmembers class * extends androidx.fragment.app.Fragment {
-  public <init>(...);
-}
+# Fragments
+-keep,allowobfuscation class * extends androidx.fragment.app.Fragment
 
-# DelegateWorker
--keep,allowobfuscation class * extends com.topjohnwu.magisk.base.DelegateWorker
+# BaseWorkerWrapper
+-keep,allowobfuscation class * extends com.topjohnwu.magisk.core.base.BaseWorkerWrapper
 
 # BootSigner
 -keep class a.a { *; }
-
-# Workaround R8 bug
--keep,allowobfuscation class com.topjohnwu.magisk.model.receiver.GeneralReceiver
--keepclassmembers class a.e { *; }
 
 # Strip logging
 -assumenosideeffects class timber.log.Timber.Tree { *; }
 
 # Excessive obfuscation
--repackageclasses 'a'
+-repackageclasses a
 -allowaccessmodification
 
 # QOL

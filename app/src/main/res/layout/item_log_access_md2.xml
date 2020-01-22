@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.topjohnwu.magisk.R" />
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.LogItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.log.LogViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?listPreferredItemHeightSmall"
+        tools:layout_gravity="center">
+
+        <include
+            android:id="@+id/log_track_container"
+            bullet="@{item.item.action ? R.drawable.ic_check_md2 : R.drawable.ic_close_md2}"
+            isBottom="@{item.isBottom}"
+            isSelected="@{!item.item.action}"
+            isTop="@{item.isTop}"
+            layout="@layout/item_log_track_md2"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/l1"
+            android:paddingTop="@dimen/l_50"
+            android:paddingBottom="@dimen/l_50"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/log_track_container"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/log_app_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{item.item.appName}"
+                android:textAppearance="@style/AppearanceFoundation.Body"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/log_date"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/app_name" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/log_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{item.date}"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toTopOf="@+id/log_app_details"
+                app:layout_constraintTop_toBottomOf="@+id/log_app_name"
+                tools:text="06:00 PM, 10 Oct 2019" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/log_app_details"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{String.format(`%s  %s`, @string/pid(item.item.fromPid), @string/target_uid(item.item.toUid))}"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/log_command"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/log_date"
+                tools:text="PID: 7196  Target UID: 0" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/log_command"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="@{item.item.command}"
+                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/log_app_details"
+                app:layout_constraintTop_toTopOf="@+id/log_app_details"
+                tools:text="/system/bin/sh" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

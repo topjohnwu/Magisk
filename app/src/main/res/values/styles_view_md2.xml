@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="W" parent="Widget" />
+
+    <style name="W.Home" />
+
+    <style name="W.Home.Extra" />
+
+    <style name="W.Home.Extra.Title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">@style/AppearanceFoundation.Caption.Variant</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="W.Home.Extra.Value">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">@style/AppearanceFoundation.Caption</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginStart">@dimen/l_50</item>
+        <item name="layout_constrainedWidth">true</item>
+        <item name="layout_constraintHorizontal_bias">0</item>
+        <item name="android:ellipsize">middle</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+</resources>

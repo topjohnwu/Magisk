@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.SafeModeNotice" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="?colorError">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="@dimen/l1"
+            android:text="@string/module_safe_mode_message"
+            android:textAppearance="@style/AppearanceFoundation.Caption.OnPrimary"
+            android:textStyle="bold" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

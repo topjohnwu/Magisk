@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Foundation" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">?colorSurface</item>
+    </style>
+
+    <!--This should be overridden in v19 for transparency, etc-->
+    <style name="Foundation.Compat" />
+
+    <!--region Do not remove-->
+    <style name="WidgetFoundation" parent="android:Widget" />
+
+    <style name="AppearanceFoundation">
+        <item name="android:fontFamily">@font/exo</item>
+    </style>
+    <!--endregion-->
+
+    <style name="Foundation.Base" parent="Foundation.Compat">
+        <item name="android:fontFamily">@font/exo</item>
+        <item name="android:includeFontPadding">false</item>
+
+        <!--///-->
+
+        <item name="selectableItemBackground">@drawable/bg_selectable</item>
+        <item name="selectableItemBackgroundBorderless">@drawable/bg_selectable_borderless</item>
+        <item name="actionBarSize">@dimen/internal_action_bar_size</item>
+    </style>
+
+    <style name="Foundation.Default" parent="Foundation.Base">
+        <item name="android:windowBackground">?colorSurface</item>
+    </style>
+
+</resources>

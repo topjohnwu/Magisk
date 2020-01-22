@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.data.repository
 
-import com.topjohnwu.magisk.data.database.SettingsDao
-import com.topjohnwu.magisk.data.database.StringDao
+import com.topjohnwu.magisk.core.magiskdb.SettingsDao
+import com.topjohnwu.magisk.core.magiskdb.StringDao
 import io.reactivex.schedulers.Schedulers
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

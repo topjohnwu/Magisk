@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem.Selector" />
+
+        <variable
+            name="callback"
+            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem.Callback" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card"
+        isEnabled="@{item.enabled}"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="@{item.enabled ? 1f : .5f}"
+        android:onClick="@{(view) -> item.onPressed(view, callback)}"
+        tools:layout_gravity="center">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/selector_icon"
+                style="@style/WidgetFoundation.Icon"
+                gone="@{item.icon == 0}"
+                android:background="@null"
+                android:rotation="180"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/selector_divider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@{item.icon}"
+                tools:srcCompat="@drawable/ic_fingerprint" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/selector_indicator"
+                style="@style/WidgetFoundation.Icon"
+                android:background="@null"
+                android:rotation="180"
+                app:layout_constraintBottom_toTopOf="@+id/selector_divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_back_md2" />
+
+            <LinearLayout
+                android:id="@+id/selector_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@{item.icon == 0 ? (int) @dimen/l1 : 0}"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/l1"
+                android:paddingBottom="@dimen/l1"
+                app:layout_constraintBottom_toTopOf="@+id/selector_divider"
+                app:layout_constraintEnd_toStartOf="@+id/selector_indicator"
+                app:layout_constraintStart_toEndOf="@+id/selector_icon"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/selector_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="start"
+                    android:text="@{item.title}"
+                    android:textAppearance="@style/AppearanceFoundation.Body"
+                    android:textStyle="bold"
+                    tools:lines="1"
+                    tools:text="@tools:sample/lorem/random" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/selector_description"
+                    gone="@{item.description.empty}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.description}"
+                    android:textAppearance="@style/AppearanceFoundation.Tiny.Variant"
+                    tools:lines="2"
+                    tools:text="@tools:sample/lorem/random" />
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/selector_divider"
+                gone="@{item.selectedEntry == null}"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:alpha=".5"
+                android:background="?colorSurface"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/selector_text" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/selector_selection"
+                gone="@{item.selectedEntry == null}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/l1"
+                android:paddingTop="@dimen/l_75"
+                android:paddingEnd="@dimen/l1"
+                android:paddingBottom="@dimen/l_75"
+                android:text="@{item.selectedEntry}"
+                android:textAppearance="@style/AppearanceFoundation.Tiny.Variant"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/selector_text"
+                app:layout_constraintTop_toTopOf="@+id/selector_divider"
+                tools:text="@tools:sample/lorem" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

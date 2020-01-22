@@ -10,6 +10,7 @@ import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.extensions.drawableCompat
+import kotlin.math.roundToInt
 
 class KItemDecoration(
     private val context: Context,
@@ -63,7 +64,7 @@ class KItemDecoration(
             .map { parent[it] }
             .forEach { child ->
                 parent.getDecoratedBoundsWithMargins(child, bounds)
-                val bottom = bounds.bottom + Math.round(child.translationY)
+                val bottom = bounds.bottom + child.translationY.roundToInt()
                 val top = bottom - drawable.intrinsicHeight
                 drawable.setBounds(left, top, right, bottom)
                 drawable.draw(canvas)
@@ -93,7 +94,7 @@ class KItemDecoration(
             .map { parent[it] }
             .forEach { child ->
                 parent.layoutManager!!.getDecoratedBoundsWithMargins(child, bounds)
-                val right = bounds.right + Math.round(child.translationX)
+                val right = bounds.right + child.translationX.roundToInt()
                 val left = right - drawable.intrinsicWidth
                 drawable.setBounds(left, top, right, bottom)
                 drawable.draw(canvas)

@@ -18,9 +18,9 @@ open class DiffObservableList<T>(
 ) : AbstractList<T>(), ObservableList<T> {
 
     private val LIST_LOCK = Object()
-    private var list: MutableList<T> = ArrayList()
+    protected var list: MutableList<T> = ArrayList()
     private val listeners = ListChangeRegistry()
-    private val listCallback = ObservableListUpdateCallback()
+    protected val listCallback = ObservableListUpdateCallback()
 
     override val size: Int get() = list.size
 
@@ -38,7 +38,7 @@ open class DiffObservableList<T>(
         return doCalculateDiff(frozenList, newItems)
     }
 
-    private fun doCalculateDiff(oldItems: List<T>, newItems: List<T>?): DiffUtil.DiffResult {
+    protected fun doCalculateDiff(oldItems: List<T>, newItems: List<T>?): DiffUtil.DiffResult {
         return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize() = oldItems.size
 

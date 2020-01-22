@@ -28,14 +28,17 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import com.topjohnwu.magisk.Const
 import com.topjohnwu.magisk.FileProvider
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.DynamicClassLoader
-import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.currentLocale
+import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ShellUtils
 import java.io.File
 import java.io.FileNotFoundException
+import java.text.SimpleDateFormat
+import java.util.*
 import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
@@ -283,7 +286,7 @@ fun Context.drawableCompat(@DrawableRes id: Int) = ContextCompat.getDrawable(thi
  * with respect to RTL layout direction
  */
 fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 &&
+    if (SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 &&
         resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
     ) {
         return end to start
@@ -294,10 +297,10 @@ fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
 fun Context.openUrl(url: String) = Utils.openLink(this, url.toUri())
 
 @Suppress("FunctionName")
-inline fun <reified T> T.DynamicClassLoader(apk: File)
-        = DynamicClassLoader(apk, T::class.java.classLoader)
+inline fun <reified T> T.DynamicClassLoader(apk: File) =
+    DynamicClassLoader(apk, T::class.java.classLoader)
 
-fun Context.unwrap() : Context {
+fun Context.unwrap(): Context {
     var context = this
     while (true) {
         if (context is ContextWrapper)
@@ -309,3 +312,38 @@ fun Context.unwrap() : Context {
 }
 
 fun Uri.writeTo(file: File) = toFile().copyTo(file)
+
+fun Context.hasPermissions(vararg permissions: String) = permissions.all {
+    ContextCompat.checkSelfPermission(this, it) == PERMISSION_GRANTED
+}
+
+private val securityLevelFormatter get() = SimpleDateFormat("yyyy-MM-dd",
+    currentLocale
+)
+
+/** Friendly reminder to seek newer roms or install oem updates. */
+val isDeviceSecure: Boolean
+    get() {
+        val latestPermittedTime = Calendar.getInstance().apply {
+            time = securityLevelDate
+            add(Calendar.MONTH, 2)
+        }.time.time
+        return now in 0..latestPermittedTime
+    }
+val securityLevelDate get() = securityLevelFormatter.parseOrNull(securityLevel) ?: Date(0)
+val securityLevel
+    get() = if (SDK_INT >= Build.VERSION_CODES.M) {
+        Build.VERSION.SECURITY_PATCH
+    } else {
+        null
+    } ?: "1970-01-01" //never
+
+val isSAR
+    get() = ShellUtils
+        .fastCmd("grep_prop ro.build.system_root_image")
+        .let { it.isNotEmpty() && it.toBoolean() }
+
+val isAB
+    get() = ShellUtils
+        .fastCmd("grep_prop ro.build.ab_update")
+        .let { it.isNotEmpty() && it.toBoolean() }

@@ -1,6 +1,6 @@
 package a;
 
-import com.topjohnwu.magisk.utils.PatchAPK;
+import com.topjohnwu.magisk.core.utils.PatchAPK;
 import com.topjohnwu.signing.BootSigner;
 
 public class a {

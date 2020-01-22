@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.DeveloperItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout_gravity="center|start">
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/WidgetFoundation.Card.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/l1">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{item.name}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.OnPrimary"
+                    android:textStyle="bold"
+                    tools:text="\@topjohnwu" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    itemBinding="@{viewModel.itemBinding}"
+                    items="@{item.items}"
+                    nestedScrollingEnabled="@{false}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:fadingEdgeLength="@dimen/l1"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/l_50"
+                    android:requiresFadingEdge="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/item_developer_link" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

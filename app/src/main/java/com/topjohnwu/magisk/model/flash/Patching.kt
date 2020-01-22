@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.model.flash
 
 import android.net.Uri
-import com.topjohnwu.magisk.tasks.MagiskInstaller
+import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.superuser.Shell
 
 sealed class Patching(
@@ -28,8 +28,7 @@ sealed class Patching(
         logs: MutableList<String>,
         resultListener: FlashResultListener
     ) : Patching(file, console, logs, resultListener) {
-        override fun operations() =
-            extractZip() && handleFile(uri) && patchBoot() && storeBoot()
+        override fun operations() = doPatchFile(uri)
     }
 
     class SecondSlot(
@@ -38,8 +37,7 @@ sealed class Patching(
         logs: MutableList<String>,
         resultListener: FlashResultListener
     ) : Patching(file, console, logs, resultListener) {
-        override fun operations() =
-            findSecondaryImage() && extractZip() && patchBoot() && flashBoot() && postOTA()
+        override fun operations() = secondSlot()
     }
 
     class Direct(
@@ -48,8 +46,7 @@ sealed class Patching(
         logs: MutableList<String>,
         resultListener: FlashResultListener
     ) : Patching(file, console, logs, resultListener) {
-        override fun operations() =
-            findImage() && extractZip() && patchBoot() && flashBoot()
+        override fun operations() = direct()
     }
 
 }

@@ -3,10 +3,11 @@ package com.topjohnwu.magisk.model.entity
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.topjohnwu.magisk.core.model.MagiskPolicy
+import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.extensions.now
 import com.topjohnwu.magisk.extensions.timeFormatTime
 import com.topjohnwu.magisk.extensions.toTime
-import com.topjohnwu.magisk.model.entity.MagiskPolicy.Companion.ALLOW
 
 @Entity(tableName = "logs")
 data class MagiskLog(
@@ -22,11 +23,6 @@ data class MagiskLog(
     @PrimaryKey(autoGenerate = true) var id: Int = 0
     @Ignore val timeString = time.toTime(timeFormatTime)
 }
-
-data class WrappedMagiskLog(
-    val time: Long,
-    val items: List<MagiskLog>
-)
 
 fun MagiskPolicy.toLog(
     toUid: Int,

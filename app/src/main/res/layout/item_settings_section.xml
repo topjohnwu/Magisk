@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/l1"
+        android:paddingBottom="@dimen/l_50">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            gone="@{item.title.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{item.title}"
+            android:textAppearance="@style/AppearanceFoundation.Display.Secondary"
+            android:textStyle="bold"
+            tools:text="@tools:sample/lorem" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            gone="@{item.description.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{item.description}"
+            android:textAppearance="@style/AppearanceFoundation.Tiny.Bold"
+            tools:text="@tools:sample/lorem/random" />
+
+    </LinearLayout>
+
+</layout>

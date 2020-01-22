@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <group
+        android:name="forth"
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="180">
+        <path
+            android:fillColor="#000"
+            android:pathData="M20,11H6.83l2.88,-2.88c0.39,-0.39 0.39,-1.02 0,-1.41 -0.39,-0.39 -1.02,-0.39 -1.41,0L3.71,11.3c-0.39,0.39 -0.39,1.02 0,1.41L8.3,17.3c0.39,0.39 1.02,0.39 1.41,0 0.39,-0.39 0.39,-1.02 0,-1.41L6.83,13H20c0.55,0 1,-0.45 1,-1s-0.45,-1 -1,-1z" />
+    </group>
+
+</vector>
