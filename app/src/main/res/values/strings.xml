@@ -12,11 +12,11 @@
 
     <!--Home-->
     <string name="no_connection">No connection available</string>
-    <string name="installed_error_md2">is not installed</string>
-    <string name="channel_error_md2">has invalid update channel!</string>
-    <string name="up_to_date_md2">is up to date</string>
-    <string name="obsolete_md2">can be updated!</string>
-    <string name="loading_md2">is loading…</string>
+    <string name="installed_error">is not installed</string>
+    <string name="channel_error">has invalid update channel!</string>
+    <string name="up_to_date">is up to date</string>
+    <string name="obsolete">can be updated!</string>
+    <string name="loading">is loading…</string>
     <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions.</string>
     <string name="home_notice_hide">Hide</string>
     <string name="app_changelog">Changelog</string>
