@@ -4,7 +4,7 @@
     <string name="modules">Modüller</string>
     <string name="downloads">İndir</string>
     <string name="superuser">Yetkili kullanıcı</string>
-    <string name="log">Günlük</string>
+    <string name="logs">Günlük</string>
     <string name="settings">Ayarlar</string>
     <string name="install">Yükle</string>
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>

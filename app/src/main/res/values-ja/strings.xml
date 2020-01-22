@@ -4,7 +4,7 @@
     <string name="modules">モジュール</string>
     <string name="downloads">ダウンロード</string>
     <string name="superuser">スーパーユーザー</string>
-    <string name="log">ログ</string>
+    <string name="logs">ログ</string>
     <string name="settings">設定</string>
     <string name="install">ｲﾝｽﾄｰﾙ</string>
     <string name="unsupport_magisk_title">対応していないMagiskバージョン</string>

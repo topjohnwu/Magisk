@@ -49,7 +49,7 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
     override fun onStart() {
         super.onStart()
         setHasOptionsMenu(true)
-        activity.title = resources.getString(R.string.section_modules)
+        activity.title = resources.getString(R.string.modules)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

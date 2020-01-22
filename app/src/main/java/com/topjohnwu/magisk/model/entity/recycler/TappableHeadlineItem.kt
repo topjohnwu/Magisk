@@ -27,12 +27,12 @@ sealed class TappableHeadlineItem : ComparableRvItem<TappableHeadlineItem>() {
     // --- objects
 
     object Hide : TappableHeadlineItem() {
-        override val title = R.string.magisk_hide_md2
+        override val title = R.string.magiskhide
         override val icon = R.drawable.ic_hide_md2
     }
 
     object Safetynet : TappableHeadlineItem() {
-        override val title = R.string.safetyNet
+        override val title = R.string.safetynet
         override val icon = R.drawable.ic_safetynet_md2
     }
 

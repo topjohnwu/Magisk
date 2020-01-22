@@ -4,7 +4,7 @@
     <string name="modules">Mòduls</string>
     <string name="downloads">Baixada</string>
     <string name="superuser">Superusuari</string>
-    <string name="log">Registre</string>
+    <string name="logs">Registre</string>
     <string name="settings">Configuració</string>
     <string name="install">Instal·lar</string>
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>

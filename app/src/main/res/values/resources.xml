@@ -5,7 +5,14 @@
     <string name="app_name" translatable="false">Magisk Manager</string>
     <string name="re_app_name" translatable="false">Manager</string>
     <string name="magisk" translatable="false">Magisk</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
+    <string name="magiskhide" translatable="false">MagiskHide</string>
     <string name="empty" translatable="false"/>
+
+    <string name="topjohnwu" translatable="false">\@topjohnwu</string>
+    <string name="diareuse" translatable="false">\@diareuse</string>
+    <string name="paypal" translatable="false">PayPal</string>
+    <string name="patreon" translatable="false">Patreon</string>
+    <string name="twitter" translatable="false">Twitter</string>
+    <string name="xda" translatable="false">XDA</string>
 
 </resources>

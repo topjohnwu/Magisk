@@ -4,7 +4,7 @@
     <string name="modules">Модули</string>
     <string name="downloads">Репозиторий</string>
     <string name="superuser">Суперпользователь</string>
-    <string name="log">Логи</string>
+    <string name="logs">Логи</string>
     <string name="settings">Настройки</string>
     <string name="install">Установка</string>
     <string name="unsupport_magisk_title">Неподдерживаемая версия Magisk</string>

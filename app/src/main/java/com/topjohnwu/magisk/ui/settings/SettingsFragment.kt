@@ -19,7 +19,7 @@ class SettingsFragment : CompatFragment<SettingsViewModel, FragmentSettingsMd2Bi
     override fun onStart() {
         super.onStart()
 
-        activity.title = resources.getString(R.string.section_settings)
+        activity.title = resources.getString(R.string.settings)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

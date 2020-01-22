@@ -4,7 +4,7 @@
     <string name="modules">모듈</string>
     <string name="downloads">다운로드</string>
     <string name="superuser">슈퍼유저</string>
-    <string name="log">로그</string>
+    <string name="logs">로그</string>
     <string name="settings">설정</string>
     <string name="install">설치</string>
     <string name="unsupport_magisk_title">지원되지 않는 Magisk 버전</string>

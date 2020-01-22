@@ -4,7 +4,7 @@
     <string name="modules">Modules</string>
     <string name="downloads">Téléchargements</string>
     <string name="superuser">Super‑utilisateur</string>
-    <string name="log">Journal</string>
+    <string name="logs">Journal</string>
     <string name="settings">Paramètres</string>
     <string name="install">Installer</string>
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>

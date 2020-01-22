@@ -5,7 +5,7 @@
     <string name="modules">الإضافات</string>
     <string name="downloads">التنزيلات</string>
     <string name="superuser">المستخدم المتميز</string>
-    <string name="log">السجل</string>
+    <string name="logs">السجل</string>
     <string name="settings">الإعدادات</string>
     <string name="install">التثبيت</string>
     <string name="unsupport_magisk_title">إصدار Magisk غير مدعوم</string>

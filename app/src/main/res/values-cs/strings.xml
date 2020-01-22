@@ -4,7 +4,7 @@
     <string name="modules">Moduly</string>
     <string name="downloads">Stahování</string>
     <string name="superuser">Superuser</string>
-    <string name="log">Log</string>
+    <string name="logs">Log</string>
     <string name="settings">Nastavení</string>
     <string name="install">Instalovat</string>
     <string name="unsupport_magisk_title">Nepodporovaná verze Magisk</string>

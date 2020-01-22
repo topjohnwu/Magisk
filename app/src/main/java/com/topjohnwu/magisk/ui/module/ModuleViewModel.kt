@@ -71,7 +71,7 @@ class ModuleViewModel(
         it.bindExtra(BR.viewModel, this)
     }
 
-    private val itemNoneInstalled = TextItem(R.string.module_install_none)
+    private val itemNoneInstalled = TextItem(R.string.no_modules_found)
     private val itemNoneUpdatable = TextItem(R.string.module_update_none)
 
     private val itemsInstalledHelpers = ObservableArrayList<TextItem>().also {
@@ -116,7 +116,7 @@ class ModuleViewModel(
         ).also { it.hasButton = false }
 
         private val sectionActive = SectionTitle(
-            R.string.module_section_installed,
+            R.string.installed,
             R.string.reboot,
             R.drawable.ic_restart
         ).also { it.hasButton = false }

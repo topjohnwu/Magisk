@@ -4,7 +4,7 @@
     <string name="modules">模組</string>
     <string name="downloads">線上模組庫</string>
     <string name="superuser">超級使用者</string>
-    <string name="log">紀錄</string>
+    <string name="logs">紀錄</string>
     <string name="settings">設定</string>
     <string name="install">安裝</string>
     <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>

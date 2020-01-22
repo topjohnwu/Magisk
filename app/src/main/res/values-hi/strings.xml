@@ -4,7 +4,7 @@
     <string name="modules">मॉड्यूल</string>
     <string name="downloads">डाउनलोड</string>
     <string name="superuser">उत्तम उपयोगकर्ता</string>
-    <string name="log">अभिलेख</string>
+    <string name="logs">अभिलेख</string>
     <string name="settings">सेटिंग्स</string>
     <string name="install">स्थापित करें</string>
     <string name="unsupport_magisk_title">असमर्थित Magisk संस्करण</string>

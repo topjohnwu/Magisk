@@ -4,7 +4,7 @@
     <string name="modules">Модули</string>
     <string name="downloads">Преземања</string>
     <string name="superuser">Супер-корисник</string>
-    <string name="log">Записник</string>
+    <string name="logs">Записник</string>
     <string name="settings">Поставки</string>
     <string name="install">Инсталирај</string>
     <string name="unsupport_magisk_title">Неподдржана верзија на Magisk</string>

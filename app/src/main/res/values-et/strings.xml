@@ -4,7 +4,7 @@
     <string name="modules">Moodulid</string>
     <string name="downloads">Allalaadimised</string>
     <string name="superuser">Superkasutaja</string>
-    <string name="log">Logi</string>
+    <string name="logs">Logi</string>
     <string name="settings">Seaded</string>
     <string name="install">Installi</string>
     <string name="unsupport_magisk_title">Mittetoetatud Magisk\'i versioon</string>

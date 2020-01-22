@@ -4,7 +4,7 @@
     <string name="modules">Модулі</string>
     <string name="downloads">Завантаження</string>
     <string name="superuser">Суперкористувач</string>
-    <string name="log">Журнал</string>
+    <string name="logs">Журнал</string>
     <string name="settings">Налаштування</string>
     <string name="install">Встановлення</string>
     <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>

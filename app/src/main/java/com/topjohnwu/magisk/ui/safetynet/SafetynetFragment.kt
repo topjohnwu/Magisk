@@ -12,7 +12,7 @@ class SafetynetFragment : CompatFragment<SafetynetViewModel, FragmentSafetynetMd
 
     override fun onStart() {
         super.onStart()
-        activity.setTitle(R.string.safetyNet)
+        activity.setTitle(R.string.safetynet)
     }
 
 }

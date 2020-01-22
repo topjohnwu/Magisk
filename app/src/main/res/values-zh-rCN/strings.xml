@@ -4,7 +4,7 @@
     <string name="modules">模块</string>
     <string name="downloads">下载</string>
     <string name="superuser">超级用户</string>
-    <string name="log">日志</string>
+    <string name="logs">日志</string>
     <string name="settings">设置</string>
     <string name="install">安装</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>

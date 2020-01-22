@@ -26,7 +26,7 @@ sealed class HomeItem : ComparableRvItem<HomeItem>() {
     // region Children
     sealed class PayPal : HomeItem() {
         override val icon = R.drawable.ic_paypal
-        override val title = R.string.home_item_paypal
+        override val title = R.string.paypal
         override val link = "https://paypal.me/%s"
 
         // region Children
@@ -42,13 +42,13 @@ sealed class HomeItem : ComparableRvItem<HomeItem>() {
 
     object Patreon : HomeItem() {
         override val icon = R.drawable.ic_patreon
-        override val title = R.string.home_item_patreon
+        override val title = R.string.patreon
         override val link = Const.Url.PATREON_URL
     }
 
     sealed class Twitter : HomeItem() {
         override val icon = R.drawable.ic_twitter
-        override val title = R.string.home_item_twitter
+        override val title = R.string.twitter
         override val link = "https://twitter.com/%s"
 
         // region Children
@@ -70,7 +70,7 @@ sealed class HomeItem : ComparableRvItem<HomeItem>() {
 
     object Xda : HomeItem() {
         override val icon = R.drawable.ic_xda
-        override val title = R.string.home_item_xda
+        override val title = R.string.xda
         override val link = Const.Url.XDA_THREAD
     }
     // endregion
@@ -97,13 +97,13 @@ sealed class DeveloperItem : ComparableRvItem<DeveloperItem>() {
     object Mainline : DeveloperItem() {
         override val items =
             listOf(HomeItem.PayPal.Mainline, HomeItem.Patreon, HomeItem.Twitter.Mainline)
-        override val name = R.string.home_links_mainline
+        override val name = R.string.topjohnwu
     }
 
     object App : DeveloperItem() {
         override val items =
             listOf(HomeItem.PayPal.App, HomeItem.Twitter.App)
-        override val name = R.string.home_links_app
+        override val name = R.string.diareuse
     }
 
     object Project : DeveloperItem() {

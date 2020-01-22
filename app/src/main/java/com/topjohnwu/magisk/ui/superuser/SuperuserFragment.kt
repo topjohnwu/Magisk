@@ -22,7 +22,7 @@ class SuperuserFragment : CompatFragment<SuperuserViewModel, FragmentSuperuserMd
 
     override fun onStart() {
         super.onStart()
-        activity.title = resources.getString(R.string.section_superuser)
+        activity.title = resources.getString(R.string.superuser)
         setHasOptionsMenu(true)
     }
 

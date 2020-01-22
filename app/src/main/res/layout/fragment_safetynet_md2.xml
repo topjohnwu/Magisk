@@ -118,7 +118,7 @@
                     android:id="@+id/safetynet_android_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/system"
+                    android:text="@string/safetynet_system"
                     android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                     app:layout_constraintBottom_toTopOf="@+id/safetynet_attestation"
                     app:layout_constraintEnd_toStartOf="@+id/safetynet_android_version"

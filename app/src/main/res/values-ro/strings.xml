@@ -4,7 +4,7 @@
     <string name="modules">Module</string>
     <string name="downloads">Descărcări</string>
     <string name="superuser">Superutilizator</string>
-    <string name="log">Jurnal</string>
+    <string name="logs">Jurnal</string>
     <string name="settings">Setări</string>
     <string name="install">Instalează</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>

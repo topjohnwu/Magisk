@@ -33,7 +33,7 @@ class LogFragment : CompatFragment<LogViewModel, FragmentLogMd2Binding>() {
     override fun onStart() {
         super.onStart()
         setHasOptionsMenu(true)
-        activity.title = resources.getString(R.string.section_log)
+        activity.title = resources.getString(R.string.logs)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
