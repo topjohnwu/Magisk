@@ -2,7 +2,6 @@
 
     <!--Welcome Activity-->
     <string name="modules">Module</string>
-    <string name="downloads">Descărcări</string>
     <string name="superuser">Superutilizator</string>
     <string name="logs">Jurnal</string>
     <string name="settings">Setări</string>
@@ -10,36 +9,19 @@
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk nu este instalat.</string>
-    <string name="checking_for_updates">Se caută actualizări…</string>
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
-    <string name="safetyNet_check_text">Atinge pentru a începe verificarea SafetyNet</string>
-    <string name="checking_safetyNet_status">Se verifică starea SafetyNet…</string>
-    <string name="safetyNet_check_success">Verificare SafetyNet cu succes</string>
     <string name="safetyNet_api_error">Eroare privind API-ul SafetyNet</string>
     <string name="safetyNet_res_invalid">Răspunsul este nevalid.</string>
-    <string name="magisk_up_to_date">Magisk este la zi</string>
-    <string name="manager_up_to_date">Magisk Manager este la zi</string>
-    <string name="advanced_settings_title">Setări avansate</string>
     <string name="keep_force_encryption">Păstrează criptarea forțată</string>
     <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
-    <string name="current_installed">Instalată: %1$s</string>
-    <string name="latest_version">Ultima: %1$s</string>
     <string name="uninstall">Dezinstalează</string>
     <string name="uninstall_magisk_title">Dezinstalează Magisk</string>
     <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate. Rootul va fi eliminat și potențial se vor cripta datele dacă nu sunt criptate deja.</string>
     <string name="update">Actualizează</string>
-    <string name="core_only_enabled">(Este activat modul numai de bază)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nu sunt furnizate informații)</string>
     <string name="no_modules_found">Niciun modul găsit.</string>
-    <string name="update_file_created">Modulul va fi actualizat la următoarea repornire.</string>
-    <string name="remove_file_created">Modulul va fi eliminat la următoarea repornire.</string>
-    <string name="remove_file_deleted">Modulul nu va fi eliminat la următoarea repornire.</string>
-    <string name="disable_file_created">Modulul va fi dezactivat la următoarea repornire.</string>
-    <string name="disable_file_removed">Modulul va fi activat la următoarea repornire.</string>
-    <string name="author">Creat de %1$s</string>
     <string name="reboot_recovery">Repornește în recovery</string>
     <string name="reboot_bootloader">Repornește în bootloader</string>
     <string name="reboot_download">Repornește în download</string>
@@ -48,15 +30,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Actualizare disponibilă</string>
     <string name="installed">Instalate</string>
-    <string name="not_installed">Neinstalate</string>
-    <string name="updated_on">Actualizat la: %1$s</string>
     <string name="sorting_order">Ordine de sortare</string>
-    <string name="sort_by_name">Sortează după nume</string>
-    <string name="sort_by_update">Sortează după ultima actualizare</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Salvează jurnalul</string>
-    <string name="menuReload">Reîncarcă</string>
     <string name="menuClearLog">Golește jurnalul acum</string>
     <string name="logs_cleared">Jurnal golit cu succes.</string>
 
@@ -79,7 +56,6 @@
     <string name="direct_install">Instalare directă (Recomandat)</string>
     <string name="install_inactive_slot">Instalare în slotul inactiv (După OTA)</string>
     <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să booteze în slotul inactiv actual după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
-    <string name="select_method">Selectează metoda</string>
     <string name="setup_title">Configurare suplimentară</string>
     <string name="select_patch_file">Selectează și patchuiește un fișier</string>
     <string name="patch_file_msg">Selectează o imagine brută (*.img) sau un fișier tar ODIN (*.tar)</string>
@@ -102,7 +78,6 @@
     <string name="hide_manager_title">Se ascunde Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat.</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul.</string>
-    <string name="warning">Avertisment</string>
     <string name="complete_uninstall">Dezinstalare totală</string>
     <string name="restore_img">Restaurează imagini</string>
     <string name="restore_img_msg">Se restaurează…</string>
@@ -116,9 +91,6 @@
     <string name="setup_msg">Rulează configurarea mediului…</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">General</string>
-    <string name="settings_dark_theme_title">Temă întunecată</string>
-    <string name="settings_dark_theme_summary">Activează tema întunecată.</string>
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
@@ -129,7 +101,6 @@
     <string name="settings_restore_manager_summary">Restaurează Magisk Manager cu pachetul original</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Limba implicită a sistemului)</string>
-    <string name="settings_update">Setări de actualizare</string>
     <string name="settings_check_update_title">Caută actualizări</string>
     <string name="settings_check_update_summary">Caută periodic actualizări în fundal</string>
     <string name="settings_update_channel_title">Canal de actualizare</string>
@@ -137,7 +108,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalizat</string>
     <string name="settings_update_custom_msg">Inserează un URL personalizat</string>
-    <string name="settings_core_only_title">Mod numai de bază pentru Magisk</string>
     <string name="settings_core_only_summary">Activează numai funcțiile de bază. MagiskSU și MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat.</string>
     <string name="settings_magiskhide_summary">Ascunde Magisk de diferite forme de detectare.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -158,7 +128,6 @@
     <string name="auto_response">Răspuns automat</string>
     <string name="request_timeout">Expirare pentru solicitare</string>
     <string name="superuser_notification">Notificare de superutilizator</string>
-    <string name="request_timeout_summary">%1$d secunde</string>
     <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
     <string name="settings_su_reauth_summary">Reautentifică permisiunile pentru superutilizator după o actualizare a aplicației</string>
 
@@ -208,7 +177,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID țintă: %1$d</string>
-    <string name="command">Comandă: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Afișează aplicațiile de sistem</string>

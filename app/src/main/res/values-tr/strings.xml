@@ -2,7 +2,6 @@
 
     <!--Welcome Activity-->
     <string name="modules">Modüller</string>
-    <string name="downloads">İndir</string>
     <string name="superuser">Yetkili kullanıcı</string>
     <string name="logs">Günlük</string>
     <string name="settings">Ayarlar</string>
@@ -11,37 +10,20 @@
 	<string name="unsupport_magisk_msg">Magisk Manager\'ın bu sürümü, %1$s daha düşük Magisk versiyonlarını desteklememektedir.\n\nUygulama hiçbir Magisk kurulu değil gibi davranacak, lütfen en kısa zamanda Magisk\'i yükseltin.</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk yüklü değil</string>
-    <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
-    <string name="safetyNet_check_text">SafetyNet kontrolünü başlat</string>
-    <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
-    <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
     <string name="safetyNet_api_error">SafetyNet API Hatası</string>
     <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
-    <string name="magisk_up_to_date">Magisk güncel</string>
-    <string name="manager_up_to_date">Magisk Manager güncel</string>
-    <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i koru</string>
     <string name="recovery_mode">Kurtarma Modu</string>
-    <string name="current_installed">Yüklü: %1$s</string>
-    <string name="latest_version">Güncel: %1$s</string>
     <string name="uninstall">Kaldır</string>
     <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacaktır ve verileriniz zaten şifrelenmemişse potansiyel olarak verileriniz şifrelenecektir.</string>
     <string name="update">Güncelle</string>
-    <string name="core_only_enabled">(Yalnızca çekirdek modu etkin)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
     <string name="no_modules_found">Modül yok</string>
-    <string name="update_file_created">Modül sonraki yeniden başlatmada güncellenecek!</string>
-    <string name="remove_file_created">Modül sonraki yeniden başlatmada kaldırılacak!</string>
-    <string name="remove_file_deleted">Modül sonraki yeniden başlatmada kaldırılmayacak!</string>
-    <string name="disable_file_created">Modül sonraki yeniden başlatmada devre dışı bırakılacak!</string>
-    <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek!</string>
-    <string name="author">Yapımcı: %1$s</string>
     <string name="reboot_recovery">Kurtarma moduna yeniden başlat</string>
     <string name="reboot_bootloader">Ön yükleyici moduna yeniden başlat</string>
     <string name="reboot_download">Yükleme moduna yeniden başlat</string>
@@ -50,15 +32,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Güncelleme Mevcut</string>
     <string name="installed">Yüklü</string>
-    <string name="not_installed">Yüklü Değil</string>
-    <string name="updated_on">Güncelleme zamanı: %1$s</string>
     <string name="sorting_order">Sıralama Düzeni</string>
-    <string name="sort_by_name">İsme göre sırala</string>
-    <string name="sort_by_update">Son güncellemeye göre sırala</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Günlüğü kaydet</string>
-    <string name="menuReload">Yeniden yükle</string>
     <string name="menuClearLog">Günlüğü temizle</string>
     <string name="logs_cleared">Günlük başarıyla temizlendi</string>
 
@@ -81,7 +58,6 @@
     <string name="direct_install">Doğrudan kurulum (Önerilen)</string>
     <string name="install_inactive_slot">Aktif olmayan yuvaya yükle (OTA\'dan sonra)</string>
     <string name="install_inactive_slot_msg">Cihazınız, yeniden başlatmanın ardından geçerli etkin olmayan yuvaya önyüklemeye ZORLANACAK!\nBu seçeneği yalnızca OTA yapıldıktan sonra kullanın.\nDevam edilsin mi?</string>
-    <string name="select_method">Yöntem seçin</string>
     <string name="setup_title">Ek kurulum</string>
     <string name="select_patch_file">Dosya seçin ve yamalayın</string>
     <string name="patch_file_msg">Bir işlenmemiş görüntü (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
@@ -103,7 +79,6 @@
     <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu.</string>
     <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı.</string>
-    <string name="warning">Uyarı</string>
     <string name="complete_uninstall">Tamamen Kaldır</string>
     <string name="restore_img">Önyükleme İmajını Geri Yükle</string>
     <string name="restore_img_msg">Geri Yükleniyor…</string>
@@ -118,9 +93,6 @@
 	<string name="authenticate">Kimlik doğrulaması</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Genel</string>
-    <string name="settings_dark_theme_title">Karanlık Tema</string>
-    <string name="settings_dark_theme_summary">Karanlık temayı etkinleştir</string>
     <string name="settings_download_path_title">İndirme yolu</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
@@ -131,7 +103,6 @@
     <string name="settings_restore_manager_summary">Orijinal paket adı ile Magisk Manager\'ı geri yükle</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
-    <string name="settings_update">Güncelleme Ayarları</string>
     <string name="settings_check_update_title">Güncellemeleri denetle</string>
     <string name="settings_check_update_summary">Düzenli aralıklarla arka planda güncellemeleri denetle</string>
     <string name="settings_update_channel_title">Güncelleme Kanalı</string>
@@ -139,14 +110,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özel</string>
     <string name="settings_update_custom_msg">Özel bir URL ekleyin</string>
-    <string name="settings_core_only_title">Magisk Sadece Çekirdek Modu</string>
     <string name="settings_core_only_summary">Sadece temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU ve MagiskHide yine de etkinleştirilecektir</string>
     <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
     <string name="settings_hosts_title">Sistemsiz host</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
     <string name="settings_hosts_toast">Sistemsiz host modülü eklendi</string>
 
-    <string name="settings_app_name">İstediğiniz uygulama adını yazın</string>
     <string name="settings_app_name_hint">Yeni ad</string>
     <string name="settings_app_name_helper">Uygulama bu ad ile yeniden paketlenecek</string>
     <string name="settings_app_name_error">Geçersiz format</string>
@@ -164,7 +133,6 @@
     <string name="auto_response">Otomatik Yanıt</string>
     <string name="request_timeout">İstek Zaman Aşımı</string>
     <string name="superuser_notification">Yetkili Kullanıcı Bildirimi</string>
-    <string name="request_timeout_summary">%1$d saniye</string>
     <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrula</string>
     <string name="settings_su_reauth_summary">Uygulama yükseltmeleri sonrasında yetkili kullanıcı izinlerini yeniden doğrula</string>
     <string name="settings_su_biometric_title">Biyometrik Kimlik Doğrulamayı Etkinleştir</string>
@@ -217,7 +185,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Hedef UID: %1$d</string>
-    <string name="command">Komut: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Sistem uygulamalarını göster</string>

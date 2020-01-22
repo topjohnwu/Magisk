@@ -16,6 +16,7 @@ import android.content.res.Resources
 import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.ProcessPhoenix
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.core.utils.updateConfig
@@ -153,3 +154,23 @@ object ClassMap {
 
     operator fun get(c: Class<*>) = map.getOrElse(c) { c }
 }
+
+/*
+* TODO: These string were used in the old design, but currently aren't.
+*  However, they should be, so keep a reference here to prevent it from
+*  being removed when running "remove unused resources" */
+val shouldKeepStrings = listOf(
+    R.string.patch_file_msg,
+    R.string.no_apps_found,
+    R.string.no_info_provided,
+    R.string.reboot_bootloader,
+    R.string.reboot_recovery,
+    R.string.reboot_edl,
+    R.string.reboot_download,
+    R.string.release_notes,
+    R.string.settings_download_path_error,
+    R.string.unsupport_magisk_msg,
+    R.string.unsupport_magisk_title,
+    R.string.install_inactive_slot_msg,
+    R.string.invalid_update_channel
+)

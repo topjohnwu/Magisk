@@ -2,7 +2,6 @@
 
     <!--Welcome Activity-->
     <string name="modules">Модули</string>
-    <string name="downloads">Репозиторий</string>
     <string name="superuser">Суперпользователь</string>
     <string name="logs">Логи</string>
     <string name="settings">Настройки</string>
@@ -11,37 +10,20 @@
     <string name="unsupport_magisk_msg">Эта версия Magisk Manager не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, как будто Magisk не установлен, пожалуйста, обновите Magisk как можно быстрее.</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk не установлен</string>
-    <string name="checking_for_updates">Проверка обновлений…</string>
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
-    <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
-    <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
-    <string name="safetyNet_check_success">Результат проверки SafetyNet</string>
     <string name="safetyNet_api_error">Ошибка SafetyNet API</string>
     <string name="safetyNet_res_invalid">Некорректный ответ</string>
-    <string name="magisk_up_to_date">Magisk актуален</string>
-    <string name="manager_up_to_date">Magisk Manager актуален</string>
-    <string name="advanced_settings_title">Расширенные опции</string>
     <string name="keep_force_encryption">Не отключать шифрование /data</string>
     <string name="keep_dm_verity">Не отключать AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Режим установки в recovery</string>
-    <string name="current_installed">Установлен: %1$s</string>
-    <string name="latest_version">Последний: %1$s</string>
     <string name="uninstall">Удаление</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
     <string name="uninstall_magisk_msg">Все модули будут отключены/удалены!\nRoot-права будут удалены!\nШифрование будет активировано!</string>
     <string name="update">Обновить</string>
-    <string name="core_only_enabled">(Активирован режим Magisk Core)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет информации)</string>
     <string name="no_modules_found">Модули не найдены</string>
-    <string name="update_file_created">Модуль будет обновлён после перезагрузки!</string>
-    <string name="remove_file_created">Модуль будет удалён после перезагрузки!</string>
-    <string name="remove_file_deleted">Модуль не будет удалён после перезагрузки!</string>
-    <string name="disable_file_created">Модуль будет отключён после перезагрузки!</string>
-    <string name="disable_file_removed">Модуль будет активирован после перезагрузки!</string>
-    <string name="author">Автор: %1$s</string>
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
     <string name="reboot_download">Перезагрузка в Download</string>
@@ -50,15 +32,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Доступно обновление</string>
     <string name="installed">Установлены</string>
-    <string name="not_installed">Не установлены</string>
-    <string name="updated_on">Обновлено: %1$s</string>
     <string name="sorting_order">Сортировка</string>
-    <string name="sort_by_name">По имени</string>
-    <string name="sort_by_update">По дате обновления</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Сохранить лог</string>
-    <string name="menuReload">Обновить</string>
     <string name="menuClearLog">Очистить лог</string>
     <string name="logs_cleared">Лог успешно очищен</string>
 
@@ -81,7 +58,6 @@
     <string name="direct_install">Прямая установка (Рекомендуется)</string>
     <string name="install_inactive_slot">Установка во второй слот (OTA)</string>
     <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции после OTA.\nПродолжить?</string>
-    <string name="select_method">Способ установки</string>
     <string name="setup_title">Дополнительная установка</string>
     <string name="select_patch_file">Пропатчить образ вручную</string>
     <string name="patch_file_msg">Выберите файл образа (*.img) или архив ODIN (*.tar)</string>
@@ -102,8 +78,7 @@
     <string name="failure">Ошибка</string>
     <string name="hide_manager_title">Скрытие Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Не удалось пересобрать Magisk Manager</string>
-    <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки</string> 
-    <string name="warning">Предупреждение</string>
+    <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
     <string name="restore_img_msg">Восстановление…</string>
@@ -118,9 +93,6 @@
     <string name="authenticate">Аутентификация</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Основные</string>
-    <string name="settings_dark_theme_title">Тёмная тема</string>
-    <string name="settings_dark_theme_summary">Включить тёмное оформление</string>
     <string name="settings_download_path_title">Папка для загрузки</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
@@ -131,7 +103,6 @@
     <string name="settings_restore_manager_summary">Восстановить Magisk Manager с исходным названием и именем пакета</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (Системный)</string>
-    <string name="settings_update">Настройки обновлений</string>
     <string name="settings_check_update_title">Проверка обновлений</string>
     <string name="settings_check_update_summary">Периодически проверять наличие обновлений в фоновом режиме</string>
     <string name="settings_update_channel_title">Источник обновлений</string>
@@ -139,14 +110,12 @@
     <string name="settings_update_beta">Beta канал</string>
     <string name="settings_update_custom">Сторонний канал</string>
     <string name="settings_update_custom_msg">Укажите ссылку</string>
-    <string name="settings_core_only_title">Magisk Core</string>
     <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU и Magisk Hide останутся активными</string>
     <string name="settings_magiskhide_summary">Скрывать Magisk от различных обнаружений</string>
     <string name="settings_hosts_title">Внесистемный hosts файл</string>
     <string name="settings_hosts_summary">Поддержка внесистемного hosts файла для приложений, блокирующих рекламу</string>
     <string name="settings_hosts_toast">Добавлен модуль внесистемного hosts файла</string>
 
-    <string name="settings_app_name">Укажите имя приложения</string>
     <string name="settings_app_name_hint">Новое имя</string>
     <string name="settings_app_name_helper">Приложение будет пересобрано с этим именем</string>
     <string name="settings_app_name_error">Некорректный формат</string>
@@ -164,7 +133,6 @@
     <string name="auto_response">Автоматический ответ</string>
     <string name="request_timeout">Ожидание ответа</string>
     <string name="superuser_notification">Уведомления суперпользователя</string>
-    <string name="request_timeout_summary">%1$d секунд</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
     <string name="settings_su_biometric_title">Биометрическая аутентификация</string>
@@ -217,7 +185,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Целевой UID: %1$d</string>
-    <string name="command">Команда: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Системные приложения</string>

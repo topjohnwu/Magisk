@@ -2,7 +2,6 @@
 
     <!--Sections-->
     <string name="modules">Modules</string>
-    <string name="downloads">Downloads</string>
     <string name="superuser">Superuser</string>
     <string name="logs">Logs</string>
     <string name="settings">Settings</string>
@@ -46,26 +45,15 @@
     <string name="home_extra_mode_safe">Safe</string>
     <string name="home_extra_mode_stub">Dynamic</string>
 
-    <string name="magisk_version_error">Magisk is not installed</string>
-    <string name="checking_for_updates">Checking for updates…</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
-    <string name="safetyNet_check_text">Tap to start SafetyNet check</string>
-    <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
-    <string name="safetyNet_check_success">SafetyNet Check Success</string>
     <string name="safetyNet_api_error">SafetyNet API Error</string>
     <string name="safetyNet_res_invalid">The response is invalid</string>
-    <string name="magisk_up_to_date">Magisk is up to date</string>
-    <string name="manager_up_to_date">Magisk Manager is up to date</string>
-    <string name="current_installed">Installed: %1$s</string>
-    <string name="latest_version">Latest: %1$s</string>
     <string name="uninstall">Uninstall</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
     <string name="update">Update</string>
-    <string name="core_only_enabled">(Core only mode enabled)</string>
 
     <!--Install-->
-    <string name="advanced_settings_title">Advanced Settings</string>
     <string name="keep_force_encryption">Preserve force encryption</string>
     <string name="keep_dm_verity">Preserve AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Recovery Mode</string>
@@ -78,7 +66,6 @@
     <string name="direct_install">Direct Install (Recommended)</string>
     <string name="install_inactive_slot">Install to Inactive Slot (After OTA)</string>
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
-    <string name="select_method">Select Method</string>
     <string name="setup_title">Additional Setup</string>
     <string name="select_patch_file">Select and Patch a File</string>
     <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar)</string>
@@ -118,12 +105,10 @@
     <string name="log_data_none">You\'re log-free, try using your SU enabled apps more.</string>
     <string name="log_data_magisk_none">Magisk logs are empty, that\'s weird.</string>
     <string name="menuSaveLog">Save log</string>
-    <string name="menuReload">Reload</string>
     <string name="menuClearLog">Clear log now</string>
     <string name="logs_cleared">Log successfully cleared.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
-    <string name="command">Command: %1$s</string>
 
     <!--SafetyNet-->
     <string name="safetynet_attest_success">Success!</string>
@@ -142,12 +127,6 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
     <string name="no_modules_found">No modules found</string>
-    <string name="update_file_created">Module will be updated at next reboot!</string>
-    <string name="remove_file_created">Module will be removed at next reboot!</string>
-    <string name="remove_file_deleted">Module will not be removed at next reboot!</string>
-    <string name="disable_file_created">Module will be disabled at next reboot!</string>
-    <string name="disable_file_removed">Module will be enabled at next reboot!</string>
-    <string name="author">Created by %1$s</string>
     <string name="reboot_recovery">Reboot to Recovery</string>
     <string name="reboot_bootloader">Reboot to Bootloader</string>
     <string name="reboot_download">Reboot to Download</string>
@@ -163,11 +142,7 @@
     <string name="module_update_none">Your modules are up to date!</string>
     <string name="update_available">Update Available</string>
     <string name="installed">Installed</string>
-    <string name="not_installed">Not Installed</string>
-    <string name="updated_on">Updated on: %1$s</string>
     <string name="sorting_order">Sorting Order</string>
-    <string name="sort_by_name">Sort by name</string>
-    <string name="sort_by_update">Sort by last update</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Theme Mode</string>
@@ -182,9 +157,6 @@
     <string name="settings_grid_span_count_1">One item per line (Small Screens)</string>
     <string name="settings_grid_span_count_2">Two items per line (Recommended)</string>
     <string name="settings_grid_span_count_3">Three item per line (Tablet/TV)</string>
-    <string name="settings_general_category">General</string>
-    <string name="settings_dark_theme_title">Dark Theme</string>
-    <string name="settings_dark_theme_summary">Enable dark theme</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
@@ -195,7 +167,6 @@
     <string name="settings_restore_manager_summary">Restore Magisk Manager with original package and app names</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
-    <string name="settings_update">Update Settings</string>
     <string name="settings_check_update_title">Check Updates</string>
     <string name="settings_check_update_summary">Periodically check for updates in the background</string>
     <string name="settings_update_channel_title">Update Channel</string>
@@ -207,7 +178,6 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>
-    <string name="settings_app_name">Type desired app name</string>
     <string name="settings_app_name_hint">New name</string>
     <string name="settings_app_name_helper">App will be repackaged to this name</string>
     <string name="settings_app_name_error">Invalid format</string>
@@ -225,7 +195,6 @@
     <string name="auto_response">Automatic Response</string>
     <string name="request_timeout">Request Timeout</string>
     <string name="superuser_notification">Superuser Notification</string>
-    <string name="request_timeout_summary">%1$d seconds</string>
     <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
     <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
     <string name="settings_su_biometric_title">Enable Biometric Authentication</string>
@@ -277,7 +246,6 @@
     <string name="hide_manager_title">Hiding Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Hide Magisk Manager failed.</string>
     <string name="open_link_failed_toast">No application found to open the link</string>
-    <string name="warning">Warning</string>
     <string name="complete_uninstall">Complete Uninstall</string>
     <string name="restore_img">Restore Images</string>
     <string name="restore_img_msg">Restoring…</string>

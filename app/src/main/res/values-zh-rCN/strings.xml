@@ -2,7 +2,6 @@
 
     <!--Welcome Activity-->
     <string name="modules">模块</string>
-    <string name="downloads">下载</string>
     <string name="superuser">超级用户</string>
     <string name="logs">日志</string>
     <string name="settings">设置</string>
@@ -11,37 +10,20 @@
     <string name="unsupport_magisk_msg">此版本的 Magisk Manager 不支持低于 %1$s 的 Magisk。\n\n进入后表现为未安装状态，但升级功能可用，请尽快升级。</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">未安装 Magisk</string>
-    <string name="checking_for_updates">正在检查更新…</string>
     <string name="invalid_update_channel">无效的更新通道</string>
-    <string name="safetyNet_check_text">点按启动 SafetyNet 检查</string>
-    <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
-    <string name="safetyNet_check_success">SafetyNet 检查完成</string>
     <string name="safetyNet_api_error">SafetyNet API 错误</string>
     <string name="safetyNet_res_invalid">回传值无效</string>
-    <string name="magisk_up_to_date">Magisk 已是最新版本</string>
-    <string name="manager_up_to_date">Magisk Manager 已是最新版本</string>
-    <string name="advanced_settings_title">安装选项</string>
     <string name="keep_force_encryption">保持强制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
     <string name="recovery_mode">安装到 Recovery</string>
-    <string name="current_installed">已安装：%1$s</string>
-    <string name="latest_version">最新版：%1$s</string>
     <string name="uninstall">卸载</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">所有模块将停用或删除，Root 会被移除。未加密的设备重启时可能会被进行加密。</string>
     <string name="update">更新</string>
-    <string name="core_only_enabled">(核心功能模式开启)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
     <string name="no_modules_found">未找到模块</string>
-    <string name="update_file_created">模块将在下次重启后更新</string>
-    <string name="remove_file_created">模块将在下次重启后移除</string>
-    <string name="remove_file_deleted">模块不会在下次重启后移除</string>
-    <string name="disable_file_created">模块将在下次重启后禁用</string>
-    <string name="disable_file_removed">模块将在下次重启后启用</string>
-    <string name="author">作者：%1$s</string>
     <string name="reboot_recovery">重启到 Recovery</string>
     <string name="reboot_bootloader">重启到 Bootloader</string>
     <string name="reboot_download">重启到 Download</string>
@@ -50,15 +32,10 @@
     <!--Repo Fragment-->
     <string name="update_available">可更新</string>
     <string name="installed">已安装</string>
-    <string name="not_installed">未安装</string>
-    <string name="updated_on">更新于: %1$s</string>
     <string name="sorting_order">排序方式</string>
-    <string name="sort_by_name">按名称排序</string>
-    <string name="sort_by_update">按更新时间排序</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">保存日志</string>
-    <string name="menuReload">刷新</string>
     <string name="menuClearLog">清除日志</string>
     <string name="logs_cleared">日志已清除</string>
 
@@ -81,7 +58,6 @@
     <string name="direct_install">直接安装（推荐）</string>
     <string name="install_inactive_slot">安装到未使用的槽位（OTA 后）</string>
     <string name="install_inactive_slot_msg">重启后，设备将被强制切换到另一个槽位！\n请在 OTA 安装完毕后再使用。\n是否继续？</string>
-    <string name="select_method">选择安装方法</string>
     <string name="setup_title">修复安装</string>
     <string name="select_patch_file">选择并修补一个文件</string>
     <string name="patch_file_msg">选择一个原始镜像文件 (*.img) 或一个 ODIN tar包 (*.tar)</string>
@@ -103,7 +79,6 @@
     <string name="hide_manager_title">正在隐藏 Magisk Manager…</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
     <string name="open_link_failed_toast">找不到能够打开此链接的应用</string>
-    <string name="warning">警告</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂镜像</string>
     <string name="restore_img_msg">正在还原…</string>
@@ -118,9 +93,6 @@
     <string name="authenticate">验证您的身份</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">常规</string>
-    <string name="settings_dark_theme_title">暗色主题</string>
-    <string name="settings_dark_theme_summary">使用暗色主题</string>
     <string name="settings_download_path_title">下载路径</string>
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
@@ -131,7 +103,6 @@
     <string name="settings_restore_manager_summary">用原安装包还原 Magisk Manager</string>
     <string name="language">语言</string>
     <string name="system_default">（系统默认）</string>
-    <string name="settings_update">更新设定</string>
     <string name="settings_check_update_title">检查更新</string>
     <string name="settings_check_update_summary">在后台定期检查更新</string>
     <string name="settings_update_channel_title">更新通道</string>
@@ -139,14 +110,12 @@
     <string name="settings_update_beta">测试版</string>
     <string name="settings_update_custom">自定义</string>
     <string name="settings_update_custom_msg">请输入自定义网址</string>
-    <string name="settings_core_only_title">Magisk 核心功能模式</string>
     <string name="settings_core_only_summary">仅启用核心功能，不加载任何模块。MagiskSU 和 MagiskHide 仍会持续运作</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其难以被检测</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>
 
-    <string name="settings_app_name">输入想要的应用名称</string>
     <string name="settings_app_name_hint">新名称</string>
     <string name="settings_app_name_helper">新应用将使用此名称</string>
     <string name="settings_app_name_error">输入无效</string>
@@ -164,7 +133,6 @@
     <string name="auto_response">自动响应</string>
     <string name="request_timeout">请求超时</string>
     <string name="superuser_notification">超级用户通知</string>
-    <string name="request_timeout_summary">%1$d 秒</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
     <string name="settings_su_biometric_title">启用生物识别认证</string>
@@ -217,7 +185,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">目标 UID: %1$d</string>
-    <string name="command">命令: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">显示系统应用</string>
