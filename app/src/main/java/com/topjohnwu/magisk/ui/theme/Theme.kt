@@ -35,6 +35,10 @@ enum class Theme(
     Salamence(
         themeName = "Salamence",
         themeRes = R.style.ThemeFoundationMD2_Salamence
+    ),
+    Ianmacd(
+        themeName = "ianmacd",
+        themeRes = R.style.ThemeFoundationMD2_Ianmacd
     );
 
     val isSelected get() = Config.themeOrdinal == ordinal

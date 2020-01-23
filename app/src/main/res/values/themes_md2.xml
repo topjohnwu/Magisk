@@ -115,4 +115,12 @@
 
     <!--3rd party themes-->
 
+    <style name="ThemeFoundationMD2.Ianmacd" parent="ThemeFoundationMD2.Amoled">
+        <item name="colorPrimary">#47AE84</item>
+        <item name="colorPrimaryVariant">#8047AE84</item>
+        <item name="colorSecondary">#47AE84</item>
+        <item name="colorSecondaryVariant">#8047AE84</item>
+        <item name="colorOnSurfaceVariant">#B0FFFFFF</item>
+    </style>
+
 </resources>
