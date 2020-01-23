@@ -169,7 +169,7 @@
     <string name="settings_su_reauth_summary">Overí autentifikáciu oprávnení superuser po upgrade aplikácie</string>
     <string name="settings_su_biometric_title">Povoliť biometrickú autentifikáciu</string>
     <string name="settings_su_biometric_summary">Použite biometrickú autentifikáciu pre povolenie žiadostí superuser</string>
-    <string name="no_biometric">Nepodporované zariadenia alebo biometria nie je povolená v nastaveniach</string>
+    <string name="no_biometric">Nepodporované zariadenie alebo biometria nie je povolená v nastaveniach</string>
 
     <string name="multiuser_mode">Režim viacerých používateľov</string>
     <string name="settings_owner_only">Iba majiteľ zariadenia</string>
