@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.topjohnwu.magisk.model.entity.recycler.HideProcessItem" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.hide.HideViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:background="?selectableItemBackground"
+        android:onClick="@{() -> item.toggle(viewModel)}"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/l1"
+            android:layout_marginTop="@dimen/l_50"
+            android:layout_marginEnd="@dimen/l1"
+            android:layout_marginBottom="@dimen/l_50"
+            android:singleLine="true"
+            android:text="@{item.item.name}"
+            android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/hide_process_checkbox"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="com.topjohnwu.magisk" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/hide_process_checkbox"
+            style="@style/WidgetFoundation.Image.Small"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            isSelected="@{item.isHidden}"
+            android:layout_marginTop="@dimen/l_50"
+            android:layout_marginEnd="@dimen/l1"
+            android:layout_marginBottom="@dimen/l_50"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_radio_check_button"
+            app:tint="?colorPrimary" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

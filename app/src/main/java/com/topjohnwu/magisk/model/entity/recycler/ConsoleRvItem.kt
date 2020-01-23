@@ -6,7 +6,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 
-class ConsoleRvItem(val item: String) : LenientRvItem<ConsoleRvItem>() {
+open class ConsoleRvItem(val item: String) : LenientRvItem<ConsoleRvItem>() {
     override val layoutRes: Int = R.layout.item_console
 
     override fun onBindingBound(binding: ViewDataBinding, recyclerView: RecyclerView) {
@@ -23,4 +23,8 @@ class ConsoleRvItem(val item: String) : LenientRvItem<ConsoleRvItem>() {
 
     override fun contentSameAs(other: ConsoleRvItem) = itemSameAs(other)
     override fun itemSameAs(other: ConsoleRvItem) = item == other.item
+}
+
+class ConsoleItem(item: String) : ConsoleRvItem(item) {
+    override val layoutRes = R.layout.item_console_md2
 }

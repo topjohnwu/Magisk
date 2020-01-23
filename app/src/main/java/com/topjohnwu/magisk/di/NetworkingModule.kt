@@ -4,7 +4,7 @@ import android.content.Context
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.net.Networking

@@ -86,9 +86,10 @@
         <item>Canary (Debug)</item>
     </string-array>
 
-    <string-array name="sorting_orders">
-        <item>@string/sort_by_name</item>
-        <item>@string/sort_by_update</item>
+    <string-array name="span_count">
+        <item>@string/settings_grid_span_count_1</item>
+        <item>@string/settings_grid_span_count_2</item>
+        <item>@string/settings_grid_span_count_3</item>
     </string-array>
 
 </resources>

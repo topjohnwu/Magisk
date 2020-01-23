@@ -407,20 +407,24 @@ static void patch_fstab(const string &fstab) {
 #define FSR "/first_stage_ramdisk"
 
 void ABFirstStageInit::prepare() {
-	auto dir = xopen_dir(FSR);
-	if (!dir)
-		return;
-	string fstab(FSR "/");
-	for (dirent *de; (de = xreaddir(dir.get()));) {
-		if (strstr(de->d_name, "fstab")) {
-			fstab += de->d_name;
-			break;
-		}
-	}
-	if (fstab.length() == sizeof(FSR))
-		return;
+	// It is actually possible to NOT have FSR, create it just in case
+	xmkdir(FSR, 0755);
 
-	patch_fstab(fstab);
+	if (auto dir = xopen_dir(FSR); dir) {
+		string fstab(FSR "/");
+		for (dirent *de; (de = xreaddir(dir.get()));) {
+			if (strstr(de->d_name, "fstab")) {
+				fstab += de->d_name;
+				break;
+			}
+		}
+		if (fstab.length() == sizeof(FSR))
+			return;
+
+		patch_fstab(fstab);
+	} else {
+		return;
+	}
 
 	// Move stuffs for next stage
 	xmkdir(FSR "/system", 0755);

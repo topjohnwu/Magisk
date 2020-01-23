@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
 import com.topjohnwu.magisk.utils.RxBus
 import org.koin.core.qualifier.named
@@ -23,6 +24,7 @@ val applicationModule = module {
     single { PreferenceManager.getDefaultSharedPreferences(get<Context>(Protected)) }
     single { ActivityTracker() }
     factory { get<ActivityTracker>().foreground ?: NullActivity }
+    single { LocalBroadcastManager.getInstance(get()) }
 }
 
 private fun createDEContext(context: Context): Context {

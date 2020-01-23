@@ -3,28 +3,19 @@
 
     <!--Welcome Activity-->
     <string name="modules">Модули</string>
-    <string name="downloads">Преузимања</string>
     <string name="superuser">Супер-корисник</string>
-    <string name="log">Дневник</string>
+    <string name="logs">Дневник</string>
     <string name="settings">Подешавања</string>
     <string name="install">Инсталација</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Магиск није инсталиран</string>
-    <string name="checking_for_updates">Проверавам Ажурирања…</string>
     <string name="invalid_update_channel">Непостојећи Канал Ажурирања</string>
-    <string name="safetyNet_check_text">Притисни да започнеш СигурнаМрежа проверу</string>
-    <string name="checking_safetyNet_status">Проверавам СигурнаМрежа статус…</string>
-    <string name="safetyNet_check_success">СигурнаМрежа Провера Успешна</string>
     <string name="safetyNet_api_error">СигурнаМрежа АПИ Грешка</string>
     <string name="safetyNet_res_invalid">Одговор није валидан</string>
 
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Напредна Подешавања</string>
     <string name="keep_force_encryption">Задржи форсирану енкрипцију</string>
     <string name="keep_dm_verity">Задржи AVB 2.0/dm-verity</string>
-    <string name="current_installed">Инсталирана: %1$s</string>
-    <string name="latest_version">Најновија: %1$s</string>
     <string name="uninstall">Унинсталирај</string>
     <string name="uninstall_magisk_title">Унинсталирај Магиск</string>
     <string name="uninstall_magisk_msg">Сви модули ће бити онеспособљени/уклоњени. Корен ће бити уклоњен, и потенцијално енкриптовати твоје податке уколико већ нису енкриптовани</string>
@@ -33,21 +24,13 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Без информација)</string>
     <string name="no_modules_found">Нема пронађених модула</string>
-    <string name="update_file_created">Модул ће бити ажуриран после рестарта</string>
-    <string name="remove_file_created">Модул ће бити уклоњен после рестарта</string>
-    <string name="remove_file_deleted">Модул неће бити уклоњен после рестарта</string>
-    <string name="disable_file_created">Модул ће бити онеспособљен после рестарта</string>
-    <string name="disable_file_removed">Модул ће бити оспособљен после рестарта</string>
-    <string name="author">Креирао %1$s</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Ажурирање доступно</string>
     <string name="installed">Инсталирано</string>
-    <string name="not_installed">Није инсталирано</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Сачувај дневник</string>
-    <string name="menuReload">Поново учитај</string>
     <string name="menuClearLog">Обриши дневник</string>
     <string name="logs_cleared">Дневник успешно креиран</string>
 
@@ -73,7 +56,6 @@
     <string name="hide_manager_fail_toast">Скривање Магиск Менаџера неуспешно…</string>
     <string name="download_zip_only">Преузми само Зип</string>
     <string name="direct_install">Директна Инсталација (Препоручено)</string>
-    <string name="select_method">Изабери Методу</string>
     <string name="complete_uninstall">Комплетна Унинсталација</string>
     <string name="restore_done">Повратак успешан!</string>
     <string name="restore_fail">Фабрички бекап не постоји!</string>
@@ -82,22 +64,17 @@
     <string name="download_file_error">Грешка при преузимању фајла</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Генерално</string>
-    <string name="settings_dark_theme_title">Црна тема</string>
-    <string name="settings_dark_theme_summary">Омогући црну тему</string>
     <string name="settings_clear_cache_title">Обриши кеш спремишта</string>
     <string name="settings_clear_cache_summary">Очисти кеширану имформацију за онлајн спремишта, форсира апликацију да освежи онлајн</string>
     <string name="settings_hide_manager_title">Сакриј Магиск Менаџер</string>
     <string name="settings_hide_manager_summary">Препакуј Магиск Менаџер са насумичним именом пакета</string>
     <string name="language">Језик</string>
     <string name="system_default">(Фабрички Система)</string>
-    <string name="settings_update">Подешавања Ажурирања</string>
     <string name="settings_update_channel_title">Канал Ажурирања</string>
     <string name="settings_update_stable">Стабилан</string>
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">По наруџби</string>
     <string name="settings_update_custom_msg">Унеси наруџбени УРЛ</string>
-    <string name="settings_core_only_title">Магиск Основни Режим</string>
     <string name="settings_core_only_summary">Омогућава само основне карактеристике, сви модули неће бити учитани. МагискСК и МагискСакриј ће бити омогућени</string>
     <string name="settings_magiskhide_summary">Сакриј Магиск од разних детекција</string>
     <string name="settings_hosts_title">Без-системски домаћини (hosts)</string>
@@ -117,7 +94,6 @@
     <string name="auto_response">Аутоматски одговор</string>
     <string name="request_timeout">Истек захтева</string>
     <string name="superuser_notification">Нотификације Супер-корисника</string>
-    <string name="request_timeout_summary">%1$d секунди</string>
     <string name="settings_su_reauth_title">Поново одобри после ажурирања</string>
     <string name="settings_su_reauth_summary">Поново одобри дозволу Супер-корисника после ажурирања апликације</string>
 
@@ -165,6 +141,5 @@
 
     <!--Superuser logs-->
     <string name="target_uid">Циљани УИД: %1$d</string>
-    <string name="command">Команда: %1$s</string>
 
 </resources>

@@ -2,45 +2,27 @@
 
     <!--Welcome Activity-->
     <string name="modules">मॉड्यूल</string>
-    <string name="downloads">डाउनलोड</string>
     <string name="superuser">उत्तम उपयोगकर्ता</string>
-    <string name="log">अभिलेख</string>
+    <string name="logs">अभिलेख</string>
     <string name="settings">सेटिंग्स</string>
     <string name="install">स्थापित करें</string>
     <string name="unsupport_magisk_title">असमर्थित Magisk संस्करण</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk स्थापित नहीं है</string>
-    <string name="checking_for_updates">अपडेट्स के लिए जांच हो रही है…</string>
     <string name="invalid_update_channel">अमान्य अपडेट चैनल</string>
-    <string name="safetyNet_check_text">SafetyNet की जांच शुरू करें</string>
-    <string name="checking_safetyNet_status">SafetyNet के स्थिति की जाँच हो रही है…</string>
-    <string name="safetyNet_check_success">SafetyNet की जांच सफल हुई</string>
     <string name="safetyNet_api_error">SafetyNet API त्रुटि</string>
     <string name="safetyNet_res_invalid">अनुक्रिया अमान्य है.</string>
-    <string name="magisk_up_to_date">Magisk अप टू डेट है</string>
-    <string name="manager_up_to_date">Magisk Manager अप टू डेट है</string>
-    <string name="advanced_settings_title">एडवांस सेटिंग्स</string>
     <string name="keep_force_encryption">बल एन्क्रिप्शन को बनाये रखें</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity को बनाये रखें</string>
     <string name="recovery_mode">रिकवरी मोड</string>
-    <string name="current_installed">स्थापित: %1$s</string>
-    <string name="latest_version">नवीनतम: %1$s</string>
     <string name="uninstall">स्थापना रद्द करें</string>
     <string name="uninstall_magisk_title">Magisk की स्थापना रद्द करें</string>
     <string name="uninstall_magisk_msg">सभी मॉड्यूल अक्षम/हटा दिए जाएंगे. रुट और आपका संभावित रूप से एन्क्रिप्ट डाटा हटा दिया जाएगा.</string>
     <string name="update">अपडेट करें</string>
-    <string name="core_only_enabled">(केवल मूल मोड समर्थकृत)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(कोई जानकारी प्रदान नहीं की गई)</string>
     <string name="no_modules_found">कोई मॉड्यूल नहीं मिला</string>
-    <string name="update_file_created">मॉड्यूल अगले रिबूट पे अपडेट किया जाएगा !</string>
-    <string name="remove_file_created">मॉड्यूल अगले रिबूट पे हटाया जाएगा !</string>
-    <string name="remove_file_deleted">मॉड्यूल अगले रिबूट पे नहीं हटाया जाएगा !</string>
-    <string name="disable_file_created">मॉड्यूल अगले रिबूट पे निर्योग्य किया जाएगा !</string>
-    <string name="disable_file_removed">मॉड्यूल अगले रिबूट पे योग्य किया जाएगा !</string>
-    <string name="author">%1$s के द्वारा बनाया गया</string>
     <string name="reboot_recovery">रिकवरी मोड में रिबूट करें</string>
     <string name="reboot_bootloader">बूटलोडर में रिबूट करें</string>
     <string name="reboot_download">डाउनलोड में रिबूट करें</string>
@@ -49,15 +31,10 @@
     <!--Repo Fragment-->
     <string name="update_available">अपडेट उपलब्ध है</string>
     <string name="installed">स्थापित</string>
-    <string name="not_installed">स्थापित नहीं है</string>
-    <string name="updated_on">%1$s को अपडेट किया गया</string>
     <string name="sorting_order">छँटाई क्रम </string>
-    <string name="sort_by_name">नाम द्वारा छांटें</string>
-    <string name="sort_by_update">आखिरी अपडेट द्वारा छांटें</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">अभिलेख सेव करें</string>
-    <string name="menuReload">पुनः लोड करें</string>
     <string name="menuClearLog">अभिलेख साफ़ करें</string>
     <string name="logs_cleared">अभिलेख सफलतापूर्वक साफ़ हो गया.</string>
 
@@ -80,7 +57,6 @@
     <string name="direct_install">सीधा स्थापित करें (अनुशंसित)</string>
     <string name="install_inactive_slot">निष्क्रिय स्लॉट में स्थापित करें (OTA के बाद)</string>
     <string name="install_inactive_slot_msg">आपके डिवाइस को रीबूट के बाद वर्तमान निष्क्रिय स्लॉट में बूट करने के लिए मजबूर किया जाएगा!\nOTA होने के बाद ही इस विकल्प का उपयोग करें.\nजारी रखें?</string>
-    <string name="select_method">विधि का चयन करें</string>
     <string name="setup_title">अतिरिक्त सेटअप</string>
     <string name="select_patch_file">एक फ़ाइल का चयन और पैच करें</string>
     <string name="patch_file_msg">एक कच्ची इमेज चुनें (*.img) या एक ODIN tarfile (*.tar)</string>
@@ -103,7 +79,6 @@
     <string name="hide_manager_title">Magisk Manager छुप रहा है…</string>
     <string name="hide_manager_fail_toast">Magisk Manager छुपने में असफल रहा.</string>
     <string name="open_link_failed_toast">लिंक खोलने के लिए कोई एप्लिकेशन नहीं मिला.</string>
-    <string name="warning">चेतावनी</string>
     <string name="complete_uninstall">पूरी तरह से स्थापना रद्द करें</string>
     <string name="restore_img">इमेजेज को पुनर्स्थापित करें</string>
     <string name="restore_img_msg">वापस लाया जा रहा…</string>
@@ -117,9 +92,6 @@
     <string name="setup_msg">पर्यावरण सेटअप चल रहा है…</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">सामान्य</string>
-    <string name="settings_dark_theme_title">डार्क थीम</string>
-    <string name="settings_dark_theme_summary">डार्क थीम सक्षम करें.</string>
     <string name="settings_download_path_title">डाउनलोड करने की जगह</string>
     <string name="settings_download_path_message">%1$s में फाइल्स रखी जाएँगी</string>
     <string name="settings_clear_cache_title">Repo Cache साफ़ करें</string>
@@ -130,7 +102,6 @@
     <string name="settings_restore_manager_summary">Magisk Manager को अपने मूल पैकेज नाम से पुनर्स्थापित करें</string>
     <string name="language">भाषा</string>
     <string name="system_default">(सिस्टम डिफ़ॉल्ट)</string>
-    <string name="settings_update">सेटिंग्स अपडेट करें</string>
     <string name="settings_check_update_title">अपडेट के लिए जाँच करें</string>
     <string name="settings_check_update_summary">समय-समय पर बैकग्राउंड में अपडेट की जांच करते रहें.</string>
     <string name="settings_update_channel_title">अपडेट का चैनल</string>
@@ -138,7 +109,6 @@
     <string name="settings_update_beta">बीटा</string>
     <string name="settings_update_custom">कस्टम</string>
     <string name="settings_update_custom_msg">एक कस्टम URL डालें</string>
-    <string name="settings_core_only_title">Magisk का केवल मूल मोड</string>
     <string name="settings_core_only_summary">केवल मुख्य विशेषताएं सक्षम करें. MagiskSU और MagiskHide अभी भी सक्षम रहेंगे, लेकिन कोई मॉड्यूल लोड नहीं किया जाएगा.</string>
     <string name="settings_magiskhide_summary">पता लगाने के विभिन्न रूपों से Magisk को छुपाएं.</string>
     <string name="settings_hosts_title">सिस्टमलेस होस्ट्स</string>
@@ -159,7 +129,6 @@
     <string name="auto_response">स्वचालित प्रतिक्रिया</string>
     <string name="request_timeout">निवेदन का समय समाप्त</string>
     <string name="superuser_notification">उत्तम उपयोगकर्ता सूचना</string>
-    <string name="request_timeout_summary">%1$d सेकंड्‌स</string>
     <string name="settings_su_reauth_title">अपग्रेड के बाद फिर से प्रमाणित करें</string>
     <string name="settings_su_reauth_summary">एप्लीकेशन अपग्रेड होने के बाद उत्तम उपयोगकर्ता की अनुमतियों को फिर से प्रमाणित करें</string>
 
@@ -209,7 +178,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">लक्ष्य UID: %1$d</string>
-    <string name="command">Command: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">सिस्टम ऍप्लिकेशन्स दिखाएं</string>

@@ -1,57 +1,76 @@
 package com.topjohnwu.magisk.ui.log
 
-
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.graphics.Insets
+import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.base.BaseFragment
-import com.topjohnwu.magisk.databinding.FragmentLogBinding
-import com.topjohnwu.magisk.model.events.PageChangedEvent
-import com.topjohnwu.magisk.model.events.ViewEvent
+import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
+import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.base.CompatFragment
+import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class LogFragment : BaseFragment<LogViewModel, FragmentLogBinding>() {
+class LogFragment : CompatFragment<LogViewModel, FragmentLogMd2Binding>() {
 
-    override val layoutRes: Int = R.layout.fragment_log
-    override val viewModel: LogViewModel by viewModel()
+    override val layoutRes = R.layout.fragment_log_md2
+    override val viewModel by viewModel<LogViewModel>()
 
-    override fun onEventDispatched(event: ViewEvent) {
-        super.onEventDispatched(event)
-        when (event) {
-            is PageChangedEvent -> activity.invalidateOptionsMenu()
+    private var actionSave: MenuItem? = null
+    private var isMagiskLogVisible
+        get() = binding.logFilter.isVisible
+        set(value) {
+            MotionRevealHelper.withViews(binding.logFilter, binding.logFilterToggle, value)
+            actionSave?.isVisible = value
+            (activity as MainActivity).invalidateToolbar()
         }
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.logTabs.setupWithViewPager(binding.logContainer, true)
-    }
+    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onStart() {
         super.onStart()
         setHasOptionsMenu(true)
-        activity.setTitle(R.string.log)
+        activity.title = resources.getString(R.string.logs)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.logFilterToggle.setOnClickListener {
+            isMagiskLogVisible = true
+        }
+    }
+
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_log, menu)
-        menu.findItem(R.id.menu_save).isVisible = viewModel.currentPage.value == 1
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_log_md2, menu)
+        actionSave = menu.findItem(R.id.action_save)?.also {
+            it.isVisible = isMagiskLogVisible
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_save -> activity.withExternalRW {
-                onSuccess {
-                    viewModel.saveLog()
-                }
-            }
-            R.id.menu_clear -> viewModel.clearLog()
-            R.id.menu_refresh -> viewModel.refresh()
+            R.id.action_save -> viewModel.saveMagiskLog()
+            R.id.action_clear ->
+                if (isMagiskLogVisible) viewModel.clearMagiskLog()
+                else viewModel.clearLog()
         }
-        return true
+        return super.onOptionsItemSelected(item)
+    }
+
+
+    override fun onPreBind(binding: FragmentLogMd2Binding) = Unit
+
+    override fun onBackPressed(): Boolean {
+        if (binding.logFilter.isVisible) {
+            isMagiskLogVisible = false
+            return true
+        }
+        return super.onBackPressed()
     }
 
 }

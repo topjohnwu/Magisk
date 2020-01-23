@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.os.Build" />
+        <import type="com.topjohnwu.magisk.core.Info" />
+
+        <import type="com.topjohnwu.magisk.BuildConfig" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.safetynet.SafetynetViewModel" />
+
+    </data>
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
+        android:paddingBottom="@{viewModel.insets.bottom}"
+        tools:paddingBottom="48dp"
+        tools:paddingTop="24dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                invisibleUnless="@{viewModel.checking}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/safetynet_attest_loading"
+                android:textAppearance="@style/AppearanceFoundation.Title" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                invisibleUnless="@{viewModel.success || viewModel.failed}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/l1"
+                android:paddingBottom="@dimen/l1">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/safetynet_icon"
+                    style="@style/WidgetFoundation.Image.Big"
+                    app:layout_constraintBottom_toTopOf="@+id/safetynet_magisk_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias=".3"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    app:srcCompat="@drawable/ic_magisk"
+                    app:tint="?colorOnSurface" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/safetynet_magisk_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/l1"
+                    android:text="@string/magisk"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                    app:layout_constraintBottom_toTopOf="@+id/safetynet_manager_title"
+                    app:layout_constraintEnd_toStartOf="@+id/safetynet_magisk_version"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/safetynet_icon" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/safetynet_magisk_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l_50"
+                    android:text="@{Info.env.magiskVersionString}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/safetynet_magisk_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@+id/safetynet_magisk_title"
+                    app:layout_constraintTop_toTopOf="@+id/safetynet_magisk_title"
+                    tools:text="20.0" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/safetynet_manager_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/manager"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                    app:layout_constraintBottom_toTopOf="@+id/safetynet_android_title"
+                    app:layout_constraintEnd_toStartOf="@+id/safetynet_manager_version"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/safetynet_magisk_title" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/safetynet_manager_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l_50"
+                    android:text="@{BuildConfig.VERSION_NAME}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/safetynet_manager_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@+id/safetynet_manager_title"
+                    app:layout_constraintTop_toTopOf="@+id/safetynet_manager_title"
+                    tools:text="10.0.0" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/safetynet_android_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/safetynet_system"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                    app:layout_constraintBottom_toTopOf="@+id/safetynet_attestation"
+                    app:layout_constraintEnd_toStartOf="@+id/safetynet_android_version"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/safetynet_manager_title" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/safetynet_android_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l_50"
+                    android:text="@{Build.VERSION.RELEASE}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/safetynet_android_title"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@+id/safetynet_android_title"
+                    app:layout_constraintTop_toTopOf="@+id/safetynet_android_title"
+                    tools:text="10" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/safetynet_attestation"
+                    style="@style/WidgetFoundation.Card.Elevated"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginTop="@dimen/l2"
+                    android:layout_marginEnd="@dimen/l1"
+                    app:cardCornerRadius="@dimen/l1"
+                    app:cardElevation="@dimen/l1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/safetynet_android_title"
+                    app:layout_constraintWidth_max="300dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <View
+                            goneUnless="@{viewModel.failed}"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:alpha=".5"
+                            android:background="?colorError"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <View
+                            goneUnless="@{viewModel.success}"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:alpha=".5"
+                            android:background="?colorSecondary"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/safetynet_title"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/l1"
+                            android:layout_marginTop="@dimen/l2"
+                            android:layout_marginEnd="@dimen/l1"
+                            android:gravity="center"
+                            android:text="@{viewModel.safetyNetTitle}"
+                            android:textAppearance="@style/AppearanceFoundation.Display.OnPrimary"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_chainStyle="packed"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="@string/safetynet_attest_success" />
+
+                        <View
+                            android:id="@+id/safetynet_divider"
+                            android:layout_width="50dp"
+                            android:layout_height="4dp"
+                            android:layout_marginTop="@dimen/l2"
+                            android:background="@drawable/bg_divider_rounded_on_primary"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/safetynet_title" />
+
+                        <LinearLayout
+                            android:id="@+id/safetynet_cts"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/l1"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/safetynet_divider">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:gravity="start"
+                                android:text="ctsProfile"
+                                android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                style="@style/WidgetFoundation.Icon.OnPrimary"
+                                isSelected="@{viewModel.ctsState}"
+                                android:layout_gravity="center"
+                                app:srcCompat="@drawable/ic_check_circle_md2" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/safetynet_basicintegrity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/l1"
+                            android:orientation="horizontal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/safetynet_cts">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:gravity="start"
+                                android:text="basicIntegrity"
+                                android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText" />
+
+                            <androidx.appcompat.widget.AppCompatImageView
+                                style="@style/WidgetFoundation.Icon.OnPrimary"
+                                isSelected="@{viewModel.basicIntegrityState}"
+                                android:layout_gravity="center"
+                                app:srcCompat="@drawable/ic_check_circle_md2" />
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/WidgetFoundation.Button.Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/l1"
+                    android:layout_marginBottom="@dimen/l1"
+                    android:onClick="@{() -> viewModel.reset()}"
+                    android:text="@string/safetynet_attest_restart"
+                    android:textAllCaps="false"
+                    android:textColor="?colorOnSurfaceVariant"
+                    app:icon="@drawable/ic_refresh_safetynet_md2"
+                    app:iconTint="?colorOnSurfaceVariant"
+                    app:layout_constraintEnd_toEndOf="@+id/safetynet_attestation"
+                    app:layout_constraintTop_toBottomOf="@+id/safetynet_attestation" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+</layout>

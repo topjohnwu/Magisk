@@ -2,28 +2,17 @@
 
     <!--Welcome Activity-->
     <string name="modules">โมดูล</string>
-    <string name="downloads">ดาวน์โหลด</string>
     <string name="superuser">Superuser</string>
-    <string name="log">บันทึก</string>
+    <string name="logs">บันทึก</string>
     <string name="settings">ตั้งค่า</string>
     <string name="install">ติดตั้ง</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk ไม่ได้ถูกติดตั้ง</string>
-    <string name="checking_for_updates">กำลังตรวจสอบการอัพเดต…</string>
     <string name="invalid_update_channel">ช่องทางการอัพเดตไม่ถูกต้อง</string>
-    <string name="safetyNet_check_text">แตะเพื่อเริ่มการตรวจสอบ SafetyNet</string>
-    <string name="checking_safetyNet_status">กำลังตรวจสอบสถานะ SafetyNet…</string>
-    <string name="safetyNet_check_success">สถานะ SafetyNet สมบูรณ์</string>
     <string name="safetyNet_api_error">SafetyNet API เกิดข้อผิดพลาด</string>
     <string name="safetyNet_res_invalid">คำตอบรับไม่ถูกต้อง</string>
-    <string name="magisk_up_to_date">Magisk เวอร์ชันล่าสุดแล้ว</string>
-    <string name="manager_up_to_date">Magisk Manager เวอร์ชันล่าสุดแล้ว</string>
-    <string name="advanced_settings_title">ขั้นสูง</string>
     <string name="keep_force_encryption">เก็บค่าบังคับการเข้ารหัส</string>
     <string name="keep_dm_verity">เก็บค่า AVB 2.0/dm-verity</string>
-    <string name="current_installed">ที่ถูกติดตั้ง: %1$s</string>
-    <string name="latest_version">ล่าสุด: %1$s</string>
     <string name="uninstall">ถอนการติดตั้ง</string>
     <string name="uninstall_magisk_title">ถอนการติดตั้ง Magisk</string>
     <string name="uninstall_magisk_msg">โมดูลทั้งหมดจะถูกปิดการใช้งาน/ถูกลบ, สิทธิการเข้าถึง Root จะถูกลบ และข้อมูลของคุณอาจถูกเข้ารหัส</string>
@@ -32,12 +21,6 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(ไม่มีข้อมูล)</string>
     <string name="no_modules_found">ไม่พบโมดูล</string>
-    <string name="update_file_created">โมดูลจะถูกอัพเดตในการรีบู๊ตครั้งหน้า</string>
-    <string name="remove_file_created">โมดูลจะถูกลบในการรีบู๊ตครั้งหน้า</string>
-    <string name="remove_file_deleted">โมดูลจะไม่ถูกลบในการรีบู๊ตครั้งหน้า</string>
-    <string name="disable_file_created">โมดูลจะถูกเปิดใช้งานในการรีบู๊ตครั้งหน้า</string>
-    <string name="disable_file_removed">โมดูลจะถูกปิดใช้งานในการรีบู๊ตครั้งหน้า</string>
-    <string name="author">สร้างโดย %1$s</string>
     <string name="reboot_recovery">รีบู๊ตไปโหมดกู้คืน</string>
     <string name="reboot_bootloader">รีบู๊ตไป Bootloader</string>
     <string name="reboot_download">รีบู๊ตไป Download</string>
@@ -45,15 +28,10 @@
     <!--Repo Fragment-->
     <string name="update_available">มีการอัพเดต</string>
     <string name="installed">ติดตั้งแล้ว</string>
-    <string name="not_installed">ไม่ได้ติดตั้ง</string>
-    <string name="updated_on">อัพเดตเมื่อ %1$s</string>
     <string name="sorting_order">การเรียง</string>
-    <string name="sort_by_name">เรียงตามชื่อ</string>
-    <string name="sort_by_update">เรียงตามการอัพเดตล่าสุด</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">เก็บบันทึก</string>
-    <string name="menuReload">รีโหลด</string>
     <string name="menuClearLog">ล้างบันทึก</string>
     <string name="logs_cleared">บันทึกถูกล้างแล้ว</string>
 
@@ -86,9 +64,7 @@
     <string name="download_zip_only">ดาวน์โหลด Zip เท่านั้น</string>
     <string name="direct_install">การติดตั้งโดยตรง (แนะนำ)</string>
     <string name="install_inactive_slot">ติดตั้งไปยัง Slot ที่ไม่ใช้งาน (หลังจาก OTA)</string>
-    <string name="warning">คำเตือน</string>
     <string name="install_inactive_slot_msg">อุปกรณ์ของคุณจะถูกบังคับให้บู๊ตไป Slot ที่ไม่ใช่งานหลังจากรีบูต!\nใช้ตัวเลือกนี้หลังจาก OTA เสร็จเท่านั้น\nดำเนินการต่อ?</string>
-    <string name="select_method">เลือกวิธี</string>
     <string name="complete_uninstall">ถอนการติดตั้งแบบสมบูรณ์</string>
     <string name="restore_img">กู้คืน Images</string>
     <string name="restore_img_msg">กำลังกู้คืน…</string>
@@ -103,9 +79,6 @@
     <string name="setup_msg">กำลังรันการตั้งค่า…</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">ทั่วไป</string>
-    <string name="settings_dark_theme_title">โหมดมืด</string>
-    <string name="settings_dark_theme_summary">เปิดใช้โหมดมืด</string>
     <string name="settings_clear_cache_title">ล้างแคช Repo</string>
     <string name="settings_clear_cache_summary">ล้างข้อมูล repo ออนไลน์ที่ถูกแคชไว้</string>
     <string name="settings_hide_manager_title">ซ่อน Magisk Manager</string>
@@ -114,7 +87,6 @@
     <string name="settings_restore_manager_summary">กู้คืนชื่อเดิมของ Magisk Manager</string>
     <string name="language">ภาษา</string>
     <string name="system_default">(มาตรฐานระบบ)</string>
-    <string name="settings_update">การอัพเดต</string>
     <string name="settings_check_update_title">ตรวจสอบการอัพเดต</string>
     <string name="settings_check_update_summary">ตรวจสอบการอัพเดตเป็นระยะในพื้นหลัง</string>
     <string name="settings_update_channel_title">ช่องทางการอัพเดต</string>
@@ -122,7 +94,6 @@
     <string name="settings_update_beta">เบต้า</string>
     <string name="settings_update_custom">กำหนดเอง</string>
     <string name="settings_update_custom_msg">ใส่ URL</string>
-    <string name="settings_core_only_title">โหมดคอร์เท่านั้น</string>
     <string name="settings_core_only_summary">ใช้งานฟีเจอร์หลักเท่านั้น MagiskSU และ MagiskHide จะถูกเปิดใช้งาน แต่โมดูลต่างๆจะไม่ถูกโหลด</string>
     <string name="settings_magiskhide_summary">ซ่อน Magisk จากการตรวจสอบในหลากหลายรูปแบบ</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -143,7 +114,6 @@
     <string name="auto_response">การตอบกลับ</string>
     <string name="request_timeout">เวลาการขอใช้งาน</string>
     <string name="superuser_notification">การแจ้งเตือน Superuser</string>
-    <string name="request_timeout_summary">%1$d วินาที</string>
     <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัพเกรด</string>
     <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัพเกรด</string>
 
@@ -191,6 +161,5 @@
 
     <!--Superuser logs-->
     <string name="target_uid">UID เป้าหมาย: %1$d</string>
-    <string name="command">คำสั่ง: %1$s</string>
 
 </resources>

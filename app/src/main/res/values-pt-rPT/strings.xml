@@ -3,27 +3,18 @@
 
     <!--Welcome Activity-->
     <string name="modules">Módulos</string>
-    <string name="downloads">Transferir</string>
     <string name="superuser">root</string>
-    <string name="log">Registo</string>
+    <string name="logs">Registo</string>
     <string name="settings">Definições</string>
     <string name="install">Instalar</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk não instalado</string>
-    <string name="checking_for_updates">A procurar por atualizações…</string>
-    <string name="safetyNet_check_text">Pressione para verificar SafetyNet</string>
-    <string name="checking_safetyNet_status">A verificar o estado do SafetyNet…</string>
-    <string name="safetyNet_check_success">SafetyNet verificado com sucesso</string>
     <string name="safetyNet_api_error">Erro na API SafetyNet</string>
     <string name="safetyNet_res_invalid">A resposta é inválida</string>
 
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Definições avançadas</string>
     <string name="keep_force_encryption">Manter encriptação forçada</string>
     <string name="keep_dm_verity">Manter AVB 2.0/dm-verity</string>
-    <string name="current_installed">Instalada: %1$s</string>
-    <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstalar</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="update">Atualizar</string>
@@ -31,21 +22,13 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
     <string name="no_modules_found">Nenhum módulo encontrado</string>
-    <string name="update_file_created">Módulo será atualizado depois de reiniciar</string>
-    <string name="remove_file_created">Módulo será removido depois de reiniciar</string>
-    <string name="remove_file_deleted">Módulo não será removido ao reiniciar</string>
-    <string name="disable_file_created">Módulo será desativado depois de reiniciar</string>
-    <string name="disable_file_removed">Módulo será ativado depois de reiniciar</string>
-    <string name="author">Criado por %1$s</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Atualização disponível</string>
     <string name="installed">Instalado</string>
-    <string name="not_installed">Não Instalado</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Gravar registo</string>
-    <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Limpar registo agora</string>
     <string name="logs_cleared">Registo limpo com sucesso</string>
 
@@ -69,15 +52,11 @@
     <string name="hide_manager_fail_toast">Falha ao esconder Magisk Manager…</string>
     <string name="download_zip_only">Transferir Apenas Ficheiro Zip</string>
     <string name="direct_install">Instalar Diretamente (Recomendado)</string>
-    <string name="select_method">Selecionar Método</string>
     <string name="complete_uninstall">Desinstalação Completa</string>
     <string name="restore_done">Restauração feita!</string>
     <string name="download_file_error">Erro ao transferir ficheiro</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Geral</string>
-    <string name="settings_dark_theme_title">Tema escuro</string>
-    <string name="settings_dark_theme_summary">Ativa o tema escuro</string>
     <string name="settings_clear_cache_title">Apagar Cache de Repositório</string>
     <string name="settings_clear_cache_summary">Apaga a informação cache de repositórios online. online, forçando a aplicação a atualizar online</string>
     <string name="settings_hide_manager_title">Esconder Magisk Manager</string>
@@ -85,7 +64,6 @@
     <string name="system_default">(Padrão do Sistema)</string>
     <string name="settings_update_stable">Estável</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_core_only_title">Magisk somente em Modo Core</string>
     <string name="settings_core_only_summary">Ativar somente funcionalidades principais, todos os módulos não serão carregados. MagiskSU e MagiskHide ainda estará ativado</string>
     <string name="settings_magiskhide_summary">Oculta Magisk de várias deteções</string>
     <string name="settings_hosts_title">Ativar systemless hosts</string>
@@ -105,7 +83,6 @@
     <string name="auto_response">Resposta Automática</string>
     <string name="request_timeout">Tempo limite de solicitação</string>
     <string name="superuser_notification">Notificação de root</string>
-    <string name="request_timeout_summary">%1$d segundos</string>
     <string name="settings_su_reauth_title">Autenticar novamente após atualizar</string>
     <string name="settings_su_reauth_summary">Autenticar novamente permissões de root após atualizar aplicações</string>
 
@@ -154,6 +131,5 @@
 
     <!--Superuser logs-->
     <string name="target_uid">Alvo UID: %1$d</string>
-    <string name="command">Comando: %1$s</string>
 
 </resources>

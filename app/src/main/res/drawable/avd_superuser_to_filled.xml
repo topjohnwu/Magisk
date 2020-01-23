@@ -1,0 +1,28 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="vector"
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <path
+                android:name="path"
+                android:fillColor="#000000"
+                android:fillType="evenOdd"
+                android:pathData="M 21 11 C 21 16.55 17.16 21.74 12 23 C 6.84 21.74 3 16.55 3 11 L 3 5 L 7.5 3 L 12 1 L 21 5 L 21 11 M 12 21 L 12 21 C 8.25 20 5 15.54 5 11.22 L 5 6.3 L 12 3.18 L 19 6.3 L 19 11.22 C 19 15.54 15.75 20 12 21" />
+        </vector>
+    </aapt:attr>
+    <target android:name="path">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="300"
+                android:interpolator="@interpolator/fast_out_slow_in"
+                android:propertyName="pathData"
+                android:valueFrom="M 21 11 C 21 16.55 17.16 21.74 12 23 C 6.84 21.74 3 16.55 3 11 L 3 5 L 7.5 3 L 12 1 L 21 5 L 21 11 M 12 21 L 12 21 C 8.25 20 5 15.54 5 11.22 L 5 6.3 L 12 3.18 L 19 6.3 L 19 11.22 C 19 15.54 15.75 20 12 21"
+                android:valueTo="M 21 11 C 21 16.55 17.16 21.74 12 23 C 6.84 21.74 3 16.55 3 11 L 3 5 L 12 1 L 12 1 L 21 5 L 21 11 M 12 10.18 L 12 10.18 C 12 10.18 12 10.18 12 10.18 L 12 10.18 L 12 10.18 L 12 10.18 L 12 10.18 C 12 10.18 12 10.18 12 10.18"
+                android:valueType="pathType" />
+        </aapt:attr>
+    </target>
+</animated-vector>

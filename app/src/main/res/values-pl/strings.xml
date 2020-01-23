@@ -2,46 +2,28 @@
 
     <!--Welcome Activity-->
     <string name="modules">Moduły</string>
-    <string name="downloads">Pobieranie</string>
     <string name="superuser">Superuser</string>
-    <string name="log">Log</string>
+    <string name="logs">Log</string>
     <string name="settings">Ustawienia</string>
     <string name="install">Instaluj</string>
     <string name="unsupport_magisk_title">Nieobsługiwana Wersja Magisk</string>
     <string name="unsupport_magisk_msg">Ta wersja Magisk Managera nie obsługuje wersji Magiska poniżej %1$s.\n\nZaktualizuj Magisk.</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk nie jest zainstalowany.</string>
-    <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
     <string name="invalid_update_channel">Nieprawidłowy Kanał Aktualizacji</string>
-    <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
-    <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
-    <string name="safetyNet_check_success">SafetyNet Poprawny</string>
     <string name="safetyNet_api_error">SafetyNet API Błędny</string>
     <string name="safetyNet_res_invalid">Usługa nie odpowiada.</string>
-    <string name="magisk_up_to_date">Magisk jest aktualny</string>
-    <string name="manager_up_to_date">Magisk Manager jest aktualny</string>
-    <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
     <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
     <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity (weryfikację procesu bootowania)</string>
     <string name="recovery_mode">Tryb Recovery</string>
-    <string name="current_installed">Zainstalowana: %1$s</string>
-    <string name="latest_version">Ostatnia: %1$s</string>
     <string name="uninstall">Odinstaluj</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
     <string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte. Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>
     <string name="update">Pobierz</string>
-    <string name="core_only_enabled">(Włączony tylko tryb jądra)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
     <string name="no_modules_found">Nie znaleziono modułów.</string>
-    <string name="update_file_created">Moduł zostanie zaktualizowany przy następnym restarcie.</string>
-    <string name="remove_file_created">Moduł zostanie usunięty przy następnym uruchomieniu.</string>
-    <string name="remove_file_deleted">Moduł nie zostanie usunięty podczas następnego restartu.</string>
-    <string name="disable_file_created">Moduł zostanie wyłączony przy następnym restarcie.</string>
-    <string name="disable_file_removed">Moduł zostanie włączony przy następnym restarcie.</string>
-    <string name="author">Autor: %1$s</string>
     <string name="reboot_recovery">Restart do Recovery</string>
     <string name="reboot_bootloader">Restart do Bootloadera</string>
     <string name="reboot_download">Restart do Download</string>
@@ -50,15 +32,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Aktualizacja dostępna</string>
     <string name="installed">Zainstalowany</string>
-    <string name="not_installed">Nie zainstalowany</string>
-    <string name="updated_on">Zaktualizowano: %1$s</string>
     <string name="sorting_order">Kolejność Sortowania</string>
-    <string name="sort_by_name">Sortuj po nazwie</string>
-    <string name="sort_by_update">Sortuj po ostatniej aktualizacji</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Zapisz log</string>
-    <string name="menuReload">Załaduj ponownie</string>
     <string name="menuClearLog">Wyczyść Log</string>
     <string name="logs_cleared">Log wyczyszczony.</string>
 
@@ -81,7 +58,6 @@
     <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
     <string name="install_inactive_slot">Zainstaluj do Nieaktywnego Slotu (po OTA)</string>
     <string name="install_inactive_slot_msg">Urządzenie będzie MUSIAŁO uruchomić się z bieżącego nieaktywnego slotu po restarcie! /\nUżyj tylko tej opcji po zakończeniu OTA.\nKontynuować?</string>
-    <string name="select_method">Wybierz Metodę</string>
     <string name="setup_title">Dodatkowa konfiguracja</string>
     <string name="select_patch_file">Wybierz i Wgraj Plik</string>
     <string name="patch_file_msg">Wybierz obraz raw (*.img) lub plik ODIN tar (*.tar)</string>
@@ -104,7 +80,6 @@
     <string name="hide_manager_title">Ukryj Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Błąd Ukrycia Magisk Managera.</string>
     <string name="open_link_failed_toast">Nie znaleziono aplikacji pod linkiem.</string>
-    <string name="warning">Uwaga</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_img">Przywróć Obraz</string>
     <string name="restore_img_msg">Przywracanie…</string>
@@ -118,9 +93,6 @@
     <string name="setup_msg">Uruchamianie konfiguracji środowiska…</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Ogólne</string>
-    <string name="settings_dark_theme_title">Ciemny Motyw</string>
-    <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
     <string name="settings_download_path_title">Pobierz dodatek</string>
     <string name="settings_download_path_message">Pliki zostaną zapisane w %1$s</string>
     <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
@@ -131,7 +103,6 @@
     <string name="settings_restore_manager_summary">Przywróć oryginalną paczkę Magisk Manager</string>
     <string name="language">Język</string>
     <string name="system_default">(Domyślny Systemu)</string>
-    <string name="settings_update">Ustawienia Aktualizacji</string>
     <string name="settings_check_update_title">Sprawdzanie Aktualizacji</string>
     <string name="settings_check_update_summary">Regularnie sprawdzaj aktualizacje w tle</string>
     <string name="settings_update_channel_title">Kanał Aktualizacji</string>
@@ -139,14 +110,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Własny</string>
     <string name="settings_update_custom_msg">Wstaw własny URL</string>
-    <string name="settings_core_only_title">Tylko Podstawowy Tryb Magisk</string>
     <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU i MagiskHide nadal będą włączone</string>
     <string name="settings_magiskhide_summary">Włącz Magisk Hide dla wykrytych aplikacji</string>
     <string name="settings_hosts_title">Włącz systemless hosts</string>
     <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
     <string name="settings_hosts_toast">Dodano moduł systemless hosts</string>
 
-    <string name="settings_app_name">Wpisz żądaną nazwę aplikacji</string>
     <string name="settings_app_name_hint">Nowa Nazwa</string>
     <string name="settings_app_name_helper">Aplikacja zostanie ponownie spakowana do tej nazwy</string>
     <string name="settings_app_name_error">Zły format</string>
@@ -164,7 +133,6 @@
     <string name="auto_response">Automatyczna Odpowiedź</string>
     <string name="request_timeout">Limit Czasu Żądania</string>
     <string name="superuser_notification">Powiadomienia Superusera</string>
-    <string name="request_timeout_summary">%1$d sekund</string>
     <string name="settings_su_reauth_title">Ponowienie uwierzytelnienia po aktualizacji</string>
     <string name="settings_su_reauth_summary">Ponowne uwierzytelnianie uprawnienia superużytkownika po aktualizacji aplikacji</string>
     <string name="settings_su_biometric_title">Uwierzytelnianie odciskiem palca</string>
@@ -217,7 +185,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Identyfikator UID: %1$d</string>
-    <string name="command">Komenda: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Pokaż aplikacje systemowe</string>

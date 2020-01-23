@@ -8,6 +8,4 @@ interface Navigator {
     //TODO Elevate Fragment to MagiskFragment<*,*> once everything is on board with it
     val baseFragments: List<KClass<out Fragment>>
 
-    fun navigateTo(event: MagiskNavigationEvent)
-
 }

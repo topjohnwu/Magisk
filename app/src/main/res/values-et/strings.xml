@@ -2,45 +2,27 @@
 
     <!--Welcome Activity-->
     <string name="modules">Moodulid</string>
-    <string name="downloads">Allalaadimised</string>
     <string name="superuser">Superkasutaja</string>
-    <string name="log">Logi</string>
+    <string name="logs">Logi</string>
     <string name="settings">Seaded</string>
     <string name="install">Installi</string>
     <string name="unsupport_magisk_title">Mittetoetatud Magisk\'i versioon</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk pole installitud</string>
-    <string name="checking_for_updates">Kontrollin uuendusi…</string>
     <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
-    <string name="safetyNet_check_text">Koputa SafetyNet\'i kontrolliks</string>
-    <string name="checking_safetyNet_status">Kontrollin SafetyNet\'i olekut…</string>
-    <string name="safetyNet_check_success">SafetyNet\'i kontroll edukas</string>
     <string name="safetyNet_api_error">SafetyNet\'i API viga</string>
     <string name="safetyNet_res_invalid">Vastus on sobimatu.</string>
-    <string name="magisk_up_to_date">Magisk on kaasaegne</string>
-    <string name="manager_up_to_date">Magisk Manager on kaasaegne</string>
-    <string name="advanced_settings_title">Täpsemad seaded</string>
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
     <string name="keep_dm_verity">Säilita AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Taastusrežiim</string>
-    <string name="current_installed">Installitud: %1$s</string>
-    <string name="latest_version">Viimatine: %1$s</string>
     <string name="uninstall">Eemalda</string>
     <string name="uninstall_magisk_title">Eemalda Magisk</string>
     <string name="uninstall_magisk_msg">Kõik moodulid keelatakse/eemaldatakse. Juurkasutaja eemaldatakse ning su andmed potensiaalselt krüpteeritakse, kui need ei ole juba krüpteeritud.</string>
     <string name="update">Uuenda</string>
-    <string name="core_only_enabled">(Ainult tuuma režiim lubatud)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Info puudub)</string>
     <string name="no_modules_found">Mooduleid ei leitud.</string>
-    <string name="update_file_created">Moodul uuendatakse järgmisel taaskäivitusel.</string>
-    <string name="remove_file_created">Moodul eemaldatakse järgmisel taaskäivitusel.</string>
-    <string name="remove_file_deleted">Moodulit ei eemaldata järgmisel taaskäivitusel.</string>
-    <string name="disable_file_created">Moodul keelatakse järgmisel taaskäivitusel.</string>
-    <string name="disable_file_removed">Moodul lubatakse järgmisel taaskäivitusel.</string>
-    <string name="author">Loodud %1$s poolt</string>
     <string name="reboot_recovery">Taaskäivita taastusesse</string>
     <string name="reboot_bootloader">Taaskäivita käivitushaldurisse</string>
     <string name="reboot_download">Taaskäivita allalaadimisrežiimi</string>
@@ -49,15 +31,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Uuendus saadaval</string>
     <string name="installed">Installitud</string>
-    <string name="not_installed">Pole installitud</string>
-    <string name="updated_on">Uuendatud: %1$s</string>
     <string name="sorting_order">Sorteerimisjärjekord</string>
-    <string name="sort_by_name">Sorteeri nime järgi</string>
-    <string name="sort_by_update">Sorteeri viimase uuenduse järgi</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Salvesta logi</string>
-    <string name="menuReload">Laadi uuesti</string>
     <string name="menuClearLog">Tühjenda logi nüüd</string>
     <string name="logs_cleared">Logi edukalt tühjendatud.</string>
 
@@ -80,7 +57,6 @@
     <string name="direct_install">Otsene install (soovitatud)</string>
     <string name="install_inactive_slot">Installi ebaaktiivsesse lahtrisse (pärast üle-õhu uuendust)</string>
     <string name="install_inactive_slot_msg">Sinu seade SUNNITAKSE peale taaskäivitust käivituma praegusesse ebaaktiivsesse lahtrisse!\nKasuta seda valikut vaid peale üle-õhu uuenduse teostamist.\nJätkad?</string>
-    <string name="select_method">Vali meetod</string>
     <string name="setup_title">Lisaseadistus</string>
     <string name="select_patch_file">Vali ja paika fail</string>
     <string name="patch_file_msg">Vali toortõmmis (*.img) või ODIN tar-fail (*.tar)</string>
@@ -103,7 +79,6 @@
     <string name="hide_manager_title">Peidan Magisk Manager\'i…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'i peitmine ebaõnnestus.</string>
     <string name="open_link_failed_toast">Lingi avamiseks sobivat rakendust ei leitud.</string>
-    <string name="warning">Hoiatus</string>
     <string name="complete_uninstall">Täielik eemaldus</string>
     <string name="restore_img">Taasta tõmmised</string>
     <string name="restore_img_msg">Taastamine…</string>
@@ -117,9 +92,6 @@
     <string name="setup_msg">Käivitan keskkonnaseadistust…</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Üldine</string>
-    <string name="settings_dark_theme_title">Tume teema</string>
-    <string name="settings_dark_theme_summary">Luba tume teema.</string>
     <string name="settings_download_path_title">Allalaadimise failitee</string>
     <string name="settings_download_path_message">Failid salvestatakse kausta %1$s</string>
     <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
@@ -130,7 +102,6 @@
     <string name="settings_restore_manager_summary">Taasta Magisk Manager\'i originaalpakett</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
-    <string name="settings_update">Uuenduste seaded</string>
     <string name="settings_check_update_title">Kontrolli uuendusi</string>
     <string name="settings_check_update_summary">Kontrolli taustal perioodiliselt uuendusi.</string>
     <string name="settings_update_channel_title">Uuenduste kanal</string>
@@ -138,7 +109,6 @@
     <string name="settings_update_beta">Beeta</string>
     <string name="settings_update_custom">Kohandatud</string>
     <string name="settings_update_custom_msg">Sisesta kohandatud URL</string>
-    <string name="settings_core_only_title">Magisk\'i ainult tuuma režiim</string>
     <string name="settings_core_only_summary">Luba ainult põhifunktsioonid. MagiskSU ja MagiskHide siiski lubatakse, ent mooduleid ei laadita.</string>
     <string name="settings_magiskhide_summary">Peida Magisk erinevate tuvastuste eest</string>
     <string name="settings_hosts_title">Süsteemivaba hosts</string>
@@ -159,7 +129,6 @@
     <string name="auto_response">Automaatne vastus</string>
     <string name="request_timeout">Taotluse ajalõpp</string>
     <string name="superuser_notification">Superkasutaja teade</string>
-    <string name="request_timeout_summary">%1$d sekundit</string>
     <string name="settings_su_reauth_title">Taas-autendi peale täiendust</string>
     <string name="settings_su_reauth_summary">Taas-autendi superkasutaja õigused peale rakenduse täiendamist</string>
 
@@ -209,7 +178,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Siht-UID: %1$d</string>
-    <string name="command">Käsklus: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Kuva süsteemirakendused</string>

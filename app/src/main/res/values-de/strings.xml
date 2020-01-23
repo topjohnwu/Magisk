@@ -2,46 +2,28 @@
 
     <!--Welcome Activity-->
     <string name="modules">Module</string>
-    <string name="downloads">Downloads</string>
     <string name="superuser">Superuser</string>
-    <string name="log">Log</string>
+    <string name="logs">Log</string>
     <string name="settings">Einstellungen</string>
     <string name="install">Installieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk Version</string>
     <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Versionen unter %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert ist. Bitte Magisk so schnell wie möglich aktualisieren.</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk ist nicht installiert</string>
-    <string name="checking_for_updates">Suche nach Aktualisierungen…</string>
     <string name="invalid_update_channel">Ungültiger Aktualisierungskanal</string>
-    <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
-    <string name="checking_safetyNet_status">SafetyNet-Status prüfen…</string>
-    <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
     <string name="safetyNet_api_error">SafetyNet API Fehler</string>
     <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
-    <string name="magisk_up_to_date">Magisk ist auf dem neuesten Stand</string>
-    <string name="manager_up_to_date">Magisk Manager ist auf dem neuesten Stand</string>
-    <string name="advanced_settings_title">Erweiterte Optionen</string>
     <string name="keep_force_encryption">\"force encryption\" beibehalten</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity beibehalten</string>
     <string name="recovery_mode">Wiederherstellungsmodus</string>
-    <string name="current_installed">Installiert: %1$s</string>
-    <string name="latest_version">Neueste: %1$s</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
     <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt, und deine Daten werden möglicherweise verschlüsselt, wenn es nicht bereits der Fall ist.</string>
     <string name="update">aktualisieren</string>
-    <string name="core_only_enabled">(Core only Modus aktiviert)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nichts angegeben)</string>
     <string name="no_modules_found">Keine Module gefunden</string>
-    <string name="update_file_created">Modul wird beim nächsten Neustart aktualisiert</string>
-    <string name="remove_file_created">Modul wird beim nächsten Neustart entfernt</string>
-    <string name="remove_file_deleted">Modul wird beim nächsten Neustart nicht entfernt</string>
-    <string name="disable_file_created">Modul wird beim nächsten Neustart deaktiviert</string>
-    <string name="disable_file_removed">Modul wird beim nächsten Neustart aktiviert</string>
-    <string name="author">Erstellt von %1$s</string>
     <string name="reboot_recovery">Neustart in das Recovery</string>
     <string name="reboot_bootloader">Neustart in den Bootloader</string>
     <string name="reboot_download">Neustart in den Download-Modus</string>
@@ -50,15 +32,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Aktualisierung verfügbar</string>
     <string name="installed">Installiert</string>
-    <string name="not_installed">Nicht installiert</string>
-    <string name="updated_on">Zuletzt aktualisiert: %1$s</string>
     <string name="sorting_order">Sortierung</string>
-    <string name="sort_by_name">Nach Namen sortieren</string>
-    <string name="sort_by_update">Nach Aktualisierungsdatum sortieren</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Log speichern</string>
-    <string name="menuReload">Log erneut laden</string>
     <string name="menuClearLog">Log löschen</string>
     <string name="logs_cleared">Log gelöscht</string>
 
@@ -81,7 +58,6 @@
     <string name="direct_install">Direkt installieren (empfohlen)</string>
     <string name="install_inactive_slot">In inaktiven Slot installieren (Nach OTA)</string>
     <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
-    <string name="select_method">Methode auswählen</string>
     <string name="setup_title">Zusätzliche Einrichtung</string>
     <string name="select_patch_file">Auswählen und Patchen einer Datei</string>
     <string name="patch_file_msg">Ein Rohabbild (*.img) oder eine ODIN-Tar-Datei (*.tar) auswählen.</string>
@@ -103,7 +79,6 @@
     <string name="hide_manager_title">Magisk Manager verbergen…</string>
     <string name="hide_manager_fail_toast">Magisk Manager verbergen ist fehlgeschlagen…</string>
     <string name="open_link_failed_toast">Es wurde keine App gefunden, um diesen Link zu öffnen…</string>
-    <string name="warning">Warnung</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
     <string name="restore_img">Images wiederherstellen</string>
     <string name="restore_img_msg">Wiederherstellen…</string>
@@ -118,9 +93,6 @@
     <string name="authenticate">Authentifizieren</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Allgemein</string>
-    <string name="settings_dark_theme_title">Dunkles Theme</string>
-    <string name="settings_dark_theme_summary">Dunkles Theme aktivieren</string>
     <string name="settings_download_path_title">Download-Verzeichnis</string>
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
     <string name="settings_clear_cache_title">Repo-Cache leeren</string>
@@ -131,7 +103,6 @@
     <string name="settings_restore_manager_summary">Magisk Manager mit ursprünglichem Paketnamen wiederherstellen</string>
     <string name="language">Sprache</string>
     <string name="system_default">(Systemstandard)</string>
-    <string name="settings_update">Aktualisierungs-Einstellungen</string>
     <string name="settings_check_update_title">Auf Aktualisierungen prüfen</string>
     <string name="settings_check_update_summary">Regelmäßig im Hintergrund auf Aktualisierungen prüfen</string>
     <string name="settings_update_channel_title">Aktualisierungs-Kanal</string>
@@ -139,14 +110,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Benutzerdefiniert</string>
     <string name="settings_update_custom_msg">Eine benutzerdefinierte URL eingeben</string>
-    <string name="settings_core_only_title">Nur Kernfunktionen</string>
     <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU und Magisk Hide bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
     <string name="settings_hosts_toast">Systemless Hosts-Modul hinzugefügt</string>
 
-    <string name="settings_app_name">Den gewünschten App-Namen eingeben</string>
     <string name="settings_app_name_hint">Neuer Name</string>
     <string name="settings_app_name_helper">Die App wird unter diesem Namen neu gepackt</string>
     <string name="settings_app_name_error">Ungültiges Format</string>
@@ -164,7 +133,6 @@
     <string name="auto_response">Automatisch beantworten</string>
     <string name="request_timeout">Zeitlimit für Anfrage</string>
     <string name="superuser_notification">Superuser-Benachrichtigung</string>
-    <string name="request_timeout_summary">%1$d Sekunden</string>
     <string name="settings_su_reauth_title">Nach Aktualisierung erneut authentifizieren</string>
     <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Aktualisierung erneut abfragen</string>
     <string name="settings_su_biometric_title">Biometrische Authentifizierung aktivieren</string>
@@ -217,7 +185,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Ziel-UID: %1$d</string>
-    <string name="command">Befehl: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">System-Apps anzeigen</string>

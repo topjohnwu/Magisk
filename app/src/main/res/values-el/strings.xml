@@ -2,29 +2,20 @@
     <!--Welcome Activity-->
     <string name="modules">Modules</string>
 
-    <string name="downloads">Λήψεις</string>
     <string name="superuser">Υπερχρήστης</string>
-    <string name="log">Αρχείο Καταγραφής</string>
+    <string name="logs">Αρχείο Καταγραφής</string>
     <string name="settings">Ρυθμίσεις</string>
     <string name="install">Εγκατάσταση</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Το Magisk δεν είναι εγκατεστημένο</string>
 
-    <string name="checking_for_updates">Έλεγχος για ενημερώσεις…</string>
     <string name="invalid_update_channel">Λανθασμένο κανάλι ενημέρωσης</string>
-    <string name="safetyNet_check_text">Πατήστε για έλεγχο του SafetyNet</string>
-    <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
-    <string name="safetyNet_check_success">Ο Έλεγχος του SafetyNet Ήταν Επιτυχής</string>
     <string name="safetyNet_api_error">Σφάλμα του SafetyNet API</string>
     <string name="safetyNet_res_invalid">Η απόκριση είναι άκυρη</string>
 
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Προηγμένες ρυθμίσεις</string>
     <string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
     <string name="keep_dm_verity">Διατήρηση dm-verity</string>
-    <string name="current_installed">Εγκατεστημένη: %1$s</string>
-    <string name="latest_version">Τελευταία: %1$s</string>
     <string name="uninstall">Απεγκατάσταση</string>
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
     <string name="uninstall_magisk_msg">Όλα τα modules θα απενεργοποιηθούν/αφαιρεθούν. Το root θα αφαιρεθεί και ενδέχεται να κρυπτογραφηθούν τα δεδομένα σας, εάν δεν είναι κρυπτογραφημένα</string>
@@ -33,12 +24,6 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Δεν δόθηκαν πληροφορίες)</string>
     <string name="no_modules_found">Δεν βρέθηκαν modules</string>
-    <string name="update_file_created">Η ενότητα θα ενημερωθεί στην επόμενη επανεκκίνηση</string>
-    <string name="remove_file_created">Η ενότητα θα αφαιρεθεί στην επόμενη επανεκκίνηση</string>
-    <string name="remove_file_deleted">Η ενότητα δεν θα αφαιρεθεί στην επόμενη επανεκκίνηση</string>
-    <string name="disable_file_created">Η ενότητα θα απενεργοποιηθεί στην επόμενη επανεκκίνηση</string>
-    <string name="disable_file_removed">Η ενότητα θα ενεργοποιηθεί στην επόμενη επανεκκίνηση</string>
-    <string name="author">Δημιουργήθηκε από τον/την %1$s</string>
     <string name="reboot_recovery">Επανεκκίνηση στο Recovery</string>
     <string name="reboot_bootloader">Επανεκκίνηση στο Bootloader</string>
     <string name="reboot_download">Επανεκκίνηση για λήψη</string>
@@ -46,15 +31,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Διαθέσιμη Ενημέρωση</string>
     <string name="installed">Εγκαταστάθηκε</string>
-    <string name="not_installed">Μη εγκατεστημένη</string>
-    <string name="updated_on">Αναβαθμίστηκε στις: %1$s</string>
     <string name="sorting_order">Ταξινόμηση κατά</string>
-    <string name="sort_by_name">Ταξινόμηση κατά όνομα</string>
-    <string name="sort_by_update">Ταξινόμηση κατά τελευταία αναβάθμιση</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">"Αποθήκευση καταγραφής "</string>
-    <string name="menuReload">Επαναφόρτωση</string>
     <string name="menuClearLog">Εκκαθάριση αρχείου καταγραφής τώρα</string>
     <string name="logs_cleared">Το αρχείο καταγραφής εκκαθαρίστηκε επιτυχώς</string>
 
@@ -80,7 +60,6 @@
     <string name="hide_manager_fail_toast">Η απόκρυψη του Magisk Manager απέτυχε…</string>
     <string name="download_zip_only">Λήψη Zip Μόνο</string>
     <string name="direct_install">Απευθείας Εγκατάσταση (Προτείνεται)</string>
-    <string name="select_method">Επιλογή Μεθόδου</string>
     <string name="complete_uninstall">Πλήρης απεγκατάσταση</string>
     <string name="restore_done">Η ανάκτηση έγινε!</string>
     <string name="restore_fail">Δεν υπάρχει αντίγραφο ασφαλείας!</string>
@@ -89,22 +68,17 @@
     <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Γενικά</string>
-    <string name="settings_dark_theme_title">Σκούρο θέμα</string>
-    <string name="settings_dark_theme_summary">Ενεργοποίηση σκούρου θέματος</string>
     <string name="settings_clear_cache_title">Εκκαθάριση προσωρινής μνήμης αποθετηρίων</string>
     <string name="settings_clear_cache_summary">Καθαρίζει τις κρυφές πληροφορίες για απευθείας συνδεδεμένα αποθετήρια, αναγκάζει την εφαρμογή να κάνει ανανέωση σε απευθείας σύνδεση</string>
     <string name="settings_hide_manager_title">Απόκρυψη του Magisk Manager</string>
     <string name="settings_hide_manager_summary">Ανασυγκρότηση του Magisk Manager με τυχαίο όνομα πακέτου</string>
     <string name="language">Γλώσσα</string>
     <string name="system_default">(Προεπιλογή Συστήματος)</string>
-    <string name="settings_update">Ρυθμίσεις Ενημερώσεων</string>
     <string name="settings_update_channel_title">Κανάλι Ενημερώσεων</string>
     <string name="settings_update_stable">Σταθερό</string>
     <string name="settings_update_beta">Δοκιμαστικό</string>
     <string name="settings_update_custom">Custom</string>
     <string name="settings_update_custom_msg">Εισαγωγή ενός custom URL</string>
-    <string name="settings_core_only_title">Magisk Λειτουργία Πυρήνα Μόνο</string>
     <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, καμία από τις ενότητες δεν θα ενεργοποιηθεί. Τα MagiskSU και MagiskHide θα παραμείνουν ενεργά</string>
     <string name="settings_magiskhide_summary">Κρύβει το Magisk από διάφορες ανιχνεύσεις</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -124,7 +98,6 @@
     <string name="auto_response">Αυτόματη Απόκριση</string>
     <string name="request_timeout">Χρονικό όριο Αιτήματος</string>
     <string name="superuser_notification">Ειδοποίηση Υπερχρήστη</string>
-    <string name="request_timeout_summary">%1$d δευτερόλεπτα</string>
     <string name="settings_su_reauth_title">Επαναπιστοποίηση μετά από αναβάθμιση</string>
     <string name="settings_su_reauth_summary">Επαναπιστοποίηση αδειών υπερχρήστη μετά την αναβάθμιση μίας εφαρμογής</string>
 
@@ -172,5 +145,4 @@
 
     <!--Superuser logs-->
     <string name="target_uid">UID Στόχος: %1$d</string>
-    <string name="command">Εντολή: %1$s</string>
 </resources>

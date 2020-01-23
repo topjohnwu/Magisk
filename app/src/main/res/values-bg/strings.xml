@@ -2,28 +2,19 @@
 
     <!--Welcome Activity-->
     <string name="modules">Модули</string>
-    <string name="downloads">Изтегляния</string>
     <string name="superuser">Superuser</string>
-    <string name="log">Дневник</string>
+    <string name="logs">Дневник</string>
     <string name="settings">Настройки</string>
     <string name="install">Инсталиране</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk не е инсталиран.</string>
-    <string name="checking_for_updates">Проверяваме за актуализации…</string>
     <string name="invalid_update_channel">Невалиден канал за актуализации</string>
-    <string name="safetyNet_check_text">Докоснете за стартиране на SafetyNet проверката.</string>
-    <string name="checking_safetyNet_status">Проверка статуса на SafetyNet…</string>
-    <string name="safetyNet_check_success">SafetyNet проверката е успешна.</string>
     <string name="safetyNet_api_error">Грешка в SafetyNet ППИ</string>
     <string name="safetyNet_res_invalid">Невалиден отговор</string>
 
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Допълнителни настройки</string>
     <string name="keep_force_encryption">Запазване на наложеното криптиране</string>
     <string name="keep_dm_verity">Запазване на AVB 2.0/dm-verity</string>
-    <string name="current_installed">Инсталирана: %1$s</string>
-    <string name="latest_version">Най-нова: %1$s</string>
     <string name="uninstall">Деинсталиране</string>
     <string name="uninstall_magisk_title">Деинсталиране на Magisk</string>
     <string name="uninstall_magisk_msg">Всички модули ще бъдат изключени/премахнати. Руут достъпът ще бъде премахнат и е възможно криптиране на данните Ви.</string>
@@ -32,12 +23,6 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Не е представена информация)</string>
     <string name="no_modules_found">Няма намерени модули.</string>
-    <string name="update_file_created">Модулът ще бъде обновен при следващото рестартиране.</string>
-    <string name="remove_file_created">Модулът ще бъде премахнат при следващото рестартиране.</string>
-    <string name="remove_file_deleted">Модулът няма да бъде премахнат при следващото рестартиране.</string>
-    <string name="disable_file_created">Модулът ще бъде изключен при следващото рестартиране.</string>
-    <string name="disable_file_removed">Модулът ще бъде активиран при следващото рестартиране.</string>
-    <string name="author">Създаден от %1$s</string>
     <string name="reboot_recovery">Рестартиране в режима за възстановяване</string>
     <string name="reboot_bootloader">Рестартиране в буутлоудъра</string>
     <string name="reboot_download">Рестартиране в даунлоуд режима</string>
@@ -45,15 +30,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Налице е актуализация.</string>
     <string name="installed">Инсталирани</string>
-    <string name="not_installed">Не са инсталирани</string>
-    <string name="updated_on">Актуализиран на: %1$s</string>
     <string name="sorting_order">Сортиране</string>
-    <string name="sort_by_name">Сортиране по наименование</string>
-    <string name="sort_by_update">Сортиране по последно обновяване</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Запазване на доклад</string>
-    <string name="menuReload">Презареждане</string>
     <string name="menuClearLog">Изчистване на дневника</string>
     <string name="logs_cleared">Успешно изчистване на дневника.</string>
 
@@ -81,9 +61,8 @@
     <string name="download_zip_only">Изтегляне само на архив</string>
     <string name="direct_install">Директно инсталиране (Препоръчва се.)</string>
     <string name="install_inactive_slot">Инсталиране на неактивен слот (След OTA)</string>
-    <string name="warning">Внимание</string>
     <string name="install_inactive_slot_msg">Вашето устройство НАЛОЖИТЕЛНО ще стартира текущия неактивен слот при следващото рестартиране.\nИзползвайте тази опция само след като приключи инсталирането на OTA.\nПродължаване?</string>
-.   <string name="select_method">Избор на метод</string>
+    .
     <string name="complete_uninstall">Пълно деинсталиране</string>
     <string name="restore_img">Възстановяване на образи</string>
     <string name="restore_img_msg">Възстановяване…</string>
@@ -99,9 +78,6 @@
     <string name="download_file_error">Грешка при изтеглянето на файла.</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Общи</string>
-    <string name="settings_dark_theme_title">Тъмна тема</string>
-    <string name="settings_dark_theme_summary">Включване на тъмната тема</string>
     <string name="settings_clear_cache_title">Изчистване кеша на хранилището</string>
     <string name="settings_clear_cache_summary">Изчистване на кешираната информация на онлайн хранилището за принудителното му обновяване.</string>
     <string name="settings_hide_manager_title">Скриване на Magisk Manager</string>
@@ -110,7 +86,6 @@
     <string name="settings_restore_manager_summary">Възстановяване на оригиналното пакетно наименование на Magisk Manager.</string>
     <string name="language">Език</string>
     <string name="system_default">(Системен)</string>
-    <string name="settings_update">Настройки за актуализиране</string>
     <string name="settings_check_update_title">Проверка за актуализации</string>
     <string name="settings_check_update_summary">Периодично проверяване за актуализации във фонов режим.</string>
     <string name="settings_update_channel_title">Канал за актуализации</string>
@@ -118,7 +93,6 @@
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">Потребителски</string>
     <string name="settings_update_custom_msg">Въведете потребителски URL</string>
-    <string name="settings_core_only_title">Режим Magisk Core Only</string>
     <string name="settings_core_only_summary">Работят само основни функции, като MagiskSU и MagiskHide, без всякакви модули.</string>
     <string name="settings_magiskhide_summary">Скриване на Magisk от различни детектори.</string>
     <string name="settings_hosts_title">Несистемни хостове</string>
@@ -139,7 +113,6 @@
     <string name="auto_response">Автоматичен отговор</string>
     <string name="request_timeout">Време за запитване</string>
     <string name="superuser_notification">Superuser известие</string>
-    <string name="request_timeout_summary">%1$d секунди</string>
     <string name="settings_su_reauth_title">Повторно запитване след актуализация</string>
     <string name="settings_su_reauth_summary">Повторно запитване за Superuser достъп след актуализация на приложенията.</string>
 
@@ -187,6 +160,5 @@
 
     <!--Superuser logs-->
     <string name="target_uid">Целеви UID: %1$d</string>
-    <string name="command">Команда: %1$s</string>
 
 </resources>

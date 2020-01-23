@@ -3,27 +3,18 @@
 
     <!--Welcome Activity-->
     <string name="modules">Moduler</string>
-    <string name="downloads">Nerladdningar</string>
     <string name="superuser">Superuser</string>
-    <string name="log">Logg</string>
+    <string name="logs">Logg</string>
     <string name="settings">Inställningar</string>
     <string name="install">Install</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk är inte installerad</string>
 
-    <string name="checking_for_updates">Söker efter uppdateringar…</string>
-    <string name="safetyNet_check_text">Tryck för att starta SafetyNet-kontroll</string>
-    <string name="checking_safetyNet_status">Kontrollerar SafetyNet-status…</string>
-    <string name="safetyNet_check_success">SafetyNet-kontroll lyckades</string>
     <string name="safetyNet_res_invalid">Svaret är ogiltigt</string>
 
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Advancerade inställningar</string>
     <string name="keep_force_encryption">Fortsätt tvinga kryptering</string>
     <string name="keep_dm_verity">Behåll AVB 2.0/dm-verity</string>
-    <string name="current_installed">Installerad: %1$s</string>
-    <string name="latest_version">Senaste: %1$s</string>
     <string name="uninstall">Avinstallera</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
     <string name="update">Uppdatera</string>
@@ -31,21 +22,13 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Ingen information tillhandahållen)</string>
     <string name="no_modules_found">Hittade inga moduler</string>
-    <string name="update_file_created">Modulen kommer att uppdateras vid nästa omstart</string>
-    <string name="remove_file_created">Modulen kommer att tas bort vid nästa omstart</string>
-    <string name="remove_file_deleted">Modulen kommer att inte att tas bort vid nästa omstart</string>
-    <string name="disable_file_created">Modulen kommer att inaktiveras vid nästa omstart</string>
-    <string name="disable_file_removed">Modulen kommer att aktiveras vid nästa omstart</string>
-    <string name="author">Skapad av %1$s</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Uppdatering tillgänglig</string>
     <string name="installed">Installerad</string>
-    <string name="not_installed">Inte installerad</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Spara loggen</string>
-    <string name="menuReload">Uppdatera</string>
     <string name="menuClearLog">Rensa loggen</string>
     <string name="logs_cleared">Loggen rensad</string>
 
@@ -67,13 +50,9 @@
     <string name="download_file_error">Fel vid nerladdning av fil</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Allmän</string>
-    <string name="settings_dark_theme_title">Mörkt tema</string>
-    <string name="settings_dark_theme_summary">Aktivera mörkt tema</string>
     <string name="settings_clear_cache_title">Rensa repo-cache</string>
     <string name="settings_clear_cache_summary">Rensa den lagrade information för online-repos, tvingar appen att uppdatera online</string>
 
-    <string name="settings_core_only_title">Endast Magisk kärnläge</string>
     <string name="settings_core_only_summary">Aktiverar endast kärnfunktioner, alla moduler laddas inte. MagiskSU och MagiskHide kommer fortfarande att vara aktiverade</string>
     <string name="settings_magiskhide_summary">Dölj Magisk från att bli upptäckt</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -93,7 +72,6 @@
     <string name="auto_response">Automatiskt svar</string>
     <string name="request_timeout">Förfrågnings-timeout</string>
     <string name="superuser_notification">Superuser-avisering</string>
-    <string name="request_timeout_summary">%1$d sekunder</string>
     <string name="settings_su_reauth_title">Återautentisera efter uppdatering</string>
     <string name="settings_su_reauth_summary">Återautentisera superuser-behörigheter efter en applikationsuppdatering</string>
 
@@ -141,6 +119,5 @@
 
     <!--Superuser logs-->
     <string name="target_uid">Mål-UID: %1$d</string>
-    <string name="command">Kommando: %1$s</string>
 
 </resources>

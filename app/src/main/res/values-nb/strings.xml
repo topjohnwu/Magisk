@@ -2,28 +2,19 @@
 
     <!--Welcome Activity-->
     <string name="modules">Moduler</string>
-    <string name="downloads">Nedlastinger</string>
     <string name="superuser">Superbruker</string>
-    <string name="log">Logg</string>
+    <string name="logs">Logg</string>
     <string name="settings">Innstillinger</string>
     <string name="install">Installer</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk er ikke installert.</string>
-    <string name="checking_for_updates">Ser etter oppdateringer …</string>
     <string name="invalid_update_channel">Ugyldig oppdateringskanal</string>
-    <string name="safetyNet_check_text">Trykk for å begynne SafetyNet-sjekken.</string>
-    <string name="checking_safetyNet_status">Sjekker SafetyNet-statusen …</string>
-    <string name="safetyNet_check_success">SafetyNet-sjekken var vellykket</string>
     <string name="safetyNet_api_error">SafetyNet-API-feil</string>
     <string name="safetyNet_res_invalid">Tilbakemeldingen er ugyldig.</string>
 
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Avanserte innstillinger</string>
     <string name="keep_force_encryption">Preserver tvunget kryptering</string>
     <string name="keep_dm_verity">Preserver AVB 2.0/dm-verity</string>
-    <string name="current_installed">Installert: %1$s</string>
-    <string name="latest_version">Nyeste: %1$s</string>
     <string name="uninstall">Avinstaller</string>
     <string name="uninstall_magisk_title">Avinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Alle moduler vil bli avskrudd/fjernet. Root vil bli fjernet, og dataene dine blir kanskje kryptert dersom de ikke allerede er det.</string>
@@ -32,12 +23,6 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Ingen info er oppgitt)</string>
     <string name="no_modules_found">Ingen moduler ble funnet</string>
-    <string name="update_file_created">Modulen vil bli oppdatert ved neste omstart.</string>
-    <string name="remove_file_created">Modulen vil bli fjernet ved neste omstart.</string>
-    <string name="remove_file_deleted">Modulen vil bli ikke bli fjernet ved neste omstart.</string>
-    <string name="disable_file_created">Modulen vil bli skrudd av ved neste omstart.</string>
-    <string name="disable_file_removed">Modulen vil bli skrudd på ved neste omstart.</string>
-    <string name="author">Laget av %1$s</string>
     <string name="reboot_recovery">Omstart til gjenoppretting</string>
     <string name="reboot_bootloader">Omstart til oppstartslaster</string>
     <string name="reboot_download">Omstart til nedlasting</string>
@@ -45,15 +30,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Oppdatering tilgjengelig</string>
     <string name="installed">Installert</string>
-    <string name="not_installed">Ikke installert</string>
-    <string name="updated_on">Oppdatert den: %1$s</string>
     <string name="sorting_order">Sorteringsrekkefølge</string>
-    <string name="sort_by_name">Sorter etter navn</string>
-    <string name="sort_by_update">Sorter etter seneste oppdatering</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Lagre loggboken</string>
-    <string name="menuReload">Omlast</string>
     <string name="menuClearLog">Tøm loggboken nå</string>
     <string name="logs_cleared">Loggboken ble vellykket tømt.</string>
 
@@ -86,9 +66,7 @@
     <string name="download_zip_only">Bare last ned ZIPen</string>
     <string name="direct_install">Direkteinstallasjon (Anbefalt)</string>
     <string name="install_inactive_slot">Installer til et inaktivt felt (Etter OTA)</string>
-    <string name="warning">Advarsel</string>
     <string name="install_inactive_slot_msg">Enheten din vil bli TVUNGET til å starte opp på det som for øyeblikket er et inaktivt felt, etter en omstart!\nBare bruk dette alternativet etter at OTA-oppdateringen er ferdig.\nVil du fortsette?</string>
-    <string name="select_method">Velg metode</string>
     <string name="complete_uninstall">Fullstendig avinstallering</string>
     <string name="restore_img">Gjenopprett oppstartsbilde</string>
     <string name="restore_img_msg">Gjenoppretter …</string>
@@ -103,9 +81,6 @@
     <string name="setup_msg">Kjører appmiljøoppsettet …</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Generelt</string>
-    <string name="settings_dark_theme_title">Mørkt tema</string>
-    <string name="settings_dark_theme_summary">Skru på det mørke temaet.</string>
     <string name="settings_clear_cache_title">Tøm repomellomlageret</string>
     <string name="settings_clear_cache_summary">Tøm den mellomlagrede informasjonen til nettrepoer. Dette tvinger appen til å oppfriskes på nett.</string>
     <string name="settings_hide_manager_title">Skjul Magisk Manager</string>
@@ -114,7 +89,6 @@
     <string name="settings_restore_manager_summary">Gjenopprett Magisk Manager med den opprinnelige pakken</string>
     <string name="language">Språk</string>
     <string name="system_default">(Systemets standard)</string>
-    <string name="settings_update">Oppdateringsinnstillinger</string>
     <string name="settings_check_update_title">Let etter oppdateringer</string>
     <string name="settings_check_update_summary">Let jevnlig etter oppdateringer i bakgrunnen.</string>
     <string name="settings_update_channel_title">Oppdateringskanal</string>
@@ -122,7 +96,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Tilpasset</string>
     <string name="settings_update_custom_msg">Skriv inn en egendefinert URL</string>
-    <string name="settings_core_only_title">Kun Magisk-kjernefunksjoner</string>
     <string name="settings_core_only_summary">Bare aktiver kjernefunksjonene. MagiskSU og MagiskHide vil fortsatt være skrudd på, men ingen moduler vil bli lastet inn</string>
     <string name="settings_magiskhide_summary">Skjul Magisk fra diverse måter å bli oppdaget på.</string>
     <string name="settings_hosts_title">Systemløs «hosts»-fil</string>
@@ -143,7 +116,6 @@
     <string name="auto_response">Automatisk tilbakemelding</string>
     <string name="request_timeout">Tidsgrense for tilbakemelding Timeout</string>
     <string name="superuser_notification">Superbruker-notifikasjon</string>
-    <string name="request_timeout_summary">%1$d sekunder</string>
     <string name="settings_su_reauth_title">Autentiser på nytt etter oppdateringer after upgrade</string>
     <string name="settings_su_reauth_summary">Autentiser superbruker-tillatelser på nytt etter at en app har blitt oppdatert</string>
 
@@ -191,6 +163,5 @@
 
     <!--Superuser logs-->
     <string name="target_uid">Mål-UID: %1$d</string>
-    <string name="command">Kommando: %1$s</string>
 
 </resources>

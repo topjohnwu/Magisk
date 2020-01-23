@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.hide.HideViewModel" />
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/hide_content"
+            dividerVertical="@{@drawable/divider_l1}"
+            invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
+            itemBinding="@{viewModel.itemBinding}"
+            items="@{viewModel.items}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/l1"
+            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
+            android:paddingEnd="@dimen/l1"
+            android:paddingBottom="@{viewModel.insets.bottom}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_hide_md2"
+            tools:paddingTop="40dp" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/hide_filter_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginStart="@dimen/l1"
+            android:layout_marginEnd="@dimen/l1"
+            android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
+            app:backgroundTint="?colorSurfaceSurfaceVariant"
+            app:srcCompat="@drawable/ic_filter"
+            app:tint="?colorPrimary"
+            tools:layout_marginBottom="64dp" />
+
+        <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+            android:id="@+id/hide_filter"
+            style="@style/WidgetFoundation.Card.Variant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:visibility="invisible"
+            app:cardCornerRadius="0dp">
+
+            <include
+                android:id="@+id/hide_filter_include"
+                layout="@layout/include_hide_filter"
+                viewModel="@{viewModel}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
+        <LinearLayout
+            goneUnless="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/safetynet_attest_loading"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                style="@style/WidgetFoundation.ProgressBar.Indeterminate"
+                android:layout_marginTop="@dimen/l1" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</layout>

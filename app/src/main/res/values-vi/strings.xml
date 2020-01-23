@@ -2,28 +2,19 @@
 	
     <!--Welcome Activity-->
     <string name="modules">Mô-đun</string>
-    <string name="downloads">Tải xuống</string>
     <string name="superuser">Superuser</string>
-    <string name="log">Nhật ký</string>
+    <string name="logs">Nhật ký</string>
     <string name="settings">Thiết lập</string>
     <string name="install">Cài đặt</string>
     
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk chưa được cài đặt</string>
-    <string name="checking_for_updates">Đang kiểm tra cập nhật…</string>
     <string name="invalid_update_channel">Kênh cập nhật không hợp lệ</string>
-    <string name="safetyNet_check_text">Chạm để bắt đầu kiểm tra SafetyNet</string>
-    <string name="checking_safetyNet_status">Đang kiểm tra trạng thái SafetyNet…</string>
-    <string name="safetyNet_check_success">Kiểm tra SafetyNet thành công</string>
     <string name="safetyNet_api_error">Lỗi SafetyNet API</string>
     <string name="safetyNet_res_invalid">Phản hồi không hợp lệ.</string>
     
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Thiết lập nâng cao</string>
     <string name="keep_force_encryption">Giữ bắt buộc mã hoá</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
-    <string name="current_installed">Đã cài: %1$s</string>
-    <string name="latest_version">Mới nhất: %1$s</string>
     <string name="uninstall">Gỡ bỏ</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
     <string name="uninstall_magisk_msg">Tất cả mô-đun sẽ bị vô hiệu/loại bỏ. Root sẽ bị loại bỏ và dữ liệu của bạn có thể bị mã hoá.</string>
@@ -32,12 +23,6 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Không có thông tin được cung cấp)</string>
     <string name="no_modules_found">Không tìm thấy mô-đun</string>
-    <string name="update_file_created">Mô-đun sẽ được cập nhật ở lần khởi động lại kế tiếp</string>
-    <string name="remove_file_created">Mô-đun sẽ được xoá bỏ ở lần khởi động lại kế tiếp</string>
-    <string name="remove_file_deleted">Mô-đun sẽ không được xoá bỏ ở lần khởi động lại kế tiếp</string>
-    <string name="disable_file_created">Mô-đun sẽ bị vô hiệu ở lần khởi động lại kế tiếp</string>
-    <string name="disable_file_removed">Mô-đun sẽ được kích hoạt ở lần khởi động lại kế tiếp</string>
-    <string name="author">Tạo bởi %1$s</string>
     <string name="reboot_recovery">Khởi động vào Recovery</string>
     <string name="reboot_bootloader">Khởi động vào Bootloader</string>
     <string name="reboot_download">Khởi động vào Download</string>
@@ -45,15 +30,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Có cập nhật mới</string>
     <string name="installed">Đã được cài đặt</string>
-    <string name="not_installed">Chưa được cài đặt</string>
-    <string name="updated_on">Cập nhật vào: %1$s</string>
     <string name="sorting_order">Thứ tự sắp xếp</string>
-    <string name="sort_by_name">Sắp xếp theo tên</string>
-    <string name="sort_by_update">Sắp xếp theo cập nhật lần cuối</string>
-    
+
     <!--Log Fragment-->
     <string name="menuSaveLog">Lưu nhật ký</string>
-    <string name="menuReload">Tải lại</string>
     <string name="menuClearLog">Xoá nhật ký ngay</string>
     <string name="logs_cleared">Đã xoá nhật ký thành công</string>
 
@@ -81,9 +61,7 @@
     <string name="download_zip_only">Chỉ tải xuống tập tin zip</string>
     <string name="direct_install">Cài đặt trực tiếp (Được đề xuất)</string>
     <string name="install_inactive_slot">Cài đặt vào vùng không hoạt động (Sau khi OTA)</string>
-    <string name="warning">Cảnh báo</string>
     <string name="install_inactive_slot_msg">Thiết bị của bạn sẽ bắt buộc phải khởi động tới vị trí không hoạt động hiện tại sau khi khởi động lại!\nChỉ sử dụng tuỳ chọn này sau khi cập nhật OTA hoàn tất.\nMuốn tiếp tục?</string>
-    <string name="select_method">Chọn phương thức</string>
     <string name="complete_uninstall">Xác nhận gỡ bỏ</string>
     <string name="restore_img">Khôi phục images</string>
     <string name="restore_img_msg">Đang khôi phục…</string>
@@ -99,9 +77,6 @@
     <string name="download_file_error">Lỗi tải tập tin</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Chung</string>
-    <string name="settings_dark_theme_title">Chủ đề tối</string>
-    <string name="settings_dark_theme_summary">Dùng chủ đề tối</string>
     <string name="settings_clear_cache_title">Xoá bộ đệm kho</string>
     <string name="settings_clear_cache_summary">Xoá thông tin được lưu trong bộ nhớ cache của các bản thử nghiệm trực tuyến. Điều này buộc ứng dụng phải làm mới trực tuyến.</string>
     <string name="settings_hide_manager_title">Ẩn Magisk Manager</string>
@@ -110,7 +85,6 @@
     <string name="settings_restore_manager_summary">Khôi phục Magisk Manager với gói ban đầu</string>
     <string name="language">Ngôn ngữ</string>
     <string name="system_default">(Mặc định hệ thống)</string>
-    <string name="settings_update">Cài đặt cập nhật</string>
     <string name="settings_check_update_title">Kiểm tra cập nhật</string>
     <string name="settings_check_update_summary">Định kỳ kiểm tra các bản cập nhật trong nền.</string>
     <string name="settings_update_channel_title">Kênh cập nhật</string>
@@ -118,7 +92,6 @@
     <string name="settings_update_beta">Dùng thử</string>
     <string name="settings_update_custom">Tuỳ chỉnh</string>
     <string name="settings_update_custom_msg">Chèn URL tuỳ chỉnh</string>
-    <string name="settings_core_only_title">Chế độ chỉ lõi Magisk</string>
     <string name="settings_core_only_summary">Chỉ bật các tính năng chính. MagiskSU và MagiskHide sẽ vẫn được kích hoạt, nhưng sẽ không có mô-đun nào được tải.</string>
     <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -138,7 +111,6 @@
     <string name="auto_response">Tự phản hồi</string>
     <string name="request_timeout">Thời gian chờ yêu cầu</string>
     <string name="superuser_notification">Thông báo Superuser</string>
-    <string name="request_timeout_summary">%1$d giây</string>
     <string name="settings_su_reauth_title">Xác thực lại sau khi nâng cấp</string>
     <string name="settings_su_reauth_summary">Xác thực lại quyền superuser sau khi nâng cấp ứng dụng</string>
     <string name="multiuser_mode">Chế độ đa người dùng</string>
@@ -184,5 +156,4 @@
 
     <!--Superuser logs-->
     <string name="target_uid">Mục UID: %1$d</string>
-    <string name="command">Điều khiển: %1$s</string>
 </resources>

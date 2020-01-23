@@ -1,20 +1,18 @@
 package com.topjohnwu.magisk.data.repository
 
-import com.topjohnwu.magisk.Const
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.database.SuLogDao
 import com.topjohnwu.magisk.model.entity.MagiskLog
-import com.topjohnwu.magisk.model.entity.WrappedMagiskLog
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Completable
 import io.reactivex.Single
-import java.util.concurrent.TimeUnit
 
 
 class LogRepository(
     private val logDao: SuLogDao
 ) {
 
-    fun fetchLogs() = logDao.fetchAll().map { it.wrap() }
+    fun fetchLogs() = logDao.fetchAll()
 
     fun fetchMagiskLogs() = Single.fromCallable {
         Shell.su("tail -n 5000 ${Const.MAGISK_LOG}").exec().out
@@ -27,12 +25,5 @@ class LogRepository(
     }
 
     fun insert(log: MagiskLog) = logDao.insert(log)
-
-    private fun List<MagiskLog>.wrap(): List<WrappedMagiskLog> {
-        val day = TimeUnit.DAYS.toMillis(1)
-        return groupBy { it.time / day }
-            .map { WrappedMagiskLog(it.key * day, it.value) }
-    }
-
 
 }

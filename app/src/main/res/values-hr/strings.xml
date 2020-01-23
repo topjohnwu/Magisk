@@ -3,28 +3,19 @@
 
     <!--Welcome Activity-->
     <string name="modules">Moduli</string>
-    <string name="downloads">Preuzimanja</string>
     <string name="superuser">Superuser</string>
-    <string name="log">Zapisnik događaja</string>
+    <string name="logs">Zapisnik događaja</string>
     <string name="settings">Postavke</string>
     <string name="install">Instaliranje</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk nije instaliran</string>
 
-    <string name="checking_for_updates">Provjera ažuriranja…</string>
-    <string name="safetyNet_check_text">Dodirni za SafetyNet provjeru</string>
-    <string name="checking_safetyNet_status">Provjera SafetyNet statusa</string>
-    <string name="safetyNet_check_success">SafetyNet provjera uspješna</string>
     <string name="safetyNet_api_error">SafetyNet API greška</string>
     <string name="safetyNet_res_invalid">Odgovor je nevažeći</string>
 
     <!--Install Fragment-->
-    <string name="advanced_settings_title">Napredne postavke</string>
     <string name="keep_force_encryption">Zadrži prisilno šifirannje</string>
     <string name="keep_dm_verity">Zadrži AVB 2.0/dm-verity</string>
-    <string name="current_installed">Instalirana: %1$s</string>
-    <string name="latest_version">Najnovija: %1$s</string>
     <string name="uninstall">Deinstaliraj</string>
     <string name="uninstall_magisk_title">Deinstaliraj Magisk</string>
     <string name="uninstall_magisk_msg">Svi moduli će biti onemogućeni/uklonjeni. Root će biti uklonjen i potencijalno šifrirati Vaše podatke, ukoliko Vaši podaci trenutačno nisu šifrirani</string>
@@ -33,21 +24,13 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Nema podataka)</string>
     <string name="no_modules_found">Nijedan modul nije pronađen</string>
-    <string name="update_file_created">Modul će se ažurirati pri sljedećem ponovnom pokretanju</string>
-    <string name="remove_file_created">Modul će biti uklonjen pri sljedećem ponovnom pokretanju</string>
-    <string name="remove_file_deleted">Modul neće biti uklonjen pri sljedećem ponovnom pokretanju</string>
-    <string name="disable_file_created">Modul će biti onemogućen pri sljedećem ponovnom pokretanju</string>
-    <string name="disable_file_removed">Modul će biti omogućen pri sljedećem ponovnom pokretanju</string>
-    <string name="author">Napravio %1$s</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Ažuriranje dostupno</string>
     <string name="installed">Instalirano</string>
-    <string name="not_installed">Nije instalirano</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">"Spremi zapisnik "</string>
-    <string name="menuReload">Ponovno učitaj</string>
     <string name="menuClearLog">Očisti zapisnik sada</string>
     <string name="logs_cleared">Zapisnik je uspješno izbrisan</string>
 
@@ -71,7 +54,6 @@
     <string name="hide_manager_fail_toast">Skrivanje Magisk Manager nije uspjelo</string>
     <string name="download_zip_only">Preuzmi samo zip</string>
     <string name="direct_install">Izravna instalacija (preporuča se)</string>
-    <string name="select_method">Odaberite metodu</string>
     <string name="complete_uninstall">Potpuna deinstalacija</string>
     <string name="restore_done">Obnova je dovršena!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
@@ -80,21 +62,16 @@
     <string name="download_file_error">Pogreška prilikom preuzimanja datoteke</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Općenito</string>
-    <string name="settings_dark_theme_title">Tamna tema</string>
-    <string name="settings_dark_theme_summary">Omogući tamnu temu</string>
     <string name="settings_clear_cache_title">Izbriši predmemoriju repozitorija</string>
     <string name="settings_clear_cache_summary">Izbrišite predmemorirane informacije za online repozitorij, prisiljavajući aplikaciju da se osvježi online</string>
     <string name="settings_hide_manager_title">Sakrij Magisk Manager</string>
     <string name="settings_hide_manager_summary">Privremeno sakrij Magisk Manager.\nTo će instalirati novu aplikaciju pod nazivom \"Otkrij Magisk Manager\"</string>
     <string name="language">Jezik</string>
     <string name="system_default">(Zadana postavka sustava)</string>
-    <string name="settings_update">Ažuriraj postavke</string>
     <string name="settings_update_channel_title">Kanal ažuriranja</string>
     <string name="settings_update_stable">Stabilno</string>
     <string name="settings_update_beta">Beta</string>
 
-    <string name="settings_core_only_title">Samo Magisk Core način rada</string>
     <string name="settings_core_only_summary">Omogućite samo osnovne značajke, svi se moduli neće učitati. MagiskSU i MagiskHide će i dalje biti omogućeni</string>
     <string name="settings_magiskhide_summary">Sakrij Magisk od raznih detekcija</string>
     <string name="settings_hosts_title">Systemless hostovi</string>
@@ -114,7 +91,6 @@
     <string name="auto_response">Automatski odgovor</string>
     <string name="request_timeout">Vremensko ograničenje zahtjeva</string>
     <string name="superuser_notification">Superuser obavijest</string>
-    <string name="request_timeout_summary">%1$d sekundi</string>
     <string name="settings_su_reauth_title">Ponovno provjerite autentičnost nakon ažuriranja</string>
     <string name="settings_su_reauth_summary">Ponovno provjerite autentičnost Superuser dopuštenja nakon ažuriranja aplikacije</string>
 
@@ -162,6 +138,5 @@
 
     <!--Superuser logs-->
     <string name="target_uid">Ciljani UID: %1$d</string>
-    <string name="command">Naredba: %1$s</string>
 
 </resources>

@@ -2,10 +2,10 @@ package a;
 
 import android.content.Context;
 
-import com.topjohnwu.magisk.model.update.UpdateCheckService;
-
 import androidx.annotation.NonNull;
 import androidx.work.WorkerParameters;
+
+import com.topjohnwu.magisk.core.UpdateCheckService;
 
 public class g extends w<UpdateCheckService> {
     /* Stub */

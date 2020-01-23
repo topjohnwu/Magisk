@@ -2,13 +2,13 @@ package com.topjohnwu.magisk.model.entity.internal
 
 import android.content.Context
 import android.os.Parcelable
-import com.topjohnwu.magisk.Config
-import com.topjohnwu.magisk.Info
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.extensions.cachedFile
 import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.model.entity.MagiskJson
-import com.topjohnwu.magisk.model.entity.ManagerJson
-import com.topjohnwu.magisk.model.entity.module.Repo
+import com.topjohnwu.magisk.core.model.MagiskJson
+import com.topjohnwu.magisk.core.model.ManagerJson
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.io.File
@@ -59,7 +59,7 @@ sealed class DownloadSubject : Parcelable {
         val magisk: MagiskJson = Info.remote.magisk
 
         @Parcelize
-        protected data class Flash(
+        data class Flash(
             override val configuration: Configuration
         ) : Magisk() {
             override val url: String get() = magisk.link
@@ -72,7 +72,7 @@ sealed class DownloadSubject : Parcelable {
         }
 
         @Parcelize
-        protected class Uninstall : Magisk() {
+        class Uninstall : Magisk() {
             override val configuration: Configuration get() = Configuration.Uninstall
             override val url: String get() = Info.remote.uninstaller.link
 
@@ -83,7 +83,7 @@ sealed class DownloadSubject : Parcelable {
         }
 
         @Parcelize
-        protected class Download : Magisk() {
+        class Download : Magisk() {
             override val configuration: Configuration get() = Configuration.Download
             override val url: String get() = magisk.link
 

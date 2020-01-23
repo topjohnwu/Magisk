@@ -2,45 +2,27 @@
 
     <!--Welcome Activity-->
     <string name="modules">Модулі</string>
-    <string name="downloads">Завантаження</string>
     <string name="superuser">Суперкористувач</string>
-    <string name="log">Журнал</string>
+    <string name="logs">Журнал</string>
     <string name="settings">Налаштування</string>
     <string name="install">Встановлення</string>
     <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk не встановлено.</string>
-    <string name="checking_for_updates">Перевірка оновлень…</string>
     <string name="invalid_update_channel">Неправильний канал оновлень</string>
-    <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
-    <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
-    <string name="safetyNet_check_success">Результат перевірки SafetyNet</string>
     <string name="safetyNet_api_error">Помилка в API SafetyNet</string>
     <string name="safetyNet_res_invalid">Невірна відповідь.</string>
-    <string name="magisk_up_to_date">Magisk останньої версії</string>
-    <string name="manager_up_to_date">Magisk Manager останньої версії</string>
-    <string name="advanced_settings_title">Розширені налаштування</string>
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
     <string name="keep_dm_verity">Залишити AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Режим Recovery</string>
-    <string name="current_installed">Поточна: %1$s</string>
-    <string name="latest_version">Найновіша: %1$s</string>
     <string name="uninstall">Видалити</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
     <string name="update">Оновити</string>
-    <string name="core_only_enabled">(увімкнено режим ядра)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(немає наданої інформації)</string>
     <string name="no_modules_found">Модулів не знайдено.</string>
-    <string name="update_file_created">Модуль оновиться при перезавантаженні.</string>
-    <string name="remove_file_created">Модуль видалиться при перезавантаженні.</string>
-    <string name="remove_file_deleted">Модуль не видалиться при перезавантаженні.</string>
-    <string name="disable_file_created">Модуль вимкнеться при перезавантаженні.</string>
-    <string name="disable_file_removed">Модуль увімкнеться при перезавантаженні.</string>
-    <string name="author">Автор: %1$s</string>
     <string name="reboot_recovery">Перезавантажити в Recovery</string>
     <string name="reboot_bootloader">Перезавантажити в Bootloader</string>
     <string name="reboot_download">Перезавантажити в Download</string>
@@ -49,15 +31,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Доступне оновлення</string>
     <string name="installed">Встановлено</string>
-    <string name="not_installed">Не встановлено</string>
-    <string name="updated_on">Оновлено: %1$s</string>
     <string name="sorting_order">Порядок сортування</string>
-    <string name="sort_by_name">Сортувати за назвою</string>
-    <string name="sort_by_update">Сортувати за оновленням</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Зберегти журнал</string>
-    <string name="menuReload">Оновити</string>
     <string name="menuClearLog">Очистити журнал</string>
     <string name="logs_cleared">Журнал успішно очищено.</string>
 
@@ -80,7 +57,6 @@
     <string name="direct_install">Пряме встановлення (рекомендовано)</string>
     <string name="install_inactive_slot">Встановити в неактивний слот (після OTA)</string>
     <string name="install_inactive_slot_msg">Ваш пристрій буде примусово перезавантажено в неактивний слот!\nВикористовуйте цю опцію тільки для встановлення OTA.\nПродовжити?</string>
-    <string name="select_method">Виберіть спосіб</string>
     <string name="setup_title">Додаткове налаштування</string>
     <string name="select_patch_file">Вибрати і пропатчити файл</string>
     <string name="patch_file_msg">Виберіть необроблений образ (*.img) або стиснутий файл ODIN (*.tar)</string>
@@ -103,7 +79,6 @@
     <string name="hide_manager_title">Приховування Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager.</string>
     <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання.</string>
-    <string name="warning">Попередження</string>
     <string name="complete_uninstall">Повне видалення</string>
     <string name="restore_img">Відновити розділи</string>
     <string name="restore_img_msg">Відновлення…</string>
@@ -117,9 +92,6 @@
     <string name="setup_msg">Налаштування робочого середовища…</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Основні</string>
-    <string name="settings_dark_theme_title">Темна тема</string>
-    <string name="settings_dark_theme_summary">Увімкнути темне оформлення.</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
     <string name="settings_clear_cache_title">Очищення кешу</string>
@@ -130,7 +102,6 @@
     <string name="settings_restore_manager_summary">Відновити Magisk Manager з оригінального пакету</string>
     <string name="language">Мова</string>
     <string name="system_default">Стандартна (системна)</string>
-    <string name="settings_update">Налаштування оновлень</string>
     <string name="settings_check_update_title">Перевіряти оновлення</string>
     <string name="settings_check_update_summary">Періодично перевіряти оновлення у фоновому режимі.</string>
     <string name="settings_update_channel_title">Канал оновлення</string>
@@ -138,14 +109,12 @@
     <string name="settings_update_beta">Бета реліз</string>
     <string name="settings_update_custom">Власний</string>
     <string name="settings_update_custom_msg">Вставте власний URL</string>
-    <string name="settings_core_only_title">Режим Magisk Core</string>
     <string name="settings_core_only_summary">Увімкнути тільки можливості ядра. MagiskSU i Magisk Hide залишуться увімкненими, проте ніякі модулі не будуть завантажені.</string>
     <string name="settings_magiskhide_summary">Приховати Magisk від різних форм виявлень.</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для програм блокування реклами.</string>
     <string name="settings_hosts_toast">Додано модуль позасистемних хостів</string>
 
-    <string name="settings_app_name">Введіть бажане ім\'я застосунку</string>
     <string name="settings_app_name_hint">Нове ім\'я</string>
     <string name="settings_app_name_helper">Застосунок буде перезібрано з цим ім\'ям</string>
     <string name="settings_app_name_error">Неправильний формат</string>
@@ -163,7 +132,6 @@
     <string name="auto_response">Автоматична відповідь</string>
     <string name="request_timeout">Час запиту</string>
     <string name="superuser_notification">Сповіщення суперкористувача</string>
-    <string name="request_timeout_summary">%1$d сек.</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програм</string>
 
@@ -213,7 +181,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Цільовий UID: %1$d</string>
-    <string name="command">Команда: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Показати системні програми</string>

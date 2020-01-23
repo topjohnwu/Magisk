@@ -1,25 +1,36 @@
 package com.topjohnwu.magisk.di
 
 import android.net.Uri
+import com.topjohnwu.magisk.legacy.flash.FlashViewModel
+import com.topjohnwu.magisk.legacy.surequest.SuRequestViewModel
 import com.topjohnwu.magisk.ui.MainViewModel
-import com.topjohnwu.magisk.ui.flash.FlashViewModel
 import com.topjohnwu.magisk.ui.hide.HideViewModel
 import com.topjohnwu.magisk.ui.home.HomeViewModel
+import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.log.LogViewModel
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
+import com.topjohnwu.magisk.ui.request.RequestViewModel
+import com.topjohnwu.magisk.ui.safetynet.SafetynetViewModel
+import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
+import com.topjohnwu.magisk.ui.theme.ThemeViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-
 val viewModelModules = module {
-    viewModel { MainViewModel() }
+    viewModel { HideViewModel(get()) }
     viewModel { HomeViewModel(get()) }
-    viewModel { SuperuserViewModel(get(), get(), get(), get()) }
-    viewModel { HideViewModel(get(), get()) }
+    viewModel { LogViewModel(get()) }
     viewModel { ModuleViewModel(get(), get(), get()) }
-    viewModel { LogViewModel(get(), get()) }
+    viewModel { RequestViewModel() }
+    viewModel { SafetynetViewModel(get()) }
+    viewModel { SettingsViewModel(get()) }
+    viewModel { SuperuserViewModel(get(), get(), get()) }
+    viewModel { ThemeViewModel() }
+    viewModel { InstallViewModel() }
+    viewModel { MainViewModel() }
+
+    // Legacy
     viewModel { (action: String, file: Uri, additional: Uri) ->
         FlashViewModel(action, file, additional, get())
     }

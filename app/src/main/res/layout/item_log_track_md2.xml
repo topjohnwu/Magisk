@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="isTop"
+            type="Boolean" />
+
+        <variable
+            name="isBottom"
+            type="Boolean" />
+
+        <variable
+            name="bullet"
+            type="Integer" />
+
+        <variable
+            name="isSelected"
+            type="Boolean" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout_gravity="center"
+        tools:minHeight="?listPreferredItemHeightSmall">
+
+        <View
+            android:id="@+id/track_top"
+            invisible="@{isTop}"
+            android:layout_width="2dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="2dp"
+            android:alpha=".3"
+            android:background="@drawable/bg_line_bottom_rounded"
+            app:layout_constraintBottom_toTopOf="@+id/track_bullet"
+            app:layout_constraintEnd_toEndOf="@+id/track_bullet"
+            app:layout_constraintStart_toStartOf="@+id/track_bullet"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/track_bullet"
+            style="@style/WidgetFoundation.Image.Small"
+            isSelected="@{isSelected}"
+            srcCompat="@{bullet}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/color_primary_error_transient"
+            tools:srcCompat="@drawable/ic_check_md2" />
+
+        <View
+            android:id="@+id/track_bottom"
+            invisible="@{isBottom}"
+            android:layout_width="2dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="2dp"
+            android:alpha=".3"
+            android:background="@drawable/bg_line_top_rounded"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/track_bullet"
+            app:layout_constraintStart_toStartOf="@+id/track_bullet"
+            app:layout_constraintTop_toBottomOf="@+id/track_bullet" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

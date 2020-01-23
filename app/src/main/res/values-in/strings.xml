@@ -1,46 +1,28 @@
 <resources>
     <!--Welcome Activity-->
     <string name="modules">Modul</string>
-    <string name="downloads">Unduhan</string>
     <string name="superuser">Superuser</string>
-    <string name="log">Log</string>
+    <string name="logs">Log</string>
     <string name="settings">Setelan</string>
     <string name="install">Pasang</string>
     <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
     <string name="unsupport_magisk_msg">Magisk Manager versi ini tidak mendukung versi Magisk di bawah %1$s.\n\nAplikasi akan bertingkah seperti tidak ada Magisk terpasang, silakan perbarui Magisk sesegera mungkin.</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk tidak terpasang.</string>
-    <string name="checking_for_updates">Memeriksa pembaruan…</string>
     <string name="invalid_update_channel">Kanal Pembaruan tidak valid!</string>
-    <string name="safetyNet_check_text">Mulai pemeriksaan SafetyNet</string>
-    <string name="checking_safetyNet_status">Memeriksa status SafetyNet…</string>
-    <string name="safetyNet_check_success">Pemeriksaan SafetyNet Berhasil</string>
     <string name="safetyNet_api_error">Kesalahan pada API SafetyNet</string>
     <string name="safetyNet_res_invalid">Tanggapan tidak valid</string>
-    <string name="magisk_up_to_date">Magisk dalam versi terbaru</string>
-    <string name="manager_up_to_date">Magisk Manager dalam versi terbaru</string>
-    <string name="advanced_settings_title">Opsi Lanjutan</string>
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Mode Pemulihan</string>
-    <string name="current_installed">Terpasang: %1$s</string>
-    <string name="latest_version">Terbaru: %1$s</string>
     <string name="uninstall">Copot</string>
     <string name="uninstall_magisk_title">Copot Magisk</string>
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus!\nRoot akan dihapus!\nData Anda berpotensi terenkripsi jika belum!</string>
     <string name="update">Perbarui</string>
-    <string name="core_only_enabled">(Mode core only aktif)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Tidak ada info tersedia)</string>
     <string name="no_modules_found">Tidak ada modul ditemukan.</string>
-    <string name="update_file_created">Modul akan diperbarui pada reboot berikutnya.</string>
-    <string name="remove_file_created">Modul akan dihapus pada reboot berikutnya.</string>
-    <string name="remove_file_deleted">Modul tidak akan dihapus pada reboot berikutnya.</string>
-    <string name="disable_file_created">Modul akan dinonaktifkan pada reboot berikutnya.</string>
-    <string name="disable_file_removed">Modul akan diaktifkan pada reboot berikutnya.</string>
-    <string name="author">Dibuat oleh %1$s</string>
     <string name="reboot_recovery">Reboot ke Recovery</string>
     <string name="reboot_bootloader">Reboot ke Bootloader</string>
     <string name="reboot_download">Reboot ke Download</string>
@@ -49,15 +31,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Pembaruan Tersedia</string>
     <string name="installed">Terpasang</string>
-    <string name="not_installed">Tidak Terpasang</string>
-    <string name="updated_on">Diperbarui pada: %1$s</string>
     <string name="sorting_order">Urutkan Susunan</string>
-    <string name="sort_by_name">Urut berdasarkan nama</string>
-    <string name="sort_by_update">Urut berdasarkan pembaruan terakhir</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Simpan log</string>
-    <string name="menuReload">Muat ulang</string>
     <string name="menuClearLog">Bersihkan log sekarang</string>
     <string name="logs_cleared">Log berhasil dibersihkan.</string>
 
@@ -80,7 +57,6 @@
     <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
     <string name="install_inactive_slot">Pasang ke Slot Nonaktif (Setelah OTA)</string>
     <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah sebuah reboot!\nHanya gunakan opsi ini setelah OTA selesai.\nLanjutkan?</string>
-    <string name="select_method">Pilih Metode</string>
     <string name="setup_title">Penyiapan Tambahan</string>
     <string name="select_patch_file">Pilih dan Tambal Sebuah File</string>
     <string name="patch_file_msg">Pilih sebuah image mentah (*.img) atau file tar ODIN (*.tar)</string>
@@ -103,7 +79,6 @@
     <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager.</string>
     <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan</string>
-    <string name="warning">Peringatan</string>
     <string name="complete_uninstall">Copot Total</string>
     <string name="restore_img">Pulihkan Image</string>
     <string name="restore_img_msg">Memulihkan…</string>
@@ -118,9 +93,6 @@
     <string name="authenticate">Otentikasi</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">Umum</string>
-    <string name="settings_dark_theme_title">Tema Gelap</string>
-    <string name="settings_dark_theme_summary">Aktifkan tema gelap</string>
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
     <string name="settings_clear_cache_title">Bersihkan Cache Repo</string>
@@ -131,7 +103,6 @@
     <string name="settings_restore_manager_summary">Pulihkan Magisk Manager dengan paket dan nama asli</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Default Sistem)</string>
-    <string name="settings_update">Setelan Pembaruan</string>
     <string name="settings_check_update_title">Periksa Pembaruan</string>
     <string name="settings_check_update_summary">Secara periodik memeriksa pembaruan di latar belakang</string>
     <string name="settings_update_channel_title">Kanal Pembaruan</string>
@@ -139,14 +110,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Kustom</string>
     <string name="settings_update_custom_msg">Masukkan sebuah URL kustom</string>
-    <string name="settings_core_only_title">Magisk Mode Core Only</string>
     <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU dan MagiskHide akan tetap diaktifkan</string>
     <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai bentuk pendeteksian</string>
     <string name="settings_hosts_title">Host tanpa sistem</string>
     <string name="settings_hosts_summary">Dukungan host tanpa sistem untuk apl pemblokir iklan</string>
     <string name="settings_hosts_toast">Ditambahkan modul host tanpa sistem</string>
 
-    <string name="settings_app_name">Ketik nama apl yang diinginkan</string>
     <string name="settings_app_name_hint">Nama baru</string>
     <string name="settings_app_name_helper">Apl akan dipak ulang ke nama ini</string>
     <string name="settings_app_name_error">Format tidak valid</string>
@@ -164,7 +133,6 @@
     <string name="auto_response">Tanggapan Otomatis</string>
     <string name="request_timeout">Batas Waktu Permintaan</string>
     <string name="superuser_notification">Notifikasi Superuser</string>
-    <string name="request_timeout_summary">%1$d detik</string>
     <string name="settings_su_reauth_title">Otentikasi ulang setelah pembaruan</string>
     <string name="settings_su_reauth_summary">Otentikasi ulang izin superuser setelah pembaruan sebuah aplikasi</string>
     <string name="settings_su_biometric_title">Aktifkan Otentikasi Biometrik</string>
@@ -217,7 +185,6 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID target: %1$d</string>
-    <string name="command">Perintah: %1$s</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Tampilkan apl sistem</string>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/collapsed"
+        android:drawable="@drawable/ic_delete_md2"
+        android:state_selected="true" />
+
+    <item
+        android:id="@+id/expanded"
+        android:drawable="@drawable/ic_magisk_outline" />
+
+    <transition
+        android:drawable="@drawable/avd_magisk_delete"
+        android:fromId="@+id/expanded"
+        android:toId="@+id/collapsed" />
+
+    <transition
+        android:drawable="@drawable/avd_delete_magisk"
+        android:fromId="@+id/collapsed"
+        android:toId="@id/expanded" />
+
+</animated-selector>

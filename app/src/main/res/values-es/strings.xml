@@ -2,45 +2,27 @@
 
     <!--Welcome Activity-->
     <string name="modules">Módulos</string>
-    <string name="downloads">Descargas</string>
     <string name="superuser">Superusuario</string>
-    <string name="log">Registro</string>
+    <string name="logs">Registro</string>
     <string name="settings">Ajustes</string>
     <string name="install">Instalar</string>
     <string name="unsupport_magisk_title">Versión de Magisk no soportada</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version_error">Magisk no está instalado</string>
-    <string name="checking_for_updates">Buscando Actualizaciones…</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
-    <string name="safetyNet_check_text">Verificar estado de SafetyNet</string>
-    <string name="checking_safetyNet_status">Verificando…</string>
-    <string name="safetyNet_check_success">La verificación fue exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_res_invalid">La respuesta no es válida</string>
-    <string name="magisk_up_to_date">Magisk está actualizado.</string>
-    <string name="manager_up_to_date">Magisk Manager está actualizado.</string>
-    <string name="advanced_settings_title">Ajustes avanzados</string>
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Modo Recovery</string>
-    <string name="current_installed">Instalada: %1$s</string>
-    <string name="latest_version">Última: %1$s</string>
     <string name="uninstall">Desinstalar</string>
     <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="update">Actualizar</string>
-    <string name="core_only_enabled">(Core Only Mode Habilitado)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>
     <string name="no_modules_found">No se encontraron módulos</string>
-    <string name="update_file_created">El módulo se actualizará en el siguiente reinicio</string>
-    <string name="remove_file_created">El módulo se eliminará en el siguiente reinicio</string>
-    <string name="remove_file_deleted">El módulo no se eliminará en el siguiente reinicio</string>
-    <string name="disable_file_created">El módulo se desactivará en el siguiente reinicio</string>
-    <string name="disable_file_removed">El módulo se activará en el siguiente reinicio</string>
-    <string name="author">Creado por %1$s</string>
     <string name="reboot_recovery">Reiniciar en Modo Recovery</string>
     <string name="reboot_bootloader">Reiniciar en Modo Bootloader</string>
     <string name="reboot_download">Reiniciar en Modo Download</string>
@@ -49,15 +31,10 @@
     <!--Repo Fragment-->
     <string name="update_available">Actualización Disponible</string>
     <string name="installed">Instalado</string>
-    <string name="not_installed">No Instalado</string>
-    <string name="updated_on">Actualizado el: %1$s</string>
     <string name="sorting_order">Orden de Clasificación</string>
-    <string name="sort_by_name">Ordenar por nombre</string>
-    <string name="sort_by_update">Ordenar según la última actualización</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Guardar registro</string>
-    <string name="menuReload">Recargar</string>
     <string name="menuClearLog">Limpiar registro ahora</string>
     <string name="logs_cleared">Registro limpiado correctamente</string>
 
@@ -78,7 +55,6 @@
     <string name="direct_install">Instalación Directa (Recomendado)</string>
     <string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
     <string name="install_inactive_slot_msg">¡Se forzará su dispositivo para que arranque en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\nContinuar?</string>
-    <string name="select_method">Seleccionar Método</string>
     <string name="setup_title">Configuración Adicional</string>
     <string name="select_patch_file">Seleccionar y parchear un archivo</string>
     <string name="patch_file_msg">Seleccione una imagen raw (* .img) o un archivo tar de ODIN (* .tar)</string>
@@ -101,7 +77,6 @@
     <string name="hide_manager_title">Ocultando Magisk Manager…</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
-    <string name="warning">Advertencia</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
     <string name="restore_img_msg">Restaurando …</string>
@@ -116,9 +91,6 @@
     <string name="authenticate">Autenticar</string>
 
     <!--Settings Activity -->
-    <string name="settings_general_category">General</string>
-    <string name="settings_dark_theme_title">Tema oscuro</string>
-    <string name="settings_dark_theme_summary">Habilitar el tema oscuro</string>
     <string name="settings_download_path_title">Ruta de Descarga</string>
     <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
@@ -129,7 +101,6 @@
     <string name="settings_restore_manager_summary">Restaura Magisk Manager con el paquete original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
-    <string name="settings_update">Ajustes de Actualización</string>
     <string name="settings_check_update_title">Comprobar Actualizaciones</string>
     <string name="settings_check_update_summary">Buscar periódicamente en segundo plano si existen actualizaciones</string>
     <string name="settings_update_channel_title">Canal de Actualización</string>
@@ -157,7 +128,6 @@
     <string name="auto_response">Respuesta automática</string>
     <string name="request_timeout">Tiempo de petición</string>
     <string name="superuser_notification">Notificación de superusuario</string>
-    <string name="request_timeout_summary">%1$d segundos</string>
     <string name="settings_su_reauth_title">Re-autenticación</string>
     <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada o reinstalada</string>
     <string name="settings_su_biometric_title">Habilitar autenticación biométrica</string>
@@ -210,9 +180,8 @@
     <!--Superuser logs-->
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID de objetivo: %1$d</string>
-    <string name="command">Comando: %1$s</string>
 
-     <!-- MagiskHide -->
+    <!-- MagiskHide -->
     <string name="show_system_app">Mostrar sistema</string>
 
 </resources>

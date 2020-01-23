@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.MainViewModel" />
+
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?colorSurface"
+        android:orientation="vertical"
+        android:paddingLeft="@{viewModel.insets.left}"
+        android:paddingRight="@{viewModel.insets.right}"
+        tools:ignore="RtlHardcoded">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/main_nav_host"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/main_toolbar_wrapper"
+            style="@style/WidgetFoundation.Appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@{viewModel.insets.top}">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/main_toolbar"
+                style="@style/WidgetFoundation.Toolbar"
+                android:layout_width="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_scrollFlags="noScroll"
+                tools:layout_marginTop="24dp"
+                tools:title="Home" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/main_bottom_bar"
+            style="@style/WidgetFoundation.Card.Elevated"
+            android:layout_width="192dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginStart="@dimen/l1"
+            android:layout_marginEnd="@dimen/l1"
+            android:layout_marginBottom="@{(int) @dimen/l1 + viewModel.insets.bottom}"
+            tools:layout_marginBottom="64dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:orientation="vertical">
+
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/main_navigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    app:elevation="0dp"
+                    app:itemIconTint="@color/color_menu_tint"
+                    app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
+                    app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
+                    app:itemTextColor="@color/color_menu_tint"
+                    app:labelVisibilityMode="unlabeled"
+                    app:menu="@menu/menu_bottom_nav" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    gone="@{viewModel.isConnected}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingBottom="@dimen/l_50"
+                    android:text="@string/no_connection"
+                    android:textAppearance="@style/AppearanceFoundation.Caption"
+                    android:textColor="?colorError"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>
