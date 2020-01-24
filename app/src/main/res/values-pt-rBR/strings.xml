@@ -1,15 +1,15 @@
 <resources>
-    <!--Universal-->
-
-    <!--Welcome Activity-->
+    
+    <!--Sections-->
     <string name="modules">Módulos</string>
     <string name="superuser">Superusuário</string>
     <string name="logs">Registro</string>
     <string name="settings">Configurações</string>
     <string name="install">Instalar</string>
-    <string name="unsupport_magisk_title">Versão não suportada do Magisk</string>
-    <string name="unsupport_magisk_msg">Esta versão do Magisk Manager não suporta versões do Magisk menores que %1$s.\n\nO aplicativo se comportará como se nenhum Magisk estivesse instalado, por favor, atualize o Magisk o mais rápido possível.</string>
-
+    <string name="section_home">Home</string>
+    <string name="section_theme">Temas</string>
+    <string name="safetynet">SafetyNet</string>
+    
     <!--Status Fragment-->
     <string name="invalid_update_channel">Canal de Atualizações Inválido</string>
     <string name="safetyNet_api_error">Erro na API do SafetyNet</string>
