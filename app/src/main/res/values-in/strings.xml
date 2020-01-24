@@ -1,57 +1,57 @@
 <resources>
-    <!--Welcome Activity-->
+
+    <!--Sections-->
     <string name="modules">Modul</string>
-    <string name="superuser">Superuser</string>
+    <string name="superuser">Superuser</string> <!-- do not translate -->
     <string name="logs">Log</string>
     <string name="settings">Setelan</string>
+    <string name="refresh">Segarkan Data Lokal</string>
     <string name="install">Pasang</string>
-    <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
-    <string name="unsupport_magisk_msg">Magisk Manager versi ini tidak mendukung versi Magisk di bawah %1$s.\n\nAplikasi akan bertingkah seperti tidak ada Magisk terpasang, silakan perbarui Magisk sesegera mungkin.</string>
+    <string name="section_home">Beranda</string>
+    <string name="section_theme">Tema</string>
+    <string name="safetynet">SafetyNet</string> <!-- do not translate -->
 
-    <!--Status Fragment-->
-    <string name="invalid_update_channel">Kanal Pembaruan tidak valid!</string>
-    <string name="safetynet_api_error">Kesalahan pada API SafetyNet</string>
-    <string name="safetynet_res_invalid">Tanggapan tidak valid</string>
+    <!--Home-->
+    <string name="no_connection">Tidak ada jaringan tersedia</string>
+    <string name="app_changelog">Log pembaruan</string>
+    <string name="manager">Manajer</string>
+    <string name="loading">Memuat…</string>
+    <string name="info">Info</string>
+    <string name="uninstall">Copot</string>
+    <string name="update">Perbarui</string>
+    <string name="not_available">T/A</string>
+    <string name="hide">Sembunyikan</string>
+    <string name="status">Status</string>
+    <string name="home_package">Paket</string>
+    <string name="details">Rincian</string>
+
+    <string name="home_notice_content">Selalu pastikan Anda menggunakan Magisk Manager yang bersumber terbuka. Manager dari sumber tidak dikenal dapat melakukan tindakan jahat.</string>
+    <string name="home_support_title">Dukung Kami</string>
+    <string name="home_links_project">Tautan proyek</string>
+    <string name="home_item_source">Sumber</string>
+    <string name="home_support_content">Magisk adalah, dan akan selalu gratis dan bersumber terbuka. Namun Anda dapat menunjukkan kepada kami bahwa Anda peduli dengan mengirimkan sejumlah kecil donasi.</string>
+    <string name="home_device_title">Perangkat</string>
+    <string name="home_device_extra_manufacturer">Pabrikan</string>
+    <string name="home_device_extra_model">Model</string>
+    <string name="home_device_extra_board">Papan</string>
+    <string name="home_device_system">Sistem</string>
+    <string name="home_status_normal">Normal</string>
+    <string name="home_status_safe">Mode Aman</string>
+    <string name="home_status_stub">Rintisan</string>
+    <string name="home_installed_version">Terpasang</string>
+    <string name="home_latest_version">Terbaru</string>
+    <string name="invalid_update_channel">Kanal Pembaruan Tidak Valid</string>
+    <string name="uninstall_magisk_title">Copot Magisk</string>
+    <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus!\nRoot akan dihapus!\nData Anda berpotensi terenkripsi jika belum!</string>
+
+    <!--Install-->
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Mode Pemulihan</string>
-    <string name="uninstall">Copot</string>
-    <string name="uninstall_magisk_title">Copot Magisk</string>
-    <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus!\nRoot akan dihapus!\nData Anda berpotensi terenkripsi jika belum!</string>
-    <string name="update">Perbarui</string>
-
-    <!--Module Fragment-->
-    <string name="no_info_provided">(Tidak ada info tersedia)</string>
-    <string name="no_modules_found">Tidak ada modul ditemukan.</string>
-    <string name="reboot_recovery">Reboot ke Recovery</string>
-    <string name="reboot_bootloader">Reboot ke Bootloader</string>
-    <string name="reboot_download">Reboot ke Download</string>
-    <string name="reboot_edl">Reboot ke EDL</string>
-
-    <!--Repo Fragment-->
-    <string name="update_available">Pembaruan Tersedia</string>
-    <string name="home_installed_version">Terpasang</string>
-    <string name="sorting_order">Urutkan Susunan</string>
-
-    <!--Log Fragment-->
-    <string name="menuSaveLog">Simpan log</string>
-    <string name="menuClearLog">Bersihkan log sekarang</string>
-    <string name="logs_cleared">Log berhasil dibersihkan.</string>
-
-    <!--About Activity-->
-    <string name="app_changelog">Log pembaruan</string>
-
-    <!--System Components, Notifications-->
-    <string name="update_channel">Pembaruan Magisk</string>
-    <string name="progress_channel">Notifikasi Kemajuan</string>
-    <string name="download_complete">Unduhan selesai</string>
-    <string name="download_file_error">Kesalahan mengunduh file</string>
-    <string name="download_open_parent">Tampilkan dalam induk folder</string>
-    <string name="download_open_self">Tampilkan file</string>
-    <string name="magisk_update_title">Pembaruan Magisk Tersedia!</string>
-    <string name="manager_update_title">Pembaruan Magisk Manager Tersedia!</string>
-
-    <!--Installation-->
+    <string name="install_options_title">Opsi</string>
+    <string name="install_method_title">Metode</string>
+    <string name="install_next">Lanjut</string>
+    <string name="install_start">Mulai</string>
     <string name="manager_download_install">Tekan untuk unduh dan pasang</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
     <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
@@ -61,42 +61,100 @@
     <string name="select_patch_file">Pilih dan Tambal Sebuah File</string>
     <string name="patch_file_msg">Pilih sebuah image mentah (*.img) atau file tar ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Me-reboot dalam 5 detik…</string>
+    <string name="flash_screen_title">Pemasangan</string>
 
-    <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Pasang %1$s</string>
-    <string name="repo_install_msg">Apakah Anda ingin memasang %1$s sekarang?</string>
-    <string name="download">Unduh</string>
-    <string name="reboot">Reboot</string>
-    <string name="settings_reboot_toast">Reboot untuk menerapkan perubahan</string>
-    <string name="release_notes">Catatan rilis</string>
-    <string name="repo_cache_cleared">Cache repo dibersihkan</string>
+    <!--Superuser-->
+    <string name="su_request_title">Permintaan Superuser</string>
+    <string name="deny">Tolak</string>
+    <string name="prompt">Beritahu</string>
+    <string name="grant">Izinkan</string>
+    <string name="su_warning">Memberikan akses penuh ke perangkat Anda.\nTolak jika Anda tidak yakin!</string>
+    <string name="forever">Selamanya</string>
+    <string name="once">Sekali</string>
+    <string name="tenmin">10 mnt</string>
+    <string name="twentymin">20 mnt</string>
+    <string name="thirtymin">30 mnt</string>
+    <string name="sixtymin">60 mnt</string>
+    <string name="su_allow_toast">%1$s diberikan hak Superuser</string>
+    <string name="su_deny_toast">%1$s ditolak hak Superuser</string>
+    <string name="no_apps_found">Tidak ada apl ditemukan</string>
+    <string name="su_snack_grant">Hak Superuser dari %1$s diberikan</string>
+    <string name="su_snack_deny">Hak Superuser dari %1$s ditolak</string>
+    <string name="su_snack_notif_on">Notifikasi dari %1$s diaktifkan</string>
+    <string name="su_snack_notif_off">Notifikasi dari %1$s dinonaktifkan</string>
+    <string name="su_snack_log_on">Log dari %1$s diaktifkan</string>
+    <string name="su_snack_log_off">Log dari %1$s dinonaktifkan</string>
+    <string name="su_revoke_title">Cabut?</string>
+    <string name="su_revoke_msg">Konfirmasi untuk mencabut hak %1$s?</string>
+    <string name="toast">Toast</string> <!-- do not translate -->
+    <string name="none">Tidak ada</string>
 
-    <string name="dtbo_patched_title">DTBO telah ditambal!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silakan reboot.</string>
-    <string name="flashing">Flashing…</string>
-    <string name="done">Selesai!</string>
-    <string name="failure">Gagal</string>
-    <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager.</string>
-    <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan</string>
-    <string name="complete_uninstall">Copot Total</string>
-    <string name="restore_img">Pulihkan Image</string>
-    <string name="restore_img_msg">Memulihkan…</string>
-    <string name="restore_done">Pemulihan selesai!</string>
-    <string name="restore_fail">Cadangan stock tidak ada!</string>
-    <string name="proprietary_title">Unduh Kode Proprieter</string>
-    <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS dan tidak menyertakan kode API proprieter Google SafetyNet.\n\nAkankah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
-    <string name="setup_fail">Penyiapan gagal</string>
-    <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
-    <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
-    <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
-    <string name="authenticate">Otentikasi</string>
+    <string name="superuser_toggle_notification">Notifikasi</string>
+    <string name="superuser_toggle_revoke">Cabut</string>
+    <string name="superuser_policy_none">Tidak ada aplikasi yang meminta akses superuser saat ini.</string>
 
-    <!--Settings Activity -->
+    <!--Logs-->
+    <string name="log_data_none">Anda terbebas dari log, coba gunakan aplikasi dengan SU aktif Anda lebih sering.</string>
+    <string name="log_data_magisk_none">Log Magisk kosong, itu aneh.</string>
+    <string name="menuSaveLog">Simpan log</string>
+    <string name="menuClearLog">Bersihkan log sekarang</string>
+    <string name="logs_cleared">Log berhasil dibersihkan.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">UID target: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetyNet_api_error">Kesalahan API SafetyNet</string>
+    <string name="safetyNet_res_invalid">Tanggapan tidak valid</string>
+    <string name="safetynet_attest_success">Sukses!</string>
+    <string name="safetynet_attest_failure">Pengesahan gagal!</string>
+    <string name="safetynet_attest_loading">Tunggu sebentar…</string>
+    <string name="safetynet_attest_restart">Coba lagi</string>
+    <string name="safetynet_system">@string/home_device_system</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Tampilkan apl sistem</string>
+    <string name="hide_filter_hint">Saring berdasarkan nama</string>
+    <string name="hide_scroll_up">Gulir ke atas</string>
+    <string name="hide_filters">Saring</string>
+    <string name="hide_search">Cari</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Tidak ada info disediakan)</string>
+    <string name="no_modules_found">Tidak ada modul ditemukan</string>
+    <string name="reboot_recovery">Mulai ulang ke Recovery</string>
+    <string name="reboot_bootloader">Mulai ulang ke Bootloader</string>
+    <string name="reboot_download">Mulai ulang ke Download</string>
+    <string name="reboot_edl">Mulai ulang ke EDL</string>
+    <string name="module_safe_mode_message">Anda dalam mode aman. Tidak ada modul pengguna yang akan bekerja.\nPesan ini akan menghilang setelah mode aman dinonaktifkan.</string>
+    <string name="module_version_author">%1$s oleh %2$s</string>
+    <string name="module_section_pending">Pembaruan</string>
+    <string name="module_section_pending_action">Perbarui semua</string>
+    <string name="module_section_remote">Remote</string> <!-- do not translate -->
+    <string name="module_state_remove">Hapus</string>
+    <string name="module_state_restore">Pulihkan</string>
+    <string name="module_action_install_external">Pasang dari penyimpanan</string>
+    <string name="module_update_none">Modul Anda dalam versi terbaru!</string>
+    <string name="update_available">Pembaruan Tersedia</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="sorting_order">Urutkan Susunan</string>
+    <string name="module_permission_declined">Berikan izin penyimpanan untuk mengaktifkan fungsi ini</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">Mode Tema</string>
+    <string name="settings_dark_mode_message">Pilih mode yang paling cocok dengan gaya Anda!</string>
+    <string name="settings_dark_mode_light">Selalu Terang</string>
+    <string name="settings_dark_mode_system">Ikuti Sistem</string>
+    <string name="settings_dark_mode_dark">Selalu Gelap</string>
+    <string name="settings_safe_mode_title">Mode Aman</string>
+    <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU dan MagiskHide akan tetap diaktifkan</string>
+    <string name="settings_grid_column_count_title">Pengaturan daftar</string>
+    <string name="settings_grid_column_count_summary">Mengatur lebar item dalam sebuah daftar. Jalankan ulang apl untuk menerapkan perubahan.</string>
+    <string name="settings_grid_column_count_1">Standar</string>
+    <string name="settings_grid_column_count_2">Terjepit</string>
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
     <string name="settings_clear_cache_title">Bersihkan Cache Repo</string>
-    <string name="settings_clear_cache_summary">Bersihkan informasi ter-cache untuk repo online. Ini memaksa apl untuk menyegarkan secara online</string>
+    <string name="settings_clear_cache_summary">Bersihkan informasi ter-cache untuk repo daring. Ini memaksa apl untuk menyegarkan secara daring</string>
     <string name="settings_hide_manager_title">Sembunyikan Magisk Manager</string>
     <string name="settings_hide_manager_summary">Pak ulang Magisk Manager dengan nama paket dan apl acak</string>
     <string name="settings_restore_manager_title">Pulihkan Magisk Manager</string>
@@ -110,12 +168,10 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Kustom</string>
     <string name="settings_update_custom_msg">Masukkan sebuah URL kustom</string>
-    <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU dan MagiskHide akan tetap diaktifkan</string>
     <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai bentuk pendeteksian</string>
     <string name="settings_hosts_title">Host tanpa sistem</string>
     <string name="settings_hosts_summary">Dukungan host tanpa sistem untuk apl pemblokir iklan</string>
     <string name="settings_hosts_toast">Ditambahkan modul host tanpa sistem</string>
-
     <string name="settings_app_name_hint">Nama baru</string>
     <string name="settings_app_name_helper">Apl akan dipak ulang ke nama ini</string>
     <string name="settings_app_name_error">Format tidak valid</string>
@@ -138,6 +194,7 @@
     <string name="settings_su_biometric_title">Aktifkan Otentikasi Biometrik</string>
     <string name="settings_su_biometric_summary">Gunakan otentikasi biometrik untuk mengizinkan permintaan superuser</string>
     <string name="no_biometric">Perangkat tidak didukung atau tidak ada opsi biometrik yang diaktifkan</string>
+    <string name="settings_customization">Kustomisasi</string>
 
     <string name="multiuser_mode">Mode Multipengguna</string>
     <string name="settings_owner_only">Pemilik Perangkat Saja</string>
@@ -156,36 +213,47 @@
     <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri</string>
     <string name="settings_download_path_error">Kesalahan membuat folder. Folder harus dapat diakses dari direktori penyimpanan root dan bukan merupakan file.</string>
 
-    <!--Superuser-->
-    <string name="su_request_title">Permintaan Superuser</string>
-    <string name="deny">Tolak</string>
-    <string name="prompt">Beritahu</string>
-    <string name="grant">Izinkan</string>
-    <string name="su_warning">Mengizinkan akses penuh ke perangkat Anda.\nTolak jika Anda tidak yakin!</string>
-    <string name="forever">Selamanya</string>
-    <string name="once">Sekali</string>
-    <string name="tenmin">10 mnt</string>
-    <string name="twentymin">20 mnt</string>
-    <string name="thirtymin">30 mnt</string>
-    <string name="sixtymin">60 mnt</string>
-    <string name="su_allow_toast">%1$s diizinkan akses Superuser</string>
-    <string name="su_deny_toast">%1$s ditolak akses Superuser</string>
-    <string name="no_apps_found">Tidak ada apl ditemukan</string>
-    <string name="su_snack_grant">Akses Superuser dari %1$s diizinkan</string>
-    <string name="su_snack_deny">Akses Superuser dari %1$s ditolak</string>
-    <string name="su_snack_notif_on">Notifikasi dari %1$s diaktifkan</string>
-    <string name="su_snack_notif_off">Notifikasi dari %1$s dinonaktifkan</string>
-    <string name="su_snack_log_on">Logging dari %1$s diaktifkan</string>
-    <string name="su_snack_log_off">Logging dari %1$s dinonaktifkan</string>
-    <string name="su_revoke_title">Cabut?</string>
-    <string name="su_revoke_msg">Konfirmasi untuk mencabut akses %1$s?</string>
-    <string name="toast">Toast</string>
-    <string name="none">Tidak ada</string>
+    <!--Notifications-->
+    <string name="update_channel">Pembaruan Magisk</string>
+    <string name="progress_channel">Notifikasi Kemajuan</string>
+    <string name="download_complete">Unduhan selesai</string>
+    <string name="download_file_error">Kesalahan mengunduh file</string>
+    <string name="download_open_parent">Tampilkan dalam induk folder</string>
+    <string name="download_open_self">Tampilkan file</string>
+    <string name="magisk_update_title">Pembaruan Magisk Tersedia!</string>
+    <string name="manager_update_title">Pembaruan Magisk Manager Tersedia!</string>
 
-    <!--Superuser logs-->
-    <string name="pid">PID: %1$d</string>
-    <string name="target_uid">UID target: %1$d</string>
+    <!--Toasts, Dialogs-->
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+    <string name="repo_install_title">Pasang %1$s</string>
+    <string name="repo_install_msg">Apakah Anda ingin memasang %1$s sekarang?</string>
+    <string name="download">Unduh</string>
+    <string name="reboot">Mulai ulang</string>
+    <string name="settings_reboot_toast">Mulai ulang untuk menerapkan perubahan</string>
+    <string name="release_notes">Catatan rilis</string>
+    <string name="repo_cache_cleared">Cache repo dibersihkan</string>
+    <string name="dtbo_patched_title">DTBO telah ditambal!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silakan mulai ulang.</string>
+    <string name="flashing">Flashing…</string> <!-- do not translate -->
+    <string name="done">Selesai!</string>
+    <string name="failure">Gagal</string>
+    <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager.</string>
+    <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan</string>
+    <string name="complete_uninstall">Copot Total</string>
+    <string name="restore_img">Pulihkan Image</string>
+    <string name="restore_img_msg">Memulihkan…</string>
+    <string name="restore_done">Pemulihan selesai!</string>
+    <string name="restore_fail">Cadangan stock tidak ada!</string>
+    <string name="proprietary_title">Unduh Kode Proprieter</string>
+    <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS dan tidak menyertakan kode API proprieter Google SafetyNet.\n\nAkankah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
+    <string name="setup_fail">Penyiapan gagal</string>
+    <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
+    <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
+    <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
+    <string name="authenticate">Otentikasi</string>
+    <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
+    <string name="unsupport_magisk_msg">Magisk Manager versi ini tidak mendukung versi Magisk di bawah %1$s.\n\nAplikasi akan bertingkah seperti tidak ada Magisk terpasang, silakan perbarui Magisk sesegera mungkin.</string>
 
-    <!-- MagiskHide -->
-    <string name="show_system_app">Tampilkan apl sistem</string>
 </resources>
