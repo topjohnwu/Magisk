@@ -123,4 +123,12 @@
         <item name="colorOnSurfaceVariant">#B0FFFFFF</item>
     </style>
 
+    <style name="ThemeFoundationMD2.Monochrome" parent="ThemeFoundationMD2.Ianmacd">
+        <item name="colorPrimary">#BABABA</item>
+        <item name="colorPrimaryVariant">#80BABABA</item>
+        <item name="colorSecondary">#000000</item>
+        <item name="colorSecondaryVariant">#80000000</item>
+        <item name="colorOnSurfaceVariant">#B0000000</item>
+    </style>
+
 </resources>

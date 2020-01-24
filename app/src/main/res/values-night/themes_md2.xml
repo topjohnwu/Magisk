@@ -41,4 +41,11 @@
         <item name="colorOnSurfaceVariant">#B0FFFFFF</item>
     </style>
 
+    <style name="ThemeFoundationMD2.Monochrome" parent="ThemeFoundationMD2.Ianmacd">
+        <item name="colorPrimary">#BABABA</item>
+        <item name="colorPrimaryVariant">#80BABABA</item>
+        <item name="colorSecondary">#FFFFFF</item>
+        <item name="colorSecondaryVariant">#80FFFFFF</item>
+    </style>
+
 </resources>

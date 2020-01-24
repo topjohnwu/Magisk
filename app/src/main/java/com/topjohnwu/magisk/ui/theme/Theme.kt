@@ -39,6 +39,10 @@ enum class Theme(
     Ianmacd(
         themeName = "ianmacd",
         themeRes = R.style.ThemeFoundationMD2_Ianmacd
+    ),
+    Monochrome(
+        themeName = "Monochrome",
+        themeRes = R.style.ThemeFoundationMD2_Monochrome
     );
 
     val isSelected get() = Config.themeOrdinal == ordinal
