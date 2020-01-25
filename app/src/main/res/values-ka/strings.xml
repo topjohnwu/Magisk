@@ -199,7 +199,7 @@
     <string name="settings_su_reauth_summary">სუპერმომხმარებლის ნებართვის რეაუტენთიგიკაცია აპის განახლების შემდეგ</string>
     <string name="settings_su_biometric_title">ბიომეტრიკული ავტენთიფიკაციის ჩართვა</string>
     <string name="settings_su_biometric_summary">ბიმეტრიკული ავტენთიფიკაციის გამოყენება სუპერმომხმარებლის ნებართვის გასაცემად</string>
-    <string name="no_biometric">მხარდაუმჭერელი მოწყობილობა ან არასწორად დაყენებული ბიომეტრიკული პარამეტრები</string>
+    <string name="no_biometric">შეუთავსებელი მოწყობილობა ან არასწორად დაყენებული ბიომეტრიკული პარამეტრები</string>
 
     <string name="multiuser_mode">მრავალმომხმარებლიანი რეჟიმი</string>
     <string name="settings_owner_only">მხოლოდ მოწყობილობის მფლობელი</string>
@@ -258,7 +258,7 @@
     <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი ინსტალაცია იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
     <string name="setup_msg">მიმდინარეობს ინტერფეისის ინსტალაცია…</string>
     <string name="authenticate">ავტენთიკაცია</string>
-    <string name="unsupport_magisk_title">უმხარდამჭერო Magisk-ის ვერსია</string>
+    <string name="unsupport_magisk_title">შეუთავსებელი Magisk-ის ვერსია</string>
     <string name="unsupport_magisk_msg">ამ ვერსიის Magisk მენეჯერთან არ არის მხარდაჭერილი %1$s -ზე დაბალი Magisk-ის ვერსია.\n\nპროგრამა ისე ირეაგირებს, თითქოს Magisk-ი არ არის დაყენებული, გთხოვთ განაახლოთ Magisk-ი რაც შეიძლება მალე.</string>
 
 </resources>
