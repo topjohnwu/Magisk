@@ -237,7 +237,7 @@
    <string name="reboot">Reinicializar</string>
    <string name="settings_reboot_toast">Reinicie para aplicar as configurações</string>
    <string name="release_notes">Notas da versão</string>
-   <string name="repo_cache_cleared">Cache de repositório limpo</string>
+   <string name="repo_cache_cleared">Cache do repositório limpo</string>
    <string name="dtbo_patched_title">O DTBO foi corrigido!</string>
    <string name="dtbo_patched_reboot">O Magisk Manager corrigiu o dtbo.img. Reinicie.</string>
    <string name="flashing">Flechando...</string>
