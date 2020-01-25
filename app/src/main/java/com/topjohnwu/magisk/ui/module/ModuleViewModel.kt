@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.core.tasks.RepoUpdater
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.addOnListChangedCallback
 import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -156,6 +157,21 @@ class ModuleViewModel(
             }
             update(subject.module, progress.times(100).roundToInt())
         }
+
+        itemsInstalled.addOnListChangedCallback(
+            onItemRangeInserted = { sender, _, count ->
+                if (count > 0 || sender.size > 0) {
+                    itemsInstalledHelpers.clear()
+                }
+            }
+        )
+        itemsUpdatable.addOnListChangedCallback(
+            onItemRangeInserted = { sender, _, count ->
+                if (count > 0 || sender.size > 0) {
+                    itemsUpdatableHelpers.clear()
+                }
+            }
+        )
     }
 
     // ---
@@ -175,19 +191,13 @@ class ModuleViewModel(
         .observeOn(AndroidSchedulers.mainThread())
         .map {
             itemsInstalled.update(it.first, it.second)
-            if (itemsInstalled.isNotEmpty())
-                itemsInstalledHelpers.remove(itemNoneInstalled)
             it.first
         }
         .observeOn(Schedulers.io())
         .map { loadUpdates(it) }
         .map { it to itemsUpdatable.calculateDiff(it) }
         .observeOn(AndroidSchedulers.mainThread())
-        .doOnSuccess {
-            itemsUpdatable.update(it.first, it.second)
-            if (itemsUpdatable.isNotEmpty())
-                itemsUpdatableHelpers.remove(itemNoneUpdatable)
-        }
+        .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
         .ignoreElement()!!
 
     @Synchronized
@@ -261,7 +271,7 @@ class ModuleViewModel(
     @WorkerThread
     private fun List<ModuleItem>.loadDetail() = onEach { module ->
         Single.fromCallable { dao.getRepoById(module.item.id)!! }
-            .subscribeK { module.repo = it }
+            .subscribeK(onError = {}) { module.repo = it }
             .add()
     }
 

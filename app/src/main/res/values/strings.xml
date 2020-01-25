@@ -200,6 +200,7 @@
     <string name="settings_su_biometric_title">Enable Biometric Authentication</string>
     <string name="settings_su_biometric_summary">Use biometric authentication to allow superuser requests</string>
     <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>
+    <string name="settings_customization">Customization</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>
