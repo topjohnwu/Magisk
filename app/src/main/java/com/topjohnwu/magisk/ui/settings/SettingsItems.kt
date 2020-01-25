@@ -28,7 +28,7 @@ import kotlin.math.min
 // --- Customization
 
 object Customization : SettingsItem.Section() {
-    override val title = "Customization".asTransitive()
+    override val title = R.string.settings_customization.asTransitive()
 }
 
 object Language : SettingsItem.Selector() {
