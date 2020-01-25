@@ -200,7 +200,7 @@
     <string name="settings_su_biometric_title">ბიომეტრიკული ავტენთიფიკაციის ჩართვა</string>
     <string name="settings_su_biometric_summary">ბიმეტრიკული ავტენთიფიკაციის გამოყენება სუპერმომხმარებლის ნებართვის გასაცემად</string>
     <string name="no_biometric">შეუთავსებელი მოწყობილობა ან არასწორად დაყენებული ბიომეტრიკული პარამეტრები</string>
-    <string name="settings_customization">პერონალიზაცია</string>
+    <string name="settings_customization">პერსონალიზაცია</string>
 
     <string name="multiuser_mode">მრავალმომხმარებლიანი რეჟიმი</string>
     <string name="settings_owner_only">მხოლოდ მოწყობილობის მფლობელი</string>
