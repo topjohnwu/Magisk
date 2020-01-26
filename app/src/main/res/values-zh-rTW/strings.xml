@@ -200,6 +200,7 @@
     <string name="settings_su_biometric_title">啟用生物特徵驗證</string>
     <string name="settings_su_biometric_summary">使用生物特徵驗證來允許 Superuser 的請求</string>
     <string name="no_biometric">不支援的裝置或是未啟用生物特徵設定</string>
+    <string name="settings_customization">客製化</string>
 
     <string name="multiuser_mode">多重使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
