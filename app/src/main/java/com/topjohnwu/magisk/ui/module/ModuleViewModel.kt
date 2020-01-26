@@ -75,12 +75,8 @@ class ModuleViewModel(
     private val itemNoneInstalled = TextItem(R.string.no_modules_found)
     private val itemNoneUpdatable = TextItem(R.string.module_update_none)
 
-    private val itemsInstalledHelpers = ObservableArrayList<TextItem>().also {
-        it.add(itemNoneInstalled)
-    }
-    private val itemsUpdatableHelpers = ObservableArrayList<TextItem>().also {
-        it.add(itemNoneUpdatable)
-    }
+    private val itemsInstalledHelpers = ObservableArrayList<TextItem>()
+    private val itemsUpdatableHelpers = ObservableArrayList<TextItem>()
 
     private val itemsCoreOnly = ObservableArrayList<SafeModeNotice>()
     private val itemsInstalled = diffListOf<ModuleItem>()
@@ -159,16 +155,22 @@ class ModuleViewModel(
         }
 
         itemsInstalled.addOnListChangedCallback(
-            onItemRangeInserted = { sender, _, count ->
-                if (count > 0 || sender.size > 0) {
-                    itemsInstalledHelpers.clear()
+            onItemRangeInserted = { _, _, _ ->
+                itemsInstalledHelpers.clear()
+            },
+            onItemRangeRemoved = { sender, _, _ ->
+                if (sender.isEmpty() && itemsInstalledHelpers.isEmpty()) {
+                    itemsInstalledHelpers.add(itemNoneInstalled)
                 }
             }
         )
         itemsUpdatable.addOnListChangedCallback(
-            onItemRangeInserted = { sender, _, count ->
-                if (count > 0 || sender.size > 0) {
-                    itemsUpdatableHelpers.clear()
+            onItemRangeInserted = { _, _, _ ->
+                itemsUpdatableHelpers.clear()
+            },
+            onItemRangeRemoved = { sender, _, _ ->
+                if (sender.isEmpty() && itemsUpdatableHelpers.isEmpty()) {
+                    itemsUpdatableHelpers.add(itemNoneUpdatable)
                 }
             }
         )
@@ -198,6 +200,10 @@ class ModuleViewModel(
         .map { it to itemsUpdatable.calculateDiff(it) }
         .observeOn(AndroidSchedulers.mainThread())
         .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
+        .doOnSuccess {
+            if (itemsInstalled.isEmpty()) itemsInstalledHelpers.add(itemNoneInstalled)
+            if (itemsUpdatable.isEmpty()) itemsUpdatableHelpers.add(itemNoneUpdatable)
+        }
         .ignoreElement()!!
 
     @Synchronized
