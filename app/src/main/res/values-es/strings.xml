@@ -199,6 +199,7 @@
     	<string name="settings_su_biometric_title">Habilitar autenticación biométrica</string>
     	<string name="settings_su_biometric_summary">Usar autenticación biométrica para permitir solicitudes de superusuario</string>
     	<string name="no_biometric">Dispositivo no compatible o las configuraciones biométricas no están habilitadas</string>
+	<string name="settings_customization">Personalización</string>
 	
 	<string name="multiuser_mode">Modo MultiUsuario</string>
     	<string name="settings_owner_only">Sólo Administrador del Dispositivo</string>
