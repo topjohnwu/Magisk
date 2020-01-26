@@ -1,11 +1,11 @@
 <resources>	
 
 	<!--Sections-->
-	<string name="modules">Modules</string>
-    	<string name="superuser">Superuser</string>
-    	<string name="logs">Logs</string>
-    	<string name="settings">Settings</string>
-    	<string name="install">Install</string>
+	<string name="modules">Modulos</string>
+    	<string name="superuser">Superusuario</string>
+    	<string name="logs">Registros</string>
+    	<string name="settings">Ajustes</string>
+    	<string name="install">Instalar</string>
 	<string name="section_home">Inicio</string>
     	<string name="section_theme">Temas</string>
 	
@@ -25,7 +25,7 @@
 	<string name="home_support_title">Apoyanos</string>
     	<string name="home_links_project">Links del Proyecto</string>
     	<string name="home_item_source">Codigo Fuente</string>
-    	<string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación :D.</string>
+    	<string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
 
     	<string name="home_device_security">Estado:</string>
     	<string name="home_device_system">Sistema:</string>
@@ -178,7 +178,7 @@
     	<string name="settings_hosts_summary">Soporte para aplicaciones Adblock fuera de la partición system</string>
     	<string name="settings_hosts_toast">Módulo systemless hosts agregado</string>
 	<string name="settings_app_name_hint">Nuevo Nombre</string>
-    	<string name="settings_app_name_helper">La app se reempaquetara</string>
+    	<string name="settings_app_name_helper">La app se reempaquetará</string>
     	<string name="settings_app_name_error">Formato inválido</string>
 	<string name="settings_su_app_adb">Aplicaciones y ADB</string>
     	<string name="settings_su_app">Sólo aplicaciones</string>
