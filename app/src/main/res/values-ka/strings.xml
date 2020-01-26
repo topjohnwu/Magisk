@@ -25,7 +25,7 @@
     <string name="home_support_title">მხარდაჭერა</string>
     <string name="home_links_project">პროექტები</string>
     <string name="home_item_source">წყარო</string>
-    <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
+    <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
 
     <string name="home_device_security">უსაფრთხოება</string>
     <string name="home_device_system">სისტემა</string>
@@ -145,25 +145,25 @@
     <string name="sorting_order">სორტირების თანმიმდევრობა</string>
 
     <!--Settings -->
-    <string name="settings_dark_mode_title">თემის რეჟიმი</string>
+    <string name="settings_dark_mode_title">თემების ჩამონათვალი</string>
     <string name="settings_dark_mode_message">აირჩიეთ ის რაც ყველაზე ძალიან მოგწონთ!</string>
     <string name="settings_dark_mode_light">ღია თემა</string>
     <string name="settings_dark_mode_system">სისტემაზე დაფუძნებული</string>
     <string name="settings_dark_mode_dark">მუქი თემა</string>
     <string name="settings_safe_mode_title">უსაფრთხო რეჟიმი</string>
     <string name="settings_core_only_summary" deprecated="true">მხოლოდ მთავარი ფუნქციების ჩართვა. MagiskSU და MagiskHide-ი იმუშავებენ, მაგრამ მოდულები არ ჩაიტვირთება</string>
-    <string name="settings_grid_span_count_title">ბადეს სვეტების ზომა</string>
-    <string name="settings_grid_span_count_summary">სვამს სვეტების ზომას. თქვენ შეგიძლიათ ამის შეცვლა პარამეტრების გარეთ, ორი თითის საპირისპირო მიმართულებით გასმით.</string>
+    <string name="settings_grid_span_count_title">ბადის სვეტების ზომა</string>
+    <string name="settings_grid_span_count_summary">არეგულირებს სვეტების ზომას. თქვენ შეგიძლიათ ამის შეცვლა პარამეტრების გარეთ, ორი თითის საპირისპირო მიმართულებით გასმით.</string>
     <string name="settings_grid_span_count_1">თითო ფანჯარა სტრიქონზე (პატარა ეკრანებისთვის)</string>
     <string name="settings_grid_span_count_2">ორი ფანჯარა სტრიქონზე (რეკომენდირებული)</string>
     <string name="settings_grid_span_count_3">სამი ფნაჯარა სტრიონზე (Tablet/TV)</string>
     <string name="settings_download_path_title">გადმოწერის ლოკაცია</string>
     <string name="settings_download_path_message">ფაილები შეინახება %1$s -ში</string>
-    <string name="settings_clear_cache_title">რეპოზიტორიის ქეშის წაშლა</string>
+    <string name="settings_clear_cache_title">რეპოზიტორიების ქეშის წაშლა</string>
     <string name="settings_clear_cache_summary">რეპოზიტორიებისთვის ქეშის წაშლა. ეს დაარეფრეშებს პროგრამას</string>
     <string name="settings_hide_manager_title">Magisk მენეჯერის დამალვა</string>
     <string name="settings_hide_manager_summary">Magisk მენეჯერის რეპაკეტირება რანდომ პაკეტის სახელებით</string>
-    <string name="settings_restore_manager_title">Magisk მენეჯერის პაკეტის აღდგენა</string>
+    <string name="settings_restore_manager_title">Magisk მენეჯერის პაკეტის სახელის აღდგენა</string>
     <string name="settings_restore_manager_summary">Magisk მენეჯერის აღდგენა ორიგინალი პაკეტის სახელით</string>
     <string name="language">ენა</string>
     <string name="system_default">(სისტემის რჩეული)</string>
@@ -174,7 +174,7 @@
     <string name="settings_update_beta">ბეტა</string>
     <string name="settings_update_custom">პერსონალიზირებული</string>
     <string name="settings_update_custom_msg">სხვა URL-ის ჩასმა</string>
-    <string name="settings_magiskhide_summary">Magisk-ის დამალვა დაცვის სერხებისგან</string>
+    <string name="settings_magiskhide_summary">Magisk-ის დამალვა დაცვის ხერხებისგან</string>
     <string name="settings_hosts_title">გარესისტემური ჰოსტები</string>
     <string name="settings_hosts_summary">გარესისტემური ჰოსტები Adblock-ებისთვის</string>
     <string name="settings_hosts_toast">გარესისტემური ჰოსტების მოდული დამატებულია</string>
@@ -200,13 +200,14 @@
     <string name="settings_su_biometric_title">ბიომეტრიკული ავტენთიფიკაციის ჩართვა</string>
     <string name="settings_su_biometric_summary">ბიმეტრიკული ავტენთიფიკაციის გამოყენება სუპერმომხმარებლის ნებართვის გასაცემად</string>
     <string name="no_biometric">შეუთავსებელი მოწყობილობა ან არასწორად დაყენებული ბიომეტრიკული პარამეტრები</string>
+    <string name="settings_customization">პერსონალიზაცია</string>
 
     <string name="multiuser_mode">მრავალმომხმარებლიანი რეჟიმი</string>
     <string name="settings_owner_only">მხოლოდ მოწყობილობის მფლობელი</string>
     <string name="settings_owner_manage">მოწყობილობის მფლობელის მიერ მართვა</string>
     <string name="settings_user_independent">მომხმარებლისგან დამოუკიდებელი</string>
     <string name="owner_only_summary">მხოლოდ მფლობელს ჰქონდეს სუპერმომხმარებელთან წვდომა</string>
-    <string name="owner_manage_summary">მხოლოდ მფლობელს ჰქონდეს ნებართვის მართვა</string>
+    <string name="owner_manage_summary">მხოლოდ მფლობელს ჰქონდეს ნებართვების მართვა</string>
     <string name="user_indepenent_summary">ყოველ მომხმარებელს თავიანთი ნებართვები ჰქონდეთ</string>
 
     <string name="mount_namespace_mode">Namespace რეჟიმის დამონტაჟება</string>
@@ -240,7 +241,7 @@
     <string name="repo_cache_cleared">რეპოზიტორიის ქეში გასუფთავდა</string>
     <string name="dtbo_patched_title">DTBO დაპატჩულია!</string>
     <string name="dtbo_patched_reboot">Magisk მენეგერმა დაპატჩა dtbo.img. გთხოვთ გადატვირთეთ.</string>
-    <string name="flashing">მიმდინარეობს ჩაყენება…</string>
+    <string name="flashing">მიმდინარეობს ჩაშენება…</string>
     <string name="done">დასრულდა!</string>
     <string name="failure">ჩაიშალა</string>
     <string name="hide_manager_title">ვმალავთ Magisk მენეჯერს…</string>
@@ -252,7 +253,7 @@
     <string name="restore_done">აღდგენა დასრულდა!</string>
     <string name="restore_fail">საწყისი რეზერვი არ არსებობს!</string>
     <string name="proprietary_title">კუთვნილი კოდის გადმოწერა</string>
-    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და გახსნილ-წყაროიანი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდი.\n\nდართავთ Magisk მენეჯერს ამ დამატების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
+    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და გახსნილ-წყაროიანი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
     <string name="setup_fail">ინსტალაცია ჩაიშალა</string>
     <string name="env_fix_title">სჭირდება დამატებითი ინსტალაცია</string>
     <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი ინსტალაცია იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
