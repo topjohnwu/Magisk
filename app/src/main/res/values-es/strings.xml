@@ -37,7 +37,7 @@
 	
     	<string name="home_extra_code">Clave</string>
     	<string name="home_extra_mode">Modo</string>
-    	<string name="home_extra_connection">Conectado</string>
+    	<string name="home_extra_connection">Conexión</string>
     	<string name="home_extra_package">Paquete</string>
 
     	<string name="home_extra_mode_normal">Normal</string>
