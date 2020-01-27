@@ -42,7 +42,7 @@ class ContextNode {
     Unmap();
   }
 
-  DISALLOW_COPY_AND_ASSIGN(ContextNode);
+  BIONIC_DISALLOW_COPY_AND_ASSIGN(ContextNode);
 
   bool Open(bool access_rw, bool* fsetxattr_failed);
   bool CheckAccessAndOpen();

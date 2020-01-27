@@ -25,8 +25,8 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _BIONIC_LOCK_H
-#define _BIONIC_LOCK_H
+
+#pragma once
 
 #include <stdatomic.h>
 #include "private/bionic_futex.h"
@@ -70,25 +70,24 @@ class Lock {
   }
 
   void unlock() {
+    bool shared = process_shared; /* cache to local variable */
     if (atomic_exchange_explicit(&state, Unlocked, memory_order_release) == LockedWithWaiter) {
-      __futex_wake_ex(&state, process_shared, 1);
+      __futex_wake_ex(&state, shared, 1);
     }
   }
 };
 
 class LockGuard {
  public:
-  LockGuard(Lock& lock) : lock_(lock) {
+  explicit LockGuard(Lock& lock) : lock_(lock) {
     lock_.lock();
   }
   ~LockGuard() {
     lock_.unlock();
   }
 
-  DISALLOW_COPY_AND_ASSIGN(LockGuard);
+  BIONIC_DISALLOW_COPY_AND_ASSIGN(LockGuard);
 
  private:
   Lock& lock_;
 };
-
-#endif  // _BIONIC_LOCK_H
