@@ -1,11 +1,11 @@
 <resources>	
 
 	<!--Sections-->
-	<string name="modules">Modules</string>
-    	<string name="superuser">Superuser</string>
-    	<string name="logs">Logs</string>
-    	<string name="settings">Settings</string>
-    	<string name="install">Install</string>
+	<string name="modules">Modulos</string>
+    	<string name="superuser">Superusuario</string>
+    	<string name="logs">Registros</string>
+    	<string name="settings">Ajustes</string>
+    	<string name="install">Instalar</string>
 	<string name="section_home">Inicio</string>
     	<string name="section_theme">Temas</string>
 	
@@ -25,7 +25,7 @@
 	<string name="home_support_title">Apoyanos</string>
     	<string name="home_links_project">Links del Proyecto</string>
     	<string name="home_item_source">Codigo Fuente</string>
-    	<string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación :D.</string>
+    	<string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
 
     	<string name="home_device_security">Estado:</string>
     	<string name="home_device_system">Sistema:</string>
@@ -37,7 +37,7 @@
 	
     	<string name="home_extra_code">Clave</string>
     	<string name="home_extra_mode">Modo</string>
-    	<string name="home_extra_connection">Conectado</string>
+    	<string name="home_extra_connection">Conexión</string>
     	<string name="home_extra_package">Paquete</string>
 
     	<string name="home_extra_mode_normal">Normal</string>
@@ -153,7 +153,7 @@
 	<string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
 	<string name="settings_grid_span_count_title">Tamaño de columna</string>
     	<string name="settings_grid_span_count_summary">Establece el tamaño de columna para todas las listas de cuadrículas elegibles. Puede establecer esta configuración externa realizando un gesto de pellizco.</string>
-    	<string name="settings_grid_span_count_1">Un sección por línea (Pantallas Pequeñas)</string>
+    	<string name="settings_grid_span_count_1">Una sección por línea (Pantallas Pequeñas)</string>
     	<string name="settings_grid_span_count_2">Dos secciones por línea (Recomendado)</string>
     	<string name="settings_grid_span_count_3">Tres secciones por línea (Tablet/TV)</string>
 	<string name="settings_download_path_title">Ruta de Descarga</string>
@@ -178,7 +178,7 @@
     	<string name="settings_hosts_summary">Soporte para aplicaciones Adblock fuera de la partición system</string>
     	<string name="settings_hosts_toast">Módulo systemless hosts agregado</string>
 	<string name="settings_app_name_hint">Nuevo Nombre</string>
-    	<string name="settings_app_name_helper">La app se reempaquetara</string>
+    	<string name="settings_app_name_helper">La app se reempaquetará</string>
     	<string name="settings_app_name_error">Formato inválido</string>
 	<string name="settings_su_app_adb">Aplicaciones y ADB</string>
     	<string name="settings_su_app">Sólo aplicaciones</string>
