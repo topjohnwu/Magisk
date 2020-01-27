@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.content.Intent
-import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
 import com.topjohnwu.magisk.model.events.RequestFileEvent
@@ -12,8 +11,6 @@ class InstallFragment : CompatFragment<InstallViewModel, FragmentInstallMd2Bindi
 
     override val layoutRes = R.layout.fragment_install_md2
     override val viewModel by viewModel<InstallViewModel>()
-
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

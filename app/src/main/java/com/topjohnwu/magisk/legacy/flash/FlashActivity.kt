@@ -9,14 +9,14 @@ import androidx.core.net.toUri
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.intent
+import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.databinding.ActivityFlashBinding
 import com.topjohnwu.magisk.extensions.snackbar
-import com.topjohnwu.magisk.model.events.BackPressEvent
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
-import com.topjohnwu.magisk.core.view.Notifications
+import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
@@ -24,13 +24,15 @@ import java.io.File
 open class FlashActivity : BaseUIActivity<FlashViewModel, ActivityFlashBinding>() {
 
     override val layoutRes: Int = R.layout.activity_flash
-    override val themeRes: Int = R.style.MagiskTheme_Flashing
     override val viewModel: FlashViewModel by viewModel {
         val uri = intent.data ?: let { finish(); Uri.EMPTY }
         val additionalUri = intent.getParcelableExtra(Const.Key.FLASH_DATA) ?: uri
         val action = intent.getStringExtra(Const.Key.FLASH_ACTION) ?: let { finish();"" }
         parametersOf(action, uri, additionalUri)
     }
+
+    override val navigation: CompatNavigationDelegate<BaseUIActivity<FlashViewModel, ActivityFlashBinding>>? =
+        null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
@@ -49,7 +51,6 @@ open class FlashActivity : BaseUIActivity<FlashViewModel, ActivityFlashBinding>(
         super.onEventDispatched(event)
         when (event) {
             is SnackbarEvent -> snackbar(snackbarView, event.message(this), event.length, event.f)
-            is BackPressEvent -> onBackPressed()
             is PermissionEvent -> withPermissions(*event.permissions.toTypedArray()) {
                 onSuccess { event.callback.onNext(true) }
                 onFailure {

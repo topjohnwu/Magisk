@@ -5,7 +5,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
 import com.topjohnwu.magisk.model.navigation.Navigation
@@ -17,8 +16,6 @@ class SuperuserFragment : CompatFragment<SuperuserViewModel, FragmentSuperuserMd
 
     override val layoutRes = R.layout.fragment_superuser_md2
     override val viewModel by viewModel<SuperuserViewModel>()
-
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onStart() {
         super.onStart()

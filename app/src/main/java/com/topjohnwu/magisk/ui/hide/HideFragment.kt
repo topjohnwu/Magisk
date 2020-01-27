@@ -6,7 +6,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,8 +27,6 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
             if (!value) hideKeyboard()
             MotionRevealHelper.withViews(binding.hideFilter, binding.hideFilterToggle, value)
         }
-
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

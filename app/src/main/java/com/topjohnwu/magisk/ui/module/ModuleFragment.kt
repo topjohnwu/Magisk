@@ -6,7 +6,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -38,8 +37,6 @@ class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>
             (activity as? MainActivity)?.requestNavigationHidden(value)
             MotionRevealHelper.withViews(binding.moduleFilter, binding.moduleFilterToggle, value)
         }
-
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
