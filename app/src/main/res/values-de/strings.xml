@@ -23,7 +23,7 @@
     <string name="home_support_title">Unterstützen Sie uns</string>
     <string name="home_links_project">Projekt-Links</string>
     <string name="home_item_source">Quelle</string>
-    <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch zeigen, dass Sie sich darum kümmern, indem Sie uns eine kleine Spende schicken.</string>
+    <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
 
     <string name="home_device_security">Sicherheit</string>
 
@@ -56,8 +56,8 @@
     <string name="manager_download_install">Tippen zum Herunterladen und Installieren</string>
     <string name="download_zip_only">Nur Zip herunterladen</string>
     <string name="direct_install">Direkte Installation (empfohlen)</string>
-    <string name="install_inactive_slot">In inaktiven Steckplatz installieren (Nach OTA)</string>
-    <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den aktuellen inaktiven Steckplatz zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
+    <string name="install_inactive_slot">In inaktiven Slot installieren (Nach OTA)</string>
+    <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den aktuellen inaktiven Slot zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
     <string name="setup_title">Zusätzliche Einstellungen</string>
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
     <string name="patch_file_msg">Raw Image auswählen(*.img) oder ein ODIN tarfile (*.tar)</string>
@@ -68,7 +68,7 @@
     <string name="deny">Verweigern</string>
     <string name="prompt">Prompt</string>
     <string name="grant">Gestatten</string>
-    <string name="su_warning">Superuser-Rechte von %1$s werden verweigert vollen Zugriff auf Ihr Gerät.\nAblehnen, wenn Sie sich nicht sicher sind!</string>
+    <string name="su_warning">Gewährt vollen Zugriff auf Ihr Gerät. Den Zugriff verweigern, wenn Sie sich nicht sicher sind!</string>
     <string name="forever">Für immer</string>
     <string name="once">Einmal</string>
     <string name="tenmin">10 Minuten</string>
