@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.legacy.surequest
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.view.Window
@@ -13,13 +14,16 @@ import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
+import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
     override val layoutRes: Int = R.layout.activity_request
-    override val themeRes: Int = R.style.MagiskTheme_SU
     override val viewModel: SuRequestViewModel by viewModel()
+
+    override val navigation: CompatNavigationDelegate<BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>>? =
+        null
 
     override fun onBackPressed() {
         viewModel.denyPressed()
@@ -56,6 +60,12 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         } else {
             runHandler(intent.action)
         }
+    }
+
+    override fun getTheme(): Resources.Theme {
+        val theme = super.getTheme()
+        theme.applyStyle(R.style.Foundation_Floating, true)
+        return theme
     }
 
     override fun onEventDispatched(event: ViewEvent) {

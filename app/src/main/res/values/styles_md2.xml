@@ -9,6 +9,8 @@
     <style name="Foundation.Compat" />
 
     <!--region Do not remove-->
+    <style name="Empty" />
+
     <style name="WidgetFoundation" parent="android:Widget" />
 
     <style name="AppearanceFoundation">
@@ -29,6 +31,11 @@
 
     <style name="Foundation.Default" parent="Foundation.Base">
         <item name="android:windowBackground">?colorSurface</item>
+    </style>
+
+    <style name="Foundation.Floating" parent="Empty">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 
 </resources>

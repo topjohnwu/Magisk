@@ -5,7 +5,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
@@ -27,8 +26,6 @@ class LogFragment : CompatFragment<LogViewModel, FragmentLogMd2Binding>() {
             actionSave?.isVisible = value
             (activity as MainActivity).invalidateToolbar()
         }
-
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onStart() {
         super.onStart()
