@@ -155,24 +155,12 @@ class ModuleViewModel(
         }
 
         itemsInstalled.addOnListChangedCallback(
-            onItemRangeInserted = { _, _, _ ->
-                itemsInstalledHelpers.clear()
-            },
-            onItemRangeRemoved = { sender, _, _ ->
-                if (sender.isEmpty() && itemsInstalledHelpers.isEmpty()) {
-                    itemsInstalledHelpers.add(itemNoneInstalled)
-                }
-            }
+            onItemRangeInserted = { _, _, _ -> itemsInstalledHelpers.clear() },
+            onItemRangeRemoved = { _, _, _ -> addInstalledEmptyMessage() }
         )
         itemsUpdatable.addOnListChangedCallback(
-            onItemRangeInserted = { _, _, _ ->
-                itemsUpdatableHelpers.clear()
-            },
-            onItemRangeRemoved = { sender, _, _ ->
-                if (sender.isEmpty() && itemsUpdatableHelpers.isEmpty()) {
-                    itemsUpdatableHelpers.add(itemNoneUpdatable)
-                }
-            }
+            onItemRangeInserted = { _, _, _ -> itemsUpdatableHelpers.clear() },
+            onItemRangeRemoved = { _, _, _ -> addUpdatableEmptyMessage() }
         )
     }
 
@@ -201,8 +189,8 @@ class ModuleViewModel(
         .observeOn(AndroidSchedulers.mainThread())
         .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
         .doOnSuccess {
-            if (itemsInstalled.isEmpty()) itemsInstalledHelpers.add(itemNoneInstalled)
-            if (itemsUpdatable.isEmpty()) itemsUpdatableHelpers.add(itemNoneUpdatable)
+            addInstalledEmptyMessage()
+            addUpdatableEmptyMessage()
         }
         .ignoreElement()!!
 
@@ -286,6 +274,20 @@ class ModuleViewModel(
             .map { it.first { it.item.id == repo.id } }
             .subscribeK { it.progress.value = progress }
             .add()
+
+    // ---
+
+    private fun addInstalledEmptyMessage() {
+        if (itemsInstalled.isEmpty() && itemsInstalledHelpers.isEmpty()) {
+            itemsInstalledHelpers.add(itemNoneInstalled)
+        }
+    }
+
+    private fun addUpdatableEmptyMessage() {
+        if (itemsUpdatable.isEmpty() && itemsUpdatableHelpers.isEmpty()) {
+            itemsUpdatableHelpers.add(itemNoneUpdatable)
+        }
+    }
 
     private fun updateCoreOnlyWarning() {
         if (Config.coreOnly) {
