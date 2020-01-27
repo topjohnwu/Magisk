@@ -153,7 +153,7 @@
 	<string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
 	<string name="settings_grid_span_count_title">Tamaño de columna</string>
     	<string name="settings_grid_span_count_summary">Establece el tamaño de columna para todas las listas de cuadrículas elegibles. Puede establecer esta configuración externa realizando un gesto de pellizco.</string>
-    	<string name="settings_grid_span_count_1">Un sección por línea (Pantallas Pequeñas)</string>
+    	<string name="settings_grid_span_count_1">Una sección por línea (Pantallas Pequeñas)</string>
     	<string name="settings_grid_span_count_2">Dos secciones por línea (Recomendado)</string>
     	<string name="settings_grid_span_count_3">Tres secciones por línea (Tablet/TV)</string>
 	<string name="settings_download_path_title">Ruta de Descarga</string>
