@@ -57,7 +57,7 @@
     <string name="download_zip_only">Nur Zip herunterladen</string>
     <string name="direct_install">Direkte Installation (empfohlen)</string>
     <string name="install_inactive_slot">In inaktiven Slot installieren (Nach OTA)</string>
-    <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den aktuellen inaktiven Slot zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
+    <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den inaktiven Slot zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
     <string name="setup_title">Zusätzliche Einstellungen</string>
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
     <string name="patch_file_msg">Raw Image auswählen(*.img) oder ein ODIN tarfile (*.tar)</string>
