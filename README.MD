@@ -23,7 +23,7 @@ Furthermore, Magisk provides a **Systemless Interface** to alter the system (or 
 ## Building Notes and Instructions
 
 -  Clone sources with submodules: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
--  Building is supported on macOS, Linux, and Windows. Official releases are built and tested with [FrankeNDK](https://github.com/topjohnwu/FrankeNDK); point `ANDROID_NDK_HOME` to FrankeNDK if you want to use it for compiling.
+-  Building is supported on macOS, Linux, and Windows. Official releases are built and tested with [FrankeNDK](https://github.com/topjohnwu/FrankeNDK); point `ANDROID_NDK_HOME` to FrankeNDK if you want to use it for compiling. Compiling with the normal NDK may not work.
 -  Set configurations in `config.prop`. A sample file `config.prop.sample` is provided as an example.
 -  Run `build.py` with argument `-h` to see the built-in help message. The `-h` option also works for each supported actions, e.g. `./build.py binary -h`
 -  By default, `build.py` build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (via the `-r, --release` flag), you need a Java Keystore file `release-key.jks` (only `JKS` format is supported) to sign APKs and zips. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
