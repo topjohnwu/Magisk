@@ -93,7 +93,7 @@
     <string name="su_snack_log_on">%1$s -ის ლოგინგი ჩართულია</string>
     <string name="su_snack_log_off">%1$s -ის ლოგინგი გამორთულია</string>
     <string name="su_revoke_title">გავაუქმოთ?</string>
-    <string name="su_revoke_msg">გსურთ %1$s -ის ნებართვების გაუქმება?</string>
+    <string name="su_revoke_msg">გსურთ %1$s ისთვის ნებართვების გაუქმება?</string>
     <string name="toast">ჩვეულებრივი</string>
     <string name="none">არანაირი</string>
 
@@ -120,7 +120,7 @@
     <!-- MagiskHide -->
     <string name="show_system_app">სისტემის პროგრამების ჩვენება</string>
     <string name="hide_filter_hint">ფილტრაცია სახელის მიხედვით</string>
-    <string name="hide_scroll_up">მაღლა სქროლვა</string>
+    <string name="hide_scroll_up">მაღლა ასქროლვა</string>
     <string name="hide_filters">ფილტრები</string>
     <string name="hide_search">ძებნა</string>
 
@@ -132,16 +132,16 @@
     <string name="reboot_download">Download-ში გადატვირთვა</string>
     <string name="reboot_edl">EDL-ში გადატვირთვა</string>
     <string name="module_safe_mode_message">თქვენ ბრძანდებით უსაფრთხო რეჟიმში, მოდულები გამორთული იქნება.\nეს შეტყობინება უსაფრთხო რეჟიმიდან გამოსვლის შემდეგ გაქრება.</string>
-    <string name="module_version_author">%1$s %2$s -თი</string>
+    <string name="module_version_author">%1$s %2$s სგან</string>
     <string name="module_section_pending">განახლებები</string>
     <string name="module_section_pending_action">ყველას განახლება</string>
-    <string name="module_section_remote">წვდომა</string>
+    <string name="module_section_remote">გადმოწერა</string>
     <string name="module_state_remove">წაშლა</string>
     <string name="module_state_restore">აღდგენა</string>
     <string name="module_action_install_external">მახსოვრობიდან დაინსტალირება</string>
     <string name="module_update_none">თქვენი მოდულები განახლებულია!</string>
     <string name="update_available">ხელმისაწვდომია განახლება</string>
-    <string name="installed">დაინსტალირდა</string>
+    <string name="installed">დაინსტალირებული</string>
     <string name="sorting_order">სორტირების თანმიმდევრობა</string>
 
     <!--Settings -->
@@ -226,7 +226,7 @@
     <string name="download_file_error">შეცდომა გადმოწერის დროს</string>
     <string name="download_open_parent">მშობელ საქაღდეში ნახვა</string>
     <string name="download_open_self">ფაილის ჩვენება</string>
-    <string name="magisk_update_title">ხელმისაწვდომია Magisk-ის გახლება!</string>
+    <string name="magisk_update_title">ხელმისაწვდომია Magisk-ის განახლება!</string>
     <string name="manager_update_title">ხელმისაწვდომია Magisk მენეჯერის გახლება!</string>
 
     <!--Toasts, Dialogs-->
@@ -240,7 +240,7 @@
     <string name="release_notes">რელიზის შენიშვნები</string>
     <string name="repo_cache_cleared">რეპოზიტორიის ქეში გასუფთავდა</string>
     <string name="dtbo_patched_title">DTBO დაპატჩულია!</string>
-    <string name="dtbo_patched_reboot">Magisk მენეგერმა დაპატჩა dtbo.img. გთხოვთ გადატვირთეთ.</string>
+    <string name="dtbo_patched_reboot">Magisk მენეჯერმა დაპატჩა dtbo.img. გთხოვთ გადატვირთეთ.</string>
     <string name="flashing">მიმდინარეობს ჩაშენება…</string>
     <string name="done">დასრულდა!</string>
     <string name="failure">ჩაიშალა</string>
