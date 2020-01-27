@@ -120,7 +120,7 @@
     <!-- MagiskHide -->
     <string name="show_system_app">სისტემის პროგრამების ჩვენება</string>
     <string name="hide_filter_hint">ფილტრაცია სახელის მიხედვით</string>
-    <string name="hide_scroll_up">მაღლა სქროლვა</string>
+    <string name="hide_scroll_up">მაღლა ასქროლვა</string>
     <string name="hide_filters">ფილტრები</string>
     <string name="hide_search">ძებნა</string>
 
