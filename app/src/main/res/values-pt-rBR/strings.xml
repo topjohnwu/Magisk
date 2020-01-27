@@ -3,7 +3,7 @@
    <!--Sections-->
    <string name="modules">Módulos</string>
    <string name="superuser">Superusuário</string>
-   <string name="logs">Logs</string>
+   <string name="logs">Registros</string>
    <string name="settings">Configurações</string>
    <string name="install">Instalar</string>
    <string name="section_home">Home</string>
@@ -12,9 +12,9 @@
 
    <!--Home-->
    <string name="no_connection">Nenhuma conexão disponível</string>
-   <string name="installed_error">não está instalado</string>
+   <string name="installed_error">Não está instalado</string>
    <string name="channel_error">possui um canal de atualização inválido!</string>
-   <string name="up_to_date">está atualizado</string>
+   <string name="up_to_date">Está Atualizado</string>
    <string name="obsolete">Atualização Disponível!</string>
    <string name="loading">carregando…</string>
    <string name="home_notice_content">Certifique-se sempre de que você está usando o Magisk Manager Open-Source. Versões de fonte desconhecida pode realizar ações maliciosas.</string>
@@ -22,7 +22,7 @@
    <string name="app_changelog">Registro de alterações</string>
    <string name="manager">Manager</string>
 
-   <string name="home_support_title">Apoie-nos</string>
+   <string name="home_support_title">Contribua com o Projeto</string>
    <string name="home_links_project">Links do projeto</string>
    <string name="home_item_source">Origem</string>
    <string name="home_support_content">Magisk é, e sempre será, gratuito e de código aberto. No entanto, você pode nos mostrar que se importa enviando uma pequena doação.</string>
@@ -50,7 +50,7 @@
    <string name="safetyNet_res_invalid">A resposta é inválida</string>
    <string name="uninstall">Desinstalar</string>
    <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-   <string name="uninstall_magisk_msg">Todos os módulos serão desativados / removidos! \ nA raiz será removida! \ nSeus dados potencialmente criptografados, se ainda não estiverem!</string>
+   <string name="uninstall_magisk_msg">Todos os módulos serão desativados/removidos!\nA raiz será removida!\nSeus dados potencialmente criptografados, se ainda não estiverem!</string>
    <string name="update">Atualização</string>
 
    <!--Install-->
@@ -65,17 +65,17 @@
    <string name="download_zip_only">Somente download do Zip</string>
    <string name="direct_install">Instalação direta (recomendada)</string>
    <string name="install_inactive_slot">Instalar no slot inativo (após o OTA)</string>
-   <string name="install_inactive_slot_msg">Seu dispositivo será FORÇADO para inicializar no slot inativo atual após uma reinicialização! \nSó use esta opção após a conclusão do OTA. \nContinuar?</string>
+   <string name="install_inactive_slot_msg">Seu dispositivo será FORÇADO para inicializar no slot inativo atual após uma reinicialização!\nSó use esta opção após a conclusão do OTA.\nContinuar?</string>
    <string name="setup_title">Configuração adicional</string>
    <string name="select_patch_file">Selecione e corrija um arquivo</string>
    <string name="patch_file_msg">Selecione uma imagem bruta (*.img) ou um arquivo tarin ODIN (*.tar)</string>
-   <string name="reboot_delay_toast">Reiniciando em 5 segundos …</string>
+   <string name="reboot_delay_toast">Reiniciando em 5 segundos…</string>
 
    <!--Superuser-->
-   <string name="su_request_title">Pedido de superusuário</string>
-   <string name="deny">Negar</string>
-   <string name="prompt">Prompt</string>
-   <string name="grant">Grant</string>
+   <string name="su_request_title">Solicitação de Superusuário</string>
+   <string name="deny">Negar Automaticamente</string>
+   <string name="prompt">Perguntar</string>
+   <string name="grant">Conceder Automaticamente</string>
    <string name="su_warning">Concede acesso total ao seu dispositivo.\nNegar se você não tiver certeza!</string>
    <string name="forever">Sempre</string>
    <string name="once">Uma vez</string>
@@ -94,7 +94,7 @@
    <string name="su_snack_log_off">O registro de  %1$s é desativado</string>
    <string name="su_revoke_title">Revogar?</string>
    <string name="su_revoke_msg">Confirmar revogar Acesso de  %1$s?</string>
-   <string name="toast">Brinde</string>
+   <string name="toast">Pop-up no estilo Toast</string>
    <string name="none">Nenhum</string>
 
    <string name="superuser_toggle_notification">Notificações</string>
@@ -102,11 +102,11 @@
    <string name="superuser_policy_none">Nenhum aplicativo solicitou permissão de superusuário ainda.</string>
 
    <!--Logs-->
-   <string name="log_data_none">Você não está logado, tente usar mais os aplicativos habilitados para SU.</string>
-   <string name="log_data_magisk_none">Os logs do Magisk estão vazios, isso é estranho.</string>
-   <string name="menuSaveLog">Salvar log</string>
-   <string name="menuClearLog">Limpar log agora</string>
-   <string name="logs_cleared">Log limpo com êxito.</string>
+   <string name="log_data_none">Você não tem registros, tente usar mais os aplicativos habilitados para SU.</string>
+   <string name="log_data_magisk_none">Os Registro de atividade do Magisk estão vazios, isso é estranho.</string>
+   <string name="menuSaveLog">Salvar Registro</string>
+   <string name="menuClearLog">Limpar Registro agora</string>
+   <string name="logs_cleared">Registro limpo com sucesso.</string>
    <string name="pid">PID: %1$d</string>
    <string name="target_uid">Alvo UID: %1$d</string>
 
@@ -153,11 +153,11 @@
    <string name="settings_safe_mode_title">Modo de segurança</string>
    <string name="settings_core_only_summary" obsoleto = "true">Ative apenas os principais recursos. O MagiskSU e o MagiskHide ainda estarão ativados, mas nenhum módulo será carregado</string>
    <string name="settings_grid_span_count_title">Tamanho da coluna da grade</string>
-   <string name="settings_grid_span_count_summary">Define o tamanho da coluna para todas as listas de grade qualificadas. Você pode definir essas configurações externas executando o gesto de pinça.</string>
+   <string name="settings_grid_span_count_summary">Define o tamanho da coluna para todas as listas de grade qualificadas. Você pode definir essas configurações realizando o gesto de pinça com os dedos.</string>
    <string name="settings_grid_span_count_1">Um item por linha (telas pequenas)</string>    
    <string name="settings_grid_span_count_2">Dois itens por linha (recomendado)</string>
    <string name="settings_grid_span_count_3">Três itens por linha (Tablet/TV)</string>
-   <string name="settings_download_path_title">Caminho do download</string>
+   <string name="settings_download_path_title">Caminho de Download</string>
    <string name="settings_download_path_message">Os arquivos serão salvos em  %1$s</string>
    <string name="settings_clear_cache_title">Limpar cache de repositório</string>
    <string name="settings_clear_cache_summary">Limpe as informações em cache para repositórios online. Isso força o aplicativo a atualizar on-line</string>
@@ -169,7 +169,7 @@
    <string name="system_default">(Padrão do sistema)</string>
    <string name="settings_check_update_title">Verificar atualizações</string>
    <string name="settings_check_update_summary">Verifique periodicamente se há atualizações em segundo plano</string>
-   <string name="settings_update_channel_title">Atualizar canal</string>
+   <string name="settings_update_channel_title">Canal de Atualização</string>
    <string name="settings_update_stable">Estável</string>
    <string name="settings_update_beta">Beta</string>
    <string name="settings_update_custom">Canal personalizado</string>
