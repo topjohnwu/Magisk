@@ -6,7 +6,7 @@
    <string name="logs">Registros</string>
    <string name="settings">Configurações</string>
    <string name="install">Instalar</string>
-   <string name="section_home">Home</string>
+   <string name="section_home">Início</string>
    <string name="section_theme">Temas</string>
    <string name="safetynet">SafetyNet</string>
 
@@ -46,7 +46,7 @@
    <string name="home_extra_mode_stub">Dinâmico</string>
    
    <string name="invalid_update_channel">Canal de atualização inválido</string>
-   <string name="safetyNet_api_error">Erro da API SafetyNet</string>
+   <string name="safetyNet_api_error">Erro do API SafetyNet</string>
    <string name="safetyNet_res_invalid">A resposta é inválida</string>
    <string name="uninstall">Desinstalar</string>
    <string name="uninstall_magisk_title">Desinstalar Magisk</string>
@@ -73,9 +73,9 @@
 
    <!--Superuser-->
    <string name="su_request_title">Solicitação de Superusuário</string>
-   <string name="deny">Negar Automaticamente</string>
+   <string name="deny">Negar</string>
    <string name="prompt">Perguntar</string>
-   <string name="grant">Conceder Automaticamente</string>
+   <string name="grant">Conceder</string>
    <string name="su_warning">Concede acesso total ao seu dispositivo.\nNegar se você não tiver certeza!</string>
    <string name="forever">Sempre</string>
    <string name="once">Uma vez</string>
