@@ -4,8 +4,8 @@ import android.content.DialogInterface
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
-import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.core.utils.Utils
+import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import org.koin.core.KoinComponent

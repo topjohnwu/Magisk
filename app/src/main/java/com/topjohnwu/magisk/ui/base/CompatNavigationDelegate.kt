@@ -49,7 +49,7 @@ class CompatNavigationDelegate<out Source>(
     }
 
     fun onBackPressed(): Boolean {
-        val fragment = controller.currentFrag as? CompatFragment<*, *>
+        val fragment = controller.currentFrag as? BaseUIFragment<*, *>
 
         if (fragment?.onBackPressed() == true) {
             return true

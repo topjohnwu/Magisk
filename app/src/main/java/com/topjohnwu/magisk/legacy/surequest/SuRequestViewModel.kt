@@ -12,11 +12,11 @@ import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
+import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.KObservableField
 import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter

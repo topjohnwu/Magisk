@@ -9,12 +9,12 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
-import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.signing.JarMap
 import com.topjohnwu.signing.SignAPK
 import com.topjohnwu.superuser.Shell

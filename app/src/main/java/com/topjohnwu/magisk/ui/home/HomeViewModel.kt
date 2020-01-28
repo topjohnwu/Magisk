@@ -7,11 +7,11 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.RemoteFileService
-import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.model.UpdateInfo
+import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem

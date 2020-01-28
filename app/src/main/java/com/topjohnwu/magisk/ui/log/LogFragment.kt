@@ -9,11 +9,11 @@ import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.base.CompatFragment
+import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class LogFragment : CompatFragment<LogViewModel, FragmentLogMd2Binding>() {
+class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_log_md2
     override val viewModel by viewModel<LogViewModel>()

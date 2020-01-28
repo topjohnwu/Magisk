@@ -7,12 +7,12 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.utils.SafetyNetHelper
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.utils.RxBus
-import com.topjohnwu.magisk.core.utils.SafetyNetHelper
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.superuser.Shell

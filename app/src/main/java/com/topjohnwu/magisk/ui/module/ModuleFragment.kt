@@ -15,14 +15,13 @@ import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.ReselectionTarget
-import com.topjohnwu.magisk.ui.base.CompatFragment
-import com.topjohnwu.magisk.ui.base.hideKeyboard
+import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import com.topjohnwu.magisk.utils.PinchZoomTouchListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ModuleFragment : CompatFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
+class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
     ReselectionTarget {
 
     override val layoutRes = R.layout.fragment_module_md2
