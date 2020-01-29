@@ -32,8 +32,11 @@
 # BaseWorkerWrapper
 -keep,allowobfuscation class * extends com.topjohnwu.magisk.core.base.BaseWorkerWrapper
 
-# Strip logging
--assumenosideeffects class timber.log.Timber.Tree { *; }
+# Strip Timber verbose and debug logging
+-assumenosideeffects class timber.log.Timber.Tree {
+  public void v(**);
+  public void d(**);
+}
 
 # Excessive obfuscation
 -repackageclasses a
