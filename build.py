@@ -332,7 +332,7 @@ def build_apk(args, module):
                         zout.writestr(e, zin.read(e))
 
             # Zipalign
-            execv([zipalign, '-fz', '4', source, target])
+            execv([zipalign, '-f', '4', source, target])
 
             # Sign APK
             execv([apksigner, 'sign', '--v1-signer-name', 'CERT',
