@@ -80,7 +80,7 @@ Important Note: **You CANNOT use custom recoveries to install/upgrade Magisk!**
 ### Unlocking Bootloader
 Normally I wouldn't provide instructions for this, but since things had changed drastically from previous Samsung devices, and there are some caveats, I figure this would be helpful.
 - Allow bootloader unlocking in Developer options → OEM unlocking
-- Reboot your device to download mode. Either use `adb reboot download`, or use the key combo for your device.
+- Reboot your device to recovery mode. Either use `adb reboot recovery`, or use the key combo for your device.
 - Long press volume up to unlock the bootloader. **This will wipe your data and automatically reboot.**
 
 Just when you think the bootloader is unlocked, it is *actually* not! Samsung introduced `VaultKeeper`, meaning the bootloader will reject any unofficial partitions before `VaultKeeper` explicitly allows it.
