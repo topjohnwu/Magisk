@@ -13,7 +13,7 @@
     <!--Home-->
     <string name="no_connection">Connexió no disponible</string>
     <string name="installed_error">no està instal·lat</string>
-    <string name="channel_error">té un canal d'actualització invàlid!</string>
+    <string name="channel_error">té un canal d\'actualització invàlid!</string>
     <string name="up_to_date">està actualitzat</string>
     <string name="obsolete">es pot actualitzar!</string>
     <string name="loading">està carregant…</string>
@@ -138,7 +138,7 @@
     <string name="module_section_remote">Remot</string>
     <string name="module_state_remove">Eliminar</string>
     <string name="module_state_restore">Recuperar</string>
-    <string name="module_action_install_external">Instal·lar des de l'emmagatzematge</string>
+    <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="module_update_none">Els seus mòduls estan actualitzats!</string>
     <string name="update_available">Actualització Disponible</string>
     <string name="installed">Instal·lat</string>
