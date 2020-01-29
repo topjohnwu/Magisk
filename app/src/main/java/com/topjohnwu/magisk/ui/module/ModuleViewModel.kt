@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.core.tasks.RepoUpdater
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.extensions.addOnListChangedCallback
 import com.topjohnwu.magisk.extensions.reboot
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -74,12 +75,8 @@ class ModuleViewModel(
     private val itemNoneInstalled = TextItem(R.string.no_modules_found)
     private val itemNoneUpdatable = TextItem(R.string.module_update_none)
 
-    private val itemsInstalledHelpers = ObservableArrayList<TextItem>().also {
-        it.add(itemNoneInstalled)
-    }
-    private val itemsUpdatableHelpers = ObservableArrayList<TextItem>().also {
-        it.add(itemNoneUpdatable)
-    }
+    private val itemsInstalledHelpers = ObservableArrayList<TextItem>()
+    private val itemsUpdatableHelpers = ObservableArrayList<TextItem>()
 
     private val itemsCoreOnly = ObservableArrayList<SafeModeNotice>()
     private val itemsInstalled = diffListOf<ModuleItem>()
@@ -156,6 +153,15 @@ class ModuleViewModel(
             }
             update(subject.module, progress.times(100).roundToInt())
         }
+
+        itemsInstalled.addOnListChangedCallback(
+            onItemRangeInserted = { _, _, _ -> itemsInstalledHelpers.clear() },
+            onItemRangeRemoved = { _, _, _ -> addInstalledEmptyMessage() }
+        )
+        itemsUpdatable.addOnListChangedCallback(
+            onItemRangeInserted = { _, _, _ -> itemsUpdatableHelpers.clear() },
+            onItemRangeRemoved = { _, _, _ -> addUpdatableEmptyMessage() }
+        )
     }
 
     // ---
@@ -175,18 +181,16 @@ class ModuleViewModel(
         .observeOn(AndroidSchedulers.mainThread())
         .map {
             itemsInstalled.update(it.first, it.second)
-            if (itemsInstalled.isNotEmpty())
-                itemsInstalledHelpers.remove(itemNoneInstalled)
             it.first
         }
         .observeOn(Schedulers.io())
         .map { loadUpdates(it) }
         .map { it to itemsUpdatable.calculateDiff(it) }
         .observeOn(AndroidSchedulers.mainThread())
+        .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
         .doOnSuccess {
-            itemsUpdatable.update(it.first, it.second)
-            if (itemsUpdatable.isNotEmpty())
-                itemsUpdatableHelpers.remove(itemNoneUpdatable)
+            addInstalledEmptyMessage()
+            addUpdatableEmptyMessage()
         }
         .ignoreElement()!!
 
@@ -261,7 +265,7 @@ class ModuleViewModel(
     @WorkerThread
     private fun List<ModuleItem>.loadDetail() = onEach { module ->
         Single.fromCallable { dao.getRepoById(module.item.id)!! }
-            .subscribeK { module.repo = it }
+            .subscribeK(onError = {}) { module.repo = it }
             .add()
     }
 
@@ -270,6 +274,20 @@ class ModuleViewModel(
             .map { it.first { it.item.id == repo.id } }
             .subscribeK { it.progress.value = progress }
             .add()
+
+    // ---
+
+    private fun addInstalledEmptyMessage() {
+        if (itemsInstalled.isEmpty() && itemsInstalledHelpers.isEmpty()) {
+            itemsInstalledHelpers.add(itemNoneInstalled)
+        }
+    }
+
+    private fun addUpdatableEmptyMessage() {
+        if (itemsUpdatable.isEmpty() && itemsUpdatableHelpers.isEmpty()) {
+            itemsUpdatableHelpers.add(itemNoneUpdatable)
+        }
+    }
 
     private fun updateCoreOnlyWarning() {
         if (Config.coreOnly) {

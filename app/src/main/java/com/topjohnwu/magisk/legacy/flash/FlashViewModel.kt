@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.*
-import com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem
+import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.flash.FlashResultListener
 import com.topjohnwu.magisk.model.flash.Flashing
@@ -48,7 +48,7 @@ class FlashViewModel(
     private val logItems = Collections.synchronizedList(mutableListOf<String>())
 
     init {
-        outItems.sendUpdatesTo(items) { it.map { ConsoleRvItem(it) } }
+        outItems.sendUpdatesTo(items) { it.map { ConsoleItem(it) } }
         outItems.copyNewInputInto(logItems)
 
         state = State.LOADING

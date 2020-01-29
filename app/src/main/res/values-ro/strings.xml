@@ -1,104 +1,170 @@
 <resources>
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">Module</string>
     <string name="superuser">Superutilizator</string>
-    <string name="logs">Jurnal</string>
+    <string name="logs">Jurnale</string>
     <string name="settings">Setări</string>
     <string name="install">Instalează</string>
-    <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
+    <string name="section_home">Start</string>
+    <string name="section_theme">Teme</string>
+    <string name="safetynet">SafetyNet</string>
 
-    <!--Status Fragment-->
+    <!--Home-->
+    <string name="no_connection">Nu există conexiune disponibilă</string>
+    <string name="installed_error">nu este instalat</string>
+    <string name="channel_error">are un canal de actualizare nevalid!</string>
+    <string name="up_to_date">este la zi</string>
+    <string name="obsolete">poate fi actualizat!</string>
+    <string name="loading">se încarcă…</string>
+    <string name="home_notice_content">Asigură-te întotdeauna că folosești aplicația open-source Magisk Manager. Managerul din surse necunoscute poate efectua acțiuni rău-intenționate.</string>
+    <string name="home_notice_hide">Ascunde</string>
+    <string name="app_changelog">Jurnalul schimbărilor</string>
+    <string name="manager">Manager</string>
+
+    <string name="home_support_title">Sprijină-ne</string>
+    <string name="home_links_project">Linkurile proiectului</string>
+    <string name="home_item_source">Sursă</string>
+    <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă trimițând o mică donație.</string>
+
+    <string name="home_device_security">Securitate</string>
+    <string name="home_device_system">Sistem</string>
+    <string name="home_device_build_style">A/B</string>
+    <string name="home_device_build_type">SAR</string>
+
+    <string name="home_device_security_secure">Securizat</string>
+    <string name="home_device_security_outdated">Perimat</string>
+
+    <string name="home_extra_version">Versiune</string>
+    <string name="home_extra_code">Cod</string>
+    <string name="home_extra_mode">Mod</string>
+    <string name="home_extra_connection">Conexiune</string>
+    <string name="home_extra_package">Pachet</string>
+
+    <string name="home_extra_mode_normal">Normal</string>
+    <string name="home_extra_mode_safe">Sigur</string>
+    <string name="home_extra_mode_stub">Dinamic</string>
+
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
     <string name="safetyNet_api_error">Eroare privind API-ul SafetyNet</string>
-    <string name="safetyNet_res_invalid">Răspunsul este nevalid.</string>
-    <string name="keep_force_encryption">Păstrează criptarea forțată</string>
-    <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
+    <string name="safetyNet_res_invalid">Răspunsul este nevalid</string>
     <string name="uninstall">Dezinstalează</string>
     <string name="uninstall_magisk_title">Dezinstalează Magisk</string>
-    <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate. Rootul va fi eliminat și potențial se vor cripta datele dacă nu sunt criptate deja.</string>
+    <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate!\nRootul va fi eliminat!\nPotențial ți se vor cripta datele dacă nu sunt criptate deja!</string>
     <string name="update">Actualizează</string>
 
-    <!--Module Fragment-->
-    <string name="no_info_provided">(Nu sunt furnizate informații)</string>
-    <string name="no_modules_found">Niciun modul găsit.</string>
-    <string name="reboot_recovery">Repornește în recovery</string>
-    <string name="reboot_bootloader">Repornește în bootloader</string>
-    <string name="reboot_download">Repornește în download</string>
-    <string name="reboot_edl">Repornește în EDL</string>
-
-    <!--Repo Fragment-->
-    <string name="update_available">Actualizare disponibilă</string>
-    <string name="installed">Instalate</string>
-    <string name="sorting_order">Ordine de sortare</string>
-
-    <!--Log Fragment-->
-    <string name="menuSaveLog">Salvează jurnalul</string>
-    <string name="menuClearLog">Golește jurnalul acum</string>
-    <string name="logs_cleared">Jurnal golit cu succes.</string>
-
-    <!--About Activity-->
-    <string name="app_changelog">Jurnalul modificărilor</string>
-
-    <!-- System Components, Notifications -->
-    <string name="update_channel">Actualizări Magisk</string>
-    <string name="progress_channel">Notificări de progres</string>
-    <string name="download_complete">Descărcare finalizată</string>
-    <string name="download_file_error">Eroare la descărcarea fișierului</string>
-    <string name="download_open_parent">Afișează în dosarul părinte</string>
-    <string name="download_open_self">Afișează fișierul</string>
-    <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
-    <string name="manager_update_title">Actualizare Magisk Manager disponibilă!</string>
-
-    <!-- Installation -->
-    <string name="manager_download_install">Apasă pentru a descărca și a instala.</string>
-    <string name="download_zip_only">Doar descarcă zip-ul</string>
-    <string name="direct_install">Instalare directă (Recomandat)</string>
-    <string name="install_inactive_slot">Instalare în slotul inactiv (După OTA)</string>
-    <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să booteze în slotul inactiv actual după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
+    <!--Install-->
+    <string name="keep_force_encryption">Păstrează criptarea forțată</string>
+    <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Mod de recuperare</string>
+    <string name="install_options_title">Opțiuni</string>
+    <string name="install_method_title">Metodă</string>
+    <string name="install_next">Înainte</string>
+    <string name="install_start">Să-i dăm drumul</string>
+    <string name="manager_download_install">Apasă pentru a descărca și a instala</string>
+    <string name="download_zip_only">Descarcă doar fișierul zip</string>
+    <string name="direct_install">Instalează direct (Recomandat)</string>
+    <string name="install_inactive_slot">Instalează în slotul inactiv (După OTA)</string>
+    <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să booteze în slotul actual inactiv după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
     <string name="setup_title">Configurare suplimentară</string>
     <string name="select_patch_file">Selectează și patchuiește un fișier</string>
     <string name="patch_file_msg">Selectează o imagine brută (*.img) sau un fișier tar ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Repornire în 5 secunde…</string>
 
-    <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Instalează %1$s</string>
-    <string name="repo_install_msg">Vrei să instalezi acum %1$s?</string>
-    <string name="download">Descarcă</string>
-    <string name="reboot">Repornește</string>
-    <string name="settings_reboot_toast">Repornește pentru a aplica setările.</string>
-    <string name="release_notes">Note privind versiunea</string>
-    <string name="repo_cache_cleared">Cache-ul depozitelor golit</string>
+    <!--Superuser-->
+    <string name="su_request_title">Solicitare de superutilizator</string>
+    <string name="deny">Refuză</string>
+    <string name="prompt">Solicitare</string>
+    <string name="grant">Permite</string>
+    <string name="su_warning">Permite acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
+    <string name="forever">Pentru totdeauna</string>
+    <string name="once">O singură dată</string>
+    <string name="tenmin">10 minute</string>
+    <string name="twentymin">20 de minute</string>
+    <string name="thirtymin">30 de minute</string>
+    <string name="sixtymin">60 de minute</string>
+    <string name="su_allow_toast">Aplicației %1$s i-au fost acordate drepturi de superutilizator</string>
+    <string name="su_deny_toast">Aplicației %1$s i-au fost refuzate drepturi de superutilizator</string>
+    <string name="no_apps_found">Nicio aplicație găsită</string>
+    <string name="su_snack_grant">Drepturile de superutilizator pentru %1$s au fost acordate</string>
+    <string name="su_snack_deny">Drepturile de superutilizator pentru %1$s au fost refuzate</string>
+    <string name="su_snack_notif_on">Notificările pentru %1$s au fost activate</string>
+    <string name="su_snack_notif_off">Notificările pentru %1$s au fost dezactivate</string>
+    <string name="su_snack_log_on">Jurnalizarea pentru %1$s a fost activată</string>
+    <string name="su_snack_log_off">Jurnalizarea pentru %1$s a fost dezactivată</string>
+    <string name="su_revoke_title">Revoci?</string>
+    <string name="su_revoke_msg">Confirmi revocarea drepturilor pentru %1$s?</string>
+    <string name="toast">Mesaj</string>
+    <string name="none">Niciuna</string>
 
-    <string name="dtbo_patched_title">DTBO a fost patchuit!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager a patchuit dtbo.img. Te rugăm să repornești.</string>
-    <string name="flashing">Procesare în curs…</string>
-    <string name="done">Terminat!</string>
-    <string name="failure">Eșec</string>
-    <string name="hide_manager_title">Se ascunde Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat.</string>
-    <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul.</string>
-    <string name="complete_uninstall">Dezinstalare totală</string>
-    <string name="restore_img">Restaurează imagini</string>
-    <string name="restore_img_msg">Se restaurează…</string>
-    <string name="restore_done">Restaurare terminată!</string>
-    <string name="restore_fail">Nu există backup stock!</string>
-    <string name="proprietary_title">Descarcă cod proprietar</string>
-    <string name="proprietary_notice">Magisk Manager este FOSS și nu conține codul proprietar al Google pentru API-ul SafetyNet.\n\nPermiți ca Magisk Manager să descarce o extensie (care conține GoogleApiClient) pentru verificările SafetyNet?</string>
-    <string name="setup_fail">Configurare eșuată.</string>
-    <string name="env_fix_title">Necesită configurare suplimentară</string>
-    <string name="env_fix_msg">Dispozitivul tău are nevoie de configurări suplimentare pentru ca Magisk să funcționeze corect. Se va descărca zip-ul de configurare Magisk, vrei să continui acum?</string>
-    <string name="setup_msg">Rulează configurarea mediului…</string>
+    <string name="superuser_toggle_notification">Notificări</string>
+    <string name="superuser_toggle_revoke">Revocă</string>
+    <string name="superuser_policy_none">Nicio aplicație nu a solicitat încă permisiuni de superutilizator.</string>
 
-    <!--Settings Activity -->
+    <!--Logs-->
+    <string name="log_data_none">Nu există jurnale, încearcă să folosești ceva mai mult aplicațiile cu acces de superutilizator.</string>
+    <string name="log_data_magisk_none">Jurnalele Magisk sunt goale, asta-i ciudat.</string>
+    <string name="menuSaveLog">Salvează jurnalul</string>
+    <string name="menuClearLog">Golește jurnalul acum</string>
+    <string name="logs_cleared">Jurnal golit cu succes.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">UID țintă: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetynet_attest_success">Succes!</string>
+    <string name="safetynet_attest_failure">Atestarea a eșuat!</string>
+    <string name="safetynet_attest_loading">Așteaptă o clipă…</string>
+    <string name="safetynet_attest_restart">Încearcă din nou</string>
+    <string name="safetynet_system">Sistem</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Afișează aplicațiile de sistem</string>
+    <string name="hide_filter_hint">Filtrează după nume</string>
+    <string name="hide_scroll_up">Derulează în sus</string>
+    <string name="hide_filters">Filtre</string>
+    <string name="hide_search">Căutare</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Nu sunt furnizate informații)</string>
+    <string name="no_modules_found">Niciun modul găsit</string>
+    <string name="reboot_recovery">Repornește în modul recovery</string>
+    <string name="reboot_bootloader">Repornește în modul bootloader</string>
+    <string name="reboot_download">Repornește în modul download</string>
+    <string name="reboot_edl">Repornește în EDL</string>
+    <string name="module_safe_mode_message">Ești în modul sigur. Niciunul dintre modulele de utilizator nu va funcționa.\nAcest mesaj va dispărea odată cu dezactivarea modului sigur.</string>
+    <string name="module_version_author">%1$s de %2$s</string>
+    <string name="module_section_pending">Actualizări</string>
+    <string name="module_section_pending_action">Actualizează-le pe toate</string>
+    <string name="module_section_remote">La distanță</string>
+    <string name="module_state_remove">Elimină</string>
+    <string name="module_state_restore">Restaurează</string>
+    <string name="module_action_install_external">Instalează din stocare</string>
+    <string name="module_update_none">Modulele tale sunt la zi!</string>
+    <string name="update_available">Actualizare disponibilă</string>
+    <string name="installed">Instalate</string>
+    <string name="sorting_order">Ordine de sortare</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">Mod pentru temă</string>
+    <string name="settings_dark_mode_message">Selectează modul care ți se pliază cel mai bine stilului!</string>
+    <string name="settings_dark_mode_light">Mereu mod deschis</string>
+    <string name="settings_dark_mode_system">Urmărește modul sistemului</string>
+    <string name="settings_dark_mode_dark">Mereu mod întunecat</string>
+    <string name="settings_safe_mode_title">Mod sigur</string>
+    <string name="settings_core_only_summary" deprecated="true">Activează numai funcțiile de bază. MagiskSU și MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat</string>
+    <string name="settings_grid_span_count_title">Dimensiune pentru coloana grilei</string>
+    <string name="settings_grid_span_count_summary">Setează dimensiunea coloanei pentru toate listele de grile eligibile. Poți seta acest lucru în afara Setărilor executând un gest de apropiere/îndepărtare cu degetele.</string>
+    <string name="settings_grid_span_count_1">Un element per rând (Ecrane mici)</string>
+    <string name="settings_grid_span_count_2">Două elemente per rând (Recomandat)</string>
+    <string name="settings_grid_span_count_3">Trei elemente per rând (Tabletă/TV)</string>
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
     <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online.</string>
     <string name="settings_hide_manager_title">Ascunde Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Reîmpachetează Magisk Manager cu nume de pachet aleatoriu.</string>
+    <string name="settings_hide_manager_summary">Reîmpachetează Magisk Manager cu numele aleatorii pentru pachet și aplicație</string>
     <string name="settings_restore_manager_title">Restaurează Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Restaurează Magisk Manager cu pachetul original</string>
+    <string name="settings_restore_manager_summary">Restaurează Magisk Manager cu numele originale pentru pachet și aplicație</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Limba implicită a sistemului)</string>
     <string name="settings_check_update_title">Caută actualizări</string>
@@ -106,14 +172,15 @@
     <string name="settings_update_channel_title">Canal de actualizare</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_custom">Personalizat</string>
+    <string name="settings_update_custom">Canal personalizat</string>
     <string name="settings_update_custom_msg">Inserează un URL personalizat</string>
-    <string name="settings_core_only_summary">Activează numai funcțiile de bază. MagiskSU și MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat.</string>
-    <string name="settings_magiskhide_summary">Ascunde Magisk de diferite forme de detectare.</string>
-    <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">Suport systemless hosts pentru aplicațiile adblock.</string>
-    <string name="settings_hosts_toast">Modulul Systemless hosts adăugat</string>
-
+    <string name="settings_magiskhide_summary">Ascunde Magisk de diferite forme de detectare</string>
+    <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
+    <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor adblock</string>
+    <string name="settings_hosts_toast">Modulul pentru fișierul hosts în afara partiției system, adăugat</string>
+    <string name="settings_app_name_hint">Nume nou</string>
+    <string name="settings_app_name_helper">Aplicația va fi reîmpachetată cu acest nume</string>
+    <string name="settings_app_name_error">Format nevalid</string>
     <string name="settings_su_app_adb">Aplicații și ADB</string>
     <string name="settings_su_app">Doar aplicații</string>
     <string name="settings_su_adb">Doar ADB</string>
@@ -130,55 +197,69 @@
     <string name="superuser_notification">Notificare de superutilizator</string>
     <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
     <string name="settings_su_reauth_summary">Reautentifică permisiunile pentru superutilizator după o actualizare a aplicației</string>
+    <string name="settings_su_biometric_title">Activează autentificarea biometrică</string>
+    <string name="settings_su_biometric_summary">Folosește autentificarea biometrică pentru a permite cereri de superutilizator</string>
+    <string name="no_biometric">Dispozitiv nesuportat sau nu sunt activate setări biometrice</string>
+    <string name="settings_customization">Personalizare</string>
 
     <string name="multiuser_mode">Mod de multiutilizator</string>
     <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
     <string name="settings_owner_manage">Gestionat de proprietarul dispozitivului</string>
     <string name="settings_user_independent">Utilizator independent</string>
-    <string name="owner_only_summary">Numai proprietarul are acces la root.</string>
-    <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească solicitări.</string>
-    <string name="user_indepenent_summary">Fiecare utilizator are reguli separate pentru root.</string>
+    <string name="owner_only_summary">Numai proprietarul are acces la root</string>
+    <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească solicitări</string>
+    <string name="user_indepenent_summary">Fiecare utilizator are proprile sale reguli separate pentru root</string>
 
-    <string name="mount_namespace_mode">Mod de montare pentru spațiile de nume</string>
+    <string name="mount_namespace_mode">Modul spațiului de nume pentru montare</string>
     <string name="settings_ns_global">Spațiu de nume global</string>
     <string name="settings_ns_requester">Spațiu de nume moștenit</string>
     <string name="settings_ns_isolate">Spațiu de nume izolat</string>
-    <string name="global_summary">Toate sesiunile de root folosesc spațiul de nume global.</string>
-    <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului.</string>
-    <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat.</string>
+    <string name="global_summary">Toate sesiunile de root folosesc spațiul de nume global</string>
+    <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului</string>
+    <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat</string>
     <string name="settings_download_path_error">Eroare la crearea dosarului. Acesta trebuie să fie accesibil din directorul rădăcină al stocării și nu trebuie să fie un fișier.</string>
 
-    <!--Superuser-->
-    <string name="su_request_title">Solicitare de superutilizator</string>
-    <string name="deny">Refuză</string>
-    <string name="prompt">Solicitare</string>
-    <string name="grant">Permite</string>
-    <string name="su_warning">Permite acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
-    <string name="forever">Pentru totdeauna</string>
-    <string name="once">O singură dată</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
-    <string name="su_allow_toast">Aplicației %1$s i-au fost acordate drepturi de superutilizator</string>
-    <string name="su_deny_toast">Aplicației %1$s i-au fost refuzate drepturi de superutilizator</string>
-    <string name="no_apps_found">Nicio aplicație găsită</string>
-    <string name="su_snack_grant">Drepturile de superutilizator pentru %1$s au fost acordate</string>
-    <string name="su_snack_deny">Drepturile de superutilizator pentru %1$s au fost refuzate</string>
-    <string name="su_snack_notif_on">Notificările pentru %1$s au fost activate</string>
-    <string name="su_snack_notif_off">Notificările pentru %1$s au fost dezactivate</string>
-    <string name="su_snack_log_on">Jurnalizarea pentru %1$s a fost activată</string>
-    <string name="su_snack_log_off">Jurnalizarea pentru %1$s a fost dezactivată</string>
-    <string name="su_revoke_title">Revoci?</string>
-    <string name="su_revoke_msg">Confirmi revocarea drepturilor pentru %1$s?</string>
-    <string name="toast">Mesaj</string>
-    <string name="none">Nimic</string>
+    <!--Notifications-->
+    <string name="update_channel">Actualizări Magisk</string>
+    <string name="progress_channel">Notificări de progres</string>
+    <string name="download_complete">Descărcare finalizată</string>
+    <string name="download_file_error">Eroare la descărcarea fișierului</string>
+    <string name="download_open_parent">Afișează în dosarul părinte</string>
+    <string name="download_open_self">Afișează fișierul</string>
+    <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
+    <string name="manager_update_title">Actualizare Magisk Manager disponibilă!</string>
 
-    <!--Superuser logs-->
-    <string name="pid">PID: %1$d</string>
-    <string name="target_uid">UID țintă: %1$d</string>
-
-    <!-- MagiskHide -->
-    <string name="show_system_app">Afișează aplicațiile de sistem</string>
+    <!--Toasts, Dialogs-->
+    <string name="yes">Da</string>
+    <string name="no">Nu</string>
+    <string name="repo_install_title">Instalează %1$s</string>
+    <string name="repo_install_msg">Vrei să instalezi acum %1$s?</string>
+    <string name="download">Descarcă</string>
+    <string name="reboot">Repornește</string>
+    <string name="settings_reboot_toast">Repornește pentru a aplica setările</string>
+    <string name="release_notes">Note privind versiunea</string>
+    <string name="repo_cache_cleared">Cache-ul depozitelor golit</string>
+    <string name="dtbo_patched_title">DTBO a fost patchuit!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager a patchuit dtbo.img. Te rugăm să repornești.</string>
+    <string name="flashing">Se scrie în memoria flash…</string>
+    <string name="done">Terminat!</string>
+    <string name="failure">Eșec</string>
+    <string name="hide_manager_title">Se ascunde Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat.</string>
+    <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul</string>
+    <string name="complete_uninstall">Dezinstalare finalizată</string>
+    <string name="restore_img">Restaurează imagini</string>
+    <string name="restore_img_msg">Se restaurează…</string>
+    <string name="restore_done">Restaurare terminată!</string>
+    <string name="restore_fail">Nu există backup stock!</string>
+    <string name="proprietary_title">Descarcă cod proprietar</string>
+    <string name="proprietary_notice">Magisk Manager este FOSS și nu conține codul proprietar al Google pentru API-ul SafetyNet.\n\nPermiți ca Magisk Manager să descarce o extensie (care conține GoogleApiClient) pentru verificările SafetyNet?</string>
+    <string name="setup_fail">Configurare eșuată</string>
+    <string name="env_fix_title">Necesită configurare suplimentară</string>
+    <string name="env_fix_msg">Dispozitivul are nevoie de configurare suplimentară pentru ca Magisk să funcționeze corect. Se va descărca fișierul zip de configurare Magisk, vrei să continui acum?</string>
+    <string name="setup_msg">Rulează configurarea mediului…</string>
+    <string name="authenticate">Autentificare</string>
+    <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
+    <string name="unsupport_magisk_msg">Această versiune de Magisk Manager nu suportă versiunea Magisk mai mică de %1$s.\n\nAplicația se va comporta ca și cum nu este instalat Magisk, te rugăm să actualizezi Magisk cât mai curând posibil.</string>
 
 </resources>

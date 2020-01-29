@@ -9,12 +9,12 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
-import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.signing.JarMap
 import com.topjohnwu.signing.SignAPK
 import com.topjohnwu.superuser.Shell
@@ -35,7 +35,7 @@ object PatchAPK {
     val ALPHANUM = ALPHA + DIGITS
     private val ALPHANUMDOTS = "$ALPHANUM............"
 
-    private fun genPackageName(prefix: String, length: Int): String {
+    private fun genPackageName(prefix: String, length: Int): CharSequence {
         val builder = StringBuilder(length)
         builder.append(prefix)
         val len = length - prefix.length
@@ -51,10 +51,10 @@ object PatchAPK {
             builder.append(next)
             prev = next
         }
-        return builder.toString()
+        return builder
     }
 
-    private fun findAndPatch(xml: ByteArray, from: String, to: String): Boolean {
+    private fun findAndPatch(xml: ByteArray, from: CharSequence, to: CharSequence): Boolean {
         if (to.length > from.length)
             return false
         val buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer()
@@ -73,7 +73,7 @@ object PatchAPK {
         if (offList.isEmpty())
             return false
 
-        val toBuf = to.toCharArray().copyOf(from.length)
+        val toBuf = to.toString().toCharArray().copyOf(from.length)
         for (off in offList) {
             buf.position(off)
             buf.put(toBuf)
@@ -113,7 +113,7 @@ object PatchAPK {
         if (!Shell.su("force_pm_install $repack").exec().isSuccess)
             return false
 
-        Config.suManager = pkg
+        Config.suManager = pkg.toString()
         Config.export()
         Shell.su("pm uninstall ${BuildConfig.APPLICATION_ID}").submit()
 
@@ -122,7 +122,7 @@ object PatchAPK {
 
     @JvmStatic
     @JvmOverloads
-    fun patch(apk: String, out: String, pkg: String, label: String = "Manager"): Boolean {
+    fun patch(apk: String, out: String, pkg: CharSequence, label: String = "Manager"): Boolean {
         try {
             val jar = JarMap.open(apk)
             val je = jar.getJarEntry(Const.ANDROID_MANIFEST)
@@ -144,7 +144,7 @@ object PatchAPK {
         return true
     }
 
-    fun patch(apk: File, out: File, pkg: String, label: String): Boolean {
+    fun patch(apk: File, out: File, pkg: CharSequence, label: String): Boolean {
         try {
             if (apk.length() < 1 shl 18) {
                 // APK is smaller than 256K, must be stub

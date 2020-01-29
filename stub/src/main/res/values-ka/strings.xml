@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">განაახლეთ სრულ Magisk მენჯერის ვერსიამდე ინსტალაციის დასასრულებლად. გსურთ გადმოწერა და ინსტალირება?</string>
+    <string name="no_internet_msg">გთხოვთ დაუკავშირდით ინტერნეტს! საჭიროა Magisk მენეჯერის სრულ ვერსიამდე განახლება.</string>
+    <string name="dling">მიმდინარეობს გადმოწერა</string>
+</resources>

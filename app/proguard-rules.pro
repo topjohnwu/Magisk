@@ -16,6 +16,9 @@
 #   public *;
 #}
 
+# Stubs
+-keep class a.* { *; }
+
 # Snet
 -keepclassmembers class com.topjohnwu.magisk.core.utils.SafetyNetHelper { *; }
 -keep,allowobfuscation interface com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback
@@ -28,9 +31,6 @@
 
 # BaseWorkerWrapper
 -keep,allowobfuscation class * extends com.topjohnwu.magisk.core.base.BaseWorkerWrapper
-
-# BootSigner
--keep class a.a { *; }
 
 # Strip logging
 -assumenosideeffects class timber.log.Timber.Tree { *; }

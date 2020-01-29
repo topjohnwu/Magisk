@@ -6,6 +6,8 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.utils.ProgressInputStream
+import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.NullActivity
 import com.topjohnwu.magisk.extensions.get
@@ -13,8 +15,6 @@ import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
-import com.topjohnwu.magisk.core.utils.ProgressInputStream
-import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Completable
 import okhttp3.ResponseBody

@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.ui.base.CompatActivity
+import com.topjohnwu.magisk.ui.base.BaseUIActivity
 import kotlin.reflect.KClass
 
 @DslMarker
@@ -24,7 +24,7 @@ class MagiskNavigationEvent(
     }
 
     override fun invoke(activity: BaseActivity) {
-        if (activity !is CompatActivity<*, *>) return
+        if (activity !is BaseUIActivity<*, *>) return
         activity.navigation?.navigateTo(this)
     }
 
