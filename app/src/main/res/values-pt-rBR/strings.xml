@@ -20,7 +20,7 @@
    <string name="home_notice_content">Certifique-se sempre de que você está usando o Magisk Manager Open-Source. Versões de fonte desconhecida pode realizar ações maliciosas.</string>
    <string name="home_notice_hide">Ocultar</string>
    <string name="app_changelog">Registro de alterações</string>
-   <string name="manager">Manager</string>
+   <string name="manager">Gerenciador</string>
 
    <string name="home_support_title">Contribua com o Projeto</string>
    <string name="home_links_project">Links do projeto</string>
@@ -200,7 +200,8 @@
    <string name="settings_su_biometric_title">Ativar autenticação biométrica</string>
    <string name="settings_su_biometric_summary">Use a autenticação biométrica para permitir solicitações de superusuário</string>
    <string name="no_biometric">Dispositivo não suportado ou nenhuma configuração biométrica está ativada</string>
-
+   <string name="settings_customization">Personalizações</string>
+   
    <string name="multiuser_mode">Modo multiusuário</string>
    <string name="settings_owner_only">Somente proprietário do dispositivo</string>
    <string name="settings_owner_manage">Gerenciado pelo proprietário do dispositivo</string>
