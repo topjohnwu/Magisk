@@ -189,7 +189,7 @@
                                 style="@style/W.Home.Extra.Title"
                                 android:text="@string/home_device_system"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_extra_security_title" />
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_device_extra_version_value"
