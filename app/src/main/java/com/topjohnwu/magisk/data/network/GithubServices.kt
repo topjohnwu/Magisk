@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.data.network
 
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.tasks.GithubRepoInfo
 import com.topjohnwu.magisk.core.model.UpdateInfo
+import com.topjohnwu.magisk.core.tasks.GithubRepoInfo
 import io.reactivex.Flowable
 import io.reactivex.Single
 import okhttp3.ResponseBody

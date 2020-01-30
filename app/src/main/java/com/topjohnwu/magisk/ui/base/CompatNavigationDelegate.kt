@@ -7,14 +7,13 @@ import com.ncapdevi.fragnav.FragNavTransactionOptions
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.navigation.MagiskAnimBuilder
 import com.topjohnwu.magisk.model.navigation.MagiskNavigationEvent
-import com.topjohnwu.magisk.model.navigation.Navigator
 import com.topjohnwu.magisk.ui.ReselectionTarget
 import timber.log.Timber
 
 class CompatNavigationDelegate<out Source>(
     private val source: Source,
     private val listener: FragNavController.TransactionListener? = null
-) : FragNavController.RootFragmentListener where Source : CompatActivity<*, *>, Source : Navigator {
+) : FragNavController.RootFragmentListener where Source : BaseUIActivity<*, *> {
 
     private val controller by lazy {
         check(source.navHost != 0) { "Did you forget to override \"navHostId\"?" }
@@ -50,7 +49,7 @@ class CompatNavigationDelegate<out Source>(
     }
 
     fun onBackPressed(): Boolean {
-        val fragment = controller.currentFrag as? CompatFragment<*, *>
+        val fragment = controller.currentFrag as? BaseUIFragment<*, *>
 
         if (fragment?.onBackPressed() == true) {
             return true

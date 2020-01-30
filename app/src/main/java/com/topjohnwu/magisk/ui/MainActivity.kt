@@ -17,7 +17,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.base.CompatActivity
+import com.topjohnwu.magisk.ui.base.BaseUIActivity
 import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
 import com.topjohnwu.magisk.ui.home.HomeFragment
 import com.topjohnwu.magisk.ui.module.ModuleFragment
@@ -29,7 +29,7 @@ import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
 
-open class MainActivity : CompatActivity<MainViewModel, ActivityMainMd2Binding>(),
+open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(),
     FragNavController.TransactionListener {
 
     override val layoutRes = R.layout.activity_main_md2

@@ -5,20 +5,17 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.base.CompatFragment
+import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.PinchZoomTouchListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SuperuserFragment : CompatFragment<SuperuserViewModel, FragmentSuperuserMd2Binding>() {
+class SuperuserFragment : BaseUIFragment<SuperuserViewModel, FragmentSuperuserMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_superuser_md2
     override val viewModel by viewModel<SuperuserViewModel>()
-
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onStart() {
         super.onStart()

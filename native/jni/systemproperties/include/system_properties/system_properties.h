@@ -52,7 +52,7 @@ class SystemProperties {
   explicit SystemProperties(bool initialized) : initialized_(initialized) {
   }
 
-  DISALLOW_COPY_AND_ASSIGN(SystemProperties);
+  BIONIC_DISALLOW_COPY_AND_ASSIGN(SystemProperties);
 
   bool Init(const char* filename);
   bool AreaInit(const char* filename, bool* fsetxattr_failed);

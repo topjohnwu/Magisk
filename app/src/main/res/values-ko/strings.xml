@@ -130,7 +130,7 @@
     <string name="settings_su_request_45">45초</string>
     <string name="settings_su_request_60">60초</string>
     <string name="superuser_access">슈퍼유저 액세스</string>
-    <string name="auto_response">자동 응답</string>
+    <string name="auto_response">슈퍼유저 요청</string>
     <string name="request_timeout">요청 시간 제한</string>
     <string name="superuser_notification">슈퍼유저 알림</string>
     <string name="settings_su_reauth_title">업데이트 후 다시 승인</string>
@@ -158,9 +158,9 @@
 
     <!--Superuser-->
     <string name="su_request_title">슈퍼유저 요청</string>
-    <string name="deny">거부</string>
-    <string name="prompt">메시지</string>
-    <string name="grant">허용</string>
+    <string name="deny">일괄 거부</string>
+    <string name="prompt">수동 허가</string>
+    <string name="grant">일괄 허용</string>
     <string name="su_warning">기기에 대한 전체 액세스 권한을 부여합니다.\n확실하지 않은 경우 거부하세요!</string>
     <string name="forever">영구적으로</string>
     <string name="once">한 번만</string>

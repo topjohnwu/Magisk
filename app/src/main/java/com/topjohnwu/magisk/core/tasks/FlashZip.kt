@@ -3,11 +3,11 @@ package com.topjohnwu.magisk.core.tasks
 import android.content.Context
 import android.net.Uri
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.utils.unzip
 import com.topjohnwu.magisk.extensions.fileName
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.extensions.readUri
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.core.utils.unzip
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Single
 import java.io.File

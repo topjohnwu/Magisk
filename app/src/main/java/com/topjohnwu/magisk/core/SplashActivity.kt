@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.core.view.Shortcuts
+import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 

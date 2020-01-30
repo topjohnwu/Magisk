@@ -75,12 +75,8 @@ class ModuleViewModel(
     private val itemNoneInstalled = TextItem(R.string.no_modules_found)
     private val itemNoneUpdatable = TextItem(R.string.module_update_none)
 
-    private val itemsInstalledHelpers = ObservableArrayList<TextItem>().also {
-        it.add(itemNoneInstalled)
-    }
-    private val itemsUpdatableHelpers = ObservableArrayList<TextItem>().also {
-        it.add(itemNoneUpdatable)
-    }
+    private val itemsInstalledHelpers = ObservableArrayList<TextItem>()
+    private val itemsUpdatableHelpers = ObservableArrayList<TextItem>()
 
     private val itemsCoreOnly = ObservableArrayList<SafeModeNotice>()
     private val itemsInstalled = diffListOf<ModuleItem>()
@@ -159,18 +155,12 @@ class ModuleViewModel(
         }
 
         itemsInstalled.addOnListChangedCallback(
-            onItemRangeInserted = { sender, _, count ->
-                if (count > 0 || sender.size > 0) {
-                    itemsInstalledHelpers.clear()
-                }
-            }
+            onItemRangeInserted = { _, _, _ -> itemsInstalledHelpers.clear() },
+            onItemRangeRemoved = { _, _, _ -> addInstalledEmptyMessage() }
         )
         itemsUpdatable.addOnListChangedCallback(
-            onItemRangeInserted = { sender, _, count ->
-                if (count > 0 || sender.size > 0) {
-                    itemsUpdatableHelpers.clear()
-                }
-            }
+            onItemRangeInserted = { _, _, _ -> itemsUpdatableHelpers.clear() },
+            onItemRangeRemoved = { _, _, _ -> addUpdatableEmptyMessage() }
         )
     }
 
@@ -198,6 +188,10 @@ class ModuleViewModel(
         .map { it to itemsUpdatable.calculateDiff(it) }
         .observeOn(AndroidSchedulers.mainThread())
         .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
+        .doOnSuccess {
+            addInstalledEmptyMessage()
+            addUpdatableEmptyMessage()
+        }
         .ignoreElement()!!
 
     @Synchronized
@@ -280,6 +274,20 @@ class ModuleViewModel(
             .map { it.first { it.item.id == repo.id } }
             .subscribeK { it.progress.value = progress }
             .add()
+
+    // ---
+
+    private fun addInstalledEmptyMessage() {
+        if (itemsInstalled.isEmpty() && itemsInstalledHelpers.isEmpty()) {
+            itemsInstalledHelpers.add(itemNoneInstalled)
+        }
+    }
+
+    private fun addUpdatableEmptyMessage() {
+        if (itemsUpdatable.isEmpty() && itemsUpdatableHelpers.isEmpty()) {
+            itemsUpdatableHelpers.add(itemNoneUpdatable)
+        }
+    }
 
     private fun updateCoreOnlyWarning() {
         if (Config.coreOnly) {

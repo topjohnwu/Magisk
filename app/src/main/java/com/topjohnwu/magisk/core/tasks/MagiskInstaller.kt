@@ -7,8 +7,8 @@ import android.text.TextUtils
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.extensions.*

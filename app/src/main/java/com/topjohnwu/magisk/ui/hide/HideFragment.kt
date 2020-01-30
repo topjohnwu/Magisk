@@ -6,18 +6,17 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHideMd2Binding
-import com.topjohnwu.magisk.ui.base.CompatFragment
-import com.topjohnwu.magisk.ui.base.hideKeyboard
+import com.topjohnwu.magisk.extensions.hideKeyboard
+import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
+class HideFragment : BaseUIFragment<HideViewModel, FragmentHideMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_hide_md2
     override val viewModel by viewModel<HideViewModel>()
@@ -28,8 +27,6 @@ class HideFragment : CompatFragment<HideViewModel, FragmentHideMd2Binding>() {
             if (!value) hideKeyboard()
             MotionRevealHelper.withViews(binding.hideFilter, binding.hideFilterToggle, value)
         }
-
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

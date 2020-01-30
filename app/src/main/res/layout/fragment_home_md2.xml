@@ -107,18 +107,6 @@
                         android:background="@drawable/bg_card"
                         android:orientation="horizontal">
 
-                        <View
-                            gone="@{XAndroidKt.isDeviceSecure()}"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:alpha=".15"
-                            android:background="?colorError"
-                            android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/home_device_overview"
                             android:layout_width="wrap_content"
@@ -197,28 +185,11 @@
                             app:layout_constraintTop_toTopOf="parent">
 
                             <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_security_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_device_security"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_security_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{XAndroidKt.isDeviceSecure() ? @string/home_device_security_secure : @string/home_device_security_outdated}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_security_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_security_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_security_title"
-                                tools:text="@string/home_device_security_secure" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_device_extra_version_title"
                                 style="@style/W.Home.Extra.Title"
                                 android:text="@string/home_device_system"
                                 app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_extra_security_title" />
+                                app:layout_constraintTop_toTopOf="parent" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_device_extra_version_value"

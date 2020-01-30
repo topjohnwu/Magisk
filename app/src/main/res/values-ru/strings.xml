@@ -200,6 +200,7 @@
     <string name="settings_su_biometric_title">Биометрическая аутентификация</string>
     <string name="settings_su_biometric_summary">Использовать биометрическую аутентификацию для запросов прав суперпользователя</string>
     <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
+    <string name="settings_customization">Персонализация</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только владелец</string>

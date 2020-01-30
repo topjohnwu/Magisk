@@ -18,7 +18,6 @@ class CompatDelegate internal constructor(
 
     fun onCreate() {
         ensureInsets()
-
     }
 
     fun onResume() {

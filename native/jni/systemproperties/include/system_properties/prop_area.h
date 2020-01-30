@@ -86,7 +86,7 @@ struct prop_bt {
   }
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(prop_bt);
+  BIONIC_DISALLOW_COPY_AND_ASSIGN(prop_bt);
 };
 
 class prop_area {
@@ -138,10 +138,10 @@ class prop_area {
 
   prop_bt* root_node();
 
-  prop_bt* find_prop_bt(prop_bt* const bt, const char* name, uint32_t namelen, bool alloc_if_needed);
-
   /* resetprop: Traverse through the trie and find the node */
-  prop_bt *find_prop_bt(prop_bt *const trie, const char *name, bool alloc_if_needed);
+  prop_bt *find_prop_bt(prop_bt *const bt, const char* name, bool alloc_if_needed);
+
+  prop_bt* find_prop_bt(prop_bt* const bt, const char* name, uint32_t namelen, bool alloc_if_needed);
 
   const prop_info* find_property(prop_bt* const trie, const char* name, uint32_t namelen,
                                  const char* value, uint32_t valuelen, bool alloc_if_needed);
@@ -163,5 +163,5 @@ class prop_area {
   uint32_t reserved_[28];
   char data_[0];
 
-  DISALLOW_COPY_AND_ASSIGN(prop_area);
+  BIONIC_DISALLOW_COPY_AND_ASSIGN(prop_area);
 };
