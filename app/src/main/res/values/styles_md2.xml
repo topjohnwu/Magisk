@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="SplashTheme" parent="SplashThemeBase" />
+
     <style name="Foundation" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
     </style>
@@ -12,6 +14,9 @@
     <style name="Empty" />
 
     <style name="WidgetFoundation" parent="android:Widget" />
+
+    <!-- {@deprecated Use WidgetFoundation instead.} -->
+    <style name="Widget" parent="WidgetFoundation" />
 
     <style name="AppearanceFoundation">
         <item name="android:fontFamily">@font/exo</item>

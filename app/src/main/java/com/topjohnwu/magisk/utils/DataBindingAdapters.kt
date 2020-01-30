@@ -9,9 +9,7 @@ import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import android.widget.TextSwitcher
 import android.widget.TextView
-import android.widget.ViewSwitcher
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
@@ -284,24 +282,6 @@ fun View.setOnSelectClickListener(listener: View.OnClickListener, resetTime: Lon
                 }
             }
         }
-    }
-}
-
-@BindingAdapter("textCaptionVariant")
-fun TextSwitcher.setTextBinding(text: CharSequence) {
-    tag as? ViewSwitcher.ViewFactory ?: ViewSwitcher.ViewFactory {
-        View.inflate(context, R.layout.swicher_caption_variant, null)
-    }.also {
-        tag = it
-        setFactory(it)
-        setInAnimation(context, R.anim.switcher_bottom_up)
-        setOutAnimation(context, R.anim.switcher_center_up)
-    }
-
-
-    val currentText = (currentView as? TextView)?.text
-    if (currentText != text) {
-        setText(text)
     }
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="W" parent="Widget" />
+    <style name="W" parent="android:Widget" />
 
     <style name="W.Home" />
 
