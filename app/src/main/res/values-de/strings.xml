@@ -16,7 +16,6 @@
     <string name="up_to_date">ist auf dem neuesten Stand</string>
     <string name="obsolete">kann aktualisiert werden!</string>
     <string name="loading">wird geladen…</string>
-    <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Versionen unter %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert ist. Bitte Magisk so schnell wie möglich aktualisieren.</string>
     <string name="home_notice_hide">Ausblenden</string>
     <string name="manager">Manager</string>
 
@@ -52,7 +51,7 @@
     <string name="install_options_title">Optionen</string>
     <string name="install_method_title">Methode</string>
     <string name="install_next">Weiter</string>
-    <string name="install_start">Los geht's</string>
+    <string name="install_start">Los geht\'s</string>
     <string name="manager_download_install">Tippen zum Herunterladen und Installieren</string>
     <string name="download_zip_only">Nur Zip herunterladen</string>
     <string name="direct_install">Direkte Installation (empfohlen)</string>
