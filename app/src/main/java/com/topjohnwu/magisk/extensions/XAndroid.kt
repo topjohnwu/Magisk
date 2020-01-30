@@ -42,7 +42,6 @@ import com.topjohnwu.superuser.ShellUtils
 import java.io.File
 import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
-import java.util.*
 import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
@@ -324,23 +323,6 @@ fun Context.hasPermissions(vararg permissions: String) = permissions.all {
 private val securityLevelFormatter get() = SimpleDateFormat("yyyy-MM-dd",
     currentLocale
 )
-
-/** Friendly reminder to seek newer roms or install oem updates. */
-val isDeviceSecure: Boolean
-    get() {
-        val latestPermittedTime = Calendar.getInstance().apply {
-            time = securityLevelDate
-            add(Calendar.MONTH, 2)
-        }.time.time
-        return now in 0..latestPermittedTime
-    }
-val securityLevelDate get() = securityLevelFormatter.parseOrNull(securityLevel) ?: Date(0)
-val securityLevel
-    get() = if (SDK_INT >= Build.VERSION_CODES.M) {
-        Build.VERSION.SECURITY_PATCH
-    } else {
-        null
-    } ?: "1970-01-01" //never
 
 val isSAR
     get() = ShellUtils
