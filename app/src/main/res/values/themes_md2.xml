@@ -113,6 +113,13 @@
         <item name="colorOnPrimaryVariant">#D9222222</item>
     </style>
 
+    <style name="ThemeFoundationMD2.Fraxure" parent="ThemeFoundationMD2.Amoled">
+        <item name="colorPrimary">#009688</item>
+        <item name="colorPrimaryVariant">#8000796B</item>
+        <item name="colorSecondary">#D50000</item>
+        <item name="colorSecondaryVariant">#806D1111</item>
+    </style>
+
     <!--3rd party themes-->
 
 </resources>
