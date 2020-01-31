@@ -191,6 +191,8 @@ static bool fdt_patch(Iter first, Iter last) {
 	return modified;
 }
 
+#define MAX_FDT_GROWTH 256
+
 template <class Table, class Header>
 static int dt_table_patch(const Header *hdr, const char *out) {
 	map<uint32_t, fdt_blob> dtb_map;
@@ -216,9 +218,9 @@ static int dt_table_patch(const Header *hdr, const char *out) {
 		if (dtb_map.count(offset) == 0) {
 			auto blob = buf + offset;
 			uint32_t size = fdt_totalsize(blob);
-			auto fdt = xmalloc(size + 256);
+			auto fdt = xmalloc(size + MAX_FDT_GROWTH);
 			memcpy(fdt, blob, size);
-			fdt_open_into(fdt, fdt, size + 256);
+			fdt_open_into(fdt, fdt, size + MAX_FDT_GROWTH);
 			dtb_map[offset] = { fdt, offset };
 		}
 	}
@@ -255,7 +257,7 @@ static int dt_table_patch(const Header *hdr, const char *out) {
 		val.second.offset = lseek(fd, 0, SEEK_CUR);
 		auto fdt = val.second.fdt;
 		fdt_pack(fdt);
-		int size = fdt_totalsize(fdt);
+		auto size = fdt_totalsize(fdt);
 		total_size += xwrite(fd, fdt, size);
 		val.second.len = do_align(size, align);
 		write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), align));
@@ -287,12 +289,12 @@ static int blob_patch(uint8_t *dtb, size_t dtb_sz, const char *out) {
 	for (int i = 0; i < dtb_sz; ++i) {
 		if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
 			auto len = fdt_totalsize(dtb + i);
-			auto fdt = static_cast<uint8_t *>(xmalloc(len + 256));
+			auto fdt = static_cast<uint8_t *>(xmalloc(len + MAX_FDT_GROWTH));
 			memcpy(fdt, dtb + i, len);
 			fdt_pack(fdt);
 			uint32_t padding = len - fdt_totalsize(fdt);
 			padding_list.push_back(padding);
-			fdt_open_into(fdt, fdt, len + 256);
+			fdt_open_into(fdt, fdt, len + MAX_FDT_GROWTH);
 			fdt_list.push_back(fdt);
 			i += len - 1;
 		}
