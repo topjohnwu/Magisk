@@ -7,8 +7,10 @@
 
     <style name="W.Home" />
 
+    <!--remove-->
     <style name="W.Home.Extra" />
 
+    <!--remove-->
     <style name="W.Home.Extra.Title">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -16,6 +18,7 @@
         <item name="android:singleLine">true</item>
     </style>
 
+    <!--remove-->
     <style name="W.Home.Extra.Value">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -26,6 +29,61 @@
         <item name="layout_constraintHorizontal_bias">0</item>
         <item name="android:ellipsize">middle</item>
         <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="W.Home.Card" parent="WidgetFoundation.Card">
+        <item name="android:layout_marginStart">@dimen/l1</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="W.Home.Card.First">
+        <item name="android:layout_marginStart">0dp</item>
+    </style>
+
+    <style name="W.Home.Title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">@dimen/l1</item>
+        <item name="android:paddingEnd">@dimen/l1</item>
+        <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">@dimen/l_50</item>
+        <item name="android:paddingBottom">@dimen/l_50</item>
+    </style>
+
+    <style name="W.Home.Section">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:background">?colorSurface</item>
+        <item name="android:alpha">.5</item>
+    </style>
+
+    <style name="W.Home.Item">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">@dimen/l1</item>
+        <item name="android:paddingEnd">@dimen/l1</item>
+    </style>
+
+    <style name="W.Home.Item.Top">
+        <item name="android:paddingTop">@dimen/l_75</item>
+    </style>
+
+    <style name="W.Home.Item.Bottom">
+        <item name="android:paddingBottom">@dimen/l_75</item>
+    </style>
+
+    <style name="W.Home.ItemContent">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textAppearance">@style/AppearanceFoundation.Caption</item>
+    </style>
+
+    <style name="W.Home.ItemContent.Right">
+        <item name="android:layout_marginStart">@dimen/l_50</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <!--endregion-->

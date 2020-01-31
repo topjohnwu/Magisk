@@ -41,6 +41,11 @@ class HomeViewModel(
 
     val stateMagisk = KObservableField(MagiskState.LOADING)
     val stateManager = KObservableField(MagiskState.LOADING)
+    val stateVersionMagisk = KObservableField("")
+    val stateCodeMagisk = KObservableField(0)
+    val stateVersionManager = KObservableField("")
+    val stateCodeManager = KObservableField(0)
+    val stateCodeStub = KObservableField(0)
     val stateTextMagisk = Observer(stateMagisk) {
         when (stateMagisk.value) {
             MagiskState.NOT_INSTALLED -> R.string.installed_error.res()
@@ -59,8 +64,6 @@ class HomeViewModel(
     }
     val statePackageManager = packageName
     val statePackageOriginal = statePackageManager == BuildConfig.APPLICATION_ID
-    val stateVersionUpdateMagisk = KObservableField("")
-    val stateVersionUpdateManager = KObservableField("")
 
     val stateMagiskProgress = KObservableField(0)
     val stateManagerProgress = KObservableField(0)
@@ -110,21 +113,12 @@ class HomeViewModel(
             else -> MagiskState.UP_TO_DATE
         }
 
-        stateVersionUpdateMagisk.value = when {
-            info.magisk.isObsolete -> "%s > %s".format(
-                Info.env.magiskVersionString.clipVersion(info.magisk.version),
-                info.magisk.version.clipVersion(Info.env.magiskVersionString)
-            )
-            else -> ""
-        }
+        stateVersionMagisk.value = info.magisk.version
+        stateVersionManager.value = info.app.version
 
-        stateVersionUpdateManager.value = when {
-            info.app.isObsolete -> "%s > %s".format(
-                BuildConfig.VERSION_NAME.clipVersion(info.app.version),
-                info.app.version.clipVersion(BuildConfig.VERSION_NAME)
-            )
-            else -> ""
-        }
+        stateCodeMagisk.value = info.magisk.versionCode
+        stateCodeManager.value = info.app.versionCode
+        stateCodeStub.value = info.stub.versionCode
 
         ensureEnv()
     }

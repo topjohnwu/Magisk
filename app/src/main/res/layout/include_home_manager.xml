@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.topjohnwu.magisk.core.Info" />
+
+        <import type="com.topjohnwu.magisk.BuildConfig" />
+
+        <import type="com.topjohnwu.magisk.core.InfoKt" />
+
+        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_gravity="center">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/home_manager_icon"
+            style="@style/WidgetFoundation.Icon.Primary"
+            android:layout_marginStart="@dimen/l1"
+            android:padding="@dimen/l_50"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_manager" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/home_manager_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/l1"
+            android:text="@{viewModel.stateHideManagerName}"
+            android:textAppearance="@style/AppearanceFoundation.Title"
+            app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"
+            app:layout_constraintEnd_toStartOf="@+id/home_manager_action"
+            app:layout_constraintStart_toEndOf="@+id/home_manager_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/manager" />
+
+        <FrameLayout
+            android:id="@+id/home_manager_action"
+            gone="@{viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/home_manager_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/home_manager_title">
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/WidgetFoundation.Button"
+                gone="@{viewModel.stateManager != MagiskState.OBSOLETE}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/l_50"
+                android:onClick="@{() -> viewModel.onManagerPressed()}"
+                android:text="@string/update"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_update_md2" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/WidgetFoundation.Button.Text"
+                gone="@{viewModel.stateManager == MagiskState.OBSOLETE}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/l_50"
+                android:onClick="@{() -> viewModel.onManagerPressed()}"
+                android:text="@string/install"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_install" />
+
+        </FrameLayout>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/home_manager_title_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="home_manager_action,home_manager_title,home_manager_icon" />
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fadingEdgeLength="@dimen/l1"
+            android:paddingStart="@dimen/l1"
+            android:paddingTop="@dimen/l_50"
+            android:paddingEnd="@dimen/l1"
+            android:requiresFadingEdge="horizontal"
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@+id/home_manager_title_barrier">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/W.Home.Card.First"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/home_manager_remote_title"
+                            style="@style/W.Home.Title"
+                            android:text="@string/module_section_remote"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <View
+                            style="@style/W.Home.Section"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_title" />
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_remote_version"
+                            style="@style/W.Home.Item.Top"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_title">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_extra_version" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{viewModel.stateVersionManager}"
+                                tools:text="20.1" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_remote_version_code"
+                            style="@style/W.Home.Item"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_version">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_extra_code" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{Integer.toString(viewModel.stateCodeManager)}"
+                                tools:text="12345" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_remote_stub_version_code"
+                            style="@style/W.Home.Item.Bottom"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_version_code">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_extra_stub" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{Integer.toString(viewModel.stateCodeStub)}"
+                                tools:text="5" />
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <ProgressBar
+                        style="@style/WidgetFoundation.ProgressBar"
+                        gone="@{viewModel.stateManagerProgress == 0 || viewModel.stateManagerProgress == 100}"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="bottom"
+                        android:max="100"
+                        android:progress="@{viewModel.stateManagerProgress}" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/W.Home.Card"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/home_manager_internal_title"
+                            style="@style/W.Home.Title"
+                            android:text="@string/installed"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <View
+                            style="@style/W.Home.Section"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_title" />
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_internal_version"
+                            style="@style/W.Home.Item.Top"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_title">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_extra_version" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{BuildConfig.VERSION_NAME}"
+                                tools:text="20.1" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_internal_version_code"
+                            style="@style/W.Home.Item"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_version">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_extra_code" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{Integer.toString(BuildConfig.VERSION_CODE)}"
+                                tools:text="12345" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_internal_stub_version_code"
+                            style="@style/W.Home.Item.Bottom"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_version_code">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_extra_stub" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{Info.stub != null ? Integer.toString(Info.stub.version) : @string/home_extra_stub_na}"
+                                tools:text="5" />
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/W.Home.Card"
+                    gone="@{Info.env.magiskVersionCode &lt; 0}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/home_manager_details_title"
+                            style="@style/W.Home.Title"
+                            android:text="@string/home_details_title"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <View
+                            style="@style/W.Home.Section"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_details_title" />
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_internal_mode"
+                            style="@style/W.Home.Item.Top"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_details_title">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_extra_mode" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{InfoKt.isRunningAsStub ? @string/home_extra_mode_stub : @string/home_extra_mode_normal}"
+                                tools:text="Normal" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_internal_connection"
+                            style="@style/W.Home.Item.Bottom"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_mode">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_extra_package" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:id="@+id/home_manager_extra_connection_value"
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{viewModel.statePackageManager}"
+                                tools:text="com.topjohnwu.magisk" />
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
