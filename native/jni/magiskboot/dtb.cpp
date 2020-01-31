@@ -283,24 +283,35 @@ static int dt_table_patch(const Header *hdr, const char *out) {
 
 static int blob_patch(uint8_t *dtb, size_t dtb_sz, const char *out) {
 	vector<uint8_t *> fdt_list;
+	vector<uint32_t> padding_list;
 	for (int i = 0; i < dtb_sz; ++i) {
 		if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
-			int len = fdt_totalsize(dtb + i);
+			auto len = fdt_totalsize(dtb + i);
 			auto fdt = static_cast<uint8_t *>(xmalloc(len + 256));
 			memcpy(fdt, dtb + i, len);
+			fdt_pack(fdt);
+			uint32_t padding = len - fdt_totalsize(fdt);
+			padding_list.push_back(padding);
 			fdt_open_into(fdt, fdt, len + 256);
 			fdt_list.push_back(fdt);
 			i += len - 1;
 		}
 	}
+
 	if (!fdt_patch(fdt_list.begin(), fdt_list.end()))
 		return 1;
 
 	unlink(out);
 	int fd = xopen(out, O_WRONLY | O_CREAT | O_CLOEXEC, 0644);
 
-	for (auto fdt : fdt_list) {
+	for (int i = 0; i < fdt_list.size(); ++i) {
+		auto fdt = fdt_list[i];
 		fdt_pack(fdt);
+		// Only add padding back if it is anything meaningful
+		if (padding_list[i] > 4) {
+			auto len = fdt_totalsize(fdt);
+			fdt_set_totalsize(fdt, len + padding_list[i]);
+		}
 		xwrite(fd, fdt, fdt_totalsize(fdt));
 		free(fdt);
 	}
