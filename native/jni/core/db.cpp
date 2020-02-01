@@ -57,9 +57,9 @@ static void (*android_update_LD_LIBRARY_PATH)(const char *ld_library_path);
 }
 
 #ifdef __LP64__
-constexpr char apex_path[] = ":/apex/com.android.runtime/lib64";
+constexpr char apex_path[] = "/apex/com.android.runtime/lib64:";
 #else
-constexpr char apex_path[] = ":/apex/com.android.runtime/lib";
+constexpr char apex_path[] = "/apex/com.android.runtime/lib:";
 #endif
 
 static int dl_init = 0;
@@ -80,15 +80,14 @@ static bool dload_sqlite() {
 
 		// Inject APEX into LD_LIBRARY_PATH
 		char ld_path[4096];
-		android_get_LD_LIBRARY_PATH(ld_path, sizeof(ld_path));
-		int len = strlen(ld_path);
-		strcpy(ld_path + len, apex_path);
+		memcpy(ld_path, apex_path, sizeof(apex_path));
+		constexpr int len = sizeof(apex_path) - 1;
+		android_get_LD_LIBRARY_PATH(ld_path + len, sizeof(ld_path) - len);
 		android_update_LD_LIBRARY_PATH(ld_path);
 		sqlite = dlopen("libsqlite.so", RTLD_LAZY);
 
 		// Revert LD_LIBRARY_PATH just in case
-		ld_path[len] = '\0';
-		android_update_LD_LIBRARY_PATH(ld_path);
+		android_update_LD_LIBRARY_PATH(ld_path + len);
 	}
 	DLERR(sqlite);
 
