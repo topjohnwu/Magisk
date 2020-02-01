@@ -17,7 +17,7 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
+        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l3}"
         tools:layout_marginTop="24dp">
 
         <LinearLayout
@@ -144,17 +144,6 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.button.MaterialButton
-                style="@style/WidgetFoundation.Button.Error"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                android:onClick="@{() -> viewModel.onDeletePressed()}"
-                android:text="@string/uninstall"
-                android:textAllCaps="false"
-                app:icon="@drawable/ic_delete_md2" />
 
         </LinearLayout>
 
