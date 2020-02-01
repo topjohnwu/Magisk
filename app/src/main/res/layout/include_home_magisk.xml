@@ -40,6 +40,7 @@
             android:layout_marginStart="@dimen/l1"
             android:text="@string/magisk"
             android:textAppearance="@style/AppearanceFoundation.Title"
+            android:textColor="?colorPrimary"
             app:layout_constraintBottom_toBottomOf="@+id/home_magisk_icon"
             app:layout_constraintEnd_toStartOf="@+id/home_magisk_action"
             app:layout_constraintStart_toEndOf="@+id/home_magisk_icon"
