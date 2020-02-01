@@ -470,18 +470,19 @@ interface OnPopupMenuItemClickListener {
 
 @BindingAdapter("popupMenu", "popupMenuOnClickListener", requireAll = false)
 fun View.setPopupMenu(popupMenu: Int, listener: OnPopupMenuItemClickListener) {
-    tag = tag as? PopupMenu ?: let {
+    val menu = tag as? PopupMenu ?: let {
         val themeWrapper = ContextThemeWrapper(context, R.style.Foundation_PopupMenu)
         PopupMenu(themeWrapper, this)
     }
-    setOnClickListener {
-        (tag as PopupMenu).apply {
-            menuInflater.inflate(popupMenu, menu)
-            setOnMenuItemClickListener {
-                listener.onMenuItemClick(it.itemId)
-                true
-            }
-            show()
+    tag = menu.apply {
+        this.menu.clear()
+        menuInflater.inflate(popupMenu, this.menu)
+        setOnMenuItemClickListener {
+            listener.onMenuItemClick(it.itemId)
+            true
         }
+    }
+    setOnClickListener {
+        (tag as PopupMenu).show()
     }
 }
