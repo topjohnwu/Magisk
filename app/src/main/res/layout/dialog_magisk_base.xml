@@ -17,17 +17,15 @@
         android:layout_height="match_parent">
 
         <FrameLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_default="wrap"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_default="percent"
-            app:layout_constraintWidth_max="400dp"
-            app:layout_constraintWidth_percent="1">
+            app:layout_constraintWidth_max="400dp">
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card.Elevated"
