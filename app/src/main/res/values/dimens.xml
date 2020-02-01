@@ -14,6 +14,7 @@
     <dimen name="l_75">12dp</dimen>
     <dimen name="l1">16dp</dimen>
     <dimen name="l2">32dp</dimen>
+    <dimen name="l3">48dp</dimen>
 
     <dimen name="r1">8dp</dimen>
 

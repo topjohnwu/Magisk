@@ -23,6 +23,13 @@
     </style>
     <!--endregion-->
 
+    <style name="Foundation.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">?colorOnSurface</item>
+        <item name="android:itemBackground">?colorSurfaceVariant</item>
+        <item name="android:itemTextAppearance">@style/AppearanceFoundation.Caption</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="Foundation.Base" parent="Foundation.Compat">
         <item name="android:fontFamily">@font/exo</item>
         <item name="android:includeFontPadding">false</item>
@@ -32,6 +39,7 @@
         <item name="selectableItemBackground">@drawable/bg_selectable</item>
         <item name="selectableItemBackgroundBorderless">@drawable/bg_selectable_borderless</item>
         <item name="actionBarSize">@dimen/internal_action_bar_size</item>
+        <item name="popupMenuStyle">@style/Foundation.PopupMenu</item>
     </style>
 
     <style name="Foundation.Default" parent="Foundation.Base">

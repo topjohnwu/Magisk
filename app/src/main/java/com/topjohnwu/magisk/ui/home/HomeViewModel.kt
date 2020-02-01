@@ -136,6 +136,15 @@ class HomeViewModel(
         .subscribeK { Navigation.install().publish() }
         .add()
 
+    fun rebootPressed(menuItemId: Int) = when (menuItemId) {
+        R.id.action_reboot_normal -> reboot()
+        R.id.action_reboot_bootloader -> reboot("bootloader")
+        R.id.action_reboot_download -> reboot("download")
+        R.id.action_reboot_edl -> reboot("edl")
+        R.id.action_reboot_recovery -> Shell.su("/system/bin/reboot recovery").submit()
+        else -> Unit
+    }
+
     fun toggle(kof: KObservableField<Boolean>) = kof.toggle()
 
     fun hideNotice() {
