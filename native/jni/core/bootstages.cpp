@@ -393,9 +393,8 @@ static bool magisk_env() {
 		VLOGI("link", MIRRMNT(system) "/product", MIRRMNT(product));
 	}
 
-	// Disable/remove magiskhide, resetprop, and modules
+	// Disable/remove magiskhide, resetprop
 	if (SDK_INT < 19) {
-		close(xopen(DISABLEFILE, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
 		unlink("/sbin/resetprop");
 		unlink("/sbin/magiskhide");
 	}
