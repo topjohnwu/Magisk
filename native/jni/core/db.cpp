@@ -80,15 +80,14 @@ static bool dload_sqlite() {
 
 		// Inject APEX into LD_LIBRARY_PATH
 		char ld_path[4096];
-		strcpy(ld_path, apex_path);
-		int len = strlen(apex_path);
+		memcpy(ld_path, apex_path, sizeof(apex_path));
+		constexpr int len = sizeof(apex_path) - 1;
 		android_get_LD_LIBRARY_PATH(ld_path + len, sizeof(ld_path) - len);
 		android_update_LD_LIBRARY_PATH(ld_path);
 		sqlite = dlopen("libsqlite.so", RTLD_LAZY);
 
 		// Revert LD_LIBRARY_PATH just in case
-		strcpy(ld_path, ld_path + len);
-		android_update_LD_LIBRARY_PATH(ld_path);
+		android_update_LD_LIBRARY_PATH(ld_path + len);
 	}
 	DLERR(sqlite);
 
