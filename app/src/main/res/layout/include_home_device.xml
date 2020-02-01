@@ -11,6 +11,10 @@
 
         <import type="com.topjohnwu.magisk.extensions.XSUKt" />
 
+        <import type="com.topjohnwu.magisk.R" />
+
+        <import type="com.topjohnwu.superuser.Shell" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -44,10 +48,12 @@
             app:layout_constraintStart_toEndOf="@+id/home_device_icon"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!--todo (diareuse) add dropdown menu so users can choose which reboot they want -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/home_device_action_reboot"
             style="@style/WidgetFoundation.Button.Text"
+            gone="@{!Shell.rootAccess()}"
+            popupMenu="@{R.menu.menu_reboot}"
+            popupMenuOnClickListener="@{(it) -> viewModel.rebootPressed(it)}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/l_50"

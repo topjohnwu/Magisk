@@ -5,9 +5,11 @@ import android.animation.ValueAnimator
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.ColorInt
@@ -459,5 +461,27 @@ fun TextView.setStrikeThroughEnabled(useStrikeThrough: Boolean) {
         paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
     } else {
         paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+    }
+}
+
+interface OnPopupMenuItemClickListener {
+    fun onMenuItemClick(itemId: Int)
+}
+
+@BindingAdapter("popupMenu", "popupMenuOnClickListener", requireAll = false)
+fun View.setPopupMenu(popupMenu: Int, listener: OnPopupMenuItemClickListener) {
+    tag = tag as? PopupMenu ?: let {
+        val themeWrapper = ContextThemeWrapper(context, R.style.Foundation_PopupMenu)
+        PopupMenu(themeWrapper, this)
+    }
+    setOnClickListener {
+        (tag as PopupMenu).apply {
+            menuInflater.inflate(popupMenu, menu)
+            setOnMenuItemClickListener {
+                listener.onMenuItemClick(it.itemId)
+                true
+            }
+            show()
+        }
     }
 }
