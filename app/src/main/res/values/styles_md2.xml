@@ -41,6 +41,7 @@
     <style name="Foundation.Floating" parent="Empty">
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
 </resources>
