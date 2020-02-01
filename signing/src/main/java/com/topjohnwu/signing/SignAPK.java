@@ -1,8 +1,9 @@
 package com.topjohnwu.signing;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DEROutputStream;
+import org.bouncycastle.asn1.ASN1OutputStream;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
@@ -48,7 +49,8 @@ import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
 /*
-* Modified from from AOSP(Marshmallow) SignAPK.java
+* Modified from from AOSP
+* https://android.googlesource.com/platform/build/+/refs/heads/marshmallow-release/tools/signapk/SignApk.java
 * */
 
 public class SignAPK {
@@ -86,8 +88,8 @@ public class SignAPK {
         sign(cert, key, input, output, false);
     }
 
-    private static void sign(X509Certificate cert, PrivateKey key,
-                             JarMap input, OutputStream output, boolean minSign) throws Exception {
+    private static void sign(X509Certificate cert, PrivateKey key, JarMap input,
+                             OutputStream output, boolean wholeFile) throws Exception {
         int hashes = 0;
         hashes |= getDigestAlgorithm(cert);
 
@@ -96,7 +98,7 @@ public class SignAPK {
         // we've historically done).
         long timestamp = cert.getNotBefore().getTime() + 3600L * 1000;
 
-        if (minSign) {
+        if (wholeFile) {
             signWholeFile(input.getFile(), cert, key, output);
         } else {
             JarOutputStream outputJar = new JarOutputStream(output);
@@ -129,6 +131,7 @@ public class SignAPK {
                     "\" in cert [" + cert.getSubjectDN());
         }
     }
+
     /** Returns the expected signature algorithm for this key type. */
     private static String getSignatureAlgorithm(X509Certificate cert) {
         String sigAlg = cert.getSigAlgName().toUpperCase(Locale.US);
@@ -145,6 +148,7 @@ public class SignAPK {
             throw new IllegalArgumentException("unsupported key type: " + keyType);
         }
     }
+
     // Files matching this pattern are not copied to the output.
     private static Pattern stripPattern =
             Pattern.compile("^(META-INF/((.*)[.](SF|RSA|DSA|EC)|com/android/otacert))|(" +
@@ -178,7 +182,7 @@ public class SignAPK {
         // We sort the input entries by name, and add them to the
         // output manifest in sorted order.  We expect that the output
         // map will be deterministic.
-        TreeMap<String, JarEntry> byName = new TreeMap<String, JarEntry>();
+        TreeMap<String, JarEntry> byName = new TreeMap<>();
         for (Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements(); ) {
             JarEntry entry = e.nextElement();
             byName.put(entry.getName(), entry);
@@ -209,8 +213,9 @@ public class SignAPK {
         return output;
     }
 
-    /** Write to another stream and track how many bytes have been
-     *  written.
+    /**
+     * Write to another stream and track how many bytes have been
+     * written.
      */
     private static class CountOutputStream extends FilterOutputStream {
         private int mCount;
@@ -232,9 +237,20 @@ public class SignAPK {
             return mCount;
         }
     }
+
+    /**
+     * An OutputStream that does literally nothing
+     */
+    private static OutputStream stubStream = new OutputStream() {
+        @Override
+        public void write(int b) {}
+
+        @Override
+        public void write(byte[] b, int off, int len) {}
+    };
+
     /** Write a .SF file with a digest of the specified manifest. */
-    private static void writeSignatureFile(Manifest manifest, OutputStream out,
-                                           int hash)
+    private static void writeSignatureFile(Manifest manifest, OutputStream out, int hash)
             throws IOException, GeneralSecurityException {
         Manifest sf = new Manifest();
         Attributes main = sf.getMainAttributes();
@@ -243,7 +259,7 @@ public class SignAPK {
         MessageDigest md = MessageDigest.getInstance(
                 hash == USE_SHA256 ? "SHA256" : "SHA1");
         PrintStream print = new PrintStream(
-                new DigestOutputStream(new ByteArrayOutputStream(), md),
+                new DigestOutputStream(stubStream, md),
                 true, "UTF-8");
         // Digest of the entire manifest
         manifest.write(print);
@@ -260,7 +276,7 @@ public class SignAPK {
             print.print("\r\n");
             print.flush();
             Attributes sfAttr = new Attributes();
-            sfAttr.putValue(hash == USE_SHA256 ? "SHA-256-Digest" : "SHA1-Digest-Manifest",
+            sfAttr.putValue(hash == USE_SHA256 ? "SHA-256-Digest" : "SHA1-Digest",
                     new String(Base64.encode(md.digest()), "ASCII"));
             sf.getEntries().put(entry.getKey(), sfAttr);
         }
@@ -275,6 +291,7 @@ public class SignAPK {
             cout.write('\n');
         }
     }
+
     /** Sign data and write the digital signature to 'out'. */
     private static void writeSignatureBlock(
             CMSTypedData data, X509Certificate publicKey, PrivateKey privateKey,
@@ -297,9 +314,10 @@ public class SignAPK {
         gen.addCertificates(certs);
         CMSSignedData sigData = gen.generate(data, false);
         ASN1InputStream asn1 = new ASN1InputStream(sigData.getEncoded());
-        DEROutputStream dos = new DEROutputStream(out);
+        ASN1OutputStream dos = ASN1OutputStream.create(out, ASN1Encoding.DER);
         dos.writeObject(asn1.readObject());
     }
+
     /**
      * Copy all the files in a manifest from input to output.  We set
      * the modification times in the output to a fixed time, so as to
@@ -480,6 +498,7 @@ public class SignAPK {
         temp.writeTo(outputStream);
         outputStream.close();
     }
+
     private static void signFile(Manifest manifest, JarMap inputJar,
                                  X509Certificate cert, PrivateKey privateKey,
                                  JarOutputStream outputJar)

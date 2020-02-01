@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="W" parent="Widget" />
+    <style name="W" parent="android:Widget" />
+
+    <!--region Home-->
 
     <style name="W.Home" />
 
@@ -25,5 +27,31 @@
         <item name="android:ellipsize">middle</item>
         <item name="android:singleLine">true</item>
     </style>
+
+    <!--endregion-->
+
+    <!--region Themes-->
+
+    <style name="W.Theme">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/l1</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="W.Theme.Left">
+        <item name="android:layout_marginEnd">@dimen/l1</item>
+    </style>
+
+    <style name="W.Theme.Right" />
+
+    <style name="W.Theme.Container" parent="Empty">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:baselineAligned">false</item>
+    </style>
+
+    <!--endregion-->
 
 </resources>

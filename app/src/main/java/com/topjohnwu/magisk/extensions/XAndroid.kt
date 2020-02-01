@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.extensions
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.ContextWrapper
@@ -22,23 +23,25 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.provider.OpenableColumns
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.core.net.toFile
 import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.FileProvider
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.DynamicClassLoader
-import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import java.io.File
 import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
-import java.util.*
 import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
@@ -321,23 +324,6 @@ private val securityLevelFormatter get() = SimpleDateFormat("yyyy-MM-dd",
     currentLocale
 )
 
-/** Friendly reminder to seek newer roms or install oem updates. */
-val isDeviceSecure: Boolean
-    get() {
-        val latestPermittedTime = Calendar.getInstance().apply {
-            time = securityLevelDate
-            add(Calendar.MONTH, 2)
-        }.time.time
-        return now in 0..latestPermittedTime
-    }
-val securityLevelDate get() = securityLevelFormatter.parseOrNull(securityLevel) ?: Date(0)
-val securityLevel
-    get() = if (SDK_INT >= Build.VERSION_CODES.M) {
-        Build.VERSION.SECURITY_PATCH
-    } else {
-        null
-    } ?: "1970-01-01" //never
-
 val isSAR
     get() = ShellUtils
         .fastCmd("grep_prop ro.build.system_root_image")
@@ -347,3 +333,14 @@ val isAB
     get() = ShellUtils
         .fastCmd("grep_prop ro.build.ab_update")
         .let { it.isNotEmpty() && it.toBoolean() }
+
+fun Activity.hideKeyboard() {
+    val view = currentFocus ?: return
+    getSystemService<InputMethodManager>()
+        ?.hideSoftInputFromWindow(view.windowToken, 0)
+    view.clearFocus()
+}
+
+fun Fragment.hideKeyboard() {
+    activity?.hideKeyboard()
+}

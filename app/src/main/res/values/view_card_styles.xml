@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="Widget.Card" parent="Widget.MaterialComponents.CardView">
-        <item name="cardCornerRadius">@dimen/radius_generic</item>
-        <item name="cardElevation">0dp</item>
-    </style>
-
-</resources>

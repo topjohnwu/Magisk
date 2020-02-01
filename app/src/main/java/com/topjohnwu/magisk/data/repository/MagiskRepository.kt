@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.data.repository
 
 import android.content.pm.PackageManager
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.extensions.getLabel
 import com.topjohnwu.magisk.extensions.packageName

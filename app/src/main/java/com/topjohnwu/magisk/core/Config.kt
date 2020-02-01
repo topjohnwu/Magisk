@@ -9,14 +9,14 @@ import androidx.core.content.edit
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.magiskdb.SettingsDao
 import com.topjohnwu.magisk.core.magiskdb.StringDao
+import com.topjohnwu.magisk.core.utils.BiometricHelper
+import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.model.preference.PreferenceModel
 import com.topjohnwu.magisk.ui.theme.Theme
-import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream

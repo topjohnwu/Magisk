@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -22,7 +21,7 @@
         android:paddingEnd="@dimen/l1"
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="2"
@@ -30,132 +29,124 @@
             android:useDefaultMargins="true">
 
             <include
-                item="@{viewModel.themeHeadline}"
                 android:id="@+id/theme_card_dark"
+                item="@{viewModel.themeHeadline}"
                 layout="@layout/item_tappable_headline"
                 listener="@{viewModel}" />
 
-            <FrameLayout
-                android:id="@+id/theme_default"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                android:theme="@style/ThemeFoundationMD2.Piplup"
-                app:layout_constraintEnd_toStartOf="@+id/theme_amoled"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/theme_card_dark">
+            <LinearLayout style="@style/W.Theme.Container">
 
-                <include
-                    layout="@layout/item_theme"
-                    theme="@{Theme.Piplup}"
-                    viewModel="@{viewModel}" />
+                <FrameLayout
+                    android:id="@+id/theme_default"
+                    style="@style/W.Theme.Left"
+                    android:theme="@style/ThemeFoundationMD2.Piplup">
 
-            </FrameLayout>
+                    <include
+                        layout="@layout/item_theme"
+                        theme="@{Theme.Piplup}"
+                        viewModel="@{viewModel}" />
 
-            <FrameLayout
-                android:id="@+id/theme_amoled"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:theme="@style/ThemeFoundationMD2.Amoled"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/theme_default"
-                app:layout_constraintTop_toBottomOf="@+id/theme_card_dark">
+                </FrameLayout>
 
-                <include
-                    layout="@layout/item_theme"
-                    theme="@{Theme.PiplupAmoled}"
-                    viewModel="@{viewModel}" />
+                <FrameLayout
+                    android:id="@+id/theme_amoled"
+                    style="@style/W.Theme.Right"
+                    android:theme="@style/ThemeFoundationMD2.Amoled">
 
-            </FrameLayout>
+                    <include
+                        layout="@layout/item_theme"
+                        theme="@{Theme.PiplupAmoled}"
+                        viewModel="@{viewModel}" />
 
-            <FrameLayout
-                android:id="@+id/theme_rayquaza"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:theme="@style/ThemeFoundationMD2.Rayquaza"
-                app:layout_constraintEnd_toEndOf="@+id/theme_default"
-                app:layout_constraintStart_toStartOf="@+id/theme_default"
-                app:layout_constraintTop_toBottomOf="@+id/theme_default">
+                </FrameLayout>
 
-                <include
-                    layout="@layout/item_theme"
-                    theme="@{Theme.Rayquaza}"
-                    viewModel="@{viewModel}" />
+            </LinearLayout>
 
-            </FrameLayout>
+            <LinearLayout style="@style/W.Theme.Container">
 
-            <FrameLayout
-                android:id="@+id/theme_zapdos"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:theme="@style/ThemeFoundationMD2.Zapdos"
-                app:layout_constraintEnd_toEndOf="@+id/theme_amoled"
-                app:layout_constraintStart_toStartOf="@+id/theme_amoled"
-                app:layout_constraintTop_toBottomOf="@+id/theme_amoled">
+                <FrameLayout
+                    android:id="@+id/theme_rayquaza"
+                    style="@style/W.Theme.Left"
+                    android:theme="@style/ThemeFoundationMD2.Rayquaza">
 
-                <include
-                    layout="@layout/item_theme"
-                    theme="@{Theme.Zapdos}"
-                    viewModel="@{viewModel}" />
+                    <include
+                        layout="@layout/item_theme"
+                        theme="@{Theme.Rayquaza}"
+                        viewModel="@{viewModel}" />
 
-            </FrameLayout>
+                </FrameLayout>
 
-            <FrameLayout
-                android:id="@+id/theme_charmeleon"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:theme="@style/ThemeFoundationMD2.Charmeleon"
-                app:layout_constraintEnd_toEndOf="@+id/theme_rayquaza"
-                app:layout_constraintStart_toStartOf="@+id/theme_rayquaza"
-                app:layout_constraintTop_toBottomOf="@+id/theme_rayquaza">
+                <FrameLayout
+                    android:id="@+id/theme_zapdos"
+                    style="@style/W.Theme.Right"
+                    android:theme="@style/ThemeFoundationMD2.Zapdos">
 
-                <include
-                    layout="@layout/item_theme"
-                    theme="@{Theme.Charmeleon}"
-                    viewModel="@{viewModel}" />
+                    <include
+                        layout="@layout/item_theme"
+                        theme="@{Theme.Zapdos}"
+                        viewModel="@{viewModel}" />
 
-            </FrameLayout>
+                </FrameLayout>
 
-            <FrameLayout
-                android:id="@+id/theme_mew"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:theme="@style/ThemeFoundationMD2.Mew"
-                app:layout_constraintEnd_toEndOf="@+id/theme_zapdos"
-                app:layout_constraintStart_toStartOf="@+id/theme_zapdos"
-                app:layout_constraintTop_toBottomOf="@+id/theme_zapdos">
+            </LinearLayout>
 
-                <include
-                    layout="@layout/item_theme"
-                    theme="@{Theme.Mew}"
-                    viewModel="@{viewModel}" />
+            <LinearLayout style="@style/W.Theme.Container">
 
-            </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/theme_charmeleon"
+                    style="@style/W.Theme.Left"
+                    android:theme="@style/ThemeFoundationMD2.Charmeleon">
 
-            <FrameLayout
-                android:id="@+id/theme_salamence"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
-                android:theme="@style/ThemeFoundationMD2.Salamence"
-                app:layout_constraintEnd_toEndOf="@+id/theme_charmeleon"
-                app:layout_constraintStart_toStartOf="@+id/theme_charmeleon"
-                app:layout_constraintTop_toBottomOf="@+id/theme_charmeleon">
+                    <include
+                        layout="@layout/item_theme"
+                        theme="@{Theme.Charmeleon}"
+                        viewModel="@{viewModel}" />
 
-                <include
-                    layout="@layout/item_theme"
-                    theme="@{Theme.Salamence}"
-                    viewModel="@{viewModel}" />
+                </FrameLayout>
 
-            </FrameLayout>
+                <FrameLayout
+                    android:id="@+id/theme_mew"
+                    style="@style/W.Theme.Right"
+                    android:theme="@style/ThemeFoundationMD2.Mew">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <include
+                        layout="@layout/item_theme"
+                        theme="@{Theme.Mew}"
+                        viewModel="@{viewModel}" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <LinearLayout style="@style/W.Theme.Container">
+
+                <FrameLayout
+                    android:id="@+id/theme_salamence"
+                    style="@style/W.Theme.Left"
+                    android:theme="@style/ThemeFoundationMD2.Salamence">
+
+                    <include
+                        layout="@layout/item_theme"
+                        theme="@{Theme.Salamence}"
+                        viewModel="@{viewModel}" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/theme_fraxure"
+                    style="@style/W.Theme.Right"
+                    android:theme="@style/ThemeFoundationMD2.Fraxure">
+
+                    <include
+                        layout="@layout/item_theme"
+                        theme="@{Theme.Fraxure}"
+                        viewModel="@{viewModel}" />
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 

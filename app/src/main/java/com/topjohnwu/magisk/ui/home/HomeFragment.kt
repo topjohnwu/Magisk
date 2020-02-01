@@ -3,19 +3,16 @@ package com.topjohnwu.magisk.ui.home
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import androidx.core.graphics.Insets
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.ui.base.CompatFragment
+import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class HomeFragment : CompatFragment<HomeViewModel, FragmentHomeMd2Binding>() {
+class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_home_md2
     override val viewModel by viewModel<HomeViewModel>()
-
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onStart() {
         super.onStart()

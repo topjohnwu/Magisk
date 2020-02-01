@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.model.toPolicy
+import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.extensions.get
@@ -21,7 +22,6 @@ import com.topjohnwu.magisk.extensions.startActivityWithRoot
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
 import com.topjohnwu.magisk.model.entity.toLog
-import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.superuser.Shell
 import timber.log.Timber
 
