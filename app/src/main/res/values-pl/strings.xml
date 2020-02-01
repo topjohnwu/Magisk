@@ -5,7 +5,7 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logi</string>
     <string name="settings">Ustawienia</string>
-    <string name="install">Instalacja</string>
+    <string name="install">Instaluj</string>
     <string name="section_home">Strona główna</string>
     <string name="section_theme">Motywy</string>
     <string name="safetynet">SafetyNet</string>
@@ -25,7 +25,7 @@
     <string name="home_support_title">Wesprzyj nas</string>
     <string name="home_links_project">Linki do projektu</string>
     <string name="home_item_source">Żródło</string>
-    <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwartoźródłowy. Możesz nam jednak pokazać, że Ci zależy, wysyłając niewielką darowiznę.</string>
+    <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwarty. Możesz nam jednak pokazać, że Ci zależy, wysyłając niewielką darowiznę.</string>
 
     <string name="home_device_security">Bezpieczeństwo</string>
     <string name="home_device_system">System</string>
@@ -88,14 +88,14 @@
     <string name="no_apps_found">Nie znaleziono aplikacji</string>
     <string name="su_snack_grant">Przyznano uprawnienia Superusera dla %1$s</string>
     <string name="su_snack_deny">Odmówiono uprawnień Superusera dla %1$s</string>
-    <string name="su_snack_notif_on">Powiadomienia dla %1$s są włączone</string>
-    <string name="su_snack_notif_off">Powiadomienia dla %1$s są wyłączone</string>
-    <string name="su_snack_log_on">Logowanie dla %1$s jest włączone</string>
-    <string name="su_snack_log_off">Logowanie dla %1$s jest wyłączone</string>
+    <string name="su_snack_notif_on">Włączono powiadomienia dla %1$s</string>
+    <string name="su_snack_notif_off">Wyłączono powiadomienia dla %1$s</string>
+    <string name="su_snack_log_on">Włączono logowanie dla %1$s</string>
+    <string name="su_snack_log_off">Wyłączono logowanie dla %1$s</string>
     <string name="su_revoke_title">Odwołać?</string>
-    <string name="su_revoke_msg">Potwierdzasz odwołanie uprawnień %1$s?</string>
+    <string name="su_revoke_msg">Potwierdzasz odwołanie uprawnień dla %1$s?</string>
     <string name="toast">Wyskakujące powiadomienie</string>
-    <string name="none">Wyłączone</string>
+    <string name="none">Brak</string>
 
     <string name="superuser_toggle_notification">Powiadomienia</string>
     <string name="superuser_toggle_revoke">Odwołaj</string>
@@ -105,7 +105,7 @@
     <string name="log_data_none">Logi są puste, spróbuj użyć aplikacji wymagających roota.</string>
     <string name="log_data_magisk_none">Logi Magiska są puste, to dziwne.</string>
     <string name="menuSaveLog">Zapisz log</string>
-    <string name="menuClearLog">Wyczyść teraz log</string>
+    <string name="menuClearLog">Wyczyść log</string>
     <string name="logs_cleared">Log został pomyślnie wyczyszczony.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Docelowy UID: %1$d</string>
@@ -146,19 +146,19 @@
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Tryb motywu</string>
-    <string name="settings_dark_mode_message">Wybierz tryb który najlepiej pasuje do twojego stylu!</string>
+    <string name="settings_dark_mode_message">Wybierz tryb, który najbardziej ci odpowiada!</string>
     <string name="settings_dark_mode_light">Zawsze jasny</string>
-    <string name="settings_dark_mode_system">Zgodnie z ustawieniami systemowymi</string>
+    <string name="settings_dark_mode_system">Ustawienie systemowe</string>
     <string name="settings_dark_mode_dark">Zawsze ciemny</string>
     <string name="settings_safe_mode_title">Tryb awaryjny (Safe Mode)</string>
     <string name="settings_core_only_summary" deprecated="true">Włącza tylko podstawowe funkcje. MagiskSU i MagiskHide będą nadal włączone, ale nie zostaną załadowane żadne moduły</string>
-    <string name="settings_grid_span_count_title">Rozmiar kolumny siatki</string>
-    <string name="settings_grid_span_count_summary">Ustawia rozmiar kolumny wszystkich pól wyboru. Możesz również zmienić to ustawienie wykonując gest uszczypnięcia.</string>
+    <string name="settings_grid_span_count_title">Rozmiar kolumn siatki</string>
+    <string name="settings_grid_span_count_summary">Ustawia wielkość kolumny wszystkich pól wyboru. Możesz również zmienić to ustawienie wykonując gest uszczypnięcia.</string>
     <string name="settings_grid_span_count_1">Jeden element w wierszu (małe ekrany)</string>
     <string name="settings_grid_span_count_2">Dwa elementy w wierszu (zalecane)</string>
-    <string name="settings_grid_span_count_3">Trzy elementy w wierszu (Tablet/Telewizor)</string>
+    <string name="settings_grid_span_count_3">Trzy elementy w wierszu (tablet/telewizor)</string>
     <string name="settings_download_path_title">Ścieżka pobierania</string>
-    <string name="settings_download_path_message">Pliki będą zapisywane do %1$s</string>
+    <string name="settings_download_path_message">Pliki pobrane przez Managera będą zapisywane do %1$s</string>
     <string name="settings_clear_cache_title">Wyczyść pamięć cache repozytorium</string>
     <string name="settings_clear_cache_summary">Wyczyść zapisane informacje o repozytoriach. Wymusza na aplikacji odświeżenie informacji online</string>
     <string name="settings_hide_manager_title">Ukryj Magisk Managera</string>
@@ -166,18 +166,18 @@
     <string name="settings_restore_manager_title">Przywróć Magisk Managera</string>
     <string name="settings_restore_manager_summary">Przywróć Magisk Managera z oryginalnymi nazwami pakietu i aplikacji</string>
     <string name="language">Język</string>
-    <string name="system_default">(Domyślny systemu)</string>
+    <string name="system_default">(Domyślny systemowy)</string>
     <string name="settings_check_update_title">Sprawdzanie aktualizacji</string>
     <string name="settings_check_update_summary">Regularnie sprawdzaj dostępność aktualizacji w tle</string>
     <string name="settings_update_channel_title">Kanał aktualizacji</string>
     <string name="settings_update_stable">Stabilny</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_custom">Niestandardowy</string>
+    <string name="settings_update_custom">Własny</string>
     <string name="settings_update_custom_msg">Wprowadź własny adres URL</string>
     <string name="settings_magiskhide_summary">Ukryj Magiska przed różnymi metodami wykrywania</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Włącz wsparcie Systemless dla aplikacji typu Adblock</string>
-    <string name="settings_hosts_toast">Dodano moduł systemless hosts</string>
+    <string name="settings_hosts_toast">Dodano moduł Systemless Hosts</string>
     <string name="settings_app_name_hint">Nowa nazwa</string>
     <string name="settings_app_name_helper">Aplikacja zostanie przepakowana do tej nazwy</string>
     <string name="settings_app_name_error">Błędny format</string>
@@ -192,17 +192,17 @@
     <string name="settings_su_request_45">45 sekund</string>
     <string name="settings_su_request_60">60 sekund</string>
     <string name="superuser_access">Dostęp do Superusera</string>
-    <string name="auto_response">Automatyczna odpowiedź</string>
+    <string name="auto_response">Automatyczna reakcja</string>
     <string name="request_timeout">Limit czasu żądania</string>
     <string name="superuser_notification">Powiadomienia Superusera</string>
     <string name="settings_su_reauth_title">Ponowienie uwierzytelniania po aktualizacji</string>
-    <string name="settings_su_reauth_summary">Ponowienie uprawnień Superusera po aktualizacji aplikacji</string>
+    <string name="settings_su_reauth_summary">Ponowienie dostępu do uprawnień Superusera po aktualizacji aplikacji</string>
     <string name="settings_su_biometric_title">Uwierzytelnianie biometryczne</string>
     <string name="settings_su_biometric_summary">Używaj uwierzytelniania biometrycznego (np. odcisku palca) aby przyznać uprawnienia Superusera</string>
-    <string name="no_biometric">Nieobsługiwane urządzenie lub ustawienia biometryczne nie są włączone</string>
+    <string name="no_biometric">Urządzenie jest nieobsługiwane lub ustawienia biometryczne nie są włączone</string>
     <string name="settings_customization">Personalizacja</string>
 
-    <string name="multiuser_mode">Tryb Multiuser</string>
+    <string name="multiuser_mode">Tryb wielu użytkowników (Multiuser)</string>
     <string name="settings_owner_only">Tylko właściciel urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie przez właściciela urządzenia</string>
     <string name="settings_user_independent">Niezależni użytkownicy</string>
@@ -213,11 +213,11 @@
     <string name="mount_namespace_mode">Tryb przestrzeni nazw montowania</string>
     <string name="settings_ns_global">Globalna przestrzeń nazw</string>
     <string name="settings_ns_requester">Dziedziczona przestrzeń nazw</string>
-    <string name="settings_ns_isolate">Odizolowana przestrzeń nazw</string>
-    <string name="global_summary">Każda sesja roota używa globalnej przestrzeni nazw montowania</string>
+    <string name="settings_ns_isolate">Izolowana przestrzeń nazw</string>
+    <string name="global_summary">Wszystkie sesje roota będą używać globalnej przestrzeni nazw montowania</string>
     <string name="requester_summary">Sesje roota odziedziczą przestrzeń nazw od wywołującego</string>
     <string name="isolate_summary">Każda sesja roota dostanie własną, izolowaną przestrzeń nazw</string>
-    <string name="settings_download_path_error">Błąd tworzenia katalogu. Podana ścieżka musi być dostępna z głównego katalogu pamięci i nie może być plikiem.</string>
+    <string name="settings_download_path_error">Błąd tworzenia folderu. Podana ścieżka musi być dostępna z głównego katalogu pamięci i nie może być plikiem.</string>
 
     <!--Notifications-->
     <string name="update_channel">Aktualizacja Magiska</string>
@@ -232,7 +232,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Tak</string>
     <string name="no">Nie</string>
-    <string name="repo_install_title">Instaluj %1$s</string>
+    <string name="repo_install_title">Instalacja %1$s</string>
     <string name="repo_install_msg">Czy chcesz zainstalować %1$s ?</string>
     <string name="download">Pobierz</string>
     <string name="reboot">Restart</string>
@@ -253,13 +253,13 @@
     <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Kopia zapasowa nie istnieje!</string>
     <string name="proprietary_title">Pobierz własny kod</string>
-    <string name="proprietary_notice">Magisk Manager to FOSS i nie zawiera własnościowego kodu Google - SafetyNet API.\n\nCzy zezwolić Magisk Managerowi na pobranie rozszerzenia (zawierającego GoogleApiClient) w celu sprawdzenia SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager to FOSS (wolne i otwarte oprogramowanie) i nie zawiera własnościowego kodu Google - SafetyNet API.\n\nCzy zezwolić Magisk Managerowi na pobranie rozszerzenia (zawierającego GoogleApiClient) w celu sprawdzenia SafetyNet?</string>
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga dodatkowej konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie paczki instalacyjnej Magisk, czy chcesz kontynuować?</string>
     <string name="setup_msg">Uruchamianie środowiska konfiguracji…</string>
     <string name="authenticate">Uwierzytelnianie</string>
     <string name="unsupport_magisk_title">Nieobsługiwana wersja Magiska</string>
-    <string name="unsupport_magisk_msg">Ta wersja Magisk Managera nie obsługuje wersji Magiska poniżej %1$s.\n\nAplikacja będzie działać tak, jakby Magisk nie był zainstalowany, zaktualizuj Magiska jak najszybciej.</string>
+    <string name="unsupport_magisk_msg">Ta wersja Magisk Managera nie obsługuje wersji Magiska poniżej %1$s.\n\nAplikacja będzie działać tak, jakby Magisk nie był zainstalowany. Zaktualizuj Magiska jak najszybciej.</string>
 
 </resources>
