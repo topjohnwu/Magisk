@@ -49,7 +49,7 @@
 
         <FrameLayout
             android:id="@+id/home_manager_action"
-            gone="@{viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
+            invisible="@{viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="@+id/home_manager_title"
