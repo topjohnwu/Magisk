@@ -217,7 +217,14 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 		struct stat st;
 		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
 		if (S_ISLNK(st.st_mode)) {
+#if defined(__i386__)
+			// readlinkat() may failed on x86 platform, returning random value 
+			// instead of  number of bytes placed in buf (length of link)
+			memset(buf, 0, sizeof(buf));
+			readlinkat(src, entry->d_name, buf, sizeof(buf));
+#else
 			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
+#endif
 			xsymlink(buf, sbin_path.data());
 		} else {
 			sprintf(buf, "%s/%s", mirror, entry->d_name);
