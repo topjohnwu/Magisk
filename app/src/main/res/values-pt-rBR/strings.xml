@@ -6,7 +6,7 @@
    <string name="logs">Registros</string>
    <string name="settings">Configurações</string>
    <string name="install">Instalar</string>
-   <string name="section_home">Home</string>
+   <string name="section_home">Início</string>
    <string name="section_theme">Temas</string>
    <string name="safetynet">SafetyNet</string>
 
@@ -20,7 +20,7 @@
    <string name="home_notice_content">Certifique-se sempre de que você está usando o Magisk Manager Open-Source. Versões de fonte desconhecida pode realizar ações maliciosas.</string>
    <string name="home_notice_hide">Ocultar</string>
    <string name="app_changelog">Registro de alterações</string>
-   <string name="manager">Manager</string>
+   <string name="manager">Gerenciador</string>
 
    <string name="home_support_title">Contribua com o Projeto</string>
    <string name="home_links_project">Links do projeto</string>
@@ -46,7 +46,7 @@
    <string name="home_extra_mode_stub">Dinâmico</string>
    
    <string name="invalid_update_channel">Canal de atualização inválido</string>
-   <string name="safetyNet_api_error">Erro da API SafetyNet</string>
+   <string name="safetyNet_api_error">Erro do API SafetyNet</string>
    <string name="safetyNet_res_invalid">A resposta é inválida</string>
    <string name="uninstall">Desinstalar</string>
    <string name="uninstall_magisk_title">Desinstalar Magisk</string>
@@ -73,9 +73,9 @@
 
    <!--Superuser-->
    <string name="su_request_title">Solicitação de Superusuário</string>
-   <string name="deny">Negar Automaticamente</string>
+   <string name="deny">Negar</string>
    <string name="prompt">Perguntar</string>
-   <string name="grant">Conceder Automaticamente</string>
+   <string name="grant">Conceder</string>
    <string name="su_warning">Concede acesso total ao seu dispositivo.\nNegar se você não tiver certeza!</string>
    <string name="forever">Sempre</string>
    <string name="once">Uma vez</string>
@@ -200,7 +200,8 @@
    <string name="settings_su_biometric_title">Ativar autenticação biométrica</string>
    <string name="settings_su_biometric_summary">Use a autenticação biométrica para permitir solicitações de superusuário</string>
    <string name="no_biometric">Dispositivo não suportado ou nenhuma configuração biométrica está ativada</string>
-
+   <string name="settings_customization">Personalizações</string>
+   
    <string name="multiuser_mode">Modo multiusuário</string>
    <string name="settings_owner_only">Somente proprietário do dispositivo</string>
    <string name="settings_owner_manage">Gerenciado pelo proprietário do dispositivo</string>
