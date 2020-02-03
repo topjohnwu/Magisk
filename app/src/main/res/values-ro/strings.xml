@@ -5,6 +5,7 @@
     <string name="superuser">Superutilizator</string>
     <string name="logs">Jurnale</string>
     <string name="settings">Setări</string>
+    <string name="refresh">Reîmprospătează datele locale</string>
     <string name="install">Instalează</string>
     <string name="section_home">Start</string>
     <string name="section_theme">Teme</string>
