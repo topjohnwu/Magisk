@@ -5,6 +5,7 @@
     <string name="superuser">Суперпользователь</string>
     <string name="logs">Логи</string>
     <string name="settings">Настройки</string>
+    <string name="refresh">Обновить список</string>
     <string name="install">Установка</string>
     <string name="section_home">Главная</string>
     <string name="section_theme">Темы</string>
@@ -38,12 +39,12 @@
     <string name="home_extra_version">Версия</string>
     <string name="home_extra_code">Сборка</string>
     <string name="home_extra_mode">Режим</string>
-    <string name="home_extra_connection">Подключён</string> <!--TODO-->
+    <string name="home_extra_connection">Подключён</string>
     <string name="home_extra_package">Имя пакета</string>
 
     <string name="home_extra_mode_normal">Обычный</string>
     <string name="home_extra_mode_safe">Безопасный</string>
-    <string name="home_extra_mode_stub">Динамический</string> <!--TODO-->
+    <string name="home_extra_mode_stub">Динамический</string>
 
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="safetyNet_api_error">Ошибка SafetyNet API</string>
