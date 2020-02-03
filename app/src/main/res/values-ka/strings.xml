@@ -55,7 +55,7 @@
 
     <!--Install-->
     <string name="keep_force_encryption">შიფრირება ყოველთვის იყოს ჩართული</string>
-    <string name="keep_dm_verity">AVB 2.0/dm-verity იყოს ჩართUლი</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity იყოს ჩართული</string>
     <string name="recovery_mode">Recovery რეჟიმი</string>
     <string name="install_options_title">ოფციები</string>
     <string name="install_method_title">მეთოდი</string>
