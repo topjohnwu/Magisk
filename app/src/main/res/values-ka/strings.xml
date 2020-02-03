@@ -5,7 +5,7 @@
     <string name="superuser">სუპერმომხმარებელი</string>
     <string name="logs">ლოგები</string>
     <string name="settings">პარამეტრები</string>
-    <string name="refresh">ლოკალური ფაილების დარეფრეშება</string>
+    <string name="refresh">ლოკალური მონაცემების დარეფრეშება</string>
     <string name="install">ინსტალაცია</string>
     <string name="section_home">საწყისი</string>
     <string name="section_theme">თემები</string>
