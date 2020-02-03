@@ -135,7 +135,7 @@
     <string name="module_version_author">%1$s - %2$s</string>
     <string name="module_section_pending">Güncellemeler</string>
     <string name="module_section_pending_action">Tümünü güncelle</string>
-    <string name="module_section_remote">Remote</string>
+    <string name="module_section_remote">İndirilebilir</string>
     <string name="module_state_remove">Kaldır</string>
     <string name="module_state_restore">Geri yükle</string>
     <string name="module_action_install_external">Depolama alanından yükle</string>
@@ -200,6 +200,7 @@
     <string name="settings_su_biometric_title">Biyometrik Kimlik Doğrulamayı Etkinleştir</string>
     <string name="settings_su_biometric_summary">Superuser isteklerine izin vermek için biyometrik kimlik doğrulamayı kullanın</string>
     <string name="no_biometric">Desteklenmeyen cihaz veya biyometrik ayar etkinleştirilmemiş</string>
+    <string name="settings_customization">Özelleştirme</string>
 
     <string name="multiuser_mode">Çok Kullanıcılı Mod</string>
     <string name="settings_owner_only">Yalnızca Cihaz Sahibi</string>

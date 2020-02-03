@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.core.utils
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.widget.Toast
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
@@ -11,14 +10,13 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.signing.JarMap
 import com.topjohnwu.signing.SignAPK
 import com.topjohnwu.superuser.Shell
-import io.reactivex.Completable
+import io.reactivex.Single
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -28,12 +26,13 @@ import java.security.SecureRandom
 
 object PatchAPK {
 
-    private const val LOWERALPHA = "abcdefghijklmnopqrstuvwxyz"
-    private val UPPERALPHA = LOWERALPHA.toUpperCase()
-    private val ALPHA = LOWERALPHA + UPPERALPHA
+    private const val ALPHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     private const val DIGITS = "0123456789"
-    val ALPHANUM = ALPHA + DIGITS
-    private val ALPHANUMDOTS = "$ALPHANUM............"
+    const val ALPHANUM = ALPHA + DIGITS
+    private const val ALPHANUMDOTS = "$ALPHANUM............"
+
+    private const val APP_ID = "com.topjohnwu.magisk"
+    private const val APP_NAME = "Magisk Manager"
 
     private fun genPackageName(prefix: String, length: Int): CharSequence {
         val builder = StringBuilder(length)
@@ -81,18 +80,40 @@ object PatchAPK {
         return true
     }
 
+    fun patch(apk: String, out: String, pkg: CharSequence, label: CharSequence): Boolean {
+        try {
+            val jar = JarMap.open(apk)
+            val je = jar.getJarEntry(Const.ANDROID_MANIFEST)
+            val xml = jar.getRawData(je)
+
+            if (!findAndPatch(xml, APP_ID, pkg) ||
+                !findAndPatch(xml, APP_NAME, label))
+                return false
+
+            // Write apk changes
+            jar.getOutputStream(je).write(xml)
+            val keys = Keygen(get())
+            SignAPK.sign(keys.cert, keys.key, jar, FileOutputStream(out).buffered())
+        } catch (e: Exception) {
+            Timber.e(e)
+            return false
+        }
+
+        return true
+    }
+
     private fun patchAndHide(context: Context, label: String): Boolean {
-        val src = if (!isRunningAsStub && SDK_INT >= 28 &&
-            Info.env.magiskVersionCode >= Const.Version.PROVIDER_CONNECT) {
-            // If not running as stub, and we are compatible with stub, use stub
+        val dlStub = !isRunningAsStub && SDK_INT >= 28 &&
+                Info.env.magiskVersionCode >= Const.Version.PROVIDER_CONNECT
+        val src = if (dlStub) {
             val stub = File(context.cacheDir, "stub.apk")
             val svc = get<GithubRawServices>()
-            runCatching {
+            try {
                 svc.fetchFile(Info.remote.stub.link).blockingGet().byteStream().use {
                     it.writeTo(stub)
                 }
-            }.onFailure {
-                Timber.e(it)
+            } catch (e: Exception) {
+                Timber.e(e)
                 return false
             }
             stub.path
@@ -102,7 +123,7 @@ object PatchAPK {
 
         // Generate a new random package name and signature
         val repack = File(context.cacheDir, "patched.apk")
-        val pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length)
+        val pkg = genPackageName("com.", APP_ID.length)
         Config.keyStoreRaw = ""
 
         if (!patch(src, repack.path, pkg, label))
@@ -115,67 +136,20 @@ object PatchAPK {
 
         Config.suManager = pkg.toString()
         Config.export()
-        Shell.su("pm uninstall ${BuildConfig.APPLICATION_ID}").submit()
+        Shell.su("pm uninstall $APP_ID").submit()
 
         return true
-    }
-
-    @JvmStatic
-    @JvmOverloads
-    fun patch(apk: String, out: String, pkg: CharSequence, label: String = "Manager"): Boolean {
-        try {
-            val jar = JarMap.open(apk)
-            val je = jar.getJarEntry(Const.ANDROID_MANIFEST)
-            val xml = jar.getRawData(je)
-
-            if (!findAndPatch(xml, BuildConfig.APPLICATION_ID, pkg) ||
-                    !findAndPatch(xml, "Magisk Manager", label))
-                return false
-
-            // Write apk changes
-            jar.getOutputStream(je).write(xml)
-            val keys = Keygen()
-            SignAPK.sign(keys.cert, keys.key, jar, FileOutputStream(out).buffered())
-        } catch (e: Exception) {
-            Timber.e(e)
-            return false
-        }
-
-        return true
-    }
-
-    fun patch(apk: File, out: File, pkg: CharSequence, label: String): Boolean {
-        try {
-            if (apk.length() < 1 shl 18) {
-                // APK is smaller than 256K, must be stub
-                return patch(apk.path, out.path, pkg, label)
-            }
-
-            // Try using the new APK to patch itself
-            val loader = DynamicClassLoader(apk)
-            val cls = loader.loadClass("a.a")
-
-            for (m in cls.declaredMethods) {
-                val pars = m.parameterTypes
-                if (pars.size == 4 && pars[0] == String::class.java) {
-                    return m.invoke(null, apk.path, out.path, pkg, label) as Boolean
-                }
-            }
-            throw Exception("No matching method found")
-        } catch (e: Exception) {
-            Timber.e(e)
-            // Fallback to use the current implementation
-            return patch(apk.path, out.path, pkg, label)
-        }
     }
 
     fun hideManager(context: Context, label: String) {
-        Completable.fromAction {
-            val progress = Notifications.progress(context, context.getString(R.string.hide_manager_title))
-            Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build())
-            if (!patchAndHide(context, label))
+        val progress = Notifications.progress(context, context.getString(R.string.hide_manager_title))
+        Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build())
+        Single.fromCallable {
+            patchAndHide(context, label)
+        }.subscribeK {
+            if (!it)
                 Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG)
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID)
-        }.subscribeK()
+        }
     }
 }

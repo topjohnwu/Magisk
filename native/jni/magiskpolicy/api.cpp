@@ -80,6 +80,11 @@ int sepol_attradd(const char *s, const char *a) {
 	return add_typeattribute(s, a);
 }
 
+int sepol_genfscon(const char *name, const char *path, const char *context) {
+	vprint("genfscon %s %s %s\n", name, path, context);
+	return add_genfscon(name, path, context);
+}
+
 int sepol_exists(const char *source) {
 	return hashtab_search(magisk_policydb->p_types.table, source) != nullptr;
 }

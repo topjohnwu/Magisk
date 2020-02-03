@@ -44,6 +44,11 @@ R"EOF(Type 6:
 "name_transition source_type target_type class default_type object_name"
 )EOF";
 
+static const char *type_msg_7 =
+R"EOF(Type 7:
+"genfscon fs_name partial_path fs_context"
+)EOF";
+
 void statement_help() {
 	fprintf(stderr,
 R"EOF(One policy statement should be treated as one parameter;
@@ -63,8 +68,9 @@ Supported policy statements:
 %s
 %s
 %s
+%s
 Notes:
-* Type 4 - 6 does not support collections
+* Type 4 - 7 does not support collections
 * Object classes cannot be collections
 * source_type and target_type can also be attributes
 
@@ -76,7 +82,7 @@ allow s1 t2 class { all-permissions }
 allow s2 t1 class { all-permissions }
 allow s2 t2 class { all-permissions }
 
-)EOF", type_msg_1, type_msg_2, type_msg_3, type_msg_4, type_msg_5, type_msg_6);
+)EOF", type_msg_1, type_msg_2, type_msg_3, type_msg_4, type_msg_5, type_msg_6, type_msg_7);
 	exit(0);
 }
 
@@ -371,9 +377,36 @@ static int parse_pattern_6(int action, const char *action_str, char *stmt) {
 		}
 		++state;
 	}
-	if (state < 4) return 1;
+	if (state < 5) return 1;
 	if (sepol_nametrans(source, target, cls, def, filename))
 		LOGW("Error in: %s %s %s %s %s %s\n", action_str, source, target, cls, def, filename);
+	return 0;
+}
+
+// Pattern 7: action name path context
+static int parse_pattern_7(int action, const char *action_str, char *stmt) {
+	int state = 0;
+	char *cur;
+	char *name, *path, *context;
+	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
+		switch(state) {
+			case 0:
+				name = cur;
+				break;
+			case 1:
+				path = cur;
+				break;
+			case 2:
+				context = cur;
+				break;
+			default:
+				return 1;
+		}
+		++state;
+	}
+	if (state < 3) return 1;
+	if (sepol_genfscon(name, path, context))
+		LOGW("Error in: %s %s %s %s\n", action_str, name, path, context);
 	return 0;
 }
 
@@ -412,6 +445,7 @@ void parse_statement(const char *statement) {
 	add_action("type_change", 5, 1)
 	add_action("type_member", 5, 2)
 	add_action("name_transition", 6, 0)
+	add_action("genfscon", 7, 0)
 	else { LOGW("Unknown statement: '%s'\n\n", statement); }
 }
 

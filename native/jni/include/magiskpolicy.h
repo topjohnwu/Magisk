@@ -28,6 +28,7 @@ int sepol_create(const char *s);
 int sepol_permissive(const char *s);
 int sepol_enforce(const char *s);
 int sepol_attradd(const char *s, const char *a);
+int sepol_genfscon(const char *name, const char *path, const char *context);
 int sepol_exists(const char *source);
 
 // Built in rules

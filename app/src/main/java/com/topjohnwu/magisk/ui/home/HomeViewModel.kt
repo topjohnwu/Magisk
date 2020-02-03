@@ -65,9 +65,6 @@ class HomeViewModel(
     val stateMagiskProgress = KObservableField(0)
     val stateManagerProgress = KObservableField(0)
 
-    val stateMagiskExpanded = KObservableField(false)
-    val stateManagerExpanded = KObservableField(false)
-
     val stateHideManagerName = R.string.manager.res().let {
         if (!statePackageOriginal) {
             it.replaceRandomWithSpecial(3)

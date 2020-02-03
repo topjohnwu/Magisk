@@ -138,6 +138,14 @@ static void main_daemon() {
 		}
 		return true;
 	});
+	if (SDK_INT < 0) {
+		// In case some devices do not store this info in build.prop, fallback to getprop
+		auto sdk = getprop("ro.build.version.sdk");
+		if (!sdk.empty()) {
+			LOGI("* Device API level: %s\n", sdk.data());
+			SDK_INT = parse_int(sdk);
+		}
+	}
 
 	// Load config status
 	parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
