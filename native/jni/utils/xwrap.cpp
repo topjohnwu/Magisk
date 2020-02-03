@@ -285,13 +285,24 @@ ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz) {
 }
 
 ssize_t xreadlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
+	// readlinkat() may fail on x86 platform, returning random value
+	// instead of number of bytes placed in buf (length of link)
+#if defined(__i386__) || defined(__x86_64__)
+	memset(buf, 0, bufsiz);
 	ssize_t ret = readlinkat(dirfd, pathname, buf, bufsiz);
 	if (ret == -1) {
+		PLOGE("readlinkat %s", pathname);
+	}
+	return ret;
+#else
+	ssize_t ret = readlinkat(dirfd, pathname, buf, bufsiz);
+	if (ret < 0) {
 		PLOGE("readlinkat %s", pathname);
 	} else {
 		buf[ret] = '\0';
 	}
 	return ret;
+#endif
 }
 
 int xsymlink(const char *target, const char *linkpath) {
