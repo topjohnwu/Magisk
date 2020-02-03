@@ -5,6 +5,7 @@
     <string name="superuser">Superužívateľ</string>
     <string name="logs">Záznamy</string>
     <string name="settings">Nastavenia</string>
+    <string name="refresh">Obnoviť lokálne dáta</string>
     <string name="install">Inštalovať</string>
     <string name="section_home">Domov</string>
     <string name="section_theme">Motívy</string>
