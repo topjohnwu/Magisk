@@ -143,7 +143,7 @@
     <string name="module_update_none">თქვენი მოდულები განახლებულია!</string>
     <string name="update_available">ხელმისაწვდომია განახლება</string>
     <string name="installed">დაინსტალირებული</string>
-    <string name="sorting_order">სორტირების თანმიმდევრობა</string>
+    <string name="sorting_order">სორტირება</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">თემების ჩამონათვალი</string>
