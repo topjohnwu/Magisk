@@ -5,6 +5,7 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logi</string>
     <string name="settings">Ustawienia</string>
+    <string name="refresh">Odśwież dane lokalne</string>
     <string name="install">Instaluj</string>
     <string name="section_home">Strona główna</string>
     <string name="section_theme">Motywy</string>
