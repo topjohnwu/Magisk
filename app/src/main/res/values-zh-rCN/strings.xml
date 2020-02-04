@@ -5,6 +5,7 @@
     <string name="superuser">超级用户</string>
     <string name="logs">日志</string>
     <string name="settings">设置</string>
+    <string name="refresh">刷新本地数据</string>
     <string name="install">安装</string>
     <string name="section_home">主页</string>
     <string name="section_theme">主题</string>
