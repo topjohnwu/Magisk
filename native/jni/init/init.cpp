@@ -102,7 +102,7 @@ static void decompress_ramdisk() {
 	uint8_t *buf;
 	size_t sz;
 	mmap_ro(ramdisk_xz, buf, sz);
-	int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC);
+	int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 700);
 	unxz(fd, buf, sz);
 	munmap(buf, sz);
 	close(fd);
