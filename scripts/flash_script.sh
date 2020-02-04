@@ -80,17 +80,20 @@ if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   mount -o rw,remount /system
   ADDOND=/system/addon.d/99-magisk.sh
-  cat <<EOF > $ADDOND
+  cat <<'EOF' > $ADDOND
 #!/sbin/sh
 # ADDOND_VERSION=2
 
 mount /data 2>/dev/null
 
 if [ -f /data/adb/magisk/addon.d.sh ]; then
-  exec sh /data/adb/magisk/addon.d.sh "\$@"
+  exec sh /data/adb/magisk/addon.d.sh "$@"
 else
-  OUTFD=\$(ps | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
-  ui_print() { echo -e "ui_print \$1\nui_print" >> /proc/self/fd/\$OUTFD; }
+  OUTFD=$(ps | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
+  [ ! -z $OUTFD -a "$OUTFD" -eq "$OUTFD" ] 2>/dev/null || OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
+  [ ! -z $OUTFD -a "$OUTFD" -eq "$OUTFD" ] 2>/dev/null || OUTFD=$(ps | grep -v 'grep' | grep -oE 'status_fd=(.*)' | cut -d= -f2)
+  [ ! -z $OUTFD -a "$OUTFD" -eq "$OUTFD" ] 2>/dev/null || OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'status_fd=(.*)' | cut -d= -f2)
+  ui_print() { echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD; }
 
   ui_print "************************"
   ui_print "* Magisk addon.d failed"
