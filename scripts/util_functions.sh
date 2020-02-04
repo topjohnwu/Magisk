@@ -69,7 +69,7 @@ setup_flashable() {
     # We will have to manually find out OUTFD
     for FD in `ls /proc/$$/fd`; do
       if readlink /proc/$$/fd/$FD | grep -q pipe; then
-        if ps | grep -v grep | grep -q " 3 $FD "; then
+        if ps | grep -v grep | grep -qE " 3 $FD |status_fd=$FD"; then
           OUTFD=$FD
           break
         fi
@@ -109,12 +109,21 @@ recovery_actions() {
 }
 
 recovery_cleanup() {
+  local DIR
   ui_print "- Unmounting partitions"
   (umount_apex
-  umount -l /system
-  umount -l /system_root
+  if [ ! -d /postinstall/tmp ]; then
+    umount -l /system
+    umount -l /system_root
+  fi
   umount -l /vendor
   umount -l /persist
+  for DIR in /apex /system /system_root; do
+    if [ -L "${DIR}_link" ]; then
+      rmdir $DIR
+      mv -f ${DIR}_link $DIR
+    fi
+  done
   umount -l /dev/random) 2>/dev/null
   export PATH=$OLD_PATH
   [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
@@ -148,13 +157,21 @@ find_block() {
   return 1
 }
 
+setup_mountpoint() {
+  local POINT=$1
+  [ -L $POINT ] && mv -f $POINT ${POINT}_link
+  if [ ! -d $POINT ]; then
+    rm -f $POINT
+    mkdir -p $POINT
+  fi
+}
+
 # mount_name <partname> <mountpoint> <flag>
 mount_name() {
   local PART=$1
   local POINT=$2
   local FLAG=$3
-  [ -L $POINT ] && rm -f $POINT
-  mkdir -p $POINT 2>/dev/null
+  setup_mountpoint $POINT
   is_mounted $POINT && return
   ui_print "- Mounting $POINT"
   # First try mounting with fstab
@@ -187,8 +204,7 @@ mount_partitions() {
   mount_ro_ensure "system$SLOT app$SLOT" /system
   if [ -f /system/init.rc ]; then
     SYSTEM_ROOT=true
-    [ -L /system_root ] && rm -f /system_root
-    mkdir /system_root 2>/dev/null
+    setup_mountpoint /system_root
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   else
@@ -218,7 +234,7 @@ mount_apex() {
   [ -d /system/apex ] || return
   # APEX files present; need to extract and mount the payload imgs or if already extracted, mount folders
   local APEX DEST LOOP MINORX NUM
-  [ -L /apex ] && rm -f /apex
+  setup_mountpoint /apex
   [ -e /dev/block/loop1 ] && MINORX=$(ls -l /dev/block/loop1 | awk '{ print $6 }') || MINORX=1
   NUM=0
   for APEX in /system/apex/*; do
@@ -249,7 +265,7 @@ mount_apex() {
   done
   export ANDROID_RUNTIME_ROOT=/apex/com.android.runtime
   export ANDROID_TZDATA_ROOT=/apex/com.android.tzdata
-  export BOOTCLASSPATH=/apex/com.android.runtime/javalib/core-oj.jar:/apex/com.android.runtime/javalib/core-libart.jar:/apex/com.android.runtime/javalib/okhttp.jar:/apex/com.android.runtime/javalib/bouncycastle.jar:/apex/com.android.runtime/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/android.test.base.jar:/apex/com.android.conscrypt/javalib/conscrypt.jar:/apex/com.android.media/javalib/updatable-media.jar
+  export BOOTCLASSPATH=/apex/com.android.runtime/javalib/core-oj.jar:/apex/com.android.runtime/javalib/core-libart.jar:/apex/com.android.runtime/javalib/okhttp.jar:/apex/com.android.runtime/javalib/bouncycastle.jar:/apex/com.android.runtime/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/android.test.base.jar:/system/framework/telephony-ext.jar:/apex/com.android.conscrypt/javalib/conscrypt.jar:/apex/com.android.media/javalib/updatable-media.jar;
 }
 
 umount_apex() {
