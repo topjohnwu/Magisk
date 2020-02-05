@@ -87,14 +87,14 @@
     <string name="su_allow_toast">%1$s-ს მიენიჭა სუპერმომხმარებლის ნებართვები</string>
     <string name="su_deny_toast">%1$s-ს აეკრძალა სუპერმომხმარებლის ნებართვები</string>
     <string name="no_apps_found">პროგრამები არ არის აღმოჩენილი</string>
-    <string name="su_snack_grant">%1$s-ის ნებართვები იქნა მინჭებული</string>
+    <string name="su_snack_grant">%1$s-ის ნებართვები იქნა მინიჭებული</string>
     <string name="su_snack_deny">%1$s-ის ნებართვები იქნა აკრძალული</string>
-    <string name="su_snack_notif_on">%1$s-ის შეტყბინებები ჩართულია</string>
-    <string name="su_snack_notif_off">%1$s-ის შეტყბინებები გამორთულია</string>
+    <string name="su_snack_notif_on">%1$s-ის შეტყობინებები ჩართულია</string>
+    <string name="su_snack_notif_off">%1$s-ის შეტყობინებები გამორთულია</string>
     <string name="su_snack_log_on">%1$s-ის ლოგინგი ჩართულია</string>
     <string name="su_snack_log_off">%1$s-ის ლოგინგი გამორთულია</string>
     <string name="su_revoke_title">გავაუქმოთ?</string>
-    <string name="su_revoke_msg">გსურთ %1$s-ისთვის ნებართვების გაუქმება?</string>
+    <string name="su_revoke_msg">ნამდვილად გსურთ %1$s-ისთვის ნებართვების გაუქმება?</string>
     <string name="toast">ჩვეულებრივი</string>
     <string name="none">არანაირი</string>
 
