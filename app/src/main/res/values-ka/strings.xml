@@ -216,7 +216,7 @@
     <string name="settings_ns_requester">მიღებითი Namespace-ი</string>
     <string name="settings_ns_isolate">იზოლირებული Namespace-ი</string>
     <string name="global_summary">ყველა root სესია გამოიყენებს გლობალურ სამონტაჟო namespace-ს</string>
-    <string name="requester_summary">Root სესიები მიიღებენ მომწოდებლის სამოტაჟო namespace-ს</string>
+    <string name="requester_summary">Root სესიები მიიღებენ მომწოდებლის სამონტაჟო namespace-ს</str8ing>
     <string name="isolate_summary">ყოველ root სესიას ექნებათ თავიანთი იზოლირებული namespace-ი</string>
     <string name="settings_download_path_error">შეცდომა საქაღალდეს შექმნის დროს. იგი უნდა იყოს ხელმისაწვდომი მახსოვრობიდან და არ უნდა იყოს ფაილი.</string>
 
@@ -228,7 +228,7 @@
     <string name="download_open_parent">მშობელ საქაღდეში ნახვა</string>
     <string name="download_open_self">ფაილის ჩვენება</string>
     <string name="magisk_update_title">ხელმისაწვდომია Magisk-ის განახლება!</string>
-    <string name="manager_update_title">ხელმისაწვდომია Magisk მენეჯერის გახლება!</string>
+    <string name="manager_update_title">ხელმისაწვდომია Magisk მენეჯერის განახლება!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">დიახ</string>
@@ -254,7 +254,7 @@
     <string name="restore_done">აღდგენა დასრულდა!</string>
     <string name="restore_fail">საწყისი რეზერვი არ არსებობს!</string>
     <string name="proprietary_title">კუთვნილი კოდის გადმოწერა</string>
-    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და გახსნილ-წყაროიანი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
+    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და წყარო-გახსნილი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
     <string name="setup_fail">ინსტალაცია ჩაიშალა</string>
     <string name="env_fix_title">სჭირდება დამატებითი ინსტალაცია</string>
     <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი ინსტალაცია იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
