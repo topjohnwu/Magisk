@@ -106,6 +106,7 @@
                 <com.google.android.material.card.MaterialCardView
                     style="@style/W.Home.Card.First"
                     android:layout_width="wrap_content"
+                    android:alpha="@{viewModel.stateCodeManager &lt; 0 ? .5f : 1f}"
                     android:layout_height="wrap_content">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -129,6 +130,7 @@
                         <LinearLayout
                             android:id="@+id/home_manager_remote_version"
                             style="@style/W.Home.Item.Top"
+                            invisible="@{viewModel.stateCodeManager &lt; 0}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_title">
 
@@ -146,6 +148,7 @@
                         <LinearLayout
                             android:id="@+id/home_manager_remote_version_code"
                             style="@style/W.Home.Item"
+                            invisible="@{viewModel.stateCodeManager &lt; 0}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_version">
 
@@ -163,6 +166,7 @@
                         <LinearLayout
                             android:id="@+id/home_manager_remote_stub_version_code"
                             style="@style/W.Home.Item.Bottom"
+                            invisible="@{viewModel.stateCodeManager &lt; 0}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_version_code">
 

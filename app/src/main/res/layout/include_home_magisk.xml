@@ -107,9 +107,9 @@
 
                 <com.google.android.material.card.MaterialCardView
                     style="@style/W.Home.Card.First"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:visibility="gone">
+                    android:layout_width="wrap_content"
+                    android:alpha="@{viewModel.stateCodeMagisk &lt; 0 ? .5f : 1f}">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="wrap_content"
@@ -132,6 +132,7 @@
                         <LinearLayout
                             android:id="@+id/home_magisk_remote_version"
                             style="@style/W.Home.Item.Top"
+                            invisible="@{viewModel.stateCodeMagisk &lt; 0}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_remote_title">
 
@@ -149,6 +150,7 @@
                         <LinearLayout
                             android:id="@+id/home_magisk_remote_version_code"
                             style="@style/W.Home.Item.Bottom"
+                            invisible="@{viewModel.stateCodeMagisk &lt; 0}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_remote_version">
 
