@@ -13,6 +13,8 @@
 
         <import type="com.topjohnwu.magisk.R" />
 
+        <import type="com.topjohnwu.magisk.model.events.RebootEvent" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -51,7 +53,7 @@
             style="@style/WidgetFoundation.Button.Text"
             invisibleUnless="@{XSUKt.hasRoot}"
             popupMenu="@{R.menu.menu_reboot}"
-            popupMenuOnClickListener="@{(it) -> viewModel.rebootPressed(it)}"
+            popupMenuOnClickListener="@{RebootEvent::reboot}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/l_50"
