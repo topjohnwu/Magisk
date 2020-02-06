@@ -43,8 +43,10 @@
             android:textColor="?colorPrimary"
             app:layout_constraintBottom_toBottomOf="@+id/home_magisk_icon"
             app:layout_constraintEnd_toStartOf="@+id/home_magisk_action"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/home_magisk_icon"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.761" />
 
         <FrameLayout
             android:id="@+id/home_magisk_action"
@@ -107,7 +109,8 @@
                 <com.google.android.material.card.MaterialCardView
                     style="@style/W.Home.Card.First"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    tools:visibility="gone">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="wrap_content"
@@ -308,31 +311,42 @@
                     android:clickable="true"
                     android:onClick="@{() -> viewModel.onDeletePressed()}">
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingStart="@dimen/l1"
-                        android:paddingTop="@dimen/l_50"
-                        android:paddingEnd="@dimen/l1"
-                        android:paddingBottom="@dimen/l_50">
+                        android:orientation="vertical">
 
-                        <androidx.appcompat.widget.AppCompatImageView
-                            style="@style/WidgetFoundation.Icon.Error"
-                            android:background="@null"
-                            app:srcCompat="@drawable/ic_delete_md2" />
+                        <View
+                            style="@style/W.Home.Section"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_delete" />
 
                         <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/home_magisk_delete"
+                            style="@style/W.Home.Title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/uninstall"
-                            android:textAppearance="@style/AppearanceFoundation.Caption"
                             android:textColor="?colorError"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                    </LinearLayout>
+                        <androidx.appcompat.widget.AppCompatImageView
+                            style="@style/WidgetFoundation.Icon.Error"
+                            android:layout_marginTop="@dimen/l_50"
+                            android:background="@null"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_delete"
+                            app:srcCompat="@drawable/ic_delete_md2" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
