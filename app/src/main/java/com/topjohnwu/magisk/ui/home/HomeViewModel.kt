@@ -21,7 +21,6 @@ import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
@@ -46,22 +45,6 @@ class HomeViewModel(
     val stateVersionManager = KObservableField("")
     val stateCodeManager = KObservableField(0)
     val stateCodeStub = KObservableField(0)
-    val stateTextMagisk = Observer(stateMagisk) {
-        when (stateMagisk.value) {
-            MagiskState.NOT_INSTALLED -> R.string.installed_error.res()
-            MagiskState.UP_TO_DATE -> R.string.up_to_date.res()
-            MagiskState.LOADING -> R.string.loading.res()
-            MagiskState.OBSOLETE -> R.string.obsolete.res()
-        }
-    }
-    val stateTextManager = Observer(stateManager) {
-        when (stateManager.value) {
-            MagiskState.NOT_INSTALLED -> R.string.channel_error.res()
-            MagiskState.UP_TO_DATE -> R.string.up_to_date.res()
-            MagiskState.LOADING -> R.string.loading.res()
-            MagiskState.OBSOLETE -> R.string.obsolete.res()
-        }
-    }
     val statePackageManager = packageName
     val statePackageOriginal = statePackageManager == BuildConfig.APPLICATION_ID
 
@@ -168,12 +151,6 @@ class HomeViewModel(
                 shownDialog = true
                 EnvFixDialog().publish()
             }
-    }
-
-    private fun String.clipVersion(other: String = ""): String {
-        val thisVersion = substringBefore('-')
-        val otherVersion = other.substringBefore('-')
-        return if (thisVersion != otherVersion) thisVersion else substringAfter('-')
     }
 
 }
