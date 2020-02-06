@@ -178,6 +178,13 @@
 
         </LinearLayout>
 
+        <androidx.appcompat.widget.AppCompatImageView
+            isSelected="@{item.enabled}"
+            android:layout_width="@dimen/l1"
+            android:layout_height="@dimen/l1"
+            android:layout_gravity="right|top"
+            app:srcCompat="@drawable/ic_card_check" />
+
     </com.google.android.material.card.MaterialCardView>
 
 </layout>
