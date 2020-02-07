@@ -12,7 +12,7 @@
     <string name="safetynet">SafetyNet</string>
 	
 	<!--Home-->
-    <string name="no_connection">Connettività non disponibile</string>
+    <string name="no_connection">Connessione non disponibile</string>
     <string name="installed_error">non è installato</string>
     <string name="channel_error">ha un canale di aggiornamento non valido!</string>
     <string name="up_to_date">è aggiornato</string>
