@@ -1,6 +1,6 @@
 <resources>
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">Module</string>
     <string name="superuser">Superuser</string>
     <string name="logs">Log</string>
