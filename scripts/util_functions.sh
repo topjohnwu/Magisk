@@ -135,6 +135,7 @@ recovery_cleanup() {
 # Installation Related
 #######################
 
+# find_block [partname...]
 find_block() {
   for BLOCK in "$@"; do
     DEVICE=`find /dev/block -type l -iname $BLOCK | head -n 1` 2>/dev/null
@@ -157,7 +158,8 @@ find_block() {
   return 1
 }
 
-setup_mountpoint() {
+# setup_mntpoint <mountpoint>
+setup_mntpoint() {
   local POINT=$1
   [ -L $POINT ] && mv -f $POINT ${POINT}_link
   if [ ! -d $POINT ]; then
@@ -166,12 +168,12 @@ setup_mountpoint() {
   fi
 }
 
-# mount_name <partname> <mountpoint> <flag>
+# mount_name <partname(s)> <mountpoint> <flag>
 mount_name() {
   local PART=$1
   local POINT=$2
   local FLAG=$3
-  setup_mountpoint $POINT
+  setup_mntpoint $POINT
   is_mounted $POINT && return
   ui_print "- Mounting $POINT"
   # First try mounting with fstab
@@ -182,6 +184,7 @@ mount_name() {
   fi
 }
 
+# mount_ro_ensure <partname(s)> <mountpoint>
 mount_ro_ensure() {
   # We handle ro partitions only in recovery
   $BOOTMODE && return
@@ -204,7 +207,7 @@ mount_partitions() {
   mount_ro_ensure "system$SLOT app$SLOT" /system
   if [ -f /system/init.rc ]; then
     SYSTEM_ROOT=true
-    setup_mountpoint /system_root
+    setup_mntpoint /system_root
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   else
@@ -230,53 +233,69 @@ mount_partitions() {
   fi
 }
 
+# loop_setup <ext4_img>, sets LOOPDEV
+loop_setup() {
+  unset LOOPDEV
+  local LOOP
+  local MINORX=1
+  [ -e /dev/block/loop1 ] && MINORX=$(stat -Lc '%T' /dev/block/loop1)
+  local NUM=0
+  while [ $NUM -lt 64 ]; do
+    LOOP=/dev/block/loop$NUM
+    [ -e $LOOP ] || mknod $LOOP b 7 $((NUM * MINORX))
+    if losetup $LOOP "$1" 2>/dev/null; then
+      LOOPDEV=$LOOP
+      break
+    fi
+    NUM=$((NUM + 1))
+  done
+}
+
 mount_apex() {
-  [ -d /system/apex ] || return
-  # APEX files present; need to extract and mount the payload imgs or if already extracted, mount folders
-  local APEX DEST LOOP MINORX NUM
-  setup_mountpoint /apex
-  [ -e /dev/block/loop1 ] && MINORX=$(ls -l /dev/block/loop1 | awk '{ print $6 }') || MINORX=1
-  NUM=0
+  $BOOTMODE || [ ! -d /system/apex ] && return
+  local APEX DEST
+  setup_mntpoint /apex
   for APEX in /system/apex/*; do
     DEST=/apex/$(basename $APEX .apex)
     [ "$DEST" == /apex/com.android.runtime.release ] && DEST=/apex/com.android.runtime
-    mkdir -p $DEST
-    case $APEX in
-      *.apex)
-        unzip -qo $APEX apex_payload.img -d /apex
-        mv -f /apex/apex_payload.img $DEST.img
-        mount -t ext4 -o ro,noatime $DEST.img $DEST 2>/dev/null
-        if [ $? != 0 ]; then
-          while [ $NUM -lt 64 ]; do
-            LOOP=/dev/block/loop$NUM;
-            (mknod $LOOP b 7 $((NUM * MINORX))
-            losetup $LOOP $DEST.img) 2>/dev/null
-            NUM=$((NUM + 1))
-            losetup $LOOP | grep -q $DEST.img && break
-          done
-          mount -t ext4 -o ro,loop,noatime $LOOP $DEST
-          if [ $? != 0 ]; then
-            losetup -d $LOOP 2>/dev/null
-          fi
-        fi
-      ;;
-      *) mount -o bind $APEX $DEST;;
-    esac
+    mkdir -p $DEST 2>/dev/null
+    if [ -f $APEX ]; then
+      # APEX APKs, extract and loop mount
+      unzip -qo $APEX apex_payload.img -d /apex
+      loop_setup apex_payload.img
+      if [ ! -z $LOOPDEV ]; then
+        ui_print "- Mounting $DEST"
+        mount -t ext4 -o ro,noatime $LOOPDEV $DEST
+      fi
+      rm -f apex_payload.img
+    elif [ -d $APEX ]; then
+      # APEX folders, bind mount directory
+      ui_print "- Mounting $DEST"
+      mount -o bind $APEX $DEST
+    fi
   done
   export ANDROID_RUNTIME_ROOT=/apex/com.android.runtime
   export ANDROID_TZDATA_ROOT=/apex/com.android.tzdata
-  export BOOTCLASSPATH=/apex/com.android.runtime/javalib/core-oj.jar:/apex/com.android.runtime/javalib/core-libart.jar:/apex/com.android.runtime/javalib/okhttp.jar:/apex/com.android.runtime/javalib/bouncycastle.jar:/apex/com.android.runtime/javalib/apache-xml.jar:/system/framework/framework.jar:/system/framework/ext.jar:/system/framework/telephony-common.jar:/system/framework/voip-common.jar:/system/framework/ims-common.jar:/system/framework/android.test.base.jar:/system/framework/telephony-ext.jar:/apex/com.android.conscrypt/javalib/conscrypt.jar:/apex/com.android.media/javalib/updatable-media.jar;
+  local APEXRJPATH=/apex/com.android.runtime/javalib
+  local SYSFRAME=/system/framework
+  export BOOTCLASSPATH=\
+$APEXRJPATH/core-oj.jar:$APEXRJPATH/core-libart.jar:$APEXRJPATH/okhttp.jar:\
+$APEXRJPATH/bouncycastle.jar:$APEXRJPATH/apache-xml.jar:$SYSFRAME/framework.jar:\
+$SYSFRAME/ext.jar:$SYSFRAME/telephony-common.jar:$SYSFRAME/voip-common.jar:\
+$SYSFRAME/ims-common.jar:$SYSFRAME/android.test.base.jar:$SYSFRAME/telephony-ext.jar:\
+/apex/com.android.conscrypt/javalib/conscrypt.jar:\
+/apex/com.android.media/javalib/updatable-media.jar
 }
 
 umount_apex() {
   [ -d /apex ] || return
-  local DEST LOOP
-  for DEST in $(find /apex -type d -mindepth 1 -maxdepth 1); do
-    if [ -f $DEST.img ]; then
-      LOOP=$(mount | grep $DEST | cut -d" " -f1)
-    fi
-    (umount -l $DEST;
-    losetup -d $LOOP) 2>/dev/null
+  local DEST SRC
+  for DEST in /apex/*; do
+    [ "$DEST" = '/apex/*' ] && break
+    SRC=$(grep $DEST /proc/mounts | awk '{ print $1 }')
+    umount -l $DEST
+    # Detach loop device just in case
+    losetup -d $SRC 2>/dev/null
   done
   rm -rf /apex
   unset ANDROID_RUNTIME_ROOT
