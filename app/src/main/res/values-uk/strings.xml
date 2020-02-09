@@ -5,7 +5,7 @@
     <string name="superuser">Суперкористувач</string>
     <string name="logs">Журнали</string>
     <string name="settings">Налаштування</string>
-    <string name="refresh">Оновити локальні дані</string>
+    <string name="refresh">Оновити список</string>
     <string name="install">Встановлення</string>
     <string name="section_home">Домашня</string>
     <string name="section_theme">Теми</string>
@@ -28,6 +28,12 @@
     <string name="home_item_source">Джерело</string>
     <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування.</string>
 
+    <string name="home_device_title">Ваш пристрій</string>
+    <string name="home_device_info_title">Інфо</string>
+    <string name="home_device_extra_manufacturer">Виробник</string>
+    <string name="home_device_extra_model">Модель</string>
+    <string name="home_device_extra_board">Платформа</string>
+
     <string name="home_device_security">Безпека</string>
     <string name="home_device_system">Система</string>
     <string name="home_device_build_style">A/B</string>
@@ -39,12 +45,16 @@
     <string name="home_extra_version">Версія</string>
     <string name="home_extra_code">Код</string>
     <string name="home_extra_mode">Режим</string>
-    <string name="home_extra_connection">З\'єднання</string>
+    <string name="home_extra_connection">З\'єднано</string>
     <string name="home_extra_package">Пакунок</string>
 
     <string name="home_extra_mode_normal">Нормальний</string>
     <string name="home_extra_mode_safe">Безпечний</string>
     <string name="home_extra_mode_stub">Динамічний</string>
+    <string name="home_extra_stub">Stub</string>
+    <string name="home_extra_stub_na">N/A</string>
+
+    <string name="home_details_title">Специфіка</string>
 
     <string name="invalid_update_channel">Невірний канал оновлення</string>
     <string name="safetyNet_api_error">Помилка SafetyNet API</string>
