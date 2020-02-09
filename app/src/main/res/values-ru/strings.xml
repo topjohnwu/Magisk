@@ -5,6 +5,7 @@
     <string name="superuser">Суперпользователь</string>
     <string name="logs">Логи</string>
     <string name="settings">Настройки</string>
+    <string name="refresh">Обновить список</string>
     <string name="install">Установка</string>
     <string name="section_home">Главная</string>
     <string name="section_theme">Темы</string>
@@ -27,6 +28,12 @@
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете проявить заботу, отправив небольшое пожертвование.</string>
 
+    <string name="home_device_title">Устройство</string>
+    <string name="home_device_info_title">Инфо</string>
+    <string name="home_device_extra_manufacturer">Производитель</string>
+    <string name="home_device_extra_model">Модель</string>
+    <string name="home_device_extra_board">Платформа</string>
+
     <string name="home_device_security">ASPL</string> <!--ro.build.version.security_patch-->
     <string name="home_device_system">Android</string> <!--Do not translate-->
     <string name="home_device_build_style">A/B</string> <!--Do not translate-->
@@ -38,12 +45,16 @@
     <string name="home_extra_version">Версия</string>
     <string name="home_extra_code">Сборка</string>
     <string name="home_extra_mode">Режим</string>
-    <string name="home_extra_connection">Подключён</string> <!--TODO-->
+    <string name="home_extra_connection">Подключён</string>
     <string name="home_extra_package">Имя пакета</string>
 
     <string name="home_extra_mode_normal">Обычный</string>
     <string name="home_extra_mode_safe">Безопасный</string>
-    <string name="home_extra_mode_stub">Динамический</string> <!--TODO-->
+    <string name="home_extra_mode_stub">Динамический</string>
+    <string name="home_extra_stub">Stub</string> <!--Do not translate-->
+    <string name="home_extra_stub_na">N/A</string> <!--Do not translate-->
+
+    <string name="home_details_title">Специфика</string>
 
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="safetyNet_api_error">Ошибка SafetyNet API</string>
@@ -135,7 +146,7 @@
     <string name="module_version_author">%1$s от %2$s</string>
     <string name="module_section_pending">Обновления</string>
     <string name="module_section_pending_action">Обновить все</string>
-    <string name="module_section_remote">Не установлены</string>
+    <string name="module_section_remote">Подробно</string>
     <string name="module_state_remove">Удалить</string>
     <string name="module_state_restore">Восстановить</string>
     <string name="module_action_install_external">Установить из хранилища</string>
