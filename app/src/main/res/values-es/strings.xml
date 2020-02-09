@@ -5,6 +5,7 @@
     	<string name="superuser">Superusuario</string>
     	<string name="logs">Registros</string>
     	<string name="settings">Ajustes</string>
+	<string name="refresh">Actualizar Datos Locales</string>
     	<string name="install">Instalar</string>
 	<string name="section_home">Inicio</string>
     	<string name="section_theme">Temas</string>
@@ -27,6 +28,12 @@
     	<string name="home_item_source">Codigo Fuente</string>
     	<string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
 
+	<string name="home_device_title">Tu dispositivo</string>
+   	<string name="home_device_info_title">Información</string>
+    	<string name="home_device_extra_manufacturer">Fabricante:</string>
+    	<string name="home_device_extra_model">Modelo:</string>
+    	<string name="home_device_extra_board">Placa:</string>
+	
     	<string name="home_device_security">Estado:</string>
     	<string name="home_device_system">Sistema:</string>
     	<string name="home_device_build_style">A/B:</string>
@@ -43,6 +50,9 @@
     	<string name="home_extra_mode_normal">Normal</string>
     	<string name="home_extra_mode_safe">Seguro</string>
     	<string name="home_extra_mode_stub">Dinámico</string>
+	
+	
+	<string name="home_details_title">Detalles</string>
 	
 	<string name="invalid_update_channel">Canal de actualización inválido</string>
     	<string name="safetyNet_api_error">Error en la API de SafetyNet</string>
