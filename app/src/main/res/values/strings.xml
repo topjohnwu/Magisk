@@ -28,6 +28,12 @@
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
 
+    <string name="home_device_title">Your device</string>
+    <string name="home_device_info_title">Info</string>
+    <string name="home_device_extra_manufacturer">Manufacturer</string>
+    <string name="home_device_extra_model">Model</string>
+    <string name="home_device_extra_board">Board</string>
+
     <string name="home_device_security">Security</string>
     <string name="home_device_system">System</string>
     <string name="home_device_build_style">A/B</string>
@@ -45,6 +51,10 @@
     <string name="home_extra_mode_normal">Normal</string>
     <string name="home_extra_mode_safe">Safe</string>
     <string name="home_extra_mode_stub">Dynamic</string>
+    <string name="home_extra_stub">Stub</string>
+    <string name="home_extra_stub_na">N/A</string>
+
+    <string name="home_details_title">Details</string>
 
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="safetyNet_api_error">SafetyNet API Error</string>

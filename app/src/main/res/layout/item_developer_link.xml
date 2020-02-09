@@ -15,10 +15,11 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground"
+        android:background="?selectableItemBackgroundBorderless"
+        android:minWidth="60dp"
         android:onClick="@{() -> viewModel.onLinkPressed(item.link)}"
         android:padding="@dimen/l_50"
         tools:layout_gravity="center">
@@ -26,25 +27,11 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/developer_link"
             style="@style/WidgetFoundation.Image.Small"
-            app:layout_constraintEnd_toStartOf="@+id/developer_more"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_gravity="center"
             app:srcCompat="@{item.icon}"
             app:tint="?colorOnPrimary"
             tools:srcCompat="@drawable/ic_paypal" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/developer_more"
-            style="@style/WidgetFoundation.Image.Small"
-            android:layout_height="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/developer_link"
-            app:layout_constraintStart_toEndOf="@+id/developer_link"
-            app:layout_constraintTop_toTopOf="@+id/developer_link"
-            app:srcCompat="@drawable/ic_more"
-            app:tint="?colorOnPrimary" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
 </layout>
