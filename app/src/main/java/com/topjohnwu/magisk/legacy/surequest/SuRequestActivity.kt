@@ -6,6 +6,7 @@ import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.view.Window
+import android.view.WindowManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
@@ -66,6 +67,12 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         val theme = super.getTheme()
         theme.applyStyle(R.style.Foundation_Floating, true)
         return theme
+    }
+
+    override fun onResume() {
+        super.onResume()
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE)
     }
 
     override fun onEventDispatched(event: ViewEvent) {
