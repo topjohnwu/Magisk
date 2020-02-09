@@ -13,11 +13,11 @@
 
     <!--Home-->
     <string name="no_connection">Нет подключения к сети</string>
-    <string name="installed_error">не установлен</string>
-    <string name="channel_error">некорректный канал обновлений!</string>
-    <string name="up_to_date">актуален</string>
-    <string name="obsolete">жаждет обновиться!</string> <!--Joke-->
-    <string name="loading">загружается…</string>
+    <string name="installed_error">Не установлен</string>
+    <string name="channel_error">Некорректный канал обновлений!</string>
+    <string name="up_to_date">Актуален</string>
+    <string name="obsolete">Доступно обновление!</string>
+    <string name="loading">Загружается…</string>
     <string name="home_notice_content">Убедитесь, что Вы скачали и установили Magisk (Manager) из официальных источников. Установочные файлы, загруженные из сторонних источников, могут содержать вредоносный код.</string>
     <string name="home_notice_hide">Скрыть</string>
     <string name="app_changelog">Изменения</string>
@@ -162,9 +162,9 @@
     <string name="settings_dark_mode_system">Системный</string>
     <string name="settings_dark_mode_dark">Всегда тёмный</string>
     <string name="settings_safe_mode_title">Безопасный режим</string>
-    <string name="settings_core_only_summary" deprecated="true">Задействовать только основной функционал (MagiskSU и MagiskHide), модули не будут активированы</string>
+    <string name="settings_core_only_summary" deprecated="true">Задействовать только основной функционал (MagiskSU и MagiskHide). Модули не будут активированы</string>
     <string name="settings_grid_span_count_title">Расположение элементов</string>
-    <string name="settings_grid_span_count_summary">Укажите количество столбцов в сетке элементов. Возможно динамическое изменение жестом масштабирования</string>
+    <string name="settings_grid_span_count_summary">Укажите число столбцов в сетке элементов. Возможно динамическое изменение жестом масштабирования</string>
     <string name="settings_grid_span_count_1">Один элемент (Небольшие экраны)</string>
     <string name="settings_grid_span_count_2">Два элемента (Рекомендуется)</string>
     <string name="settings_grid_span_count_3">Три элемента (Планшеты/TV)</string>
@@ -189,7 +189,7 @@
     <string name="settings_hosts_title">Внесистемный hosts файл</string>
     <string name="settings_hosts_summary">Поддержка внесистемного hosts файла для приложений, блокирующих рекламу</string>
     <string name="settings_hosts_toast">Добавлен модуль внесистемного hosts файла</string>
-    <string name="settings_app_name_hint">Новое имя</string>
+    <string name="settings_app_name_hint">Введите имя</string>
     <string name="settings_app_name_helper">Приложение будет пересобрано с этим именем</string>
     <string name="settings_app_name_error">Некорректный формат</string>
     <string name="settings_su_app_adb">Приложения и ADB</string>
@@ -252,7 +252,7 @@
     <string name="repo_cache_cleared">Кэш репозитория модулей очищен</string>
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
-    <string name="flashing">Прошивка…</string>
+    <string name="flashing">Установка…</string>
     <string name="done">Завершено!</string>
     <string name="failure">Ошибка</string>
     <string name="hide_manager_title">Скрытие Magisk Manager…</string>
