@@ -6,6 +6,7 @@ import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.view.Window
+import android.view.WindowManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
@@ -32,6 +33,8 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
     override fun onCreate(savedInstanceState: Bundle?) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         lockOrientation()
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE)
         super.onCreate(savedInstanceState)
 
         fun showRequest() {
@@ -40,11 +43,7 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         }
 
         fun runHandler(action: String?) {
-            SuCallbackHandler(
-                this,
-                action,
-                intent.extras
-            )
+            SuCallbackHandler(this, action, intent.extras)
             finish()
         }
 

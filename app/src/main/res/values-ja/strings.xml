@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
-    <string name="safetyNet_api_error">SafetyNet APIエラー</string>
-    <string name="safetyNet_res_invalid">応答が不正です</string>
+    <string name="safetynet_api_error">SafetyNet APIエラー</string>
+    <string name="safetynet_res_invalid">応答が不正です</string>
     <string name="keep_force_encryption">強制的な暗号化を維持する</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verityを維持する</string>
     <string name="uninstall">アンインストール</string>

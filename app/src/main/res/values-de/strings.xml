@@ -11,12 +11,7 @@
 
     <!--Home-->
     <string name="no_connection">Keine Verbindung verfügbar</string>
-    <string name="installed_error">ist nicht installiert</string>
-    <string name="channel_error">hat einen ungültigen Update-Kanal!</string>
-    <string name="up_to_date">ist auf dem neuesten Stand</string>
-    <string name="obsolete">kann aktualisiert werden!</string>
-    <string name="loading">wird geladen…</string>
-    <string name="home_notice_hide">Ausblenden</string>
+    <string name="hide">Ausblenden</string>
     <string name="manager">Manager</string>
 
     <string name="home_support_title">Unterstützen Sie uns</string>
@@ -24,21 +19,11 @@
     <string name="home_item_source">Quelle</string>
     <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
 
-    <string name="home_device_security">Sicherheit</string>
-
-    <string name="home_device_security_secure">Sicher</string>
-    <string name="home_device_security_outdated">Veraltet</string>
-
-    <string name="home_extra_mode">Modus</string>
-    <string name="home_extra_connection">Verbindung</string>
-    <string name="home_extra_package">Paket</string>
-
-    <string name="home_extra_mode_safe">Sicher</string>
-    <string name="home_extra_mode_stub">Dynamisch</string>
+    <string name="home_package">Paket</string>
 
     <string name="invalid_update_channel">Ungültiger Aktualisierungskanal</string>
-    <string name="safetyNet_api_error">SafetyNet API Fehler</string>
-    <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
+    <string name="safetynet_api_error">SafetyNet API Fehler</string>
+    <string name="safetynet_res_invalid">Die Antwort ist ungültig</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
     <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt!\nRoot wird entfernt!\nIhre Daten werden potentiell verschlüsselt, wenn sie nicht bereits verschlüsselt sind!</string>

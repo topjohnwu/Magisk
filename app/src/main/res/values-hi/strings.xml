@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">अमान्य अपडेट चैनल</string>
-    <string name="safetyNet_api_error">SafetyNet API त्रुटि</string>
-    <string name="safetyNet_res_invalid">अनुक्रिया अमान्य है.</string>
+    <string name="safetynet_api_error">SafetyNet API त्रुटि</string>
+    <string name="safetynet_res_invalid">अनुक्रिया अमान्य है.</string>
     <string name="keep_force_encryption">बल एन्क्रिप्शन को बनाये रखें</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity को बनाये रखें</string>
     <string name="recovery_mode">रिकवरी मोड</string>

@@ -13,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">კავშირირი არ არის</string>
-    <string name="installed_error">არ არის დაინსტალირებული</string>
-    <string name="channel_error">არასწორი განახლების არხი!</string>
-    <string name="up_to_date">განახლებულია</string>
-    <string name="obsolete">განახლება შესაძლებელია!</string>
-    <string name="loading">იტვირთება…</string>
     <string name="home_notice_content">დარწმუნებული იყავით რომ Magisk მენეჯერის წყარო-გახსნილ ვერსიას ხმარობთ. დახურული წყაროს მქონე მენეჯემა შეიძლება მოწყობილობა დააზიანოს.</string>
-    <string name="home_notice_hide">დამალვა</string>
+    <string name="hide">დამალვა</string>
     <string name="app_changelog">ცვლილებები</string>
     <string name="manager">მენეჯერი</string>
 
@@ -28,27 +23,15 @@
     <string name="home_item_source">წყარო</string>
     <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
 
-    <string name="home_device_security">უსაფრთხოება</string>
     <string name="home_device_system">სისტემა</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">უსაფრთხო</string>
-    <string name="home_device_security_outdated">ვადაგასული</string>
+    <string name="home_package">პაკეტი</string>
 
-    <string name="home_extra_version">ვერსია</string>
-    <string name="home_extra_code">კოდი</string>
-    <string name="home_extra_mode">რეჟიმი</string>
-    <string name="home_extra_connection">კავშირი</string>
-    <string name="home_extra_package">პაკეტი</string>
-
-    <string name="home_extra_mode_normal">ნორმალური</string>
-    <string name="home_extra_mode_safe">უსაფრთხო</string>
-    <string name="home_extra_mode_stub">დინამიური</string>
+    <string name="home_status_normal">ნორმალური</string>
 
     <string name="invalid_update_channel">არასწორი განახლების არხი</string>
-    <string name="safetyNet_api_error">SafetyNet API-ს შეცდომა</string>
-    <string name="safetyNet_res_invalid">პასუხი არასწორია</string>
+    <string name="safetynet_api_error">SafetyNet API-ს შეცდომა</string>
+    <string name="safetynet_res_invalid">პასუხი არასწორია</string>
     <string name="uninstall">დეინსტალაცია</string>
     <string name="uninstall_magisk_title">Magisk-ის დეინსტალაცია</string>
     <string name="uninstall_magisk_msg">ყველა მოდული იქნება წაშლილი/გამორთული!\nRoot-ი წაიშლება!\nთქვენი მონაცემები დაიშიფრება!</string>

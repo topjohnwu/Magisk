@@ -13,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">Nu există conexiune disponibilă</string>
-    <string name="installed_error">nu este instalat</string>
-    <string name="channel_error">are un canal de actualizare nevalid!</string>
-    <string name="up_to_date">este la zi</string>
-    <string name="obsolete">poate fi actualizat!</string>
-    <string name="loading">se încarcă…</string>
     <string name="home_notice_content">Asigură-te întotdeauna că folosești aplicația open-source Magisk Manager. Managerul din surse necunoscute poate efectua acțiuni rău-intenționate.</string>
-    <string name="home_notice_hide">Ascunde</string>
+    <string name="hide">Ascunde</string>
     <string name="app_changelog">Jurnalul schimbărilor</string>
     <string name="manager">Manager</string>
 
@@ -28,27 +23,15 @@
     <string name="home_item_source">Sursă</string>
     <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă trimițând o mică donație.</string>
 
-    <string name="home_device_security">Securitate</string>
     <string name="home_device_system">Sistem</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">Securizat</string>
-    <string name="home_device_security_outdated">Perimat</string>
+    <string name="home_package">Pachet</string>
 
-    <string name="home_extra_version">Versiune</string>
-    <string name="home_extra_code">Cod</string>
-    <string name="home_extra_mode">Mod</string>
-    <string name="home_extra_connection">Conexiune</string>
-    <string name="home_extra_package">Pachet</string>
-
-    <string name="home_extra_mode_normal">Normal</string>
-    <string name="home_extra_mode_safe">Sigur</string>
-    <string name="home_extra_mode_stub">Dinamic</string>
+    <string name="home_status_normal">Normal</string>
 
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
-    <string name="safetyNet_api_error">Eroare privind API-ul SafetyNet</string>
-    <string name="safetyNet_res_invalid">Răspunsul este nevalid</string>
+    <string name="safetynet_api_error">Eroare privind API-ul SafetyNet</string>
+    <string name="safetynet_res_invalid">Răspunsul este nevalid</string>
     <string name="uninstall">Dezinstalează</string>
     <string name="uninstall_magisk_title">Dezinstalează Magisk</string>
     <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate!\nRootul va fi eliminat!\nPotențial ți se vor cripta datele dacă nu sunt criptate deja!</string>

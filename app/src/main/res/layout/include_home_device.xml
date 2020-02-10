@@ -15,6 +15,8 @@
 
         <import type="com.topjohnwu.magisk.model.events.RebootEvent" />
 
+        <import type="com.topjohnwu.magisk.core.Info" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -99,7 +101,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_device_info_title"
                             style="@style/W.Home.Title"
-                            android:text="@string/home_device_info_title"
+                            android:text="@string/info"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -195,7 +197,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_device_details_title"
                             style="@style/W.Home.Title"
-                            android:text="@string/home_details_title"
+                            android:text="@string/details"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -214,7 +216,7 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/home_device_build_style" />
+                                android:text="A/B" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
@@ -225,17 +227,34 @@
 
                         <LinearLayout
                             android:id="@+id/home_device_details_sar"
-                            style="@style/W.Home.Item.Bottom"
+                            style="@style/W.Home.Item"
                             app:layout_constraintStart_toStartOf="@+id/home_device_details_ab"
                             app:layout_constraintTop_toBottomOf="@+id/home_device_details_ab">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/home_device_build_type" />
+                                android:text="SAR" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
                                 android:text="@{XAndroidKt.isSAR ? @string/yes : @string/no}"
+                                tools:text="Yes" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_device_details_recovery"
+                            style="@style/W.Home.Item.Bottom"
+                            app:layout_constraintStart_toStartOf="@+id/home_device_details_sar"
+                            app:layout_constraintTop_toBottomOf="@+id/home_device_details_sar">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="Ramdisk" />
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{Info.recovery ? @string/no : @string/yes }"
                                 tools:text="Yes" />
 
                         </LinearLayout>

@@ -11,14 +11,14 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">قناة تحديث غير صالحة</string>
-    <string name="safetyNet_api_error">خطأ SafetyNet API</string>
-    <string name="safetyNet_res_invalid">رد غير صالح</string>
+    <string name="safetynet_api_error">خطأ SafetyNet API</string>
+    <string name="safetynet_res_invalid">رد غير صالح</string>
     <string name="keep_force_encryption">إبقاء التشفير بقوة</string>
     <string name="keep_dm_verity">إبقاء AVB 2.0/dm-verity</string>
     <string name="recovery_mode">نمط الاستعادة</string>
     <string name="uninstall">إلغاء التثبيت</string>
     <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
-    <string name="uninstall_magisk_msg">ستُعطل/ستُحذف جميع الإضافات. سيُحذف الروت ، وربما ستشفر بياناتك إذا لم تكن غير مشفرة حالياً.</string>  
+    <string name="uninstall_magisk_msg">ستُعطل/ستُحذف جميع الإضافات. سيُحذف الروت ، وربما ستشفر بياناتك إذا لم تكن غير مشفرة حالياً.</string>
     <string name="update">تحديث</string>
 
     <!--Module Fragment-->
@@ -28,7 +28,7 @@
     <string name="reboot_bootloader">إعادة التشغيل إلى نمط Bootloader</string>
     <string name="reboot_download">إعادة التشغيل إلى نمط التحميل</string>
     <string name="reboot_edl">إعادة التشغيل إلى نمط EDL</string>
-    
+
     <!--Repo Fragment-->
     <string name="update_available">يتوفر على تحديث</string>
     <string name="installed">مثبت</string>
@@ -38,7 +38,7 @@
     <string name="menuSaveLog">حفظ السجل</string>
     <string name="menuClearLog">حذف السجل الآن</string>
     <string name="logs_cleared">حُذف السجل بنجاح</string>
-    
+
     <!--About Activity-->
     <string name="app_changelog">تغييرات التطبيق</string>
 
@@ -115,7 +115,7 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts يدعم تطبيقات حجب الإعلانات</string>
     <string name="settings_hosts_toast">مُكنت إضافة Systemless hosts</string>
-    
+
     <string name="settings_su_app_adb">التطبيقات و ADB</string>
     <string name="settings_su_app">التطبيقات فقط</string>
     <string name="settings_su_adb">ADB فقط</string>

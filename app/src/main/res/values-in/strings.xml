@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Kanal Pembaruan tidak valid!</string>
-    <string name="safetyNet_api_error">Kesalahan pada API SafetyNet</string>
-    <string name="safetyNet_res_invalid">Tanggapan tidak valid</string>
+    <string name="safetynet_api_error">Kesalahan pada API SafetyNet</string>
+    <string name="safetynet_res_invalid">Tanggapan tidak valid</string>
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Mode Pemulihan</string>

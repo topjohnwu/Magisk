@@ -83,8 +83,8 @@ class SafetynetViewModel(
             ctsState.value = false
             basicIntegrityState.value = false
             safetyNetTitle.value = when (response) {
-                SafetyNetHelper.RESPONSE_ERR -> R.string.safetyNet_res_invalid
-                else -> R.string.safetyNet_api_error
+                SafetyNetHelper.RESPONSE_ERR -> R.string.safetynet_res_invalid
+                else -> R.string.safetynet_api_error
             }
         }
     }
