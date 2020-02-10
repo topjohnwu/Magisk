@@ -21,6 +21,7 @@ object Info {
     @JvmStatic
     val env by envRef              // Local
     var remote = UpdateInfo()      // Remote
+    @JvmStatic
     var stub: DynAPK.Data? = null  // Stub
 
     @JvmStatic

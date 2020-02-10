@@ -5,6 +5,7 @@
     <string name="superuser">Superusuari</string>
     <string name="logs">Registre</string>
     <string name="settings">Configuració</string>
+    <string name="refresh">Refresca les dades locals</string>
     <string name="install">Instal·lar</string>
     <string name="section_home">Inici</string>
     <string name="section_theme">Temes</string>

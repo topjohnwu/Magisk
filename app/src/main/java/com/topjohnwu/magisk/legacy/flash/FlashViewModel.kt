@@ -5,6 +5,7 @@ import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Handler
+import android.view.MenuItem
 import androidx.core.os.postDelayed
 import androidx.databinding.ObservableArrayList
 import com.topjohnwu.magisk.BR
@@ -86,7 +87,14 @@ class FlashViewModel(
         }
     }
 
-    fun savePressed() = withPermissions(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+    fun onMenuItemClicked(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_save -> savePressed()
+        }
+        return true
+    }
+
+    private fun savePressed() = withPermissions(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
         .map { now }
         .map { it.toTime(timeFormatStandard) }
         .map { Const.MAGISK_INSTALL_LOG_FILENAME.format(it) }
