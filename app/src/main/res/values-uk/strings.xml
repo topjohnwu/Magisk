@@ -28,7 +28,9 @@
     <string name="home_item_source">Джерело</string>
     <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування.</string>
 
-    <string name="home_device_title">Ваш пристрій</string>
+    <string name="home_loading">Завантаження…</string>
+
+    <string name="home_device_title">Пристрій</string>
     <string name="home_device_info_title">Інфо</string>
     <string name="home_device_extra_manufacturer">Виробник</string>
     <string name="home_device_extra_model">Модель</string>
