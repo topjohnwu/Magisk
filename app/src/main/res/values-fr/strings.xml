@@ -12,13 +12,8 @@
 
     <!--Home-->
     <string name="no_connection">Aucune connexion disponible</string>
-    <string name="installed_error">n’est pas installé</string>
-    <string name="channel_error">a un canal de mise à jour invalide !</string>
-    <string name="up_to_date">est à jour</string>
-    <string name="obsolete">dispose d’une mise à jour !</string>
-    <string name="loading">est en cours de chargement…</string>
     <string name="home_notice_content">Assurez‑vous de toujours utiliser la version libre de Magisk Manager. Une version provenant d’une source inconnue peut effectuer des actions malveillantes.</string>
-    <string name="home_notice_hide">Masquage</string>
+    <string name="hide">Masquage</string>
     <string name="app_changelog">Journal des modifications</string>
     <string name="manager">Le gestionnaire</string>
 
@@ -27,27 +22,17 @@
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open‑source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
 
-    <string name="home_device_security">Sécurité</string>
     <string name="home_device_system">Système</string>
     <string name="home_device_build_style">A/B</string>
     <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">Securisé</string>
-    <string name="home_device_security_outdated">Obsolète</string>
+    <string name="home_package">Paquet</string>
 
-    <string name="home_extra_version">Version</string>
-    <string name="home_extra_code">Code</string>
-    <string name="home_extra_mode">Mode</string>
-    <string name="home_extra_connection">Connexion</string>
-    <string name="home_extra_package">Paquet</string>
-
-    <string name="home_extra_mode_normal">Normal</string>
-    <string name="home_extra_mode_safe">Sûr</string>
-    <string name="home_extra_mode_stub">Dynamique</string>
+    <string name="home_status_normal">Normal</string>
 
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
-    <string name="safetyNet_api_error">Erreur de l’API SafetyNet</string>
-    <string name="safetyNet_res_invalid">La réponse est incorrecte</string>
+    <string name="safetynet_api_error">Erreur de l’API SafetyNet</string>
+    <string name="safetynet_res_invalid">La réponse est incorrecte</string>
     <string name="uninstall">Désinstaller</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
@@ -62,13 +47,13 @@
     <string name="install_next">Suivant</string>
     <string name="install_start">C’est parti</string>
     <string name="manager_download_install">Appuyez pour le télécharger et l’installer</string>
-    <string name="download_zip_only">Télécharger le ZIP sans l’installer</string>														   
-    <string name="direct_install">Installation directe (recommandée)</string>																   
+    <string name="download_zip_only">Télécharger le ZIP sans l’installer</string>
+    <string name="direct_install">Installation directe (recommandée)</string>
     <string name="install_inactive_slot">Installer dans l’espace inactif (après mise à jour OTA)</string>
     <string name="install_inactive_slot_msg">Votre appareil sera obligatoirement réamorcé à partir de l’espace (slot) actuellement inactif après son redémarrage !\nN’utilisez uniquement cette option qu’après que la mise à jour OTA a été effectuée.\nVoulez‑vous continuer ?</string>
     <string name="setup_title">Configuration supplémentaire</string>
-    <string name="select_patch_file">Sélectionnez le fichier cible du correctif</string>													
-    <string name="patch_file_msg">Sélectionnez une image brute (*.img) ou une archive TAR ODIN (*.tar)</string>																 
+    <string name="select_patch_file">Sélectionnez le fichier cible du correctif</string>
+    <string name="patch_file_msg">Sélectionnez une image brute (*.img) ou une archive TAR ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Redémarrage dans 5 secondes…</string>
 
     <!--Superuser-->
@@ -200,7 +185,7 @@
     <string name="settings_su_biometric_title">Activer l’authentification biométrique</string>
     <string name="settings_su_biometric_summary">Utiliser l’authentification biométrique pour autoriser les accès en super‑utilisateur</string>
     <string name="no_biometric">L’appareil n’est pas pris en charge ou alors aucun paramètre biométrique n’est activé</string>
-	<string name="settings_customization">Personnalisation</string>
+    <string name="settings_customization">Personnalisation</string>
 
     <string name="multiuser_mode">Mode multi‑utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>

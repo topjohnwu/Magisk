@@ -99,7 +99,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_device_info_title"
                             style="@style/W.Home.Title"
-                            android:text="@string/home_device_info_title"
+                            android:text="@string/info"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -195,7 +195,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_device_details_title"
                             style="@style/W.Home.Title"
-                            android:text="@string/home_details_title"
+                            android:text="@string/details"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 

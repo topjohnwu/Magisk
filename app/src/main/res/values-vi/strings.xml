@@ -1,17 +1,17 @@
 <resources>
-	
+
     <!--Welcome Activity-->
     <string name="modules">Mô-đun</string>
     <string name="superuser">Superuser</string>
     <string name="logs">Nhật ký</string>
     <string name="settings">Thiết lập</string>
     <string name="install">Cài đặt</string>
-    
+
     <!--Status Fragment-->
     <string name="invalid_update_channel">Kênh cập nhật không hợp lệ</string>
-    <string name="safetyNet_api_error">Lỗi SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Phản hồi không hợp lệ.</string>
-    
+    <string name="safetynet_api_error">Lỗi SafetyNet API</string>
+    <string name="safetynet_res_invalid">Phản hồi không hợp lệ.</string>
+
     <!--Install Fragment-->
     <string name="keep_force_encryption">Giữ bắt buộc mã hoá</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
@@ -19,14 +19,14 @@
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
     <string name="uninstall_magisk_msg">Tất cả mô-đun sẽ bị vô hiệu/loại bỏ. Root sẽ bị loại bỏ và dữ liệu của bạn có thể bị mã hoá.</string>
     <string name="update">Cập nhật</string>
-    
+
     <!--Module Fragment-->
     <string name="no_info_provided">(Không có thông tin được cung cấp)</string>
     <string name="no_modules_found">Không tìm thấy mô-đun</string>
     <string name="reboot_recovery">Khởi động vào Recovery</string>
     <string name="reboot_bootloader">Khởi động vào Bootloader</string>
     <string name="reboot_download">Khởi động vào Download</string>
-    
+
     <!--Repo Fragment-->
     <string name="update_available">Có cập nhật mới</string>
     <string name="installed">Đã được cài đặt</string>

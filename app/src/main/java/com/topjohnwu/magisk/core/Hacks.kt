@@ -156,21 +156,21 @@ object ClassMap {
 }
 
 /*
-* TODO: These string were used in the old design, but currently aren't.
-*  However, they should be, so keep a reference here to prevent it from
-*  being removed when running "remove unused resources" */
-val shouldKeepStrings = listOf(
+* Keep a reference to these resources to prevent it from
+* being removed when running "remove unused resources" */
+val shouldKeepResources = listOf(
+    /* TODO: The following strings should be used somewhere */
     R.string.patch_file_msg,
     R.string.no_apps_found,
     R.string.no_info_provided,
-    R.string.reboot_bootloader,
-    R.string.reboot_recovery,
-    R.string.reboot_edl,
-    R.string.reboot_download,
     R.string.release_notes,
     R.string.settings_download_path_error,
     R.string.unsupport_magisk_msg,
     R.string.unsupport_magisk_title,
     R.string.install_inactive_slot_msg,
-    R.string.invalid_update_channel
+    R.string.invalid_update_channel,
+    R.string.update_available,
+
+    /* Android Studio is dumb and cannot detect following usages in databinding */
+    R.menu.menu_reboot
 )

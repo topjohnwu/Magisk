@@ -12,13 +12,8 @@
 
     <!--Home-->
     <string name="no_connection">無法連線</string>
-    <string name="installed_error">未被安裝</string>
-    <string name="channel_error">是無效的更新頻道</string>
-    <string name="up_to_date">是最新版本</string>
-    <string name="obsolete">可以更新！</string>
-    <string name="loading">……</string>
     <string name="home_notice_content">請總是確認您正在使用開源的 Magisk Manager。未知來源的 Manager 可能藏有惡意的操作。</string>
-    <string name="home_notice_hide">隱藏</string>
+    <string name="hide">隱藏</string>
     <string name="app_changelog">更新日誌</string>
     <string name="manager">Manager</string>
 
@@ -27,27 +22,17 @@
     <string name="home_item_source">原始碼</string>
     <string name="home_support_content">Magisk 現在是，未來也永遠是免費且開源。但您可以透過發送小額的抖內來彰顯對我們的支持。</string>
 
-    <string name="home_device_security">安全性</string>
     <string name="home_device_system">系統版本</string>
     <string name="home_device_build_style">A/B 系統</string>
     <string name="home_device_build_type">SaR 分割區</string>
 
-    <string name="home_device_security_secure">很安全</string>
-    <string name="home_device_security_outdated">已過期</string>
+    <string name="home_package">包裝名稱</string>
 
-    <string name="home_extra_version">版本</string>
-    <string name="home_extra_code">內部版號</string>
-    <string name="home_extra_mode">模式</string>
-    <string name="home_extra_connection">連線</string>
-    <string name="home_extra_package">包裝名稱</string>
-
-    <string name="home_extra_mode_normal">正常</string>
-    <string name="home_extra_mode_safe">安全</string>
-    <string name="home_extra_mode_stub">動態</string>
+    <string name="home_status_normal">正常</string>
 
     <string name="invalid_update_channel">無效的更新頻道</string>
-    <string name="safetyNet_api_error">SafetyNet API 錯誤</string>
-    <string name="safetyNet_res_invalid">回傳值無效</string>
+    <string name="safetynet_api_error">SafetyNet API 錯誤</string>
+    <string name="safetynet_res_invalid">回傳值無效</string>
     <string name="uninstall">解除安裝</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
     <string name="uninstall_magisk_msg">所有模組將會被停用並移除！\nRoot 將會被移除且若有還沒被加密過的資料將可能被加密！</string>
@@ -130,7 +115,7 @@
     <string name="reboot_recovery">重新啟動至 Recovery</string>
     <string name="reboot_bootloader">重新啟動至 Bootloader</string>
     <string name="reboot_download">重新啟動至 Download</string>
-	<string name="reboot_edl">重新啟動至 EDL</string>
+    <string name="reboot_edl">重新啟動至 EDL</string>
     <string name="module_safe_mode_message">您正在安全模式。任何使用者的模組將不會運作。\n此訊息將會在安全模式停用後消失。</string>
     <string name="module_version_author">%1$s 來自 %2$s</string>
     <string name="module_section_pending">更新</string>
@@ -158,7 +143,7 @@
     <string name="settings_grid_span_count_2">兩個項目一行（建議）</string>
     <string name="settings_grid_span_count_3">三個項目一行（平板/電視）</string>
     <string name="settings_download_path_title">下載路徑</string>
-    <string name="settings_download_path_message">檔案將被儲存在：%1$s</string>	
+    <string name="settings_download_path_message">檔案將被儲存在：%1$s</string>
     <string name="settings_clear_cache_title">清除線上模組庫快取</string>
     <string name="settings_clear_cache_summary">將強制重新載入線上模組庫</string>
     <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>

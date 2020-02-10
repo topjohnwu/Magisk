@@ -13,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">Нет подключения к сети</string>
-    <string name="installed_error">Не установлен</string>
-    <string name="channel_error">Некорректный канал обновлений!</string>
-    <string name="up_to_date">Актуален</string>
-    <string name="obsolete">Доступно обновление!</string>
-    <string name="loading">Загружается…</string>
     <string name="home_notice_content">Убедитесь, что Вы скачали и установили Magisk (Manager) из официальных источников. Установочные файлы, загруженные из сторонних источников, могут содержать вредоносный код.</string>
-    <string name="home_notice_hide">Скрыть</string>
+    <string name="hide">Скрыть</string>
     <string name="app_changelog">Изменения</string>
     <string name="manager">Manager</string> <!--Do not translate-->
 
@@ -29,36 +24,30 @@
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете проявить заботу, отправив небольшое пожертвование.</string>
 
     <string name="home_device_title">Устройство</string>
-    <string name="home_device_info_title">Инфо</string>
+    <string name="info">Инфо</string>
     <string name="home_device_extra_manufacturer">Производитель</string>
     <string name="home_device_extra_model">Модель</string>
     <string name="home_device_extra_board">Платформа</string>
 
-    <string name="home_device_security">ASPL</string> <!--ro.build.version.security_patch-->
+    <!--ro.build.version.security_patch-->
     <string name="home_device_system">Android</string> <!--Do not translate-->
     <string name="home_device_build_style">A/B</string> <!--Do not translate-->
     <string name="home_device_build_type">SAR</string> <!--Do not translate-->
 
-    <string name="home_device_security_secure">Актуален</string> <!--ro.build.version.security_patch-->
-    <string name="home_device_security_outdated">Устарел</string> <!--ro.build.version.security_patch-->
+    <!--ro.build.version.security_patch-->
+    <!--ro.build.version.security_patch-->
 
-    <string name="home_extra_version">Версия</string>
-    <string name="home_extra_code">Сборка</string>
-    <string name="home_extra_mode">Режим</string>
-    <string name="home_extra_connection">Подключён</string>
-    <string name="home_extra_package">Имя пакета</string>
+    <string name="home_package">Имя пакета</string>
 
-    <string name="home_extra_mode_normal">Обычный</string>
-    <string name="home_extra_mode_safe">Безопасный</string>
-    <string name="home_extra_mode_stub">Динамический</string>
-    <string name="home_extra_stub">Stub</string> <!--Do not translate-->
-    <string name="home_extra_stub_na">N/A</string> <!--Do not translate-->
+    <string name="home_status_normal">Обычный</string>
+    <string name="home_status_stub">Stub</string> <!--Do not translate-->
+    <string name="not_available">N/A</string> <!--Do not translate-->
 
-    <string name="home_details_title">Специфика</string>
+    <string name="details">Специфика</string>
 
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
-    <string name="safetyNet_api_error">Ошибка SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Некорректный ответ</string>
+    <string name="safetynet_api_error">Ошибка SafetyNet API</string>
+    <string name="safetynet_res_invalid">Некорректный ответ</string>
     <string name="uninstall">Удаление</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
     <string name="uninstall_magisk_msg">Все модули будут отключены/удалены!\nRoot-права будут удалены!\nШифрование будет активировано!</string>

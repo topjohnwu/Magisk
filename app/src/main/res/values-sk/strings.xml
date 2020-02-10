@@ -13,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">Žiadne pripojenie</string>
-    <string name="installed_error">nie je nainštalovaný</string>
-    <string name="channel_error">má neplatný aktualizačný kanál</string>
-    <string name="up_to_date">je aktuálny</string>
-    <string name="obsolete">môže byť aktualizovaný!</string>
-    <string name="loading">načítava sa…</string>
     <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie.</string>
-    <string name="home_notice_hide">Skryť</string>
+    <string name="hide">Skryť</string>
     <string name="app_changelog">Zoznam zmien</string>
     <string name="manager">Správca</string>
 
@@ -28,27 +23,17 @@
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
 
-    <string name="home_device_security">Zabezpečenie</string>
     <string name="home_device_system">Systém</string>
     <string name="home_device_build_style">A/B</string>
     <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">Zabezpečené</string>
-    <string name="home_device_security_outdated">Zastarané</string>
+    <string name="home_package">Balíček</string>
 
-    <string name="home_extra_version">Verzia</string>
-    <string name="home_extra_code">Kód</string>
-    <string name="home_extra_mode">Režim</string>
-    <string name="home_extra_connection">Pripojenie</string>
-    <string name="home_extra_package">Balíček</string>
-
-    <string name="home_extra_mode_normal">Normálny</string>
-    <string name="home_extra_mode_safe">Bezpečný</string>
-    <string name="home_extra_mode_stub">Dynamický</string>
+    <string name="home_status_normal">Normálny</string>
 
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
-    <string name="safetyNet_api_error">Chyba SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Odpoveď je neplatná</string>
+    <string name="safetynet_api_error">Chyba SafetyNet API</string>
+    <string name="safetynet_res_invalid">Odpoveď je neplatná</string>
     <string name="uninstall">Odinštalovať</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené!\nRoot bude odstránený!\nMôže dôjsť k zašifrovaniu vašich dát, ak už nie sú zašifrované!</string>

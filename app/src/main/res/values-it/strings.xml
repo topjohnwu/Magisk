@@ -10,16 +10,11 @@
     <string name="section_home">Home</string>
     <string name="section_theme">Temi</string>
     <string name="safetynet">SafetyNet</string>
-	
-	<!--Home-->
+
+    <!--Home-->
     <string name="no_connection">Connessione non disponibile</string>
-    <string name="installed_error">non è installato</string>
-    <string name="channel_error">ha un canale di aggiornamento non valido!</string>
-    <string name="up_to_date">è aggiornato</string>
-    <string name="obsolete">può essere aggiornato!</string>
-    <string name="loading">è in caricamento…</string>
     <string name="home_notice_content">Assicurarsi di utilizzare la versione open source di Magisk Manager. Se proveniente da fonti sconosciute, potrebbe eseguire azioni dannose.</string>
-    <string name="home_notice_hide">Hide</string>
+    <string name="hide">Hide</string>
     <string name="app_changelog">Changelog</string>
     <string name="manager">Manager</string>
 
@@ -28,27 +23,17 @@
     <string name="home_item_source">Codice sorgente</string>
     <string name="home_support_content">Magisk è e sempre sarà gratuto ed open source. Puoi comunque mostrarci il tuo appezzamento inviando una piccola donazione.</string>
 
-    <string name="home_device_security">Sicurezza</string>
     <string name="home_device_system">Sistema</string>
     <string name="home_device_build_style">A/B</string>
     <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">Sicuro</string>
-    <string name="home_device_security_outdated">Non aggiornato</string>
+    <string name="home_package">Pacchetto</string>
 
-    <string name="home_extra_version">Versione</string>
-    <string name="home_extra_code">Codice</string>
-    <string name="home_extra_mode">Modalità</string>
-    <string name="home_extra_connection">Connessione</string>
-    <string name="home_extra_package">Pacchetto</string>
-
-    <string name="home_extra_mode_normal">Normale</string>
-    <string name="home_extra_mode_safe">Sicura</string>
-    <string name="home_extra_mode_stub">Dinamica</string>
+    <string name="home_status_normal">Normale</string>
 
     <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
-    <string name="safetyNet_api_error">Errore API SafetyNet</string>
-    <string name="safetyNet_res_invalid">La risposta non è valida</string>
+    <string name="safetynet_api_error">Errore API SafetyNet</string>
+    <string name="safetynet_res_invalid">La risposta non è valida</string>
     <string name="uninstall">Disinstalla</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso e i tuoi dati potrebbero essere criptati, nel caso non lo siano già.</string>
@@ -71,8 +56,8 @@
     <string name="select_patch_file">Seleziona e aggiorna un file</string>
     <string name="patch_file_msg">Seleziona un\'immagine in formato .img o un file ODIN .tar</string>
     <string name="reboot_delay_toast">Riavvio fra 5 secondi…</string>
-	
-	    <!--Superuser-->
+
+    <!--Superuser-->
     <string name="su_request_title">Richiesta Superuser</string>
     <string name="deny">Nega</string>
     <string name="prompt">Chiedi</string>
@@ -97,12 +82,12 @@
     <string name="su_revoke_msg">Confermi la revoca dei diritti a %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Nessuno</string>
-	
+
     <string name="superuser_toggle_notification">Notifiche</string>
     <string name="superuser_toggle_revoke">Revoca</string>
     <string name="superuser_policy_none">Nessuna app ha ancora chiesto i permessi di superuser.</string>
 
-	<!--Logs-->
+    <!--Logs-->
     <string name="log_data_none">Non ci sono eventi, prova ad utilizzare un\'app che richiede i diritti di root.</string>
     <string name="log_data_magisk_none">Il registro eventi di Magisk è vuoto, questo è davvero strano.</string>
     <string name="menuSaveLog">Salva registro eventi</string>
@@ -111,7 +96,7 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
 
-	<!--SafetyNet-->
+    <!--SafetyNet-->
     <string name="safetynet_attest_success">Successo!</string>
     <string name="safetynet_attest_failure">Attestazione fallita!</string>
     <string name="safetynet_attest_loading">Solo un secondo…</string>
@@ -124,7 +109,7 @@
     <string name="hide_scroll_up">Scorri verso l\'alto</string>
     <string name="hide_filters">Filtri</string>
     <string name="hide_search">Cerca</string>
-	
+
     <!--Module Fragment-->
     <string name="no_info_provided">(Nessuna informazione)</string>
     <string name="no_modules_found">Nessun modulo trovato</string>
@@ -145,7 +130,7 @@
     <string name="installed">Installato</string>
     <string name="sorting_order">Ordina per</string>
 
-	<!--Settings -->
+    <!--Settings -->
     <string name="settings_dark_mode_title">Impostazioni tema</string>
     <string name="settings_dark_mode_message">Seleziona il tema che si adatta meglio al tuo stile!</string>
     <string name="settings_dark_mode_light">Chiaro</string>
@@ -157,7 +142,7 @@
     <string name="settings_grid_span_count_summary">Imposta la dimensione delle colonne nelle liste a griglia. Può anche essere modificato eseguendo un pinch to zoom in una lista.</string>
     <string name="settings_grid_span_count_1">Un elemento per linea (Schermi piccoli)</string>
     <string name="settings_grid_span_count_2">Due elementi per linea (Raccomandato)</string>
-    <string name="settings_grid_span_count_3">Tre elementi per linea (Tablet/TV)</string>   
+    <string name="settings_grid_span_count_3">Tre elementi per linea (Tablet/TV)</string>
     <string name="settings_download_path_title">Percorso di download</string>
     <string name="settings_download_path_message">I file verranno salvati in %1$s</string>
     <string name="settings_clear_cache_title">Svuota cache repository</string>
@@ -202,7 +187,7 @@
     <string name="settings_su_biometric_summary">Utilizza l\'autenticazione biometrica per accettare le richieste superuser</string>
     <string name="no_biometric">Il dispositivo non è supportato o le impostazioni biometriche sono disattivate</string>
     <string name="settings_customization">Personalizzazione</string>
-	
+
     <string name="multiuser_mode">Modalità multiutente</string>
     <string name="settings_owner_only">Solo proprietario del dispositivo</string>
     <string name="settings_owner_manage">Gestito dal proprietario utente</string>
@@ -210,8 +195,8 @@
     <string name="owner_only_summary">Solo il proprietario ha i permessi di root</string>
     <string name="owner_manage_summary">Solo il proprietario può gestire accesso root e ricevere richieste</string>
     <string name="user_indepenent_summary">Ogni utente ha le proprie regole di root indpendenti</string>
-	
-	<string name="mount_namespace_mode">Modalità mount namespace</string>
+
+    <string name="mount_namespace_mode">Modalità mount namespace</string>
     <string name="settings_ns_global">Namespace globale</string>
     <string name="settings_ns_requester">Namespace ereditato</string>
     <string name="settings_ns_isolate">Namespace isolato</string>
@@ -219,9 +204,9 @@
     <string name="requester_summary">Le sessioni di root erediteranno il namespace del loro richiedente</string>
     <string name="isolate_summary">Ogni sessione di root avrà il suo namespace isolato</string>
     <string name="settings_download_path_error">Errore durante la creazione della cartella. Deve essere accessibile dalla radice della memoria di archiviazione e non essere un file.</string>
-	
-	<!--Notifications-->
-	<string name="update_channel">Aggiornamenti Magisk</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Aggiornamenti Magisk</string>
     <string name="progress_channel">Notifiche di avanzamento</string>
     <string name="download_complete">Download completato</string>
     <string name="download_file_error">Errore durante il download del file</string>
@@ -229,9 +214,9 @@
     <string name="download_open_self">Mostra file</string>
     <string name="magisk_update_title">È disponibile un aggiornamento di Magisk!</string>
     <string name="manager_update_title">È disponibile un aggiornamento di Magisk Manager!</string>
-	
-	<!--Toasts, Dialogs-->
-	<string name="yes">Sì</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Sì</string>
     <string name="no">No</string>
     <string name="repo_install_title">Installazione di %1$s</string>
     <string name="repo_install_msg">Vuoi installare %1$s?</string>
@@ -263,5 +248,5 @@
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
     <string name="unsupport_magisk_msg">Questa versione di Magisk Manager non supporta versioni di Magisk inferiori a %1$s.\n\nQuesta app si comporterà come se non fosse installato Magisk, che deve essere aggiornato per procedere all\'utilizzo.</string>
 
-  
+
 </resources>
