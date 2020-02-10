@@ -16,12 +16,11 @@ class RootInit : Shell.Initializer() {
 
     fun init(context: Context, shell: Shell): Boolean {
         val job = shell.newJob()
+        job.add(context.rawResource(R.raw.manager))
         if (shell.isRoot) {
             job.add(context.rawResource(R.raw.util_functions))
-                .add(context.rawResource(R.raw.utils))
+                .add("SHA1=`grep_prop SHA1 /sbin/.magisk/config`")
             Const.MAGISK_DISABLE_FILE = SuFile("/cache/.disable_magisk")
-        } else {
-            job.add(context.rawResource(R.raw.nonroot_utils))
         }
 
         job.add(

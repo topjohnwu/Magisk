@@ -1,3 +1,7 @@
+##################################
+# Magisk Manager internal scripts
+##################################
+
 env_check() {
   for file in busybox magisk magiskboot magiskinit util_functions.sh boot_patch.sh; do
     [ -f $MAGISKBIN/$file ] || return 1
@@ -116,4 +120,20 @@ force_pm_install() {
   return $res
 }
 
-SHA1=`grep_prop SHA1 /sbin/.magisk/config`
+##########################
+# Non-root util_functions
+##########################
+
+mount_partitions() {
+  [ "`getprop ro.build.ab_update`" = "true" ] && SLOT=`getprop ro.boot.slot_suffix`
+  # Check whether non rootfs root dir exists
+  grep ' / ' /proc/mounts | grep -qv 'rootfs' && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+}
+
+get_flags() {
+  $SYSTEM_ROOT && KEEPVERITY=true || KEEPVERITY=false
+  [ "`getprop ro.crypto.state`" = "encrypted" ] && KEEPFORCEENCRYPT=true || KEEPFORCEENCRYPT=false
+  RECOVERYMODE=false
+}
+
+run_migrations() { return; }
