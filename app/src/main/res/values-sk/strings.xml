@@ -5,6 +5,7 @@
     <string name="superuser">Superužívateľ</string>
     <string name="logs">Záznamy</string>
     <string name="settings">Nastavenia</string>
+    <string name="refresh">Obnoviť lokálne dáta</string>
     <string name="install">Inštalovať</string>
     <string name="section_home">Domov</string>
     <string name="section_theme">Motívy</string>
@@ -17,7 +18,7 @@
     <string name="up_to_date">je aktuálny</string>
     <string name="obsolete">môže byť aktualizovaný!</string>
     <string name="loading">načítava sa…</string>
-    <string name="home_notice_content">Vždy sa uistite, že používate program Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie.</string>
+    <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie.</string>
     <string name="home_notice_hide">Skryť</string>
     <string name="app_changelog">Zoznam zmien</string>
     <string name="manager">Správca</string>
