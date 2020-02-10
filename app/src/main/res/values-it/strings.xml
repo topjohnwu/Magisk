@@ -103,7 +103,7 @@
     <string name="superuser_policy_none">Nessuna app ha ancora chiesto i permessi di superuser.</string>
 
 	<!--Logs-->
-    <string name="log_data_none">Non ci sono eventi, prova ad utilizzare un'\app che richiede i diritti di root.</string>
+    <string name="log_data_none">Non ci sono eventi, prova ad utilizzare un\'app che richiede i diritti di root.</string>
     <string name="log_data_magisk_none">Il registro eventi di Magisk è vuoto, questo è davvero strano.</string>
     <string name="menuSaveLog">Salva registro eventi</string>
     <string name="menuClearLog">Svuota il registro eventi</string>

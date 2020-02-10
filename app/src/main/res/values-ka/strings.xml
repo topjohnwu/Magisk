@@ -216,7 +216,7 @@
     <string name="settings_ns_requester">მიღებითი Namespace-ი</string>
     <string name="settings_ns_isolate">იზოლირებული Namespace-ი</string>
     <string name="global_summary">ყველა root სესია გამოიყენებს გლობალურ სამონტაჟო namespace-ს</string>
-    <string name="requester_summary">Root სესიები მიიღებენ მომწოდებლის სამონტაჟო namespace-ს</str8ing>
+    <string name="requester_summary">Root სესიები მიიღებენ მომწოდებლის სამონტაჟო namespace-ს</string>
     <string name="isolate_summary">ყოველ root სესიას ექნებათ თავიანთი იზოლირებული namespace-ი</string>
     <string name="settings_download_path_error">შეცდომა საქაღალდეს შექმნის დროს. იგი უნდა იყოს ხელმისაწვდომი მახსოვრობიდან და არ უნდა იყოს ფაილი.</string>
 
