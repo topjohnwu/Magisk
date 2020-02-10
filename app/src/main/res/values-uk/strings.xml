@@ -1,58 +1,78 @@
 <resources>
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">Модулі</string>
     <string name="superuser">Суперкористувач</string>
-    <string name="logs">Журнал</string>
+    <string name="logs">Журнали</string>
     <string name="settings">Налаштування</string>
+    <string name="refresh">Оновити список</string>
     <string name="install">Встановлення</string>
-    <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
+    <string name="section_home">Домашня</string>
+    <string name="section_theme">Теми</string>
+    <string name="safetynet">SafetyNet</string>
 
-    <!--Status Fragment-->
-    <string name="invalid_update_channel">Неправильний канал оновлень</string>
-    <string name="safetyNet_api_error">Помилка в API SafetyNet</string>
-    <string name="safetyNet_res_invalid">Невірна відповідь.</string>
+    <!--Home-->
+    <string name="no_connection">Немає з\'єднання</string>
+    <string name="installed_error">не встановлено</string>
+    <string name="channel_error">має невірний канал оновлень!</string>
+    <string name="up_to_date">оновлено</string>
+    <string name="obsolete">можна оновити!</string>
+    <string name="loading">завантажується…</string>
+    <string name="home_notice_content">Завжди впевнюйтеся, що користуєтеся офіційним Magisk Manager. Manager з невідомих джерел може виконувати шкідливі дії.</string>
+    <string name="home_notice_hide">Сховати</string>
+    <string name="app_changelog">Список змін</string>
+    <string name="manager">Manager</string>
+
+    <string name="home_support_title">Підтримати нас</string>
+    <string name="home_links_project">Посилання на проєкт</string>
+    <string name="home_item_source">Джерело</string>
+    <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування.</string>
+
+    <string name="home_device_title">Ваш пристрій</string>
+    <string name="home_device_info_title">Інфо</string>
+    <string name="home_device_extra_manufacturer">Виробник</string>
+    <string name="home_device_extra_model">Модель</string>
+    <string name="home_device_extra_board">Платформа</string>
+
+    <string name="home_device_security">Безпека</string>
+    <string name="home_device_system">Система</string>
+    <string name="home_device_build_style">A/B</string>
+    <string name="home_device_build_type">SAR</string>
+
+    <string name="home_device_security_secure">Безпечно</string>
+    <string name="home_device_security_outdated">Застаріле</string>
+
+    <string name="home_extra_version">Версія</string>
+    <string name="home_extra_code">Код</string>
+    <string name="home_extra_mode">Режим</string>
+    <string name="home_extra_connection">З\'єднано</string>
+    <string name="home_extra_package">Пакунок</string>
+
+    <string name="home_extra_mode_normal">Нормальний</string>
+    <string name="home_extra_mode_safe">Безпечний</string>
+    <string name="home_extra_mode_stub">Динамічний</string>
+    <string name="home_extra_stub">Stub</string>
+    <string name="home_extra_stub_na">N/A</string>
+
+    <string name="home_details_title">Специфіка</string>
+
+    <string name="invalid_update_channel">Невірний канал оновлення</string>
+    <string name="safetyNet_api_error">Помилка SafetyNet API</string>
+    <string name="safetyNet_res_invalid">Невірна відповідь</string>
+    <string name="uninstall">Видалити</string>
+    <string name="uninstall_magisk_title">Видалити Magisk</string>
+    <string name="uninstall_magisk_msg">Ця дія призведе до вимкнення/видалення всіх модулів! Рут буде повністю видалено!\nВаші дані можуть зашифруватися, якщо вони не зашифровані!\nВпевнені, що бажаєте продовжити?</string>
+    <string name="update">Оновити</string>
+
+    <!--Install-->
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
     <string name="keep_dm_verity">Залишити AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Режим Recovery</string>
-    <string name="uninstall">Видалити</string>
-    <string name="uninstall_magisk_title">Видалити Magisk</string>
-    <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
-    <string name="update">Оновити</string>
-
-    <!--Module Fragment-->
-    <string name="no_info_provided">(немає наданої інформації)</string>
-    <string name="no_modules_found">Модулів не знайдено.</string>
-    <string name="reboot_recovery">Перезавантажити в Recovery</string>
-    <string name="reboot_bootloader">Перезавантажити в Bootloader</string>
-    <string name="reboot_download">Перезавантажити в Download</string>
-    <string name="reboot_edl">Перезавантажити в EDL</string>
-
-    <!--Repo Fragment-->
-    <string name="update_available">Доступне оновлення</string>
-    <string name="installed">Встановлено</string>
-    <string name="sorting_order">Порядок сортування</string>
-
-    <!--Log Fragment-->
-    <string name="menuSaveLog">Зберегти журнал</string>
-    <string name="menuClearLog">Очистити журнал</string>
-    <string name="logs_cleared">Журнал успішно очищено.</string>
-
-    <!--About Activity-->
-    <string name="app_changelog">Перелік змін</string>
-
-    <!-- System Components, Notifications -->
-    <string name="update_channel">Оновлення Magisk</string>
-    <string name="progress_channel">Сповіщення прогресу</string>
-    <string name="download_complete">Завантаження завершено</string>
-    <string name="download_file_error">Помилка завантаження файлу</string>
-    <string name="download_open_parent">Показати в батьківській папці</string>
-    <string name="download_open_self">Показати файл</string>
-    <string name="magisk_update_title">Доступне оновлення Magisk!</string>
-    <string name="manager_update_title">Доступне оновлення Magisk Manager!</string>
-
-    <!-- Installation -->
-    <string name="manager_download_install">Натисніть, щоб завантажити і встановити.</string>
+    <string name="install_options_title">Параметри</string>
+    <string name="install_method_title">Спосіб</string>
+    <string name="install_next">Далі</string>
+    <string name="install_start">Почати</string>
+    <string name="manager_download_install">Натисніть, щоб завантажити і встановити</string>
     <string name="download_zip_only">Тільки завантажити</string>
     <string name="direct_install">Пряме встановлення (рекомендовано)</string>
     <string name="install_inactive_slot">Встановити в неактивний слот (після OTA)</string>
@@ -62,64 +82,118 @@
     <string name="patch_file_msg">Виберіть необроблений образ (*.img) або стиснутий файл ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Перезавантаження через 5 секунд…</string>
 
-    <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Встановити %1$s</string>
-    <string name="repo_install_msg">Бажаєте встановити %1$s ?</string>
-    <string name="download">Завантажити</string>
-    <string name="reboot">Перезавантажити</string>
-    <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій.</string>
-    <string name="release_notes">Особливості версії</string>
-    <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
+    <!--Superuser-->
+    <string name="su_request_title">Запит прав суперкористувача</string>
+    <string name="deny">Відмовити</string>
+    <string name="prompt">Запитувати</string>
+    <string name="grant">Надати</string>
+    <string name="su_warning">Надати повний доступ до пристрою.\nЯкщо не впевнені, відмовте в доступі!</string>
+    <string name="forever">Назавжди</string>
+    <string name="once">Одноразово</string>
+    <string name="tenmin">10 хв.</string>
+    <string name="twentymin">20 хв.</string>
+    <string name="thirtymin">30 хв.</string>
+    <string name="sixtymin">60 хв.</string>
+    <string name="su_allow_toast">%1$s надані права суперкористувача</string>
+    <string name="su_deny_toast">%1$s відмовлено в правах суперкористувача</string>
+    <string name="no_apps_found">Застосунків не виявлено</string>
+    <string name="su_snack_grant">%1$s надані права суперкористувача</string>
+    <string name="su_snack_deny">%1$s відмовлено в правах суперкористувача</string>
+    <string name="su_snack_notif_on">Сповіщення для %1$s увімкнено</string>
+    <string name="su_snack_notif_off">Сповіщення для %1$s вимкнено</string>
+    <string name="su_snack_log_on">Журнал подій для %1$s увімкнено</string>
+    <string name="su_snack_log_off">Журнал подій для %1$s вимкнено</string>
+    <string name="su_revoke_title">Відкликати?</string>
+    <string name="su_revoke_msg">Підтвердити відкликання прав для %1$s?</string>
+    <string name="toast">Спливаюче сповіщення</string>
+    <string name="none">Ні</string>
 
-    <string name="dtbo_patched_title">DTBO пропатчено!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager пропатчив dtbo.img. Будь ласка, перезавантажте пристрій.</string>
-    <string name="flashing">Прошивання…</string>
-    <string name="done">Готово!</string>
-    <string name="failure">Не вдалося</string>
-    <string name="hide_manager_title">Приховування Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager.</string>
-    <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання.</string>
-    <string name="complete_uninstall">Повне видалення</string>
-    <string name="restore_img">Відновити розділи</string>
-    <string name="restore_img_msg">Відновлення…</string>
-    <string name="restore_done">Відновлення завершено!</string>
-    <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
-    <string name="proprietary_title">Завантажити пропрієтарний код</string>
-    <string name="proprietary_notice">Magisk Manager — це безкоштовна програма з відкритим вихідним кодом, тому вона не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
-    <string name="setup_fail">Не вдалося налаштувати.</string>
-    <string name="env_fix_title">Потрібне додаткове налаштування</string>
-    <string name="env_fix_msg">Для правильної роботи Magisk, потрібне додаткове налаштування вашого пристрою. Буде завантажено zip-архів. Розпочати негайно?</string>
-    <string name="setup_msg">Налаштування робочого середовища…</string>
+    <string name="superuser_toggle_notification">Сповіщення</string>
+    <string name="superuser_toggle_revoke">Відкликати</string>
+    <string name="superuser_policy_none">Досі ніякий застосунок не запитував права суперкористувача</string>
 
-    <!--Settings Activity -->
+    <!--Logs-->
+    <string name="log_data_none">Покищо немає даних в журналі, спробуйте більше користуватися застосунками, які потребують прав суперкористувача</string>
+    <string name="log_data_magisk_none">Журнал Magisk порожній, це дивно.</string>
+    <string name="menuSaveLog">Зберегти журнал</string>
+    <string name="menuClearLog">Очистити журнал</string>
+    <string name="logs_cleared">Журнал успішно очищено</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Цільовий UID: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetynet_attest_success">Успішно!</string>
+    <string name="safetynet_attest_failure">Провірку не пройдено!</string>
+    <string name="safetynet_attest_loading">Секунду…</string>
+    <string name="safetynet_attest_restart">Спробувати знову</string>
+    <string name="safetynet_system">Система</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Показувати системні застосунки</string>
+    <string name="hide_filter_hint">Фільтрувати за назвою</string>
+    <string name="hide_scroll_up">Прогорнути вгору</string>
+    <string name="hide_filters">Фільтри</string>
+    <string name="hide_search">Пошук</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(немає наданої інформації)</string>
+    <string name="no_modules_found">Модулів не знайдено</string>
+    <string name="reboot_recovery">Перезавантажити в Recovery</string>
+    <string name="reboot_bootloader">Перезавантажити в Bootloader</string>
+    <string name="reboot_download">Перезавантажити в Download</string>
+    <string name="reboot_edl">Перезавантажити в EDL</string>
+    <string name="module_safe_mode_message">Ви в безпечному режимі. В цьому режимі модулі не працюватимуть.\nПовідомлення зникне, після вимкнення безпечного режиму.</string>
+    <string name="module_version_author">%1$s, розробник %2$s</string>
+    <string name="module_section_pending">Оновлення</string>
+    <string name="module_section_pending_action">Оновити всі</string>
+    <string name="module_section_remote">Можна завантажити</string>
+    <string name="module_state_remove">Видалити</string>
+    <string name="module_state_restore">Відновити</string>
+    <string name="module_action_install_external">Встановити зі сховища</string>
+    <string name="module_update_none">Ваші модулі оновлені!</string>
+    <string name="update_available">Доступне оновлення</string>
+    <string name="installed">Встановлені</string>
+    <string name="sorting_order">Порядок сортування</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">Режим теми</string>
+    <string name="settings_dark_mode_message">Виберіть режим, який вам найбільш до вподоби!</string>
+    <string name="settings_dark_mode_light">Завжди світлий</string>
+    <string name="settings_dark_mode_system">Слідувати системному</string>
+    <string name="settings_dark_mode_dark">Завжди темний</string>
+    <string name="settings_safe_mode_title">Безпечний режим</string>
+    <string name="settings_core_only_summary" deprecated="true">Увімкнути тільки можливості ядра. MagiskSU i Magisk Hide залишуться увімкненими, проте ніякі модулі не будуть завантажені</string>
+    <string name="settings_grid_span_count_title">Розмір стовпців</string>
+    <string name="settings_grid_span_count_summary">Встановити розмір стовпців для всіх придатних списків сіткою. Ви можете змінювати це поза налаштуваннями, зробивши жест щипка</string>
+    <string name="settings_grid_span_count_1">Один стовбець (малі екрани)</string>
+    <string name="settings_grid_span_count_2">Два стовбці (рекомендовано)</string>
+    <string name="settings_grid_span_count_3">Три стовбці (планшети/телевізори)</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
-    <string name="settings_clear_cache_title">Очищення кешу</string>
-    <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії. Це змусить програму примусово оновлюватися через Інтернет.</string>
-    <string name="settings_hide_manager_title">Приховати Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Перезібрати Magisk Manager з випадковим іменем пакету.</string>
+    <string name="settings_clear_cache_title">Очистити кеш</string>
+    <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії. Це змусить застосунок примусово оновлюватися через Інтернет</string>
+    <string name="settings_hide_manager_title">Сховати Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Перезібрати Magisk Manager з випадковими іменами застосунку та пакунку</string>
     <string name="settings_restore_manager_title">Відновити Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Відновити Magisk Manager з оригінального пакету</string>
+    <string name="settings_restore_manager_summary">Відновити Magisk Manager до оригінального імені пакунку та застосунку</string>
     <string name="language">Мова</string>
-    <string name="system_default">Стандартна (системна)</string>
+    <string name="system_default">(системна)</string>
     <string name="settings_check_update_title">Перевіряти оновлення</string>
-    <string name="settings_check_update_summary">Періодично перевіряти оновлення у фоновому режимі.</string>
+    <string name="settings_check_update_summary">Періодично перевіряти оновлення у фоновому режимі</string>
     <string name="settings_update_channel_title">Канал оновлення</string>
     <string name="settings_update_stable">Стабільний реліз</string>
     <string name="settings_update_beta">Бета реліз</string>
     <string name="settings_update_custom">Власний</string>
     <string name="settings_update_custom_msg">Вставте власний URL</string>
-    <string name="settings_core_only_summary">Увімкнути тільки можливості ядра. MagiskSU i Magisk Hide залишуться увімкненими, проте ніякі модулі не будуть завантажені.</string>
-    <string name="settings_magiskhide_summary">Приховати Magisk від різних форм виявлень.</string>
+    <string name="settings_magiskhide_summary">Приховати Magisk від різних форм виявлень</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
-    <string name="settings_hosts_summary">Підтримка позасистемних хостів для програм блокування реклами.</string>
+    <string name="settings_hosts_summary">Підтримка позасистемних хостів для застосунків блокування реклами</string>
     <string name="settings_hosts_toast">Додано модуль позасистемних хостів</string>
-
     <string name="settings_app_name_hint">Нове ім\'я</string>
     <string name="settings_app_name_helper">Застосунок буде перезібрано з цим ім\'ям</string>
     <string name="settings_app_name_error">Неправильний формат</string>
-    <string name="settings_su_app_adb">Програми і ADB</string>
-    <string name="settings_su_app">Програми</string>
+    <string name="settings_su_app_adb">Застосунки і ADB</string>
+    <string name="settings_su_app">Застосунки</string>
     <string name="settings_su_adb">ADB</string>
     <string name="settings_su_disable">Вимкнено</string>
     <string name="settings_su_request_10">10 секунд</string>
@@ -133,56 +207,70 @@
     <string name="request_timeout">Час запиту</string>
     <string name="superuser_notification">Сповіщення суперкористувача</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
-    <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програм</string>
+    <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програ</string>
+    <string name="settings_su_biometric_title">Біометрична автентифікація</string>
+    <string name="settings_su_biometric_summary">Використовувати біометричну автентифікацію, щоб підтверджувати запити суперкористувача</string>
+    <string name="no_biometric">Пристрій не підтримується, або не налаштовано біометрику</string>
+    <string name="settings_customization">Оформлення</string>
 
     <string name="multiuser_mode">Багатокористувацький режим</string>
     <string name="settings_owner_only">Тільки власник</string>
     <string name="settings_owner_manage">Регулювання власником</string>
     <string name="settings_user_independent">Незалежний користувач</string>
-    <string name="owner_only_summary">Тільки власник має root-доступ.</string>
-    <string name="owner_manage_summary">Тільки власник може керувати root-доступом і опрацьовувати запити на надання доступу.</string>
-    <string name="user_indepenent_summary">Кожен користувач має власні правила root-доступу.</string>
+    <string name="owner_only_summary">Тільки власник має root-доступ</string>
+    <string name="owner_manage_summary">Тільки власник може керувати root-доступом і опрацьовувати запити на надання доступу</string>
+    <string name="user_indepenent_summary">Кожен користувач має власні правила root-доступу</string>
 
     <string name="mount_namespace_mode">Режим монтування простору імен</string>
     <string name="settings_ns_global">Глобальний простір імен</string>
     <string name="settings_ns_requester">Наслідуваний простір імен</string>
     <string name="settings_ns_isolate">Ізольований простір імен</string>
-    <string name="global_summary">Всі сеанси Суперкористувача використовують глобальний простір імен.</string>
-    <string name="requester_summary">Сеанси Суперкористувача наслідують простір імен запитувача.</string>
-    <string name="isolate_summary">Кожнен сеанс Суперкористувача має власний ізольований простір імен.</string>
+    <string name="global_summary">Всі сеанси суперкористувача використовують глобальний простір імен</string>
+    <string name="requester_summary">Сеанси суперкористувача наслідують простір імен запитувача</string>
+    <string name="isolate_summary">Кожнен сеанс суперкористувача має власний ізольований простір імен</string>
     <string name="settings_download_path_error">Помилка створення папки. Вона повинна бути доступна з кореневої директорії сховища і не повинна бути файлом.</string>
 
-    <!--Superuser-->
-    <string name="su_request_title">Запит прав Суперкористувача</string>
-    <string name="deny">Відмовити</string>
-    <string name="prompt">Запитувати</string>
-    <string name="grant">Надати</string>
-    <string name="su_warning">Надати повний доступ до пристрою.\nЯкщо не впевнені, що бажаєте продовжити, відхиліть дану дію.</string>
-    <string name="forever">Назавжди</string>
-    <string name="once">Одноразово</string>
-    <string name="tenmin">10 хв.</string>
-    <string name="twentymin">20 хв.</string>
-    <string name="thirtymin">30 хв.</string>
-    <string name="sixtymin">60 хв.</string>
-    <string name="su_allow_toast">%1$s надані права Суперкористувача</string>
-    <string name="su_deny_toast">%1$s відмовлено в правах Суперкористувача</string>
-    <string name="no_apps_found">Програм не виявлено</string>
-    <string name="su_snack_grant">%1$s надані права Суперкористувача</string>
-    <string name="su_snack_deny">%1$s відмовлено в правах Суперкористувача</string>
-    <string name="su_snack_notif_on">Сповіщення для %1$s увімкнено</string>
-    <string name="su_snack_notif_off">Сповіщення для %1$s вимкнено</string>
-    <string name="su_snack_log_on">Журнал подій для %1$s увімкнено</string>
-    <string name="su_snack_log_off">Журнал подій для %1$s вимкнено</string>
-    <string name="su_revoke_title">Відкликати?</string>
-    <string name="su_revoke_msg">Підтвердити відкликання прав для %1$s?</string>
-    <string name="toast">Спливаюче сповіщення</string>
-    <string name="none">Ні</string>
+    <!--Notifications-->
+    <string name="update_channel">Оновлення Magisk</string>
+    <string name="progress_channel">Сповіщення прогресу</string>
+    <string name="download_complete">Завантаження завершено</string>
+    <string name="download_file_error">Помилка завантаження файлу</string>
+    <string name="download_open_parent">Показати в батьківській папці</string>
+    <string name="download_open_self">Показати файл</string>
+    <string name="magisk_update_title">Доступне оновлення Magisk!</string>
+    <string name="manager_update_title">Доступне оновлення Magisk Manager!</string>
 
-    <!--Superuser logs-->
-    <string name="pid">PID: %1$d</string>
-    <string name="target_uid">Цільовий UID: %1$d</string>
-
-    <!-- MagiskHide -->
-    <string name="show_system_app">Показати системні програми</string>
+    <!--Toasts, Dialogs-->
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="repo_install_title">Встановити %1$s</string>
+    <string name="repo_install_msg">Бажаєте встановити %1$s?</string>
+    <string name="download">Завантажити</string>
+    <string name="reboot">Перезавантажити</string>
+    <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій</string>
+    <string name="release_notes">Особливості версії</string>
+    <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
+    <string name="dtbo_patched_title">DTBO пропатчено!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager пропатчив dtbo.img. Будь ласка, перезавантажте пристрій.</string>
+    <string name="flashing">Прошивання…</string>
+    <string name="done">Готово!</string>
+    <string name="failure">Не вдалося</string>
+    <string name="hide_manager_title">Приховування Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager.</string>
+    <string name="open_link_failed_toast">Не знайдено застосунку для відкриття посилання</string>
+    <string name="complete_uninstall">Повне видалення</string>
+    <string name="restore_img">Відновити розділи</string>
+    <string name="restore_img_msg">Відновлення…</string>
+    <string name="restore_done">Відновлення завершено!</string>
+    <string name="restore_fail">Немає оригінальної резервної копії!</string>
+    <string name="proprietary_title">Завантажити пропрієтарний код</string>
+    <string name="proprietary_notice">Magisk Manager — це безкоштовний застосунок з відкритим вихідним кодом, тому він не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
+    <string name="setup_fail">Не вдалося налаштувати</string>
+    <string name="env_fix_title">Потрібне додаткове налаштування</string>
+    <string name="env_fix_msg">Для правильної роботи Magisk на вашому пристрої, потрібне додаткове налаштування. Буде завантажено zip-архів. Розпочати негайно?</string>
+    <string name="setup_msg">Налаштування робочого середовища…</string>
+    <string name="authenticate">Автентифікувати</string>
+    <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
+    <string name="unsupport_magisk_msg">Ця версія Magisk Manager не підтримує версію Magisk нижчу, ніж %1$s.\n\nЗастосунок буде працювати, ніби Magisk не встановлено. Будь ласка, оновіть Magisk якомога швидше.</string>
 
 </resources>
