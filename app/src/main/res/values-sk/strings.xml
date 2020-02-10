@@ -28,6 +28,14 @@
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
 
+    <string name="home_loading">Načítava sa…</string>
+
+    <string name="home_device_title">Zariadenie</string>
+    <string name="home_device_info_title">Info</string>
+    <string name="home_device_extra_manufacturer">Výrobca</string>
+    <string name="home_device_extra_model">Model</string>
+    <string name="home_device_extra_board">Platforma</string>
+
     <string name="home_device_security">Zabezpečenie</string>
     <string name="home_device_system">Systém</string>
     <string name="home_device_build_style">A/B</string>
@@ -45,6 +53,10 @@
     <string name="home_extra_mode_normal">Normálny</string>
     <string name="home_extra_mode_safe">Bezpečný</string>
     <string name="home_extra_mode_stub">Dynamický</string>
+    <string name="home_extra_stub">Stub</string>
+    <string name="home_extra_stub_na">N/A</string>
+
+    <string name="home_details_title">Podrobnosti</string>
 
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="safetyNet_api_error">Chyba SafetyNet API</string>
