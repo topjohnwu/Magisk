@@ -40,19 +40,23 @@ class HomeViewModel(
 
     val stateMagisk = KObservableField(MagiskState.LOADING)
     val stateManager = KObservableField(MagiskState.LOADING)
-    val stateVersionMagisk = KObservableField("")
-    val stateCodeMagisk = KObservableField(0)
-    val stateVersionManager = KObservableField("")
-    val stateCodeManager = KObservableField(0)
-    val stateCodeStub = KObservableField(0)
-    val statePackageManager = packageName
-    val statePackageOriginal = statePackageManager == BuildConfig.APPLICATION_ID
 
+    val stateMagiskRemoteVersion = KObservableField(R.string.home_loading.res())
+    val stateMagiskInstalledVersion get() =
+        "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
+    val stateMagiskMode get() = (if (Config.coreOnly)
+        R.string.home_extra_mode_safe else R.string.home_extra_mode_normal).res()
     val stateMagiskProgress = KObservableField(0)
+
+    val stateManagerRemoteVersion = KObservableField(R.string.home_loading.res())
+    val stateManagerInstalledVersion = Info.stub?.let {
+        "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${it.version})"
+    } ?: "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+    val statePackageName = packageName
     val stateManagerProgress = KObservableField(0)
 
     val stateHideManagerName = R.string.manager.res().let {
-        if (!statePackageOriginal) {
+        if (packageName != BuildConfig.APPLICATION_ID) {
             it.replaceRandomWithSpecial(3)
         } else {
             it
@@ -80,28 +84,24 @@ class HomeViewModel(
     }
 
     override fun refresh() = repoMagisk.fetchUpdate()
-        .onErrorReturn { Info.remote }
-        .subscribeK { updateBy(it) }
+        .onErrorReturn { null }
+        .subscribeK { it?.updateUI() }
 
-    private fun updateBy(info: UpdateInfo) {
+    private fun UpdateInfo.updateUI() {
         stateMagisk.value = when {
-            !info.magisk.isInstalled -> MagiskState.NOT_INSTALLED
-            info.magisk.isObsolete -> MagiskState.OBSOLETE
+            !Info.env.isActive -> MagiskState.NOT_INSTALLED
+            magisk.isObsolete -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
         stateManager.value = when {
-            !info.app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
-            info.app.isObsolete -> MagiskState.OBSOLETE
+            !app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
+            app.isObsolete -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
-        stateVersionMagisk.value = info.magisk.version
-        stateVersionManager.value = info.app.version
-
-        stateCodeMagisk.value = info.magisk.versionCode
-        stateCodeManager.value = info.app.versionCode
-        stateCodeStub.value = info.stub.versionCode
+        stateMagiskRemoteVersion.value = "${magisk.version} (${magisk.versionCode})"
+        stateManagerRemoteVersion.value = "${app.version} (${app.versionCode}) (${stub.versionCode})"
 
         ensureEnv()
     }
@@ -153,14 +153,11 @@ class HomeViewModel(
             }
     }
 
-}
+    private val MagiskJson.isObsolete
+        get() = Info.env.isActive && Info.env.magiskVersionCode < versionCode
+    val ManagerJson.isUpdateChannelCorrect
+        get() = versionCode > 0
+    val ManagerJson.isObsolete
+        get() = BuildConfig.VERSION_CODE < versionCode
 
-@Suppress("unused")
-val MagiskJson.isInstalled
-    get() = Info.env.magiskVersionCode > 0
-val MagiskJson.isObsolete
-    get() = Info.env.magiskVersionCode < versionCode && isInstalled
-val ManagerJson.isUpdateChannelCorrect
-    get() = versionCode > 0
-val ManagerJson.isObsolete
-    get() = BuildConfig.VERSION_CODE < versionCode
+}

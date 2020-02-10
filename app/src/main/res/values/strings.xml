@@ -28,7 +28,9 @@
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
 
-    <string name="home_device_title">Your device</string>
+    <string name="home_loading">Loading…</string>
+
+    <string name="home_device_title">Device</string>
     <string name="home_device_info_title">Info</string>
     <string name="home_device_extra_manufacturer">Manufacturer</string>
     <string name="home_device_extra_model">Model</string>

@@ -7,8 +7,6 @@
 
         <import type="com.topjohnwu.magisk.core.Info" />
 
-        <import type="com.topjohnwu.magisk.BuildConfig" />
-
         <import type="com.topjohnwu.magisk.core.InfoKt" />
 
         <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
@@ -106,7 +104,6 @@
                 <com.google.android.material.card.MaterialCardView
                     style="@style/W.Home.Card.First"
                     android:layout_width="wrap_content"
-                    android:alpha="@{viewModel.stateCodeManager &lt; 0 ? .5f : 1f}"
                     android:layout_height="wrap_content">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -114,9 +111,9 @@
                         android:layout_height="wrap_content">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/home_manager_remote_title"
+                            android:id="@+id/home_manager_info_title"
                             style="@style/W.Home.Title"
-                            android:text="@string/module_section_remote"
+                            android:text="@string/home_device_info_title"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -125,59 +122,39 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_title" />
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_info_title" />
 
                         <LinearLayout
-                            android:id="@+id/home_manager_remote_version"
+                            android:id="@+id/home_manager_latest_version"
                             style="@style/W.Home.Item.Top"
-                            invisible="@{viewModel.stateCodeManager &lt; 0}"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_title">
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_info_title">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_version" />
+                                android:text="@string/module_section_remote" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.stateVersionManager}"
-                                tools:text="20.1" />
+                                android:text="@{viewModel.isConnected ? viewModel.stateManagerRemoteVersion : @string/home_extra_stub_na}"
+                                tools:text="8.0.0 (123) (10)" />
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/home_manager_remote_version_code"
-                            style="@style/W.Home.Item"
-                            invisible="@{viewModel.stateCodeManager &lt; 0}"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_version">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_code" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Integer.toString(viewModel.stateCodeManager)}"
-                                tools:text="12345" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/home_manager_remote_stub_version_code"
+                            android:id="@+id/home_manager_installed_version"
                             style="@style/W.Home.Item.Bottom"
-                            invisible="@{viewModel.stateCodeManager &lt; 0}"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_remote_version_code">
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_latest_version">
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_stub" />
+                                android:text="@string/installed" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Integer.toString(viewModel.stateCodeStub)}"
-                                tools:text="5" />
+                                android:text="@{viewModel.stateManagerInstalledVersion}"
+                                tools:text="8.0.0 (123) (10)" />
 
                         </LinearLayout>
 
@@ -195,84 +172,6 @@
 
                 <com.google.android.material.card.MaterialCardView
                     style="@style/W.Home.Card"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/home_manager_internal_title"
-                            style="@style/W.Home.Title"
-                            android:text="@string/installed"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <View
-                            style="@style/W.Home.Section"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_title" />
-
-                        <LinearLayout
-                            android:id="@+id/home_manager_internal_version"
-                            style="@style/W.Home.Item.Top"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_title">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_version" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{BuildConfig.VERSION_NAME}"
-                                tools:text="20.1" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/home_manager_internal_version_code"
-                            style="@style/W.Home.Item"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_version">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_code" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Integer.toString(BuildConfig.VERSION_CODE)}"
-                                tools:text="12345" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/home_manager_internal_stub_version_code"
-                            style="@style/W.Home.Item.Bottom"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_version_code">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_stub" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.stub != null ? Integer.toString(Info.stub.version) : @string/home_extra_stub_na}"
-                                tools:text="5" />
-                        </LinearLayout>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/W.Home.Card"
-                    gone="@{Info.env.magiskVersionCode &lt; 0}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
@@ -324,7 +223,7 @@
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_extra_connection_value"
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.statePackageManager}"
+                                android:text="@{viewModel.statePackageName}"
                                 tools:text="com.topjohnwu.magisk" />
 
                         </LinearLayout>
