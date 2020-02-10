@@ -22,8 +22,6 @@
     <string name="home_item_source">Origem</string>
     <string name="home_support_content">Magisk é, e sempre será, gratuito e de código aberto. No entanto, você pode nos mostrar que se importa enviando uma pequena doação.</string>
     <string name="home_device_system">Sistema</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
     <string name="home_package">Pacote</string>
     <string name="home_status_normal">Normal</string>
     <string name="invalid_update_channel">Canal de atualização inválido</string>

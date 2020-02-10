@@ -24,8 +24,6 @@
     <string name="home_support_content">Magisk és, i sempre serà, gratis i codi lliure. De totes maneres, pot mostrar el seu interès fent una petita donació.</string>
 
     <string name="home_device_system">Sistema</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
     <string name="home_package">Paquet</string>
 

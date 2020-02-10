@@ -30,8 +30,6 @@
     <string name="home_device_extra_board">Platforma</string>
 
     <string name="home_device_system">System</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
     <string name="home_package">Pakiet</string>
 

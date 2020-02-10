@@ -24,8 +24,6 @@
     <string name="home_support_content">Magisk 现在是，将来也永远是免费且开源的。但您可以向我们小额捐赠表示支持。</string>
 
     <string name="home_device_system">系统版本</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
     <string name="home_package">包名</string>
 

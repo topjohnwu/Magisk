@@ -35,8 +35,6 @@
     <string name="home_device_extra_model">Model</string>
     <string name="home_device_extra_board">Board</string>
     <string name="home_device_system">System</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
     <string name="home_status_normal">Normal</string>
     <string name="home_status_safe">Safe Mode</string>
     <string name="home_status_stub">Stub</string>

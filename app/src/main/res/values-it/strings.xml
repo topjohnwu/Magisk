@@ -24,8 +24,6 @@
     <string name="home_support_content">Magisk è e sempre sarà gratuto ed open source. Puoi comunque mostrarci il tuo appezzamento inviando una piccola donazione.</string>
 
     <string name="home_device_system">Sistema</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
     <string name="home_package">Pacchetto</string>
 

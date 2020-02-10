@@ -26,9 +26,7 @@
     <string name="home_device_extra_model">Modelo:</string>
     <string name="home_device_extra_board">Placa:</string>
     <string name="home_device_system">Sistema:</string>
-    <string name="home_device_build_style">A/B:</string>
-    <string name="home_device_build_type">SAR:</string>
-    <string name="home_package">Paquete</string>
+	<string name="home_package">Paquete</string>
     <string name="home_status_normal">Normal</string>
     <string name="details">Detalles</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>

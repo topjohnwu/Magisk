@@ -31,8 +31,8 @@
 
     <!--ro.build.version.security_patch-->
     <string name="home_device_system">Android</string> <!--Do not translate-->
-    <string name="home_device_build_style">A/B</string> <!--Do not translate-->
-    <string name="home_device_build_type">SAR</string> <!--Do not translate-->
+    <!--Do not translate-->
+    <!--Do not translate-->
 
     <!--ro.build.version.security_patch-->
     <!--ro.build.version.security_patch-->
