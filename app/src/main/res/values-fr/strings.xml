@@ -5,6 +5,7 @@
     <string name="superuser">Super‑utilisateur</string>
     <string name="logs">Journaux</string>
     <string name="settings">Paramètres</string>
+    <string name="refresh">Rafrachir Données locales</string>
     <string name="install">Installer</string>
     <string name="section_home">Accueil</string>
     <string name="section_theme">Thèmes</string>
@@ -27,6 +28,14 @@
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open‑source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
 
+    <string name="home_loading">Chargement…</string>
+	
+    <string name="home_device_title">Périphérique</string>
+    <string name="home_device_info_title">Info</string>
+    <string name="home_device_extra_manufacturer">Fabriquant</string>
+    <string name="home_device_extra_model">Modèle</string>
+    <string name="home_device_extra_board">Adminitstration</string>
+	
     <string name="home_device_security">Sécurité</string>
     <string name="home_device_system">Système</string>
     <string name="home_device_build_style">A/B</string>
@@ -44,6 +53,10 @@
     <string name="home_extra_mode_normal">Normal</string>
     <string name="home_extra_mode_safe">Sûr</string>
     <string name="home_extra_mode_stub">Dynamique</string>
+    <string name="home_extra_stub">Stub</string>
+    <string name="home_extra_stub_na">N/A</string>
+	
+    <string name="home_details_title">Détails</string>
 
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="safetyNet_api_error">Erreur de l’API SafetyNet</string>
@@ -135,7 +148,7 @@
     <string name="module_version_author">%1$s, par %2$s</string>
     <string name="module_section_pending">Mises à jour</string>
     <string name="module_section_pending_action">Tout mettre à jour</string>
-    <string name="module_section_remote">À distance</string>
+    <string name="module_section_remote">En ligne</string>
     <string name="module_state_remove">Supprimer</string>
     <string name="module_state_restore">Restorer</string>
     <string name="module_action_install_external">Installer depuis le stockage</string>
@@ -200,7 +213,7 @@
     <string name="settings_su_biometric_title">Activer l’authentification biométrique</string>
     <string name="settings_su_biometric_summary">Utiliser l’authentification biométrique pour autoriser les accès en super‑utilisateur</string>
     <string name="no_biometric">L’appareil n’est pas pris en charge ou alors aucun paramètre biométrique n’est activé</string>
-	<string name="settings_customization">Personnalisation</string>
+    <string name="settings_customization">Personnalisation</string>
 
     <string name="multiuser_mode">Mode multi‑utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
