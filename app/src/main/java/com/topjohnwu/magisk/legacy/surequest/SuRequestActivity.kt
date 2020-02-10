@@ -33,6 +33,8 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
     override fun onCreate(savedInstanceState: Bundle?) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         lockOrientation()
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE,
+                WindowManager.LayoutParams.FLAG_SECURE)
         super.onCreate(savedInstanceState)
 
         fun showRequest() {
@@ -41,11 +43,7 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         }
 
         fun runHandler(action: String?) {
-            SuCallbackHandler(
-                this,
-                action,
-                intent.extras
-            )
+            SuCallbackHandler(this, action, intent.extras)
             finish()
         }
 
@@ -67,12 +65,6 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         val theme = super.getTheme()
         theme.applyStyle(R.style.Foundation_Floating, true)
         return theme
-    }
-
-    override fun onResume() {
-        super.onResume()
-        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE,
-                WindowManager.LayoutParams.FLAG_SECURE)
     }
 
     override fun onEventDispatched(event: ViewEvent) {
