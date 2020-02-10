@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
-    <string name="safetyNet_api_error">SafetyNet\'i API viga</string>
-    <string name="safetyNet_res_invalid">Vastus on sobimatu.</string>
+    <string name="safetynet_api_error">SafetyNet\'i API viga</string>
+    <string name="safetynet_res_invalid">Vastus on sobimatu.</string>
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
     <string name="keep_dm_verity">Säilita AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Taastusrežiim</string>
@@ -61,7 +61,7 @@
     <string name="select_patch_file">Vali ja paika fail</string>
     <string name="patch_file_msg">Vali toortõmmis (*.img) või ODIN tar-fail (*.tar)</string>
     <string name="reboot_delay_toast">Taaskäivitamine 5 sekundi pärast…</string>
-    
+
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">Installi %1$s</string>
     <string name="repo_install_msg">Kas soovid kohe installida %1$s?</string>
@@ -98,7 +98,7 @@
     <string name="settings_clear_cache_summary">Tühjenda vahemälus olev teave võrgus olevate hoidlate kohta. See sunnib rakendust võrgust värskendama.</string>
     <string name="settings_hide_manager_title">Peida Magisk Manager</string>
     <string name="settings_hide_manager_summary">Taaspaki Magisk Manager juhusliku nimega.</string>
-     <string name="settings_restore_manager_title">Taasta Magisk Manager</string>
+    <string name="settings_restore_manager_title">Taasta Magisk Manager</string>
     <string name="settings_restore_manager_summary">Taasta Magisk Manager\'i originaalpakett</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
@@ -181,5 +181,5 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Kuva süsteemirakendused</string>
-    
+
 </resources>

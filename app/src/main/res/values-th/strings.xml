@@ -9,8 +9,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">ช่องทางการอัพเดตไม่ถูกต้อง</string>
-    <string name="safetyNet_api_error">SafetyNet API เกิดข้อผิดพลาด</string>
-    <string name="safetyNet_res_invalid">คำตอบรับไม่ถูกต้อง</string>
+    <string name="safetynet_api_error">SafetyNet API เกิดข้อผิดพลาด</string>
+    <string name="safetynet_res_invalid">คำตอบรับไม่ถูกต้อง</string>
     <string name="keep_force_encryption">เก็บค่าบังคับการเข้ารหัส</string>
     <string name="keep_dm_verity">เก็บค่า AVB 2.0/dm-verity</string>
     <string name="uninstall">ถอนการติดตั้ง</string>

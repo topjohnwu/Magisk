@@ -13,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">Połączenie niedostępne</string>
-    <string name="installed_error">nie jest zainstalowany</string>
-    <string name="channel_error">ma nieprawidłowy kanał aktualizacji!</string>
-    <string name="up_to_date">jest aktualny</string>
-    <string name="obsolete">może zostać zaktualizowany!</string>
-    <string name="loading">ładuje się…</string>
     <string name="home_notice_content">Zawsze upewnij się, że używasz otwartoźródłowego Magisk Managera. Manager z nieznanego źródła może wykonywać złośliwe działania.</string>
-    <string name="home_notice_hide">Ukryj</string>
+    <string name="hide">Ukryj</string>
     <string name="app_changelog">Dziennik zmian</string>
     <string name="manager">Manager</string>
 
@@ -29,36 +24,24 @@
     <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwarty. Możesz nam jednak pokazać, że Ci zależy, wysyłając niewielką darowiznę.</string>
 
     <string name="home_device_title">Twoje urządzenie</string>
-    <string name="home_device_info_title">Informacje</string>
+    <string name="info">Informacje</string>
     <string name="home_device_extra_manufacturer">Producent</string>
     <string name="home_device_extra_model">Model</string>
     <string name="home_device_extra_board">Platforma</string>
 
-    <string name="home_device_security">Bezpieczeństwo</string>
     <string name="home_device_system">System</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">Bezpieczny</string>
-    <string name="home_device_security_outdated">Nieaktualny</string>
+    <string name="home_package">Pakiet</string>
 
-    <string name="home_extra_version">Wersja</string>
-    <string name="home_extra_code">Kod</string>
-    <string name="home_extra_mode">Tryb</string>
-    <string name="home_extra_connection">Połączenie</string>
-    <string name="home_extra_package">Pakiet</string>
+    <string name="home_status_normal">Normalny</string>
+    <string name="home_status_stub">Rdzeń</string>
+    <string name="not_available">N/D</string>
 
-    <string name="home_extra_mode_normal">Normalny</string>
-    <string name="home_extra_mode_safe">Awaryjny</string>
-    <string name="home_extra_mode_stub">Dynamiczny</string>
-    <string name="home_extra_stub">Rdzeń</string>
-    <string name="home_extra_stub_na">N/D</string>
-
-    <string name="home_details_title">Szczegóły</string>
+    <string name="details">Szczegóły</string>
 
     <string name="invalid_update_channel">Nieprawidłowy kanał aktualizacji</string>
-    <string name="safetyNet_api_error">Błąd SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Odpowiedź nieprawidłowa</string>
+    <string name="safetynet_api_error">Błąd SafetyNet API</string>
+    <string name="safetynet_res_invalid">Odpowiedź nieprawidłowa</string>
     <string name="uninstall">Odinstaluj</string>
     <string name="uninstall_magisk_title">Odinstaluj Magiska</string>
     <string name="uninstall_magisk_msg">Wszystkie moduły zostaną wyłączone/usunięte!\nRoot zostanie usunięty!\nTwoje dane zostaną potencjalnie zaszyfrowane, jeżeli obecnie nie są!</string>

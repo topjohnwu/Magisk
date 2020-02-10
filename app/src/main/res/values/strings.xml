@@ -13,58 +13,34 @@
 
     <!--Home-->
     <string name="no_connection">No connection available</string>
-    <string name="installed_error">is not installed</string>
-    <string name="channel_error">has invalid update channel!</string>
-    <string name="up_to_date">is up to date</string>
-    <string name="obsolete">can be updated!</string>
-    <string name="loading">is loading…</string>
-    <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions.</string>
-    <string name="home_notice_hide">Hide</string>
     <string name="app_changelog">Changelog</string>
     <string name="manager">Manager</string>
+    <string name="loading">Loading…</string>
+    <string name="info">Info</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="update">Update</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">Hide</string>
+    <string name="status">Status</string>
+    <string name="home_package">Package</string>
+    <string name="details">Details</string>
 
+    <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions.</string>
     <string name="home_support_title">Support Us</string>
     <string name="home_links_project">Project links</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
-
-    <string name="home_loading">Loading…</string>
-
     <string name="home_device_title">Device</string>
-    <string name="home_device_info_title">Info</string>
     <string name="home_device_extra_manufacturer">Manufacturer</string>
     <string name="home_device_extra_model">Model</string>
     <string name="home_device_extra_board">Board</string>
-
-    <string name="home_device_security">Security</string>
     <string name="home_device_system">System</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
-
-    <string name="home_device_security_secure">Secure</string>
-    <string name="home_device_security_outdated">Outdated</string>
-
-    <string name="home_extra_version">Version</string>
-    <string name="home_extra_code">Code</string>
-    <string name="home_extra_mode">Mode</string>
-    <string name="home_extra_connection">Connection</string>
-    <string name="home_extra_package">Package</string>
-
-    <string name="home_extra_mode_normal">Normal</string>
-    <string name="home_extra_mode_safe">Safe</string>
-    <string name="home_extra_mode_stub">Dynamic</string>
-    <string name="home_extra_stub">Stub</string>
-    <string name="home_extra_stub_na">N/A</string>
-
-    <string name="home_details_title">Details</string>
-
+    <string name="home_status_normal">Normal</string>
+    <string name="home_status_safe">Safe Mode</string>
+    <string name="home_status_stub">Stub</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
-    <string name="safetyNet_api_error">SafetyNet API Error</string>
-    <string name="safetyNet_res_invalid">The response is invalid</string>
-    <string name="uninstall">Uninstall</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
-    <string name="update">Update</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Preserve force encryption</string>
@@ -124,6 +100,8 @@
     <string name="target_uid">Target UID: %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">SafetyNet API Error</string>
+    <string name="safetynet_res_invalid">The response is invalid</string>
     <string name="safetynet_attest_success">Success!</string>
     <string name="safetynet_attest_failure">Attestation failed!</string>
     <string name="safetynet_attest_loading">Just a sec…</string>

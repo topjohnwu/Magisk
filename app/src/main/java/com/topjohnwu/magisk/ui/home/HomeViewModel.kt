@@ -41,14 +41,14 @@ class HomeViewModel(
     val stateMagisk = KObservableField(MagiskState.LOADING)
     val stateManager = KObservableField(MagiskState.LOADING)
 
-    val stateMagiskRemoteVersion = KObservableField(R.string.home_loading.res())
+    val stateMagiskRemoteVersion = KObservableField(R.string.loading.res())
     val stateMagiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
     val stateMagiskMode get() = (if (Config.coreOnly)
-        R.string.home_extra_mode_safe else R.string.home_extra_mode_normal).res()
+        R.string.home_status_safe else R.string.home_status_normal).res()
     val stateMagiskProgress = KObservableField(0)
 
-    val stateManagerRemoteVersion = KObservableField(R.string.home_loading.res())
+    val stateManagerRemoteVersion = KObservableField(R.string.loading.res())
     val stateManagerInstalledVersion = Info.stub?.let {
         "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${it.version})"
     } ?: "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"

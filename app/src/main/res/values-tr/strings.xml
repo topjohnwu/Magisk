@@ -12,13 +12,8 @@
 
     <!--Home-->
     <string name="no_connection">Bağlantı yok</string>
-    <string name="installed_error">yüklenmemiş</string>
-    <string name="channel_error">geçersiz güncelleme kanalı!</string>
-    <string name="up_to_date">güncel</string>
-    <string name="obsolete">güncellenebilir!</string>
-    <string name="loading">yükleniyor…</string>
     <string name="home_notice_content">Her zaman açık kaynaklı Magisk Manager kullandığınızdan emin olun. Bilinmeyen kaynak yöneticisi kötü amaçlı eylemler gerçekleştirebilir.</string>
-    <string name="home_notice_hide">Gizle</string>
+    <string name="hide">Gizle</string>
     <string name="app_changelog">Değişiklikler</string>
     <string name="manager">Yönetici</string>
 
@@ -27,33 +22,21 @@
     <string name="home_item_source">Kaynak</string>
     <string name="home_support_content">Magisk özgür ve açık kaynaklıdır ve her zaman öyle olacaktır. Ancak küçük bir bağış göndererek bize önem verdiğinizi gösterebilirsiniz.</string>
 
-    <string name="home_device_security">Güvenlik</string>
     <string name="home_device_system">Sistem</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">Güvenli</string>
-    <string name="home_device_security_outdated">Eski</string>
+    <string name="home_package">Paket</string>
 
-    <string name="home_extra_version">Sürüm</string>
-    <string name="home_extra_code">Kod</string>
-    <string name="home_extra_mode">Mod</string>
-    <string name="home_extra_connection">Bağlantı</string>
-    <string name="home_extra_package">Paket</string>
-
-    <string name="home_extra_mode_normal">Normal</string>
-    <string name="home_extra_mode_safe">Güvenli</string>
-    <string name="home_extra_mode_stub">Dinamik</string>
+    <string name="home_status_normal">Normal</string>
 
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
-    <string name="safetyNet_api_error">SafetyNet API Hatası</string>
-    <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
+    <string name="safetynet_api_error">SafetyNet API Hatası</string>
+    <string name="safetynet_res_invalid">Yanıt geçersiz</string>
     <string name="uninstall">Kaldır</string>
     <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacaktır ve verileriniz zaten şifrelenmemişse potansiyel olarak verileriniz şifrelenecektir.</string>
     <string name="update">Güncelle</string>
-	
-    <!--Install-->	
+
+    <!--Install-->
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i koru</string>
     <string name="recovery_mode">Kurtarma Modu</string>

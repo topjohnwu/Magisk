@@ -13,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">Немає з\'єднання</string>
-    <string name="installed_error">не встановлено</string>
-    <string name="channel_error">має невірний канал оновлень!</string>
-    <string name="up_to_date">оновлено</string>
-    <string name="obsolete">можна оновити!</string>
-    <string name="loading">завантажується…</string>
     <string name="home_notice_content">Завжди впевнюйтеся, що користуєтеся офіційним Magisk Manager. Manager з невідомих джерел може виконувати шкідливі дії.</string>
-    <string name="home_notice_hide">Сховати</string>
+    <string name="hide">Сховати</string>
     <string name="app_changelog">Список змін</string>
     <string name="manager">Manager</string>
 
@@ -29,36 +24,24 @@
     <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування.</string>
 
     <string name="home_device_title">Ваш пристрій</string>
-    <string name="home_device_info_title">Інфо</string>
+    <string name="info">Інфо</string>
     <string name="home_device_extra_manufacturer">Виробник</string>
     <string name="home_device_extra_model">Модель</string>
     <string name="home_device_extra_board">Платформа</string>
 
-    <string name="home_device_security">Безпека</string>
     <string name="home_device_system">Система</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">Безпечно</string>
-    <string name="home_device_security_outdated">Застаріле</string>
+    <string name="home_package">Пакунок</string>
 
-    <string name="home_extra_version">Версія</string>
-    <string name="home_extra_code">Код</string>
-    <string name="home_extra_mode">Режим</string>
-    <string name="home_extra_connection">З\'єднано</string>
-    <string name="home_extra_package">Пакунок</string>
+    <string name="home_status_normal">Нормальний</string>
+    <string name="home_status_stub">Stub</string>
+    <string name="not_available">N/A</string>
 
-    <string name="home_extra_mode_normal">Нормальний</string>
-    <string name="home_extra_mode_safe">Безпечний</string>
-    <string name="home_extra_mode_stub">Динамічний</string>
-    <string name="home_extra_stub">Stub</string>
-    <string name="home_extra_stub_na">N/A</string>
-
-    <string name="home_details_title">Специфіка</string>
+    <string name="details">Специфіка</string>
 
     <string name="invalid_update_channel">Невірний канал оновлення</string>
-    <string name="safetyNet_api_error">Помилка SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Невірна відповідь</string>
+    <string name="safetynet_api_error">Помилка SafetyNet API</string>
+    <string name="safetynet_res_invalid">Невірна відповідь</string>
     <string name="uninstall">Видалити</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до вимкнення/видалення всіх модулів! Рут буде повністю видалено!\nВаші дані можуть зашифруватися, якщо вони не зашифровані!\nВпевнені, що бажаєте продовжити?</string>

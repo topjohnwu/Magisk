@@ -24,8 +24,6 @@
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
 
     <string name="home_device_system">Systém</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
     <string name="home_package">Balíček</string>
 

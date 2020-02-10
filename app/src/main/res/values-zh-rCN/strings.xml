@@ -13,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">无法连接</string>
-    <string name="installed_error">未安装</string>
-    <string name="channel_error">是无效的更新通道！</string>
-    <string name="up_to_date">已是最新版本</string>
-    <string name="obsolete">可更新！</string>
-    <string name="loading">加载中…</string>
     <string name="home_notice_content">确保您使用的是开源的 Magisk Manager。未知来源的 Manager 可能执行恶意操作。</string>
-    <string name="home_notice_hide">隐藏</string>
+    <string name="hide">隐藏</string>
     <string name="app_changelog">更新日志</string>
     <string name="manager">Manager</string>
 
@@ -28,27 +23,15 @@
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk 现在是，将来也永远是免费且开源的。但您可以向我们小额捐赠表示支持。</string>
 
-    <string name="home_device_security">安全性</string>
     <string name="home_device_system">系统版本</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">安全</string>
-    <string name="home_device_security_outdated">过时</string>
+    <string name="home_package">包名</string>
 
-    <string name="home_extra_version">版本</string>
-    <string name="home_extra_code">版本号</string>
-    <string name="home_extra_mode">模式</string>
-    <string name="home_extra_connection">连接</string>
-    <string name="home_extra_package">包名</string>
-
-    <string name="home_extra_mode_normal">常规</string>
-    <string name="home_extra_mode_safe">安全</string>
-    <string name="home_extra_mode_stub">动态</string>
+    <string name="home_status_normal">常规</string>
 
     <string name="invalid_update_channel">无效的更新通道</string>
-    <string name="safetyNet_api_error">SafetyNet API 错误</string>
-    <string name="safetyNet_res_invalid">回传值无效</string>
+    <string name="safetynet_api_error">SafetyNet API 错误</string>
+    <string name="safetynet_res_invalid">回传值无效</string>
     <string name="uninstall">卸载</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">所有模块会被停用或删除！\nRoot 会被移除!\n未加密的设备重启时可能会被进行加密！</string>

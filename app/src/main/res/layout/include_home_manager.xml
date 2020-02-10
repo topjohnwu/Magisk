@@ -113,7 +113,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_manager_info_title"
                             style="@style/W.Home.Title"
-                            android:text="@string/home_device_info_title"
+                            android:text="@string/info"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -136,7 +136,7 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.isConnected ? viewModel.stateManagerRemoteVersion : @string/home_extra_stub_na}"
+                                android:text="@{viewModel.isConnected ? viewModel.stateManagerRemoteVersion : @string/not_available}"
                                 tools:text="8.0.0 (123) (10)" />
 
                         </LinearLayout>
@@ -182,7 +182,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_manager_details_title"
                             style="@style/W.Home.Title"
-                            android:text="@string/home_details_title"
+                            android:text="@string/details"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -201,11 +201,11 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_mode" />
+                                android:text="@string/status" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{InfoKt.isRunningAsStub ? @string/home_extra_mode_stub : @string/home_extra_mode_normal}"
+                                android:text="@{InfoKt.isRunningAsStub ? @string/home_status_stub : @string/home_status_normal}"
                                 tools:text="Normal" />
 
                         </LinearLayout>
@@ -218,7 +218,7 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_package" />
+                                android:text="@string/home_package" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 android:id="@+id/home_manager_extra_connection_value"

@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
 
-    <string name="safetyNet_api_error">SafetyNet API greška</string>
-    <string name="safetyNet_res_invalid">Odgovor je nevažeći</string>
+    <string name="safetynet_api_error">SafetyNet API greška</string>
+    <string name="safetynet_res_invalid">Odgovor je nevažeći</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Zadrži prisilno šifirannje</string>

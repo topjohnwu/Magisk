@@ -115,7 +115,7 @@
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/home_magisk_info_title"
                             style="@style/W.Home.Title"
-                            android:text="@string/home_device_info_title"
+                            android:text="@string/info"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -138,7 +138,7 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.isConnected ? viewModel.stateMagiskRemoteVersion : @string/home_extra_stub_na}"
+                                android:text="@{viewModel.isConnected ? viewModel.stateMagiskRemoteVersion : @string/not_available}"
                                 tools:text="20.1 (12345)" />
 
                         </LinearLayout>
@@ -155,7 +155,7 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.env.isActive ? viewModel.stateMagiskInstalledVersion : @string/home_extra_stub_na}"
+                                android:text="@{Info.env.isActive ? viewModel.stateMagiskInstalledVersion : @string/not_available}"
                                 tools:text="20.1 (12345)" />
 
                         </LinearLayout>
@@ -168,11 +168,11 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/home_extra_mode" />
+                                android:text="@string/status" />
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.env.isActive ? viewModel.stateMagiskMode : @string/home_extra_stub_na}"
+                                android:text="@{Info.env.isActive ? viewModel.stateMagiskMode : @string/not_available}"
                                 tools:text="Normal" />
 
                         </LinearLayout>

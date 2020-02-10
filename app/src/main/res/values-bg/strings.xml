@@ -9,8 +9,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Невалиден канал за актуализации</string>
-    <string name="safetyNet_api_error">Грешка в SafetyNet ППИ</string>
-    <string name="safetyNet_res_invalid">Невалиден отговор</string>
+    <string name="safetynet_api_error">Грешка в SafetyNet ППИ</string>
+    <string name="safetynet_res_invalid">Невалиден отговор</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Запазване на наложеното криптиране</string>
