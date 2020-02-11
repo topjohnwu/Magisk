@@ -82,6 +82,7 @@
             android:onClick="@{() -> viewModel.restartPressed()}"
             android:text="@string/reboot"
             android:textAllCaps="false"
+            android:textColor="?colorOnPrimary"
             android:textStyle="bold"
             app:backgroundTint="?colorPrimary"
             app:icon="@drawable/ic_restart"
