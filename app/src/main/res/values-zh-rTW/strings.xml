@@ -12,29 +12,35 @@
 
     <!--Home-->
     <string name="no_connection">無法連線</string>
-    <string name="home_notice_content">請總是確認您正在使用開源的 Magisk Manager。未知來源的 Manager 可能藏有惡意的操作。</string>
     <string name="hide">隱藏</string>
     <string name="app_changelog">更新日誌</string>
     <string name="manager">Manager</string>
+    <string name="loading">讀取中……</string>
+    <string name="info">資訊</string>
+    <string name="uninstall">解除安裝</string>
+    <string name="update">更新</string>
+    <string name="not_available">無</string>
+    <string name="hide">隱藏</string>
+    <string name="status">狀態</string>
+    <string name="home_package">包裝名稱</string>
+    <string name="details">細節</string>
 
+    <string name="home_notice_content">請總是確認您正在使用開源的 Magisk Manager。未知來源的 Manager 可能藏有惡意的操作。</string>
     <string name="home_support_title">支援我們</string>
     <string name="home_links_project">產品連結</string>
     <string name="home_item_source">原始碼</string>
     <string name="home_support_content">Magisk 現在是，未來也永遠是免費且開源。但您可以透過發送小額的抖內來彰顯對我們的支持。</string>
-
+    <string name="home_device_title">裝置</string>
+    <string name="home_device_extra_manufacturer">製造商</string>
+    <string name="home_device_extra_model">型號</string>
+    <string name="home_device_extra_board">機板</string>
     <string name="home_device_system">系統版本</string>
-
-    <string name="home_package">包裝名稱</string>
-
     <string name="home_status_normal">正常</string>
-
+    <string name="home_status_safe">安全模式</string>
+    <string name="home_status_stub">殘存模式</string>
     <string name="invalid_update_channel">無效的更新頻道</string>
-    <string name="safetynet_api_error">SafetyNet API 錯誤</string>
-    <string name="safetynet_res_invalid">回傳值無效</string>
-    <string name="uninstall">解除安裝</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
     <string name="uninstall_magisk_msg">所有模組將會被停用並移除！\nRoot 將會被移除且若有還沒被加密過的資料將可能被加密！</string>
-    <string name="update">更新</string>
 
     <!--Install-->
     <string name="keep_force_encryption">保持強制加密</string>
@@ -43,7 +49,7 @@
     <string name="install_options_title">選項</string>
     <string name="install_method_title">方法</string>
     <string name="install_next">下一步</string>
-    <string name="install_start">Let\'s go</string>
+    <string name="install_start">開始執行</string>
     <string name="manager_download_install">點選以下載並安裝</string>
     <string name="download_zip_only">僅下載 ZIP 安裝包</string>
     <string name="direct_install">直接安裝（建議）</string>
@@ -94,6 +100,8 @@
     <string name="target_uid">目標 UID：%1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">SafetyNet API 錯誤</string>
+    <string name="safetynet_res_invalid">回傳值無效</string>
     <string name="safetynet_attest_success">成功</string>
     <string name="safetynet_attest_failure">認證失敗！</string>
     <string name="safetynet_attest_loading">稍候片刻……</string>
