@@ -38,7 +38,7 @@ direct_install() {
 }
 
 mm_patch_dtb() {
-  local result=1
+  (local result=1
   local PATCHED=$TMPDIR/dt.patched
   for name in dtb dtbo; do
     local IMAGE=`find_block $name$SLOT`
@@ -55,7 +55,9 @@ mm_patch_dtb() {
       fi
     fi
   done
-  return $result
+  # Run broadcast command passed from app
+  eval $1
+  )& >/dev/null 2>&1
 }
 
 restore_imgs() {

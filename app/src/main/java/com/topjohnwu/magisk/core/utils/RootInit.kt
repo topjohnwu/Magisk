@@ -3,9 +3,11 @@ package com.topjohnwu.magisk.core.utils
 import android.content.Context
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.extensions.rawResource
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.io.SuFile
 
 class RootInit : Shell.Initializer() {
@@ -29,6 +31,12 @@ class RootInit : Shell.Initializer() {
             "run_migrations",
             "export BOOTMODE=true"
         ).exec()
+
+        fun getvar(name: String) = ShellUtils.fastCmd(shell, "echo \$$name").toBoolean()
+
+        Info.keepVerity = getvar("KEEPVERITY")
+        Info.keepEnc = getvar("KEEPFORCEENCRYPT")
+        Info.recovery = getvar("RECOVERYMODE")
 
         return true
     }
