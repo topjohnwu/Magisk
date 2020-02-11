@@ -39,6 +39,8 @@ class SuRequestViewModel(
 
     val selectedItemPosition = KObservableField(0)
 
+    val grantEnabled = KObservableField(false)
+
     private val items = DiffObservableList(ComparableRvItem.callback)
     private val itemBinding = ItemBinding.of<ComparableRvItem<*>> { binding, _, item ->
         item.bind(binding)
@@ -100,10 +102,13 @@ class SuRequestViewModel(
             packageName.value = policy.packageName
             selectedItemPosition.value = timeoutPrefs.getInt(policy.packageName, 0)
 
-            // Override timer
-            val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
+            // Override timer (+1 second because the popup need one second to appear)
+            val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong()+1)
             timer = object : CountDownTimer(millis, 1000) {
                 override fun onTick(remains: Long) {
+                    if (remains <= millis - 1000) {
+                        grantEnabled.value = true
+                    }
                     denyText.value = "${res.getString(R.string.deny)} (${remains / 1000})"
                 }
 
