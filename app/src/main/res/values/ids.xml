@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <item name="hideWhenSelected" type="id" />
     <item name="recyclerScrollListener" type="id" />
-    <item name="revealAnim" type="id" />
 
 </resources>
