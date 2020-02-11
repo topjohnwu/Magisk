@@ -33,7 +33,7 @@
     <string name="home_device_title">Périphérique</string>
     <string name="home_device_extra_manufacturer">Fabriquant</string>
     <string name="home_device_extra_model">Modèle</string>
-    <string name="home_device_extra_board">Plateforme</string>
+    <string name="home_device_extra_board">Socle</string>
     <string name="home_device_system">Système</string>
     <string name="home_status_normal">Normal</string>
     <string name="home_status_safe">Mode Sûr</string>
