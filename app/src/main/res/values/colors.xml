@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="su_request_background">#e0e0e0</color>
-
-    <!-- Card colors -->
-    <color name="card_background_color_dark">#ff424242</color>
-    <color name="card_background_color_light">#ffffffff</color>
+    <color name="colorOverlay">#0D000000</color>
 </resources>

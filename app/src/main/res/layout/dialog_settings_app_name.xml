@@ -26,7 +26,7 @@
             app:boxStrokeColor="?colorOnSurfaceVariant"
             app:counterEnabled="true"
             app:counterMaxLength="14"
-            app:counterOverflowTextColor="@color/colorError"
+            app:counterOverflowTextColor="?colorError"
             app:error="@{data.error ? @string/settings_app_name_error : @string/empty}"
             app:errorEnabled="true"
             app:errorTextColor="?colorError"
