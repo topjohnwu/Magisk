@@ -136,11 +136,6 @@
     <string name="settings_dark_mode_dark">Scuro</string>
     <string name="settings_safe_mode_title">Modalità sicura</string>
     <string name="settings_core_only_summary" deprecated="true">Abilita solo le funzioni principali. Nessun modulo verrà caricato. MagiskSU e MagiskHide rimarranno abilitati</string>
-    <string name="settings_grid_span_count_title">Dimensione colonne</string>
-    <string name="settings_grid_span_count_summary">Imposta la dimensione delle colonne nelle liste a griglia. Può anche essere modificato eseguendo un pinch to zoom in una lista.</string>
-    <string name="settings_grid_span_count_1">Un elemento per linea (Schermi piccoli)</string>
-    <string name="settings_grid_span_count_2">Due elementi per linea (Raccomandato)</string>
-    <string name="settings_grid_span_count_3">Tre elementi per linea (Tablet/TV)</string>
     <string name="settings_download_path_title">Percorso di download</string>
     <string name="settings_download_path_message">I file verranno salvati in %1$s</string>
     <string name="settings_clear_cache_title">Svuota cache repository</string>

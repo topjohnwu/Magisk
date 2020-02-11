@@ -131,11 +131,11 @@
     <string name="settings_dark_mode_dark">Sempre Escuro</string>
     <string name="settings_safe_mode_title">Modo de segurança</string>
     <string name="settings_core_only_summary" obsoleto="true">Ative apenas os principais recursos. O MagiskSU e o MagiskHide ainda estarão ativados, mas nenhum módulo será carregado</string>
-    <string name="settings_grid_span_count_title">Tamanho da coluna da grade</string>
-    <string name="settings_grid_span_count_summary">Define o tamanho da coluna para todas as listas de grade qualificadas. Você pode definir essas configurações realizando o gesto de pinça com os dedos.</string>
-    <string name="settings_grid_span_count_1">Um item por linha (telas pequenas)</string>    
-    <string name="settings_grid_span_count_2">Dois itens por linha (recomendado)</string>
-    <string name="settings_grid_span_count_3">Três itens por linha (Tablet/TV)</string>
+    <![CDATA[
+        
+
+
+    ]]>
     <string name="settings_download_path_title">Caminho de Download</string>
     <string name="settings_download_path_message">Os arquivos serão salvos em  %1$s</string>
     <string name="settings_clear_cache_title">Limpar cache de repositório</string>

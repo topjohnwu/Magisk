@@ -135,11 +135,6 @@
     <string name="settings_dark_mode_dark">暗色模式</string>
     <string name="settings_safe_mode_title">安全模式</string>
     <string name="settings_core_only_summary" deprecated="true">保持 MagiskSU 及 MagiskHide 開啟並停止載入模組。</string>
-    <string name="settings_grid_span_count_title">調整網格行數</string>
-    <string name="settings_grid_span_count_summary">透過設定網格行數來調整清單的顯示。您也可以透過縮放的手勢直接進行調整。</string>
-    <string name="settings_grid_span_count_1">一個項目一行（小螢幕）</string>
-    <string name="settings_grid_span_count_2">兩個項目一行（建議）</string>
-    <string name="settings_grid_span_count_3">三個項目一行（平板/電視）</string>
     <string name="settings_download_path_title">下載路徑</string>
     <string name="settings_download_path_message">檔案將被儲存在：%1$s</string>
     <string name="settings_clear_cache_title">清除線上模組庫快取</string>

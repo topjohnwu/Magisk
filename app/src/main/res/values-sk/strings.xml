@@ -136,11 +136,6 @@
     <string name="settings_dark_mode_dark">Vždy tmavý</string>
     <string name="settings_safe_mode_title">Núdzový režim</string>
     <string name="settings_core_only_summary" deprecated="true">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU a MagiskHide, ale žiadne moduly nebudú zavedené</string>
-    <string name="settings_grid_span_count_title">Veľkosť stĺpca mriežky</string>
-    <string name="settings_grid_span_count_summary">Nastaví veľkosť stĺpca pre všetky vhodné zoznamy mriežky. Tiež to môžete zmeniť pomocou stiahnutia prstami (pinch to zoom).</string>
-    <string name="settings_grid_span_count_1">Jedna položka na riadok (Malé obrazovky)</string>
-    <string name="settings_grid_span_count_2">Dve položky na riadok (Odporúčané)</string>
-    <string name="settings_grid_span_count_3">Tri položky na riadok (Tablet/TV)</string>
     <string name="settings_download_path_title">Cesta na sťahovanie</string>
     <string name="settings_download_path_message">Súbory budú uložené do %1$s</string>
     <string name="settings_clear_cache_title">Vyčistiť cache repo</string>

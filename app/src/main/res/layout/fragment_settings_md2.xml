@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.core.Config" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.settings.SettingsViewModel" />
@@ -17,6 +19,7 @@
         dividerVertical="@{@drawable/divider_l_50}"
         itemBinding="@{viewModel.itemBinding}"
         items="@{viewModel.items}"
+        spanCount="@{Config.listSpanCount}"
         android:id="@+id/settings_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -28,7 +31,7 @@
         android:paddingEnd="@dimen/l_50"
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
         app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-        app:spanCount="2"
+        app:spanCount="1"
         tools:layout_marginTop="24dp"
         tools:listitem="@layout/item_settings_toggle"
         tools:paddingTop="@dimen/l1" />

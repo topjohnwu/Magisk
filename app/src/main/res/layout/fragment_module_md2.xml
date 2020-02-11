@@ -25,6 +25,7 @@
             gone="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
+            spanCount="@{Config.listSpanCount}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -34,7 +35,7 @@
             android:paddingEnd="0dp"
             android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
             app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-            app:spanCount="2"
+            app:spanCount="1"
             tools:listitem="@layout/item_module_md2" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

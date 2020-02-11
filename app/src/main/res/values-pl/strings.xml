@@ -146,11 +146,6 @@
     <string name="settings_dark_mode_dark">Zawsze ciemny</string>
     <string name="settings_safe_mode_title">Tryb awaryjny (Safe Mode)</string>
     <string name="settings_core_only_summary" deprecated="true">Włącza tylko podstawowe funkcje. MagiskSU i MagiskHide będą nadal włączone, ale nie zostaną załadowane żadne moduły</string>
-    <string name="settings_grid_span_count_title">Rozmiar kolumn siatki</string>
-    <string name="settings_grid_span_count_summary">Ustawia wielkość kolumny wszystkich pól wyboru. Możesz również zmienić to ustawienie wykonując gest uszczypnięcia.</string>
-    <string name="settings_grid_span_count_1">Jeden element w wierszu (małe ekrany)</string>
-    <string name="settings_grid_span_count_2">Dwa elementy w wierszu (zalecane)</string>
-    <string name="settings_grid_span_count_3">Trzy elementy w wierszu (tablet/telewizor)</string>
     <string name="settings_download_path_title">Ścieżka pobierania</string>
     <string name="settings_download_path_message">Pliki pobrane przez Managera będą zapisywane do %1$s</string>
     <string name="settings_clear_cache_title">Wyczyść pamięć cache repozytorium</string>

@@ -126,11 +126,11 @@ object DownloadPath : SettingsItem.Input() {
 
 object GridSize : SettingsItem.Selector() {
     override var value by bindableValue(Config.listSpanCount - 1) {
-        Config.listSpanCount = max(1, min(3, it + 1))
+        Config.listSpanCount = max(1, min(2, it + 1))
     }
 
-    override val title = R.string.settings_grid_span_count_title.asTransitive()
-    override val description = R.string.settings_grid_span_count_summary.asTransitive()
+    override val title = R.string.settings_grid_column_count_title.asTransitive()
+    override val description = R.string.settings_grid_column_count_summary.asTransitive()
     override val entries = resources.getStringArray(R.array.span_count)
     override val entryValues = resources.getStringArray(R.array.value_array)
 }

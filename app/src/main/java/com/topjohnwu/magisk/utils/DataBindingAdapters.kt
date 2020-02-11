@@ -23,9 +23,7 @@ import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -484,5 +482,13 @@ fun View.setPopupMenu(popupMenu: Int, listener: OnPopupMenuItemClickListener) {
     }
     setOnClickListener {
         (tag as PopupMenu).show()
+    }
+}
+
+@BindingAdapter("spanCount")
+fun RecyclerView.setSpanCount(count: Int) {
+    when (val lama = layoutManager) {
+        is GridLayoutManager -> lama.spanCount = count
+        is StaggeredGridLayoutManager -> lama.spanCount = count
     }
 }

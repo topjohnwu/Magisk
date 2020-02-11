@@ -136,11 +136,6 @@
     <string name="settings_dark_mode_dark">暗色模式</string>
     <string name="settings_safe_mode_title">安全模式</string>
     <string name="settings_core_only_summary" deprecated="true">仅启用核心功能，不加载任何模块。MagiskSU 和 MagiskHide 仍会持续运作</string>
-    <string name="settings_grid_span_count_title">设置网格列数</string>
-    <string name="settings_grid_span_count_summary">设置网格列数以调整显示效果。您可以通过缩放手势直接调整</string>
-    <string name="settings_grid_span_count_1">每行一项（小屏幕）</string>
-    <string name="settings_grid_span_count_2">每行两项（推荐）</string>
-    <string name="settings_grid_span_count_3">每行三项（平板/电视）</string>
     <string name="settings_download_path_title">下载路径</string>
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>

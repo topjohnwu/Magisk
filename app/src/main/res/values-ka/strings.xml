@@ -136,11 +136,6 @@
     <string name="settings_dark_mode_dark">მუქი თემა</string>
     <string name="settings_safe_mode_title">უსაფრთხო რეჟიმი</string>
     <string name="settings_core_only_summary" deprecated="true">მხოლოდ მთავარი ფუნქციების ჩართვა. MagiskSU და MagiskHide-ი იმუშავებენ, მაგრამ მოდულები არ ჩაიტვირთება</string>
-    <string name="settings_grid_span_count_title">ბადის სვეტების ზომა</string>
-    <string name="settings_grid_span_count_summary">არეგულირებს სვეტების ზომას. თქვენ შეგიძლიათ ამის შეცვლა პარამეტრების გარეთ, ორი თითის საპირისპირო მიმართულებით გასმით.</string>
-    <string name="settings_grid_span_count_1">თითო ფანჯარა სტრიქონზე (პატარა ეკრანებისთვის)</string>
-    <string name="settings_grid_span_count_2">ორი ფანჯარა სტრიქონზე (რეკომენდირებული)</string>
-    <string name="settings_grid_span_count_3">სამი ფნაჯარა სტრიონზე (Tablet/TV)</string>
     <string name="settings_download_path_title">გადმოწერის ლოკაცია</string>
     <string name="settings_download_path_message">ფაილები შეინახება %1$s-ში</string>
     <string name="settings_clear_cache_title">რეპოზიტორიების ქეშის წაშლა</string>

@@ -56,7 +56,7 @@ object Config : PreferenceModel, DBConfig {
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
-        const val LIST_SPAN_COUNT = "list_span_count"
+        const val LIST_SPAN_COUNT = "column_count"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -147,7 +147,8 @@ object Config : PreferenceModel, DBConfig {
     @JvmStatic
     var coreOnly by preference(Key.COREONLY, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
-    var listSpanCount by preference(Key.LIST_SPAN_COUNT, 2)
+    @JvmStatic
+    var listSpanCount by preference(Key.LIST_SPAN_COUNT, 1)
 
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
     var locale by preference(Key.LOCALE, "")
