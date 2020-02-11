@@ -101,12 +101,6 @@
 
     <string name="settings_safe_mode_title">안전 모드</string>
 
-    <string name="settings_grid_span_count_title">그리드 열 개수</string>
-    <string name="settings_grid_span_count_summary">가능한 그리드 열 개수를 설정합니다. 설정 메뉴 밖에서도 Pinch 제스처를 통해 변경할 수 있습니다.</string>
-    <string name="settings_grid_span_count_1">한 줄에 하나 (작은 화면)</string>
-    <string name="settings_grid_span_count_2">한 줄에 두 개 (추천)</string>
-    <string name="settings_grid_span_count_3">한 줄에 세 개 (태블릿/TV)</string>
-
     <string name="settings_download_path_title">다운로드 경로</string>
     <string name="settings_download_path_message">파일이 %1$s에 저장됩니다.</string>
     <string name="settings_clear_cache_title">저장소 캐시 비우기</string>

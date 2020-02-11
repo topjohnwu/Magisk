@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.core.Config" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.superuser.SuperuserViewModel" />
@@ -24,6 +26,7 @@
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
             nestedScrollingEnabled="@{false}"
+            spanCount="@{Config.listSpanCount}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -32,7 +35,7 @@
             android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
             android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
             app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-            app:spanCount="2"
+            app:spanCount="1"
             tools:layout_marginTop="24dp"
             tools:listitem="@layout/item_policy_md2"
             tools:paddingTop="@dimen/l1" />

@@ -152,11 +152,6 @@
     <string name="settings_dark_mode_dark">Всегда тёмный</string>
     <string name="settings_safe_mode_title">Безопасный режим</string>
     <string name="settings_core_only_summary" deprecated="true">Задействовать только основной функционал (MagiskSU и MagiskHide). Модули не будут активированы</string>
-    <string name="settings_grid_span_count_title">Расположение элементов</string>
-    <string name="settings_grid_span_count_summary">Укажите число столбцов в сетке элементов. Возможно динамическое изменение жестом масштабирования</string>
-    <string name="settings_grid_span_count_1">Один элемент (Небольшие экраны)</string>
-    <string name="settings_grid_span_count_2">Два элемента (Рекомендуется)</string>
-    <string name="settings_grid_span_count_3">Три элемента (Планшеты/TV)</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>

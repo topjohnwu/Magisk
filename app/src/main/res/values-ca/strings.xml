@@ -136,11 +136,6 @@
     <string name="settings_dark_mode_dark">Sempre fosc</string>
     <string name="settings_safe_mode_title">Mode segur</string>
     <string name="settings_core_only_summary">Només habilita les funcionalitats bàsiques. MagiskSU i MagiskHide seguiran activats, però cap mòdul es carregarà</string>
-    <string name="settings_grid_span_count_title">Mida de la columna</string>
-    <string name="settings_grid_span_count_summary">Estableix la mida de la columna per totes les llistes de quadrícules elegibles. Pot canviar aquesta configuració fent gestos de pessic.</string>
-    <string name="settings_grid_span_count_1">Una secció per línia (Pantalles petites)</string>
-    <string name="settings_grid_span_count_2">Dos seccions per línia (Recomanat)</string>
-    <string name="settings_grid_span_count_3">Tres seccions per línia (Tauleta/TV)</string>
     <string name="settings_download_path_title">Directori de baixades</string>
     <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>

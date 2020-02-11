@@ -135,11 +135,6 @@
     <string name="settings_dark_mode_dark">Her zaman karanlık</string>
     <string name="settings_safe_mode_title">Güvenli Mod</string>
     <string name="settings_core_only_summary" deprecated="true">Sadece temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU ve MagiskHide yine de etkinleştirilecektir</string>
-    <string name="settings_grid_span_count_title">Izgara Sütunu Boyutu</string>
-    <string name="settings_grid_span_count_summary">Tüm uygun ızgara listeleri için sütun boyutunu ayarlar. Bu ayarların dışında sıkıştırma hareketi gerçekleştirerek bu ayarları yapabilirsiniz.</string>
-    <string name="settings_grid_span_count_1">Satır başına bir öğe (Küçük Ekranlar)</string>
-    <string name="settings_grid_span_count_2">Satır başına iki öğe (Önerilen)</string>
-    <string name="settings_grid_span_count_3">Satır başına üç öğe (Tablet/TV)</string>
     <string name="settings_download_path_title">İndirme yolu</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_clear_cache_title">Depo Önbelleğini Temizle</string>

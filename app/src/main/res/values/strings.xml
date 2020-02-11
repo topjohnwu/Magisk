@@ -143,11 +143,10 @@
     <string name="settings_dark_mode_dark">Always Dark</string>
     <string name="settings_safe_mode_title">Safe Mode</string>
     <string name="settings_core_only_summary" deprecated="true">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded</string>
-    <string name="settings_grid_span_count_title">Grid Column Size</string>
-    <string name="settings_grid_span_count_summary">Sets column size for all eligible grid lists. You can set this outside settings by performing pinch gesture.</string>
-    <string name="settings_grid_span_count_1">One item per line (Small Screens)</string>
-    <string name="settings_grid_span_count_2">Two items per line (Recommended)</string>
-    <string name="settings_grid_span_count_3">Three item per line (Tablet/TV)</string>
+    <string name="settings_grid_column_count_title">List arrangement</string>
+    <string name="settings_grid_column_count_summary">Sets item width in a list. Restart app to apply changes.</string>
+    <string name="settings_grid_column_count_1">Standard</string>
+    <string name="settings_grid_column_count_2">Squished</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>

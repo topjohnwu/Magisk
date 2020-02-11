@@ -136,11 +136,6 @@
     <string name="settings_dark_mode_dark">Mereu mod întunecat</string>
     <string name="settings_safe_mode_title">Mod sigur</string>
     <string name="settings_core_only_summary" deprecated="true">Activează numai funcțiile de bază. MagiskSU și MagiskHide vor fi în continuare activate, însă niciun modul nu va fi încărcat</string>
-    <string name="settings_grid_span_count_title">Dimensiune pentru coloana grilei</string>
-    <string name="settings_grid_span_count_summary">Setează dimensiunea coloanei pentru toate listele de grile eligibile. Poți seta acest lucru în afara Setărilor executând un gest de apropiere/îndepărtare cu degetele.</string>
-    <string name="settings_grid_span_count_1">Un element per rând (Ecrane mici)</string>
-    <string name="settings_grid_span_count_2">Două elemente per rând (Recomandat)</string>
-    <string name="settings_grid_span_count_3">Trei elemente per rând (Tabletă/TV)</string>
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>

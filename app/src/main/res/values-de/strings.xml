@@ -125,11 +125,6 @@
     <string name="settings_dark_mode_dark">Immer dunkel</string>
     <string name="settings_safe_mode_title">Sicherer Modus</string>
     <string name="settings_core_only_summary" deprecated="true">Nur die Kernfunktionen aktivieren. MagiskSU und MagiskHide werden weiterhin aktiviert, aber es werden keine Module geladen</string>
-    <string name="settings_grid_span_count_title">Raster-Spaltengröße</string>
-    <string name="settings_grid_span_count_summary">Legt die Spaltengröße für alle in Frage kommenden Rasterlisten fest. Sie können diese außerhalb der Einstellungen durch eine Pinch-Geste einstellen.</string>
-    <string name="settings_grid_span_count_1">Ein Element pro Zeile (Kleine Bildschirme)</string>
-    <string name="settings_grid_span_count_2">Zwei Elemente pro Zeile (Empfohlen)</string>
-    <string name="settings_grid_span_count_3">Drei Elemente pro Zeile (Tablet/TV)</string>
     <string name="settings_download_path_title">Download-Verzeichnis</string>
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
     <string name="settings_clear_cache_title">Repo-Cache leeren</string>
