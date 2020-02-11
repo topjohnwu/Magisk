@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorSecondary">#FFC107</color>
-    <color name="colorSecondaryDark">#AD8305</color>
-
-    <color name="colorText">#FFFFFF</color>
-    <color name="colorTextInactive">#ADADAD</color>
-    <color name="colorTextInverse">#1D1D1D</color>
-
-    <color name="colorTextTinted">#FFFFFF</color>
-    <color name="colorCardStrokeInverse">#2AE4E4E4</color>
-
+    <color name="colorOverlay">#1AFFFFFF</color>
 </resources>

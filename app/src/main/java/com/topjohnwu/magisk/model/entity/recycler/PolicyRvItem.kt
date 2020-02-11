@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import android.graphics.drawable.Drawable
+import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.databinding.ComparableRvItem
@@ -45,6 +47,12 @@ class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<
     fun toggleLog(viewModel: SuperuserViewModel) {
         shouldLog.toggle()
         viewModel.updatePolicy(PolicyUpdateEvent.Log(updatedPolicy))
+    }
+
+    override fun onBindingBound(binding: ViewDataBinding) {
+        super.onBindingBound(binding)
+        val params = binding.root.layoutParams as? StaggeredGridLayoutManager.LayoutParams
+        params?.isFullSpan = true
     }
 
     override fun contentSameAs(other: PolicyItem) = itemSameAs(other)
