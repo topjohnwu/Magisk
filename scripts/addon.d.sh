@@ -13,9 +13,9 @@ trampoline() {
     exec sh /data/adb/magisk/addon.d.sh "$@"
   else
     OUTFD=$(ps | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
-    [ "$OUTFD" -eq "$OUTFD" ] 2>/dev/null || OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
-    [ "$OUTFD" -eq "$OUTFD" ] 2>/dev/null || OUTFD=$(ps | grep -v 'grep' | grep -oE 'status_fd=(.*)' | cut -d= -f2)
-    [ "$OUTFD" -eq "$OUTFD" ] 2>/dev/null || OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'status_fd=(.*)' | cut -d= -f2)
+    [ "$OUTFD" == "$((OUTFD * 1))" ] || OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
+    [ "$OUTFD" == "$((OUTFD * 1))" ] || OUTFD=$(ps | grep -v 'grep' | grep -oE 'status_fd=(.*)' | cut -d= -f2)
+    [ "$OUTFD" == "$((OUTFD * 1))" ] || OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'status_fd=(.*)' | cut -d= -f2)
     ui_print() { echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD; }
 
     ui_print "************************"
