@@ -7,8 +7,6 @@
 
         <import type="android.os.Build" />
 
-        <import type="com.topjohnwu.magisk.extensions.XAndroidKt" />
-
         <import type="com.topjohnwu.magisk.extensions.XSUKt" />
 
         <import type="com.topjohnwu.magisk.R" />
@@ -186,7 +184,6 @@
 
                 <com.google.android.material.card.MaterialCardView
                     style="@style/W.Home.Card"
-                    goneUnless="@{XSUKt.hasRoot}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
@@ -220,7 +217,7 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{XAndroidKt.isAB ? @string/yes : @string/no}"
+                                android:text="@{Info.isAB ? @string/yes : @string/no}"
                                 tools:text="Yes" />
 
                         </LinearLayout>
@@ -237,7 +234,7 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{XAndroidKt.isSAR ? @string/yes : @string/no}"
+                                android:text="@{Info.isSAR ? @string/yes : @string/no}"
                                 tools:text="Yes" />
 
                         </LinearLayout>
@@ -254,7 +251,7 @@
 
                             <androidx.appcompat.widget.AppCompatTextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.recovery ? @string/no : @string/yes }"
+                                android:text="@{Info.ramdisk ? @string/yes : @string/no }"
                                 tools:text="Yes" />
 
                         </LinearLayout>

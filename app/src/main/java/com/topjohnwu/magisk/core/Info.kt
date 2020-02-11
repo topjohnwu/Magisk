@@ -24,12 +24,15 @@ object Info {
     @JvmStatic
     var stub: DynAPK.Data? = null  // Stub
 
-    @JvmStatic
-    var keepVerity = false
-    @JvmStatic
-    var keepEnc = false
-    @JvmStatic
-    var recovery = false
+    // Toggle-able options
+    @JvmStatic var keepVerity = false
+    @JvmStatic var keepEnc = false
+    @JvmStatic var recovery = false
+
+    // Immutable device state
+    @JvmStatic var isSAR = false
+    @JvmStatic var isAB = false
+    @JvmStatic var ramdisk = false
 
     val isConnected by lazy {
         KObservableField(false).also { field ->

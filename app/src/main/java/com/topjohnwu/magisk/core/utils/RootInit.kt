@@ -26,17 +26,20 @@ class RootInit : Shell.Initializer() {
         }
 
         job.add(
+            "export BOOTMODE=true",
             "mount_partitions",
             "get_flags",
-            "run_migrations",
-            "export BOOTMODE=true"
+            "run_migrations"
         ).exec()
 
         fun getvar(name: String) = ShellUtils.fastCmd(shell, "echo \$$name").toBoolean()
 
         Info.keepVerity = getvar("KEEPVERITY")
         Info.keepEnc = getvar("KEEPFORCEENCRYPT")
+        Info.isSAR = getvar("SYSTEM_ROOT")
+        Info.ramdisk = shell.newJob().add("check_boot_ramdisk").exec().isSuccess
         Info.recovery = getvar("RECOVERYMODE")
+        Info.isAB = getvar("ISAB")
 
         return true
     }
