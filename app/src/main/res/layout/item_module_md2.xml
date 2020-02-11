@@ -30,57 +30,70 @@
         tools:layout_marginBottom="@dimen/l1"
         tools:layout_marginEnd="@dimen/l1">
 
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/module_state_icon"
+            gone="@{!item.removed &amp;&amp; !item.updated}"
+            srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : (item.updated ? R.drawable.ic_update_md2 : 0)}"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:alpha=".05"
+            android:background="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?colorOnSurface"
+            tools:srcCompat="@drawable/ic_update_md2" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/module_state_icon"
-                style="@style/WidgetFoundation.Image.Small"
-                gone="@{!item.removed &amp;&amp; !item.updated}"
-                srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : (item.updated ? R.drawable.ic_update_md2 : 0)}"
-                android:layout_marginStart="@dimen/l1"
-                android:background="@null"
-                app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/module_title"
-                tools:srcCompat="@drawable/ic_update_md2" />
-
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/module_title"
-                strikeThrough="@{!item.enabled}"
+                strikeThrough="@{item.removed}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
+                android:layout_marginEnd="@dimen/l_50"
                 android:text="@{item.item.name}"
                 android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/module_state_icon"
+                app:layout_constraintEnd_toStartOf="@+id/module_indicator"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/lorem" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/module_version_author"
-                strikeThrough="@{!item.enabled}"
+                strikeThrough="@{item.removed}"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
                 android:text="@{@string/module_version_author(item.item.version, item.item.author)}"
                 android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/module_state_icon"
+                app:layout_constraintEnd_toEndOf="@+id/module_title"
+                app:layout_constraintStart_toStartOf="@+id/module_title"
                 app:layout_constraintTop_toBottomOf="@+id/module_title"
                 tools:text="v1 by topjohnwu" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/module_indicator"
+                style="@style/WidgetFoundation.Switch"
+                isSelected="@{item.enabled &amp;&amp; !Config.coreOnly}"
+                android:layout_marginEnd="@dimen/l_50"
+                app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toEndOf="@+id/module_info"
+                app:layout_constraintTop_toTopOf="@+id/module_title" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/module_description"
                 gone="@{item.item.description.empty}"
-                strikeThrough="@{!item.enabled}"
+                strikeThrough="@{item.removed}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
@@ -97,6 +110,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="@dimen/l1"
+                android:layout_marginRight="6dp"
                 android:background="?colorSurfaceVariant"
                 app:layout_constraintTop_toBottomOf="@+id/module_description" />
 
@@ -129,13 +143,6 @@
                 tools:text="Remove" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.appcompat.widget.AppCompatImageView
-            isSelected="@{item.enabled}"
-            android:layout_width="@dimen/l1"
-            android:layout_height="@dimen/l1"
-            android:layout_gravity="right|top"
-            app:srcCompat="@drawable/ic_card_check" />
 
     </com.google.android.material.card.MaterialCardView>
 

@@ -42,16 +42,14 @@
                 app:srcCompat="@{item.icon}"
                 tools:srcCompat="@drawable/ic_fingerprint" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/toggle_indicator"
                 style="@style/WidgetFoundation.Switch"
                 isEnabled="@{item.enabled}"
-                onTouch="@{(view, event) -> item.onTouched(view, callback, event)}"
+                isSelected="@{item.value}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/l_25"
-                android:checked="@{item.value}"
-                android:text=""
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

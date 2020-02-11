@@ -36,12 +36,13 @@
                 app:navigationIcon="@drawable/ic_back_md2">
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    style="@style/Widget.Text.Emphasize"
                     movieBehavior="@{viewModel.loading}"
                     movieBehaviorText="@{viewModel.behaviorText}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:textAppearance="@style/AppearanceFoundation.Body"
+                    android:textStyle="bold"
                     android:fontFamily="monospace"
                     android:gravity="center"
                     android:textColor="?colorOnSurface"
