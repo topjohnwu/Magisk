@@ -102,14 +102,14 @@ class SuRequestViewModel(
             packageName.value = policy.packageName
             selectedItemPosition.value = timeoutPrefs.getInt(policy.packageName, 0)
 
-            // Override timer (+1 second because the popup need one second to appear)
-            val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong()+1)
+            // Override timer
+            val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
             timer = object : CountDownTimer(millis, 1000) {
                 override fun onTick(remains: Long) {
                     if (remains <= millis - 1000) {
                         grantEnabled.value = true
                     }
-                    denyText.value = "${res.getString(R.string.deny)} (${remains / 1000})"
+                    denyText.value = "${res.getString(R.string.deny)} (${(remains / 1000) + 1})"
                 }
 
                 override fun onFinish() {
