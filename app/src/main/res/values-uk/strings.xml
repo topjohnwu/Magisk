@@ -124,15 +124,15 @@
     <string name="reboot_edl">Перезавантажити в EDL</string>
     <string name="module_safe_mode_message">Ви в безпечному режимі. В цьому режимі модулі не працюватимуть.\nПовідомлення зникне, після вимкнення безпечного режиму.</string>
     <string name="module_version_author">%1$s, розробник %2$s</string>
-    <string name="module_section_pending">Оновлення</string>
-    <string name="module_section_pending_action">Оновити всі</string>
+    <string name="module_section_installed">Встановлені</string>
+    <string name="module_section_updates">Оновлення</string>
+    <string name="module_section_action_update_all">Оновити всі</string>
     <string name="module_section_remote">Можна завантажити</string>
     <string name="module_state_remove">Видалити</string>
     <string name="module_state_restore">Відновити</string>
     <string name="module_action_install_external">Встановити зі сховища</string>
     <string name="module_update_none">Ваші модулі оновлені!</string>
     <string name="update_available">Доступне оновлення</string>
-    <string name="installed">Встановлені</string>
     <string name="sorting_order">Порядок сортування</string>
 
     <!--Settings -->

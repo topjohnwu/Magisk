@@ -29,7 +29,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Oppdatering tilgjengelig</string>
-    <string name="installed">Installert</string>
+    <string name="module_section_installed">Installert</string>
     <string name="sorting_order">Sorteringsrekkefølge</string>
 
     <!--Log Fragment-->

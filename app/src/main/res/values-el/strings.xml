@@ -30,7 +30,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Διαθέσιμη Ενημέρωση</string>
-    <string name="installed">Εγκαταστάθηκε</string>
+    <string name="module_section_installed">Εγκαταστάθηκε</string>
     <string name="sorting_order">Ταξινόμηση κατά</string>
 
     <!--Log Fragment-->

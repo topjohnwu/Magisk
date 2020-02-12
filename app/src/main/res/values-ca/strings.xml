@@ -117,15 +117,15 @@
     <string name="reboot_edl">Reiniciar a EDL</string>
     <string name="module_safe_mode_message">Està en mode segur. Cap dels mòduls instal·lats funcionarà.\nAquest missatge desapareixerà quan el mode segur es desactivi.</string>
     <string name="module_version_author">%1$s per %2$s</string>
-    <string name="module_section_pending">Actualitzacions</string>
-    <string name="module_section_pending_action">Actualitza tot</string>
+    <string name="module_section_installed">Instal·lat</string>
+    <string name="module_section_updates">Actualitzacions</string>
+    <string name="module_section_action_update_all">Actualitza tot</string>
     <string name="module_section_remote">Remot</string>
     <string name="module_state_remove">Eliminar</string>
     <string name="module_state_restore">Recuperar</string>
     <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="module_update_none">Els seus mòduls estan actualitzats!</string>
     <string name="update_available">Actualització Disponible</string>
-    <string name="installed">Instal·lat</string>
     <string name="sorting_order">Ordre de Classificació</string>
 
     <!--Settings -->

@@ -28,7 +28,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Достапно е ажурирање</string>
-    <string name="installed">Инсталирано</string>
+    <string name="module_section_installed">Инсталирано</string>
     <string name="sorting_order">Начин на подредување</string>
 
     <!--Log Fragment-->

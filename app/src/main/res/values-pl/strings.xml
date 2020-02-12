@@ -127,15 +127,15 @@
     <string name="reboot_edl">Restart do EDL</string>
     <string name="module_safe_mode_message">Jesteś w trybie awaryjnym. Żaden moduł użytkownika nie będzie działał.\nTen komunikat zniknie po wyłączeniu trybu awaryjnego.</string>
     <string name="module_version_author">%1$s by %2$s</string>
-    <string name="module_section_pending">Aktualizacje</string>
-    <string name="module_section_pending_action">Zaktualizuj wszystkie</string>
+    <string name="module_section_installed">Zainstalowane</string>
+    <string name="module_section_updates">Aktualizacje</string>
+    <string name="module_section_action_update_all">Zaktualizuj wszystkie</string>
     <string name="module_section_remote">Dostępne</string>
     <string name="module_state_remove">Usuń</string>
     <string name="module_state_restore">Przywróć</string>
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
     <string name="module_update_none">Twoje moduły są aktualne!</string>
     <string name="update_available">Dostępna aktualizacja</string>
-    <string name="installed">Zainstalowane</string>
     <string name="sorting_order">Kolejność sortowania</string>
 
     <!--Settings -->

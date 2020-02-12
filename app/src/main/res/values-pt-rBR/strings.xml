@@ -112,15 +112,15 @@
     <string name="reboot_edl">Reiniciar para EDL</string>
     <string name="module_safe_mode_message">Você está em modo seguro. Nenhum dos módulos de usuário funcionará.\nEsta mensagem desaparecerá assim que o modo seguro estiver desativado.</string>
     <string name="module_version_author">%1$s por %2$s</string>
-    <string name="module_section_pending">Atualizações</string>
-    <string name="module_section_pending_action">Atualizar tudo</string>
+    <string name="module_section_installed">Instalado</string>
+    <string name="module_section_updates">Atualizações</string>
+    <string name="module_section_action_update_all">Atualizar tudo</string>
     <string name="module_section_remote">Remoto</string>
     <string name="module_state_remove">Remover</string>
     <string name="module_state_restore">Restaurar</string>
     <string name="module_action_install_external">Instale a partir do armazenamento</string>
     <string name="module_update_none">Seus módulos estão atualizados!</string>
     <string name="update_available">Atualização disponível</string>
-    <string name="installed">Instalado</string>
     <string name="sorting_order">Ordem de classificação</string>
 
     <!--Settings -->

@@ -31,7 +31,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">يتوفر على تحديث</string>
-    <string name="installed">مثبت</string>
+    <string name="module_section_installed">مثبت</string>
     <string name="sorting_order">ترتيب الفرز</string>
 
     <!--Log Fragment-->

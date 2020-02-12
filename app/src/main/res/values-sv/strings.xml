@@ -25,7 +25,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Uppdatering tillgänglig</string>
-    <string name="installed">Installerad</string>
+    <string name="module_section_installed">Installerad</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Spara loggen</string>

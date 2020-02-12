@@ -116,15 +116,15 @@
     <string name="reboot_edl">Redémarrer en mode secours (EDL)</string>
     <string name="module_safe_mode_message">Vous êtes en mode sans échec. Aucun des modules utilisateur ne fonctionnera. Ce message disparaîtra après désactivation du mode sans échec.</string>
     <string name="module_version_author">%1$s, par %2$s</string>
-    <string name="module_section_pending">Mises à jour</string>
-    <string name="module_section_pending_action">Tout mettre à jour</string>
+    <string name="module_section_installed">Installée</string>
+    <string name="module_section_updates">Mises à jour</string>
+    <string name="module_section_action_update_all">Tout mettre à jour</string>
     <string name="module_section_remote">À distance</string>
     <string name="module_state_remove">Supprimer</string>
     <string name="module_state_restore">Restorer</string>
     <string name="module_action_install_external">Installer depuis le stockage</string>
     <string name="module_update_none">Vos modules sont à jour !</string>
     <string name="update_available">Mise à jour disponible</string>
-    <string name="installed">Installée</string>
     <string name="sorting_order">Classement</string>
 
     <!--Settings -->

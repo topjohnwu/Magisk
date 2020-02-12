@@ -30,7 +30,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Uuendus saadaval</string>
-    <string name="installed">Installitud</string>
+    <string name="module_section_installed">Installitud</string>
     <string name="sorting_order">Sorteerimisjärjekord</string>
 
     <!--Log Fragment-->

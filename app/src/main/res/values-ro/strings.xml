@@ -117,15 +117,15 @@
     <string name="reboot_edl">Repornește în EDL</string>
     <string name="module_safe_mode_message">Ești în modul sigur. Niciunul dintre modulele de utilizator nu va funcționa.\nAcest mesaj va dispărea odată cu dezactivarea modului sigur.</string>
     <string name="module_version_author">%1$s de %2$s</string>
-    <string name="module_section_pending">Actualizări</string>
-    <string name="module_section_pending_action">Actualizează-le pe toate</string>
+    <string name="module_section_installed">Instalate</string>
+    <string name="module_section_updates">Actualizări</string>
+    <string name="module_section_action_update_all">Actualizează-le pe toate</string>
     <string name="module_section_remote">La distanță</string>
     <string name="module_state_remove">Elimină</string>
     <string name="module_state_restore">Restaurează</string>
     <string name="module_action_install_external">Instalează din stocare</string>
     <string name="module_update_none">Modulele tale sunt la zi!</string>
     <string name="update_available">Actualizare disponibilă</string>
-    <string name="installed">Instalate</string>
     <string name="sorting_order">Ordine de sortare</string>
 
     <!--Settings -->

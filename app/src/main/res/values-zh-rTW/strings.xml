@@ -123,15 +123,15 @@
     <string name="reboot_edl">重新啟動至 EDL</string>
     <string name="module_safe_mode_message">您正在安全模式。任何使用者的模組將不會運作。\n此訊息將會在安全模式停用後消失。</string>
     <string name="module_version_author">%1$s 來自 %2$s</string>
-    <string name="module_section_pending">更新</string>
-    <string name="module_section_pending_action">全部更新</string>
+    <string name="module_section_installed">已安裝</string>
+    <string name="module_section_updates">更新</string>
+    <string name="module_section_action_update_all">全部更新</string>
     <string name="module_section_remote">遠端</string>
     <string name="module_state_remove">移除</string>
     <string name="module_state_restore">還原</string>
     <string name="module_action_install_external">從本機安裝</string>
     <string name="module_update_none">您的模組已全部更新到最新！</string>
     <string name="update_available">有可用的更新</string>
-    <string name="installed">已安裝</string>
     <string name="sorting_order">排序方式</string>
 
     <!--Settings -->

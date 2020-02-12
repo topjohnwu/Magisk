@@ -106,14 +106,14 @@ class ModuleViewModel(
         )
 
         private val sectionUpdate = SectionTitle(
-            R.string.module_section_pending,
-            R.string.module_section_pending_action,
+            R.string.module_section_updates,
+            R.string.module_section_action_update_all,
             R.drawable.ic_update_md2
             // enable with implementation of https://github.com/topjohnwu/Magisk/issues/2036
         ).also { it.hasButton = false }
 
         private val sectionActive = SectionTitle(
-            R.string.installed,
+            R.string.module_section_installed,
             R.string.reboot,
             R.drawable.ic_restart
         ).also { it.hasButton = false }

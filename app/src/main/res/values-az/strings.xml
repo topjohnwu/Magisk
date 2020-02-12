@@ -29,7 +29,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Yeniləmə Var</string>
-    <string name="installed">Yüklənib</string>
+    <string name="module_section_installed">Yüklənib</string>
     <string name="sorting_order">Nizamlama Qaydası</string>
 
     <!--Log Fragment-->

@@ -27,7 +27,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Ажурирање доступно</string>
-    <string name="installed">Инсталирано</string>
+    <string name="module_section_installed">Инсталирано</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Сачувај дневник</string>

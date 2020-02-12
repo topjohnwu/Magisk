@@ -24,6 +24,8 @@
     <string name="status">Status</string>
     <string name="home_package">Package</string>
     <string name="details">Details</string>
+    <string name="current_installed_version">Installed</string>
+    <string name="current_remote_version">Remote</string>
 
     <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions.</string>
     <string name="home_support_title">Support Us</string>
@@ -124,15 +126,15 @@
     <string name="reboot_edl">Reboot to EDL</string>
     <string name="module_safe_mode_message">You\'re in safe mode. None of user modules will work.\nThis message will disappear once safe mode is disabled.</string>
     <string name="module_version_author">%1$s by %2$s</string>
-    <string name="module_section_pending">Updates</string>
-    <string name="module_section_pending_action">Update all</string>
+    <string name="module_section_installed">Installed</string>
+    <string name="module_section_updates">Updates</string>
+    <string name="module_section_action_update_all">Update all</string>
     <string name="module_section_remote">Remote</string>
     <string name="module_state_remove">Remove</string>
     <string name="module_state_restore">Restore</string>
     <string name="module_action_install_external">Install from storage</string>
     <string name="module_update_none">Your modules are up to date!</string>
     <string name="update_available">Update Available</string>
-    <string name="installed">Installed</string>
     <string name="sorting_order">Sorting Order</string>
 
     <!--Settings -->

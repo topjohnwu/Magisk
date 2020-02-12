@@ -124,15 +124,15 @@
     <string name="reboot_edl">Перезагрузка в EDL</string>
     <string name="module_safe_mode_message">Активирован безопасный режим. Все модули отключены.\nЭто предупреждение исчезнет при отключении безопасного режима.</string>
     <string name="module_version_author">%1$s от %2$s</string>
-    <string name="module_section_pending">Обновления</string>
-    <string name="module_section_pending_action">Обновить все</string>
+    <string name="module_section_installed">Установлены</string>
+    <string name="module_section_updates">Обновления</string>
+    <string name="module_section_action_update_all">Обновить все</string>
     <string name="module_section_remote">Подробно</string>
     <string name="module_state_remove">Удалить</string>
     <string name="module_state_restore">Восстановить</string>
     <string name="module_action_install_external">Установить из хранилища</string>
     <string name="module_update_none">Ваши модули обновлены!</string>
     <string name="update_available">Доступно обновление</string>
-    <string name="installed">Установлены</string>
     <string name="sorting_order">Сортировка</string>
 
     <!--Settings -->

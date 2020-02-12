@@ -124,15 +124,15 @@
     <string name="reboot_edl">重启到 EDL</string>
     <string name="module_safe_mode_message">您正处于安全模式。用户模块不会生效\n退出安全模式时此消息将消失。</string>
     <string name="module_version_author">%1$s by %2$s</string>
-    <string name="module_section_pending">更新</string>
-    <string name="module_section_pending_action">全部更新</string>
+    <string name="module_section_installed">已安装</string>
+    <string name="module_section_updates">更新</string>
+    <string name="module_section_action_update_all">全部更新</string>
     <string name="module_section_remote">云端</string>
     <string name="module_state_remove">移除</string>
     <string name="module_state_restore">还原</string>
     <string name="module_action_install_external">从本地文件安装</string>
     <string name="module_update_none">您的模块是最新的！</string>
     <string name="update_available">可更新</string>
-    <string name="installed">已安装</string>
     <string name="sorting_order">排序方式</string>
 
     <!--Settings -->

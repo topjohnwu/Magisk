@@ -27,7 +27,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Ažuriranje dostupno</string>
-    <string name="installed">Instalirano</string>
+    <string name="module_section_installed">Instalirano</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">"Spremi zapisnik "</string>

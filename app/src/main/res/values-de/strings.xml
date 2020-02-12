@@ -106,15 +106,15 @@
     <string name="reboot_edl">Neustart im EDL-Modus</string>
     <string name="module_safe_mode_message">Sie sind im sicheren Modus. Keines der Benutzermodule wird funktionieren.\nDiese Meldung verschwindet, sobald der abgesicherte Modus deaktiviert wird.</string>
     <string name="module_version_author">%1$s von %2$s</string>
-    <string name="module_section_pending">Aktualisierungen</string>
-    <string name="module_section_pending_action">Alle aktualisieren</string>
+    <string name="module_section_installed">Installiert</string>
+    <string name="module_section_updates">Aktualisierungen</string>
+    <string name="module_section_action_update_all">Alle aktualisieren</string>
     <string name="module_section_remote">Remote</string>
     <string name="module_state_remove">Entfernen</string>
     <string name="module_state_restore">Wiederherstellen</string>
     <string name="module_action_install_external">Aus dem Speicher installieren</string>
     <string name="module_update_none">Ihre Module sind auf dem neuesten Stand!</string>
     <string name="update_available">Update verfügbar</string>
-    <string name="installed">Installiert</string>
     <string name="sorting_order">Sortierreihenfolge</string>
 
     <!--Settings -->

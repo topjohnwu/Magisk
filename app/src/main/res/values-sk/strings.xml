@@ -122,15 +122,15 @@
     <string name="reboot_edl">Reštartovať do EDL</string>
     <string name="module_safe_mode_message">Nachádzate sa v núdzovom režime. Žiadny z používateľských modulov nebude fungovať.\nTáto správa zmizne po vypnutí núdzového režimu.</string>
     <string name="module_version_author">%1$s by %2$s</string>
-    <string name="module_section_pending">Aktualizácie</string>
-    <string name="module_section_pending_action">Aktualizovať všetko</string>
+    <string name="module_section_installed">Nainštalované</string>
+    <string name="module_section_updates">Aktualizácie</string>
+    <string name="module_section_action_update_all">Aktualizovať všetko</string>
     <string name="module_section_remote">Vzdialené</string>
     <string name="module_state_remove">Odstrániť</string>
     <string name="module_state_restore">Obnoviť</string>
     <string name="module_action_install_external">Inštalácia z úložiska</string>
     <string name="module_update_none">Vaše moduly sú aktuálne!</string>
     <string name="update_available">Dostupná aktualizácia</string>
-    <string name="installed">Nainštalované</string>
     <string name="sorting_order">Zoradenie</string>
 
     <!--Settings -->
