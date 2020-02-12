@@ -40,7 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextView
                         android:id="@+id/home_notice_content"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -73,6 +73,8 @@
                 viewModel="@{viewModel}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <include
@@ -81,7 +83,9 @@
                 viewModel="@{viewModel}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l_50"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
                 app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper" />
 
             <include
@@ -90,7 +94,9 @@
                 viewModel="@{viewModel}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l_50"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
 
             <com.google.android.material.card.MaterialCardView
@@ -106,7 +112,7 @@
                     android:orientation="vertical"
                     android:paddingTop="@dimen/l1">
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/l1"
@@ -114,7 +120,7 @@
                         android:text="@string/home_support_title"
                         android:textAppearance="@style/AppearanceFoundation.Title" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/l1"
@@ -132,7 +138,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
                         android:clipToPadding="false"
-                        android:nestedScrollingEnabled="@{false}"
+                        android:nestedScrollingEnabled="false"
                         android:orientation="horizontal"
                         android:overScrollMode="ifContentScrolls"
                         android:paddingStart="@dimen/l1"

@@ -21,249 +21,242 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:layout_gravity="center">
+        android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/home_device_icon"
-            style="@style/WidgetFoundation.Icon.Primary"
-            android:layout_marginStart="@dimen/l1"
-            android:padding="@dimen/l_50"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_device" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/home_device_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/l1"
-            android:text="@string/home_device_title"
-            android:textAppearance="@style/AppearanceFoundation.Title"
-            android:textColor="?colorPrimary"
-            app:layout_constraintBottom_toBottomOf="@+id/home_device_icon"
-            app:layout_constraintEnd_toStartOf="@+id/home_device_action_reboot"
-            app:layout_constraintStart_toEndOf="@+id/home_device_icon"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/home_device_action_reboot"
-            style="@style/WidgetFoundation.Button.Text"
-            invisibleUnless="@{XSUKt.hasRoot}"
-            popupMenu="@{R.menu.menu_reboot}"
-            popupMenuOnClickListener="@{RebootEvent::reboot}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/l_50"
-            android:text="@string/reboot"
-            android:textAllCaps="false"
-            app:icon="@drawable/ic_restart"
-            app:layout_constraintBottom_toBottomOf="@+id/home_device_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/home_device_title" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/home_device_title_barrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="home_device_action_reboot,home_device_title,home_device_icon" />
-
-        <HorizontalScrollView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fadingEdgeLength="@dimen/l1"
-            android:paddingStart="@dimen/l1"
             android:paddingTop="@dimen/l_50"
+            android:paddingStart="@dimen/l1"
             android:paddingEnd="@dimen/l1"
-            android:requiresFadingEdge="horizontal"
-            android:scrollbars="none"
-            app:layout_constraintTop_toBottomOf="@+id/home_device_title_barrier">
+            android:paddingBottom="@dimen/l1"
+            tools:layout_gravity="center">
 
-            <LinearLayout
+            <ImageView
+                android:id="@+id/home_device_icon"
+                style="@style/WidgetFoundation.Icon.Primary"
+                android:padding="@dimen/l_50"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_device" />
+
+            <TextView
+                android:id="@+id/home_device_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:text="@string/home_device_title"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textColor="?colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/home_device_icon"
+                app:layout_constraintEnd_toStartOf="@+id/home_device_action_reboot"
+                app:layout_constraintStart_toEndOf="@+id/home_device_icon"
+                app:layout_constraintTop_toTopOf="@+id/home_device_icon" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/home_device_action_reboot"
+                style="@style/WidgetFoundation.Button.Text"
+                invisibleUnless="@{XSUKt.hasRoot}"
+                popupMenu="@{R.menu.menu_reboot}"
+                popupMenuOnClickListener="@{RebootEvent::reboot}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:text="@string/reboot"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_restart"
+                app:layout_constraintBottom_toBottomOf="@+id/home_device_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/home_device_title" />
 
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/W.Home.Card.First"
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/home_device_title_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="home_device_action_reboot,home_device_title,home_device_icon" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fadingEdgeLength="@dimen/l1"
+                android:paddingTop="@dimen/l_50"
+                android:requiresFadingEdge="horizontal"
+                android:scrollbars="none"
+                app:layout_constraintTop_toBottomOf="@+id/home_device_title_barrier">
+
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/W.Home.Card.First"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/home_device_info_title"
-                            style="@style/W.Home.Title"
-                            android:text="@string/info"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
 
-                        <View
-                            style="@style/W.Home.Section"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_info_title" />
+                            <View
+                                style="@style/W.Home.Section"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                        <LinearLayout
-                            android:id="@+id/home_device_info_manufacturer"
-                            style="@style/W.Home.Item.Top"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_info_title">
+                            <LinearLayout
+                                android:id="@+id/home_device_info_manufacturer"
+                                style="@style/W.Home.Item.Top"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_device_extra_manufacturer" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="@string/home_device_extra_manufacturer" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Build.MANUFACTURER}"
-                                tools:text="Google" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Build.MANUFACTURER}"
+                                    tools:text="Google" />
 
-                        </LinearLayout>
+                            </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/home_device_info_product"
-                            style="@style/W.Home.Item"
-                            app:layout_constraintStart_toStartOf="@+id/home_device_info_manufacturer"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_info_manufacturer">
+                            <LinearLayout
+                                android:id="@+id/home_device_info_product"
+                                style="@style/W.Home.Item"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_info_manufacturer"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_info_manufacturer">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_device_extra_model" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="@string/home_device_extra_model" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Build.DEVICE ?? Build.PRODUCT}"
-                                tools:text="Pixel 4" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Build.DEVICE ?? Build.PRODUCT}"
+                                    tools:text="Pixel 4" />
 
-                        </LinearLayout>
+                            </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/home_device_info_board"
-                            style="@style/W.Home.Item"
-                            app:layout_constraintStart_toStartOf="@+id/home_device_info_product"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_info_product">
+                            <LinearLayout
+                                android:id="@+id/home_device_info_board"
+                                style="@style/W.Home.Item"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_info_product"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_info_product">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_device_extra_board" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="@string/home_device_extra_board" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Build.BOARD}"
-                                tools:text="flame" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Build.BOARD}"
+                                    tools:text="flame" />
 
-                        </LinearLayout>
+                            </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/home_device_info_version"
-                            style="@style/W.Home.Item.Bottom"
-                            app:layout_constraintStart_toStartOf="@+id/home_device_info_board"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_info_board">
+                            <LinearLayout
+                                android:id="@+id/home_device_info_version"
+                                style="@style/W.Home.Item.Bottom"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_info_board"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_info_board">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_device_system" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="@string/home_device_system" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Build.VERSION.RELEASE}"
-                                tools:text="10" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Build.VERSION.RELEASE}"
+                                    tools:text="10" />
 
-                        </LinearLayout>
+                            </LinearLayout>
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </com.google.android.material.card.MaterialCardView>
+                    </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/W.Home.Card"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/W.Home.Card"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/home_device_details_title"
-                            style="@style/W.Home.Title"
-                            android:text="@string/details"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
 
-                        <View
-                            style="@style/W.Home.Section"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_details_title" />
+                            <View
+                                style="@style/W.Home.Section"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
 
-                        <LinearLayout
-                            android:id="@+id/home_device_details_ab"
-                            style="@style/W.Home.Item.Top"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_details_title">
+                            <LinearLayout
+                                android:id="@+id/home_device_details_ab"
+                                style="@style/W.Home.Item.Top"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="A/B" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="A/B" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.isAB ? @string/yes : @string/no}"
-                                tools:text="Yes" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Info.isAB ? @string/yes : @string/no}"
+                                    tools:text="Yes" />
 
-                        </LinearLayout>
+                            </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/home_device_details_sar"
-                            style="@style/W.Home.Item"
-                            app:layout_constraintStart_toStartOf="@+id/home_device_details_ab"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_details_ab">
+                            <LinearLayout
+                                android:id="@+id/home_device_details_sar"
+                                style="@style/W.Home.Item"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_details_ab"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_details_ab">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="SAR" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="SAR" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.isSAR ? @string/yes : @string/no}"
-                                tools:text="Yes" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Info.isSAR ? @string/yes : @string/no}"
+                                    tools:text="Yes" />
 
-                        </LinearLayout>
+                            </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/home_device_details_recovery"
-                            style="@style/W.Home.Item.Bottom"
-                            app:layout_constraintStart_toStartOf="@+id/home_device_details_sar"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_details_sar">
+                            <LinearLayout
+                                android:id="@+id/home_device_details_recovery"
+                                style="@style/W.Home.Item.Bottom"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_details_sar"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_details_sar">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="Ramdisk" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="Ramdisk" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.ramdisk ? @string/yes : @string/no }"
-                                tools:text="Yes" />
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Info.ramdisk ? @string/yes : @string/no }"
+                                    tools:text="Yes" />
 
-                        </LinearLayout>
+                            </LinearLayout>
 
-                    </androidx.constraintlayout.widget.ConstraintLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </com.google.android.material.card.MaterialCardView>
+                    </com.google.android.material.card.MaterialCardView>
 
-            </LinearLayout>
+                </LinearLayout>
 
-        </HorizontalScrollView>
+            </HorizontalScrollView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </layout>
