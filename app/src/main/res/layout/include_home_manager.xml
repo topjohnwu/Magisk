@@ -44,7 +44,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
-                android:text="@{viewModel.stateHideManagerName}"
+                android:text="@string/manager"
                 android:textAppearance="@style/AppearanceFoundation.Title"
                 android:textColor="?colorPrimary"
                 app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"

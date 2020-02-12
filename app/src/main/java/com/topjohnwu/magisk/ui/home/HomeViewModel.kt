@@ -44,8 +44,7 @@ class HomeViewModel(
     val stateMagiskRemoteVersion = KObservableField(R.string.loading.res())
     val stateMagiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
-    val stateMagiskMode get() = (if (Config.coreOnly)
-        R.string.home_status_safe else R.string.home_status_normal).res()
+    val stateMagiskMode get() = (if (Config.coreOnly) R.string.home_status_safe else R.string.home_status_normal).res()
     val stateMagiskProgress = KObservableField(0)
 
     val stateManagerRemoteVersion = KObservableField(R.string.loading.res())
@@ -54,14 +53,6 @@ class HomeViewModel(
     } ?: "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     val statePackageName = packageName
     val stateManagerProgress = KObservableField(0)
-
-    val stateHideManagerName = R.string.manager.res().let {
-        if (packageName != BuildConfig.APPLICATION_ID) {
-            it.replaceRandomWithSpecial(3)
-        } else {
-            it
-        }
-    }
 
     val items = listOf(DeveloperItem.Mainline, DeveloperItem.App, DeveloperItem.Project)
     val itemBinding = itemBindingOf<HomeItem> {
