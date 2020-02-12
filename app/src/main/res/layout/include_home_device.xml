@@ -143,27 +143,10 @@
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/home_device_info_board"
-                                style="@style/W.Home.Item"
-                                app:layout_constraintStart_toStartOf="@+id/home_device_info_product"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_info_product">
-
-                                <TextView
-                                    style="@style/W.Home.ItemContent"
-                                    android:text="@string/home_device_extra_board" />
-
-                                <TextView
-                                    style="@style/W.Home.ItemContent.Right"
-                                    android:text="@{Build.BOARD}"
-                                    tools:text="flame" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
                                 android:id="@+id/home_device_info_version"
                                 style="@style/W.Home.Item.Bottom"
-                                app:layout_constraintStart_toStartOf="@+id/home_device_info_board"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_info_board">
+                                app:layout_constraintStart_toStartOf="@+id/home_device_info_product"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_info_product">
 
                                 <TextView
                                     style="@style/W.Home.ItemContent"
