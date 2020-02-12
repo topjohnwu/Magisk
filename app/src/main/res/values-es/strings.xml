@@ -142,6 +142,10 @@
     <string name="settings_dark_mode_dark">Oscuro</string>
     <string name="settings_safe_mode_title">Modo Seguro</string>
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
+    <string name="settings_grid_column_count_title">Gestión de la Lista</string>
+    <string name="settings_grid_column_count_summary">Establece el ancho de la lista. Reinicie la aplicación para aplicar los cambios.</string>
+    <string name="settings_grid_column_count_1">Estándar</string>
+    <string name="settings_grid_column_count_2">Compacto</string>
     <string name="settings_download_path_title">Ruta de Descarga</string>
     <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
