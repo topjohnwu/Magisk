@@ -143,11 +143,10 @@
     <string name="settings_dark_mode_dark">Toujours sombre</string>
     <string name="settings_safe_mode_title">Mode sans échec</string>
     <string name="settings_core_only_summary" deprecated="true">Activer uniquement les fonctionnalités de base. MagiskSU et MagiskHide resteront activés, mais aucun module ne sera chargé.</string>
-    <string name="settings_grid_span_count_title">Taille de la colonne de la grille</string>
-    <string name="settings_grid_span_count_summary">Définit la taille des colonnes pour toutes les listes en grille éligibles. Vous pouvez outrepasser ces paramètres en effectuant un geste de pincement.</string>
-    <string name="settings_grid_span_count_1">un élément par ligne (petits écrans)</string>
-    <string name="settings_grid_span_count_2">deux éléments par ligne (recommandé)</string>
-    <string name="settings_grid_span_count_3">trois éléments par ligne (tablette ou TV)</string>
+    <string name="settings_grid_column_count_title">Disposition de la liste</string>
+    <string name="settings_grid_column_count_summary">Définit la largeur de l\'élément dans une liste. Redémarrez l\'application pour appliquer les changements.</string>
+    <string name="settings_grid_column_count_1">Standard</string>
+    <string name="settings_grid_column_count_2">Écraser</string>
     <string name="settings_download_path_title">Répertoire de téléchargement</string>
     <string name="settings_download_path_message">Les fichiers seront enregistrés au format %1$s</string>
     <string name="settings_clear_cache_title">Vider le cache des dépôts</string>
