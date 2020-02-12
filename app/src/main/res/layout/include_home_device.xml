@@ -52,12 +52,12 @@
                 android:textAppearance="@style/AppearanceFoundation.Title"
                 android:textColor="?colorPrimary"
                 app:layout_constraintBottom_toBottomOf="@+id/home_device_icon"
-                app:layout_constraintEnd_toStartOf="@+id/home_device_action_reboot"
+                app:layout_constraintEnd_toStartOf="@+id/home_device_action"
                 app:layout_constraintStart_toEndOf="@+id/home_device_icon"
                 app:layout_constraintTop_toTopOf="@+id/home_device_icon" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/home_device_action_reboot"
+                android:id="@+id/home_device_action"
                 style="@style/WidgetFoundation.Button.Text"
                 invisibleUnless="@{XSUKt.hasRoot}"
                 popupMenu="@{R.menu.menu_reboot}"
@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
-                app:constraint_referenced_ids="home_device_action_reboot,home_device_title,home_device_icon" />
+                app:constraint_referenced_ids="home_device_action,home_device_title,home_device_icon" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
