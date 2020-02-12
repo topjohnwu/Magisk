@@ -52,6 +52,8 @@
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
             android:layout_marginBottom="@{(int) @dimen/l1 + viewModel.insets.bottom}"
+            app:strokeWidth="@dimen/l_125"
+            app:strokeColor="?colorPrimary"
             tools:layout_marginBottom="64dp">
 
             <LinearLayout
