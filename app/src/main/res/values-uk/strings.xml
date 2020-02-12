@@ -100,8 +100,8 @@
     <string name="target_uid">Цільовий UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetyNet_api_error">Помилка SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Невірна відповідь</string>
+    <string name="safetynet_api_error">Помилка SafetyNet API</string>
+    <string name="safetynet_res_invalid">Невірна відповідь</string>
     <string name="safetynet_attest_success">Успішно!</string>
     <string name="safetynet_attest_failure">Провірку не пройдено!</string>
     <string name="safetynet_attest_loading">Секунду…</string>
