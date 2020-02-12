@@ -10,33 +10,37 @@
     <string name="section_home">Inicio</string>
     <string name="section_theme">Temas</string>
 
-
     <!--Home-->
     <string name="no_connection">Conexión no Disponible</string>
-    <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto.  Una versión de origen desconocido podria realizar acciones maliciosas.</string>
-    <string name="hide">Ocultar</string>
     <string name="app_changelog">Registro de Cambios</string>
+	
+    <string name="loading">Cargando…</string>
+    <string name="info">Información</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="update">Actualizar</string>
+	
+    <string name="hide">Ocultar</string>
+    <string name="status">Estado</string>
+    <string name="home_package">Paquete</string>
+    <string name="details">Detalles</string>
+
+    <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto.  Una versión de origen desconocido podria realizar acciones maliciosas.</string>
     <string name="home_support_title">Apoyanos</string>
     <string name="home_links_project">Links del Proyecto</string>
-    <string name="home_item_source">Codigo Fuente</string>
-    <string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
-    <string name="home_device_title">Tu dispositivo</string>
-    <string name="info">Información</string>
-    <string name="home_device_extra_manufacturer">Fabricante:</string>
-    <string name="home_device_extra_model">Modelo:</string>
-    <string name="home_device_extra_board">Placa:</string>
-    <string name="home_device_system">Sistema:</string>
-	<string name="home_package">Paquete</string>
+    <string name="home_item_source">Codigo Fuente</string>	
+    <string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>	
+    <string name="home_device_title">Tu dispositivo</string>  
+    <string name="home_device_extra_manufacturer">Fabricante</string>
+    <string name="home_device_extra_model">Modelo</string>
+    <string name="home_device_extra_board">Placa</string>
+    <string name="home_device_system">Android</string>
     <string name="home_status_normal">Normal</string>
-    <string name="details">Detalles</string>
-    <string name="invalid_update_channel">Canal de actualización inválido</string>
-    <string name="safetynet_api_error">Error en la API de SafetyNet</string>
-    <string name="safetynet_res_invalid">La respuesta no es válida</string>
-    <string name="uninstall">Desinstalar</string>
-    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
-    <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-    <string name="update">Actualizar</string>
+    <string name="home_status_safe">Modo Seguro</string>	
 
+    <string name="invalid_update_channel">Canal de actualización inválido</string>
+    <string name="uninstall_magisk_title">Desinstalar Magisk</string>
+    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
+	
     <!--Install-->
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
@@ -95,6 +99,8 @@
     <string name="target_uid">UID de objetivo: %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">Error en la API de SafetyNet</string>
+    <string name="safetynet_res_invalid">La respuesta no es válida</string>
     <string name="safetynet_attest_success">¡Éxito!</string>
     <string name="safetynet_attest_failure">La certificación falló!</string>
     <string name="safetynet_attest_loading">Solo un segundo…</string>
@@ -119,7 +125,7 @@
     <string name="module_version_author">%1$s por %2$s</string>
     <string name="module_section_pending">Actualizaciones</string>
     <string name="module_section_pending_action">¡Actualizar todo!</string>
-    <string name="module_section_remote">Remoto</string>
+    <string name="module_section_remote">Disponible</string>
     <string name="module_state_remove">Eliminar</string>
     <string name="module_state_restore">Restaurar</string>
     <string name="module_action_install_external">Instalar desde almacenamiento</string>
@@ -197,7 +203,6 @@
     <string name="requester_summary">Las sesiones de root heredarán las peticiones Namespace</string>
     <string name="isolate_summary">Cada sesión root tendrá su propia Namespace</string>
     <string name="settings_download_path_error">Error al crear la carpeta. Debe ser accesible desde el directorio raíz de almacenamiento y no debe ser un archivo.</string>
-
 
     <!--Notifications-->
     <string name="update_channel">Actualización de Magisk</string>
