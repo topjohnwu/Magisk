@@ -197,6 +197,77 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
+                    <com.google.android.material.card.MaterialCardView
+                        style="@style/W.Home.Card"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <View
+                                style="@style/W.Home.Section"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
+
+                            <LinearLayout
+                                android:id="@+id/home_device_details_ab"
+                                style="@style/W.Home.Item.Top"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent">
+
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="A/B" />
+
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Info.isAB ? @string/yes : @string/no}"
+                                    tools:text="Yes" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/home_device_details_sar"
+                                style="@style/W.Home.Item"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_details_ab"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_details_ab">
+
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="SAR" />
+
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Info.isSAR ? @string/yes : @string/no}"
+                                    tools:text="Yes" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/home_device_details_recovery"
+                                style="@style/W.Home.Item.Bottom"
+                                app:layout_constraintStart_toStartOf="@+id/home_device_details_sar"
+                                app:layout_constraintTop_toBottomOf="@+id/home_device_details_sar">
+
+                                <TextView
+                                    style="@style/W.Home.ItemContent"
+                                    android:text="Ramdisk" />
+
+                                <TextView
+                                    style="@style/W.Home.ItemContent.Right"
+                                    android:text="@{Info.ramdisk ? @string/yes : @string/no }"
+                                    tools:text="Yes" />
+
+                            </LinearLayout>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
                 </LinearLayout>
 
             </HorizontalScrollView>

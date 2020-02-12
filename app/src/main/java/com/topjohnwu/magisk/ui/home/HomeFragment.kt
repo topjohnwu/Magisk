@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.*
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
+import com.topjohnwu.magisk.model.events.RebootEvent
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.ui.base.BaseUIFragment
+import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
@@ -27,8 +29,6 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
         super.onCreateView(inflater, container, savedInstanceState)
 
         // Set barrier reference IDs in code, since resource IDs will be stripped in release mode
-        binding.homeDeviceWrapper.homeDeviceTitleBarrier.referencedIds =
-            intArrayOf(R.id.home_device_action, R.id.home_device_title, R.id.home_device_icon)
         binding.homeMagiskWrapper.homeMagiskTitleBarrier.referencedIds =
             intArrayOf(R.id.home_magisk_action, R.id.home_magisk_title, R.id.home_magisk_icon)
         binding.homeManagerWrapper.homeManagerTitleBarrier.referencedIds =
@@ -39,10 +39,13 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_home_md2, menu)
+        if (!Shell.rootAccess())
+            menu.removeItem(R.id.action_reboot)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_settings -> Navigation.settings().dispatchOnSelf()
+        R.id.action_reboot -> RebootEvent.inflateMenu(activity).show()
         else -> null
     }?.let { true } ?: super.onOptionsItemSelected(item)
 
