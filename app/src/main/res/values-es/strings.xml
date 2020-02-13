@@ -91,7 +91,7 @@
 
     <!--Logs-->
     <string name="log_data_none">No se tiene registro, intente usar más sus aplicaciones habilitadas para SU.</string>
-    <string name="log_data_magisk_none">Los registros de Magisk están vacíos, eso es raro.</string>
+    <string name="log_data_magisk_none">Los registros de Magisk están vacíos, esto es muy raro.</string>
     <string name="menuSaveLog">Guardar registro</string>
     <string name="menuClearLog">Limpiar registro ahora</string>
     <string name="logs_cleared">Registro limpiado correctamente</string>
@@ -105,7 +105,7 @@
     <string name="safetynet_attest_failure">La certificación falló!</string>
     <string name="safetynet_attest_loading">Solo un segundo…</string>
     <string name="safetynet_attest_restart">Inténtalo de nuevo</string>
-    <string name="safetynet_system">Sistema</string>
+    <string name="safetynet_system">Android</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostrar sistema</string>
