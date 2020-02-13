@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
@@ -40,6 +41,12 @@ open class FlashActivity : BaseUIActivity<FlashViewModel, ActivityFlashBinding>(
         val id = intent.getIntExtra(Const.Key.DISMISS_ID, -1)
         if (id != -1)
             Notifications.mgr.cancel(id)
+        viewRoot.isFocusable = true
+        viewRoot.isFocusableInTouchMode = true
+        viewRoot.setOnKeyListener {
+            _, keyCode, _ -> keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+        }
+        viewRoot.requestFocus()
     }
 
     override fun onBackPressed() {
