@@ -4,12 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.core.tasks.patchDTB
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.core.view.Shortcuts
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.ShellUtils
 
 open class SplashActivity : Activity() {
 
@@ -22,7 +22,7 @@ open class SplashActivity : Activity() {
         Shell.getShell { initAndStart() }
     }
 
-    private fun initAndStart() {
+    private fun handleRepackage() {
         val pkg = Config.suManager
         if (Config.suManager.isNotEmpty() && packageName == BuildConfig.APPLICATION_ID) {
             Config.suManager = ""
@@ -35,31 +35,17 @@ open class SplashActivity : Activity() {
                 Shell.su("pm uninstall " + BuildConfig.APPLICATION_ID).submit()
             }
         }
+    }
 
-        Info.keepVerity = ShellUtils.fastCmd("echo \$KEEPVERITY").toBoolean()
-        Info.keepEnc = ShellUtils.fastCmd("echo \$KEEPFORCEENCRYPT").toBoolean()
-        Info.recovery = ShellUtils.fastCmd("echo \$RECOVERYMODE").toBoolean()
-
-        // Set default configs
+    private fun initAndStart() {
         Config.initialize()
-
-        // Create notification channel on Android O
+        handleRepackage()
         Notifications.setup(this)
-
-        // Schedule periodic update checks
         Utils.scheduleUpdateCheck(this)
-
-        // Setup shortcuts
         Shortcuts.setup(this)
 
-        if (Info.isNewReboot) {
-            val shell = Shell.newInstance()
-            shell.newJob().add("mm_patch_dtb").submit {
-                if (it.isSuccess)
-                    Notifications.dtboPatched(this)
-                shell.close()
-            }
-        }
+        // Patch DTB partitions if needed
+        patchDTB(this)
 
         DONE = true
         Navigation.start(intent, this)

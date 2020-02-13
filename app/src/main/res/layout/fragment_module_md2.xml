@@ -25,6 +25,7 @@
             gone="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
+            spanCount="@{Config.listSpanCount}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"

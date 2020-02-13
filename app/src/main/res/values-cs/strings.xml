@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Neplatný kanál aktualizace</string>
-    <string name="safetyNet_api_error">Chyba SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Odpověď je neplatná.</string>
+    <string name="safetynet_api_error">Chyba SafetyNet API</string>
+    <string name="safetynet_res_invalid">Odpověď je neplatná.</string>
     <string name="keep_force_encryption">Udržet "force encryption"</string>
     <string name="keep_dm_verity">Udržet "AVB 2.0/dm-verity"</string>
     <string name="uninstall">Odinstalovat</string>

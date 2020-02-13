@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.ui.ReselectionTarget
 import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
-import com.topjohnwu.magisk.utils.PinchZoomTouchListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
@@ -66,9 +65,6 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
                 if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
             }
         })
-
-        PinchZoomTouchListener.attachTo(binding.moduleFilterInclude.moduleFilterList)
-        PinchZoomTouchListener.attachTo(binding.moduleList)
     }
 
     override fun onDestroyView() {
@@ -76,8 +72,6 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
             binding.moduleList.removeOnScrollListener(it)
             binding.moduleFilterInclude.moduleFilterList.removeOnScrollListener(it)
         }
-        PinchZoomTouchListener.clear(binding.moduleList)
-        PinchZoomTouchListener.clear(binding.moduleFilterInclude.moduleFilterList)
         super.onDestroyView()
     }
 

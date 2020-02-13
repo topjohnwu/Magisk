@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Etibarsız Yeniləmə Kanalı</string>
-    <string name="safetyNet_api_error">SafetyNet API Xətası</string>
-    <string name="safetyNet_res_invalid">Cavab etibarsızdır.</string>
+    <string name="safetynet_api_error">SafetyNet API Xətası</string>
+    <string name="safetynet_res_invalid">Cavab etibarsızdır.</string>
     <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
     <string name="uninstall">Sil</string>

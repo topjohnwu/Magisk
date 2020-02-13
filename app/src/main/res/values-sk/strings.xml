@@ -5,6 +5,7 @@
     <string name="superuser">Superužívateľ</string>
     <string name="logs">Záznamy</string>
     <string name="settings">Nastavenia</string>
+    <string name="refresh">Obnoviť lokálne dáta</string>
     <string name="install">Inštalovať</string>
     <string name="section_home">Domov</string>
     <string name="section_theme">Motívy</string>
@@ -12,46 +13,34 @@
 
     <!--Home-->
     <string name="no_connection">Žiadne pripojenie</string>
-    <string name="installed_error">nie je nainštalovaný</string>
-    <string name="channel_error">má neplatný aktualizačný kanál</string>
-    <string name="up_to_date">je aktuálny</string>
-    <string name="obsolete">môže byť aktualizovaný!</string>
-    <string name="loading">načítava sa…</string>
-    <string name="home_notice_content">Vždy sa uistite, že používate program Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie.</string>
-    <string name="home_notice_hide">Skryť</string>
     <string name="app_changelog">Zoznam zmien</string>
     <string name="manager">Správca</string>
+    <string name="loading">Načítava sa…</string>
+    <string name="info">Info</string>
+    <string name="uninstall">Odinštalovať</string>
+    <string name="update">Aktualizovať</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">Skryť</string>
+    <string name="status">Stav</string>
+    <string name="home_package">Balíček</string>
+    <string name="details">Podrobnosti</string>
 
+    <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie.</string>
     <string name="home_support_title">Podporte nás</string>
     <string name="home_links_project">Odkazy projektu</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
-
-    <string name="home_device_security">Zabezpečenie</string>
+    <string name="home_device_title">Zariadenie</string>
+    <string name="home_device_extra_manufacturer">Výrobca</string>
+    <string name="home_device_extra_model">Model</string>
+    <string name="home_device_extra_board">Platforma</string>
     <string name="home_device_system">Systém</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
-
-    <string name="home_device_security_secure">Zabezpečené</string>
-    <string name="home_device_security_outdated">Zastarané</string>
-
-    <string name="home_extra_version">Verzia</string>
-    <string name="home_extra_code">Kód</string>
-    <string name="home_extra_mode">Režim</string>
-    <string name="home_extra_connection">Pripojenie</string>
-    <string name="home_extra_package">Balíček</string>
-
-    <string name="home_extra_mode_normal">Normálny</string>
-    <string name="home_extra_mode_safe">Bezpečný</string>
-    <string name="home_extra_mode_stub">Dynamický</string>
-
+    <string name="home_status_normal">Normálny</string>
+    <string name="home_status_safe">Núdzový režim</string>
+    <string name="home_status_stub">Stub</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
-    <string name="safetyNet_api_error">Chyba SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Odpoveď je neplatná</string>
-    <string name="uninstall">Odinštalovať</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené!\nRoot bude odstránený!\nMôže dôjsť k zašifrovaniu vašich dát, ak už nie sú zašifrované!</string>
-    <string name="update">Aktualizovať</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Ponechať vynútené šifrovanie</string>
@@ -152,11 +141,6 @@
     <string name="settings_dark_mode_dark">Vždy tmavý</string>
     <string name="settings_safe_mode_title">Núdzový režim</string>
     <string name="settings_core_only_summary" deprecated="true">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU a MagiskHide, ale žiadne moduly nebudú zavedené</string>
-    <string name="settings_grid_span_count_title">Veľkosť stĺpca mriežky</string>
-    <string name="settings_grid_span_count_summary">Nastaví veľkosť stĺpca pre všetky vhodné zoznamy mriežky. Tiež to môžete zmeniť pomocou stiahnutia prstami (pinch to zoom).</string>
-    <string name="settings_grid_span_count_1">Jedna položka na riadok (Malé obrazovky)</string>
-    <string name="settings_grid_span_count_2">Dve položky na riadok (Odporúčané)</string>
-    <string name="settings_grid_span_count_3">Tri položky na riadok (Tablet/TV)</string>
     <string name="settings_download_path_title">Cesta na sťahovanie</string>
     <string name="settings_download_path_message">Súbory budú uložené do %1$s</string>
     <string name="settings_clear_cache_title">Vyčistiť cache repo</string>

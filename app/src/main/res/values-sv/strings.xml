@@ -10,7 +10,7 @@
 
     <!--Status Fragment-->
 
-    <string name="safetyNet_res_invalid">Svaret är ogiltigt</string>
+    <string name="safetynet_res_invalid">Svaret är ogiltigt</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Fortsätt tvinga kryptering</string>

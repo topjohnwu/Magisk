@@ -38,10 +38,8 @@ import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.ShellUtils
 import java.io.File
 import java.io.FileNotFoundException
-import java.text.SimpleDateFormat
 import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
@@ -319,20 +317,6 @@ fun Uri.writeTo(file: File) = toFile().copyTo(file)
 fun Context.hasPermissions(vararg permissions: String) = permissions.all {
     ContextCompat.checkSelfPermission(this, it) == PERMISSION_GRANTED
 }
-
-private val securityLevelFormatter get() = SimpleDateFormat("yyyy-MM-dd",
-    currentLocale
-)
-
-val isSAR
-    get() = ShellUtils
-        .fastCmd("grep_prop ro.build.system_root_image")
-        .let { it.isNotEmpty() && it.toBoolean() }
-
-val isAB
-    get() = ShellUtils
-        .fastCmd("grep_prop ro.build.ab_update")
-        .let { it.isNotEmpty() && it.toBoolean() }
 
 fun Activity.hideKeyboard() {
     val view = currentFocus ?: return

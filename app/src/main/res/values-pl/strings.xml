@@ -5,6 +5,7 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logi</string>
     <string name="settings">Ustawienia</string>
+    <string name="refresh">Odśwież lokalne dane</string>
     <string name="install">Instaluj</string>
     <string name="section_home">Strona główna</string>
     <string name="section_theme">Motywy</string>
@@ -12,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">Połączenie niedostępne</string>
-    <string name="installed_error">nie jest zainstalowany</string>
-    <string name="channel_error">ma nieprawidłowy kanał aktualizacji!</string>
-    <string name="up_to_date">jest aktualny</string>
-    <string name="obsolete">może zostać zaktualizowany!</string>
-    <string name="loading">ładuje się…</string>
     <string name="home_notice_content">Zawsze upewnij się, że używasz otwartoźródłowego Magisk Managera. Manager z nieznanego źródła może wykonywać złośliwe działania.</string>
-    <string name="home_notice_hide">Ukryj</string>
+    <string name="hide">Ukryj</string>
     <string name="app_changelog">Dziennik zmian</string>
     <string name="manager">Manager</string>
 
@@ -27,27 +23,25 @@
     <string name="home_item_source">Żródło</string>
     <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwarty. Możesz nam jednak pokazać, że Ci zależy, wysyłając niewielką darowiznę.</string>
 
-    <string name="home_device_security">Bezpieczeństwo</string>
+    <string name="home_device_title">Twoje urządzenie</string>
+    <string name="info">Informacje</string>
+    <string name="home_device_extra_manufacturer">Producent</string>
+    <string name="home_device_extra_model">Model</string>
+    <string name="home_device_extra_board">Platforma</string>
+
     <string name="home_device_system">System</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">Bezpieczny</string>
-    <string name="home_device_security_outdated">Nieaktualny</string>
+    <string name="home_package">Pakiet</string>
 
-    <string name="home_extra_version">Wersja</string>
-    <string name="home_extra_code">Kod</string>
-    <string name="home_extra_mode">Tryb</string>
-    <string name="home_extra_connection">Połączenie</string>
-    <string name="home_extra_package">Pakiet</string>
+    <string name="home_status_normal">Normalny</string>
+    <string name="home_status_stub">Rdzeń</string>
+    <string name="not_available">N/D</string>
 
-    <string name="home_extra_mode_normal">Normalny</string>
-    <string name="home_extra_mode_safe">Awaryjny</string>
-    <string name="home_extra_mode_stub">Dynamiczny</string>
+    <string name="details">Szczegóły</string>
 
     <string name="invalid_update_channel">Nieprawidłowy kanał aktualizacji</string>
-    <string name="safetyNet_api_error">Błąd SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Odpowiedź nieprawidłowa</string>
+    <string name="safetynet_api_error">Błąd SafetyNet API</string>
+    <string name="safetynet_res_invalid">Odpowiedź nieprawidłowa</string>
     <string name="uninstall">Odinstaluj</string>
     <string name="uninstall_magisk_title">Odinstaluj Magiska</string>
     <string name="uninstall_magisk_msg">Wszystkie moduły zostaną wyłączone/usunięte!\nRoot zostanie usunięty!\nTwoje dane zostaną potencjalnie zaszyfrowane, jeżeli obecnie nie są!</string>
@@ -135,7 +129,7 @@
     <string name="module_version_author">%1$s by %2$s</string>
     <string name="module_section_pending">Aktualizacje</string>
     <string name="module_section_pending_action">Zaktualizuj wszystkie</string>
-    <string name="module_section_remote">Zdalne</string>
+    <string name="module_section_remote">Dostępne</string>
     <string name="module_state_remove">Usuń</string>
     <string name="module_state_restore">Przywróć</string>
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
@@ -152,11 +146,6 @@
     <string name="settings_dark_mode_dark">Zawsze ciemny</string>
     <string name="settings_safe_mode_title">Tryb awaryjny (Safe Mode)</string>
     <string name="settings_core_only_summary" deprecated="true">Włącza tylko podstawowe funkcje. MagiskSU i MagiskHide będą nadal włączone, ale nie zostaną załadowane żadne moduły</string>
-    <string name="settings_grid_span_count_title">Rozmiar kolumn siatki</string>
-    <string name="settings_grid_span_count_summary">Ustawia wielkość kolumny wszystkich pól wyboru. Możesz również zmienić to ustawienie wykonując gest uszczypnięcia.</string>
-    <string name="settings_grid_span_count_1">Jeden element w wierszu (małe ekrany)</string>
-    <string name="settings_grid_span_count_2">Dwa elementy w wierszu (zalecane)</string>
-    <string name="settings_grid_span_count_3">Trzy elementy w wierszu (tablet/telewizor)</string>
     <string name="settings_download_path_title">Ścieżka pobierania</string>
     <string name="settings_download_path_message">Pliki pobrane przez Managera będą zapisywane do %1$s</string>
     <string name="settings_clear_cache_title">Wyczyść pamięć cache repozytorium</string>
