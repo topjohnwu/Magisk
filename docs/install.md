@@ -70,6 +70,7 @@ Important Note: **You CANNOT use custom recoveries to install/upgrade Magisk!**
 
 ## Samsung (System-as-root)
 **If your device is NOT launched with Android 9.0 or higher (released after 2019), you are reading the wrong section.**
+Here's [ChineseVersion/中文版本](https://www.hackblack.cn/posts/SamsungRecv/) of this part.
 
 ### Before Installing Magisk
 - Your device is non-A/B and uses system-as-root, so Magisk will be installed to the **recovery** partition of your device. **Please read the [Magisk in Recovery](#magisk-in-recovery) section!**
