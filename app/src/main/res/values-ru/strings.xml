@@ -21,7 +21,7 @@
     <string name="update">Обновить</string>
     <string name="not_available">N/A</string> <!--Do not translate-->
     <string name="hide">Скрыть</string>
-    <string name="status">Status</string>
+    <string name="status">Cостояние</string>
     <string name="home_package">Имя пакета</string>
     <string name="details">Специфика</string>
 
@@ -143,6 +143,10 @@
     <string name="settings_dark_mode_dark">Всегда тёмный</string>
     <string name="settings_safe_mode_title">Безопасный режим</string>
     <string name="settings_core_only_summary" deprecated="true">Задействовать только основной функционал (MagiskSU и MagiskHide). Модули не будут активированы</string>
+    <string name="settings_grid_column_count_title">Вид списка</string>
+    <string name="settings_grid_column_count_summary">Устанавливает ширину элементов в списке. Перезапустите приложение, чтобы применить изменения.</string>
+    <string name="settings_grid_column_count_1">Стандартный</string>
+    <string name="settings_grid_column_count_2">Сжатый</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
