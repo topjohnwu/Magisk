@@ -14,6 +14,7 @@
     <string name="safetynet_res_invalid">Cavab etibarsızdır.</string>
     <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
+    <string name="recovery_mode">Bərpa Modu</string>
     <string name="uninstall">Sil</string>
     <string name="uninstall_magisk_title">Magisk\'i Sil</string>
     <string name="uninstall_magisk_msg">Bütün əlavələr ləğv olunacaq/silinəcək. Root silinəcək, və əgər hal-hazırda deyilsə, bütün məlumatlarınız potensiyal olaraq şifrələnəcək.</string>
@@ -22,7 +23,7 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Məlumat təmin edilməyib)</string>
     <string name="no_modules_found">Əlavələr yoxdur.</string>
-    <string name="reboot_recovery">Bərpa rejimində yenidən başlat</string>
+    <string name="reboot_recovery">Bərpada yenidən başlat</string>
     <string name="reboot_bootloader">Bootloader\'ə yenidən başlat</string>
     <string name="reboot_download">Yükləmə rejimində yenidən başlat</string>
     <string name="reboot_edl">EDL\'ə yenidən başlat</string>
@@ -134,6 +135,11 @@
     <string name="global_summary">Bütün root sessyaları qlobal qoşma namespace\'dən istifadə edir.</string>
     <string name="requester_summary">Root sessyaları soruşulan namespace\'ləri birindən digərinə keçirəcək.</string>
     <string name="isolate_summary">Hər bir root sessyasının ayrılmış namespace\'i olacaq.</string>
+    <string name="settings_su_biometric_title">Biometrik Uyğunlaşmanı Aç</string>
+    <string name="settings_su_biometric_summary">Superuser icazəsi üçün biometrik uyğunlaşmadan istifadə et</string>
+    <string name="no_biometric">Cihaz ya dəstəklənmir ya da biometrik tənzimləmələr açılmalıdır</string>
+    <string name="settings_download_path_title">Yükləmə yeri</string>
+    <string name="settings_download_path_message">Faylların bura yüklənəcək: %1$s</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Tələbi</string>
