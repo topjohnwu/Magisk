@@ -6,6 +6,7 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
@@ -16,7 +17,9 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
+import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
@@ -96,6 +99,12 @@ class HomeViewModel(
 
         ensureEnv()
     }
+
+    fun onTestPressed() = object : ViewEvent(), ActivityExecutor {
+        override fun invoke(activity: BaseActivity) {
+            /* Entry point to trigger test events within the app */
+        }
+    }.publish()
 
     fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
 
