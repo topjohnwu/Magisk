@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.model.entity.recycler.LenientRvItem
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 
-class BindingAdapter : BindingRecyclerViewAdapter<ComparableRvItem<*>>() {
+class BindingAdapter <T : ComparableRvItem<*>> : BindingRecyclerViewAdapter<T>() {
 
     private var recyclerView: RecyclerView? = null
 
@@ -15,12 +15,12 @@ class BindingAdapter : BindingRecyclerViewAdapter<ComparableRvItem<*>>() {
         variableId: Int,
         layoutRes: Int,
         position: Int,
-        item: ComparableRvItem<*>
+        item: T
     ) {
         super.onBindBinding(binding, variableId, layoutRes, position, item)
 
         when (item) {
-            is LenientRvItem -> {
+            is LenientRvItem<*> -> {
                 val recycler = recyclerView ?: return
                 item.onBindingBound(binding)
                 item.onBindingBound(binding, recycler)

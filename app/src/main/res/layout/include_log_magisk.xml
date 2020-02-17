@@ -30,7 +30,7 @@
                 android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
                 android:paddingBottom="@{viewModel.insets.bottom}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_console"
+                tools:listitem="@layout/item_console_md2"
                 tools:paddingTop="24dp" />
 
         </HorizontalScrollView>
