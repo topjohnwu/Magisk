@@ -31,11 +31,11 @@ void hide_sensitive_props() {
 
 	// Xiaomi cross region flash
 	auto hwc = getprop("ro.boot.hwc");
-	if (!hwc.empty() && hwc.find("China") != string::npos) {
+	if (!hwc.empty() && hwc.find("CN") != string::npos) {
 		setprop("ro.boot.hwc", "GLOBAL", false);
 	}
 	auto hwcountry = getprop("ro.boot.hwcountry");
-	if (!hwcountry.empty() && hwcountry.find("CN") != string::npos) {
+	if (!hwcountry.empty() && hwcountry.find("China") != string::npos) {
 		setprop("ro.boot.hwcountry", "GLOBAL", false);
 	}
 }
