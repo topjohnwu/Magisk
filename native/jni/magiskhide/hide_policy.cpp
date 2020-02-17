@@ -28,6 +28,16 @@ void hide_sensitive_props() {
 		if (!value.empty() && value != prop_value[i])
 			setprop(prop_key[i], prop_value[i], false);
 	}
+
+	// Xiaomi cross region flash
+	auto hwc = getprop("ro.boot.hwc");
+	if (!hwc.empty() && hwc.find("China") != string::npos) {
+		setprop("ro.boot.hwc", "GLOBAL", false);
+	}
+	auto hwcountry = getprop("ro.boot.hwcountry");
+	if (!hwcountry.empty() && hwcountry.find("CN") != string::npos) {
+		setprop("ro.boot.hwcountry", "GLOBAL", false);
+	}
 }
 
 static inline void lazy_unmount(const char* mountpoint) {
