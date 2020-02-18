@@ -30,7 +30,7 @@
     <string name="home_links_project">Liens du projet</string>
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open‑source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
-   <string name="home_device_title">Appareil</string>
+    <string name="home_device_title">Appareil</string>
     <string name="home_device_extra_manufacturer">Fabricant</string>
     <string name="home_device_extra_model">Modèle</string>
     <string name="home_device_extra_board">Carte</string>
