@@ -17,8 +17,6 @@ import java.util.concurrent.TimeUnit
 
 object Utils {
 
-    val isCanary: Boolean = BuildConfig.VERSION_NAME.contains("-")
-
     fun toast(msg: CharSequence, duration: Int) {
         UiThreadHandler.run { Toast.makeText(get(), msg, duration).show() }
     }
