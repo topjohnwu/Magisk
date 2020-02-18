@@ -5,6 +5,7 @@
     <string name="superuser">Super‑utilisateur</string>
     <string name="logs">Journaux</string>
     <string name="settings">Paramètres</string>
+    <string name="refresh">Actualiser les données locales</string>
     <string name="install">Installer</string>
     <string name="section_home">Accueil</string>
     <string name="section_theme">Thèmes</string>
@@ -12,29 +13,34 @@
 
     <!--Home-->
     <string name="no_connection">Aucune connexion disponible</string>
-    <string name="home_notice_content">Assurez‑vous de toujours utiliser la version libre de Magisk Manager. Une version provenant d’une source inconnue peut effectuer des actions malveillantes.</string>
-    <string name="hide">Masquage</string>
     <string name="app_changelog">Journal des modifications</string>
-    <string name="manager">Le gestionnaire</string>
+    <string name="manager">Manager</string>
+    <string name="loading">Chargement…</string>
+    <string name="info">Info</string>
+    <string name="uninstall">Désinstaller</string>
+    <string name="update">Mettre à jour</string>
+    <string name="not_available">non disponible</string>
+    <string name="hide">Masquer</string>
+    <string name="status">État</string>
+    <string name="home_package">Paquet</string>
+    <string name="details">Détails</string>
 
+    <string name="home_notice_content">Assurez‑vous de toujours utiliser la version libre de Magisk Manager. Une version provenant d’une source inconnue peut effectuer des actions malveillantes.</string>
     <string name="home_support_title">Soutenez‑nous</string>
     <string name="home_links_project">Liens du projet</string>
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open‑source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
-
+    <string name="home_device_title">Appareil</string>
+    <string name="home_device_extra_manufacturer">Fabricant</string>
+    <string name="home_device_extra_model">Modèle</string>
+    <string name="home_device_extra_board">Carte</string>
     <string name="home_device_system">Système</string>
-
-    <string name="home_package">Paquet</string>
-
     <string name="home_status_normal">Normal</string>
-
+    <string name="home_status_safe">Mode sans échec</string>
+    <string name="home_status_stub">Stub</string>
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
-    <string name="safetynet_api_error">Erreur de l’API SafetyNet</string>
-    <string name="safetynet_res_invalid">La réponse est incorrecte</string>
-    <string name="uninstall">Désinstaller</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
-    <string name="update">Mettre à jour</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
@@ -94,9 +100,11 @@
     <string name="target_uid">UID cible : %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">Erreur de l’API SafetyNet</string>
+    <string name="safetynet_res_invalid">La réponse est incorrecte</string>
     <string name="safetynet_attest_success">Attestion accordée !</string>
     <string name="safetynet_attest_failure">Attestation refusée !</string>
-    <string name="safetynet_attest_loading">Juste une seconde…</string>
+    <string name="safetynet_attest_loading">Une petite seconde…</string>
     <string name="safetynet_attest_restart">Essayer à nouveau</string>
     <string name="safetynet_system">Système</string>
 
@@ -135,8 +143,12 @@
     <string name="settings_dark_mode_dark">Toujours sombre</string>
     <string name="settings_safe_mode_title">Mode sans échec</string>
     <string name="settings_core_only_summary" deprecated="true">Activer uniquement les fonctionnalités de base. MagiskSU et MagiskHide resteront activés, mais aucun module ne sera chargé.</string>
+    <string name="settings_grid_column_count_title">Style d’affichage des listes</string>
+    <string name="settings_grid_column_count_summary">Définit le nombre d’éléments par ligne dans les listes. Redémarrez l’application pour appliquer les changements.</string>
+    <string name="settings_grid_column_count_1">Standard</string>
+    <string name="settings_grid_column_count_2">Compact</string>
     <string name="settings_download_path_title">Répertoire de téléchargement</string>
-    <string name="settings_download_path_message">Les fichiers seront enregistrés au format %1$s</string>
+    <string name="settings_download_path_message">Les fichiers seront enregistrés sous %1$s</string>
     <string name="settings_clear_cache_title">Vider le cache des dépôts</string>
     <string name="settings_clear_cache_summary">Effacer les informations en cache concerant les dépôts en ligne. Ceci force l’application à télécharger des informations à jour.</string>
     <string name="settings_hide_manager_title">Masquer Magisk Manager</string>
