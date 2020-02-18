@@ -5,7 +5,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.binding.BindingAdapter
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
@@ -42,9 +41,9 @@ class LogViewModel(
 
     // --- console
 
-    val consoleAdapter = BindingAdapter()
-    val itemsConsole = diffListOf<ComparableRvItem<*>>()
-    val itemConsoleBinding = itemBindingOf<ComparableRvItem<*>> {}
+    val consoleAdapter = BindingAdapter<ConsoleItem>()
+    val itemsConsole = diffListOf<ConsoleItem>()
+    val itemConsoleBinding = itemBindingOf<ConsoleItem>()
 
     override fun refresh(): Disposable {
         val logs = repo.fetchLogs()

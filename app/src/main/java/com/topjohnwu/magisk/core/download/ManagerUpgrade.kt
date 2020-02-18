@@ -27,7 +27,7 @@ private fun RemoteFileService.patch(apk: File, id: Int) {
             .setContentText("")
     }
     val patched = File(apk.parent, "patched.apk")
-    PatchAPK.patch(apk, patched, packageName, applicationInfo.nonLocalizedLabel.toString())
+    PatchAPK.patch(apk.path, patched.path, packageName, applicationInfo.nonLocalizedLabel)
     apk.delete()
     patched.renameTo(apk)
 }

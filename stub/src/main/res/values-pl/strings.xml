@@ -1,4 +1,5 @@
 <resources>
-    <string name="upgrade_msg">Przejdź na pełną wersję programu Magisk Manager, aby ukończyć konfigurację. Ściągnąć i zainstalować?</string>
-    <string name="no_internet_msg">Połącz się z Internetem! Wymagana jest aktualizacja do pełnego programu Magisk Manager.</string>
+    <string name="upgrade_msg">Zaktualizuj aplikację do pełnej wersji Magisk Managera aby ukończyć instalację. Pobrać i zainstalować?</string>
+    <string name="no_internet_msg">Połącz się z Internetem! Wymagana jest aktualizacja do pełnej wersji Magisk Managera.</string>
+    <string name="dling">Pobieranie</string>
 </resources>

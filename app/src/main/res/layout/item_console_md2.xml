@@ -6,12 +6,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.ConsoleRvItem" />
-
-        <!--no actions are required-->
-        <variable
-            name="viewModel"
-            type="Object" />
+            type="com.topjohnwu.magisk.model.entity.recycler.ConsoleItem" />
 
     </data>
 

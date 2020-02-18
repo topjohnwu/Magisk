@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.isCanaryVersion
 import com.topjohnwu.magisk.core.utils.*
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
@@ -126,11 +127,11 @@ object DownloadPath : SettingsItem.Input() {
 
 object GridSize : SettingsItem.Selector() {
     override var value by bindableValue(Config.listSpanCount - 1) {
-        Config.listSpanCount = max(1, min(3, it + 1))
+        Config.listSpanCount = max(1, min(2, it + 1))
     }
 
-    override val title = R.string.settings_grid_span_count_title.asTransitive()
-    override val description = R.string.settings_grid_span_count_summary.asTransitive()
+    override val title = R.string.settings_grid_column_count_title.asTransitive()
+    override val description = R.string.settings_grid_column_count_summary.asTransitive()
     override val entries = resources.getStringArray(R.array.span_count)
     override val entryValues = resources.getStringArray(R.array.value_array)
 }
@@ -140,7 +141,7 @@ object UpdateChannel : SettingsItem.Selector() {
 
     override val title = R.string.settings_update_channel_title.asTransitive()
     override val entries = resources.getStringArray(R.array.update_channel).let {
-        if (!Utils.isCanary && Config.updateChannel < Config.Value.CANARY_CHANNEL)
+        if (!isCanaryVersion && Config.updateChannel < Config.Value.CANARY_CHANNEL)
             it.take(it.size - 2).toTypedArray() else it
     }
     override val entryValues = resources.getStringArray(R.array.value_array)

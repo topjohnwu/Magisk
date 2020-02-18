@@ -18,18 +18,12 @@ import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
 import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 import java.io.File
 
 open class FlashActivity : BaseUIActivity<FlashViewModel, ActivityFlashBinding>() {
 
     override val layoutRes: Int = R.layout.activity_flash
-    override val viewModel: FlashViewModel by viewModel {
-        val uri = intent.data ?: let { finish(); Uri.EMPTY }
-        val additionalUri = intent.getParcelableExtra(Const.Key.FLASH_DATA) ?: uri
-        val action = intent.getStringExtra(Const.Key.FLASH_ACTION) ?: let { finish();"" }
-        parametersOf(action, uri, additionalUri)
-    }
+    override val viewModel: FlashViewModel by viewModel()
 
     override val navigation: CompatNavigationDelegate<BaseUIActivity<FlashViewModel, ActivityFlashBinding>>? =
         null
@@ -40,6 +34,7 @@ open class FlashActivity : BaseUIActivity<FlashViewModel, ActivityFlashBinding>(
         val id = intent.getIntExtra(Const.Key.DISMISS_ID, -1)
         if (id != -1)
             Notifications.mgr.cancel(id)
+        viewModel.startFlashing(intent)
     }
 
     override fun onBackPressed() {

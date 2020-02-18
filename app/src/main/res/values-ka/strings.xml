@@ -5,6 +5,7 @@
     <string name="superuser">სუპერმომხმარებელი</string>
     <string name="logs">ლოგები</string>
     <string name="settings">პარამეტრები</string>
+    <string name="refresh">ლოკალური მონაცემების დარეფრეშება</string>
     <string name="install">ინსტალაცია</string>
     <string name="section_home">საწყისი</string>
     <string name="section_theme">თემები</string>
@@ -12,13 +13,8 @@
 
     <!--Home-->
     <string name="no_connection">კავშირირი არ არის</string>
-    <string name="installed_error">არ არის დაინსტალირებული</string>
-    <string name="channel_error">არასწორი განახლების არხი!</string>
-    <string name="up_to_date">განახლებულია</string>
-    <string name="obsolete">განახლება შესაძლებელია!</string>
-    <string name="loading">იტვირთება…</string>
     <string name="home_notice_content">დარწმუნებული იყავით რომ Magisk მენეჯერის წყარო-გახსნილ ვერსიას ხმარობთ. დახურული წყაროს მქონე მენეჯემა შეიძლება მოწყობილობა დააზიანოს.</string>
-    <string name="home_notice_hide">დამალვა</string>
+    <string name="hide">დამალვა</string>
     <string name="app_changelog">ცვლილებები</string>
     <string name="manager">მენეჯერი</string>
 
@@ -27,27 +23,15 @@
     <string name="home_item_source">წყარო</string>
     <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
 
-    <string name="home_device_security">უსაფრთხოება</string>
     <string name="home_device_system">სისტემა</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
 
-    <string name="home_device_security_secure">უსაფრთხო</string>
-    <string name="home_device_security_outdated">ვადაგასული</string>
+    <string name="home_package">პაკეტი</string>
 
-    <string name="home_extra_version">ვერსია</string>
-    <string name="home_extra_code">კოდი</string>
-    <string name="home_extra_mode">რეჟიმი</string>
-    <string name="home_extra_connection">კავშირი</string>
-    <string name="home_extra_package">პაკეტი</string>
-
-    <string name="home_extra_mode_normal">ნორმალური</string>
-    <string name="home_extra_mode_safe">უსაფრთხო</string>
-    <string name="home_extra_mode_stub">დინამიური</string>
+    <string name="home_status_normal">ნორმალური</string>
 
     <string name="invalid_update_channel">არასწორი განახლების არხი</string>
-    <string name="safetyNet_api_error">SafetyNet API-ს შეცდომა</string>
-    <string name="safetyNet_res_invalid">პასუხი არასწორია</string>
+    <string name="safetynet_api_error">SafetyNet API-ს შეცდომა</string>
+    <string name="safetynet_res_invalid">პასუხი არასწორია</string>
     <string name="uninstall">დეინსტალაცია</string>
     <string name="uninstall_magisk_title">Magisk-ის დეინსტალაცია</string>
     <string name="uninstall_magisk_msg">ყველა მოდული იქნება წაშლილი/გამორთული!\nRoot-ი წაიშლება!\nთქვენი მონაცემები დაიშიფრება!</string>
@@ -55,7 +39,7 @@
 
     <!--Install-->
     <string name="keep_force_encryption">შიფრირება ყოველთვის იყოს ჩართული</string>
-    <string name="keep_dm_verity">AVB 2.0/dm-verity იყოს ჩართUლი</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity იყოს ჩართული</string>
     <string name="recovery_mode">Recovery რეჟიმი</string>
     <string name="install_options_title">ოფციები</string>
     <string name="install_method_title">მეთოდი</string>
@@ -65,7 +49,7 @@
     <string name="download_zip_only">მხოლოდ Zip-ის გადმოწერა</string>
     <string name="direct_install">აქვე დაინსტალირება (რეკომენდირებულია)</string>
     <string name="install_inactive_slot">არააქტიურ სლოტში დაყენება (სისტემის განახლების შემდეგ)</string>
-    <string name="install_inactive_slot_msg">თქვენი მოწყობილობა გადაიტვირთება არაქატიურ სლოტში!\nგამოიყენეთ ეს ოფცია მხოლოდ სისტემის განახლების დროს.\nგავაგრძელოთ?</string>
+    <string name="install_inactive_slot_msg">თქვენი მოწყობილობა გადაიტვირთება არააქატიურ სლოტში!\nგამოიყენეთ ეს ოფცია მხოლოდ სისტემის განახლების დროს.\nგავაგრძელოთ?</string>
     <string name="setup_title">დამატებითი ინსტალაცია</string>
     <string name="select_patch_file">ფაილის დაპატჩვა</string>
     <string name="patch_file_msg">აირჩიეთ (*.img) ფაილი ან ODIN tarfile-ი (*.tar)</string>
@@ -83,17 +67,17 @@
     <string name="twentymin">20 წუთში</string>
     <string name="thirtymin">30 წუთში</string>
     <string name="sixtymin">60 წუთში</string>
-    <string name="su_allow_toast">%1$s -ს მიენიჭა სუპერმომხმარების ნებართვები</string>
-    <string name="su_deny_toast">%1$s -ს აეკრძალა სუპერმომხმარების ნებართვები</string>
+    <string name="su_allow_toast">%1$s-ს მიენიჭა სუპერმომხმარებლის ნებართვები</string>
+    <string name="su_deny_toast">%1$s-ს აეკრძალა სუპერმომხმარებლის ნებართვები</string>
     <string name="no_apps_found">პროგრამები არ არის აღმოჩენილი</string>
-    <string name="su_snack_grant">%1$s -ის ნებართვები იქნა მინჭებული</string>
-    <string name="su_snack_deny">%1$s -ის ნებართვები იქნა აკრძალული</string>
-    <string name="su_snack_notif_on">%1$s -ის შეტყბინებები ჩართულია</string>
-    <string name="su_snack_notif_off">%1$s -ის შეტყბინებები გამორთულია</string>
-    <string name="su_snack_log_on">%1$s -ის ლოგინგი ჩართულია</string>
-    <string name="su_snack_log_off">%1$s -ის ლოგინგი გამორთულია</string>
+    <string name="su_snack_grant">%1$s-ის ნებართვები იქნა მინიჭებული</string>
+    <string name="su_snack_deny">%1$s-ის ნებართვები იქნა აკრძალული</string>
+    <string name="su_snack_notif_on">%1$s-ის შეტყობინებები ჩართულია</string>
+    <string name="su_snack_notif_off">%1$s-ის შეტყობინებები გამორთულია</string>
+    <string name="su_snack_log_on">%1$s-ის ლოგინგი ჩართულია</string>
+    <string name="su_snack_log_off">%1$s-ის ლოგინგი გამორთულია</string>
     <string name="su_revoke_title">გავაუქმოთ?</string>
-    <string name="su_revoke_msg">გსურთ %1$s ისთვის ნებართვების გაუქმება?</string>
+    <string name="su_revoke_msg">ნამდვილად გსურთ %1$s-ისთვის ნებართვების გაუქმება?</string>
     <string name="toast">ჩვეულებრივი</string>
     <string name="none">არანაირი</string>
 
@@ -132,7 +116,7 @@
     <string name="reboot_download">Download-ში გადატვირთვა</string>
     <string name="reboot_edl">EDL-ში გადატვირთვა</string>
     <string name="module_safe_mode_message">თქვენ ბრძანდებით უსაფრთხო რეჟიმში, მოდულები გამორთული იქნება.\nეს შეტყობინება უსაფრთხო რეჟიმიდან გამოსვლის შემდეგ გაქრება.</string>
-    <string name="module_version_author">%1$s %2$s სგან</string>
+    <string name="module_version_author">%1$s %2$s-სგან</string>
     <string name="module_section_pending">განახლებები</string>
     <string name="module_section_pending_action">ყველას განახლება</string>
     <string name="module_section_remote">გადმოწერა</string>
@@ -142,7 +126,7 @@
     <string name="module_update_none">თქვენი მოდულები განახლებულია!</string>
     <string name="update_available">ხელმისაწვდომია განახლება</string>
     <string name="installed">დაინსტალირებული</string>
-    <string name="sorting_order">სორტირების თანმიმდევრობა</string>
+    <string name="sorting_order">სორტირება</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">თემების ჩამონათვალი</string>
@@ -152,13 +136,8 @@
     <string name="settings_dark_mode_dark">მუქი თემა</string>
     <string name="settings_safe_mode_title">უსაფრთხო რეჟიმი</string>
     <string name="settings_core_only_summary" deprecated="true">მხოლოდ მთავარი ფუნქციების ჩართვა. MagiskSU და MagiskHide-ი იმუშავებენ, მაგრამ მოდულები არ ჩაიტვირთება</string>
-    <string name="settings_grid_span_count_title">ბადის სვეტების ზომა</string>
-    <string name="settings_grid_span_count_summary">არეგულირებს სვეტების ზომას. თქვენ შეგიძლიათ ამის შეცვლა პარამეტრების გარეთ, ორი თითის საპირისპირო მიმართულებით გასმით.</string>
-    <string name="settings_grid_span_count_1">თითო ფანჯარა სტრიქონზე (პატარა ეკრანებისთვის)</string>
-    <string name="settings_grid_span_count_2">ორი ფანჯარა სტრიქონზე (რეკომენდირებული)</string>
-    <string name="settings_grid_span_count_3">სამი ფნაჯარა სტრიონზე (Tablet/TV)</string>
     <string name="settings_download_path_title">გადმოწერის ლოკაცია</string>
-    <string name="settings_download_path_message">ფაილები შეინახება %1$s -ში</string>
+    <string name="settings_download_path_message">ფაილები შეინახება %1$s-ში</string>
     <string name="settings_clear_cache_title">რეპოზიტორიების ქეშის წაშლა</string>
     <string name="settings_clear_cache_summary">რეპოზიტორიებისთვის ქეშის წაშლა. ეს დაარეფრეშებს პროგრამას</string>
     <string name="settings_hide_manager_title">Magisk მენეჯერის დამალვა</string>
@@ -196,9 +175,9 @@
     <string name="request_timeout">პასუხის ტაიმაუტი</string>
     <string name="superuser_notification">სუპერმომხმარებლის შეტყობინება</string>
     <string name="settings_su_reauth_title">რეაუტენთიფიკაცია განახლების შემდეგ</string>
-    <string name="settings_su_reauth_summary">სუპერმომხმარებლის ნებართვის რეაუტენთიგიკაცია აპის განახლების შემდეგ</string>
-    <string name="settings_su_biometric_title">ბიომეტრიკული ავტენთიფიკაციის ჩართვა</string>
-    <string name="settings_su_biometric_summary">ბიმეტრიკული ავტენთიფიკაციის გამოყენება სუპერმომხმარებლის ნებართვის გასაცემად</string>
+    <string name="settings_su_reauth_summary">სუპერმომხმარებლის ნებართვის რეაუტენთიფიკაცია აპის განახლების შემდეგ</string>
+    <string name="settings_su_biometric_title">ბიომეტრიკული აუტენთიფიკაციის ჩართვა</string>
+    <string name="settings_su_biometric_summary">ბიომეტრიკული აუტენთიფიკაციის გამოყენება სუპერმომხმარებლის ნებართვის გასაცემად</string>
     <string name="no_biometric">შეუთავსებელი მოწყობილობა ან არასწორად დაყენებული ბიომეტრიკული პარამეტრები</string>
     <string name="settings_customization">პერსონალიზაცია</string>
 
@@ -214,8 +193,8 @@
     <string name="settings_ns_global">გლობალური Namespace-ი</string>
     <string name="settings_ns_requester">მიღებითი Namespace-ი</string>
     <string name="settings_ns_isolate">იზოლირებული Namespace-ი</string>
-    <string name="global_summary">ყველა root სესია გამოიყენებენ გლობალურ სამონტაჟო namespace-ს</string>
-    <string name="requester_summary">Root სესიები მიიღებენ მომწოდებლის სამოტაჟო namespace-ს</string>
+    <string name="global_summary">ყველა root სესია გამოიყენებს გლობალურ სამონტაჟო namespace-ს</string>
+    <string name="requester_summary">Root სესიები მიიღებენ მომწოდებლის სამონტაჟო namespace-ს</string>
     <string name="isolate_summary">ყოველ root სესიას ექნებათ თავიანთი იზოლირებული namespace-ი</string>
     <string name="settings_download_path_error">შეცდომა საქაღალდეს შექმნის დროს. იგი უნდა იყოს ხელმისაწვდომი მახსოვრობიდან და არ უნდა იყოს ფაილი.</string>
 
@@ -227,13 +206,13 @@
     <string name="download_open_parent">მშობელ საქაღდეში ნახვა</string>
     <string name="download_open_self">ფაილის ჩვენება</string>
     <string name="magisk_update_title">ხელმისაწვდომია Magisk-ის განახლება!</string>
-    <string name="manager_update_title">ხელმისაწვდომია Magisk მენეჯერის გახლება!</string>
+    <string name="manager_update_title">ხელმისაწვდომია Magisk მენეჯერის განახლება!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">დიახ</string>
     <string name="no">არა</string>
-    <string name="repo_install_title">%1$s -ის ინსტალაცია</string>
-    <string name="repo_install_msg">გნებავთ %1$s -ის ახლავე დაინსტალირება?</string>
+    <string name="repo_install_title">%1$s-ის ინსტალაცია</string>
+    <string name="repo_install_msg">გნებავთ %1$s-ის ახლავე დაინსტალირება?</string>
     <string name="download">გადმოწერა</string>
     <string name="reboot">გადატვირთვა</string>
     <string name="settings_reboot_toast">გადატვირთეთ ცვლილებების შესანახად</string>
@@ -253,13 +232,13 @@
     <string name="restore_done">აღდგენა დასრულდა!</string>
     <string name="restore_fail">საწყისი რეზერვი არ არსებობს!</string>
     <string name="proprietary_title">კუთვნილი კოდის გადმოწერა</string>
-    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და გახსნილ-წყაროიანი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
+    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და წყარო-გახსნილი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
     <string name="setup_fail">ინსტალაცია ჩაიშალა</string>
     <string name="env_fix_title">სჭირდება დამატებითი ინსტალაცია</string>
     <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი ინსტალაცია იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
     <string name="setup_msg">მიმდინარეობს ინტერფეისის ინსტალაცია…</string>
-    <string name="authenticate">ავტენთიკაცია</string>
+    <string name="authenticate">აუტენთიფიკაცია</string>
     <string name="unsupport_magisk_title">შეუთავსებელი Magisk-ის ვერსია</string>
-    <string name="unsupport_magisk_msg">ამ ვერსიის Magisk მენეჯერთან არ არის მხარდაჭერილი %1$s -ზე დაბალი Magisk-ის ვერსია.\n\nპროგრამა ისე ირეაგირებს, თითქოს Magisk-ი არ არის დაყენებული, გთხოვთ განაახლოთ Magisk-ი რაც შეიძლება მალე.</string>
+    <string name="unsupport_magisk_msg">ამ ვერსიის Magisk მენეჯერთან არ არის მხარდაჭერილი %1$s-ზე დაბალი Magisk-ის ვერსია.\n\nპროგრამა ისე ირეაგირებს, თითქოს Magisk-ი არ არის დაყენებული, გთხოვთ განაახლოთ Magisk-ი რაც შეიძლება მალე.</string>
 
 </resources>

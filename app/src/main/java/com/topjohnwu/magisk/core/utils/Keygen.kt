@@ -1,21 +1,17 @@
 package com.topjohnwu.magisk.core.utils
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Base64
 import android.util.Base64OutputStream
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.utils.PatchAPK.ALPHANUM
-import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.signing.CryptoUtils.readCertificate
 import com.topjohnwu.signing.CryptoUtils.readPrivateKey
-import com.topjohnwu.superuser.internal.InternalUtils
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
-import org.koin.core.context.GlobalContext
-import org.koin.core.context.startKoin
-import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.security.KeyPairGenerator
@@ -33,7 +29,7 @@ private interface CertKeyProvider {
 }
 
 @Suppress("DEPRECATION")
-class Keygen: CertKeyProvider {
+class Keygen(context: Context) : CertKeyProvider {
 
     companion object {
         private const val ALIAS = "magisk"
@@ -70,9 +66,6 @@ class Keygen: CertKeyProvider {
     }
 
     init {
-        // This object could possibly be accessed from an external app
-        // Get context from reflection into Android's framework
-        val context = InternalUtils.getContext()
         val pm = context.packageManager
         val info = pm.getPackageInfo(context.packageName, PackageManager.GET_SIGNATURES)
         val sig = info.signatures[0]
@@ -104,14 +97,6 @@ class Keygen: CertKeyProvider {
     }
 
     private fun init(): KeyStore {
-        GlobalContext.getOrNull() ?: {
-            // Invoked externally, do some basic initialization
-            startKoin {
-                modules(koinModules)
-            }
-            Timber.plant(Timber.DebugTree())
-        }()
-
         val raw = Config.keyStoreRaw
         val ks = KeyStore.getInstance("PKCS12")
         if (raw.isEmpty()) {
@@ -135,7 +120,7 @@ class Keygen: CertKeyProvider {
         val dname = X500Name("CN=${randomString()}")
         val builder = JcaX509v3CertificateBuilder(dname, BigInteger(160, Random()),
             start.time, end.time, dname, kp.public)
-        val signer = JcaContentSignerBuilder("SHA256WithRSA").build(kp.private)
+        val signer = JcaContentSignerBuilder("SHA1WithRSA").build(kp.private)
         val cert = JcaX509CertificateConverter().getCertificate(builder.build(signer))
 
         // Store them into keystore

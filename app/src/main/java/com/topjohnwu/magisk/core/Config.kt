@@ -56,7 +56,7 @@ object Config : PreferenceModel, DBConfig {
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
-        const val LIST_SPAN_COUNT = "list_span_count"
+        const val LIST_SPAN_COUNT = "column_count"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -106,7 +106,7 @@ object Config : PreferenceModel, DBConfig {
     }
 
     private val defaultChannel =
-        if (Utils.isCanary) {
+        if (isCanaryVersion) {
             if (BuildConfig.DEBUG)
                 Value.CANARY_DEBUG_CHANNEL
             else
@@ -116,24 +116,12 @@ object Config : PreferenceModel, DBConfig {
     var bootId by preference(Key.BOOT_ID, "")
 
     var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
-    var repoOrder by preference(
-        Key.REPO_ORDER,
-        Value.ORDER_DATE
-    )
+    var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
-    var suAutoReponse by preferenceStrInt(
-        Key.SU_AUTO_RESPONSE,
-        Value.SU_PROMPT
-    )
-    var suNotification by preferenceStrInt(
-        Key.SU_NOTIFICATION,
-        Value.NOTIFICATION_TOAST
-    )
-    var updateChannel by preferenceStrInt(
-        Key.UPDATE_CHANNEL,
-        defaultChannel
-    )
+    var suAutoReponse by preferenceStrInt(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT)
+    var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
+    var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
 
     var safetyNotice by preference(Key.SAFETY, true)
     var darkThemeExtended by preference(
@@ -147,31 +135,22 @@ object Config : PreferenceModel, DBConfig {
     @JvmStatic
     var coreOnly by preference(Key.COREONLY, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
-    var listSpanCount by preference(Key.LIST_SPAN_COUNT, 2)
+    @JvmStatic
+    var listSpanCount by preference(Key.LIST_SPAN_COUNT, 1)
 
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
     var locale by preference(Key.LOCALE, "")
 
-    var rootMode by dbSettings(
-        Key.ROOT_ACCESS,
-        Value.ROOT_ACCESS_APPS_AND_ADB
-    )
-    var suMntNamespaceMode by dbSettings(
-        Key.SU_MNT_NS,
-        Value.NAMESPACE_MODE_REQUESTER
-    )
-    var suMultiuserMode by dbSettings(
-        Key.SU_MULTIUSER_MODE,
-        Value.MULTIUSER_MODE_OWNER_ONLY
-    )
+    var rootMode by dbSettings(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB)
+    var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
+    var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 
     // Always return a path in external storage where we can write
-    val downloadDirectory
-        get() =
-            Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
+    val downloadDirectory get() =
+        Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 

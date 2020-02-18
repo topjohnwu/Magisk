@@ -24,8 +24,7 @@
         android:onClick="@{() -> item.toggle(viewModel)}"
         android:onLongClick="@{() -> item.toggle()}"
         tools:layout_marginBottom="@dimen/l1"
-        tools:layout_marginEnd="@dimen/l1"
-        tools:layout_width="200dp">
+        tools:layout_marginEnd="@dimen/l1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,21 +48,8 @@
                     app:layout_constraintVertical_bias="0"
                     tools:srcCompat="@drawable/ic_logo" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    style="@style/WidgetFoundation.Image.Big"
-                    gone="@{item.isEnabled()}"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/policy_app_icon"
-                    app:layout_constraintEnd_toEndOf="@+id/policy_app_icon"
-                    app:layout_constraintStart_toStartOf="@+id/policy_app_icon"
-                    app:layout_constraintTop_toTopOf="@+id/policy_app_icon"
-                    app:srcCompat="@drawable/ic_off"
-                    app:tint="?colorSurface"
-                    tools:visibility="visible" />
-
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/policy_app_name"
-                    strikeThrough="@{!item.enabled}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/margin_generic"
@@ -75,14 +61,13 @@
                     android:textAppearance="@style/AppearanceFoundation.Body"
                     android:textIsSelectable="false"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/policy_indicator"
                     app:layout_constraintStart_toEndOf="@+id/policy_app_icon"
                     app:layout_constraintTop_toTopOf="@+id/policy_app_icon"
                     tools:text="@string/app_name" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/policy_package_name"
-                    strikeThrough="@{!item.enabled}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/l1"
@@ -99,6 +84,15 @@
                     app:layout_constraintTop_toBottomOf="@id/policy_app_name"
                     app:layout_constraintVertical_bias="0"
                     tools:text="com.topjohnwu.magisk" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/policy_indicator"
+                    style="@style/WidgetFoundation.Switch"
+                    isSelected="@{item.enabled}"
+                    android:layout_marginEnd="@dimen/l1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -119,7 +113,7 @@
                     android:id="@+id/policy_notify"
                     style="@style/WidgetFoundation.Button.Text"
                     isSelected="@{item.shouldNotify}"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:minHeight="24dp"
                     android:onClick="@{() -> item.toggleNotify(viewModel)}"
@@ -129,17 +123,27 @@
                     android:textColor="@color/color_state_primary_transient"
                     app:icon="@drawable/ic_notifications_md2"
                     app:iconTint="@color/color_state_primary_transient"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/policy_log"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/color_state_primary_transient" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/l_50"
+                    android:layout_marginBottom="@dimen/l_50"
+                    android:background="?colorSurface"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/policy_notify"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/policy_log"
                     style="@style/WidgetFoundation.Button.Text"
                     isSelected="@{item.shouldLog}"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:minHeight="24dp"
                     android:onClick="@{() -> item.toggleLog(viewModel)}"
@@ -150,15 +154,26 @@
                     app:icon="@drawable/ic_bug_md2"
                     app:iconTint="@color/color_state_primary_transient"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/policy_notify"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/policy_delete"
+                    app:layout_constraintStart_toEndOf="@+id/policy_notify"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/color_state_primary_transient" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="@dimen/l_50"
+                    android:layout_marginBottom="@dimen/l_50"
+                    android:background="?colorSurface"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/policy_log"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/policy_delete"
                     style="@style/WidgetFoundation.Button.Text"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:minHeight="24dp"
                     android:onClick="@{() -> viewModel.deletePressed(item)}"
@@ -170,8 +185,8 @@
                     app:iconTint="?colorError"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/policy_log"
+                    app:layout_constraintStart_toEndOf="@+id/policy_log"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:rippleColor="?colorError" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

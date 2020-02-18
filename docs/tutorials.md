@@ -3,8 +3,6 @@
 ## OTA Installation
 Magisk does modifications systemless-ly, which means applying official OTAs is much simpler. Here I provide a few tutorials for several different kind of devices to apply OTAs and preserve Magisk after the installation if possible.
 
-**This tutorial is only for Magisk v17.0+**
-
 **NOTE: In order to apply OTAs, you HAVE to make sure you haven't modified `/system` (and `/vendor` if available) in any way. Even remounting the partition to rw will tamper block verification!!**
 
 ### Prerequisites
@@ -58,27 +56,20 @@ If you decide to start by installing Magisk without touching your recovery parti
 ## Best Practices for MagiskHide
 There are a lot of people confused about why their setup isn't bypassing detections as expected. Here are some of the best practices to maintain a proper environment for MagiskHide. The guidelines in the following is ordered in progression, you might not need to do everything all the way through, but you should have done previous steps before going on to the next step.
 
-If you've followed all practices below and still cannot succeed, consider switching to the beta channel as new MagiskHide upgrades might have not come to the stable channel yet.
-
-<p align="center"><img src="images/beta_channel.png" width="300"/></p>
-<p align="center">Settings → Update Settings → Update Channel</p>
-
 Let's start with SafetyNet.
 
-- Check SafetyNet status with Magisk Manager. Google banned the usage of old APIs, and many "SafetyNet Detection" apps you used were never updated and thus cannot provide correct information. **Trust the SafetyNet check included in Magisk Manager!**
+- Check SafetyNet status by using Magisk Manager. Google had banned usage of old APIs, and many "SafetyNet Detection" apps might be outdated.
 - Start clean: my advice is always the easy route - **use stock ROMs**. If you prefer custom ROMs, choose stable, official builds from well-reputed teams.
-- If you cannot even pass **basicIntegrity**, there are some serious issues! Even though in theory Magisk Modules can be hidden by MagiskHide, you should first try enabling *Core-Only Mode* and see if it makes any difference. If it still doesn't pass, the ROM you're using is the problem. If it passes, experiment and narrow down the problematic module(s).
-
-<p align="center"><img src="images/core_only.png" width="250"/></p>
-
-- If **basicIntegrity** passes but **ctsProfile** doesn't, you might be using a ROM that has never passed CTS (OEM betas, previews, China based ROMs etc.). Try out [MagiskHide Props Config](https://forum.xda-developers.com/apps/magisk/module-magiskhide-props-config-t3789228) from @Didgeridoohan and switch a known CTS-passing fingerprint from the massive list included in the module. You will be very surprised by the results!
+- If you cannot even pass **basicIntegrity**, there are some serious issues! Even though in theory Magisk Modules should be hidden by MagiskHide, some modules modify stuffs that MagiskHide is not sufficient. Please remove modules one by one and narrow down the problematic module(s). If it still doesn't pass, the ROM you're using is the problem.
+- If **basicIntegrity** passes but **ctsProfile** doesn't, you might be using a ROM that has never passed CTS (OEM betas, previews, China based ROMs etc.). Try out [MagiskHide Props Config](https://forum.xda-developers.com/apps/magisk/module-magiskhide-props-config-t3789228) from @Didgeridoohan and switch a known CTS-passing fingerprint from the massive list included in the module.
 
 At this point, SafetyNet should be fully passed. Let's change gears to notorious apps that detects all kinds of weird shit.
 
 <p align="center"><img src="images/safetynet.png" width="300"/></p>
 <p align="center">This is just so pleasing to look at, right?</p>
 
-- Add your target app to the MagiskHide list: go to the "MagiskHide" section in Magisk Manager, and check the app you want to hide. **Do not abuse MagiskHide!** I've seen some paranoid people adding *a lot* of unnecessary apps to the list. This behavior is very likely to not only break MagiskHide, **but also Magisk itself or even the whole system** (`magiskd`/`magisklogd` crashes, system bogged down). Remember: with the current MagiskHide implementation, **each additional hide target comes with a large cost**; only enable those you are SURE you needed!
+- Add your target app to the MagiskHide list: go to the "MagiskHide" section in Magisk Manager, and check the app you want to hide. **Do NOT add a large number of apps to the list!** This behavior will not only very likely to break MagiskHide, **but also Magisk itself or even the whole system** (`magiskd` crashes, system bogged down etc.). Remember: only enable those you are SURE you needed!
+- Note that apps installed in adopted storage is currently unsupported to be added to the hide list.
 - Hide Magisk Manager: go to (Settings → Hide Magisk Manager) to repackage the app with a random package name.
 
 <p align="center"><img src="images/hide_manager.png" width="300"/></p>

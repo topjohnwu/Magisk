@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Невалиден канал за ажурирања</string>
-    <string name="safetyNet_api_error">Грешка со SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Одговорот е невалиден.</string>
+    <string name="safetynet_api_error">Грешка со SafetyNet API</string>
+    <string name="safetynet_res_invalid">Одговорот е невалиден.</string>
     <string name="keep_force_encryption">Задржи ја присилната енкрипција</string>
     <string name="keep_dm_verity">Задржи AVB 2.0/dm-verity</string>
     <string name="uninstall">Деинсталирај</string>

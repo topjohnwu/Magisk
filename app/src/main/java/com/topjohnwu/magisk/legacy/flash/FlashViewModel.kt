@@ -2,34 +2,32 @@ package com.topjohnwu.magisk.legacy.flash
 
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Handler
+import android.view.MenuItem
 import androidx.core.os.postDelayed
 import androidx.databinding.ObservableArrayList
-import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.*
+import com.topjohnwu.magisk.model.binding.BindingAdapter
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.flash.FlashResultListener
 import com.topjohnwu.magisk.model.flash.Flashing
 import com.topjohnwu.magisk.model.flash.Patching
 import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.utils.DiffObservableList
+import com.topjohnwu.magisk.ui.base.diffListOf
+import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
-import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.io.File
 import java.util.*
 
 class FlashViewModel(
-    action: String,
-    installer: Uri,
-    uri: Uri,
     private val resources: Resources
 ) : BaseViewModel(), FlashResultListener {
 
@@ -38,11 +36,9 @@ class FlashViewModel(
 
     val behaviorText = KObservableField(resources.getString(R.string.flashing))
 
-    val items = DiffObservableList(ComparableRvItem.callback)
-    val itemBinding = ItemBinding.of<ComparableRvItem<*>> { itemBinding, _, item ->
-        item.bind(itemBinding)
-        itemBinding.bindExtra(BR.viewModel, this@FlashViewModel)
-    }
+    val adapter = BindingAdapter<ConsoleItem>()
+    val items = diffListOf<ConsoleItem>()
+    val itemBinding = itemBindingOf<ConsoleItem>()
 
     private val outItems = ObservableArrayList<String>()
     private val logItems = Collections.synchronizedList(mutableListOf<String>())
@@ -50,8 +46,12 @@ class FlashViewModel(
     init {
         outItems.sendUpdatesTo(items) { it.map { ConsoleItem(it) } }
         outItems.copyNewInputInto(logItems)
+    }
 
-        state = State.LOADING
+    fun startFlashing(intent: Intent) {
+        val installer = intent.data ?: return
+        val uri: Uri? = intent.getParcelableExtra(Const.Key.FLASH_DATA)
+        val action = intent.getStringExtra(Const.Key.FLASH_ACTION) ?: return
 
         when (action) {
             Const.Value.FLASH_ZIP -> Flashing
@@ -67,7 +67,7 @@ class FlashViewModel(
                 .SecondSlot(installer, outItems, logItems, this)
                 .exec()
             Const.Value.PATCH_FILE -> Patching
-                .File(installer, uri, outItems, logItems, this)
+                .File(installer, uri ?: return, outItems, logItems, this)
                 .exec()
         }
     }
@@ -86,7 +86,14 @@ class FlashViewModel(
         }
     }
 
-    fun savePressed() = withPermissions(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+    fun onMenuItemClicked(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_save -> savePressed()
+        }
+        return true
+    }
+
+    private fun savePressed() = withPermissions(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
         .map { now }
         .map { it.toTime(timeFormatStandard) }
         .map { Const.MAGISK_INSTALL_LOG_FILENAME.format(it) }

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="SplashTheme" parent="SplashThemeBase" />
+
     <style name="Foundation" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
     </style>
@@ -13,10 +15,20 @@
 
     <style name="WidgetFoundation" parent="android:Widget" />
 
+    <!-- {@deprecated Use WidgetFoundation instead.} -->
+    <style name="Widget" parent="WidgetFoundation" />
+
     <style name="AppearanceFoundation">
         <item name="android:fontFamily">@font/exo</item>
     </style>
     <!--endregion-->
+
+    <style name="Foundation.PopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">?colorOnSurface</item>
+        <item name="android:itemBackground">?colorSurfaceVariant</item>
+        <item name="android:itemTextAppearance">@style/AppearanceFoundation.Caption</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
     <style name="Foundation.Base" parent="Foundation.Compat">
         <item name="android:fontFamily">@font/exo</item>
@@ -27,6 +39,7 @@
         <item name="selectableItemBackground">@drawable/bg_selectable</item>
         <item name="selectableItemBackgroundBorderless">@drawable/bg_selectable_borderless</item>
         <item name="actionBarSize">@dimen/internal_action_bar_size</item>
+        <item name="popupMenuStyle">@style/Foundation.PopupMenu</item>
     </style>
 
     <style name="Foundation.Default" parent="Foundation.Base">
@@ -36,6 +49,7 @@
     <style name="Foundation.Floating" parent="Empty">
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
 </resources>

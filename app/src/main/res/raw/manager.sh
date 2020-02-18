@@ -1,3 +1,7 @@
+##################################
+# Magisk Manager internal scripts
+##################################
+
 env_check() {
   for file in busybox magisk magiskboot magiskinit util_functions.sh boot_patch.sh; do
     [ -f $MAGISKBIN/$file ] || return 1
@@ -34,7 +38,7 @@ direct_install() {
 }
 
 mm_patch_dtb() {
-  local result=1
+  (local result=1
   local PATCHED=$TMPDIR/dt.patched
   for name in dtb dtbo; do
     local IMAGE=`find_block $name$SLOT`
@@ -51,7 +55,9 @@ mm_patch_dtb() {
       fi
     fi
   done
-  return $result
+  # Run broadcast command passed from app
+  eval $1
+  )& >/dev/null 2>&1
 }
 
 restore_imgs() {
@@ -116,4 +122,40 @@ force_pm_install() {
   return $res
 }
 
-SHA1=`grep_prop SHA1 /sbin/.magisk/config`
+check_boot_ramdisk() {
+  # Create boolean ISAB
+  [ -z $SLOT ] && ISAB=false || ISAB=true
+
+  # If we are running as recovery mode, then we do not have ramdisk in boot
+  $RECOVERYMODE && return 1
+
+  # If we are A/B, then we must have ramdisk
+  $ISAB && return 0
+
+  # If we are using legacy SAR, but not AB, we do not have ramdisk in boot
+  if grep ' / ' /proc/mounts | grep -q '/dev/root'; then
+    # Override recovery mode to true
+    RECOVERYMODE=true
+    return 1
+  fi
+
+  return 0
+}
+
+##########################
+# Non-root util_functions
+##########################
+
+mount_partitions() {
+  [ "`getprop ro.build.ab_update`" = "true" ] && SLOT=`getprop ro.boot.slot_suffix`
+  # Check whether non rootfs root dir exists
+  grep ' / ' /proc/mounts | grep -qv 'rootfs' && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+}
+
+get_flags() {
+  $SYSTEM_ROOT && KEEPVERITY=true || KEEPVERITY=false
+  [ "`getprop ro.crypto.state`" = "encrypted" ] && KEEPFORCEENCRYPT=true || KEEPFORCEENCRYPT=false
+  RECOVERYMODE=false
+}
+
+run_migrations() { return; }

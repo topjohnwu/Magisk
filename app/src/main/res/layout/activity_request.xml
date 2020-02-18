@@ -11,132 +11,143 @@
 
     </data>
 
-    <LinearLayout
-        android:id="@+id/su_popup"
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card.Elevated"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="?attr/colorBackgroundFloating"
-        android:minWidth="350dp"
-        android:orientation="vertical">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/request_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_horizontal"
-            android:text="@string/su_request_title"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_gravity="center">
 
         <LinearLayout
+            android:id="@+id/su_popup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp">
+            android:minWidth="350dp"
+            android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/app_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="0"
-                android:src="@{viewModel.icon}"
-                tools:src="@drawable/ic_delete" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/request_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginBottom="@dimen/l_50"
+                android:gravity="center_horizontal"
+                android:text="@string/su_request_title"
+                android:textAppearance="@style/AppearanceFoundation.Title" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/l_50"
+                android:layout_marginBottom="@dimen/l_50"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/app_name"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/app_icon"
+                    style="@style/WidgetFoundation.Icon"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="@dimen/l_50"
+                    android:layout_marginEnd="@dimen/l1"
+                    android:layout_weight="0"
+                    android:padding="0dp"
+                    android:src="@{viewModel.icon}"
+                    app:tint="@null"
+                    tools:src="@drawable/ic_delete_md2" />
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxWidth="300dp"
-                    android:maxLines="1"
-                    android:minWidth="200dp"
-                    android:text="@{viewModel.title}"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="?android:textColorPrimary"
-                    tools:text="Magisk" />
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/package_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxWidth="300dp"
-                    android:maxLines="1"
-                    android:minWidth="200dp"
-                    android:text="@{viewModel.packageName}"
-                    android:textColor="?android:textColorSecondary"
-                    tools:text="com.topjohnwu.magisk" />
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/app_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxWidth="300dp"
+                        android:maxLines="1"
+                        android:minWidth="200dp"
+                        android:text="@{viewModel.title}"
+                        android:textAppearance="@style/AppearanceFoundation.Body"
+                        android:textStyle="bold"
+                        tools:text="Magisk" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/package_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxWidth="300dp"
+                        android:maxLines="1"
+                        android:minWidth="200dp"
+                        android:text="@{viewModel.packageName}"
+                        android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                        tools:text="com.topjohnwu.magisk" />
+                </LinearLayout>
             </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/timeout"
+                onTouch="@{() -> viewModel.spinnerTouched()}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:adapter="@{viewModel.adapter}"
+                android:selection="@={viewModel.selectedItemPosition}" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/warning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/l1"
+                android:gravity="center"
+                android:text="@{viewModel.warningText}"
+                android:textAppearance="@style/AppearanceFoundation.Body"
+                android:textColor="?colorError"
+                android:textStyle="bold"
+                tools:text="@string/su_warning" />
+
+            <LinearLayout
+                style="?android:buttonBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/l2"
+                android:paddingEnd="@dimen/l2">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/deny_btn"
+                    style="@style/WidgetFoundation.Button.Text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="@{() -> viewModel.denyPressed()}"
+                    android:text="@{viewModel.denyText}"
+                    android:textColor="?colorOnSurfaceVariant"
+                    tools:text="@string/deny" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/grant_btn"
+                    style="@style/WidgetFoundation.Button.Text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="@{() -> viewModel.grantPressed()}"
+                    android:enabled="@{viewModel.grantEnabled}"
+                    android:text="@string/grant" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/timeout"
-            onTouch="@{() -> viewModel.spinnerTouched()}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:adapter="@{viewModel.adapter}"
-            android:selection="@={viewModel.selectedItemPosition}" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/warning"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="5dp"
-            android:drawablePadding="10dp"
-            android:text="@{viewModel.warningText}"
-            android:textColor="?android:textColorSecondary"
-            tools:text="@string/su_warning" />
-
-        <LinearLayout
-            style="?android:buttonBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="bottom"
-            android:orientation="horizontal"
-            android:paddingStart="30dp"
-            android:paddingEnd="30dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/deny_btn"
-                style="@style/Widget.Button.Text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="@{() -> viewModel.denyPressed()}"
-                android:text="@{viewModel.denyText}"
-                tools:text="@string/deny" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/grant_btn"
-                style="@style/Widget.Button.Text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="@{() -> viewModel.grantPressed()}"
-                android:text="@string/grant" />
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </layout>

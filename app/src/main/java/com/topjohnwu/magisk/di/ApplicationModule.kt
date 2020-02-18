@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
+import com.topjohnwu.magisk.core.ResourceMgr
 import com.topjohnwu.magisk.utils.RxBus
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -17,7 +18,7 @@ val Protected = named("protected")
 
 val applicationModule = module {
     single { RxBus() }
-    factory { get<Context>().resources }
+    factory { ResourceMgr.resource }
     factory { get<Context>().packageManager }
     factory(Protected) { createDEContext(get()) }
     single(SUTimeout) { get<Context>(Protected).getSharedPreferences("su_timeout", 0) }
