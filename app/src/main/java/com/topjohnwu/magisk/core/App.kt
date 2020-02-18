@@ -82,7 +82,7 @@ open class App() : Application() {
             androidContext(wrapped)
             modules(koinModules)
         }
-        ResourceMgr.init(impl)
+        ResMgr.init(impl)
         app.registerActivityLifecycleCallbacks(get<ActivityTracker>())
         WorkManager.initialize(impl.wrapJob(), androidx.work.Configuration.Builder().build())
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.ArrayRes
 import androidx.annotation.CallSuper
 import androidx.databinding.Bindable
 import androidx.databinding.ViewDataBinding
@@ -145,12 +146,18 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
         protected val resources get() = get<Resources>()
 
-        abstract val entries: Array<out CharSequence>
-        abstract val entryValues: Array<out CharSequence>
+        @ArrayRes open val entryRes = -1
+        @ArrayRes open val entryValRes = -1
+
+        open val entries get() = resources.getArrayOrEmpty(entryRes)
+        open val entryValues get() = resources.getArrayOrEmpty(entryValRes)
 
         @get:Bindable
         val selectedEntry
             get() = entries.getOrNull(value)
+
+        private fun Resources.getArrayOrEmpty(id: Int): Array<String> =
+            runCatching { getStringArray(id) }.getOrDefault(emptyArray())
 
         override fun onPressed(view: View, callback: Callback) {
             if (entries.isEmpty() || entryValues.isEmpty()) return
