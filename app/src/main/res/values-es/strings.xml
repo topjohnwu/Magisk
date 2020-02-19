@@ -91,7 +91,7 @@
 
     <!--Logs-->
     <string name="log_data_none">No se tiene registro, intente usar más sus aplicaciones habilitadas para SU.</string>
-    <string name="log_data_magisk_none">Los registros de Magisk están vacíos, eso es raro.</string>
+    <string name="log_data_magisk_none">Los registros de Magisk están vacíos, esto es muy raro.</string>
     <string name="menuSaveLog">Guardar registro</string>
     <string name="menuClearLog">Limpiar registro ahora</string>
     <string name="logs_cleared">Registro limpiado correctamente</string>
@@ -105,7 +105,7 @@
     <string name="safetynet_attest_failure">La certificación falló!</string>
     <string name="safetynet_attest_loading">Solo un segundo…</string>
     <string name="safetynet_attest_restart">Inténtalo de nuevo</string>
-    <string name="safetynet_system">Sistema</string>
+    <string name="safetynet_system">Android</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostrar sistema</string>
@@ -142,6 +142,10 @@
     <string name="settings_dark_mode_dark">Oscuro</string>
     <string name="settings_safe_mode_title">Modo Seguro</string>
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
+    <string name="settings_grid_column_count_title">Gestión de la Lista</string>
+    <string name="settings_grid_column_count_summary">Establece el ancho de la lista. Reinicie la aplicación para aplicar los cambios.</string>
+    <string name="settings_grid_column_count_1">Estándar</string>
+    <string name="settings_grid_column_count_2">Compacto</string>
     <string name="settings_download_path_title">Ruta de Descarga</string>
     <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
