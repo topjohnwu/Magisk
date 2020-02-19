@@ -15,7 +15,7 @@
     <string name="no_connection">კავშირი არ არის</string>
     <string name="app_changelog">ცვლილებები</string>
     <string name="manager">მენეჯერი</string>
-    <string name="loading">იტვირთება...</string>
+    <string name="loading">იტვირთება…</string>
     <string name="info">ინფორმაცია</string>
     <string name="uninstall">დეინსტალაცია</string>
     <string name="update">განახლება</string>
@@ -31,7 +31,6 @@
     <string name="home_item_source">წყარო</string>
     <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
     <string name="home_device_title">მოწყობილობა</string>
-    <string name="home_device_extra_manufacროturer">მწარმოებელი</string>
     <string name="home_device_extra_model">მოდელი</string>
     <string name="home_device_extra_board">პლატა</string>
     <string name="home_device_system">სისტემა</string>
@@ -143,10 +142,6 @@
     <string name="settings_dark_mode_dark">მუქი თემა</string>
     <string name="settings_safe_mode_title">უსაფრთხო რეჟიმი</string>
     <string name="settings_core_only_summary" deprecated="true">მხოლოდ მთავარი ფუნქციების ჩართვა. MagiskSU და MagiskHide-ი იმუშავებენ, მაგრამ მოდულები არ ჩაიტვირთება</string>
-    <string name="settings_grid_span_count_title">ბადის სვეტების ზომა</string>
-    <string name="settings_grid_span_count_summary">არეგულირებს სვეტების ზომას. თქვენ შეგიძლიათ ამის შეცვლა პარამეტრების გარეთ, ორი თითის საპირისპირო მიმართულებით გასმით.</string>
-    <string name="settings_grid_span_count_1">თითო ფანჯარა სტრიქონზე (პატარა ეკრანებისთვის)</string>
-    <string name="settings_grid_span_count_2">ორი ფანჯარა სტრიქონზე (რეკომენდირებული)</string>
     <string name="settings_download_path_title">გადმოწერის ლოკაცია</string>
     <string name="settings_download_path_message">ფაილები შეინახება %1$s-ში</string>
     <string name="settings_clear_cache_title">რეპოზიტორიების ქეშის წაშლა</string>
