@@ -100,6 +100,8 @@
     <string name="target_uid">Cieľový UID: %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">Chyba SafetyNet API</string>
+    <string name="safetynet_res_invalid">Odpoveď je neplatná</string>
     <string name="safetynet_attest_success">Úspech!</string>
     <string name="safetynet_attest_failure">Overenie zlyhalo!</string>
     <string name="safetynet_attest_loading">Momentík ...</string>
@@ -121,7 +123,7 @@
     <string name="reboot_download">Reštartovať do Download</string>
     <string name="reboot_edl">Reštartovať do EDL</string>
     <string name="module_safe_mode_message">Nachádzate sa v núdzovom režime. Žiadny z používateľských modulov nebude fungovať.\nTáto správa zmizne po vypnutí núdzového režimu.</string>
-    <string name="module_version_author">%1$s by %2$s</string>
+    <string name="module_version_author">%1$s od %2$s</string>
     <string name="module_section_pending">Aktualizácie</string>
     <string name="module_section_pending_action">Aktualizovať všetko</string>
     <string name="module_section_remote">Vzdialené</string>
@@ -141,6 +143,10 @@
     <string name="settings_dark_mode_dark">Vždy tmavý</string>
     <string name="settings_safe_mode_title">Núdzový režim</string>
     <string name="settings_core_only_summary" deprecated="true">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU a MagiskHide, ale žiadne moduly nebudú zavedené</string>
+    <string name="settings_grid_column_count_title">Usporiadanie zoznamu</string>
+    <string name="settings_grid_column_count_summary">Nastaví šírku položky v zozname. Ak chcete aplikovať zmeny, reštartujte aplikáciu.</string>
+    <string name="settings_grid_column_count_1">Štandardný</string>
+    <string name="settings_grid_column_count_2">Stlačený</string>
     <string name="settings_download_path_title">Cesta na sťahovanie</string>
     <string name="settings_download_path_message">Súbory budú uložené do %1$s</string>
     <string name="settings_clear_cache_title">Vyčistiť cache repo</string>
