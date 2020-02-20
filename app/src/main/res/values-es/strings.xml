@@ -13,12 +13,12 @@
     <!--Home-->
     <string name="no_connection">Conexión no Disponible</string>
     <string name="app_changelog">Registro de Cambios</string>
-	
+
     <string name="loading">Cargando…</string>
     <string name="info">Información</string>
     <string name="uninstall">Desinstalar</string>
     <string name="update">Actualizar</string>
-	
+
     <string name="hide">Ocultar</string>
     <string name="status">Estado</string>
     <string name="home_package">Paquete</string>
@@ -27,20 +27,20 @@
     <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto.  Una versión de origen desconocido podria realizar acciones maliciosas.</string>
     <string name="home_support_title">Apoyanos</string>
     <string name="home_links_project">Links del Proyecto</string>
-    <string name="home_item_source">Codigo Fuente</string>	
-    <string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>	
-    <string name="home_device_title">Tu dispositivo</string>  
+    <string name="home_item_source">Codigo Fuente</string>
+    <string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
+    <string name="home_device_title">Tu dispositivo</string>
     <string name="home_device_extra_manufacturer">Fabricante</string>
     <string name="home_device_extra_model">Modelo</string>
     <string name="home_device_extra_board">Placa</string>
     <string name="home_device_system">Android</string>
     <string name="home_status_normal">Normal</string>
-    <string name="home_status_safe">Modo Seguro</string>	
+    <string name="home_status_safe">Modo Seguro</string>
 
     <string name="invalid_update_channel">Canal de actualización inválido</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
-	
+
     <!--Install-->
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
@@ -91,7 +91,7 @@
 
     <!--Logs-->
     <string name="log_data_none">No se tiene registro, intente usar más sus aplicaciones habilitadas para SU.</string>
-    <string name="log_data_magisk_none">Los registros de Magisk están vacíos, eso es raro.</string>
+    <string name="log_data_magisk_none">Los registros de Magisk están vacíos, esto es muy raro.</string>
     <string name="menuSaveLog">Guardar registro</string>
     <string name="menuClearLog">Limpiar registro ahora</string>
     <string name="logs_cleared">Registro limpiado correctamente</string>
@@ -105,7 +105,7 @@
     <string name="safetynet_attest_failure">La certificación falló!</string>
     <string name="safetynet_attest_loading">Solo un segundo…</string>
     <string name="safetynet_attest_restart">Inténtalo de nuevo</string>
-    <string name="safetynet_system">Sistema</string>
+    <string name="safetynet_system">Android</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostrar sistema</string>
@@ -142,6 +142,10 @@
     <string name="settings_dark_mode_dark">Oscuro</string>
     <string name="settings_safe_mode_title">Modo Seguro</string>
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
+    <string name="settings_grid_column_count_title">Gestión de la Lista</string>
+    <string name="settings_grid_column_count_summary">Establece el ancho de la lista. Reinicie la aplicación para aplicar los cambios.</string>
+    <string name="settings_grid_column_count_1">Estándar</string>
+    <string name="settings_grid_column_count_2">Compacto</string>
     <string name="settings_download_path_title">Ruta de Descarga</string>
     <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>

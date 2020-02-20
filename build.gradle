@@ -16,7 +16,7 @@ buildscript {
         maven { url 'https://kotlin.bintray.com/kotlinx' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.0-rc02'
+        classpath 'com.android.tools.build:gradle:3.6.0-rc03'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${vKotlin}"
 
 

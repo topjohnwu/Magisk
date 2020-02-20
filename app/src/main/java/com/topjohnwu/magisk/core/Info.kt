@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.core
 
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.extensions.get
@@ -13,6 +14,7 @@ import java.io.FileInputStream
 import java.io.IOException
 
 val isRunningAsStub get() = Info.stub != null
+val isCanaryVersion = !BuildConfig.VERSION_NAME.contains(".")
 
 object Info {
 

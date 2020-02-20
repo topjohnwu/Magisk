@@ -23,6 +23,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.util.concurrent.TimeUnit
@@ -62,12 +63,12 @@ fun setOnTouchListener(view: View, listener: View.OnTouchListener) {
 @BindingAdapter("scrollToLast")
 fun setScrollToLast(view: RecyclerView, shouldScrollToLast: Boolean) {
 
-    fun scrollToLast() = view.post {
+    fun scrollToLast() = UiThreadHandler.handler.postDelayed({
         view.scrollToPosition(view.adapter?.itemCount?.minus(1) ?: 0)
-    }
+    }, 30)
 
     fun wait(callback: () -> Unit) {
-        Observable.timer(1, TimeUnit.SECONDS).subscribeK { callback() }
+        UiThreadHandler.handler.postDelayed(callback, 1000)
     }
 
     fun RecyclerView.Adapter<*>.setListener() {

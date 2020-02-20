@@ -57,7 +57,7 @@ fun Class<*>.cmp(pkg: String): ComponentName {
 inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
 
 private open class GlobalResContext(base: Context) : ContextWrapper(base) {
-    open val mRes: Resources get() = ResourceMgr.resource
+    open val mRes: Resources get() = ResMgr.resource
 
     override fun getResources(): Resources {
         return mRes
@@ -78,22 +78,24 @@ private class ResContext(base: Context) : GlobalResContext(base) {
     private fun Resources.patch(): Resources {
         updateConfig()
         if (isRunningAsStub)
-            assets.addAssetPath(ResourceMgr.resApk)
+            assets.addAssetPath(ResMgr.apk)
         return this
     }
 }
 
-object ResourceMgr {
+object ResMgr {
 
     lateinit var resource: Resources
-    lateinit var resApk: String
+    lateinit var apk: String
 
     fun init(context: Context) {
         resource = context.resources
         refreshLocale()
         if (isRunningAsStub) {
-            resApk = DynAPK.current(context).path
-            resource.assets.addAssetPath(resApk)
+            apk = DynAPK.current(context).path
+            resource.assets.addAssetPath(apk)
+        } else {
+            apk = context.packageResourcePath
         }
     }
 }
@@ -169,8 +171,5 @@ val shouldKeepResources = listOf(
     R.string.unsupport_magisk_title,
     R.string.install_inactive_slot_msg,
     R.string.invalid_update_channel,
-    R.string.update_available,
-
-    /* Android Studio is dumb and cannot detect following usages in databinding */
-    R.menu.menu_reboot
+    R.string.update_available
 )
