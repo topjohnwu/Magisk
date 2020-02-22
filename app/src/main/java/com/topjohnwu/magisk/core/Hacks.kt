@@ -147,7 +147,6 @@ object ClassMap {
         MainActivity::class.java to a.b::class.java,
         SplashActivity::class.java to a.c::class.java,
         FlashActivity::class.java to a.f::class.java,
-        UpdateCheckService::class.java to a.g::class.java,
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
         SuRequestActivity::class.java to a.m::class.java,

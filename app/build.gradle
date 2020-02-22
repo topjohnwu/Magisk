@@ -32,7 +32,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-                    'proguard-rules.pro', 'proguard-kotlin.pro'
+                    'proguard-rules.pro'
         }
     }
 
