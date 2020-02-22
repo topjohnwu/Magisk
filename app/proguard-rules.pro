@@ -39,7 +39,7 @@
 }
 
 # Excessive obfuscation
--repackageclasses a
+-repackageclasses
 -allowaccessmodification
 
 # QOL
