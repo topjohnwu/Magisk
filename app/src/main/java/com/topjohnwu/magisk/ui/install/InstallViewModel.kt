@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
@@ -11,14 +12,13 @@ import com.topjohnwu.magisk.model.events.RequestFileEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.ShellUtils
 import org.koin.core.get
 import kotlin.math.roundToInt
 
 class InstallViewModel : BaseViewModel(State.LOADED) {
 
-    val isRooted = Shell.rootAccess()
-    val isAB = isABDevice()
+    val isRooted get() = Shell.rootAccess()
+    val isAB get() = Info.isAB
 
     val step = KObservableField(0)
     val method = KObservableField(-1)
@@ -64,9 +64,4 @@ class InstallViewModel : BaseViewModel(State.LOADED) {
         R.id.method_inactive_slot -> Configuration.Flash.Secondary
         else -> throw IllegalArgumentException("Unknown value")
     }
-
-    private fun isABDevice() = ShellUtils
-        .fastCmd("grep_prop ro.build.ab_update")
-        .let { it.isNotEmpty() && it.toBoolean() }
-
 }
