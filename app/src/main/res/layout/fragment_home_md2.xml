@@ -30,7 +30,7 @@
             <com.google.android.material.button.MaterialButton
                 android:layout_gravity="center"
                 style="@style/WidgetFoundation.Button"
-                gone="@{true}"
+                gone="@{!viewModel.showTest}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="@{() -> viewModel.onTestPressed()}"

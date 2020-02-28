@@ -96,6 +96,8 @@ class HomeViewModel(
         ensureEnv()
     }
 
+    val showTest = false
+
     fun onTestPressed() = object : ViewEvent(), ActivityExecutor {
         override fun invoke(activity: BaseActivity) {
             /* Entry point to trigger test events within the app */
