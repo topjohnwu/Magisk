@@ -209,6 +209,11 @@ mount_partitions() {
     SYSTEM_ROOT=true
     setup_mntpoint /system_root
     mount --move /system /system_root
+    if [ $? != 0 ]; then
+      umount /system
+      umount -l /system 2>/dev/null
+      mount_ro_ensure "system$SLOT app$SLOT" /system_root
+    fi
     mount -o bind /system_root/system /system
   else
     grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
