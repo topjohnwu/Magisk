@@ -5,14 +5,16 @@
    <string name="superuser">Superusuário</string>
    <string name="logs">Registros</string>
    <string name="settings">Configurações</string>
-   <string name="install">Instalar</string>
+   <string name="refresh">Atualizar dados locais</string>
+   <string name="install">Instalar</string>
    <string name="section_home">Início</string>
    <string name="section_theme">Temas</string>
    <string name="safetynet">SafetyNet</string>
 
    <!--Home-->
    <string name="no_connection">Nenhuma conexão disponível</string>
-   <string name="installed_error">Não está instalado</string>
+   <string name="app_changelog">Registro de alterações</string>
+   <string name="installed_error">Não está instalado</string>
    <string name="channel_error">possui um canal de atualização inválido!</string>
    <string name="up_to_date">Está Atualizado</string>
    <string name="obsolete">Atualização Disponível!</string>
@@ -20,15 +22,19 @@
    <string name="home_notice_content">Certifique-se sempre de que você está usando o Magisk Manager Open-Source. Versões de fonte desconhecida pode realizar ações maliciosas.</string>
    <string name="home_notice_hide">Ocultar</string>
    <string name="app_changelog">Registro de alterações</string>
+   <string name="home_notice_content">Certifique-se sempre de que você está usando o Magisk Manager Open-Source. Versões de fonte desconhecida pode realizar ações maliciosas.</string>
    <string name="manager">Gerenciador</string>
 
    <string name="home_support_title">Contribua com o Projeto</string>
    <string name="home_links_project">Links do projeto</string>
    <string name="home_item_source">Origem</string>
-   <string name="home_support_content">Magisk é, e sempre será, gratuito e de código aberto. No entanto, você pode nos mostrar que se importa enviando uma pequena doação.</string>
 
    <string name="home_device_security">Segurança</string>
-   <string name="home_device_system">Sistema</string>
+   <string name="home_device_title">Dispositivo</string>
+   <string name="home_device_extra_manufacturer">Fabricante</string>
+   <string name="home_device_extra_model">Modelo</string>
+   <string name="home_device_extra_board">Placa</string> 
+   <string name="home_device_system">Sistema</string>
    <string name="home_device_build_style">A/B</string>
    <string name="home_device_build_type">SAR</string>
 
@@ -42,6 +48,8 @@
    <string name="home_extra_package">Pacote</string>
 
    <string name="home_extra_mode_normal">Normal</string>
+   <string name="home_status_safe">Safe Mode</string>
+   <string name="home_status_stub">Esboço</string>
    <string name="home_extra_mode_safe">Seguro</string>
    <string name="home_extra_mode_stub">Dinâmico</string>
    
@@ -111,6 +119,8 @@
    <string name="target_uid">Alvo UID: %1$d</string>
 
    <!--SafetyNet-->
+   <string name="safetynet_api_error">Erro da API SafetyNet</string>
+   <string name="safetynet_res_invalid">A resposta é inválida</string>
    <string name="safetynet_attest_success">Sucesso!</string>
    <string name="safetynet_attest_failure">O certificado falhou!</string>
    <string name="safetynet_attest_loading">Aguarde…</string>
@@ -151,8 +161,11 @@
    <string name="settings_dark_mode_system">Baseado no Sistema</string>
    <string name="settings_dark_mode_dark">Sempre Escuro</string>
    <string name="settings_safe_mode_title">Modo de segurança</string>
-   <string name="settings_core_only_summary" obsoleto = "true">Ative apenas os principais recursos. O MagiskSU e o MagiskHide ainda estarão ativados, mas nenhum módulo será carregado</string>
-   <string name="settings_grid_span_count_title">Tamanho da coluna da grade</string>
+   <string name="settings_core_only_summary" deprecated="true">Ative apenas os principais recursos. O MagiskSU e o MagiskHide ainda estarão ativados, mas nenhum módulo será carregado</string>
+   <string name="settings_grid_column_count_title">Organização da lista</string>
+   <string name="settings_grid_column_count_summary">Define a largura do item em uma lista. Reinicie o aplicativo para aplicar as alterações.</string>
+   <string name="settings_grid_column_count_1">Padrão</string>
+   <string name="settings_grid_span_count_title">Tamanho da coluna da grade</string>
    <string name="settings_grid_span_count_summary">Define o tamanho da coluna para todas as listas de grade qualificadas. Você pode definir essas configurações realizando o gesto de pinça com os dedos.</string>
    <string name="settings_grid_span_count_1">Um item por linha (telas pequenas)</string>    
    <string name="settings_grid_span_count_2">Dois itens por linha (recomendado)</string>
