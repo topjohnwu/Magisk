@@ -20,8 +20,8 @@ private fun RemoteFileService.patch(apk: File, id: Int) {
     if (packageName == BuildConfig.APPLICATION_ID)
         return
 
-    update(id) { notification ->
-        notification.setProgress(0, 0, true)
+    update(id) {
+        it.setProgress(0, 0, true)
             .setProgress(0, 0, true)
             .setContentTitle(getString(R.string.hide_manager_title))
             .setContentText("")
@@ -53,11 +53,11 @@ private fun RemoteFileService.upgrade(apk: File, id: Int) {
 }
 
 private fun RemoteFileService.restore(apk: File, id: Int) {
-    update(id) { notification ->
-        notification.setProgress(0, 0, true)
-                .setProgress(0, 0, true)
-                .setContentTitle(getString(R.string.restore_img_msg))
-                .setContentText("")
+    update(id) {
+        it.setProgress(0, 0, true)
+            .setProgress(0, 0, true)
+            .setContentTitle(getString(R.string.restore_img_msg))
+            .setContentText("")
     }
     Config.export()
     // Make it world readable
@@ -65,8 +65,8 @@ private fun RemoteFileService.restore(apk: File, id: Int) {
     Shell.su("pm install $apk && pm uninstall $packageName").exec()
 }
 
-fun RemoteFileService.handleAPK(subject: DownloadSubject.Manager)
-    = when (subject.configuration) {
+fun RemoteFileService.handleAPK(subject: DownloadSubject.Manager) =
+    when (subject.configuration) {
         is Upgrade -> upgrade(subject.file, subject.hashCode())
         is Restore -> restore(subject.file, subject.hashCode())
     }
