@@ -1,14 +1,17 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
+import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.RemoteFileService
+import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.RequestFileEvent
+import com.topjohnwu.magisk.model.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
@@ -41,8 +44,14 @@ class InstallViewModel : BaseViewModel(State.LOADED) {
             }
         }
         method.addOnPropertyChangedCallback {
-            if (method.value == R.id.method_patch) {
-                RequestFileEvent().publish()
+            when (method.value) {
+                R.id.method_patch -> {
+                    Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
+                    RequestFileEvent().publish()
+                }
+                R.id.method_inactive_slot -> {
+                    SecondSlotWarningDialog().publish()
+                }
             }
         }
     }
