@@ -8,11 +8,6 @@
             name="item"
             type="com.topjohnwu.magisk.model.entity.recycler.ConsoleItem" />
 
-        <!--no actions are required-->
-        <variable
-            name="viewModel"
-            type="Object" />
-
     </data>
 
     <TextView

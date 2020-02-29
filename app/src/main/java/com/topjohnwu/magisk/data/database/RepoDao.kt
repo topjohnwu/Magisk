@@ -4,7 +4,7 @@ import androidx.room.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.model.module.Repo
 
-@Database(version = 6, entities = [Repo::class, RepoEtag::class])
+@Database(version = 6, entities = [Repo::class, RepoEtag::class], exportSchema = false)
 abstract class RepoDatabase : RoomDatabase() {
 
     abstract fun repoDao() : RepoDao

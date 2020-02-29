@@ -27,6 +27,17 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/l1">
 
+            <com.google.android.material.button.MaterialButton
+                android:layout_gravity="center"
+                style="@style/WidgetFoundation.Button"
+                gone="@{!viewModel.showTest}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> viewModel.onTestPressed()}"
+                android:text="TEST"
+                android:textAllCaps="false"
+                tools:visibility="gone"/>
+
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card.Primary"
                 goneUnless="@{viewModel.noticeVisible}"
