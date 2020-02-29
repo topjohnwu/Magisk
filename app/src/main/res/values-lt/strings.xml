@@ -9,8 +9,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Neteisingas atnaujinimų nustatymas</string>
-    <string name="safetyNet_api_error">SafetyNet API Klaida</string>
-    <string name="safetyNet_res_invalid">Gautas neteisingas atsakymas</string>
+    <string name="safetynet_api_error">SafetyNet API Klaida</string>
+    <string name="safetynet_res_invalid">Gautas neteisingas atsakymas</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Palikti priverstinį šifravimą</string>

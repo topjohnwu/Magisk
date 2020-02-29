@@ -6,7 +6,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
-@Database(version = 1, entities = [MagiskLog::class])
+@Database(version = 1, entities = [MagiskLog::class], exportSchema = false)
 abstract class SuLogDatabase : RoomDatabase() {
 
     abstract fun suLogDao(): SuLogDao

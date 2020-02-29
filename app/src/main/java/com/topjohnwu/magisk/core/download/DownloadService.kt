@@ -9,15 +9,18 @@ import android.os.Build
 import android.webkit.MimeTypeMap
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.intent
+import com.topjohnwu.magisk.core.tasks.EnvFixTask
 import com.topjohnwu.magisk.extensions.chooser
 import com.topjohnwu.magisk.extensions.exists
 import com.topjohnwu.magisk.extensions.provide
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.legacy.flash.FlashActivity
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.utils.APKInstall
+import io.reactivex.Completable
 import org.koin.core.get
 import java.io.File
 import kotlin.random.Random.Default.nextInt
@@ -43,6 +46,7 @@ open class DownloadService : RemoteFileService() {
         id: Int
     ) = when (val conf = subject.configuration) {
         Uninstall -> FlashActivity.uninstall(this, subject.file, id)
+        EnvFix -> { remove(id); EnvFixTask(subject.file).exec() }
         is Patch -> FlashActivity.patch(this, subject.file, conf.fileUri, id)
         is Flash -> FlashActivity.flash(this, subject.file, conf is Secondary, id)
         else -> Unit
@@ -60,10 +64,14 @@ open class DownloadService : RemoteFileService() {
         subject: Manager,
         id: Int
     ) {
-        remove(id)
-        when (subject.configuration)  {
-            is APK.Upgrade -> APKInstall.install(this, subject.file)
-            is APK.Restore -> Unit
+        Completable.fromAction {
+            handleAPK(subject)
+        }.subscribeK {
+            remove(id)
+            when (subject.configuration)  {
+                is APK.Upgrade -> APKInstall.install(this, subject.file)
+                is APK.Restore -> Unit
+            }
         }
     }
 

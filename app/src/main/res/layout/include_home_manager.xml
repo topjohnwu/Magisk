@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.topjohnwu.magisk.core.Info" />
+
+        <import type="com.topjohnwu.magisk.core.InfoKt" />
+
+        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/l_50"
+            android:paddingStart="@dimen/l1"
+            android:paddingEnd="@dimen/l1"
+            android:paddingBottom="@dimen/l1"
+            tools:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/home_manager_icon"
+                style="@style/WidgetFoundation.Icon.Primary"
+                android:padding="@dimen/l_50"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_manager" />
+
+            <TextView
+                android:id="@+id/home_manager_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:text="@string/manager"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textColor="?colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"
+                app:layout_constraintEnd_toStartOf="@+id/home_manager_action"
+                app:layout_constraintStart_toEndOf="@+id/home_manager_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/manager" />
+
+            <FrameLayout
+                android:id="@+id/home_manager_action"
+                invisible="@{viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/home_manager_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/home_manager_title">
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/WidgetFoundation.Button"
+                    gone="@{viewModel.stateManager != MagiskState.OBSOLETE}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{() -> viewModel.onManagerPressed()}"
+                    android:text="@string/update"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_update_md2" />
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/WidgetFoundation.Button.Text"
+                    gone="@{viewModel.stateManager == MagiskState.OBSOLETE}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{() -> viewModel.onManagerPressed()}"
+                    android:text="@string/install"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_install" />
+
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/home_manager_title_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                tools:constraint_referenced_ids="home_manager_action,home_manager_title,home_manager_icon" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fadingEdgeLength="@dimen/l1"
+                android:paddingTop="@dimen/l_50"
+                android:requiresFadingEdge="horizontal"
+                android:scrollbars="none"
+                app:layout_constraintTop_toBottomOf="@+id/home_manager_title_barrier">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_latest_version"
+                            style="@style/W.Home.Item.Top"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" >
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/module_section_remote" />
+
+                            <TextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{viewModel.isConnected ? viewModel.stateManagerRemoteVersion : @string/not_available}"
+                                tools:text="8.0.0 (123) (10)" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_installed_version"
+                            style="@style/W.Home.Item"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_latest_version">
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/installed" />
+
+                            <TextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{viewModel.stateManagerInstalledVersion}"
+                                tools:text="8.0.0 (123) (10)" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_internal_mode"
+                            style="@style/W.Home.Item"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_installed_version">
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/status" />
+
+                            <TextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{InfoKt.isRunningAsStub ? @string/home_status_stub : @string/home_status_normal}"
+                                tools:text="Normal" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_manager_internal_connection"
+                            style="@style/W.Home.Item.Bottom"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_mode">
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/home_package" />
+
+                            <TextView
+                                android:id="@+id/home_manager_extra_connection_value"
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{viewModel.statePackageName}"
+                                tools:text="com.topjohnwu.magisk" />
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <ProgressBar
+                        style="@style/WidgetFoundation.ProgressBar"
+                        gone="@{viewModel.stateManagerProgress == 0 || viewModel.stateManagerProgress == 100}"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="bottom"
+                        android:max="100"
+                        android:progress="@{viewModel.stateManagerProgress}" />
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

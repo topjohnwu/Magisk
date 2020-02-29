@@ -1,14 +1,15 @@
 package com.topjohnwu.magisk.model.events.dialog
 
-import android.content.DialogInterface
-import android.widget.Toast
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.tasks.MagiskInstaller
-import com.topjohnwu.magisk.core.utils.Utils
-import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.core.download.DownloadService
+import com.topjohnwu.magisk.model.entity.internal.Configuration.EnvFix
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.view.MagiskDialog
-import com.topjohnwu.superuser.internal.UiThreadHandler
-import org.koin.core.KoinComponent
 
 class EnvFixDialog : DialogEvent() {
 
@@ -21,14 +22,16 @@ class EnvFixDialog : DialogEvent() {
             onClick {
                 dialog.applyTitle(R.string.setup_title)
                     .applyMessage(R.string.setup_msg)
-                    .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                        title = ""
-                    }
-                    .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                        title = ""
-                    }
+                    .resetButtons()
                     .cancellable(false)
-                fixEnv(it)
+                val lbm = LocalBroadcastManager.getInstance(dialog.context)
+                lbm.registerReceiver(object : BroadcastReceiver() {
+                    override fun onReceive(context: Context, intent: Intent?) {
+                        dialog.dismiss()
+                        lbm.unregisterReceiver(this)
+                    }
+                }, IntentFilter(DISMISS))
+                DownloadService(dialog.context) { subject = Magisk(EnvFix) }
             }
         }
         .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
@@ -36,20 +39,7 @@ class EnvFixDialog : DialogEvent() {
         }
         .let { Unit }
 
-    private fun fixEnv(dialog: DialogInterface) {
-        object : MagiskInstaller(), KoinComponent {
-            override fun operations() = fixEnv()
-
-            override fun onResult(success: Boolean) {
-                dialog.dismiss()
-                Utils.toast(
-                    if (success) R.string.reboot_delay_toast else R.string.setup_fail,
-                    Toast.LENGTH_LONG
-                )
-                if (success)
-                    UiThreadHandler.handler.postDelayed({ reboot() }, 5000)
-            }
-        }.exec()
+    companion object {
+        const val DISMISS = "com.topjohnwu.magisk.ENV_DONE"
     }
-
 }

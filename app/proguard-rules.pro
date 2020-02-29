@@ -16,6 +16,15 @@
 #   public *;
 #}
 
+# Kotlin
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+	public static void checkExpressionValueIsNotNull(...);
+	public static void checkNotNullExpressionValue(...);
+	public static void checkReturnedValueIsNotNull(...);
+	public static void checkFieldIsNotNull(...);
+	public static void checkParameterIsNotNull(...);
+}
+
 # Stubs
 -keep class a.* { *; }
 
@@ -29,14 +38,14 @@
 # Fragments
 -keep,allowobfuscation class * extends androidx.fragment.app.Fragment
 
-# BaseWorkerWrapper
--keep,allowobfuscation class * extends com.topjohnwu.magisk.core.base.BaseWorkerWrapper
-
-# Strip logging
--assumenosideeffects class timber.log.Timber.Tree { *; }
+# Strip Timber verbose and debug logging
+-assumenosideeffects class timber.log.Timber.Tree {
+  public void v(**);
+  public void d(**);
+}
 
 # Excessive obfuscation
--repackageclasses a
+-repackageclasses
 -allowaccessmodification
 
 # QOL

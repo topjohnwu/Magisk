@@ -191,8 +191,10 @@ static bool fdt_patch(Iter first, Iter last) {
 	return modified;
 }
 
+#define MAX_FDT_GROWTH 256
+
 template <class Table, class Header>
-static int dtb_patch(const Header *hdr, const char *in, const char *out) {
+static int dt_table_patch(const Header *hdr, const char *out) {
 	map<uint32_t, fdt_blob> dtb_map;
 	auto buf = reinterpret_cast<const uint8_t *>(hdr);
 	auto tables = reinterpret_cast<const Table *>(hdr + 1);
@@ -216,9 +218,9 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 		if (dtb_map.count(offset) == 0) {
 			auto blob = buf + offset;
 			uint32_t size = fdt_totalsize(blob);
-			auto fdt = xmalloc(size + 256);
+			auto fdt = xmalloc(size + MAX_FDT_GROWTH);
 			memcpy(fdt, blob, size);
-			fdt_open_into(fdt, fdt, size + 256);
+			fdt_open_into(fdt, fdt, size + MAX_FDT_GROWTH);
 			dtb_map[offset] = { fdt, offset };
 		}
 	}
@@ -229,9 +231,8 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 	if (!fdt_patch(make_iter(dtb_map.begin()), make_iter(dtb_map.end())))
 		return 1;
 
-	if (out == in)
-		unlink(in);
-	int fd = xopen(out, O_RDWR | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
+	unlink(out);
+	int fd = xopen(out, O_RDWR | O_CREAT | O_CLOEXEC, 0644);
 
 	uint32_t total_size = 0;
 
@@ -256,7 +257,7 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 		val.second.offset = lseek(fd, 0, SEEK_CUR);
 		auto fdt = val.second.fdt;
 		fdt_pack(fdt);
-		int size = fdt_totalsize(fdt);
+		auto size = fdt_totalsize(fdt);
 		total_size += xwrite(fd, fdt, size);
 		val.second.len = do_align(size, align);
 		write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), align));
@@ -282,6 +283,45 @@ static int dtb_patch(const Header *hdr, const char *in, const char *out) {
 	return 0;
 }
 
+static int blob_patch(uint8_t *dtb, size_t dtb_sz, const char *out) {
+	vector<uint8_t *> fdt_list;
+	vector<uint32_t> padding_list;
+	for (int i = 0; i < dtb_sz; ++i) {
+		if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
+			auto len = fdt_totalsize(dtb + i);
+			auto fdt = static_cast<uint8_t *>(xmalloc(len + MAX_FDT_GROWTH));
+			memcpy(fdt, dtb + i, len);
+			fdt_pack(fdt);
+			uint32_t padding = len - fdt_totalsize(fdt);
+			padding_list.push_back(padding);
+			fdt_open_into(fdt, fdt, len + MAX_FDT_GROWTH);
+			fdt_list.push_back(fdt);
+			i += len - 1;
+		}
+	}
+
+	if (!fdt_patch(fdt_list.begin(), fdt_list.end()))
+		return 1;
+
+	unlink(out);
+	int fd = xopen(out, O_WRONLY | O_CREAT | O_CLOEXEC, 0644);
+
+	for (int i = 0; i < fdt_list.size(); ++i) {
+		auto fdt = fdt_list[i];
+		fdt_pack(fdt);
+		// Only add padding back if it is anything meaningful
+		if (padding_list[i] > 4) {
+			auto len = fdt_totalsize(fdt);
+			fdt_set_totalsize(fdt, len + padding_list[i]);
+		}
+		xwrite(fd, fdt, fdt_totalsize(fdt));
+		free(fdt);
+	}
+	close(fd);
+
+	return 0;
+}
+
 #define MATCH(s) (memcmp(dtb, s, sizeof(s) - 1) == 0)
 
 static int dtb_patch(const char *in, const char *out) {
@@ -298,13 +338,13 @@ static int dtb_patch(const char *in, const char *out) {
 		switch (hdr->version) {
 			case 1:
 				fprintf(stderr, "QCDT v1\n");
-				return dtb_patch<qctable_v1>(hdr, in, out);
+				return dt_table_patch<qctable_v1>(hdr, out);
 			case 2:
 				fprintf(stderr, "QCDT v2\n");
-				return dtb_patch<qctable_v2>(hdr, in, out);
+				return dt_table_patch<qctable_v2>(hdr, out);
 			case 3:
 				fprintf(stderr, "QCDT v3\n");
-				return dtb_patch<qctable_v3>(hdr, in, out);
+				return dt_table_patch<qctable_v3>(hdr, out);
 			default:
 				return 1;
 		}
@@ -313,7 +353,7 @@ static int dtb_patch(const char *in, const char *out) {
 		switch (hdr->version) {
 			case 2:
 				fprintf(stderr, "DTBH v2\n");
-				return dtb_patch<bhtable_v2>(hdr, in, out);
+				return dt_table_patch<bhtable_v2>(hdr, out);
 			default:
 				return 1;
 		}
@@ -322,7 +362,7 @@ static int dtb_patch(const char *in, const char *out) {
 		switch (hdr->version) {
 			case 1:
 				fprintf(stderr, "PXA-DT v1\n");
-				return dtb_patch<pxatable_v1>(hdr, in, out);
+				return dt_table_patch<pxatable_v1>(hdr, out);
 			default:
 				return 1;
 		}
@@ -331,7 +371,7 @@ static int dtb_patch(const char *in, const char *out) {
 		switch (hdr->version) {
 			case 1:
 				fprintf(stderr, "PXA-19xx v1\n");
-				return dtb_patch<pxatable_v1>(hdr, in, out);
+				return dt_table_patch<pxatable_v1>(hdr, out);
 			default:
 				return 1;
 		}
@@ -340,7 +380,7 @@ static int dtb_patch(const char *in, const char *out) {
 		switch (hdr->version) {
 			case 1:
 				fprintf(stderr, "SPRD v1\n");
-				return dtb_patch<sprdtable_v1>(hdr, in, out);
+				return dt_table_patch<sprdtable_v1>(hdr, out);
 			default:
 				return 1;
 		}
@@ -349,33 +389,13 @@ static int dtb_patch(const char *in, const char *out) {
 		switch (hdr->version) {
 			case 0:
 				fprintf(stderr, "DT_TABLE v0\n");
-				return dtb_patch<dt_table_entry>(hdr, in, out);
+				return dt_table_patch<dt_table_entry>(hdr, out);
 			default:
 				return 1;
 		}
 	} else {
-		vector<uint8_t *> fdt_list;
-		for (int i = 0; i < dtb_sz; ++i) {
-			if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
-				int len = fdt_totalsize(dtb + i);
-				auto fdt = static_cast<uint8_t *>(xmalloc(len + 256));
-				memcpy(fdt, dtb + i, len);
-				fdt_open_into(fdt, fdt, len + 256);
-				fdt_list.push_back(fdt);
-				i += len - 1;
-			}
-		}
-		if (!fdt_patch(fdt_list.begin(), fdt_list.end()))
-			return 1;
-		int fd = xopen(out, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
-		for (auto fdt : fdt_list) {
-			fdt_pack(fdt);
-			xwrite(fd, fdt, fdt_totalsize(fdt));
-			free(fdt);
-		}
-		close(fd);
+		return blob_patch(dtb, dtb_sz, out);
 	}
-	return 0;
 }
 
 int dtb_commands(int argc, char *argv[]) {

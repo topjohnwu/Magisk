@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Ongeldig bijwerkkanaal</string>
-    <string name="safetyNet_api_error">SafetyNet API fout</string>
-    <string name="safetyNet_res_invalid">Reactie is ongeldig</string>
+    <string name="safetynet_api_error">SafetyNet API fout</string>
+    <string name="safetynet_res_invalid">Reactie is ongeldig</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Behoud afgedwongen versleuteling</string>

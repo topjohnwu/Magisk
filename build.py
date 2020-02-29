@@ -58,7 +58,7 @@ archs = ['armeabi-v7a', 'x86']
 arch64 = ['arm64-v8a', 'x86_64']
 support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'resetprop', 'busybox', 'test']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
-build_tools = os.path.join(os.environ['ANDROID_HOME'], 'build-tools', '29.0.2')
+build_tools = os.path.join(os.environ['ANDROID_HOME'], 'build-tools', '29.0.3')
 
 # Global vars
 config = {}
@@ -332,7 +332,7 @@ def build_apk(args, module):
                         zout.writestr(e, zin.read(e))
 
             # Zipalign
-            execv([zipalign, '-fz', '4', source, target])
+            execv([zipalign, '-f', '4', source, target])
 
             # Sign APK
             execv([apksigner, 'sign', '--v1-signer-name', 'CERT',

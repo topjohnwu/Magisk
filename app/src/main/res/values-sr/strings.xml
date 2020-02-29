@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Непостојећи Канал Ажурирања</string>
-    <string name="safetyNet_api_error">СигурнаМрежа АПИ Грешка</string>
-    <string name="safetyNet_res_invalid">Одговор није валидан</string>
+    <string name="safetynet_api_error">СигурнаМрежа АПИ Грешка</string>
+    <string name="safetynet_res_invalid">Одговор није валидан</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Задржи форсирану енкрипцију</string>

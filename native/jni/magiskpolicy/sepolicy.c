@@ -11,18 +11,25 @@ policydb_t *magisk_policydb = NULL;
 extern void *xmalloc(size_t size);
 extern void *xcalloc(size_t nmemb, size_t size);
 extern void *xrealloc(void *ptr, size_t size);
+
+// Internal libsepol APIs
 extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
+extern int context_from_string(
+		sepol_handle_t * handle,
+		const policydb_t * policydb,
+		context_struct_t ** cptr,
+		const char *con_str, size_t con_str_len);
 
 // Generic hash table traversal
 #define hash_for_each(node_ptr, n_slots, table, block) \
-	for (int __i = 0; __i < (table)->n_slots; ++__i) { \
-		__typeof__(*(table)->node_ptr) node; \
-		__typeof__(node) __next; \
-		for (node = (table)->node_ptr[__i]; node; node = __next) { \
-			__next = node->next; \
-			block \
-		} \
+for (int __i = 0; __i < (table)->n_slots; ++__i) { \
+	__typeof__(*(table)->node_ptr) node; \
+	__typeof__(node) __next; \
+	for (node = (table)->node_ptr[__i]; node; node = __next) { \
+		__next = node->next; \
+		block \
 	} \
+}
 
 // hashtab traversal
 #define hashtab_for_each(hashtab, block) \
@@ -484,6 +491,66 @@ int add_type_rule(const char *s, const char *t, const char *c, const char *d, in
 
 	avtab_ptr_t node = get_avtab_node(&key, NULL);
 	node->datum.data = def->s.value;
+
+	return 0;
+}
+
+int add_genfscon(const char *name, const char *path, const char *context) {
+	// First try to create context
+	context_struct_t *ctx;
+	if (context_from_string(NULL, mpdb, &ctx, context, strlen(context))) {
+		LOGW("Failed to create context from string [%s]\n", context);
+		return 1;
+	}
+
+	// Allocate genfs context
+	ocontext_t *newc = xcalloc(sizeof(*newc), 1);
+	newc->u.name = strdup(path);
+	memcpy(&newc->context[0], ctx, sizeof(*ctx));
+	free(ctx);
+
+	// Find or allocate genfs
+	genfs_t *last_gen = NULL;
+	genfs_t *newfs = NULL;
+	for (genfs_t *node = mpdb->genfs; node; node = node->next) {
+		if (strcmp(node->fstype, name) == 0) {
+			newfs = node;
+			break;
+		}
+		last_gen = node;
+	}
+	if (newfs == NULL) {
+		newfs = xcalloc(sizeof(*newfs), 1);
+		newfs->fstype = strdup(name);
+		// Insert
+		if (last_gen)
+			last_gen->next = newfs;
+		else
+			mpdb->genfs = newfs;
+	}
+
+	// Insert or replace genfs context
+	ocontext_t *last_ctx = NULL;
+	for (ocontext_t *node = newfs->head; node; node = node->next) {
+		if (strcmp(node->u.name, path) == 0) {
+			// Unlink
+			if (last_ctx)
+				last_ctx->next = node->next;
+			else
+				newfs->head = NULL;
+			// Destroy old node
+			free(node->u.name);
+			context_destroy(&node->context[0]);
+			free(node);
+			break;
+		}
+		last_ctx = node;
+	}
+	// Insert
+	if (last_ctx)
+		last_ctx->next = newc;
+	else
+		newfs->head = newc;
 
 	return 0;
 }

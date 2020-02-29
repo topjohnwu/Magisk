@@ -84,4 +84,9 @@ abstract class BaseActivity : AppCompatActivity() {
         startActivityForResult(intent, requestCode)
     }
 
+    override fun recreate() {
+        startActivity(intent)
+        finish()
+    }
+
 }

@@ -11,8 +11,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">올바르지 않은 업데이트 채널</string>
-    <string name="safetyNet_api_error">SafetyNet API 오류</string>
-    <string name="safetyNet_res_invalid">올바르지 않은 결괏값</string>
+    <string name="safetynet_api_error">SafetyNet API 오류</string>
+    <string name="safetynet_res_invalid">올바르지 않은 결괏값</string>
     <string name="keep_force_encryption">강제 암호화 유지</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity 유지</string>
     <string name="recovery_mode">리커버리 모드</string>
@@ -93,6 +93,14 @@
     <string name="authenticate">인증</string>
 
     <!--Settings Activity -->
+    <string name="settings_dark_mode_title">테마 선택</string>
+    <string name="settings_dark_mode_message">원하는 테마 모드를 선택하세요!</string>
+    <string name="settings_dark_mode_light">기본</string>
+    <string name="settings_dark_mode_system">시스템 설정값</string>
+    <string name="settings_dark_mode_dark">다크 모드</string>
+
+    <string name="settings_safe_mode_title">안전 모드</string>
+
     <string name="settings_download_path_title">다운로드 경로</string>
     <string name="settings_download_path_message">파일이 %1$s에 저장됩니다.</string>
     <string name="settings_clear_cache_title">저장소 캐시 비우기</string>
@@ -101,6 +109,7 @@
     <string name="settings_hide_manager_summary">무작위 패키지 이름으로 Magisk Manager를 다시 패키징합니다.</string>
     <string name="settings_restore_manager_title">Magisk Manager 복구</string>
     <string name="settings_restore_manager_summary">기존 패키지 이름으로 Magisk Manager를 복원합니다.</string>
+
     <string name="language">언어</string>
     <string name="system_default">(시스템 기본값)</string>
     <string name="settings_check_update_title">업데이트 확인</string>
@@ -130,7 +139,7 @@
     <string name="settings_su_request_45">45초</string>
     <string name="settings_su_request_60">60초</string>
     <string name="superuser_access">슈퍼유저 액세스</string>
-    <string name="auto_response">자동 응답</string>
+    <string name="auto_response">슈퍼유저 요청</string>
     <string name="request_timeout">요청 시간 제한</string>
     <string name="superuser_notification">슈퍼유저 알림</string>
     <string name="settings_su_reauth_title">업데이트 후 다시 승인</string>
@@ -158,9 +167,9 @@
 
     <!--Superuser-->
     <string name="su_request_title">슈퍼유저 요청</string>
-    <string name="deny">거부</string>
-    <string name="prompt">메시지</string>
-    <string name="grant">허용</string>
+    <string name="deny">일괄 거부</string>
+    <string name="prompt">수동 허가</string>
+    <string name="grant">일괄 허용</string>
     <string name="su_warning">기기에 대한 전체 액세스 권한을 부여합니다.\n확실하지 않은 경우 거부하세요!</string>
     <string name="forever">영구적으로</string>
     <string name="once">한 번만</string>

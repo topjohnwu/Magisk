@@ -57,7 +57,7 @@
         <item name="colorError">#CC0047</item>
         <item name="colorOnError">#F9F9F9</item>
         <item name="colorOnSurface">#444444</item>
-        <item name="colorOnSurfaceVariant">#80444444</item>
+        <item name="colorOnSurfaceVariant">#BF444444</item>
         <item name="colorDisabled">#808080</item>
         <item name="colorDisabledVariant">#66808080</item>
     </style>
@@ -111,6 +111,13 @@
         <item name="colorSecondaryVariant">#80C06A75</item>
         <item name="colorOnPrimary">#000000</item>
         <item name="colorOnPrimaryVariant">#D9222222</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Fraxure" parent="ThemeFoundationMD2.Amoled">
+        <item name="colorPrimary">#009688</item>
+        <item name="colorPrimaryVariant">#8000796B</item>
+        <item name="colorSecondary">?colorError</item>
+        <item name="colorSecondaryVariant">#806D1111</item>
     </style>
 
     <!--3rd party themes-->

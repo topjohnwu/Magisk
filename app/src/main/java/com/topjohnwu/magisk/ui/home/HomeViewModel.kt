@@ -6,22 +6,23 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.*
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
+import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
+import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.model.navigation.Navigation
-import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
@@ -41,40 +42,18 @@ class HomeViewModel(
 
     val stateMagisk = KObservableField(MagiskState.LOADING)
     val stateManager = KObservableField(MagiskState.LOADING)
-    val stateTextMagisk = Observer(stateMagisk) {
-        when (stateMagisk.value) {
-            MagiskState.NOT_INSTALLED -> R.string.installed_error.res()
-            MagiskState.UP_TO_DATE -> R.string.up_to_date.res()
-            MagiskState.LOADING -> R.string.loading.res()
-            MagiskState.OBSOLETE -> R.string.obsolete.res()
-        }
-    }
-    val stateTextManager = Observer(stateManager) {
-        when (stateManager.value) {
-            MagiskState.NOT_INSTALLED -> R.string.channel_error.res()
-            MagiskState.UP_TO_DATE -> R.string.up_to_date.res()
-            MagiskState.LOADING -> R.string.loading.res()
-            MagiskState.OBSOLETE -> R.string.obsolete.res()
-        }
-    }
-    val statePackageManager = packageName
-    val statePackageOriginal = statePackageManager == BuildConfig.APPLICATION_ID
-    val stateVersionUpdateMagisk = KObservableField("")
-    val stateVersionUpdateManager = KObservableField("")
 
-    val stateMagiskProgress = KObservableField(0)
+    val stateMagiskRemoteVersion = KObservableField(R.string.loading.res())
+    val stateMagiskInstalledVersion get() =
+        "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
+    val stateMagiskMode get() = (if (Config.coreOnly) R.string.home_status_safe else R.string.home_status_normal).res()
+
+    val stateManagerRemoteVersion = KObservableField(R.string.loading.res())
+    val stateManagerInstalledVersion = Info.stub?.let {
+        "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${it.version})"
+    } ?: "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+    val statePackageName = packageName
     val stateManagerProgress = KObservableField(0)
-
-    val stateMagiskExpanded = KObservableField(false)
-    val stateManagerExpanded = KObservableField(false)
-
-    val stateHideManagerName = R.string.manager.res().let {
-        if (!statePackageOriginal) {
-            it.replaceRandomWithSpecial(3)
-        } else {
-            it
-        }
-    }
 
     val items = listOf(DeveloperItem.Mainline, DeveloperItem.App, DeveloperItem.Project)
     val itemBinding = itemBindingOf<HomeItem> {
@@ -89,48 +68,41 @@ class HomeViewModel(
     init {
         RemoteFileService.progressBroadcast.observeForever {
             when (it?.second) {
-                is Magisk.Download,
-                is Magisk.Flash -> stateMagiskProgress.value = it.first.times(100f).roundToInt()
                 is Manager -> stateManagerProgress.value = it.first.times(100f).roundToInt()
             }
         }
     }
 
     override fun refresh() = repoMagisk.fetchUpdate()
-        .onErrorReturn { Info.remote }
-        .subscribeK { updateBy(it) }
+        .onErrorReturn { null }
+        .subscribeK { it?.updateUI() }
 
-    private fun updateBy(info: UpdateInfo) {
+    private fun UpdateInfo.updateUI() {
         stateMagisk.value = when {
-            !info.magisk.isInstalled -> MagiskState.NOT_INSTALLED
-            info.magisk.isObsolete -> MagiskState.OBSOLETE
+            !Info.env.isActive -> MagiskState.NOT_INSTALLED
+            magisk.isObsolete -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
         stateManager.value = when {
-            !info.app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
-            info.app.isObsolete -> MagiskState.OBSOLETE
+            !app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
+            app.isObsolete -> MagiskState.OBSOLETE
             else -> MagiskState.UP_TO_DATE
         }
 
-        stateVersionUpdateMagisk.value = when {
-            info.magisk.isObsolete -> "%s > %s".format(
-                Info.env.magiskVersionString.clipVersion(info.magisk.version),
-                info.magisk.version.clipVersion(Info.env.magiskVersionString)
-            )
-            else -> ""
-        }
-
-        stateVersionUpdateManager.value = when {
-            info.app.isObsolete -> "%s > %s".format(
-                BuildConfig.VERSION_NAME.clipVersion(info.app.version),
-                info.app.version.clipVersion(BuildConfig.VERSION_NAME)
-            )
-            else -> ""
-        }
+        stateMagiskRemoteVersion.value = "${magisk.version} (${magisk.versionCode})"
+        stateManagerRemoteVersion.value = "${app.version} (${app.versionCode}) (${stub.versionCode})"
 
         ensureEnv()
     }
+
+    val showTest = false
+
+    fun onTestPressed() = object : ViewEvent(), ActivityExecutor {
+        override fun invoke(activity: BaseActivity) {
+            /* Entry point to trigger test events within the app */
+        }
+    }.publish()
 
     fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
 
@@ -179,20 +151,11 @@ class HomeViewModel(
             }
     }
 
-    private fun String.clipVersion(other: String = ""): String {
-        val thisVersion = substringBefore('-')
-        val otherVersion = other.substringBefore('-')
-        return if (thisVersion != otherVersion) thisVersion else substringAfter('-')
-    }
+    private val MagiskJson.isObsolete
+        get() = Info.env.isActive && Info.env.magiskVersionCode < versionCode
+    val ManagerJson.isUpdateChannelCorrect
+        get() = versionCode > 0
+    val ManagerJson.isObsolete
+        get() = BuildConfig.VERSION_CODE < versionCode
 
 }
-
-@Suppress("unused")
-val MagiskJson.isInstalled
-    get() = Info.env.magiskVersionCode > 0
-val MagiskJson.isObsolete
-    get() = Info.env.magiskVersionCode < versionCode && isInstalled
-val ManagerJson.isUpdateChannelCorrect
-    get() = versionCode > 0
-val ManagerJson.isObsolete
-    get() = BuildConfig.VERSION_CODE < versionCode

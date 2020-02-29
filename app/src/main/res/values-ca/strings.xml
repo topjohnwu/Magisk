@@ -1,10 +1,11 @@
 <resources>
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">Mòduls</string>
     <string name="superuser">Superusuari</string>
     <string name="logs">Registre</string>
     <string name="settings">Configuració</string>
+    <string name="refresh">Refresca les dades locals</string>
     <string name="install">Instal·lar</string>
     <string name="section_home">Inici</string>
     <string name="section_theme">Temes</string>
@@ -12,46 +13,34 @@
 
     <!--Home-->
     <string name="no_connection">Connexió no disponible</string>
-    <string name="installed_error">no està instal·lat</string>
-    <string name="channel_error">té un canal d'actualització invàlid!</string>
-    <string name="up_to_date">està actualitzat</string>
-    <string name="obsolete">es pot actualitzar!</string>
-    <string name="loading">està carregant…</string>
-    <string name="home_notice_content">Asseguris sempre que està utilitzant un Magisk Manager de codi lliure. Managers de fonts desconegudes podrien causar accions malicioses.</string>
-    <string name="home_notice_hide">Ocultar</string>
     <string name="app_changelog">Registre de canvis</string>
     <string name="manager">Manager</string>
+    <string name="loading">Carregant…</string>
+    <string name="info">Informació</string>
+    <string name="uninstall">Desinstal·lar</string>
+    <string name="update">Actualització</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">Amagar</string>
+    <string name="status">Estat</string>
+    <string name="home_package">Paquet</string>
+    <string name="details">Detalls</string>
 
+    <string name="home_notice_content">Asseguris sempre que està utilitzant un Magisk Manager de codi lliure. Managers de fonts desconegudes podrien causar accions malicioses.</string>
     <string name="home_support_title">Doni\'ns suport</string>
     <string name="home_links_project">Enllaços del projecte</string>
     <string name="home_item_source">Codi font</string>
     <string name="home_support_content">Magisk és, i sempre serà, gratis i codi lliure. De totes maneres, pot mostrar el seu interès fent una petita donació.</string>
-
-    <string name="home_device_security">Seguretat</string>
+    <string name="home_device_title">Dispositiu</string>
+    <string name="home_device_extra_manufacturer">Fabricant</string>
+    <string name="home_device_extra_model">Model</string>
+    <string name="home_device_extra_board">Placa</string>
     <string name="home_device_system">Sistema</string>
-    <string name="home_device_build_style">A/B</string>
-    <string name="home_device_build_type">SAR</string>
-
-    <string name="home_device_security_secure">Segur</string>
-    <string name="home_device_security_outdated">Desactualitzat</string>
-
-    <string name="home_extra_version">Versió</string>
-    <string name="home_extra_code">Codi</string>
-    <string name="home_extra_mode">Mode</string>
-    <string name="home_extra_connection">Connexió</string>
-    <string name="home_extra_package">Paquet</string>
-
-    <string name="home_extra_mode_normal">Normal</string>
-    <string name="home_extra_mode_safe">Segur</string>
-    <string name="home_extra_mode_stub">Dinàmic</string>
-
+    <string name="home_status_normal">Normal</string>
+    <string name="home_status_safe">Mode segur</string>
+    <string name="home_status_stub">Stub</string>
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
-    <string name="safetyNet_api_error">Error en l\'API de SafetyNet</string>
-    <string name="safetyNet_res_invalid">La resposta és invàlida</string>
-    <string name="uninstall">Desinstal·lar</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Arrel s\'eliminarà i, possiblement, xifrarà totes les dades (si no estan ja xifrades).</string>
-    <string name="update">Actualització</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
@@ -61,7 +50,7 @@
     <string name="install_method_title">Mètode</string>
     <string name="install_next">Següent</string>
     <string name="install_start">Endavant</string>
-    <string name="manager_download_install">Premi per baixar i instalar.</string>
+    <string name="manager_download_install">Premi per baixar i instal·lar.</string>
     <string name="download_zip_only">Únicament baixa el ZIP</string>
     <string name="direct_install">Instal·lació directa (Recomanat)</string>
     <string name="install_inactive_slot">Instal·la a la ranura inactiva (Després d\'una OTA)</string>
@@ -87,7 +76,7 @@
     <string name="su_deny_toast">Denegats els drets de superusuari de %1$s</string>
     <string name="no_apps_found">No s\'han trobat aplicacions</string>
     <string name="su_snack_grant">Drets de superusuari de %1$s permesos</string>
-    <string name="su_snack_deny"> Drets de superusuari de %1$s denegats</string>
+    <string name="su_snack_deny">Drets de superusuari de %1$s denegats</string>
     <string name="su_snack_notif_on">Notificacions de %1$s habilitades</string>
     <string name="su_snack_notif_off">Notificacions de %1$s deshabilitades</string>
     <string name="su_snack_log_on">Registres de %1$s habilitats</string>
@@ -99,7 +88,7 @@
 
     <string name="superuser_toggle_notification">Notificacions</string>
     <string name="superuser_toggle_revoke">Revocar</string>
-    <string name="superuser_policy_none">Cap app ha demanat permisos de superusuari.</string>
+    <string name="superuser_policy_none">Cap aplicació ha demanat permisos de superusuari.</string>
 
     <!--Logs-->
     <string name="log_data_none">No hi ha cap registre. Provi a utilitzar aplicacions que requereixen permisos SU.</string>
@@ -111,6 +100,8 @@
     <string name="target_uid">UID de l\'objectiu: %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">Error en l\'API de SafetyNet</string>
+    <string name="safetynet_res_invalid">La resposta és invàlida</string>
     <string name="safetynet_attest_success">Èxit!</string>
     <string name="safetynet_attest_failure">Certificació fallida!</string>
     <string name="safetynet_attest_loading">Només un segon…</string>
@@ -118,7 +109,7 @@
     <string name="safetynet_system">Sistema</string>
 
     <!-- MagiskHide -->
-    <string name="show_system_app">Mostra apps del sistema</string>
+    <string name="show_system_app">Mostra aplicacions del sistema</string>
     <string name="hide_filter_hint">Filtra per nom</string>
     <string name="hide_scroll_up">Vés amunt</string>
     <string name="hide_filters">Filtres</string>
@@ -138,7 +129,7 @@
     <string name="module_section_remote">Remot</string>
     <string name="module_state_remove">Eliminar</string>
     <string name="module_state_restore">Recuperar</string>
-    <string name="module_action_install_external">Instal·lar des de l'emmagatzematge</string>
+    <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="module_update_none">Els seus mòduls estan actualitzats!</string>
     <string name="update_available">Actualització Disponible</string>
     <string name="installed">Instal·lat</string>
@@ -152,17 +143,16 @@
     <string name="settings_dark_mode_dark">Sempre fosc</string>
     <string name="settings_safe_mode_title">Mode segur</string>
     <string name="settings_core_only_summary">Només habilita les funcionalitats bàsiques. MagiskSU i MagiskHide seguiran activats, però cap mòdul es carregarà</string>
-    <string name="settings_grid_span_count_title">Mida de la columna</string>
-    <string name="settings_grid_span_count_summary">Estableix la mida de la columna per totes les llistes de quadrícules elegibles. Pot canviar aquesta configuració fent gestos de pessic.</string>
-    <string name="settings_grid_span_count_1">Una secció per línia (Pantalles petites)</string>
-    <string name="settings_grid_span_count_2">Dos seccions per línia (Recomanat)</string>
-    <string name="settings_grid_span_count_3">Tres seccions per línia (Tauleta/TV)</string>
+    <string name="settings_grid_column_count_title">Organització de les llistes</string>
+    <string name="settings_grid_column_count_summary">Estableix l\'amplitud dels elements de la llista. S\'ha de reiniciar l\'aplicació per aplicar els canvis.</string>
+    <string name="settings_grid_column_count_1">Estàndard</string>
+    <string name="settings_grid_column_count_2">Compacte</string>
     <string name="settings_download_path_title">Directori de baixades</string>
     <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
     <string name="settings_clear_cache_summary">Neteja l\'informació en memòria cau per als repositoris en línia. Força a l\'aplicació a actualitzar-se en línia.</string>
     <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Reempaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
+    <string name="settings_hide_manager_summary">Torna a empaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
     <string name="settings_restore_manager_title">Restaurar Magisk Manager</string>
     <string name="settings_restore_manager_summary">Restaura Magisk Manager amb el nom de paquet original</string>
     <string name="language">Idioma</string>
@@ -179,7 +169,7 @@
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
     <string name="settings_app_name_hint">Nou nom</string>
-    <string name="settings_app_name_helper">Es refarà l\'app amb aquest nom</string>
+    <string name="settings_app_name_helper">Es refarà l\'aplicació amb aquest nom</string>
     <string name="settings_app_name_error">Format invàlid</string>
     <string name="settings_su_app_adb">Aplicacions y ADB</string>
     <string name="settings_su_app">Només aplicacions</string>
@@ -207,7 +197,7 @@
     <string name="settings_owner_manage">Administrador del Dispositiu</string>
     <string name="settings_user_independent">Usuari Independent</string>
     <string name="owner_only_summary">Només l\'administrador té accés d\'arrel</string>
-    <string name="owner_manage_summary"> Només l\'administrador pot supervisar l\'acces d\'arrel y rebre sol·licituds d\'altres usuaris</string>
+    <string name="owner_manage_summary">Només l\'administrador pot supervisar l\'acces d\'arrel y rebre sol·licituds d\'altres usuaris</string>
     <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel </string>
 
     <string name="mount_namespace_mode">Muntar Namespace </string>
@@ -260,6 +250,6 @@
     <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
-    <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'app es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk el més aviat possible.</string>
+    <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk el més aviat possible.</string>
 
 </resources>

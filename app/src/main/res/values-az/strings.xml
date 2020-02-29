@@ -10,8 +10,8 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Etibarsız Yeniləmə Kanalı</string>
-    <string name="safetyNet_api_error">SafetyNet API Xətası</string>
-    <string name="safetyNet_res_invalid">Cavab etibarsızdır.</string>
+    <string name="safetynet_api_error">SafetyNet API Xətası</string>
+    <string name="safetynet_res_invalid">Cavab etibarsızdır.</string>
     <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
     <string name="uninstall">Sil</string>
@@ -71,7 +71,7 @@
     <string name="install_inactive_slot">Fəal olmayan slota quraşdır (OTA\'dan sonra)</string>
     <string name="install_inactive_slot_msg">Cihazınız yenidən başladıldıqdan sonra fəal olmayan slota başlamağa MƏCBUR ediləcək!\nBu seçimi yalnız OTA bitdikdən sonra istifadə edin.\nDavam edirsiniz?</string>
     <string name="complete_uninstall">Silməni Bitir</string>
-    <string name="restore_img">Surətləri Qaytar</string>
+    <string name="restore_img">Nüsxələri Qaytar</string>
     <string name="restore_img_msg">Geri qaytarılır…</string>
     <string name="restore_done">Geri qaytarma bitdi!</string>
     <string name="restore_fail">Stock nüsxə mövcud deyil!</string>
@@ -127,13 +127,13 @@
     <string name="owner_only_summary">Yalnız cihaz sahibinin root icazəsi var.</string>
     <string name="owner_manage_summary">Yalnız cihaz sahibi root icazələrini redaktə edə və icazə istəkləri qəbul edə bilər.</string>
     <string name="user_indepenent_summary">Hər istifadəçinin ayrı root qaydaları var.</string>
-    <string name="mount_namespace_mode">Namespace Modunu Qoş</string>
-    <string name="settings_ns_global">Qlobal Namespace</string>
-    <string name="settings_ns_requester">Keçmə Namespace</string>
-    <string name="settings_ns_isolate">Ayrılmış Namespace</string>
-    <string name="global_summary">Bütün root sessyaları qlobal qoşma namespace\'dən istifadə edir.</string>
-    <string name="requester_summary">Root sessyaları soruşulan namespace\'ləri birindən digərinə keçirəcək.</string>
-    <string name="isolate_summary">Hər bir root sessyasının ayrılmış namespace\'i olacaq.</string>
+    <string name="mount_namespace_mode">Adlarfəzası Modunu Qoş</string>
+    <string name="settings_ns_global">Qlobal Adlarfəzası</string>
+    <string name="settings_ns_requester">Keçmə Adlarfəzası</string>
+    <string name="settings_ns_isolate">Ayrılmış Adlarfəzası</string>
+    <string name="global_summary">Bütün root sessyaları qlobal qoşma adlarfəzasından istifadə edir.</string>
+    <string name="requester_summary">Root sessyaları soruşulan adlarfəzasından birindən digərinə keçirəcək.</string>
+    <string name="isolate_summary">Hər bir root sessyasının ayrılmış adlarfəzası olacaq.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Tələbi</string>

@@ -5,22 +5,6 @@
 
     <data>
 
-        <import type="android.os.Build" />
-
-        <import type="com.topjohnwu.magisk.core.Info" />
-
-        <import type="com.topjohnwu.magisk.core.InfoKt" />
-
-        <import type="com.topjohnwu.magisk.core.Config" />
-
-        <import type="com.topjohnwu.magisk.BuildConfig" />
-
-        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
-
-        <import type="com.topjohnwu.magisk.extensions.XAndroidKt" />
-
-        <import type="com.topjohnwu.magisk.extensions.XSUKt" />
-
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -33,7 +17,7 @@
         android:clipToPadding="false"
         android:fillViewport="true"
         android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
+        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l3}"
         tools:layout_marginTop="24dp">
 
         <LinearLayout
@@ -42,6 +26,17 @@
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingTop="@dimen/l1">
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_gravity="center"
+                style="@style/WidgetFoundation.Button"
+                gone="@{!viewModel.showTest}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{() -> viewModel.onTestPressed()}"
+                android:text="TEST"
+                android:textAllCaps="false"
+                tools:visibility="gone"/>
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card.Primary"
@@ -56,7 +51,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextView
                         android:id="@+id/home_notice_content"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -73,7 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:onClick="@{() -> viewModel.hideNotice()}"
-                        android:text="@string/home_notice_hide"
+                        android:text="@string/hide"
                         android:textAllCaps="false"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -83,670 +78,26 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <include
+                android:id="@+id/home_magisk_wrapper"
+                layout="@layout/include_home_magisk"
+                viewModel="@{viewModel}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/home_device_wrapper"
-                    style="@style/WidgetFoundation.Card.Variant"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_card"
-                        android:orientation="horizontal">
-
-                        <View
-                            gone="@{XAndroidKt.isDeviceSecure()}"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:alpha=".15"
-                            android:background="?colorError"
-                            android:visibility="gone"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/home_device_overview"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/home_device_icon"
-                                style="@style/WidgetFoundation.Icon.Primary"
-                                android:layout_marginStart="@dimen/l_50"
-                                android:layout_marginTop="@dimen/l1"
-                                android:layout_marginBottom="@dimen/l1"
-                                android:background="@null"
-                                android:padding="@dimen/l_50"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:srcCompat="@drawable/ic_device"
-                                app:tint="@color/color_primary_error_transient" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_title"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/l_50"
-                                android:layout_marginEnd="@dimen/l1"
-                                android:gravity="start|center_vertical"
-                                android:text="@{Build.MANUFACTURER}"
-                                android:textAppearance="@style/AppearanceFoundation.Title"
-                                app:layout_constrainedWidth="true"
-                                app:layout_constraintBottom_toTopOf="@+id/home_device_product"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintHorizontal_bias="0"
-                                app:layout_constraintStart_toEndOf="@+id/home_device_icon"
-                                app:layout_constraintTop_toTopOf="@+id/home_device_icon"
-                                app:layout_constraintVertical_chainStyle="packed"
-                                tools:text="Google" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_product"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@{Build.DEVICE ?? Build.PRODUCT}"
-                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                                app:layout_constraintBottom_toTopOf="@+id/home_device_board"
-                                app:layout_constraintEnd_toEndOf="@+id/home_device_title"
-                                app:layout_constraintHorizontal_bias="0"
-                                app:layout_constraintStart_toStartOf="@+id/home_device_title"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_title"
-                                tools:text="Pixel 4" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_board"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@{Build.BOARD}"
-                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_device_icon"
-                                app:layout_constraintEnd_toEndOf="@+id/home_device_title"
-                                app:layout_constraintHorizontal_bias="0"
-                                app:layout_constraintStart_toStartOf="@+id/home_device_title"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_product"
-                                tools:text="flame" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/home_device_details"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="@dimen/l1"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/home_device_overview"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_security_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_device_security"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_security_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{XAndroidKt.isDeviceSecure() ? @string/home_device_security_secure : @string/home_device_security_outdated}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_security_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_security_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_security_title"
-                                tools:text="@string/home_device_security_secure" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_version_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_device_system"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_extra_security_title" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_version_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{Build.VERSION.RELEASE}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_version_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_version_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_version_title"
-                                tools:text="10" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_build_style_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_device_build_style"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_extra_version_title" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_build_style_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{XAndroidKt.isAB ? @string/yes : @string/no}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_build_style_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_build_style_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_build_style_title"
-                                tools:text="Yes" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_build_type_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_device_build_type"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_device_extra_build_style_title" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_device_extra_build_type_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{XAndroidKt.isSAR ? @string/yes : @string/no}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_device_extra_build_type_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_device_extra_build_type_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_device_extra_build_type_title"
-                                tools:text="Yes" />
-
-                            <!--todo(topjohnwu) Add device info here-->
-                            <!--Copy & paste "..._title" and "..._value"-->
-                            <!--Change ids to match "home_device_extra_*info-type*_value" or "..._title"-->
-                            <!--Fix constraints by replacing ids (views are always bound to "title")-->
-
-                            <androidx.constraintlayout.widget.Group
-                                goneUnless="@{XSUKt.hasRoot}"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:constraint_referenced_ids="home_device_extra_build_style_title,home_device_extra_build_style_value,home_device_extra_build_type_title,home_device_extra_build_type_value"
-                                tools:visibility="gone" />
-
-                            <!--todo(topjohnwu) If info requires root add id to this group-->
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/home_magisk_wrapper"
-                    style="@style/WidgetFoundation.Card.Variant"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l1"
-                    android:layout_marginTop="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l_50"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@+id/home_magisk_buttons"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper"
-                    app:layout_constraintWidth_max="400dp">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_card"
-                        android:orientation="vertical">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:animateLayoutChanges="true"
-                            android:paddingStart="@dimen/l_50"
-                            android:paddingTop="@dimen/l1"
-                            android:paddingBottom="@dimen/l1"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/home_magisk_info"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/home_magisk_icon"
-                                style="@style/WidgetFoundation.Icon.Primary"
-                                android:background="@null"
-                                android:padding="@dimen/l_25"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:srcCompat="@drawable/ic_magisk_delete" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_title"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/l_50"
-                                android:gravity="start|center_vertical"
-                                android:text="@string/magisk"
-                                android:textAppearance="@style/AppearanceFoundation.Title"
-                                app:layout_constrainedWidth="true"
-                                app:layout_constraintBottom_toTopOf="@+id/home_magisk_status"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_magisk_icon"
-                                app:layout_constraintTop_toTopOf="@+id/home_magisk_icon"
-                                app:layout_constraintVertical_chainStyle="packed" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_status"
-                                gone="@{viewModel.stateTextMagisk.empty}"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:text="@{viewModel.stateTextMagisk}"
-                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                                app:layout_constrainedWidth="true"
-                                app:layout_constraintBottom_toTopOf="@+id/home_magisk_version"
-                                app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
-                                app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
-                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_title"
-                                tools:text="@string/up_to_date" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_version"
-                                gone="@{viewModel.stateVersionUpdateMagisk.empty}"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:text="@{viewModel.stateVersionUpdateMagisk}"
-                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                                app:layout_constrainedWidth="true"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_icon"
-                                app:layout_constraintEnd_toEndOf="@+id/home_magisk_title"
-                                app:layout_constraintStart_toStartOf="@+id/home_magisk_title"
-                                tools:visibility="gone"
-                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_status" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/home_magisk_info"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:clipToPadding="false"
-                            android:padding="@dimen/l1"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintWidth_max="150dp">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_extra_version_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_extra_version"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_extra_version_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{Info.env.magiskVersionString}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_version_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_version_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_magisk_extra_version_title"
-                                tools:text="20.1" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_extra_code_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_extra_code"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_extra_version_title" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_extra_code_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{Integer.toString(Info.env.magiskVersionCode)}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_code_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_code_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_magisk_extra_code_title"
-                                tools:text="12345" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_extra_mode_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_extra_mode"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_extra_code_title" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_extra_mode_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{Config.coreOnly ? @string/home_extra_mode_safe : @string/home_extra_mode_normal}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_mode_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_mode_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_magisk_extra_mode_title"
-                                tools:text="Normal" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_extra_connection_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_extra_connection"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_magisk_extra_mode_title" />
-
-                            <!--todo(topjohnwu) fix connection type-->
-                            <!--don't forget to bind verbose values to proper resources-->
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_magisk_extra_connection_value"
-                                style="@style/W.Home.Extra.Value"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_magisk_extra_connection_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_magisk_extra_connection_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_magisk_extra_connection_title"
-                                tools:text="Normal" />
-
-                            <androidx.constraintlayout.widget.Group
-                                gone="@{Info.env.magiskVersionCode &lt; 0}"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:constraint_referenced_ids="home_magisk_extra_version_title,home_magisk_extra_version_value,home_magisk_extra_code_title,home_magisk_extra_code_value,home_magisk_extra_mode_title,home_magisk_extra_mode_value,home_magisk_extra_connection_title,home_magisk_extra_connection_value" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <ProgressBar
-                        style="@style/WidgetFoundation.ProgressBar"
-                        gone="@{viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100}"
-                        android:layout_width="match_parent"
-                        android:layout_gravity="bottom"
-                        android:max="100"
-                        android:progress="@{viewModel.stateMagiskProgress}" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <FrameLayout
-                    android:id="@+id/home_magisk_buttons"
-                    gone="@{viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/l_50"
-                    android:animateLayoutChanges="true"
-                    app:layout_constraintBottom_toBottomOf="@+id/home_magisk_wrapper"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toEndOf="@+id/home_magisk_wrapper"
-                    app:layout_constraintTop_toTopOf="@+id/home_magisk_wrapper"
-                    app:layout_constraintVertical_bias=".5">
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        gone="@{viewModel.stateMagisk != MagiskState.OBSOLETE}"
-                        isEnabled="@{viewModel.stateManager == MagiskState.UP_TO_DATE &amp;&amp; (viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100)}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:onClick="@{() -> viewModel.onMagiskPressed()}"
-                        android:text="@string/update"
-                        app:backgroundTint="?colorPrimary"
-                        app:elevation="0dp"
-                        app:fabSize="mini"
-                        app:srcCompat="@drawable/ic_update_md2"
-                        app:tint="?colorOnPrimary"
-                        tools:visibility="gone" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        gone="@{viewModel.stateMagisk == MagiskState.OBSOLETE}"
-                        isEnabled="@{viewModel.stateManager == MagiskState.UP_TO_DATE &amp;&amp; (viewModel.stateMagiskProgress == 0 || viewModel.stateMagiskProgress == 100)}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:onClick="@{() -> viewModel.onMagiskPressed()}"
-                        android:text="@string/install"
-                        app:backgroundTint="?colorSurface"
-                        app:elevation="0dp"
-                        app:fabSize="mini"
-                        app:srcCompat="@drawable/ic_install"
-                        app:tint="?colorPrimary" />
-
-                </FrameLayout>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/home_manager_wrapper"
-                    style="@style/WidgetFoundation.Card.Variant"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l1"
-                    android:layout_marginTop="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l_50"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toStartOf="@+id/home_manager_buttons"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper"
-                    app:layout_constraintWidth_max="400dp">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_card"
-                        android:orientation="vertical">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:paddingStart="@dimen/l_50"
-                            android:paddingTop="@dimen/l1"
-                            android:paddingBottom="@dimen/l1"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@+id/home_manager_info"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <androidx.appcompat.widget.AppCompatImageView
-                                android:id="@+id/home_manager_icon"
-                                style="@style/WidgetFoundation.Icon.Primary"
-                                android:background="@null"
-                                android:padding="@dimen/l_50"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:srcCompat="@drawable/ic_manager" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_title"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/l_50"
-                                android:gravity="start|center_vertical"
-                                android:text="@{viewModel.stateHideManagerName}"
-                                android:textAppearance="@style/AppearanceFoundation.Title"
-                                app:layout_constrainedWidth="true"
-                                app:layout_constraintBottom_toTopOf="@+id/home_manager_status"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_manager_icon"
-                                app:layout_constraintTop_toTopOf="@+id/home_manager_icon"
-                                app:layout_constraintVertical_chainStyle="packed"
-                                tools:text="@string/manager" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_status"
-                                gone="@{viewModel.stateTextManager.empty}"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:text="@{viewModel.stateTextManager}"
-                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                                app:layout_constrainedWidth="true"
-                                app:layout_constraintBottom_toTopOf="@+id/home_manager_version"
-                                app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
-                                app:layout_constraintStart_toStartOf="@+id/home_manager_title"
-                                app:layout_constraintTop_toBottomOf="@+id/home_manager_title"
-                                tools:text="@string/obsolete" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_version"
-                                gone="@{viewModel.stateVersionUpdateManager.empty}"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:text="@{viewModel.stateVersionUpdateManager}"
-                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                                app:layout_constrainedWidth="true"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"
-                                app:layout_constraintEnd_toEndOf="@+id/home_manager_title"
-                                app:layout_constraintStart_toStartOf="@+id/home_manager_title"
-                                app:layout_constraintTop_toBottomOf="@+id/home_manager_status"
-                                tools:text="10.0.0 > 10.0.1" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:id="@+id/home_manager_info"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:clipToPadding="false"
-                            android:padding="@dimen/l1"
-                            app:layout_constrainedWidth="true"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintWidth_max="150dp">
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_extra_version_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_extra_version"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_extra_version_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{BuildConfig.VERSION_NAME}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_version_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_manager_extra_version_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_manager_extra_version_title"
-                                tools:text="8.0.0" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_extra_code_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_extra_code"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_version_title" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_extra_code_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{Integer.toString(BuildConfig.VERSION_CODE)}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_code_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_manager_extra_code_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_manager_extra_code_title"
-                                tools:text="12345" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_extra_mode_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_extra_mode"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_code_title" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_extra_mode_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{InfoKt.isRunningAsStub ? @string/home_extra_mode_stub : @string/home_extra_mode_normal}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_mode_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_manager_extra_mode_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_manager_extra_mode_title"
-                                tools:text="@string/home_extra_mode_stub" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_extra_package_title"
-                                style="@style/W.Home.Extra.Title"
-                                android:text="@string/home_extra_package"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/home_manager_extra_mode_title" />
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/home_manager_extra_package_value"
-                                style="@style/W.Home.Extra.Value"
-                                android:text="@{viewModel.statePackageManager}"
-                                app:layout_constraintBottom_toBottomOf="@+id/home_manager_extra_package_title"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/home_manager_extra_package_title"
-                                app:layout_constraintTop_toTopOf="@+id/home_manager_extra_package_title"
-                                tools:text="com.soqspa.xmclaeixl" />
-
-                            <androidx.constraintlayout.widget.Group
-                                gone="@{viewModel.statePackageOriginal}"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:constraint_referenced_ids="home_manager_extra_package_title,home_manager_extra_package_value" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <ProgressBar
-                        style="@style/WidgetFoundation.ProgressBar"
-                        gone="@{viewModel.stateManagerProgress == 0 || viewModel.stateManagerProgress == 100}"
-                        android:layout_width="match_parent"
-                        android:layout_gravity="bottom"
-                        android:max="100"
-                        android:progress="@{viewModel.stateManagerProgress}" />
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <FrameLayout
-                    android:id="@+id/home_manager_buttons"
-                    gone="@{viewModel.stateManager == MagiskState.LOADING || !viewModel.isConnected}"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/l_50"
-                    app:layout_constraintBottom_toBottomOf="@+id/home_manager_wrapper"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintStart_toEndOf="@+id/home_manager_wrapper"
-                    app:layout_constraintTop_toTopOf="@+id/home_manager_wrapper"
-                    app:layout_constraintVertical_bias=".5">
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        gone="@{viewModel.stateManager != MagiskState.OBSOLETE}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:onClick="@{() -> viewModel.onManagerPressed()}"
-                        app:backgroundTint="?colorPrimary"
-                        app:elevation="0dp"
-                        app:fabSize="mini"
-                        app:srcCompat="@drawable/ic_update_md2"
-                        app:tint="?colorOnPrimary" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        gone="@{viewModel.stateManager == MagiskState.OBSOLETE}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:onClick="@{() -> viewModel.onManagerPressed()}"
-                        app:backgroundTint="?colorSurface"
-                        app:elevation="0dp"
-                        app:fabSize="mini"
-                        app:srcCompat="@drawable/ic_install"
-                        app:tint="?colorPrimary"
-                        tools:visibility="gone" />
-
-                </FrameLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper" />
+
+            <include
+                android:id="@+id/home_manager_wrapper"
+                layout="@layout/include_home_manager"
+                viewModel="@{viewModel}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card"
@@ -761,7 +112,7 @@
                     android:orientation="vertical"
                     android:paddingTop="@dimen/l1">
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/l1"
@@ -769,7 +120,7 @@
                         android:text="@string/home_support_title"
                         android:textAppearance="@style/AppearanceFoundation.Title" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/l1"
@@ -787,7 +138,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
                         android:clipToPadding="false"
-                        android:nestedScrollingEnabled="@{false}"
+                        android:nestedScrollingEnabled="false"
                         android:orientation="horizontal"
                         android:overScrollMode="ifContentScrolls"
                         android:paddingStart="@dimen/l1"
@@ -799,17 +150,6 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.button.MaterialButton
-                style="@style/WidgetFoundation.Button.Error"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                android:onClick="@{() -> viewModel.onDeletePressed()}"
-                android:text="@string/uninstall"
-                android:textAllCaps="false"
-                app:icon="@drawable/ic_delete_md2" />
 
         </LinearLayout>
 
