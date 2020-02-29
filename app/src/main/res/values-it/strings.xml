@@ -125,7 +125,7 @@
     <string name="module_action_install_external">Installa dalla memoria</string>
     <string name="module_update_none">I tuoi moduli sono aggiornati!</string>
     <string name="update_available">Aggiornamento disponibile</string>
-    <string name="installed">Installato</string>
+    <string name="home_installed_version">Installato</string>
     <string name="sorting_order">Ordina per</string>
 
     <!--Settings -->

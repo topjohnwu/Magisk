@@ -31,7 +31,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">업데이트 가능</string>
-    <string name="installed">설치됨</string>
+    <string name="home_installed_version">설치됨</string>
     <string name="sorting_order">정렬 방식</string>
 
     <!--Log Fragment-->

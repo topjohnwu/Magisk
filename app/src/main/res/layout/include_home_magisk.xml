@@ -128,7 +128,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/module_section_remote" />
+                                android:text="@string/home_latest_version" />
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
@@ -145,7 +145,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="@string/installed" />
+                                android:text="@string/home_installed_version" />
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"

@@ -132,7 +132,7 @@
     <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="module_update_none">Els seus mòduls estan actualitzats!</string>
     <string name="update_available">Actualització Disponible</string>
-    <string name="installed">Instal·lat</string>
+    <string name="home_installed_version">Instal·lat</string>
     <string name="sorting_order">Ordre de Classificació</string>
 
     <!--Settings -->

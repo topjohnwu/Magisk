@@ -132,7 +132,7 @@
     <string name="module_action_install_external">Встановити зі сховища</string>
     <string name="module_update_none">Ваші модулі оновлені!</string>
     <string name="update_available">Доступне оновлення</string>
-    <string name="installed">Встановлені</string>
+    <string name="home_installed_version">Встановлені</string>
     <string name="sorting_order">Порядок сортування</string>
 
     <!--Settings -->

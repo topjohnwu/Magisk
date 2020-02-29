@@ -113,7 +113,7 @@ class ModuleViewModel(
         ).also { it.hasButton = false }
 
         private val sectionActive = SectionTitle(
-            R.string.installed,
+            R.string.module_installed,
             R.string.reboot,
             R.drawable.ic_restart
         ).also { it.hasButton = false }

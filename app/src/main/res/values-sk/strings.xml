@@ -132,7 +132,7 @@
     <string name="module_action_install_external">Inštalácia z úložiska</string>
     <string name="module_update_none">Vaše moduly sú aktuálne!</string>
     <string name="update_available">Dostupná aktualizácia</string>
-    <string name="installed">Nainštalované</string>
+    <string name="home_installed_version">Nainštalované</string>
     <string name="sorting_order">Zoradenie</string>
 
     <!--Settings -->
