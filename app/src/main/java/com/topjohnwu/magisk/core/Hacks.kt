@@ -166,8 +166,6 @@ val shouldKeepResources = listOf(
     R.string.no_info_provided,
     R.string.release_notes,
     R.string.settings_download_path_error,
-    R.string.unsupport_magisk_msg,
-    R.string.unsupport_magisk_title,
     R.string.install_inactive_slot_msg,
     R.string.invalid_update_channel,
     R.string.update_available

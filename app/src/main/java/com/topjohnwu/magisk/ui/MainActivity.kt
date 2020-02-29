@@ -14,6 +14,7 @@ import com.google.android.material.card.MaterialCardView
 import com.ncapdevi.fragnav.FragNavController
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.navigation.Navigation
@@ -25,6 +26,7 @@ import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideableBehavior
+import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.reflect.KClass
@@ -54,6 +56,15 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (Info.env.isUnsupported) {
+            MagiskDialog(this)
+                .applyTitle(R.string.unsupport_magisk_title)
+                .applyMessage(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
+                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
+                .cancellable(true)
+                .reveal()
+        }
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
