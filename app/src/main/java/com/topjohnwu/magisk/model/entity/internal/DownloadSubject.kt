@@ -97,7 +97,7 @@ sealed class DownloadSubject : Parcelable {
             operator fun invoke(configuration: Configuration) = when (configuration) {
                 Configuration.Download -> Download()
                 Configuration.Uninstall -> Uninstall()
-                Configuration.EnvFix, is Configuration.Flash -> DownloadInternal(configuration)
+                Configuration.EnvFix, is Configuration.Flash, is Configuration.Patch -> DownloadInternal(configuration)
                 else -> throw IllegalArgumentException()
             }
         }
