@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.Manifest
 import androidx.annotation.WorkerThread
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
@@ -20,6 +21,7 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
+import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
@@ -330,11 +332,27 @@ class ModuleViewModel(
         else -> Unit
     }
 
-    fun downloadPressed(item: RepoItem) = ModuleInstallDialog(item.item).publish()
-    fun installPressed() = InstallExternalModuleEvent().publish()
+    fun downloadPressed(item: RepoItem) = withPermissions(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ).any { it }.subscribeK(onError = { permissionDenied() }) {
+        ModuleInstallDialog(item.item).publish()
+    }.add()
+
+    fun installPressed() = withPermissions(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ).any { it }.subscribeK(onError = { permissionDenied() }) {
+        InstallExternalModuleEvent().publish()
+    }.add()
+
     fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
     fun infoPressed(item: ModuleItem) {
         OpenChangelogEvent(item.repo ?: return).publish()
+    }
+
+    private fun permissionDenied() {
+        SnackbarEvent(R.string.module_permission_declined).publish()
     }
 
 }

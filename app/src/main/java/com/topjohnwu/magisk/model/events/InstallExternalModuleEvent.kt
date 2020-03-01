@@ -1,8 +1,10 @@
 package com.topjohnwu.magisk.model.events
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.RequiresPermission
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.intent
@@ -10,14 +12,11 @@ import com.topjohnwu.magisk.legacy.flash.FlashActivity
 
 class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
 
+    @RequiresPermission(allOf = [Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE])
     override fun invoke(activity: BaseActivity) {
-        activity.withExternalRW {
-            onSuccess {
-                val intent = Intent(Intent.ACTION_GET_CONTENT)
-                intent.type = "application/zip"
-                activity.startActivityForResult(intent, Const.ID.FETCH_ZIP)
-            }
-        }
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "application/zip"
+        activity.startActivityForResult(intent, Const.ID.FETCH_ZIP)
     }
 
     companion object {
