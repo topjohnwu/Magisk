@@ -136,6 +136,7 @@
     <string name="update_available">Update Available</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sorting Order</string>
+    <string name="module_permission_declined">Grant storage permission to enable this functionality</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Theme Mode</string>
