@@ -29,7 +29,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Налице е актуализация.</string>
-    <string name="installed">Инсталирани</string>
+    <string name="home_installed_version">Инсталирани</string>
     <string name="sorting_order">Сортиране</string>
 
     <!--Log Fragment-->

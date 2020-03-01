@@ -30,7 +30,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">अपडेट उपलब्ध है</string>
-    <string name="installed">स्थापित</string>
+    <string name="home_installed_version">स्थापित</string>
     <string name="sorting_order">छँटाई क्रम </string>
 
     <!--Log Fragment-->

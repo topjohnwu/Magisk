@@ -132,7 +132,7 @@
     <string name="module_action_install_external">Instalează din stocare</string>
     <string name="module_update_none">Modulele tale sunt la zi!</string>
     <string name="update_available">Actualizare disponibilă</string>
-    <string name="installed">Instalat(e)</string>
+    <string name="home_installed_version">Instalat(e)</string>
     <string name="sorting_order">Ordine de sortare</string>
 
     <!--Settings -->
