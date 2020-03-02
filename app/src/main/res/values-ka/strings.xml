@@ -38,7 +38,7 @@
     <string name="home_status_normal">ნორმალური</string>
     <string name="home_status_safe">უსაფრთხო რეჟიმი</string>
     <string name="home_status_stub">დინამიური</string>
-    <string name="home_installed_version">დაინსტალირებულკ</string>
+    <string name="home_installed_version">დაინსტალირებული</string>
     <string name="home_latest_version">უახლესი</string>
     <string name="invalid_update_channel">არასწორი განახლების არხი</string>
     <string name="uninstall_magisk_title">Magisk-ის დეინსტალაცია</string>
