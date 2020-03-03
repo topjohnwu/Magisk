@@ -3,6 +3,8 @@
 ## OTA Installation
 Magisk does modifications systemless-ly, which means applying official OTAs is much simpler. Here I provide a few tutorials for several different kind of devices to apply OTAs and preserve Magisk after the installation if possible.
 
+**NOTE: On some devices a new OTA update might not be shown as "available" until you uninstall Magisk and the updater says "System is up-to-date"**
+
 **NOTE: In order to apply OTAs, you HAVE to make sure you haven't modified `/system` (and `/vendor` if available) in any way. Even remounting the partition to rw will tamper block verification!!**
 
 ### Prerequisites
