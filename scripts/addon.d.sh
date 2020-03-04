@@ -7,10 +7,12 @@
 #
 ########################################################
 
+args=("$@")
+
 trampoline() {
   mount /data 2>/dev/null
   if [ -f /data/adb/magisk/addon.d.sh ]; then
-    exec sh /data/adb/magisk/addon.d.sh "$@"
+    exec sh /data/adb/magisk/addon.d.sh "$args"
   else
     OUTFD=$(ps | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
     [ "$OUTFD" == "$((OUTFD * 1))" ] || OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'update(.*)' | cut -d" " -f3)
