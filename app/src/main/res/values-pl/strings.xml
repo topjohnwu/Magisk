@@ -13,39 +13,34 @@
 
     <!--Home-->
     <string name="no_connection">Połączenie niedostępne</string>
-    <string name="home_notice_content">Zawsze upewnij się, że używasz otwartoźródłowego Magisk Managera. Manager z nieznanego źródła może wykonywać złośliwe działania.</string>
-    <string name="hide">Ukryj</string>
     <string name="app_changelog">Dziennik zmian</string>
     <string name="manager">Manager</string>
+    <string name="loading">Ładowanie…</string>
+    <string name="info">Informacje</string>
+    <string name="uninstall">Odinstaluj</string>
+    <string name="update">Zaktualizuj</string>
+    <string name="not_available">N/D</string>
+    <string name="hide">Ukryj</string>
+    <string name="status">Status</string>
+    <string name="home_package">Pakiet</string>
+    <string name="details">Szczegóły</string>
 
+    <string name="home_notice_content">Zawsze upewnij się, że używasz otwartoźródłowego Magisk Managera. Manager z nieznanego źródła może wykonywać złośliwe działania.</string>
     <string name="home_support_title">Wesprzyj nas</string>
     <string name="home_links_project">Linki do projektu</string>
-    <string name="home_item_source">Żródło</string>
+    <string name="home_item_source">Źródło</string>
     <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwarty. Możesz nam jednak pokazać, że Ci zależy, wysyłając niewielką darowiznę.</string>
-
-    <string name="home_device_title">Twoje urządzenie</string>
-    <string name="info">Informacje</string>
+    <string name="home_device_title">Urządzenie</string>
     <string name="home_device_extra_manufacturer">Producent</string>
     <string name="home_device_extra_model">Model</string>
     <string name="home_device_extra_board">Platforma</string>
-
     <string name="home_device_system">System</string>
-
-    <string name="home_package">Pakiet</string>
-
     <string name="home_status_normal">Normalny</string>
-    <string name="home_status_stub">Rdzeń</string>
-    <string name="not_available">N/D</string>
-
-    <string name="details">Szczegóły</string>
-
+    <string name="home_status_safe">Awaryjny</string>
+    <string name="home_status_stub">Ukryty</string>
     <string name="invalid_update_channel">Nieprawidłowy kanał aktualizacji</string>
-    <string name="safetynet_api_error">Błąd SafetyNet API</string>
-    <string name="safetynet_res_invalid">Odpowiedź nieprawidłowa</string>
-    <string name="uninstall">Odinstaluj</string>
     <string name="uninstall_magisk_title">Odinstaluj Magiska</string>
     <string name="uninstall_magisk_msg">Wszystkie moduły zostaną wyłączone/usunięte!\nRoot zostanie usunięty!\nTwoje dane zostaną potencjalnie zaszyfrowane, jeżeli obecnie nie są!</string>
-    <string name="update">Zaktualizuj</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
@@ -105,6 +100,8 @@
     <string name="target_uid">Docelowy UID: %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">Błąd API SafetyNet</string>
+    <string name="safetynet_res_invalid">Odpowiedź jest nieprawidłowa</string>
     <string name="safetynet_attest_success">Sukces!</string>
     <string name="safetynet_attest_failure">Zaświadczenie nieprawidłowe!</string>
     <string name="safetynet_attest_loading">Jeszcze chwila…</string>
@@ -135,7 +132,7 @@
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
     <string name="module_update_none">Twoje moduły są aktualne!</string>
     <string name="update_available">Dostępna aktualizacja</string>
-    <string name="installed">Zainstalowane</string>
+    <string name="home_installed_version">Zainstalowane</string>
     <string name="sorting_order">Kolejność sortowania</string>
 
     <!--Settings -->
@@ -146,6 +143,10 @@
     <string name="settings_dark_mode_dark">Zawsze ciemny</string>
     <string name="settings_safe_mode_title">Tryb awaryjny (Safe Mode)</string>
     <string name="settings_core_only_summary" deprecated="true">Włącza tylko podstawowe funkcje. MagiskSU i MagiskHide będą nadal włączone, ale nie zostaną załadowane żadne moduły</string>
+    <string name="settings_grid_column_count_title">Układ listy</string>
+    <string name="settings_grid_column_count_summary">Ustawia szerokość elementu na liście. Uruchom ponownie aplikację, aby zastosować zmiany.</string>
+    <string name="settings_grid_column_count_1">Standardowy</string>
+    <string name="settings_grid_column_count_2">Ściśnięty</string>
     <string name="settings_download_path_title">Ścieżka pobierania</string>
     <string name="settings_download_path_message">Pliki pobrane przez Managera będą zapisywane do %1$s</string>
     <string name="settings_clear_cache_title">Wyczyść pamięć cache repozytorium</string>
@@ -162,7 +163,7 @@
     <string name="settings_update_stable">Stabilny</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Własny</string>
-    <string name="settings_update_custom_msg">Wprowadź własny adres URL</string>
+    <string name="settings_update_custom_msg">Wprowadź adres URL własnego repozytorium</string>
     <string name="settings_magiskhide_summary">Ukryj Magiska przed różnymi metodami wykrywania</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Włącz wsparcie Systemless dla aplikacji typu Adblock</string>

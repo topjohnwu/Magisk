@@ -13,6 +13,7 @@
 #define VEND_POLICY_DIR     "/vendor/etc/selinux/"
 #define PROD_POLICY_DIR     "/product/etc/selinux/"
 #define ODM_POLICY_DIR      "/odm/etc/selinux/"
+#define SYSEXT_POLICY_DIR   "/system_ext/etc/selinux/"
 #define SPLIT_PLAT_CIL      PLAT_POLICY_DIR "plat_sepolicy.cil"
 
 #define SEPOL_PROC_DOMAIN   "magisk"

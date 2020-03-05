@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.core.tasks
 
+import com.squareup.moshi.JsonClass
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.data.database.RepoDao
@@ -8,7 +9,6 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.schedulers.Schedulers
-import se.ansman.kotshi.JsonSerializable
 import timber.log.Timber
 import java.net.HttpURLConnection
 import java.text.SimpleDateFormat
@@ -89,7 +89,7 @@ private val dateFormat: SimpleDateFormat =
         timeZone = TimeZone.getTimeZone("UTC")
     }
 
-@JsonSerializable
+@JsonClass(generateAdapter = true)
 data class GithubRepoInfo(
     val name: String,
     val pushed_at: String

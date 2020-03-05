@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.di
 
 import android.content.Context
-import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Const
@@ -20,7 +19,6 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import se.ansman.kotshi.KotshiJsonAdapterFactory
 
 val networkingModule = module {
     single { createOkHttpClient(get()) }
@@ -49,9 +47,7 @@ fun createOkHttpClient(context: Context): OkHttpClient {
 }
 
 fun createMoshiConverterFactory(): MoshiConverterFactory {
-    val moshi = Moshi.Builder()
-            .add(KotshiJsonAdapterFactory)
-            .build()
+    val moshi = Moshi.Builder().build()
     return MoshiConverterFactory.create(moshi)
 }
 
@@ -63,9 +59,6 @@ fun createRetrofit(okHttpClient: OkHttpClient): Retrofit.Builder {
         .client(okHttpClient)
 }
 
-@KotshiJsonAdapterFactory
-abstract class JsonAdapterFactory : JsonAdapter.Factory
-
 inline fun <reified T> createApiService(retrofitBuilder: Retrofit.Builder, baseUrl: String): T {
     return retrofitBuilder
         .baseUrl(baseUrl)
@@ -75,9 +68,9 @@ inline fun <reified T> createApiService(retrofitBuilder: Retrofit.Builder, baseU
 
 fun createMarkwon(context: Context, okHttpClient: OkHttpClient): Markwon {
     return Markwon.builder(context)
-            .usePlugin(HtmlPlugin.create())
-            .usePlugin(ImagesPlugin.create {
-                it.addSchemeHandler(OkHttpNetworkSchemeHandler.create(okHttpClient))
-            })
-            .build()
+        .usePlugin(HtmlPlugin.create())
+        .usePlugin(ImagesPlugin.create {
+            it.addSchemeHandler(OkHttpNetworkSchemeHandler.create(okHttpClient))
+        })
+        .build()
 }

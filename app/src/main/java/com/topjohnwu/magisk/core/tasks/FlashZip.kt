@@ -18,7 +18,7 @@ abstract class FlashZip(
     private val mUri: Uri,
     private val console: MutableList<String>,
     private val logs: MutableList<String>
-) {
+) : FlashResultListener {
 
     private val context: Context by inject()
     private val installFolder = File(context.cacheDir, "flash").apply {
@@ -94,6 +94,4 @@ abstract class FlashZip(
         .subscribeK(onError = { onResult(false) }) { onResult(it) }
         .let { Unit } // ignores result disposable
 
-
-    protected abstract fun onResult(success: Boolean)
 }

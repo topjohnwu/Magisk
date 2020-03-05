@@ -21,7 +21,7 @@
     <string name="home_support_title">Supportaci</string>
     <string name="home_links_project">Link del progetto</string>
     <string name="home_item_source">Codice sorgente</string>
-    <string name="home_support_content">Magisk è e sempre sarà gratuto ed open source. Puoi comunque mostrarci il tuo appezzamento inviando una piccola donazione.</string>
+    <string name="home_support_content">Magisk è e sempre sarà gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento inviando una piccola donazione.</string>
 
     <string name="home_device_system">Sistema</string>
 
@@ -125,7 +125,7 @@
     <string name="module_action_install_external">Installa dalla memoria</string>
     <string name="module_update_none">I tuoi moduli sono aggiornati!</string>
     <string name="update_available">Aggiornamento disponibile</string>
-    <string name="installed">Installato</string>
+    <string name="home_installed_version">Installato</string>
     <string name="sorting_order">Ordina per</string>
 
     <!--Settings -->

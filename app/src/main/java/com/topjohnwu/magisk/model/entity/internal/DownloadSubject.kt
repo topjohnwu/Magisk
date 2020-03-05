@@ -20,7 +20,7 @@ sealed class DownloadSubject : Parcelable {
     open val title: String get() = file.name
 
     @Parcelize
-    data class Module(
+    class Module(
         val module: Repo,
         val configuration: Configuration
     ) : DownloadSubject() {
@@ -33,7 +33,7 @@ sealed class DownloadSubject : Parcelable {
     }
 
     @Parcelize
-    data class Manager(
+    class Manager(
         val configuration: Configuration.APK
     ) : DownloadSubject() {
 
@@ -53,13 +53,13 @@ sealed class DownloadSubject : Parcelable {
 
     }
 
-    sealed class Magisk : DownloadSubject() {
+    abstract class Magisk : DownloadSubject() {
 
         abstract val configuration: Configuration
         val magisk: MagiskJson = Info.remote.magisk
 
         @Parcelize
-        data class Flash(
+        private class DownloadInternal(
             override val configuration: Configuration
         ) : Magisk() {
             override val url: String get() = magisk.link
@@ -72,8 +72,8 @@ sealed class DownloadSubject : Parcelable {
         }
 
         @Parcelize
-        class Uninstall : Magisk() {
-            override val configuration: Configuration get() = Configuration.Uninstall
+        private class Uninstall : Magisk() {
+            override val configuration get() = Configuration.Uninstall
             override val url: String get() = Info.remote.uninstaller.link
 
             @IgnoredOnParcel
@@ -83,8 +83,8 @@ sealed class DownloadSubject : Parcelable {
         }
 
         @Parcelize
-        class Download : Magisk() {
-            override val configuration: Configuration get() = Configuration.Download
+        private class Download : Magisk() {
+            override val configuration get() = Configuration.Download
             override val url: String get() = magisk.link
 
             @IgnoredOnParcel
@@ -97,7 +97,8 @@ sealed class DownloadSubject : Parcelable {
             operator fun invoke(configuration: Configuration) = when (configuration) {
                 Configuration.Download -> Download()
                 Configuration.Uninstall -> Uninstall()
-                else -> Flash(configuration)
+                Configuration.EnvFix, is Configuration.Flash -> DownloadInternal(configuration)
+                else -> throw IllegalArgumentException()
             }
         }
 

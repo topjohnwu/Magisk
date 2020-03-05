@@ -27,7 +27,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Ažuriranje dostupno</string>
-    <string name="installed">Instalirano</string>
+    <string name="home_installed_version">Instalirano</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">"Spremi zapisnik "</string>

@@ -132,7 +132,7 @@
     <string name="module_action_install_external">Installer depuis le stockage</string>
     <string name="module_update_none">Vos modules sont à jour !</string>
     <string name="update_available">Mise à jour disponible</string>
-    <string name="installed">Installée</string>
+    <string name="home_installed_version">Installée</string>
     <string name="sorting_order">Classement</string>
 
     <!--Settings -->

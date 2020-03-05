@@ -25,7 +25,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Atualização disponível</string>
-    <string name="installed">Instalado</string>
+    <string name="home_installed_version">Instalado</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Gravar registo</string>

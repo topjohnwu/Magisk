@@ -27,19 +27,19 @@ Options:
    --list                    list all available applets
    --daemon                  manually start magisk daemon
    --remove-modules          remove all modules and reboot
-   --[init trigger]          start service for init trigger
 
 Advanced Options (Internal APIs):
+   --[init trigger]          start service for init trigger
+                             Supported init triggers:
+                             post-fs-data, service, boot-complete
    --unlock-blocks           set BLKROSET flag to OFF for all block devices
    --restorecon              restore selinux context on Magisk files
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
+   --path                    print internal tmpfs mount path
 
-Supported init triggers:
-   post-fs-data, service, boot-complete
-
-Supported applets:
+Available applets:
 )EOF");
 
 	for (int i = 0; applet_names[i]; ++i)
@@ -115,6 +115,10 @@ int magisk_main(int argc, char *argv[]) {
 		int fd = connect_daemon();
 		write_int(fd, REMOVE_MODULES);
 		return read_int(fd);
+	} else if (argv[1] == "--path"sv) {
+		// TODO: hardcode /sbin for now, actual logic will be used for Android 11
+		printf("/sbin\n");
+		return 0;
 	}
 #if 0
 	/* Entry point for testing stuffs */

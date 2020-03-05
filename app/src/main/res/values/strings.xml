@@ -38,6 +38,8 @@
     <string name="home_status_normal">Normal</string>
     <string name="home_status_safe">Safe Mode</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Installed</string>
+    <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
@@ -132,8 +134,9 @@
     <string name="module_action_install_external">Install from storage</string>
     <string name="module_update_none">Your modules are up to date!</string>
     <string name="update_available">Update Available</string>
-    <string name="installed">Installed</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sorting Order</string>
+    <string name="module_permission_declined">Grant storage permission to enable this functionality</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Theme Mode</string>
