@@ -38,6 +38,8 @@
     <string name="home_status_normal">Normálny</string>
     <string name="home_status_safe">Núdzový režim</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Nainštalovaná</string>
+    <string name="home_latest_version">Posledná</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené!\nRoot bude odstránený!\nMôže dôjsť k zašifrovaniu vašich dát, ak už nie sú zašifrované!</string>
@@ -132,8 +134,9 @@
     <string name="module_action_install_external">Inštalácia z úložiska</string>
     <string name="module_update_none">Vaše moduly sú aktuálne!</string>
     <string name="update_available">Dostupná aktualizácia</string>
-    <string name="home_installed_version">Nainštalované</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Zoradenie</string>
+    <string name="module_permission_declined">Udeľte povolenie pre povolenie tejto funkcie</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Režim motívu</string>
