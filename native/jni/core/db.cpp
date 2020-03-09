@@ -6,10 +6,10 @@
 #include <dlfcn.h>
 #include <sys/stat.h>
 
-#include <magisk.h>
-#include <db.h>
-#include <daemon.h>
-#include <utils.h>
+#include <magisk.hpp>
+#include <db.hpp>
+#include <daemon.hpp>
+#include <utils.hpp>
 
 #define DB_VERSION 10
 

@@ -1,9 +1,9 @@
 #include <malloc.h>
 #include <string.h>
 
-#include <utils.h>
+#include <utils.hpp>
 
-#include "magiskboot.h"
+#include "magiskboot.hpp"
 
 #define MATCH(p) else if (strncmp(s + skip, p, sizeof(p) - 1) == 0) skip += (sizeof(p) - 1)
 

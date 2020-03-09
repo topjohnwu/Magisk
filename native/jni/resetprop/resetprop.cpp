@@ -9,15 +9,15 @@
 #include <vector>
 #include <algorithm>
 
-#include <logging.h>
-#include <resetprop.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <resetprop.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include "private/_system_properties.h"
-#include "private/system_properties.h"
-#include "private/resetprop.h"
+#include <_system_properties.h>
+
+#include "_resetprop.hpp"
 
 using namespace std;
 

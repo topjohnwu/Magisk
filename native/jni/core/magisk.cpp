@@ -5,10 +5,10 @@
 #include <libgen.h>
 #include <string.h>
 
-#include <utils.h>
-#include <magisk.h>
-#include <daemon.h>
-#include <selinux.h>
+#include <utils.hpp>
+#include <magisk.hpp>
+#include <daemon.hpp>
+#include <selinux.hpp>
 #include <flags.h>
 
 using namespace std::literals;

@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include <magisk.h>
-#include <utils.h>
-#include <selinux.h>
+#include <magisk.hpp>
+#include <utils.hpp>
+#include <selinux.hpp>
 
 using namespace std;
 

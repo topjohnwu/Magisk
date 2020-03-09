@@ -3,9 +3,9 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include <utils.h>
+#include <utils.hpp>
 
-#include "magiskboot.h"
+#include "magiskboot.hpp"
 
 static void hex2byte(uint8_t *hex, uint8_t *str) {
 	char high, low;

@@ -6,9 +6,9 @@
 #include <fcntl.h>
 #include <endian.h>
 
-#include <daemon.h>
-#include <utils.h>
-#include <logging.h>
+#include <daemon.hpp>
+#include <utils.hpp>
+#include <logging.hpp>
 
 #define ABS_SOCKET_LEN(sun) (sizeof(sa_family_t) + strlen(sun->sun_path + 1) + 1)
 

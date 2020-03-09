@@ -3,12 +3,12 @@
 #include <fcntl.h>
 #include <vector>
 
-#include <magisk.h>
-#include <magiskpolicy.h>
-#include <utils.h>
+#include <magisk.hpp>
+#include <magiskpolicy.hpp>
+#include <utils.hpp>
 
-#include "init.h"
-#include "magiskrc.h"
+#include "init.hpp"
+#include "magiskrc.inc"
 
 #ifdef USE_64BIT
 #define LIBNAME "lib64"

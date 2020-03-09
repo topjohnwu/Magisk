@@ -1,11 +1,11 @@
 #include <sys/mount.h>
 
-#include <magisk.h>
-#include <utils.h>
-#include <selinux.h>
-#include <resetprop.h>
+#include <magisk.hpp>
+#include <utils.hpp>
+#include <selinux.hpp>
+#include <resetprop.hpp>
 
-#include "magiskhide.h"
+#include "magiskhide.hpp"
 
 using namespace std;
 

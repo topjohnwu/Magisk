@@ -8,12 +8,12 @@
 #include <sys/types.h>
 #include <sys/mount.h>
 
-#include <magisk.h>
-#include <utils.h>
-#include <daemon.h>
-#include <selinux.h>
-#include <db.h>
-#include <resetprop.h>
+#include <magisk.hpp>
+#include <utils.hpp>
+#include <daemon.hpp>
+#include <selinux.hpp>
+#include <db.hpp>
+#include <resetprop.hpp>
 #include <flags.h>
 
 int SDK_INT = -1;

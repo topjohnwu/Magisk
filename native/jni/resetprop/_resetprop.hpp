@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
-#include <logging.h>
+#include <logging.hpp>
 
-#include "system_properties.h"
+#include <system_properties.h>
 
 struct prop_t {
 	char *name;
