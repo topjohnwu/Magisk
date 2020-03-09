@@ -56,10 +56,9 @@ initialize() {
   if $BOOTMODE; then
     # Override ui_print when booted
     ui_print() { log -t Magisk -- "$1"; }
-  else
-    OUTFD=
-    setup_flashable
   fi
+  OUTFD=
+  setup_flashable
 }
 
 main() {
@@ -73,9 +72,9 @@ main() {
 
   $BOOTMODE || recovery_actions
 
-  ui_print "************************"
-  ui_print "* Magisk v$MAGISK_VER addon.d"
-  ui_print "************************"
+  PRETTY_VER=$MAGISK_VER
+  echo $PRETTY_VER | grep -q '\.' && PRETTY_VER=v$PRETTY_VER
+  print_title "Magisk $PRETTY_VER addon.d"
 
   mount_partitions
   check_data

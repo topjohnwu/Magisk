@@ -1,17 +1,14 @@
 #MAGISK
-##########################################################################################
+############################################
 #
 # Magisk Flash Script (updater-script)
 # by topjohnwu
 #
-# This script will detect, construct the environment for Magisk
-# It will then call boot_patch.sh to patch the boot image
-#
-##########################################################################################
+############################################
 
-##########################################################################################
+############################################
 # Preparation
-##########################################################################################
+############################################
 
 COMMONDIR=$INSTALLER/common
 APK=$COMMONDIR/magisk.apk
@@ -33,13 +30,13 @@ fi
 
 setup_flashable
 
-##########################################################################################
+############################################
 # Detection
-##########################################################################################
+############################################
 
-ui_print "************************"
-ui_print "* Magisk v$MAGISK_VER Installer"
-ui_print "************************"
+PRETTY_VER=$MAGISK_VER
+echo $PRETTY_VER | grep -q '\.' && PRETTY_VER=v$PRETTY_VER
+print_title "Magisk $PRETTY_VER Installer"
 
 is_mounted /data || mount /data || is_mounted /cache || mount /cache
 mount_partitions
@@ -63,16 +60,16 @@ chmod -R 755 $CHROMEDIR $BINDIR
 # Check if system root is installed and remove
 remove_system_su
 
-##########################################################################################
+############################################
 # Environment
-##########################################################################################
+############################################
 
 ui_print "- Constructing environment"
 
 # Copy required files
 rm -rf $MAGISKBIN/* 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
-cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $BBDIR/busybox $MAGISKBIN
+cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $BBBIN $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 
 # addon.d
@@ -86,9 +83,9 @@ fi
 
 $BOOTMODE || recovery_actions
 
-##########################################################################################
+############################################
 # Boot/DTBO Patching
-##########################################################################################
+############################################
 
 install_magisk
 
