@@ -208,8 +208,7 @@ mount_partitions() {
   if [ -f /system/init.rc ]; then
     SYSTEM_ROOT=true
     setup_mntpoint /system_root
-    mount --move /system /system_root
-    if [ $? != 0 ]; then
+    if ! mount --move /system /system_root; then
       umount /system
       umount -l /system 2>/dev/null
       mount_ro_ensure "system$SLOT app$SLOT" /system_root
