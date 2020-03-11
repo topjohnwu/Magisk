@@ -376,8 +376,11 @@ flash_image() {
     local blk_sz=`blockdev --getsize64 "$2"`
     [ $img_sz -gt $blk_sz ] && return 1
     eval $CMD1 | eval $CMD2 | cat - /dev/zero > "$2" 2>/dev/null
+  elif [ -c "$2" ]; then
+    flash_eraseall "$2"
+    eval $CMD1 | eval $CMD2 | nandwrite -p "$2" -
   else
-    ui_print "- Not block device, storing image"
+    ui_print "- Not block or char device, storing image"
     eval $CMD1 | eval $CMD2 > "$2" 2>/dev/null
   fi
   return 0
@@ -408,6 +411,13 @@ patch_dtb_partitions() {
 install_magisk() {
   cd $MAGISKBIN
 
+  # Dump image for MTD/NAND character device boot partitions
+  if [ -c $BOOTIMAGE ]; then
+    nanddump -f boot.img $BOOTIMAGE
+    local BOOTNAND=$BOOTIMAGE
+    BOOTIMAGE=boot.img
+  fi
+
   eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
   $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
 
@@ -418,6 +428,9 @@ install_magisk() {
   . ./boot_patch.sh "$BOOTIMAGE"
 
   ui_print "- Flashing new boot image"
+
+  # Restore the original boot partition path
+  [ "$BOOTNAND" ] && BOOTIMAGE=$BOOTNAND
 
   if ! flash_image new-boot.img "$BOOTIMAGE"; then
     ui_print "- Compressing ramdisk to fit in partition"
