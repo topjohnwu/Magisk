@@ -10,18 +10,13 @@
 
 using namespace std;
 
-static void set_path() {
-	char buf[4096];
-	sprintf(buf, BBPATH ":%s", getenv("PATH"));
-	setenv("PATH", buf, 1);
-}
+#define BBEXEC_CMD DATABIN "/busybox", "sh", "-o", "standalone"
 
 void exec_script(const char *script) {
 	exec_t exec {
-		.pre_exec = set_path,
 		.fork = fork_no_zombie
 	};
-	exec_command_sync(exec, "/system/bin/sh", script);
+	exec_command_sync(exec, BBEXEC_CMD, script);
 }
 
 void exec_common_script(const char *stage) {
@@ -42,13 +37,12 @@ void exec_common_script(const char *stage) {
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			strcpy(name, entry->d_name);
 			exec_t exec {
-				.pre_exec = set_path,
 				.fork = pfs ? fork_no_zombie : fork_dont_care
 			};
 			if (pfs)
-				exec_command_sync(exec, "/system/bin/sh", path);
+				exec_command_sync(exec, BBEXEC_CMD, path);
 			else
-				exec_command(exec, "/system/bin/sh", path);
+				exec_command(exec, BBEXEC_CMD, path);
 		}
 	}
 }
@@ -63,13 +57,12 @@ void exec_module_script(const char *stage, const vector<string> &module_list) {
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		exec_t exec {
-			.pre_exec = set_path,
 			.fork = pfs ? fork_no_zombie : fork_dont_care
 		};
 		if (pfs)
-			exec_command_sync(exec, "/system/bin/sh", path);
+			exec_command_sync(exec, BBEXEC_CMD, path);
 		else
-			exec_command(exec, "/system/bin/sh", path);
+			exec_command(exec, BBEXEC_CMD, path);
 	}
 }
 
@@ -83,10 +76,9 @@ rm -f $APK
 void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	exec_t exec {
-		.pre_exec = set_path,
 		.fork = fork_no_zombie
 	};
 	char cmds[sizeof(install_script) + 4096];
 	sprintf(cmds, install_script, apk);
-	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+	exec_command_sync(exec, BBEXEC_CMD, "-c", cmds);
 }
