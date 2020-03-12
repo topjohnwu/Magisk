@@ -39,7 +39,7 @@ void hide_sensitive_props() {
 	bootmode = getprop("ro.boot.mode");
 	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
 		setprop("ro.boot.mode", "unknown", false);
-
+	}
 	// Xiaomi cross region flash
 	auto hwc = getprop("ro.boot.hwc");
 	if (!hwc.empty() && hwc.find("CN") != string::npos) {
