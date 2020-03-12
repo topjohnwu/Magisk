@@ -12,13 +12,13 @@ import androidx.databinding.ObservableArrayList
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.tasks.FlashResultListener
+import com.topjohnwu.magisk.core.tasks.Flashing
+import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.extensions.*
 import com.topjohnwu.magisk.model.binding.BindingAdapter
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
-import com.topjohnwu.magisk.model.flash.FlashResultListener
-import com.topjohnwu.magisk.model.flash.Flashing
-import com.topjohnwu.magisk.model.flash.Patching
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
@@ -60,26 +60,26 @@ class FlashViewModel(
             Const.Value.UNINSTALL -> Flashing
                 .Uninstall(installer, outItems, logItems, this)
                 .exec()
-            Const.Value.FLASH_MAGISK -> Patching
+            Const.Value.FLASH_MAGISK -> MagiskInstaller
                 .Direct(installer, outItems, logItems, this)
                 .exec()
-            Const.Value.FLASH_INACTIVE_SLOT -> Patching
+            Const.Value.FLASH_INACTIVE_SLOT -> MagiskInstaller
                 .SecondSlot(installer, outItems, logItems, this)
                 .exec()
-            Const.Value.PATCH_FILE -> Patching
-                .File(installer, uri ?: return, outItems, logItems, this)
+            Const.Value.PATCH_FILE -> MagiskInstaller
+                .Patch(installer, uri ?: return, outItems, logItems, this)
                 .exec()
         }
     }
 
-    override fun onResult(isSuccess: Boolean) {
-        state = if (isSuccess) State.LOADED else State.LOADING_FAILED
+    override fun onResult(success: Boolean) {
+        state = if (success) State.LOADED else State.LOADING_FAILED
         behaviorText.value = when {
-            isSuccess -> resources.getString(R.string.done)
+            success -> resources.getString(R.string.done)
             else -> resources.getString(R.string.failure)
         }
 
-        if (isSuccess) {
+        if (success) {
             Handler().postDelayed(500) {
                 showRestartTitle.value = true
             }

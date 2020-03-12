@@ -1,9 +1,8 @@
-package com.topjohnwu.magisk.model.flash
+package com.topjohnwu.magisk.core.tasks
 
 import android.content.Context
 import android.net.Uri
 import androidx.core.os.postDelayed
-import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
@@ -28,16 +27,7 @@ sealed class Flashing(
         console: MutableList<String>,
         log: MutableList<String>,
         resultListener: FlashResultListener
-    ) : Flashing(uri, console, log, resultListener) {
-
-        override fun onResult(success: Boolean) {
-            if (success) {
-                //Utils.loadModules()
-            }
-            super.onResult(success)
-        }
-
-    }
+    ) : Flashing(uri, console, log, resultListener)
 
     class Uninstall(
         uri: Uri,

@@ -6,7 +6,7 @@
 #include <map>
 #include <string_view>
 
-#include <stream.h>
+#include <stream.hpp>
 
 struct cpio_newc_header;
 

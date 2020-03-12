@@ -10,6 +10,8 @@ LOCAL_SRC_FILES := \
 	prop_area.cpp \
 	prop_info.cpp \
 	system_properties.cpp \
+	system_property_api.cpp \
+	system_property_set.cpp \
 	property_info_parser.cpp
 
 include $(BUILD_STATIC_LIBRARY)

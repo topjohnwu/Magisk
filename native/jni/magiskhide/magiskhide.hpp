@@ -10,7 +10,7 @@
 #include <map>
 #include <set>
 
-#include <daemon.h>
+#include <daemon.hpp>
 
 #define SIGTERMTHRD SIGUSR1
 #define SIGZYGOTE   SIGUSR2

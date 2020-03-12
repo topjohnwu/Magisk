@@ -161,14 +161,10 @@ object ClassMap {
 * being removed when running "remove unused resources" */
 val shouldKeepResources = listOf(
     /* TODO: The following strings should be used somewhere */
-    R.string.patch_file_msg,
     R.string.no_apps_found,
     R.string.no_info_provided,
     R.string.release_notes,
     R.string.settings_download_path_error,
-    R.string.unsupport_magisk_msg,
-    R.string.unsupport_magisk_title,
-    R.string.install_inactive_slot_msg,
     R.string.invalid_update_channel,
     R.string.update_available
 )

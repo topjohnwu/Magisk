@@ -28,7 +28,7 @@
 
     <!--Repo Fragment-->
     <string name="update_available">更新あり</string>
-    <string name="installed">インストール済</string>
+    <string name="home_installed_version">インストール済</string>
     <string name="sorting_order">並び順</string>
 
     <!--Log Fragment-->

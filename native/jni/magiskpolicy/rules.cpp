@@ -1,6 +1,6 @@
-#include <logging.h>
+#include <logging.hpp>
 #include <flags.h>
-#include <magiskpolicy.h>
+#include <magiskpolicy.hpp>
 
 #include "sepolicy.h"
 

@@ -131,7 +131,7 @@
     <string name="module_action_install_external">從本機安裝</string>
     <string name="module_update_none">您的模組已全部更新到最新！</string>
     <string name="update_available">有可用的更新</string>
-    <string name="installed">已安裝</string>
+    <string name="home_installed_version">已安裝</string>
     <string name="sorting_order">排序方式</string>
 
     <!--Settings -->

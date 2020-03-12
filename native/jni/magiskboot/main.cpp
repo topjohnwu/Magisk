@@ -5,12 +5,12 @@
 #include <sys/mman.h>
 
 #include <mincrypt/sha.h>
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
-#include "magiskboot.h"
-#include "compress.h"
+#include "magiskboot.hpp"
+#include "compress.hpp"
 
 using namespace std;
 

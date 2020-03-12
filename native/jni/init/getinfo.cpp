@@ -5,10 +5,10 @@
 #include <fcntl.h>
 #include <vector>
 
-#include <utils.h>
-#include <logging.h>
+#include <utils.hpp>
+#include <logging.hpp>
 
-#include "init.h"
+#include "init.hpp"
 
 using namespace std;
 

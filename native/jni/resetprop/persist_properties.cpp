@@ -9,9 +9,9 @@
 #include <pb.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
-#include <utils.h>
+#include <utils.hpp>
 
-#include "private/resetprop.h"
+#include "_resetprop.hpp"
 
 using namespace std;
 

@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.*
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
@@ -48,7 +47,6 @@ class HomeViewModel(
     val stateMagiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
     val stateMagiskMode get() = (if (Config.coreOnly) R.string.home_status_safe else R.string.home_status_normal).res()
-    val stateMagiskProgress = KObservableField(0)
 
     val stateManagerRemoteVersion = KObservableField(R.string.loading.res())
     val stateManagerInstalledVersion = Info.stub?.let {
@@ -70,8 +68,6 @@ class HomeViewModel(
     init {
         RemoteFileService.progressBroadcast.observeForever {
             when (it?.second) {
-                is Magisk.Download,
-                is Magisk.Flash -> stateMagiskProgress.value = it.first.times(100f).roundToInt()
                 is Manager -> stateManagerProgress.value = it.first.times(100f).roundToInt()
             }
         }
@@ -99,6 +95,8 @@ class HomeViewModel(
 
         ensureEnv()
     }
+
+    val showTest = false
 
     fun onTestPressed() = object : ViewEvent(), ActivityExecutor {
         override fun invoke(activity: BaseActivity) {

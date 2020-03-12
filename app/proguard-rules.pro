@@ -38,9 +38,6 @@
 # Fragments
 -keep,allowobfuscation class * extends androidx.fragment.app.Fragment
 
-# BaseWorkerWrapper
--keep,allowobfuscation class * extends com.topjohnwu.magisk.core.base.BaseWorkerWrapper
-
 # Strip Timber verbose and debug logging
 -assumenosideeffects class timber.log.Timber.Tree {
   public void v(**);

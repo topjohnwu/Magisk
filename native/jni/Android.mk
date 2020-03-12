@@ -45,8 +45,6 @@ LOCAL_SRC_FILES := \
 	magiskhide/hide_policy.cpp \
 	resetprop/persist_properties.cpp \
 	resetprop/resetprop.cpp \
-	resetprop/system_property_api.cpp \
-	resetprop/system_property_set.cpp \
 	su/su.cpp \
 	su/connect.cpp \
 	su/pts.cpp \
@@ -167,8 +165,6 @@ LOCAL_SRC_FILES := \
 	core/applet_stub.cpp \
 	resetprop/persist_properties.cpp \
 	resetprop/resetprop.cpp \
-	resetprop/system_property_api.cpp \
-	resetprop/system_property_set.cpp
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=resetprop_main
 LOCAL_LDFLAGS := -static

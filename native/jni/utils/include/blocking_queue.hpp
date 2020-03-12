@@ -2,7 +2,7 @@
 
 #include <pthread.h>
 #include <deque>
-#include <misc.h>
+#include <../misc.hpp>
 
 template<typename T>
 class blocking_queue {

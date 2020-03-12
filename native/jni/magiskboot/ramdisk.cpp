@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include <utils.h>
-#include <cpio.h>
+#include <utils.hpp>
+#include <cpio.hpp>
 
-#include "magiskboot.h"
-#include "compress.h"
+#include "magiskboot.hpp"
+#include "compress.hpp"
 
 using namespace std;
 

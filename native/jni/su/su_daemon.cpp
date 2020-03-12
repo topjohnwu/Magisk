@@ -12,13 +12,13 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 
-#include <logging.h>
-#include <daemon.h>
-#include <utils.h>
-#include <selinux.h>
+#include <logging.hpp>
+#include <daemon.hpp>
+#include <utils.hpp>
+#include <selinux.hpp>
 
-#include "su.h"
-#include "pts.h"
+#include "su.hpp"
+#include "pts.hpp"
 
 using namespace std;
 

@@ -1,11 +1,11 @@
 #include <sys/mount.h>
 
-#include <magisk.h>
-#include <utils.h>
-#include <selinux.h>
-#include <resetprop.h>
+#include <magisk.hpp>
+#include <utils.hpp>
+#include <selinux.hpp>
+#include <resetprop.hpp>
 
-#include "magiskhide.h"
+#include "magiskhide.hpp"
 
 using namespace std;
 
@@ -36,9 +36,18 @@ void hide_sensitive_props() {
 	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
 		setprop("ro.bootmode", "unknown", false);
 	}
-	auto boot_mode = getprop("ro.boot.mode");
-	if (!boot_mode.empty() && boot_mode.find("recovery") != string::npos) {
+	bootmode = getprop("ro.boot.mode");
+	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
 		setprop("ro.boot.mode", "unknown", false);
+
+	// Xiaomi cross region flash
+	auto hwc = getprop("ro.boot.hwc");
+	if (!hwc.empty() && hwc.find("CN") != string::npos) {
+		setprop("ro.boot.hwc", "GLOBAL", false);
+	}
+	auto hwcountry = getprop("ro.boot.hwcountry");
+	if (!hwcountry.empty() && hwcountry.find("China") != string::npos) {
+		setprop("ro.boot.hwcountry", "GLOBAL", false);
 	}
 }
 

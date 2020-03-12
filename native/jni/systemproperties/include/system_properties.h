@@ -33,7 +33,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "redefs.h"
+
+#include "private/hacks.h"
 
 __BEGIN_DECLS
 

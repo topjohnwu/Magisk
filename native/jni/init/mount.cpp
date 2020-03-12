@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <vector>
 
-#include <utils.h>
-#include <logging.h>
-#include <selinux.h>
-#include <magisk.h>
+#include <utils.hpp>
+#include <logging.hpp>
+#include <selinux.hpp>
+#include <magisk.hpp>
 
-#include "init.h"
+#include "init.hpp"
 
 using namespace std;
 
