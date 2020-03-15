@@ -589,6 +589,106 @@ request_zip_size_check() {
 
 boot_actions() { return; }
 
+# Require ZIPFILE to be set
+is_legacy_script() {
+  unzip -l "$ZIPFILE" install.sh | grep -q install.sh
+  return $?
+}
+
+# Require OUTFD, ZIPFILE to be set
+install_module() {
+  local PERSISTDIR=/sbin/.magisk/mirror/persist
+
+  setup_flashable
+  mount_partitions
+  api_level_arch_detect
+
+  # Setup busybox and binaries
+  $BOOTMODE && boot_actions || recovery_actions
+
+  # Extract prop file
+  unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
+  [ ! -f $TMPDIR/module.prop ] && abort "! Unable to extract zip file!"
+
+  $BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
+  MODULEROOT=$NVBASE/$MODDIRNAME
+  MODID=`grep_prop id $TMPDIR/module.prop`
+  MODPATH=$MODULEROOT/$MODID
+  MODNAME=`grep_prop name $TMPDIR/module.prop`
+
+  # Create mod paths
+  rm -rf $MODPATH 2>/dev/null
+  mkdir -p $MODPATH
+
+  if is_legacy_script; then
+    unzip -oj "$ZIPFILE" module.prop install.sh uninstall.sh 'common/*' -d $TMPDIR >&2
+
+    # Load install script
+    . $TMPDIR/install.sh
+
+    # Callbacks
+    print_modname
+    on_install
+
+    [ -f $TMPDIR/uninstall.sh ] && cp -af $TMPDIR/uninstall.sh $MODPATH/uninstall.sh
+    $SKIPMOUNT && touch $MODPATH/skip_mount
+    $PROPFILE && cp -af $TMPDIR/system.prop $MODPATH/system.prop
+    cp -af $TMPDIR/module.prop $MODPATH/module.prop
+    $POSTFSDATA && cp -af $TMPDIR/post-fs-data.sh $MODPATH/post-fs-data.sh
+    $LATESTARTSERVICE && cp -af $TMPDIR/service.sh $MODPATH/service.sh
+
+    ui_print "- Setting permissions"
+    set_permissions
+  else
+    print_title "$MODNAME"
+    print_title "Powered by Magisk"
+
+    unzip -o "$ZIPFILE" customize.sh -d $MODPATH >&2
+
+    if ! grep -q '^SKIPUNZIP=1$' $MODPATH/customize.sh 2>/dev/null; then
+      ui_print "- Extracting module files"
+      unzip -o "$ZIPFILE" -x 'META-INF/*' -d $MODPATH >&2
+
+      # Default permissions
+      set_perm_recursive $MODPATH 0 0 0755 0644
+    fi
+
+    # Load customization script
+    [ -f $MODPATH/customize.sh ] && . $MODPATH/customize.sh
+  fi
+
+  # Handle replace folders
+  for TARGET in $REPLACE; do
+    ui_print "- Replace target: $TARGET"
+    mktouch $MODPATH$TARGET/.replace
+  done
+
+  if $BOOTMODE; then
+    # Update info for Magisk Manager
+    mktouch $NVBASE/modules/$MODID/update
+    cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
+  fi
+
+  # Copy over custom sepolicy rules
+  if [ -f $MODPATH/sepolicy.rule -a -e $PERSISTDIR ]; then
+    ui_print "- Installing custom sepolicy patch"
+    PERSISTMOD=$PERSISTDIR/magisk/$MODID
+    mkdir -p $PERSISTMOD
+    cp -af $MODPATH/sepolicy.rule $PERSISTMOD/sepolicy.rule
+  fi
+
+  # Remove stuffs that don't belong to modules
+  rm -rf \
+  $MODPATH/system/placeholder $MODPATH/customize.sh \
+  $MODPATH/README.md $MODPATH/.git* 2>/dev/null
+
+  cd /
+  $BOOTMODE || recovery_cleanup
+  rm -rf $TMPDIR
+
+  ui_print "- Done"
+}
+
 ##########
 # Presets
 ##########
