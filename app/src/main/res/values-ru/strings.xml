@@ -135,7 +135,6 @@
     <string name="module_update_none">Ваши модули обновлены!</string>
     <string name="module_installed">Установлены</string>
     <string name="update_available">Доступно обновление</string>
-    <string name="home_installed_version">Установлен</string>
     <string name="sorting_order">Сортировка</string>
 
     <!--Settings -->
