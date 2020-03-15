@@ -60,7 +60,7 @@ initialize() {
     ui_print() { log -t Magisk -- "$1"; }
   fi
   OUTFD=
-  setup_flashable
+  setup_flashable "$@"
 }
 
 main() {
@@ -122,7 +122,7 @@ case "$1" in
     # Stub
   ;;
   post-restore)
-    initialize
+    initialize "$@"
     if $backuptool_ab; then
       $BOOTMODE && su=su || su=sh
       exec $su -c "sh $0 addond-v2"
@@ -132,7 +132,7 @@ case "$1" in
     fi
   ;;
   addond-v2)
-    initialize
+    initialize "$@"
     main
   ;;
 esac

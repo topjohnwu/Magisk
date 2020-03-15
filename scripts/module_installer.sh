@@ -31,7 +31,7 @@ mount /data 2>/dev/null
 
 if [ $MAGISK_VER_CODE -ge 20400 ]; then
   # New Magisk have complete installation logic within util_functions.sh
-  install_module
+  install_module $@
   exit 0
 fi
 
@@ -65,7 +65,7 @@ print_modname() {
 }
 
 # Preperation for flashable zips
-setup_flashable
+setup_flashable "$@"
 
 # Mount partitions
 mount_partitions

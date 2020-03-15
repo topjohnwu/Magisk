@@ -70,7 +70,7 @@ print_title() {
 ######################
 
 setup_flashable() {
-  ensure_bb
+  ensure_bb "$@"
   $BOOTMODE && return
   if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
@@ -86,8 +86,7 @@ setup_flashable() {
 }
 
 ensure_bb() {
-  [ -o standalone ] && return
-  set -o standalone 2>/dev/null && return
+  [ $(echo $- | grep "S") ] && return
 
   # At this point, we are not running in BusyBox ash
   # Find our busybox binary
@@ -599,7 +598,7 @@ is_legacy_script() {
 install_module() {
   local PERSISTDIR=/sbin/.magisk/mirror/persist
 
-  setup_flashable
+  setup_flashable "$@"
   mount_partitions
   api_level_arch_detect
 

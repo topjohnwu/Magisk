@@ -28,7 +28,7 @@ fi
 # Load utility fuctions
 . $COMMONDIR/util_functions.sh
 
-setup_flashable
+setup_flashable "$@"
 
 ############################################
 # Detection
