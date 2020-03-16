@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
 import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
 import com.topjohnwu.magisk.ui.home.HomeFragment
+import com.topjohnwu.magisk.ui.log.LogFragment
 import com.topjohnwu.magisk.ui.module.ModuleFragment
 import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
 import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
@@ -43,7 +44,8 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     override val baseFragments: List<KClass<out Fragment>> = listOf(
         HomeFragment::class,
         ModuleFragment::class,
-        SuperuserFragment::class
+        SuperuserFragment::class,
+        LogFragment::class
     )
 
     //This temporarily fixes unwanted feature of BottomNavigationView - where the view applies
@@ -81,6 +83,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 R.id.homeFragment -> Navigation.home()
                 R.id.modulesFragment -> Navigation.modules()
                 R.id.superuserFragment -> Navigation.superuser()
+                R.id.logFragment -> Navigation.log()
                 else -> throw NotImplementedError("Id ${it.itemId} is not defined as selectable")
             }.dispatchOnSelf()
             true
