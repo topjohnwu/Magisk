@@ -62,6 +62,9 @@ Let's start with SafetyNet.
 - Start clean: my advice is always the easy route - **use stock ROMs**. If you prefer custom ROMs, choose stable, official builds from well-reputed teams.
 - If you cannot even pass **basicIntegrity**, there are some serious issues! Even though in theory Magisk Modules should be hidden by MagiskHide, some modules modify stuffs that MagiskHide is not sufficient. Please remove modules one by one and narrow down the problematic module(s). If it still doesn't pass, the ROM you're using is the problem.
 - If **basicIntegrity** passes but **ctsProfile** doesn't, you might be using a ROM that has never passed CTS (OEM betas, previews, China based ROMs etc.). Try out [MagiskHide Props Config](https://forum.xda-developers.com/apps/magisk/module-magiskhide-props-config-t3789228) from @Didgeridoohan and switch a known CTS-passing fingerprint from the massive list included in the module.
+     - **NOTE:** With changes implemented in March of 2020, Google has made it so no software (including Magisk) can hide bootloader unlock status from SafetyNet by tying results to keymaster and therefore the Trusted Execution Environment (TEE) which is tied to the CPU or dedicated security chip of your device. SafetyNet now utilizes the already implemented keymaster to get metadata from the hardware on the device (un)lock status.
+       While some devices ship broken implementations of keymaster therefore allowing SafetyNet to still pass, at some point this may no longer be the case and once you unlock your bootloader you _will not_ pass SafetyNet until you re-lock (and maybe not even then!).
+       Once again there is _nothing Magisk can do_.
 
 At this point, SafetyNet should be fully passed. Let's change gears to notorious apps that detects all kinds of weird shit.
 
