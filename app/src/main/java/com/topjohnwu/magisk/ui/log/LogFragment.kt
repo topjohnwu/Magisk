@@ -23,7 +23,7 @@ class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
         get() = binding.logFilter.isVisible
         set(value) {
             MotionRevealHelper.withViews(binding.logFilter, binding.logFilterToggle, value)
-            actionSave?.isVisible = value
+            actionSave?.isVisible = !value
             (activity as MainActivity).invalidateToolbar()
         }
 
@@ -45,7 +45,7 @@ class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_log_md2, menu)
         actionSave = menu.findItem(R.id.action_save)?.also {
-            it.isVisible = isMagiskLogVisible
+            it.isVisible = !isMagiskLogVisible
         }
     }
 
@@ -53,7 +53,7 @@ class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
         when (item.itemId) {
             R.id.action_save -> viewModel.saveMagiskLog()
             R.id.action_clear ->
-                if (isMagiskLogVisible) viewModel.clearMagiskLog()
+                if (!isMagiskLogVisible) viewModel.clearMagiskLog()
                 else viewModel.clearLog()
         }
         return super.onOptionsItemSelected(item)
