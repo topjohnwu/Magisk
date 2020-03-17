@@ -20,7 +20,6 @@ import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
-import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.adapterOf
 import com.topjohnwu.magisk.ui.base.diffListOf
@@ -85,8 +84,11 @@ class SuperuserViewModel(
         else -> Unit
     }
 
-    private fun safetynetPressed() = Navigation.safetynet().publish()
-    private fun hidePressed() = Navigation.hide().publish()
+    private fun safetynetPressed() =
+        SuperuserFragmentDirections.actionSuperuserFragmentToSafetynetFragment().publish()
+
+    private fun hidePressed() =
+        SuperuserFragmentDirections.actionSuperuserFragmentToHideFragment().publish()
 
     fun deletePressed(item: PolicyItem) {
         fun updateState() = deletePolicy(item.item)

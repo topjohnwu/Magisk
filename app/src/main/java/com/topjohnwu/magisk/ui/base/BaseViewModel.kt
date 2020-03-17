@@ -7,11 +7,13 @@ import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.extensions.doOnSubscribeUi
 import com.topjohnwu.magisk.model.events.*
+import com.topjohnwu.magisk.model.navigation.NavigationWrapper
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.utils.KObservableField
 import io.reactivex.*
@@ -97,6 +99,10 @@ abstract class BaseViewModel(
 
     fun Int.publish() {
         _viewEvents.postValue(SimpleViewEvent(this))
+    }
+
+    fun NavDirections.publish() {
+        _viewEvents.postValue(NavigationWrapper(this))
     }
 
     fun Disposable.add() {

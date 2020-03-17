@@ -1,7 +1,10 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    id("kotlin-android-extensions")
+    id("kotlin-kapt")
+    id("androidx.navigation.safeargs.kotlin")
+}
 
 kapt {
     correctErrorTypes = true
@@ -22,7 +25,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = ["room.incremental":"true"]
+                arguments = ["room.incremental": "true"]
             }
         }
     }
@@ -65,7 +68,6 @@ dependencies {
 
     implementation 'com.github.topjohnwu:jtar:1.0.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'com.ncapdevi:frag-nav:3.2.0'
     implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.6'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.18'
@@ -116,7 +118,6 @@ dependencies {
     implementation "androidx.room:room-rxjava2:${vRoom}"
     kapt "androidx.room:room-compiler:${vRoom}"
 
-    def vNav = '2.2.1'
     implementation "androidx.navigation:navigation-fragment-ktx:${vNav}"
     implementation "androidx.navigation:navigation-ui-ktx:${vNav}"
 

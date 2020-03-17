@@ -7,46 +7,30 @@ import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.Insets
+import androidx.core.view.forEach
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.Fragment
 import com.google.android.material.card.MaterialCardView
-import com.ncapdevi.fragnav.FragNavController
+import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.extensions.startAnimations
-import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
-import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
-import com.topjohnwu.magisk.ui.home.HomeFragment
-import com.topjohnwu.magisk.ui.log.LogFragment
-import com.topjohnwu.magisk.ui.module.ModuleFragment
-import com.topjohnwu.magisk.ui.superuser.SuperuserFragment
+import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
 import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideableBehavior
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.reflect.KClass
 
-open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(),
-    FragNavController.TransactionListener {
+open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>() {
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
     override val navHost: Int = R.id.main_nav_host
-
-    override val navigation by lazy { CompatNavigationDelegate(this, this) }
-
-    override val baseFragments: List<KClass<out Fragment>> = listOf(
-        HomeFragment::class,
-        ModuleFragment::class,
-        SuperuserFragment::class,
-        LogFragment::class
-    )
 
     //This temporarily fixes unwanted feature of BottomNavigationView - where the view applies
     //padding on itself given insets are not consumed beforehand. Unfortunately the listener
@@ -55,6 +39,9 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     private val navObserver = ViewTreeObserver.OnGlobalLayoutListener {
         binding.mainNavigation.setPadding(0)
     }
+
+    protected var isRoot = true
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +57,25 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
+        navigation?.addOnDestinationChangedListener { controller, destination, arguments ->
+            isRoot = when (destination.id) {
+                R.id.homeFragment,
+                R.id.modulesFragment,
+                R.id.superuserFragment,
+                R.id.logFragment -> true
+                else -> false
+            }
+
+            setDisplayHomeAsUpEnabled(!isRoot)
+            requestNavigationHidden(!isRoot)
+
+            binding.mainNavigation.menu.forEach {
+                if (it.itemId == destination.id) {
+                    it.isChecked = true
+                }
+            }
+        }
+
         setSupportActionBar(binding.mainToolbar)
 
         binding.mainToolbarWrapper.updateLayoutParams<CoordinatorLayout.LayoutParams> {
@@ -80,28 +86,26 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
         }
         binding.mainNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.homeFragment -> Navigation.home()
-                R.id.modulesFragment -> Navigation.modules()
-                R.id.superuserFragment -> Navigation.superuser()
-                R.id.logFragment -> Navigation.log()
+                R.id.homeFragment -> MainDirections.actionHomeFragment()
+                R.id.modulesFragment -> MainDirections.actionModuleFragment()
+                R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
+                R.id.logFragment -> MainDirections.actionLogFragment()
                 else -> throw NotImplementedError("Id ${it.itemId} is not defined as selectable")
-            }.dispatchOnSelf()
+            }.navigate()
             true
         }
         binding.mainNavigation.setOnNavigationItemReselectedListener {
-            navigation.onReselected()
+            (currentFragment as? ReselectionTarget)?.onReselected()
         }
 
         binding.mainNavigation.viewTreeObserver.addOnGlobalLayoutListener(navObserver)
 
         if (intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false)) {
-            Navigation.settings().dispatchOnSelf()
+            HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
         }
 
         if (savedInstanceState != null) {
-            onTabTransaction(null, -1)
-
-            if (!navigation.isRoot) {
+            if (!isRoot) {
                 requestNavigationHidden()
             }
         }
@@ -127,17 +131,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             else -> return super.onOptionsItemSelected(item)
         }
         return true
-    }
-
-    override fun onTabTransaction(fragment: Fragment?, index: Int) =
-        onFragmentTransaction(fragment, FragNavController.TransactionType.PUSH)
-
-    override fun onFragmentTransaction(
-        fragment: Fragment?,
-        transactionType: FragNavController.TransactionType
-    ) {
-        setDisplayHomeAsUpEnabled(!navigation.isRoot)
-        requestNavigationHidden(!navigation.isRoot)
     }
 
     override fun peekSystemWindowInsets(insets: Insets) {

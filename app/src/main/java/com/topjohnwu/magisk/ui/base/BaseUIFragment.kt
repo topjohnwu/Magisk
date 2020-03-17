@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.model.events.EventHandler
@@ -22,7 +23,7 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
     protected abstract val layoutRes: Int
 
     override val viewRoot: View get() = binding.root
-    override val navigation by lazy { activity.navigation }
+    override val navigation get() = activity.navigation
     private val delegate by lazy { CompatDelegate(this) }
 
     override fun consumeSystemWindowInsets(insets: Insets) = insets
@@ -77,5 +78,9 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
     }
 
     protected fun ViewEvent.dispatchOnSelf() = delegate.onEventExecute(this, this@BaseUIFragment)
+
+    fun NavDirections.navigate() {
+        navigation?.navigate(this)
+    }
 
 }

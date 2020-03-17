@@ -9,7 +9,8 @@ import androidx.core.graphics.Insets
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
-import androidx.fragment.app.Fragment
+import androidx.navigation.NavDirections
+import androidx.navigation.findNavController
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
@@ -19,7 +20,6 @@ import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.theme.Theme
-import kotlin.reflect.KClass
 
 abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding> :
     BaseActivity(), CompatView<ViewModel>, EventHandler {
@@ -28,18 +28,28 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     protected abstract val layoutRes: Int
     protected open val themeRes: Int = Theme.selected.themeRes
 
+    private val navHostFragment get() = supportFragmentManager.findFragmentById(navHost)
+    private val topFragment get() = navHostFragment?.childFragmentManager?.fragments?.getOrNull(0)
+    protected val currentFragment get() = topFragment as? BaseUIFragment<*, *>
+
     override val viewRoot: View get() = binding.root
-    override val navigation by lazy { CompatNavigationDelegate(this) as CompatNavigationDelegate? }
+    override val navigation by lazy {
+        kotlin.runCatching { findNavController(navHost) }.getOrNull()
+    }
 
     private val delegate by lazy { CompatDelegate(this) }
 
     open val navHost: Int = 0
     open val snackbarView get() = binding.root
-    open val baseFragments = listOf<KClass<out Fragment>>()
 
     init {
         val theme = Config.darkThemeExtended
         AppCompatDelegate.setDefaultNightMode(theme)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        currentFragment?.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,22 +71,11 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
         })
 
         delegate.onCreate()
-        navigation?.onCreate(savedInstanceState)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        navigation?.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onResume() {
         super.onResume()
         delegate.onResume()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        navigation?.onSaveInstanceState(outState)
     }
 
     override fun onEventDispatched(event: ViewEvent) {
@@ -87,7 +86,7 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     }
 
     override fun onBackPressed() {
-        if (navigation == null || navigation?.onBackPressed()?.not() == true) {
+        if (navigation == null || currentFragment?.onBackPressed()?.not() == true) {
             super.onBackPressed()
         }
     }
@@ -97,4 +96,9 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     }
 
     protected fun ViewEvent.dispatchOnSelf() = onEventDispatched(this)
+
+    fun NavDirections.navigate() {
+        navigation?.navigate(this)
+    }
+
 }

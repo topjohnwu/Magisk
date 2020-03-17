@@ -22,7 +22,6 @@ import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
-import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
@@ -114,7 +113,7 @@ class HomeViewModel(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     ).map { check(it);it }
-        .subscribeK { Navigation.install().publish() }
+        .subscribeK { HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish() }
         .add()
 
     fun toggle(kof: KObservableField<Boolean>) = kof.toggle()
