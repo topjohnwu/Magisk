@@ -14,7 +14,6 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?colorSurface"
         android:orientation="vertical"
         android:paddingLeft="@{viewModel.insets.left}"
         android:paddingRight="@{viewModel.insets.right}"
@@ -43,10 +42,21 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
+        <!--
+        todo(diareuse) this stupid-ass bottom menu doesn't fit with the fab-s, so either of those
+         things need to be removed, probably the fab-s.
+
+         Using the BottomAppBar is not viable as it looks terrible with the blank space in the
+         middle and / or with the "animation" which BottomNavigationView performs when it's
+         reinflating its menu items. This bullshit cockblocks the entire feature. Terrific.
+
+         Possibility is then to keep the middle fab and assign it some other functionality on all
+         screens. Which -ha-ha- good luck finding something on superuser and homepage...
+         -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/main_bottom_bar"
             style="@style/WidgetFoundation.Card.Elevated"
-            android:layout_width="192dp"
+            android:layout_width="224dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginStart="@dimen/l1"
@@ -65,8 +75,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
+                    android:textStyle="bold"
                     app:elevation="0dp"
+                    app:itemHorizontalTranslationEnabled="false"
                     app:itemIconTint="@color/color_menu_tint"
+                    app:itemRippleColor="?colorPrimary"
                     app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
                     app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
                     app:itemTextColor="@color/color_menu_tint"
