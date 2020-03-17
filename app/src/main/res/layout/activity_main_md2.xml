@@ -19,10 +19,13 @@
         android:paddingRight="@{viewModel.insets.right}"
         tools:ignore="RtlHardcoded">
 
-        <androidx.fragment.app.FragmentContainerView
+        <fragment
             android:id="@+id/main_nav_host"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/main" />
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/main_toolbar_wrapper"

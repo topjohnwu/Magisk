@@ -8,6 +8,7 @@ if (configPath.exists())
 
 buildscript {
     ext.vKotlin = '1.3.70'
+    ext.vNav = '2.3.0-alpha03'
 
     repositories {
         google()
@@ -18,6 +19,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${vKotlin}"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$vNav"
 
 
         // NOTE: Do not place your application dependencies here; they belong

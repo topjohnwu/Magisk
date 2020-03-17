@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
+import androidx.navigation.NavController
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
@@ -15,7 +16,6 @@ import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
-import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {
@@ -23,8 +23,7 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
     override val layoutRes: Int = R.layout.activity_request
     override val viewModel: SuRequestViewModel by viewModel()
 
-    override val navigation: CompatNavigationDelegate<BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>>? =
-        null
+    override val navigation: NavController? = null
 
     override fun onBackPressed() {
         viewModel.denyPressed()

@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import androidx.core.net.toUri
+import androidx.navigation.NavController
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.intent
@@ -16,7 +17,6 @@ import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
-import com.topjohnwu.magisk.ui.base.CompatNavigationDelegate
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -25,8 +25,7 @@ open class FlashActivity : BaseUIActivity<FlashViewModel, ActivityFlashBinding>(
     override val layoutRes: Int = R.layout.activity_flash
     override val viewModel: FlashViewModel by viewModel()
 
-    override val navigation: CompatNavigationDelegate<BaseUIActivity<FlashViewModel, ActivityFlashBinding>>? =
-        null
+    override val navigation: NavController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
