@@ -170,9 +170,9 @@ rm -rf \
 $MODPATH/system/placeholder $MODPATH/customize.sh \
 $MODPATH/README.md $MODPATH/.git* 2>/dev/null
 
-##############
+#############
 # Finalizing
-##############
+#############
 
 cd /
 $BOOTMODE || recovery_cleanup

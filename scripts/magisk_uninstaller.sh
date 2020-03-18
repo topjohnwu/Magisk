@@ -6,9 +6,9 @@
 #
 ############################################
 
-############################################
+##############
 # Preparation
-############################################
+##############
 
 # This path should work in any cases
 TMPDIR=/dev/tmp
@@ -51,9 +51,9 @@ $DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
 $BOOTMODE || recovery_actions
 run_migrations
 
-############################################
+############
 # Uninstall
-############################################
+############
 
 get_flags
 find_boot_image
