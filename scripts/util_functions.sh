@@ -1,9 +1,9 @@
-#########################################
+############################################
 #
 # Magisk General Utility Functions
 # by topjohnwu
 #
-#########################################
+############################################
 
 #MAGISK_VERSION_STUB
 
@@ -70,6 +70,8 @@ print_title() {
 ######################
 
 setup_flashable() {
+  # Preserve environment varibles
+  OLD_PATH=$PATH
   ensure_bb
   $BOOTMODE && return
   if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
@@ -86,23 +88,18 @@ setup_flashable() {
 }
 
 ensure_bb() {
-  [ -o standalone ] && return
-  set -o standalone 2>/dev/null && return
-
-  # At this point, we are not running in BusyBox ash
-  # Find our busybox binary
-  local BUSYBOX
-  if [ -f $TMPDIR/busybox ]; then
-    BUSYBOX=$TMPDIR/busybox
-  elif [ -f $MAGISKBIN/busybox ]; then
-    BUSYBOX=$MAGISKBIN/busybox
+  if [ -x $MAGISKTMP/busybox/busybox ]; then
+    [ -z $BBDIR ] && BBDIR=$MAGISKTMP/busybox
+  elif [ -x $TMPDIR/bin/busybox ]; then
+    [ -z $BBDIR ] && BBDIR=$TMPDIR/bin
   else
-    abort "! Cannot find BusyBox"
+    # Construct the PATH
+    [ -z $BBDIR ] && BBDIR=$TMPDIR/bin
+    mkdir -p $BBDIR
+    ln -s $MAGISKBIN/busybox $BBDIR/busybox
+    $MAGISKBIN/busybox --install -s $BBDIR
   fi
-
-  # Re-exec our script
-  chmod 755 $BUSYBOX
-  exec $BUSYBOX sh -o standalone $0 "$@"
+  echo $PATH | grep -q "^$BBDIR" || export PATH=$BBDIR:$PATH
 }
 
 recovery_actions() {
@@ -115,6 +112,9 @@ recovery_actions() {
   unset LD_LIBRARY_PATH
   unset LD_PRELOAD
   unset LD_CONFIG_FILE
+  # Force our own busybox path to be in the front
+  # and do not use anything in recovery's sbin
+  export PATH=$BBDIR:/system/bin:/vendor/bin
 }
 
 recovery_cleanup() {
