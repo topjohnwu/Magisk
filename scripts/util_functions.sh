@@ -629,6 +629,9 @@ is_legacy_script() {
 install_module() {
   local PERSISTDIR=/sbin/.magisk/mirror/persist
 
+  rm -rf $TMPDIR
+  mkdir -p $TMPDIR
+
   setup_flashable
   mount_partitions
   api_level_arch_detect
