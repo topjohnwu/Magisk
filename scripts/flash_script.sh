@@ -6,9 +6,9 @@
 #
 ############################################
 
-############################################
+##############
 # Preparation
-############################################
+##############
 
 COMMONDIR=$INSTALLER/common
 APK=$COMMONDIR/magisk.apk
@@ -30,9 +30,9 @@ fi
 
 setup_flashable
 
-############################################
+############
 # Detection
-############################################
+############
 
 PRETTY_VER=$MAGISK_VER
 echo $PRETTY_VER | grep -q '\.' && PRETTY_VER=v$PRETTY_VER
@@ -60,9 +60,9 @@ chmod -R 755 $CHROMEDIR $BINDIR
 # Check if system root is installed and remove
 remove_system_su
 
-############################################
+##############
 # Environment
-############################################
+##############
 
 ui_print "- Constructing environment"
 
@@ -83,9 +83,9 @@ fi
 
 $BOOTMODE || recovery_actions
 
-############################################
+#####################
 # Boot/DTBO Patching
-############################################
+#####################
 
 install_magisk
 

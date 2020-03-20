@@ -26,9 +26,9 @@ trampoline() {
     fi
     ui_print() { $BOOTMODE && log -t Magisk -- "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD; }
 
-    ui_print "************************"
-    ui_print "* Magisk addon.d failed"
-    ui_print "************************"
+    ui_print "***********************"
+    ui_print " Magisk addon.d failed"
+    ui_print "***********************"
     ui_print "! Cannot find Magisk binaries - was data wiped or not decrypted?"
     ui_print "! Reflash OTA from decrypted recovery or reflash Magisk"
     exit 1
