@@ -107,7 +107,7 @@ ensure_bb() {
   # Run in busybox environment to ensure consistent results
   # /proc/<pid>/cmdline shall be <interpreter> <script> <arguments...>
   local cmds=$($bb sh -o standalone -c "
-  tr '\0' '\n' < /proc/$$/cmdline | (while read -r arg; do
+  for arg in \$(tr '\0' '\n' < /proc/$$/cmdline); do
     if [ -z \"\$cmds\" ]; then
       # Skip the first argument as we want to change the interpreter
       cmds=\"sh -o standalone\"
@@ -115,7 +115,7 @@ ensure_bb() {
       cmds=\"\$cmds '\$arg'\"
     fi
   done
-  echo \$cmds)")
+  echo \$cmds")
 
   # Re-exec our script
   echo $cmds | $bb xargs $bb
@@ -151,7 +151,6 @@ recovery_cleanup() {
     fi
   done
   umount -l /dev/random) 2>/dev/null
-  export PATH=$OLD_PATH
   [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
   [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
   [ -z $OLD_LD_CFG ] || export LD_CONFIG_FILE=$OLD_LD_CFG
