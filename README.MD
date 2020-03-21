@@ -6,11 +6,18 @@
 
 Magisk is a suite of open source tools for customizing Android, supporting devices higher than Android 4.2 (API 17). It covers the fundamental parts for Android customization: root, boot scripts, SELinux patches, AVB2.0 / dm-verity / forceencrypt removals etc.
 
-Furthermore, Magisk provides a **Systemless Interface** to alter the system (or vendor) arbitrarily while the actual partitions stay completely intact. With its systemless nature along with several other hacks, Magisk can hide modifications from nearly any system integrity verifications used in banking apps, corporation monitoring apps, game cheat detections, and most importantly [Google's SafetyNet API](https://developer.android.com/training/safetynet/index.html).
+Furthermore, Magisk provides a **Systemless Interface** to alter the system (or vendor) arbitrarily while the actual partitions stay completely intact. With its systemless nature along with several other hacks, Magisk can almost perfectly hide modifications within userspace. Note that since 2020.3, the CTS check of [Google's SafetyNet API](https://developer.android.com/training/safetynet/index.html) will **NOT** pass.
 
 ## Bug Reports
 
-**Make sure to install the latest [Canary Build](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337) before reporting any bugs!** **DO NOT** report bugs that are already fixed upstream. Follow the instructions in the [Canary Channel XDA Thread](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337), and report a bug either by [opening an issue on GitHub](https://github.com/topjohnwu/Magisk/issues) or directly in the thread.
+**Only reports using debug canary builds will be accepted.** \
+Access canary builds by upgrading to either canary Magisk Manager:
+- [Canary Manager (Release)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-release.apk)
+- [Canary Manager (Debug)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
+
+For installation issues, upload both boot image and install logs. \
+For Magisk issues, upload boot logcat or dmesg. \
+For Magisk Manager crashes, record and upload the logcat when the crash occurs.
 
 ## Building Environment Requirements
 
@@ -36,27 +43,6 @@ Default string resources for Magisk Manager and its stub APK are located here:
 - `stub/src/main/res/values/strings.xml`
 
 Translate each and place them in the respective locations (`[module]/src/main/res/values-[lang]/strings.xml`).
-
-## Signature Verification
-
-Official release zips and APKs are signed with my personal private key. You can verify the key certificate to make sure the binaries you downloaded are not manipulated in anyway.
-
-``` bash
-# Use the keytool command from JDK to print certificates
-keytool -printcert -jarfile <APK or Magisk zip>
-
-# The output should contain the following signature
-Owner: CN=John Wu, L=Taipei, C=TW
-Issuer: CN=John Wu, L=Taipei, C=TW
-Serial number: 50514879
-Valid from: Sun Aug 14 13:23:44 EDT 2016 until: Tue Jul 21 13:23:44 EDT 2116
-Certificate fingerprints:
-	 MD5:  CE:DA:68:C1:E1:74:71:0A:EF:58:89:7D:AE:6E:AB:4F
-	 SHA1: DC:0F:2B:61:CB:D7:E9:D3:DB:BE:06:0B:2B:87:0D:46:BB:06:02:11
-	 SHA256: B4:CB:83:B4:DA:D9:9F:99:7D:BE:87:2F:01:3A:A1:6C:14:EE:C4:1D:16:70:21:F3:71:F7:E1:33:0F:27:3E:E6
-	 Signature algorithm name: SHA256withRSA
-	 Version: 3
-```
 
 ## License
 

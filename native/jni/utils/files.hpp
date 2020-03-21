@@ -6,7 +6,7 @@
 #include <functional>
 #include <string_view>
 
-#include "xwrap.h"
+#include "xwrap.hpp"
 
 #define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (do_align(p, a) - (p))

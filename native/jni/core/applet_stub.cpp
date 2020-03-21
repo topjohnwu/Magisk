@@ -1,6 +1,6 @@
 #include <sys/stat.h>
 
-#include <magisk.h>
+#include <magisk.hpp>
 
 int main(int argc, char *argv[]) {
 	umask(0);

@@ -38,6 +38,8 @@
     <string name="home_status_normal">Normală</string>
     <string name="home_status_safe">Mod sigur</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Versiune instalată</string>
+    <string name="home_latest_version">Ultima versiune</string>
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
     <string name="uninstall_magisk_title">Dezinstalează Magisk</string>
     <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate!\nRootul va fi eliminat!\nPotențial ți se vor cripta datele dacă nu sunt criptate deja!</string>
@@ -63,9 +65,9 @@
     <!--Superuser-->
     <string name="su_request_title">Solicitare de superutilizator</string>
     <string name="deny">Refuză</string>
-    <string name="prompt">Solicitare</string>
-    <string name="grant">Permite</string>
-    <string name="su_warning">Permite acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
+    <string name="prompt">Solicită</string>
+    <string name="grant">Acordă</string>
+    <string name="su_warning">Acordă acces complet la dispozitivul tău.\nRefuză dacă nu ești sigur!</string>
     <string name="forever">Pentru totdeauna</string>
     <string name="once">O singură dată</string>
     <string name="tenmin">10 minute</string>
@@ -132,8 +134,9 @@
     <string name="module_action_install_external">Instalează din stocare</string>
     <string name="module_update_none">Modulele tale sunt la zi!</string>
     <string name="update_available">Actualizare disponibilă</string>
-    <string name="home_installed_version">Instalat(e)</string>
+    <string name="module_installed">Instalate</string>
     <string name="sorting_order">Ordine de sortare</string>
+    <string name="module_permission_declined">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mod pentru temă</string>

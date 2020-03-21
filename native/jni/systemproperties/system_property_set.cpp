@@ -39,7 +39,7 @@
 #include <sys/un.h>
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 //#include <sys/_system_properties.h>
-#include "private/_system_properties.h"
+#include <_system_properties.h>
 #include <unistd.h>
 
 #include <async_safe/log.h>
@@ -173,7 +173,7 @@ class SocketWriter {
   uint32_t uint_buf_[kUintBufSize];
   size_t uint_buf_index_;
 
-  DISALLOW_IMPLICIT_CONSTRUCTORS(SocketWriter);
+  BIONIC_DISALLOW_IMPLICIT_CONSTRUCTORS(SocketWriter);
 };
 
 struct prop_msg {

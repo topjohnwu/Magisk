@@ -9,12 +9,12 @@
 #include <vector>
 #include <string>
 
-#include <magisk.h>
-#include <db.h>
-#include <utils.h>
-#include <daemon.h>
-#include <resetprop.h>
-#include <selinux.h>
+#include <magisk.hpp>
+#include <db.hpp>
+#include <utils.hpp>
+#include <daemon.hpp>
+#include <resetprop.hpp>
+#include <selinux.hpp>
 #include <flags.h>
 
 using namespace std;

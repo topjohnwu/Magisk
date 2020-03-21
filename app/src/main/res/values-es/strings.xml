@@ -133,6 +133,7 @@
     <string name="update_available">Actualización disponible</string>
     <string name="home_installed_version">Instalado</string>
     <string name="sorting_order">Clasificar por</string>
+    <string name="module_permission_declined">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Elegir Modo</string>

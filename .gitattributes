@@ -18,3 +18,7 @@ tools/** binary
 *.png binary
 *.jpg binary
 *.ttf binary
+
+# Help GitHub detect languages
+native/jni/external/** linguist-vendored
+native/jni/systemproperties/** linguist-language=C++

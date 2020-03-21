@@ -30,10 +30,10 @@
 
 #include <stdatomic.h>
 #include <stdint.h>
-#include <sys/system_properties.h>
+//#include <sys/system_properties.h>
+#include "../system_properties.h"
 
 #include "private/bionic_macros.h"
-#include "hacks.h"
 
 // The C11 standard doesn't allow atomic loads from const fields,
 // though C++11 does.  Fudge it until standards get straightened out.

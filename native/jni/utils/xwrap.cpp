@@ -10,8 +10,8 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
 
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
 
 FILE *xfopen(const char *pathname, const char *mode) {
 	FILE *fp = fopen(pathname, mode);
