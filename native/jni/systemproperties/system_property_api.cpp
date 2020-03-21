@@ -28,7 +28,7 @@
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 //#include <sys/_system_properties.h>
-#include "private/_system_properties.h"
+#include <_system_properties.h>
 
 #include <system_properties/prop_area.h>
 #include <system_properties/system_properties.h>

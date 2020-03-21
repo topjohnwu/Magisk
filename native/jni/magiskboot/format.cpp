@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "format.h"
+#include "format.hpp"
 
 std::map<std::string_view, format_t> name2fmt;
 Fmt2Name fmt2name;

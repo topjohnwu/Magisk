@@ -31,12 +31,15 @@
     <string name="home_item_source">წყარო</string>
     <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
     <string name="home_device_title">მოწყობილობა</string>
+    <string name="home_device_extra_manufacturer">მწარმოებელი</string>
     <string name="home_device_extra_model">მოდელი</string>
     <string name="home_device_extra_board">პლატა</string>
     <string name="home_device_system">სისტემა</string>
     <string name="home_status_normal">ნორმალური</string>
     <string name="home_status_safe">უსაფრთხო რეჟიმი</string>
     <string name="home_status_stub">დინამიური</string>
+    <string name="home_installed_version">დაინსტალირებული</string>
+    <string name="home_latest_version">უახლესი</string>
     <string name="invalid_update_channel">არასწორი განახლების არხი</string>
     <string name="uninstall_magisk_title">Magisk-ის დეინსტალაცია</string>
     <string name="uninstall_magisk_msg">ყველა მოდული იქნება წაშლილი/გამორთული!\nRoot-ი წაიშლება!\nთქვენი მონაცემები დაიშიფრება!</string>
@@ -131,7 +134,6 @@
     <string name="module_action_install_external">მახსოვრობიდან დაინსტალირება</string>
     <string name="module_update_none">თქვენი მოდულები განახლებულია!</string>
     <string name="update_available">ხელმისაწვდომია განახლება</string>
-    <string name="home_installed_version">დაინსტალირებული</string>
     <string name="sorting_order">სორტირება</string>
 
     <!--Settings -->
@@ -142,6 +144,10 @@
     <string name="settings_dark_mode_dark">მუქი თემა</string>
     <string name="settings_safe_mode_title">უსაფრთხო რეჟიმი</string>
     <string name="settings_core_only_summary" deprecated="true">მხოლოდ მთავარი ფუნქციების ჩართვა. MagiskSU და MagiskHide-ი იმუშავებენ, მაგრამ მოდულები არ ჩაიტვირთება</string>
+    <string name="settings_grid_column_count_title">სიის მოწყობა</string>
+    <string name="settings_grid_column_count_summary">შეცვალეთ ელემენტის სიგანე სიაში. გადაარესტარტეთ აპი ცვლილებების სანახავად</string>
+    <string name="settings_grid_column_count_1">სტანდარტული</string>
+    <string name="settings_grid_column_count_2">დაყოფილი</string>
     <string name="settings_download_path_title">გადმოწერის ლოკაცია</string>
     <string name="settings_download_path_message">ფაილები შეინახება %1$s-ში</string>
     <string name="settings_clear_cache_title">რეპოზიტორიების ქეშის წაშლა</string>
@@ -238,7 +244,7 @@
     <string name="restore_done">აღდგენა დასრულდა!</string>
     <string name="restore_fail">საწყისი რეზერვი არ არსებობს!</string>
     <string name="proprietary_title">კუთვნილი კოდის გადმოწერა</string>
-    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და წყარო-გახსნილი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
+    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და კოდ-გახსნილი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
     <string name="setup_fail">ინსტალაცია ჩაიშალა</string>
     <string name="env_fix_title">სჭირდება დამატებითი ინსტალაცია</string>
     <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი ინსტალაცია იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>

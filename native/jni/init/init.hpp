@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <vector>
 
-#include <magisk.h>
+#include <magisk.hpp>
 
 struct cmdline {
 	bool skip_initramfs;

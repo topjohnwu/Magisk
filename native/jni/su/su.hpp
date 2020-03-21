@@ -4,8 +4,8 @@
 #include <sys/stat.h>
 #include <memory>
 
-#include <db.h>
-#include <utils.h>
+#include <db.hpp>
+#include <utils.hpp>
 
 #define DEFAULT_SHELL "/system/bin/sh"
 

@@ -23,7 +23,7 @@
     <string name="hide">Скрыть</string>
     <string name="status">Статус</string>
     <string name="home_package">Имя пакета</string>
-    <string name="details">Специфика</string>
+    <string name="details">Подробно</string>
 
     <string name="home_notice_content">Убедитесь, что Вы скачали и установили Magisk (Manager) из официальных источников. Установочные файлы, загруженные из сторонних источников, могут содержать вредоносный код.</string>
     <string name="home_support_title">Поддержите нас</string>
@@ -38,6 +38,8 @@
     <string name="home_status_normal">Обычный</string>
     <string name="home_status_safe">Безопасный режим</string>
     <string name="home_status_stub">Stub</string> <!--Do not translate-->
+    <string name="home_installed_version">Установлен</string>
+    <string name="home_latest_version">Доступен</string>
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
     <string name="uninstall_magisk_msg">Все модули будут отключены/удалены!\nRoot-права будут удалены!\nШифрование будет активировано!</string>
@@ -49,12 +51,12 @@
     <string name="install_options_title">Опции</string>
     <string name="install_method_title">Способ</string>
     <string name="install_next">Далее</string>
-    <string name="install_start">Начать</string>
+    <string name="install_start">Установить</string>
     <string name="manager_download_install">Нажмите, чтобы загрузить и установить</string>
     <string name="download_zip_only">Только загрузка установочного ZIP</string>
     <string name="direct_install">Прямая установка (Рекомендуется)</string>
     <string name="install_inactive_slot">Установка во второй слот (OTA)</string>
-    <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции после OTA.\nПродолжить?</string>
+    <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции после OTA!\nПродолжить?</string>
     <string name="setup_title">Дополнительная установка</string>
     <string name="select_patch_file">Пропатчить образ</string>
     <string name="patch_file_msg">Выберите файл образа (*.img) или архив ODIN (*.tar)</string>
@@ -63,9 +65,9 @@
     <!--Superuser-->
     <string name="su_request_title">Запрос прав суперпользователя</string>
     <string name="deny">Запретить</string>
-    <string name="prompt">Запрос</string>
+    <string name="prompt">Запросить</string>
     <string name="grant">Разрешить</string>
-    <string name="su_warning">Разрешить полный доступ к устройству?\nЕсли не уверены - отклоните данное действие!</string>
+    <string name="su_warning">Разрешить полный доступ к устройству?\nЕсли не уверены - отклоните данный запрос!</string>
     <string name="forever">Навсегда</string>
     <string name="once">Единожды</string>
     <string name="tenmin">10 мин.</string>
@@ -84,11 +86,11 @@
     <string name="su_revoke_title">Сброс настроек</string>
     <string name="su_revoke_msg">Сбросить настройки для %1$s?</string>
     <string name="toast">Всплывающие уведомления</string>
-    <string name="none">Нет</string>
+    <string name="none">Ничего</string>
 
     <string name="superuser_toggle_notification">Уведомления</string>
     <string name="superuser_toggle_revoke">Отозвать</string>
-    <string name="superuser_policy_none">Приложения не запрашивали права суперпользователя</string>
+    <string name="superuser_policy_none">Приложения ещё не запрашивали права суперпользователя</string>
 
     <!--Logs-->
     <string name="log_data_none">Лог отсутствует</string>
@@ -102,10 +104,10 @@
     <!--SafetyNet-->
     <string name="safetynet_api_error">Ошибка SafetyNet API</string>
     <string name="safetynet_res_invalid">Некорректный ответ</string>
-    <string name="safetynet_attest_success">Пройдено!</string>
-    <string name="safetynet_attest_failure">Не пройдено!</string>
+    <string name="safetynet_attest_success">Пройден!</string>
+    <string name="safetynet_attest_failure">Не пройден!</string>
     <string name="safetynet_attest_loading">Подождите…</string>
-    <string name="safetynet_attest_restart">Повтор</string>
+    <string name="safetynet_attest_restart">Повторить</string>
     <string name="safetynet_system">Android</string> <!--Do not translate-->
 
     <!-- MagiskHide -->
@@ -125,15 +127,16 @@
     <string name="module_safe_mode_message">Активирован безопасный режим. Все модули отключены.\nЭто предупреждение исчезнет при отключении безопасного режима.</string>
     <string name="module_version_author">Версия: %1$s\nАвтор: %2$s</string>
     <string name="module_section_pending">Обновления</string>
-    <string name="module_section_pending_action">Обновить все</string>
-    <string name="module_section_remote">Версия</string>
+    <string name="module_section_pending_action">Обновить всё</string>
+    <string name="module_section_remote">Не установлены</string>
     <string name="module_state_remove">Удалить</string>
     <string name="module_state_restore">Восстановить</string>
     <string name="module_action_install_external">Установить из хранилища</string>
     <string name="module_update_none">Ваши модули обновлены!</string>
     <string name="update_available">Доступно обновление</string>
-    <string name="home_installed_version">Установлен</string>
+    <string name="module_installed">Установлены</string>
     <string name="sorting_order">Сортировка</string>
+    <string name="module_permission_declined">Пожалуйста, предоставьте доступ к хранилищу</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Оттенок</string>
@@ -144,13 +147,13 @@
     <string name="settings_safe_mode_title">Безопасный режим</string>
     <string name="settings_core_only_summary" deprecated="true">Задействовать только основной функционал (MagiskSU и MagiskHide). Модули не будут активированы</string>
     <string name="settings_grid_column_count_title">Расположение элементов</string>
-    <string name="settings_grid_column_count_summary">Устанавите ширину элементов в списке. Перезапустите приложение для применения изменений</string>
-    <string name="settings_grid_column_count_1">Обычное</string>
-    <string name="settings_grid_column_count_2">Компактное</string>
+    <string name="settings_grid_column_count_summary">Выберите компановку элементов в списке. Перезапустите приложение для применения изменений</string>
+    <string name="settings_grid_column_count_1">Обычная</string>
+    <string name="settings_grid_column_count_2">Компактная</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
-    <string name="settings_clear_cache_summary">Стереть кэш репозитория модулей, кэш будет загружен заново</string>
+    <string name="settings_clear_cache_summary">Стереть кэш репозитория модулей. Кэш будет загружен заново</string>
     <string name="settings_hide_manager_title">Скрытие Magisk Manager</string>
     <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным названием и именем пакета</string>
     <string name="settings_restore_manager_title">Восстановление Magisk Manager</string>

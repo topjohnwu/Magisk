@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <limits.h>
 
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
 #include <flags.h>
-#include <magiskpolicy.h>
+#include <magiskpolicy.hpp>
 
 #include "sepolicy.h"
 

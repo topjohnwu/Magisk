@@ -3,7 +3,7 @@
  */
 
  /*
- * pts.h
+ * pts.hpp
  *
  * Manages the pseudo-terminal driver on Linux/Android and provides some
  * helper functions to handle raw input mode and terminal window resizing

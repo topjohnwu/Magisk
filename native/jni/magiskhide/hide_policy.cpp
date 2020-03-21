@@ -1,23 +1,25 @@
 #include <sys/mount.h>
 
-#include <magisk.h>
-#include <utils.h>
-#include <selinux.h>
-#include <resetprop.h>
+#include <magisk.hpp>
+#include <utils.hpp>
+#include <selinux.hpp>
+#include <resetprop.hpp>
 
-#include "magiskhide.h"
+#include "magiskhide.hpp"
 
 using namespace std;
 
 static const char *prop_key[] =
 		{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
 		  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
-		  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", nullptr };
+		  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux",
+		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit", nullptr };
 
 static const char *prop_value[] =
 		{ "locked", "green", "1",
 		  "enforcing", "0", "0", "0",
-		  "1", "user", "release-keys", "0", nullptr };
+		  "1", "user", "release-keys", "0",
+		  "0", "0", nullptr };
 
 void hide_sensitive_props() {
 	LOGI("hide_policy: Hiding sensitive props\n");
@@ -27,6 +29,25 @@ void hide_sensitive_props() {
 		auto value = getprop(prop_key[i]);
 		if (!value.empty() && value != prop_value[i])
 			setprop(prop_key[i], prop_value[i], false);
+	}
+
+	// Hide that we booted from recovery when magisk is in recovery mode
+	auto bootmode = getprop("ro.bootmode");
+	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
+		setprop("ro.bootmode", "unknown", false);
+	}
+	bootmode = getprop("ro.boot.mode");
+	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
+		setprop("ro.boot.mode", "unknown", false);
+	}
+	// Xiaomi cross region flash
+	auto hwc = getprop("ro.boot.hwc");
+	if (!hwc.empty() && hwc.find("CN") != string::npos) {
+		setprop("ro.boot.hwc", "GLOBAL", false);
+	}
+	auto hwcountry = getprop("ro.boot.hwcountry");
+	if (!hwcountry.empty() && hwcountry.find("China") != string::npos) {
+		setprop("ro.boot.hwcountry", "GLOBAL", false);
 	}
 }
 

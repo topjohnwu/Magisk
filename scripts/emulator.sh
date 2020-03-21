@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-################################################################
+#####################################################################
 #   AVD Magisk Setup
-################################################################
+#####################################################################
 #
 # This script will setup an environment with minimal Magisk that
 # Magisk Manager will be happy to run properly within the official
@@ -14,7 +14,7 @@
 # The script assumes you are using x86/x64 emulator images.
 # Build binaries with `./build.py binary` before running this script.
 #
-################################################################
+#####################################################################
 
 abort() {
   echo "$@"
@@ -45,16 +45,9 @@ chmod 777 busybox
 chmod 777 magiskinit
 
 if [ `./busybox id -u` -ne 0 ]; then
-  # Re-run script with root
-  exec /system/xbin/su 0 sh $0
+  # Re-exec script with root
+  exec /system/xbin/su 0 ./busybox sh -o standalone $0
 fi
-
-# First setup a good env to work with
-rm -rf bin
-./busybox mkdir bin
-./busybox --install -s bin
-OLD_PATH="$PATH"
-PATH="/data/local/tmp/bin:$PATH"
 
 # Remove previous setup if exist
 pgrep magiskd >/dev/null && pkill -9 magiskd

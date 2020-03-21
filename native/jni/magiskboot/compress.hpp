@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stream.h>
+#include <stream.hpp>
 
-#include "format.h"
+#include "format.hpp"
 
 stream_ptr get_encoder(format_t type, stream_ptr &&base);
 

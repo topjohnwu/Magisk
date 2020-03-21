@@ -8,11 +8,11 @@
 #include <sys/types.h>
 #include <sys/mount.h>
 
-#include <daemon.h>
-#include <utils.h>
+#include <daemon.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
-#include "magiskhide.h"
+#include "magiskhide.hpp"
 
 using namespace std::literals;
 

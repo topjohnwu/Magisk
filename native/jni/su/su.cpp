@@ -21,12 +21,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <daemon.h>
-#include <utils.h>
+#include <daemon.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
-#include "su.h"
-#include "pts.h"
+#include "su.hpp"
+#include "pts.hpp"
 
 int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
 

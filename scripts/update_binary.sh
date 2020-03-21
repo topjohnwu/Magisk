@@ -7,32 +7,30 @@ extract_bb() {
   "$BBBIN" >/dev/null 2>&1 || dd if="$0" of="$BBBIN" bs=1024 skip=$(($X86_CNT + 1))
 }
 setup_bb() {
-  export BBDIR=$TMPDIR/bin
-  BBBIN=$BBDIR/busybox
-  mkdir -p $BBDIR 2>/dev/null
+  mkdir -p $TMPDIR 2>/dev/null
+  BBBIN=$TMPDIR/busybox
   extract_bb
-  $BBBIN --install -s $BBDIR
-  export PATH=$BBDIR:$PATH
 }
+export BBBIN
 case "$1" in
   "extract"|"-x")
     [ -z "$2" ] && BBBIN=./busybox || BBBIN="$2"
     extract_bb
     ;;
-  "indep"|"sh")
+  "sh")
     TMPDIR=.
     setup_bb
     shift
-    exec /system/bin/sh "$@"
+    exec ./busybox sh -o standalone "$@"
     ;;
   *)
-    export TMPDIR=/dev/tmp
+    TMPDIR=/dev/tmp
     rm -rf $TMPDIR 2>/dev/null
     setup_bb
     export INSTALLER=$TMPDIR/install
-    mkdir -p $INSTALLER
-    unzip -o "$3" -d $INSTALLER >&2
-    exec sh $INSTALLER/META-INF/com/google/android/updater-script "$@"
+    $BBBIN mkdir -p $INSTALLER
+    $BBBIN unzip -o "$3" -d $INSTALLER >&2
+    exec $BBBIN sh -o standalone $INSTALLER/META-INF/com/google/android/updater-script "$@"
     ;;
 esac
 exit
