@@ -24,8 +24,8 @@ def vprint(str):
 
 
 # Environment checks
-if not sys.version_info >= (3, 6):
-    error('Requires Python 3.6+')
+if not sys.version_info >= (3, 5):
+    error('Requires Python 3.5+')
 
 if 'ANDROID_HOME' not in os.environ:
     error('Please add Android SDK path to ANDROID_HOME environment variable!')
@@ -67,7 +67,7 @@ STDOUT = None
 def mv(source, target):
     try:
         shutil.move(source, target)
-        vprint(f'mv: {source} -> {target}')
+        vprint('mv: {} -> {}'.format(source, target))
     except:
         pass
 
@@ -75,7 +75,7 @@ def mv(source, target):
 def cp(source, target):
     try:
         shutil.copyfile(source, target)
-        vprint(f'cp: {source} -> {target}')
+        vprint('cp: {} -> {}'.format(source, target))
     except:
         pass
 
@@ -83,7 +83,7 @@ def cp(source, target):
 def rm(file):
     try:
         os.remove(file)
-        vprint(f'rm: {file}')
+        vprint('rm: {}'.format(file))
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
@@ -120,7 +120,7 @@ def load_config(args):
 
     # Load prop file
     if not os.path.exists(args.config):
-        error(f'Please make sure {args.config} existed')
+        error('Please make sure {} existed'.format(args.config))
 
     with open(args.config, 'r') as f:
         for line in [l.strip(' \t\r\n') for l in f]:
@@ -143,7 +143,7 @@ def load_config(args):
         error('Config error: "versionCode" is required to be an integer')
 
     if args.release and not os.path.exists(config['keyStore']):
-        error(f'Config error: assign "keyStore" to a java keystore')
+        error('Config error: assign "keyStore" to a java keystore')
 
     mkdir_p(config['outdir'])
     global STDOUT
@@ -152,9 +152,9 @@ def load_config(args):
 
 def zip_with_msg(zip_file, source, target):
     if not os.path.exists(source):
-        error(f'{source} does not exist! Try build \'binary\' and \'apk\' before zipping!')
+        error('{} does not exist! Try build \'binary\' and \'apk\' before zipping!'.format(source))
     zip_file.write(source, target)
-    vprint(f'zip: {source} -> {target}')
+    vprint('zip: {} -> {}'.format(source, target))
 
 
 def collect_binary():
@@ -191,7 +191,7 @@ def sign_zip(unsigned, output, release):
         header('* Building ' + signer_name)
         proc = execv([gradlew, 'signing:shadowJar'])
         if proc.returncode != 0:
-            error(f'Build {signer_name} failed!')
+            error('Build {} failed!'.format(signer_name))
 
     header('* Signing Zip')
 
@@ -203,11 +203,11 @@ def sign_zip(unsigned, output, release):
 
 
 def binary_dump(src, out, var_name):
-    out.write(f'constexpr unsigned char {var_name}[] = {{')
+    out.write('constexpr unsigned char {}[] = {{'.format(var_name))
     for i, c in enumerate(xz(src.read())):
         if i % 16 == 0:
             out.write('\n')
-        out.write(f'0x{c:02X},')
+        out.write('0x{:02X},'.format(c))
     out.write('\n};\n')
     out.flush()
 
@@ -236,7 +236,7 @@ def gen_update_binary():
 
 
 def run_ndk_build(flags):
-    proc = system(f'{ndk_build} -C native {base_flags} {flags} -j{cpu_count}')
+    proc = system('{} -C native {} {} -j{}'.format(ndk_build, base_flags, flags, cpu_count))
     if proc.returncode != 0:
         error('Build binary failed!')
     collect_binary()
@@ -256,7 +256,7 @@ def build_binary(args):
 
     # Basic flags
     global base_flags
-    base_flags = f'MAGISK_VERSION={config["version"]} MAGISK_VER_CODE={config["versionCode"]}'
+    base_flags = 'MAGISK_VERSION={config["version"]} MAGISK_VER_CODE={config["versionCode"]}'
     if not args.release:
         base_flags += ' MAGISK_DEBUG=1'
 
@@ -302,13 +302,13 @@ def build_binary(args):
 def build_apk(args, module):
     build_type = 'Release' if args.release else 'Debug'
 
-    proc = execv([gradlew, f'{module}:assemble{build_type}',
+    proc = execv([gradlew, '{}:assemble{}'.format(module, build_type),
                  '-PconfigPath=' + os.path.abspath(args.config)])
     if proc.returncode != 0:
-        error(f'Build {module} failed!')
+        error('Build {} failed!'.format(module))
 
     build_type = build_type.lower()
-    apk = f'{module}-{build_type}.apk'
+    apk = '{}-{}.apk'.format(module, build_type)
 
     source = os.path.join(module, 'build', 'outputs', 'apk', build_type, apk)
     target = os.path.join(config['outdir'], apk)
@@ -337,9 +337,9 @@ def build_apk(args, module):
             # Sign APK
             execv([apksigner, 'sign', '--v1-signer-name', 'CERT',
                   '--ks', config['keyStore'],
-                  '--ks-pass', f'pass:{config["keyStorePass"]}',
+                  '--ks-pass', 'pass:{0[keyStorePass]}'.format(config),
                   '--ks-key-alias', config['keyAlias'],
-                  '--key-pass', f'pass:{config["keyPass"]}', target])
+                  '--key-pass', 'pass:{0[keyPass]}'.format(config), target])
         finally:
             rm(tmp)
             rm(source)
@@ -427,9 +427,9 @@ def zip_main(args):
             # Add version info util_functions.sh
             util_func = script.read().replace(
                 '#MAGISK_VERSION_STUB',
-                f'MAGISK_VER="{config["version"]}"\nMAGISK_VER_CODE={config["versionCode"]}')
+                'MAGISK_VER="{0[version]}"\nMAGISK_VER_CODE={0[versionCode]}'.format(config))
             target = os.path.join('common', 'util_functions.sh')
-            vprint(f'zip: {source} -> {target}')
+            vprint('zip: {} -> {}'.format(source, target))
             zipf.writestr(target, util_func)
         # addon.d.sh
         source = os.path.join('scripts', 'addon.d.sh')
@@ -444,7 +444,7 @@ def zip_main(args):
 
         # End of zipping
 
-    output = os.path.join(config['outdir'], f'Magisk-v{config["version"]}.zip' if config['prettyName'] else
+    output = os.path.join(config['outdir'], 'Magisk-v{0["version"]}.zip'.format(config) if config['prettyName'] else
                           'magisk-release.zip' if args.release else 'magisk-debug.zip')
     sign_zip(unsigned, output, args.release)
     rm(unsigned)
@@ -479,7 +479,7 @@ def zip_uninstaller(args):
         source = os.path.join('scripts', 'util_functions.sh')
         with open(source, 'r') as script:
             target = os.path.join('util_functions.sh')
-            vprint(f'zip: {source} -> {target}')
+            vprint('zip: {} -> {}'.format(source, target))
             zipf.writestr(target, script.read())
 
         # chromeos
@@ -491,7 +491,7 @@ def zip_uninstaller(args):
         # End of zipping
 
     datestr = datetime.datetime.now().strftime("%Y%m%d")
-    output = os.path.join(config['outdir'], f'Magisk-uninstaller-{datestr}.zip'
+    output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datestr)
                           if config['prettyName'] else 'magisk-uninstaller.zip')
     sign_zip(unsigned, output, args.release)
     rm(unsigned)
@@ -540,8 +540,8 @@ all_parser.set_defaults(func=build_all)
 
 binary_parser = subparsers.add_parser('binary', help='build binaries')
 binary_parser.add_argument(
-    'target', nargs='*', help=f"{', '.join(support_targets)}, \
-    or empty for defaults ({', '.join(default_targets)})")
+    'target', nargs='*', help="{}, \
+    or empty for defaults ({})".format(', '.join(support_targets), ', '.join(default_targets)))
 binary_parser.set_defaults(func=build_binary)
 
 app_parser = subparsers.add_parser('app', help='build Magisk Manager')
