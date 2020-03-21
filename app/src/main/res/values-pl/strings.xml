@@ -134,7 +134,6 @@
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
     <string name="module_update_none">Twoje moduły są aktualne!</string>
     <string name="update_available">Dostępna aktualizacja</string>
-    <string name="home_installed_version">Zainstalowane</string>
     <string name="sorting_order">Kolejność sortowania</string>
     <string name="module_permission_declined">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcjonalność.</string>
 
