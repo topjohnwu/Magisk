@@ -38,7 +38,7 @@
     <string name="home_status_normal">Normálny</string>
     <string name="home_status_safe">Núdzový režim</string>
     <string name="home_status_stub">Stub</string>
-    <string name="home_installed_version">Nainštalovaná</string>
+    <string name="home_installed_version">Nainštalované</string>
     <string name="home_latest_version">Posledná</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
@@ -245,7 +245,7 @@
     <string name="restore_img_msg">Obnovovanie…</string>
     <string name="restore_done">Obnovovanie ukončené!</string>
     <string name="restore_fail">Stock záloha neexistuje!</string>
-    <string name="proprietary_title">Stiahnuť proprietárny kód</string>
+    <string name="proprietary_title">Stiahnutie proprietárneho kódu</string>
     <string name="proprietary_notice">Magisk Manager je FOSS, ktorý neobsahuje proprietárny kód SafetyNet API od Googlu.\n\nChcete povoliť appke Magisk Manager stiahnuť rozšírenie (obsahujúce GoogleApiClient) pre kontrolu SafetyNet?</string>
     <string name="setup_fail">Nastavenie zlyhalo</string>
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>
