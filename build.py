@@ -444,7 +444,7 @@ def zip_main(args):
 
         # End of zipping
 
-    output = os.path.join(config['outdir'], f'Magisk-v{config["version"]}.zip' if config['prettyName'] else
+    output = os.path.join(config['outdir'], f'Magisk-v{config["version"]}({config["versionCode"]}).zip' if config['prettyName'] else
                           'magisk-release.zip' if args.release else 'magisk-debug.zip')
     sign_zip(unsigned, output, args.release)
     rm(unsigned)

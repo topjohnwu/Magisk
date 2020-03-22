@@ -74,8 +74,8 @@ main() {
 
   $BOOTMODE || recovery_actions
 
-  PRETTY_VER=$MAGISK_VER
-  echo $PRETTY_VER | grep -q '\.' && PRETTY_VER=v$PRETTY_VER
+  PRETTY_VER=$MAGISK_VER($MAGISK_VER_CODE)
+  echo $MAGISK_VER | grep -q '\.' && PRETTY_VER=v$MAGISK_VER
   print_title "Magisk $PRETTY_VER addon.d"
 
   mount_partitions
