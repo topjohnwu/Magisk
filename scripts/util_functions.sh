@@ -47,6 +47,8 @@ is_mounted() {
 abort() {
   ui_print "$1"
   $BOOTMODE || recovery_cleanup
+  [ -n $MODPATH ] && rm -rf $MODPATH
+  rm -rf $TMPDIR
   exit 1
 }
 
@@ -642,8 +644,9 @@ install_module() {
   unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
   [ ! -f $TMPDIR/module.prop ] && abort "! Unable to extract zip file!"
 
+  local MODDIRNAME
   $BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
-  MODULEROOT=$NVBASE/$MODDIRNAME
+  local MODULEROOT=$NVBASE/$MODDIRNAME
   MODID=`grep_prop id $TMPDIR/module.prop`
   MODPATH=$MODULEROOT/$MODID
   MODNAME=`grep_prop name $TMPDIR/module.prop`
@@ -732,11 +735,11 @@ install_module() {
 
 MAGISKTMP=/sbin/.magisk
 NVBASE=/data/adb
-[ -z $TMPDIR ] && TMPDIR=/dev/tmp
+TMPDIR=/dev/tmp
 
 # Bootsigner related stuff
 BOOTSIGNERCLASS=a.a
-BOOTSIGNER="/system/bin/dalvikvm -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
+BOOTSIGNER='/system/bin/dalvikvm -Xnoimage-dex2oat -cp $APK $BOOTSIGNERCLASS'
 BOOTSIGNED=false
 
 resolve_vars
