@@ -342,7 +342,10 @@ static bool magisk_env() {
 	// Remove stuffs
 	rm_rf("/cache/data_adb");
 	rm_rf("/data/adb/modules/.core");
+	unlink("/data/adb/magisk.img");
+	unlink("/data/adb/magisk_merge.img");
 	unlink("/data/magisk.img");
+	unlink("/data/magisk_merge.img");
 	unlink("/data/magisk_debug.log");
 
 	// Directories in tmpfs overlay
