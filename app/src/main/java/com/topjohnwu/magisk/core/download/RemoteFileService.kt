@@ -14,7 +14,8 @@ import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
+import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.superuser.ShellUtils
 import io.reactivex.Completable
 import okhttp3.ResponseBody
@@ -27,19 +28,17 @@ abstract class RemoteFileService : NotificationService() {
 
     val service: GithubRawServices by inject()
 
-    override val defaultNotification
-        get() = Notifications.progress(this, "")
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.getParcelableExtra<DownloadSubject>(ARG_URL)?.let { start(it) }
         return START_REDELIVER_INTENT
     }
 
+    override fun createNotification() = Notifications.progress(this, "")
+
     // ---
 
     private fun start(subject: DownloadSubject) = checkExisting(subject)
         .onErrorResumeNext { download(subject) }
-        .doOnSubscribe { update(subject.hashCode()) { it.setContentTitle(subject.title) } }
         .subscribeK(onError = {
             Timber.e(it)
             failNotify(subject)
@@ -52,16 +51,14 @@ abstract class RemoteFileService : NotificationService() {
 
     private fun checkExisting(subject: DownloadSubject) = Completable.fromAction {
         check(subject is Magisk) { "Download cache is disabled" }
-
-        subject.file.also {
-            check(it.exists() && ShellUtils.checkSum("MD5", it, subject.magisk.md5)) {
-                "The given file does not match checksum"
-            }
+        check(subject.file.exists() &&
+                ShellUtils.checkSum("MD5", subject.file, subject.magisk.md5)) {
+            "The given file does not match checksum"
         }
     }
 
     private fun download(subject: DownloadSubject) = service.fetchFile(subject.url)
-        .map { it.toStream(subject.hashCode(), subject) }
+        .map { it.toProgressStream(subject) }
         .flatMapCompletable { stream ->
             when (subject) {
                 is Module -> service.fetchInstaller()
@@ -69,14 +66,14 @@ abstract class RemoteFileService : NotificationService() {
                     .ignoreElement()
                 else -> Completable.fromAction { stream.writeTo(subject.file) }
             }
-        }.doOnComplete {
-            if (subject is Manager)
-                handleAPK(subject)
         }
 
-    private fun ResponseBody.toStream(id: Int, subject: DownloadSubject): InputStream {
+    private fun ResponseBody.toProgressStream(subject: DownloadSubject): InputStream {
         val maxRaw = contentLength()
         val max = maxRaw / 1_000_000f
+        val id = subject.hashCode()
+
+        update(id) { it.setContentTitle(subject.title) }
 
         return ProgressInputStream(byteStream()) {
             val progress = it / 1_000_000f
@@ -94,14 +91,14 @@ abstract class RemoteFileService : NotificationService() {
         }
     }
 
-    private fun failNotify(subject: DownloadSubject) = finishNotify(subject.hashCode()) {
+    private fun failNotify(subject: DownloadSubject) = lastNotify(subject.hashCode()) {
         send(0f, subject)
         it.setContentText(getString(R.string.download_file_error))
             .setSmallIcon(android.R.drawable.stat_notify_error)
             .setOngoing(false)
     }
 
-    private fun finishNotify(subject: DownloadSubject) = finishNotify(subject.hashCode()) {
+    private fun finishNotify(subject: DownloadSubject) = lastNotify(subject.hashCode()) {
         send(1f, subject)
         it.addActions(subject)
             .setContentText(getString(R.string.download_complete))

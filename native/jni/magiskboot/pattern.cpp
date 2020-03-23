@@ -1,9 +1,9 @@
 #include <malloc.h>
 #include <string.h>
 
-#include <utils.h>
+#include <utils.hpp>
 
-#include "magiskboot.h"
+#include "magiskboot.hpp"
 
 #define MATCH(p) else if (strncmp(s + skip, p, sizeof(p) - 1) == 0) skip += (sizeof(p) - 1)
 
@@ -11,9 +11,12 @@ static int check_verity_pattern(const char *s) {
 	int skip = s[0] == ',';
 
 	if (0) {}
+	MATCH("verifyatboot");
 	MATCH("verify");
+	MATCH("avb_keys");
 	MATCH("avb");
 	MATCH("support_scfs");
+	MATCH("fsverity");
 	else return -1;
 
 	if (s[skip] == '=') {

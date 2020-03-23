@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
-#include <selinux.h>
+#include <selinux.hpp>
 
 #define ALL NULL
 

@@ -5,18 +5,18 @@
 #include <sys/mman.h>
 
 #include <mincrypt/sha.h>
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
-#include "magiskboot.h"
-#include "compress.h"
+#include "magiskboot.hpp"
+#include "compress.hpp"
 
 using namespace std;
 
 static void usage(char *arg0) {
 	fprintf(stderr,
-FULL_VER(MagiskBoot) R"EOF( - Boot Image Modification Tool
+NAME_WITH_VER(MagiskBoot) R"EOF( - Boot Image Modification Tool
 
 Usage: %s <action> [args...]
 

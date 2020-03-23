@@ -2,9 +2,9 @@
 #include <vector>
 #include <string>
 
-#include <magiskpolicy.h>
-#include <logging.h>
-#include <utils.h>
+#include <magiskpolicy.hpp>
+#include <logging.hpp>
+#include <utils.hpp>
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <android/log.h>
 
-#include <logging.h>
+#include <logging.hpp>
 #include <flags.h>
 
 int nop_log(const char *fmt, va_list ap) {

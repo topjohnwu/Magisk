@@ -24,7 +24,7 @@
     <string name="status">Durum</string>
     <string name="home_package">Paket</string>
     <string name="details">Ayrıntılar</string>
-	
+
     <string name="home_notice_content">Her zaman açık kaynaklı Magisk Manager kullandığınızdan emin olun. Bilinmeyen kaynak yöneticisi kötü amaçlı eylemler gerçekleştirebilir.</string>
     <string name="home_support_title">Bizi destekleyin</string>
     <string name="home_links_project">Proje bağlantıları</string>
@@ -38,11 +38,11 @@
     <string name="home_status_normal">Normal</string>
     <string name="home_status_safe">Güvenli Mod</string>
     <string name="home_status_stub">Stub</string>
-	<string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
+    <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacaktır ve verileriniz zaten şifrelenmemişse potansiyel olarak verileriniz şifrelenecektir.</string>
-	
-	<!--Install-->	
+
+    <!--Install-->
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i koru</string>
     <string name="recovery_mode">Kurtarma Modu</string>
@@ -59,7 +59,7 @@
     <string name="select_patch_file">Dosya seçin ve yamalayın</string>
     <string name="patch_file_msg">Bir işlenmemiş görüntü (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
-	
+
     <!--Superuser-->
     <string name="su_request_title">Yetkili Kullanıcı İsteği</string>
     <string name="deny">Reddet</string>
@@ -132,7 +132,7 @@
     <string name="module_action_install_external">Depolama alanından yükle</string>
     <string name="module_update_none">Modülleriniz güncel!</string>
     <string name="update_available">Güncelleme mevcut</string>
-    <string name="installed">Yüklendi</string>
+    <string name="home_installed_version">Yüklendi</string>
     <string name="sorting_order">Sıralama Düzeni</string>
 
     <!--Settings -->
@@ -164,7 +164,7 @@
     <string name="settings_hosts_title">Sistemsiz host</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
     <string name="settings_hosts_toast">Sistemsiz host modülü eklendi</string>
-	<string name="settings_app_name_hint">Yeni ad</string>
+    <string name="settings_app_name_hint">Yeni ad</string>
     <string name="settings_app_name_helper">Uygulama bu ad ile yeniden paketlenecek</string>
     <string name="settings_app_name_error">Geçersiz format</string>
     <string name="settings_su_app_adb">Uygulamalar ve ADB</string>
@@ -225,7 +225,7 @@
     <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Depo önbelleği temizlendi</string>
-	<string name="dtbo_patched_title">DTBO yamalandı!</string>
+    <string name="dtbo_patched_title">DTBO yamalandı!</string>
     <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
     <string name="flashing">Yükleniyor...</string>
     <string name="done">Tamamlandı!</string>
@@ -244,8 +244,8 @@
     <string name="env_fix_title">Ek Kurulum Gerekli</string>
     <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
     <string name="setup_msg">Ortam kurulumu çalışıyor…</string>
-	<string name="authenticate">Kimlik doğrulaması</string>
-	<string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
-	<string name="unsupport_magisk_msg">Magisk Manager\'ın bu sürümü, %1$s daha düşük Magisk versiyonlarını desteklememektedir.\n\nUygulama hiçbir Magisk kurulu değil gibi davranacak, lütfen en kısa zamanda Magisk\'i yükseltin.</string>
+    <string name="authenticate">Kimlik doğrulaması</string>
+    <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
+    <string name="unsupport_magisk_msg">Magisk Manager\'ın bu sürümü, %1$s daha düşük Magisk versiyonlarını desteklememektedir.\n\nUygulama hiçbir Magisk kurulu değil gibi davranacak, lütfen en kısa zamanda Magisk\'i yükseltin.</string>
 
 </resources>

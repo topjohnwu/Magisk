@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <memory>
 
-#include "../files.h"
+#include "../files.hpp"
 
 class stream {
 public:

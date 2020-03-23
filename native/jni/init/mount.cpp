@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <vector>
 
-#include <utils.h>
-#include <logging.h>
-#include <selinux.h>
-#include <magisk.h>
+#include <utils.hpp>
+#include <logging.hpp>
+#include <selinux.hpp>
+#include <magisk.hpp>
 
-#include "init.h"
+#include "init.hpp"
 
 using namespace std;
 
@@ -128,7 +128,7 @@ static void switch_root(const string &path) {
 			return true;
 		// Do not include subtrees
 		for (const auto &m : mounts) {
-			if (strncmp(me->mnt_dir, m.data(), m.length()) == 0)
+			if (strncmp(me->mnt_dir, m.data(), m.length()) == 0 && me->mnt_dir[m.length()] == '/')
 				return true;
 		}
 		mounts.emplace_back(me->mnt_dir);
@@ -137,7 +137,7 @@ static void switch_root(const string &path) {
 	for (auto &dir : mounts) {
 		auto new_path = path + dir;
 		mkdir(new_path.data(), 0755);
-		xmount(dir.data(), new_path.c_str(), nullptr, MS_MOVE, nullptr);
+		xmount(dir.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
 	}
 	chdir(path.data());
 	xmount(path.data(), "/", nullptr, MS_MOVE, nullptr);

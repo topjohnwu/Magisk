@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <limits.h>
 
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
 #include <flags.h>
-#include <magiskpolicy.h>
+#include <magiskpolicy.hpp>
 
 #include "sepolicy.h"
 
@@ -12,7 +12,7 @@ using namespace std::literals;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-FULL_VER(MagiskPolicy) R"EOF(
+NAME_WITH_VER(MagiskPolicy) R"EOF(
 
 Usage: %s [--options...] [policy statements...]
 

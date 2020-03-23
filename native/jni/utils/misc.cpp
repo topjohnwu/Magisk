@@ -14,8 +14,8 @@
 #include <syscall.h>
 #include <random>
 
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
 
 int fork_dont_care() {
 	int pid = xfork();

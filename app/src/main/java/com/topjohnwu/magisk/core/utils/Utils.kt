@@ -7,9 +7,11 @@ import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
 import androidx.work.*
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.UpdateCheckService
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
@@ -38,19 +40,20 @@ object Utils {
     fun scheduleUpdateCheck(context: Context) {
         if (Config.checkUpdate) {
             val constraints = Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .setRequiresDeviceIdle(true)
-                    .build()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresDeviceIdle(true)
+                .build()
             val request = PeriodicWorkRequest
-                    .Builder(ClassMap[UpdateCheckService::class.java] as Class<Worker>, 12, TimeUnit.HOURS)
-                    .setConstraints(constraints)
-                    .build()
+                .Builder(UpdateCheckService::class.java, 12, TimeUnit.HOURS)
+                .setConstraints(constraints)
+                .build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                    Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID,
-                    ExistingPeriodicWorkPolicy.REPLACE, request)
+                Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID,
+                ExistingPeriodicWorkPolicy.REPLACE, request
+            )
         } else {
             WorkManager.getInstance(context)
-                    .cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID)
+                .cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID)
         }
     }
 
@@ -67,7 +70,7 @@ object Utils {
         }
     }
 
-    fun ensureDownloadPath(path : String) =
+    fun ensureDownloadPath(path: String) =
         File(Environment.getExternalStorageDirectory(), path).run {
             if ((exists() && isDirectory) || mkdirs()) this else null
         }

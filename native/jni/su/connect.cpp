@@ -5,11 +5,11 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#include <daemon.h>
-#include <utils.h>
-#include <logging.h>
+#include <daemon.hpp>
+#include <utils.hpp>
+#include <logging.hpp>
 
-#include "su.h"
+#include "su.hpp"
 
 using namespace std;
 

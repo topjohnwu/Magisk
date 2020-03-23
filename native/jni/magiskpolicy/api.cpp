@@ -1,4 +1,4 @@
-#include <magiskpolicy.h>
+#include <magiskpolicy.hpp>
 
 #include "sepolicy.h"
 

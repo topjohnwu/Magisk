@@ -8,12 +8,12 @@
 #include <sys/types.h>
 #include <sys/mount.h>
 
-#include <magisk.h>
-#include <utils.h>
-#include <daemon.h>
-#include <selinux.h>
-#include <db.h>
-#include <resetprop.h>
+#include <magisk.hpp>
+#include <utils.hpp>
+#include <daemon.hpp>
+#include <selinux.hpp>
+#include <db.hpp>
+#include <resetprop.hpp>
 #include <flags.h>
 
 int SDK_INT = -1;
@@ -124,7 +124,7 @@ static void main_daemon() {
 		});
 	}
 
-	LOGI(SHOW_VER(Magisk) " daemon started\n");
+	LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
 
 	// Get server stat
 	stat("/proc/self/exe", &self_st);
