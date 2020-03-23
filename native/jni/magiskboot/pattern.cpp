@@ -11,9 +11,12 @@ static int check_verity_pattern(const char *s) {
 	int skip = s[0] == ',';
 
 	if (0) {}
+	MATCH("verifyatboot");
 	MATCH("verify");
+	MATCH("avb_keys");
 	MATCH("avb");
 	MATCH("support_scfs");
+	MATCH("fsverity");
 	else return -1;
 
 	if (s[skip] == '=') {

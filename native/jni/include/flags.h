@@ -11,9 +11,9 @@
 
 #define MAGISK_VERSION  str(__MVSTR)
 #define MAGISK_VER_CODE __MCODE
+#define MAGISK_FULL_VER MAGISK_VERSION "(" str(MAGISK_VER_CODE) ")"
 
-#define SHOW_VER(name) str(name) " v" MAGISK_VERSION "(" str(MAGISK_VER_CODE) ")"
-#define FULL_VER(name) SHOW_VER(name) " (by topjohnwu)"
+#define NAME_WITH_VER(name) str(name) " " MAGISK_FULL_VER
 
 #ifdef __MDBG
 #define MAGISK_DEBUG

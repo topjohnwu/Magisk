@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-################################################################
+#####################################################################
 #   AVD Magisk Setup
-################################################################
+#####################################################################
 #
 # This script will setup an environment with minimal Magisk that
 # Magisk Manager will be happy to run properly within the official
@@ -14,7 +14,7 @@
 # The script assumes you are using x86/x64 emulator images.
 # Build binaries with `./build.py binary` before running this script.
 #
-################################################################
+#####################################################################
 
 abort() {
   echo "$@"

@@ -39,12 +39,8 @@ fi
 # Legacy Support
 #################
 
-# Global vars
 TMPDIR=/dev/tmp
 PERSISTDIR=/sbin/.magisk/mirror/persist
-
-rm -rf $TMPDIR 2>/dev/null
-mkdir -p $TMPDIR
 
 is_legacy_script() {
   unzip -l "$ZIPFILE" install.sh | grep -q install.sh
@@ -63,6 +59,18 @@ print_modname() {
   ui_print " Powered by Magisk "
   ui_print "*******************"
 }
+
+# Override abort as old scripts have some issues
+abort() {
+  ui_print "$1"
+  $BOOTMODE || recovery_cleanup
+  [ -n $MODPATH ] && rm -rf $MODPATH
+  rm -rf $TMPDIR
+  exit 1
+}
+
+rm -rf $TMPDIR 2>/dev/null
+mkdir -p $TMPDIR
 
 # Preperation for flashable zips
 setup_flashable
@@ -170,9 +178,9 @@ rm -rf \
 $MODPATH/system/placeholder $MODPATH/customize.sh \
 $MODPATH/README.md $MODPATH/.git* 2>/dev/null
 
-##############
+#############
 # Finalizing
-##############
+#############
 
 cd /
 $BOOTMODE || recovery_cleanup

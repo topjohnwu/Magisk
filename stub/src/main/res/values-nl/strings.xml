@@ -1,1 +1,6 @@
-<resources></resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Installeer de volledige Magisk Manager om de installatie af te ronden. Wil je dit nu doen?</string>
+    <string name="no_internet_msg">Maak verbinding met het internet! Het installeren van de volledige Magisk Manager is vereist.</string>
+    <string name="dling">Bezig met downloaden...</string>
+</resources>

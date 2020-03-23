@@ -351,6 +351,9 @@ static bool magisk_env() {
 	xmkdir(BBPATH, 0755);
 	xmkdir(MODULEMNT, 0755);
 
+	// Backwards compatibility for old Magisk Manager
+	xsymlink("./modules", MAGISKTMP "/img");
+
 	// Directories in /data/adb
 	xmkdir(DATABIN, 0755);
 	xmkdir(MODULEROOT, 0755);

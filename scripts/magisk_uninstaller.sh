@@ -6,9 +6,9 @@
 #
 ############################################
 
-############################################
+##############
 # Preparation
-############################################
+##############
 
 # This path should work in any cases
 TMPDIR=/dev/tmp
@@ -51,9 +51,9 @@ $DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
 $BOOTMODE || recovery_actions
 run_migrations
 
-############################################
+############
 # Uninstall
-############################################
+############
 
 get_flags
 find_boot_image
@@ -67,6 +67,12 @@ cd $MAGISKBIN
 CHROMEOS=false
 
 ui_print "- Unpacking boot image"
+# Dump image for MTD/NAND character device boot partitions
+if [ -c $BOOTIMAGE ]; then
+  nanddump -f boot.img $BOOTIMAGE
+  BOOTNAND=$BOOTIMAGE
+  BOOTIMAGE=boot.img
+fi
 ./magiskboot unpack "$BOOTIMAGE"
 
 case $? in
@@ -78,6 +84,9 @@ case $? in
     CHROMEOS=true
     ;;
 esac
+
+# Restore the original boot partition path
+[ "$BOOTNAND" ] && BOOTIMAGE=$BOOTNAND
 
 # Detect boot image state
 ui_print "- Checking ramdisk status"
@@ -142,10 +151,10 @@ fi
 cd /
 
 if $BOOTMODE; then
-  ui_print "**********************************************"
-  ui_print "* Magisk Manager will uninstall itself, and  *"
-  ui_print "* the device will reboot after a few seconds *"
-  ui_print "**********************************************"
+  ui_print "********************************************"
+  ui_print " Magisk Manager will uninstall itself, and"
+  ui_print " the device will reboot after a few seconds"
+  ui_print "********************************************"
   (sleep 8; /system/bin/reboot)&
 else
   rm -rf /data/user*/*/*magisk* /data/app/*magisk*

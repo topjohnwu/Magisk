@@ -20,7 +20,7 @@ bool hide_enabled = false;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-		FULL_VER(MagiskHide) "\n\n"
+		NAME_WITH_VER(MagiskHide) "\n\n"
 		"Usage: %s [action [arguments...] ]\n\n"
 		"Actions:\n"
   		"   status          Return the status of magiskhide\n"
