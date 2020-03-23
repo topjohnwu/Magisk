@@ -38,7 +38,7 @@
     <string name="home_status_normal">Normal</string>
     <string name="home_status_safe">Mode sans échec</string>
     <string name="home_status_stub">Stub</string>
-    <string name="home_installed_version">Installés</string>
+    <string name="home_installed_version">Installée</string>
     <string name="home_latest_version">Dernière</string>
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
