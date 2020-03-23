@@ -53,11 +53,11 @@ For Magisk Manager crashes, record and upload the logcat when the crash occurs.
 	- macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home"`
 	- Linux: `export PATH="/path/to/androidstudio/jre/bin:$PATH"`
 	- Windows: Add `C:\Path\To\Android Studio\jre\bin` to environment variable `PATH`
-- Set environment variable `ANDROID_HOME` to the SDK folder
+- Set environment variable `ANDROID_HOME` to the Android SDK folder
 - Download / clone [FrankeNDK](https://github.com/topjohnwu/FrankeNDK) and set environment variable `ANDROID_NDK_HOME` to the folder
--  Set configurations in `config.prop`. A sample file `config.prop.sample` is provided.
--  Run `build.py` to see help messages. For each supported actions, use `-h` to access help (e.g. `./build.py all -h`)
--  By default, the script build everything in debug mode. If you want to build Magisk Manager in release mode (with the `-r, --release` flag), you need a Java Keystore (only `JKS` format is supported) to sign APKs and zips. For more information, check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key).
+- Set configurations in `config.prop`. A sample file `config.prop.sample` is provided.
+- Run `build.py` to see help messages. For each supported actions, use `-h` to access help (e.g. `./build.py all -h`)
+- By default, the script builds everything in debug mode. If you want to build Magisk Manager in release mode (with the `-r, --release` flag), you need a Java Keystore (only `JKS` format is supported) to sign APKs and zips. For more information, check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key).
 
 ## Translation Contributions
 
