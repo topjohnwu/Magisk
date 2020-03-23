@@ -15,7 +15,7 @@ using namespace std::literals;
 
 [[noreturn]] static void usage() {
 	fprintf(stderr,
-FULL_VER(Magisk) R"EOF( multi-call binary
+NAME_WITH_VER(Magisk) R"EOF( multi-call binary
 
 Usage: magisk [applet [arguments]...]
    or: magisk [options]...

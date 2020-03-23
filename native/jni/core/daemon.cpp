@@ -124,7 +124,7 @@ static void main_daemon() {
 		});
 	}
 
-	LOGI(SHOW_VER(Magisk) " daemon started\n");
+	LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
 
 	// Get server stat
 	stat("/proc/self/exe", &self_st);

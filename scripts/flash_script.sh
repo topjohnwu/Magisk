@@ -34,8 +34,11 @@ setup_flashable
 # Detection
 ############
 
-PRETTY_VER=$MAGISK_VER
-echo $PRETTY_VER | grep -q '\.' && PRETTY_VER=v$PRETTY_VER
+if echo $MAGISK_VER | grep -q '\.'; then
+  PRETTY_VER=$MAGISK_VER
+else
+  PRETTY_VER="$MAGISK_VER($MAGISK_VER_CODE)"
+fi
 print_title "Magisk $PRETTY_VER Installer"
 
 is_mounted /data || mount /data || is_mounted /cache || mount /cache

@@ -16,7 +16,7 @@ using namespace std;
 
 static void usage(char *arg0) {
 	fprintf(stderr,
-FULL_VER(MagiskBoot) R"EOF( - Boot Image Modification Tool
+NAME_WITH_VER(MagiskBoot) R"EOF( - Boot Image Modification Tool
 
 Usage: %s <action> [args...]
 
