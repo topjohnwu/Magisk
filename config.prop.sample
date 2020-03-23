@@ -15,6 +15,7 @@ prettyName=false
 # Only used when building with release flag
 # These passwords are used along with keyStore to sign APKs and zips
 # keyPass is the pwd for the specified keyAlias
+# These options are still required to be here even if you don't use them
 keyStore=release-key.jks
 keyStorePass=
 keyAlias=
