@@ -9,6 +9,8 @@ import androidx.core.graphics.Insets
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import com.topjohnwu.magisk.BR
@@ -71,6 +73,14 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
         })
 
         delegate.onCreate()
+
+        directionsDispatcher.observe(this, Observer {
+            it?.navigate()
+            // we don't want the directions to be re-dispatched, so we preemptively set them to null
+            if (it != null) {
+                directionsDispatcher.value = null
+            }
+        })
     }
 
     override fun onResume() {
@@ -99,6 +109,15 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
 
     fun NavDirections.navigate() {
         navigation?.navigate(this)
+    }
+
+    companion object {
+
+        private val directionsDispatcher = MutableLiveData<NavDirections?>()
+
+        fun postDirections(navDirections: NavDirections) =
+            directionsDispatcher.postValue(navDirections)
+
     }
 
 }

@@ -29,9 +29,6 @@
         <!-- Main -->
         <activity android:name="a.b" />
 
-        <!-- Flashing  -->
-        <activity android:name="a.f" />
-
         <!-- Superuser -->
         <activity
             android:name="a.m"

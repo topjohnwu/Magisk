@@ -29,7 +29,10 @@ abstract class RemoteFileService : NotificationService() {
     val service: GithubRawServices by inject()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getParcelableExtra<DownloadSubject>(ARG_URL)?.let { start(it) }
+        intent?.getParcelableExtra<DownloadSubject>(ARG_URL)?.let {
+            update(it.hashCode())
+            start(it)
+        }
         return START_REDELIVER_INTENT
     }
 
