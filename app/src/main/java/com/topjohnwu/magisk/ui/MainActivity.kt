@@ -137,7 +137,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
         viewModel.insets.value = insets
     }
 
-    private fun setDisplayHomeAsUpEnabled(isEnabled: Boolean) {
+    fun setDisplayHomeAsUpEnabled(isEnabled: Boolean) {
         binding.mainToolbar.startAnimations()
         when {
             isEnabled -> binding.mainToolbar.setNavigationIcon(R.drawable.ic_back_md2)

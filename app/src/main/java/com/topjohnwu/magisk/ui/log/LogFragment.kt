@@ -24,7 +24,10 @@ class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
         set(value) {
             MotionRevealHelper.withViews(binding.logFilter, binding.logFilterToggle, value)
             actionSave?.isVisible = !value
-            (activity as MainActivity).invalidateToolbar()
+            with(activity as MainActivity) {
+                invalidateToolbar()
+                setDisplayHomeAsUpEnabled(value)
+            }
         }
 
     override fun onStart() {
