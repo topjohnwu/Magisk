@@ -26,6 +26,7 @@ class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
             actionSave?.isVisible = !value
             with(activity as MainActivity) {
                 invalidateToolbar()
+                requestNavigationHidden(value)
                 setDisplayHomeAsUpEnabled(value)
             }
         }
