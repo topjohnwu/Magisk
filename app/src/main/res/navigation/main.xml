@@ -36,6 +36,33 @@
     </fragment>
 
     <fragment
+        android:id="@+id/flashFragment"
+        android:name="com.topjohnwu.magisk.ui.flash.FlashFragment"
+        android:label="FlashFragment"
+        tools:layout="@layout/fragment_flash_md2">
+
+        <argument
+            android:name="installer"
+            app:argType="android.net.Uri" />
+
+        <argument
+            android:name="action"
+            app:argType="string" />
+
+        <argument
+            android:name="additional_data"
+            android:defaultValue="@null"
+            app:argType="android.net.Uri"
+            app:nullable="true" />
+
+        <argument
+            android:name="dismiss_id"
+            android:defaultValue="-1"
+            app:argType="integer" />
+
+    </fragment>
+
+    <fragment
         android:id="@+id/installFragment"
         android:name="com.topjohnwu.magisk.ui.install.InstallFragment"
         android:label="InstallFragment"
@@ -143,6 +170,16 @@
         app:popEnterAnim="@anim/fragment_enter_pop"
         app:popExitAnim="@anim/fragment_exit_pop"
         app:popUpTo="@id/modulesFragment"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/action_flashFragment"
+        app:destination="@id/flashFragment"
+        app:enterAnim="@anim/fragment_enter"
+        app:exitAnim="@anim/fragment_exit"
+        app:popEnterAnim="@anim/fragment_enter_pop"
+        app:popExitAnim="@anim/fragment_exit_pop"
+        app:popUpTo="@id/installFragment"
         app:popUpToInclusive="true" />
 
 </navigation>

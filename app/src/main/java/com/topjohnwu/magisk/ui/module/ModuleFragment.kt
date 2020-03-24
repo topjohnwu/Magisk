@@ -42,7 +42,9 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        InstallExternalModuleEvent.onActivityResult(requireContext(), requestCode, resultCode, data)
+        InstallExternalModuleEvent.onActivityResult(requestCode, resultCode, data)?.also {
+            it.navigate()
+        }
     }
 
     override fun onStart() {
