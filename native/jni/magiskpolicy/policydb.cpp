@@ -5,10 +5,10 @@
 
 #include <cil/cil.h>
 
-#include <utils.h>
-#include <logging.h>
-#include <stream.h>
-#include <magiskpolicy.h>
+#include <utils.hpp>
+#include <logging.hpp>
+#include <stream.hpp>
+#include <magiskpolicy.hpp>
 
 #include "sepolicy.h"
 
@@ -79,6 +79,14 @@ static bool check_precompiled(const char *precompiled) {
 	if (access(actual_sha, R_OK) == 0) {
 		ok = true;
 		sprintf(compiled_sha, "%s.product_sepolicy_and_mapping.sha256", precompiled);
+		if (!cmp_sha256(actual_sha, compiled_sha) != 0)
+			return false;
+	}
+
+	actual_sha = SYSEXT_POLICY_DIR "system_ext_sepolicy_and_mapping.sha256";
+	if (access(actual_sha, R_OK) == 0) {
+		ok = true;
+		sprintf(compiled_sha, "%s.system_ext_sepolicy_and_mapping.sha256", precompiled);
 		if (!cmp_sha256(actual_sha, compiled_sha) != 0)
 			return false;
 	}

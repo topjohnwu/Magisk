@@ -9,12 +9,12 @@
 
 #include <mincrypt/sha.h>
 #include <mincrypt/sha256.h>
-#include <utils.h>
-#include <logging.h>
+#include <utils.hpp>
+#include <logging.hpp>
 
-#include "bootimg.h"
-#include "magiskboot.h"
-#include "compress.h"
+#include "bootimg.hpp"
+#include "magiskboot.hpp"
+#include "compress.hpp"
 
 using namespace std;
 

@@ -8,9 +8,9 @@
 #include <vector>
 
 #include <xz.h>
-#include <magisk.h>
-#include <cpio.h>
-#include <utils.h>
+#include <magisk.hpp>
+#include <cpio.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
 #include "binaries.h"
@@ -20,7 +20,7 @@
 #include "binaries_arch.h"
 #endif
 
-#include "init.h"
+#include "init.hpp"
 
 using namespace std;
 

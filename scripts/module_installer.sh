@@ -6,13 +6,6 @@
 
 umask 022
 
-# Global vars
-TMPDIR=/dev/tmp
-PERSISTDIR=/sbin/.magisk/mirror/persist
-
-rm -rf $TMPDIR 2>/dev/null
-mkdir -p $TMPDIR
-
 # echo before loading util_functions
 ui_print() { echo "$1"; }
 
@@ -22,6 +15,32 @@ require_new_magisk() {
   ui_print "*******************************"
   exit 1
 }
+
+#########################
+# Load util_functions.sh
+#########################
+
+OUTFD=$2
+ZIPFILE=$3
+
+mount /data 2>/dev/null
+
+[ -f /data/adb/magisk/util_functions.sh ] || require_new_magisk
+. /data/adb/magisk/util_functions.sh
+[ $MAGISK_VER_CODE -lt 19000 ] && require_new_magisk
+
+if [ $MAGISK_VER_CODE -ge 20400 ]; then
+  # New Magisk have complete installation logic within util_functions.sh
+  install_module
+  exit 0
+fi
+
+#################
+# Legacy Support
+#################
+
+TMPDIR=/dev/tmp
+PERSISTDIR=/sbin/.magisk/mirror/persist
 
 is_legacy_script() {
   unzip -l "$ZIPFILE" install.sh | grep -q install.sh
@@ -41,19 +60,17 @@ print_modname() {
   ui_print "*******************"
 }
 
-##############
-# Environment
-##############
+# Override abort as old scripts have some issues
+abort() {
+  ui_print "$1"
+  $BOOTMODE || recovery_cleanup
+  [ -n $MODPATH ] && rm -rf $MODPATH
+  rm -rf $TMPDIR
+  exit 1
+}
 
-OUTFD=$2
-ZIPFILE=$3
-
-mount /data 2>/dev/null
-
-# Load utility functions
-[ -f /data/adb/magisk/util_functions.sh ] || require_new_magisk
-. /data/adb/magisk/util_functions.sh
-[ $MAGISK_VER_CODE -gt 18100 ] || require_new_magisk
+rm -rf $TMPDIR 2>/dev/null
+mkdir -p $TMPDIR
 
 # Preperation for flashable zips
 setup_flashable
@@ -161,9 +178,9 @@ rm -rf \
 $MODPATH/system/placeholder $MODPATH/customize.sh \
 $MODPATH/README.md $MODPATH/.git* 2>/dev/null
 
-##############
+#############
 # Finalizing
-##############
+#############
 
 cd /
 $BOOTMODE || recovery_cleanup

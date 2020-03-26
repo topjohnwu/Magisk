@@ -13,10 +13,10 @@
 #include <vector>
 #include <bitset>
 
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
 
-#include "magiskhide.h"
+#include "magiskhide.hpp"
 
 using namespace std;
 

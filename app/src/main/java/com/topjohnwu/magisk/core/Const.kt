@@ -64,6 +64,7 @@ object Const {
         const val OPEN_SECTION = "section"
         const val OPEN_SETTINGS = "settings"
         const val INTENT_SET_APP = "app_json"
+        const val FLASH_INSTALLER = "installer"
         const val FLASH_ACTION = "action"
         const val FLASH_DATA = "additional_data"
         const val DISMISS_ID = "dismiss_id"

@@ -6,10 +6,10 @@
 #include <dlfcn.h>
 #include <sys/stat.h>
 
-#include <magisk.h>
-#include <db.h>
-#include <daemon.h>
-#include <utils.h>
+#include <magisk.hpp>
+#include <db.hpp>
+#include <daemon.hpp>
+#include <utils.hpp>
 
 #define DB_VERSION 10
 
@@ -115,7 +115,7 @@ db_settings::db_settings() {
 	data[ROOT_ACCESS] = ROOT_ACCESS_APPS_AND_ADB;
 	data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
 	data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
-	data[HIDE_CONFIG] = true;
+	data[HIDE_CONFIG] = false;
 }
 
 int db_settings::getKeyIdx(string_view key) const {

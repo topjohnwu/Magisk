@@ -39,6 +39,8 @@ class SuRequestViewModel(
 
     val selectedItemPosition = KObservableField(0)
 
+    val grantEnabled = KObservableField(false)
+
     private val items = DiffObservableList(ComparableRvItem.callback)
     private val itemBinding = ItemBinding.of<ComparableRvItem<*>> { binding, _, item ->
         item.bind(binding)
@@ -104,7 +106,10 @@ class SuRequestViewModel(
             val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
             timer = object : CountDownTimer(millis, 1000) {
                 override fun onTick(remains: Long) {
-                    denyText.value = "${res.getString(R.string.deny)} (${remains / 1000})"
+                    if (remains <= millis - 1000) {
+                        grantEnabled.value = true
+                    }
+                    denyText.value = "${res.getString(R.string.deny)} (${(remains / 1000) + 1})"
                 }
 
                 override fun onFinish() {

@@ -70,6 +70,7 @@ ex: ✓ `a_module`, ✓ `a.module`, ✓ `module-101`, ✗ `a module`, ✗ `1_mod
 This is the **unique identifier** of your module. You should not change it once published.
 - `versionCode` has to be an **integer**. This is used to compare versions
 - Others that weren't mentioned above can be any **single line** string.
+- Make sure to use the `UNIX (LF)` line break type and not the `Windows (CR+LF)` or `Macintosh (CR)` one.
 
 #### Shell scripts (`*.sh`)
 Please read the [Boot Scripts](#boot-scripts) section to understand the difference between `post-fs-data.sh` and `service.sh`. For most module developers, `service.sh` should be good enough if you just need to run a boot script.

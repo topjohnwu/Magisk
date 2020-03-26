@@ -17,18 +17,19 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="?selectableItemBackground"
-        android:onClick="@{() -> item.toggle(viewModel)}"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:alpha="@{item.isHidden() ? 1f : .7f}"
+        android:background="?selectableItemBackground"
+        android:onClick="@{() -> item.toggle(viewModel)}">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/l1"
-            android:layout_marginTop="@dimen/l_50"
+            android:layout_marginTop="@dimen/l_75"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@dimen/l_50"
+            android:layout_marginBottom="@dimen/l_75"
             android:singleLine="true"
             android:text="@{item.item.name}"
             android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
@@ -41,17 +42,15 @@
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/hide_process_checkbox"
             style="@style/WidgetFoundation.Image.Small"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
             isSelected="@{item.isHidden}"
-            android:layout_marginTop="@dimen/l_50"
-            android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@dimen/l_50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/l_50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_radio_check_button"
-            app:tint="?colorPrimary" />
+            android:background="@drawable/bg_checkbox"
+            app:srcCompat="@drawable/ic_checkbox" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,24 +1,27 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
+import android.widget.Toast
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.RemoteFileService
+import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.RequestFileEvent
+import com.topjohnwu.magisk.model.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.ShellUtils
 import org.koin.core.get
 import kotlin.math.roundToInt
 
 class InstallViewModel : BaseViewModel(State.LOADED) {
 
-    val isRooted = Shell.rootAccess()
-    val isAB = isABDevice()
+    val isRooted get() = Shell.rootAccess()
+    val isAB get() = Info.isAB
 
     val step = KObservableField(0)
     val method = KObservableField(-1)
@@ -37,12 +40,18 @@ class InstallViewModel : BaseViewModel(State.LOADED) {
             this.progress.value = progress.times(100).roundToInt()
             if (this.progress.value >= 100) {
                 // this might cause issues if the flash activity launches on top of this sooner
-                back()
+                // back()
             }
         }
         method.addOnPropertyChangedCallback {
-            if (method.value == R.id.method_patch) {
-                RequestFileEvent().publish()
+            when (method.value) {
+                R.id.method_patch -> {
+                    Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
+                    RequestFileEvent().publish()
+                }
+                R.id.method_inactive_slot -> {
+                    SecondSlotWarningDialog().publish()
+                }
             }
         }
     }
@@ -64,9 +73,4 @@ class InstallViewModel : BaseViewModel(State.LOADED) {
         R.id.method_inactive_slot -> Configuration.Flash.Secondary
         else -> throw IllegalArgumentException("Unknown value")
     }
-
-    private fun isABDevice() = ShellUtils
-        .fastCmd("grep_prop ro.build.ab_update")
-        .let { it.isNotEmpty() && it.toBoolean() }
-
 }

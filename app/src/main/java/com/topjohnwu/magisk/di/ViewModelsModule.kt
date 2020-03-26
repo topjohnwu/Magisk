@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.di
 
-import android.net.Uri
-import com.topjohnwu.magisk.legacy.flash.FlashViewModel
 import com.topjohnwu.magisk.legacy.surequest.SuRequestViewModel
 import com.topjohnwu.magisk.ui.MainViewModel
+import com.topjohnwu.magisk.ui.flash.FlashFragmentArgs
+import com.topjohnwu.magisk.ui.flash.FlashViewModel
 import com.topjohnwu.magisk.ui.hide.HideViewModel
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.ui.install.InstallViewModel
@@ -31,8 +31,6 @@ val viewModelModules = module {
     viewModel { MainViewModel() }
 
     // Legacy
-    viewModel { (action: String, file: Uri, additional: Uri) ->
-        FlashViewModel(action, file, additional, get())
-    }
+    viewModel { (args: FlashFragmentArgs) -> FlashViewModel(args, get()) }
     viewModel { SuRequestViewModel(get(), get(), get(SUTimeout), get()) }
 }

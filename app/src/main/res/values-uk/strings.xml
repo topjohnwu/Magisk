@@ -100,8 +100,8 @@
     <string name="target_uid">Цільовий UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetyNet_api_error">Помилка SafetyNet API</string>
-    <string name="safetyNet_res_invalid">Невірна відповідь</string>
+    <string name="safetynet_api_error">Помилка SafetyNet API</string>
+    <string name="safetynet_res_invalid">Невірна відповідь</string>
     <string name="safetynet_attest_success">Успішно!</string>
     <string name="safetynet_attest_failure">Провірку не пройдено!</string>
     <string name="safetynet_attest_loading">Секунду…</string>
@@ -132,7 +132,7 @@
     <string name="module_action_install_external">Встановити зі сховища</string>
     <string name="module_update_none">Ваші модулі оновлені!</string>
     <string name="update_available">Доступне оновлення</string>
-    <string name="installed">Встановлені</string>
+    <string name="home_installed_version">Встановлені</string>
     <string name="sorting_order">Порядок сортування</string>
 
     <!--Settings -->
@@ -143,11 +143,6 @@
     <string name="settings_dark_mode_dark">Завжди темний</string>
     <string name="settings_safe_mode_title">Безпечний режим</string>
     <string name="settings_core_only_summary" deprecated="true">Увімкнути тільки можливості ядра. MagiskSU i Magisk Hide залишуться увімкненими, проте ніякі модулі не будуть завантажені</string>
-    <string name="settings_grid_span_count_title">Розмір стовпців</string>
-    <string name="settings_grid_span_count_summary">Встановити розмір стовпців для всіх придатних списків сіткою. Ви можете змінювати це поза налаштуваннями, зробивши жест щипка</string>
-    <string name="settings_grid_span_count_1">Один стовбець (малі екрани)</string>
-    <string name="settings_grid_span_count_2">Два стовбці (рекомендовано)</string>
-    <string name="settings_grid_span_count_3">Три стовбці (планшети/телевізори)</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
     <string name="settings_clear_cache_title">Очистити кеш</string>

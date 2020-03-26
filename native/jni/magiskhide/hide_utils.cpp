@@ -7,11 +7,11 @@
 #include <dirent.h>
 #include <string.h>
 
-#include <magisk.h>
-#include <utils.h>
-#include <db.h>
+#include <magisk.hpp>
+#include <utils.hpp>
+#include <db.hpp>
 
-#include "magiskhide.h"
+#include "magiskhide.hpp"
 
 using namespace std;
 

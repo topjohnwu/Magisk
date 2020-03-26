@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.ui.ReselectionTarget
 import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
-import com.topjohnwu.magisk.utils.PinchZoomTouchListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
@@ -34,13 +33,18 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
         get() = binding.moduleFilter.isVisible
         set(value) {
             if (!value) hideKeyboard()
-            (activity as? MainActivity)?.requestNavigationHidden(value)
             MotionRevealHelper.withViews(binding.moduleFilter, binding.moduleFilterToggle, value)
+            with(activity as MainActivity) {
+                requestNavigationHidden(value)
+                setDisplayHomeAsUpEnabled(value)
+            }
         }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        InstallExternalModuleEvent.onActivityResult(requireContext(), requestCode, resultCode, data)
+        InstallExternalModuleEvent.onActivityResult(requestCode, resultCode, data)?.also {
+            it.navigate()
+        }
     }
 
     override fun onStart() {
@@ -66,9 +70,6 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
                 if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
             }
         })
-
-        PinchZoomTouchListener.attachTo(binding.moduleFilterInclude.moduleFilterList)
-        PinchZoomTouchListener.attachTo(binding.moduleList)
     }
 
     override fun onDestroyView() {
@@ -76,8 +77,6 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
             binding.moduleList.removeOnScrollListener(it)
             binding.moduleFilterInclude.moduleFilterList.removeOnScrollListener(it)
         }
-        PinchZoomTouchListener.clear(binding.moduleList)
-        PinchZoomTouchListener.clear(binding.moduleFilterInclude.moduleFilterList)
         super.onDestroyView()
     }
 

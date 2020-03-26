@@ -87,9 +87,8 @@
     </string-array>
 
     <string-array name="span_count">
-        <item>@string/settings_grid_span_count_1</item>
-        <item>@string/settings_grid_span_count_2</item>
-        <item>@string/settings_grid_span_count_3</item>
+        <item>@string/settings_grid_column_count_1</item>
+        <item>@string/settings_grid_column_count_2</item>
     </string-array>
 
 </resources>

@@ -1,18 +1,20 @@
 package com.topjohnwu.magisk.core
 
-import androidx.work.ListenableWorker
+import android.content.Context
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.core.base.BaseWorkerWrapper
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.superuser.Shell
 
-class UpdateCheckService : BaseWorkerWrapper() {
+class UpdateCheckService(context: Context, workerParams: WorkerParameters)
+    : Worker(context, workerParams) {
 
     private val magiskRepo: MagiskRepository by inject()
 
-    override fun doWork(): ListenableWorker.Result {
+    override fun doWork(): Result {
         // Make sure shell initializer was ran
         Shell.getShell()
         return runCatching {
@@ -21,9 +23,9 @@ class UpdateCheckService : BaseWorkerWrapper() {
                 Notifications.managerUpdate(applicationContext)
             else if (Info.env.magiskVersionCode < Info.remote.magisk.versionCode)
                 Notifications.magiskUpdate(applicationContext)
-            ListenableWorker.Result.success()
+            Result.success()
         }.getOrElse {
-            ListenableWorker.Result.failure()
+            Result.failure()
         }
     }
 }

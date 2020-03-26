@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.core.Config" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.superuser.SuperuserViewModel" />
@@ -23,7 +25,6 @@
             goneUnless="@{viewModel.loaded || !viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
-            nestedScrollingEnabled="@{false}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"

@@ -9,12 +9,12 @@
 #include <vector>
 #include <string>
 
-#include <magisk.h>
-#include <db.h>
-#include <utils.h>
-#include <daemon.h>
-#include <resetprop.h>
-#include <selinux.h>
+#include <magisk.hpp>
+#include <db.hpp>
+#include <utils.hpp>
+#include <daemon.hpp>
+#include <resetprop.hpp>
+#include <selinux.hpp>
 #include <flags.h>
 
 using namespace std;
@@ -342,7 +342,10 @@ static bool magisk_env() {
 	// Remove stuffs
 	rm_rf("/cache/data_adb");
 	rm_rf("/data/adb/modules/.core");
+	unlink("/data/adb/magisk.img");
+	unlink("/data/adb/magisk_merge.img");
 	unlink("/data/magisk.img");
+	unlink("/data/magisk_merge.img");
 	unlink("/data/magisk_debug.log");
 
 	// Directories in tmpfs overlay
@@ -350,6 +353,9 @@ static bool magisk_env() {
 	xmkdir(BLOCKDIR, 0);
 	xmkdir(BBPATH, 0755);
 	xmkdir(MODULEMNT, 0755);
+
+	// Backwards compatibility for old Magisk Manager
+	xsymlink("./modules", MAGISKTMP "/img");
 
 	// Directories in /data/adb
 	xmkdir(DATABIN, 0755);

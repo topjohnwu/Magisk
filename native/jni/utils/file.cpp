@@ -7,8 +7,8 @@
 #include <string.h>
 #include <libgen.h>
 
-#include <utils.h>
-#include <selinux.h>
+#include <utils.hpp>
+#include <selinux.hpp>
 
 using namespace std;
 

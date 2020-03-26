@@ -21,12 +21,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <daemon.h>
-#include <utils.h>
+#include <daemon.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
-#include "su.h"
-#include "pts.h"
+#include "su.hpp"
+#include "pts.hpp"
 
 int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
 
@@ -34,7 +34,7 @@ static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
 
 	fprintf(stream,
-	FULL_VER(MagiskSU) "\n\n"
+	NAME_WITH_VER(MagiskSU) "\n\n"
 	"Usage: su [options] [-] [user [argument...]]\n\n"
 	"Options:\n"
 	"  -c, --command COMMAND         pass COMMAND to the invoked shell\n"

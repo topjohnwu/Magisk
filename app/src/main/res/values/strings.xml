@@ -38,6 +38,8 @@
     <string name="home_status_normal">Normal</string>
     <string name="home_status_safe">Safe Mode</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Installed</string>
+    <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
@@ -59,6 +61,7 @@
     <string name="select_patch_file">Select and Patch a File</string>
     <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar)</string>
     <string name="reboot_delay_toast">Rebooting in 5 seconds…</string>
+    <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>
@@ -132,8 +135,9 @@
     <string name="module_action_install_external">Install from storage</string>
     <string name="module_update_none">Your modules are up to date!</string>
     <string name="update_available">Update Available</string>
-    <string name="installed">Installed</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sorting Order</string>
+    <string name="module_permission_declined">Grant storage permission to enable this functionality</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Theme Mode</string>
@@ -143,11 +147,10 @@
     <string name="settings_dark_mode_dark">Always Dark</string>
     <string name="settings_safe_mode_title">Safe Mode</string>
     <string name="settings_core_only_summary" deprecated="true">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded</string>
-    <string name="settings_grid_span_count_title">Grid Column Size</string>
-    <string name="settings_grid_span_count_summary">Sets column size for all eligible grid lists. You can set this outside settings by performing pinch gesture.</string>
-    <string name="settings_grid_span_count_1">One item per line (Small Screens)</string>
-    <string name="settings_grid_span_count_2">Two items per line (Recommended)</string>
-    <string name="settings_grid_span_count_3">Three item per line (Tablet/TV)</string>
+    <string name="settings_grid_column_count_title">List arrangement</string>
+    <string name="settings_grid_column_count_summary">Sets item width in a list. Restart app to apply changes.</string>
+    <string name="settings_grid_column_count_1">Standard</string>
+    <string name="settings_grid_column_count_2">Squished</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>

@@ -10,32 +10,36 @@
     <string name="section_home">Inicio</string>
     <string name="section_theme">Temas</string>
 
-
     <!--Home-->
     <string name="no_connection">Conexión no Disponible</string>
-    <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto.  Una versión de origen desconocido podria realizar acciones maliciosas.</string>
-    <string name="hide">Ocultar</string>
     <string name="app_changelog">Registro de Cambios</string>
+
+    <string name="loading">Cargando…</string>
+    <string name="info">Información</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="update">Actualizar</string>
+
+    <string name="hide">Ocultar</string>
+    <string name="status">Estado</string>
+    <string name="home_package">Paquete</string>
+    <string name="details">Detalles</string>
+
+    <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto.  Una versión de origen desconocido podria realizar acciones maliciosas.</string>
     <string name="home_support_title">Apoyanos</string>
     <string name="home_links_project">Links del Proyecto</string>
     <string name="home_item_source">Codigo Fuente</string>
     <string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
     <string name="home_device_title">Tu dispositivo</string>
-    <string name="info">Información</string>
-    <string name="home_device_extra_manufacturer">Fabricante:</string>
-    <string name="home_device_extra_model">Modelo:</string>
-    <string name="home_device_extra_board">Placa:</string>
-    <string name="home_device_system">Sistema:</string>
-	<string name="home_package">Paquete</string>
+    <string name="home_device_extra_manufacturer">Fabricante</string>
+    <string name="home_device_extra_model">Modelo</string>
+    <string name="home_device_extra_board">Placa</string>
+    <string name="home_device_system">Android</string>
     <string name="home_status_normal">Normal</string>
-    <string name="details">Detalles</string>
+    <string name="home_status_safe">Modo Seguro</string>
+
     <string name="invalid_update_channel">Canal de actualización inválido</string>
-    <string name="safetynet_api_error">Error en la API de SafetyNet</string>
-    <string name="safetynet_res_invalid">La respuesta no es válida</string>
-    <string name="uninstall">Desinstalar</string>
-    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-    <string name="update">Actualizar</string>
+    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
@@ -87,7 +91,7 @@
 
     <!--Logs-->
     <string name="log_data_none">No se tiene registro, intente usar más sus aplicaciones habilitadas para SU.</string>
-    <string name="log_data_magisk_none">Los registros de Magisk están vacíos, eso es raro.</string>
+    <string name="log_data_magisk_none">Los registros de Magisk están vacíos, esto es muy raro.</string>
     <string name="menuSaveLog">Guardar registro</string>
     <string name="menuClearLog">Limpiar registro ahora</string>
     <string name="logs_cleared">Registro limpiado correctamente</string>
@@ -95,11 +99,13 @@
     <string name="target_uid">UID de objetivo: %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">Error en la API de SafetyNet</string>
+    <string name="safetynet_res_invalid">La respuesta no es válida</string>
     <string name="safetynet_attest_success">¡Éxito!</string>
     <string name="safetynet_attest_failure">La certificación falló!</string>
     <string name="safetynet_attest_loading">Solo un segundo…</string>
     <string name="safetynet_attest_restart">Inténtalo de nuevo</string>
-    <string name="safetynet_system">Sistema</string>
+    <string name="safetynet_system">Android</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostrar sistema</string>
@@ -119,14 +125,15 @@
     <string name="module_version_author">%1$s por %2$s</string>
     <string name="module_section_pending">Actualizaciones</string>
     <string name="module_section_pending_action">¡Actualizar todo!</string>
-    <string name="module_section_remote">Remoto</string>
+    <string name="module_section_remote">Disponible</string>
     <string name="module_state_remove">Eliminar</string>
     <string name="module_state_restore">Restaurar</string>
     <string name="module_action_install_external">Instalar desde almacenamiento</string>
     <string name="module_update_none">¡Sus módulos están actualizados!</string>
     <string name="update_available">Actualización disponible</string>
-    <string name="installed">Instalado</string>
+    <string name="home_installed_version">Instalado</string>
     <string name="sorting_order">Clasificar por</string>
+    <string name="module_permission_declined">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Elegir Modo</string>
@@ -136,11 +143,10 @@
     <string name="settings_dark_mode_dark">Oscuro</string>
     <string name="settings_safe_mode_title">Modo Seguro</string>
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
-    <string name="settings_grid_span_count_title">Tamaño de columna</string>
-    <string name="settings_grid_span_count_summary">Establece el tamaño de columna para todas las listas de cuadrículas elegibles. Puede establecer esta configuración externa realizando un gesto de pellizco.</string>
-    <string name="settings_grid_span_count_1">Una sección por línea (Pantallas Pequeñas)</string>
-    <string name="settings_grid_span_count_2">Dos secciones por línea (Recomendado)</string>
-    <string name="settings_grid_span_count_3">Tres secciones por línea (Tablet/TV)</string>
+    <string name="settings_grid_column_count_title">Gestión de la Lista</string>
+    <string name="settings_grid_column_count_summary">Establece el ancho de la lista. Reinicie la aplicación para aplicar los cambios.</string>
+    <string name="settings_grid_column_count_1">Estándar</string>
+    <string name="settings_grid_column_count_2">Compacto</string>
     <string name="settings_download_path_title">Ruta de Descarga</string>
     <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
@@ -202,7 +208,6 @@
     <string name="requester_summary">Las sesiones de root heredarán las peticiones Namespace</string>
     <string name="isolate_summary">Cada sesión root tendrá su propia Namespace</string>
     <string name="settings_download_path_error">Error al crear la carpeta. Debe ser accesible desde el directorio raíz de almacenamiento y no debe ser un archivo.</string>
-
 
     <!--Notifications-->
     <string name="update_channel">Actualización de Magisk</string>

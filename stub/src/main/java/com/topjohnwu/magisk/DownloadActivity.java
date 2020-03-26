@@ -27,7 +27,7 @@ import static com.topjohnwu.magisk.DelegateApplication.MANAGER_APK;
 
 public class DownloadActivity extends Activity {
 
-    private static final boolean CANARY = BuildConfig.VERSION_NAME.contains("-");
+    private static final boolean CANARY = !BuildConfig.VERSION_NAME.contains(".");
     private static final String URL =
             BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL : RawData.urlBase() +
             (BuildConfig.DEBUG ? RawData.debug() : (CANARY ? RawData.canary() : RawData.stable()));

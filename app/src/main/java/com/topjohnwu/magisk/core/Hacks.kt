@@ -21,7 +21,6 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.core.utils.updateConfig
 import com.topjohnwu.magisk.extensions.forceGetDeclaredField
-import com.topjohnwu.magisk.legacy.flash.FlashActivity
 import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
 import com.topjohnwu.magisk.ui.MainActivity
 
@@ -57,7 +56,7 @@ fun Class<*>.cmp(pkg: String): ComponentName {
 inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
 
 private open class GlobalResContext(base: Context) : ContextWrapper(base) {
-    open val mRes: Resources get() = ResourceMgr.resource
+    open val mRes: Resources get() = ResMgr.resource
 
     override fun getResources(): Resources {
         return mRes
@@ -78,22 +77,24 @@ private class ResContext(base: Context) : GlobalResContext(base) {
     private fun Resources.patch(): Resources {
         updateConfig()
         if (isRunningAsStub)
-            assets.addAssetPath(ResourceMgr.resApk)
+            assets.addAssetPath(ResMgr.apk)
         return this
     }
 }
 
-object ResourceMgr {
+object ResMgr {
 
     lateinit var resource: Resources
-    lateinit var resApk: String
+    lateinit var apk: String
 
     fun init(context: Context) {
         resource = context.resources
         refreshLocale()
         if (isRunningAsStub) {
-            resApk = DynAPK.current(context).path
-            resource.assets.addAssetPath(resApk)
+            apk = DynAPK.current(context).path
+            resource.assets.addAssetPath(apk)
+        } else {
+            apk = context.packageResourcePath
         }
     }
 }
@@ -144,8 +145,6 @@ object ClassMap {
         App::class.java to a.e::class.java,
         MainActivity::class.java to a.b::class.java,
         SplashActivity::class.java to a.c::class.java,
-        FlashActivity::class.java to a.f::class.java,
-        UpdateCheckService::class.java to a.g::class.java,
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
         SuRequestActivity::class.java to a.m::class.java,
@@ -160,17 +159,10 @@ object ClassMap {
 * being removed when running "remove unused resources" */
 val shouldKeepResources = listOf(
     /* TODO: The following strings should be used somewhere */
-    R.string.patch_file_msg,
     R.string.no_apps_found,
     R.string.no_info_provided,
     R.string.release_notes,
     R.string.settings_download_path_error,
-    R.string.unsupport_magisk_msg,
-    R.string.unsupport_magisk_title,
-    R.string.install_inactive_slot_msg,
     R.string.invalid_update_channel,
-    R.string.update_available,
-
-    /* Android Studio is dumb and cannot detect following usages in databinding */
-    R.menu.menu_reboot
+    R.string.update_available
 )

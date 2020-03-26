@@ -4,9 +4,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <magisk.h>
-#include <selinux.h>
-#include <utils.h>
+#include <magisk.hpp>
+#include <selinux.hpp>
+#include <utils.hpp>
 
 using namespace std::literals;
 

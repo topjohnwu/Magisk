@@ -1,38 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!--new colors-->
-
-    <color name="colorPrimary">#009688</color>
-    <color name="colorPrimaryDark">#00796B</color>
-    <color name="colorSecondary">#D50000</color>
-    <color name="colorSecondaryDark">#6D1111</color>
-
-    <color name="colorText">#1D1D1D</color>
-    <color name="colorTextInactive">#6a6868</color>
-    <color name="colorTextInverse">#fff</color>
-
-    <color name="colorTextTinted">#FFFFFF</color>
-    <color name="colorCardStrokeInverse">#2A000000</color>
-
-    <color name="colorCorrect">@color/green500</color>
-    <color name="colorError">@color/red500</color>
-    <color name="colorUpdate">@color/blue500</color>
-    <!--new colors ^^-->
-
-    <color name="primary">#009688</color>
-    <color name="primary_dark">#00796B</color>
-    <color name="accentFallback">#FBC02D</color>
-    <color name="icon_grey">#757575</color>
-
-    <color name="red500">#F44336</color>
-    <color name="green500">#4CAF50</color>
-    <color name="blue500">#2196f3</color>
-
-    <color name="dark_secondary_text">#dedede</color>
     <color name="su_request_background">#e0e0e0</color>
-
-    <!-- Card colors -->
-    <color name="card_background_color_dark">#ff424242</color>
-    <color name="card_background_color_light">#ffffffff</color>
+    <color name="colorOverlay">#0D000000</color>
 </resources>

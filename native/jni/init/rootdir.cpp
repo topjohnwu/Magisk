@@ -3,12 +3,12 @@
 #include <fcntl.h>
 #include <vector>
 
-#include <magisk.h>
-#include <magiskpolicy.h>
-#include <utils.h>
+#include <magisk.hpp>
+#include <magiskpolicy.hpp>
+#include <utils.hpp>
 
-#include "init.h"
-#include "magiskrc.h"
+#include "init.hpp"
+#include "magiskrc.inc"
 
 #ifdef USE_64BIT
 #define LIBNAME "lib64"
@@ -245,20 +245,18 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 
 static string magic_mount_list;
 
-static void magic_mount(int dirfd, const string &path) {
-	DIR *dir = xfdopendir(dirfd);
-	for (dirent *entry; (entry = readdir(dir));) {
+static void magic_mount(const string &sdir, const string &ddir = "") {
+	auto dir = xopen_dir(sdir.data());
+	for (dirent *entry; (entry = readdir(dir.get()));) {
 		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
-		string dest = path + "/" + entry->d_name;
+		string src = sdir + "/" + entry->d_name;
+		string dest = ddir + "/" + entry->d_name;
 		if (access(dest.data(), F_OK) == 0) {
 			if (entry->d_type == DT_DIR) {
 				// Recursive
-				int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-				magic_mount(fd, dest);
-				close(fd);
+				magic_mount(src, dest);
 			} else {
-				string src = ROOTOVL + dest;
 				LOGD("Mount [%s] -> [%s]\n", src.data(), dest.data());
 				xmount(src.data(), dest.data(), nullptr, MS_BIND, nullptr);
 				magic_mount_list += dest;
@@ -360,9 +358,7 @@ void SARBase::patch_rootdir() {
 	clone_attr("/init.rc", ROOTOVL "/init.rc");
 
 	// Mount rootdir
-	src = xopen(ROOTOVL, O_RDONLY | O_CLOEXEC);
-	magic_mount(src, "");
-	close(src);
+	magic_mount(ROOTOVL);
 	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
 	write(dest, magic_mount_list.data(), magic_mount_list.length());
 	close(dest);

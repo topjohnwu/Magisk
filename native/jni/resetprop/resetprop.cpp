@@ -9,15 +9,15 @@
 #include <vector>
 #include <algorithm>
 
-#include <logging.h>
-#include <resetprop.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <resetprop.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include "private/_system_properties.h"
-#include "private/system_properties.h"
-#include "private/resetprop.h"
+#include <_system_properties.h>
+
+#include "_resetprop.hpp"
 
 using namespace std;
 
@@ -55,7 +55,7 @@ illegal:
 
 [[noreturn]] static void usage(char* arg0) {
 	fprintf(stderr,
-		FULL_VER(resetprop) " - System Props Modification Tool\n\n"
+		NAME_WITH_VER(resetprop) " - System Props Modification Tool\n\n"
 		"Usage: %s [flags] [options...]\n"
 		"\n"
 		"Options:\n"
@@ -71,7 +71,7 @@ illegal:
 		"   -n      set properties without init triggers\n"
 		"           only affects setprop\n"
 		"   -p      access actual persist storage\n"
-		"           only affects getprop and deleteprop\n"
+		"           only affects getprop and delprop\n"
 		"\n"
 
 	, arg0);
@@ -172,7 +172,7 @@ int setprop(const char *name, const char *value, bool trigger) {
 	auto pi = (prop_info*) __system_property_find(name);
 	if (pi != nullptr) {
 		if (trigger) {
-			if (strncmp(name, "ro.", 3) == 0) deleteprop(name);
+			if (strncmp(name, "ro.", 3) == 0) delprop(name);
 			ret = __system_property_set(name, value);
 		} else {
 			ret = __system_property_update(pi, value, strlen(value));
@@ -195,13 +195,13 @@ int setprop(const char *name, const char *value, bool trigger) {
 	return ret;
 }
 
-int deleteprop(const char *name, bool persist) {
+int delprop(const char *name, bool persist) {
 	if (!check_legal_property_name(name))
 		return 1;
 	ENSURE_INIT(-1);
 	char path[PATH_MAX];
 	path[0] = '\0';
-	LOGD("resetprop: deleteprop [%s]\n", name);
+	LOGD("resetprop: delprop [%s]\n", name);
 	if (persist && strncmp(name, "persist.", 8) == 0)
 		persist = persist_deleteprop(name);
 	return __system_property_del(name) && !(persist && strncmp(name, "persist.", 8) == 0);
@@ -235,7 +235,7 @@ int resetprop_main(int argc, char *argv[]) {
 					load_prop_file(argv[1], trigger);
 					return 0;
 				} else if (strcmp(argv[0], "--delete") == 0 && argc == 2) {
-					return deleteprop(argv[1], persist);
+					return delprop(argv[1], persist);
 				} else if (strcmp(argv[0], "--help") == 0) {
 					usage(argv0);
 				}
