@@ -38,6 +38,8 @@
     <string name="home_status_normal">Нормальний</string>
     <string name="home_status_safe">Безпечний режим</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Встановлено</string>
+    <string name="home_latest_version">Найновіша</string>
     <string name="invalid_update_channel">Невірний канал оновлення</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до вимкнення/видалення всіх модулів! Рут буде повністю видалено!\nВаші дані можуть зашифруватися, якщо вони не зашифровані!\nВпевнені, що бажаєте продовжити?</string>
@@ -59,6 +61,7 @@
     <string name="select_patch_file">Вибрати і пропатчити файл</string>
     <string name="patch_file_msg">Виберіть необроблений образ (*.img) або стиснутий файл ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Перезавантаження через 5 секунд…</string>
+    <string name="flash_screen_title">Встановлення</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав суперкористувача</string>
@@ -132,8 +135,9 @@
     <string name="module_action_install_external">Встановити зі сховища</string>
     <string name="module_update_none">Ваші модулі оновлені!</string>
     <string name="update_available">Доступне оновлення</string>
-    <string name="home_installed_version">Встановлені</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Порядок сортування</string>
+    <string name="module_permission_declined">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Режим теми</string>
@@ -143,6 +147,10 @@
     <string name="settings_dark_mode_dark">Завжди темний</string>
     <string name="settings_safe_mode_title">Безпечний режим</string>
     <string name="settings_core_only_summary" deprecated="true">Увімкнути тільки можливості ядра. MagiskSU i Magisk Hide залишуться увімкненими, проте ніякі модулі не будуть завантажені</string>
+    <string name="settings_grid_column_count_title">Упорядкування списку</string>
+    <string name="settings_grid_column_count_summary">Встановлює ширину списку. Перезавантажте застосунок, щоб застосувати зміни.</string>
+    <string name="settings_grid_column_count_1">Стандартний</string>
+    <string name="settings_grid_column_count_2">Сплющений</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
     <string name="settings_clear_cache_title">Очистити кеш</string>
