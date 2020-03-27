@@ -136,7 +136,7 @@
     <string name="update_available">Update beschikbaar</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sorteervolgorde</string>
-    <string name="module_permission_declined">Verleen de machtiging 'Opslag' om deze functie te kunnen gebruiken</string>
+    <string name="module_permission_declined">Verleen de machtiging \'Opslag\' om deze functie te kunnen gebruiken</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Thema</string>
