@@ -1,6 +1,6 @@
 package a;
 
-import com.topjohnwu.magisk.DelegateComponentFactory;
+import com.topjohnwu.magisk.MainActivity;
 
-public class a extends DelegateComponentFactory {
+public class a extends MainActivity {
 }
