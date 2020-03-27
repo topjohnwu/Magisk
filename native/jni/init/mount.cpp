@@ -97,6 +97,7 @@ static bool read_dt_fstab(cmdline *cmd, const char *name) {
 	if ((fd = open(path, O_RDONLY | O_CLOEXEC)) >= 0) {
 		read(fd, path, sizeof(path));
 		close(fd);
+		path[strcspn(path, "\r\n")] = '\0';
 		// Some custom treble use different names, so use what we read
 		char *part = rtrim(strrchr(path, '/') + 1);
 		sprintf(partname, "%s%s", part, strend(part, cmd->slot) ? cmd->slot : "");
@@ -104,6 +105,7 @@ static bool read_dt_fstab(cmdline *cmd, const char *name) {
 		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
 			read(fd, fstype, 32);
 			close(fd);
+			fstype[strcspn(fstype, "\r\n")] = '\0';
 			return true;
 		}
 	}
