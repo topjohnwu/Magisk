@@ -16,7 +16,7 @@ Here are some feature highlights:
 ## Download
 
 [![](https://img.shields.io/badge/Magisk%20Manager-v7.5.1-green)](https://github.com/topjohnwu/Magisk/releases/download/manager-v7.5.1/MagiskManager-v7.5.1.apk)
-[![](https://img.shields.io/badge/Magisk-v20.3-blue)](https://github.com/topjohnwu/Magisk/releases/download/v20.3/Magisk-v20.3.zip)
+[![](https://img.shields.io/badge/Magisk-v20.4-blue)](https://github.com/topjohnwu/Magisk/releases/download/v20.4/Magisk-v20.4.zip)
 [![](https://img.shields.io/badge/Magisk%20Beta-v20.4-blue)](https://github.com/topjohnwu/Magisk/releases/download/v20.4/Magisk-v20.4.zip)
 <br>
 [![](https://img.shields.io/badge/Magisk%20Manager-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-release.apk)
