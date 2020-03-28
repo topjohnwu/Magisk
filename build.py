@@ -242,6 +242,29 @@ def run_ndk_build(flags):
     collect_binary()
 
 
+def dump_bin_headers():
+    for arch in archs:
+        bin_file = os.path.join('native', 'out', arch, 'magisk')
+        if not os.path.exists(bin_file):
+            error('Build "magisk" before building "magiskinit"')
+        with open(os.path.join('native', 'out', arch, 'binaries_arch.h'), 'w') as out:
+            with open(bin_file, 'rb') as src:
+                binary_dump(src, out, 'magisk_xz')
+    for arch, arch32 in list(zip(arch64, archs)):
+        bin_file = os.path.join('native', 'out', arch, 'magisk')
+        with open(os.path.join('native', 'out', arch32, 'binaries_arch64.h'), 'w') as out:
+            with open(bin_file, 'rb') as src:
+                binary_dump(src, out, 'magisk_xz')
+    stub = os.path.join(config['outdir'], 'stub-release.apk')
+    if not os.path.exists(stub):
+        stub = os.path.join(config['outdir'], 'stub-debug.apk')
+        if not os.path.exists(stub):
+            error('Build stub APK before building "magiskinit"')
+    with open(os.path.join('native', 'out', 'binaries.h'), 'w') as out:
+        with open(stub, 'rb') as src:
+            binary_dump(src, out, 'manager_xz')
+
+
 def build_binary(args):
     if args.target:
         args.target = set(args.target) & set(support_targets)
@@ -263,23 +286,9 @@ def build_binary(args):
     if 'magisk' in args.target:
         run_ndk_build('B_MAGISK=1 B_64BIT=1')
         clean_elf()
-        # Dump the binary to header
-        for arch in archs:
-            bin_file = os.path.join('native', 'out', arch, 'magisk')
-            with open(os.path.join('native', 'out', arch, 'binaries_arch.h'), 'w') as out:
-                with open(bin_file, 'rb') as src:
-                    binary_dump(src, out, 'magisk_xz')
-        for arch, arch32 in list(zip(arch64, archs)):
-            bin_file = os.path.join('native', 'out', arch, 'magisk')
-            with open(os.path.join('native', 'out', arch32, 'binaries_arch64.h'), 'w') as out:
-                with open(bin_file, 'rb') as src:
-                    binary_dump(src, out, 'magisk_xz')
 
     if 'magiskinit' in args.target:
-        if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch.h')):
-            error('Build "magisk" before building "magiskinit"')
-        if not os.path.exists(os.path.join('native', 'out', 'binaries.h')):
-            error('Build stub APK before building "magiskinit"')
+        dump_bin_headers()
         run_ndk_build('B_INIT=1')
         run_ndk_build('B_INIT64=1')
 
@@ -361,12 +370,7 @@ def build_app(args):
 
 def build_stub(args):
     header('* Building Magisk Manager stub')
-    stub = build_apk(args, 'stub')
-    # Dump the stub APK to header
-    mkdir(os.path.join('native', 'out'))
-    with open(os.path.join('native', 'out', 'binaries.h'), 'w') as out:
-        with open(stub, 'rb') as src:
-            binary_dump(src, out, 'manager_xz')
+    build_apk(args, 'stub')
 
 
 def build_snet(args):
