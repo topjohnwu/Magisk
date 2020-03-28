@@ -61,6 +61,7 @@
     <string name="select_patch_file">Sélectionnez le fichier cible du correctif</string>
     <string name="patch_file_msg">Sélectionnez une image brute (*.img) ou une archive TAR ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Redémarrage dans 5 secondes…</string>
+    <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
     <string name="su_request_title">Demande d’accès super‑utilisateur</string>
