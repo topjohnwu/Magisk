@@ -85,6 +85,13 @@ class ModuleViewModel(
     private val itemsUpdatable = diffListOf<RepoItem.Update>()
     private val itemsRemote = diffListOf<RepoItem.Remote>()
 
+    var isRemoteLoading = false
+        @Bindable get
+        private set(value) {
+            field = value
+            notifyPropertyChanged(BR.remoteLoading)
+        }
+
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = MergeObservableList<ComparableRvItem<*>>()
         .insertList(itemsCoreOnly)
@@ -215,9 +222,13 @@ class ModuleViewModel(
             repoUpdater(refetch).andThen(loadRemoteDB(0))
         } else {
             loadRemoteDB(itemsRemote.size)
-        }.subscribeK(onError = Timber::e) {
-            itemsRemote.addAll(it)
-        }
+        }.observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { isRemoteLoading = true }
+            .doOnSuccess { isRemoteLoading = false }
+            .doOnError { isRemoteLoading = false }
+            .subscribeK(onError = Timber::e) {
+                itemsRemote.addAll(it)
+            }
 
         refetch = false
     }

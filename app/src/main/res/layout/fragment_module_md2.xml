@@ -90,6 +90,28 @@
 
         </LinearLayout>
 
+        <FrameLayout
+            goneUnless="@{viewModel.remoteLoading}"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_gravity="bottom">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                tools:ignore="UselessParent">
+
+                <ProgressBar
+                    style="@style/WidgetFoundation.ProgressBar.Indeterminate"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center" />
+
+            </FrameLayout>
+
+        </FrameLayout>
+
     </FrameLayout>
 
 
