@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.res.use
 import androidx.core.graphics.Insets
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
@@ -56,6 +57,13 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(themeRes)
+
+        // We need to set the window background explicitly since for whatever reason it's not
+        // propagated upstream
+        obtainStyledAttributes(intArrayOf(android.R.attr.windowBackground))
+            .use { it.getDrawable(0) }
+            .also { window.setBackgroundDrawable(it) }
+
         super.onCreate(savedInstanceState)
 
         viewModel.viewEvents.observe(this, viewEventObserver)
