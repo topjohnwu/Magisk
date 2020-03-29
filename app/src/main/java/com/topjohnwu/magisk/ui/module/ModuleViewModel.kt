@@ -193,6 +193,7 @@ class ModuleViewModel(
         .doOnSuccess {
             addInstalledEmptyMessage()
             addUpdatableEmptyMessage()
+            updateActiveState()
         }
         .ignoreElement()!!
 
