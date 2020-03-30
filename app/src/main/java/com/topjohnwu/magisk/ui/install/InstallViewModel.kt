@@ -39,8 +39,7 @@ class InstallViewModel : BaseViewModel(State.LOADED) {
             }
             this.progress.value = progress.times(100).roundToInt()
             if (this.progress.value >= 100) {
-                // this might cause issues if the flash activity launches on top of this sooner
-                // back()
+                state = State.LOADED
             }
         }
         method.addOnPropertyChangedCallback {
