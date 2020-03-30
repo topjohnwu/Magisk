@@ -722,6 +722,9 @@ void late_start(int client) {
 		// It's safe to create the folder at this point if the system didn't create it
 		if (access(SECURE_DIR, F_OK) != 0)
 			xmkdir(SECURE_DIR, 0700);
+		// Return if folder not created and do it again in boot_complete section
+		if (access(SECURE_DIR, F_OK) != 0)
+			return;
 		// And reboot to make proper setup possible
 		reboot();
 	}
@@ -758,6 +761,14 @@ void boot_complete(int client) {
 	// ack
 	write_int(client, 0);
 	close(client);
+
+	if (no_secure_dir) {
+		// It's safe to create the folder at this point if the system didn't create it
+		if (access(SECURE_DIR, F_OK) != 0)
+			xmkdir(SECURE_DIR, 0700);
+		// And reboot to make proper setup possible
+		reboot();
+	}
 
 	if (!pfs_done)
 		return;
