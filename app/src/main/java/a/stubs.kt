@@ -1,5 +1,6 @@
 package a
 
+import com.topjohnwu.magisk.ProcessPhoenix
 import com.topjohnwu.magisk.core.App
 import com.topjohnwu.magisk.core.GeneralReceiver
 import com.topjohnwu.magisk.core.SplashActivity
@@ -21,3 +22,5 @@ class h : GeneralReceiver()
 class j : DownloadService()
 
 class m : SuRequestActivity()
+
+class r : ProcessPhoenix()

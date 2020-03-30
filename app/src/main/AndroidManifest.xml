@@ -35,13 +35,17 @@
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             tools:ignore="AppLinkUrlError">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <!-- ProcessPhoenix -->
+        <activity
+            android:name="a.r"
+            android:process=":remote" />
 
         <!-- Receiver -->
         <receiver
