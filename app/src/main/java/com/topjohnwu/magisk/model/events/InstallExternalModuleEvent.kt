@@ -24,7 +24,7 @@ class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
             if (requestCode == Const.ID.FETCH_ZIP && resultCode == Activity.RESULT_OK && data != null) {
                 val data = data.data
                 if (data != null) {
-                    return MainDirections.actionFlashFragment(data, Const.Key.FLASH_ACTION)
+                    return MainDirections.actionFlashFragment(data, Const.Value.FLASH_ZIP)
                 }
             }
             return null
