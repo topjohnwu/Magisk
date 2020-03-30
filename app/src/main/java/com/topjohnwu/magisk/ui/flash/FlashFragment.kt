@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.ui.flash
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.net.Uri
@@ -14,8 +12,8 @@ import android.view.View
 import androidx.core.net.toUri
 import androidx.navigation.NavDeepLinkBuilder
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.ClassMap
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.databinding.FragmentFlashMd2Binding
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
@@ -73,14 +71,13 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
 
     companion object {
 
-        private fun createIntent(context: Context, args: args): PendingIntent {
-            return NavDeepLinkBuilder(context)
+        private fun createIntent(context: Context, args: args) =
+            NavDeepLinkBuilder(context)
                 .setGraph(R.navigation.main)
-                .setComponentName(ClassMap[MainActivity::class.java] as Class<out Activity>)
+                .setComponentName(MainActivity::class.java.cmp(context.packageName))
                 .setDestination(R.id.flashFragment)
                 .setArguments(args.toBundle())
                 .createPendingIntent()
-        }
 
         private fun flashType(isSecondSlot: Boolean) =
             if (isSecondSlot) Const.Value.FLASH_INACTIVE_SLOT else Const.Value.FLASH_MAGISK

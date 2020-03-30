@@ -139,7 +139,7 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
     }
 }
 
-object ClassMap {
+private object ClassMap {
 
     private val map = mapOf(
         App::class.java to a.e::class.java,
