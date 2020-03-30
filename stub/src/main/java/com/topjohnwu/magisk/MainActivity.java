@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 
 import com.topjohnwu.magisk.net.ErrorHandler;
 import com.topjohnwu.magisk.net.Networking;
@@ -20,7 +22,6 @@ import java.io.File;
 import static android.R.string.no;
 import static android.R.string.ok;
 import static android.R.string.yes;
-import static android.app.AlertDialog.THEME_DEVICE_DEFAULT_DARK;
 
 public class MainActivity extends Activity {
 
@@ -37,9 +38,10 @@ public class MainActivity extends Activity {
         Log.e(getClass().getSimpleName(), "", e);
         finish();
     };
+    private Context themed;
 
     private void showDialog() {
-        ProgressDialog.show(this,
+        ProgressDialog.show(themed,
             getString(R.string.dling),
             getString(R.string.dling) + " " + APP_NAME,
             true);
@@ -61,13 +63,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Networking.init(this);
+        themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
 
         if (Networking.checkNetworkStatus(this)) {
             Networking.get(URL)
                     .setErrorHandler(err)
                     .getAsJSONObject(new JSONLoader());
         } else {
-            new AlertDialog.Builder(this, THEME_DEVICE_DEFAULT_DARK)
+            new AlertDialog.Builder(themed)
                     .setCancelable(false)
                     .setTitle(APP_NAME)
                     .setMessage(getString(R.string.no_internet_msg))
@@ -83,7 +86,7 @@ public class MainActivity extends Activity {
             try {
                 JSONObject manager = json.getJSONObject("app");
                 apkLink = manager.getString("link");
-                new AlertDialog.Builder(MainActivity.this, THEME_DEVICE_DEFAULT_DARK)
+                new AlertDialog.Builder(themed)
                         .setCancelable(false)
                         .setTitle(APP_NAME)
                         .setMessage(getString(R.string.upgrade_msg))
