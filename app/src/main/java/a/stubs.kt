@@ -1,3 +1,4 @@
+@file:JvmName("a")
 package a
 
 import com.topjohnwu.magisk.ProcessPhoenix
@@ -7,6 +8,11 @@ import com.topjohnwu.magisk.core.SplashActivity
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.signing.BootSigner
+
+fun main(args: Array<String>) {
+    BootSigner.main(args)
+}
 
 class b : MainActivity()
 
