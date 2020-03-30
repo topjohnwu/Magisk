@@ -1,5 +1,0 @@
-com.topjohnwu.magisk:color/xxxxxxxx = 0x7f010000
-com.topjohnwu.magisk:drawable/xxxxxxxx = 0x7f020000
-com.topjohnwu.magisk:string/xxxxxxxx = 0x7f030000
-com.topjohnwu.magisk:style/xxxxxxxx = 0x7f040000
-com.topjohnwu.magisk:xml/xxxxxxxx = 0x7f050000

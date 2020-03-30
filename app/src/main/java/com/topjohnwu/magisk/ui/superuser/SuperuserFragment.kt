@@ -15,4 +15,6 @@ class SuperuserFragment : BaseUIFragment<SuperuserViewModel, FragmentSuperuserMd
         activity.title = resources.getString(R.string.superuser)
     }
 
+    override fun onPreBind(binding: FragmentSuperuserMd2Binding) {}
+
 }

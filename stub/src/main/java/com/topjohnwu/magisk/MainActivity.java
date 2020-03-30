@@ -4,33 +4,33 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.topjohnwu.magisk.net.ErrorHandler;
 import com.topjohnwu.magisk.net.Networking;
 import com.topjohnwu.magisk.net.ResponseListener;
-import com.topjohnwu.magisk.obfuscate.Mapping;
-import com.topjohnwu.magisk.obfuscate.RawData;
 import com.topjohnwu.magisk.utils.APKInstall;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+
 import static android.R.string.no;
 import static android.R.string.ok;
 import static android.R.string.yes;
-import static com.topjohnwu.magisk.DelegateApplication.MANAGER_APK;
+import static android.app.AlertDialog.THEME_DEVICE_DEFAULT_DARK;
 
-public class DownloadActivity extends Activity {
+public class MainActivity extends Activity {
 
     private static final boolean CANARY = !BuildConfig.VERSION_NAME.contains(".");
     private static final String URL =
-            BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL : RawData.urlBase() +
-            (BuildConfig.DEBUG ? RawData.debug() : (CANARY ? RawData.canary() : RawData.stable()));
+            BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
+            "https://raw.githubusercontent.com/topjohnwu/magisk_files/" +
+            (BuildConfig.DEBUG ? "canary/debug.json" :
+            (CANARY ? "canary/release.json" : "master/stable.json"));
+    private static final String APP_NAME = "Magisk Manager";
 
     private String apkLink;
     private ErrorHandler err = (conn, e) -> {
@@ -40,35 +40,26 @@ public class DownloadActivity extends Activity {
 
     private void showDialog() {
         ProgressDialog.show(this,
-                RawData.dling(),
-                RawData.dling() + " " + RawData.appName(),
-                true);
+            getString(R.string.dling),
+            getString(R.string.dling) + " " + APP_NAME,
+            true);
     }
 
     private void dlAPK() {
         showDialog();
-        if (Build.VERSION.SDK_INT >= 28) {
-            // Download and relaunch the app
-            Networking.get(apkLink)
-                    .setErrorHandler(err)
-                    .getAsFile(MANAGER_APK, apk -> {
-                        Intent intent = new Intent()
-                                .setComponent(new ComponentName(this, Mapping.inverse("a.r")));
-                        ProcessPhoenix.triggerRebirth(this, intent);
-                    });
-        } else {
-            // Download and upgrade the app
-            Application app = getApplication();
-            Networking.get(apkLink)
-                    .setErrorHandler(err)
-                    .getAsFile(MANAGER_APK, apk -> APKInstall.install(app, apk));
-        }
+        // Download and upgrade the app
+        Application app = getApplication();
+        Networking.get(apkLink)
+                .setErrorHandler(err)
+                .getAsFile(
+                        new File(getCacheDir(), "manager.apk"),
+                        apk -> APKInstall.install(app, apk)
+                );
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RawData.res = getResources();
         Networking.init(this);
 
         if (Networking.checkNetworkStatus(this)) {
@@ -76,10 +67,10 @@ public class DownloadActivity extends Activity {
                     .setErrorHandler(err)
                     .getAsJSONObject(new JSONLoader());
         } else {
-            new AlertDialog.Builder(this)
+            new AlertDialog.Builder(this, THEME_DEVICE_DEFAULT_DARK)
                     .setCancelable(false)
-                    .setTitle(RawData.appName())
-                    .setMessage(RawData.networkError())
+                    .setTitle(APP_NAME)
+                    .setMessage(getString(R.string.no_internet_msg))
                     .setNegativeButton(ok, (d, w) -> finish())
                     .show();
         }
@@ -92,10 +83,10 @@ public class DownloadActivity extends Activity {
             try {
                 JSONObject manager = json.getJSONObject("app");
                 apkLink = manager.getString("link");
-                new AlertDialog.Builder(DownloadActivity.this)
+                new AlertDialog.Builder(MainActivity.this, THEME_DEVICE_DEFAULT_DARK)
                         .setCancelable(false)
-                        .setTitle(RawData.appName())
-                        .setMessage(RawData.upgradeMsg())
+                        .setTitle(APP_NAME)
+                        .setMessage(getString(R.string.upgrade_msg))
                         .setPositiveButton(yes, (d, w) -> dlAPK())
                         .setNegativeButton(no, (d, w) -> finish())
                         .show();

@@ -5,76 +5,23 @@
     package="com.topjohnwu.magisk">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <application
-        android:name="a.e"
-        android:appComponentFactory="a.a"
         android:allowBackup="true"
-        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning" >
-
-        <!-- Download Activity -->
+        tools:ignore="AllowBackup">
 
         <activity
-            android:name="a.c"
-            android:theme="@style/SplashTheme">
+            android:name="a.a"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Magisk Manager Components -->
-
-        <activity android:name="a.b" />
-
-        <activity android:name="a.f" />
-
         <activity
-            android:name="a.m"
-            android:directBootAware="true"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            tools:ignore="AppLinkUrlError">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
-
-        <receiver
-            android:name="a.h"
-            android:directBootAware="true">
-            <intent-filter>
-                <action android:name="android.intent.action.REBOOT" />
-                <action android:name="android.intent.action.LOCALE_CHANGED" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
-
-                <data android:scheme="package" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name="a.j" />
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="12451000" />
-
-        <!-- WorkManager SystemJobService -->
-
-        <service
-            android:name="a.x"
-            android:directBootAware="false"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+            android:name="a.r"
+            tools:node="remove"/>
 
     </application>
 

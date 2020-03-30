@@ -61,6 +61,7 @@
     <string name="select_patch_file">Vybrať a zaplátať súbor</string>
     <string name="patch_file_msg">Vyberte raw súbor (*.img) alebo tar súbor ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reštart o 5 sekúnd…</string>
+    <string name="flash_screen_title">Inštalácia</string>
 
     <!--Superuser-->
     <string name="su_request_title">Požiadavka superužívateľa</string>

@@ -41,7 +41,7 @@ sealed class DownloadSubject : Parcelable {
         val manager: ManagerJson = Info.remote.app
 
         override val title: String
-            get() = "MagiskManager-v${manager.version}(${manager.versionCode})"
+            get() = "MagiskManager-${manager.version}(${manager.versionCode})"
 
         override val url: String
             get() = manager.link
@@ -63,7 +63,7 @@ sealed class DownloadSubject : Parcelable {
             override val configuration: Configuration
         ) : Magisk() {
             override val url: String get() = magisk.link
-            override val title: String get() = "Magisk-v${magisk.version}(${magisk.versionCode})"
+            override val title: String get() = "Magisk-${magisk.version}(${magisk.versionCode})"
 
             @IgnoredOnParcel
             override val file by lazy {
@@ -89,7 +89,7 @@ sealed class DownloadSubject : Parcelable {
 
             @IgnoredOnParcel
             override val file by lazy {
-                File(Config.downloadDirectory, "Magisk-v${magisk.version}(${magisk.versionCode}).zip")
+                File(Config.downloadDirectory, "Magisk-${magisk.version}(${magisk.versionCode}).zip")
             }
         }
 
