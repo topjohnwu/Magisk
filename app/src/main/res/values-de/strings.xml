@@ -15,7 +15,7 @@
     <string name="no_connection">Keine Verbindung verfügbar</string>
     <string name="app_changelog">Änderungen</string>
     <string name="manager">Manager</string>
-    <string name="loading">Lädt..</string>
+    <string name="loading">Lädt…</string>
     <string name="info">Info</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="update">Update</string>
@@ -60,7 +60,7 @@
     <string name="setup_title">Zusätzliche Einstellungen</string>
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
     <string name="patch_file_msg">Raw Image (*.img) oder ein ODIN tarfile (*.tar) auswählen</string>
-    <string name="reboot_delay_toast">Neustart in 5 Sekunden..</string>
+    <string name="reboot_delay_toast">Neustart in 5 Sekunden…</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
@@ -106,7 +106,7 @@
     <string name="safetynet_res_invalid">Die Antwort ist ungültig</string>
     <string name="safetynet_attest_success">Erfolgt!</string>
     <string name="safetynet_attest_failure">Bestätigung fehlgeschlagen!</string>
-    <string name="safetynet_attest_loading">Einen Moment..</string>
+    <string name="safetynet_attest_loading">Einen Moment…</string>
     <string name="safetynet_attest_restart">Erneut versuchen</string>
     <string name="safetynet_system">System</string>
 
@@ -237,12 +237,12 @@
     <string name="flashing">Flasht..</string>
     <string name="done">Fertig!</string>
     <string name="failure">Fehlgeschlagen</string>
-    <string name="hide_manager_title">Magisk Manager ausblenden..</string>
+    <string name="hide_manager_title">Magisk Manager ausblenden…</string>
     <string name="hide_manager_fail_toast">Magisk Manager ausblenden fehlgeschlagen.</string>
     <string name="open_link_failed_toast">Keine App zum öffnen des Links gefunden</string>
     <string name="complete_uninstall">Vollständig deinstallieren</string>
     <string name="restore_img">Image wiederherstellen</string>
-    <string name="restore_img_msg">Wiederherstellen..</string>
+    <string name="restore_img_msg">Wiederherstellen…</string>
     <string name="restore_done">Wiederherstellen fertig!</string>
     <string name="restore_fail">Stock-Sicherung existiert nicht!</string>
     <string name="proprietary_title">Proprietären Code herunterladen</string>
@@ -250,7 +250,7 @@
     <string name="setup_fail">Setup fehlgeschlagen</string>
     <string name="env_fix_title">Erfordert zusätzliche Einrichtung</string>
     <string name="env_fix_msg">Ihr Gerät muss zusätzlich eingerichtet werden, damit Magisk ordnungsgemäß funktioniert. Es wird das Magisk Setup-Zip herunterladen, möchten Sie jetzt fortfahren?</string>
-    <string name="setup_msg">Laufzeitumgebung einrichten..</string>
+    <string name="setup_msg">Laufzeitumgebung einrichten…</string>
     <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk Version</string>
     <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich, als ob kein Magisk installiert wäre. Bitte Magisk so schnell wie möglich aktualisieren.</string>
