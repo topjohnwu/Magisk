@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.legacy.surequest
+package com.topjohnwu.magisk.ui.surequest
 
 import android.content.Intent
 import android.content.SharedPreferences

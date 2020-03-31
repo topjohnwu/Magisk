@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.legacy.surequest.SuRequestViewModel" />
+            type="com.topjohnwu.magisk.ui.surequest.SuRequestViewModel" />
 
     </data>
 

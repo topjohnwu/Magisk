@@ -21,7 +21,7 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.core.utils.updateConfig
 import com.topjohnwu.magisk.extensions.forceGetDeclaredField
-import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.ui.MainActivity
 
 fun AssetManager.addAssetPath(path: String) {

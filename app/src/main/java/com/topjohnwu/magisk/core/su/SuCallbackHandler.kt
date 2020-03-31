@@ -20,7 +20,7 @@ import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.startActivity
 import com.topjohnwu.magisk.extensions.startActivityWithRoot
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.model.entity.toLog
 import com.topjohnwu.superuser.Shell
 import timber.log.Timber
