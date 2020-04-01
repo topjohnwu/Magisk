@@ -66,7 +66,6 @@ public:
 class SARBase : public MagiskInit {
 protected:
 	raw_data config;
-	dev_t system_dev;
 
 	void backup_files(const char *self_path);
 	void patch_rootdir();

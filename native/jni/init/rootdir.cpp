@@ -270,8 +270,10 @@ void SARBase::patch_rootdir() {
 	sbin_overlay(self, config);
 
 	// Mount system_root mirror
+	struct stat st;
+	xstat("/", &st);
 	xmkdir(ROOTMIR, 0755);
-	mknod(ROOTBLK, S_IFBLK | 0600, system_dev);
+	mknod(ROOTBLK, S_IFBLK | 0600, st.st_dev);
 	if (xmount(ROOTBLK, ROOTMIR, "ext4", MS_RDONLY, nullptr))
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
 

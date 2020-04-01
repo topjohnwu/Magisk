@@ -218,7 +218,6 @@ void SARInit::early_mount() {
 			exit(1);
 		}
 	}
-	system_dev = dev;
 	xmkdir("/system_root", 0755);
 	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
@@ -236,17 +235,6 @@ void SecondStageInit::early_mount() {
 	rm_rf("/system");
 	rm_rf("/.backup");
 	rm_rf("/overlay.d");
-
-	// Find system_dev
-	parse_mnt("/proc/mounts", [&](mntent *me) -> bool {
-		if (me->mnt_dir == "/system_root"sv) {
-			struct stat st;
-			stat(me->mnt_fsname, &st);
-			system_dev = st.st_rdev;
-			return false;
-		}
-		return true;
-	});
 
 	switch_root("/system_root");
 }
