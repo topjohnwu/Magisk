@@ -172,7 +172,7 @@ def clean_elf():
     else:
         elf_cleaner = os.path.join('native', 'out', 'elf-cleaner')
         if not os.path.exists(elf_cleaner):
-            execv(['g++', 'tools/termux-elf-cleaner/termux-elf-cleaner.cpp',
+            execv(['g++', '-std=c++11', 'tools/termux-elf-cleaner/termux-elf-cleaner.cpp',
                   '-o', elf_cleaner])
     args = [elf_cleaner]
     args.extend(os.path.join('native', 'out', arch, 'magisk') for arch in archs + arch64)
