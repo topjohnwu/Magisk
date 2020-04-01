@@ -1,4 +1,6 @@
 #include <sys/mount.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <vector>
@@ -66,9 +68,11 @@ public:
 class SARBase : public MagiskInit {
 protected:
 	raw_data config;
+	std::vector<raw_file> overlays;
 
-	void backup_files(const char *self_path);
+	void backup_files();
 	void patch_rootdir();
+	void mount_system_root();
 public:
 	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
 		persist_dir = MIRRDIR "/persist/magisk";
@@ -84,25 +88,38 @@ public:
  * 2 Stage Init
  * *************/
 
-class ABFirstStageInit : public BaseInit {
+class ForcedFirstStageInit : public BaseInit {
 private:
 	void prepare();
 public:
-	ABFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	ForcedFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 	void start() override {
 		prepare();
 		exec_init("/system/bin/init");
 	}
 };
 
-class AFirstStageInit : public BaseInit {
+class FirstStageInit : public BaseInit {
 private:
 	void prepare();
 public:
-	AFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
 	void start() override {
 		prepare();
 		exec_init();
+	}
+};
+
+class SARFirstStageInit : public SARBase {
+private:
+	void traced_exec_init();
+protected:
+	void early_mount() override;
+public:
+	SARFirstStageInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {};
+	void start() override {
+		early_mount();
+		traced_exec_init();
 	}
 };
 
@@ -152,3 +169,4 @@ int dump_magisk(const char *path, mode_t mode);
 int magisk_proxy_main(int argc, char *argv[]);
 void setup_klog();
 void mount_sbin();
+socklen_t setup_sockaddr(struct sockaddr_un *sun);

@@ -55,21 +55,18 @@ static bool is_excl(initializer_list<const char *> excl, const char *name) {
 }
 
 static void post_order_walk(int dirfd, initializer_list<const char *> excl,
-		int (*fn)(int, struct dirent *)) {
-	struct dirent *entry;
-	int newfd;
-	DIR *dir = fdopendir(dirfd);
-	if (dir == nullptr) return;
+		function<int(int, dirent *)> &&fn) {
+	auto dir = xopen_dir(dirfd);
+	if (!dir) return;
 
-	while ((entry = xreaddir(dir))) {
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (is_excl(excl, entry->d_name))
 			continue;
 		if (entry->d_type == DT_DIR) {
-			newfd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			post_order_walk(newfd, excl, fn);
-			close(newfd);
+			int newfd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			post_order_walk(newfd, excl, std::move(fn));
 		}
 		fn(dirfd, entry);
 	}
@@ -84,15 +81,14 @@ void rm_rf(const char *path) {
 	if (lstat(path, &st) < 0)
 		return;
 	if (S_ISDIR(st.st_mode)) {
-		int fd = open(path, O_RDONLY | O_CLOEXEC);
+		int fd = xopen(path, O_RDONLY | O_CLOEXEC);
 		frm_rf(fd);
-		close(fd);
 	}
 	remove(path);
 }
 
 void frm_rf(int dirfd, initializer_list<const char *> excl) {
-	post_order_walk(dirfd, excl, remove_at);
+	post_order_walk(dup(dirfd), excl, remove_at);
 }
 
 /* This will only on the same file system */
@@ -401,5 +397,52 @@ void parse_mnt(const char *file, const function<bool (mntent*)> &fn) {
 			if (!fn(&mentry))
 				break;
 		}
+	}
+}
+
+void backup_folder(const char *dir, vector<raw_file> &files) {
+	char path[4096];
+	realpath(dir, path);
+	int len = strlen(path);
+	int dirfd = xopen(dir, O_RDONLY);
+	post_order_walk(dirfd, {}, [&](int dfd, dirent *entry) -> int {
+		int fd = xopenat(dfd, entry->d_name, O_RDONLY);
+		if (fd < 0)
+			return -1;
+		if (fd_path(fd, path, sizeof(path)) < 0)
+			return -1;
+		raw_file file;
+		file.path = path + len + 1;
+		if (fgetattr(fd, &file.attr) < 0)
+			return -1;
+		if (entry->d_type == DT_REG) {
+			fd_full_read(fd, file.buf, file.sz);
+		} else if (entry->d_type == DT_LNK) {
+			xreadlinkat(dfd, entry->d_name, path, sizeof(path));
+			file.sz = strlen(path) + 1;
+			file.buf = (uint8_t *) xmalloc(file.sz);
+			memcpy(file.buf, path, file.sz);
+		}
+		close(fd);
+		files.emplace_back(std::move(file));
+		return 0;
+	});
+	close(dirfd);
+}
+
+void restore_folder(const char *dir, vector<raw_file> &files) {
+	string base(dir);
+	// Reversed post-order means folders will always be first
+	for (raw_file &file : reversed(files)) {
+		string path = base + "/" + file.path;
+		if (S_ISDIR(file.attr.st.st_mode)) {
+			mkdirs(path.data(), 0);
+		} else if (S_ISREG(file.attr.st.st_mode)) {
+			auto fp = xopen_file(path.data(), "w");
+			fwrite(file.buf, 1, file.sz, fp.get());
+		} else if (S_ISLNK(file.attr.st.st_mode)) {
+			symlink((char *)file.buf, path.data());
+		}
+		setattr(path.data(), &file.attr);
 	}
 }

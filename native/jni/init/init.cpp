@@ -217,16 +217,19 @@ int main(int argc, char *argv[]) {
 		// This will also mount /sys and /proc
 		load_kernel_info(&cmd);
 
-		if (cmd.force_normal_boot) {
-			init = make_unique<ABFirstStageInit>(argv, &cmd);
+		if (access("/apex", F_OK) == 0) {
+			if (cmd.force_normal_boot)
+				init = make_unique<ForcedFirstStageInit>(argv, &cmd);
+			else if (cmd.skip_initramfs)
+				init = make_unique<SARFirstStageInit>(argv, &cmd);
+			else
+				init = make_unique<FirstStageInit>(argv, &cmd);
 		} else if (cmd.skip_initramfs) {
 			init = make_unique<SARInit>(argv, &cmd);
 		} else {
 			decompress_ramdisk();
 			if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)
 				init = make_unique<RecoveryInit>(argv, &cmd);
-			else if (access("/apex", F_OK) == 0)
-				init = make_unique<AFirstStageInit>(argv, &cmd);
 			else
 				init = make_unique<RootFSInit>(argv, &cmd);
 		}

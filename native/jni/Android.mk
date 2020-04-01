@@ -82,6 +82,7 @@ LOCAL_SRC_FILES := \
 	init/mount.cpp \
 	init/rootdir.cpp \
 	init/getinfo.cpp \
+	init/twostage.cpp \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \

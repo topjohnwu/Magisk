@@ -5,6 +5,8 @@
 #include <mntent.h>
 #include <functional>
 #include <string_view>
+#include <string>
+#include <vector>
 
 #include "xwrap.hpp"
 
@@ -14,6 +16,27 @@
 struct file_attr {
 	struct stat st;
 	char con[128];
+};
+
+struct raw_file {
+	std::string path;
+	file_attr attr;
+	uint8_t *buf = nullptr;
+	size_t sz = 0;
+
+	raw_file() = default;
+	raw_file(const raw_file&) = delete;
+	raw_file(raw_file &&d) {
+		path = std::move(d.path);
+		attr = d.attr;
+		buf = d.buf;
+		sz = d.sz;
+		d.buf = nullptr;
+		d.sz = 0;
+	}
+	~raw_file() {
+		free(buf);
+	}
 };
 
 ssize_t fd_path(int fd, char *path, size_t size);
@@ -46,6 +69,8 @@ void *__mmap(const char *filename, size_t *size, bool rw);
 void frm_rf(int dirfd, std::initializer_list<const char *> excl = {});
 void clone_dir(int src, int dest, bool overwrite = true);
 void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
+void backup_folder(const char *dir, std::vector<raw_file> &files);
+void restore_folder(const char *dir, std::vector<raw_file> &files);
 
 template <typename T>
 void full_read(const char *filename, T &buf, size_t &size) {
@@ -92,6 +117,10 @@ static inline sDIR open_dir(const char *path) {
 
 static inline sDIR xopen_dir(const char *path) {
 	return sDIR(xopendir(path), closedir);
+}
+
+static inline sDIR xopen_dir(int dirfd) {
+	return sDIR(xfdopendir(dirfd), closedir);
 }
 
 static inline sFILE open_file(const char *path, const char *mode) {

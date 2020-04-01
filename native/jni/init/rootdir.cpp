@@ -67,22 +67,24 @@ static void patch_init_rc(FILE *rc) {
 	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
 }
 
-static void load_overlay_rc(int dirfd) {
+static void load_overlay_rc(const char *overlay) {
+	auto dir = open_dir(overlay);
+	if (!dir) return;
+
+	int dfd = dirfd(dir.get());
 	// Do not allow overwrite init.rc
-	unlinkat(dirfd, "init.rc", 0);
-	DIR *dir = fdopendir(dirfd);
-	for (dirent *entry; (entry = readdir(dir));) {
+	unlinkat(dfd, "init.rc", 0);
+	for (dirent *entry; (entry = readdir(dir.get()));) {
 		if (strend(entry->d_name, ".rc") == 0) {
 			LOGD("Found rc script [%s]\n", entry->d_name);
-			int rc = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
 			raw_data data;
 			fd_full_read(rc, data.buf, data.sz);
 			close(rc);
 			rc_list.push_back(std::move(data));
-			unlinkat(dirfd, entry->d_name, 0);
+			unlinkat(dfd, entry->d_name, 0);
 		}
 	}
-	rewinddir(dir);
 }
 
 void RootFSInit::setup_rootfs() {
@@ -102,13 +104,10 @@ void RootFSInit::setup_rootfs() {
 	}
 
 	// Handle overlays
-	int fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
-	if (fd >= 0) {
+	if (access("/overlay.d", F_OK) == 0) {
 		LOGD("Merge overlay.d\n");
-		load_overlay_rc(fd);
-		mv_dir(fd, root);
-		close(fd);
-		rmdir("/overlay.d");
+		load_overlay_rc("/overlay.d");
+		mv_f("/overlay.d", "/");
 	}
 
 	// Patch init.rc
@@ -127,7 +126,7 @@ void RootFSInit::setup_rootfs() {
 	close(sbin);
 
 	// Dump magiskinit as magisk
-	fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+	int fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
 	write(fd, self.buf, self.sz);
 	close(fd);
 }
@@ -336,21 +335,26 @@ void SARBase::patch_rootdir() {
 	patch_sepolicy(PATCHPOLICY);
 
 	// Handle overlay
-	if ((src = xopen("/dev/overlay.d", O_RDONLY | O_CLOEXEC)) >= 0) {
-		load_overlay_rc(src);
-		if (int fd = xopen("/dev/overlay.d/sbin", O_RDONLY | O_CLOEXEC); fd >= 0) {
-			dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-			clone_dir(fd, dest);
-			close(fd);
-			close(dest);
-			xmkdir(ROOTOVL "/sbin", 0);  // Prevent copying
-		}
-		dest = xopen(ROOTOVL, O_RDONLY | O_CLOEXEC);
-		clone_dir(src, dest, false);
-		rmdir(ROOTOVL "/sbin");
-		close(src);
-		close(dest);
-		rm_rf("/dev/overlay.d");
+	struct sockaddr_un sun{};
+	socklen_t len = setup_sockaddr(&sun);
+	int socketfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	if (connect(socketfd, (struct sockaddr*) &sun, len) == 0) {
+		LOGD("ACK init tracer to write backup files\n");
+		int ack;
+		// Wait for init tracer finish copying files
+		read(socketfd, &ack, sizeof(ack));
+	} else {
+		LOGD("Restore backup files locally\n");
+		restore_folder(ROOTOVL, overlays);
+		overlays.clear();
+	}
+	close(socketfd);
+	if (access(ROOTOVL "/sbin", F_OK) == 0) {
+		file_attr a;
+		getattr("/sbin", &a);
+		cp_afc(ROOTOVL "/sbin", "/sbin");
+		rm_rf(ROOTOVL "/sbin");
+		setattr("/sbin", &a);
 	}
 
 	// Patch init.rc
@@ -364,90 +368,6 @@ void SARBase::patch_rootdir() {
 	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
 	write(dest, magic_mount_list.data(), magic_mount_list.length());
 	close(dest);
-}
-
-static void patch_fstab(const string &fstab) {
-	string patched = fstab + ".p";
-	FILE *fp = xfopen(patched.data(), "we");
-	file_readline(fstab.data(), [=](string_view l) -> bool {
-		if (l[0] == '#' || l.length() == 1)
-			return true;
-		char *line = (char *) l.data();
-		int src0, src1, mnt0, mnt1, type0, type1, opt0, opt1, flag0, flag1;
-		sscanf(line, "%n%*s%n %n%*s%n %n%*s%n %n%*s%n %n%*s%n",
-			   &src0, &src1, &mnt0, &mnt1, &type0, &type1, &opt0, &opt1, &flag0, &flag1);
-		const char *src, *mnt, *type, *opt, *flag;
-		src = &line[src0];
-		line[src1] = '\0';
-		mnt = &line[mnt0];
-		line[mnt1] = '\0';
-		type = &line[type0];
-		line[type1] = '\0';
-		opt = &line[opt0];
-		line[opt1] = '\0';
-		flag = &line[flag0];
-		line[flag1] = '\0';
-
-		// Redirect system to system_root
-		if (mnt == "/system"sv)
-			mnt = "/system_root";
-
-		fprintf(fp, "%s %s %s %s %s\n", src, mnt, type, opt, flag);
-		return true;
-	});
-	fclose(fp);
-
-	// Replace old fstab
-	clone_attr(fstab.data(), patched.data());
-	rename(patched.data(), fstab.data());
-}
-
-#define FSR "/first_stage_ramdisk"
-
-void ABFirstStageInit::prepare() {
-	// It is actually possible to NOT have FSR, create it just in case
-	xmkdir(FSR, 0755);
-
-	if (auto dir = xopen_dir(FSR); dir) {
-		string fstab(FSR "/");
-		for (dirent *de; (de = xreaddir(dir.get()));) {
-			if (strstr(de->d_name, "fstab")) {
-				fstab += de->d_name;
-				break;
-			}
-		}
-		if (fstab.length() == sizeof(FSR))
-			return;
-
-		patch_fstab(fstab);
-	} else {
-		return;
-	}
-
-	// Move stuffs for next stage
-	xmkdir(FSR "/system", 0755);
-	xmkdir(FSR "/system/bin", 0755);
-	rename("/init", FSR "/system/bin/init");
-	symlink("/system/bin/init", FSR "/init");
-	xmkdir(FSR "/.backup", 0);
-	rename("/.backup/.magisk", FSR "/.backup/.magisk");
-	rename("/overlay.d", FSR "/overlay.d");
-}
-
-void AFirstStageInit::prepare() {
-	auto dir = xopen_dir("/");
-	for (dirent *de; (de = xreaddir(dir.get()));) {
-		if (strstr(de->d_name, "fstab")) {
-			patch_fstab(de->d_name);
-			break;
-		}
-	}
-
-	// Move stuffs for next stage
-	xmkdir("/system", 0755);
-	xmkdir("/system/bin", 0755);
-	rename("/init", "/system/bin/init");
-	rename("/.backup/init", "/init");
 }
 
 int magisk_proxy_main(int argc, char *argv[]) {
