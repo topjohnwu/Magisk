@@ -35,6 +35,7 @@ int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
 int xfstat(int fd, struct stat *buf);
+int xdup(int fd);
 int xdup2(int oldfd, int newfd);
 int xdup3(int oldfd, int newfd, int flags);
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz);

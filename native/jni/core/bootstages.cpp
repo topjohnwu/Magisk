@@ -478,7 +478,7 @@ static void collect_modules() {
 				fd_pathat(modfd, "uninstall.sh", buf, sizeof(buf));
 				if (access(buf, F_OK) == 0)
 					exec_script(buf);
-				frm_rf(modfd);
+				frm_rf(xdup(modfd));
 				unlinkat(dfd, entry->d_name, AT_REMOVEDIR);
 				continue;
 			}

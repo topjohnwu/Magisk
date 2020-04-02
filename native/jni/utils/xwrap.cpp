@@ -258,6 +258,14 @@ int xfstat(int fd, struct stat *buf) {
 	return ret;
 }
 
+int xdup(int fd) {
+	int ret = dup(fd);
+	if (ret == -1) {
+		PLOGE("dup");
+	}
+	return ret;
+}
+
 int xdup2(int oldfd, int newfd) {
 	int ret = dup2(oldfd, newfd);
 	if (ret == -1) {

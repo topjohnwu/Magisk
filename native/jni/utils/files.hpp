@@ -66,7 +66,7 @@ static inline void file_readline(const char *file,
 void parse_prop_file(const char *file,
 		const std::function<bool(std::string_view, std::string_view)> &fn);
 void *__mmap(const char *filename, size_t *size, bool rw);
-void frm_rf(int dirfd, std::initializer_list<const char *> excl = {});
+void frm_rf(int dirfd);
 void clone_dir(int src, int dest, bool overwrite = true);
 void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
 void backup_folder(const char *dir, std::vector<raw_file> &files);
