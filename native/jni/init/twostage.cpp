@@ -148,20 +148,19 @@ void SARFirstStageInit::traced_exec_init() {
 
 		// Swap out init with bind mount
 		xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
-		int init = xopen("/dev/magisk", O_CREAT | O_WRONLY, 0750);
+		int init = xopen("/dev/magiskinit", O_CREAT | O_WRONLY, 0750);
 		write(init, self.buf, self.sz);
 		close(init);
-		xmount("/dev/magisk", "/init", nullptr, MS_BIND, nullptr);
+		xmount("/dev/magiskinit", "/init", nullptr, MS_BIND, nullptr);
 		xumount2("/dev", MNT_DETACH);
 
-		xptrace(PTRACE_DETACH, pid);
-
-		// Start daemon for 2nd stage preparation
+		// Establish socket for 2nd stage ack
 		struct sockaddr_un sun{};
-		auto len = setup_sockaddr(&sun);
 		int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-		xbind(sockfd, (struct sockaddr*) &sun, len);
+		xbind(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun));
 		xlisten(sockfd, 1);
+
+		xptrace(PTRACE_DETACH, pid);
 
 		// Wait for second stage ack
 		int client = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
