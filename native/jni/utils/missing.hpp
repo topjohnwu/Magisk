@@ -18,6 +18,7 @@
 #define setmntent     __setmntent
 #define endmntent     __endmntent
 #define hasmntopt     __hasmntopt
+#define faccessat     __faccessat
 
 ssize_t __getline(char **lineptr, size_t *n, FILE *stream);
 ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
@@ -57,4 +58,8 @@ static inline int __linkat(int olddirfd, const char *oldpath,
 
 static inline int __inotify_init1(int flags) {
 	return syscall(__NR_inotify_init1, flags);
+}
+
+static inline int __faccessat(int dirfd, const char *pathname, int mode, int flags) {
+	return syscall(__NR_faccessat, dirfd, pathname, mode, flags);
 }

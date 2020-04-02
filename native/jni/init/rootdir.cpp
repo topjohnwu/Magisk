@@ -107,7 +107,7 @@ void RootFSInit::setup_rootfs() {
 	if (access("/overlay.d", F_OK) == 0) {
 		LOGD("Merge overlay.d\n");
 		load_overlay_rc("/overlay.d");
-		mv_f("/overlay.d", "/");
+		mv_path("/overlay.d", "/");
 	}
 
 	// Patch init.rc
@@ -120,10 +120,7 @@ void RootFSInit::setup_rootfs() {
 	// Create hardlink mirror of /sbin to /root
 	mkdir("/root", 0750);
 	clone_attr("/sbin", "/root");
-	int rootdir = xopen("/root", O_RDONLY | O_CLOEXEC);
-	int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	link_dir(sbin, rootdir);
-	close(sbin);
+	link_path("/sbin", "/root");
 
 	// Dump magiskinit as magisk
 	int fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
