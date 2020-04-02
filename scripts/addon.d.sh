@@ -12,7 +12,7 @@ trampoline() {
   if [ -f $MAGISKBIN/addon.d.sh ]; then
     exec sh $MAGISKBIN/addon.d.sh "$@"
     exit $?
-  else
+  elif [ "$1" = post-restore ]; then
     ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
     $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 
@@ -31,8 +31,8 @@ trampoline() {
     ui_print "***********************"
     ui_print "! Cannot find Magisk binaries - was data wiped or not decrypted?"
     ui_print "! Reflash OTA from decrypted recovery or reflash Magisk"
-    exit 1
   fi
+  exit 1
 }
 
 # Always use the script in /data
