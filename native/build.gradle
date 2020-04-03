@@ -2,6 +2,8 @@ apply plugin: 'com.android.library'
 
 android {
 
+    ndkVersion '0.0.0'
+
     externalNativeBuild {
         ndkBuild {
             path 'jni/Android.mk'
