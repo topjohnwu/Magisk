@@ -1,0 +1,259 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Modules</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">Logs</string>
+    <string name="settings">Settings</string>
+    <string name="refresh">Refresh Local Data</string>
+    <string name="install">Install</string>
+    <string name="section_home">Home</string>
+    <string name="section_theme">Themes</string>
+    <string name="safetynet">SafetyNet</string>
+
+    <!--Home-->
+    <string name="no_connection">No connection available</string>
+    <string name="app_changelog">Changelog</string>
+    <string name="manager">Manager</string>
+    <string name="loading">Loading…</string>
+    <string name="info">Info</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="update">Update</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">Hide</string>
+    <string name="status">Status</string>
+    <string name="home_package">Package</string>
+    <string name="details">Details</string>
+
+    <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions.</string>
+    <string name="home_support_title">Support Us</string>
+    <string name="home_links_project">Project links</string>
+    <string name="home_item_source">Source</string>
+    <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
+    <string name="home_device_title">Device</string>
+    <string name="home_device_extra_manufacturer">Manufacturer</string>
+    <string name="home_device_extra_model">Model</string>
+    <string name="home_device_extra_board">Board</string>
+    <string name="home_device_system">System</string>
+    <string name="home_status_normal">Normal</string>
+    <string name="home_status_safe">Safe Mode</string>
+    <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Installed</string>
+    <string name="home_latest_version">Latest</string>
+    <string name="invalid_update_channel">Invalid Update Channel</string>
+    <string name="uninstall_magisk_title">Uninstall Magisk</string>
+    <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Preserve force encryption</string>
+    <string name="keep_dm_verity">Preserve AVB 2.0/dm-verity</string>
+    <string name="recovery_mode">Recovery Mode</string>
+    <string name="install_options_title">Options</string>
+    <string name="install_method_title">Method</string>
+    <string name="install_next">Next</string>
+    <string name="install_start">Let\'s go</string>
+    <string name="manager_download_install">Press to download and install</string>
+    <string name="download_zip_only">Download Zip Only</string>
+    <string name="direct_install">Direct Install (Recommended)</string>
+    <string name="install_inactive_slot">Install to Inactive Slot (After OTA)</string>
+    <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
+    <string name="setup_title">Additional Setup</string>
+    <string name="select_patch_file">Select and Patch a File</string>
+    <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar)</string>
+    <string name="reboot_delay_toast">Rebooting in 5 seconds…</string>
+    <string name="flash_screen_title">Installation</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superuser Request</string>
+    <string name="deny">Deny</string>
+    <string name="prompt">Prompt</string>
+    <string name="grant">Grant</string>
+    <string name="su_warning">Grants full access to your device.\nDeny if you\'re not sure!</string>
+    <string name="forever">Forever</string>
+    <string name="once">Once</string>
+    <string name="tenmin">10 mins</string>
+    <string name="twentymin">20 mins</string>
+    <string name="thirtymin">30 mins</string>
+    <string name="sixtymin">60 mins</string>
+    <string name="su_allow_toast">%1$s was granted Superuser rights</string>
+    <string name="su_deny_toast">%1$s was denied Superuser rights</string>
+    <string name="no_apps_found">No apps found</string>
+    <string name="su_snack_grant">Superuser rights of %1$s are granted</string>
+    <string name="su_snack_deny">Superuser rights of %1$s are denied</string>
+    <string name="su_snack_notif_on">Notifications of %1$s are enabled</string>
+    <string name="su_snack_notif_off">Notifications of %1$s are disabled</string>
+    <string name="su_snack_log_on">Logging of %1$s is enabled</string>
+    <string name="su_snack_log_off">Logging of %1$s is disabled</string>
+    <string name="su_revoke_title">Revoke?</string>
+    <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
+    <string name="toast">Toast</string>
+    <string name="none">None</string>
+
+    <string name="superuser_toggle_notification">Notifications</string>
+    <string name="superuser_toggle_revoke">Revoke</string>
+    <string name="superuser_policy_none">No app has asked for superuser permission yet.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">You\'re log-free, try using your SU enabled apps more.</string>
+    <string name="log_data_magisk_none">Magisk logs are empty, that\'s weird.</string>
+    <string name="menuSaveLog">Save log</string>
+    <string name="menuClearLog">Clear log now</string>
+    <string name="logs_cleared">Log successfully cleared.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Target UID: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetynet_api_error">SafetyNet API Error</string>
+    <string name="safetynet_res_invalid">The response is invalid</string>
+    <string name="safetynet_attest_success">Success!</string>
+    <string name="safetynet_attest_failure">Attestation failed!</string>
+    <string name="safetynet_attest_loading">Just a sec…</string>
+    <string name="safetynet_attest_restart">Try again</string>
+    <string name="safetynet_system">System</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Show system apps</string>
+    <string name="hide_filter_hint">Filter by name</string>
+    <string name="hide_scroll_up">Scroll up</string>
+    <string name="hide_filters">Filters</string>
+    <string name="hide_search">Search</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(No info provided)</string>
+    <string name="no_modules_found">No modules found</string>
+    <string name="reboot_recovery">Reboot to Recovery</string>
+    <string name="reboot_bootloader">Reboot to Bootloader</string>
+    <string name="reboot_download">Reboot to Download</string>
+    <string name="reboot_edl">Reboot to EDL</string>
+    <string name="module_safe_mode_message">You\'re in safe mode. None of user modules will work.\nThis message will disappear once safe mode is disabled.</string>
+    <string name="module_version_author">%1$s by %2$s</string>
+    <string name="module_section_pending">Updates</string>
+    <string name="module_section_pending_action">Update all</string>
+    <string name="module_section_remote">Remote</string>
+    <string name="module_state_remove">Remove</string>
+    <string name="module_state_restore">Restore</string>
+    <string name="module_action_install_external">Install from storage</string>
+    <string name="module_update_none">Your modules are up to date!</string>
+    <string name="update_available">Update Available</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="sorting_order">Sorting Order</string>
+    <string name="module_permission_declined">Grant storage permission to enable this functionality</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">Theme Mode</string>
+    <string name="settings_dark_mode_message">Select mode which best suits your style!</string>
+    <string name="settings_dark_mode_light">Always Light</string>
+    <string name="settings_dark_mode_system">Follow System</string>
+    <string name="settings_dark_mode_dark">Always Dark</string>
+    <string name="settings_safe_mode_title">Safe Mode</string>
+    <string name="settings_core_only_summary" deprecated="true">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded</string>
+    <string name="settings_grid_column_count_title">List arrangement</string>
+    <string name="settings_grid_column_count_summary">Sets item width in a list. Restart app to apply changes.</string>
+    <string name="settings_grid_column_count_1">Standard</string>
+    <string name="settings_grid_column_count_2">Squished</string>
+    <string name="settings_download_path_title">Download path</string>
+    <string name="settings_download_path_message">Files will be saved to %1$s</string>
+    <string name="settings_clear_cache_title">Clear Repo Cache</string>
+    <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online</string>
+    <string name="settings_hide_manager_title">Hide Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package and app names</string>
+    <string name="settings_restore_manager_title">Restore Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package and app names</string>
+    <string name="language">Language</string>
+    <string name="system_default">(System Default)</string>
+    <string name="settings_check_update_title">Check Updates</string>
+    <string name="settings_check_update_summary">Periodically check for updates in the background</string>
+    <string name="settings_update_channel_title">Update Channel</string>
+    <string name="settings_update_stable">Stable</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Custom Channel</string>
+    <string name="settings_update_custom_msg">Insert a custom URL</string>
+    <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
+    <string name="settings_hosts_toast">Added systemless hosts module</string>
+    <string name="settings_app_name_hint">New name</string>
+    <string name="settings_app_name_helper">App will be repackaged to this name</string>
+    <string name="settings_app_name_error">Invalid format</string>
+    <string name="settings_su_app_adb">Apps and ADB</string>
+    <string name="settings_su_app">Apps only</string>
+    <string name="settings_su_adb">ADB only</string>
+    <string name="settings_su_disable">Disabled</string>
+    <string name="settings_su_request_10">10 seconds</string>
+    <string name="settings_su_request_15">15 seconds</string>
+    <string name="settings_su_request_20">20 seconds</string>
+    <string name="settings_su_request_30">30 seconds</string>
+    <string name="settings_su_request_45">45 seconds</string>
+    <string name="settings_su_request_60">60 seconds</string>
+    <string name="superuser_access">Superuser Access</string>
+    <string name="auto_response">Automatic Response</string>
+    <string name="request_timeout">Request Timeout</string>
+    <string name="superuser_notification">Superuser Notification</string>
+    <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
+    <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
+    <string name="settings_su_biometric_title">Enable Biometric Authentication</string>
+    <string name="settings_su_biometric_summary">Use biometric authentication to allow superuser requests</string>
+    <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>
+    <string name="settings_customization">Customization</string>
+
+    <string name="multiuser_mode">Multiuser Mode</string>
+    <string name="settings_owner_only">Device Owner Only</string>
+    <string name="settings_owner_manage">Device Owner Managed</string>
+    <string name="settings_user_independent">User-Independent</string>
+    <string name="owner_only_summary">Only owner has root access</string>
+    <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
+    <string name="user_indepenent_summary">Each user has his/her own separate root rules</string>
+
+    <string name="mount_namespace_mode">Mount Namespace Mode</string>
+    <string name="settings_ns_global">Global Namespace</string>
+    <string name="settings_ns_requester">Inherit Namespace</string>
+    <string name="settings_ns_isolate">Isolated Namespace</string>
+    <string name="global_summary">All root sessions use the global mount namespace</string>
+    <string name="requester_summary">Root sessions will inherit their requester\'s namespace</string>
+    <string name="isolate_summary">Each root session will have its own isolated namespace</string>
+    <string name="settings_download_path_error">Error creating folder. It must be accessible from storage root directory and must not be a file.</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk Updates</string>
+    <string name="progress_channel">Progress Notifications</string>
+    <string name="download_complete">Download complete</string>
+    <string name="download_file_error">Error downloading file</string>
+    <string name="download_open_parent">Show in parent folder</string>
+    <string name="download_open_self">Show file</string>
+    <string name="magisk_update_title">Magisk Update Available!</string>
+    <string name="manager_update_title">Magisk Manager Update Available!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="repo_install_title">Install %1$s</string>
+    <string name="repo_install_msg">Do you want to install %1$s now?</string>
+    <string name="download">Download</string>
+    <string name="reboot">Reboot</string>
+    <string name="settings_reboot_toast">Reboot to apply settings</string>
+    <string name="release_notes">Release notes</string>
+    <string name="repo_cache_cleared">Repo cache cleared</string>
+    <string name="dtbo_patched_title">DTBO was patched!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img. Please reboot.</string>
+    <string name="flashing">Flashing…</string>
+    <string name="done">Done!</string>
+    <string name="failure">Failed</string>
+    <string name="hide_manager_title">Hiding Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Hide Magisk Manager failed.</string>
+    <string name="open_link_failed_toast">No application found to open the link</string>
+    <string name="complete_uninstall">Complete Uninstall</string>
+    <string name="restore_img">Restore Images</string>
+    <string name="restore_img_msg">Restoring…</string>
+    <string name="restore_done">Restoration done!</string>
+    <string name="restore_fail">Stock backup does not exist!</string>
+    <string name="proprietary_title">Download Proprietary Code</string>
+    <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
+    <string name="setup_fail">Setup failed</string>
+    <string name="env_fix_title">Requires Additional Setup</string>
+    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
+    <string name="setup_msg">Running environment setup…</string>
+    <string name="authenticate">Authenticate</string>
+    <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
+    <string name="unsupport_magisk_msg">This version of Magisk Manager does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
+
+</resources>
