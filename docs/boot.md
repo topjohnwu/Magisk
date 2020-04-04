@@ -35,7 +35,7 @@ Method | Initial rootdir | Final rootdir
 	- Maybe some `(LV < 29)` Android Go devices?
 - **Method C - 2SI ramdisk SAR**: This method was first seen on Pixel 3 Android 10 developer preview. The kernel uses `initramfs` as rootdir and exec `/init` in `rootfs`. This `init` is responsible to mount the `system` partition and use it as the new rootdir, then finally exec `/system/bin/init` to boot.
 	- Devices with `(LV >= 29)`
-	- Devices with `(LV < 29, RV >= 29)`, excluding exceptions that were using Method B
+	- Devices with `(LV < 28, RV >= 29)`, excluding exceptions that were using Method B
 	- Google: Pixel 3 and 3a with `(RV >= 29)`
 
 ### Discussion
