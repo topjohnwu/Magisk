@@ -11,12 +11,9 @@ env_check() {
 
 fix_env() {
   cd $MAGISKBIN
-  PATH=/sbin:/system/bin sh update-binary -x
-  ./busybox rm -f $MAGISKTMP/busybox/*
-  cp -af busybox $MAGISKTMP/busybox/busybox
-  $MAGISKTMP/busybox/busybox --install -s $MAGISKTMP/busybox
-  rm -f update-binary magisk.apk
-  chmod -R 755 .
+  PATH=/system/bin /system/bin/sh update-binary -x
+  ./busybox rm -f update-binary magisk.apk
+  ./busybox chmod -R 755 .
   ./magiskinit -x magisk magisk
   cd /
 }
@@ -95,8 +92,8 @@ EOF
 
 add_hosts_module() {
   # Do not touch existing hosts module
-  [ -d /sbin/.magisk/modules/hosts ] && return
-  cd /sbin/.magisk/modules
+  [ -d $MAGISKTMP/modules/hosts ] && return
+  cd $MAGISKTMP/modules
   mkdir -p hosts/system/etc
   cat << EOF > hosts/module.prop
 id=hosts
@@ -106,8 +103,7 @@ versionCode=1
 author=Magisk Manager
 description=Magisk Manager built-in systemless hosts module
 EOF
-  cp -f /system/etc/hosts hosts/system/etc/hosts
-  magisk --clone-attr /system/etc/hosts hosts/system/etc/hosts
+  magisk --clone /system/etc/hosts hosts/system/etc/hosts
   touch hosts/update
   cd /
 }
@@ -159,3 +155,17 @@ get_flags() {
 }
 
 run_migrations() { return; }
+
+grep_prop() { return; }
+
+#############
+# Initialize
+#############
+
+mm_init() {
+  export BOOTMODE=true
+  mount_partitions
+  get_flags
+  run_migrations
+  SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
+}

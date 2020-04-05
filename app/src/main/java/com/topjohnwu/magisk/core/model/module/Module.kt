@@ -62,7 +62,7 @@ class Module(path: String) : BaseModule() {
 
     companion object {
 
-        private const val PERSIST = "/sbin/.magisk/mirror/persist/magisk"
+        private val PERSIST get() = "${Const.MAGISKTMP}/mirror/persist/magisk"
 
         @WorkerThread
         fun loadModules(): List<Module> {

@@ -34,8 +34,10 @@ grep_prop() {
 
 getvar() {
   local VARNAME=$1
-  local VALUE=
-  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /data/.magisk /cache/.magisk`
+  local VALUE
+  local PROPPATH='/data/.magisk /cache/.magisk'
+  [ -n $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
+  VALUE=$(grep_prop $VARNAME $PROPPATH)
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 
@@ -628,7 +630,8 @@ is_legacy_script() {
 
 # Require OUTFD, ZIPFILE to be set
 install_module() {
-  local PERSISTDIR=/sbin/.magisk/mirror/persist
+  local PERSISTDIR
+  command -v magisk >/dev/null && PERSISTDIR=$(magisk --path)/mirror/persist
 
   rm -rf $TMPDIR
   mkdir -p $TMPDIR
@@ -705,7 +708,7 @@ install_module() {
   fi
 
   # Copy over custom sepolicy rules
-  if [ -f $MODPATH/sepolicy.rule -a -e $PERSISTDIR ]; then
+  if [ -f $MODPATH/sepolicy.rule -a -e "$PERSISTDIR" ]; then
     ui_print "- Installing custom sepolicy patch"
     PERSISTMOD=$PERSISTDIR/magisk/$MODID
     mkdir -p $PERSISTMOD
@@ -733,7 +736,6 @@ install_module() {
 [ -z $BOOTMODE ] && ps -A 2>/dev/null | grep zygote | grep -qv grep && BOOTMODE=true
 [ -z $BOOTMODE ] && BOOTMODE=false
 
-MAGISKTMP=/sbin/.magisk
 NVBASE=/data/adb
 TMPDIR=/dev/tmp
 

@@ -6,7 +6,8 @@ import java.io.File
 object Const {
 
     // Paths
-    const val MAGISK_PATH = "/sbin/.magisk/modules"
+    lateinit var MAGISKTMP: String
+    val MAGISK_PATH get() = "$MAGISKTMP/modules"
     var MAGISK_DISABLE_FILE = File("xxx")
     const val TMP_FOLDER_PATH = "/dev/tmp"
     const val MAGISK_LOG = "/cache/magisk.log"
@@ -25,8 +26,8 @@ object Const {
     object Version {
         const val MIN_VERSION = "v19.0"
         const val MIN_VERCODE = 19000
-        const val CONNECT_MODE = 20100
-        const val PROVIDER_CONNECT = 20102
+        const val PROVIDER_CONNECT = 20200
+        const val DYNAMIC_PATH = 20400
     }
 
     object ID {

@@ -18,22 +18,20 @@ class RootInit : Shell.Initializer() {
 
     fun init(context: Context, shell: Shell): Boolean {
         val job = shell.newJob()
+        if (Info.env.magiskVersionCode >= Const.Version.DYNAMIC_PATH)
+            job.add("MAGISKTMP=$(magisk --path)/.magisk")
+        else
+            job.add("MAGISKTMP=/sbin/.magisk")
         job.add(context.rawResource(R.raw.manager))
         if (shell.isRoot) {
             job.add(context.rawResource(R.raw.util_functions))
-                .add("SHA1=`grep_prop SHA1 /sbin/.magisk/config`")
             Const.MAGISK_DISABLE_FILE = SuFile("/cache/.disable_magisk")
         }
-
-        job.add(
-            "export BOOTMODE=true",
-            "mount_partitions",
-            "get_flags",
-            "run_migrations"
-        ).exec()
+        job.add("mm_init").exec()
 
         fun getvar(name: String) = ShellUtils.fastCmd(shell, "echo \$$name").toBoolean()
 
+        Const.MAGISKTMP = ShellUtils.fastCmd(shell, "echo \$MAGISKTMP")
         Info.keepVerity = getvar("KEEPVERITY")
         Info.keepEnc = getvar("KEEPFORCEENCRYPT")
         Info.isSAR = getvar("SYSTEM_ROOT")
