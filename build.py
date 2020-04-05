@@ -395,22 +395,6 @@ def build_stub(args):
     build_apk(args, 'stub')
 
 
-def build_snet(args):
-    header('* Building snet extension')
-    proc = execv([gradlew, 'snet:assembleRelease'])
-    if proc.returncode != 0:
-        error('Build snet extention failed!')
-    source = op.join('snet', 'build', 'outputs', 'apk',
-                     'release', 'snet-release-unsigned.apk')
-    target = op.join(config['outdir'], 'snet.jar')
-    # Extract classes.dex
-    with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zout:
-        with zipfile.ZipFile(source) as zin:
-            zout.writestr('classes.dex', zin.read('classes.dex'))
-    rm(source)
-    header('Output: ' + target)
-
-
 def zip_main(args):
     header('* Packing Flashable Zip')
 
@@ -628,10 +612,6 @@ app_parser.set_defaults(func=build_app)
 stub_parser = subparsers.add_parser(
     'stub', help='build stub Magisk Manager')
 stub_parser.set_defaults(func=build_stub)
-
-snet_parser = subparsers.add_parser(
-    'snet', help='build snet extention for Magisk Manager')
-snet_parser.set_defaults(func=build_snet)
 
 zip_parser = subparsers.add_parser(
     'zip', help='zip Magisk into a flashable zip')
