@@ -253,9 +253,11 @@ def gen_update_binary():
 
 
 def run_ndk_build(flags):
-    proc = system(f'{ndk_build} -C native {base_flags} {flags} -j{cpu_count}')
+    os.chdir('native')
+    proc = system(f'{ndk_build} {base_flags} {flags} -j{cpu_count}')
     if proc.returncode != 0:
         error('Build binary failed!')
+    os.chdir('..')
     collect_binary()
 
 
