@@ -1,0 +1,259 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Modulok</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">Naplók</string>
+    <string name="settings">Beállítások</string>
+    <string name="refresh">Helyi adat frissítés</string>
+    <string name="install">Telepít</string>
+    <string name="section_home">Kezdőlap</string>
+    <string name="section_theme">Témák</string>
+    <string name="safetynet">SafetyNet</string>
+
+    <!--Home-->
+    <string name="no_connection">Nincs elérhető kapcsolat</string>
+    <string name="app_changelog">Változások</string>
+    <string name="manager">Manager</string>
+    <string name="loading">Betöltés…</string>
+    <string name="info">Infó</string>
+    <string name="uninstall">Eltávolít</string>
+    <string name="update">Frissít</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">Rejt</string>
+    <string name="status">Állapot</string>
+    <string name="home_package">Csomag</string>
+    <string name="details">Részletek</string>
+
+    <string name="home_notice_content">Mindig győződj meg arról, hogy a nyílt forrású Magisk Manager alkalmazást használod. Az ismeretlen forrású Manager rosszindulatú műveleteket hajthat végre.</string>
+    <string name="home_support_title">Support Us</string>
+    <string name="home_links_project">Projekt linkek</string>
+    <string name="home_item_source">Forrás</string>
+    <string name="home_support_content">A Magisk ingyenes és nyílt forrású, mindig is az marad. Mutasd ki érdeklődésed egy kisebb adomány küldésével.</string>
+    <string name="home_device_title">Eszköz</string>
+    <string name="home_device_extra_manufacturer">Gyártó</string>
+    <string name="home_device_extra_model">Modell</string>
+    <string name="home_device_extra_board">Board</string>
+    <string name="home_device_system">Rendszer</string>
+    <string name="home_status_normal">Normál</string>
+    <string name="home_status_safe">Biztonságos mód</string>
+    <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Telepítve</string>
+    <string name="home_latest_version">Legutóbbi</string>
+    <string name="invalid_update_channel">Érvénytelen frissítő csatorna</string>
+    <string name="uninstall_magisk_title">Magisk eltávolítása</string>
+    <string name="uninstall_magisk_msg">Minden modul letiltva/eltávolítva!\nA root eltávolításra kerül!\nPotenciálisan titkosításra kerülnek az adatok, ha még nincsenek</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">A titkosítás kényszerített megőrzése</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity megőrzése</string>
+    <string name="recovery_mode">Recovery mód</string>
+    <string name="install_options_title">Lehetőségek</string>
+    <string name="install_method_title">Módszer</string>
+    <string name="install_next">Tovább</string>
+    <string name="install_start">Start</string>
+    <string name="manager_download_install">Letöltés és telepítés</string>
+    <string name="download_zip_only">Csak a zip letöltése</string>
+    <string name="direct_install">Direkt telepítés (Ajánlott)</string>
+    <string name="install_inactive_slot">Telepítés Inaktív Slot-ba (OTA után)</string>
+    <string name="install_inactive_slot_msg">Az eszköz KÉNYSZERÍTVE lesz az aktuális inaktív slotból bootolni újraindítás után!\nEzt a lehetőséget csak az OTA elkészülte után használd.\nFolytatod?</string>
+    <string name="setup_title">További beállítások</string>
+    <string name="select_patch_file">Válaszd ki és módosítsd a fájlt</string>
+    <string name="patch_file_msg">Válassz egy raw image (*.img) vagy egy ODIN tar fájlt (*.tar)</string>
+    <string name="reboot_delay_toast">Újraindítás 5mp…</string>
+    <string name="flash_screen_title">Telepítés</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Superuser kérés</string>
+    <string name="deny">Elutasít</string>
+    <string name="prompt">Kérdez</string>
+    <string name="grant">Megad</string>
+    <string name="su_warning">Teljes hozzáférést biztosít a készülékhez.\nTagadd meg, ha nem te kérted!</string>
+    <string name="forever">Örökre</string>
+    <string name="once">Egyszer</string>
+    <string name="tenmin">10 perc</string>
+    <string name="twentymin">20 perc</string>
+    <string name="thirtymin">30 perc</string>
+    <string name="sixtymin">60 perc</string>
+    <string name="su_allow_toast">%1$s Superuser jogokat kapott</string>
+    <string name="su_deny_toast">%1$s Superuser kérése megtagadva</string>
+    <string name="no_apps_found">Nem található app</string>
+    <string name="su_snack_grant">%1$s Superuser jogok megadva</string>
+    <string name="su_snack_deny">%1$s Superuser jogok megtagadva</string>
+    <string name="su_snack_notif_on">%1$s értesítései bekapcsolva</string>
+    <string name="su_snack_notif_off">%1$s értesítései kikapcsolva</string>
+    <string name="su_snack_log_on">%1$s naplózása bekapcsolva</string>
+    <string name="su_snack_log_off">%1$s naplózása kikapcsolva</string>
+    <string name="su_revoke_title">Visszavonod?</string>
+    <string name="su_revoke_msg">Megerősíted %1$s jogainak visszavonását?</string>
+    <string name="toast">Lebegő</string>
+    <string name="none">Egyik sem</string>
+
+    <string name="superuser_toggle_notification">Értesítések</string>
+    <string name="superuser_toggle_revoke">Visszavon</string>
+    <string name="superuser_policy_none">Még egyetlen alkalmazás sem kért Superuser engedélyt.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Nincs napló, próbálj meg minél több SU kompatibilis alkalmazást használni.</string>
+    <string name="log_data_magisk_none">A Magisk naplók üres, ez furcsa.</string>
+    <string name="menuSaveLog">Napló mentés</string>
+    <string name="menuClearLog">Napló törlése most</string>
+    <string name="logs_cleared">A napló sikeresen törölve.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Cél UID: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetynet_api_error">SafetyNet API Error</string>
+    <string name="safetynet_res_invalid">A válasz érvénytelen</string>
+    <string name="safetynet_attest_success">Sikerült!</string>
+    <string name="safetynet_attest_failure">Az igazolás sikertelen!</string>
+    <string name="safetynet_attest_loading">Kis türelmet…</string>
+    <string name="safetynet_attest_restart">Próbáld újra</string>
+    <string name="safetynet_system">Rendszer</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">Rendszerappok megjel.</string>
+    <string name="hide_filter_hint">Szűrés névre</string>
+    <string name="hide_scroll_up">Görgess fel</string>
+    <string name="hide_filters">Szűrők</string>
+    <string name="hide_search">Keresés</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Nincs megadott információ)</string>
+    <string name="no_modules_found">Nem található modul</string>
+    <string name="reboot_recovery">Újraindítás - Recovery</string>
+    <string name="reboot_bootloader">Újraindítás - Bootloader</string>
+    <string name="reboot_download">Újraindítás - Download</string>
+    <string name="reboot_edl">Újraindítás - EDL</string>
+    <string name="module_safe_mode_message">Biztonságos módban vagy. A felhasználói modulok egyike sem fog működni.\nEz az üzenet eltűnik, ha a Biztonságos módot kikapcsolod</string>
+    <string name="module_version_author">%1$s, %2$s</string>
+    <string name="module_section_pending">Frissítések</string>
+    <string name="module_section_pending_action">Mindet frissítse</string>
+    <string name="module_section_remote">Távoli</string>
+    <string name="module_state_remove">Eltávolít</string>
+    <string name="module_state_restore">Helyreállít</string>
+    <string name="module_action_install_external">Telepítés tárhelyről</string>
+    <string name="module_update_none">A modulok naprakészek!</string>
+    <string name="update_available">Frissítés érhető el</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="sorting_order">Rendezési elv</string>
+    <string name="module_permission_declined">Adj tárhely engedélyt a funkció engedélyezéséhez</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">Téma mód</string>
+    <string name="settings_dark_mode_message">Válaszd ki a stílusodhoz legmegfelelőbb módot!</string>
+    <string name="settings_dark_mode_light">Mindig világos</string>
+    <string name="settings_dark_mode_system">Rendszer követése</string>
+    <string name="settings_dark_mode_dark">Mindig sötét</string>
+    <string name="settings_safe_mode_title">Biztonságos mód</string>
+    <string name="settings_core_only_summary" deprecated="true">Csak alapvető funkciók engedélyezése. A MagiskSU, a MagiskHide és a systemless hosts-ok továbbra is engedélyezettek, de egyetlen modul sem töltődik be</string>
+    <string name="settings_grid_column_count_title">Lista elrendezés</string>
+    <string name="settings_grid_column_count_summary">Beállítja a listaelemek szélességét. Érvényesítéséhez indítsd újra az appot.</string>
+    <string name="settings_grid_column_count_1">1 oszlopos</string>
+    <string name="settings_grid_column_count_2">2 oszlopos</string>
+    <string name="settings_download_path_title">Letöltés helye</string>
+    <string name="settings_download_path_message">A fájlok %1$s mappába kerülnek</string>
+    <string name="settings_clear_cache_title">Repo Cache törlés</string>
+    <string name="settings_clear_cache_summary">Törli az online repo-k gyorstárazott információit, kényszerít az online frissítésre</string>
+    <string name="settings_hide_manager_title">A Magisk Manager elrejtése</string>
+    <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package and app names</string>
+    <string name="settings_restore_manager_title">Restore Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Újracsomagolja a Magisk Managert véletlenszerű csomagnévvel</string>
+    <string name="language">Nyelv</string>
+    <string name="system_default">(Rendszer alapérték)</string>
+    <string name="settings_check_update_title">Frissítések ellenőrzése</string>
+    <string name="settings_check_update_summary">Rendszeresen ellenőrizze a frissítéseket a háttérben</string>
+    <string name="settings_update_channel_title">Frissítő csatorna</string>
+    <string name="settings_update_stable">Stabil</string>
+    <string name="settings_update_beta">Béta</string>
+    <string name="settings_update_custom">Egyéni</string>
+    <string name="settings_update_custom_msg">Add meg az egyéni URL-t</string>
+    <string name="settings_magiskhide_summary">Elrejti a Magisk-et különféle észlelések elől</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">Systemless hosts támogatás reklámblokkoló appok számára</string>
+    <string name="settings_hosts_toast">Systemless hosts modul hozzáadva</string>
+    <string name="settings_app_name_hint">Új név</string>
+    <string name="settings_app_name_helper">Az alkalmazást újracsomagoljuk ezzel a névvel</string>
+    <string name="settings_app_name_error">Érvénytelen formátum</string>
+    <string name="settings_su_app_adb">Appok és ADB</string>
+    <string name="settings_su_app">Appok csak</string>
+    <string name="settings_su_adb">ADB csak</string>
+    <string name="settings_su_disable">Kikapcsolva</string>
+    <string name="settings_su_request_10">10 mp</string>
+    <string name="settings_su_request_15">15 mp</string>
+    <string name="settings_su_request_20">20 mp</string>
+    <string name="settings_su_request_30">30 mp</string>
+    <string name="settings_su_request_45">45 mp</string>
+    <string name="settings_su_request_60">60 mp</string>
+    <string name="superuser_access">Superuser hozzáférés</string>
+    <string name="auto_response">Automatikus válasz</string>
+    <string name="request_timeout">Kérés időtúllépés</string>
+    <string name="superuser_notification">Superuser értesítés</string>
+    <string name="settings_su_reauth_title">Újraazonosítás frissítések után</string>
+    <string name="settings_su_reauth_summary">Az alkalmazás frissítése után újra hitelesítheti a superuser engedélyeket</string>
+    <string name="settings_su_biometric_title">Hitelesítés ujjlenyomattal</string>
+    <string name="settings_su_biometric_summary">Az ujjlenyomat olvasó használatával engedélyezheted a superuser kéréseket</string>
+    <string name="no_biometric">Nem támogatott eszköz vagy nincs engedélyezve a biometrikus beállítás</string>
+    <string name="settings_customization">Testreszabás</string>
+
+    <string name="multiuser_mode">Többfelhasználós mód</string>
+    <string name="settings_owner_only">Csak az eszköz tulajdonos</string>
+    <string name="settings_owner_manage">Eszköz tulajdonos kezelés</string>
+    <string name="settings_user_independent">Felhaszáló-független</string>
+    <string name="owner_only_summary">Csak a tulajdonosnak van root hozzáférése</string>
+    <string name="owner_manage_summary">Csak a tulajdonos tudja kezelni a root hozzáférést és kapja meg a kéréseket</string>
+    <string name="user_indepenent_summary">Minden felhasználónak külön root jogai vannak</string>
+
+    <string name="mount_namespace_mode">A Névtér mód felcsatolása</string>
+    <string name="settings_ns_global">Globális névtér</string>
+    <string name="settings_ns_requester">Inherit névtér</string>
+    <string name="settings_ns_isolate">Elszigetelt névtér</string>
+    <string name="global_summary">Minden root munkamenet a globális beépített névteret használja</string>
+    <string name="requester_summary">A root munkamenetek öröklik a kérelmező névterét</string>
+    <string name="isolate_summary">Minden root munkamenetnek saját elszigetelt névterülete lesz</string>
+    <string name="settings_download_path_error">Mappa létrehozási hiba. Hozzáférhetőnek kell lennie a tárhely gyökérkönyvtárából, és nem lehet fájl.</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Magisk frissítések</string>
+    <string name="progress_channel">Folyamat értesítések</string>
+    <string name="download_complete">A letöltés befejeződött</string>
+    <string name="download_file_error">Fájl letöltési hiba</string>
+    <string name="download_open_parent">Megjelenítés a szülő mappában</string>
+    <string name="download_open_self">Fájl megjelenítés</string>
+    <string name="magisk_update_title">Magisk frissítés érhető el!</string>
+    <string name="manager_update_title">Magisk Manager frissítés érhető el!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Igen</string>
+    <string name="no">Nem</string>
+    <string name="repo_install_title">%1$s telepítés</string>
+    <string name="repo_install_msg">Szeretnéd most elvégezni a(z) %1$s telepítését?</string>
+    <string name="download">Letöltés</string>
+    <string name="reboot">Újraindít</string>
+    <string name="settings_reboot_toast">Újraindítás az alkalmazáshoz</string>
+    <string name="release_notes">Kiadási megjegyzések</string>
+    <string name="repo_cache_cleared">Repo cache törölve</string>
+    <string name="dtbo_patched_title">DTBO módosítva!</string>
+    <string name="dtbo_patched_reboot">A Magisk Manager módosította a dtbo.img fájlt, indítsd újra a készüléket..</string>
+    <string name="flashing">Flashelés…</string>
+    <string name="done">Kész!</string>
+    <string name="failure">Sikertelen</string>
+    <string name="hide_manager_title">Magisk Manager elrejtése…</string>
+    <string name="hide_manager_fail_toast">A Magisk Manager elrejtése meghiúsult.</string>
+    <string name="open_link_failed_toast">Nem található alkalmazás a link megnyitásához</string>
+    <string name="complete_uninstall">Complete Uninstall</string>
+    <string name="restore_img">Image fájlok visszaállítása</string>
+    <string name="restore_img_msg">Helyreállítás…</string>
+    <string name="restore_done">Helyreállítás kész!</string>
+    <string name="restore_fail">A Stock mentés nem létezik!</string>
+    <string name="proprietary_title">Tulajdonosi kód letöltése</string>
+    <string name="proprietary_notice">A Magisk Manager egy FOSS, amely nem tartalmazza a Google védett, SafetyNet API kódját.\n\nEngedélyezed-e a Magisk Manager számára, hogy letöltsön egy kiterjesztést (a GoogleApiClient-et tartalmazza) a SafetyNet ellenőrzésekhez?</string>
+    <string name="setup_fail">Beállítás nem sikerült</string>
+    <string name="env_fix_title">További beállítások szükségesek</string>
+    <string name="env_fix_msg">A készüléknek további beállításokra van szüksége a Magisk működéséhez. Letöltjük a Magisk setup zip-et, folytatod?</string>
+    <string name="setup_msg">A környezet beállítása…</string>
+    <string name="authenticate">Azonosítás</string>
+    <string name="unsupport_magisk_title">Nem támogatott Magisk verzió</string>
+    <string name="unsupport_magisk_msg">A Magisk Manager ezen verziója nem támogat %1$s alacsonyabb Magisk verziót.\n\nAz alkalmazás úgy viselkedik, mintha nem lenne telepítve Magisk, frissítsd a Magisk-et a lehető leghamarabb.</string>
+
+</resources>
