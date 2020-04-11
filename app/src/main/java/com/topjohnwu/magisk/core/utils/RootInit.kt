@@ -18,10 +18,14 @@ class RootInit : Shell.Initializer() {
 
     fun init(context: Context, shell: Shell): Boolean {
         val job = shell.newJob()
-        if (Info.env.magiskVersionCode >= Const.Version.DYNAMIC_PATH)
-            job.add("MAGISKTMP=$(magisk --path)/.magisk")
-        else
-            job.add("MAGISKTMP=/sbin/.magisk")
+        if (Info.env.magiskVersionCode >= Const.Version.DYNAMIC_PATH) {
+            job.add("export ASH_STANDALONE=1")
+                .add("[ -x /data/adb/magisk/busybox ] && exec /data/adb/magisk/busybox sh")
+                .add("MAGISKTMP=$(magisk --path)/.magisk")
+        } else {
+            job.add("export PATH=\"/sbin/.magisk/busybox:\$PATH\"")
+                .add("MAGISKTMP=/sbin/.magisk")
+        }
         job.add(context.rawResource(R.raw.manager))
         if (shell.isRoot) {
             job.add(context.rawResource(R.raw.util_functions))
