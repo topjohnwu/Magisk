@@ -10,6 +10,7 @@ import androidx.core.graphics.Insets
 import androidx.core.view.forEach
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
+import androidx.navigation.NavDirections
 import com.google.android.material.card.MaterialCardView
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
@@ -100,9 +101,13 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         binding.mainNavigation.viewTreeObserver.addOnGlobalLayoutListener(navObserver)
 
-        if (intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false)) {
-            HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
+        when {
+            intent.hasExtra(Const.Key.OPEN_SECTION) ->
+                getScreen(intent.getStringExtra(Const.Key.OPEN_SECTION))?.navigate()
+            intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false) ->
+                HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
         }
+
 
         if (savedInstanceState != null) {
             if (!isRoot) {
@@ -163,6 +168,16 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     fun invalidateToolbar() {
         //binding.mainToolbar.startAnimations()
         binding.mainToolbar.invalidate()
+    }
+
+    private fun getScreen(name: String?): NavDirections? {
+        return when (name) {
+            "superuser" -> HomeFragmentDirections.actionSuperuserFragment()
+            "magiskhide" -> HomeFragmentDirections.actionHideFragment()
+            "modules" -> HomeFragmentDirections.actionModuleFragment()
+            null -> null
+            else -> TODO("Implement screen shortcut \"$name\"")
+        }
     }
 
 }
