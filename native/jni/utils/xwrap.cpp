@@ -53,6 +53,14 @@ int xopenat(int dirfd, const char *pathname, int flags) {
 	return fd;
 }
 
+int xopenat(int dirfd, const char *pathname, int flags, mode_t mode) {
+	int fd = openat(dirfd, pathname, flags, mode);
+	if (fd < 0) {
+		PLOGE("openat: %s", pathname);
+	}
+	return fd;
+}
+
 ssize_t xwrite(int fd, const void *buf, size_t count) {
 	int ret = write(fd, buf, count);
 	if (count != ret) {
@@ -432,6 +440,14 @@ int xinotify_init1(int flags) {
 	int ret = inotify_init1(flags);
 	if (ret == -1) {
 		PLOGE("inotify_init1");
+	}
+	return ret;
+}
+
+char *xrealpath(const char *path, char *resolved_path) {
+	char *ret = realpath(path, resolved_path);
+	if (ret == nullptr) {
+		PLOGE("xrealpath");
 	}
 	return ret;
 }

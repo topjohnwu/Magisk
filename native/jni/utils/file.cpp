@@ -127,7 +127,7 @@ void cp_afc(const char *src, const char *dest) {
 		unlink(dest);
 		if (S_ISREG(a.st.st_mode)) {
 			int sfd = xopen(src, O_RDONLY | O_CLOEXEC);
-			int dfd = xopen(dest, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC);
+			int dfd = xopen(dest, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0);
 			xsendfile(dfd, sfd, nullptr, a.st.st_size);
 			close(sfd);
 			close(dfd);
@@ -158,7 +158,7 @@ void clone_dir(int src, int dest) {
 			}
 			case DT_REG: {
 				int sfd = xopenat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
-				int dfd = xopenat(dest, entry->d_name, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC);
+				int dfd = xopenat(dest, entry->d_name, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0);
 				xsendfile(dfd, sfd, nullptr, a.st.st_size);
 				fsetattr(dfd, &a);
 				close(dfd);
@@ -359,7 +359,7 @@ void parse_mnt(const char *file, const function<bool(mntent*)> &fn) {
 
 void backup_folder(const char *dir, vector<raw_file> &files) {
 	char path[4096];
-	realpath(dir, path);
+	xrealpath(dir, path);
 	int len = strlen(path);
 	post_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> int {
 		int fd = xopenat(dfd, entry->d_name, O_RDONLY);
