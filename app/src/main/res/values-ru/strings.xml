@@ -61,6 +61,7 @@
     <string name="select_patch_file">Пропатчить образ</string>
     <string name="patch_file_msg">Выберите файл образа (*.img) или архив ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Перезагрузка через 5 секунд…</string>
+    <string name="flash_screen_title">Установка</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав суперпользователя</string>
@@ -148,8 +149,8 @@
     <string name="settings_core_only_summary" deprecated="true">Задействовать только основной функционал (MagiskSU и MagiskHide). Модули не будут активированы</string>
     <string name="settings_grid_column_count_title">Расположение элементов</string>
     <string name="settings_grid_column_count_summary">Выберите компановку элементов в списке. Перезапустите приложение для применения изменений</string>
-    <string name="settings_grid_column_count_1">Обычная</string>
-    <string name="settings_grid_column_count_2">Компактная</string>
+    <string name="settings_grid_column_count_1">Обычное</string>
+    <string name="settings_grid_column_count_2">Компактное</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
