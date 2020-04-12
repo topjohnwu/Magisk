@@ -81,20 +81,17 @@ void restorecon() {
 }
 
 void restore_rootcon() {
-	setfilecon("/sbin", ROOT_CON);
-	setfilecon(MAGISKTMP, ROOT_CON);
-	setfilecon(MIRRDIR, ROOT_CON);
-	setfilecon(BLOCKDIR, ROOT_CON);
+	setfilecon(MAGISKTMP.data(), ROOT_CON);
 
-	auto dir = xopen_dir("/sbin");
+	auto dir = xopen_dir(MAGISKTMP.data());
 	int dfd = dirfd(dir.get());
 
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_name == "."sv || entry->d_name == ".."sv)
 			continue;
-		setfilecon_at(dfd, entry->d_name, ROOT_CON);
+		if (entry->d_name == "magisk"sv || entry->d_name == "magiskinit"sv)
+			setfilecon_at(dfd, entry->d_name, MAGISK_CON);
+		else
+			setfilecon_at(dfd, entry->d_name, ROOT_CON);
 	}
-
-	setfilecon("/sbin/magisk", MAGISK_CON);
-	setfilecon("/sbin/magiskinit", MAGISK_CON);
 }

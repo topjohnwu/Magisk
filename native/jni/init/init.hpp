@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <vector>
 
-#include <magisk.hpp>
+#include <logging.hpp>
 
 struct cmdline {
 	bool skip_initramfs;
@@ -57,26 +57,25 @@ public:
 class MagiskInit : public BaseInit {
 protected:
 	raw_data self;
-	const char *persist_dir;
+	std::string persist_dir;
 
 	virtual void early_mount() = 0;
 	bool patch_sepolicy(const char *file = "/sepolicy");
 public:
-	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {}
 };
 
 class SARBase : public MagiskInit {
 protected:
 	raw_data config;
 	std::vector<raw_file> overlays;
+	std::string tmp_dir;
 
 	void backup_files();
 	void patch_rootdir();
 	void mount_system_root();
 public:
-	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
-		persist_dir = MIRRDIR "/persist/magisk";
-	}
+	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {}
 	void start() override {
 		early_mount();
 		patch_rootdir();
@@ -92,7 +91,9 @@ class ForcedFirstStageInit : public BaseInit {
 private:
 	void prepare();
 public:
-	ForcedFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	ForcedFirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {
+		LOGD("%s\n", __FUNCTION__);
+	};
 	void start() override {
 		prepare();
 		exec_init("/system/bin/init");
@@ -103,7 +104,9 @@ class FirstStageInit : public BaseInit {
 private:
 	void prepare();
 public:
-	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {
+		LOGD("%s\n", __FUNCTION__);
+	};
 	void start() override {
 		prepare();
 		exec_init();
@@ -116,7 +119,9 @@ private:
 protected:
 	void early_mount() override;
 public:
-	SARFirstStageInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {};
+	SARFirstStageInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {
+		LOGD("%s\n", __FUNCTION__);
+	};
 	void start() override {
 		early_mount();
 		traced_exec_init();
@@ -128,7 +133,9 @@ protected:
 	void early_mount() override;
 	void cleanup() override { /* Do not do any cleanup */ }
 public:
-	SecondStageInit(char *argv[]) : SARBase(argv, nullptr) {};
+	SecondStageInit(char *argv[]) : SARBase(argv, nullptr) {
+		LOGD("%s\n", __FUNCTION__);
+	};
 };
 
 /* ***********
@@ -139,7 +146,9 @@ class SARInit : public SARBase {
 protected:
 	void early_mount() override;
 public:
-	SARInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {};
+	SARInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {
+		LOGD("%s\n", __FUNCTION__);
+	};
 };
 
 /* **********
@@ -148,13 +157,12 @@ public:
 
 class RootFSInit : public MagiskInit {
 private:
-	int root = -1;
 	void setup_rootfs();
 protected:
 	void early_mount() override;
 public:
 	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
-		persist_dir = "/dev/mnt/persist/magisk";
+		LOGD("%s\n", __FUNCTION__);
 	}
 
 	void start() override {
@@ -164,9 +172,10 @@ public:
 	}
 };
 
+#define INIT_SOCKET "MAGISKINIT"
+
 void load_kernel_info(cmdline *cmd);
 int dump_magisk(const char *path, mode_t mode);
 int magisk_proxy_main(int argc, char *argv[]);
 void setup_klog();
-void mount_sbin();
-socklen_t setup_sockaddr(struct sockaddr_un *sun);
+void setup_tmp(const char *path, const raw_data &self, const raw_data &config);

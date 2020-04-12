@@ -1,12 +1,9 @@
-/* socket.c - All socket related operations
- */
-
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <endian.h>
 
-#include <daemon.hpp>
+#include <socket.hpp>
 #include <utils.hpp>
 #include <logging.hpp>
 

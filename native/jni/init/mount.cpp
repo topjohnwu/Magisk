@@ -175,7 +175,6 @@ void RootFSInit::early_mount() {
 	full_read("/init", self.buf, self.sz);
 
 	LOGD("Reverting /init\n");
-	root = xopen("/", O_RDONLY | O_CLOEXEC);
 	rename("/.backup/init", "/init");
 
 	mount_root(system);
@@ -186,7 +185,7 @@ void RootFSInit::early_mount() {
 	xmkdir("/dev/mnt", 0755);
 	mount_persist("/dev/block", "/dev/mnt");
 	mount_list.emplace_back("/dev/mnt/persist");
-	mount_list.emplace_back("/dev/mnt/cache");
+	persist_dir = "/dev/mnt/persist/magisk";
 }
 
 void SARBase::backup_files() {
@@ -261,13 +260,45 @@ void BaseInit::cleanup() {
 	mount_list.shrink_to_fit();
 }
 
-void mount_sbin() {
-	LOGD("Mount /sbin tmpfs overlay\n");
-	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
+static void patch_socket_name(const char *path) {
+	char *buf;
+	size_t size;
+	mmap_rw(path, buf, size);
+	for (int i = 0; i < size; ++i) {
+		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
+			gen_rand_str(buf + i, 16);
+			i += sizeof(MAIN_SOCKET);
+		}
+	}
+	munmap(buf, size);
+}
 
-	xmkdir(MAGISKTMP, 0755);
+void setup_tmp(const char *path, const raw_data &self, const raw_data &config) {
+	LOGD("Setup Magisk tmp at %s\n", path);
+	xmount("tmpfs", path, "tmpfs", 0, "mode=755");
+
+	chdir(path);
+
+	xmkdir(INTLROOT, 0755);
 	xmkdir(MIRRDIR, 0);
 	xmkdir(BLOCKDIR, 0);
 
 	mount_persist(BLOCKDIR, MIRRDIR);
+
+	int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
+	xwrite(fd, config.buf, config.sz);
+	close(fd);
+	fd = xopen("magiskinit", O_WRONLY | O_CREAT, 0755);
+	xwrite(fd, self.buf, self.sz);
+	close(fd);
+	dump_magisk("magisk", 0755);
+	patch_socket_name("magisk");
+
+	// Create applet symlinks
+	for (int i = 0; applet_names[i]; ++i)
+		xsymlink("./magisk", applet_names[i]);
+	xsymlink("./magiskinit", "magiskpolicy");
+	xsymlink("./magiskinit", "supolicy");
+
+	chdir("/");
 }

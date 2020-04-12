@@ -4,6 +4,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <signal.h>
+#include <libgen.h>
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/mount.h>
@@ -16,8 +17,11 @@
 #include <resetprop.hpp>
 #include <flags.h>
 
+using namespace std;
+
 int SDK_INT = -1;
 bool RECOVERY_MODE = false;
+string MAGISKTMP;
 static struct stat self_st;
 
 static void verify_client(int client, pid_t pid) {
@@ -91,6 +95,10 @@ static void *request_handler(void *args) {
 		}
 		close(client);
 		break;
+	case GET_PATH:
+		write_string(client, MAGISKTMP.data());
+		close(client);
+		break;
 	default:
 		close(client);
 		break;
@@ -114,20 +122,25 @@ static void main_daemon() {
 
 	setsid();
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
+
+	// Get self stat
+	char path[4096];
+	xreadlink("/proc/self/exe", path, sizeof(path));
+	MAGISKTMP = dirname(path);
+	xstat("/proc/self/exe", &self_st);
+
 	restore_rootcon();
 
 	// Unmount pre-init patches
-	if (access(ROOTMNT, F_OK) == 0) {
-		file_readline(true, ROOTMNT, [](auto line) -> bool {
+	auto mount_list = MAGISKTMP + "/" ROOTMNT;
+	if (access(mount_list.data(), F_OK) == 0) {
+		file_readline(true, mount_list.data(), [](string_view line) -> bool {
 			umount2(line.data(), MNT_DETACH);
 			return true;
 		});
 	}
 
 	LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
-
-	// Get server stat
-	stat("/proc/self/exe", &self_st);
 
 	// Get API level
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
@@ -148,7 +161,8 @@ static void main_daemon() {
 	}
 
 	// Load config status
-	parse_prop_file(MAGISKTMP "/config", [](auto key, auto val) -> bool {
+	auto config = MAGISKTMP + "/" INTLROOT "/config";
+	parse_prop_file(config.data(), [](auto key, auto val) -> bool {
 		if (key == "RECOVERYMODE" && val == "true")
 			RECOVERY_MODE = true;
 		return true;

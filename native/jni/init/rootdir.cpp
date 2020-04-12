@@ -6,6 +6,7 @@
 #include <magisk.hpp>
 #include <magiskpolicy.hpp>
 #include <utils.hpp>
+#include <socket.hpp>
 
 #include "init.hpp"
 #include "magiskrc.inc"
@@ -17,19 +18,6 @@
 #endif
 
 using namespace std;
-
-static void patch_socket_name(const char *path) {
-	char *buf;
-	size_t size;
-	mmap_rw(path, buf, size);
-	for (int i = 0; i < size; ++i) {
-		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(buf + i, 16);
-			i += sizeof(MAIN_SOCKET);
-		}
-	}
-	munmap(buf, size);
-}
 
 static vector<raw_data> rc_list;
 
@@ -153,15 +141,14 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 
 	// Custom rules
-	if (auto dir = xopen_dir(persist_dir); dir) {
-		char path[4096];
+	if (auto dir = xopen_dir(persist_dir.data()); dir) {
 		for (dirent *entry; (entry = xreaddir(dir.get()));) {
 			if (entry->d_name == "."sv || entry->d_name == ".."sv)
 				continue;
-			snprintf(path, sizeof(path), "%s/%s/sepolicy.rule", persist_dir, entry->d_name);
-			if (access(path, R_OK) == 0) {
-				LOGD("Loading custom sepolicy patch: %s\n", path);
-				load_rule_file(path);
+			auto rule = persist_dir + "/" + entry->d_name + "/sepolicy.rule";
+			if (access(rule.data(), R_OK) == 0) {
+				LOGD("Loading custom sepolicy patch: %s\n", rule.data());
+				load_rule_file(rule.data());
 			}
 		}
 	}
@@ -176,30 +163,6 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 	}
 
 	return patch_init;
-}
-
-static void sbin_overlay(const raw_data &self, const raw_data &config) {
-	mount_sbin();
-
-	// Dump binaries
-	xmkdir(MAGISKTMP, 0755);
-	int fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
-	xwrite(fd, config.buf, config.sz);
-	close(fd);
-	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
-	xwrite(fd, self.buf, self.sz);
-	close(fd);
-	dump_magisk("/sbin/magisk", 0755);
-	patch_socket_name("/sbin/magisk");
-
-	// Create applet symlinks
-	char path[64];
-	for (int i = 0; applet_names[i]; ++i) {
-		sprintf(path, "/sbin/%s", applet_names[i]);
-		xsymlink("./magisk", path);
-	}
-	xsymlink("./magiskinit", "/sbin/magiskpolicy");
-	xsymlink("./magiskinit", "/sbin/supolicy");
 }
 
 static void recreate_sbin(const char *mirror, bool use_bind_mount) {
@@ -233,12 +196,6 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 	}
 }
 
-#define ROOTMIR MIRRDIR "/system_root"
-#define ROOTBLK BLOCKDIR "/system_root"
-#define MONOPOLICY  "/sepolicy"
-#define PATCHPOLICY "/sbin/.se"
-#define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
-
 static string magic_mount_list;
 
 static void magic_mount(const string &sdir, const string &ddir = "") {
@@ -262,8 +219,20 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 	}
 }
 
+#define ROOTMIR MIRRDIR "/system_root"
+#define ROOTBLK BLOCKDIR "/system_root"
+#define MONOPOLICY  "/sepolicy"
+#define PATCHPOLICY "/sbin/.se"
+#define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
+
 void SARBase::patch_rootdir() {
-	sbin_overlay(self, config);
+	// TODO: dynamic paths
+	tmp_dir = "/sbin";
+
+	setup_tmp(tmp_dir.data(), self, config);
+	persist_dir = tmp_dir +  "/" MIRRDIR "/persist";
+
+	chdir(tmp_dir.data());
 
 	// Mount system_root mirror
 	struct stat st;
@@ -273,8 +242,9 @@ void SARBase::patch_rootdir() {
 	if (xmount(ROOTBLK, ROOTMIR, "ext4", MS_RDONLY, nullptr))
 		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
 
-	// Recreate original sbin structure
-	recreate_sbin(ROOTMIR "/sbin", true);
+	// Recreate original sbin structure if necessary
+	if (tmp_dir == "/sbin")
+		recreate_sbin(ROOTMIR "/sbin", true);
 
 	// Patch init
 	raw_data init;
@@ -332,20 +302,21 @@ void SARBase::patch_rootdir() {
 	patch_sepolicy(PATCHPOLICY);
 
 	// Handle overlay
-	struct sockaddr_un sun{};
-	socklen_t len = setup_sockaddr(&sun);
-	int socketfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-	if (connect(socketfd, (struct sockaddr*) &sun, len) == 0) {
+	struct sockaddr_un sun;
+	int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	if (connect(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET)) == 0) {
 		LOGD("ACK init tracer to write backup files\n");
+		// Let tracer know where tmp_dir is
+		write_string(sockfd, tmp_dir.data());
+		// Wait for tracer to finish copying files
 		int ack;
-		// Wait for init tracer finish copying files
-		read(socketfd, &ack, sizeof(ack));
+		read(sockfd, &ack, sizeof(ack));
 	} else {
 		LOGD("Restore backup files locally\n");
 		restore_folder(ROOTOVL, overlays);
 		overlays.clear();
 	}
-	close(socketfd);
+	close(sockfd);
 	if (access(ROOTOVL "/sbin", F_OK) == 0) {
 		file_attr a;
 		getattr("/sbin", &a);
@@ -362,9 +333,11 @@ void SARBase::patch_rootdir() {
 
 	// Mount rootdir
 	magic_mount(ROOTOVL);
-	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
+	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC, 0);
 	write(dest, magic_mount_list.data(), magic_mount_list.length());
 	close(dest);
+
+	chdir("/");
 }
 
 int magisk_proxy_main(int argc, char *argv[]) {
@@ -381,7 +354,7 @@ int magisk_proxy_main(int argc, char *argv[]) {
 	unlink("/sbin/magisk");
 	rm_rf("/.backup");
 
-	sbin_overlay(self, config);
+	setup_tmp("/sbin", self, config);
 
 	// Create symlinks pointing back to /root
 	recreate_sbin("/root", false);

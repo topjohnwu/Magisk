@@ -1,8 +1,10 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
+#include <magisk.hpp>
 #include <utils.hpp>
 #include <logging.hpp>
+#include <socket.hpp>
 
 #include "init.hpp"
 
@@ -103,14 +105,6 @@ static inline long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_
 	return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
 }
 
-#define INIT_SOCKET "MAGISKINIT"
-
-socklen_t setup_sockaddr(struct sockaddr_un *sun) {
-	sun->sun_family = AF_LOCAL;
-	strcpy(sun->sun_path + 1, INIT_SOCKET);
-	return sizeof(sa_family_t) + sizeof(INIT_SOCKET);
-}
-
 void SARFirstStageInit::traced_exec_init() {
 	int pid = getpid();
 
@@ -132,11 +126,6 @@ void SARFirstStageInit::traced_exec_init() {
 		// Re-exec init
 		exec_init();
 	} else {
-		// Close all file descriptors and stop logging
-		no_logging();
-		for (int i = 0; i < 20; ++i)
-			close(i);
-
 		// Attach to parent to trace exec
 		xptrace(PTRACE_ATTACH, pid);
 		waitpid(pid, nullptr, __WALL | __WNOTHREAD);
@@ -155,18 +144,22 @@ void SARFirstStageInit::traced_exec_init() {
 		xumount2("/dev", MNT_DETACH);
 
 		// Establish socket for 2nd stage ack
-		struct sockaddr_un sun{};
+		struct sockaddr_un sun;
 		int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-		xbind(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun));
+		xbind(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET));
 		xlisten(sockfd, 1);
 
+		// Resume init
 		xptrace(PTRACE_DETACH, pid);
 
 		// Wait for second stage ack
 		int client = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
 
 		// Write backup files
-		int cfg = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
+		char *tmp_dir = read_string(client);
+		chdir(tmp_dir);
+		free(tmp_dir);
+		int cfg = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
 		xwrite(cfg, config.buf, config.sz);
 		close(cfg);
 		restore_folder(ROOTOVL, overlays);
