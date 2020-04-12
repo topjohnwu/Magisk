@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">יש לעדכן לגירסה מלאה של מנהל Magisk בכדי לסיים את העדכון. להוריד ולהתקין?</string>
+    <string name="no_internet_msg">נא להתחבר לאינטרנט! עדכון לגירסה מלאה של מנהל Magisk נדרש.</string>
+    <string name="dling">מוריד</string>
+</resources>
