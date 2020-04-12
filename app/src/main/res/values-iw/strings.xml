@@ -156,7 +156,7 @@
     <string name="settings_clear_cache_title">נקה מטמון ריפו</string>
     <string name="settings_clear_cache_summary">נקה מידע זיכרון מטמון עבור ריפו מקוונים, זה יכריח את היישום לרענן באופן מקוון</string>
     <string name="settings_hide_manager_title">הסתר את מנהל  Magisk</string>
-    <string name="settings_hide_manager_summary">ארוז מחדש את מנהל Magisk עם חבילה ושם אקראיים/string>
+    <string name="settings_hide_manager_summary">ארוז מחדש את מנהל Magisk עם חבילה ושם אקראיים</string>
     <string name="settings_restore_manager_title">שחזר את מנהל Magisk</string>
     <string name="settings_restore_manager_summary">שחזר את מנהל Magisk עם חבילה ושם מקוריים</string>
     <string name="language">שפה</string>
