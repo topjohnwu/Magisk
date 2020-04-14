@@ -409,7 +409,7 @@ flash_image() {
 patch_dtb_partitions() {
   local result=1
   cd $MAGISKBIN
-  for name in dtb dtbo; do
+  for name in dtb dtbo dtbs; do
     local IMAGE=`find_block $name$SLOT`
     if [ ! -z $IMAGE ]; then
       ui_print "- $name image: $IMAGE"
@@ -571,7 +571,7 @@ run_migrations() {
 
   # Stock backups
   LOCSHA1=$SHA1
-  for name in boot dtb dtbo; do
+  for name in boot dtb dtbo dtbs; do
     BACKUP=/data/adb/magisk/stock_${name}.img
     [ -f $BACKUP ] || continue
     if [ $name = 'boot' ]; then
