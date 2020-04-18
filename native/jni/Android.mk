@@ -20,6 +20,7 @@ LOCAL_SRC_FILES := \
 	core/db.cpp \
 	core/scripting.cpp \
 	core/restorecon.cpp \
+	core/module.cpp \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \

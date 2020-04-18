@@ -41,6 +41,7 @@ void unlock_blocks();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
+void handle_modules();
 void remove_modules();
 
 /*************
