@@ -22,6 +22,7 @@ using namespace std;
 #define TYPE_SKEL    (1 << 2)    /* replace with tmpfs */
 #define TYPE_MODULE  (1 << 3)    /* mount from module */
 #define TYPE_ROOT    (1 << 4)    /* partition root */
+#define TYPE_CUSTOM  (1 << 5)    /* custom node type overrides all */
 #define TYPE_DIR     (TYPE_INTER|TYPE_MIRROR|TYPE_SKEL|TYPE_ROOT)
 
 vector<string> module_list;
@@ -43,7 +44,7 @@ static int bind_mount(const char *from, const char *to) {
 	return ret;
 }
 
-template<class T> uint8_t type_id() { return 0; }
+template<class T> uint8_t type_id() { return TYPE_CUSTOM; }
 template<> uint8_t type_id<dir_node>() { return TYPE_DIR; }
 template<> uint8_t type_id<inter_node>() { return TYPE_INTER; }
 template<> uint8_t type_id<mirror_node>() { return TYPE_MIRROR; }
@@ -62,6 +63,10 @@ public:
 	uint8_t type() { return node_type; }
 	const string &name() { return _name; }
 
+	// Paths
+	const string &node_path();
+	string mirror_path() { return mirror_dir + node_path(); }
+
 	dir_node *parent() { return _parent; }
 
 	virtual void mount() = 0;
@@ -76,10 +81,6 @@ protected:
 
 	template<class T>
 	node_entry(T*) : node_type(type_id<T>()) {}
-
-	// Paths
-	const string &node_path();
-	string mirror_path() { return mirror_dir + node_path(); }
 
 	void create_and_mount(const string &src);
 
@@ -470,6 +471,47 @@ bool dir_node::collect_files(const char *module, int dfd) {
 	return true;
 }
 
+class magisk_node : public node_entry {
+public:
+	magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
+
+	void mount() override {
+		const string &dir_name = parent()->node_path();
+		if (name() == "magisk") {
+			for (int i = 0; applet_names[i]; ++i) {
+				string dest = dir_name + "/" + applet_names[i];
+				VLOGI("create", "./magisk", dest.data());
+				xsymlink("./magisk", dest.data());
+			}
+		} else {
+			for (int i = 0; init_applet[i]; ++i) {
+				string dest = dir_name + "/" + init_applet[i];
+				VLOGI("create", "./magiskinit", dest.data());
+				xsymlink("./magiskinit", dest.data());
+			}
+		}
+		create_and_mount(MAGISKTMP + "/" + name());
+	}
+};
+
+static void inject_magisk_bins(root_node *system) {
+	auto bin = system->child<inter_node>("bin");
+	if (!bin) {
+		bin = new inter_node("bin", "");
+		system->insert(bin);
+	}
+
+	// Insert binaries
+	bin->insert(new magisk_node("magisk"));
+	bin->insert(new magisk_node("magiskinit"));
+
+	// Also delete all applets to make sure no modules can override it
+	for (int i = 0; applet_names[i]; ++i)
+		delete bin->extract(applet_names[i]);
+	for (int i = 0; init_applet[i]; ++i)
+		delete bin->extract(init_applet[i]);
+}
+
 static void mount_modules() {
 	node_entry::mirror_dir = MAGISKTMP + "/" MIRRDIR;
 	node_entry::module_mnt = MAGISKTMP + "/" MODULEMNT "/";
@@ -518,6 +560,12 @@ static void mount_modules() {
 		system->collect_files(module, fd);
 		close(fd);
 	}
+
+	if (MAGISKTMP != "/sbin") {
+		// Need to inject our binaries into /system/bin
+		inject_magisk_bins(system);
+	}
+
 	if (system->is_empty())
 		return;
 

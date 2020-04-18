@@ -26,6 +26,7 @@ extern std::string  MAGISKTMP;
 #define ROOTMNT     ROOTOVL "/.mount_list"
 
 constexpr const char *applet_names[] = { "su", "resetprop", "magiskhide", nullptr };
+constexpr const char *init_applet[] = { "magiskpolicy", "supolicy", nullptr };
 
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);

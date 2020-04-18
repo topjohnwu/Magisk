@@ -24,10 +24,8 @@
 
 using namespace std;
 
-constexpr const char *init_applet[] =
-		{ "magiskpolicy", "supolicy", "magisk", nullptr };
 constexpr int (*init_applet_main[])(int, char *[]) =
-		{ magiskpolicy_main, magiskpolicy_main, magisk_proxy_main, nullptr };
+		{ magiskpolicy_main, magiskpolicy_main, nullptr };
 
 #ifdef MAGISK_DEBUG
 static FILE *kmsg;
@@ -187,8 +185,11 @@ public:
 int main(int argc, char *argv[]) {
 	umask(0);
 
+	auto name = basename(argv[0]);
+	if (name == "magisk"sv)
+		return magisk_proxy_main(argc, argv);
 	for (int i = 0; init_applet[i]; ++i) {
-		if (strcmp(basename(argv[0]), init_applet[i]) == 0)
+		if (strcmp(name, init_applet[i]) == 0)
 			return (*init_applet_main[i])(argc, argv);
 	}
 
