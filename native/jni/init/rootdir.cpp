@@ -143,8 +143,6 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 	// Custom rules
 	if (auto dir = xopen_dir(persist_dir.data()); dir) {
 		for (dirent *entry; (entry = xreaddir(dir.get()));) {
-			if (entry->d_name == "."sv || entry->d_name == ".."sv)
-				continue;
 			auto rule = persist_dir + "/" + entry->d_name + "/sepolicy.rule";
 			if (access(rule.data(), R_OK) == 0) {
 				LOGD("Loading custom sepolicy patch: %s\n", rule.data());
@@ -170,8 +168,6 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 	int src = dirfd(dp.get());
 	char buf[4096];
 	for (dirent *entry; (entry = xreaddir(dp.get()));) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
 		string sbin_path = "/sbin/"s + entry->d_name;
 		struct stat st;
 		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);

@@ -11,11 +11,6 @@
 
 using namespace std;
 
-#define SKIP_DOTS {\
-if (entry->d_name == "."sv || entry->d_name == ".."sv) \
-	continue;\
-}
-
 #ifdef MAGISK_DEBUG
 #define VLOGI(tag, from, to) LOGI("%-8s: %s <- %s\n", tag, to, from)
 #else
@@ -440,7 +435,6 @@ bool dir_node::prepare() {
 			string mirror = skel->mirror_path();
 			auto dir = xopen_dir(mirror.data());
 			for (dirent *entry; (entry = xreaddir(dir.get()));) {
-				SKIP_DOTS
 				// Insert mirror nodes
 				skel->emplace<mirror_node>(entry->d_name, entry);
 			}
@@ -457,7 +451,6 @@ bool dir_node::collect_files(const char *module, int dfd) {
 		return true;
 
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		SKIP_DOTS
 		if (entry->d_name == ".replace"sv) {
 			// Stop traversing and tell parent to upgrade self to module
 			return false;
@@ -550,8 +543,6 @@ static void prepare_modules() {
 		int mfd = xopen(MODULEROOT, O_RDONLY | O_CLOEXEC);
 		for (dirent *entry; (entry = xreaddir(dir.get()));) {
 			if (entry->d_type == DT_DIR) {
-				if (entry->d_name == "."sv || entry->d_name == ".."sv)
-					continue;
 				// Cleanup old module if exists
 				if (faccessat(mfd, entry->d_name, F_OK, 0) == 0) {
 					frm_rf(xopenat(mfd, entry->d_name, O_RDONLY | O_CLOEXEC));
@@ -579,7 +570,7 @@ static void collect_modules() {
 	int dfd = dirfd(dir.get());
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR) {
-			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
+			if (entry->d_name == ".core"sv)
 				continue;
 
 			int modfd = xopenat(dfd, entry->d_name, O_RDONLY);

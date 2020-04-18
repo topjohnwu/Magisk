@@ -164,7 +164,7 @@ void remove_modules() {
 	int dfd = dirfd(dir.get());
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR) {
-			if (entry->d_name == "."sv || entry->d_name == ".."sv || entry->d_name == ".core"sv)
+			if (entry->d_name == ".core"sv)
 				continue;
 
 			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);

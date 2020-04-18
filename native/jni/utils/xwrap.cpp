@@ -13,6 +13,8 @@
 #include <logging.hpp>
 #include <utils.hpp>
 
+using namespace std;
+
 FILE *xfopen(const char *pathname, const char *mode) {
 	FILE *fp = fopen(pathname, mode);
 	if (fp == nullptr) {
@@ -129,11 +131,18 @@ DIR *xfdopendir(int fd) {
 
 struct dirent *xreaddir(DIR *dirp) {
 	errno = 0;
-	struct dirent *e = readdir(dirp);
-	if (errno && e == nullptr) {
-		PLOGE("readdir");
+	for (dirent *e;;) {
+		e = readdir(dirp);
+		if (e == nullptr) {
+			if (errno)
+				PLOGE("readdir");
+			return nullptr;
+		} else if (e->d_name == "."sv || e->d_name == ".."sv) {
+			// Filter . and .. for users
+			continue;
+		}
+		return e;
 	}
-	return e;
 }
 
 pid_t xsetsid() {

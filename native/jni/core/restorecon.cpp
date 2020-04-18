@@ -24,8 +24,6 @@ static void restore_syscon(int dirfd) {
 
 	dir = xfdopendir(dirfd);
 	while ((entry = xreaddir(dir))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
 		int fd = openat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
 		if (entry->d_type == DT_DIR) {
 			restore_syscon(fd);
@@ -53,8 +51,6 @@ static void restore_magiskcon(int dirfd) {
 
 	dir = xfdopendir(dirfd);
 	while ((entry = xreaddir(dir))) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
 		int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
 		if (entry->d_type == DT_DIR) {
 			restore_magiskcon(fd);
@@ -87,8 +83,6 @@ void restore_rootcon() {
 	int dfd = dirfd(dir.get());
 
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
 		if (entry->d_name == "magisk"sv || entry->d_name == "magiskinit"sv)
 			setfilecon_at(dfd, entry->d_name, MAGISK_CON);
 		else

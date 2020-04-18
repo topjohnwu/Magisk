@@ -45,17 +45,11 @@ int mkdirs(string path, mode_t mode) {
 	return 0;
 }
 
-#define SKIP_DOTS {\
-if (entry->d_name == "."sv || entry->d_name == ".."sv) \
-	continue;\
-}
-
 static void post_order_walk(int dirfd, const function<void(int, dirent *)> &&fn) {
 	auto dir = xopen_dir(dirfd);
 	if (!dir) return;
 
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		SKIP_DOTS
 		if (entry->d_type == DT_DIR)
 			post_order_walk(xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC), std::move(fn));
 		fn(dirfd, entry);
@@ -67,7 +61,6 @@ static void pre_order_walk(int dirfd, const function<bool(int, dirent *)> &&fn) 
 	if (!dir) return;
 
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		SKIP_DOTS
 		if (!fn(dirfd, entry))
 			continue;
 		if (entry->d_type == DT_DIR)
@@ -109,7 +102,6 @@ void mv_dir(int src, int dest) {
 	auto dir = xopen_dir(src);
 	run_finally f([&]{ close(dest); });
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		SKIP_DOTS
 		switch (entry->d_type) {
 		case DT_DIR:
 			if (faccessat(dest, entry->d_name, F_OK, 0) == 0) {
@@ -157,7 +149,6 @@ void clone_dir(int src, int dest) {
 	auto dir = xopen_dir(src);
 	run_finally f([&]{ close(dest); });
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		SKIP_DOTS
 		file_attr a;
 		getattrat(src, entry->d_name, &a);
 		switch (entry->d_type) {
@@ -197,7 +188,6 @@ void link_dir(int src, int dest) {
 	auto dir = xopen_dir(src);
 	run_finally f([&]{ close(dest); });
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		SKIP_DOTS
 		if (entry->d_type == DT_DIR) {
 			file_attr a;
 			getattrat(src, entry->d_name, &a);
