@@ -7,7 +7,7 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/include
 LOCAL_SRC_FILES := \
 	missing.cpp \
 	new.cpp \
-	file.cpp \
+	files.cpp \
 	misc.cpp \
 	selinux.cpp \
 	logging.cpp \
