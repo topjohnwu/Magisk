@@ -129,7 +129,7 @@ check_boot_ramdisk() {
   $ISAB && return 0
 
   # If we are using legacy SAR, but not AB, we do not have ramdisk in boot
-  if grep ' / ' /proc/mounts | grep -q '/dev/root'; then
+  if grep ' / ' /proc/mounts | grep -q '/dev/root' && getprop ro.boot.bootreason | grep -q recovery; then
     # Override recovery mode to true
     RECOVERYMODE=true
     return 1
