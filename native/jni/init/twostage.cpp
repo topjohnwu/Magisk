@@ -10,10 +10,10 @@
 
 using namespace std;
 
-static void patch_fstab(const string &fstab) {
-	string patched = fstab + ".p";
+static void patch_fstab(const char *fstab) {
+	string patched = fstab + ".p"s;
 	FILE *fp = xfopen(patched.data(), "we");
-	file_readline(fstab.data(), [=](string_view l) -> bool {
+	file_readline(fstab, [=](string_view l) -> bool {
 		if (l[0] == '#' || l.length() == 1)
 			return true;
 		char *line = (char *) l.data();
@@ -42,55 +42,38 @@ static void patch_fstab(const string &fstab) {
 	fclose(fp);
 
 	// Replace old fstab
-	clone_attr(fstab.data(), patched.data());
-	rename(patched.data(), fstab.data());
+	clone_attr(fstab, patched.data());
+	rename(patched.data(), fstab);
 }
 
 #define FSR "/first_stage_ramdisk"
 
-void ForcedFirstStageInit::prepare() {
-	// It is actually possible to NOT have FSR, create it just in case
-	xmkdir(FSR, 0755);
+void FirstStageInit::prepare() {
+	if (cmd->force_normal_boot) {
+		xmkdirs(FSR "/system/bin", 0755);
+		rename("/init" /* magiskinit */, FSR "/system/bin/init");
+		symlink("/system/bin/init", FSR "/init");
+		rename("/.backup", FSR "/.backup");
+		rename("/overlay.d", FSR "/overlay.d");
+		xsymlink("/system/bin/init", "/init");
 
-	if (auto dir = xopen_dir(FSR); dir) {
-		string fstab(FSR "/");
-		for (dirent *de; (de = xreaddir(dir.get()));) {
-			if (strstr(de->d_name, "fstab")) {
-				fstab += de->d_name;
-				break;
-			}
-		}
-		if (fstab.length() == sizeof(FSR))
-			return;
-
-		patch_fstab(fstab);
+		chdir(FSR);
 	} else {
-		return;
+		xmkdir("/system", 0755);
+		xmkdir("/system/bin", 0755);
+		rename("/init" /* magiskinit */ , "/system/bin/init");
+		rename("/.backup/init", "/init");
 	}
 
-	// Move stuffs for next stage
-	xmkdir(FSR "/system", 0755);
-	xmkdir(FSR "/system/bin", 0755);
-	rename("/init" /* magiskinit */, FSR "/system/bin/init");
-	symlink("/system/bin/init", FSR "/init");
-	rename("/.backup", FSR "/.backup");
-	rename("/overlay.d", FSR "/overlay.d");
-}
-
-void FirstStageInit::prepare() {
-	auto dir = xopen_dir("/");
+	// Patch fstab
+	auto dir = xopen_dir(".");
 	for (dirent *de; (de = xreaddir(dir.get()));) {
 		if (strstr(de->d_name, "fstab")) {
 			patch_fstab(de->d_name);
 			break;
 		}
 	}
-
-	// Move stuffs for next stage
-	xmkdir("/system", 0755);
-	xmkdir("/system/bin", 0755);
-	rename("/init" /* magiskinit */ , "/system/bin/init");
-	rename("/.backup/init", "/init");
+	chdir("/");
 }
 
 static inline long xptrace(int request, pid_t pid, void *addr, void *data) {

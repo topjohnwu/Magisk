@@ -81,7 +81,7 @@ static void load_overlay_rc(const char *overlay) {
 }
 
 void RootFSInit::setup_rootfs() {
-	if (patch_sepolicy()) {
+	if (patch_sepolicy("/sepolicy")) {
 		char *addr;
 		size_t size;
 		mmap_rw("/init", addr, size);
