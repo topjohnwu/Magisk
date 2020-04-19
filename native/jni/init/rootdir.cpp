@@ -21,7 +21,7 @@ using namespace std;
 
 static vector<raw_data> rc_list;
 
-static void patch_init_rc(FILE *rc) {
+static void patch_init_rc(FILE *rc, const char *tmp_dir) {
 	file_readline("/init.rc", [=](string_view line) -> bool {
 		// Do not start vaultkeeper
 		if (str_contains(line, "start vaultkeeper")) {
@@ -52,7 +52,7 @@ static void patch_init_rc(FILE *rc) {
 	gen_rand_str(ls_svc, sizeof(ls_svc));
 	gen_rand_str(bc_svc, sizeof(bc_svc));
 	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
-	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
+	fprintf(rc, magiskrc, tmp_dir, pfd_svc, ls_svc, bc_svc);
 }
 
 static void load_overlay_rc(const char *overlay) {
@@ -100,7 +100,7 @@ void RootFSInit::setup_rootfs() {
 
 	// Patch init.rc
 	FILE *rc = xfopen("/init.p.rc", "we");
-	patch_init_rc(rc);
+	patch_init_rc(rc, "/sbin");
 	fclose(rc);
 	clone_attr("/init.rc", "/init.p.rc");
 	rename("/init.p.rc", "/init.rc");
@@ -218,14 +218,23 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 #define ROOTMIR MIRRDIR "/system_root"
 #define ROOTBLK BLOCKDIR "/system_root"
 #define MONOPOLICY  "/sepolicy"
-#define PATCHPOLICY "/sbin/.se"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 
 void SARBase::patch_rootdir() {
-	char tmp_dir[128];
+	char tmp_dir[16];
+	const char *sepol;
 
-	// TODO: dynamic paths
-	char *p = tmp_dir + sprintf(tmp_dir, "%s", "/sbin");
+	char *p;
+	if (access("/sbin", F_OK) == 0) {
+		p = tmp_dir + sprintf(tmp_dir, "%s", "/sbin");
+		sepol = "/sbin/.se";
+	} else {
+		strcpy(tmp_dir, "/dev/");
+		p = tmp_dir + 5;
+		p += gen_rand_str(p, 10);
+		xmkdir(tmp_dir, 0);
+		sepol = "/dev/.se";
+	}
 
 	setup_tmp(tmp_dir, self, config);
 	persist_dir = string(tmp_dir) +  "/" MIRRDIR "/persist";
@@ -255,18 +264,18 @@ void SARBase::patch_rootdir() {
 	fgetattr(src, &attr);
 	close(src);
 	uint8_t *eof = init.buf + init.sz;
-	for (uint8_t *p = init.buf; p < eof; ++p) {
+	for (uint8_t *p = init.buf; p < eof;) {
 		if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
-			// Force init to load monolithic policy
 			LOGD("Remove from init: " SPLIT_PLAT_CIL "\n");
 			memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
-			p += sizeof(SPLIT_PLAT_CIL) - 1;
+			p += sizeof(SPLIT_PLAT_CIL);
 		} else if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
-			// Redirect /sepolicy to tmpfs
-			LOGD("Patch init [" MONOPOLICY "] -> [" PATCHPOLICY "]\n");
-			memcpy(p, PATCHPOLICY, sizeof(PATCHPOLICY));
+			LOGD("Patch init [" MONOPOLICY "] -> [%s]\n", sepol);
+			strcpy(reinterpret_cast<char *>(p), sepol);
 			redirect = true;
-			p += sizeof(MONOPOLICY) - 1;
+			p += sizeof(MONOPOLICY);
+		} else {
+			++p;
 		}
 	}
 	xmkdir(ROOTOVL, 0);
@@ -275,18 +284,16 @@ void SARBase::patch_rootdir() {
 	fsetattr(dest, &attr);
 	close(dest);
 
-	// Patch libselinux
 	if (!redirect) {
-		raw_data lib;
 		// init is dynamically linked, need to patch libselinux
+		raw_data lib;
 		full_read(LIBSELINUX, lib.buf, lib.sz);
 		getattr(LIBSELINUX, &attr);
 		eof = lib.buf + lib.sz;
 		for (uint8_t *p = lib.buf; p < eof; ++p) {
 			if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
-				// Redirect /sepolicy to tmpfs
-				LOGD("Patch libselinux.so [" MONOPOLICY "] -> [" PATCHPOLICY "]\n");
-				memcpy(p, PATCHPOLICY, sizeof(PATCHPOLICY));
+				LOGD("Patch libselinux.so [" MONOPOLICY "] -> [%s]\n", sepol);
+				strcpy(reinterpret_cast<char *>(p), sepol);
 				break;
 			}
 		}
@@ -299,7 +306,7 @@ void SARBase::patch_rootdir() {
 	}
 
 	// sepolicy
-	patch_sepolicy(PATCHPOLICY);
+	patch_sepolicy(sepol);
 
 	// Handle overlay
 	struct sockaddr_un sun;
@@ -327,7 +334,7 @@ void SARBase::patch_rootdir() {
 
 	// Patch init.rc
 	FILE *rc = xfopen(ROOTOVL "/init.rc", "we");
-	patch_init_rc(rc);
+	patch_init_rc(rc, tmp_dir);
 	fclose(rc);
 	clone_attr("/init.rc", ROOTOVL "/init.rc");
 
