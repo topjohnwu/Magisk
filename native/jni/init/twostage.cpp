@@ -71,10 +71,9 @@ void ForcedFirstStageInit::prepare() {
 	// Move stuffs for next stage
 	xmkdir(FSR "/system", 0755);
 	xmkdir(FSR "/system/bin", 0755);
-	rename("/init", FSR "/system/bin/init");
+	rename("/init" /* magiskinit */, FSR "/system/bin/init");
 	symlink("/system/bin/init", FSR "/init");
-	xmkdir(FSR "/.backup", 0);
-	rename("/.backup/.magisk", FSR "/.backup/.magisk");
+	rename("/.backup", FSR "/.backup");
 	rename("/overlay.d", FSR "/overlay.d");
 }
 
@@ -90,7 +89,7 @@ void FirstStageInit::prepare() {
 	// Move stuffs for next stage
 	xmkdir("/system", 0755);
 	xmkdir("/system/bin", 0755);
-	rename("/init", "/system/bin/init");
+	rename("/init" /* magiskinit */ , "/system/bin/init");
 	rename("/.backup/init", "/init");
 }
 

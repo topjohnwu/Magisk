@@ -2,6 +2,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <vector>
+#include <libgen.h>
 
 #include <magisk.hpp>
 #include <magiskpolicy.hpp>
@@ -21,8 +22,9 @@ using namespace std;
 
 static vector<raw_data> rc_list;
 
-static void patch_init_rc(FILE *rc, const char *tmp_dir) {
-	file_readline("/init.rc", [=](string_view line) -> bool {
+static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir) {
+	FILE *rc = xfopen(dest, "we");
+	file_readline(src, [=](string_view line) -> bool {
 		// Do not start vaultkeeper
 		if (str_contains(line, "start vaultkeeper")) {
 			LOGD("Remove vaultkeeper\n");
@@ -53,6 +55,9 @@ static void patch_init_rc(FILE *rc, const char *tmp_dir) {
 	gen_rand_str(bc_svc, sizeof(bc_svc));
 	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
 	fprintf(rc, magiskrc, tmp_dir, pfd_svc, ls_svc, bc_svc);
+
+	fclose(rc);
+	clone_attr(src, dest);
 }
 
 static void load_overlay_rc(const char *overlay) {
@@ -98,11 +103,7 @@ void RootFSInit::setup_rootfs() {
 		mv_path("/overlay.d", "/");
 	}
 
-	// Patch init.rc
-	FILE *rc = xfopen("/init.p.rc", "we");
-	patch_init_rc(rc, "/sbin");
-	fclose(rc);
-	clone_attr("/init.rc", "/init.p.rc");
+	patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
 	rename("/init.p.rc", "/init.rc");
 
 	// Create hardlink mirror of /sbin to /root
@@ -196,9 +197,7 @@ static string magic_mount_list;
 
 static void magic_mount(const string &sdir, const string &ddir = "") {
 	auto dir = xopen_dir(sdir.data());
-	for (dirent *entry; (entry = readdir(dir.get()));) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		string src = sdir + "/" + entry->d_name;
 		string dest = ddir + "/" + entry->d_name;
 		if (access(dest.data(), F_OK) == 0) {
@@ -215,10 +214,11 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 	}
 }
 
-#define ROOTMIR MIRRDIR "/system_root"
-#define ROOTBLK BLOCKDIR "/system_root"
+#define ROOTMIR     MIRRDIR "/system_root"
+#define ROOTBLK     BLOCKDIR "/system_root"
 #define MONOPOLICY  "/sepolicy"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
+#define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
 void SARBase::patch_rootdir() {
 	char tmp_dir[16];
@@ -229,9 +229,8 @@ void SARBase::patch_rootdir() {
 		p = tmp_dir + sprintf(tmp_dir, "%s", "/sbin");
 		sepol = "/sbin/.se";
 	} else {
-		strcpy(tmp_dir, "/dev/");
-		p = tmp_dir + 5;
-		p += gen_rand_str(p, 10);
+		p = tmp_dir + sprintf(tmp_dir, "%s", "/dev/");
+		p += gen_rand_str(p, 8);
 		xmkdir(tmp_dir, 0);
 		sepol = "/dev/.se";
 	}
@@ -257,12 +256,9 @@ void SARBase::patch_rootdir() {
 
 	// Patch init
 	raw_data init;
-	file_attr attr;
 	bool redirect = false;
 	int src = xopen("/init", O_RDONLY | O_CLOEXEC);
 	fd_full_read(src, init.buf, init.sz);
-	fgetattr(src, &attr);
-	close(src);
 	uint8_t *eof = init.buf + init.sz;
 	for (uint8_t *p = init.buf; p < eof;) {
 		if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
@@ -281,14 +277,14 @@ void SARBase::patch_rootdir() {
 	xmkdir(ROOTOVL, 0);
 	int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
 	xwrite(dest, init.buf, init.sz);
-	fsetattr(dest, &attr);
+	fclone_attr(src, dest);
+	close(src);
 	close(dest);
 
 	if (!redirect) {
 		// init is dynamically linked, need to patch libselinux
 		raw_data lib;
 		full_read(LIBSELINUX, lib.buf, lib.sz);
-		getattr(LIBSELINUX, &attr);
 		eof = lib.buf + lib.sz;
 		for (uint8_t *p = lib.buf; p < eof; ++p) {
 			if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
@@ -297,12 +293,11 @@ void SARBase::patch_rootdir() {
 				break;
 			}
 		}
-		xmkdir(ROOTOVL "/system", 0755);
-		xmkdir(ROOTOVL "/system/" LIBNAME, 0755);
+		xmkdirs(dirname(ROOTOVL LIBSELINUX), 0755);
 		dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC);
 		xwrite(dest, lib.buf, lib.sz);
-		fsetattr(dest, &attr);
 		close(dest);
+		clone_attr(LIBSELINUX, ROOTOVL LIBSELINUX);
 	}
 
 	// sepolicy
@@ -333,10 +328,13 @@ void SARBase::patch_rootdir() {
 	}
 
 	// Patch init.rc
-	FILE *rc = xfopen(ROOTOVL "/init.rc", "we");
-	patch_init_rc(rc, tmp_dir);
-	fclose(rc);
-	clone_attr("/init.rc", ROOTOVL "/init.rc");
+	if (access("/init.rc", F_OK) == 0) {
+		patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir);
+	} else {
+		// Android 11's new init.rc
+		xmkdirs(dirname(ROOTOVL NEW_INITRC), 0755);
+		patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir);
+	}
 
 	// Mount rootdir
 	magic_mount(ROOTOVL);
