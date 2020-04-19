@@ -87,13 +87,14 @@ void hide_unmount(int pid) {
 	vector<string> targets;
 
 	// Unmount dummy skeletons and /sbin links
+	targets.push_back(MAGISKTMP);
 	parse_mnt("/proc/self/mounts", [&](mntent *mentry) {
-		if (TMPFS_MNT(system) || TMPFS_MNT(vendor) || TMPFS_MNT(sbin) || TMPFS_MNT(product))
+		if (TMPFS_MNT(system) || TMPFS_MNT(vendor) || TMPFS_MNT(product) || TMPFS_MNT(system_ext))
 			targets.emplace_back(mentry->mnt_dir);
 		return true;
 	});
 
-	for (auto &s : targets)
+	for (auto &s : reversed(targets))
 		lazy_unmount(s.data());
 	targets.clear();
 
@@ -104,7 +105,7 @@ void hide_unmount(int pid) {
 		return true;
 	});
 
-	for (auto &s : targets)
+	for (auto &s : reversed(targets))
 		lazy_unmount(s.data());
 }
 

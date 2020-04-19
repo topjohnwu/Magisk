@@ -121,15 +121,13 @@ static int rm_list(const char *pkg, const char *proc = "") {
 		// Critical region
 		mutex_guard lock(monitor_lock);
 		bool remove = false;
-		auto next = hide_set.begin();
-		decltype(next) cur;
-		while (next != hide_set.end()) {
-			cur = next;
-			++next;
-			if (cur->first == pkg && (proc[0] == '\0' || cur->second == proc)) {
+		for (auto it = hide_set.begin(); it != hide_set.end();) {
+			if (it->first == pkg && (proc[0] == '\0' || it->second == proc)) {
 				remove = true;
-				LOGI("hide_list rm: [%s]\n", cur->second.data());
-				hide_set.erase(cur);
+				LOGI("hide_list rm: [%s]\n", it->second.data());
+				it = hide_set.erase(it);
+			} else {
+				++it;
 			}
 		}
 		if (!remove)
@@ -166,6 +164,11 @@ static void init_list(const char *pkg, const char *proc) {
 
 #define LEGACY_LIST MODULEROOT "/.core/hidelist"
 
+#define SAFETYNET_COMPONENT  "com.google.android.gms/.droidguard.DroidGuardService"
+#define SAFETYNET_PROCESS    "com.google.android.gms.unstable"
+#define SAFETYNET_PKG        "com.google.android.gms"
+#define MICROG_SAFETYNET     "org.microg.gms.droidguard"
+
 bool init_list() {
 	LOGD("hide_list: initialize\n");
 
@@ -195,6 +198,11 @@ bool init_list() {
 	rm_list(SAFETYNET_PROCESS);
 	init_list(SAFETYNET_PKG, SAFETYNET_PROCESS);
 	init_list(MICROG_SAFETYNET, SAFETYNET_PROCESS);
+
+	// We also need to hide the default GMS process if MAGISKTMP != /sbin
+	// The snet process communicates with the main process and get additional info
+	if (MAGISKTMP != "/sbin")
+		init_list(SAFETYNET_PKG, SAFETYNET_PKG);
 
 	update_uid_map();
 	return true;
