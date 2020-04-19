@@ -69,7 +69,6 @@ class SARBase : public MagiskInit {
 protected:
 	raw_data config;
 	std::vector<raw_file> overlays;
-	std::string tmp_dir;
 
 	void backup_files();
 	void patch_rootdir();

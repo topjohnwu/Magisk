@@ -222,24 +222,28 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 
 void SARBase::patch_rootdir() {
+	char tmp_dir[128];
+
 	// TODO: dynamic paths
-	tmp_dir = "/sbin";
+	char *p = tmp_dir + sprintf(tmp_dir, "%s", "/sbin");
 
-	setup_tmp(tmp_dir.data(), self, config);
-	persist_dir = tmp_dir +  "/" MIRRDIR "/persist";
+	setup_tmp(tmp_dir, self, config);
+	persist_dir = string(tmp_dir) +  "/" MIRRDIR "/persist";
 
-	chdir(tmp_dir.data());
+	chdir(tmp_dir);
 
 	// Mount system_root mirror
 	struct stat st;
 	xstat("/", &st);
 	xmkdir(ROOTMIR, 0755);
 	mknod(ROOTBLK, S_IFBLK | 0600, st.st_dev);
-	if (xmount(ROOTBLK, ROOTMIR, "ext4", MS_RDONLY, nullptr))
-		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
+	strcpy(p, "/" ROOTBLK);
+	if (xmount(tmp_dir, ROOTMIR, "ext4", MS_RDONLY, nullptr))
+		xmount(tmp_dir, ROOTMIR, "erofs", MS_RDONLY, nullptr);
+	*p = '\0';
 
 	// Recreate original sbin structure if necessary
-	if (tmp_dir == "/sbin")
+	if (tmp_dir == "/sbin"sv)
 		recreate_sbin(ROOTMIR "/sbin", true);
 
 	// Patch init
@@ -303,7 +307,7 @@ void SARBase::patch_rootdir() {
 	if (connect(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET)) == 0) {
 		LOGD("ACK init tracer to write backup files\n");
 		// Let tracer know where tmp_dir is
-		write_string(sockfd, tmp_dir.data());
+		write_string(sockfd, tmp_dir);
 		// Wait for tracer to finish copying files
 		int ack;
 		read(sockfd, &ack, sizeof(ack));

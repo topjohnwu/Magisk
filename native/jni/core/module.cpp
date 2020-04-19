@@ -165,7 +165,7 @@ public:
 	template<class T, class ...Args>
 	T *emplace_or_get(string_view name, Args &...args) {
 		return iter_to_node<T>(insert(children.find(name), type_id<T>(),
-				[&](auto _) { return new T(std::forward<Args>(args)...); }, true));
+		        [&](auto _) { return new T(std::forward<Args>(args)...); }, true));
 	}
 
 	// Return upgraded node or null if rejected

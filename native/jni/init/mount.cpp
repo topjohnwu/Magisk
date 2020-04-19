@@ -153,11 +153,13 @@ static void switch_root(const string &path) {
 static void mount_persist(const char *dev_base, const char *mnt_base) {
 	string mnt_point = mnt_base + "/persist"s;
 	strcpy(partname, "persist");
-	sprintf(block_dev, "%s/persist", dev_base);
+	xrealpath(dev_base, block_dev);
+	char *s = block_dev + strlen(block_dev);
+	strcpy(s, "/persist");
 	if (setup_block(false) < 0) {
 		// Fallback to cache
 		strcpy(partname, "cache");
-		sprintf(block_dev, "%s/cache", dev_base);
+		strcpy(s, "/cache");
 		if (setup_block(false) < 0) {
 			// Try NVIDIA's BS
 			strcpy(partname, "CAC");
