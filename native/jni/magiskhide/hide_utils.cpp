@@ -162,12 +162,9 @@ static void init_list(const char *pkg, const char *proc) {
 	kill_process(proc);
 }
 
-#define LEGACY_LIST MODULEROOT "/.core/hidelist"
-
-#define SAFETYNET_COMPONENT  "com.google.android.gms/.droidguard.DroidGuardService"
-#define SAFETYNET_PROCESS    "com.google.android.gms.unstable"
-#define SAFETYNET_PKG        "com.google.android.gms"
-#define MICROG_SAFETYNET     "org.microg.gms.droidguard"
+#define SNET_PROC    "com.google.android.gms.unstable"
+#define GMS_PKG      "com.google.android.gms"
+#define MICROG_PKG   "org.microg.gms.droidguard"
 
 bool init_list() {
 	LOGD("hide_list: initialize\n");
@@ -184,25 +181,14 @@ bool init_list() {
 		kill_process("usap64", true);
 	}
 
-	// Migrate old hide list into database
-	if (access(LEGACY_LIST, R_OK) == 0) {
-		file_readline(true, LEGACY_LIST, [](string_view s) -> bool {
-			add_list(s.data());
-			return true;
-		});
-		unlink(LEGACY_LIST);
-	}
-
 	// Add SafetyNet by default
-	rm_list(SAFETYNET_COMPONENT);
-	rm_list(SAFETYNET_PROCESS);
-	init_list(SAFETYNET_PKG, SAFETYNET_PROCESS);
-	init_list(MICROG_SAFETYNET, SAFETYNET_PROCESS);
+	init_list(GMS_PKG, SNET_PROC);
+	init_list(MICROG_PKG, SNET_PROC);
 
 	// We also need to hide the default GMS process if MAGISKTMP != /sbin
 	// The snet process communicates with the main process and get additional info
 	if (MAGISKTMP != "/sbin")
-		init_list(SAFETYNET_PKG, SAFETYNET_PKG);
+		init_list(GMS_PKG, GMS_PKG);
 
 	update_uid_map();
 	return true;
