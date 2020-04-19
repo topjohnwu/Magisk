@@ -68,9 +68,9 @@ dependencies {
 
     implementation 'com.github.topjohnwu:jtar:1.0.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.7'
+    implementation 'com.github.pwittchen:reactivenetwork-rx2:3.0.8'
 
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.18'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.19'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
@@ -82,7 +82,7 @@ dependencies {
     implementation "${bindingAdapter}:${vBAdapt}"
     implementation "${bindingAdapter}-recyclerview:${vBAdapt}"
 
-    def vMarkwon = '4.3.0'
+    def vMarkwon = '4.3.1'
     implementation "io.noties.markwon:core:${vMarkwon}"
     implementation "io.noties.markwon:html:${vMarkwon}"
     implementation "io.noties.markwon:image:${vMarkwon}"
@@ -123,11 +123,11 @@ dependencies {
 
     implementation 'androidx.biometric:biometric:1.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta4'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-beta01'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01'
     implementation 'androidx.browser:browser:1.2.0'
-    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.fragment:fragment-ktx:1.2.3'
+    implementation 'androidx.fragment:fragment-ktx:1.2.4'
     implementation 'androidx.work:work-runtime:2.3.4'
     implementation 'androidx.transition:transition:1.3.1'
     implementation 'androidx.multidex:multidex:2.0.1'
