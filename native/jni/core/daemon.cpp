@@ -50,6 +50,7 @@ static void *request_handler(void *args) {
 	case LATE_START:
 	case BOOT_COMPLETE:
 	case SQLITE_CMD:
+	case GET_PATH:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -106,7 +107,7 @@ static void *request_handler(void *args) {
 	return nullptr;
 }
 
-static void main_daemon() {
+static void daemon_entry(int ppid) {
 	android_logging();
 
 	int fd = xopen("/dev/null", O_WRONLY);
@@ -118,20 +119,24 @@ static void main_daemon() {
 	xdup2(fd, STDIN_FILENO);
 	if (fd > STDERR_FILENO)
 		close(fd);
-	close(fd);
 
 	setsid();
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 
+	// Make sure ppid is not in acct
+	char src[64], dest[64];
+	sprintf(src, "/acct/uid_0/pid_%d", ppid);
+	sprintf(dest, "/acct/uid_0/pid_%d", getpid());
+	rename(src, dest);
+
 	// Get self stat
-	char path[4096];
-	xreadlink("/proc/self/exe", path, sizeof(path));
-	MAGISKTMP = dirname(path);
+	xreadlink("/proc/self/exe", src, sizeof(src));
+	MAGISKTMP = dirname(src);
 	xstat("/proc/self/exe", &self_st);
 
-	restore_rootcon();
+	restore_tmpcon();
 
-	// Unmount pre-init patches
+	// SAR cleanups
 	auto mount_list = MAGISKTMP + "/" ROOTMNT;
 	if (access(mount_list.data(), F_OK) == 0) {
 		file_readline(true, mount_list.data(), [](string_view line) -> bool {
@@ -139,13 +144,13 @@ static void main_daemon() {
 			return true;
 		});
 	}
+	unlink("/dev/.se");
 
 	LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
 
 	// Get API level
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
 		if (key == "ro.build.version.sdk") {
-			LOGI("* Device API level: %s\n", val.data());
 			SDK_INT = parse_int(val);
 			return false;
 		}
@@ -155,10 +160,10 @@ static void main_daemon() {
 		// In case some devices do not store this info in build.prop, fallback to getprop
 		auto sdk = getprop("ro.build.version.sdk");
 		if (!sdk.empty()) {
-			LOGI("* Device API level: %s\n", sdk.data());
 			SDK_INT = parse_int(sdk);
 		}
 	}
+	LOGI("* Device API level: %d\n", SDK_INT);
 
 	// Load config status
 	auto config = MAGISKTMP + "/" INTLROOT "/config";
@@ -204,14 +209,7 @@ int connect_daemon(bool create) {
 		LOGD("client: launching new main daemon process\n");
 		if (fork_dont_care() == 0) {
 			close(fd);
-
-			// Make sure ppid is not in acct
-			char src[64], dest[64];
-			sprintf(src, "/acct/uid_0/pid_%d", ppid);
-			sprintf(dest, "/acct/uid_0/pid_%d", getpid());
-			rename(src, dest);
-
-			main_daemon();
+			daemon_entry(ppid);
 		}
 
 		while (connect(fd, (struct sockaddr*) &sun, len))

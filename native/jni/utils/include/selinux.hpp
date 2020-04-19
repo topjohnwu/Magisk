@@ -33,4 +33,4 @@ void setfilecon_at(int dirfd, const char *name, const char *con);
 void selinux_builtin_impl();
 void dload_selinux();
 void restorecon();
-void restore_rootcon();
+void restore_tmpcon();
