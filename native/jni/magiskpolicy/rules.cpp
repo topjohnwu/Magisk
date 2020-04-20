@@ -86,6 +86,7 @@ void sepol_magisk_rules() {
 	allowSuClient("untrusted_app");
 	allowSuClient("untrusted_app_25");
 	allowSuClient("untrusted_app_27");
+	allowSuClient("untrusted_app_29");
 	allowSuClient("update_engine");
 
 	// suRights
