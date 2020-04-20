@@ -74,7 +74,7 @@ void FirstStageInit::prepare() {
 }
 
 #define INIT_PATH  "/system/bin/init"
-#define REDIR_PATH "/system/bin/adbd"
+#define REDIR_PATH "/system/bin/am"
 
 void SARFirstStageInit::prepare() {
 	int pid = getpid();
