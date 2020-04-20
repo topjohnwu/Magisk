@@ -234,7 +234,7 @@ mount_partitions() {
 
   # Mount ro partitions
   mount_ro_ensure "system$SLOT app$SLOT" /system
-  if [ -f /system/init ] || [ -L /system/init ]; then
+  if [ -e /system/init ]; then
     SYSTEM_ROOT=true
     setup_mntpoint /system_root
     if ! mount --move /system /system_root; then
