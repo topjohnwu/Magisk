@@ -78,6 +78,7 @@ chmod -R 755 $MAGISKBIN
 # addon.d
 if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
+  blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
   mount -o rw,remount /system
   ADDOND=/system/addon.d/99-magisk.sh
   cp -af $COMMONDIR/addon.d.sh $ADDOND
