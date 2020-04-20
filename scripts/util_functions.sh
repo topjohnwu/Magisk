@@ -483,6 +483,7 @@ sign_chromeos() {
 remove_system_su() {
   if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
     ui_print "- Removing system installed root"
+    blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
     mount -o rw,remount /system
     # SuperSU
     if [ -e /system/bin/.ext/.su ]; then
