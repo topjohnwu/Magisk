@@ -195,7 +195,8 @@ void SARBase::backup_files() {
 		backup_folder("/overlay.d", overlays);
 
 	full_read("/proc/self/exe", self.buf, self.sz);
-	full_read("/.backup/.magisk", config.buf, config.sz);
+	if (access("/.backup/.magisk", R_OK) == 0)
+		full_read("/.backup/.magisk", config.buf, config.sz);
 }
 
 void SARBase::mount_system_root() {
@@ -242,11 +243,9 @@ void SARFirstStageInit::early_mount() {
 
 void SecondStageInit::early_mount() {
 	backup_files();
-	rm_rf("/system");
-	rm_rf("/.backup");
-	rm_rf("/overlay.d");
 
-	umount2("/system/bin/init", MNT_DETACH);
+	umount2("/init", MNT_DETACH);
+	umount2("/proc/self/exe", MNT_DETACH);
 
 	if (access("/system_root", F_OK) == 0)
 		switch_root("/system_root");

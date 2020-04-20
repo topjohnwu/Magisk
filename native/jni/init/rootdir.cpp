@@ -131,9 +131,11 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 		return false;
 	}
 
-	// Mount selinuxfs to communicate with kernel
-	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
-	mount_list.emplace_back(SELINUX_MNT);
+	if (access(SELINUX_VERSION, F_OK) != 0) {
+		// Mount selinuxfs to communicate with kernel
+		xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+		mount_list.emplace_back(SELINUX_MNT);
+	}
 
 	if (patch_init)
 		load_split_cil();
@@ -307,10 +309,10 @@ void SARBase::patch_rootdir() {
 	struct sockaddr_un sun;
 	int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (connect(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET)) == 0) {
-		LOGD("ACK init tracer to write backup files\n");
-		// Let tracer know where tmp_dir is
+		LOGD("ACK init daemon to write backup files\n");
+		// Let daemon know where tmp_dir is
 		write_string(sockfd, tmp_dir);
-		// Wait for tracer to finish copying files
+		// Wait for daemon to finish restoring files
 		int ack;
 		read(sockfd, &ack, sizeof(ack));
 	} else {

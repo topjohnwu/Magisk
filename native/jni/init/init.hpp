@@ -101,7 +101,7 @@ public:
 
 class SARFirstStageInit : public SARBase {
 private:
-	void traced_exec_init();
+	void prepare();
 protected:
 	void early_mount() override;
 public:
@@ -110,7 +110,8 @@ public:
 	};
 	void start() override {
 		early_mount();
-		traced_exec_init();
+		prepare();
+		exec_init();
 	}
 };
 

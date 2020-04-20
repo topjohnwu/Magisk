@@ -1,6 +1,3 @@
-#include <sys/ptrace.h>
-#include <sys/wait.h>
-
 #include <magisk.hpp>
 #include <utils.hpp>
 #include <logging.hpp>
@@ -76,19 +73,40 @@ void FirstStageInit::prepare() {
 	chdir("/");
 }
 
-static inline long xptrace(int request, pid_t pid, void *addr, void *data) {
-	long ret = ptrace(request, pid, addr, data);
-	if (ret < 0)
-		PLOGE("ptrace %d", pid);
-	return ret;
-}
+#define INIT_PATH  "/system/bin/init"
+#define REDIR_PATH "/system/bin/adbd"
 
-static inline long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_t data = 0) {
-	return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
-}
-
-void SARFirstStageInit::traced_exec_init() {
+void SARFirstStageInit::prepare() {
 	int pid = getpid();
+
+	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
+
+	// Patch init binary
+	raw_data init;
+	int src = xopen("/init", O_RDONLY);
+	fd_full_read(src, init.buf, init.sz);
+	for (uint8_t *p = init.buf, *eof = init.buf + init.sz; p < eof; ++p) {
+		if (memcmp(p, INIT_PATH, sizeof(INIT_PATH)) == 0) {
+			LOGD("Patch init [" INIT_PATH "] -> [" REDIR_PATH "]\n");
+			memcpy(p, REDIR_PATH, sizeof(REDIR_PATH));
+			break;
+		}
+	}
+	int dest = xopen("/dev/init", O_CREAT | O_WRONLY, 0);
+	write(dest, init.buf, init.sz);
+	fclone_attr(src, dest);
+	close(dest);
+
+	// Replace redirect init with magiskinit
+	dest = xopen("/dev/magiskinit", O_CREAT | O_WRONLY, 0);
+	write(dest, self.buf, self.sz);
+	fclone_attr(src, dest);
+	close(src);
+	close(dest);
+
+	xmount("/dev/init", "/init", nullptr, MS_BIND, nullptr);
+	xmount("/dev/magiskinit", REDIR_PATH, nullptr, MS_BIND, nullptr);
+	xumount2("/dev", MNT_DETACH);
 
 	// Block SIGUSR1
 	sigset_t block, old;
@@ -97,42 +115,22 @@ void SARFirstStageInit::traced_exec_init() {
 	sigprocmask(SIG_BLOCK, &block, &old);
 
 	if (int child = xfork(); child) {
-		LOGD("init tracer [%d]\n", child);
-		// Wait for children to attach
+		LOGD("init daemon [%d]\n", child);
+		// Wait for children signal
 		int sig;
 		sigwait(&block, &sig);
 
 		// Restore sigmask
-		sigprocmask(SIG_BLOCK, &old, nullptr);
-
-		// Re-exec init
-		exec_init();
+		sigprocmask(SIG_SETMASK, &old, nullptr);
 	} else {
-		// Attach to parent to trace exec
-		xptrace(PTRACE_ATTACH, pid);
-		waitpid(pid, nullptr, __WALL | __WNOTHREAD);
-		xptrace(PTRACE_SETOPTIONS, pid, nullptr, PTRACE_O_TRACEEXEC);
-		xptrace(PTRACE_CONT, pid, 0, SIGUSR1);
-
-		// Wait for execve
-		waitpid(pid, nullptr, __WALL | __WNOTHREAD);
-
-		// Swap out init with bind mount
-		xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
-		int init = xopen("/dev/magiskinit", O_CREAT | O_WRONLY, 0750);
-		write(init, self.buf, self.sz);
-		close(init);
-		xmount("/dev/magiskinit", "/init", nullptr, MS_BIND, nullptr);
-		xumount2("/dev", MNT_DETACH);
-
 		// Establish socket for 2nd stage ack
 		struct sockaddr_un sun;
 		int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 		xbind(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET));
 		xlisten(sockfd, 1);
 
-		// Resume init
-		xptrace(PTRACE_DETACH, pid);
+		// Resume parent
+		kill(pid, SIGUSR1);
 
 		// Wait for second stage ack
 		int client = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
