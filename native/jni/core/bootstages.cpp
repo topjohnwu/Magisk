@@ -33,14 +33,21 @@ extern void auto_start_magiskhide();
 #define SETMIR(b, part)   sprintf(b, "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
 #define SETBLK(b, part)   sprintf(b, "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
-#define mount_mirror(part, flag) { \
-	xstat(me->mnt_fsname, &st); \
+#define mount_mirror(part, flag) \
+else if (DIR_IS(part) && me->mnt_type != "tmpfs"sv && lstat(me->mnt_dir, &st) == 0) { \
 	SETMIR(buf1, part); \
 	SETBLK(buf2, part); \
-	mknod(buf2, (st.st_mode & S_IFMT) | 0600, st.st_rdev); \
+	mknod(buf2, S_IFBLK | 0600, st.st_dev); \
 	xmkdir(buf1, 0755); \
 	xmount(buf2, buf1, me->mnt_type, flag, nullptr); \
 	LOGI("mount: %s\n", buf1); \
+}
+
+#define link_mirror(part) \
+SETMIR(buf1, part); \
+if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
+	xsymlink("./system/" #part, buf1); \
+	LOGI("link: %s\n", buf1); \
 }
 
 static bool magisk_env() {
@@ -58,12 +65,12 @@ static bool magisk_env() {
 	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf1 };
 	for (auto alt : alt_bin) {
 		struct stat st;
-		if (lstat(alt, &st) != -1) {
+		if (lstat(alt, &st) == 0) {
 			if (S_ISLNK(st.st_mode)) {
 				unlink(alt);
 				continue;
 			}
-			rm_rf(DATABIN);;
+			rm_rf(DATABIN);
 			cp_afc(alt, DATABIN);
 			rm_rf(alt);
 			break;
@@ -81,9 +88,6 @@ static bool magisk_env() {
 
 	sprintf(buf1, "%s/" MODULEMNT, MAGISKTMP.data());
 	xmkdir(buf1, 0755);
-	// TODO: Remove. Backwards compatibility for old manager
-	sprintf(buf1, "%s/" INTLROOT "/img", MAGISKTMP.data());
-	xsymlink("./modules", buf1);
 
 	// Directories in /data/adb
 	xmkdir(DATABIN, 0755);
@@ -92,24 +96,16 @@ static bool magisk_env() {
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
 	LOGI("* Mounting mirrors");
-	bool system_as_root = false;
-	struct stat st;
+
 	parse_mnt("/proc/mounts", [&](mntent *me) {
-		if (DIR_IS(system_root)) {
-			mount_mirror(system_root, MS_RDONLY);
-			SETMIR(buf1, system);
-			xsymlink("./system_root/system", buf1);
-			LOGI("link: %s\n", buf1);
-			system_as_root = true;
-		} else if (!system_as_root && DIR_IS(system)) {
-			mount_mirror(system, MS_RDONLY);
-		} else if (DIR_IS(vendor)) {
-			mount_mirror(vendor, MS_RDONLY);
-		} else if (DIR_IS(product)) {
-			mount_mirror(product, MS_RDONLY);
-		} else if (DIR_IS(data) && me->mnt_type != "tmpfs"sv) {
-			mount_mirror(data, 0);
-		} else if (SDK_INT >= 24 && DIR_IS(proc) && !strstr(me->mnt_opts, "hidepid=2")) {
+		struct stat st;
+		if (0) {}
+		mount_mirror(system, MS_RDONLY)
+		mount_mirror(vendor, MS_RDONLY)
+		mount_mirror(product, MS_RDONLY)
+		mount_mirror(system_ext, MS_RDONLY)
+		mount_mirror(data, 0)
+		else if (SDK_INT >= 24 && DIR_IS(proc) && !strstr(me->mnt_opts, "hidepid=2")) {
 			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 		}
 		return true;
@@ -117,20 +113,12 @@ static bool magisk_env() {
 	SETMIR(buf1, system);
 	SETMIR(buf2, system_root);
 	if (access(buf1, F_OK) != 0 && access(buf2, F_OK) == 0) {
-		// Pre-init mirrors
 		xsymlink("./system_root/system", buf1);
 		LOGI("link: %s\n", buf1);
 	}
-	SETMIR(buf1, vendor);
-	if (access(buf1, F_OK) != 0) {
-		xsymlink("./system/vendor", buf1);
-		LOGI("link: %s\n", buf1);
-	}
-	SETMIR(buf1, product);
-	if (access("/system/product", F_OK) == 0 && access(buf1, F_OK) != 0) {
-		xsymlink("./system/product", buf1);
-		LOGI("link: %s\n", buf1);
-	}
+	link_mirror(vendor);
+	link_mirror(product);
+	link_mirror(system_ext);
 
 	// Disable/remove magiskhide, resetprop
 	if (SDK_INT < 19) {
