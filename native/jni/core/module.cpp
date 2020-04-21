@@ -303,6 +303,7 @@ public:
 		const string &dest = node_path();
 		file_attr a;
 		getattr(src.data(), &a);
+		mkdir(dest.data(), 0);
 		xmount("tmpfs", dest.data(), "tmpfs", 0, nullptr);
 		VLOGI("mnt_tmp", "tmpfs", dest.data());
 		setattr(dest.data(), &a);
