@@ -61,11 +61,15 @@ resolve_vars() {
 }
 
 print_title() {
-  local len=$(echo -n $1 | wc -c)
+  local len line1len line2len pounds
+  line1len=$(echo -n $1 | wc -c)
+  line2len=$(echo -n $2 | wc -c)
+  [ $line1len -gt $line2len ] && len=$line1len || len=$line2len
   len=$((len + 2))
-  local pounds=$(printf "%${len}s" | tr ' ' '*')
+  pounds=$(printf "%${len}s" | tr ' ' '*')
   ui_print "$pounds"
   ui_print " $1 "
+  [ "$2" ] && ui_print " $2 "
   ui_print "$pounds"
 }
 
@@ -652,8 +656,9 @@ install_module() {
   $BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
   local MODULEROOT=$NVBASE/$MODDIRNAME
   MODID=`grep_prop id $TMPDIR/module.prop`
-  MODPATH=$MODULEROOT/$MODID
   MODNAME=`grep_prop name $TMPDIR/module.prop`
+  MODAUTH=`grep_prop author $TMPDIR/module.prop`
+  MODPATH=$MODULEROOT/$MODID
 
   # Create mod paths
   rm -rf $MODPATH 2>/dev/null
@@ -679,7 +684,7 @@ install_module() {
     ui_print "- Setting permissions"
     set_permissions
   else
-    print_title "$MODNAME"
+    print_title "$MODNAME" "by $MODAUTH"
     print_title "Powered by Magisk"
 
     unzip -o "$ZIPFILE" customize.sh -d $MODPATH >&2

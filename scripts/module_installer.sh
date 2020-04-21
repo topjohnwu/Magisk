@@ -48,12 +48,15 @@ is_legacy_script() {
 }
 
 print_modname() {
-  local len
-  len=`echo -n $MODNAME | wc -c`
+  local authlen len namelen pounds
+  namelen=`echo -n $MODNAME | wc -c`
+  authlen=$((`echo -n $MODAUTH | wc -c` + 3))
+  [ $namelen -gt $authlen ] && len=$namelen || len=$authlen
   len=$((len + 2))
-  local pounds=`printf "%${len}s" | tr ' ' '*'`
+  pounds=$(printf "%${len}s" | tr ' ' '*')
   ui_print "$pounds"
   ui_print " $MODNAME "
+  ui_print " by $MODAUTH "
   ui_print "$pounds"
   ui_print "*******************"
   ui_print " Powered by Magisk "
@@ -95,8 +98,9 @@ unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
 $BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
 MODULEROOT=$NVBASE/$MODDIRNAME
 MODID=`grep_prop id $TMPDIR/module.prop`
-MODPATH=$MODULEROOT/$MODID
 MODNAME=`grep_prop name $TMPDIR/module.prop`
+MODAUTH=`grep_prop author $TMPDIR/module.prop`
+MODPATH=$MODULEROOT/$MODID
 
 # Create mod paths
 rm -rf $MODPATH 2>/dev/null
