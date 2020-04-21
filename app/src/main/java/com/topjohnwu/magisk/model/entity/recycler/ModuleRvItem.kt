@@ -110,22 +110,23 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
         }
 
     @get:Bindable
-    var isEnabled = item.enable
+    var isEnabled
+        get() = item.enable
         set(value) {
-            field = value
             item.enable = value
             notifyChange(BR.enabled)
         }
+
     @get:Bindable
-    var isRemoved = item.remove
+    var isRemoved
+        get() = item.remove
         set(value) {
-            field = value
             item.remove = value
             notifyChange(BR.removed)
         }
 
     val isUpdated get() = item.updated
-    val isModified get() = isRemoved || item.updated
+    val isModified get() = isRemoved || isUpdated
 
     fun toggle() {
         isEnabled = !isEnabled

@@ -12,12 +12,8 @@
         android:installLocation="internalOnly"
         android:usesCleartextTraffic="true"
         android:supportsRtl="true"
+        android:theme="@android:style/Theme.Translucent.NoTitleBar"
         tools:ignore="UnusedAttribute">
-
-        <activity
-            android:name="a.r"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:process=":remote" />
 
         <provider
             android:name="a.p"

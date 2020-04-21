@@ -10,8 +10,10 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
 
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
+
+using namespace std;
 
 FILE *xfopen(const char *pathname, const char *mode) {
 	FILE *fp = fopen(pathname, mode);
@@ -47,6 +49,14 @@ int xopen(const char *pathname, int flags, mode_t mode) {
 
 int xopenat(int dirfd, const char *pathname, int flags) {
 	int fd = openat(dirfd, pathname, flags);
+	if (fd < 0) {
+		PLOGE("openat: %s", pathname);
+	}
+	return fd;
+}
+
+int xopenat(int dirfd, const char *pathname, int flags, mode_t mode) {
+	int fd = openat(dirfd, pathname, flags, mode);
 	if (fd < 0) {
 		PLOGE("openat: %s", pathname);
 	}
@@ -121,11 +131,18 @@ DIR *xfdopendir(int fd) {
 
 struct dirent *xreaddir(DIR *dirp) {
 	errno = 0;
-	struct dirent *e = readdir(dirp);
-	if (errno && e == nullptr) {
-		PLOGE("readdir");
+	for (dirent *e;;) {
+		e = readdir(dirp);
+		if (e == nullptr) {
+			if (errno)
+				PLOGE("readdir");
+			return nullptr;
+		} else if (e->d_name == "."sv || e->d_name == ".."sv) {
+			// Filter . and .. for users
+			continue;
+		}
+		return e;
 	}
-	return e;
 }
 
 pid_t xsetsid() {
@@ -254,6 +271,14 @@ int xfstat(int fd, struct stat *buf) {
 	int ret = fstat(fd, buf);
 	if (ret == -1) {
 		PLOGE("fstat %d", fd);
+	}
+	return ret;
+}
+
+int xdup(int fd) {
+	int ret = dup(fd);
+	if (ret == -1) {
+		PLOGE("dup");
 	}
 	return ret;
 }
@@ -424,6 +449,14 @@ int xinotify_init1(int flags) {
 	int ret = inotify_init1(flags);
 	if (ret == -1) {
 		PLOGE("inotify_init1");
+	}
+	return ret;
+}
+
+char *xrealpath(const char *path, char *resolved_path) {
+	char *ret = realpath(path, resolved_path);
+	if (ret == nullptr) {
+		PLOGE("xrealpath");
 	}
 	return ret;
 }

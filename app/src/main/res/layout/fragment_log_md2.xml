@@ -15,20 +15,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{viewModel.items}"
+        <include
+            android:id="@+id/log_filter_magisk"
+            layout="@layout/include_log_magisk"
+            viewModel="@{viewModel}"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingStart="@dimen/l1"
-            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-            android:paddingEnd="@dimen/l1"
-            android:paddingBottom="@{viewModel.insets.bottom}"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_log_access_md2"
-            tools:paddingTop="24dp" />
+            android:layout_height="match_parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/log_filter_toggle"
@@ -53,27 +45,13 @@
             app:cardCornerRadius="0dp">
 
             <include
-                android:id="@+id/log_filter_include"
-                layout="@layout/include_log_magisk"
+                android:id="@+id/log_filter_superuser"
+                layout="@layout/include_log_superuser"
                 viewModel="@{viewModel}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
         </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
-
-        <FrameLayout
-            gone="@{!viewModel.items.empty}"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-
-            <include
-                item="@{viewModel.itemEmpty}"
-                layout="@layout/item_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </FrameLayout>
 
     </FrameLayout>
 

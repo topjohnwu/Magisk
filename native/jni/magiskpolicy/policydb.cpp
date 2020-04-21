@@ -5,10 +5,10 @@
 
 #include <cil/cil.h>
 
-#include <utils.h>
-#include <logging.h>
-#include <stream.h>
-#include <magiskpolicy.h>
+#include <utils.hpp>
+#include <logging.hpp>
+#include <stream.hpp>
+#include <magiskpolicy.hpp>
 
 #include "sepolicy.h"
 

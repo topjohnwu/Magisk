@@ -1,6 +1,6 @@
-#include <logging.h>
+#include <logging.hpp>
 #include <flags.h>
-#include <magiskpolicy.h>
+#include <magiskpolicy.hpp>
 
 #include "sepolicy.h"
 
@@ -86,6 +86,7 @@ void sepol_magisk_rules() {
 	allowSuClient("untrusted_app");
 	allowSuClient("untrusted_app_25");
 	allowSuClient("untrusted_app_27");
+	allowSuClient("untrusted_app_29");
 	allowSuClient("update_engine");
 
 	// suRights

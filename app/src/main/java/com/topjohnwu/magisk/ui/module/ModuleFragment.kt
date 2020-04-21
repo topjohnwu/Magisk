@@ -33,13 +33,18 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
         get() = binding.moduleFilter.isVisible
         set(value) {
             if (!value) hideKeyboard()
-            (activity as? MainActivity)?.requestNavigationHidden(value)
             MotionRevealHelper.withViews(binding.moduleFilter, binding.moduleFilterToggle, value)
+            with(activity as MainActivity) {
+                requestNavigationHidden(value)
+                setDisplayHomeAsUpEnabled(value)
+            }
         }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        InstallExternalModuleEvent.onActivityResult(requireContext(), requestCode, resultCode, data)
+        InstallExternalModuleEvent.onActivityResult(requestCode, resultCode, data)?.also {
+            it.navigate()
+        }
     }
 
     override fun onStart() {

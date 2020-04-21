@@ -8,11 +8,11 @@
 #include <sys/types.h>
 #include <sys/mount.h>
 
-#include <daemon.h>
-#include <utils.h>
+#include <daemon.hpp>
+#include <utils.hpp>
 #include <flags.h>
 
-#include "magiskhide.h"
+#include "magiskhide.hpp"
 
 using namespace std::literals;
 
@@ -20,7 +20,7 @@ bool hide_enabled = false;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-		FULL_VER(MagiskHide) "\n\n"
+		NAME_WITH_VER(MagiskHide) "\n\n"
 		"Usage: %s [action [arguments...] ]\n\n"
 		"Actions:\n"
   		"   status          Return the status of magiskhide\n"

@@ -8,7 +8,7 @@
 #include <errno.h>
 #include <mntent.h>
 
-#include "missing.h"
+#include "missing.hpp"
 
 /* Original source: https://opensource.apple.com/source/cvs/cvs-19/cvs/lib/getline.c
  * License: GPL 2 or later

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.tasks.patchDTB
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.view.Notifications
@@ -20,6 +21,7 @@ open class SplashActivity : Activity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.SplashTheme)
         super.onCreate(savedInstanceState)
         Shell.getShell { Shell.EXECUTOR.execute(this::initAndStart) }
     }

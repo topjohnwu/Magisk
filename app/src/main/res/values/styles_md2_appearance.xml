@@ -103,6 +103,7 @@
 
     <style name="AppearanceFoundation.Tiny.Bold">
         <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/exo_bold</item>
     </style>
 
     <style name="AppearanceFoundation.Tiny.Variant">

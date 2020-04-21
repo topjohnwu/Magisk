@@ -4,7 +4,6 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.ProviderInfo;
-import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
@@ -16,18 +15,11 @@ import android.provider.OpenableColumns;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
-import com.topjohnwu.shared.R;
-
-import org.xmlpull.v1.XmlPullParserException;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.xmlpull.v1.XmlPullParser.END_DOCUMENT;
-import static org.xmlpull.v1.XmlPullParser.START_TAG;
 
 /**
  * Modified from androidx.core.content.FileProvider
@@ -35,17 +27,6 @@ import static org.xmlpull.v1.XmlPullParser.START_TAG;
 public class FileProvider extends ContentProvider {
     private static final String[] COLUMNS = {
             OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE };
-
-    private static final String TAG_ROOT_PATH = "root-path";
-    private static final String TAG_FILES_PATH = "files-path";
-    private static final String TAG_CACHE_PATH = "cache-path";
-    private static final String TAG_EXTERNAL = "external-path";
-    private static final String TAG_EXTERNAL_FILES = "external-files-path";
-    private static final String TAG_EXTERNAL_CACHE = "external-cache-path";
-    private static final String TAG_EXTERNAL_MEDIA = "external-media-path";
-
-    private static final String ATTR_NAME = "name";
-    private static final String ATTR_PATH = "path";
 
     private static final File DEVICE_ROOT = new File("/");
 
@@ -171,63 +152,36 @@ public class FileProvider extends ContentProvider {
         synchronized (sCache) {
             strat = sCache.get(authority);
             if (strat == null) {
-                try {
-                    strat = parsePathStrategy(context, authority);
-                } catch (IOException e) {
-                    throw new IllegalArgumentException("Failed to parse xml", e);
-                } catch (XmlPullParserException e) {
-                    throw new IllegalArgumentException("Failed to parse xml", e);
-                }
+                strat = createPathStrategy(context, authority);
                 sCache.put(authority, strat);
             }
         }
         return strat;
     }
 
-    private static PathStrategy parsePathStrategy(Context context, String authority)
-            throws IOException, XmlPullParserException {
+    private static PathStrategy createPathStrategy(Context context, String authority) {
         final SimplePathStrategy strat = new SimplePathStrategy(authority);
 
-        final XmlResourceParser in = context.getResources().getXml(R.xml.file_paths);
-
-        int type;
-        while ((type = in.next()) != END_DOCUMENT) {
-            if (type == START_TAG) {
-                final String tag = in.getName();
-
-                final String name = in.getAttributeValue(null, ATTR_NAME);
-                String path = in.getAttributeValue(null, ATTR_PATH);
-
-                File target = null;
-                if (TAG_ROOT_PATH.equals(tag)) {
-                    target = DEVICE_ROOT;
-                } else if (TAG_FILES_PATH.equals(tag)) {
-                    target = context.getFilesDir();
-                } else if (TAG_CACHE_PATH.equals(tag)) {
-                    target = context.getCacheDir();
-                } else if (TAG_EXTERNAL.equals(tag)) {
-                    target = Environment.getExternalStorageDirectory();
-                } else if (TAG_EXTERNAL_FILES.equals(tag)) {
-                    File[] externalFilesDirs = getExternalFilesDirs(context, null);
-                    if (externalFilesDirs.length > 0) {
-                        target = externalFilesDirs[0];
-                    }
-                } else if (TAG_EXTERNAL_CACHE.equals(tag)) {
-                    File[] externalCacheDirs = getExternalCacheDirs(context);
-                    if (externalCacheDirs.length > 0) {
-                        target = externalCacheDirs[0];
-                    }
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                        && TAG_EXTERNAL_MEDIA.equals(tag)) {
-                    File[] externalMediaDirs = context.getExternalMediaDirs();
-                    if (externalMediaDirs.length > 0) {
-                        target = externalMediaDirs[0];
-                    }
-                }
-
-                if (target != null) {
-                    strat.addRoot(name, buildPath(target, path));
-                }
+        strat.addRoot("root_files", buildPath(DEVICE_ROOT, "."));
+        strat.addRoot("internal_files", buildPath(context.getFilesDir(), "."));
+        strat.addRoot("cache_files", buildPath(context.getCacheDir(), "."));
+        strat.addRoot("external_files", buildPath(Environment.getExternalStorageDirectory(), "."));
+        {
+            File[] externalFilesDirs = getExternalFilesDirs(context, null);
+            if (externalFilesDirs.length > 0) {
+                strat.addRoot("external_file_files", buildPath(externalFilesDirs[0], "."));
+            }
+        }
+        {
+            File[] externalCacheDirs = getExternalCacheDirs(context);
+            if (externalCacheDirs.length > 0) {
+                strat.addRoot("external_cache_files", buildPath(externalCacheDirs[0], "."));
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            File[] externalMediaDirs = context.getExternalMediaDirs();
+            if (externalMediaDirs.length > 0) {
+                strat.addRoot("external_media_files", buildPath(externalMediaDirs[0], "."));
             }
         }
 

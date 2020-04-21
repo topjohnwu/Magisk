@@ -1,21 +1,5 @@
 LOCAL_PATH := $(call my-dir)
 
-# Some handy paths
-EXT_PATH := jni/external
-SE_PATH := $(EXT_PATH)/selinux
-LIBSELINUX := $(SE_PATH)/libselinux/include
-LIBSEPOL := $(SE_PATH)/libsepol/include $(SE_PATH)/libsepol/cil/include
-LIBLZMA := $(EXT_PATH)/xz/src/liblzma/api
-LIBLZ4 := $(EXT_PATH)/lz4/lib
-LIBBZ2 := $(EXT_PATH)/bzip2
-LIBFDT := $(EXT_PATH)/dtc/libfdt
-LIBNANOPB := $(EXT_PATH)/nanopb
-LIBSYSTEMPROPERTIES := jni/systemproperties/include
-LIBUTILS := jni/utils/include
-LIBMINCRYPT := $(EXT_PATH)/mincrypt/include
-LIBXZ := $(EXT_PATH)/xz-embedded
-LIBPCRE2 := $(EXT_PATH)/pcre/include
-
 ########################
 # Binaries
 ########################
@@ -25,11 +9,7 @@ ifdef B_MAGISK
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
 LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
-LOCAL_C_INCLUDES := \
-	jni/include \
-	$(LIBNANOPB) \
-	$(LIBSYSTEMPROPERTIES) \
-	$(LIBUTILS)
+LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
 	core/applets.cpp \
@@ -39,14 +19,14 @@ LOCAL_SRC_FILES := \
 	core/socket.cpp \
 	core/db.cpp \
 	core/scripting.cpp \
+	core/restorecon.cpp \
+	core/module.cpp \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \
 	magiskhide/hide_policy.cpp \
 	resetprop/persist_properties.cpp \
 	resetprop/resetprop.cpp \
-	resetprop/system_property_api.cpp \
-	resetprop/system_property_set.cpp \
 	su/su.cpp \
 	su/connect.cpp \
 	su/pts.cpp \
@@ -74,16 +54,15 @@ LOCAL_STATIC_LIBRARIES := libsepol libxz libutils
 LOCAL_C_INCLUDES := \
 	jni/include \
 	out \
-	out/$(TARGET_ARCH_ABI) \
-	$(LIBXZ) \
-	$(LIBSEPOL) \
-	$(LIBUTILS)
+	out/$(TARGET_ARCH_ABI)
 
 LOCAL_SRC_FILES := \
 	init/init.cpp \
 	init/mount.cpp \
 	init/rootdir.cpp \
 	init/getinfo.cpp \
+	init/twostage.cpp \
+	core/socket.cpp \
 	magiskpolicy/api.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
@@ -101,15 +80,7 @@ ifdef B_BOOT
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils
-LOCAL_C_INCLUDES := \
-	jni/include \
-	$(EXT_PATH)/include \
-	$(LIBMINCRYPT) \
-	$(LIBLZMA) \
-	$(LIBLZ4) \
-	$(LIBBZ2) \
-	$(LIBFDT) \
-	$(LIBUTILS)
+LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
 	magiskboot/main.cpp \
@@ -132,10 +103,7 @@ ifdef B_POLICY
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskpolicy
 LOCAL_STATIC_LIBRARIES := libsepol libutils
-LOCAL_C_INCLUDES := \
-	jni/include \
-	$(LIBSEPOL) \
-	$(LIBUTILS)
+LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
 	core/applet_stub.cpp \
@@ -157,18 +125,12 @@ ifdef B_PROP
 include $(CLEAR_VARS)
 LOCAL_MODULE := resetprop
 LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
-LOCAL_C_INCLUDES := \
-	jni/include \
-	$(LIBNANOPB) \
-	$(LIBSYSTEMPROPERTIES) \
-	$(LIBUTILS)
+LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
 	core/applet_stub.cpp \
 	resetprop/persist_properties.cpp \
 	resetprop/resetprop.cpp \
-	resetprop/system_property_api.cpp \
-	resetprop/system_property_set.cpp
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=resetprop_main
 LOCAL_LDFLAGS := -static
@@ -181,9 +143,7 @@ ifdef B_TEST
 include $(CLEAR_VARS)
 LOCAL_MODULE := test
 LOCAL_STATIC_LIBRARIES := libutils
-LOCAL_C_INCLUDES := \
-	jni/include \
-	$(LIBUTILS)
+LOCAL_C_INCLUDES := jni/include
 LOCAL_SRC_FILES := test.cpp
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)

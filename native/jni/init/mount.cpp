@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <vector>
 
-#include <utils.h>
-#include <logging.h>
-#include <selinux.h>
-#include <magisk.h>
+#include <utils.hpp>
+#include <logging.hpp>
+#include <selinux.hpp>
+#include <magisk.hpp>
 
-#include "init.h"
+#include "init.hpp"
 
 using namespace std;
 
@@ -97,6 +97,7 @@ static bool read_dt_fstab(cmdline *cmd, const char *name) {
 	if ((fd = open(path, O_RDONLY | O_CLOEXEC)) >= 0) {
 		read(fd, path, sizeof(path));
 		close(fd);
+		path[strcspn(path, "\r\n")] = '\0';
 		// Some custom treble use different names, so use what we read
 		char *part = rtrim(strrchr(path, '/') + 1);
 		sprintf(partname, "%s%s", part, strend(part, cmd->slot) ? cmd->slot : "");
@@ -104,6 +105,7 @@ static bool read_dt_fstab(cmdline *cmd, const char *name) {
 		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
 			read(fd, fstype, 32);
 			close(fd);
+			fstype[strcspn(fstype, "\r\n")] = '\0';
 			return true;
 		}
 	}
@@ -121,6 +123,7 @@ if (!is_lnk("/" #name) && read_dt_fstab(cmd, #name)) { \
 
 static void switch_root(const string &path) {
 	LOGD("Switch root to %s\n", path.data());
+	int root = xopen("/", O_RDONLY);
 	vector<string> mounts;
 	parse_mnt("/proc/mounts", [&](mntent *me) {
 		// Skip root and self
@@ -142,16 +145,21 @@ static void switch_root(const string &path) {
 	chdir(path.data());
 	xmount(path.data(), "/", nullptr, MS_MOVE, nullptr);
 	chroot(".");
+
+	LOGD("Cleaning rootfs\n");
+	frm_rf(root);
 }
 
 static void mount_persist(const char *dev_base, const char *mnt_base) {
 	string mnt_point = mnt_base + "/persist"s;
 	strcpy(partname, "persist");
-	sprintf(block_dev, "%s/persist", dev_base);
+	xrealpath(dev_base, block_dev);
+	char *s = block_dev + strlen(block_dev);
+	strcpy(s, "/persist");
 	if (setup_block(false) < 0) {
 		// Fallback to cache
 		strcpy(partname, "cache");
-		sprintf(block_dev, "%s/cache", dev_base);
+		strcpy(s, "/cache");
 		if (setup_block(false) < 0) {
 			// Try NVIDIA's BS
 			strcpy(partname, "CAC");
@@ -169,7 +177,6 @@ void RootFSInit::early_mount() {
 	full_read("/init", self.buf, self.sz);
 
 	LOGD("Reverting /init\n");
-	root = xopen("/", O_RDONLY | O_CLOEXEC);
 	rename("/.backup/init", "/init");
 
 	mount_root(system);
@@ -180,30 +187,19 @@ void RootFSInit::early_mount() {
 	xmkdir("/dev/mnt", 0755);
 	mount_persist("/dev/block", "/dev/mnt");
 	mount_list.emplace_back("/dev/mnt/persist");
-	mount_list.emplace_back("/dev/mnt/cache");
+	persist_dir = "/dev/mnt/persist/magisk";
 }
 
-void SARBase::backup_files(const char *self_path) {
+void SARBase::backup_files() {
 	if (access("/overlay.d", F_OK) == 0)
-		cp_afc("/overlay.d", "/dev/overlay.d");
+		backup_folder("/overlay.d", overlays);
 
-	full_read(self_path, self.buf, self.sz);
-	full_read("/.backup/.magisk", config.buf, config.sz);
+	full_read("/proc/self/exe", self.buf, self.sz);
+	if (access("/.backup/.magisk", R_OK) == 0)
+		full_read("/.backup/.magisk", config.buf, config.sz);
 }
 
-void SARInit::early_mount() {
-	// Make dev writable
-	xmkdir("/dev", 0755);
-	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
-	mount_list.emplace_back("/dev");
-
-	backup_files("/init");
-
-	LOGD("Cleaning rootfs\n");
-	int root = xopen("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { "proc", "sys", "dev" });
-	close(root);
-
+void SARBase::mount_system_root() {
 	LOGD("Early mount system_root\n");
 	sprintf(partname, "system%s", cmd->slot);
 	strcpy(block_dev, "/dev/root");
@@ -218,10 +214,20 @@ void SARInit::early_mount() {
 			exit(1);
 		}
 	}
-	system_dev = dev;
 	xmkdir("/system_root", 0755);
 	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
+}
+
+void SARInit::early_mount() {
+	// Make dev writable
+	xmkdir("/dev", 0755);
+	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
+	mount_list.emplace_back("/dev");
+
+	backup_files();
+
+	mount_system_root();
 	switch_root("/system_root");
 
 	mount_root(vendor);
@@ -229,26 +235,20 @@ void SARInit::early_mount() {
 	mount_root(odm);
 }
 
-void SecondStageInit::early_mount() {
-	// Early mounts should already be done by first stage init
-
-	backup_files("/system/bin/init");
-	rm_rf("/system");
-	rm_rf("/.backup");
-	rm_rf("/overlay.d");
-
-	// Find system_dev
-	parse_mnt("/proc/mounts", [&](mntent *me) -> bool {
-		if (me->mnt_dir == "/system_root"sv) {
-			struct stat st;
-			stat(me->mnt_fsname, &st);
-			system_dev = st.st_rdev;
-			return false;
-		}
-		return true;
-	});
-
+void SARFirstStageInit::early_mount() {
+	backup_files();
+	mount_system_root();
 	switch_root("/system_root");
+}
+
+void SecondStageInit::early_mount() {
+	backup_files();
+
+	umount2("/init", MNT_DETACH);
+	umount2("/proc/self/exe", MNT_DETACH);
+
+	if (access("/system_root", F_OK) == 0)
+		switch_root("/system_root");
 }
 
 void BaseInit::cleanup() {
@@ -261,13 +261,45 @@ void BaseInit::cleanup() {
 	mount_list.shrink_to_fit();
 }
 
-void mount_sbin() {
-	LOGD("Mount /sbin tmpfs overlay\n");
-	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
+static void patch_socket_name(const char *path) {
+	char *buf;
+	size_t size;
+	mmap_rw(path, buf, size);
+	for (int i = 0; i < size; ++i) {
+		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
+			gen_rand_str(buf + i, 16);
+			i += sizeof(MAIN_SOCKET);
+		}
+	}
+	munmap(buf, size);
+}
 
-	xmkdir(MAGISKTMP, 0755);
+void setup_tmp(const char *path, const raw_data &self, const raw_data &config) {
+	LOGD("Setup Magisk tmp at %s\n", path);
+	xmount("tmpfs", path, "tmpfs", 0, "mode=755");
+
+	chdir(path);
+
+	xmkdir(INTLROOT, 0755);
 	xmkdir(MIRRDIR, 0);
 	xmkdir(BLOCKDIR, 0);
 
 	mount_persist(BLOCKDIR, MIRRDIR);
+
+	int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
+	xwrite(fd, config.buf, config.sz);
+	close(fd);
+	fd = xopen("magiskinit", O_WRONLY | O_CREAT, 0755);
+	xwrite(fd, self.buf, self.sz);
+	close(fd);
+	dump_magisk("magisk", 0755);
+	patch_socket_name("magisk");
+
+	// Create applet symlinks
+	for (int i = 0; applet_names[i]; ++i)
+		xsymlink("./magisk", applet_names[i]);
+	xsymlink("./magiskinit", "magiskpolicy");
+	xsymlink("./magiskinit", "supolicy");
+
+	chdir("/");
 }

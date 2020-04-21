@@ -164,7 +164,7 @@ abstract class MagiskInstallImpl : FlashResultListener {
                     FileOutputStream(extract).use { tarIn.copyTo(it) }
                     if (name.contains(".lz4")) {
                         console.add("-- Decompressing: $name")
-                        "./magiskboot --decompress $extract".sh()
+                        "./magiskboot decompress $extract".sh()
                     }
                 } else if (entry.name.contains("vbmeta.img")) {
                     vbmeta = true
@@ -189,9 +189,9 @@ abstract class MagiskInstallImpl : FlashResultListener {
                 srcBoot = recovery.path
                 // Repack boot image to prevent restore
                 arrayOf(
-                        "./magiskboot --unpack boot.img",
-                        "./magiskboot --repack boot.img",
-                        "./magiskboot --cleanup",
+                        "./magiskboot unpack boot.img",
+                        "./magiskboot repack boot.img",
+                        "./magiskboot cleanup",
                         "mv new-boot.img boot.img").sh()
                 SuFileInputStream(boot).use {
                     tarOut.putNextEntry(newEntry("boot.img", boot.length()))
@@ -259,7 +259,7 @@ abstract class MagiskInstallImpl : FlashResultListener {
         }
 
         val job = Shell.sh(
-                "./magiskboot --cleanup",
+                "./magiskboot cleanup",
                 "mv bin/busybox busybox",
                 "rm -rf magisk.apk bin boot.img update-binary",
                 "cd /")

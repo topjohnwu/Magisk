@@ -18,12 +18,13 @@ class Module(path: String) : BaseModule() {
     private val updateFile = SuFile(path, "update")
     private val ruleFile = SuFile(path, "sepolicy.rule")
 
-    val updated: Boolean = updateFile.exists()
+    val updated: Boolean get() = updateFile.exists()
 
-    var enable: Boolean = !disableFile.exists()
+    var enable: Boolean
+        get() = !disableFile.exists()
         set(enable) {
             val dir = "$PERSIST/$id"
-            field = if (enable) {
+            if (enable) {
                 Shell.su("mkdir -p $dir", "cp -af $ruleFile $dir").submit()
                 disableFile.delete()
             } else {
@@ -32,9 +33,10 @@ class Module(path: String) : BaseModule() {
             }
         }
 
-    var remove: Boolean = removeFile.exists()
+    var remove: Boolean
+        get() = removeFile.exists()
         set(remove) {
-            field = if (remove) {
+            if (remove) {
                 Shell.su("rm -rf $PERSIST/$id").submit()
                 removeFile.createNewFile()
             } else {
@@ -60,14 +62,14 @@ class Module(path: String) : BaseModule() {
 
     companion object {
 
-        private const val PERSIST = "/sbin/.magisk/mirror/persist/magisk"
+        private val PERSIST get() = "${Const.MAGISKTMP}/mirror/persist/magisk"
 
         @WorkerThread
         fun loadModules(): List<Module> {
             val moduleList = mutableListOf<Module>()
             val path = SuFile(Const.MAGISK_PATH)
             val modules =
-                    path.listFiles { _, name -> name != "lost+found" && name != ".core" }.orEmpty()
+                path.listFiles { _, name -> name != "lost+found" && name != ".core" }.orEmpty()
             for (file in modules) {
                 if (file.isFile) continue
                 val module = Module(Const.MAGISK_PATH + "/" + file.name)

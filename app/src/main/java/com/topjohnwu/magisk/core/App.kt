@@ -30,7 +30,7 @@ open class App() : Application() {
 
     init {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
-        Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER or Shell.FLAG_USE_MAGISK_BUSYBOX)
+        Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER)
         Shell.Config.verboseLogging(BuildConfig.DEBUG)
         Shell.Config.addInitializers(RootInit::class.java)
         Shell.Config.setTimeout(2)

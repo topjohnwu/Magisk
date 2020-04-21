@@ -38,6 +38,8 @@
     <string name="home_status_normal">Normálny</string>
     <string name="home_status_safe">Núdzový režim</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Nainštalované</string>
+    <string name="home_latest_version">Posledná</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené!\nRoot bude odstránený!\nMôže dôjsť k zašifrovaniu vašich dát, ak už nie sú zašifrované!</string>
@@ -59,6 +61,7 @@
     <string name="select_patch_file">Vybrať a zaplátať súbor</string>
     <string name="patch_file_msg">Vyberte raw súbor (*.img) alebo tar súbor ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reštart o 5 sekúnd…</string>
+    <string name="flash_screen_title">Inštalácia</string>
 
     <!--Superuser-->
     <string name="su_request_title">Požiadavka superužívateľa</string>
@@ -132,8 +135,9 @@
     <string name="module_action_install_external">Inštalácia z úložiska</string>
     <string name="module_update_none">Vaše moduly sú aktuálne!</string>
     <string name="update_available">Dostupná aktualizácia</string>
-    <string name="home_installed_version">Nainštalované</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Zoradenie</string>
+    <string name="module_permission_declined">Udeľte povolenie pre povolenie tejto funkcie</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Režim motívu</string>
@@ -242,7 +246,7 @@
     <string name="restore_img_msg">Obnovovanie…</string>
     <string name="restore_done">Obnovovanie ukončené!</string>
     <string name="restore_fail">Stock záloha neexistuje!</string>
-    <string name="proprietary_title">Stiahnuť proprietárny kód</string>
+    <string name="proprietary_title">Stiahnutie proprietárneho kódu</string>
     <string name="proprietary_notice">Magisk Manager je FOSS, ktorý neobsahuje proprietárny kód SafetyNet API od Googlu.\n\nChcete povoliť appke Magisk Manager stiahnuť rozšírenie (obsahujúce GoogleApiClient) pre kontrolu SafetyNet?</string>
     <string name="setup_fail">Nastavenie zlyhalo</string>
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>

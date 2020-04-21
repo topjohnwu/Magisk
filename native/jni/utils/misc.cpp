@@ -14,8 +14,8 @@
 #include <syscall.h>
 #include <random>
 
-#include <logging.h>
-#include <utils.h>
+#include <logging.hpp>
+#include <utils.hpp>
 
 int fork_dont_care() {
 	int pid = xfork();
@@ -46,7 +46,7 @@ constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY
 static bool seeded = false;
 static std::mt19937 gen;
 static std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
-void gen_rand_str(char *buf, int len, bool varlen) {
+int gen_rand_str(char *buf, int len, bool varlen) {
 	if (!seeded) {
 		if (access("/dev/urandom", F_OK) != 0)
 			mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
@@ -64,6 +64,7 @@ void gen_rand_str(char *buf, int len, bool varlen) {
 	for (int i = 0; i < len - 1; ++i)
 		buf[i] = ALPHANUM[dist(gen)];
 	buf[len - 1] = '\0';
+	return len - 1;
 }
 
 int strend(const char *s1, const char *s2) {

@@ -38,6 +38,8 @@
     <string name="home_status_normal">Normal</string>
     <string name="home_status_safe">Mode segur</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Instal·lat</string>
+    <string name="home_latest_version">Última</string>
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Arrel s\'eliminarà i, possiblement, xifrarà totes les dades (si no estan ja xifrades).</string>
@@ -132,8 +134,9 @@
     <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="module_update_none">Els seus mòduls estan actualitzats!</string>
     <string name="update_available">Actualització Disponible</string>
-    <string name="home_installed_version">Instal·lat</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Ordre de Classificació</string>
+    <string name="module_permission_declined">Garanteix permís d\'emmagatzematge per activar aquesta funcionalitat</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode del tema</string>

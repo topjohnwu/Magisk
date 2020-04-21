@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <sepol/policydb/expand.h>
 
-#include <logging.h>
+#include <logging.hpp>
 
 #include "sepolicy.h"
 

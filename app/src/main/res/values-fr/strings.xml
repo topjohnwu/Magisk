@@ -29,7 +29,7 @@
     <string name="home_support_title">Soutenez‑nous</string>
     <string name="home_links_project">Liens du projet</string>
     <string name="home_item_source">Sources</string>
-    <string name="home_support_content">Magisk est, et sera toujours, libre et open‑source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
+    <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
     <string name="home_device_title">Appareil</string>
     <string name="home_device_extra_manufacturer">Fabricant</string>
     <string name="home_device_extra_model">Modèle</string>
@@ -38,6 +38,8 @@
     <string name="home_status_normal">Normal</string>
     <string name="home_status_safe">Mode sans échec</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Installée</string>
+    <string name="home_latest_version">Dernière</string>
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
@@ -59,6 +61,7 @@
     <string name="select_patch_file">Sélectionnez le fichier cible du correctif</string>
     <string name="patch_file_msg">Sélectionnez une image brute (*.img) ou une archive TAR ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Redémarrage dans 5 secondes…</string>
+    <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
     <string name="su_request_title">Demande d’accès super‑utilisateur</string>
@@ -132,8 +135,9 @@
     <string name="module_action_install_external">Installer depuis le stockage</string>
     <string name="module_update_none">Vos modules sont à jour !</string>
     <string name="update_available">Mise à jour disponible</string>
-    <string name="home_installed_version">Installée</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Classement</string>
+   <string name="module_permission_declined">Autorisez l’accès au stockage pour activer cette fonctionnalité</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode du thème</string>
@@ -250,6 +254,6 @@
     <string name="setup_msg">Configuration de l’environnement en cours…</string>
     <string name="authenticate">Authentification</string>
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
-    <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne  prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
+    <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
 
 </resources>

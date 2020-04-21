@@ -14,11 +14,11 @@ import com.topjohnwu.magisk.extensions.chooser
 import com.topjohnwu.magisk.extensions.exists
 import com.topjohnwu.magisk.extensions.provide
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.legacy.flash.FlashActivity
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
+import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.APKInstall
 import io.reactivex.Completable
 import org.koin.core.get
@@ -45,10 +45,12 @@ open class DownloadService : RemoteFileService() {
         subject: Magisk,
         id: Int
     ) = when (val conf = subject.configuration) {
-        Uninstall -> FlashActivity.uninstall(this, subject.file, id)
-        EnvFix -> { remove(id); EnvFixTask(subject.file).exec() }
-        is Patch -> FlashActivity.patch(this, subject.file, conf.fileUri, id)
-        is Flash -> FlashActivity.flash(this, subject.file, conf is Secondary, id)
+        Uninstall -> FlashFragment.uninstall(subject.file, id)
+        EnvFix -> {
+            remove(id); EnvFixTask(subject.file).exec()
+        }
+        is Patch -> FlashFragment.patch(subject.file, conf.fileUri, id)
+        is Flash -> FlashFragment.flash(subject.file, conf is Secondary, id)
         else -> Unit
     }
 
@@ -56,7 +58,7 @@ open class DownloadService : RemoteFileService() {
         subject: Module,
         id: Int
     ) = when (subject.configuration) {
-        is Flash -> FlashActivity.install(this, subject.file, id)
+        is Flash -> FlashFragment.install(subject.file, id)
         else -> Unit
     }
 
@@ -94,9 +96,15 @@ open class DownloadService : RemoteFileService() {
                 .takeIf { it.exists(get()) }
                 ?.let { addAction(0, R.string.download_open_self, it.chooser()) }
         }
-        Uninstall -> setContentIntent(FlashActivity.uninstallIntent(context, subject.file))
-        is Flash -> setContentIntent(FlashActivity.flashIntent(context, subject.file, conf is Secondary))
-        is Patch -> setContentIntent(FlashActivity.patchIntent(context, subject.file, conf.fileUri))
+        Uninstall -> setContentIntent(FlashFragment.uninstallIntent(context, subject.file))
+        is Flash -> setContentIntent(
+            FlashFragment.flashIntent(
+                context,
+                subject.file,
+                conf is Secondary
+            )
+        )
+        is Patch -> setContentIntent(FlashFragment.patchIntent(context, subject.file, conf.fileUri))
         else -> this
     }
 
@@ -110,7 +118,7 @@ open class DownloadService : RemoteFileService() {
                 .takeIf { it.exists(get()) }
                 ?.let { addAction(0, R.string.download_open_self, it.chooser()) }
         }
-        is Flash -> setContentIntent(FlashActivity.installIntent(context, subject.file))
+        is Flash -> setContentIntent(FlashFragment.installIntent(context, subject.file))
         else -> this
     }
 

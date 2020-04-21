@@ -7,10 +7,10 @@
 extern "C" {
 #include <libfdt.h>
 }
-#include <utils.h>
+#include <utils.hpp>
 
-#include "magiskboot.h"
-#include "dtb.h"
+#include "magiskboot.hpp"
+#include "dtb.hpp"
 
 using namespace std;
 

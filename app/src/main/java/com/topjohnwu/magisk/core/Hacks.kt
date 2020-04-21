@@ -21,8 +21,7 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.core.utils.updateConfig
 import com.topjohnwu.magisk.extensions.forceGetDeclaredField
-import com.topjohnwu.magisk.legacy.flash.FlashActivity
-import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.ui.MainActivity
 
 fun AssetManager.addAssetPath(path: String) {
@@ -140,13 +139,12 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
     }
 }
 
-object ClassMap {
+private object ClassMap {
 
     private val map = mapOf(
         App::class.java to a.e::class.java,
         MainActivity::class.java to a.b::class.java,
         SplashActivity::class.java to a.c::class.java,
-        FlashActivity::class.java to a.f::class.java,
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
         SuRequestActivity::class.java to a.m::class.java,

@@ -196,9 +196,7 @@ public class SignAPK {
                     if (md_sha1 != null) md_sha1.update(buffer, 0, num);
                     if (md_sha256 != null) md_sha256.update(buffer, 0, num);
                 }
-                Attributes attr = null;
-                if (input != null) attr = input.getAttributes(name);
-                attr = attr != null ? new Attributes(attr) : new Attributes();
+                Attributes attr = new Attributes();
                 if (md_sha1 != null) {
                     attr.putValue("SHA1-Digest",
                             new String(Base64.encode(md_sha1.digest()), "ASCII"));

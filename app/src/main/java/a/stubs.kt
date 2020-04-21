@@ -1,12 +1,18 @@
+@file:JvmName("a")
 package a
 
+import com.topjohnwu.magisk.ProcessPhoenix
 import com.topjohnwu.magisk.core.App
 import com.topjohnwu.magisk.core.GeneralReceiver
 import com.topjohnwu.magisk.core.SplashActivity
 import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.legacy.flash.FlashActivity
-import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.signing.BootSigner
+
+fun main(args: Array<String>) {
+    BootSigner.main(args)
+}
 
 class b : MainActivity()
 
@@ -17,10 +23,10 @@ class e : App {
     constructor(o: Any) : super(o)
 }
 
-class f : FlashActivity()
-
 class h : GeneralReceiver()
 
 class j : DownloadService()
 
 class m : SuRequestActivity()
+
+class r : ProcessPhoenix()

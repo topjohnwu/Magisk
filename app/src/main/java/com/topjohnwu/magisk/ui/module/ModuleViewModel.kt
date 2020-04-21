@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.Manifest
 import androidx.annotation.WorkerThread
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
@@ -20,6 +21,7 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
+import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
@@ -83,16 +85,23 @@ class ModuleViewModel(
     private val itemsUpdatable = diffListOf<RepoItem.Update>()
     private val itemsRemote = diffListOf<RepoItem.Remote>()
 
+    var isRemoteLoading = false
+        @Bindable get
+        private set(value) {
+            field = value
+            notifyPropertyChanged(BR.remoteLoading)
+        }
+
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = MergeObservableList<ComparableRvItem<*>>()
         .insertList(itemsCoreOnly)
-        .insertItem(sectionActive)
-        .insertList(itemsInstalledHelpers)
-        .insertList(itemsInstalled)
-        .insertItem(InstallModule)
         .insertItem(sectionUpdate)
         .insertList(itemsUpdatableHelpers)
         .insertList(itemsUpdatable)
+        .insertItem(sectionActive)
+        .insertList(itemsInstalledHelpers)
+        .insertItem(InstallModule)
+        .insertList(itemsInstalled)
         .insertItem(sectionRemote)
         .insertList(itemsRemote)!!
     val itemBinding = itemBindingOf<ComparableRvItem<*>> {
@@ -191,6 +200,7 @@ class ModuleViewModel(
         .doOnSuccess {
             addInstalledEmptyMessage()
             addUpdatableEmptyMessage()
+            updateActiveState()
         }
         .ignoreElement()!!
 
@@ -212,9 +222,13 @@ class ModuleViewModel(
             repoUpdater(refetch).andThen(loadRemoteDB(0))
         } else {
             loadRemoteDB(itemsRemote.size)
-        }.subscribeK(onError = Timber::e) {
-            itemsRemote.addAll(it)
-        }
+        }.observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { isRemoteLoading = true }
+            .doOnSuccess { isRemoteLoading = false }
+            .doOnError { isRemoteLoading = false }
+            .subscribeK(onError = Timber::e) {
+                itemsRemote.addAll(it)
+            }
 
         refetch = false
     }
@@ -330,11 +344,27 @@ class ModuleViewModel(
         else -> Unit
     }
 
-    fun downloadPressed(item: RepoItem) = ModuleInstallDialog(item.item).publish()
-    fun installPressed() = InstallExternalModuleEvent().publish()
+    fun downloadPressed(item: RepoItem) = withPermissions(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ).any { it }.subscribeK(onError = { permissionDenied() }) {
+        ModuleInstallDialog(item.item).publish()
+    }.add()
+
+    fun installPressed() = withPermissions(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ).any { it }.subscribeK(onError = { permissionDenied() }) {
+        InstallExternalModuleEvent().publish()
+    }.add()
+
     fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
     fun infoPressed(item: ModuleItem) {
         OpenChangelogEvent(item.repo ?: return).publish()
+    }
+
+    private fun permissionDenied() {
+        SnackbarEvent(R.string.module_permission_declined).publish()
     }
 
 }

@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
 import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.RecreateEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
-import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.adapterOf
 import com.topjohnwu.magisk.ui.base.diffListOf
@@ -95,7 +94,7 @@ class SettingsViewModel(
 
     override fun onItemChanged(view: View, item: SettingsItem) = when (item) {
         // use only instances you want, don't declare everything
-        is Theme -> Navigation.theme().publish()
+        is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
         is Language -> RecreateEvent().publish()
 
         is UpdateChannel -> openUrlIfNecessary(view)
