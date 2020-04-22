@@ -100,12 +100,17 @@ void load_kernel_info(cmdline *cmd) {
 	xmkdir("/sys", 0755);
 	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
 
+	// Disable kmsg rate limiting
+	if (FILE *rate = fopen("/proc/sys/kernel/printk_devkmsg", "w"); rate) {
+		fprintf(rate, "on\n");
+		fclose(rate);
+	}
+
 	bool enter_recovery = false;
 	bool kirin = false;
 	bool recovery_mode = false;
 
 	parse_cmdline([&](auto key, auto value) -> void {
-		LOGD("cmdline: [%s]=[%s]\n", key.data(), value);
 		if (key == "androidboot.slot_suffix") {
 			strcpy(cmd->slot, value);
 		} else if (key == "androidboot.slot") {
