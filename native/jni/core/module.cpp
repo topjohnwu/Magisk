@@ -417,32 +417,42 @@ bool dir_node::prepare() {
 		auto child = it->second;
 		if (child->need_clone()) {
 			if (node_type > type_id<skel_node>()) {
-				// Upgrade will fail, remove unsupported child node
-				delete child;
-				it = children.erase(it);
-				continue;
+				// Upgrade will fail
+				goto delete_node;
 			}
 			// Tell parent to upgrade self to skel
 			upgrade_skel = true;
 			// If child is inter_node, upgrade to module
 			if (auto nit = upgrade<module_node, inter_node>(it); nit != children.end()) {
 				it = nit;
-				goto increment;
+				goto next_node;
 			}
 		}
 		if (auto dn = dyn_cast<dir_node>(child); dn && dn->is_dir() && !dn->prepare()) {
+			string mirror = dn->mirror_path();
+			if (access(mirror.data(), F_OK) != 0) {
+				// It is actually possible that mirror does not exist
+				goto delete_node;
+			}
+
 			// Upgrade child to skeleton (shall always success)
 			it = upgrade<skel_node>(it);
 			auto skel = iter_to_node<skel_node>(it);
-			string mirror = skel->mirror_path();
 			auto dir = xopen_dir(mirror.data());
 			for (dirent *entry; (entry = xreaddir(dir.get()));) {
 				// Insert mirror nodes
 				skel->emplace<mirror_node>(entry->d_name, entry);
 			}
 		}
-increment:
+next_node:
 		++it;
+		continue;
+
+delete_node:
+		// Remove the unsupported child node
+		delete it->second;
+		it = children.erase(it);
+		continue;
 	}
 	return !upgrade_skel;
 }
