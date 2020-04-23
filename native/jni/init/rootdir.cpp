@@ -144,7 +144,7 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 
 	// Custom rules
-	if (auto dir = xopen_dir(persist_dir.data()); dir) {
+	if (auto dir = open_dir(persist_dir.data()); dir) {
 		for (dirent *entry; (entry = xreaddir(dir.get()));) {
 			auto rule = persist_dir + "/" + entry->d_name + "/sepolicy.rule";
 			if (access(rule.data(), R_OK) == 0) {
@@ -238,7 +238,7 @@ void SARBase::patch_rootdir() {
 	}
 
 	setup_tmp(tmp_dir, self, config);
-	persist_dir = string(tmp_dir) +  "/" MIRRDIR "/persist";
+	persist_dir = MIRRDIR "/persist/magisk";
 
 	chdir(tmp_dir);
 
