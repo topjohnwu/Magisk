@@ -301,6 +301,21 @@ void full_read(const char *filename, void **buf, size_t *size) {
 	close(fd);
 }
 
+string fd_full_read(int fd) {
+	string str;
+	auto len = lseek(fd, 0, SEEK_END);
+	str.resize(len);
+	lseek(fd, 0, SEEK_SET);
+	xxread(fd, str.data(), len);
+	return str;
+}
+
+string full_read(const char *filename) {
+	int fd = xopen(filename, O_RDONLY | O_CLOEXEC);
+	run_finally f([=]{ close(fd); });
+	return fd < 0 ? "" : fd_full_read(fd);
+}
+
 void write_zero(int fd, size_t size) {
 	char buf[4096] = {0};
 	size_t len;

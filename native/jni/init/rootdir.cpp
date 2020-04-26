@@ -20,7 +20,7 @@
 
 using namespace std;
 
-static vector<raw_data> rc_list;
+static vector<string> rc_list;
 
 static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir) {
 	FILE *rc = xfopen(dest, "we");
@@ -44,8 +44,11 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
 	fprintf(rc, "\n");
 
 	// Inject custom rc scripts
-	for (auto &d : rc_list)
-		fprintf(rc, "\n%s\n", d.buf);
+	for (auto &script : rc_list) {
+		// Replace template arguments of rc scripts with dynamic paths
+		replace_all(script, "${MAGISKTMP}", tmp_dir);
+		fprintf(rc, "\n%s\n", script.data());
+	}
 	rc_list.clear();
 
 	// Inject Magisk rc scripts
@@ -54,7 +57,7 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
 	gen_rand_str(ls_svc, sizeof(ls_svc));
 	gen_rand_str(bc_svc, sizeof(bc_svc));
 	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
-	fprintf(rc, magiskrc, tmp_dir, pfd_svc, ls_svc, bc_svc);
+	fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc, bc_svc);
 
 	fclose(rc);
 	clone_attr(src, dest);
@@ -67,14 +70,12 @@ static void load_overlay_rc(const char *overlay) {
 	int dfd = dirfd(dir.get());
 	// Do not allow overwrite init.rc
 	unlinkat(dfd, "init.rc", 0);
-	for (dirent *entry; (entry = readdir(dir.get()));) {
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (strend(entry->d_name, ".rc") == 0) {
 			LOGD("Found rc script [%s]\n", entry->d_name);
 			int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			raw_data data;
-			fd_full_read(rc, data.buf, data.sz);
+			rc_list.push_back(fd_full_read(rc));
 			close(rc);
-			rc_list.push_back(std::move(data));
 			unlinkat(dfd, entry->d_name, 0);
 		}
 	}
@@ -261,8 +262,7 @@ void SARBase::patch_rootdir() {
 	bool redirect = false;
 	int src = xopen("/init", O_RDONLY | O_CLOEXEC);
 	fd_full_read(src, init.buf, init.sz);
-	uint8_t *eof = init.buf + init.sz;
-	for (uint8_t *p = init.buf; p < eof;) {
+	for (uint8_t *p = init.buf, *eof = init.buf + init.sz; p < eof;) {
 		if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
 			LOGD("Remove from init: " SPLIT_PLAT_CIL "\n");
 			memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
@@ -287,8 +287,7 @@ void SARBase::patch_rootdir() {
 		// init is dynamically linked, need to patch libselinux
 		raw_data lib;
 		full_read(LIBSELINUX, lib.buf, lib.sz);
-		eof = lib.buf + lib.sz;
-		for (uint8_t *p = lib.buf; p < eof; ++p) {
+		for (uint8_t *p = lib.buf, *eof = lib.buf + lib.sz; p < eof; ++p) {
 			if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
 				LOGD("Patch libselinux.so [" MONOPOLICY "] -> [%s]\n", sepol);
 				strcpy(reinterpret_cast<char *>(p), sepol);
@@ -305,7 +304,7 @@ void SARBase::patch_rootdir() {
 	// sepolicy
 	patch_sepolicy(sepol);
 
-	// Handle overlay
+	// Restore backup files
 	struct sockaddr_un sun;
 	int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (connect(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET)) == 0) {
@@ -321,12 +320,12 @@ void SARBase::patch_rootdir() {
 		overlays.clear();
 	}
 	close(sockfd);
+
+	// Handle overlay.d
+	load_overlay_rc(ROOTOVL);
 	if (access(ROOTOVL "/sbin", F_OK) == 0) {
-		file_attr a;
-		getattr("/sbin", &a);
-		cp_afc(ROOTOVL "/sbin", "/sbin");
-		rm_rf(ROOTOVL "/sbin");
-		setattr("/sbin", &a);
+		// Move files in overlay.d/sbin into Magisk's tmp_dir
+		mv_path(ROOTOVL "/sbin", tmp_dir);
 	}
 
 	// Patch init.rc

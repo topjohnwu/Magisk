@@ -1,7 +1,7 @@
 #include <magisk.hpp>
 #include <selinux.hpp>
 
-constexpr char magiskrc[] =
+constexpr char MAGISK_RC[] =
 "\n"
 
 "on post-fs-data\n"

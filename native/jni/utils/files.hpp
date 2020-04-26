@@ -58,6 +58,8 @@ void fclone_attr(int src, int dest);
 void clone_attr(const char *src, const char *dest);
 void fd_full_read(int fd, void **buf, size_t *size);
 void full_read(const char *filename, void **buf, size_t *size);
+std::string fd_full_read(int fd);
+std::string full_read(const char *filename);
 void write_zero(int fd, size_t size);
 void file_readline(bool trim, const char *file, const std::function<bool(std::string_view)> &fn);
 static inline void file_readline(const char *file,

@@ -106,3 +106,4 @@ void set_nice_name(const char *name);
 uint32_t binary_gcd(uint32_t u, uint32_t v);
 int switch_mnt_ns(int pid);
 int gen_rand_str(char *buf, int len, bool varlen = true);
+std::string &replace_all(std::string &str, std::string_view from, std::string_view to);

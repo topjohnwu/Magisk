@@ -13,9 +13,12 @@
 #include <unistd.h>
 #include <syscall.h>
 #include <random>
+#include <string>
 
 #include <logging.hpp>
 #include <utils.hpp>
+
+using namespace std;
 
 int fork_dont_care() {
 	int pid = xfork();
@@ -213,4 +216,13 @@ int switch_mnt_ns(int pid) {
 	ret = xsetns(fd, 0);
 	close(fd);
 	return ret;
+}
+
+string &replace_all(string &str, string_view from, string_view to) {
+	size_t pos = 0;
+	while((pos = str.find(from, pos)) != string::npos) {
+		str.replace(pos, from.length(), to);
+		pos += to.length();
+	}
+	return str;
 }
