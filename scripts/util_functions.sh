@@ -727,9 +727,11 @@ install_module() {
   # Copy over custom sepolicy rules
   if [ -f $MODPATH/sepolicy.rule -a -e "$PERSISTDIR" ]; then
     ui_print "- Installing custom sepolicy patch"
+    # Remove old recovery logs (which may be filling partition) to make room
+    rm -f $PERSISTDIR/cache/recovery/*
     PERSISTMOD=$PERSISTDIR/magisk/$MODID
     mkdir -p $PERSISTMOD
-    cp -af $MODPATH/sepolicy.rule $PERSISTMOD/sepolicy.rule
+    cp -af $MODPATH/sepolicy.rule $PERSISTMOD/sepolicy.rule || abort "! Insufficient partition size"
   fi
 
   # Remove stuffs that don't belong to modules
