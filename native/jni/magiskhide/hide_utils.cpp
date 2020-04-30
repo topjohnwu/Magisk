@@ -10,6 +10,7 @@
 #include <magisk.hpp>
 #include <utils.hpp>
 #include <db.hpp>
+#include <daemon.hpp>
 
 #include "magiskhide.hpp"
 

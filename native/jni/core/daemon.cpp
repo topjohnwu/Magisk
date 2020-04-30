@@ -56,6 +56,14 @@ static void *request_handler(void *args) {
 			close(client);
 			return nullptr;
 		}
+		break;
+	case REMOVE_MODULES:
+		if (credential.uid != UID_SHELL && credential.uid != UID_ROOT) {
+			write_int(client, 1);
+			close(client);
+			return nullptr;
+		}
+		break;
 	default:
 		break;
 	}
@@ -88,12 +96,8 @@ static void *request_handler(void *args) {
 		exec_sql(client);
 		break;
 	case REMOVE_MODULES:
-		if (credential.uid == UID_SHELL || credential.uid == UID_ROOT) {
-			remove_modules();
-			write_int(client, 0);
-		} else {
-			write_int(client, 1);
-		}
+		remove_modules();
+		write_int(client, 0);
 		close(client);
 		break;
 	case GET_PATH:

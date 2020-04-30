@@ -686,3 +686,23 @@ void handle_modules() {
 
 	mount_modules();
 }
+
+void remove_modules() {
+	LOGI("* Remove all modules and reboot\n");
+	auto dir = open_dir(MODULEROOT);
+	if (!dir)
+		return;
+
+	int dfd = dirfd(dir.get());
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
+		if (entry->d_type == DT_DIR) {
+			if (entry->d_name == ".core"sv)
+				continue;
+
+			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			close(xopenat(modfd, "remove", O_RDONLY | O_CREAT | O_CLOEXEC, 0));
+			close(modfd);
+		}
+	}
+	reboot();
+}

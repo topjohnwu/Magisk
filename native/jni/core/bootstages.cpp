@@ -19,11 +19,8 @@
 
 using namespace std;
 
-extern vector<string> module_list;
 static bool no_secure_dir = false;
 static bool pfs_done = false;
-
-extern void auto_start_magiskhide();
 
 /*********
  * Setup *
@@ -139,28 +136,11 @@ static bool magisk_env() {
 	return true;
 }
 
-static void reboot() {
+void reboot() {
 	if (RECOVERY_MODE)
 		exec_command_sync("/system/bin/reboot", "recovery");
 	else
 		exec_command_sync("/system/bin/reboot");
-}
-
-void remove_modules() {
-	LOGI("* Remove all modules and reboot");
-	auto dir = xopen_dir(MODULEROOT);
-	int dfd = dirfd(dir.get());
-	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		if (entry->d_type == DT_DIR) {
-			if (entry->d_name == ".core"sv)
-				continue;
-
-			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			close(xopenat(modfd, "remove", O_RDONLY | O_CREAT | O_CLOEXEC));
-			close(modfd);
-		}
-	}
-	reboot();
 }
 
 static bool check_data() {

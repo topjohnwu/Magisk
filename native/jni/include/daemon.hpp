@@ -29,46 +29,28 @@ enum {
 	DAEMON_LAST
 };
 
-// daemon.cpp
+extern int SDK_INT;
+extern bool RECOVERY_MODE;
+extern std::vector<std::string> module_list;
+#define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
 
-int connect_daemon(bool create = false);
-
-/***************
- * Boot Stages *
- ***************/
-
-void unlock_blocks();
+// Daemon handlers
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
-void handle_modules();
+void magiskhide_handler(int client);
+void su_daemon_handler(int client, struct ucred *credential);
 void remove_modules();
 
-/*************
- * Scripting *
- *************/
+// Misc
+int connect_daemon(bool create = false);
+void auto_start_magiskhide();
+void unlock_blocks();
+void handle_modules();
+void reboot();
 
+// Scripting
 void exec_script(const char *script);
 void exec_common_script(const char *stage);
 void exec_module_script(const char *stage, const std::vector<std::string> &module_list);
 void install_apk(const char *apk);
-
-/**************
- * MagiskHide *
- **************/
-
-void magiskhide_handler(int client);
-
-/*************
- * Superuser *
- *************/
-
-void su_daemon_handler(int client, struct ucred *credential);
-
-/*********************
- * Daemon Global Vars
- *********************/
-
-extern int SDK_INT;
-extern bool RECOVERY_MODE;
-#define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
