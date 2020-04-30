@@ -29,16 +29,13 @@ private:
 	pthread_mutex_t *mutex;
 };
 
+template <class Func>
 class run_finally {
 public:
-	explicit run_finally(std::function<void()> &&fn): fn(std::move(fn)) {}
-
-	void disable() { fn = nullptr; }
-
-	~run_finally() { if (fn) fn(); }
-
+	explicit run_finally(const Func &fn) : fn(fn) {}
+	~run_finally() { fn(); }
 private:
-	std::function<void()> fn;
+	const Func &fn;
 };
 
 template <typename T>
@@ -64,9 +61,9 @@ int parse_int(const char *s);
 static inline int parse_int(std::string s) { return parse_int(s.data()); }
 static inline int parse_int(std::string_view s) { return parse_int(s.data()); }
 
-int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
-					  const pthread_attr_t *attr = nullptr);
-int new_daemon_thread(std::function<void()> &&fn);
+using thread_entry = void *(*)(void *);
+int new_daemon_thread(thread_entry entry, void *arg = nullptr, const pthread_attr_t *attr = nullptr);
+int new_daemon_thread(std::function<void()> &&entry);
 
 struct exec_t {
 	bool err = false;

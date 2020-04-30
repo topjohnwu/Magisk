@@ -126,9 +126,9 @@ int exec_command_sync(exec_t &exec) {
 	return WEXITSTATUS(status);
 }
 
-int new_daemon_thread(void *(*start_routine) (void *), void *arg, const pthread_attr_t *attr) {
+int new_daemon_thread(thread_entry entry, void *arg, const pthread_attr_t *attr) {
 	pthread_t thread;
-	int ret = xpthread_create(&thread, attr, start_routine, arg);
+	int ret = xpthread_create(&thread, attr, entry, arg);
 	if (ret == 0)
 		pthread_detach(thread);
 	return ret;
@@ -141,8 +141,8 @@ static void *proxy_routine(void *fp) {
 	return nullptr;
 }
 
-int new_daemon_thread(std::function<void()> &&fn) {
-	return new_daemon_thread(proxy_routine, new std::function<void()>(std::move(fn)));
+int new_daemon_thread(std::function<void()> &&entry) {
+	return new_daemon_thread(proxy_routine, new std::function<void()>(std::move(entry)));
 }
 
 static char *argv0;
