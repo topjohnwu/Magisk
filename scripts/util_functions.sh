@@ -260,7 +260,8 @@ mount_partitions() {
     grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
     && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   fi
-  [ -L /system/vendor ] && mount_ro_ensure vendor$SLOT /vendor
+  # /vendor is used only on some older devices for recovery AVBv1 signing so is not critical if fails
+  [ -L /system/vendor ] && mount_name vendor$SLOT /vendor '-o ro'
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
 
   # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
