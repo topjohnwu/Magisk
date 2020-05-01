@@ -140,6 +140,11 @@ recovery_actions() {
   unset LD_LIBRARY_PATH
   unset LD_PRELOAD
   unset LD_CONFIG_FILE
+  # Try to preserve /etc/fstab on AOSP Q-based recovery
+  if [ -L /etc ]; then
+    setup_mntpoint /etc
+    cp -af /etc_link/* /etc
+  fi
 }
 
 recovery_cleanup() {
@@ -152,7 +157,8 @@ recovery_cleanup() {
   fi
   umount -l /vendor
   umount -l /persist
-  for DIR in /apex /system /system_root; do
+  [ -L /etc_link ] && rm -rf /etc/*
+  for DIR in /apex /system /system_root /etc; do
     if [ -L "${DIR}_link" ]; then
       rmdir $DIR
       mv -f ${DIR}_link $DIR
