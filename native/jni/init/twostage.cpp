@@ -7,41 +7,14 @@
 
 using namespace std;
 
-static void patch_fstab(const char *fstab) {
-	string patched = fstab + ".p"s;
-	FILE *fp = xfopen(patched.data(), "we");
-	file_readline(fstab, [=](string_view l) -> bool {
-		if (l[0] == '#' || l.length() == 1)
-			return true;
-		char *line = (char *) l.data();
-		int src0, src1, mnt0, mnt1, type0, type1, opt0, opt1, flag0, flag1;
-		sscanf(line, "%n%*s%n %n%*s%n %n%*s%n %n%*s%n %n%*s%n",
-			   &src0, &src1, &mnt0, &mnt1, &type0, &type1, &opt0, &opt1, &flag0, &flag1);
-		const char *src, *mnt, *type, *opt, *flag;
-		src = &line[src0];
-		line[src1] = '\0';
-		mnt = &line[mnt0];
-		line[mnt1] = '\0';
-		type = &line[type0];
-		line[type1] = '\0';
-		opt = &line[opt0];
-		line[opt1] = '\0';
-		flag = &line[flag0];
-		line[flag1] = '\0';
-
-		// Redirect system to system_root
-		if (mnt == "/system"sv)
-			mnt = "/system_root";
-
-		fprintf(fp, "%s %s %s %s %s\n", src, mnt, type, opt, flag);
-		return true;
-	});
-	fclose(fp);
-
-	// Replace old fstab
-	clone_attr(fstab, patched.data());
-	rename(patched.data(), fstab);
+void fstab_entry::to_file(FILE *fp) {
+	fprintf(fp, "%s %s %s %s %s\n", dev.data(), mnt_point.data(),
+			type.data(), mnt_flags.data(), fsmgr_flags.data());
 }
+
+#define set_info(val) \
+line[val##1] = '\0'; \
+entry.val = &line[val##0];
 
 #define FSR "/first_stage_ramdisk"
 
@@ -62,14 +35,100 @@ void FirstStageInit::prepare() {
 		rename("/.backup/init", "/init");
 	}
 
-	// Patch fstab
-	auto dir = xopen_dir(".");
-	for (dirent *de; (de = xreaddir(dir.get()));) {
-		if (strstr(de->d_name, "fstab")) {
-			patch_fstab(de->d_name);
+	// Try to load fstab from dt
+	vector<fstab_entry> fstab;
+	read_dt_fstab(fstab);
+
+	char fstab_file[128];
+	fstab_file[0] = '\0';
+
+	// Find existing fstab file
+	for (const char *hw : { cmd->hardware, cmd->hardware_plat }) {
+		if (hw[0] == '\0')
+			continue;
+		sprintf(fstab_file, "fstab.%s", hw);
+		if (access(fstab_file, F_OK) != 0) {
+			fstab_file[0] = '\0';
+			continue;
+		} else {
+			LOGD("Found fstab file: %s\n", fstab_file);
 			break;
 		}
 	}
+
+	if (fstab.empty()) {
+		// fstab has to be somewhere in ramdisk
+		if (fstab_file[0] == '\0') {
+			LOGE("Cannot find fstab file in ramdisk!\n");
+			return;
+		}
+
+		// Parse and load fstab file
+		file_readline(fstab_file, [&](string_view l) -> bool {
+			if (l[0] == '#' || l.length() == 1)
+				return true;
+			char *line = (char *) l.data();
+
+			int dev0, dev1, mnt_point0, mnt_point1, type0, type1,
+					mnt_flags0, mnt_flags1, fsmgr_flags0, fsmgr_flags1;
+
+			sscanf(line, "%n%*s%n %n%*s%n %n%*s%n %n%*s%n %n%*s%n",
+				   &dev0, &dev1, &mnt_point0, &mnt_point1, &type0, &type1,
+				   &mnt_flags0, &mnt_flags1, &fsmgr_flags0, &fsmgr_flags1);
+
+			fstab_entry entry;
+
+			set_info(dev);
+			set_info(mnt_point);
+			set_info(type);
+			set_info(mnt_flags);
+			set_info(fsmgr_flags);
+
+			fstab.emplace_back(std::move(entry));
+			return true;
+		});
+	} else {
+		// All dt fstab entries should be first_stage_mount
+		for (auto &entry : fstab) {
+			if (!str_contains(entry.fsmgr_flags, "first_stage_mount")) {
+				if (!entry.fsmgr_flags.empty())
+					entry.fsmgr_flags += ',';
+				entry.fsmgr_flags += "first_stage_mount";
+			}
+		}
+
+		if (fstab_file[0] == '\0') {
+			const char *hw = cmd->hardware[0] ? cmd->hardware :
+					(cmd->hardware_plat[0] ? cmd->hardware_plat : nullptr);
+			if (hw == nullptr) {
+				LOGE("Cannot determine hardware name!\n");
+				return;
+			}
+			sprintf(fstab_file, "fstab.%s", hw);
+		}
+
+		// Patch init to force ignore dt fstab
+		uint8_t *addr;
+		size_t sz;
+		mmap_rw("/init", addr, sz);
+		raw_data_patch(addr, sz, {
+			make_pair("android,fstab", "xxx")  /* Force IsDtFstabCompatible() to return false */
+		});
+		munmap(addr, sz);
+	}
+
+	{
+		LOGD("Write fstab file: %s\n", fstab_file);
+		auto fp = xopen_file(fstab_file, "we");
+		for (auto &entry : fstab) {
+			// Redirect system mnt_point so init won't switch root in first stage init
+			if (entry.mnt_point == "/system")
+				entry.mnt_point = "/system_root";
+			entry.to_file(fp.get());
+		}
+	}
+	chmod(fstab_file, 0644);
+
 	chdir("/");
 }
 
@@ -82,20 +141,16 @@ void SARFirstStageInit::prepare() {
 	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
 
 	// Patch init binary
-	raw_data init;
 	int src = xopen("/init", O_RDONLY);
-	fd_full_read(src, init.buf, init.sz);
-	for (uint8_t *p = init.buf, *eof = init.buf + init.sz; p < eof; ++p) {
-		if (memcmp(p, INIT_PATH, sizeof(INIT_PATH)) == 0) {
-			LOGD("Patch init [" INIT_PATH "] -> [" REDIR_PATH "]\n");
-			memcpy(p, REDIR_PATH, sizeof(REDIR_PATH));
-			break;
-		}
-	}
 	int dest = xopen("/dev/init", O_CREAT | O_WRONLY, 0);
-	write(dest, init.buf, init.sz);
-	fclone_attr(src, dest);
-	close(dest);
+	{
+		raw_data init;
+		fd_full_read(src, init.buf, init.sz);
+		raw_data_patch(init.buf, init.sz, { make_pair(INIT_PATH, REDIR_PATH) });
+		write(dest, init.buf, init.sz);
+		fclone_attr(src, dest);
+		close(dest);
+	}
 
 	// Replace redirect init with magiskinit
 	dest = xopen("/dev/magiskinit", O_CREAT | O_WRONLY, 0);

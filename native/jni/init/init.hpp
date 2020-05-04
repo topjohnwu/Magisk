@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <vector>
-#include <map>
 
 #include <logging.hpp>
 
@@ -44,6 +43,7 @@ struct fstab_entry {
 	fstab_entry() = default;
 	fstab_entry(const fstab_entry &o) = delete;
 	fstab_entry(fstab_entry &&o) = default;
+	void to_file(FILE *fp);
 };
 
 #define INIT_SOCKET "MAGISKINIT"
@@ -79,7 +79,7 @@ public:
 	cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
 	virtual ~BaseInit() = default;
 	virtual void start() = 0;
-	void read_dt_fstab(std::map<std::string_view, fstab_entry> &fstab);
+	void read_dt_fstab(std::vector<fstab_entry> &fstab);
 	void dt_early_mount();
 };
 
@@ -118,6 +118,7 @@ public:
 class FirstStageInit : public BaseInit {
 private:
 	void prepare();
+
 public:
 	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {
 		LOGD("%s\n", __FUNCTION__);

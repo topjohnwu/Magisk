@@ -104,15 +104,25 @@ if (access(#val, F_OK) == 0) {\
 	entry.val = rtrim(full_read(#val)); \
 }
 
-void BaseInit::read_dt_fstab(map<string_view, fstab_entry> &fstab) {
+void BaseInit::read_dt_fstab(vector<fstab_entry> &fstab) {
 	if (access(cmd->dt_dir, F_OK) != 0)
 		return;
+
+	char cwd[128];
+	getcwd(cwd, sizeof(cwd));
 	chdir(cmd->dt_dir);
-	run_finally cr([]{ chdir("/"); });
+	run_finally cd([&]{ chdir(cwd); });
 
 	if (access("fstab", F_OK) != 0)
 		return;
 	chdir("fstab");
+
+	// Make sure dt fstab is enabled
+	if (access("status", F_OK) == 0) {
+		auto status = rtrim(full_read("status"));
+		if (status != "okay" && status != "ok")
+			return;
+	}
 
 	auto dir = xopen_dir(".");
 	for (dirent *dp; (dp = xreaddir(dir.get()));) {
@@ -138,14 +148,14 @@ void BaseInit::read_dt_fstab(map<string_view, fstab_entry> &fstab) {
 		read_info(mnt_flags);
 		read_info(fsmgr_flags);
 
-		fstab.emplace(entry.mnt_point, std::move(entry));
+		fstab.emplace_back(std::move(entry));
 	}
 }
 
 void BaseInit::dt_early_mount() {
-	map<string_view, fstab_entry> fstab;
+	vector<fstab_entry> fstab;
 	read_dt_fstab(fstab);
-	for (const auto &[_, entry] : fstab) {
+	for (const auto &entry : fstab) {
 		if (is_lnk(entry.mnt_point.data()))
 			continue;
 		// Derive partname from dev
