@@ -99,14 +99,10 @@ void load_kernel_info(cmdline *cmd) {
 	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
 
 	// Disable kmsg rate limiting
-	if (FILE *rate = fopen("/proc/sys/kernel/printk_devkmsg", "w"); rate) {
+	if (FILE *rate = fopen("/proc/sys/kernel/printk_devkmsg", "w")) {
 		fprintf(rate, "on\n");
 		fclose(rate);
 	}
-
-	bool enter_recovery = false;
-	bool kirin = false;
-	bool recovery_mode = false;
 
 	parse_cmdline([&](auto key, auto value) -> void {
 		if (key == "androidboot.slot_suffix") {
@@ -120,37 +116,21 @@ void load_kernel_info(cmdline *cmd) {
 			cmd->force_normal_boot = value[0] == '1';
 		} else if (key == "androidboot.android_dt_dir") {
 			strcpy(cmd->dt_dir, value);
-		} else if (key == "enter_recovery") {
-			enter_recovery = value[0] == '1';
 		} else if (key == "androidboot.hardware") {
 			strcpy(cmd->hardware, value);
-			kirin = strstr(value, "kirin") || strstr(value, "hi3660") || strstr(value, "hi6250");
 		} else if (key == "androidboot.hardware.platform") {
 			strcpy(cmd->hardware_plat, value);
 		}
 	});
 
-	parse_prop_file("/.backup/.magisk", [&](auto key, auto value) -> bool {
-		if (key == "RECOVERYMODE" && value == "true")
-			recovery_mode = true;
+	parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
+		if (key == "RECOVERYMODE" && value == "true") {
+			LOGD("Running in recovery mode, waiting for key...\n");
+			cmd->skip_initramfs = !check_key_combo();
+			return false;
+		}
 		return true;
 	});
-
-	if (kirin && enter_recovery) {
-		// Inform that we are actually booting as recovery
-		if (!recovery_mode) {
-			if (FILE *f = fopen("/.backup/.magisk", "ae"); f) {
-				fprintf(f, "RECOVERYMODE=true\n");
-				fclose(f);
-			}
-			recovery_mode = true;
-		}
-	}
-
-	if (recovery_mode) {
-		LOGD("Running in recovery mode, waiting for key...\n");
-		cmd->skip_initramfs = !check_key_combo();
-	}
 
 	if (cmd->dt_dir[0] == '\0')
 		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
