@@ -1,6 +1,7 @@
 #include <sys/sysmacros.h>
 #include <string.h>
 #include <stdio.h>
+#include <libgen.h>
 #include <vector>
 
 #include <utils.hpp>
@@ -20,10 +21,6 @@ struct devinfo {
 };
 
 static vector<devinfo> dev_list;
-
-static char partname[32];
-static char fstype[32];
-static char block_dev[64];
 
 static void parse_device(devinfo *dev, const char *uevent) {
 	dev->partname[0] = '\0';
@@ -55,6 +52,11 @@ static void collect_devices() {
 	}
 }
 
+static struct {
+	char partname[32];
+	char block_dev[64];
+} blk_info;
+
 static int64_t setup_block(bool write_block = true) {
 	if (dev_list.empty())
 		collect_devices();
@@ -63,13 +65,13 @@ static int64_t setup_block(bool write_block = true) {
 
 	for (int tries = 0; tries < 3; ++tries) {
 		for (auto &dev : dev_list) {
-			if (strcasecmp(dev.partname, partname) == 0) {
+			if (strcasecmp(dev.partname, blk_info.partname) == 0) {
 				if (write_block) {
-					sprintf(block_dev, "/dev/block/%s", dev.devname);
+					sprintf(blk_info.block_dev, "/dev/block/%s", dev.devname);
 				}
-				LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
+				LOGD("Setup %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
 				dev_t rdev = makedev(dev.major, dev.minor);
-				mknod(block_dev, S_IFBLK | 0600, rdev);
+				mknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
 				return rdev;
 			}
 		}
@@ -90,35 +92,69 @@ static bool is_lnk(const char *name) {
 	return S_ISLNK(st.st_mode);
 }
 
-static bool read_dt_fstab(cmdline *cmd, const char *name) {
-	char path[128];
-	int fd;
-	sprintf(path, "%s/fstab/%s/dev", cmd->dt_dir, name);
-	if ((fd = open(path, O_RDONLY | O_CLOEXEC)) >= 0) {
-		read(fd, path, sizeof(path));
-		close(fd);
-		path[strcspn(path, "\r\n")] = '\0';
-		// Some custom treble use different names, so use what we read
-		char *part = rtrim(strrchr(path, '/') + 1);
-		sprintf(partname, "%s%s", part, strend(part, cmd->slot) ? cmd->slot : "");
-		sprintf(path, "%s/fstab/%s/type", cmd->dt_dir, name);
-		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
-			read(fd, fstype, 32);
-			close(fd);
-			fstype[strcspn(fstype, "\r\n")] = '\0';
-			return true;
-		}
-	}
-	return false;
+static string rtrim(string &&str) {
+	// Trim space, newline, and null byte from end of string
+	while (memchr(" \n\r", str[str.length() - 1], 4))
+		str.pop_back();
+	return std::move(str);
 }
 
-#define mount_root(name) \
-if (!is_lnk("/" #name) && read_dt_fstab(cmd, #name)) { \
-	LOGD("Early mount " #name "\n"); \
-	setup_block(); \
-	xmkdir("/" #name, 0755); \
-	xmount(block_dev, "/" #name, fstype, MS_RDONLY, nullptr); \
-	mount_list.emplace_back("/" #name); \
+#define read_info(val) \
+if (access(#val, F_OK) == 0) {\
+	entry.val = rtrim(full_read(#val)); \
+}
+
+void BaseInit::read_dt_fstab(map<string_view, fstab_entry> &fstab) {
+	if (access(cmd->dt_dir, F_OK) != 0)
+		return;
+	chdir(cmd->dt_dir);
+	run_finally cr([]{ chdir("/"); });
+
+	if (access("fstab", F_OK) != 0)
+		return;
+	chdir("fstab");
+
+	auto dir = xopen_dir(".");
+	for (dirent *dp; (dp = xreaddir(dir.get()));) {
+		if (dp->d_type != DT_DIR)
+			continue;
+		chdir(dp->d_name);
+		run_finally f([]{ chdir(".."); });
+
+		if (access("status", F_OK) == 0) {
+			auto status = rtrim(full_read("status"));
+			if (status != "okay" && status != "ok")
+				continue;
+		}
+
+		fstab_entry entry;
+
+		read_info(dev);
+		read_info(mnt_point) else {
+			entry.mnt_point = "/";
+			entry.mnt_point += dp->d_name;
+		}
+		read_info(type);
+		read_info(mnt_flags);
+		read_info(fsmgr_flags);
+
+		fstab.emplace(entry.mnt_point, std::move(entry));
+	}
+}
+
+void BaseInit::dt_early_mount() {
+	map<string_view, fstab_entry> fstab;
+	read_dt_fstab(fstab);
+	for (const auto &[_, entry] : fstab) {
+		if (is_lnk(entry.mnt_point.data()))
+			continue;
+		// Derive partname from dev
+		sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), cmd->slot);
+		setup_block();
+		xmkdir(entry.mnt_point.data(), 0755);
+		xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
+		mount_list.push_back(entry.mnt_point);
+	}
 }
 
 static void switch_root(const string &path) {
@@ -152,17 +188,17 @@ static void switch_root(const string &path) {
 
 static void mount_persist(const char *dev_base, const char *mnt_base) {
 	string mnt_point = mnt_base + "/persist"s;
-	strcpy(partname, "persist");
-	xrealpath(dev_base, block_dev);
-	char *s = block_dev + strlen(block_dev);
+	strcpy(blk_info.partname, "persist");
+	xrealpath(dev_base, blk_info.block_dev);
+	char *s = blk_info.block_dev + strlen(blk_info.block_dev);
 	strcpy(s, "/persist");
 	if (setup_block(false) < 0) {
 		// Fallback to cache
-		strcpy(partname, "cache");
+		strcpy(blk_info.partname, "cache");
 		strcpy(s, "/cache");
 		if (setup_block(false) < 0) {
 			// Try NVIDIA's BS
-			strcpy(partname, "CAC");
+			strcpy(blk_info.partname, "CAC");
 			if (setup_block(false) < 0)
 				return;
 		}
@@ -170,19 +206,16 @@ static void mount_persist(const char *dev_base, const char *mnt_base) {
 		mnt_point = mnt_base + "/cache"s;
 	}
 	xmkdir(mnt_point.data(), 0755);
-	xmount(block_dev, mnt_point.data(), "ext4", 0, nullptr);
+	xmount(blk_info.block_dev, mnt_point.data(), "ext4", 0, nullptr);
 }
 
 void RootFSInit::early_mount() {
 	full_read("/init", self.buf, self.sz);
 
-	LOGD("Reverting /init\n");
+	LOGD("Restoring /init\n");
 	rename("/.backup/init", "/init");
 
-	mount_root(system);
-	mount_root(vendor);
-	mount_root(product);
-	mount_root(odm);
+	dt_early_mount();
 
 	xmkdir("/dev/mnt", 0755);
 	mount_persist("/dev/block", "/dev/mnt");
@@ -201,12 +234,12 @@ void SARBase::backup_files() {
 
 void SARBase::mount_system_root() {
 	LOGD("Early mount system_root\n");
-	sprintf(partname, "system%s", cmd->slot);
-	strcpy(block_dev, "/dev/root");
+	sprintf(blk_info.partname, "system%s", cmd->slot);
+	strcpy(blk_info.block_dev, "/dev/root");
 	auto dev = setup_block(false);
 	if (dev < 0) {
 		// Try NVIDIA naming scheme
-		strcpy(partname, "APP");
+		strcpy(blk_info.partname, "APP");
 		dev = setup_block(false);
 		if (dev < 0) {
 			// We don't really know what to do at this point...
@@ -230,9 +263,7 @@ void SARInit::early_mount() {
 	mount_system_root();
 	switch_root("/system_root");
 
-	mount_root(vendor);
-	mount_root(product);
-	mount_root(odm);
+	dt_early_mount();
 }
 
 void SARFirstStageInit::early_mount() {
@@ -262,15 +293,12 @@ void BaseInit::cleanup() {
 }
 
 static void patch_socket_name(const char *path) {
+	char rstr[16];
+	gen_rand_str(rstr, sizeof(rstr));
 	char *buf;
 	size_t size;
 	mmap_rw(path, buf, size);
-	for (int i = 0; i < size; ++i) {
-		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(buf + i, 16);
-			i += sizeof(MAIN_SOCKET);
-		}
-	}
+	raw_data_patch(buf, size, { make_pair(MAIN_SOCKET, rstr) });
 	munmap(buf, size);
 }
 

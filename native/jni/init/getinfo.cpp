@@ -12,11 +12,9 @@
 
 using namespace std;
 
-#define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
-
 static void parse_cmdline(const std::function<void (std::string_view, const char *)> &fn) {
 	char cmdline[4096];
-	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
+	int fd = xopen("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
 
@@ -125,7 +123,10 @@ void load_kernel_info(cmdline *cmd) {
 		} else if (key == "enter_recovery") {
 			enter_recovery = value[0] == '1';
 		} else if (key == "androidboot.hardware") {
+			strcpy(cmd->hardware, value);
 			kirin = strstr(value, "kirin") || strstr(value, "hi3660") || strstr(value, "hi6250");
+		} else if (key == "androidboot.hardware.platform") {
+			strcpy(cmd->hardware_plat, value);
 		}
 	});
 
@@ -154,8 +155,11 @@ void load_kernel_info(cmdline *cmd) {
 	if (cmd->dt_dir[0] == '\0')
 		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
 
+	LOGD("Device info:\n");
 	LOGD("skip_initramfs=[%d]\n", cmd->skip_initramfs);
 	LOGD("force_normal_boot=[%d]\n", cmd->force_normal_boot);
 	LOGD("slot=[%s]\n", cmd->slot);
 	LOGD("dt_dir=[%s]\n", cmd->dt_dir);
+	LOGD("hardware=[%s]\n", cmd->hardware);
+	LOGD("hardware.platform=[%s]\n", cmd->hardware_plat);
 }

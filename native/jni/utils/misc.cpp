@@ -164,14 +164,6 @@ bool ends_with(const std::string_view &s1, const std::string_view &s2) {
 	return l1 < l2 ? false : s1.compare(l1 - l2, l2, s2) == 0;
 }
 
-char *rtrim(char *str) {
-	int len = strlen(str);
-	while (len > 0 && str[len - 1] == ' ')
-		--len;
-	str[len] = '\0';
-	return str;
-}
-
 /*
  * Bionic's atoi runs through strtol().
  * Use our own implementation for faster conversion.

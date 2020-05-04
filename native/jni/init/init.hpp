@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <vector>
+#include <map>
 
 #include <logging.hpp>
 
@@ -11,7 +12,9 @@ struct cmdline {
 	bool skip_initramfs;
 	bool force_normal_boot;
 	char slot[3];
-	char dt_dir[128];
+	char dt_dir[64];
+	char hardware[32];
+	char hardware_plat[32];
 };
 
 struct raw_data {
@@ -30,6 +33,30 @@ struct raw_data {
 		free(buf);
 	}
 };
+
+struct fstab_entry {
+	std::string dev;
+	std::string mnt_point;
+	std::string type;
+	std::string mnt_flags;
+	std::string fsmgr_flags;
+
+	fstab_entry() = default;
+	fstab_entry(const fstab_entry &o) = delete;
+	fstab_entry(fstab_entry &&o) = default;
+};
+
+#define INIT_SOCKET "MAGISKINIT"
+#define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
+
+void load_kernel_info(cmdline *cmd);
+int dump_magisk(const char *path, mode_t mode);
+int magisk_proxy_main(int argc, char *argv[]);
+void setup_klog();
+void setup_tmp(const char *path, const raw_data &self, const raw_data &config);
+
+using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
+int raw_data_patch(void *addr, size_t sz, str_pairs list);
 
 /***************
  * Base classes
@@ -52,6 +79,8 @@ public:
 	cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
 	virtual ~BaseInit() = default;
 	virtual void start() = 0;
+	void read_dt_fstab(std::map<std::string_view, fstab_entry> &fstab);
+	void dt_early_mount();
 };
 
 class MagiskInit : public BaseInit {
@@ -158,11 +187,3 @@ public:
 		exec_init();
 	}
 };
-
-#define INIT_SOCKET "MAGISKINIT"
-
-void load_kernel_info(cmdline *cmd);
-int dump_magisk(const char *path, mode_t mode);
-int magisk_proxy_main(int argc, char *argv[]);
-void setup_klog();
-void setup_tmp(const char *path, const raw_data &self, const raw_data &config);

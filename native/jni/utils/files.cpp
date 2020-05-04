@@ -302,11 +302,10 @@ void full_read(const char *filename, void **buf, size_t *size) {
 }
 
 string fd_full_read(int fd) {
+	char buf[4096];
 	string str;
-	auto len = lseek(fd, 0, SEEK_END);
-	str.resize(len);
-	lseek(fd, 0, SEEK_SET);
-	xxread(fd, str.data(), len);
+	for (ssize_t len; (len = xread(fd, buf, sizeof(buf))) > 0;)
+		str.insert(str.end(), buf, buf + len);
 	return str;
 }
 

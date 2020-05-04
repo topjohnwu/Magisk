@@ -97,7 +97,6 @@ bool ends_with(const std::string_view &s1, const std::string_view &s2);
 int fork_dont_care();
 int fork_no_zombie();
 int strend(const char *s1, const char *s2);
-char *rtrim(char *str);
 void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
 uint32_t binary_gcd(uint32_t u, uint32_t v);
