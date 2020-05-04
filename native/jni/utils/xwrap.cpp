@@ -454,9 +454,12 @@ int xinotify_init1(int flags) {
 }
 
 char *xrealpath(const char *path, char *resolved_path) {
-	char *ret = realpath(path, resolved_path);
+	char buf[PATH_MAX];
+	char *ret = realpath(path, buf);
 	if (ret == nullptr) {
 		PLOGE("xrealpath");
+	} else {
+		strcpy(resolved_path, buf);
 	}
 	return ret;
 }
