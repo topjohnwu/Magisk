@@ -68,7 +68,8 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/rules.cpp \
 	magiskpolicy/policydb.cpp \
 	magiskpolicy/statement.cpp \
-	magiskpolicy/sepolicy.c
+	magiskpolicy/sepolicy.c \
+	magiskboot/pattern.cpp
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)

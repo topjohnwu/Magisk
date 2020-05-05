@@ -18,6 +18,8 @@ entry.val = &line[val##0];
 
 #define FSR "/first_stage_ramdisk"
 
+extern uint32_t patch_verity(void *buf, uint32_t size);
+
 void FirstStageInit::prepare() {
 	if (cmd->force_normal_boot) {
 		xmkdirs(FSR "/system/bin", 0755);
@@ -124,6 +126,11 @@ void FirstStageInit::prepare() {
 			// Redirect system mnt_point so init won't switch root in first stage init
 			if (entry.mnt_point == "/system")
 				entry.mnt_point = "/system_root";
+
+			// Force remove AVB for 2SI since it may bootloop some devices
+			auto len = patch_verity(entry.fsmgr_flags.data(), entry.fsmgr_flags.length());
+			entry.fsmgr_flags.resize(len);
+
 			entry.to_file(fp.get());
 		}
 	}
