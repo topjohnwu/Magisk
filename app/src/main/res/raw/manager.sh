@@ -34,29 +34,6 @@ direct_install() {
   return 0
 }
 
-mm_patch_dtb() {
-  (local result=1
-  local PATCHED=$TMPDIR/dt.patched
-  for name in dtb dtbo; do
-    local IMAGE=`find_block $name$SLOT`
-    if [ ! -z $IMAGE ]; then
-      if $MAGISKBIN/magiskboot dtb $IMAGE patch $PATCHED; then
-        result=0
-        if [ ! -z $SHA1 ]; then
-          # Backup stuffs
-          mkdir /data/magisk_backup_${SHA1} 2>/dev/null
-          cat $IMAGE | gzip -9 > /data/magisk_backup_${SHA1}/${name}.img.gz
-        fi
-        cat $PATCHED /dev/zero > $IMAGE
-        rm -f $PATCHED
-      fi
-    fi
-  done
-  # Run broadcast command passed from app
-  eval $1
-  )& >/dev/null 2>&1
-}
-
 restore_imgs() {
   [ -z $SHA1 ] && return 1
   local BACKUPDIR=/data/magisk_backup_$SHA1

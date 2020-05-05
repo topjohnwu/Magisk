@@ -85,32 +85,6 @@ object Notifications {
         mgr.notify(Const.ID.APK_UPDATE_NOTIFICATION_ID, builder.build())
     }
 
-    fun dtboPatched(context: Context) {
-        val intent = context.intent<GeneralReceiver>()
-                .setAction(Const.Key.BROADCAST_REBOOT)
-        val pendingIntent = PendingIntent.getBroadcast(context,
-                Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val builder = updateBuilder(
-            context
-        )
-            .setContentTitle(context.getString(R.string.dtbo_patched_title))
-            .setContentText(context.getString(R.string.dtbo_patched_reboot))
-
-        if (SDK_INT >= 23) {
-            val action = Notification.Action.Builder(
-                context.getBitmap(R.drawable.ic_refresh).toIcon(),
-                context.getString(R.string.reboot), pendingIntent).build()
-            builder.addAction(action)
-        } else {
-            builder.addAction(
-                R.drawable.ic_refresh,
-                context.getString(R.string.reboot), pendingIntent)
-        }
-
-        mgr.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build())
-    }
-
     fun progress(context: Context, title: CharSequence): Notification.Builder {
         val builder = if (SDK_INT >= 26) {
             Notification.Builder(context, PROGRESS_NOTIFICATION_CHANNEL)

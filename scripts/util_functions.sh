@@ -420,27 +420,6 @@ flash_image() {
   return 0
 }
 
-patch_dtb_partitions() {
-  local result=1
-  cd $MAGISKBIN
-  for name in dtb dtbo dtbs; do
-    local IMAGE=`find_block $name$SLOT`
-    if [ ! -z $IMAGE ]; then
-      ui_print "- $name image: $IMAGE"
-      if ./magiskboot dtb $IMAGE patch dt.patched; then
-        result=0
-        ui_print "- Backing up stock $name image"
-        cat $IMAGE > stock_${name}.img
-        ui_print "- Flashing patched $name"
-        cat dt.patched /dev/zero > $IMAGE
-        rm -f dt.patched
-      fi
-    fi
-  done
-  cd /
-  return $result
-}
-
 # Common installation script for flash_script.sh and addon.d.sh
 install_magisk() {
   cd $MAGISKBIN
@@ -478,7 +457,6 @@ install_magisk() {
   ./magiskboot cleanup
   rm -f new-boot.img
 
-  patch_dtb_partitions
   run_migrations
 }
 

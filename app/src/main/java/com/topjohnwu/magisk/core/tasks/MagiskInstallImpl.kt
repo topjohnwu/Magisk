@@ -287,10 +287,7 @@ abstract class MagiskInstallImpl : FlashResultListener {
     private fun flashBoot(): Boolean {
         if (!"direct_install $installDir $srcBoot".sh().isSuccess)
             return false
-        arrayOf(
-            "(KEEPVERITY=${Info.keepVerity} patch_dtb_partitions)",
-            "run_migrations"
-        ).sh()
+        arrayOf("run_migrations").sh()
         return true
     }
 

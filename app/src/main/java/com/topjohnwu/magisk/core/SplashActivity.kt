@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.tasks.patchDTB
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.core.view.Shortcuts
@@ -47,9 +46,6 @@ open class SplashActivity : Activity() {
         Notifications.setup(this)
         Utils.scheduleUpdateCheck(this)
         Shortcuts.setup(this)
-
-        // Patch DTB partitions if needed
-        patchDTB(this)
 
         // Pre-fetch network stuffs
         get<GithubRawServices>()
