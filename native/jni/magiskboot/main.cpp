@@ -42,7 +42,7 @@ Supported actions:
     Search <hexpattern1> in <file>, and replace with <hexpattern2>
 
   cpio <incpio> [commands...]
-    Do cpio commands to <incpio> (modifications are done directly)
+    Do cpio commands to <incpio> (modifications are done in-place)
     Each command is a single argument, add quotes for each command
     Supported commands:
       exists ENTRY
@@ -64,8 +64,8 @@ Supported actions:
         Return values:
         0:stock    1:Magisk    2:unsupported (phh, SuperSU, Xposed)
       patch
-        Apply ramdisk patches. Configure settings with env variables:
-        KEEPVERITY KEEPFORCEENCRYPT
+        Apply ramdisk patches
+        Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
       backup ORIG
         Create ramdisk backups from ORIG
       restore
@@ -79,10 +79,10 @@ Supported actions:
       print [-f]
         Print all contents of dtb for debugging
         Specify [-f] to only print fstab nodes
-      patch [OUT]
+      patch
         Search for fstab and remove verity/avb
-        If [OUT] is not specified, it will directly output to <input>
-        Configure with env variables: KEEPVERITY TWOSTAGEINIT
+        Modifications are done directly to the file in-place
+        Configure with env variables: KEEPVERITY
 
   split <input>
     Split image.*-dtb into kernel + kernel_dtb
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
 	} else if (argc > 2 && action == "cpio"sv) {
 		if (cpio_commands(argc - 2, argv + 2))
 			usage(argv[0]);
-	} else if (argc > 2 && action == "dtb") {
+	} else if (argc > 3 && action == "dtb") {
 		if (dtb_commands(argc - 2, argv + 2))
 			usage(argv[0]);
 	} else {
