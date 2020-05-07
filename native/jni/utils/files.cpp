@@ -86,11 +86,13 @@ void frm_rf(int dirfd) {
 }
 
 void mv_path(const char *src, const char *dest) {
-	file_attr a;
-	getattr(src, &a);
-	if (S_ISDIR(a.st.st_mode)) {
-		xmkdirs(dest, 0);
-		setattr(dest, &a);
+	file_attr attr;
+	getattr(src, &attr);
+	if (S_ISDIR(attr.st.st_mode)) {
+		if (access(dest, F_OK) != 0) {
+			xmkdirs(dest, 0);
+			setattr(dest, &attr);
+		}
 		mv_dir(xopen(src, O_RDONLY | O_CLOEXEC), xopen(dest, O_RDONLY | O_CLOEXEC));
 	} else{
 		xrename(src, dest);
@@ -100,7 +102,7 @@ void mv_path(const char *src, const char *dest) {
 
 void mv_dir(int src, int dest) {
 	auto dir = xopen_dir(src);
-	run_finally f([&]{ close(dest); });
+	run_finally f([=]{ close(dest); });
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		switch (entry->d_type) {
 		case DT_DIR:

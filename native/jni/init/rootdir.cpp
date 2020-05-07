@@ -316,8 +316,8 @@ void SARBase::patch_rootdir() {
 	// Handle overlay.d
 	load_overlay_rc(ROOTOVL);
 	if (access(ROOTOVL "/sbin", F_OK) == 0) {
-		// Move files in overlay.d/sbin into Magisk's tmp_dir
-		mv_path(ROOTOVL "/sbin", tmp_dir);
+		// Move files in overlay.d/sbin into tmp_dir
+		mv_path(ROOTOVL "/sbin", ".");
 	}
 
 	// Patch init.rc
