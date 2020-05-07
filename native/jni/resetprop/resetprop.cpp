@@ -7,7 +7,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <vector>
-#include <algorithm>
+#include <map>
 
 #include <logging.hpp>
 #include <resetprop.hpp>
@@ -55,48 +55,34 @@ illegal:
 
 [[noreturn]] static void usage(char* arg0) {
 	fprintf(stderr,
-		NAME_WITH_VER(resetprop) " - System Props Modification Tool\n\n"
-		"Usage: %s [flags] [options...]\n"
-		"\n"
-		"Options:\n"
-		"   -h, --help        show this message\n"
-		"   (no arguments)    print all properties\n"
-		"   NAME              get property\n"
-		"   NAME VALUE        set property entry NAME with VALUE\n"
-		"   --file FILE       load props from FILE\n"
-		"   --delete NAME     delete property\n"
-		"\n"
-		"Flags:\n"
-		"   -v      print verbose output to stderr\n"
-		"   -n      set properties without init triggers\n"
-		"           only affects setprop\n"
-		"   -p      access actual persist storage\n"
-		"           only affects getprop and delprop\n"
-		"\n"
+NAME_WITH_VER(resetprop) R"EOF(" - System Props Modification Tool
 
-	, arg0);
+Usage: %s [flags] [options...]
+
+Options:
+   -h, --help        show this message
+   (no arguments)    print all properties
+   NAME              get property
+   NAME VALUE        set property entry NAME with VALUE
+   --file FILE       load props from FILE
+   --delete NAME     delete property
+
+Flags:
+   -v      print verbose output to stderr
+   -n      set properties without going through init
+           affects setprop and prop file loading
+   -p      also access props directly from persist storage
+           affects getprop and delprop
+
+)EOF", arg0);
 	exit(1);
 }
 
-static void read_props(const prop_info *pi, void *read_cb) {
+static void read_props(const prop_info *pi, void *cb) {
 	__system_property_read_callback(
 			pi, [](auto cb, auto name, auto value, auto) {
-				((read_cb_t *) cb)->exec(name, value);
-			}, read_cb);
-}
-
-void collect_props(const char *name, const char *value, void *v_plist) {
-	auto prop_list = static_cast<vector<prop_t> *>(v_plist);
-	prop_list->emplace_back(name, value);
-}
-
-static void collect_unique_props(const char *name, const char *value, void *v_plist) {
-	auto &prop_list = *static_cast<vector<prop_t> *>(v_plist);
-	for (auto &prop : prop_list) {
-		if (strcmp(name, prop.name) == 0)
-			return;
-	}
-	collect_props(name, value, v_plist);
+				reinterpret_cast<prop_cb*>(cb)->exec(name, value);
+			}, cb);
 }
 
 static int init_resetprop() {
@@ -109,11 +95,9 @@ static int init_resetprop() {
 }
 
 static void print_props(bool persist) {
-	vector<prop_t> prop_list;
-	getprop(collect_props, &prop_list, persist);
-	sort(prop_list.begin(), prop_list.end());
-	for (auto &prop : prop_list)
-		printf("[%s]: [%s]\n", prop.name, prop.value);
+	getprops([](auto name, auto value, auto) {
+		printf("[%s]: [%s]\n", name, value);
+	}, nullptr, persist);
 }
 
 /* **************************************************
@@ -122,8 +106,8 @@ static void print_props(bool persist) {
 
 #define ENSURE_INIT(ret) if (init_resetprop()) return ret
 
-int prop_exist(const char *name) {
-	ENSURE_INIT(0);
+bool prop_exist(const char *name) {
+	ENSURE_INIT(false);
 	return __system_property_find(name) != nullptr;
 }
 
@@ -137,29 +121,31 @@ string getprop(const char *name, bool persist) {
 		if (persist && strncmp(name, "persist.", 8) == 0) {
 			auto value = persist_getprop(name);
 			if (value.empty())
-				LOGD("resetprop: prop [%s] does not exist\n", name);
+				goto not_found;
 			return value;
 		}
+not_found:
+		LOGD("resetprop: prop [%s] does not exist\n", name);
 		return string();
 	} else {
-		char value[PROP_VALUE_MAX];
-		read_cb_t read_cb;
-		read_cb.cb = [](auto, auto value, auto dst) -> void { strcpy((char *) dst, value); };
-		read_cb.arg = value;
-		read_props(pi, &read_cb);
-		LOGD("resetprop: getprop [%s]: [%s]\n", name, value);
-		return value;
+		char buf[PROP_VALUE_MAX];
+		auto reader = make_prop_cb(buf, [](auto, auto value, auto buf) { strcpy(buf, value); });
+		read_props(pi, &reader);
+		LOGD("resetprop: getprop [%s]: [%s]\n", name, buf);
+		return buf;
 	}
 }
 
-void getprop(void (*callback)(const char *, const char *, void *), void *cookie, bool persist) {
+void getprops(void (*callback)(const char *, const char *, void *), void *cookie, bool persist) {
 	ENSURE_INIT();
-	read_cb_t read_cb(callback, cookie);
-	__system_property_foreach(read_props, &read_cb);
-	if (persist) {
-		read_cb.cb = collect_unique_props;
-		persist_getprop(&read_cb);
-	}
+	prop_list list;
+	prop_collector collector(list);
+	__system_property_foreach(read_props, &collector);
+	if (persist)
+		persist_getprops(&collector);
+	for (auto &[key, val] : list)
+		callback(key.data(), val.data(), cookie);
+	persist_cleanup();
 }
 
 int setprop(const char *name, const char *value, bool trigger) {
