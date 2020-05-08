@@ -17,6 +17,8 @@ endif
 
 # Busybox require some additional settings
 ifdef B_BB
+ifeq ($(OS),Windows_NT)
 APP_SHORT_COMMANDS := true
+endif
 APP_PLATFORM := android-21
 endif
