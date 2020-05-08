@@ -299,7 +299,7 @@ def build_binary(args):
 
     header('* Building binaries: ' + ' '.join(args.target))
 
-    # os.utime(op.join('native', 'jni', 'include', 'flags.h'))
+    os.utime(op.join('native', 'jni', 'include', 'flags.h'))
 
     # Basic flags
     global base_flags
