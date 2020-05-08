@@ -542,7 +542,7 @@ static void inject_magisk_bins(root_node *system) {
 		delete bin->extract(init_applet[i]);
 }
 
-static void mount_modules() {
+void magic_mount() {
 	node_entry::mirror_dir = MAGISKTMP + "/" MIRRDIR;
 	node_entry::module_mnt = MAGISKTMP + "/" MODULEMNT "/";
 
@@ -683,12 +683,10 @@ void handle_modules() {
 	// Recollect modules (module scripts could remove itself)
 	module_list.clear();
 	collect_modules();
-
-	mount_modules();
 }
 
-void remove_modules() {
-	LOGI("* Remove all modules and reboot\n");
+void foreach_modules(const char *name) {
+	LOGI("* Add %s to all modules\n", name);
 	auto dir = open_dir(MODULEROOT);
 	if (!dir)
 		return;
@@ -700,9 +698,8 @@ void remove_modules() {
 				continue;
 
 			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			close(xopenat(modfd, "remove", O_RDONLY | O_CREAT | O_CLOEXEC, 0));
+			close(xopenat(modfd, name, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
 			close(modfd);
 		}
 	}
-	reboot();
 }

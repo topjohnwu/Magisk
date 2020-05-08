@@ -40,14 +40,18 @@ void late_start(int client);
 void boot_complete(int client);
 void magiskhide_handler(int client);
 void su_daemon_handler(int client, struct ucred *credential);
-void remove_modules();
+void foreach_modules(const char *name);
 
 // Misc
 int connect_daemon(bool create = false);
-void auto_start_magiskhide();
 void unlock_blocks();
 void handle_modules();
+void magic_mount();
 void reboot();
+
+// MagiskHide
+void auto_start_magiskhide();
+int stop_magiskhide();
 
 // Scripting
 void exec_script(const char *script);

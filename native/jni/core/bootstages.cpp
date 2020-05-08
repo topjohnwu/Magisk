@@ -21,6 +21,7 @@ using namespace std;
 
 static bool no_secure_dir = false;
 static bool pfs_done = false;
+static bool safe_mode = false;
 
 /*********
  * Setup *
@@ -224,12 +225,6 @@ static void dump_logs() {
 	pthread_exit(nullptr);
 }
 
-[[noreturn]] static void core_only() {
-	pfs_done = true;
-	auto_start_magiskhide();
-	unblock_boot_process();
-}
-
 void post_fs_data(int client) {
 	// ack
 	write_int(client, 0);
@@ -262,16 +257,21 @@ void post_fs_data(int client) {
 		unblock_boot_process();
 	}
 
-	LOGI("* Running post-fs-data.d scripts\n");
-	exec_common_script("post-fs-data");
+	if (getprop("persist.sys.safemode", true) == "1") {
+		safe_mode = true;
+		// Disable all modules and magiskhide so next boot will be clean
+		foreach_modules("disable");
+		stop_magiskhide();
+	} else {
+		LOGI("* Running post-fs-data.d scripts\n");
+		exec_common_script("post-fs-data");
+		handle_modules();
+		auto_start_magiskhide();
+	}
 
-	// Core only mode
-	if (access(DISABLEFILE, F_OK) == 0)
-		core_only();
-
-	handle_modules();
-
-	core_only();
+	// We still want to do magic mount because root itself might need it
+	magic_mount();
+	unblock_boot_process();
 }
 
 void late_start(int client) {
@@ -290,7 +290,7 @@ void late_start(int client) {
 		reboot();
 	}
 
-	if (!pfs_done)
+	if (!pfs_done || safe_mode)
 		return;
 
 	auto_start_magiskhide();
@@ -298,11 +298,8 @@ void late_start(int client) {
 	LOGI("* Running service.d scripts\n");
 	exec_common_script("service");
 
-	// Core only mode
-	if (access(DISABLEFILE, F_OK) != 0) {
-		LOGI("* Running module service scripts\n");
-		exec_module_script("service", module_list);
-	}
+	LOGI("* Running module service scripts\n");
+	exec_module_script("service", module_list);
 
 	// All boot stage done, cleanup
 	module_list.clear();
@@ -315,7 +312,7 @@ void boot_complete(int client) {
 	write_int(client, 0);
 	close(client);
 
-	if (!pfs_done)
+	if (!pfs_done || safe_mode)
 		return;
 
 	auto_start_magiskhide();

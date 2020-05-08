@@ -96,9 +96,10 @@ static void *request_handler(void *args) {
 		exec_sql(client);
 		break;
 	case REMOVE_MODULES:
-		remove_modules();
+		foreach_modules("remove");
 		write_int(client, 0);
 		close(client);
+		reboot();
 		break;
 	case GET_PATH:
 		write_string(client, MAGISKTMP.data());

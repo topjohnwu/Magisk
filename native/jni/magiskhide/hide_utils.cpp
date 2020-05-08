@@ -10,7 +10,6 @@
 #include <magisk.hpp>
 #include <utils.hpp>
 #include <db.hpp>
-#include <daemon.hpp>
 
 #include "magiskhide.hpp"
 
@@ -267,9 +266,11 @@ void launch_magiskhide(int client) {
 int stop_magiskhide() {
 	LOGI("* Stopping MagiskHide\n");
 
+	if (hide_enabled)
+		pthread_kill(proc_monitor_thread, SIGTERMTHRD);
+
 	hide_enabled = false;
 	set_hide_config();
-	pthread_kill(proc_monitor_thread, SIGTERMTHRD);
 
 	return DAEMON_SUCCESS;
 }
