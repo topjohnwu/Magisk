@@ -88,6 +88,8 @@ const pb_field_t PersistentProperties_fields[2] = {
  * End of auto generated code
  * ***************************/
 
+bool use_pb = false;
+
 #ifdef APPLET_STUB_MAIN
 struct {
 	void push_back(...){};

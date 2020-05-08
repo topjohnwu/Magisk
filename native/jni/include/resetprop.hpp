@@ -3,7 +3,6 @@
 #include <string>
 #include <functional>
 
-bool prop_exist(const char *name);
 int setprop(const char *name, const char *value, bool trigger = true);
 std::string getprop(const char *name, bool persist = false);
 void getprops(void (*callback)(const char *, const char *, void *),

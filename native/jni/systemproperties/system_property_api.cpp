@@ -100,7 +100,7 @@ int __system_property_add(const char* name, unsigned int namelen, const char* va
 }
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE
-int __system_property_del(const char* name) {
+int __system_property_delete(const char* name) {
   return system_properties.Delete(name);
 }
 
