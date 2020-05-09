@@ -13,13 +13,16 @@ static const char *prop_key[] =
 		{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
 		  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
 		  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux",
-		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit", nullptr };
+		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit",
+		  "vendor.boot.vbmeta.device_state", "vendor.boot.verifiedbootstate", nullptr };
+
 
 static const char *prop_value[] =
 		{ "locked", "green", "1",
 		  "enforcing", "0", "0", "0",
 		  "1", "user", "release-keys", "0",
-		  "0", "0", nullptr };
+		  "0", "0",
+		  "locked", "green", nullptr };
 
 void hide_sensitive_props() {
 	LOGI("hide_policy: Hiding sensitive props\n");
@@ -39,6 +42,10 @@ void hide_sensitive_props() {
 	bootmode = getprop("ro.boot.mode");
 	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
 		setprop("ro.boot.mode", "unknown", false);
+	}
+	bootmode = getprop("vendor.boot.mode");
+	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
+		setprop("vendor.boot.mode", "unknown", false);
 	}
 	// Xiaomi cross region flash
 	auto hwc = getprop("ro.boot.hwc");
