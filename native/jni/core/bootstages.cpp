@@ -271,6 +271,7 @@ void post_fs_data(int client) {
 
 	// We still want to do magic mount because root itself might need it
 	magic_mount();
+	pfs_done = true;
 	unblock_boot_process();
 }
 
@@ -325,7 +326,8 @@ void boot_complete(int client) {
 		// Check whether we have manager installed
 		if (!check_manager()) {
 			// Install stub
-			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk");
+			auto init = MAGISKTMP + "/magiskinit";
+			exec_command_sync(init.data(), "-x", "manager", "/data/magisk.apk");
 			install_apk("/data/magisk.apk");
 		}
 	}
