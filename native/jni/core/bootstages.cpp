@@ -189,18 +189,23 @@ void unlock_blocks() {
 	}
 }
 
-static bool log_dump = false;
-static void dump_logs() {
-	if (log_dump)
-		return;
-	int test = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null");
-	chmod("/dev/null", 0666);
-	if (test != 0)
-		return;
-	rename(LOGFILE, LOGFILE ".bak");
-	log_dump = true;
+static void collect_logs(bool reset) {
+	static bool running = false;
+	static pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
+	{
+		mutex_guard lock(log_lock);
+		if (running)
+			return;
+		int test = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null");
+		chmod("/dev/null", 0666);
+		if (test != 0)
+			return;
+		running = true;
+	}
+	if (reset)
+		rename(LOGFILE, LOGFILE ".bak");
 	// Start a daemon thread and wait indefinitely
-	new_daemon_thread([]() -> void {
+	new_daemon_thread([]{
 		int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
 		exec_t exec {
 			.fd = fd,
@@ -209,7 +214,8 @@ static void dump_logs() {
 		int pid = exec_command(exec, "/system/bin/logcat", "-s", "Magisk");
 		close(fd);
 		if (pid < 0) {
-			log_dump = false;
+			mutex_guard lock(log_lock);
+			running = false;
 		} else {
 			waitpid(pid, nullptr, 0);
 		}
@@ -220,7 +226,7 @@ static void dump_logs() {
  * Entry points *
  ****************/
 
-[[noreturn]] static void unblock_boot_process() {
+[[noreturn]] static void exit_post_fs_data() {
 	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
 	pthread_exit(nullptr);
 }
@@ -234,9 +240,9 @@ void post_fs_data(int client) {
 		xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 
 	if (!check_data())
-		unblock_boot_process();
+		exit_post_fs_data();
 
-	dump_logs();
+	collect_logs(true);
 
 	LOGI("** post-fs-data mode running\n");
 
@@ -249,12 +255,12 @@ void post_fs_data(int client) {
 		 * will cause bootloops on FBE devices. */
 		LOGE(SECURE_DIR " is not present, abort...");
 		no_secure_dir = true;
-		unblock_boot_process();
+		exit_post_fs_data();
 	}
 
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
-		unblock_boot_process();
+		exit_post_fs_data();
 	}
 
 	if (getprop("persist.sys.safemode", true) == "1") {
@@ -272,7 +278,7 @@ void post_fs_data(int client) {
 	// We still want to do magic mount because root itself might need it
 	magic_mount();
 	pfs_done = true;
-	unblock_boot_process();
+	exit_post_fs_data();
 }
 
 void late_start(int client) {
@@ -281,7 +287,7 @@ void late_start(int client) {
 	write_int(client, 0);
 	close(client);
 
-	dump_logs();
+	collect_logs(false);
 
 	if (no_secure_dir) {
 		// It's safe to create the folder at this point if the system didn't create it
@@ -312,6 +318,8 @@ void boot_complete(int client) {
 	// ack
 	write_int(client, 0);
 	close(client);
+
+	collect_logs(false);
 
 	if (!pfs_done || safe_mode)
 		return;
