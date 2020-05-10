@@ -33,7 +33,6 @@ int nop_log(const char *fmt, va_list ap);
 void nop_ex(int i);
 
 void no_logging();
-void android_logging();
 void cmdline_logging();
 
 int log_handler(log_type t, const char *fmt, ...);
