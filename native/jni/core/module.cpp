@@ -645,29 +645,25 @@ static void prepare_modules() {
 
 static void collect_modules() {
 	auto dir = xopen_dir(MODULEROOT);
+	if (!dir)
+		return;
 	int dfd = dirfd(dir.get());
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		if (entry->d_type == DT_DIR) {
-			if (entry->d_name == ".core"sv)
-				continue;
-
+		if (entry->d_type == DT_DIR && entry->d_name != ".core"sv) {
 			int modfd = xopenat(dfd, entry->d_name, O_RDONLY);
-			run_finally f([=]{ close(modfd); });
-
 			if (faccessat(modfd, "remove", F_OK, 0) == 0) {
 				LOGI("%s: remove\n", entry->d_name);
 				auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
 				if (access(uninstaller.data(), F_OK) == 0)
 					exec_script(uninstaller.data());
-				frm_rf(xdup(modfd));
+				frm_rf(modfd);
 				unlinkat(dfd, entry->d_name, AT_REMOVEDIR);
 				continue;
 			}
-
 			unlinkat(modfd, "update", 0);
-
 			if (faccessat(modfd, "disable", F_OK, 0) != 0)
 				module_list.emplace_back(entry->d_name);
+			close(modfd);
 		}
 	}
 }
