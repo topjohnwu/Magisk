@@ -54,8 +54,8 @@ void magiskhide_handler(int client) {
 
 	switch (req) {
 	case LAUNCH_MAGISKHIDE:
-		launch_magiskhide(client);
-		return;
+		res = launch_magiskhide();
+		break;
 	case STOP_MAGISKHIDE:
 		res = stop_magiskhide();
 		break;
@@ -67,8 +67,7 @@ void magiskhide_handler(int client) {
 		break;
 	case LS_HIDELIST:
 		ls_list(client);
-		client = -1;
-		break;
+		return;
 	case HIDE_STATUS:
 		res = hide_enabled() ? HIDE_IS_ENABLED : HIDE_NOT_ENABLED;
 		break;

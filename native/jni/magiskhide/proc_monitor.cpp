@@ -95,7 +95,7 @@ static void check_zygote() {
 	crawl_procfs([](int pid) -> bool {
 		char buf[512];
 		snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
-		if (FILE *f = fopen(buf, "re"); f) {
+		if (FILE *f = fopen(buf, "re")) {
 			fgets(buf, sizeof(buf), f);
 			if (strncmp(buf, "zygote", 6) == 0 && parse_ppid(pid) == 1)
 				new_zygote(pid);
@@ -167,7 +167,7 @@ static void term_thread(int) {
 	hide_set.clear();
 	attaches.reset();
 	// Misc
-	hide_enabled = false;
+	set_hide_state(false);
 	pthread_mutex_destroy(&monitor_lock);
 	close(inotify_fd);
 	inotify_fd = -1;

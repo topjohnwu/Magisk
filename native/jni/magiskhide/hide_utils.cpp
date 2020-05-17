@@ -16,15 +16,19 @@
 using namespace std;
 
 static pthread_t proc_monitor_thread;
+static bool hide_state = false;
+
+// This locks the 2 variables above
+static pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
 
 // Leave /proc fd opened as we're going to read from it repeatedly
 static DIR *procfp;
-void crawl_procfs(const function<bool (int)> &fn) {
+void crawl_procfs(const function<bool(int)> &fn) {
 	rewinddir(procfp);
 	crawl_procfs(procfp, fn);
 }
 
-void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
+void crawl_procfs(DIR *dir, const function<bool(int)> &fn) {
 	struct dirent *dp;
 	int pid;
 	while ((dp = readdir(dir))) {
@@ -34,18 +38,20 @@ void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
 	}
 }
 
-static bool hide_state = false;
-static pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
-
 bool hide_enabled() {
 	mutex_guard g(hide_state_lock);
 	return hide_state;
 }
 
+void set_hide_state(bool state) {
+	mutex_guard g(hide_state_lock);
+	hide_state = state;
+}
+
 static bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
 	sprintf(buf, "/proc/%d/cmdline", pid);
-	if (FILE *f; (f = fopen(buf, "re"))) {
+	if (FILE *f = fopen(buf, "re")) {
 		fgets(buf, sizeof(buf), f);
 		fclose(f);
 		if (strcmp(buf, name) == 0)
@@ -174,7 +180,7 @@ static void init_list(const char *pkg, const char *proc) {
 #define GMS_PKG      "com.google.android.gms"
 #define MICROG_PKG   "org.microg.gms.droidguard"
 
-bool init_list() {
+static bool init_list() {
 	LOGD("hide_list: initialize\n");
 
 	char *err = db_exec("SELECT * FROM hidelist", [](db_row &row) -> bool {
@@ -211,7 +217,7 @@ void ls_list(int client) {
 	close(client);
 }
 
-static void set_hide_config() {
+static void update_hide_config() {
 	char sql[64];
 	sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
 			DB_SETTING_KEYS[HIDE_CONFIG], hide_state);
@@ -219,80 +225,66 @@ static void set_hide_config() {
 	db_err(err);
 }
 
-[[noreturn]] static void launch_err(int client, int code = DAEMON_ERROR) {
-	if (code != HIDE_IS_ENABLED)
-		hide_state = false;
-	if (client >= 0) {
-		write_int(client, code);
-		close(client);
-	}
-	pthread_mutex_unlock(&hide_state_lock);
-	pthread_exit(nullptr);
-}
-
-void launch_magiskhide(int client) {
-	pthread_mutex_lock(&hide_state_lock);
+int launch_magiskhide() {
+	mutex_guard g(hide_state_lock);
 
 	if (SDK_INT < 19)
-		launch_err(client);
+		return DAEMON_ERROR;
 
 	if (hide_state)
-		launch_err(client, HIDE_IS_ENABLED);
+		return HIDE_IS_ENABLED;
 
 	if (access("/proc/1/ns/mnt", F_OK) != 0)
-		launch_err(client, HIDE_NO_NS);
-
-	hide_state = true;
-	set_hide_config();
-	LOGI("* Starting MagiskHide\n");
+		return HIDE_NO_NS;
 
 	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
-		launch_err(client);
+		return DAEMON_ERROR;
+
+	LOGI("* Starting MagiskHide\n");
+
+	// Initialize the hide list
+	if (!init_list())
+		return DAEMON_ERROR;
 
 	hide_sensitive_props();
+	if (pfs_done)
+		hide_late_sensitive_props();
 
 	// Initialize the mutex lock
 	pthread_mutex_init(&monitor_lock, nullptr);
 
-	// Initialize the hide list
-	if (!init_list())
-		launch_err(client);
-
-	// Get thread reference
-	proc_monitor_thread = pthread_self();
-	if (client >= 0) {
-		write_int(client, DAEMON_SUCCESS);
-		close(client);
-		client = -1;
-	}
 	// Start monitoring
-	proc_monitor();
+	void *(*start)(void*) = [](void*) -> void* { proc_monitor(); return nullptr; };
+	if (xpthread_create(&proc_monitor_thread, nullptr, start, nullptr))
+		return DAEMON_ERROR;
 
-	// proc_monitor should not return
-	launch_err(client);
+	hide_state = true;
+	update_hide_config();
+	return DAEMON_SUCCESS;
 }
 
 int stop_magiskhide() {
-	LOGI("* Stopping MagiskHide\n");
-
 	mutex_guard g(hide_state_lock);
-	if (hide_state)
-		pthread_kill(proc_monitor_thread, SIGTERMTHRD);
-	hide_state = false;
-	set_hide_config();
 
+	if (hide_state) {
+		LOGI("* Stopping MagiskHide\n");
+		pthread_kill(proc_monitor_thread, SIGTERMTHRD);
+	}
+
+	hide_state = false;
+	update_hide_config();
 	return DAEMON_SUCCESS;
 }
 
 void auto_start_magiskhide() {
 	if (hide_enabled()) {
 		pthread_kill(proc_monitor_thread, SIGZYGOTE);
+		hide_late_sensitive_props();
 	} else if (SDK_INT >= 19) {
 		db_settings dbs;
 		get_db_settings(dbs, HIDE_CONFIG);
-		if (dbs[HIDE_CONFIG]) {
-			new_daemon_thread([]{ launch_magiskhide(-1); });
-		}
+		if (dbs[HIDE_CONFIG])
+			launch_magiskhide();
 	}
 }
 

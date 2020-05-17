@@ -16,7 +16,7 @@
 #define SIGZYGOTE   SIGUSR2
 
 // CLI entries
-void launch_magiskhide(int client);
+int launch_magiskhide();
 int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);
@@ -31,11 +31,13 @@ void update_uid_map();
 void crawl_procfs(const std::function<bool (int)> &fn);
 void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
 bool hide_enabled();
+void set_hide_state(bool state);
 
 // Hide policies
 void hide_daemon(int pid);
 void hide_unmount(int pid = getpid());
 void hide_sensitive_props();
+void hide_late_sensitive_props();
 
 extern pthread_mutex_t monitor_lock;
 extern std::set<std::pair<std::string, std::string>> hide_set;

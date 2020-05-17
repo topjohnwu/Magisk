@@ -13,48 +13,60 @@ static const char *prop_key[] =
 		{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
 		  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
 		  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux",
-		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit",
-		  "vendor.boot.vbmeta.device_state", "vendor.boot.verifiedbootstate", nullptr };
+		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit", nullptr };
 
-
-static const char *prop_value[] =
+static const char *prop_val[] =
 		{ "locked", "green", "1",
 		  "enforcing", "0", "0", "0",
 		  "1", "user", "release-keys", "0",
-		  "0", "0",
-		  "locked", "green", nullptr };
+		  "0", "0", nullptr };
+
+static const char *late_prop_key[] =
+		{ "vendor.boot.vbmeta.device_state", "vendor.boot.verifiedbootstate", nullptr };
+
+static const char *late_prop_val[] =
+		{ "locked", "green", nullptr };
 
 void hide_sensitive_props() {
 	LOGI("hide_policy: Hiding sensitive props\n");
 
-	// Hide all sensitive props
 	for (int i = 0; prop_key[i]; ++i) {
 		auto value = getprop(prop_key[i]);
-		if (!value.empty() && value != prop_value[i])
-			setprop(prop_key[i], prop_value[i], false);
+		if (!value.empty() && value != prop_val[i])
+			setprop(prop_key[i], prop_val[i], false);
 	}
 
 	// Hide that we booted from recovery when magisk is in recovery mode
 	auto bootmode = getprop("ro.bootmode");
-	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
+	if (!bootmode.empty() && str_contains(bootmode, "recovery")) {
 		setprop("ro.bootmode", "unknown", false);
 	}
 	bootmode = getprop("ro.boot.mode");
-	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
+	if (!bootmode.empty() && str_contains(bootmode, "recovery")) {
 		setprop("ro.boot.mode", "unknown", false);
-	}
-	bootmode = getprop("vendor.boot.mode");
-	if (!bootmode.empty() && bootmode.find("recovery") != string::npos) {
-		setprop("vendor.boot.mode", "unknown", false);
 	}
 	// Xiaomi cross region flash
 	auto hwc = getprop("ro.boot.hwc");
-	if (!hwc.empty() && hwc.find("CN") != string::npos) {
+	if (!hwc.empty() && str_contains(hwc, "CN")) {
 		setprop("ro.boot.hwc", "GLOBAL", false);
 	}
 	auto hwcountry = getprop("ro.boot.hwcountry");
-	if (!hwcountry.empty() && hwcountry.find("China") != string::npos) {
+	if (!hwcountry.empty() && str_contains(hwcountry, "China")) {
 		setprop("ro.boot.hwcountry", "GLOBAL", false);
+	}
+}
+
+void hide_late_sensitive_props() {
+	LOGI("hide_policy: Hiding sensitive props (late)\n");
+
+	for (int i = 0; late_prop_key[i]; ++i) {
+		auto value = getprop(late_prop_key[i]);
+		if (!value.empty() && value != late_prop_val[i])
+			setprop(prop_key[i], late_prop_val[i], false);
+	}
+	auto bootmode = getprop("vendor.boot.mode");
+	if (!bootmode.empty() && str_contains(bootmode, "recovery")) {
+		setprop("vendor.boot.mode", "unknown", false);
 	}
 }
 

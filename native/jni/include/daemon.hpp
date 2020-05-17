@@ -31,6 +31,7 @@ enum {
 
 extern int SDK_INT;
 extern bool RECOVERY_MODE;
+extern bool pfs_done;
 extern std::vector<std::string> module_list;
 #define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
 
