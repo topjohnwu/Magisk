@@ -30,13 +30,13 @@ void update_uid_map();
 // Utility functions
 void crawl_procfs(const std::function<bool (int)> &fn);
 void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
+bool hide_enabled();
 
 // Hide policies
 void hide_daemon(int pid);
 void hide_unmount(int pid = getpid());
 void hide_sensitive_props();
 
-extern bool hide_enabled;
 extern pthread_mutex_t monitor_lock;
 extern std::set<std::pair<std::string, std::string>> hide_set;
 

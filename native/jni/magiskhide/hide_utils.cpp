@@ -34,6 +34,14 @@ void crawl_procfs(DIR *dir, const function<bool (int)> &fn) {
 	}
 }
 
+static bool hide_state = false;
+static pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
+
+bool hide_enabled() {
+	mutex_guard g(hide_state_lock);
+	return hide_state;
+}
+
 static bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
 	sprintf(buf, "/proc/%d/cmdline", pid);
@@ -206,39 +214,40 @@ void ls_list(int client) {
 static void set_hide_config() {
 	char sql[64];
 	sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
-			DB_SETTING_KEYS[HIDE_CONFIG], hide_enabled);
+			DB_SETTING_KEYS[HIDE_CONFIG], hide_state);
 	char *err = db_exec(sql);
 	db_err(err);
 }
 
 [[noreturn]] static void launch_err(int client, int code = DAEMON_ERROR) {
 	if (code != HIDE_IS_ENABLED)
-		hide_enabled = false;
+		hide_state = false;
 	if (client >= 0) {
 		write_int(client, code);
 		close(client);
 	}
+	pthread_mutex_unlock(&hide_state_lock);
 	pthread_exit(nullptr);
 }
 
-#define LAUNCH_ERR launch_err(client)
-
 void launch_magiskhide(int client) {
-	if (SDK_INT < 19)
-		LAUNCH_ERR;
+	pthread_mutex_lock(&hide_state_lock);
 
-	if (hide_enabled)
+	if (SDK_INT < 19)
+		launch_err(client);
+
+	if (hide_state)
 		launch_err(client, HIDE_IS_ENABLED);
 
 	if (access("/proc/1/ns/mnt", F_OK) != 0)
 		launch_err(client, HIDE_NO_NS);
 
-	hide_enabled = true;
+	hide_state = true;
 	set_hide_config();
 	LOGI("* Starting MagiskHide\n");
 
 	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
-		LAUNCH_ERR;
+		launch_err(client);
 
 	hide_sensitive_props();
 
@@ -247,7 +256,7 @@ void launch_magiskhide(int client) {
 
 	// Initialize the hide list
 	if (!init_list())
-		LAUNCH_ERR;
+		launch_err(client);
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();
@@ -260,23 +269,23 @@ void launch_magiskhide(int client) {
 	proc_monitor();
 
 	// proc_monitor should not return
-	LAUNCH_ERR;
+	launch_err(client);
 }
 
 int stop_magiskhide() {
 	LOGI("* Stopping MagiskHide\n");
 
-	if (hide_enabled)
+	mutex_guard g(hide_state_lock);
+	if (hide_state)
 		pthread_kill(proc_monitor_thread, SIGTERMTHRD);
-
-	hide_enabled = false;
+	hide_state = false;
 	set_hide_config();
 
 	return DAEMON_SUCCESS;
 }
 
 void auto_start_magiskhide() {
-	if (hide_enabled) {
+	if (hide_enabled()) {
 		pthread_kill(proc_monitor_thread, SIGZYGOTE);
 	} else if (SDK_INT >= 19) {
 		db_settings dbs;
