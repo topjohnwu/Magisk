@@ -51,6 +51,7 @@ void reboot();
 
 // MagiskHide
 void auto_start_magiskhide();
+void hide_sensitive_props_late();
 int stop_magiskhide();
 
 // Scripting

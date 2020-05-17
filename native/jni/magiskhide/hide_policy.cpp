@@ -14,7 +14,7 @@ static const char *prop_key[] =
 		  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
 		  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux",
 		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit",
-		  "vendor.boot.vbmeta.device_state", "vendor.boot.verifiedbootstate", nullptr };
+		  "vendor.boot.vbmeta.device_state", nullptr };
 
 
 static const char *prop_value[] =
@@ -22,7 +22,13 @@ static const char *prop_value[] =
 		  "enforcing", "0", "0", "0",
 		  "1", "user", "release-keys", "0",
 		  "0", "0",
-		  "locked", "green", nullptr };
+		  "locked", nullptr };
+
+static const char *prop_key_late[] =
+		{ "vendor.boot.verifiedbootstate", nullptr };
+
+static const char *prop_value_late[] =
+		{ "green", nullptr };
 
 void hide_sensitive_props() {
 	LOGI("hide_policy: Hiding sensitive props\n");
@@ -55,6 +61,17 @@ void hide_sensitive_props() {
 	auto hwcountry = getprop("ro.boot.hwcountry");
 	if (!hwcountry.empty() && hwcountry.find("China") != string::npos) {
 		setprop("ro.boot.hwcountry", "GLOBAL", false);
+	}
+}
+
+void hide_sensitive_props_late() {
+	LOGI("hide_policy: Hiding sensitive props in boot_complete\n");
+
+	// Hide sensitive props after boot complete
+	for (int i = 0; prop_key_late[i]; ++i) {
+		auto value = getprop(prop_key_late[i]);
+		if (!value.empty() && value != prop_value_late[i])
+			setprop(prop_key_late[i], prop_value_late[i], false);
 	}
 }
 
