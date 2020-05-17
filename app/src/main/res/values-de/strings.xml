@@ -234,7 +234,7 @@
     <string name="repo_cache_cleared">Repo-Cache gelöscht</string>
     <string name="dtbo_patched_title">DTBO wurde gepatcht!</string>
     <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatcht. Bitte neu starten.</string>
-    <string name="flashing">Flasht..</string>
+    <string name="flashing">Flashen…</string>
     <string name="done">Fertig!</string>
     <string name="failure">Fehlgeschlagen</string>
     <string name="hide_manager_title">Magisk Manager ausblenden…</string>
