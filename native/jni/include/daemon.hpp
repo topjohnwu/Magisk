@@ -6,7 +6,7 @@
 
 #include <socket.hpp>
 
-// Commands require connecting to daemon
+// Daemon command codes
 enum {
 	DO_NOTHING = 0,
 	SUPERUSER,
@@ -29,8 +29,17 @@ enum {
 	DAEMON_LAST
 };
 
+// Daemon state
+enum {
+	STATE_POST_FS_DATA,
+	STATE_LATE_START,
+	STATE_BOOT_COMPLETE,
+	STATE_UNKNOWN
+};
+
 extern int SDK_INT;
 extern bool RECOVERY_MODE;
+extern int daemon_state;
 extern bool pfs_done;
 extern std::vector<std::string> module_list;
 #define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
