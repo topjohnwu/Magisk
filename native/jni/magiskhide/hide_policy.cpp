@@ -12,20 +12,20 @@ using namespace std;
 static const char *prop_key[] =
 		{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
 		  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
-		  "ro.secure", "ro.build.type", "ro.build.tags",
+		  "ro.secure", "ro.build.type", "ro.build.tags", "vendor.boot.vbmeta.device_state",
 		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit", nullptr };
 
 static const char *prop_val[] =
 		{ "locked", "green", "1",
 		  "enforcing", "0", "0", "0",
-		  "1", "user", "release-keys",
+		  "1", "user", "release-keys", "locked",
 		  "0", "0", nullptr };
 
 static const char *late_prop_key[] =
-		{ "vendor.boot.vbmeta.device_state", "vendor.boot.verifiedbootstate", nullptr };
+		{ "vendor.boot.verifiedbootstate", nullptr };
 
 static const char *late_prop_val[] =
-		{ "locked", "green", nullptr };
+		{ "green", nullptr };
 
 void hide_sensitive_props() {
 	LOGI("hide_policy: Hiding sensitive props\n");
@@ -43,6 +43,9 @@ void hide_sensitive_props() {
 	bootmode = getprop("ro.boot.mode");
 	if (!bootmode.empty() && str_contains(bootmode, "recovery"))
 		setprop("ro.boot.mode", "unknown", false);
+	bootmode = getprop("vendor.boot.mode");
+	if (!bootmode.empty() && str_contains(bootmode, "recovery"))
+		setprop("vendor.boot.mode", "unknown", false);
 
 	// Xiaomi cross region flash
 	auto hwc = getprop("ro.boot.hwc");
@@ -65,10 +68,6 @@ void hide_late_sensitive_props() {
 		if (!value.empty() && value != late_prop_val[i])
 			setprop(prop_key[i], late_prop_val[i], false);
 	}
-
-	auto bootmode = getprop("vendor.boot.mode");
-	if (!bootmode.empty() && str_contains(bootmode, "recovery"))
-		setprop("vendor.boot.mode", "unknown", false);
 }
 
 static void lazy_unmount(const char* mountpoint) {

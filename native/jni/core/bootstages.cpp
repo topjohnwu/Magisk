@@ -271,8 +271,8 @@ void post_fs_data(int client) {
 	} else {
 		LOGI("* Running post-fs-data.d scripts\n");
 		exec_common_script("post-fs-data");
-		handle_modules();
 		auto_start_magiskhide();
+		handle_modules();
 	}
 
 	// We still want to do magic mount because root itself might need it
@@ -299,8 +299,6 @@ void late_start(int client) {
 
 	if (!pfs_done || safe_mode)
 		return;
-
-	auto_start_magiskhide();
 
 	LOGI("* Running service.d scripts\n");
 	exec_common_script("service");
