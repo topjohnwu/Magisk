@@ -8,7 +8,7 @@ constexpr char MAGISK_RC[] =
 "    start logd\n"
 "    rm " UNBLOCKFILE "\n"
 "    start %2$s\n"
-"    wait " UNBLOCKFILE " 10\n"
+"    wait " UNBLOCKFILE " 40\n"
 "    rm " UNBLOCKFILE "\n"
 "\n"
 
