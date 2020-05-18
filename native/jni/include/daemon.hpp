@@ -39,10 +39,10 @@ enum {
 
 extern int SDK_INT;
 extern bool RECOVERY_MODE;
-extern int daemon_state;
-extern bool pfs_done;
-extern std::vector<std::string> module_list;
+extern int DAEMON_STATE;
 #define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
+
+extern std::vector<std::string> module_list;
 
 // Daemon handlers
 void post_fs_data(int client);

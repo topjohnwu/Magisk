@@ -19,7 +19,7 @@
 
 using namespace std;
 
-bool pfs_done = false;
+static bool pfs_done = false;
 static bool no_secure_dir = false;
 static bool safe_mode = false;
 

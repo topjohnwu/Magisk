@@ -247,7 +247,7 @@ int launch_magiskhide() {
 		return DAEMON_ERROR;
 
 	hide_sensitive_props();
-	if (pfs_done)
+	if (DAEMON_STATE >= STATE_BOOT_COMPLETE)
 		hide_late_sensitive_props();
 
 	// Initialize the mutex lock

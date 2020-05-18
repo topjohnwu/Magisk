@@ -20,7 +20,7 @@ using namespace std;
 int SDK_INT = -1;
 bool RECOVERY_MODE = false;
 string MAGISKTMP;
-int daemon_state = STATE_UNKNOWN;
+int DAEMON_STATE = STATE_UNKNOWN;
 
 static struct stat self_st;
 
@@ -98,13 +98,13 @@ static void handle_request(int client) {
 	switch (req_code) {
 	// In case of init trigger launches, set the corresponding states
 	case POST_FS_DATA:
-		daemon_state = STATE_POST_FS_DATA;
+		DAEMON_STATE = STATE_POST_FS_DATA;
 		break;
 	case LATE_START:
-		daemon_state = STATE_LATE_START;
+		DAEMON_STATE = STATE_LATE_START;
 		break;
 	case BOOT_COMPLETE:
-		daemon_state = STATE_BOOT_COMPLETE;
+		DAEMON_STATE = STATE_BOOT_COMPLETE;
 		break;
 
 	// Simple requests to query daemon info
