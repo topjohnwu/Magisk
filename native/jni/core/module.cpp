@@ -25,7 +25,7 @@ using namespace std;
 #define TYPE_CUSTOM  (1 << 5)    /* custom node type overrides all */
 #define TYPE_DIR     (TYPE_INTER|TYPE_SKEL|TYPE_ROOT)
 
-vector<string> module_list;
+static vector<string> module_list;
 
 class node_entry;
 class dir_node;
@@ -671,10 +671,7 @@ static void collect_modules() {
 void handle_modules() {
 	prepare_modules();
 	collect_modules();
-
-	// Execute module scripts
-	LOGI("* Running module post-fs-data scripts\n");
-	exec_module_script("post-fs-data", module_list);
+	exec_module_scripts("post-fs-data");
 
 	// Recollect modules (module scripts could remove itself)
 	module_list.clear();
@@ -698,4 +695,8 @@ void foreach_modules(const char *name) {
 			close(modfd);
 		}
 	}
+}
+
+void exec_module_scripts(const char *stage) {
+	exec_module_scripts(stage, module_list);
 }

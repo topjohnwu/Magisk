@@ -24,7 +24,8 @@ void exec_script(const char *script) {
 	exec_command_sync(exec, BBEXEC_CMD, script);
 }
 
-void exec_common_script(const char *stage) {
+void exec_common_scripts(const char *stage) {
+	LOGI("* Running %s.d scripts\n", stage);
 	char path[4096];
 	char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage);
 	auto dir = xopen_dir(path);
@@ -53,7 +54,8 @@ void exec_common_script(const char *stage) {
 	}
 }
 
-void exec_module_script(const char *stage, const vector<string> &module_list) {
+void exec_module_scripts(const char *stage, const vector<string> &module_list) {
+	LOGI("* Running module %s scripts\n", stage);
 	char path[4096];
 	bool pfs = stage == "post-fs-data"sv;
 	for (auto &m : module_list) {

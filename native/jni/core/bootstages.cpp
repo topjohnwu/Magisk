@@ -268,8 +268,7 @@ void post_fs_data(int client) {
 		foreach_modules("disable");
 		stop_magiskhide();
 	} else {
-		LOGI("* Running post-fs-data.d scripts\n");
-		exec_common_script("post-fs-data");
+		exec_common_scripts("post-fs-data");
 		auto_start_magiskhide();
 		handle_modules();
 	}
@@ -299,15 +298,8 @@ void late_start(int client) {
 	if (!pfs_done || safe_mode)
 		return;
 
-	LOGI("* Running service.d scripts\n");
-	exec_common_script("service");
-
-	LOGI("* Running module service scripts\n");
-	exec_module_script("service", module_list);
-
-	// All boot stage done, cleanup
-	module_list.clear();
-	module_list.shrink_to_fit();
+	exec_common_scripts("service");
+	exec_module_scripts("service");
 }
 
 void boot_complete(int client) {
