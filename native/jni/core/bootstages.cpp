@@ -146,28 +146,27 @@ void reboot() {
 
 static bool check_data() {
 	bool mnt = false;
-	bool data = false;
-	file_readline("/proc/mounts", [&](string_view s) -> bool {
-		if (str_contains(s, " /data ") && !str_contains(s, "tmpfs"))
+	file_readline("/proc/mounts", [&](string_view s) {
+		if (str_contains(s, " /data ") && !str_contains(s, "tmpfs")) {
 			mnt = true;
+			return false;
+		}
 		return true;
 	});
-	if (mnt) {
-		auto crypto = getprop("ro.crypto.state");
-		if (!crypto.empty()) {
-			if (crypto == "unencrypted") {
-				// Unencrypted, we can directly access data
-				data = true;
-			} else {
-				// Encrypted, check whether vold is started
-				data = !getprop("init.svc.vold").empty();
-			}
+	if (!mnt)
+		return false;
+	auto crypto = getprop("ro.crypto.state");
+	if (!crypto.empty()) {
+		if (crypto == "unencrypted") {
+			// Unencrypted, we can directly access data
+			return true;
 		} else {
-			// ro.crypto.state is not set, assume it's unencrypted
-			data = true;
+			// Encrypted, check whether vold is started
+			return !getprop("init.svc.vold").empty();
 		}
 	}
-	return data;
+	// ro.crypto.state is not set, assume it's unencrypted
+	return true;
 }
 
 void unlock_blocks() {
