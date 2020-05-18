@@ -56,7 +56,7 @@ void hide_sensitive_props() {
 		setprop("ro.boot.hwcountry", "GLOBAL", false);
 
 	auto selinux = getprop("ro.build.selinux");
-	if (!selinux.empty)
+	if (!selinux.empty())
 		delprop("ro.build.selinux");
 }
 
