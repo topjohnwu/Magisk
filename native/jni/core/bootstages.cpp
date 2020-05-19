@@ -1,11 +1,7 @@
 #include <sys/mount.h>
 #include <sys/wait.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <dirent.h>
+#include <sys/sysmacros.h>
+#include <linux/input.h>
 #include <libgen.h>
 #include <vector>
 #include <string>
@@ -220,6 +216,53 @@ static void collect_logs(bool reset) {
 	});
 }
 
+#define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
+
+static bool check_key_combo() {
+	uint8_t bitmask[(KEY_MAX + 1) / 8];
+	vector<int> events;
+	constexpr char name[] = "/dev/.ev";
+
+	// First collect candidate events that accepts volume down
+	for (int minor = 64; minor < 96; ++minor) {
+		if (xmknod(name, S_IFCHR | 0444, makedev(13, minor)))
+			continue;
+		int fd = open(name, O_RDONLY | O_CLOEXEC);
+		unlink(name);
+		if (fd < 0)
+			continue;
+		memset(bitmask, 0, sizeof(bitmask));
+		ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
+		if (test_bit(KEY_VOLUMEDOWN, bitmask))
+			events.push_back(fd);
+		else
+			close(fd);
+	}
+	if (events.empty())
+		return false;
+
+	run_finally fin([&]{ std::for_each(events.begin(), events.end(), close); });
+
+	// Check if volume down key is held continuously for more than 3 seconds
+	for (int i = 0; i < 300; ++i) {
+		bool pressed = false;
+		for (const int &fd : events) {
+			memset(bitmask, 0, sizeof(bitmask));
+			ioctl(fd, EVIOCGKEY(sizeof(bitmask)), bitmask);
+			if (test_bit(KEY_VOLUMEDOWN, bitmask)) {
+				pressed = true;
+				break;
+			}
+		}
+		if (!pressed)
+			return false;
+		// Check every 10ms
+		usleep(10000);
+	}
+	LOGD("KEY_VOLUMEDOWN detected: enter safe mode\n");
+	return true;
+}
+
 /****************
  * Entry points *
  ****************/
@@ -260,7 +303,7 @@ void post_fs_data(int client) {
 		goto unblock_init;
 	}
 
-	if (getprop("persist.sys.safemode", true) == "1") {
+	if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
 		safe_mode = true;
 		// Disable all modules and magiskhide so next boot will be clean
 		foreach_modules("disable");

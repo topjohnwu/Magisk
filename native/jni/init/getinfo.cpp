@@ -48,10 +48,8 @@ static bool check_key_combo() {
 	constexpr const char *name = "/event";
 
 	for (int minor = 64; minor < 96; ++minor) {
-		if (mknod(name, S_IFCHR | 0444, makedev(13, minor))) {
-			PLOGE("mknod");
+		if (xmknod(name, S_IFCHR | 0444, makedev(13, minor)))
 			continue;
-		}
 		int fd = open(name, O_RDONLY | O_CLOEXEC);
 		unlink(name);
 		if (fd < 0)
@@ -60,17 +58,15 @@ static bool check_key_combo() {
 		ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
 		if (test_bit(KEY_VOLUMEUP, bitmask))
 			events.push_back(fd);
+		else
+			close(fd);
 	}
-
 	if (events.empty())
 		return false;
 
-	run_finally fin([&]() -> void {
-		for (const int &fd : events)
-			close(fd);
-	});
+	run_finally fin([&]{ std::for_each(events.begin(), events.end(), close); });
 
-	// Return true if volume key up is hold for more than 3 seconds
+	// Return true if volume up key is held for more than 3 seconds
 	int count = 0;
 	for (int i = 0; i < 500; ++i) {
 		for (const int &fd : events) {
