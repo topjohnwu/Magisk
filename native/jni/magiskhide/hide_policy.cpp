@@ -11,15 +11,17 @@ using namespace std;
 
 static const char *prop_key[] =
 		{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
-		  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
-		  "ro.secure", "ro.build.type", "ro.build.tags", "vendor.boot.vbmeta.device_state",
-		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit", nullptr };
+		  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit",
+		  "ro.debuggable", "ro.secure", "ro.build.type", "ro.build.tags",
+		  "ro.vendor.boot.warranty_bit", "ro.vendor.warranty_bit",
+		  "vendor.boot.vbmeta.device_state", nullptr };
 
 static const char *prop_val[] =
 		{ "locked", "green", "1",
-		  "enforcing", "0", "0", "0",
-		  "1", "user", "release-keys", "locked",
-		  "0", "0", nullptr };
+		  "enforcing", "0", "0",
+		  "0", "1", "user", "release-keys",
+		  "0", "0",
+		  "locked", nullptr };
 
 static const char *late_prop_key[] =
 		{ "vendor.boot.verifiedbootstate", nullptr };
@@ -66,7 +68,7 @@ void hide_late_sensitive_props() {
 	for (int i = 0; late_prop_key[i]; ++i) {
 		auto value = getprop(late_prop_key[i]);
 		if (!value.empty() && value != late_prop_val[i])
-			setprop(prop_key[i], late_prop_val[i], false);
+			setprop(late_prop_key[i], late_prop_val[i], false);
 	}
 }
 
