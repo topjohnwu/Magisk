@@ -20,7 +20,6 @@
 using namespace std;
 
 static bool pfs_done = false;
-static bool no_secure_dir = false;
 static bool safe_mode = false;
 
 /*********
@@ -225,11 +224,6 @@ static void collect_logs(bool reset) {
  * Entry points *
  ****************/
 
-[[noreturn]] static void exit_post_fs_data() {
-	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
-	pthread_exit(nullptr);
-}
-
 void post_fs_data(int client) {
 	// ack
 	write_int(client, 0);
@@ -239,7 +233,7 @@ void post_fs_data(int client) {
 		xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 
 	if (!check_data())
-		exit_post_fs_data();
+		goto unblock_init;
 
 	collect_logs(true);
 
@@ -249,17 +243,21 @@ void post_fs_data(int client) {
 	unlock_blocks();
 
 	if (access(SECURE_DIR, F_OK) != 0) {
-		/* If the folder is not automatically created by the system,
-		 * do NOT proceed further. Manual creation of the folder
-		 * will cause bootloops on FBE devices. */
-		LOGE(SECURE_DIR " is not present, abort...");
-		no_secure_dir = true;
-		exit_post_fs_data();
+		if (SDK_INT < 24) {
+			// There is no FBE pre 7.0, we can directly create the folder without issues
+			xmkdir(SECURE_DIR, 0700);
+		} else {
+			/* If the folder is not automatically created by Android,
+			 * do NOT proceed further. Manual creation of the folder
+			 * will cause bootloops on FBE devices. */
+			LOGE(SECURE_DIR " is not present, abort...\n");
+			goto unblock_init;
+		}
 	}
 
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
-		exit_post_fs_data();
+		goto unblock_init;
 	}
 
 	if (getprop("persist.sys.safemode", true) == "1") {
@@ -273,10 +271,12 @@ void post_fs_data(int client) {
 		handle_modules();
 	}
 
-	// We still want to do magic mount because root itself might need it
+	// We still do magic mount because root itself might need it
 	magic_mount();
 	pfs_done = true;
-	exit_post_fs_data();
+
+unblock_init:
+	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
 }
 
 void late_start(int client) {
@@ -286,14 +286,6 @@ void late_start(int client) {
 	close(client);
 
 	collect_logs(false);
-
-	if (no_secure_dir) {
-		// It's safe to create the folder at this point if the system didn't create it
-		if (access(SECURE_DIR, F_OK) != 0)
-			xmkdir(SECURE_DIR, 0700);
-		// And reboot to make proper setup possible
-		reboot();
-	}
 
 	if (!pfs_done || safe_mode)
 		return;
@@ -310,10 +302,16 @@ void boot_complete(int client) {
 
 	collect_logs(false);
 
-	if (!pfs_done || safe_mode)
+	if (safe_mode)
 		return;
 
-	auto_start_magiskhide();
+	/* It's safe to create the folder at this point if the system didn't create it
+	 * Magisk Manager should finish up the remaining environment setup */
+	if (access(SECURE_DIR, F_OK) != 0)
+		xmkdir(SECURE_DIR, 0700);
+
+	if (pfs_done)
+		auto_start_magiskhide();
 
 	if (access(MANAGERAPK, F_OK) == 0) {
 		// Install Magisk Manager if exists
