@@ -129,13 +129,14 @@ void RootFSInit::setup_rootfs() {
 
 bool MagiskInit::patch_sepolicy(const char *file) {
 	bool patch_init = false;
+	sepolicy *sepol = nullptr;
 
 	if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
 		LOGD("sepol: split policy\n");
 		patch_init = true;
 	} else if (access("/sepolicy", R_OK) == 0) {
 		LOGD("sepol: monolithic policy\n");
-		load_policydb("/sepolicy");
+		sepol = sepolicy::from_file("/sepolicy");
 	} else {
 		LOGD("sepol: no selinux\n");
 		return false;
@@ -148,10 +149,10 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 	}
 
 	if (patch_init)
-		load_split_cil();
+		sepol = sepolicy::from_split();
 
-	sepol_magisk_rules();
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
+	sepol->magisk_rules();
+	sepol->allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 
 	// Custom rules
 	if (auto dir = open_dir(persist_dir.data()); dir) {
@@ -159,13 +160,13 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 			auto rule = persist_dir + "/" + entry->d_name + "/sepolicy.rule";
 			if (access(rule.data(), R_OK) == 0) {
 				LOGD("Loading custom sepolicy patch: %s\n", rule.data());
-				load_rule_file(rule.data());
+				sepol->load_rule_file(rule.data());
 			}
 		}
 	}
 
-	dump_policydb(file);
-	destroy_policydb();
+	sepol->to_file(file);
+	delete sepol;
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {

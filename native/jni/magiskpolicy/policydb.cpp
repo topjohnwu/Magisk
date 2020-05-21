@@ -12,26 +12,6 @@
 
 #include "sepolicy.h"
 
-int load_policydb(const char *file) {
-	LOGD("Load policy from: %s\n", file);
-	if (magisk_policydb)
-		destroy_policydb();
-
-	struct policy_file pf;
-	policy_file_init(&pf);
-	pf.fp = xfopen(file, "re");
-	pf.type = PF_USE_STDIO;
-
-	magisk_policydb = static_cast<policydb_t *>(xmalloc(sizeof(policydb_t)));
-	if (policydb_init(magisk_policydb) || policydb_read(magisk_policydb, &pf, 0)) {
-		LOGE("Fail to load policy from %s\n", file);
-		return 1;
-	}
-
-	fclose(pf.fp);
-	return 0;
-}
-
 #define SHALEN 64
 static bool cmp_sha256(const char *a, const char *b) {
 	char id_a[SHALEN] = {0};
@@ -94,17 +74,6 @@ static bool check_precompiled(const char *precompiled) {
 	return ok;
 }
 
-int load_split_cil() {
-	const char *odm_pre = ODM_POLICY_DIR "precompiled_sepolicy";
-	const char *vend_pre = VEND_POLICY_DIR "precompiled_sepolicy";
-	if (access(odm_pre, R_OK) == 0 && check_precompiled(odm_pre))
-		return load_policydb(odm_pre);
-	else if (access(vend_pre, R_OK) == 0 && check_precompiled(vend_pre))
-		return load_policydb(vend_pre);
-	else
-		return compile_split_cil();
-}
-
 static void load_cil(struct cil_db *db, const char *file) {
 	char *addr;
 	size_t size;
@@ -114,15 +83,37 @@ static void load_cil(struct cil_db *db, const char *file) {
 	munmap(addr, size);
 }
 
-int compile_split_cil() {
+sepolicy *sepolicy::from_file(const char *file) {
+	LOGD("Load policy from: %s\n", file);
+
+	policy_file_t pf;
+	policy_file_init(&pf);
+	auto fp = xopen_file(file, "re");
+	pf.fp = fp.get();
+	pf.type = PF_USE_STDIO;
+
+	auto db = static_cast<policydb_t *>(xmalloc(sizeof(policydb_t)));
+	if (policydb_init(db) || policydb_read(db, &pf, 0)) {
+		LOGE("Fail to load policy from %s\n", file);
+		free(db);
+		return nullptr;
+	}
+
+	auto sepol = new sepolicy();
+	sepol->db = db;
+	return sepol;
+}
+
+sepolicy *sepolicy::compile_split() {
 	char path[128], plat_ver[10];
-	struct cil_db *db = nullptr;
+	cil_db_t *db = nullptr;
 	sepol_policydb_t *pdb = nullptr;
 	FILE *f;
 	int policy_ver;
 	const char *cil_file;
 
 	cil_db_init(&db);
+	run_finally fin([db_ptr = &db]{ cil_db_destroy(db_ptr); });
 	cil_set_mls(db, 1);
 	cil_set_multiple_decls(db, 1);
 	cil_set_disable_neverallow(db, 1);
@@ -173,29 +164,48 @@ int compile_split_cil() {
 		load_cil(db, cil_file);
 
 	if (cil_compile(db))
-		return 1;
+		return nullptr;
 	if (cil_build_policydb(db, &pdb))
-		return 1;
+		return nullptr;
 
-	cil_db_destroy(&db);
-	magisk_policydb = &pdb->p;
-	return 0;
+	auto sepol = new sepolicy();
+	sepol->db = &pdb->p;
+	return sepol;
 }
 
-int dump_policydb(const char *file) {
+sepolicy *sepolicy::from_split() {
+	const char *odm_pre = ODM_POLICY_DIR "precompiled_sepolicy";
+	const char *vend_pre = VEND_POLICY_DIR "precompiled_sepolicy";
+	if (access(odm_pre, R_OK) == 0 && check_precompiled(odm_pre))
+		return sepolicy::from_file(odm_pre);
+	else if (access(vend_pre, R_OK) == 0 && check_precompiled(vend_pre))
+		return sepolicy::from_file(vend_pre);
+	else
+		return sepolicy::compile_split();
+}
+
+sepolicy::~sepolicy() {
+	policydb_destroy(db);
+	free(db);
+}
+
+int sepolicy::to_file(const char *file) {
 	uint8_t *data;
 	size_t len;
 
-	{
-		auto fp = make_stream_fp<byte_stream>(data, len);
-		struct policy_file pf;
-		policy_file_init(&pf);
-		pf.type = PF_USE_STDIO;
-		pf.fp = fp.get();
-		if (policydb_write(magisk_policydb, &pf)) {
-			LOGE("Fail to create policy image\n");
-			return 1;
-		}
+	/* No partial writes are allowed to /sys/fs/selinux/load, thus the reason why we
+	 * first dump everything into memory, then directly call write system call */
+
+	auto fp = make_stream_fp<byte_stream>(data, len);
+	run_finally fin([=]{ free(data); });
+
+	policy_file_t pf;
+	policy_file_init(&pf);
+	pf.type = PF_USE_STDIO;
+	pf.fp = fp.get();
+	if (policydb_write(db, &pf)) {
+		LOGE("Fail to create policy image\n");
+		return 1;
 	}
 
 	int fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
@@ -204,14 +214,5 @@ int dump_policydb(const char *file) {
 	xwrite(fd, data, len);
 
 	close(fd);
-	free(data);
 	return 0;
-}
-
-void destroy_policydb() {
-	if (magisk_policydb) {
-		policydb_destroy(magisk_policydb);
-		free(magisk_policydb);
-		magisk_policydb = nullptr;
-	}
 }
