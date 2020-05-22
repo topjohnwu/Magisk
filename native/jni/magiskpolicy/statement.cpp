@@ -26,13 +26,13 @@ Rules: allowxperm, auditallowxperm, dontauditxperm
 
 static const char *type_msg_3 =
 R"EOF(Type 3:
-"<rule_name> type"
+"<rule_name> ^type"
 Rules: create, permissive, enforcing
 )EOF";
 
 static const char *type_msg_4 =
 R"EOF(Type 4:
-"typeattribute type attribute"
+"typeattribute ^type ^attribute"
 )EOF";
 
 static const char *type_msg_5 =
@@ -92,12 +92,12 @@ static bool tokenize_string(char *stmt, vector<vector<char *>> &arr) {
 		vector<char *> token;
 		if (tok[0] == '{') {
 			// cur could point to somewhere in the braces, restore the string
-			cur[-1] = ' ';
+			if (cur)
+				cur[-1] = ' ';
 			++tok;
 			char *end = strchr(tok, '}');
 			if (end == nullptr) {
 				// Bracket not closed, syntax error
-				LOGE("Unclosed bracket detected\n");
 				return false;
 			}
 			*end = '\0';
@@ -114,111 +114,117 @@ static bool tokenize_string(char *stmt, vector<vector<char *>> &arr) {
 	return true;
 }
 
+// Check array size and all args listed in 'ones' have size = 1 (no multiple entries)
+template <int size, int ...ones>
+static bool check_tokens(vector<vector<char *>> &arr) {
+	if (arr.size() != size)
+		return false;
+	initializer_list<int> list{ones...};
+	for (int i : list)
+		if (arr[i].size() != 1)
+			return false;
+	return true;
+}
+
+template <int size, int ...ones>
+static bool tokenize_and_check(char *stmt, vector<vector<char *>> &arr) {
+	return tokenize_string(stmt, arr) && check_tokens<size, ones...>(arr);
+}
+
+template <typename Func, typename ...Args>
+static void run_and_check(const Func &fn, const char *action, Args ...args) {
+	if (fn(args...)) {
+		string s = "Error in: %s";
+		for (int i = 0; i < sizeof...(args); ++i) s += " %s";
+		s += "\n";
+		LOGW(s.data(), action, (args ? args : "*")...);
+	}
+}
+
+#define run_fn(...) run_and_check(fn, action, __VA_ARGS__)
+
 // Pattern 1: action { source } { target } { class } { permission }
 template <typename Func>
-static bool parse_pattern_1(Func fn, const char *action, char *stmt) {
+static bool parse_pattern_1(const Func &fn, const char *action, char *stmt) {
 	vector<vector<char *>> arr;
-	if (!tokenize_string(stmt, arr))
-		return false;
-	if (arr.size() != 4)
+	if (!tokenize_and_check<4>(stmt, arr))
 		return false;
 	for (char *src : arr[0])
 		for (char *tgt : arr[1])
 			for (char *cls : arr[2])
 				for (char *perm : arr[3])
-					if (fn(src, tgt, cls, perm))
-						LOGW("Error in: %s %s %s %s %s\n", action, src, tgt, cls, perm);
+					run_fn(src, tgt, cls, perm);
 	return true;
 }
 
 // Pattern 2: action { source } { target } { class } ioctl range
 template <typename Func>
-static bool parse_pattern_2(Func fn, const char *action, char *stmt) {
+static bool parse_pattern_2(const Func &fn, const char *action, char *stmt) {
 	vector<vector<char *>> arr;
-	if (!tokenize_string(stmt, arr))
-		return false;
-	if (arr.size() != 5 || arr[3].size() != 1 || arr[3][0] != "ioctl"sv || arr[4].size() != 1)
+	if (!tokenize_and_check<5, 3, 4>(stmt, arr) || arr[3][0] != "ioctl"sv)
 		return false;
 	char *range = arr[4][0];
 	for (char *src : arr[0])
 		for (char *tgt : arr[1])
 			for (char *cls : arr[2])
-				if (fn(src, tgt, cls, range))
-					LOGW("Error in: %s %s %s %s ioctl %s\n", action, src, tgt, cls, range);
+				run_fn(src, tgt, cls, range);
 	return true;
 }
 
 // Pattern 3: action { type }
 template <typename Func>
-static bool parse_pattern_3(Func fn, const char *action, char *stmt) {
+static bool parse_pattern_3(const Func &fn, const char *action, char *stmt) {
 	vector<vector<char *>> arr;
-	if (!tokenize_string(stmt, arr))
-		return false;
-	if (arr.size() != 1)
+	if (!tokenize_and_check<1>(stmt, arr))
 		return false;
 	for (char *type : arr[0])
-		if (fn(type))
-			LOGW("Error in: %s %s\n", action, type);
+		run_fn(type);
 	return true;
 }
 
 // Pattern 4: action { type } { attribute }
 template <typename Func>
-static bool parse_pattern_4(Func fn, const char *action, char *stmt) {
+static bool parse_pattern_4(const Func &fn, const char *action, char *stmt) {
 	vector<vector<char *>> arr;
-	if (!tokenize_string(stmt, arr))
-		return false;
-	if (arr.size() != 2)
+	if (!tokenize_and_check<2>(stmt, arr))
 		return false;
 	for (char *type : arr[0])
 		for (char *attr : arr[1])
-			if (fn(type, attr))
-				LOGW("Error in: %s %s %s\n", action, type, attr);
+			run_fn(type, attr);
 	return true;
 }
 
 // Pattern 5: action source target class default
 template <typename Func>
-static bool parse_pattern_5(Func fn, const char *action, char *stmt) {
+static bool parse_pattern_5(const Func &fn, const char *action, char *stmt) {
 	vector<vector<char *>> arr;
-	if (!tokenize_string(stmt, arr))
+	if (!tokenize_and_check<4, 0, 1, 2, 3>(stmt, arr))
 		return false;
-	if (arr.size() != 4 ||
-		arr[0].size() != 1 || arr[1].size() != 1 || arr[2].size() != 1 || arr[3].size() != 1)
-		return false;
-	if (fn(arr[0][0], arr[1][0], arr[2][0], arr[3][0]))
-		LOGW("Error in: %s %s %s %s %s\n", action, arr[0][0], arr[1][0], arr[2][0], arr[3][0]);
+	run_fn(arr[0][0], arr[1][0], arr[2][0], arr[3][0]);
 	return true;
 }
 
 // Pattern 6: action source target class default (filename)
 template <typename Func>
-static bool parse_pattern_6(Func fn, const char *action, char *stmt) {
+static bool parse_pattern_6(const Func &fn, const char *action, char *stmt) {
 	vector<vector<char *>> arr;
 	if (!tokenize_string(stmt, arr))
 		return false;
 	if (arr.size() == 4)
 		arr.emplace_back(initializer_list<char*>{nullptr});
-	if (arr.size() != 5 ||
-		arr[0].size() != 1 || arr[1].size() != 1 || arr[2].size() != 1 ||
-		arr[3].size() != 1 || arr[4].size() != 1)
+	if (!check_tokens<5, 0, 1, 2, 3, 4>(arr))
 		return false;
-	if (fn(arr[0][0], arr[1][0], arr[2][0], arr[3][0], arr[4][0]))
-		LOGW("Error in: %s %s %s %s %s %s\n", action,
-				arr[0][0], arr[1][0], arr[2][0], arr[3][0], arr[4][0] ? arr[4][0] : "");
+	run_fn(arr[0][0], arr[1][0], arr[2][0], arr[3][0], arr[4][0]);
 	return true;
 }
 
 // Pattern 7: action name path context
 template <typename Func>
-static bool parse_pattern_7(Func fn, const char *action, char *stmt) {
+static bool parse_pattern_7(const Func &fn, const char *action, char *stmt) {
 	vector<vector<char *>> arr;
-	if (!tokenize_string(stmt, arr))
+	if (!tokenize_and_check<3, 0, 1, 2>(stmt, arr))
 		return false;
-	if (arr.size() != 3 || arr[0].size() != 1 || arr[1].size() != 1 || arr[2].size() != 1)
-		return false;
-	if (fn(arr[0][0], arr[1][0], arr[2][0]))
-		LOGW("Error in: %s %s %s %s\n", action, arr[0][0], arr[1][0], arr[2][0]);
+	run_fn(arr[0][0], arr[1][0], arr[2][0]);
 	return true;
 }
 
@@ -263,7 +269,7 @@ void sepolicy::parse_statement(const char *stmt) {
 	add_action_func("attradd", 4, typeattribute)
 	add_action_func("name_transition", 6, type_transition)
 
-	else { LOGW("Syntax error in '%s'\n\n", stmt); }
+	else { LOGW("Unknown action: '%s'\n\n", action); }
 }
 
 void sepolicy::load_rule_file(const char *file) {
