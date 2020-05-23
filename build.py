@@ -55,8 +55,8 @@ arch64 = ['arm64-v8a', 'x86_64']
 support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'resetprop', 'busybox', 'test']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
-ndk_ver = '21'
-ndk_ver_full = '21.0.6113669'
+ndk_ver = '21b'
+ndk_ver_full = '21.1.6352462'
 build_tools_ver = '29.0.3'
 
 ndk_root = op.join(os.environ['ANDROID_HOME'], 'ndk')
