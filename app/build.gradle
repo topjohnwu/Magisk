@@ -49,7 +49,6 @@ android {
         exclude '/org/bouncycastle/**'
         exclude '/kotlin/**'
         exclude '/kotlinx/**'
-        exclude '/okhttp3/**'
     }
 
     kotlinOptions {
@@ -103,11 +102,12 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-scalars:${vRetrofit}"
     implementation "com.squareup.retrofit2:adapter-rxjava2:${vRetrofit}"
 
-    def vOkHttp = '3.12.10'
+    def vOkHttp = '3.12.12'
     implementation("com.squareup.okhttp3:okhttp:${vOkHttp}") {
         force = true
     }
     implementation "com.squareup.okhttp3:logging-interceptor:${vOkHttp}"
+    implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:${vOkHttp}")
 
     def vMoshi = '1.10.0-SNAPSHOT'
     implementation "com.squareup.moshi:moshi:${vMoshi}"

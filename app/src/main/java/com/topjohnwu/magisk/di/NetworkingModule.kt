@@ -12,7 +12,9 @@ import io.noties.markwon.Markwon
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.image.network.OkHttpNetworkSchemeHandler
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
+import okhttp3.dnsoverhttps.DnsOverHttps
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -42,6 +44,10 @@ fun createOkHttpClient(context: Context): OkHttpClient {
     if (!Networking.init(context)) {
         builder.sslSocketFactory(NoSSLv3SocketFactory())
     }
+
+    builder.dns(DnsOverHttps.Builder().client(builder.build())
+            .url(HttpUrl.get("https://162.159.36.1/dns-query")) //Cloudflare
+            .build())
 
     return builder.build()
 }
