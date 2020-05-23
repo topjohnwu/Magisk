@@ -6,7 +6,7 @@
 #include <logging.hpp>
 #include <utils.hpp>
 
-#include "sepolicy.h"
+#include "sepolicy.hpp"
 
 using namespace std;
 

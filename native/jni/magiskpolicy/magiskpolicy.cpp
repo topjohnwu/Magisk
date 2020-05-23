@@ -6,7 +6,7 @@
 #include <flags.h>
 #include <magiskpolicy.hpp>
 
-#include "sepolicy.h"
+#include "sepolicy.hpp"
 
 using namespace std::literals;
 

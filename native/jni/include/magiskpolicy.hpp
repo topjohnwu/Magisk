@@ -41,7 +41,7 @@ public:
 	int dontauditxperm(c_str src, c_str tgt, c_str cls, c_str range);
 
 	// Type rules
-	int type_transition(c_str src, c_str tgt, c_str cls, c_str def, c_str obj = nullptr);
+	int type_transition(c_str s, c_str t, c_str c, c_str d, c_str o = nullptr);
 	int type_change(c_str src, c_str tgt, c_str cls, c_str def);
 	int type_member(c_str src, c_str tgt, c_str cls, c_str def);
 
@@ -50,8 +50,7 @@ public:
 
 	// Magisk
 	void magisk_rules();
-	void allow_su_client(c_str type);
 
-private:
+protected:
 	policydb *db;
 };

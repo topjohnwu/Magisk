@@ -1,10 +1,12 @@
+#include <initializer_list>
+
 #include <logging.hpp>
 #include <flags.h>
 #include <magiskpolicy.hpp>
 
-#include "sepolicy.h"
+#include "sepolicy.hpp"
 
-void sepolicy::allow_su_client(const char *type) {
+void sepol_impl::allow_su_client(const char *type) {
 	if (!exists(type))
 		return;
 	allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
@@ -78,16 +80,11 @@ void sepolicy::magisk_rules() {
 	allow(SEPOL_PROC_DOMAIN, "kernel", "security", "load_policy");
 
 	// Allow these processes to access MagiskSU
-	allow_su_client("init");
-	allow_su_client("shell");
-	allow_su_client("system_app");
-	allow_su_client("priv_app");
-	allow_su_client("platform_app");
-	allow_su_client("untrusted_app");
-	allow_su_client("untrusted_app_25");
-	allow_su_client("untrusted_app_27");
-	allow_su_client("untrusted_app_29");
-	allow_su_client("update_engine");
+	std::initializer_list<const char *> clients {
+		"init", "shell", "system_app", "priv_app", "platform_app", "untrusted_app",
+		"untrusted_app_25", "untrusted_app_27", "untrusted_app_29", "update_engine" };
+	for (auto type : clients)
+		impl->allow_su_client(type);
 
 	// suRights
 	allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
@@ -199,7 +196,7 @@ void sepolicy::magisk_rules() {
 
 #if 0
 	// Remove all dontaudit in debug mode
-	strip_dontaudit(db);
+	impl->strip_dontaudit();
 #endif
 
 	log_cb.w = bak;

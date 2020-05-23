@@ -10,7 +10,7 @@
 #include <stream.hpp>
 #include <magiskpolicy.hpp>
 
-#include "sepolicy.h"
+#include "sepolicy.hpp"
 
 #define SHALEN 64
 static bool cmp_sha256(const char *a, const char *b) {

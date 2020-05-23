@@ -63,12 +63,11 @@ LOCAL_SRC_FILES := \
 	init/getinfo.cpp \
 	init/twostage.cpp \
 	core/socket.cpp \
-	magiskpolicy/api.cpp \
+	magiskpolicy/sepolicy.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
 	magiskpolicy/policydb.cpp \
 	magiskpolicy/statement.cpp \
-	magiskpolicy/sepolicy.c \
 	magiskboot/pattern.cpp
 
 LOCAL_LDFLAGS := -static
@@ -108,12 +107,11 @@ LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
 	core/applet_stub.cpp \
-	magiskpolicy/api.cpp \
+	magiskpolicy/sepolicy.cpp \
 	magiskpolicy/magiskpolicy.cpp \
 	magiskpolicy/rules.cpp \
 	magiskpolicy/policydb.cpp \
-	magiskpolicy/statement.cpp \
-	magiskpolicy/sepolicy.c
+	magiskpolicy/statement.cpp
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
 LOCAL_LDFLAGS := -static
