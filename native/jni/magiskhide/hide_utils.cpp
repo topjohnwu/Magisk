@@ -76,18 +76,15 @@ static bool validate(const char *s) {
 	for (char c; (c = *s); ++s) {
 		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
 			(c >= '0' && c <= '9') || c == '_' || c == ':') {
-			dot = false;
 			continue;
 		}
 		if (c == '.') {
-			if (dot)  // No consecutive dots
-				return false;
 			dot = true;
 			continue;
 		}
 		return false;
 	}
-	return true;
+	return dot;
 }
 
 static int add_list(const char *pkg, const char *proc = "") {
