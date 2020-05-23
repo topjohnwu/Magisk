@@ -19,6 +19,18 @@ static void dprint(const char *action, Args ...args) {
 #define dprint(...)
 #endif
 
+// libsepol internal APIs
+__BEGIN_DECLS
+int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
+int avtab_hash(struct avtab_key *keyp, uint32_t mask);
+int type_set_expand(type_set_t * set, ebitmap_t * t, policydb_t * p, unsigned char alwaysexpand);
+int context_from_string(
+		sepol_handle_t * handle,
+		const policydb_t * policydb,
+		context_struct_t ** cptr,
+		const char *con_str, size_t con_str_len);
+__END_DECLS
+
 template <typename T>
 struct auto_cast_wrapper
 {
@@ -54,16 +66,31 @@ hash_for_each((hashtab)->htable, (hashtab)->size, fn)
 #define avtab_for_each(avtab, fn) \
 hash_for_each((avtab)->htable, (avtab)->nslot, fn)
 
-// libsepol internal APIs
-extern "C" int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
-extern "C" int context_from_string(
-		sepol_handle_t * handle,
-		const policydb_t * policydb,
-		context_struct_t ** cptr,
-		const char *con_str, size_t con_str_len);
-extern "C" int type_set_expand(
-		type_set_t * set, ebitmap_t * t, policydb_t * p,
-		unsigned char alwaysexpand);
+static int avtab_remove_node(avtab_t *h, avtab_ptr_t node) {
+	if (!h || !h->htable)
+		return SEPOL_ENOMEM;
+	int hvalue = avtab_hash(&node->key, h->mask);
+	avtab_ptr_t prev, cur;
+	for (prev = nullptr, cur = h->htable[hvalue]; cur; prev = cur, cur = cur->next) {
+		if (cur == node)
+			break;
+	}
+	if (cur == nullptr)
+		return SEPOL_ENOENT;
+
+	// Detach from hash table
+	if (prev)
+		prev->next = node->next;
+	else
+		h->htable[hvalue] = node->next;
+	h->nel--;
+
+	// Free memory
+	if (node->key.specified & AVTAB_XPERMS)
+		free(node->datum.xperms);
+	free(node);
+	return 0;
+}
 
 int sepol_impl::set_attr(const char *attr_name, int type_val) {
 	type_datum_t *attr = hashtab_find(db->p_types.table, attr_name);
