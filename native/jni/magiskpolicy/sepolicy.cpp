@@ -19,6 +19,9 @@ static void dprint(const char *action, Args ...args) {
 #define dprint(...)
 #endif
 
+// Invert is adding rules for auditdeny; in other cases, invert is removing rules
+#define strip_av(effect, invert) ((effect == AVTAB_AUDITDENY) == !invert)
+
 // libsepol internal APIs
 __BEGIN_DECLS
 int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
@@ -59,11 +62,24 @@ static void hash_for_each(Node **node_ptr, int n_slot, const Func &fn) {
 	}
 }
 
-#define hashtab_for_each(hashtab, fn) \
-hash_for_each((hashtab)->htable, (hashtab)->size, fn)
+template <class Func>
+static void hashtab_for_each(hashtab_t htab, const Func &fn) {
+	hash_for_each(htab->htable, htab->size, fn);
+}
 
-#define avtab_for_each(avtab, fn) \
-hash_for_each((avtab)->htable, (avtab)->nslot, fn)
+template <class Func>
+static void avtab_for_each(avtab_t *avtab, const Func &fn) {
+	hash_for_each(avtab->htable, avtab->nslot, fn);
+}
+
+template <class Func>
+static void for_each_attr(hashtab_t htab, const Func &fn) {
+	hashtab_for_each(htab, [&](hashtab_ptr_t node) {
+		auto type = static_cast<type_datum_t *>(node->datum);
+		if (type->flavor == TYPE_ATTRIB)
+			fn(type);
+	});
+}
 
 static int avtab_remove_node(avtab_t *h, avtab_ptr_t node) {
 	if (!h || !h->htable)
@@ -151,21 +167,32 @@ avtab_ptr_t sepol_impl::get_avtab_node(avtab_key_t *key, avtab_extended_perms_t 
 	return node;
 }
 
-void sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, bool n) {
+void sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, bool invert) {
 	if (src == nullptr) {
-		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
-			src = auto_cast(node->datum);
-			add_rule(src, tgt, cls, perm, effect, n);
-		});
+		if (strip_av(effect, invert)) {
+			// Stripping av, have to go through all types for correct results
+			hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
+				add_rule(auto_cast(node->datum), tgt, cls, perm, effect, invert);
+			});
+		} else {
+			// If we are not stripping av, go through all attributes instead of types for optimization
+			for_each_attr(db->p_types.table, [&](type_datum_t *type) {
+				add_rule(type, tgt, cls, perm, effect, invert);
+			});
+		}
 	} else if (tgt == nullptr) {
-		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
-			tgt = auto_cast(node->datum);
-			add_rule(src, tgt, cls, perm, effect, n);
-		});
+		if (strip_av(effect, invert)) {
+			hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
+				add_rule(src, auto_cast(node->datum), cls, perm, effect, invert);
+			});
+		} else {
+			for_each_attr(db->p_types.table, [&](type_datum_t *type) {
+				add_rule(src, type, cls, perm, effect, invert);
+			});
+		}
 	} else if (cls == nullptr) {
 		hashtab_for_each(db->p_classes.table, [&](hashtab_ptr_t node) {
-			cls = auto_cast(node->datum);
-			add_rule(src, tgt, cls, perm, effect, n);
+			add_rule(src, tgt, auto_cast(node->datum), perm, effect, invert);
 		});
 	} else {
 		avtab_key_t key;
@@ -175,7 +202,7 @@ void sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *c
 		key.specified = effect;
 
 		avtab_ptr_t node = get_avtab_node(&key, nullptr);
-		if (n) {
+		if (invert) {
 			if (perm)
 				node->datum.data &= ~(1U << (perm->s.value - 1));
 			else
@@ -190,7 +217,7 @@ void sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *c
 	}
 }
 
-bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool n) {
+bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool invert) {
 	type_datum_t *src = nullptr, *tgt = nullptr;
 	class_datum_t *cls = nullptr;
 	perm_datum_t *perm = nullptr;
@@ -234,7 +261,7 @@ bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const cha
 			return false;
 		}
 	}
-	add_rule(src, tgt, cls, perm, effect, n);
+	add_rule(src, tgt, cls, perm, effect, invert);
 	return true;
 }
 
@@ -242,21 +269,18 @@ bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const cha
 #define ioctl_func(x) (x & 0xFF)
 
 void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
-		class_datum_t *cls, uint16_t low, uint16_t high, int effect, bool n) {
+		class_datum_t *cls, uint16_t low, uint16_t high, int effect, bool invert) {
 	if (src == nullptr) {
-		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
-			src = auto_cast(node->datum);
-			add_xperm_rule(src, tgt, cls, low, high, effect, n);
+		for_each_attr(db->p_types.table, [&](type_datum_t *type) {
+			add_xperm_rule(type, tgt, cls, low, high, effect, invert);
 		});
 	} else if (tgt == nullptr) {
-		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
-			tgt = auto_cast(node->datum);
-			add_xperm_rule(src, tgt, cls, low, high, effect, n);
+		for_each_attr(db->p_types.table, [&](type_datum_t *type) {
+			add_xperm_rule(src, type, cls, low, high, effect, invert);
 		});
 	} else if (cls == nullptr) {
 		hashtab_for_each(db->p_classes.table, [&](hashtab_ptr_t node) {
-			tgt = auto_cast(node->datum);
-			add_xperm_rule(src, tgt, cls, low, high, effect, n);
+			add_xperm_rule(src, tgt, auto_cast(node->datum), low, high, effect, invert);
 		});
 	} else {
 		avtab_key_t key;
@@ -279,14 +303,14 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
 
 		if (xperms.specified == AVTAB_XPERMS_IOCTLDRIVER) {
 			for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
-				if (n)
+				if (invert)
 					xperm_clear(i, xperms.perms);
 				else
 					xperm_set(i, xperms.perms);
 			}
 		} else {
 			for (int i = ioctl_func(low); i <= ioctl_func(high); ++i) {
-				if (n)
+				if (invert)
 					xperm_clear(i, xperms.perms);
 				else
 					xperm_set(i, xperms.perms);
@@ -302,7 +326,7 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
 	}
 }
 
-bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, const char *range, int effect, bool n) {
+bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, const char *range, int effect, bool invert) {
 	type_datum_t *src = nullptr, *tgt = nullptr;
 	class_datum_t *cls = nullptr;
 
@@ -344,7 +368,7 @@ bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, con
 		high = 0xFFFF;
 	}
 
-	add_xperm_rule(src, tgt, cls, low, high, effect, n);
+	add_xperm_rule(src, tgt, cls, low, high, effect, invert);
 	return true;
 }
 
