@@ -110,12 +110,12 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	for (; i < argc; ++i)
 		sepol->parse_statement(argv[i]);
 
-	if (live && sepol->to_file(SELINUX_LOAD)) {
+	if (live && !sepol->to_file(SELINUX_LOAD)) {
 		fprintf(stderr, "Cannot apply policy\n");
 		return 1;
 	}
 
-	if (out_file && sepol->to_file(out_file)) {
+	if (out_file && !sepol->to_file(out_file)) {
 		fprintf(stderr, "Cannot dump policy to %s\n", out_file);
 		return 1;
 	}

@@ -189,7 +189,7 @@ sepolicy::~sepolicy() {
 	free(db);
 }
 
-int sepolicy::to_file(const char *file) {
+bool sepolicy::to_file(const char *file) {
 	uint8_t *data;
 	size_t len;
 
@@ -205,14 +205,14 @@ int sepolicy::to_file(const char *file) {
 	pf.fp = fp.get();
 	if (policydb_write(db, &pf)) {
 		LOGE("Fail to create policy image\n");
-		return 1;
+		return false;
 	}
 
 	int fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
 	if (fd < 0)
-		return 1;
+		return false;
 	xwrite(fd, data, len);
 
 	close(fd);
-	return 0;
+	return true;
 }

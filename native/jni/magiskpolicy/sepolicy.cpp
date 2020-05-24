@@ -37,7 +37,6 @@ struct auto_cast_wrapper
 	auto_cast_wrapper(T *ptr) : ptr(ptr) {}
 	template <typename U>
 	operator U*() const { return static_cast<U*>(ptr); }
-
 private:
 	T *ptr;
 };
@@ -152,42 +151,21 @@ avtab_ptr_t sepol_impl::get_avtab_node(avtab_key_t *key, avtab_extended_perms_t 
 	return node;
 }
 
-int sepol_impl::add_avrule(avtab_key_t *key, int val, bool n) {
-	avtab_ptr_t node = get_avtab_node(key, nullptr);
-
-	if (n) {
-		if (val < 0)
-			node->datum.data = 0U;
-		else
-			node->datum.data &= ~(1U << (val - 1));
-	} else {
-		if (val < 0)
-			node->datum.data = ~0U;
-		else
-			node->datum.data |= 1U << (val - 1);
-	}
-
-	check_avtab_node(node);
-	return 0;
-}
-
-int sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, bool n) {
-	int ret = 0;
-
+void sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, bool n) {
 	if (src == nullptr) {
 		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
 			src = auto_cast(node->datum);
-			ret |= add_rule(src, tgt, cls, perm, effect, n);
+			add_rule(src, tgt, cls, perm, effect, n);
 		});
 	} else if (tgt == nullptr) {
 		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
 			tgt = auto_cast(node->datum);
-			ret |= add_rule(src, tgt, cls, perm, effect, n);
+			add_rule(src, tgt, cls, perm, effect, n);
 		});
 	} else if (cls == nullptr) {
 		hashtab_for_each(db->p_classes.table, [&](hashtab_ptr_t node) {
 			cls = auto_cast(node->datum);
-			ret |= add_rule(src, tgt, cls, perm, effect, n);
+			add_rule(src, tgt, cls, perm, effect, n);
 		});
 	} else {
 		avtab_key_t key;
@@ -195,13 +173,24 @@ int sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cl
 		key.target_type = tgt->s.value;
 		key.target_class = cls->s.value;
 		key.specified = effect;
-		return add_avrule(&key, perm ? perm->s.value : -1, n);
-	}
 
-	return ret;
+		avtab_ptr_t node = get_avtab_node(&key, nullptr);
+		if (n) {
+			if (perm)
+				node->datum.data &= ~(1U << (perm->s.value - 1));
+			else
+				node->datum.data = 0U;
+		} else {
+			if (perm)
+				node->datum.data |= 1U << (perm->s.value - 1);
+			else
+				node->datum.data = ~0U;
+		}
+		check_avtab_node(node);
+	}
 }
 
-int sepol_impl::add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool n) {
+bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool n) {
 	type_datum_t *src = nullptr, *tgt = nullptr;
 	class_datum_t *cls = nullptr;
 	perm_datum_t *perm = nullptr;
@@ -210,7 +199,7 @@ int sepol_impl::add_rule(const char *s, const char *t, const char *c, const char
 		src = hashtab_find(db->p_types.table, s);
 		if (src == nullptr) {
 			LOGW("source type %s does not exist\n", s);
-			return 1;
+			return false;
 		}
 	}
 
@@ -218,7 +207,7 @@ int sepol_impl::add_rule(const char *s, const char *t, const char *c, const char
 		tgt = hashtab_find(db->p_types.table, t);
 		if (tgt == nullptr) {
 			LOGW("target type %s does not exist\n", t);
-			return 1;
+			return false;
 		}
 	}
 
@@ -226,14 +215,14 @@ int sepol_impl::add_rule(const char *s, const char *t, const char *c, const char
 		cls = hashtab_find(db->p_classes.table, c);
 		if (cls == nullptr) {
 			LOGW("class %s does not exist\n", c);
-			return 1;
+			return false;
 		}
 	}
 
 	if (p) {
 		if (c == nullptr) {
 			LOGW("No class is specified, cannot add perm [%s] \n", p);
-			return 1;
+			return false;
 		}
 
 		perm = hashtab_find(cls->permissions.table, p);
@@ -242,70 +231,32 @@ int sepol_impl::add_rule(const char *s, const char *t, const char *c, const char
 		}
 		if (perm == nullptr) {
 			LOGW("perm %s does not exist in class %s\n", p, c);
-			return 1;
+			return false;
 		}
 	}
-	return add_rule(src, tgt, cls, perm, effect, n);
+	add_rule(src, tgt, cls, perm, effect, n);
+	return true;
 }
 
 #define ioctl_driver(x) (x>>8 & 0xFF)
 #define ioctl_func(x) (x & 0xFF)
 
-int sepol_impl::add_avxrule(avtab_key_t *key, uint16_t low, uint16_t high, bool n) {
-	avtab_datum_t *datum;
-	avtab_extended_perms_t xperms;
-
-	memset(&xperms, 0, sizeof(xperms));
-	if (ioctl_driver(low) != ioctl_driver(high)) {
-		xperms.specified = AVTAB_XPERMS_IOCTLDRIVER;
-		xperms.driver = 0;
-	} else {
-		xperms.specified = AVTAB_XPERMS_IOCTLFUNCTION;
-		xperms.driver = ioctl_driver(low);
-	}
-
-	if (xperms.specified == AVTAB_XPERMS_IOCTLDRIVER) {
-		for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
-			if (n)
-				xperm_clear(i, xperms.perms);
-			else
-				xperm_set(i, xperms.perms);
-		}
-	} else {
-		for (int i = ioctl_func(low); i <= ioctl_func(high); ++i) {
-			if (n)
-				xperm_clear(i, xperms.perms);
-			else
-				xperm_set(i, xperms.perms);
-		}
-	}
-
-	datum = &get_avtab_node(key, &xperms)->datum;
-
-	if (datum->xperms == nullptr)
-		datum->xperms = auto_cast(xmalloc(sizeof(xperms)));
-
-	memcpy(datum->xperms, &xperms, sizeof(xperms));
-	return 0;
-}
-
-int sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
+void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
 		class_datum_t *cls, uint16_t low, uint16_t high, int effect, bool n) {
-	int ret = 0;
 	if (src == nullptr) {
 		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
 			src = auto_cast(node->datum);
-			ret |= add_xperm_rule(src, tgt, cls, low, high, effect, n);
+			add_xperm_rule(src, tgt, cls, low, high, effect, n);
 		});
 	} else if (tgt == nullptr) {
 		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
 			tgt = auto_cast(node->datum);
-			ret |= add_xperm_rule(src, tgt, cls, low, high, effect, n);
+			add_xperm_rule(src, tgt, cls, low, high, effect, n);
 		});
 	} else if (cls == nullptr) {
 		hashtab_for_each(db->p_classes.table, [&](hashtab_ptr_t node) {
 			tgt = auto_cast(node->datum);
-			ret |= add_xperm_rule(src, tgt, cls, low, high, effect, n);
+			add_xperm_rule(src, tgt, cls, low, high, effect, n);
 		});
 	} else {
 		avtab_key_t key;
@@ -313,12 +264,45 @@ int sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
 		key.target_type = tgt->s.value;
 		key.target_class = cls->s.value;
 		key.specified = effect;
-		return add_avxrule(&key, low, high, n);
+
+		avtab_datum_t *datum;
+		avtab_extended_perms_t xperms;
+
+		memset(&xperms, 0, sizeof(xperms));
+		if (ioctl_driver(low) != ioctl_driver(high)) {
+			xperms.specified = AVTAB_XPERMS_IOCTLDRIVER;
+			xperms.driver = 0;
+		} else {
+			xperms.specified = AVTAB_XPERMS_IOCTLFUNCTION;
+			xperms.driver = ioctl_driver(low);
+		}
+
+		if (xperms.specified == AVTAB_XPERMS_IOCTLDRIVER) {
+			for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
+				if (n)
+					xperm_clear(i, xperms.perms);
+				else
+					xperm_set(i, xperms.perms);
+			}
+		} else {
+			for (int i = ioctl_func(low); i <= ioctl_func(high); ++i) {
+				if (n)
+					xperm_clear(i, xperms.perms);
+				else
+					xperm_set(i, xperms.perms);
+			}
+		}
+
+		datum = &get_avtab_node(&key, &xperms)->datum;
+
+		if (datum->xperms == nullptr)
+			datum->xperms = auto_cast(xmalloc(sizeof(xperms)));
+
+		memcpy(datum->xperms, &xperms, sizeof(xperms));
 	}
-	return ret;
 }
 
-int sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, const char *range, int effect, bool n) {
+bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, const char *range, int effect, bool n) {
 	type_datum_t *src = nullptr, *tgt = nullptr;
 	class_datum_t *cls = nullptr;
 
@@ -326,7 +310,7 @@ int sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, cons
 		src = hashtab_find(db->p_types.table, s);
 		if (src == nullptr) {
 			LOGW("source type %s does not exist\n", s);
-			return 1;
+			return false;
 		}
 	}
 
@@ -334,7 +318,7 @@ int sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, cons
 		tgt = hashtab_find(db->p_types.table, t);
 		if (tgt == nullptr) {
 			LOGW("target type %s does not exist\n", t);
-			return 1;
+			return false;
 		}
 	}
 
@@ -342,7 +326,7 @@ int sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, cons
 		cls = hashtab_find(db->p_classes.table, c);
 		if (cls == nullptr) {
 			LOGW("class %s does not exist\n", c);
-			return 1;
+			return false;
 		}
 	}
 
@@ -360,173 +344,33 @@ int sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, cons
 		high = 0xFFFF;
 	}
 
-	return add_xperm_rule(src, tgt, cls, low, high, effect, n);
+	add_xperm_rule(src, tgt, cls, low, high, effect, n);
+	return true;
 }
 
-int sepol_impl::create_domain(const char *type_name) {
-	symtab_datum_t *src = hashtab_find(db->p_types.table, type_name);
-	if (src) {
-		LOGW("Type %s already exists\n", type_name);
-		return 0;
-	}
-
-	type_datum_t *type = auto_cast(xmalloc(sizeof(type_datum_t)));
-	type_datum_init(type);
-	type->primary = 1;
-	type->flavor = TYPE_TYPE;
-
-	uint32_t value = 0;
-	symtab_insert(db, SYM_TYPES, strdup(type_name), type, SCOPE_DECL, 1, &value);
-	type->s.value = value;
-
-	if (ebitmap_set_bit(&db->global->branch_list->declared.scope[SYM_TYPES], value - 1, 1)) {
-		return 1;
-	}
-
-	db->type_attr_map = auto_cast(xrealloc(db->type_attr_map, sizeof(ebitmap_t) * db->p_types.nprim));
-	db->attr_type_map = auto_cast(xrealloc(db->attr_type_map, sizeof(ebitmap_t) * db->p_types.nprim));
-	ebitmap_init(&db->type_attr_map[value - 1]);
-	ebitmap_init(&db->attr_type_map[value - 1]);
-	ebitmap_set_bit(&db->type_attr_map[value - 1], value - 1, 1);
-
-	src = hashtab_find(db->p_types.table, type_name);
-	if (!src)
-		return 1;
-
-	if (policydb_index_decls(nullptr, db))
-		return 1;
-
-	if (policydb_index_classes(db))
-		return 1;
-
-	if (policydb_index_others(nullptr, db, 0))
-		return 1;
-
-	// Add the domain to all roles
-	for (unsigned i = 0; i < db->p_roles.nprim; ++i) {
-		// Not sure all those three calls are needed
-		ebitmap_set_bit(&db->role_val_to_struct[i]->types.negset, value - 1, 0);
-		ebitmap_set_bit(&db->role_val_to_struct[i]->types.types, value - 1, 1);
-		type_set_expand(&db->role_val_to_struct[i]->types, &db->role_val_to_struct[i]->cache, db, 0);
-	}
-
-	return set_attr("domain", value);
-}
-
-int sepol_impl::set_domain_state(const char *s, bool permissive) {
-	type_datum_t *type;
-	if (s == nullptr) {
-		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
-			type = auto_cast(node->datum);
-			if (ebitmap_set_bit(&db->permissive_map, type->s.value, permissive))
-				LOGW("Could not set bit in permissive map\n");
-		});
-	} else {
-		type = hashtab_find(db->p_types.table, s);
-		if (type == nullptr) {
-			LOGW("type %s does not exist\n", s);
-			return 1;
-		}
-		if (ebitmap_set_bit(&db->permissive_map, type->s.value, permissive)) {
-			LOGW("Could not set bit in permissive map\n");
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int sepol_impl::add_filename_trans(const char *s, const char *t, const char *c, const char *d, const char *o) {
-	type_datum_t *src, *tgt, *def;
-	class_datum_t *cls;
-	filename_trans_datum_t *trans;
-
-	src = hashtab_find(db->p_types.table, s);
-	if (src == nullptr) {
-		LOGW("source type %s does not exist\n", s);
-		return 1;
-	}
-	tgt = hashtab_find(db->p_types.table, t);
-	if (tgt == nullptr) {
-		LOGW("target type %s does not exist\n", t);
-		return 1;
-	}
-	cls = hashtab_find(db->p_classes.table, c);
-	if (cls == nullptr) {
-		LOGW("class %s does not exist\n", c);
-		return 1;
-	}
-	def = hashtab_find(db->p_types.table, d);
-	if (def == nullptr) {
-		LOGW("default type %s does not exist\n", d);
-		return 1;
-	}
-
-	filename_trans_t trans_key;
-	trans_key.stype = src->s.value;
-	trans_key.ttype = tgt->s.value;
-	trans_key.tclass = cls->s.value;
-	trans_key.name = (char *) o;
-
-	trans = hashtab_find(db->filename_trans, (hashtab_key_t) &trans_key);
-
-	if (trans == nullptr) {
-		trans = auto_cast(xcalloc(sizeof(*trans), 1));
-		hashtab_insert(db->filename_trans, (hashtab_key_t) &trans_key, trans);
-	}
-
-	// Overwrite existing
-	trans->otype = def->s.value;
-	return 0;
-}
-
-int sepol_impl::add_typeattribute(const char *type, const char *attr) {
-	type_datum_t *domain = hashtab_find(db->p_types.table, type);
-	if (domain == nullptr) {
-		LOGW("type %s does not exist\n", type);
-		return 1;
-	}
-
-	int attr_val = set_attr(attr, domain->s.value);
-	if (attr_val < 0)
-		return 1;
-
-	hashtab_for_each(db->p_classes.table, [&](hashtab_ptr_t node){
-		auto cls = static_cast<class_datum_t *>(node->datum);
-		for (constraint_node_t *n = cls->constraints; n ; n = n->next) {
-			for (constraint_expr_t *e = n->expr; e; e = e->next) {
-				if (e->expr_type == CEXPR_NAMES &&
-					ebitmap_get_bit(&e->type_names->types, attr_val - 1)) {
-					ebitmap_set_bit(&e->names, domain->s.value - 1, 1);
-				}
-			}
-		}
-	});
-	return 0;
-}
-
-int sepol_impl::add_type_rule(const char *s, const char *t, const char *c, const char *d, int effect) {
+bool sepol_impl::add_type_rule(const char *s, const char *t, const char *c, const char *d, int effect) {
 	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
 	src = hashtab_find(db->p_types.table, s);
 	if (src == nullptr) {
 		LOGW("source type %s does not exist\n", s);
-		return 1;
+		return false;
 	}
 	tgt = hashtab_find(db->p_types.table, t);
 	if (tgt == nullptr) {
 		LOGW("target type %s does not exist\n", t);
-		return 1;
+		return false;
 	}
 	cls = hashtab_find(db->p_classes.table, c);
 	if (cls == nullptr) {
 		LOGW("class %s does not exist\n", c);
-		return 1;
+		return false;
 	}
 	def = hashtab_find(db->p_types.table, d);
 	if (def == nullptr) {
 		LOGW("default type %s does not exist\n", d);
-		return 1;
+		return false;
 	}
 
 	avtab_key_t key;
@@ -538,15 +382,59 @@ int sepol_impl::add_type_rule(const char *s, const char *t, const char *c, const
 	avtab_ptr_t node = get_avtab_node(&key, nullptr);
 	node->datum.data = def->s.value;
 
-	return 0;
+	return true;
 }
 
-int sepol_impl::add_genfscon(const char *fs_name, const char *path, const char *context) {
+bool sepol_impl::add_filename_trans(const char *s, const char *t, const char *c, const char *d, const char *o) {
+	type_datum_t *src, *tgt, *def;
+	class_datum_t *cls;
+	filename_trans_datum_t *trans;
+
+	src = hashtab_find(db->p_types.table, s);
+	if (src == nullptr) {
+		LOGW("source type %s does not exist\n", s);
+		return false;
+	}
+	tgt = hashtab_find(db->p_types.table, t);
+	if (tgt == nullptr) {
+		LOGW("target type %s does not exist\n", t);
+		return false;
+	}
+	cls = hashtab_find(db->p_classes.table, c);
+	if (cls == nullptr) {
+		LOGW("class %s does not exist\n", c);
+		return false;
+	}
+	def = hashtab_find(db->p_types.table, d);
+	if (def == nullptr) {
+		LOGW("default type %s does not exist\n", d);
+		return false;
+	}
+
+	filename_trans_t key;
+	key.stype = src->s.value;
+	key.ttype = tgt->s.value;
+	key.tclass = cls->s.value;
+	key.name = (char *) o;
+
+	trans = hashtab_find(db->filename_trans, (hashtab_key_t) &key);
+
+	if (trans == nullptr) {
+		trans = auto_cast(xcalloc(sizeof(*trans), 1));
+		hashtab_insert(db->filename_trans, (hashtab_key_t) &key, trans);
+	}
+
+	// Overwrite existing
+	trans->otype = def->s.value;
+	return true;
+}
+
+bool sepol_impl::add_genfscon(const char *fs_name, const char *path, const char *context) {
 	// First try to create context
 	context_struct_t *ctx;
 	if (context_from_string(nullptr, db, &ctx, context, strlen(context))) {
 		LOGW("Failed to create context from string [%s]\n", context);
-		return 1;
+		return false;
 	}
 
 	// Allocate genfs context
@@ -598,7 +486,96 @@ int sepol_impl::add_genfscon(const char *fs_name, const char *path, const char *
 	else
 		newfs->head = newc;
 
-	return 0;
+	return true;
+}
+
+bool sepol_impl::create_domain(const char *type_name) {
+	type_datum_t *type = hashtab_find(db->p_types.table, type_name);
+	if (type) {
+		LOGW("Type %s already exists\n", type_name);
+		return true;
+	}
+
+	type = auto_cast(xmalloc(sizeof(type_datum_t)));
+	type_datum_init(type);
+	type->primary = 1;
+	type->flavor = TYPE_TYPE;
+
+	uint32_t value = 0;
+	if (symtab_insert(db, SYM_TYPES, strdup(type_name), type, SCOPE_DECL, 1, &value))
+		return false;
+	type->s.value = value;
+	ebitmap_set_bit(&db->global->branch_list->declared.p_types_scope, value - 1, 1);
+
+	auto new_size = sizeof(ebitmap_t) * db->p_types.nprim;
+	db->type_attr_map = auto_cast(xrealloc(db->type_attr_map, new_size));
+	db->attr_type_map = auto_cast(xrealloc(db->attr_type_map, new_size));
+	ebitmap_init(&db->type_attr_map[value - 1]);
+	ebitmap_init(&db->attr_type_map[value - 1]);
+	ebitmap_set_bit(&db->type_attr_map[value - 1], value - 1, 1);
+
+	// Re-index stuffs
+	if (policydb_index_decls(nullptr, db) ||
+		policydb_index_classes(db) || policydb_index_others(nullptr, db, 0))
+		return false;
+
+	// Add the type to all roles
+	for (int i = 0; i < db->p_roles.nprim; ++i) {
+		// Not sure all those three calls are needed
+		ebitmap_set_bit(&db->role_val_to_struct[i]->types.negset, value - 1, 0);
+		ebitmap_set_bit(&db->role_val_to_struct[i]->types.types, value - 1, 1);
+		type_set_expand(&db->role_val_to_struct[i]->types, &db->role_val_to_struct[i]->cache, db, 0);
+	}
+
+	set_attr("domain", value);
+	return true;
+}
+
+bool sepol_impl::set_domain_state(const char *s, bool permissive) {
+	type_datum_t *type;
+	if (s == nullptr) {
+		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
+			type = auto_cast(node->datum);
+			if (ebitmap_set_bit(&db->permissive_map, type->s.value, permissive))
+				LOGW("Could not set bit in permissive map\n");
+		});
+	} else {
+		type = hashtab_find(db->p_types.table, s);
+		if (type == nullptr) {
+			LOGW("type %s does not exist\n", s);
+			return false;
+		}
+		if (ebitmap_set_bit(&db->permissive_map, type->s.value, permissive)) {
+			LOGW("Could not set bit in permissive map\n");
+			return false;
+		}
+	}
+	return true;
+}
+
+bool sepol_impl::add_typeattribute(const char *type, const char *attr) {
+	type_datum_t *domain = hashtab_find(db->p_types.table, type);
+	if (domain == nullptr) {
+		LOGW("type %s does not exist\n", type);
+		return false;
+	}
+
+	int attr_val = set_attr(attr, domain->s.value);
+	if (attr_val < 0)
+		return false;
+
+	hashtab_for_each(db->p_classes.table, [&](hashtab_ptr_t node){
+		auto cls = static_cast<class_datum_t *>(node->datum);
+		for (constraint_node_t *n = cls->constraints; n ; n = n->next) {
+			for (constraint_expr_t *e = n->expr; e; e = e->next) {
+				if (e->expr_type == CEXPR_NAMES &&
+					ebitmap_get_bit(&e->type_names->types, attr_val - 1)) {
+					ebitmap_set_bit(&e->names, domain->s.value - 1, 1);
+				}
+			}
+		}
+	});
+	return true;
 }
 
 void sepol_impl::strip_dontaudit() {
@@ -608,52 +585,52 @@ void sepol_impl::strip_dontaudit() {
 	});
 }
 
-int sepolicy::allow(const char *s, const char *t, const char *c, const char *p) {
+bool sepolicy::allow(const char *s, const char *t, const char *c, const char *p) {
 	dprint(__FUNCTION__, s, t, c, p);
 	return impl->add_rule(s, t, c, p, AVTAB_ALLOWED, false);
 }
 
-int sepolicy::deny(const char *s, const char *t, const char *c, const char *p) {
+bool sepolicy::deny(const char *s, const char *t, const char *c, const char *p) {
 	dprint(__FUNCTION__, s, t, c, p);
 	return impl->add_rule(s, t, c, p, AVTAB_ALLOWED, true);
 }
 
-int sepolicy::auditallow(const char *s, const char *t, const char *c, const char *p) {
+bool sepolicy::auditallow(const char *s, const char *t, const char *c, const char *p) {
 	dprint(__FUNCTION__, s, t, c, p);
 	return impl->add_rule(s, t, c, p, AVTAB_AUDITALLOW, false);
 }
 
-int sepolicy::dontaudit(const char *s, const char *t, const char *c, const char *p) {
+bool sepolicy::dontaudit(const char *s, const char *t, const char *c, const char *p) {
 	dprint(__FUNCTION__, s, t, c, p);
 	return impl->add_rule(s, t, c, p, AVTAB_AUDITDENY, true);
 }
 
-int sepolicy::allowxperm(const char *s, const char *t, const char *c, const char *range) {
+bool sepolicy::allowxperm(const char *s, const char *t, const char *c, const char *range) {
 	dprint(__FUNCTION__, s, t, c, "ioctl", range);
 	return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_ALLOWED, false);
 }
 
-int sepolicy::auditallowxperm(const char *s, const char *t, const char *c, const char *range) {
+bool sepolicy::auditallowxperm(const char *s, const char *t, const char *c, const char *range) {
 	dprint(__FUNCTION__, s, t, c, "ioctl", range);
 	return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_AUDITALLOW, false);
 }
 
-int sepolicy::dontauditxperm(const char *s, const char *t, const char *c, const char *range) {
+bool sepolicy::dontauditxperm(const char *s, const char *t, const char *c, const char *range) {
 	dprint(__FUNCTION__, s, t, c, "ioctl", range);
 	return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_DONTAUDIT, false);
 }
 
-int sepolicy::type_change(const char *s, const char *t, const char *c, const char *d) {
+bool sepolicy::type_change(const char *s, const char *t, const char *c, const char *d) {
 	dprint(__FUNCTION__, s, t, c, d);
 	return impl->add_type_rule(s, t, c, d, AVTAB_CHANGE);
 }
 
-int sepolicy::type_member(const char *s, const char *t, const char *c, const char *d) {
+bool sepolicy::type_member(const char *s, const char *t, const char *c, const char *d) {
 	dprint(__FUNCTION__, s, t, c, d);
 	return impl->add_type_rule(s, t, c, d, AVTAB_MEMBER);
 }
 
-int sepolicy::type_transition(const char *s, const char *t, const char *c, const char *d, const char *o) {
+bool sepolicy::type_transition(const char *s, const char *t, const char *c, const char *d, const char *o) {
 	if (o) {
 		dprint(__FUNCTION__, s, t, c, d);
 		return impl->add_type_rule(s, t, c, d, AVTAB_TRANSITION);
@@ -663,31 +640,31 @@ int sepolicy::type_transition(const char *s, const char *t, const char *c, const
 	}
 }
 
-int sepolicy::permissive(const char *s) {
+bool sepolicy::permissive(const char *s) {
 	dprint(__FUNCTION__, s);
 	return impl->set_domain_state(s, true);
 }
 
-int sepolicy::enforce(const char *s) {
+bool sepolicy::enforce(const char *s) {
 	dprint(__FUNCTION__, s);
 	return impl->set_domain_state(s, false);
 }
 
-int sepolicy::create(const char *s) {
+bool sepolicy::create(const char *s) {
 	dprint(__FUNCTION__, s);
 	return impl->create_domain(s);
 }
 
-int sepolicy::typeattribute(const char *type, const char *attr) {
+bool sepolicy::typeattribute(const char *type, const char *attr) {
 	dprint(__FUNCTION__, type, attr);
 	return impl->add_typeattribute(type, attr);
 }
 
-int sepolicy::genfscon(const char *fs_name, const char *path, const char *ctx) {
+bool sepolicy::genfscon(const char *fs_name, const char *path, const char *ctx) {
 	dprint(__FUNCTION__, fs_name, path, ctx);
 	return impl->add_genfscon(fs_name, path, ctx);
 }
 
-int sepolicy::exists(const char *source) {
+bool sepolicy::exists(const char *source) {
 	return hashtab_search(db->p_types.table, source) != nullptr;
 }

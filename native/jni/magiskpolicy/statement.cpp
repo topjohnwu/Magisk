@@ -133,7 +133,7 @@ static bool tokenize_and_check(char *stmt, vector<vector<char *>> &arr) {
 
 template <typename Func, typename ...Args>
 static void run_and_check(const Func &fn, const char *action, Args ...args) {
-	if (fn(args...)) {
+	if (!fn(args...)) {
 		string s = "Error in: %s";
 		for (int i = 0; i < sizeof...(args); ++i) s += " %s";
 		s += "\n";
