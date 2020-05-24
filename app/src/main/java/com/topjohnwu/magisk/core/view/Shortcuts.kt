@@ -51,6 +51,19 @@ object Shortcuts {
                     .setRank(0)
                     .build()
             )
+            shortCuts.add(
+                ShortcutInfo.Builder(context, "safetynet")
+                    .setShortLabel(context.getString(R.string.safetynet))
+                    .setIntent(
+                        Intent(intent)
+                            .putExtra(Const.Key.OPEN_SECTION, "safetynet")
+                            .setAction(Intent.ACTION_VIEW)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    )
+                    .setIcon(getIcon(R.drawable.sc_safetynet))
+                    .setRank(3)
+                    .build()
+            )
         }
         if (Info.env.magiskHide) {
             shortCuts.add(

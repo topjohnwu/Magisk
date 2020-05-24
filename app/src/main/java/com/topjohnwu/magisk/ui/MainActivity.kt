@@ -175,6 +175,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             "superuser" -> HomeFragmentDirections.actionSuperuserFragment()
             "magiskhide" -> HomeFragmentDirections.actionHideFragment()
             "modules" -> HomeFragmentDirections.actionModuleFragment()
+            "safetynet" -> HomeFragmentDirections.actionSafetynetFragment()
             null -> null
             else -> TODO("Implement screen shortcut \"$name\"")
         }
