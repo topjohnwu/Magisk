@@ -46,21 +46,19 @@ fun createOkHttpClient(context: Context): OkHttpClient {
         builder.sslSocketFactory(NoSSLv3SocketFactory())
     }
 
-    val bootstrapDnsHosts = listOf(
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(162.toByte(), 159.toByte(), 36, 1)),
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(162.toByte(), 159.toByte(), 46, 1)),
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(1, 1, 1, 1)),
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(1, 0, 0, 1)),
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(162.toByte(), 159.toByte(), 132.toByte(), 53)),
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(0x26, 0x06, 0x47, 0, 0x47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x11, 0x11)),
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(0x26, 0x06, 0x47, 0, 0x47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x10, 0x01)),
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(0x26, 0x06, 0x47, 0, 0x47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x64)),
-            InetAddress.getByAddress("cloudflare-dns.com", byteArrayOf(0x26, 0x06, 0x47, 0, 0x47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x64, 0x00))
-    )
-
     builder.dns(DnsOverHttps.Builder().client(builder.build())
             .url(HttpUrl.get("https://cloudflare-dns.com/dns-query"))
-            .bootstrapDnsHosts(bootstrapDnsHosts)
+            .bootstrapDnsHosts(listOf(
+                    InetAddress.getByName("162.159.36.1"),
+                    InetAddress.getByName("162.159.46.1"),
+                    InetAddress.getByName("1.1.1.1"),
+                    InetAddress.getByName("1.0.0.1"),
+                    InetAddress.getByName("162.159.132.53"),
+                    InetAddress.getByName("2606:4700:4700::1111"),
+                    InetAddress.getByName("2606:4700:4700::1001"),
+                    InetAddress.getByName("2606:4700:4700::0064"),
+                    InetAddress.getByName("2606:4700:4700::6400")
+            ))
             .build())
 
     return builder.build()
