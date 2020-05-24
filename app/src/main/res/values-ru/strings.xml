@@ -21,7 +21,7 @@
     <string name="update">Обновить</string>
     <string name="not_available">N/A</string> <!--Do not translate-->
     <string name="hide">Скрыть</string>
-    <string name="status">Статус</string>
+    <string name="status">Режим</string>
     <string name="home_package">Имя пакета</string>
     <string name="details">Подробно</string>
 
