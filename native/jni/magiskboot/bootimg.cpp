@@ -255,6 +255,7 @@ void boot_img::parse_image(uint8_t *addr) {
 
 	k_fmt = check_fmt(kernel, hdr->kernel_size());
 	r_fmt = check_fmt(ramdisk, hdr->ramdisk_size());
+	e_fmt = check_fmt(extra, hdr->extra_size());
 
 	// Check MTK
 	if (k_fmt == MTK) {
@@ -280,6 +281,7 @@ void boot_img::parse_image(uint8_t *addr) {
 
 	fprintf(stderr, "KERNEL_FMT      [%s]\n", fmt2name[k_fmt]);
 	fprintf(stderr, "RAMDISK_FMT     [%s]\n", fmt2name[r_fmt]);
+	fprintf(stderr, "EXTRA_FMT       [%s]\n", fmt2name[e_fmt]);
 }
 
 static int find_dtb_offset(uint8_t *buf, int sz) {
@@ -371,7 +373,13 @@ int unpack(const char *image, bool nodecomp, bool hdr) {
 	dump(boot.second, boot.hdr->second_size(), SECOND_FILE);
 
 	// Dump extra
-	dump(boot.extra, boot.hdr->extra_size(), EXTRA_FILE);
+	if (!nodecomp && COMPRESSED(boot.e_fmt)) {
+		int fd = creat(EXTRA_FILE, 0644);
+		decompress(boot.e_fmt, fd, boot.extra, boot.hdr->extra_size());
+		close(fd);
+	} else {
+		dump(boot.extra, boot.hdr->extra_size(), EXTRA_FILE);
+	}
 
 	// Dump recovery_dtbo
 	dump(boot.recovery_dtbo, boot.hdr->recovery_dtbo_size(), RECV_DTBO_FILE);
@@ -483,7 +491,15 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 	// extra
 	off.extra = lseek(fd, 0, SEEK_CUR);
 	if (access(EXTRA_FILE, R_OK) == 0) {
-		boot.hdr->extra_size() = restore(fd, EXTRA_FILE);
+		size_t raw_size;
+		void *raw_buf;
+		mmap_ro(EXTRA_FILE, raw_buf, raw_size);
+		if (!nocomp && !COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.e_fmt)) {
+			boot.hdr->extra_size() = compress(boot.e_fmt, fd, raw_buf, raw_size);
+		} else {
+			boot.hdr->extra_size() = xwrite(fd, raw_buf, raw_size);
+		}
+		munmap(raw_buf, raw_size);
 		file_align();
 	}
 
