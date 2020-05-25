@@ -23,7 +23,8 @@ public:
 	void load_rule_file(c_str file);
 
 	// Operation on types
-	bool create(c_str type);
+	bool type(c_str name, c_str attr);
+	bool attribute(c_str name);
 	bool permissive(c_str type);
 	bool enforce(c_str type);
 	bool typeattribute(c_str type, c_str attr);
@@ -50,6 +51,9 @@ public:
 
 	// Magisk
 	void magisk_rules();
+
+	// Deprecate
+	bool create(c_str name) { return type(name, "domain"); }
 
 protected:
 	policydb *db;

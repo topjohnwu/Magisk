@@ -16,8 +16,9 @@ struct sepol_impl : public sepolicy {
 	bool add_type_rule(const char *s, const char *t, const char *c, const char *d, int effect);
 	bool add_filename_trans(const char *s, const char *t, const char *c, const char *d, const char *o);
 	bool add_genfscon(const char *fs_name, const char *path, const char *context);
-	bool create_domain(const char *type_name);
-	bool set_domain_state(const char *s, bool permissive);
+	bool add_type(const char *type_name, uint32_t flavor);
+	bool set_type_state(const char *type_name, bool permissive);
+	void add_typeattribute(type_datum_t *type, type_datum_t *attr);
 	bool add_typeattribute(const char *type, const char *attr);
 	void strip_dontaudit();
 	void allow_su_client(const char *type);

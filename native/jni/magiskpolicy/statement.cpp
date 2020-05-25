@@ -11,45 +11,52 @@
 using namespace std;
 
 static const char *type_msg_1 =
-R"EOF(Type 1:
-"<rule_name> ^source_type ^target_type ^class ^perm_set"
-Rules: allow, deny, auditallow, dontaudit
+R"EOF("allow *source_type *target_type *class *perm_set"
+"deny *source_type *target_type *class *perm_set"
+"auditallow *source_type *target_type *class *perm_set"
+"dontaudit *source_type *target_type *class *perm_set"
 )EOF";
 
 static const char *type_msg_2 =
-R"EOF(Type 2:
-"<rule_name> ^source_type ^target_type ^class operation xperm_set"
-Rules: allowxperm, auditallowxperm, dontauditxperm
-- The only supported operation is ioctl
-- The only supported xperm_set format is range ([low-high])
+R"EOF("allowxperm *source_type *target_type *class operation xperm_set"
+"auditallowxperm *source_type *target_type *class operation xperm_set"
+"dontauditxperm *source_type *target_type *class operation xperm_set"
+- The only supported operation is 'ioctl'
+- xperm_set format is either 'low-high', 'value', or '*'.
+  '*' will be treated as '0x0000-0xFFFF'.
+  All values should be written in hexadecimal.
 )EOF";
 
 static const char *type_msg_3 =
-R"EOF(Type 3:
-"<rule_name> ^type"
-Rules: create, permissive, enforcing
+R"EOF("permissive ^type"
+"enforce ^type"
 )EOF";
 
 static const char *type_msg_4 =
-R"EOF(Type 4:
-"typeattribute ^type ^attribute"
+R"EOF("typeattribute ^type ^attribute"
 )EOF";
 
 static const char *type_msg_5 =
-R"EOF(Type 5:
-"<rule_name> source_type target_type class default_type"
-Rules: type_change, type_member
+R"EOF("type type_name ^(attribute)"
+- Argument 'attribute' is optional, default to 'domain'
 )EOF";
 
 static const char *type_msg_6 =
-R"EOF(Type 6:
-"type_transition source_type target_type class default_type (object_name)"
-- Entry 'object_name' is optional
+R"EOF("attribute attribute_name"
 )EOF";
 
 static const char *type_msg_7 =
-R"EOF(Type 7:
-"genfscon fs_name partial_path fs_context"
+R"EOF("type_transition source_type target_type class default_type (object_name)"
+- Argument 'object_name' is optional
+)EOF";
+
+static const char *type_msg_8 =
+R"EOF("type_change source_type target_type class default_type"
+"type_member source_type target_type class default_type"
+)EOF";
+
+static const char *type_msg_9 =
+R"EOF("genfscon fs_name partial_path fs_context"
 )EOF";
 
 void statement_help() {
@@ -61,8 +68,8 @@ Multiple policy statements can be provided in a single command.
 Statements has a format of "<rule_name> [args...]".
 Arguments labeled with (^) can accept one or more entries. Multiple
 entries consist of a space separated list enclosed in braces ({}).
-For args that support multiple entries, (*) can be used to
-represent all valid matches.
+Arguments labeled with (*) are the same as (^), but additionally
+support the match-all operator (*).
 
 Example: "allow { s1 s2 } { t1 t2 } class *"
 Will be expanded to:
@@ -81,15 +88,20 @@ Supported policy statements:
 %s
 %s
 %s
-)EOF", type_msg_1, type_msg_2, type_msg_3, type_msg_4, type_msg_5, type_msg_6, type_msg_7);
+%s
+%s
+)EOF", type_msg_1, type_msg_2, type_msg_3, type_msg_4,
+type_msg_5, type_msg_6, type_msg_7, type_msg_8, type_msg_9);
 	exit(0);
 }
 
-static bool tokenize_string(char *stmt, vector<vector<char *>> &arr) {
+using parsed_tokens = vector<vector<const char *>>;
+
+static bool tokenize_string(char *stmt, parsed_tokens &arr) {
 	// cur is the pointer to where the top level is parsing
 	char *cur = stmt;
 	for (char *tok; (tok = strtok_r(nullptr, " ", &cur)) != nullptr;) {
-		vector<char *> token;
+		vector<const char *> token;
 		if (tok[0] == '{') {
 			// cur could point to somewhere in the braces, restore the string
 			if (cur)
@@ -116,7 +128,7 @@ static bool tokenize_string(char *stmt, vector<vector<char *>> &arr) {
 
 // Check array size and all args listed in 'ones' have size = 1 (no multiple entries)
 template <int size, int ...ones>
-static bool check_tokens(vector<vector<char *>> &arr) {
+static bool check_tokens(parsed_tokens &arr) {
 	if (arr.size() != size)
 		return false;
 	initializer_list<int> list{ones...};
@@ -127,7 +139,7 @@ static bool check_tokens(vector<vector<char *>> &arr) {
 }
 
 template <int size, int ...ones>
-static bool tokenize_and_check(char *stmt, vector<vector<char *>> &arr) {
+static bool tokenize_and_check(char *stmt, parsed_tokens &arr) {
 	return tokenize_string(stmt, arr) && check_tokens<size, ones...>(arr);
 }
 
@@ -143,85 +155,112 @@ static void run_and_check(const Func &fn, const char *action, Args ...args) {
 
 #define run_fn(...) run_and_check(fn, action, __VA_ARGS__)
 
-// Pattern 1: action { source } { target } { class } { permission }
+// Pattern 1: allow { source } { target } { class } { permission }
 template <typename Func>
 static bool parse_pattern_1(const Func &fn, const char *action, char *stmt) {
-	vector<vector<char *>> arr;
+	parsed_tokens arr;
 	if (!tokenize_and_check<4>(stmt, arr))
 		return false;
-	for (char *src : arr[0])
-		for (char *tgt : arr[1])
-			for (char *cls : arr[2])
-				for (char *perm : arr[3])
+	for (auto src : arr[0])
+		for (auto tgt : arr[1])
+			for (auto cls : arr[2])
+				for (auto perm : arr[3])
 					run_fn(src, tgt, cls, perm);
 	return true;
 }
 
-// Pattern 2: action { source } { target } { class } ioctl range
+// Pattern 2: allowxperm { source } { target } { class } ioctl range
 template <typename Func>
 static bool parse_pattern_2(const Func &fn, const char *action, char *stmt) {
-	vector<vector<char *>> arr;
+	parsed_tokens arr;
 	if (!tokenize_and_check<5, 3, 4>(stmt, arr) || arr[3][0] != "ioctl"sv)
 		return false;
-	char *range = arr[4][0];
-	for (char *src : arr[0])
-		for (char *tgt : arr[1])
-			for (char *cls : arr[2])
+	auto range = arr[4][0];
+	for (auto src : arr[0])
+		for (auto tgt : arr[1])
+			for (auto cls : arr[2])
 				run_fn(src, tgt, cls, range);
 	return true;
 }
 
-// Pattern 3: action { type }
+// Pattern 3: permissive { type }
 template <typename Func>
 static bool parse_pattern_3(const Func &fn, const char *action, char *stmt) {
-	vector<vector<char *>> arr;
+	parsed_tokens arr;
 	if (!tokenize_and_check<1>(stmt, arr))
 		return false;
-	for (char *type : arr[0])
+	for (auto type : arr[0])
 		run_fn(type);
 	return true;
 }
 
-// Pattern 4: action { type } { attribute }
+// Pattern 4: typeattribute { type } { attribute }
 template <typename Func>
 static bool parse_pattern_4(const Func &fn, const char *action, char *stmt) {
-	vector<vector<char *>> arr;
+	parsed_tokens arr;
 	if (!tokenize_and_check<2>(stmt, arr))
 		return false;
-	for (char *type : arr[0])
-		for (char *attr : arr[1])
+	for (auto type : arr[0])
+		for (auto attr : arr[1])
 			run_fn(type, attr);
 	return true;
 }
 
-// Pattern 5: action source target class default
+// Pattern 5: type name { attribute }
 template <typename Func>
 static bool parse_pattern_5(const Func &fn, const char *action, char *stmt) {
-	vector<vector<char *>> arr;
-	if (!tokenize_and_check<4, 0, 1, 2, 3>(stmt, arr))
+	parsed_tokens arr;
+	string tmp_str;
+	if (!tokenize_string(stmt, arr))
 		return false;
-	run_fn(arr[0][0], arr[1][0], arr[2][0], arr[3][0]);
+	if (arr.size() == 1) {
+		arr.emplace_back(initializer_list<const char*>{ "domain" });
+	}
+	if (!check_tokens<2, 0>(arr))
+		return false;
+	for (auto attr : arr[1])
+		run_fn(arr[0][0], attr);
 	return true;
 }
 
-// Pattern 6: action source target class default (filename)
+// Pattern 6: attribute name
 template <typename Func>
 static bool parse_pattern_6(const Func &fn, const char *action, char *stmt) {
-	vector<vector<char *>> arr;
+	parsed_tokens arr;
+	if (!tokenize_and_check<1, 0>(stmt, arr))
+		return false;
+	run_fn(arr[0][1]);
+	return true;
+}
+
+// Pattern 7: type_transition source target class default (filename)
+template <typename Func>
+static bool parse_pattern_7(const Func &fn, const char *action, char *stmt) {
+	parsed_tokens arr;
 	if (!tokenize_string(stmt, arr))
 		return false;
 	if (arr.size() == 4)
-		arr.emplace_back(initializer_list<char*>{nullptr});
+		arr.emplace_back(initializer_list<const char*>{nullptr});
 	if (!check_tokens<5, 0, 1, 2, 3, 4>(arr))
 		return false;
 	run_fn(arr[0][0], arr[1][0], arr[2][0], arr[3][0], arr[4][0]);
 	return true;
 }
 
-// Pattern 7: action name path context
+// Pattern 8: type_change source target class default
 template <typename Func>
-static bool parse_pattern_7(const Func &fn, const char *action, char *stmt) {
-	vector<vector<char *>> arr;
+static bool parse_pattern_8(const Func &fn, const char *action, char *stmt) {
+	parsed_tokens arr;
+	if (!tokenize_and_check<4, 0, 1, 2, 3>(stmt, arr))
+		return false;
+	run_fn(arr[0][0], arr[1][0], arr[2][0], arr[3][0]);
+	return true;
+}
+
+// Pattern 9: genfscon name path context
+template <typename Func>
+static bool parse_pattern_9(const Func &fn, const char *action, char *stmt) {
+	parsed_tokens arr;
 	if (!tokenize_and_check<3, 0, 1, 2>(stmt, arr))
 		return false;
 	run_fn(arr[0][0], arr[1][0], arr[2][0]);
@@ -256,18 +295,20 @@ void sepolicy::parse_statement(const char *stmt) {
 	add_action(allowxperm, 2)
 	add_action(auditallowxperm, 2)
 	add_action(dontauditxperm, 2)
-	add_action(create, 3)
 	add_action(permissive, 3)
 	add_action(enforce, 3)
 	add_action(typeattribute, 4)
-	add_action(type_change, 5)
-	add_action(type_member, 5)
-	add_action(type_transition, 6)
-	add_action(genfscon, 7)
+	add_action(type, 5)
+	add_action(attribute, 6)
+	add_action(type_transition, 7)
+	add_action(type_change, 8)
+	add_action(type_member, 8)
+	add_action(genfscon, 9)
 
 	// Backwards compatible syntax
+	add_action(create, 3)
 	add_action_func("attradd", 4, typeattribute)
-	add_action_func("name_transition", 6, type_transition)
+	add_action_func("name_transition", 7, type_transition)
 
 	else { LOGW("Unknown action: '%s'\n\n", action); }
 }

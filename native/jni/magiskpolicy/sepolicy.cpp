@@ -513,7 +513,7 @@ bool sepol_impl::add_genfscon(const char *fs_name, const char *path, const char 
 	return true;
 }
 
-bool sepol_impl::create_domain(const char *type_name) {
+bool sepol_impl::add_type(const char *type_name, uint32_t flavor) {
 	type_datum_t *type = hashtab_find(db->p_types.table, type_name);
 	if (type) {
 		LOGW("Type %s already exists\n", type_name);
@@ -523,7 +523,7 @@ bool sepol_impl::create_domain(const char *type_name) {
 	type = auto_cast(xmalloc(sizeof(type_datum_t)));
 	type_datum_init(type);
 	type->primary = 1;
-	type->flavor = TYPE_TYPE;
+	type->flavor = flavor;
 
 	uint32_t value = 0;
 	if (symtab_insert(db, SYM_TYPES, strdup(type_name), type, SCOPE_DECL, 1, &value))
@@ -551,22 +551,21 @@ bool sepol_impl::create_domain(const char *type_name) {
 		type_set_expand(&db->role_val_to_struct[i]->types, &db->role_val_to_struct[i]->cache, db, 0);
 	}
 
-	set_attr("domain", value);
 	return true;
 }
 
-bool sepol_impl::set_domain_state(const char *s, bool permissive) {
+bool sepol_impl::set_type_state(const char *type_name, bool permissive) {
 	type_datum_t *type;
-	if (s == nullptr) {
+	if (type_name == nullptr) {
 		hashtab_for_each(db->p_types.table, [&](hashtab_ptr_t node) {
 			type = auto_cast(node->datum);
 			if (ebitmap_set_bit(&db->permissive_map, type->s.value, permissive))
 				LOGW("Could not set bit in permissive map\n");
 		});
 	} else {
-		type = hashtab_find(db->p_types.table, s);
+		type = hashtab_find(db->p_types.table, type_name);
 		if (type == nullptr) {
-			LOGW("type %s does not exist\n", s);
+			LOGW("type %s does not exist\n", type_name);
 			return false;
 		}
 		if (ebitmap_set_bit(&db->permissive_map, type->s.value, permissive)) {
@@ -577,28 +576,43 @@ bool sepol_impl::set_domain_state(const char *s, bool permissive) {
 	return true;
 }
 
-bool sepol_impl::add_typeattribute(const char *type, const char *attr) {
-	type_datum_t *domain = hashtab_find(db->p_types.table, type);
-	if (domain == nullptr) {
-		LOGW("type %s does not exist\n", type);
-		return false;
-	}
-
-	int attr_val = set_attr(attr, domain->s.value);
-	if (attr_val < 0)
-		return false;
+void sepol_impl::add_typeattribute(type_datum_t *type, type_datum_t *attr) {
+	ebitmap_set_bit(&db->type_attr_map[type->s.value - 1], attr->s.value - 1, 1);
+	ebitmap_set_bit(&db->attr_type_map[attr->s.value - 1], type->s.value - 1, 1);
 
 	hashtab_for_each(db->p_classes.table, [&](hashtab_ptr_t node){
 		auto cls = static_cast<class_datum_t *>(node->datum);
 		for (constraint_node_t *n = cls->constraints; n ; n = n->next) {
 			for (constraint_expr_t *e = n->expr; e; e = e->next) {
 				if (e->expr_type == CEXPR_NAMES &&
-					ebitmap_get_bit(&e->type_names->types, attr_val - 1)) {
-					ebitmap_set_bit(&e->names, domain->s.value - 1, 1);
+					ebitmap_get_bit(&e->type_names->types, attr->s.value - 1)) {
+					ebitmap_set_bit(&e->names, type->s.value - 1, 1);
 				}
 			}
 		}
 	});
+}
+
+bool sepol_impl::add_typeattribute(const char *type, const char *attr) {
+	type_datum_t *type_d = hashtab_find(db->p_types.table, type);
+	if (type_d == nullptr) {
+		LOGW("type %s does not exist\n", type);
+		return false;
+	} else if (type_d->flavor == TYPE_ATTRIB) {
+		LOGW("type %s is an attribute\n", attr);
+		return false;
+	}
+
+	type_datum *attr_d = hashtab_find(db->p_types.table, attr);
+	if (attr_d == nullptr) {
+		LOGW("attribute %s does not exist\n", type);
+		return false;
+	} else if (attr_d->flavor != TYPE_ATTRIB) {
+		LOGW("type %s is not an attribute \n", attr);
+		return false;
+	}
+
+	add_typeattribute(type_d, attr_d);
 	return true;
 }
 
@@ -666,17 +680,22 @@ bool sepolicy::type_transition(const char *s, const char *t, const char *c, cons
 
 bool sepolicy::permissive(const char *s) {
 	dprint(__FUNCTION__, s);
-	return impl->set_domain_state(s, true);
+	return impl->set_type_state(s, true);
 }
 
 bool sepolicy::enforce(const char *s) {
 	dprint(__FUNCTION__, s);
-	return impl->set_domain_state(s, false);
+	return impl->set_type_state(s, false);
 }
 
-bool sepolicy::create(const char *s) {
-	dprint(__FUNCTION__, s);
-	return impl->create_domain(s);
+bool sepolicy::type(const char *name, const char *attr) {
+	dprint(__FUNCTION__, name, attr);
+	return impl->add_type(name, TYPE_TYPE) && impl->add_typeattribute(name, attr);
+}
+
+bool sepolicy::attribute(const char *name) {
+	dprint(__FUNCTION__, name);
+	return impl->add_type(name, TYPE_ATTRIB);
 }
 
 bool sepolicy::typeattribute(const char *type, const char *attr) {
