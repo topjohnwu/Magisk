@@ -152,7 +152,6 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 		sepol = sepolicy::from_split();
 
 	sepol->magisk_rules();
-	sepol->allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 
 	// Custom rules
 	if (auto dir = open_dir(persist_dir.data()); dir) {

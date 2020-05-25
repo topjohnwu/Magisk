@@ -11,8 +11,6 @@ void sepol_impl::allow_su_client(const char *type) {
 		return;
 	allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
 	allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
-	allow(SEPOL_PROC_DOMAIN, type, "fd", "use");
-	allow(SEPOL_PROC_DOMAIN, type, "fifo_file", ALL);
 
 	// Allow binder service
 	allow(type, SEPOL_PROC_DOMAIN, "binder", "call");
@@ -36,15 +34,12 @@ void sepolicy::magisk_rules() {
 	auto bak = log_cb.w;
 	log_cb.w = nop_log;
 
-	// First prevent anything to change sepolicy except ourselves
+	// Prevent anything to change sepolicy except ourselves
 	deny(ALL, "kernel", "security", "load_policy");
 
-	if (!exists(SEPOL_PROC_DOMAIN))
-		create(SEPOL_PROC_DOMAIN);
-	if (!exists(SEPOL_FILE_DOMAIN))
-		create(SEPOL_FILE_DOMAIN);
+	type(SEPOL_PROC_DOMAIN, "domain");
+	type(SEPOL_FILE_DOMAIN, "file_type");
 	permissive(SEPOL_PROC_DOMAIN);
-
 	typeattribute(SEPOL_PROC_DOMAIN, "mlstrustedsubject");
 	typeattribute(SEPOL_PROC_DOMAIN, "netdomain");
 	typeattribute(SEPOL_PROC_DOMAIN, "bluetoothdomain");
@@ -66,18 +61,17 @@ void sepolicy::magisk_rules() {
 	allow("init", "tmpfs", "file", "getattr");
 	allow("init", "tmpfs", "file", "execute");
 
-	// Shell, properties, logs
-	if (exists("default_prop"))
-		allow(SEPOL_PROC_DOMAIN, "default_prop", "property_service", "set");
-	allow(SEPOL_PROC_DOMAIN, "init", "unix_stream_socket", "connectto");
-	allow(SEPOL_PROC_DOMAIN, "rootfs", "filesystem", "remount");
-	if (exists("logd"))
-		allow(SEPOL_PROC_DOMAIN, "logd", "unix_stream_socket", "connectto");
-	allow(SEPOL_PROC_DOMAIN, SEPOL_PROC_DOMAIN, ALL, ALL);
+	// Make our domain unconstrained
+	allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
+	// Allow us to do any ioctl on all block devices
+	if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
+		allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL);
 
-	// For sepolicy live patching
-	allow(SEPOL_PROC_DOMAIN, "kernel", "security", "read_policy");
-	allow(SEPOL_PROC_DOMAIN, "kernel", "security", "load_policy");
+	// Make our file type unconstrained
+	allow(ALL, SEPOL_FILE_DOMAIN, "file", ALL);
+	allow(ALL, SEPOL_FILE_DOMAIN, "dir", ALL);
+	allow(ALL, SEPOL_FILE_DOMAIN, "fifo_file", ALL);
+	allow(ALL, SEPOL_FILE_DOMAIN, "chr_file", ALL);
 
 	// Allow these processes to access MagiskSU
 	std::initializer_list<const char *> clients {
@@ -93,13 +87,6 @@ void sepolicy::magisk_rules() {
 	allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "read");
 	allow("servicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
 	allow("servicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
-	allow(SEPOL_PROC_DOMAIN, "servicemanager", "dir", "search");
-	allow(SEPOL_PROC_DOMAIN, "servicemanager", "dir", "read");
-	allow(SEPOL_PROC_DOMAIN, "servicemanager", "file", "open");
-	allow(SEPOL_PROC_DOMAIN, "servicemanager", "file", "read");
-	allow(SEPOL_PROC_DOMAIN, "servicemanager", "process", "getattr");
-	allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "transfer");
-	allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "call");
 	allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
 
 	// allowLog
@@ -108,12 +95,6 @@ void sepolicy::magisk_rules() {
 	allow("logd", SEPOL_PROC_DOMAIN, "file", "open");
 	allow("logd", SEPOL_PROC_DOMAIN, "file", "getattr");
 
-	// suBackL0
-	allow("system_server", SEPOL_PROC_DOMAIN, "binder", "call");
-	allow("system_server", SEPOL_PROC_DOMAIN, "binder", "transfer");
-	allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "call");
-	allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "transfer");
-
 	// suBackL6
 	allow("surfaceflinger", "app_data_file", "dir", ALL);
 	allow("surfaceflinger", "app_data_file", "file", ALL);
@@ -121,8 +102,7 @@ void sepolicy::magisk_rules() {
 	typeattribute("surfaceflinger", "mlstrustedsubject");
 
 	// suMiscL6
-	if (exists("audioserver"))
-		allow("audioserver", "audioserver", "process", "execmem");
+	allow("audioserver", "audioserver", "process", "execmem");
 
 	// Liveboot
 	allow("surfaceflinger", SEPOL_PROC_DOMAIN, "process", "ptrace");
@@ -146,38 +126,13 @@ void sepolicy::magisk_rules() {
 	allow("hwservicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
 
 	// For mounting loop devices, mirrors, tmpfs
-	allow(SEPOL_PROC_DOMAIN, "kernel", "process", "setsched");
-	allow(SEPOL_PROC_DOMAIN, "labeledfs", "filesystem", "mount");
-	allow(SEPOL_PROC_DOMAIN, "labeledfs", "filesystem", "unmount");
-	allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "mount");
-	allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "unmount");
 	allow("kernel", ALL, "file", "read");
 	allow("kernel", ALL, "file", "write");
-
-	// Allow us to do anything to any files/dir/links
-	allow(SEPOL_PROC_DOMAIN, ALL, "file", ALL);
-	allow(SEPOL_PROC_DOMAIN, ALL, "dir", ALL);
-	allow(SEPOL_PROC_DOMAIN, ALL, "lnk_file", ALL);
-	allow(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL);
-	allow(SEPOL_PROC_DOMAIN, ALL, "sock_file", ALL);
-	allow(SEPOL_PROC_DOMAIN, ALL, "chr_file", ALL);
-	allow(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
-
-	// Allow us to do any ioctl on all block devices
-	if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
-		allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", "0x0000-0xFFFF");
 
 	// Allow all binder transactions
 	allow(ALL, SEPOL_PROC_DOMAIN, "binder", ALL);
 
-	// Super files
-	allow(ALL, SEPOL_FILE_DOMAIN, "file", ALL);
-	allow(ALL, SEPOL_FILE_DOMAIN, "dir", ALL);
-	allow(ALL, SEPOL_FILE_DOMAIN, "fifo_file", ALL);
-	allow(ALL, SEPOL_FILE_DOMAIN, "chr_file", ALL);
-	allow(SEPOL_FILE_DOMAIN, ALL, "filesystem", "associate");
-
-	// For changing attributes
+	// For changing file context
 	allow("rootfs", "tmpfs", "filesystem", "associate");
 
 	// Xposed
