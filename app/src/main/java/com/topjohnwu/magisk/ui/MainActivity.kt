@@ -58,7 +58,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-        navigation?.addOnDestinationChangedListener { controller, destination, arguments ->
+        navigation?.addOnDestinationChangedListener { _, destination, _ ->
             isRoot = when (destination.id) {
                 R.id.homeFragment,
                 R.id.modulesFragment,
@@ -107,7 +107,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false) ->
                 HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
         }
-
 
         if (savedInstanceState != null) {
             if (!isRoot) {
