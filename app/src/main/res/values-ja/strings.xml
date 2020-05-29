@@ -22,7 +22,7 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(情報がありません)</string>
     <string name="no_modules_found">モジュールが見つかりません</string>
-    <string name="reboot_recovery">リカバリへ再起動</string>
+    <string name="reboot_recovery">Recovery へ再起動</string>
     <string name="reboot_bootloader">Bootloader へ再起動</string>
     <string name="reboot_download">Download へ再起動</string>
 
@@ -80,6 +80,8 @@
     <string name="setup_msg">環境セットアップを実行中…</string>
 
     <!--Settings Activity -->
+    <string name="settings_download_path_title">ダウンロードの場所</string>
+    <string name="settings_download_path_message">ファイルは %1$s に保存されます</string>
     <string name="settings_clear_cache_title">キャッシュを消去</string>
     <string name="settings_clear_cache_summary">オンラインリポジトリのキャッシュされた情報を消去し、アプリをオンラインで更新します</string>
     <string name="settings_hide_manager_title">Magisk Manager を隠す</string>
@@ -117,6 +119,8 @@
     <string name="superuser_notification">スーパーユーザー通知</string>
     <string name="settings_su_reauth_title">アップグレード後の再認証</string>
     <string name="settings_su_reauth_summary">アプリのアップグレード後にスーパーユーザー権限を再認証します</string>
+    <string name="settings_su_biometric_title">生体認証の有効化</string>
+    <string name="settings_su_biometric_summary">スーパーユーザーのリクエスト時に生体認証を使用します</string>
 
     <string name="multiuser_mode">マルチユーザーモード</string>
     <string name="settings_owner_only">端末の管理者のみ</string>
@@ -166,5 +170,15 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">システムアプリを表示</string>
+    <string name="authenticate">認証</string>
+    <string name="failure">失敗</string>
+    <string name="done">完了！</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
+    <string name="reboot_edl">EDL へ再起動</string>
+    <string name="settings_app_name_hint">新しい名前</string>
+    <string name="settings_app_name_helper">アプリはこの名前で再パッケージされます</string>
+    <string name="settings_app_name_error">不正なフォーマット</string>
+    <string name="no_biometric">サポートされていないデバイスまたは生体認証が有効化されていません</string>
 
 </resources>
