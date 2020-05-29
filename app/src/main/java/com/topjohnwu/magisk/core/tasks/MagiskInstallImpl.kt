@@ -41,6 +41,7 @@ abstract class MagiskInstallImpl : FlashResultListener {
 
     private val console: MutableList<String>
     private val logs: MutableList<String>
+    private var srcNand: String = ""
     private var tarOut: TarOutputStream? = null
 
     private val service: GithubRawServices by inject()
@@ -239,6 +240,11 @@ abstract class MagiskInstallImpl : FlashResultListener {
     }
 
     private fun patchBoot(): Boolean {
+        if ("[ -c $srcBoot ] && nanddump -f boot.img $srcBoot".sh().isSuccess) {
+            srcNand = srcBoot
+            srcBoot = File(installDir, "boot.img").path
+        }
+
         var isSigned = false
         try {
             SuFileInputStream(srcBoot).use {
@@ -256,6 +262,10 @@ abstract class MagiskInstallImpl : FlashResultListener {
                 "RECOVERYMODE=${Info.recovery} sh update-binary " +
                 "sh boot_patch.sh $srcBoot").sh().isSuccess) {
             return false
+        }
+
+        if (!srcNand.isEmpty()) {
+            srcBoot = srcNand
         }
 
         val job = Shell.sh(
