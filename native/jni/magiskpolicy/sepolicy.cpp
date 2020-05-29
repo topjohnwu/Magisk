@@ -107,19 +107,6 @@ static int avtab_remove_node(avtab_t *h, avtab_ptr_t node) {
 	return 0;
 }
 
-int sepol_impl::set_attr(const char *attr_name, int type_val) {
-	type_datum_t *attr = hashtab_find(db->p_types.table, attr_name);
-	if (!attr || attr->flavor != TYPE_ATTRIB)
-		return -1;
-
-	if (ebitmap_set_bit(&db->type_attr_map[type_val - 1], attr->s.value - 1, 1))
-		return -1;
-	if (ebitmap_set_bit(&db->attr_type_map[attr->s.value - 1], type_val - 1, 1))
-		return -1;
-
-	return attr->s.value;
-}
-
 void sepol_impl::check_avtab_node(avtab_ptr_t node) {
 	bool redundant;
 	if (node->key.specified == AVTAB_AUDITDENY)

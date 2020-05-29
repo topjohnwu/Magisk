@@ -5,7 +5,6 @@
 
 // Internal APIs, do not use directly
 struct sepol_impl : public sepolicy {
-	int set_attr(const char *attr_name, int type_val);
 	void check_avtab_node(avtab_ptr_t node);
 	avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms);
 	bool add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool invert);
