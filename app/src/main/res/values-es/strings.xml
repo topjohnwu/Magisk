@@ -1,18 +1,18 @@
 <resources>
 
     <!--Sections-->
-    <string name="modules">Modulos</string>
+    <string name="modules">Módulos</string>
     <string name="superuser">Superusuario</string>
     <string name="logs">Registros</string>
     <string name="settings">Ajustes</string>
-    <string name="refresh">Actualizar Datos Locales</string>
+    <string name="refresh">Actualizar datos locales</string>
     <string name="install">Instalar</string>
     <string name="section_home">Inicio</string>
     <string name="section_theme">Temas</string>
 
     <!--Home-->
-    <string name="no_connection">Conexión no Disponible</string>
-    <string name="app_changelog">Registro de Cambios</string>
+    <string name="no_connection">Conexión no disponible</string>
+    <string name="app_changelog">Registro de cambios</string>
 
     <string name="loading">Cargando…</string>
     <string name="info">Información</string>
@@ -24,10 +24,10 @@
     <string name="home_package">Paquete</string>
     <string name="details">Detalles</string>
 
-    <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto.  Una versión de origen desconocido podria realizar acciones maliciosas.</string>
-    <string name="home_support_title">Apoyanos</string>
-    <string name="home_links_project">Links del Proyecto</string>
-    <string name="home_item_source">Codigo Fuente</string>
+    <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto. Una versión de origen desconocido podria realizar acciones maliciosas.</string>
+    <string name="home_support_title">Apóyenos</string>
+    <string name="home_links_project">Enlaces del proyecto</string>
+    <string name="home_item_source">Código fuente</string>
     <string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
     <string name="home_device_title">Tu dispositivo</string>
     <string name="home_device_extra_manufacturer">Fabricante</string>
@@ -35,27 +35,27 @@
     <string name="home_device_extra_board">Placa</string>
     <string name="home_device_system">Android</string>
     <string name="home_status_normal">Normal</string>
-    <string name="home_status_safe">Modo Seguro</string>
+    <string name="home_status_safe">Modo seguro</string>
 
     <string name="invalid_update_channel">Canal de actualización inválido</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
+    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
-    <string name="recovery_mode">Modo Recovery</string>
+    <string name="recovery_mode">Modo recovery</string>
     <string name="install_options_title">Opciones</string>
     <string name="install_method_title">Método</string>
     <string name="install_next">Siguiente</string>
     <string name="install_start">Comencemos</string>
     <string name="manager_download_install">Pulse para descargar e instalar</string>
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
-    <string name="direct_install">Instalación Directa (Recomendado)</string>
+    <string name="direct_install">Instalación directa (recomendado)</string>
     <string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
-    <string name="install_inactive_slot_msg">¡Se forzará su dispositivo para que arranque en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\nContinuar?</string>
-    <string name="setup_title">Configuración Adicional</string>
-    <string name="select_patch_file">Seleccionar y parchear un archivo</string>
+    <string name="install_inactive_slot_msg">¡Su dispositivo será forzado a arrancar en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\n¿Continuar?</string>
+    <string name="setup_title">Configuración adicional</string>
+    <string name="select_patch_file">Seleccionar y parchar un archivo</string>
     <string name="patch_file_msg">Seleccione una imagen raw (* .img) o un archivo tar de ODIN (* .tar)</string>
     <string name="reboot_delay_toast">Reiniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>
@@ -104,8 +104,8 @@
     <string name="safetynet_res_invalid">La respuesta no es válida</string>
     <string name="safetynet_attest_success">¡Éxito!</string>
     <string name="safetynet_attest_failure">La certificación falló!</string>
-    <string name="safetynet_attest_loading">Solo un segundo…</string>
-    <string name="safetynet_attest_restart">Inténtalo de nuevo</string>
+    <string name="safetynet_attest_loading">Aguarde un segundo…</string>
+    <string name="safetynet_attest_restart">Inténtelo de nuevo</string>
     <string name="safetynet_system">Android</string>
 
     <!-- MagiskHide -->
@@ -118,10 +118,10 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>
     <string name="no_modules_found">No se encontraron módulos</string>
-    <string name="reboot_recovery">Reiniciar en Modo Recovery</string>
-    <string name="reboot_bootloader">Reiniciar en Modo Bootloader</string>
-    <string name="reboot_download">Reiniciar en Modo Download</string>
-    <string name="reboot_edl">Reiniciar en Modo EDL</string>
+    <string name="reboot_recovery">Reiniciar en modo recovery</string>
+    <string name="reboot_bootloader">Reiniciar en modo bootloader</string>
+    <string name="reboot_download">Reiniciar en modo download</string>
+    <string name="reboot_edl">Reiniciar en modo EDL</string>
     <string name="module_safe_mode_message">Estás en modo seguro. Ninguno de los módulos de usuario funcionará.\nEste mensaje desaparecerá una vez que se desactive el modo seguro.</string>
     <string name="module_version_author">%1$s por %2$s</string>
     <string name="module_section_pending">Actualizaciones</string>
@@ -137,7 +137,7 @@
     <string name="module_permission_declined">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
 
     <!--Settings -->
-    <string name="settings_dark_mode_title">Elegir Modo</string>
+    <string name="settings_dark_mode_title">Elegir modo</string>
     <string name="settings_dark_mode_message">¡Seleccione el modo que mejor se adapte a su estilo!</string>
     <string name="settings_dark_mode_light">Claro</string>
     <string name="settings_dark_mode_system">Seguir al sistema</string>
@@ -160,14 +160,14 @@
     <string name="system_default">(Idioma del sistema)</string>
     <string name="settings_check_update_title">Comprobar Actualizaciones</string>
     <string name="settings_check_update_summary">Buscar periódicamente en segundo plano si existen actualizaciones</string>
-    <string name="settings_update_channel_title">Canal de Actualización</string>
+    <string name="settings_update_channel_title">Canal de actualización</string>
     <string name="settings_update_stable">Estable</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Insertar una URL personalizada</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
-    <string name="settings_hosts_summary">Soporte para aplicaciones Adblock fuera de la partición system</string>
+    <string name="settings_hosts_summary">Soporte para bloqueadores de publicidad fuera de la partición system</string>
     <string name="settings_hosts_toast">Módulo systemless hosts agregado</string>
     <string name="settings_app_name_hint">Nuevo Nombre</string>
     <string name="settings_app_name_helper">La app se reempaquetará</string>
@@ -193,10 +193,10 @@
     <string name="no_biometric">Dispositivo no compatible o las configuraciones biométricas no están habilitadas</string>
     <string name="settings_customization">Personalización</string>
 
-    <string name="multiuser_mode">Modo MultiUsuario</string>
-    <string name="settings_owner_only">Sólo Administrador del Dispositivo</string>
-    <string name="settings_owner_manage">Administrador del Dispositivo</string>
-    <string name="settings_user_independent">Usuario Independiente</string>
+    <string name="multiuser_mode">Modo multiusuario</string>
+    <string name="settings_owner_only">Sólo administrador del dispositivo</string>
+    <string name="settings_owner_manage">Administrador del dispositivo</string>
+    <string name="settings_user_independent">Usuario independiente</string>
     <string name="owner_only_summary">Sólo el administrador tiene acceso root</string>
     <string name="owner_manage_summary">Sólo el administrador puede supervisar el acceso root y recibir solicitudes de otros usuarios</string>
     <string name="user_indepenent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
@@ -224,7 +224,7 @@
     <string name="yes">Si</string>
     <string name="no">No</string>
     <string name="repo_install_title">Instalar %1$s</string>
-    <string name="repo_install_msg">¿Quieres instalar %1$s ahora?</string>
+    <string name="repo_install_msg">¿Desea instalar %1$s ahora?</string>
     <string name="download">Descargar</string>
     <string name="reboot">Reiniciar</string>
     <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
@@ -236,19 +236,19 @@
     <string name="done">¡Hecho!</string>
     <string name="failure">Ha fallado</string>
     <string name="hide_manager_title">Ocultando Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
+    <string name="hide_manager_fail_toast">La ocultación de Magisk Manager ha fallado…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
     <string name="restore_img_msg">Restaurando …</string>
     <string name="restore_done">¡Restauración Terminada!</string>
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
-    <string name="proprietary_title">Descargar Código Propietario</string>
-    <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para la comprobación de SafetyNet?</string>
-    <string name="setup_fail">Instalación Fallida</string>
-    <string name="env_fix_title">Se Requiere una Instalación Adicional</string>
-    <string name="env_fix_msg">Su dispositivo requiere una instalación adicional para que Magisk funcione correctamente. Se descargará el zip de instalación de Magisk, desea continuar ahora?</string>
-    <string name="setup_msg">Ejecutando Configuración de Entorno</string>
+    <string name="proprietary_title">Descargar código propietario</string>
+    <string name="proprietary_notice">Magisk Manager es un software libre por lo que no contiene el código API de SafetyNet (código propietario de Google).\n\n ¿Desea permitir que Magisk Manager descargue una extensión (que contiene GoogleApiClient) para comprobar el estado de SafetyNet?</string>
+    <string name="setup_fail">Instalación fallida</string>
+    <string name="env_fix_title">Se requiere una instalación adicional</string>
+    <string name="env_fix_msg">Su dispositivo requiere una instalación adicional para que Magisk funcione correctamente. Se descargará el zip de instalación de Magisk, ¿desea continuar ahora?</string>
+    <string name="setup_msg">Ejecutando configuración de entorno</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versión de Magisk no soportada</string>
     <string name="unsupport_magisk_msg">Esta versión de Magisk Manager no admite versiones de Magisk inferiores a %1$s.\n\nLa aplicación se comportará como si no estuviera instalado Magisk, actualícelo tan pronto como sea posible.</string>
