@@ -411,8 +411,8 @@ flash_image() {
     [ $img_sz -gt $blk_sz ] && return 1
     eval $CMD1 | eval $CMD2 | cat - /dev/zero > "$2" 2>/dev/null
   elif [ -c "$2" ]; then
-    flash_eraseall "$2"
-    eval $CMD1 | eval $CMD2 | nandwrite -p "$2" -
+    flash_eraseall "$2" >&2
+    eval $CMD1 | eval $CMD2 | nandwrite -p "$2" - >&2
   else
     ui_print "- Not block or char device, storing image"
     eval $CMD1 | eval $CMD2 > "$2" 2>/dev/null
