@@ -94,7 +94,7 @@
     <string name="superuser_policy_none">Cap aplicació ha demanat permisos de superusuari.</string>
 
     <!--Logs-->
-    <string name="log_data_none">No hi ha cap registre. Provi d'utilitzar aplicacions que requereixen permisos de superusuari.</string>
+    <string name="log_data_none">No hi ha cap registre. Provi d\'utilitzar aplicacions que requereixen permisos de superusuari.</string>
     <string name="log_data_magisk_none">Els registre de Magisk estan buits. Això és estrany.</string>
     <string name="menuSaveLog">Desar registre</string>
     <string name="menuClearLog">Netejar registre ara</string>
