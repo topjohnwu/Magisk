@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
 
-    ndkVersion '0.0.0'
+    ndkVersion '99.99.99'
 
     externalNativeBuild {
         ndkBuild {

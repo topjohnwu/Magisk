@@ -55,8 +55,8 @@ arch64 = ['arm64-v8a', 'x86_64']
 support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'resetprop', 'busybox', 'test']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
-ndk_ver = '21b'
-ndk_ver_full = '21.1.6352462'
+ndk_ver = '21c'
+ndk_ver_full = '21.2.6472646'
 build_tools_ver = '29.0.3'
 
 ndk_root = op.join(os.environ['ANDROID_HOME'], 'ndk')
@@ -574,7 +574,7 @@ def setup_ndk(args):
     src_prop = op.join(ndk_path, 'source.properties')
     props = parse_props(src_prop)
     props['Pkg.Revision.orig'] = props['Pkg.Revision']
-    props['Pkg.Revision'] = '0.0.0'
+    props['Pkg.Revision'] = '99.99.99'
     with open(src_prop, 'w') as p:
         for key, val in props.items():
             print(f'{key} = {val}', file=p)
