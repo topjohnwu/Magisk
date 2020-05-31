@@ -560,10 +560,11 @@ def setup_ndk(args):
     rm_rf(op.join(ndk_path, 'sysroot'))
 
     header('* Replacing API-16 static libs')
-    for arch in ['arm', 'i686']:
+    for target in ['arm-linux-androideabi', 'i686-linux-android']:
+      arch = target.split('-')[0]
       lib_dir = op.join(
         ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
-        'sysroot', 'usr', 'lib', f'{arch}-linux-androideabi', '16')
+        'sysroot', 'usr', 'lib', f'{target}', '16')
       src_dir = op.join('tools', 'ndk-bins', arch)
       # Remove stupid macOS crap
       rm(op.join(src_dir, '.DS_Store'))
