@@ -239,6 +239,12 @@ abstract class MagiskInstallImpl : FlashResultListener {
     }
 
     private fun patchBoot(): Boolean {
+        var srcNand = ""
+        if ("[ -c $srcBoot ] && nanddump -f boot.img $srcBoot".sh().isSuccess) {
+            srcNand = srcBoot
+            srcBoot = File(installDir, "boot.img").path
+        }
+
         var isSigned = false
         try {
             SuFileInputStream(srcBoot).use {
@@ -256,6 +262,10 @@ abstract class MagiskInstallImpl : FlashResultListener {
                 "RECOVERYMODE=${Info.recovery} sh update-binary " +
                 "sh boot_patch.sh $srcBoot").sh().isSuccess) {
             return false
+        }
+
+        if (srcNand.isNotEmpty()) {
+            srcBoot = srcNand
         }
 
         val job = Shell.sh(
