@@ -1,7 +1,6 @@
 #include <initializer_list>
 
 #include <logging.hpp>
-#include <flags.h>
 #include <magiskpolicy.hpp>
 
 #include "sepolicy.hpp"

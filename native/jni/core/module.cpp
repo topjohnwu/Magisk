@@ -7,15 +7,10 @@
 #include <selinux.hpp>
 #include <daemon.hpp>
 #include <resetprop.hpp>
-#include <flags.h>
 
 using namespace std;
 
-#ifdef MAGISK_DEBUG
 #define VLOGI(tag, from, to) LOGI("%-8s: %s <- %s\n", tag, to, from)
-#else
-#define VLOGI(tag, from, to) LOGI("%-8s: %s\n", tag, to)
-#endif
 
 #define TYPE_MIRROR  (1 << 0)    /* mount from mirror */
 #define TYPE_INTER   (1 << 1)    /* intermediate node */

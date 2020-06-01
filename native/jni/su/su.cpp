@@ -23,7 +23,7 @@
 
 #include <daemon.hpp>
 #include <utils.hpp>
-#include <flags.h>
+#include <flags.hpp>
 
 #include "su.hpp"
 #include "pts.hpp"
@@ -34,7 +34,7 @@ static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
 
 	fprintf(stream,
-	NAME_WITH_VER(MagiskSU) "\n\n"
+	"MagiskSU\n\n"
 	"Usage: su [options] [-] [user [argument...]]\n\n"
 	"Options:\n"
 	"  -c, --command COMMAND         pass COMMAND to the invoked shell\n"

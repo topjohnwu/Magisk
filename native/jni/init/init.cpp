@@ -1,8 +1,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/sysmacros.h>
-#include <stdio.h>
-#include <string.h>
 #include <fcntl.h>
 #include <libgen.h>
 #include <vector>
@@ -11,7 +9,6 @@
 #include <magisk.hpp>
 #include <cpio.hpp>
 #include <utils.hpp>
-#include <flags.h>
 
 #include "binaries.h"
 #ifdef USE_64BIT
@@ -26,47 +23,6 @@ using namespace std;
 
 constexpr int (*init_applet_main[])(int, char *[]) =
 		{ magiskpolicy_main, magiskpolicy_main, nullptr };
-
-#ifdef MAGISK_DEBUG
-static FILE *kmsg;
-static char kmsg_buf[4096];
-static int vprintk(const char *fmt, va_list ap) {
-	vsnprintf(kmsg_buf + 12, sizeof(kmsg_buf) - 12, fmt, ap);
-	return fprintf(kmsg, "%s", kmsg_buf);
-}
-void setup_klog() {
-	// Shut down first 3 fds
-	int fd;
-	if (access("/dev/null", W_OK) == 0) {
-		fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
-	} else {
-		mknod("/null", S_IFCHR | 0666, makedev(1, 3));
-		fd = xopen("/null", O_RDWR | O_CLOEXEC);
-		unlink("/null");
-	}
-	xdup3(fd, STDIN_FILENO, O_CLOEXEC);
-	xdup3(fd, STDOUT_FILENO, O_CLOEXEC);
-	xdup3(fd, STDERR_FILENO, O_CLOEXEC);
-	if (fd > STDERR_FILENO)
-		close(fd);
-
-	if (access("/dev/kmsg", W_OK) == 0) {
-		fd = xopen("/dev/kmsg", O_WRONLY | O_CLOEXEC);
-	} else {
-		mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
-		fd = xopen("/kmsg", O_WRONLY | O_CLOEXEC);
-		unlink("/kmsg");
-	}
-
-	kmsg = fdopen(fd, "w");
-	setbuf(kmsg, nullptr);
-	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
-	log_cb.ex = nop_ex;
-	strcpy(kmsg_buf, "magiskinit: ");
-}
-#else
-void setup_klog() {}
-#endif
 
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
@@ -193,7 +149,7 @@ int main(int argc, char *argv[]) {
 			return (*init_applet_main[i])(argc, argv);
 	}
 
-#ifdef MAGISK_DEBUG
+#if 0
 	if (getenv("INIT_TEST") != nullptr)
 		return test_main(argc, argv);
 #endif
@@ -207,12 +163,12 @@ int main(int argc, char *argv[]) {
 
 	if (getpid() != 1)
 		return 1;
-	setup_klog();
 
 	BaseInit *init;
 	cmdline cmd{};
 
 	if (argc > 1 && argv[1] == "selinux_setup"sv) {
+		setup_klog();
 		init = new SecondStageInit(argv);
 	} else {
 		// This will also mount /sys and /proc

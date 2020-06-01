@@ -13,7 +13,7 @@
 #include <selinux.hpp>
 #include <db.hpp>
 #include <resetprop.hpp>
-#include <flags.h>
+#include <flags.hpp>
 
 using namespace std;
 
@@ -129,16 +129,14 @@ shortcut:
 	close(client);
 }
 
+#define vlog __android_log_vprint
+
 static void android_logging() {
 	static constexpr char TAG[] = "Magisk";
-#ifdef MAGISK_DEBUG
-	log_cb.d = [](auto fmt, auto ap){ return __android_log_vprint(ANDROID_LOG_DEBUG, TAG, fmt, ap); };
-#else
-	log_cb.d = nop_log;
-#endif
-	log_cb.i = [](auto fmt, auto ap){ return __android_log_vprint(ANDROID_LOG_INFO, TAG, fmt, ap); };
-	log_cb.w = [](auto fmt, auto ap){ return __android_log_vprint(ANDROID_LOG_WARN, TAG, fmt, ap); };
-	log_cb.e = [](auto fmt, auto ap){ return __android_log_vprint(ANDROID_LOG_ERROR, TAG, fmt, ap); };
+	log_cb.d = [](auto fmt, auto ap){ return vlog(ANDROID_LOG_DEBUG, TAG, fmt, ap); };
+	log_cb.i = [](auto fmt, auto ap){ return vlog(ANDROID_LOG_INFO, TAG, fmt, ap); };
+	log_cb.w = [](auto fmt, auto ap){ return vlog(ANDROID_LOG_WARN, TAG, fmt, ap); };
+	log_cb.e = [](auto fmt, auto ap){ return vlog(ANDROID_LOG_ERROR, TAG, fmt, ap); };
 	log_cb.ex = nop_ex;
 }
 

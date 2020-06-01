@@ -10,7 +10,6 @@
 
 #include <daemon.hpp>
 #include <utils.hpp>
-#include <flags.h>
 
 #include "magiskhide.hpp"
 
@@ -18,7 +17,7 @@ using namespace std::literals;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-		NAME_WITH_VER(MagiskHide) "\n\n"
+		"MagiskHide - Hide Config CLI\n\n"
 		"Usage: %s [action [arguments...] ]\n\n"
 		"Actions:\n"
   		"   status          Return the status of magiskhide\n"
@@ -106,7 +105,7 @@ int magiskhide_main(int argc, char *argv[]) {
 		execvp(argv[2], argv + 2);
 		exit(1);
 	}
-#ifdef MAGISK_DEBUG
+#if 0
 	else if (opt == "test"sv)
 		test_proc_monitor();
 #endif

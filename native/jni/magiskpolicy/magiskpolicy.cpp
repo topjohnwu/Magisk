@@ -1,9 +1,5 @@
-#include <stdio.h>
-#include <limits.h>
-
 #include <logging.hpp>
 #include <utils.hpp>
-#include <flags.h>
 #include <magiskpolicy.hpp>
 
 #include "sepolicy.hpp"
@@ -12,7 +8,7 @@ using namespace std::literals;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-NAME_WITH_VER(MagiskPolicy) R"EOF(
+R"EOF(MagiskPolicy - Sepolicy Patch Tool
 
 Usage: %s [--options...] [policy statements...]
 

@@ -1,21 +1,17 @@
 #include <sys/mount.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <libgen.h>
-#include <string.h>
 
 #include <utils.hpp>
 #include <magisk.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
-#include <flags.h>
+#include <flags.hpp>
 
-using namespace std::literals;
+using namespace std;
 
 [[noreturn]] static void usage() {
 	fprintf(stderr,
-NAME_WITH_VER(Magisk) R"EOF( multi-call binary
+R"EOF(Magisk - Multi-purpose Utility
 
 Usage: magisk [applet [arguments]...]
    or: magisk [options]...

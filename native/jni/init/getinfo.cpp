@@ -87,18 +87,58 @@ static bool check_key_combo() {
 	return false;
 }
 
-void load_kernel_info(cmdline *cmd) {
-	// Communicate with kernel using procfs and sysfs
-	xmkdir("/proc", 0755);
-	xmount("proc", "/proc", "proc", 0, nullptr);
-	xmkdir("/sys", 0755);
-	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
+static FILE *kmsg;
+static char kmsg_buf[4096];
+static int vprintk(const char *fmt, va_list ap) {
+	vsnprintf(kmsg_buf + 12, sizeof(kmsg_buf) - 12, fmt, ap);
+	return fprintf(kmsg, "%s", kmsg_buf);
+}
+void setup_klog() {
+	// Shut down first 3 fds
+	int fd;
+	if (access("/dev/null", W_OK) == 0) {
+		fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
+	} else {
+		mknod("/null", S_IFCHR | 0666, makedev(1, 3));
+		fd = xopen("/null", O_RDWR | O_CLOEXEC);
+		unlink("/null");
+	}
+	xdup3(fd, STDIN_FILENO, O_CLOEXEC);
+	xdup3(fd, STDOUT_FILENO, O_CLOEXEC);
+	xdup3(fd, STDERR_FILENO, O_CLOEXEC);
+	if (fd > STDERR_FILENO)
+		close(fd);
+
+	if (access("/dev/kmsg", W_OK) == 0) {
+		fd = xopen("/dev/kmsg", O_WRONLY | O_CLOEXEC);
+	} else {
+		mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
+		fd = xopen("/kmsg", O_WRONLY | O_CLOEXEC);
+		unlink("/kmsg");
+	}
+
+	kmsg = fdopen(fd, "w");
+	setbuf(kmsg, nullptr);
+	log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
+	log_cb.ex = nop_ex;
+	strcpy(kmsg_buf, "magiskinit: ");
 
 	// Disable kmsg rate limiting
 	if (FILE *rate = fopen("/proc/sys/kernel/printk_devkmsg", "w")) {
 		fprintf(rate, "on\n");
 		fclose(rate);
 	}
+}
+
+void load_kernel_info(cmdline *cmd) {
+	// Get kernel data using procfs and sysfs
+	xmkdir("/proc", 0755);
+	xmount("proc", "/proc", "proc", 0, nullptr);
+	xmkdir("/sys", 0755);
+	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
+
+	// Log to kernel
+	setup_klog();
 
 	parse_cmdline([&](auto key, auto value) -> void {
 		if (key == "androidboot.slot_suffix") {

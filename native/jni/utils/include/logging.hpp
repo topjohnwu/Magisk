@@ -1,17 +1,15 @@
 #pragma once
 
-#include <errno.h>
-#include <stdarg.h>
-#include <string.h>
+#include <cerrno>
+#include <cstdarg>
+#include <cstring>
 
-__BEGIN_DECLS
-
-typedef enum {
+enum {
 	L_DEBUG,
 	L_INFO,
 	L_WARN,
 	L_ERR
-} log_type;
+};
 
 struct log_callback {
 	int (*d)(const char* fmt, va_list ap);
@@ -21,20 +19,19 @@ struct log_callback {
 	void (*ex)(int code);
 };
 
-extern struct log_callback log_cb;
+extern log_callback log_cb;
 
-#define LOGD(...) log_handler(L_DEBUG, __VA_ARGS__)
-#define LOGI(...) log_handler(L_INFO, __VA_ARGS__)
-#define LOGW(...) log_handler(L_WARN, __VA_ARGS__)
-#define LOGE(...) log_handler(L_ERR, __VA_ARGS__)
-#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, strerror(errno))
+#define LOGD(...) log_handler<L_DEBUG>(__VA_ARGS__)
+#define LOGI(...) log_handler<L_INFO>(__VA_ARGS__)
+#define LOGW(...) log_handler<L_WARN>(__VA_ARGS__)
+#define LOGE(...) log_handler<L_ERR>(__VA_ARGS__)
+#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, std::strerror(errno))
 
-int nop_log(const char *fmt, va_list ap);
-void nop_ex(int i);
+int nop_log(const char *, va_list);
+void nop_ex(int);
 
 void no_logging();
 void cmdline_logging();
 
-int log_handler(log_type t, const char *fmt, ...);
-
-__END_DECLS
+template<int type>
+void log_handler(const char *fmt, ...) __printflike(1, 2);

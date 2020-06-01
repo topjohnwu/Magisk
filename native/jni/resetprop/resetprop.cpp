@@ -6,7 +6,6 @@
 #include <logging.hpp>
 #include <resetprop.hpp>
 #include <utils.hpp>
-#include <flags.h>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include <_system_properties.h>
@@ -22,7 +21,7 @@ static int (*system_property_set)(const char*, const char*);
 
 [[noreturn]] static void usage(char* arg0) {
 	fprintf(stderr,
-NAME_WITH_VER(resetprop) R"EOF(" - System Props Modification Tool
+R"EOF("resetprop - System Props Modification Tool
 
 Usage: %s [flags] [options...]
 

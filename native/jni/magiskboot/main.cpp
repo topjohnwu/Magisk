@@ -1,13 +1,12 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include <unistd.h>
 #include <sys/mman.h>
 
 #include <mincrypt/sha.h>
 #include <logging.hpp>
 #include <utils.hpp>
-#include <flags.h>
 
 #include "magiskboot.hpp"
 #include "compress.hpp"
@@ -16,7 +15,7 @@ using namespace std;
 
 static void usage(char *arg0) {
 	fprintf(stderr,
-NAME_WITH_VER(MagiskBoot) R"EOF( - Boot Image Modification Tool
+R"EOF(MagiskBoot - Boot Image Modification Tool
 
 Usage: %s <action> [args...]
 
