@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define VLOGI(tag, from, to) LOGI("%-8s: %s <- %s\n", tag, to, from)
+#define VLOGD(tag, from, to) LOGD("%-8s: %s <- %s\n", tag, to, from)
 
 #define TYPE_MIRROR  (1 << 0)    /* mount from mirror */
 #define TYPE_INTER   (1 << 1)    /* intermediate node */
@@ -35,7 +35,7 @@ template<class T> static bool isa(node_entry *node);
 static int bind_mount(const char *from, const char *to) {
 	int ret = xmount(from, to, nullptr, MS_BIND, nullptr);
 	if (ret == 0)
-		VLOGI("bind_mnt", from, to);
+		VLOGD("bind_mnt", from, to);
 	return ret;
 }
 
@@ -452,7 +452,7 @@ bool dir_node::collect_files(const char *module, int dfd) {
 void node_entry::create_and_mount(const string &src) {
 	const string &dest = node_path();
 	if (is_lnk()) {
-		VLOGI("cp_link", src.data(), dest.data());
+		VLOGD("cp_link", src.data(), dest.data());
 		cp_afc(src.data(), dest.data());
 	} else {
 		if (is_dir())
@@ -486,7 +486,7 @@ void skel_node::mount() {
 	if (!isa<skel_node>(parent())) {
 		// We don't need another layer of tmpfs if parent is skel
 		xmount("tmpfs", dest.data(), "tmpfs", 0, nullptr);
-		VLOGI("mnt_tmp", "tmpfs", dest.data());
+		VLOGD("mnt_tmp", "tmpfs", dest.data());
 	}
 	setattr(dest.data(), &a);
 	dir_node::mount();
@@ -505,13 +505,13 @@ public:
 		if (name() == "magisk") {
 			for (int i = 0; applet_names[i]; ++i) {
 				string dest = dir_name + "/" + applet_names[i];
-				VLOGI("create", "./magisk", dest.data());
+				VLOGD("create", "./magisk", dest.data());
 				xsymlink("./magisk", dest.data());
 			}
 		} else {
 			for (int i = 0; init_applet[i]; ++i) {
 				string dest = dir_name + "/" + init_applet[i];
-				VLOGI("create", "./magiskinit", dest.data());
+				VLOGD("create", "./magiskinit", dest.data());
 				xsymlink("./magiskinit", dest.data());
 			}
 		}
