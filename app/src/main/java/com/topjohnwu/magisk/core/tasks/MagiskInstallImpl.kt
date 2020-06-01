@@ -41,7 +41,6 @@ abstract class MagiskInstallImpl : FlashResultListener {
 
     private val console: MutableList<String>
     private val logs: MutableList<String>
-    private var srcNand: String = ""
     private var tarOut: TarOutputStream? = null
 
     private val service: GithubRawServices by inject()
@@ -240,6 +239,7 @@ abstract class MagiskInstallImpl : FlashResultListener {
     }
 
     private fun patchBoot(): Boolean {
+        var srcNand = ""
         if ("[ -c $srcBoot ] && nanddump -f boot.img $srcBoot".sh().isSuccess) {
             srcNand = srcBoot
             srcBoot = File(installDir, "boot.img").path
