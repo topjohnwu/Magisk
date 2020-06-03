@@ -54,6 +54,7 @@ android {
         exclude '/org/bouncycastle/**'
         exclude '/kotlin/**'
         exclude '/kotlinx/**'
+        exclude '/okhttp3/**'
     }
 
     kotlinOptions {
