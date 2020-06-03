@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.di
 
 import android.content.Context
 import com.squareup.moshi.Moshi
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawServices
@@ -16,7 +15,6 @@ import okhttp3.Dns
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
-import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -36,12 +34,10 @@ val networkingModule = module {
 fun createOkHttpClient(context: Context): OkHttpClient {
     val builder = OkHttpClient.Builder()
 
-    if (BuildConfig.DEBUG) {
-        val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.HEADERS
-        }
-        builder.addInterceptor(httpLoggingInterceptor)
-    }
+//    val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
+//        level = HttpLoggingInterceptor.Level.HEADERS
+//    }
+//    builder.addInterceptor(httpLoggingInterceptor)
 
     if (!Networking.init(context)) {
         builder.sslSocketFactory(NoSSLv3SocketFactory())
