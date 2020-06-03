@@ -657,11 +657,11 @@ bool sepolicy::type_member(const char *s, const char *t, const char *c, const ch
 
 bool sepolicy::type_transition(const char *s, const char *t, const char *c, const char *d, const char *o) {
 	if (o) {
-		dprint(__FUNCTION__, s, t, c, d);
-		return impl->add_type_rule(s, t, c, d, AVTAB_TRANSITION);
-	} else {
 		dprint(__FUNCTION__, s, t, c, d, o);
 		return impl->add_filename_trans(s, t, c, d, o);
+	} else {
+		dprint(__FUNCTION__, s, t, c, d);
+		return impl->add_type_rule(s, t, c, d, AVTAB_TRANSITION);
 	}
 }
 
