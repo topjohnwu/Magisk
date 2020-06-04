@@ -83,7 +83,7 @@ rm -f $APK
 )EOF";
 
 void install_apk(const char *apk) {
-	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon(apk, "u:object_r:" SEPOL_FILE_TYPE ":s0");
 	exec_t exec {
 		.pre_exec = set_standalone,
 		.fork = fork_no_zombie

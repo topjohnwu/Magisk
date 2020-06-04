@@ -20,7 +20,6 @@ struct sepol_impl : public sepolicy {
 	void add_typeattribute(type_datum_t *type, type_datum_t *attr);
 	bool add_typeattribute(const char *type, const char *attr);
 	void strip_dontaudit();
-	void allow_su_client(const char *type);
 };
 
 #define impl static_cast<sepol_impl *>(this)

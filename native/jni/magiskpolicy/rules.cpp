@@ -1,32 +1,7 @@
-#include <initializer_list>
-
 #include <logging.hpp>
 #include <magiskpolicy.hpp>
 
 #include "sepolicy.hpp"
-
-void sepol_impl::allow_su_client(const char *type) {
-	if (!exists(type))
-		return;
-	allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
-	allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
-
-	// Allow binder service
-	allow(type, SEPOL_PROC_DOMAIN, "binder", "call");
-	allow(type, SEPOL_PROC_DOMAIN, "binder", "transfer");
-
-	// Allow termios ioctl
-	allow(type, "devpts", "chr_file", "ioctl");
-	allow(type, "untrusted_app_devpts", "chr_file", "ioctl");
-	allow(type, "untrusted_app_25_devpts", "chr_file", "ioctl");
-	allow(type, "untrusted_app_all_devpts", "chr_file", "ioctl");
-	if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
-		allowxperm(type, "devpts", "chr_file", "0x5400-0x54FF");
-		allowxperm(type, "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
-		allowxperm(type, "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
-		allowxperm(type, "untrusted_app_all_devpts", "chr_file", "0x5400-0x54FF");
-	}
-}
 
 void sepolicy::magisk_rules() {
 	// Temp suppress warnings
@@ -37,18 +12,86 @@ void sepolicy::magisk_rules() {
 	deny(ALL, "kernel", "security", "load_policy");
 
 	type(SEPOL_PROC_DOMAIN, "domain");
-	type(SEPOL_FILE_DOMAIN, "file_type");
-	permissive(SEPOL_PROC_DOMAIN);
+	type(SEPOL_CLIENT_DOMAIN, "domain");
+	type(SEPOL_FILE_TYPE, "file_type");
+	type(SEPOL_EXEC_TYPE, "file_type");
+	permissive(SEPOL_PROC_DOMAIN);  /* Just in case something is missing */
 	typeattribute(SEPOL_PROC_DOMAIN, "mlstrustedsubject");
 	typeattribute(SEPOL_PROC_DOMAIN, "netdomain");
 	typeattribute(SEPOL_PROC_DOMAIN, "bluetoothdomain");
-	typeattribute(SEPOL_FILE_DOMAIN, "mlstrustedobject");
+	typeattribute(SEPOL_FILE_TYPE, "mlstrustedobject");
+
+	// Make our root domain unconstrained
+	allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
+	// Allow us to do any ioctl on all block devices
+	if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
+		allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL);
+
+	// Create unconstrained file type
+	allow(ALL, SEPOL_FILE_TYPE, "file", ALL);
+	allow(ALL, SEPOL_FILE_TYPE, "dir", ALL);
+	allow(ALL, SEPOL_FILE_TYPE, "fifo_file", ALL);
+	allow(ALL, SEPOL_FILE_TYPE, "chr_file", ALL);
+
+	// Basic su client needs
+	allow(SEPOL_CLIENT_DOMAIN, ALL, "fd", "use");
+	allow(SEPOL_CLIENT_DOMAIN, SEPOL_CLIENT_DOMAIN, ALL, ALL);
+	allow(SEPOL_CLIENT_DOMAIN, SEPOL_EXEC_TYPE, "file", ALL);
+	allow(SEPOL_CLIENT_DOMAIN, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
+	allow(SEPOL_CLIENT_DOMAIN, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
+
+	// Allow su client to manipulate pts
+	const char *pts[] {
+		"devpts", "untrusted_app_devpts", "untrusted_app_25_devpts", "untrusted_app_all_devpts" };
+	for (auto type : pts) {
+		allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "read");
+		allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "write");
+		allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "getattr");
+		allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "ioctl");
+		if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
+			allowxperm(SEPOL_CLIENT_DOMAIN, type, "chr_file", "0x5400-0x54FF");
+	}
+
+	// Allow these processes to access MagiskSU
+	const char *clients[] {
+		"init", "shell", "system_app", "priv_app", "platform_app", "untrusted_app",
+		"untrusted_app_25", "untrusted_app_27", "untrusted_app_29", "update_engine" };
+	for (auto type : clients) {
+		if (!exists(type))
+			continue;
+		// exec magisk
+		allow(type, SEPOL_EXEC_TYPE, "file", "read");
+		allow(type, SEPOL_EXEC_TYPE, "file", "open");
+		allow(type, SEPOL_EXEC_TYPE, "file", "getattr");
+		allow(type, SEPOL_EXEC_TYPE, "file", "execute");
+
+		// Auto transit to client domain
+		type_transition(type, SEPOL_EXEC_TYPE, "process", SEPOL_CLIENT_DOMAIN);
+		allow(type, SEPOL_CLIENT_DOMAIN, "process", "transition");
+		dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "siginh");
+		dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "rlimitinh");
+		dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "noatsecure");
+
+		allow(SEPOL_CLIENT_DOMAIN, type, "process", "sigchld");
+		allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "read");
+		allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "write");
+		allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "ioctl");
+	}
+
+	// Allow system_server to manage magisk_client
+	allow("system_server", SEPOL_CLIENT_DOMAIN, "process", "getpgid");
+	allow("system_server", SEPOL_CLIENT_DOMAIN, "process", "sigkill");
+
+	// Don't allow pesky processes to monitor audit deny logs when poking magisk daemon sockets
+	dontaudit(ALL, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
 
 	// Let everyone access tmpfs files (for SAR sbin overlay)
 	allow(ALL, "tmpfs", "file", ALL);
 
-	// For normal rootfs file/directory operations when rw (for SAR / overlay)
+	// For relabelling files
 	allow("rootfs", "labeledfs", "filesystem", "associate");
+	allow(SEPOL_FILE_TYPE, "pipefs", "filesystem", "associate");
+	allow(SEPOL_FILE_TYPE, "devpts", "filesystem", "associate");
 
 	// Let init transit to SEPOL_PROC_DOMAIN
 	allow("kernel", "kernel", "process", "setcurrent");
@@ -59,25 +102,6 @@ void sepolicy::magisk_rules() {
 	allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
 	allow("init", "tmpfs", "file", "getattr");
 	allow("init", "tmpfs", "file", "execute");
-
-	// Make our domain unconstrained
-	allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
-	// Allow us to do any ioctl on all block devices
-	if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
-		allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL);
-
-	// Make our file type unconstrained
-	allow(ALL, SEPOL_FILE_DOMAIN, "file", ALL);
-	allow(ALL, SEPOL_FILE_DOMAIN, "dir", ALL);
-	allow(ALL, SEPOL_FILE_DOMAIN, "fifo_file", ALL);
-	allow(ALL, SEPOL_FILE_DOMAIN, "chr_file", ALL);
-
-	// Allow these processes to access MagiskSU
-	std::initializer_list<const char *> clients {
-		"init", "shell", "system_app", "priv_app", "platform_app", "untrusted_app",
-		"untrusted_app_25", "untrusted_app_27", "untrusted_app_29", "update_engine" };
-	for (auto type : clients)
-		impl->allow_su_client(type);
 
 	// suRights
 	allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");

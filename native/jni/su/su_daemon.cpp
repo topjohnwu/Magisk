@@ -275,9 +275,9 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	xdup2(errfd, STDERR_FILENO);
 
 	// Unleash all streams from SELinux hell
-	setfilecon("/proc/self/fd/0", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	setfilecon("/proc/self/fd/1", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	setfilecon("/proc/self/fd/2", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/proc/self/fd/0", "u:object_r:" SEPOL_FILE_TYPE ":s0");
+	setfilecon("/proc/self/fd/1", "u:object_r:" SEPOL_FILE_TYPE ":s0");
+	setfilecon("/proc/self/fd/2", "u:object_r:" SEPOL_FILE_TYPE ":s0");
 
 	close(infd);
 	close(outfd);
