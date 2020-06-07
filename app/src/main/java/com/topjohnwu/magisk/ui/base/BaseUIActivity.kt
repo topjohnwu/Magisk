@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.base
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
@@ -94,6 +95,10 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     override fun onResume() {
         super.onResume()
         delegate.onResume()
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        return currentFragment?.onKeyEvent(event) == true || super.dispatchKeyEvent(event)
     }
 
     override fun onEventDispatched(event: ViewEvent) {

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -60,6 +61,14 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
             activity.requestedOrientation = defaultOrientation
         }
         super.onDestroyView()
+    }
+
+    override fun onKeyEvent(event: KeyEvent): Boolean {
+        return when(event.keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP,
+            KeyEvent.KEYCODE_VOLUME_DOWN -> true
+            else -> false
+        }
     }
 
     override fun onBackPressed(): Boolean {
