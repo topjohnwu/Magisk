@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.base
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,6 +50,10 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
     override fun onEventDispatched(event: ViewEvent) {
         super.onEventDispatched(event)
         delegate.onEventExecute(event, this)
+    }
+
+    open fun onKeyEvent(event: KeyEvent): Boolean {
+        return false
     }
 
     open fun onBackPressed(): Boolean = false
