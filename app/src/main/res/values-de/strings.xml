@@ -25,7 +25,7 @@
     <string name="home_package">Packet</string>
     <string name="details">Details</string>
 
-    <string name="home_notice_content">Benutze nur den quelloffenen Magisk Manager. Magisk von unbekannten Quellen kann zu schädlichen Aktionen führen</string>
+    <string name="home_notice_content">Benutzen Sie nur den quelloffenen Magisk Manager. Magisk von unbekannten Quellen kann zu schädlichen Aktionen führen.</string>
     <string name="home_support_title">Unterstützen Sie uns</string>
     <string name="home_links_project">Projekt-Links</string>
     <string name="home_item_source">Quelle</string>
@@ -55,7 +55,7 @@
     <string name="manager_download_install">Tippen zum Herunterladen und Installieren</string>
     <string name="download_zip_only">Nur Zip herunterladen</string>
     <string name="direct_install">Direkte Installation (empfohlen)</string>
-    <string name="install_inactive_slot">Installiere auf inactiven Slot (Nach OTA)</string>
+    <string name="install_inactive_slot">Installiere in inaktiven Slot (Nach OTA)</string>
     <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den inaktiven Slot zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
     <string name="setup_title">Zusätzliche Einstellungen</string>
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
@@ -67,13 +67,13 @@
     <string name="deny">Verweigern</string>
     <string name="prompt">Sofort</string>
     <string name="grant">Gewähren</string>
-    <string name="su_warning">Gewähre vollen Zugriff auf dein Gerät.Den Zugriff verweigern, wenn Sie sich nicht sicher sind!</string>
+    <string name="su_warning">Gewähren Sie vollen Zugriff auf Ihr Gerät. Den Zugriff verweigern, wenn Sie sich nicht sicher sind!</string>
     <string name="forever">Für immer</string>
     <string name="once">Einmalig</string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
+    <string name="tenmin">10 Minuten</string>
+    <string name="twentymin">20 Minuten</string>
+    <string name="thirtymin">30 Minuten</string>
+    <string name="sixtymin">60 Minuten</string>
     <string name="su_allow_toast">%1$s wurden Superuser-Rechte gewährt</string>
     <string name="su_deny_toast">%1$s wurden Superuser-Rechte verweigert</string>
     <string name="no_apps_found">Keine Apps gefunden</string>
@@ -104,7 +104,7 @@
     <!--SafetyNet-->
     <string name="safetynet_api_error">SafetyNet API Fehler</string>
     <string name="safetynet_res_invalid">Die Antwort ist ungültig</string>
-    <string name="safetynet_attest_success">Erfolgt!</string>
+    <string name="safetynet_attest_success">Erfolg!</string>
     <string name="safetynet_attest_failure">Bestätigung fehlgeschlagen!</string>
     <string name="safetynet_attest_loading">Einen Moment…</string>
     <string name="safetynet_attest_restart">Erneut versuchen</string>
@@ -136,7 +136,7 @@
     <string name="update_available">Update verfügbar</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sortierreihenfolge</string>
-    <string name="module_permission_declined">Gewähre den Speicher Zugriff, um diese Funtion zu aktivieren.</string>
+    <string name="module_permission_declined">Gewähre den Speicher-Zugriff, um diese Funtion zu aktivieren.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Themen-Modus</string>
@@ -147,7 +147,7 @@
     <string name="settings_safe_mode_title">Sicherer Modus</string>
     <string name="settings_core_only_summary" deprecated="true">Nur die Kernfunktionen aktivieren. MagiskSU und MagiskHide werden weiterhin aktiviert, aber es werden keine Module geladen</string>
     <string name="settings_grid_column_count_title">Listen Anordnung</string>
-    <string name="settings_grid_column_count_summary">Setzt Element-Breite als Liste. Starte die App neu, um die Veränderungen anzuwenden.</string>
+    <string name="settings_grid_column_count_summary">Setzt Elementbreite als Liste. Starte die App neu, um die Veränderungen anzuwenden.</string>
     <string name="settings_grid_column_count_1">Standard</string>
     <string name="settings_grid_column_count_2">Gequetscht</string>
     <string name="settings_download_path_title">Download-Verzeichnis</string>
@@ -200,7 +200,7 @@
     <string name="settings_owner_manage">Durch Gerätebesitzer verwaltet</string>
     <string name="settings_user_independent">Benutzerunabhängig</string>
     <string name="owner_only_summary">Nur der Besitzer hat Root-Zugriff</string>
-    <string name="owner_manage_summary">Nur der Besitzer verwaltet den Root-Zugriff und erhält Zugriffs-Anfragen</string>
+    <string name="owner_manage_summary">Nur der Besitzer verwaltet den Root-Zugriff und erhält Zugriffsanfragen</string>
     <string name="user_indepenent_summary">Jeder Nutzer hat seine eingenen Root-Regeln</string>
 
     <string name="mount_namespace_mode">Mount Namespace Modus</string>
@@ -252,7 +252,7 @@
     <string name="env_fix_msg">Ihr Gerät muss zusätzlich eingerichtet werden, damit Magisk ordnungsgemäß funktioniert. Es wird das Magisk Setup-Zip herunterladen, möchten Sie jetzt fortfahren?</string>
     <string name="setup_msg">Laufzeitumgebung einrichten…</string>
     <string name="authenticate">Authentifizieren</string>
-    <string name="unsupport_magisk_title">Nicht unterstützte Magisk Version</string>
+    <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
     <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich, als ob kein Magisk installiert wäre. Bitte Magisk so schnell wie möglich aktualisieren.</string>
 
 </resources>
