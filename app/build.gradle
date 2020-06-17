@@ -109,13 +109,15 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava2:${vRetrofit}"
 
     def vOkHttp = '3.12.12'
-    implementation("com.squareup.okhttp3:okhttp:${vOkHttp}") {
-        force = true
+    implementation("com.squareup.okhttp3:okhttp") {
+        version {
+            strictly "$vOkHttp"
+        }
     }
     implementation "com.squareup.okhttp3:logging-interceptor:${vOkHttp}"
     implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:${vOkHttp}")
 
-    def vMoshi = '1.10.0-SNAPSHOT'
+    def vMoshi = '1.9.3'
     implementation "com.squareup.moshi:moshi:${vMoshi}"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}"
 
@@ -128,15 +130,15 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:${vNav}"
 
     implementation 'androidx.biometric:biometric:1.0.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta6'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta7'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01'
     implementation 'androidx.browser:browser:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.fragment:fragment-ktx:1.2.4'
+    implementation 'androidx.fragment:fragment-ktx:1.2.5'
     implementation 'androidx.work:work-runtime:2.3.4'
     implementation 'androidx.transition:transition:1.3.1'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation 'com.google.android.material:material:1.2.0-beta01'
 }

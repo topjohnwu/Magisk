@@ -57,7 +57,7 @@ default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
 ndk_ver = '21c'
 ndk_ver_full = '21.2.6472646'
-build_tools_ver = '29.0.3'
+build_tools_ver = '30.0.0'
 
 ndk_root = op.join(os.environ['ANDROID_HOME'], 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
