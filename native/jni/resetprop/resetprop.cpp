@@ -3,7 +3,6 @@
 #include <vector>
 #include <map>
 
-#include <logging.hpp>
 #include <resetprop.hpp>
 #include <utils.hpp>
 

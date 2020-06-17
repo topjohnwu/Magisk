@@ -2,7 +2,6 @@
 
 #include <string>
 #include <map>
-#include <logging.hpp>
 
 #include <system_properties.h>
 

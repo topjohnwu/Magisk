@@ -7,7 +7,6 @@
 
 #include <daemon.hpp>
 #include <utils.hpp>
-#include <logging.hpp>
 
 #include "su.hpp"
 

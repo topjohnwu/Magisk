@@ -5,7 +5,6 @@
 #include <vector>
 
 #include <utils.hpp>
-#include <logging.hpp>
 #include <selinux.hpp>
 #include <magisk.hpp>
 

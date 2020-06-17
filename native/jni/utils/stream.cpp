@@ -1,5 +1,4 @@
 #include <utils.hpp>
-#include <logging.hpp>
 #include <stream.hpp>
 
 static int strm_read(void *v, char *buf, int len) {

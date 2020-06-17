@@ -10,7 +10,6 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
 
-#include <logging.hpp>
 #include <utils.hpp>
 
 using namespace std;

@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <logging.hpp>
+#include "logging.hpp"
 #include <flags.hpp>
 
 using namespace std;

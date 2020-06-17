@@ -12,7 +12,6 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 
-#include <logging.hpp>
 #include <daemon.hpp>
 #include <utils.hpp>
 #include <selinux.hpp>

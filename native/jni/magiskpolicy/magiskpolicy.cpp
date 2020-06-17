@@ -1,4 +1,3 @@
-#include <logging.hpp>
 #include <utils.hpp>
 #include <magiskpolicy.hpp>
 

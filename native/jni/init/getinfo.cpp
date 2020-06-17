@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <utils.hpp>
-#include <logging.hpp>
 
 #include "init.hpp"
 

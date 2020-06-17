@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <vector>
 
-#include <logging.hpp>
+#include <utils.hpp>
 
 struct cmdline {
 	bool skip_initramfs;

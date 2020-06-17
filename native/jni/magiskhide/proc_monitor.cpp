@@ -13,7 +13,6 @@
 #include <vector>
 #include <bitset>
 
-#include <logging.hpp>
 #include <utils.hpp>
 
 #include "magiskhide.hpp"

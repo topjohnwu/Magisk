@@ -6,7 +6,6 @@
 #include <cil/cil.h>
 
 #include <utils.hpp>
-#include <logging.hpp>
 #include <stream.hpp>
 #include <magiskpolicy.hpp>
 

@@ -10,7 +10,6 @@
 #include <mincrypt/sha.h>
 #include <mincrypt/sha256.h>
 #include <utils.hpp>
-#include <logging.hpp>
 
 #include "bootimg.hpp"
 #include "magiskboot.hpp"

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <logging.hpp>
 #include <string>
 
 #define MAIN_SOCKET  "d30138f2310a9fb9c54a3e0c21f58591"

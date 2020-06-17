@@ -5,7 +5,6 @@
 
 #include <socket.hpp>
 #include <utils.hpp>
-#include <logging.hpp>
 
 #define ABS_SOCKET_LEN(sun) (sizeof(sa_family_t) + strlen(sun->sun_path + 1) + 1)
 

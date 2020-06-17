@@ -15,7 +15,6 @@
 #include <random>
 #include <string>
 
-#include <logging.hpp>
 #include <utils.hpp>
 
 using namespace std;

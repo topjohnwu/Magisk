@@ -1,6 +1,5 @@
 #include <magisk.hpp>
 #include <utils.hpp>
-#include <logging.hpp>
 #include <socket.hpp>
 
 #include "init.hpp"

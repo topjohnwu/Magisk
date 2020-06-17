@@ -5,7 +5,6 @@
 #include <sys/mman.h>
 
 #include <mincrypt/sha.h>
-#include <logging.hpp>
 #include <utils.hpp>
 
 #include "magiskboot.hpp"
