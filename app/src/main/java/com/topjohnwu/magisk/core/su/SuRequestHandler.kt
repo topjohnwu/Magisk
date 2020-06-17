@@ -2,7 +2,10 @@ package com.topjohnwu.magisk.core.su
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.LocalSocket
+import android.net.LocalSocketAddress
 import android.os.CountDownTimer
+import androidx.collection.ArrayMap
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
@@ -11,43 +14,36 @@ import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.model.toPolicy
 import com.topjohnwu.magisk.extensions.now
 import timber.log.Timber
+import java.io.*
 import java.util.concurrent.TimeUnit
 
 abstract class SuRequestHandler(
     private val packageManager: PackageManager,
     private val policyDB: PolicyDao
 ) {
-    protected var timer: CountDownTimer = object : CountDownTimer(
-        TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1)) {
-        override fun onFinish() {
-            respond(MagiskPolicy.DENY, 0)
-        }
-        override fun onTick(remains: Long) {}
-    }
+    private val socket: LocalSocket = LocalSocket()
+    private lateinit var out: DataOutputStream
+    private lateinit var input: DataInputStream
+
+    protected var timer: CountDownTimer = DefaultCountDown()
         set(value) {
             field.cancel()
             field = value
             field.start()
         }
-
     protected lateinit var policy: MagiskPolicy
-
-    private val cleanupTasks = mutableListOf<() -> Unit>()
-    private lateinit var connector: SuConnector
+        private set
 
     abstract fun onStart()
-    abstract fun onRespond()
 
     fun start(intent: Intent): Boolean {
         val socketName = intent.getStringExtra("socket") ?: return false
 
         try {
-            connector = object : SuConnector(socketName) {
-                override fun onResponse() {
-                    out.writeInt(policy.policy)
-                }
-            }
-            val map = connector.readRequest()
+            socket.connect(LocalSocketAddress(socketName, LocalSocketAddress.Namespace.ABSTRACT))
+            out = DataOutputStream(BufferedOutputStream(socket.outputStream))
+            input = DataInputStream(BufferedInputStream(socket.inputStream))
+            val map = readRequest()
             val uid = map["uid"]?.toIntOrNull() ?: return false
             policy = uid.toPolicy(packageManager)
         } catch (e: Exception) {
@@ -71,18 +67,8 @@ abstract class SuRequestHandler(
         }
 
         timer.start()
-        cleanupTasks.add {
-            timer.cancel()
-        }
-
         onStart()
         return true
-    }
-
-    private fun respond() {
-        connector.response()
-        cleanupTasks.forEach { it() }
-        onRespond()
     }
 
     fun respond(action: Int, time: Int) {
@@ -98,6 +84,45 @@ abstract class SuRequestHandler(
         if (until >= 0)
             policyDB.update(policy).blockingAwait()
 
-        respond()
+        try {
+            out.writeInt(policy.policy)
+            out.flush()
+        } catch (e: IOException) {
+            Timber.e(e)
+        } finally {
+            runCatching {
+                input.close()
+                out.close()
+                socket.close()
+            }
+        }
+
+        timer.cancel()
+    }
+
+    @Throws(IOException::class)
+    private fun readRequest(): Map<String, String> {
+        fun readString(): String {
+            val len = input.readInt()
+            val buf = ByteArray(len)
+            input.readFully(buf)
+            return String(buf, Charsets.UTF_8)
+        }
+        val ret = ArrayMap<String, String>()
+        while (true) {
+            val name = readString()
+            if (name == "eof")
+                break
+            ret[name] = readString()
+        }
+        return ret
+    }
+
+    private inner class DefaultCountDown
+        : CountDownTimer(TimeUnit.MINUTES.toMillis(1), TimeUnit.MINUTES.toMillis(1)) {
+        override fun onFinish() {
+            respond(MagiskPolicy.DENY, 0)
+        }
+        override fun onTick(remains: Long) {}
     }
 }

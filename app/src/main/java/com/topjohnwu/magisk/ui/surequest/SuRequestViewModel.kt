@@ -85,6 +85,9 @@ class SuRequestViewModel(
             val pos = selectedItemPosition.value
             timeoutPrefs.edit().putInt(policy.packageName, pos).apply()
             respond(action, Config.Value.TIMEOUT_LIST[pos])
+
+            // Kill activity after response
+            DieEvent().publish()
         }
 
         fun cancelTimer() {
@@ -117,11 +120,6 @@ class SuRequestViewModel(
                     respond(DENY)
                 }
             }
-        }
-
-        override fun onRespond() {
-            // Kill activity after response
-            DieEvent().publish()
         }
     }
 
