@@ -1,16 +1,14 @@
 package com.topjohnwu.magisk.core.download
 
-import android.app.Activity
 import android.app.Notification
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.di.NullActivity
-import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -47,7 +45,7 @@ abstract class RemoteFileService : NotificationService() {
             failNotify(subject)
         }) {
             val newId = finishNotify(subject)
-            if (get<Activity>() !is NullActivity) {
+            if (ForegroundTracker.hasForeground) {
                 onFinished(subject, newId)
             }
         }

@@ -1,8 +1,10 @@
 package com.topjohnwu.magisk.core
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
 import androidx.work.WorkManager
@@ -12,9 +14,7 @@ import com.topjohnwu.magisk.FileProvider
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.utils.RootInit
 import com.topjohnwu.magisk.core.utils.updateConfig
-import com.topjohnwu.magisk.di.ActivityTracker
 import com.topjohnwu.magisk.di.koinModules
-import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.unwrap
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
@@ -67,7 +67,7 @@ open class App() : Application() {
             modules(koinModules)
         }
         ResMgr.init(impl)
-        app.registerActivityLifecycleCallbacks(get<ActivityTracker>())
+        app.registerActivityLifecycleCallbacks(ForegroundTracker)
         WorkManager.initialize(impl.wrapJob(), androidx.work.Configuration.Builder().build())
     }
 
@@ -81,4 +81,26 @@ open class App() : Application() {
         if (!isRunningAsStub)
             super.onConfigurationChanged(newConfig)
     }
+}
+
+object ForegroundTracker : Application.ActivityLifecycleCallbacks {
+
+    @Volatile
+    var foreground: Activity? = null
+
+    val hasForeground get() = foreground != null
+
+    override fun onActivityResumed(activity: Activity) {
+        foreground = activity
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+        foreground = null
+    }
+
+    override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
+    override fun onActivityStarted(activity: Activity) {}
+    override fun onActivityStopped(activity: Activity) {}
+    override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
+    override fun onActivityDestroyed(activity: Activity) {}
 }
