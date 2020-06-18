@@ -35,7 +35,7 @@ setup_flashable
 
 print_title "Magisk Uninstaller"
 
-is_mounted /data || mount /data || abort "! Unable to mount partitions"
+is_mounted /data || mount /data || abort "! Unable to mount /data, please uninstall with Magisk Manager"
 is_mounted /cache || mount /cache 2>/dev/null
 mount_partitions
 
@@ -144,7 +144,8 @@ rm -rf \
 /data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* $PERSISTDIR/magisk 2>/dev/null
 
 if [ -f /system/addon.d/99-magisk.sh ]; then
-  mount -o rw,remount /system
+  blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
+  mount -o rw,remount /system || mount -o rw,remount /
   rm -f /system/addon.d/99-magisk.sh
 fi
 
