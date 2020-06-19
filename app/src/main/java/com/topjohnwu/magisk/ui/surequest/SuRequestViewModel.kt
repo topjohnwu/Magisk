@@ -13,12 +13,11 @@ import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.util.concurrent.TimeUnit.SECONDS
@@ -41,13 +40,11 @@ class SuRequestViewModel(
 
     val grantEnabled = KObservableField(false)
 
-    private val items = DiffObservableList(ComparableRvItem.callback)
-    private val itemBinding = ItemBinding.of<ComparableRvItem<*>> { binding, _, item ->
-        item.bind(binding)
-    }
-
-    val adapter = BindingListViewAdapter<ComparableRvItem<*>>(1).apply {
-        itemBinding = this@SuRequestViewModel.itemBinding
+    private val items = res.getStringArray(R.array.allow_timeout).map { SpinnerRvItem(it) }
+    val adapter = BindingListViewAdapter<SpinnerRvItem>(1).apply {
+        itemBinding = ItemBinding.of { binding, _, item ->
+            item.bind(binding)
+        }
         setItems(items)
     }
 
@@ -81,7 +78,11 @@ class SuRequestViewModel(
 
     private inner class Handler : SuRequestHandler(pm, policyDB) {
 
+        private lateinit var timer: CountDownTimer
+
         fun respond(action: Int) {
+            timer.cancel()
+
             val pos = selectedItemPosition.value
             timeoutPrefs.edit().putInt(policy.packageName, pos).apply()
             respond(action, Config.Value.TIMEOUT_LIST[pos])
@@ -96,30 +97,36 @@ class SuRequestViewModel(
         }
 
         override fun onStart() {
-            res.getStringArray(R.array.allow_timeout)
-                .map { SpinnerRvItem(it) }
-                .let { items.update(it) }
-
             icon.value = policy.applicationInfo.loadIcon(pm)
             title.value = policy.appName
             packageName.value = policy.packageName
-            selectedItemPosition.value = timeoutPrefs.getInt(policy.packageName, 0)
-
-            // Override timer
-            val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
-            timer = object : CountDownTimer(millis, 1000) {
-                override fun onTick(remains: Long) {
-                    if (remains <= millis - 1000) {
-                        grantEnabled.value = true
-                    }
-                    denyText.value = "${res.getString(R.string.deny)} (${(remains / 1000) + 1})"
-                }
-
-                override fun onFinish() {
-                    denyText.value = res.getString(R.string.deny)
-                    respond(DENY)
-                }
+            UiThreadHandler.handler.post {
+                // Delay is required to properly do selection
+                selectedItemPosition.value = timeoutPrefs.getInt(policy.packageName, 0)
             }
+
+            // Set timer
+            val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
+            timer = SuTimer(millis, 1000).apply { start() }
+        }
+
+        private inner class SuTimer(
+            private val millis: Long,
+            interval: Long
+        ) : CountDownTimer(millis, interval) {
+
+            override fun onTick(remains: Long) {
+                if (!grantEnabled.value && remains <= millis - 1000) {
+                    grantEnabled.value = true
+                }
+                denyText.value = "${res.getString(R.string.deny)} (${(remains / 1000) + 1})"
+            }
+
+            override fun onFinish() {
+                denyText.value = res.getString(R.string.deny)
+                respond(DENY)
+            }
+
         }
     }
 

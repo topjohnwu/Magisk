@@ -139,12 +139,9 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 	}
 
 	// If still not determined, ask manager
-	struct sockaddr_un addr;
-	int sockfd = create_rand_socket(&addr);
-
-	// Connect manager
-	app_socket(addr.sun_path + 1, info);
-	int fd = socket_accept(sockfd, 60);
+	char socket_name[32];
+	gen_rand_str(socket_name, sizeof(socket_name));
+	int fd = app_socket(socket_name, info);
 	if (fd < 0) {
 		info->access.policy = DENY;
 	} else {
@@ -153,7 +150,6 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 		info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
 		close(fd);
 	}
-	close(sockfd);
 
 	return info;
 }

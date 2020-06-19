@@ -6,23 +6,18 @@
 #include <socket.hpp>
 #include <utils.hpp>
 
-#define ABS_SOCKET_LEN(sun) (sizeof(sa_family_t) + strlen(sun->sun_path + 1) + 1)
+static size_t socket_len(sockaddr_un *sun) {
+	if (sun->sun_path[0])
+		return sizeof(sa_family_t) + strlen(sun->sun_path) + 1;
+	else
+		return sizeof(sa_family_t) + strlen(sun->sun_path + 1) + 1;
+}
 
-socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name) {
+socklen_t setup_sockaddr(sockaddr_un *sun, const char *name) {
 	memset(sun, 0, sizeof(*sun));
 	sun->sun_family = AF_LOCAL;
 	strcpy(sun->sun_path + 1, name);
-	return ABS_SOCKET_LEN(sun);
-}
-
-int create_rand_socket(struct sockaddr_un *sun) {
-	memset(sun, 0, sizeof(*sun));
-	sun->sun_family = AF_LOCAL;
-	gen_rand_str(sun->sun_path + 1, sizeof(sun->sun_path) - 1);
-	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-	xbind(fd, (struct sockaddr*) sun, ABS_SOCKET_LEN(sun));
-	xlisten(fd, 1);
-	return fd;
+	return socket_len(sun);
 }
 
 int socket_accept(int sockfd, int timeout) {

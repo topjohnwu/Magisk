@@ -12,10 +12,12 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
+import io.reactivex.Single
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {
@@ -37,8 +39,11 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         super.onCreate(savedInstanceState)
 
         fun showRequest() {
-            if (!viewModel.handleRequest(intent))
-                finish()
+            Single.fromCallable {
+                viewModel.handleRequest(intent)
+            }.subscribeK {
+                if (!it) finish()
+            }
         }
 
         fun runHandler(action: String?) {

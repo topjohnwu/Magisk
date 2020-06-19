@@ -28,6 +28,7 @@ object Const {
         const val MIN_VERCODE = 19000
         const val PROVIDER_CONNECT = 20200
         const val DYNAMIC_PATH = 20400
+        const val SEPOLICY_REDESIGN = 20416
     }
 
     object ID {

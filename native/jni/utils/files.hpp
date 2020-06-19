@@ -133,3 +133,7 @@ static inline sFILE open_file(const char *path, const char *mode) {
 static inline sFILE xopen_file(const char *path, const char *mode) {
 	return sFILE(xfopen(path, mode), fclose);
 }
+
+static inline sFILE xopen_file(int fd, const char *mode) {
+	return sFILE(xfdopen(fd, mode), fclose);
+}

@@ -1,9 +1,5 @@
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <stdio.h>
 
 #include <daemon.hpp>
 #include <utils.hpp>
@@ -92,9 +88,9 @@ public:
 	}
 };
 
-static bool check_error(int fd) {
+static bool check_no_error(int fd) {
 	char buf[1024];
-	unique_ptr<FILE, decltype(&fclose)> out(xfdopen(fd, "r"), fclose);
+	auto out = xopen_file(fd, "r");
 	while (fgets(buf, sizeof(buf), out.get())) {
 		if (strncmp(buf, "Error", 5) == 0)
 			return false;
@@ -123,7 +119,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 			.argv = args.data()
 		};
 		exec_command_sync(exec);
-		if (check_error(exec.fd))
+		if (check_no_error(exec.fd))
 			return;
 	}
 
@@ -143,7 +139,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 		// Then try start activity without component name
 		strcpy(target, info->str[SU_MANAGER].data());
 		exec_command_sync(exec);
-		if (check_error(exec.fd))
+		if (check_no_error(exec.fd))
 			return;
 	}
 
@@ -183,12 +179,31 @@ void app_notify(const su_context &ctx) {
 	}
 }
 
-void app_socket(const char *socket, const shared_ptr<su_info> &info) {
+int app_socket(const char *name, const shared_ptr<su_info> &info) {
 	vector<Extra> extras;
 	extras.reserve(1);
-	extras.emplace_back("socket", socket);
+	extras.emplace_back("socket", name);
 
 	exec_cmd("request", extras, info, PKG_ACTIVITY);
+
+	sockaddr_un addr;
+	size_t len = setup_sockaddr(&addr, name);
+	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	bool connected = false;
+	// Try at most 60 seconds
+	for (int i = 0; i < 600; ++i) {
+		if (connect(fd, reinterpret_cast<sockaddr *>(&addr), len) == 0) {
+			connected = true;
+			break;
+		}
+		usleep(100000);  // 100ms
+	}
+	if (connected) {
+		return fd;
+	} else {
+		close(fd);
+		return -1;
+	}
 }
 
 void socket_send_request(int fd, const shared_ptr<su_info> &info) {

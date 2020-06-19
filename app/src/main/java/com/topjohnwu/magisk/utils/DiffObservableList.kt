@@ -86,8 +86,7 @@ open class DiffObservableList<T>(
     @MainThread
     fun update(newItems: List<T>) {
         val diffResult = doCalculateDiff(list, newItems)
-        list = newItems.toMutableList()
-        diffResult.dispatchUpdatesTo(listCallback)
+        update(newItems, diffResult)
     }
 
     override fun addOnListChangedCallback(listener: ObservableList.OnListChangedCallback<out ObservableList<T>>) {
