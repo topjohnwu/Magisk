@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.isCanaryVersion
 import com.topjohnwu.magisk.core.utils.*
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
@@ -141,8 +140,7 @@ object UpdateChannel : SettingsItem.Selector() {
 
     override val title = R.string.settings_update_channel_title.asTransitive()
     override val entries get() = resources.getStringArray(R.array.update_channel).let {
-        if (!isCanaryVersion && Config.updateChannel < Config.Value.CANARY_CHANNEL)
-            it.take(it.size - 2).toTypedArray() else it
+        if (BuildConfig.DEBUG) it.toMutableList().apply { add("Canary") }.toTypedArray() else it
     }
     override val entryValRes = R.array.value_array
 }

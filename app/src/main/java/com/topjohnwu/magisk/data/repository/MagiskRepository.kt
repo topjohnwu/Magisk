@@ -23,9 +23,7 @@ class MagiskRepository(
         Config.Value.DEFAULT_CHANNEL, Config.Value.STABLE_CHANNEL -> apiRaw.fetchStableUpdate()
         Config.Value.BETA_CHANNEL -> apiRaw.fetchBetaUpdate()
         Config.Value.CANARY_CHANNEL -> apiRaw.fetchCanaryUpdate()
-        Config.Value.CANARY_DEBUG_CHANNEL -> apiRaw.fetchCanaryDebugUpdate()
-        Config.Value.CUSTOM_CHANNEL -> apiRaw.fetchCustomUpdate(
-            Config.customChannelUrl)
+        Config.Value.CUSTOM_CHANNEL -> apiRaw.fetchCustomUpdate(Config.customChannelUrl)
         else -> throw IllegalArgumentException()
     }.flatMap {
         // If remote version is lower than current installed, try switching to beta

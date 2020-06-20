@@ -19,11 +19,8 @@ interface GithubRawServices {
     @GET("$MAGISK_FILES/master/beta.json")
     fun fetchBetaUpdate(): Single<UpdateInfo>
 
-    @GET("$MAGISK_FILES/canary/release.json")
-    fun fetchCanaryUpdate(): Single<UpdateInfo>
-
     @GET("$MAGISK_FILES/canary/debug.json")
-    fun fetchCanaryDebugUpdate(): Single<UpdateInfo>
+    fun fetchCanaryUpdate(): Single<UpdateInfo>
 
     @GET
     fun fetchCustomUpdate(@Url url: String): Single<UpdateInfo>
@@ -73,9 +70,11 @@ interface GithubRawServices {
 interface GithubApiServices {
 
     @GET("repos")
-    fun fetchRepos(@Query("page") page: Int,
-                   @Header(Const.Key.IF_NONE_MATCH) etag: String,
-                   @Query("sort") sort: String = "pushed",
-                   @Query("per_page") count: Int = 100): Flowable<Result<List<GithubRepoInfo>>>
+    fun fetchRepos(
+        @Query("page") page: Int,
+        @Header(Const.Key.IF_NONE_MATCH) etag: String,
+        @Query("sort") sort: String = "pushed",
+        @Query("per_page") count: Int = 100
+    ): Flowable<Result<List<GithubRepoInfo>>>
 
 }

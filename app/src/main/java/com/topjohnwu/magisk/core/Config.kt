@@ -70,7 +70,6 @@ object Config : PreferenceModel, DBConfig {
         const val BETA_CHANNEL = 1
         const val CUSTOM_CHANNEL = 2
         const val CANARY_CHANNEL = 3
-        const val CANARY_DEBUG_CHANNEL = 4
 
         // root access mode
         const val ROOT_ACCESS_DISABLED = 0
@@ -106,12 +105,10 @@ object Config : PreferenceModel, DBConfig {
     }
 
     private val defaultChannel =
-        if (isCanaryVersion) {
-            if (BuildConfig.DEBUG)
-                Value.CANARY_DEBUG_CHANNEL
-            else
-                Value.CANARY_CHANNEL
-        } else Value.DEFAULT_CHANNEL
+        if (BuildConfig.DEBUG)
+            Value.CANARY_CHANNEL
+        else
+            Value.DEFAULT_CHANNEL
 
     var bootId by preference(Key.BOOT_ID, "")
 
@@ -154,33 +151,34 @@ object Config : PreferenceModel, DBConfig {
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 
-    fun initialize() = prefs.also {
-        if (it.getBoolean(SU_FINGERPRINT, false)) {
-            suBiometric = true
+    fun initialize() {
+        prefs.edit { parsePrefs() }
+
+        prefs.edit {
+            // Settings migration
+            if (prefs.getBoolean(SU_FINGERPRINT, false))
+                suBiometric = true
+            remove(SU_FINGERPRINT)
+            prefs.getString(Key.UPDATE_CHANNEL, null).also {
+                if (it == null)
+                    putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
+                else if (it.toInt() > Value.CANARY_CHANNEL)
+                    putString(Key.UPDATE_CHANNEL, Value.CANARY_CHANNEL.toString())
+            }
+
+            // Get actual state
+            putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
+
+            // Write database configs
+            putString(Key.ROOT_ACCESS, rootMode.toString())
+            putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
+            putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
+            putBoolean(Key.SU_BIOMETRIC, BiometricHelper.isEnabled)
         }
-    }.edit {
-        parsePrefs(this)
-
-        // Legacy stuff
-        remove(SU_FINGERPRINT)
-
-        // Get actual state
-        putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
-
-        // Write database configs
-        putString(Key.ROOT_ACCESS, rootMode.toString())
-        putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
-        putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
-        putBoolean(Key.SU_BIOMETRIC, BiometricHelper.isEnabled)
-    }.also {
-        if (!prefs.contains(Key.UPDATE_CHANNEL))
-            prefs.edit().putString(Key.UPDATE_CHANNEL, defaultChannel.toString()).apply()
     }
 
-    private fun parsePrefs(editor: SharedPreferences.Editor) = editor.apply {
-        val config = SuFile.open("/data/adb",
-            Const.MANAGER_CONFIGS
-        )
+    private fun SharedPreferences.Editor.parsePrefs() {
+        val config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS)
         if (config.exists()) runCatching {
             val input = SuFileInputStream(config)
             val parser = Xml.newPullParser()

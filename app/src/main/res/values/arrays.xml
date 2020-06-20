@@ -81,9 +81,6 @@
         <item>@string/settings_update_stable</item>
         <item>@string/settings_update_beta</item>
         <item>@string/settings_update_custom</item>
-        <!-- Debug only, don't care to translate -->
-        <item>Canary</item>
-        <item>Canary (Debug)</item>
     </string-array>
 
     <string-array name="span_count">
