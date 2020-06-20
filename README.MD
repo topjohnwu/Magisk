@@ -17,10 +17,10 @@ Here are some feature highlights:
 
 [![](https://img.shields.io/badge/Magisk%20Manager-v7.5.1-green)](https://github.com/topjohnwu/Magisk/releases/download/manager-v7.5.1/MagiskManager-v7.5.1.apk)
 [![](https://img.shields.io/badge/Magisk-v20.4-blue)](https://github.com/topjohnwu/Magisk/releases/download/v20.4/Magisk-v20.4.zip)
-[![](https://img.shields.io/badge/Magisk%20Beta-v20.4-blue)](https://github.com/topjohnwu/Magisk/releases/download/v20.4/Magisk-v20.4.zip)
+[![](https://img.shields.io/badge/Magisk-uninstaller-red)](https://github.com/topjohnwu/Magisk/releases/download/v20.4/Magisk-uninstaller-20200323.zip)
 <br>
-[![](https://img.shields.io/badge/Magisk%20Manager-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-release.apk)
-[![](https://img.shields.io/badge/Magisk%20Manager-Canary%20Debug-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
+[![](https://img.shields.io/badge/Magisk%20Beta-v20.4-blue)](https://github.com/topjohnwu/Magisk/releases/download/v20.4/Magisk-v20.4.zip)
+[![](https://img.shields.io/badge/Magisk%20Manager-Canary-green)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
 
 ## Useful Links
 
@@ -39,9 +39,9 @@ Here are some feature highlights:
 
 ## Bug Reports
 
-Canary Channels are cutting edge builds for those adventurous. To access canary builds, install either Canary Magisk Manager, switch to a Canary Channel in settings and upgrade.
+Canary Channels are cutting edge builds for those adventurous. To access canary builds, install the Canary Magisk Manager, switch to the Canary Channel in settings and upgrade.
 
-**Only bug reports from Canary DEBUG builds will be accepted.**
+**Only bug reports from Canary builds will be accepted.**
 
 For installation issues, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
@@ -51,15 +51,14 @@ For Magisk Manager crashes, record and upload the logcat when the crash occurs.
 
 - Magisk builds on any OS Android Studio supports. Install Android Studio and do the initial setups.
 - Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
-- Install Python 3.6+. For Windows, select 'Add Python to PATH' in installer, and run `pip install colorama` after install.
-- Configure to use the JDK bundled in Android Studio:
-	- macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home"`
-	- Linux: `export PATH="/path/to/androidstudio/jre/bin:$PATH"`
-	- Windows: Add `C:\Path\To\Android Studio\jre\bin` to environment variable `PATH`
+- Install Python 3.6+ \
+(Windows only: select **'Add Python to PATH'** in installer, and run `pip install colorama` after install)
+- Install JDK 9+. Tested on JDK 14.
 - Set environment variable `ANDROID_HOME` to the Android SDK folder (can be found in Android Studio settings)
 - Run `./build.py ndk` to let the script download and install NDK for you
 - Set configurations in `config.prop`. A sample `config.prop.sample` is provided.
-- To start building, run `build.py` to see your options. For each action, use `-h` to access help (e.g. `./build.py all -h`)
+- To start building, run `build.py` to see your options. \
+For each action, use `-h` to access help (e.g. `./build.py all -h`)
 - To start development, open the project in Android Studio. Both app (Kotlin/Java) and native (C++/C) source code can be properly developed using the IDE, but *always* use `build.py` for building.
 - `build.py` builds in debug mode by default. If you want release builds (with `-r, --release`), you need a Java Keystore to sign APKs and zips. For more information, check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key).
 
