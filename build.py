@@ -355,8 +355,8 @@ def build_apk(args, module):
                 tmp = f.name
 
             # AAPT2 optimization
-            execv([aapt2, 'optimize', '-o', tmp, '--enable-resource-obfuscation',
-                  '--enable-resource-path-shortening', source])
+            execv([aapt2, 'optimize', '-o', tmp, '--collapse-resource-names',
+                  '--shorten-resource-paths', source])
 
             # Recompress everything just to piss people off
             with zipfile.ZipFile(source, 'w', compression=zipfile.ZIP_DEFLATED) as zout:
@@ -368,7 +368,9 @@ def build_apk(args, module):
             execv([zipalign, '-f', '4', source, target])
 
             # Sign APK
-            execv([apksigner, 'sign', '--v1-signer-name', 'CERT',
+            execv([apksigner, 'sign',
+                  '--v4-signing-enabled', 'false',
+                  '--v1-signer-name', 'CERT',
                   '--ks', config['keyStore'],
                   '--ks-pass', f'pass:{config["keyStorePass"]}',
                   '--ks-key-alias', config['keyAlias'],
