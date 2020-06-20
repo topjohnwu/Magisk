@@ -20,6 +20,7 @@ import io.reactivex.Single
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.SecureRandom
@@ -74,7 +75,8 @@ object PatchAPK {
 
         val toBuf = to.toString().toCharArray().copyOf(from.length)
         for (off in offList) {
-            buf.position(off)
+            // IMPORTANT CAST FOR BYTECODE COMPATIBILITY (DO NOT REMOVE)
+            (buf as Buffer).position(off)
             buf.put(toBuf)
         }
         return true

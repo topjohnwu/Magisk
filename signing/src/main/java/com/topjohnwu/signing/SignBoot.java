@@ -18,6 +18,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.PrivateKey;
@@ -179,13 +180,15 @@ public class SignBoot {
                 + ((secondSize + pageSize - 1) / pageSize) * pageSize;
         int headerVersion = image.getInt(); // boot image header version or dt/extra size
         if (headerVersion > 0 && headerVersion < BOOT_IMAGE_HEADER_VERSION_MAXIMUM) {
-            image.position(BOOT_IMAGE_HEADER_V1_RECOVERY_DTBO_SIZE_OFFSET);
+            // IMPORTANT CAST FOR BYTECODE COMPATIBILITY (DO NOT REMOVE)
+            ((Buffer) image).position(BOOT_IMAGE_HEADER_V1_RECOVERY_DTBO_SIZE_OFFSET);
             int recoveryDtboLength = image.getInt();
             length += ((recoveryDtboLength + pageSize - 1) / pageSize) * pageSize;
             image.getLong(); // recovery_dtbo address
             int headerSize = image.getInt();
             if (headerVersion == 2) {
-                image.position(BOOT_IMAGE_HEADER_V2_DTB_SIZE_OFFSET);
+                // IMPORTANT CAST FOR BYTECODE COMPATIBILITY (DO NOT REMOVE)
+                ((Buffer) image).position(BOOT_IMAGE_HEADER_V2_DTB_SIZE_OFFSET);
                 int dtbLength = image.getInt();
                 length += ((dtbLength + pageSize - 1) / pageSize) * pageSize;
                 image.getLong(); // dtb address
