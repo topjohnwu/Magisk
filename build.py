@@ -369,7 +369,6 @@ def build_apk(args, module):
 
             # Sign APK
             execv([apksigner, 'sign',
-                  '--v3-signing-enabled', 'false',
                   '--v4-signing-enabled', 'false',
                   '--v1-signer-name', 'CERT',
                   '--ks', config['keyStore'],
