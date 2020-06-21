@@ -40,6 +40,16 @@ subprojects {
         maven { url "https://jitpack.io" }
         maven { url "http://oss.sonatype.org/content/repositories/snapshots" }
     }
+
+    if (getPlugins().hasPlugin('java')) {
+        tasks.withType(JavaCompile) {
+            // If building with JDK 9+, we need additional flags to generate compatible bytecode
+            if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
+                options.compilerArgs += ['--release', '8']
+            }
+        }
+    }
+
     afterEvaluate { module ->
         if (getPlugins().hasPlugin('com.android.library') ||
             getPlugins().hasPlugin('com.android.application')) {
