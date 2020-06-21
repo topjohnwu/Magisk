@@ -95,12 +95,12 @@ class ModuleViewModel(
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = MergeObservableList<ComparableRvItem<*>>()
         .insertList(itemsCoreOnly)
+        .insertItem(InstallModule)
         .insertItem(sectionUpdate)
         .insertList(itemsUpdatableHelpers)
         .insertList(itemsUpdatable)
         .insertItem(sectionActive)
         .insertList(itemsInstalledHelpers)
-        .insertItem(InstallModule)
         .insertList(itemsInstalled)
         .insertItem(sectionRemote)
         .insertList(itemsRemote)!!
