@@ -67,7 +67,7 @@ object Shortcuts {
                     .build()
             )
         }
-        if (!Config.coreOnly && Info.env.isActive) {
+        if (Info.env.isActive) {
             shortCuts.add(
                 ShortcutInfo.Builder(context, "modules")
                     .setShortLabel(context.getString(R.string.modules))

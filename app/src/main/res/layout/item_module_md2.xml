@@ -21,10 +21,10 @@
 
     <com.google.android.material.card.MaterialCardView
         style="@style/WidgetFoundation.Card.Variant"
-        isEnabled="@{!Config.coreOnly &amp;&amp; !item.removed}"
+        isEnabled="@{!item.removed}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="@{item.enabled &amp;&amp; !Config.coreOnly ? 1f : .5f}"
+        android:alpha="@{item.enabled ? 1f : .5f}"
         android:onClick="@{() -> item.toggle()}"
         tools:layout_gravity="center"
         tools:layout_marginBottom="@dimen/l1"
@@ -82,7 +82,7 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/module_indicator"
                 style="@style/WidgetFoundation.Switch"
-                isSelected="@{item.enabled &amp;&amp; !Config.coreOnly}"
+                isSelected="@{item.enabled}"
                 android:layout_marginEnd="@dimen/l_50"
                 app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
                 app:layout_constraintEnd_toEndOf="parent"

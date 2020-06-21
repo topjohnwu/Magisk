@@ -60,7 +60,6 @@ object Config : PreferenceModel, DBConfig {
 
         // system state
         const val MAGISKHIDE = "magiskhide"
-        const val COREONLY = "disable"
     }
 
     object Value {
@@ -129,8 +128,6 @@ object Config : PreferenceModel, DBConfig {
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
     var magiskHide by preference(Key.MAGISKHIDE, true)
-    @JvmStatic
-    var coreOnly by preference(Key.COREONLY, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
     @JvmStatic
     var listSpanCount by preference(Key.LIST_SPAN_COUNT, 1)
@@ -165,9 +162,6 @@ object Config : PreferenceModel, DBConfig {
                 else if (it.toInt() > Value.CANARY_CHANNEL)
                     putString(Key.UPDATE_CHANNEL, Value.CANARY_CHANNEL.toString())
             }
-
-            // Get actual state
-            putBoolean(Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
 
             // Write database configs
             putString(Key.ROOT_ACCESS, rootMode.toString())

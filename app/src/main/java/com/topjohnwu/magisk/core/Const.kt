@@ -1,14 +1,12 @@
 package com.topjohnwu.magisk.core
 
 import android.os.Process
-import java.io.File
 
 object Const {
 
     // Paths
     lateinit var MAGISKTMP: String
     val MAGISK_PATH get() = "$MAGISKTMP/modules"
-    var MAGISK_DISABLE_FILE = File("xxx")
     const val TMP_FOLDER_PATH = "/dev/tmp"
     const val MAGISK_LOG = "/cache/magisk.log"
 

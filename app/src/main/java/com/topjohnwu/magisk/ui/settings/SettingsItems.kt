@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
@@ -208,21 +207,6 @@ object Reauthenticate : SettingsItem.Toggle() {
 
 object Magisk : SettingsItem.Section() {
     override val title = R.string.magisk.asTransitive()
-}
-
-object SafeMode : SettingsItem.Toggle() {
-    override val title = R.string.settings_safe_mode_title.asTransitive()
-    // Use old placeholder for now, will update text once native implementation is changed
-    override val description = R.string.settings_core_only_summary.asTransitive()
-    override var value by bindableValue(Config.coreOnly) {
-        if (Config.coreOnly == it) return@bindableValue
-        Config.coreOnly = it
-        when {
-            it -> runCatching { Const.MAGISK_DISABLE_FILE.createNewFile() }
-            else -> Const.MAGISK_DISABLE_FILE.delete()
-        }
-        Utils.toast(R.string.settings_reboot_toast, Toast.LENGTH_LONG)
-    }
 }
 
 object MagiskHide : SettingsItem.Toggle() {

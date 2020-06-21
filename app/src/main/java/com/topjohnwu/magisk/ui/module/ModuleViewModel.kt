@@ -80,7 +80,6 @@ class ModuleViewModel(
     private val itemsInstalledHelpers = ObservableArrayList<TextItem>()
     private val itemsUpdatableHelpers = ObservableArrayList<TextItem>()
 
-    private val itemsCoreOnly = ObservableArrayList<SafeModeNotice>()
     private val itemsInstalled = diffListOf<ModuleItem>()
     private val itemsUpdatable = diffListOf<RepoItem.Update>()
     private val itemsRemote = diffListOf<RepoItem.Remote>()
@@ -94,7 +93,6 @@ class ModuleViewModel(
 
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = MergeObservableList<ComparableRvItem<*>>()
-        .insertList(itemsCoreOnly)
         .insertItem(InstallModule)
         .insertItem(sectionUpdate)
         .insertList(itemsUpdatableHelpers)
@@ -176,7 +174,6 @@ class ModuleViewModel(
     // ---
 
     override fun refresh(): Disposable {
-        updateCoreOnlyWarning()
         if (itemsRemote.isEmpty())
             loadRemote()
         return loadInstalled().subscribeK()
@@ -300,15 +297,6 @@ class ModuleViewModel(
     private fun addUpdatableEmptyMessage() {
         if (itemsUpdatable.isEmpty() && itemsUpdatableHelpers.isEmpty()) {
             itemsUpdatableHelpers.add(itemNoneUpdatable)
-        }
-    }
-
-    private fun updateCoreOnlyWarning() {
-        if (Config.coreOnly) {
-            if (itemsCoreOnly.isNotEmpty()) return
-            itemsCoreOnly.add(SafeModeNotice)
-        } else {
-            itemsCoreOnly.clear()
         }
     }
 

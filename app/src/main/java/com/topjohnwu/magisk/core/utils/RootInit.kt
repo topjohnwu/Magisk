@@ -8,7 +8,6 @@ import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.extensions.rawResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
-import com.topjohnwu.superuser.io.SuFile
 
 class RootInit : Shell.Initializer() {
 
@@ -29,7 +28,6 @@ class RootInit : Shell.Initializer() {
         job.add(context.rawResource(R.raw.manager))
         if (shell.isRoot) {
             job.add(context.rawResource(R.raw.util_functions))
-            Const.MAGISK_DISABLE_FILE = SuFile("/cache/.disable_magisk")
         }
         job.add("mm_init").exec()
 

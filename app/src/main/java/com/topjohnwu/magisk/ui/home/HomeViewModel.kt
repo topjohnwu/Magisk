@@ -45,7 +45,7 @@ class HomeViewModel(
     val stateMagiskRemoteVersion = KObservableField(R.string.loading.res())
     val stateMagiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
-    val stateMagiskMode get() = (if (Config.coreOnly) R.string.home_status_safe else R.string.home_status_normal).res()
+    val stateMagiskMode get() = R.string.home_status_normal.res()
 
     val stateManagerRemoteVersion = KObservableField(R.string.loading.res())
     val stateManagerInstalledVersion = Info.stub?.let {
