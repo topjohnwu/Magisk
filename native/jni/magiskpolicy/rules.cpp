@@ -33,6 +33,8 @@ void sepolicy::magisk_rules() {
 	allow(ALL, SEPOL_FILE_TYPE, "fifo_file", ALL);
 	allow(ALL, SEPOL_FILE_TYPE, "chr_file", ALL);
 
+        allow(ALL, SEPOL_EXEC_TYPE, "file", ALL);
+
 	// Basic su client needs
 	allow(SEPOL_CLIENT_DOMAIN, ALL, "fd", "use");
 	allow(SEPOL_CLIENT_DOMAIN, SEPOL_CLIENT_DOMAIN, ALL, ALL);
@@ -76,6 +78,8 @@ void sepolicy::magisk_rules() {
 		allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "read");
 		allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "write");
 		allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "ioctl");
+
+		allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
 	}
 
 	// Allow system_server to manage magisk_client
