@@ -293,6 +293,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 			break;
 		case NAMESPACE_MODE_ISOLATE:
 			LOGD("su: use new isolated namespace\n");
+			switch_mnt_ns(ctx.pid);
 			xunshare(CLONE_NEWNS);
 			xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
 			break;
