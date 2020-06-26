@@ -35,10 +35,11 @@ class Keygen(context: Context) : CertKeyProvider {
         private const val ALIAS = "magisk"
         private val PASSWORD get() = "magisk".toCharArray()
         private const val TESTKEY_CERT = "61ed377e85d386a8dfee6b864bd85b0bfaa5af81"
+        private const val DNAME = "C=US,ST=California,L=Mountain View,O=Google Inc.,OU=Android,CN=Android"
         private const val BASE64_FLAG = Base64.NO_PADDING or Base64.NO_WRAP
     }
 
-    private val start = Calendar.getInstance()
+    private val start = Calendar.getInstance().apply { add(Calendar.MONTH, -3) }
     private val end = Calendar.getInstance().apply { add(Calendar.YEAR, 30) }
 
     override val cert get() = provider.cert
@@ -85,17 +86,6 @@ class Keygen(context: Context) : CertKeyProvider {
         }
     }
 
-    private fun randomString(): String {
-        val rand = kotlin.random.Random.Default
-        val len = rand.nextInt(5, 10)
-        val sb = StringBuilder(len)
-        for (i in 0..len) {
-            val idx = rand.nextInt(ALPHANUM.length)
-            sb.append(ALPHANUM[idx])
-        }
-        return sb.toString()
-    }
-
     private fun init(): KeyStore {
         val raw = Config.keyStoreRaw
         val ks = KeyStore.getInstance("PKCS12")
@@ -117,7 +107,7 @@ class Keygen(context: Context) : CertKeyProvider {
 
         // Generate new private key and certificate
         val kp = KeyPairGenerator.getInstance("RSA").apply { initialize(4096) }.genKeyPair()
-        val dname = X500Name("CN=${randomString()}")
+        val dname = X500Name(DNAME)
         val builder = JcaX509v3CertificateBuilder(dname, BigInteger(160, Random()),
             start.time, end.time, dname, kp.public)
         val signer = JcaContentSignerBuilder("SHA1WithRSA").build(kp.private)
