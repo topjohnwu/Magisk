@@ -21,7 +21,7 @@ class UpdateCheckService(context: Context, workerParams: WorkerParameters)
             magiskRepo.fetchUpdate().blockingGet()
             if (BuildConfig.VERSION_CODE < Info.remote.app.versionCode)
                 Notifications.managerUpdate(applicationContext)
-            else if (Info.env.magiskVersionCode < Info.remote.magisk.versionCode)
+            else if (Info.env.isActive && Info.env.magiskVersionCode < Info.remote.magisk.versionCode)
                 Notifications.magiskUpdate(applicationContext)
             Result.success()
         }.getOrElse {
