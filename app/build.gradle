@@ -22,6 +22,7 @@ android {
         multiDexEnabled true
         versionName props['appVersion']
         versionCode props['appVersionCode'] as Integer
+        buildConfigField 'int', 'LATEST_MAGISK', props['versionCode'] ?: 'Integer.MAX_VALUE'
 
         javaCompileOptions {
             annotationProcessorOptions {

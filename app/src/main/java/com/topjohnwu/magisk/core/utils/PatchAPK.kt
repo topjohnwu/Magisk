@@ -103,8 +103,7 @@ object PatchAPK {
     }
 
     private fun patchAndHide(context: Context, label: String): Boolean {
-        val dlStub = !isRunningAsStub && SDK_INT >= 28 &&
-                Info.env.magiskVersionCode >= Const.Version.PROVIDER_CONNECT
+        val dlStub = !isRunningAsStub && SDK_INT >= 28 && Const.Version.atLeast_20_2()
         val src = if (dlStub) {
             val stub = File(context.cacheDir, "stub.apk")
             val svc = get<GithubRawServices>()

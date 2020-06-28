@@ -9,7 +9,6 @@ import androidx.collection.ArrayMap
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.model.toPolicy
@@ -38,7 +37,7 @@ abstract class SuRequestHandler(
         val name = intent.getStringExtra("socket") ?: return false
 
         try {
-            if (Info.env.magiskVersionCode >= Const.Version.SEPOLICY_REDESIGN) {
+            if (Const.Version.atLeastCanary()) {
                 val server = LocalServerSocket(name)
                 val futureSocket = Shell.EXECUTOR.submit(Callable { server.accept() })
                 try {
