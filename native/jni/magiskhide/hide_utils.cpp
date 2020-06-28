@@ -239,6 +239,9 @@ int launch_magiskhide() {
 
 	LOGI("* Starting MagiskHide\n");
 
+	// Initialize the mutex lock
+	pthread_mutex_init(&monitor_lock, nullptr);
+
 	// Initialize the hide list
 	if (!init_list())
 		return DAEMON_ERROR;
@@ -246,9 +249,6 @@ int launch_magiskhide() {
 	hide_sensitive_props();
 	if (DAEMON_STATE >= STATE_BOOT_COMPLETE)
 		hide_late_sensitive_props();
-
-	// Initialize the mutex lock
-	pthread_mutex_init(&monitor_lock, nullptr);
 
 	// Start monitoring
 	void *(*start)(void*) = [](void*) -> void* { proc_monitor(); return nullptr; };
