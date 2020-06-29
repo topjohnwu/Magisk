@@ -85,7 +85,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun recreate() {
-        startActivity(intent)
+        startActivity(Intent().setComponent(intent.component))
         finish()
     }
 
