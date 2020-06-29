@@ -27,7 +27,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
-                    android:text="@{viewModel.consoleText}"
+                    precomputedText="@{viewModel.consoleText}"
                     android:textAppearance="@style/AppearanceFoundation.Caption"
                     android:textSize="10sp"
                     android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
