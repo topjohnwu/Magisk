@@ -83,7 +83,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${vKotlin}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${vKotlin}"
 
-    def vBAdapt = '3.1.1'
+    def vBAdapt = '4.0.0'
     def bindingAdapter = 'me.tatarka.bindingcollectionadapter2:bindingcollectionadapter'
     implementation "${bindingAdapter}:${vBAdapt}"
     implementation "${bindingAdapter}-recyclerview:${vBAdapt}"
@@ -98,7 +98,7 @@ dependencies {
     implementation "com.github.topjohnwu.libsu:core:${vLibsu}"
     implementation "com.github.topjohnwu.libsu:io:${vLibsu}"
 
-    def vKoin = '2.0.1'
+    def vKoin = '2.1.6'
     implementation "org.koin:koin-core:${vKoin}"
     implementation "org.koin:koin-android:${vKoin}"
     implementation "org.koin:koin-androidx-viewmodel:${vKoin}"
@@ -132,7 +132,7 @@ dependencies {
 
     implementation 'androidx.biometric:biometric:1.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta7'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-rc01'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.browser:browser:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'

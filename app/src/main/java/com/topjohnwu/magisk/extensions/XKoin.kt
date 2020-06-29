@@ -1,10 +1,10 @@
 package com.topjohnwu.magisk.extensions
 
-import org.koin.core.context.GlobalContext
+import org.koin.core.context.KoinContextHandler
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 
-fun getKoin() = GlobalContext.get().koin
+fun getKoin() = KoinContextHandler.get()
 
 inline fun <reified T> inject(
     qualifier: Qualifier? = null,
