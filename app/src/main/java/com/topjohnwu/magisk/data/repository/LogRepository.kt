@@ -15,8 +15,22 @@ class LogRepository(
     fun fetchLogs() = logDao.fetchAll()
 
     fun fetchMagiskLogs() = Single.fromCallable {
-        Shell.su("tail -n 5000 ${Const.MAGISK_LOG}").exec().out
-    }.flattenAsFlowable { it }.filter { it.isNotEmpty() }
+        val list = object : AbstractMutableList<String>() {
+            val buf = StringBuilder()
+            override val size get() = 0
+            override fun get(index: Int): String = ""
+            override fun removeAt(index: Int): String = ""
+            override fun set(index: Int, element: String): String = ""
+            override fun add(index: Int, element: String) {
+                if (element.isNotEmpty()) {
+                    buf.append(element)
+                    buf.append('\n')
+                }
+            }
+        }
+        Shell.su("cat ${Const.MAGISK_LOG}").to(list).exec()
+        list.buf.toString()
+    }
 
     fun clearLogs() = logDao.deleteAll()
 

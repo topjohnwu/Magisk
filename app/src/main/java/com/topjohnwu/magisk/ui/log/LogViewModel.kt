@@ -6,14 +6,13 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.model.binding.BindingAdapter
-import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -32,18 +31,16 @@ class LogViewModel(
     val itemEmpty = TextItem(R.string.log_data_none)
     val itemMagiskEmpty = TextItem(R.string.log_data_magisk_none)
 
-    // --- main view
+    // --- su log
 
     val items = diffListOf<LogItem>()
     val itemBinding = itemBindingOf<LogItem> {
         it.bindExtra(BR.viewModel, this)
     }
 
-    // --- console
+    // --- magisk log
 
-    val consoleAdapter = BindingAdapter<ConsoleItem>()
-    val itemsConsole = diffListOf<ConsoleItem>()
-    val itemConsoleBinding = itemBindingOf<ConsoleItem>()
+    val consoleText = KObservableField(" ")
 
     override fun refresh(): Disposable {
         val logs = repo.fetchLogs()
@@ -63,12 +60,7 @@ class LogViewModel(
             .ignoreElement()
 
         val console = repo.fetchMagiskLogs()
-            .map { ConsoleItem(it) }
-            .toList()
-            .observeOn(Schedulers.computation())
-            .map { it to itemsConsole.calculateDiff(it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { itemsConsole.update(it.first, it.second) }
+            .doOnSuccess { consoleText.value = it }
             .ignoreElement()
 
         return Completable.merge(listOf(logs, console)).subscribeK()
