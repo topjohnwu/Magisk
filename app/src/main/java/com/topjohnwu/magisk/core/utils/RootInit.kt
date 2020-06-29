@@ -18,9 +18,9 @@ class RootInit : Shell.Initializer() {
     fun init(context: Context, shell: Shell): Boolean {
         shell.newJob().apply {
             if (Const.Version.atLeast_20_4()) {
-                add("MAGISKTMP=$(magisk --path)/.magisk")
+                add("export MAGISKTMP=$(magisk --path)/.magisk")
             } else {
-                add("MAGISKTMP=/sbin/.magisk")
+                add("export MAGISKTMP=/sbin/.magisk")
             }
             if (Const.Version.atLeastCanary()) {
                 add("export ASH_STANDALONE=1")
