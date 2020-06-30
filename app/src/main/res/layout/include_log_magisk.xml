@@ -14,10 +14,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             gone="@{viewModel.consoleText.empty}"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -36,7 +38,7 @@
 
             </HorizontalScrollView>
 
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <FrameLayout
             gone="@{!viewModel.consoleText.empty}"
