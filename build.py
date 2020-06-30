@@ -398,6 +398,22 @@ def build_stub(args):
     header('* Building Magisk Manager stub')
     build_apk(args, 'stub')
 
+# Bind mount snet package on top of the stub folder
+def build_snet(args):
+    header('* Building snet extension')
+    proc = execv([gradlew, 'stub:assembleRelease'])
+    if proc.returncode != 0:
+        error('Build snet extention failed!')
+    source = op.join('stub', 'build', 'outputs', 'apk',
+                     'release', 'stub-release.apk')
+    target = op.join(config['outdir'], 'snet.jar')
+    # Extract classes.dex
+    with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zout:
+        with zipfile.ZipFile(source) as zin:
+            zout.writestr('classes.dex', zin.read('classes.dex'))
+    rm(source)
+    header('Output: ' + target)
+
 
 def zip_main(args):
     header('* Packing Flashable Zip')

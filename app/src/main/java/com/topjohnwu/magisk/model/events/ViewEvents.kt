@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.core.utils.SafetyNetHelper
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.DynamicClassLoader
+import com.topjohnwu.magisk.extensions.OnErrorListener
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.utils.RxBus
@@ -19,8 +20,10 @@ import com.topjohnwu.superuser.Shell
 import dalvik.system.DexFile
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
+import org.json.JSONObject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import timber.log.Timber
 import java.io.File
 import java.lang.reflect.InvocationHandler
 
@@ -40,18 +43,25 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
     private val magiskRepo by inject<MagiskRepository>()
     private val rxBus by inject<RxBus>()
 
-    private lateinit var EXT_APK: File
-    private lateinit var EXT_DEX: File
+    private lateinit var apk: File
+    private lateinit var dex: File
 
     override fun invoke(context: Context) {
-        val die = ::EXT_APK.isInitialized
+        apk = File("${context.filesDir.parent}/snet", "snet.jar")
+        dex = File(apk.parent, "snet.dex")
 
-        EXT_APK = File("${context.filesDir.parent}/snet", "snet.jar")
-        EXT_DEX = File(EXT_APK.parent, "snet.dex")
+        attest(context) {
+            // Download and retry
+            Shell.sh("rm -rf " + apk.parent).exec()
+            apk.parentFile?.mkdir()
+            download(context, true)
+        }
+    }
 
+    private fun attest(context: Context, onError: OnErrorListener) {
         Completable.fromAction {
-            val loader = DynamicClassLoader(EXT_APK)
-            val dex = DexFile.loadDex(EXT_APK.path, EXT_DEX.path, 0)
+            val loader = DynamicClassLoader(apk)
+            val dex = DexFile.loadDex(apk.path, dex.path, 0)
 
             // Scan through the dex and find our helper class
             var helperClass: Class<*>? = null
@@ -66,32 +76,25 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
             }
             helperClass ?: throw Exception()
 
-            val helper = helperClass.getMethod(
-                "get",
-                Class::class.java, Context::class.java, Any::class.java
-            )
+            val helper = helperClass
+                .getMethod("get", Class::class.java, Context::class.java, Any::class.java)
                 .invoke(null, SafetyNetHelper::class.java, context, this) as SafetyNetHelper
 
             if (helper.version < Const.SNET_EXT_VER)
                 throw Exception()
 
             helper.attest()
-        }.subscribeK(onError = {
-            if (die) {
-                rxBus.post(SafetyNetResult(-1))
-            } else {
-                Shell.sh("rm -rf " + EXT_APK.parent).exec()
-                EXT_APK.parentFile?.mkdir()
-                download(context, true)
-            }
-        })
+        }.subscribeK(onError = onError)
     }
 
     @Suppress("SameParameterValue")
     private fun download(context: Context, askUser: Boolean) {
         fun downloadInternal() = magiskRepo.fetchSafetynet()
-            .map { it.byteStream().writeTo(EXT_APK) }
-            .subscribeK { invoke(context) }
+            .map { it.byteStream().writeTo(apk) }
+            .subscribeK { attest(context) {
+                Timber.e(it)
+                rxBus.post(SafetyNetResult())
+            } }
 
         if (!askUser) {
             downloadInternal()
@@ -107,14 +110,14 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
                 onClick { downloadInternal() }
             }
             .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                titleRes = android.R.string.no
-                onClick { rxBus.post(SafetyNetResult(-2)) }
+                titleRes = android.R.string.cancel
+                onClick { rxBus.post(SafetyNetResult(dismiss = true)) }
             }
             .reveal()
     }
 
-    override fun onResponse(responseCode: Int) {
-        rxBus.post(SafetyNetResult(responseCode))
+    override fun onResponse(response: JSONObject?) {
+        rxBus.post(SafetyNetResult(response))
     }
 }
 
