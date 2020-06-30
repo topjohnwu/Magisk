@@ -28,6 +28,7 @@ class SafetynetViewModel(
     val safetyNetTitle = KObservableField(R.string.empty)
     val ctsState = KObservableField(false)
     val basicIntegrityState = KObservableField(false)
+    val evalType = KObservableField("")
 
     val isChecking @Bindable get() = currentState == LOADING
     val isFailed @Bindable get() = currentState == FAILED
@@ -67,10 +68,12 @@ class SafetynetViewModel(
             runCatching {
                 val cts = getBoolean("ctsProfileMatch")
                 val basic = getBoolean("basicIntegrity")
+                val eval = optString("evaluationType")
                 val result = cts && basic
                 cachedResult = this
                 ctsState.value = cts
                 basicIntegrityState.value = basic
+                evalType.value = if (eval.contains("HARDWARE")) "HARDWARE" else "BASIC"
                 currentState = if (result) PASS else FAILED
                 safetyNetTitle.value =
                     if (result) R.string.safetynet_attest_success
@@ -79,12 +82,14 @@ class SafetynetViewModel(
                 currentState = FAILED
                 ctsState.value = false
                 basicIntegrityState.value = false
+                evalType.value = "N/A"
                 safetyNetTitle.value = R.string.safetynet_res_invalid
             }
         } ?: {
             currentState = FAILED
             ctsState.value = false
             basicIntegrityState.value = false
+            evalType.value = "N/A"
             safetyNetTitle.value = R.string.safetynet_api_error
         }()
     }
