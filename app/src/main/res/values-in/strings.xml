@@ -103,8 +103,8 @@
     <string name="target_uid">UID target: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetyNet_api_error">Kesalahan API SafetyNet</string>
-    <string name="safetyNet_res_invalid">Tanggapan tidak valid</string>
+    <string name="safetynet_api_error">Kesalahan API SafetyNet</string>
+    <string name="safetynet_res_invalid">Tanggapan tidak valid</string>
     <string name="safetynet_attest_success">Sukses!</string>
     <string name="safetynet_attest_failure">Pengesahan gagal!</string>
     <string name="safetynet_attest_loading">Tunggu sebentar…</string>
