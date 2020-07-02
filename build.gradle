@@ -1,3 +1,5 @@
+import java.nio.file.Paths
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 def props = new Properties()
@@ -57,6 +59,28 @@ subprojects {
                 compileOptions {
                     sourceCompatibility JavaVersion.VERSION_1_8
                     targetCompatibility JavaVersion.VERSION_1_8
+                }
+            }
+        }
+
+        tasks.whenTaskAdded { task ->
+            if (task.name == 'processReleaseResources') {
+                task.finalizedBy tasks.create('optimizeReleaseResources') {
+                    doLast {
+                        def aapt2 = Paths.get(android.sdkDirectory.path,
+                                'build-tools', android.buildToolsVersion, 'aapt2')
+                        def zip = Paths.get(project.buildDir.path, 'intermediates',
+                                'processed_res', 'release', 'out', 'resources-release.ap_')
+                        def optimized = new File("${zip}.opt")
+                        def cmd = exec {
+                            commandLine aapt2, 'optimize', '--collapse-resource-names',
+                                    '--shorten-resource-paths', '-o', optimized, zip
+                            ignoreExitValue true
+                        }
+                        if (cmd.exitValue == 0) {
+                            optimized.renameTo("$zip")
+                        }
+                    }
                 }
             }
         }

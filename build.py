@@ -57,12 +57,10 @@ default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
 ndk_ver = '21c'
 ndk_ver_full = '21.2.6472646'
-build_tools_ver = '30.0.0'
 
 ndk_root = op.join(os.environ['ANDROID_HOME'], 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
 ndk_build = op.join(ndk_path, 'ndk-build')
-build_tools = op.join(os.environ['ANDROID_HOME'], 'build-tools', build_tools_ver)
 gradlew = op.join('.', 'gradlew' + ('.bat' if is_windows else ''))
 
 # Global vars
@@ -345,42 +343,7 @@ def build_apk(args, module):
 
     source = op.join(module, 'build', 'outputs', 'apk', build_type, apk)
     target = op.join(config['outdir'], apk)
-
-    if args.release:
-        zipalign = op.join(build_tools, 'zipalign' + ('.exe' if is_windows else ''))
-        aapt2 = op.join(build_tools, 'aapt2' + ('.exe' if is_windows else ''))
-        apksigner = op.join(build_tools, 'apksigner' + ('.bat' if is_windows else ''))
-        try:
-            with tempfile.NamedTemporaryFile(delete=False) as f:
-                tmp = f.name
-
-            # AAPT2 optimization
-            execv([aapt2, 'optimize', '-o', tmp, '--collapse-resource-names',
-                  '--shorten-resource-paths', source])
-
-            # Recompress everything just to piss people off
-            with zipfile.ZipFile(source, 'w', compression=zipfile.ZIP_DEFLATED) as zout:
-                with zipfile.ZipFile(tmp) as zin:
-                    for e in zin.namelist():
-                        zout.writestr(e, zin.read(e))
-
-            # Zipalign
-            execv([zipalign, '-f', '4', source, target])
-
-            # Sign APK
-            execv([apksigner, 'sign',
-                  '--v4-signing-enabled', 'false',
-                  '--v1-signer-name', 'CERT',
-                  '--ks', config['keyStore'],
-                  '--ks-pass', f'pass:{config["keyStorePass"]}',
-                  '--ks-key-alias', config['keyAlias'],
-                  '--key-pass', f'pass:{config["keyPass"]}', target])
-        finally:
-            rm(tmp)
-            rm(source)
-    else:
-        mv(source, target)
-
+    mv(source, target)
     header('Output: ' + target)
     return target
 
