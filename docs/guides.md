@@ -90,7 +90,7 @@ All files you want Magisk to replace/inject for you should be placed in this fol
 
 ## Magisk Module Installer
 
-A Magisk Module Installer is a Magisk Module packaged in a zip file that can be flashed in Magisk Manager or custom recoveries such as TWRP. An installer have the same file structure as a Magisk module (please check the previous section for more info). The simplest Magisk Module Installer is just a Magisk Module packed in a zip file, with addition to the following files:
+A Magisk Module Installer is a Magisk Module packaged in a zip file that can be flashed in Magisk Manager or custom recoveries such as TWRP. An installer has the same file structure as a Magisk module (please check the previous section for more info). The simplest Magisk Module Installer is just a Magisk Module packed in a zip file, with addition to the following files:
 
 - `update-binary`: Download the latest [module_installer.sh](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) and rename/copy that script as `update-binary`
 - `updater-script`: This file should only contain the string `#MAGISK`
