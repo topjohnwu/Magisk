@@ -25,7 +25,7 @@ val viewModelModules = module {
     viewModel { SettingsViewModel(get()) }
     viewModel { SuperuserViewModel(get(), get(), get()) }
     viewModel { ThemeViewModel() }
-    viewModel { InstallViewModel() }
+    viewModel { InstallViewModel(get(), get()) }
     viewModel { MainViewModel() }
 
     // Legacy

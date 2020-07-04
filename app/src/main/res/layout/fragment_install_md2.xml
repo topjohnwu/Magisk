@@ -50,7 +50,7 @@
                             android:layout_height="wrap_content"
                             android:minHeight="?listPreferredItemHeightSmall">
 
-                            <androidx.appcompat.widget.AppCompatImageView
+                            <ImageView
                                 android:id="@+id/install_step_options_icon"
                                 style="@style/WidgetFoundation.Icon"
                                 isSelected="@{viewModel.step > 0}"
@@ -60,7 +60,7 @@
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:srcCompat="@drawable/ic_check_circle_md2" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
+                            <TextView
                                 android:id="@+id/install_step_options_title"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -129,7 +129,7 @@
                             android:layout_height="wrap_content"
                             android:minHeight="?listPreferredItemHeightSmall">
 
-                            <androidx.appcompat.widget.AppCompatImageView
+                            <ImageView
                                 android:id="@+id/install_step_method_icon"
                                 style="@style/WidgetFoundation.Icon"
                                 isSelected="@{viewModel.step > 1}"
@@ -139,7 +139,7 @@
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:srcCompat="@drawable/ic_check_circle_md2" />
 
-                            <androidx.appcompat.widget.AppCompatTextView
+                            <TextView
                                 android:id="@+id/install_step_method_title"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -217,6 +217,25 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/WidgetFoundation.Card.Variant"
+                    gone="@{viewModel.step != 0}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/l1"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l1"
+                    app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="15dp"
+                        android:textAppearance="@style/AppearanceFoundation.Caption"
+                        android:text="@{viewModel.notes}"/>
+
+                </com.google.android.material.card.MaterialCardView>
+
                 <com.google.android.material.button.MaterialButton
                     style="@style/WidgetFoundation.Button.Text"
                     gone="@{viewModel.step != 2}"
@@ -241,7 +260,7 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -279,7 +298,7 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"

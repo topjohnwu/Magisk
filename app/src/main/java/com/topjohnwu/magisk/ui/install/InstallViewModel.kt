@@ -1,13 +1,17 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
+import android.text.SpannableString
+import android.text.Spanned
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.utils.Utils
+import com.topjohnwu.magisk.data.repository.StringRepository
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.RequestFileEvent
@@ -15,20 +19,23 @@ import com.topjohnwu.magisk.model.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
+import io.noties.markwon.Markwon
 import org.koin.core.get
 import kotlin.math.roundToInt
 
-class InstallViewModel : BaseViewModel(State.LOADED) {
+class InstallViewModel(
+    stringRepo: StringRepository,
+    markwon: Markwon
+) : BaseViewModel(State.LOADED) {
 
     val isRooted get() = Shell.rootAccess()
     val isAB get() = Info.isAB
 
     val step = KObservableField(0)
     val method = KObservableField(-1)
-
     val progress = KObservableField(0)
-
-    var data = KObservableField<Uri?>(null)
+    val data = KObservableField<Uri?>(null)
+    val notes = KObservableField<Spanned>(SpannableString(""))
 
     init {
         RemoteFileService.reset()
@@ -42,8 +49,13 @@ class InstallViewModel : BaseViewModel(State.LOADED) {
                 state = State.LOADED
             }
         }
+        stringRepo.getString(Info.remote.magisk.note).map {
+            markwon.toMarkdown(it)
+        }.subscribeK {
+            notes.value = it
+        }
         method.addOnPropertyChangedCallback {
-            when (method.value) {
+            when (it!!) {
                 R.id.method_patch -> {
                     Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
                     RequestFileEvent().publish()
