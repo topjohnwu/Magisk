@@ -27,7 +27,7 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-String.metaClass.toFile = { new File(this) }
+String.metaClass.toFile = { new File(delegate) }
 def configFile = rootProject.findProperty('configPath')?.toFile() ?: rootProject.file('config.prop')
 if (!configFile.exists())
     throw new GradleException("Please setup config.prop")
