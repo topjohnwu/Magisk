@@ -200,11 +200,11 @@ def sign_zip(unsigned, output, release):
         return
 
     signer_name = 'zipsigner-3.0.jar'
-    zipsigner = op.join('signing', 'build', 'libs', signer_name)
+    zipsigner = op.join('app', 'signing', 'build', 'libs', signer_name)
 
     if not op.exists(zipsigner):
         header('* Building ' + signer_name)
-        proc = execv([gradlew, 'signing:shadowJar'])
+        proc = execv([gradlew, 'app:signing:shadowJar'])
         if proc.returncode != 0:
             error(f'Build {signer_name} failed!')
 
@@ -360,6 +360,7 @@ def build_app(args):
 def build_stub(args):
     header('* Building Magisk Manager stub')
     build_apk(args, 'stub')
+
 
 # Bind mount snet package on top of the stub folder
 def build_snet(args):
