@@ -47,16 +47,13 @@ object Config : PreferenceModel, DBConfig {
         const val UPDATE_CHANNEL = "update_channel"
         const val CUSTOM_CHANNEL = "custom_channel"
         const val LOCALE = "locale"
-        const val DARK_THEME = "dark_theme"
-        const val DARK_THEME_EXTENDED = "dark_theme_extended"
+        const val DARK_THEME = "dark_theme_extended"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
         const val DOWNLOAD_PATH = "download_path"
-        const val REDESIGN = "redesign"
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
-        const val LIST_SPAN_COUNT = "column_count"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -120,17 +117,12 @@ object Config : PreferenceModel, DBConfig {
     var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
 
     var safetyNotice by preference(Key.SAFETY, true)
-    var darkThemeExtended by preference(
-        Key.DARK_THEME_EXTENDED,
-        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-    )
+    var darkTheme by preference(Key.DARK_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
     var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
     var magiskHide by preference(Key.MAGISKHIDE, true)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
-    @JvmStatic
-    var listSpanCount by preference(Key.LIST_SPAN_COUNT, 1)
 
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
     var locale by preference(Key.LOCALE, "")

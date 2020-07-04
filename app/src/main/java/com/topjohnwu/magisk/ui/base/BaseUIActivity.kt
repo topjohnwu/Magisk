@@ -47,7 +47,7 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     open val snackbarView get() = binding.root
 
     init {
-        val theme = Config.darkThemeExtended
+        val theme = Config.darkTheme
         AppCompatDelegate.setDefaultNightMode(theme)
     }
 

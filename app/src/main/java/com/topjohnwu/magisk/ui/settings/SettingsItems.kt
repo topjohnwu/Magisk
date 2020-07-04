@@ -21,8 +21,6 @@ import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
 import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.superuser.Shell
 import java.io.File
-import kotlin.math.max
-import kotlin.math.min
 
 // --- Customization
 
@@ -121,17 +119,6 @@ object DownloadPath : SettingsItem.Input() {
 
     override fun getView(context: Context) = DialogSettingsDownloadPathBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
-}
-
-object GridSize : SettingsItem.Selector() {
-    override var value by bindableValue(Config.listSpanCount - 1) {
-        Config.listSpanCount = max(1, min(2, it + 1))
-    }
-
-    override val title = R.string.settings_grid_column_count_title.asTransitive()
-    override val description = R.string.settings_grid_column_count_summary.asTransitive()
-    override val entryRes = R.array.span_count
-    override val entryValRes = R.array.value_array
 }
 
 object UpdateChannel : SettingsItem.Selector() {

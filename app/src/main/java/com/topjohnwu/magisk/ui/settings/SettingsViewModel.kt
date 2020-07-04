@@ -40,7 +40,7 @@ class SettingsViewModel(
         // Customization
         val list = mutableListOf(
             Customization,
-            Theme, Language, GridSize
+            Theme, Language
         )
         if (Build.VERSION.SDK_INT < 21) {
             // Pre 5.0 does not support getting colors from attributes,
