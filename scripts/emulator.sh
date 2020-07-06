@@ -57,7 +57,7 @@ pgrep magiskd >/dev/null && pkill -9 magiskd
 [ -e /sys/fs/selinux ] && SELINUX=true || SELINUX=false
 if $SELINUX; then
   ln -sf ./magiskinit magiskpolicy
-  ./magiskpolicy --live --magisk 'allow magisk * * *'
+  ./magiskpolicy --live --magisk
 fi
 
 # Setup sbin overlay
@@ -94,9 +94,6 @@ chmod 755 /sbin/magisk
 ln -s ./magisk /sbin/su
 ln -s ./magisk /sbin/resetprop
 ln -s ./magisk /sbin/magiskhide
-mkdir -p /sbin/.magisk/busybox
-cp -af ./busybox /sbin/.magisk/busybox/busybox
-/sbin/.magisk/busybox/busybox --install -s /sbin/.magisk/busybox
 mkdir -p /data/adb/modules 2>/dev/null
 mkdir /data/adb/post-fs-data.d 2>/dev/null
 mkdir /data/adb/services.d 2>/dev/null

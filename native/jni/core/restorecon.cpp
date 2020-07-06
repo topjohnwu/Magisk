@@ -1,6 +1,7 @@
 #include <string_view>
 
 #include <magisk.hpp>
+#include <daemon.hpp>
 #include <selinux.hpp>
 #include <utils.hpp>
 
@@ -87,7 +88,7 @@ void restore_tmpcon() {
 	int dfd = dirfd(dir.get());
 
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		if (entry->d_name == "magisk"sv)
+		if (SDK_INT >= 26 && entry->d_name == "magisk"sv)
 			setfilecon_at(dfd, entry->d_name, EXEC_CON);
 		else
 			setfilecon_at(dfd, entry->d_name, SYSTEM_CON);

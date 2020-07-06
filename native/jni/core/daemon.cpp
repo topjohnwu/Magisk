@@ -156,6 +156,8 @@ static void daemon_entry(int ppid) {
 	setsid();
 	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 
+	LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
+
 	// Make sure ppid is not in acct
 	char src[64], dest[64];
 	sprintf(src, "/acct/uid_0/pid_%d", ppid);
@@ -166,20 +168,6 @@ static void daemon_entry(int ppid) {
 	xreadlink("/proc/self/exe", src, sizeof(src));
 	MAGISKTMP = dirname(src);
 	xstat("/proc/self/exe", &self_st);
-
-	restore_tmpcon();
-
-	// SAR cleanups
-	auto mount_list = MAGISKTMP + "/" ROOTMNT;
-	if (access(mount_list.data(), F_OK) == 0) {
-		file_readline(true, mount_list.data(), [](string_view line) -> bool {
-			umount2(line.data(), MNT_DETACH);
-			return true;
-		});
-	}
-	unlink("/dev/.se");
-
-	LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
 
 	// Get API level
 	parse_prop_file("/system/build.prop", [](auto key, auto val) -> bool {
@@ -197,6 +185,18 @@ static void daemon_entry(int ppid) {
 		}
 	}
 	LOGI("* Device API level: %d\n", SDK_INT);
+
+	restore_tmpcon();
+
+	// SAR cleanups
+	auto mount_list = MAGISKTMP + "/" ROOTMNT;
+	if (access(mount_list.data(), F_OK) == 0) {
+		file_readline(true, mount_list.data(), [](string_view line) -> bool {
+			umount2(line.data(), MNT_DETACH);
+			return true;
+		});
+	}
+	unlink("/dev/.se");
 
 	// Load config status
 	auto config = MAGISKTMP + "/" INTLROOT "/config";
