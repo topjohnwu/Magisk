@@ -1,5 +1,3 @@
-import java.util.*
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -7,10 +5,6 @@ plugins {
     kotlin("kapt")
     id("androidx.navigation.safeargs.kotlin")
 }
-
-val props = Properties()
-val vKotlin = "1.3.72"
-val vNav = "2.3.0"
 
 kapt {
     correctErrorTypes = true
