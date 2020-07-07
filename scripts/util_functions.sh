@@ -245,20 +245,25 @@ mount_partitions() {
   fi
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
-  # Mount ro partitions
-  mount_ro_ensure "system$SLOT app$SLOT" /system
-  if [ -f /system/init -o -L /system/init ]; then
-    SYSTEM_ROOT=true
-    setup_mntpoint /system_root
-    if ! mount --move /system /system_root; then
-      umount /system
-      umount -l /system 2>/dev/null
-      mount_ro_ensure "system$SLOT app$SLOT" /system_root
+  if [ -z $S ] || [ $S == "/system" ] || [ $S == "/system/system" ]; then
+    # Mount ro partitions
+    mount_ro_ensure "system$SLOT app$SLOT" /system
+    if [ -f /system/init -o -L /system/init ]; then
+      SYSTEM_ROOT=true
+      setup_mntpoint /system_root
+      if ! mount --move /system /system_root; then
+        umount /system
+        umount -l /system 2>/dev/null
+        mount_ro_ensure "system$SLOT app$SLOT" /system_root
+      fi
+      mount -o bind /system_root/system /system
+    else
+      grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
+      && SYSTEM_ROOT=true || SYSTEM_ROOT=false
     fi
-    mount -o bind /system_root/system /system
   else
-    grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
-    && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+    SYSTEM_ROOT=true
+    mount -o bind $S /system
   fi
   # /vendor is used only on some older devices for recovery AVBv1 signing so is not critical if fails
   [ -L /system/vendor ] && mount_name vendor$SLOT /vendor '-o ro'
