@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
-import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import androidx.core.os.postDelayed
@@ -26,7 +25,8 @@ import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
-import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.kamranzafar.jtar.TarEntry
 import org.kamranzafar.jtar.TarHeader
 import org.kamranzafar.jtar.TarInputStream
@@ -43,14 +43,7 @@ import java.nio.ByteBuffer
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-interface FlashResultListener {
-
-    @MainThread
-    fun onResult(success: Boolean)
-
-}
-
-abstract class MagiskInstallImpl : FlashResultListener, KoinComponent {
+abstract class MagiskInstallImpl : KoinComponent {
 
     protected lateinit var installDir: File
     private lateinit var srcBoot: String
@@ -388,53 +381,48 @@ abstract class MagiskInstallImpl : FlashResultListener, KoinComponent {
     @WorkerThread
     protected abstract fun operations(): Boolean
 
-    fun exec() {
-        Single.fromCallable { operations() }.subscribeK { onResult(it) }
-    }
+    open suspend fun exec() = withContext(Dispatchers.IO) { operations() }
 }
 
 sealed class MagiskInstaller(
     file: Uri,
     console: MutableList<String>,
-    logs: MutableList<String>,
-    private val resultListener: FlashResultListener
+    logs: MutableList<String>
 ) : MagiskInstallImpl(file, console, logs) {
 
-    override fun onResult(success: Boolean) {
+    override suspend fun exec(): Boolean {
+        val success = super.exec()
         if (success) {
             console.add("- All done!")
         } else {
             Shell.sh("rm -rf $installDir").submit()
             console.add("! Installation failed")
         }
-        resultListener.onResult(success)
+        return success
     }
 
     class Patch(
         file: Uri,
         private val uri: Uri,
         console: MutableList<String>,
-        logs: MutableList<String>,
-        resultListener: FlashResultListener
-    ) : MagiskInstaller(file, console, logs, resultListener) {
+        logs: MutableList<String>
+    ) : MagiskInstaller(file, console, logs) {
         override fun operations() = doPatchFile(uri)
     }
 
     class SecondSlot(
         file: Uri,
         console: MutableList<String>,
-        logs: MutableList<String>,
-        resultListener: FlashResultListener
-    ) : MagiskInstaller(file, console, logs, resultListener) {
+        logs: MutableList<String>
+    ) : MagiskInstaller(file, console, logs) {
         override fun operations() = secondSlot()
     }
 
     class Direct(
         file: Uri,
         console: MutableList<String>,
-        logs: MutableList<String>,
-        resultListener: FlashResultListener
-    ) : MagiskInstaller(file, console, logs, resultListener) {
+        logs: MutableList<String>
+    ) : MagiskInstaller(file, console, logs) {
         override fun operations() = direct()
     }
 
@@ -445,7 +433,8 @@ class EnvFixTask(
 ) : MagiskInstallImpl() {
     override fun operations() = fixEnv(zip)
 
-    override fun onResult(success: Boolean) {
+    override suspend fun exec(): Boolean {
+        val success = super.exec()
         LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(EnvFixDialog.DISMISS))
         Utils.toast(
             if (success) R.string.reboot_delay_toast else R.string.setup_fail,
@@ -453,5 +442,6 @@ class EnvFixTask(
         )
         if (success)
             UiThreadHandler.handler.postDelayed(5000) { reboot() }
+        return success
     }
 }

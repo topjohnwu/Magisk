@@ -5,11 +5,11 @@ import android.content.res.Resources
 import android.net.Uri
 import android.view.MenuItem
 import androidx.databinding.ObservableArrayList
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.tasks.FlashResultListener
-import com.topjohnwu.magisk.core.tasks.Flashing
+import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.extensions.*
@@ -21,13 +21,14 @@ import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 
 class FlashViewModel(
     args: FlashFragmentArgs,
     private val resources: Resources
-) : BaseViewModel(), FlashResultListener {
+) : BaseViewModel() {
 
     val showReboot = KObservableField(Shell.rootAccess())
     val behaviorText = KObservableField(resources.getString(R.string.flashing))
@@ -51,30 +52,36 @@ class FlashViewModel(
     }
 
     private fun startFlashing(installer: Uri, uri: Uri?, action: String) {
-        when (action) {
-            Const.Value.FLASH_ZIP -> {
-                Flashing.Install(installer, outItems, logItems, this).exec()
+        viewModelScope.launch {
+            val result = when (action) {
+                Const.Value.FLASH_ZIP -> {
+                    FlashZip(installer, outItems, logItems).exec()
+                }
+                Const.Value.UNINSTALL -> {
+                    showReboot.value = false
+                    FlashZip.Uninstall(installer, outItems, logItems).exec()
+                }
+                Const.Value.FLASH_MAGISK -> {
+                    MagiskInstaller.Direct(installer, outItems, logItems).exec()
+                }
+                Const.Value.FLASH_INACTIVE_SLOT -> {
+                    MagiskInstaller.SecondSlot(installer, outItems, logItems).exec()
+                }
+                Const.Value.PATCH_FILE -> {
+                    uri ?: return@launch
+                    showReboot.value = false
+                    MagiskInstaller.Patch(installer, uri, outItems, logItems).exec()
+                }
+                else -> {
+                    back()
+                    return@launch
+                }
             }
-            Const.Value.UNINSTALL -> {
-                showReboot.value = false
-                Flashing.Uninstall(installer, outItems, logItems, this).exec()
-            }
-            Const.Value.FLASH_MAGISK -> {
-                MagiskInstaller.Direct(installer, outItems, logItems, this).exec()
-            }
-            Const.Value.FLASH_INACTIVE_SLOT -> {
-                MagiskInstaller.SecondSlot(installer, outItems, logItems, this).exec()
-            }
-            Const.Value.PATCH_FILE -> {
-                uri ?: return
-                showReboot.value = false
-                MagiskInstaller.Patch(installer, uri, outItems, logItems, this).exec()
-            }
-            else -> back()
+            onResult(result)
         }
     }
 
-    override fun onResult(success: Boolean) {
+    private fun onResult(success: Boolean) {
         state = if (success) State.LOADED else State.LOADING_FAILED
         behaviorText.value = when {
             success -> resources.getString(R.string.done)

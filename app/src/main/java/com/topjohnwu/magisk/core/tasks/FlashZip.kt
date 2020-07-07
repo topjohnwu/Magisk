@@ -2,25 +2,29 @@ package com.topjohnwu.magisk.core.tasks
 
 import android.content.Context
 import android.net.Uri
+import androidx.core.os.postDelayed
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.unzip
 import com.topjohnwu.magisk.extensions.fileName
-import com.topjohnwu.magisk.extensions.inject
 import com.topjohnwu.magisk.extensions.readUri
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.superuser.Shell
-import io.reactivex.Single
+import com.topjohnwu.superuser.internal.UiThreadHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
-abstract class FlashZip(
+open class FlashZip(
     private val mUri: Uri,
     private val console: MutableList<String>,
     private val logs: MutableList<String>
-) : FlashResultListener {
+): KoinComponent {
 
-    private val context: Context by inject()
+    val context: Context by inject()
     private val installFolder = File(context.cacheDir, "flash").apply {
         if (!exists()) mkdirs()
     }
@@ -79,19 +83,37 @@ abstract class FlashZip(
             .exec().isSuccess
     }
 
-    fun exec() = Single
-        .fromCallable {
-            runCatching {
-                flash()
-            }.getOrElse {
-                it.printStackTrace()
+    open suspend fun exec() = withContext(Dispatchers.IO) {
+        try {
+            if (!flash()) {
+                console.add("! Installation failed")
                 false
-            }.apply {
-                Shell.su("cd /", "rm -rf ${tmpFile.parent} ${Const.TMP_FOLDER_PATH}")
-                    .submit()
+            } else {
+                true
             }
+        } catch (e: IOException) {
+            Timber.e(e)
+            false
+        } finally {
+            Shell.su("cd /", "rm -rf ${tmpFile.parent} ${Const.TMP_FOLDER_PATH}").submit()
         }
-        .subscribeK(onError = { onResult(false) }) { onResult(it) }
-        .let { Unit } // ignores result disposable
+    }
+
+    class Uninstall(
+        uri: Uri,
+        console: MutableList<String>,
+        log: MutableList<String>
+    ) : FlashZip(uri, console, log) {
+
+        override suspend fun exec(): Boolean {
+            val success = super.exec()
+            if (success) {
+                UiThreadHandler.handler.postDelayed(3000) {
+                    Shell.su("pm uninstall " + context.packageName).exec()
+                }
+            }
+            return success
+        }
+    }
 
 }

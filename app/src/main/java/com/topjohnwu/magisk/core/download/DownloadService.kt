@@ -21,6 +21,8 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.APKInstall
 import io.reactivex.Completable
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.koin.core.get
 import java.io.File
 import kotlin.random.Random.Default.nextInt
@@ -47,7 +49,9 @@ open class DownloadService : RemoteFileService() {
     ) = when (val conf = subject.configuration) {
         Uninstall -> FlashFragment.uninstall(subject.file, id)
         EnvFix -> {
-            remove(id); EnvFixTask(subject.file).exec()
+            remove(id)
+            GlobalScope.launch { EnvFixTask(subject.file).exec() }
+            Unit
         }
         is Patch -> FlashFragment.patch(subject.file, conf.fileUri, id)
         is Flash -> FlashFragment.flash(subject.file, conf is Secondary, id)
