@@ -22,7 +22,7 @@ class RepoUpdater(
     private suspend fun forcedReload(cached: MutableSet<String>) = coroutineScope {
         cached.forEach {
             launch {
-                val repo = Repo(it)
+                val repo = repoDB.getRepo(it)!!
                 try {
                     repo.update()
                     repoDB.addRepo(repo)
