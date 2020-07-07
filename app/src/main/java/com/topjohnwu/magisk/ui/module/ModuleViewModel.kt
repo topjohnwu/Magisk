@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.annotation.WorkerThread
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
@@ -30,8 +31,10 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
-import timber.log.Timber
 import kotlin.math.roundToInt
 
 /*
@@ -204,30 +207,28 @@ class ModuleViewModel(
     @Synchronized
     fun loadRemote() {
         // check for existing jobs
-        if (remoteJob?.isDisposed?.not() == true) {
+        if (isRemoteLoading)
             return
-        }
         if (itemsRemote.isEmpty()) {
             EndlessRecyclerScrollListener.ResetState().publish()
         }
 
-        fun loadRemoteDB(offset: Int) = Single
-            .fromCallable { dao.getRepos(offset) }
-            .map { it.map { RepoItem.Remote(it) } }
-
-        remoteJob = if (itemsRemote.isEmpty()) {
-            repoUpdater(refetch).andThen(loadRemoteDB(0))
-        } else {
-            loadRemoteDB(itemsRemote.size)
-        }.observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { isRemoteLoading = true }
-            .doOnSuccess { isRemoteLoading = false }
-            .doOnError { isRemoteLoading = false }
-            .subscribeK(onError = Timber::e) {
-                itemsRemote.addAll(it)
+        viewModelScope.launch {
+            suspend fun loadRemoteDB(offset: Int) = withContext(Dispatchers.IO) {
+                dao.getRepos(offset).map { RepoItem.Remote(it) }
             }
 
-        refetch = false
+            isRemoteLoading = true
+            val repos = if (itemsRemote.isEmpty()) {
+                repoUpdater(refetch)
+                loadRemoteDB(0)
+            } else {
+                loadRemoteDB(itemsRemote.size)
+            }
+            isRemoteLoading = false
+            itemsRemote.addAll(repos)
+            refetch = false
+        }
     }
 
     fun forceRefresh() {

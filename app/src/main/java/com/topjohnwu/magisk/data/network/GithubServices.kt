@@ -3,10 +3,9 @@ package com.topjohnwu.magisk.data.network
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.tasks.GithubRepoInfo
-import io.reactivex.Flowable
 import io.reactivex.Single
 import okhttp3.ResponseBody
-import retrofit2.adapter.rxjava2.Result
+import retrofit2.Response
 import retrofit2.http.*
 
 interface GithubRawServices {
@@ -40,6 +39,9 @@ interface GithubRawServices {
     @GET("$MAGISK_MODULES/{$MODULE}/master/{$FILE}")
     fun fetchModuleInfo(@Path(MODULE) id: String, @Path(FILE) file: String): Single<String>
 
+    @GET("$MAGISK_MODULES/{$MODULE}/master/{$FILE}")
+    suspend fun fetchModuleFile(@Path(MODULE) id: String, @Path(FILE) file: String): String
+
     //endregion
 
     /**
@@ -70,11 +72,11 @@ interface GithubRawServices {
 interface GithubApiServices {
 
     @GET("repos")
-    fun fetchRepos(
+    suspend fun fetchRepos(
         @Query("page") page: Int,
         @Header(Const.Key.IF_NONE_MATCH) etag: String,
         @Query("sort") sort: String = "pushed",
         @Query("per_page") count: Int = 100
-    ): Flowable<Result<List<GithubRepoInfo>>>
+    ): Response<List<GithubRepoInfo>>
 
 }
