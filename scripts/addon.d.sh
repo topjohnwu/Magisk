@@ -7,37 +7,8 @@
 #
 ########################################################
 
-trampoline() {
-  mount /data 2>/dev/null
-  if [ -f $MAGISKBIN/addon.d.sh ]; then
-    exec sh $MAGISKBIN/addon.d.sh "$@"
-    exit $?
-  elif [ "$1" = post-restore ]; then
-    ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
-    $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
-
-    if ! $BOOTMODE; then
-      # update-binary|updater <RECOVERY_API_VERSION> <OUTFD> <ZIPFILE>
-      OUTFD=$(ps | grep -v 'grep' | grep -oE 'update(.*) 3 [0-9]+' | cut -d" " -f3)
-      [ -z $OUTFD ] && OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'update(.*) 3 [0-9]+' | cut -d" " -f3)
-      # update_engine_sideload --payload=file://<ZIPFILE> --offset=<OFFSET> --headers=<HEADERS> --status_fd=<OUTFD>
-      [ -z $OUTFD ] && OUTFD=$(ps | grep -v 'grep' | grep -oE 'status_fd=[0-9]+' | cut -d= -f2)
-      [ -z $OUTFD ] && OUTFD=$(ps -Af | grep -v 'grep' | grep -oE 'status_fd=[0-9]+' | cut -d= -f2)
-    fi
-    ui_print() { $BOOTMODE && log -t Magisk -- "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD; }
-
-    ui_print "***********************"
-    ui_print " Magisk addon.d failed"
-    ui_print "***********************"
-    ui_print "! Cannot find Magisk binaries - was data wiped or not decrypted?"
-    ui_print "! Reflash OTA from decrypted recovery or reflash Magisk"
-  fi
-  exit 1
-}
-
-# Always use the script in /data
-MAGISKBIN=/data/adb/magisk
-[ "$0" = $MAGISKBIN/addon.d.sh ] || trampoline "$@"
+ADDOND=$S/addon.d
+MAGISKTMP=/tmp/magisk
 
 V1_FUNCS=/tmp/backuptool.functions
 V2_FUNCS=/postinstall/tmp/backuptool.functions
@@ -53,7 +24,8 @@ fi
 
 initialize() {
   # Load utility functions
-  . $MAGISKBIN/util_functions.sh
+  . $MAGISKTMP/util_functions.sh
+  MAGISKBIN=$MAGISKTMP
 
   if $BOOTMODE; then
     # Override ui_print when booted
@@ -81,8 +53,8 @@ main() {
   fi
   print_title "Magisk $PRETTY_VER addon.d"
 
+  is_mounted /data || mount /data 2>/dev/null
   mount_partitions
-  check_data
   get_flags
 
   if $backuptool_ab; then
@@ -110,7 +82,8 @@ main() {
 
 case "$1" in
   backup)
-    # Stub
+    cp -af $ADDOND/magisk $MAGISKTMP
+    mv $MAGISKTMP/boot_patch.sh.in $MAGISKTMP/boot_patch.sh
   ;;
   restore)
     # Stub

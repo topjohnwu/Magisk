@@ -80,9 +80,13 @@ if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
   mount -o rw,remount /system
-  ADDOND=/system/addon.d/99-magisk.sh
-  cp -af $COMMONDIR/addon.d.sh $ADDOND
-  chmod 755 $ADDOND
+  ADDOND=/system/addon.d
+  rm -rf $ADDOND/99-magisk.sh 2>/dev/null
+  rm -rf $ADDOND/magisk 2>/dev/null
+  mkdir -p $ADDOND/magisk
+  cp -af $MAGISKBIN/. $ADDOND/magisk
+  mv $ADDOND/magisk/boot_patch.sh $ADDOND/magisk/boot_patch.sh.in
+  mv $ADDOND/magisk/addon.d.sh $ADDOND/99-magisk.sh
 fi
 
 $BOOTMODE || recovery_actions
