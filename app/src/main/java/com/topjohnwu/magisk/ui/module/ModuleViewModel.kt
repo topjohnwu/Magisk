@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.module
 
 import android.Manifest
-import androidx.annotation.WorkerThread
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
@@ -27,14 +26,13 @@ import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
+import java.lang.Runnable
 import kotlin.math.roundToInt
 
 /*
@@ -143,7 +141,6 @@ class ModuleViewModel(
 
     // ---
 
-    private var remoteJob: Disposable? = null
     private var refetch = false
     private val dao
         get() = when (Config.repoOrder) {
@@ -176,33 +173,45 @@ class ModuleViewModel(
 
     // ---
 
-    override fun refresh(): Disposable {
+    override fun refresh(): Disposable? {
         if (itemsRemote.isEmpty())
             loadRemote()
-        return loadInstalled().subscribeK()
+        loadInstalled()
+        return null
     }
 
-    private fun loadInstalled() = Single.fromCallable { Module.loadModules() }
-        .map { it.map { ModuleItem(it) } }
-        .map { it.loadDetail() }
-        .map { it to itemsInstalled.calculateDiff(it) }
-        .applyViewModel(this)
-        .observeOn(AndroidSchedulers.mainThread())
-        .map {
-            itemsInstalled.update(it.first, it.second)
-            it.first
+    private suspend fun loadUpdates(installed: List<ModuleItem>) = withContext(Dispatchers.IO) {
+        installed
+            .mapNotNull { dao.getUpdatableRepoById(it.item.id, it.item.versionCode) }
+            .map { RepoItem.Update(it) }
+    }
+
+    private suspend fun List<ModuleItem>.loadDetails() = withContext(Dispatchers.IO) {
+        onEach {
+            launch {
+                it.repo = dao.getRepoById(it.item.id)
+            }
         }
-        .observeOn(Schedulers.io())
-        .map { loadUpdates(it) }
-        .map { it to itemsUpdatable.calculateDiff(it) }
-        .observeOn(AndroidSchedulers.mainThread())
-        .doOnSuccess { itemsUpdatable.update(it.first, it.second) }
-        .doOnSuccess {
-            addInstalledEmptyMessage()
-            addUpdatableEmptyMessage()
-            updateActiveState()
+    }
+
+    private fun loadInstalled() = viewModelScope.launch {
+        state = State.LOADING
+        val installed = Module.installed().map { ModuleItem(it) }
+        val detailLoad = async { installed.loadDetails() }
+        val updates = loadUpdates(installed)
+        val diff = withContext(Dispatchers.Default) {
+            val i = async { itemsInstalled.calculateDiff(installed) }
+            val u = async { itemsUpdatable.calculateDiff(updates) }
+            awaitAll(i, u)
         }
-        .ignoreElement()!!
+        detailLoad.await()
+        itemsInstalled.update(installed, diff[0])
+        itemsUpdatable.update(updates, diff[1])
+        addInstalledEmptyMessage()
+        addUpdatableEmptyMessage()
+        updateActiveState()
+        state = State.LOADED
+    }
 
     @Synchronized
     fun loadRemote() {
@@ -226,8 +235,8 @@ class ModuleViewModel(
                 loadRemoteDB(itemsRemote.size)
             }
             isRemoteLoading = false
-            itemsRemote.addAll(repos)
             refetch = false
+            UiThreadHandler.handler.post { itemsRemote.addAll(repos) }
         }
     }
 
@@ -274,13 +283,6 @@ class ModuleViewModel(
 
     // ---
 
-    @WorkerThread
-    private fun List<ModuleItem>.loadDetail() = onEach { module ->
-        Single.fromCallable { dao.getRepoById(module.item.id)!! }
-            .subscribeK(onError = {}) { module.repo = it }
-            .add()
-    }
-
     private fun update(repo: Repo, progress: Int) =
         Single.fromCallable { itemsRemote + itemsSearch }
             .map { it.first { it.item.id == repo.id } }
@@ -303,13 +305,6 @@ class ModuleViewModel(
 
     // ---
 
-    @WorkerThread
-    private fun loadUpdates(installed: List<ModuleItem>) = installed
-        .mapNotNull { dao.getUpdatableRepoById(it.item.id, it.item.versionCode) }
-        .map { RepoItem.Update(it) }
-
-    // ---
-
     fun updateActiveState() = Single.fromCallable { itemsInstalled.any { it.isModified } }
         .subscribeK { sectionActive.hasButton = it }
         .add()
@@ -326,7 +321,6 @@ class ModuleViewModel(
             Single.fromCallable { itemsRemote }
                 .subscribeK {
                     itemsRemote.removeAll(it)
-                    remoteJob?.dispose()
                     loadRemote()
                 }.add()
         }
