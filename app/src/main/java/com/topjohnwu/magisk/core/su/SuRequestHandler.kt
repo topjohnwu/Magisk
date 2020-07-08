@@ -13,12 +13,11 @@ import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.model.toPolicy
 import com.topjohnwu.magisk.extensions.now
-import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.internal.UiThreadHandler
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.*
-import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.SECONDS
 
 abstract class SuRequestHandler(
     private val packageManager: PackageManager,
@@ -33,35 +32,11 @@ abstract class SuRequestHandler(
 
     abstract fun onStart()
 
-    fun start(intent: Intent): Boolean {
+    suspend fun start(intent: Intent): Boolean {
         val name = intent.getStringExtra("socket") ?: return false
 
-        try {
-            if (Const.Version.atLeastCanary()) {
-                val server = LocalServerSocket(name)
-                val futureSocket = Shell.EXECUTOR.submit(Callable { server.accept() })
-                try {
-                    socket = futureSocket.get(1, TimeUnit.SECONDS)
-                } catch (e: Exception) {
-                    // Timeout or any IO errors
-                    throw e
-                } finally {
-                    server.close()
-                }
-            } else {
-                socket = LocalSocket()
-                socket.connect(LocalSocketAddress(name, LocalSocketAddress.Namespace.ABSTRACT))
-            }
-            output = DataOutputStream(BufferedOutputStream(socket.outputStream))
-            input = DataInputStream(BufferedInputStream(socket.inputStream))
-            val map = Shell.EXECUTOR.submit(Callable { readRequest() })
-                .runCatching { get(1, TimeUnit.SECONDS) }.getOrNull() ?: return false
-            val uid = map["uid"]?.toIntOrNull() ?: return false
-            policy = uid.toPolicy(packageManager)
-        } catch (e: Exception) {
-            Timber.e(e)
+        if (!init(name))
             return false
-        }
 
         // Never allow com.topjohnwu.magisk (could be malware)
         if (policy.packageName == BuildConfig.APPLICATION_ID)
@@ -77,8 +52,46 @@ abstract class SuRequestHandler(
                 return true
             }
         }
-        UiThreadHandler.run { onStart() }
+
+        onStart()
         return true
+    }
+
+    private suspend fun <T> Deferred<T>.timedAwait() : T? {
+        return withTimeoutOrNull(SECONDS.toMillis(1)) {
+            await()
+        }
+    }
+
+    private class SocketError : IOException()
+
+    private suspend fun init(name: String) = withContext(Dispatchers.IO) {
+        try {
+            if (Const.Version.atLeastCanary()) {
+                LocalServerSocket(name).use {
+                    socket = async { it.accept() }.timedAwait() ?: throw SocketError()
+                }
+            } else {
+                socket = LocalSocket()
+                socket.connect(LocalSocketAddress(name, LocalSocketAddress.Namespace.ABSTRACT))
+            }
+            output = DataOutputStream(BufferedOutputStream(socket.outputStream))
+            input = DataInputStream(BufferedInputStream(socket.inputStream))
+            val map = async { readRequest() }.timedAwait() ?: throw SocketError()
+            val uid = map["uid"]?.toIntOrNull() ?: throw SocketError()
+            policy = uid.toPolicy(packageManager)
+            true
+        } catch (e: Exception) {
+            when (e) {
+                is IOException, is PackageManager.NameNotFoundException -> {
+                    Timber.e(e)
+                    if (::socket.isInitialized)
+                        socket.close()
+                    false
+                }
+                else -> throw e  // Unexpected error
+            }
+        }
     }
 
     fun respond(action: Int, time: Int) {
@@ -91,7 +104,7 @@ abstract class SuRequestHandler(
         policy.until = until
         policy.uid = policy.uid % 100000 + Const.USER_ID * 100000
 
-        Shell.EXECUTOR.submit {
+        GlobalScope.launch(Dispatchers.IO) {
             try {
                 output.writeInt(policy.policy)
                 output.flush()

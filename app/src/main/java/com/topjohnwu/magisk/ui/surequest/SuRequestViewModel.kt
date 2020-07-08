@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
@@ -18,6 +19,7 @@ import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.internal.UiThreadHandler
+import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.util.concurrent.TimeUnit.SECONDS
@@ -72,8 +74,11 @@ class SuRequestViewModel(
         return false
     }
 
-    fun handleRequest(intent: Intent): Boolean {
-        return handler.start(intent)
+    fun handleRequest(intent: Intent) {
+        viewModelScope.launch {
+            if (!handler.start(intent))
+                DieEvent().publish()
+        }
     }
 
     private inner class Handler : SuRequestHandler(pm, policyDB) {
