@@ -50,7 +50,7 @@ class HideViewModel(
 
     val isFilterExpanded = KObservableField(false)
 
-    override fun refresh() = magiskRepo.fetchApps()
+    override fun rxRefresh() = magiskRepo.fetchApps()
         .map { it to magiskRepo.fetchHideTargets().blockingGet() }
         .map { pair -> pair.first.map { mergeAppTargets(it, pair.second) } }
         .flattenAsFlowable { it }

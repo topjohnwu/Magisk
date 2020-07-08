@@ -72,7 +72,7 @@ class HomeViewModel(
         }
     }
 
-    override fun refresh() = repoMagisk.fetchUpdate()
+    override fun rxRefresh() = repoMagisk.fetchUpdate()
         .onErrorReturn { null }
         .subscribeK { it?.updateUI() }
 

@@ -42,7 +42,7 @@ class LogViewModel(
 
     val consoleText = KObservableField(" ")
 
-    override fun refresh(): Disposable {
+    override fun rxRefresh(): Disposable {
         val logs = repo.fetchLogs()
             .map { it.map { LogItem(it) } }
             .observeOn(Schedulers.computation())

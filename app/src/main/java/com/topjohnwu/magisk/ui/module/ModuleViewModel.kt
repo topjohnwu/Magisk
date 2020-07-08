@@ -24,7 +24,6 @@ import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.KObservableField
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.*
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 import kotlin.math.roundToInt
@@ -47,7 +46,7 @@ class ModuleViewModel(
     private val repoName: RepoByNameDao,
     private val repoUpdated: RepoByUpdatedDao,
     private val repoUpdater: RepoUpdater
-) : BaseViewModel(), Queryable {
+) : BaseViewModel(useRx = false), Queryable {
 
     override val queryDelay = 1000L
     private var queryJob: Job? = null
@@ -168,11 +167,10 @@ class ModuleViewModel(
 
     // ---
 
-    override fun refresh(): Disposable? {
+    override fun refresh(): Job {
         if (itemsRemote.isEmpty())
             loadRemote()
-        loadInstalled()
-        return null
+        return loadInstalled()
     }
 
     private suspend fun loadUpdates(installed: List<ModuleItem>) = withContext(Dispatchers.IO) {

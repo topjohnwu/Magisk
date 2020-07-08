@@ -21,11 +21,13 @@ import io.reactivex.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.Job
 import org.koin.core.KoinComponent
 import androidx.databinding.Observable as BindingObservable
 
 abstract class BaseViewModel(
-    initialState: State = State.LOADING
+    initialState: State = State.LOADING,
+    val useRx: Boolean = true
 ) : ViewModel(), BindingObservable, KoinComponent {
 
     enum class State {
@@ -49,6 +51,7 @@ abstract class BaseViewModel(
     private val disposables = CompositeDisposable()
     private val _viewEvents = MutableLiveData<ViewEvent>()
     private var runningTask: Disposable? = null
+    private var runningJob: Job? = null
     private val refreshCallback = object : androidx.databinding.Observable.OnPropertyChangedCallback() {
         override fun onPropertyChanged(sender: androidx.databinding.Observable?, propertyId: Int) {
             requestRefresh()
@@ -62,13 +65,22 @@ abstract class BaseViewModel(
     /** This should probably never be called manually, it's called manually via delegate. */
     @Synchronized
     fun requestRefresh() {
-        if (runningTask?.isDisposed?.not() == true) {
+        if (useRx) {
+            if (runningTask?.isDisposed?.not() == true) {
+                return
+            }
+            runningTask = rxRefresh()
             return
         }
-        runningTask = refresh()
+        if (runningJob?.isActive == true) {
+            return
+        }
+        runningJob = refresh()
     }
 
-    protected open fun refresh(): Disposable? = null
+    protected open fun rxRefresh(): Disposable? = null
+
+    protected open fun refresh(): Job? = null
 
     open fun notifyStateChanged() {
         notifyPropertyChanged(BR.loading)

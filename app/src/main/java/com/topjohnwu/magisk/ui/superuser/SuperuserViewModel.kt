@@ -53,7 +53,7 @@ class SuperuserViewModel(
 
     // ---
 
-    override fun refresh() = db.fetchAll()
+    override fun rxRefresh() = db.fetchAll()
         .flattenAsFlowable { it }
         .parallel()
         .map { PolicyItem(it, it.applicationInfo.loadIcon(packageManager)) }
