@@ -21,8 +21,8 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.core.utils.updateConfig
 import com.topjohnwu.magisk.extensions.forceGetDeclaredField
-import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 
 fun AssetManager.addAssetPath(path: String) {
     DynAPK.addAssetPath(this, path)

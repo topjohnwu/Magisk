@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.home
 
 import android.Manifest
 import android.os.Build
+import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
@@ -24,7 +25,6 @@ import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import me.tatarka.bindingcollectionadapter2.BR
 import kotlin.math.roundToInt
@@ -37,22 +37,22 @@ class HomeViewModel(
     private val repoMagisk: MagiskRepository
 ) : BaseViewModel() {
 
-    val isNoticeVisible = KObservableField(Config.safetyNotice)
+    val isNoticeVisible = ObservableField(Config.safetyNotice)
 
-    val stateMagisk = KObservableField(MagiskState.LOADING)
-    val stateManager = KObservableField(MagiskState.LOADING)
+    val stateMagisk = ObservableField(MagiskState.LOADING)
+    val stateManager = ObservableField(MagiskState.LOADING)
 
-    val stateMagiskRemoteVersion = KObservableField(R.string.loading.res())
+    val stateMagiskRemoteVersion = ObservableField(R.string.loading.res())
     val stateMagiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
     val stateMagiskMode get() = R.string.home_status_normal.res()
 
-    val stateManagerRemoteVersion = KObservableField(R.string.loading.res())
+    val stateManagerRemoteVersion = ObservableField(R.string.loading.res())
     val stateManagerInstalledVersion = Info.stub?.let {
         "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${it.version})"
     } ?: "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     val statePackageName = packageName
-    val stateManagerProgress = KObservableField(0)
+    val stateManagerProgress = ObservableField(0)
 
     val items = listOf(DeveloperItem.Mainline, DeveloperItem.App, DeveloperItem.Project)
     val itemBinding = itemBindingOf<HomeItem> {
@@ -115,8 +115,6 @@ class HomeViewModel(
     ).map { check(it);it }
         .subscribeK { HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish() }
         .add()
-
-    fun toggle(kof: KObservableField<Boolean>) = kof.toggle()
 
     fun hideNotice() {
         Config.safetyNotice = false

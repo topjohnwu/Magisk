@@ -1,12 +1,13 @@
 package com.topjohnwu.magisk.core
 
+import androidx.databinding.ObservableField
 import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.utils.CachedValue
-import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import java.io.FileInputStream
@@ -35,7 +36,7 @@ object Info {
     @JvmStatic var ramdisk = false
 
     val isConnected by lazy {
-        KObservableField(false).also { field ->
+        ObservableField(false).also { field ->
             ReactiveNetwork.observeNetworkConnectivity(get())
                 .subscribeK {
                     field.value = it.available()

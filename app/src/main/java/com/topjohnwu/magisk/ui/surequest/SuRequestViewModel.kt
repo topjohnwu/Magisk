@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
+import androidx.databinding.ObservableField
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
@@ -14,10 +15,10 @@ import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.core.utils.BiometricHelper
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
@@ -31,16 +32,16 @@ class SuRequestViewModel(
     private val res: Resources
 ) : BaseViewModel() {
 
-    val icon = KObservableField<Drawable?>(null)
-    val title = KObservableField("")
-    val packageName = KObservableField("")
+    val icon = ObservableField<Drawable?>(null)
+    val title = ObservableField("")
+    val packageName = ObservableField("")
 
-    val denyText = KObservableField(res.getString(R.string.deny))
-    val warningText = KObservableField<CharSequence>(res.getString(R.string.su_warning))
+    val denyText = ObservableField(res.getString(R.string.deny))
+    val warningText = ObservableField<CharSequence>(res.getString(R.string.su_warning))
 
-    val selectedItemPosition = KObservableField(0)
+    val selectedItemPosition = ObservableField(0)
 
-    val grantEnabled = KObservableField(false)
+    val grantEnabled = ObservableField(false)
 
     private val items = res.getStringArray(R.array.allow_timeout).map { SpinnerRvItem(it) }
     val adapter = BindingListViewAdapter<SpinnerRvItem>(1).apply {

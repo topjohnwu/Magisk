@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.extensions.snackbar
 import com.topjohnwu.magisk.extensions.startAnimations
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent

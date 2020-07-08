@@ -5,11 +5,7 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import androidx.core.net.toUri
 import androidx.navigation.NavDeepLinkBuilder
 import com.topjohnwu.magisk.R

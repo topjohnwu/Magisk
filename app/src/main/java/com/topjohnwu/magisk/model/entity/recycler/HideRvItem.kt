@@ -2,16 +2,17 @@ package com.topjohnwu.magisk.model.entity.recycler
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.extensions.startAnimations
 import com.topjohnwu.magisk.extensions.toggle
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.hide.HideViewModel
-import com.topjohnwu.magisk.utils.KObservableField
 import kotlin.math.roundToInt
 
 class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
@@ -21,8 +22,8 @@ class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
     val packageName = item.info.info.packageName.orEmpty()
     val items = item.processes.map { HideProcessItem(it) }
 
-    val isExpanded = KObservableField(false)
-    val itemsChecked = KObservableField(0)
+    val isExpanded = ObservableField(false)
+    val itemsChecked = ObservableField(0)
     val itemsCheckedPercent = Observer(itemsChecked) {
         (itemsChecked.value.toFloat() / items.size * 100).roundToInt()
     }
@@ -68,7 +69,7 @@ class HideProcessItem(val item: StatefulProcess) : ComparableRvItem<HideProcessI
 
     override val layoutRes = R.layout.item_hide_process_md2
 
-    val isHidden = KObservableField(item.isHidden)
+    val isHidden = ObservableField(item.isHidden)
 
     fun toggle(viewModel: HideViewModel) {
         isHidden.toggle()

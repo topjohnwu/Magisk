@@ -1,18 +1,19 @@
 package com.topjohnwu.magisk.ui.log
 
+import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -40,7 +41,7 @@ class LogViewModel(
 
     // --- magisk log
 
-    val consoleText = KObservableField(" ")
+    val consoleText = ObservableField(" ")
 
     override fun rxRefresh(): Disposable {
         val logs = repo.fetchLogs()

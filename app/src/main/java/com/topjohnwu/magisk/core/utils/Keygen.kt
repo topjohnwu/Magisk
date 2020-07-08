@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.util.Base64
 import android.util.Base64OutputStream
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.utils.PatchAPK.ALPHANUM
 import com.topjohnwu.signing.CryptoUtils.readCertificate
 import com.topjohnwu.signing.CryptoUtils.readPrivateKey
 import org.bouncycastle.asn1.x500.X500Name

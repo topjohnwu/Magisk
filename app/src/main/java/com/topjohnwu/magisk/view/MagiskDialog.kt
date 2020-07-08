@@ -15,6 +15,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.updatePadding
+import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,8 +23,8 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.KObservableField
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 
@@ -71,10 +72,10 @@ class MagiskDialog @JvmOverloads constructor(
     }
 
     inner class Data {
-        val icon = KObservableField(0)
-        val iconRaw = KObservableField<Drawable?>(null)
-        val title = KObservableField<CharSequence>("")
-        val message = KObservableField<CharSequence>("")
+        val icon = ObservableField(0)
+        val iconRaw = ObservableField<Drawable?>(null)
+        val title = ObservableField<CharSequence>("")
+        val message = ObservableField<CharSequence>("")
 
         val buttonPositive = Button()
         val buttonNeutral = Button()
@@ -87,9 +88,9 @@ class MagiskDialog @JvmOverloads constructor(
     }
 
     inner class Button {
-        val icon = KObservableField(0)
-        val title = KObservableField<CharSequence>("")
-        val isEnabled = KObservableField(true)
+        val icon = ObservableField(0)
+        val title = ObservableField<CharSequence>("")
+        val isEnabled = ObservableField(true)
 
         var onClickAction: OnDialogButtonClickListener = {}
         var preventDismiss = false

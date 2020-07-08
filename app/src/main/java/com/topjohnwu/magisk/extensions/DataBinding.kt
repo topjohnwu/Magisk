@@ -55,3 +55,11 @@ inline fun <T> ObservableField<T>.updateNonNull(block: (T) -> Unit) {
 inline fun ObservableInt.update(block: (Int) -> Unit) {
     set(get().apply(block))
 }
+
+inline var <T> ObservableField<T>.value
+    get() = get() as T
+    set(value) {
+        // Use Kotlin comparision (Any.equals)
+        if (value != get())
+            set(value)
+    }

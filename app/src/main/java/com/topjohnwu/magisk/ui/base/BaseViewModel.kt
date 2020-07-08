@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.annotation.CallSuper
 import androidx.core.graphics.Insets
 import androidx.databinding.Bindable
+import androidx.databinding.ObservableField
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,10 +14,10 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.extensions.doOnSubscribeUi
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.navigation.NavigationWrapper
 import com.topjohnwu.magisk.model.observer.Observer
-import com.topjohnwu.magisk.utils.KObservableField
 import io.reactivex.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -40,7 +41,7 @@ abstract class BaseViewModel(
 
     val isConnected = Observer(Info.isConnected) { Info.isConnected.value }
     val viewEvents: LiveData<ViewEvent> get() = _viewEvents
-    val insets = KObservableField(Insets.NONE)
+    val insets = ObservableField(Insets.NONE)
 
     var state: State = initialState
         set(value) {

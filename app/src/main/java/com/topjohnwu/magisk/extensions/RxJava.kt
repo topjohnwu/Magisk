@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.extensions
 
 import androidx.databinding.ObservableField
-import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -75,34 +74,6 @@ fun Completable.subscribeK(
     onComplete: OnCompleteListener = {}
 ) = applySchedulers()
     .subscribe(onComplete, onError)
-
-
-fun <T> Observable<out T>.updateBy(
-    field: KObservableField<T?>
-) = doOnNextUi { field.value = it }
-    .doOnErrorUi { field.value = null }
-
-fun <T> Single<out T>.updateBy(
-    field: KObservableField<T?>
-) = doOnSuccessUi { field.value = it }
-    .doOnErrorUi { field.value = null }
-
-fun <T> Maybe<out T>.updateBy(
-    field: KObservableField<T?>
-) = doOnSuccessUi { field.value = it }
-    .doOnErrorUi { field.value = null }
-    .doOnComplete { field.value = field.value }
-
-fun <T> Flowable<out T>.updateBy(
-    field: KObservableField<T?>
-) = doOnNextUi { field.value = it }
-    .doOnErrorUi { field.value = null }
-
-fun Completable.updateBy(
-    field: KObservableField<Boolean>
-) = doOnCompleteUi { field.value = true }
-    .doOnErrorUi { field.value = false }
-
 
 fun <T> Observable<T>.doOnSubscribeUi(body: () -> Unit) =
     doOnSubscribe { UiThreadHandler.run { body() } }

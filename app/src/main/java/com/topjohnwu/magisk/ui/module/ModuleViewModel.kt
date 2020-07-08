@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.module
 
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
+import androidx.databinding.ObservableField
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -15,6 +16,7 @@ import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnListChangedCallback
 import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
@@ -23,7 +25,6 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
-import com.topjohnwu.magisk.utils.KObservableField
 import kotlinx.coroutines.*
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 import kotlin.math.roundToInt
@@ -63,7 +64,7 @@ class ModuleViewModel(
             searchLoading.value = true
         }
 
-    val searchLoading = KObservableField(false)
+    val searchLoading = ObservableField(false)
     val itemsSearch = diffListOf<RepoItem>()
     val itemSearchBinding = itemBindingOf<RepoItem> {
         it.bindExtra(BR.viewModel, this)

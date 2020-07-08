@@ -2,11 +2,12 @@ package com.topjohnwu.magisk.ui.hide
 
 import android.content.pm.ApplicationInfo
 import androidx.databinding.Bindable
+import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.extensions.toggle
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.model.entity.ProcessHideApp
@@ -17,7 +18,6 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.Queryable
 import com.topjohnwu.magisk.ui.base.filterableListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.KObservableField
 
 class HideViewModel(
     private val magiskRepo: MagiskRepository
@@ -48,7 +48,7 @@ class HideViewModel(
         it.bindExtra(BR.viewModel, this)
     }
 
-    val isFilterExpanded = KObservableField(false)
+    val isFilterExpanded = ObservableField(false)
 
     override fun rxRefresh() = magiskRepo.fetchApps()
         .map { it to magiskRepo.fetchHideTargets().blockingGet() }
@@ -100,8 +100,6 @@ class HideViewModel(
 
     fun toggleItem(item: HideProcessItem) = magiskRepo
         .toggleHide(item.isHidden.value, item.item.packageName, item.item.name)
-
-    fun toggle(item: KObservableField<Boolean>) = item.toggle()
 
     fun resetQuery() {
         query = ""

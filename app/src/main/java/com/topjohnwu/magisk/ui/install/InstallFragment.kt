@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.install
 import android.content.Intent
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.events.RequestFileEvent
 import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel

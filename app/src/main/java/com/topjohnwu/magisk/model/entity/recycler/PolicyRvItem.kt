@@ -1,23 +1,24 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import android.graphics.drawable.Drawable
+import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.toggle
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import com.topjohnwu.magisk.utils.KObservableField
 
 class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyItem>() {
     override val layoutRes = R.layout.item_policy_md2
 
-    val isExpanded = KObservableField(false)
-    val isEnabled = KObservableField(item.policy == MagiskPolicy.ALLOW)
-    val shouldNotify = KObservableField(item.notification)
-    val shouldLog = KObservableField(item.logging)
+    val isExpanded = ObservableField(false)
+    val isEnabled = ObservableField(item.policy == MagiskPolicy.ALLOW)
+    val shouldNotify = ObservableField(item.notification)
+    val shouldLog = ObservableField(item.logging)
 
     private val updatedPolicy
         get() = item.copy(

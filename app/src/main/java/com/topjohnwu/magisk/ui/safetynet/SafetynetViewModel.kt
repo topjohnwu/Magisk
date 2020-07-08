@@ -1,14 +1,15 @@
 package com.topjohnwu.magisk.ui.safetynet
 
 import androidx.databinding.Bindable
+import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.events.SafetyNetResult
 import com.topjohnwu.magisk.model.events.UpdateSafetyNetEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
-import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.magisk.utils.RxBus
 import org.json.JSONObject
 
@@ -25,10 +26,10 @@ class SafetynetViewModel(
             field = value
             notifyStateChanged()
         }
-    val safetyNetTitle = KObservableField(R.string.empty)
-    val ctsState = KObservableField(false)
-    val basicIntegrityState = KObservableField(false)
-    val evalType = KObservableField("")
+    val safetyNetTitle = ObservableField(R.string.empty)
+    val ctsState = ObservableField(false)
+    val basicIntegrityState = ObservableField(false)
+    val evalType = ObservableField("")
 
     val isChecking @Bindable get() = currentState == LOADING
     val isFailed @Bindable get() = currentState == FAILED

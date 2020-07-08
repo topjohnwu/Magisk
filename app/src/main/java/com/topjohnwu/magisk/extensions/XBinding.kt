@@ -1,10 +1,10 @@
 package com.topjohnwu.magisk.extensions
 
+import androidx.databinding.ObservableField
 import androidx.databinding.ObservableList
-import com.topjohnwu.magisk.utils.KObservableField
 
 
-fun KObservableField<Boolean>.toggle() {
+fun ObservableField<Boolean>.toggle() {
     value = !value
 }
 

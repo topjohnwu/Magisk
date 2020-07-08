@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.net.Uri
 import android.view.MenuItem
 import androidx.databinding.ObservableArrayList
+import androidx.databinding.ObservableField
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
@@ -19,7 +20,6 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import java.io.File
@@ -30,8 +30,8 @@ class FlashViewModel(
     private val resources: Resources
 ) : BaseViewModel() {
 
-    val showReboot = KObservableField(Shell.rootAccess())
-    val behaviorText = KObservableField(resources.getString(R.string.flashing))
+    val showReboot = ObservableField(Shell.rootAccess())
+    val behaviorText = ObservableField(resources.getString(R.string.flashing))
 
     val adapter = BindingAdapter<ConsoleItem>()
     val items = diffListOf<ConsoleItem>()

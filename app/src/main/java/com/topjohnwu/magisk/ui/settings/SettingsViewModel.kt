@@ -13,11 +13,12 @@ import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
-import com.topjohnwu.magisk.model.events.RxPermissionEvent
 import com.topjohnwu.magisk.model.events.RecreateEvent
+import com.topjohnwu.magisk.model.events.RxPermissionEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.adapterOf

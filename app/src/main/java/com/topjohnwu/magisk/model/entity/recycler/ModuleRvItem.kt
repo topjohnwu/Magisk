@@ -1,9 +1,6 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
-import androidx.databinding.Bindable
-import androidx.databinding.Observable
-import androidx.databinding.PropertyChangeRegistry
-import androidx.databinding.ViewDataBinding
+import androidx.databinding.*
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -11,7 +8,6 @@ import com.topjohnwu.magisk.core.model.module.Module
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
-import com.topjohnwu.magisk.utils.KObservableField
 
 object InstallModule : ComparableRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download
@@ -65,7 +61,7 @@ class SectionTitle(
 sealed class RepoItem(val item: Repo) : ObservableItem<RepoItem>() {
     override val layoutRes: Int = R.layout.item_repo_md2
 
-    val progress = KObservableField(0)
+    val progress = ObservableField(0)
     var isUpdate = false
         @Bindable get
         protected set(value) {

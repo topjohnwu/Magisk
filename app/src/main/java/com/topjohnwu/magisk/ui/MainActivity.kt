@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.graphics.Insets
 import androidx.core.view.forEach
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
@@ -136,10 +135,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             else -> return super.onOptionsItemSelected(item)
         }
         return true
-    }
-
-    override fun peekSystemWindowInsets(insets: Insets) {
-        viewModel.insets.value = insets
     }
 
     fun setDisplayHomeAsUpEnabled(isEnabled: Boolean) {
