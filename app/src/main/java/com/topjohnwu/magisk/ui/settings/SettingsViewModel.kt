@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
-import com.topjohnwu.magisk.model.events.PermissionEvent
+import com.topjohnwu.magisk.model.events.RxPermissionEvent
 import com.topjohnwu.magisk.model.events.RecreateEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
@@ -137,7 +137,7 @@ class SettingsViewModel(
     private fun requireRWPermission() {
         val callback = PublishSubject.create<Boolean>()
         callback.subscribeK { if (!it) requireRWPermission() }
-        PermissionEvent(
+        RxPermissionEvent(
             listOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE

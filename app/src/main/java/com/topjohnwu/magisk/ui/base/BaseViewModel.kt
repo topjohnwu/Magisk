@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.base
 
+import android.Manifest
 import androidx.annotation.CallSuper
 import androidx.core.graphics.Insets
 import androidx.databinding.Bindable
@@ -88,7 +89,15 @@ abstract class BaseViewModel(
 
     fun withPermissions(vararg permissions: String): Observable<Boolean> {
         val subject = PublishSubject.create<Boolean>()
-        return subject.doOnSubscribeUi { PermissionEvent(permissions.toList(), subject).publish() }
+        return subject.doOnSubscribeUi { RxPermissionEvent(permissions.toList(), subject).publish() }
+    }
+
+    fun withPermissions(vararg permissions: String, callback: (Boolean) -> Unit) {
+        PermissionEvent(permissions.toList(), callback).publish()
+    }
+
+    fun withExternalRW(callback: (Boolean) -> Unit) {
+        withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, callback = callback)
     }
 
     fun back() = BackPressEvent().publish()

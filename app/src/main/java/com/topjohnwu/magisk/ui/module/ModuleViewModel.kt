@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.module
 
-import android.Manifest
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
@@ -16,7 +15,6 @@ import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.addOnListChangedCallback
 import com.topjohnwu.magisk.extensions.reboot
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
@@ -26,13 +24,9 @@ import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.KObservableField
-import com.topjohnwu.superuser.internal.UiThreadHandler
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.*
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
-import java.lang.Runnable
 import kotlin.math.roundToInt
 
 /*
@@ -53,9 +47,11 @@ class ModuleViewModel(
     private val repoName: RepoByNameDao,
     private val repoUpdated: RepoByUpdatedDao,
     private val repoUpdater: RepoUpdater
-) : BaseViewModel(), Queryable by Queryable.impl(1000) {
+) : BaseViewModel(), Queryable {
 
-    override val queryRunnable = Runnable { query() }
+    override val queryDelay = 1000L
+    private var queryJob: Job? = null
+    private var remoteJob: Job? = null
 
     var query = ""
         @Bindable get
@@ -68,7 +64,6 @@ class ModuleViewModel(
             searchLoading.value = true
         }
 
-    private var queryJob: Disposable? = null
     val searchLoading = KObservableField(false)
     val itemsSearch = diffListOf<RepoItem>()
     val itemSearchBinding = itemBindingOf<RepoItem> {
@@ -213,16 +208,15 @@ class ModuleViewModel(
         state = State.LOADED
     }
 
-    @Synchronized
     fun loadRemote() {
         // check for existing jobs
-        if (isRemoteLoading)
+        if (remoteJob?.isActive == true)
             return
-        if (itemsRemote.isEmpty()) {
-            EndlessRecyclerScrollListener.ResetState().publish()
-        }
 
-        viewModelScope.launch {
+        if (itemsRemote.isEmpty())
+            EndlessRecyclerScrollListener.ResetState().publish()
+
+        remoteJob = viewModelScope.launch {
             suspend fun loadRemoteDB(offset: Int) = withContext(Dispatchers.IO) {
                 dao.getRepos(offset).map { RepoItem.Remote(it) }
             }
@@ -236,7 +230,7 @@ class ModuleViewModel(
             }
             isRemoteLoading = false
             refetch = false
-            UiThreadHandler.handler.post { itemsRemote.addAll(repos) }
+            queryHandler.post { itemsRemote.addAll(repos) }
         }
     }
 
@@ -250,44 +244,44 @@ class ModuleViewModel(
 
     // ---
 
-    override fun submitQuery() {
-        queryHandler.removeCallbacks(queryRunnable)
-        queryHandler.postDelayed(queryRunnable, queryDelay)
-    }
-
-    private fun queryInternal(query: String, offset: Int): Single<List<RepoItem>> {
-        if (query.isBlank()) {
-            return Single.just(listOf<RepoItem>())
-                .doOnSubscribe { itemsSearch.clear() }
-                .subscribeOn(AndroidSchedulers.mainThread())
+    private suspend fun queryInternal(query: String, offset: Int): List<RepoItem> {
+        return if (query.isBlank()) {
+            itemsSearch.clear()
+            listOf()
+        } else {
+            withContext(Dispatchers.IO) {
+                dao.searchRepos(query, offset).map { RepoItem.Remote(it) }
+            }
         }
-        return Single.fromCallable { dao.searchRepos(query, offset) }
-            .map { it.map { RepoItem.Remote(it) } }
     }
 
-    private fun query(query: String = this.query, offset: Int = 0) {
-        queryJob?.dispose()
-        queryJob = queryInternal(query, offset)
-            .map { it to itemsSearch.calculateDiff(it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { searchLoading.value = false }
-            .subscribeK { itemsSearch.update(it.first, it.second) }
+    override fun query() {
+        queryJob = viewModelScope.launch {
+            val searched = queryInternal(query, 0)
+            val diff = withContext(Dispatchers.Default) {
+                itemsSearch.calculateDiff(searched)
+            }
+            searchLoading.value = false
+            itemsSearch.update(searched, diff)
+        }
     }
 
-    @Synchronized
     fun loadMoreQuery() {
-        if (queryJob?.isDisposed == false) return
-        queryJob = queryInternal(query, itemsSearch.size)
-            .subscribeK { itemsSearch.addAll(it) }
+        if (queryJob?.isActive == true) return
+        queryJob = viewModelScope.launch {
+            val searched = queryInternal(query, itemsSearch.size)
+            queryHandler.post { itemsSearch.addAll(searched) }
+        }
     }
 
     // ---
 
-    private fun update(repo: Repo, progress: Int) =
-        Single.fromCallable { itemsRemote + itemsSearch }
-            .map { it.first { it.item.id == repo.id } }
-            .subscribeK { it.progress.value = progress }
-            .add()
+    private fun update(repo: Repo, progress: Int) = viewModelScope.launch {
+        val item = withContext(Dispatchers.Default) {
+            (itemsRemote + itemsSearch).first { it.item.id == repo.id }
+        }
+        item.progress.value = progress
+    }
 
     // ---
 
@@ -305,12 +299,14 @@ class ModuleViewModel(
 
     // ---
 
-    fun updateActiveState() = Single.fromCallable { itemsInstalled.any { it.isModified } }
-        .subscribeK { sectionActive.hasButton = it }
-        .add()
+    fun updateActiveState() = viewModelScope.launch {
+        sectionActive.hasButton = withContext(Dispatchers.Default) {
+            itemsInstalled.any { it.isModified }
+        }
+    }
 
     fun sectionPressed(item: SectionTitle) = when (item) {
-        sectionActive -> reboot() //TODO add reboot picker, regular reboot is not always preferred
+        sectionActive -> reboot() // TODO add reboot picker, regular reboot is not always preferred
         sectionRemote -> {
             Config.repoOrder = when (Config.repoOrder) {
                 Config.Value.ORDER_NAME -> Config.Value.ORDER_DATE
@@ -318,28 +314,28 @@ class ModuleViewModel(
                 else -> Config.Value.ORDER_NAME
             }
             updateOrderIcon()
-            Single.fromCallable { itemsRemote }
-                .subscribeK {
-                    itemsRemote.removeAll(it)
-                    loadRemote()
-                }.add()
+            queryHandler.post {
+                itemsRemote.clear()
+                loadRemote()
+            }
+            Unit
         }
         else -> Unit
     }
 
-    fun downloadPressed(item: RepoItem) = withPermissions(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    ).any { it }.subscribeK(onError = { permissionDenied() }) {
-        ModuleInstallDialog(item.item).publish()
-    }.add()
+    fun downloadPressed(item: RepoItem) = withExternalRW {
+        if (it)
+            ModuleInstallDialog(item.item).publish()
+        else
+            permissionDenied()
+    }
 
-    fun installPressed() = withPermissions(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    ).any { it }.subscribeK(onError = { permissionDenied() }) {
-        InstallExternalModuleEvent().publish()
-    }.add()
+    fun installPressed() = withExternalRW {
+        if (it)
+            InstallExternalModuleEvent().publish()
+        else
+            permissionDenied()
+    }
 
     fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
     fun infoPressed(item: ModuleItem) {

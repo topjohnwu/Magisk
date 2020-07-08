@@ -131,7 +131,7 @@ class OpenChangelogEvent(val item: Repo) : ViewEvent(), ContextExecutor {
     }
 }
 
-class PermissionEvent(
+class RxPermissionEvent(
     val permissions: List<String>,
     val callback: PublishSubject<Boolean>
 ) : ViewEvent(), ActivityExecutor {
@@ -144,6 +144,22 @@ class PermissionEvent(
             onFailure {
                 callback.onNext(false)
                 callback.onError(SecurityException("User refused permissions"))
+            }
+        }
+}
+
+class PermissionEvent(
+    private val permissions: List<String>,
+    private val callback: (Boolean) -> Unit
+) : ViewEvent(), ActivityExecutor {
+
+    override fun invoke(activity: BaseActivity) =
+        activity.withPermissions(*permissions.toTypedArray()) {
+            onSuccess {
+                callback(true)
+            }
+            onFailure {
+                callback(false)
             }
         }
 }

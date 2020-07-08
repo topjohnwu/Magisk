@@ -21,16 +21,16 @@ import com.topjohnwu.magisk.utils.KObservableField
 
 class HideViewModel(
     private val magiskRepo: MagiskRepository
-) : BaseViewModel(), Queryable by Queryable.impl(1000) {
+) : BaseViewModel(), Queryable {
 
-    override val queryRunnable = Runnable { query() }
+    override val queryDelay = 1000L
 
     var isShowSystem = false
         @Bindable get
         set(value) {
             field = value
             notifyPropertyChanged(BR.showSystem)
-            query()
+            submitQuery()
         }
 
     var query = ""
@@ -81,17 +81,9 @@ class HideViewModel(
 
     // ---
 
-    override fun submitQuery() {
-        queryHandler.removeCallbacks(queryRunnable)
-        queryHandler.postDelayed(queryRunnable, queryDelay)
-    }
-
-    private fun query(
-        query: String = this.query,
-        showSystem: Boolean = isShowSystem
-    ) = items.filter {
+    override fun query() = items.filter {
         fun filterSystem(): Boolean {
-            return showSystem || it.item.info.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
+            return isShowSystem || it.item.info.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
         }
 
         fun filterQuery(): Boolean {
