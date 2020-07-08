@@ -256,6 +256,7 @@ class ModuleViewModel(
     }
 
     override fun query() {
+        EndlessRecyclerScrollListener.ResetState().publish()
         queryJob = viewModelScope.launch {
             val searched = queryInternal(query, 0)
             val diff = withContext(Dispatchers.Default) {
@@ -277,10 +278,13 @@ class ModuleViewModel(
     // ---
 
     private fun update(repo: Repo, progress: Int) = viewModelScope.launch {
-        val item = withContext(Dispatchers.Default) {
-            (itemsRemote + itemsSearch).first { it.item.id == repo.id }
+        val items = withContext(Dispatchers.Default) {
+            val predicate = { it: RepoItem -> it.item.id == repo.id }
+            itemsUpdatable.filter(predicate) +
+                itemsRemote.filter(predicate) +
+                itemsSearch.filter(predicate)
         }
-        item.progress.value = progress
+        items.forEach { it.progress.value = progress }
     }
 
     // ---
