@@ -18,8 +18,6 @@ import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.navigation.NavigationWrapper
 import com.topjohnwu.magisk.model.observer.Observer
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Job
 import org.koin.core.KoinComponent
 
@@ -45,9 +43,7 @@ abstract class BaseViewModel(
             notifyStateChanged()
         }
 
-    private val disposables = CompositeDisposable()
     private val _viewEvents = MutableLiveData<ViewEvent>()
-    private var runningTask: Disposable? = null
     private var runningJob: Job? = null
     private val refreshCallback = object : Observable.OnPropertyChangedCallback() {
         override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
@@ -68,8 +64,6 @@ abstract class BaseViewModel(
         runningJob = refresh()
     }
 
-    protected open fun rxRefresh(): Disposable? = null
-
     protected open fun refresh(): Job? = null
 
     open fun notifyStateChanged() {
@@ -81,7 +75,6 @@ abstract class BaseViewModel(
     @CallSuper
     override fun onCleared() {
         isConnected.removeOnPropertyChangedCallback(refreshCallback)
-        disposables.clear()
         super.onCleared()
     }
 
@@ -109,10 +102,6 @@ abstract class BaseViewModel(
 
     fun NavDirections.publish() {
         _viewEvents.postValue(NavigationWrapper(this))
-    }
-
-    fun Disposable.add() {
-        disposables.add(this)
     }
 
     // The following is copied from androidx.databinding.BaseObservable
