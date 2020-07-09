@@ -47,7 +47,7 @@ class ModuleViewModel(
     private val repoName: RepoByNameDao,
     private val repoUpdated: RepoByUpdatedDao,
     private val repoUpdater: RepoUpdater
-) : BaseViewModel(useRx = false), Queryable {
+) : BaseViewModel(), Queryable {
 
     override val queryDelay = 1000L
     private var queryJob: Job? = null

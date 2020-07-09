@@ -111,13 +111,13 @@ abstract class SuRequestHandler(
             } catch (e: IOException) {
                 Timber.e(e)
             } finally {
-                if (until >= 0)
-                    policyDB.update(policy).blockingAwait()
                 runCatching {
                     input.close()
                     output.close()
                     socket.close()
                 }
+                if (until >= 0)
+                    policyDB.update(policy)
             }
         }
     }

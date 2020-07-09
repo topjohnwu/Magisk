@@ -126,7 +126,7 @@ dependencies {
 
     val vRoom = "2.2.5"
     implementation("androidx.room:room-runtime:${vRoom}")
-    implementation("androidx.room:room-rxjava2:${vRoom}")
+    implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
     implementation("androidx.navigation:navigation-fragment-ktx:${Deps.vNav}")
@@ -139,9 +139,10 @@ dependencies {
     implementation("androidx.preference:preference:1.1.1")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
-    implementation("androidx.work:work-runtime:2.3.4")
+    implementation("androidx.work:work-runtime-ktx:2.3.4")
     implementation("androidx.transition:transition:1.3.1")
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("androidx.core:core-ktx:1.3.0")
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.0.0")
     implementation("com.google.android.material:material:1.2.0-beta01")
 }

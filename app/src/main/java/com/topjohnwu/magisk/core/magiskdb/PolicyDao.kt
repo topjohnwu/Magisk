@@ -7,6 +7,8 @@ import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.model.toMap
 import com.topjohnwu.magisk.core.model.toPolicy
 import com.topjohnwu.magisk.extensions.now
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -17,55 +19,56 @@ class PolicyDao(
 
     override val table: String = Table.POLICY
 
-    fun deleteOutdated(
-        nowSeconds: Long = TimeUnit.MILLISECONDS.toSeconds(now)
-    ) = query<Delete> {
+    suspend fun deleteOutdated() = buildQuery<Delete> {
         condition {
             greaterThan("until", "0")
             and {
-                lessThan("until", nowSeconds.toString())
+                lessThan("until", TimeUnit.MILLISECONDS.toSeconds(now).toString())
             }
             or {
                 lessThan("until", "0")
             }
         }
-    }.ignoreElement()
+    }.commit()
 
-    fun delete(packageName: String) = query<Delete> {
+    suspend fun delete(packageName: String) = buildQuery<Delete> {
         condition {
             equals("package_name", packageName)
         }
-    }.ignoreElement()
+    }.commit()
 
-    fun delete(uid: Int) = query<Delete> {
+    suspend fun delete(uid: Int) = buildQuery<Delete> {
         condition {
             equals("uid", uid)
         }
-    }.ignoreElement()
+    }.commit()
 
-    fun fetch(uid: Int) = query<Select> {
+    suspend fun fetch(uid: Int) = buildQuery<Select> {
         condition {
             equals("uid", uid)
         }
-    }.map { it.first().toPolicySafe() }
+    }.query().first().toPolicyOrNull()
 
-    fun update(policy: MagiskPolicy) = query<Replace> {
+    suspend fun update(policy: MagiskPolicy) = buildQuery<Replace> {
         values(policy.toMap())
-    }.ignoreElement()
+    }.commit()
 
-    fun fetchAll() = query<Select> {
+    suspend fun <R: Any> fetchAll(mapper: (MagiskPolicy) -> R) = buildQuery<Select> {
         condition {
             equals("uid/100000", Const.USER_ID)
         }
-    }.map { it.mapNotNull { it.toPolicySafe() } }
+    }.query {
+        it.toPolicyOrNull()?.let(mapper)
+    }
 
-
-    private fun Map<String, String>.toPolicySafe(): MagiskPolicy? {
+    private fun Map<String, String>.toPolicyOrNull(): MagiskPolicy? {
         return runCatching { toPolicy(context.packageManager) }.getOrElse {
             Timber.e(it)
             if (it is PackageManager.NameNotFoundException) {
                 val uid = getOrElse("uid") { null } ?: return null
-                delete(uid).subscribe()
+                GlobalScope.launch {
+                    delete(uid.toInt())
+                }
             }
             null
         }

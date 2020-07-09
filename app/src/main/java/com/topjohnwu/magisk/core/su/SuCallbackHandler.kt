@@ -19,10 +19,11 @@ import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.extensions.get
 import com.topjohnwu.magisk.extensions.startActivity
 import com.topjohnwu.magisk.extensions.startActivityWithRoot
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.toLog
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 object SuCallbackHandler : ProviderCallHandler {
@@ -111,7 +112,9 @@ object SuCallbackHandler : ProviderCallHandler {
         )
 
         val logRepo = get<LogRepository>()
-        logRepo.insert(log).subscribeK(onError = { Timber.e(it) })
+        GlobalScope.launch {
+            logRepo.insert(log)
+        }
     }
 
     private fun handleNotify(context: Context, data: Bundle) {

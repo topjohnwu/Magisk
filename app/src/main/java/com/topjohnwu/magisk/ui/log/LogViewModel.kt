@@ -1,12 +1,12 @@
 package com.topjohnwu.magisk.ui.log
 
 import androidx.databinding.ObservableField
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem
@@ -15,12 +15,10 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.superuser.Shell
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.util.*
 
 class LogViewModel(
@@ -43,28 +41,21 @@ class LogViewModel(
 
     val consoleText = ObservableField(" ")
 
-    override fun rxRefresh(): Disposable {
-        val logs = repo.fetchLogs()
-            .map { it.map { LogItem(it) } }
-            .observeOn(Schedulers.computation())
-            .map { it to items.calculateDiff(it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess {
-                items.firstOrNull()?.isTop = false
-                items.lastOrNull()?.isBottom = false
-
-                items.update(it.first, it.second)
-
-                items.firstOrNull()?.isTop = true
-                items.lastOrNull()?.isBottom = true
+    override fun refresh() = viewModelScope.launch {
+        consoleText.value = repo.fetchMagiskLogs()
+        val deferred = withContext(Dispatchers.Default) {
+            async {
+                val suLogs = repo.fetchSuLogs().map { LogItem(it) }
+                suLogs to items.calculateDiff(suLogs)
             }
-            .ignoreElement()
-
-        val console = repo.fetchMagiskLogs()
-            .doOnSuccess { consoleText.value = it }
-            .ignoreElement()
-
-        return Completable.merge(listOf(logs, console)).subscribeK()
+        }
+        delay(500)
+        val (suLogs, diff) = deferred.await()
+        items.firstOrNull()?.isTop = false
+        items.lastOrNull()?.isBottom = false
+        items.update(suLogs, diff)
+        items.firstOrNull()?.isTop = true
+        items.lastOrNull()?.isBottom = true
     }
 
     fun saveMagiskLog() {
@@ -76,10 +67,10 @@ class LogViewModel(
         )
 
         val logFile = File(Config.downloadDirectory, filename)
-        runCatching {
+        try {
             logFile.createNewFile()
-        }.onFailure {
-            Timber.e(it)
+        } catch (e: IOException) {
+            Timber.e(e)
             return
         }
 
@@ -88,18 +79,14 @@ class LogViewModel(
         }
     }
 
-    fun clearMagiskLog() = repo.clearMagiskLogs()
-        .subscribeK {
-            SnackbarEvent(R.string.logs_cleared).publish()
-            requestRefresh()
-        }
-        .add()
+    fun clearMagiskLog() = repo.clearMagiskLogs {
+        SnackbarEvent(R.string.logs_cleared).publish()
+        requestRefresh()
+    }
 
-    fun clearLog() = repo.clearLogs()
-        .subscribeK {
-            SnackbarEvent(R.string.logs_cleared).publish()
-            requestRefresh()
-        }
-        .add()
-
+    fun clearLog() = viewModelScope.launch {
+        repo.clearLogs()
+        SnackbarEvent(R.string.logs_cleared).publish()
+        requestRefresh()
+    }
 }

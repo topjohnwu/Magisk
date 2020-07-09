@@ -2,19 +2,18 @@ package com.topjohnwu.magisk.data.repository
 
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.database.SuLogDao
+import com.topjohnwu.magisk.extensions.await
 import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.superuser.Shell
-import io.reactivex.Completable
-import io.reactivex.Single
 
 
 class LogRepository(
     private val logDao: SuLogDao
 ) {
 
-    fun fetchLogs() = logDao.fetchAll()
+    suspend fun fetchSuLogs() = logDao.fetchAll()
 
-    fun fetchMagiskLogs() = Single.fromCallable {
+    suspend fun fetchMagiskLogs(): String {
         val list = object : AbstractMutableList<String>() {
             val buf = StringBuilder()
             override val size get() = 0
@@ -28,16 +27,15 @@ class LogRepository(
                 }
             }
         }
-        Shell.su("cat ${Const.MAGISK_LOG}").to(list).exec()
-        list.buf.toString()
+        Shell.su("cat ${Const.MAGISK_LOG}").to(list).await()
+        return list.buf.toString()
     }
 
-    fun clearLogs() = logDao.deleteAll()
+    suspend fun clearLogs() = logDao.deleteAll()
 
-    fun clearMagiskLogs() = Completable.fromAction {
-        Shell.su("echo -n > ${Const.MAGISK_LOG}").exec()
-    }
+    fun clearMagiskLogs(cb: (Shell.Result) -> Unit) =
+        Shell.su("echo -n > ${Const.MAGISK_LOG}").submit(cb)
 
-    fun insert(log: MagiskLog) = logDao.insert(log)
+    suspend fun insert(log: MagiskLog) = logDao.insert(log)
 
 }

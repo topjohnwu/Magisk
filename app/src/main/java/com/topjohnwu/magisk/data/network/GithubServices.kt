@@ -13,16 +13,16 @@ interface GithubRawServices {
     //region topjohnwu/magisk_files
 
     @GET("$MAGISK_FILES/master/stable.json")
-    fun fetchStableUpdate(): Single<UpdateInfo>
+    suspend fun fetchStableUpdate(): UpdateInfo
 
     @GET("$MAGISK_FILES/master/beta.json")
-    fun fetchBetaUpdate(): Single<UpdateInfo>
+    suspend fun fetchBetaUpdate(): UpdateInfo
 
     @GET("$MAGISK_FILES/canary/debug.json")
-    fun fetchCanaryUpdate(): Single<UpdateInfo>
+    suspend fun fetchCanaryUpdate(): UpdateInfo
 
     @GET
-    fun fetchCustomUpdate(@Url url: String): Single<UpdateInfo>
+    suspend fun fetchCustomUpdate(@Url url: String): UpdateInfo
 
     @GET("$MAGISK_FILES/{$REVISION}/snet.jar")
     @Streaming

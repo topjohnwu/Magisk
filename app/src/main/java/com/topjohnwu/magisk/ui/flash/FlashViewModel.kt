@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.flash
 
-import android.Manifest
 import android.content.res.Resources
 import android.net.Uri
 import android.view.MenuItem
@@ -21,7 +20,9 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.*
 
@@ -96,25 +97,23 @@ class FlashViewModel(
         return true
     }
 
-    private fun savePressed() = withPermissions(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    )
-        .map { now }
-        .map { it.toTime(timeFormatStandard) }
-        .map { Const.MAGISK_INSTALL_LOG_FILENAME.format(it) }
-        .map { File(Config.downloadDirectory, it) }
-        .map { file ->
-            file.bufferedWriter().use { writer ->
-                logItems.forEach {
-                    writer.write(it)
-                    writer.newLine()
+    private fun savePressed() = withExternalRW {
+        if (!it)
+            return@withExternalRW
+        viewModelScope.launch {
+            val name = Const.MAGISK_INSTALL_LOG_FILENAME.format(now.toTime(timeFormatStandard))
+            val file = File(Config.downloadDirectory, name)
+            withContext(Dispatchers.IO) {
+                file.bufferedWriter().use { writer ->
+                    logItems.forEach {
+                        writer.write(it)
+                        writer.newLine()
+                    }
                 }
             }
-            file.path
+            SnackbarEvent(file.path).publish()
         }
-        .subscribeK { SnackbarEvent(it).publish() }
-        .add()
+    }
 
     fun restartPressed() = reboot()
 }

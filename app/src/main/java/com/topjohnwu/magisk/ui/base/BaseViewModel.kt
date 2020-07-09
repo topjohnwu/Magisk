@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.annotation.CallSuper
 import androidx.core.graphics.Insets
 import androidx.databinding.Bindable
+import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
@@ -13,23 +14,18 @@ import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.extensions.doOnSubscribeUi
 import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.navigation.NavigationWrapper
 import com.topjohnwu.magisk.model.observer.Observer
-import io.reactivex.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Job
 import org.koin.core.KoinComponent
-import androidx.databinding.Observable as BindingObservable
 
 abstract class BaseViewModel(
-    initialState: State = State.LOADING,
-    val useRx: Boolean = true
-) : ViewModel(), BindingObservable, KoinComponent {
+    initialState: State = State.LOADING
+) : ViewModel(), Observable, KoinComponent {
 
     enum class State {
         LOADED, LOADING, LOADING_FAILED
@@ -53,8 +49,8 @@ abstract class BaseViewModel(
     private val _viewEvents = MutableLiveData<ViewEvent>()
     private var runningTask: Disposable? = null
     private var runningJob: Job? = null
-    private val refreshCallback = object : androidx.databinding.Observable.OnPropertyChangedCallback() {
-        override fun onPropertyChanged(sender: androidx.databinding.Observable?, propertyId: Int) {
+    private val refreshCallback = object : Observable.OnPropertyChangedCallback() {
+        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
             requestRefresh()
         }
     }
@@ -66,13 +62,6 @@ abstract class BaseViewModel(
     /** This should probably never be called manually, it's called manually via delegate. */
     @Synchronized
     fun requestRefresh() {
-        if (useRx) {
-            if (runningTask?.isDisposed?.not() == true) {
-                return
-            }
-            runningTask = rxRefresh()
-            return
-        }
         if (runningJob?.isActive == true) {
             return
         }
@@ -98,11 +87,6 @@ abstract class BaseViewModel(
 
     fun withView(action: BaseActivity.() -> Unit) {
         ViewActionEvent(action).publish()
-    }
-
-    fun withPermissions(vararg permissions: String): Observable<Boolean> {
-        val subject = PublishSubject.create<Boolean>()
-        return subject.doOnSubscribeUi { RxPermissionEvent(permissions.toList(), subject).publish() }
     }
 
     fun withPermissions(vararg permissions: String, callback: (Boolean) -> Unit) {
@@ -137,7 +121,7 @@ abstract class BaseViewModel(
     private var callbacks: PropertyChangeRegistry? = null
 
     @Synchronized
-    override fun addOnPropertyChangedCallback(callback: BindingObservable.OnPropertyChangedCallback) {
+    override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback) {
         if (callbacks == null) {
             callbacks = PropertyChangeRegistry()
         }
@@ -145,7 +129,7 @@ abstract class BaseViewModel(
     }
 
     @Synchronized
-    override fun removeOnPropertyChangedCallback(callback: BindingObservable.OnPropertyChangedCallback) {
+    override fun removeOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback) {
         callbacks?.remove(callback)
     }
 
@@ -168,63 +152,4 @@ abstract class BaseViewModel(
         callbacks?.notifyCallbacks(this, fieldId, null)
     }
 
-    //region Rx
-    protected fun <T> Observable<T>.applyViewModel(viewModel: BaseViewModel, allowFinishing: Boolean = true) =
-        doOnSubscribe { viewModel.state =
-            State.LOADING
-        }
-            .doOnError { viewModel.state =
-                State.LOADING_FAILED
-            }
-            .doOnNext { if (allowFinishing) viewModel.state =
-                State.LOADED
-            }
-
-    protected fun <T> Single<T>.applyViewModel(viewModel: BaseViewModel, allowFinishing: Boolean = true) =
-        doOnSubscribe { viewModel.state =
-            State.LOADING
-        }
-            .doOnError { viewModel.state =
-                State.LOADING_FAILED
-            }
-            .doOnSuccess { if (allowFinishing) viewModel.state =
-                State.LOADED
-            }
-
-    protected fun <T> Maybe<T>.applyViewModel(viewModel: BaseViewModel, allowFinishing: Boolean = true) =
-        doOnSubscribe { viewModel.state =
-            State.LOADING
-        }
-            .doOnError { viewModel.state =
-                State.LOADING_FAILED
-            }
-            .doOnComplete { if (allowFinishing) viewModel.state =
-                State.LOADED
-            }
-            .doOnSuccess { if (allowFinishing) viewModel.state =
-                State.LOADED
-            }
-
-    protected fun <T> Flowable<T>.applyViewModel(viewModel: BaseViewModel, allowFinishing: Boolean = true) =
-        doOnSubscribe { viewModel.state =
-            State.LOADING
-        }
-            .doOnError { viewModel.state =
-                State.LOADING_FAILED
-            }
-            .doOnNext { if (allowFinishing) viewModel.state =
-                State.LOADED
-            }
-
-    protected fun Completable.applyViewModel(viewModel: BaseViewModel, allowFinishing: Boolean = true) =
-        doOnSubscribe { viewModel.state =
-            State.LOADING
-        }
-            .doOnError { viewModel.state =
-                State.LOADING_FAILED
-            }
-            .doOnComplete { if (allowFinishing) viewModel.state =
-                State.LOADED
-            }
-    //endregion
 }

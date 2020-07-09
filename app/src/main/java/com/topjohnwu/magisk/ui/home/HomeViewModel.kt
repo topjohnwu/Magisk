@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.Manifest
 import android.os.Build
 import androidx.databinding.ObservableField
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
@@ -11,9 +11,11 @@ import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
-import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.extensions.*
+import com.topjohnwu.magisk.extensions.await
+import com.topjohnwu.magisk.extensions.packageName
+import com.topjohnwu.magisk.extensions.res
+import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
@@ -26,6 +28,7 @@ import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BR
 import kotlin.math.roundToInt
 
@@ -72,27 +75,29 @@ class HomeViewModel(
         }
     }
 
-    override fun rxRefresh() = repoMagisk.fetchUpdate()
-        .onErrorReturn { null }
-        .subscribeK { it?.updateUI() }
+    override fun refresh() = viewModelScope.launch {
+        repoMagisk.fetchUpdate()?.apply {
+            stateMagisk.value = when {
+                !Info.env.isActive -> MagiskState.NOT_INSTALLED
+                magisk.isObsolete -> MagiskState.OBSOLETE
+                else -> MagiskState.UP_TO_DATE
+            }
 
-    private fun UpdateInfo.updateUI() {
-        stateMagisk.value = when {
-            !Info.env.isActive -> MagiskState.NOT_INSTALLED
-            magisk.isObsolete -> MagiskState.OBSOLETE
-            else -> MagiskState.UP_TO_DATE
+            stateManager.value = when {
+                !app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
+                app.isObsolete -> MagiskState.OBSOLETE
+                else -> MagiskState.UP_TO_DATE
+            }
+
+            stateMagiskRemoteVersion.value =
+                "${magisk.version} (${magisk.versionCode})"
+            stateManagerRemoteVersion.value =
+                "${app.version} (${app.versionCode}) (${stub.versionCode})"
+
+            launch {
+                ensureEnv()
+            }
         }
-
-        stateManager.value = when {
-            !app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
-            app.isObsolete -> MagiskState.OBSOLETE
-            else -> MagiskState.UP_TO_DATE
-        }
-
-        stateMagiskRemoteVersion.value = "${magisk.version} (${magisk.versionCode})"
-        stateManagerRemoteVersion.value = "${app.version} (${app.versionCode}) (${stub.versionCode})"
-
-        ensureEnv()
     }
 
     val showTest = false
@@ -109,19 +114,18 @@ class HomeViewModel(
 
     fun onManagerPressed() = ManagerInstallDialog().publish()
 
-    fun onMagiskPressed() = withPermissions(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    ).map { check(it);it }
-        .subscribeK { HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish() }
-        .add()
+    fun onMagiskPressed() = withExternalRW {
+        if (it) {
+            HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
+        }
+    }
 
     fun hideNotice() {
         Config.safetyNotice = false
         isNoticeVisible.value = false
     }
 
-    private fun ensureEnv() {
+    private suspend fun ensureEnv() {
         val invalidStates = listOf(
             MagiskState.NOT_INSTALLED,
             MagiskState.LOADING
@@ -138,21 +142,18 @@ class HomeViewModel(
             return
         }
 
-        Shell.su("env_check")
-            .toSingle()
-            .map { it.exec() }
-            .filter { !it.isSuccess }
-            .subscribeK {
-                shownDialog = true
-                EnvFixDialog().publish()
-            }
+        val result = Shell.su("env_check").await()
+        if (!result.isSuccess) {
+            shownDialog = true
+            EnvFixDialog().publish()
+        }
     }
 
     private val MagiskJson.isObsolete
         get() = Info.env.isActive && Info.env.magiskVersionCode < versionCode
-    val ManagerJson.isUpdateChannelCorrect
+    private val ManagerJson.isUpdateChannelCorrect
         get() = versionCode > 0
-    val ManagerJson.isObsolete
+    private val ManagerJson.isObsolete
         get() = BuildConfig.VERSION_CODE < versionCode
 
 }

@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.superuser
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import androidx.databinding.ObservableArrayList
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
@@ -10,8 +11,6 @@ import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.extensions.applySchedulers
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
 import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
@@ -24,7 +23,9 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.adapterOf
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
 class SuperuserViewModel(
@@ -53,27 +54,23 @@ class SuperuserViewModel(
 
     // ---
 
-    override fun rxRefresh() = db.fetchAll()
-        .flattenAsFlowable { it }
-        .parallel()
-        .map { PolicyItem(it, it.applicationInfo.loadIcon(packageManager)) }
-        .sequential()
-        .sorted { o1, o2 ->
-            compareBy<PolicyItem>(
+    override fun refresh() = viewModelScope.launch {
+        state = State.LOADING
+        val (policies, diff) = withContext(Dispatchers.Default) {
+            val policies = db.fetchAll {
+                PolicyItem(it, it.applicationInfo.loadIcon(packageManager))
+            }.sortedWith(compareBy(
                 { it.item.appName.toLowerCase(currentLocale) },
                 { it.item.packageName }
-            ).compare(o1, o2)
+            ))
+            policies to itemsPolicies.calculateDiff(policies)
         }
-        .toList()
-        .map { it to itemsPolicies.calculateDiff(it) }
-        .applySchedulers()
-        .applyViewModel(this)
-        .subscribeK {
-            itemsPolicies.update(it.first, it.second)
-            if (itemsPolicies.isNotEmpty()) {
-                itemsHelpers.remove(itemNoData)
-            }
+        itemsPolicies.update(policies, diff)
+        if (itemsPolicies.isNotEmpty()) {
+            itemsHelpers.remove(itemNoData)
         }
+        state = State.LOADED
+    }
 
     // ---
 
@@ -91,14 +88,13 @@ class SuperuserViewModel(
         SuperuserFragmentDirections.actionSuperuserFragmentToHideFragment().publish()
 
     fun deletePressed(item: PolicyItem) {
-        fun updateState() = deletePolicy(item.item)
-            .subscribeK {
-                itemsPolicies.removeAll { it.genericItemSameAs(item) }
-                if (itemsPolicies.isEmpty() && itemsHelpers.isEmpty()) {
-                    itemsHelpers.add(itemNoData)
-                }
+        fun updateState() = viewModelScope.launch {
+            db.delete(item.item.uid)
+            itemsPolicies.removeAll { it.genericItemSameAs(item) }
+            if (itemsPolicies.isEmpty() && itemsHelpers.isEmpty()) {
+                itemsHelpers.add(itemNoData)
             }
-            .add()
+        }
 
         if (BiometricHelper.isEnabled) {
             BiometricDialog {
@@ -114,34 +110,37 @@ class SuperuserViewModel(
 
     //---
 
-    fun updatePolicy(it: PolicyUpdateEvent) = when (it) {
-        is PolicyUpdateEvent.Notification -> updatePolicy(it.item).map {
-            when {
-                it.notification -> R.string.su_snack_notif_on
-                else -> R.string.su_snack_notif_off
-            } to it.appName
+    fun updatePolicy(it: PolicyUpdateEvent) = viewModelScope.launch {
+        val snackStr = when (it) {
+            is PolicyUpdateEvent.Notification -> {
+                updatePolicy(it.item)
+                when {
+                    it.item.notification -> R.string.su_snack_notif_on
+                    else -> R.string.su_snack_notif_off
+                }
+            }
+            is PolicyUpdateEvent.Log -> {
+                updatePolicy(it.item)
+                when {
+                    it.item.logging -> R.string.su_snack_log_on
+                    else -> R.string.su_snack_log_off
+                }
+            }
         }
-        is PolicyUpdateEvent.Log -> updatePolicy(it.item).map {
-            when {
-                it.logging -> R.string.su_snack_log_on
-                else -> R.string.su_snack_log_off
-            } to it.appName
-        }
-    }.map { resources.getString(it.first, it.second) }
-        .subscribeK { SnackbarEvent(it).publish() }
-        .add()
+        SnackbarEvent(resources.getString(snackStr, it.item.appName)).publish()
+    }
 
     fun togglePolicy(item: PolicyItem, enable: Boolean) {
         fun updateState() {
             val policy = if (enable) MagiskPolicy.ALLOW else MagiskPolicy.DENY
             val app = item.item.copy(policy = policy)
 
-            updatePolicy(app)
-                .map { it.policy == MagiskPolicy.ALLOW }
-                .map { if (it) R.string.su_snack_grant else R.string.su_snack_deny }
-                .map { resources.getString(it).format(item.item.appName) }
-                .subscribeK { SnackbarEvent(it).publish() }
-                .add()
+            viewModelScope.launch {
+                updatePolicy(app)
+                val res = if (app.policy == MagiskPolicy.ALLOW) R.string.su_snack_grant
+                else R.string.su_snack_deny
+                SnackbarEvent(resources.getString(res).format(item.item.appName))
+            }
         }
 
         if (BiometricHelper.isEnabled) {
@@ -156,10 +155,6 @@ class SuperuserViewModel(
 
     //---
 
-    private fun updatePolicy(policy: MagiskPolicy) =
-        db.update(policy).andThen(Single.just(policy))
-
-    private fun deletePolicy(policy: MagiskPolicy) =
-        db.delete(policy.uid).andThen(Single.just(policy))
+    private suspend fun updatePolicy(policy: MagiskPolicy) = db.update(policy)
 
 }

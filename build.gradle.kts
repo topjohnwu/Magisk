@@ -60,7 +60,7 @@ subprojects {
             plugins.hasPlugin("com.android.application")) {
             android.apply {
                 compileSdkVersion(30)
-                buildToolsVersion = "30.0.0"
+                buildToolsVersion = "30.0.1"
 
                 defaultConfig {
                     if (minSdkVersion == null)

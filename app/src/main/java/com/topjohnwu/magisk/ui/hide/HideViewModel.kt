@@ -3,10 +3,10 @@ package com.topjohnwu.magisk.ui.hide
 import android.content.pm.ApplicationInfo
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableField
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
@@ -18,6 +18,9 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.Queryable
 import com.topjohnwu.magisk.ui.base.filterableListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HideViewModel(
     private val magiskRepo: MagiskRepository
@@ -50,19 +53,18 @@ class HideViewModel(
 
     val isFilterExpanded = ObservableField(false)
 
-    override fun rxRefresh() = magiskRepo.fetchApps()
-        .map { it to magiskRepo.fetchHideTargets().blockingGet() }
-        .map { pair -> pair.first.map { mergeAppTargets(it, pair.second) } }
-        .flattenAsFlowable { it }
-        .map { HideItem(it) }
-        .toList()
-        .map { it.sort() }
-        .map { it to items.calculateDiff(it) }
-        .applyViewModel(this)
-        .subscribeK {
-            items.update(it.first, it.second)
-            submitQuery()
+    override fun refresh() = viewModelScope.launch {
+        state = State.LOADING
+        val apps = magiskRepo.fetchApps()
+        val hides = magiskRepo.fetchHideTargets()
+        val (hidden, diff) = withContext(Dispatchers.Default) {
+            val hidden = apps.map { mergeAppTargets(it, hides) }.map { HideItem(it) }.sort()
+            hidden to items.calculateDiff(hidden)
         }
+        items.update(hidden, diff)
+        submitQuery()
+        state = State.LOADED
+    }
 
     // ---
 

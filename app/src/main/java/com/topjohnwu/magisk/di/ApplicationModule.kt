@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.di
 
 import android.content.Context
 import android.os.Build
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
 import com.topjohnwu.magisk.core.ResMgr
 import com.topjohnwu.magisk.utils.RxBus
@@ -19,7 +18,6 @@ val applicationModule = module {
     factory(Protected) { createDEContext(get()) }
     single(SUTimeout) { get<Context>(Protected).getSharedPreferences("su_timeout", 0) }
     single { PreferenceManager.getDefaultSharedPreferences(get<Context>(Protected)) }
-    single { LocalBroadcastManager.getInstance(get()) }
 }
 
 private fun createDEContext(context: Context): Context {
