@@ -9,7 +9,6 @@ import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.extensions.value
-import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 
 class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyItem>() {
@@ -42,12 +41,12 @@ class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<
 
     fun toggleNotify(viewModel: SuperuserViewModel) {
         shouldNotify.toggle()
-        viewModel.updatePolicy(PolicyUpdateEvent.Notification(updatedPolicy))
+        viewModel.updatePolicy(updatedPolicy, isLogging = false)
     }
 
     fun toggleLog(viewModel: SuperuserViewModel) {
         shouldLog.toggle()
-        viewModel.updatePolicy(PolicyUpdateEvent.Log(updatedPolicy))
+        viewModel.updatePolicy(updatedPolicy, isLogging = true)
     }
 
     override fun onBindingBound(binding: ViewDataBinding) {

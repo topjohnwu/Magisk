@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import androidx.preference.PreferenceManager
 import com.topjohnwu.magisk.core.ResMgr
-import com.topjohnwu.magisk.utils.RxBus
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -12,7 +11,6 @@ val SUTimeout = named("su_timeout")
 val Protected = named("protected")
 
 val applicationModule = module {
-    single { RxBus() }
     factory { ResMgr.resource }
     factory { get<Context>().packageManager }
     factory(Protected) { createDEContext(get()) }

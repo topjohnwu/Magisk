@@ -4,22 +4,22 @@ import androidx.databinding.Bindable
 import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.value
-import com.topjohnwu.magisk.model.events.SafetyNetResult
-import com.topjohnwu.magisk.model.events.UpdateSafetyNetEvent
+import com.topjohnwu.magisk.model.events.CheckSafetyNetEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
-import com.topjohnwu.magisk.utils.RxBus
 import org.json.JSONObject
 
 enum class SafetyNetState {
     LOADING, PASS, FAILED, IDLE
 }
 
-class SafetynetViewModel(
-    rxBus: RxBus
-) : BaseViewModel() {
+data class SafetyNetResult(
+    val response: JSONObject? = null,
+    val dismiss: Boolean = false
+)
+
+class SafetynetViewModel : BaseViewModel() {
 
     private var currentState = IDLE
         set(value) {
@@ -36,10 +36,6 @@ class SafetynetViewModel(
     val isSuccess @Bindable get() = currentState == PASS
 
     init {
-        rxBus.register<SafetyNetResult>()
-            .subscribeK { resolveResponse(it) }
-            .add()
-
         cachedResult?.also {
             resolveResponse(SafetyNetResult(it))
         } ?: attest()
@@ -54,7 +50,9 @@ class SafetynetViewModel(
 
     private fun attest() {
         currentState = LOADING
-        UpdateSafetyNetEvent().publish()
+        CheckSafetyNetEvent {
+            resolveResponse(it)
+        }.publish()
     }
 
     fun reset() = attest()

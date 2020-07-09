@@ -15,7 +15,6 @@ import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
 import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem
-import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
@@ -110,24 +109,19 @@ class SuperuserViewModel(
 
     //---
 
-    fun updatePolicy(it: PolicyUpdateEvent) = viewModelScope.launch {
-        val snackStr = when (it) {
-            is PolicyUpdateEvent.Notification -> {
-                updatePolicy(it.item)
-                when {
-                    it.item.notification -> R.string.su_snack_notif_on
-                    else -> R.string.su_snack_notif_off
-                }
+    fun updatePolicy(policy: MagiskPolicy, isLogging: Boolean) = viewModelScope.launch {
+        db.update(policy)
+        val str = when {
+            isLogging -> when {
+                policy.logging -> R.string.su_snack_log_on
+                else -> R.string.su_snack_log_off
             }
-            is PolicyUpdateEvent.Log -> {
-                updatePolicy(it.item)
-                when {
-                    it.item.logging -> R.string.su_snack_log_on
-                    else -> R.string.su_snack_log_off
-                }
+            else -> when {
+                policy.notification -> R.string.su_snack_notif_on
+                else -> R.string.su_snack_notif_off
             }
         }
-        SnackbarEvent(resources.getString(snackStr, it.item.appName)).publish()
+        SnackbarEvent(resources.getString(str, policy.appName)).publish()
     }
 
     fun togglePolicy(item: PolicyItem, enable: Boolean) {
@@ -136,7 +130,7 @@ class SuperuserViewModel(
             val app = item.item.copy(policy = policy)
 
             viewModelScope.launch {
-                updatePolicy(app)
+                db.update(app)
                 val res = if (app.policy == MagiskPolicy.ALLOW) R.string.su_snack_grant
                 else R.string.su_snack_deny
                 SnackbarEvent(resources.getString(res).format(item.item.appName))
@@ -152,9 +146,4 @@ class SuperuserViewModel(
             updateState()
         }
     }
-
-    //---
-
-    private suspend fun updatePolicy(policy: MagiskPolicy) = db.update(policy)
-
 }

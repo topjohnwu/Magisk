@@ -21,7 +21,7 @@ val viewModelModules = module {
     viewModel { HomeViewModel(get()) }
     viewModel { LogViewModel(get()) }
     viewModel { ModuleViewModel(get(), get(), get()) }
-    viewModel { SafetynetViewModel(get()) }
+    viewModel { SafetynetViewModel() }
     viewModel { SettingsViewModel(get()) }
     viewModel { SuperuserViewModel(get(), get(), get()) }
     viewModel { ThemeViewModel() }

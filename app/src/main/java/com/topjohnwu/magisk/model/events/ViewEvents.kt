@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.extensions.DynamicClassLoader
 import com.topjohnwu.magisk.extensions.OnErrorListener
 import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
-import com.topjohnwu.magisk.utils.RxBus
+import com.topjohnwu.magisk.ui.safetynet.SafetyNetResult
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.superuser.Shell
@@ -38,10 +38,11 @@ abstract class ViewEvent {
     var handled = false
 }
 
-class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, SafetyNetHelper.Callback {
+class CheckSafetyNetEvent(
+    private val callback: (SafetyNetResult) -> Unit = {}
+) : ViewEvent(), ContextExecutor, KoinComponent, SafetyNetHelper.Callback {
 
     private val magiskRepo by inject<MagiskRepository>()
-    private val rxBus by inject<RxBus>()
 
     private lateinit var apk: File
     private lateinit var dex: File
@@ -93,7 +94,7 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
             .map { it.byteStream().writeTo(apk) }
             .subscribeK { attest(context) {
                 Timber.e(it)
-                rxBus.post(SafetyNetResult())
+                callback(SafetyNetResult())
             } }
 
         if (!askUser) {
@@ -111,13 +112,13 @@ class UpdateSafetyNetEvent : ViewEvent(), ContextExecutor, KoinComponent, Safety
             }
             .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
                 titleRes = android.R.string.cancel
-                onClick { rxBus.post(SafetyNetResult(dismiss = true)) }
+                onClick { callback(SafetyNetResult(dismiss = true)) }
             }
             .reveal()
     }
 
     override fun onResponse(response: JSONObject?) {
-        rxBus.post(SafetyNetResult(response))
+        callback(SafetyNetResult(response))
     }
 }
 
