@@ -73,7 +73,7 @@ class MagiskDialog @JvmOverloads constructor(
 
     inner class Data {
         val icon = ObservableField(0)
-        val iconRaw = ObservableField<Drawable?>(null)
+        val iconRaw = ObservableField(null as Drawable?)
         val title = ObservableField<CharSequence>("")
         val message = ObservableField<CharSequence>("")
 
