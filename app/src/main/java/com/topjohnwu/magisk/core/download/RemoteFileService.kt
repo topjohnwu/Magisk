@@ -9,17 +9,17 @@ import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
 import com.topjohnwu.superuser.ShellUtils
-import io.reactivex.Completable
+import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import timber.log.Timber
+import java.io.IOException
 import java.io.InputStream
 
 abstract class RemoteFileService : NotificationService() {
@@ -29,7 +29,14 @@ abstract class RemoteFileService : NotificationService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.getParcelableExtra<DownloadSubject>(ARG_URL)?.let {
             update(it.hashCode())
-            start(it)
+            coroutineScope.launch {
+                try {
+                    start(it)
+                } catch (e: IOException) {
+                    Timber.e(e)
+                    failNotify(it)
+                }
+            }
         }
         return START_REDELIVER_INTENT
     }
@@ -38,36 +45,23 @@ abstract class RemoteFileService : NotificationService() {
 
     // ---
 
-    private fun start(subject: DownloadSubject) = checkExisting(subject)
-        .onErrorResumeNext { download(subject) }
-        .subscribeK(onError = {
-            Timber.e(it)
-            failNotify(subject)
-        }) {
-            val newId = finishNotify(subject)
-            if (ForegroundTracker.hasForeground) {
-                onFinished(subject, newId)
+    private suspend fun start(subject: DownloadSubject) {
+        if (subject !is Magisk ||
+            !subject.file.exists() ||
+            !ShellUtils.checkSum("MD5", subject.file, subject.magisk.md5)) {
+            val stream = service.fetchFile(subject.url).toProgressStream(subject)
+            when (subject) {
+                is Module ->
+                    stream.toModule(subject.file, service.fetchInstaller().byteStream())
+                else ->
+                    stream.writeTo(subject.file)
             }
         }
-
-    private fun checkExisting(subject: DownloadSubject) = Completable.fromAction {
-        check(subject is Magisk) { "Download cache is disabled" }
-        check(subject.file.exists() &&
-                ShellUtils.checkSum("MD5", subject.file, subject.magisk.md5)) {
-            "The given file does not match checksum"
+        val newId = finishNotify(subject)
+        if (ForegroundTracker.hasForeground) {
+            onFinished(subject, newId)
         }
     }
-
-    private fun download(subject: DownloadSubject) = service.fetchFile(subject.url)
-        .map { it.toProgressStream(subject) }
-        .flatMapCompletable { stream ->
-            when (subject) {
-                is Module -> service.fetchInstaller()
-                    .doOnSuccess { stream.toModule(subject.file, it.byteStream()) }
-                    .ignoreElement()
-                else -> Completable.fromAction { stream.writeTo(subject.file) }
-            }
-        }
 
     private fun ResponseBody.toProgressStream(subject: DownloadSubject): InputStream {
         val maxRaw = contentLength()
@@ -112,8 +106,7 @@ abstract class RemoteFileService : NotificationService() {
     // ---
 
 
-    @Throws(Throwable::class)
-    protected abstract fun onFinished(subject: DownloadSubject, id: Int)
+    protected abstract suspend fun onFinished(subject: DownloadSubject, id: Int)
 
     protected abstract fun Notification.Builder.addActions(subject: DownloadSubject)
             : Notification.Builder

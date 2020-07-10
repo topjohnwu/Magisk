@@ -20,8 +20,6 @@ class MagiskRepository(
     private val packageManager: PackageManager
 ) {
 
-    fun fetchSafetynet() = apiRaw.fetchSafetynet()
-
     suspend fun fetchUpdate() = try {
         var info = when (Config.updateChannel) {
             Config.Value.DEFAULT_CHANNEL, Config.Value.STABLE_CHANNEL -> apiRaw.fetchStableUpdate()

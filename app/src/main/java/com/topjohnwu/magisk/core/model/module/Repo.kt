@@ -31,7 +31,7 @@ data class Repo(
 
     val downloadFilename: String get() = "$name-$version($versionCode).zip".legalFilename()
 
-    val readme get() = stringRepo.getReadme(this)
+    suspend fun readme() = stringRepo.getReadme(this)
 
     val zipUrl: String get() = Const.Url.ZIP_URL.format(id)
 

@@ -16,10 +16,11 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
 import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.io.File
 
 // --- Customization
@@ -38,13 +39,15 @@ object Language : SettingsItem.Selector() {
     override var entries = emptyArray<String>()
     override var entryValues = emptyArray<String>()
 
-    init {
-        availableLocales.subscribeK { (names, values) ->
-            entries = names
-            entryValues = values
-            val selectedLocale = currentLocale.getDisplayName(currentLocale)
-            value = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
-            notifyChange(BR.selectedEntry)
+    suspend fun loadLanguages(scope: CoroutineScope) {
+        scope.launch {
+            availableLocales().let { (names, values) ->
+                entries = names
+                entryValues = values
+                val selectedLocale = currentLocale.getDisplayName(currentLocale)
+                value = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
+                notifyChange(BR.selectedEntry)
+            }
         }
     }
 }

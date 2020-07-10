@@ -228,11 +228,12 @@
                     app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
 
                     <TextView
+                        android:id="@+id/release_notes"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
                         android:textAppearance="@style/AppearanceFoundation.Caption"
-                        android:text="@{viewModel.notes}"/>
+                        markdownText="@{viewModel.notes}"/>
 
                 </com.google.android.material.card.MaterialCardView>
 

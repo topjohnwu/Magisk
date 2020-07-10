@@ -10,6 +10,7 @@ import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Info
@@ -93,6 +94,11 @@ abstract class BaseViewModel(
     fun back() = BackPressEvent().publish()
 
     fun <Event : ViewEvent> Event.publish() {
+        _viewEvents.postValue(this)
+    }
+
+    fun <Event : ViewEventsWithScope> Event.publish() {
+        scope = viewModelScope
         _viewEvents.postValue(this)
     }
 

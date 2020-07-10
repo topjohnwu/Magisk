@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.content.Intent
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
 import com.topjohnwu.magisk.extensions.value
@@ -21,6 +22,9 @@ class InstallFragment : BaseUIFragment<InstallViewModel, FragmentInstallMd2Bindi
     override fun onStart() {
         super.onStart()
         requireActivity().setTitle(R.string.install)
+
+        // Allow markwon to run in viewmodel scope
+        binding.releaseNotes.tag = viewModel.viewModelScope
     }
 
 }

@@ -1,10 +1,9 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
-import android.text.SpannableString
-import android.text.Spanned
 import android.widget.Toast
 import androidx.databinding.ObservableField
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
@@ -12,7 +11,6 @@ import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.repository.StringRepository
 import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
@@ -20,13 +18,12 @@ import com.topjohnwu.magisk.model.events.RequestFileEvent
 import com.topjohnwu.magisk.model.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.superuser.Shell
-import io.noties.markwon.Markwon
+import kotlinx.coroutines.launch
 import org.koin.core.get
 import kotlin.math.roundToInt
 
 class InstallViewModel(
-    stringRepo: StringRepository,
-    markwon: Markwon
+    stringRepo: StringRepository
 ) : BaseViewModel(State.LOADED) {
 
     val isRooted get() = Shell.rootAccess()
@@ -35,8 +32,8 @@ class InstallViewModel(
     val step = ObservableField(0)
     val method = ObservableField(-1)
     val progress = ObservableField(0)
-    val data = ObservableField<Uri?>(null)
-    val notes = ObservableField<Spanned>(SpannableString(""))
+    val data = ObservableField(null as Uri?)
+    val notes = ObservableField("")
 
     init {
         RemoteFileService.reset()
@@ -50,10 +47,8 @@ class InstallViewModel(
                 state = State.LOADED
             }
         }
-        stringRepo.getString(Info.remote.magisk.note).map {
-            markwon.toMarkdown(it)
-        }.subscribeK {
-            notes.value = it
+        viewModelScope.launch {
+            notes.value = stringRepo.getString(Info.remote.magisk.note)
         }
         method.addOnPropertyChangedCallback {
             when (it!!) {

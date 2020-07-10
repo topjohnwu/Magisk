@@ -15,7 +15,9 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.Protected
-import com.topjohnwu.magisk.extensions.*
+import com.topjohnwu.magisk.extensions.readUri
+import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.extensions.withStreams
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
@@ -322,7 +324,7 @@ abstract class MagiskInstallImpl : KoinComponent {
                 tarOut = null
                 it
             } ?: destFile.outputStream()
-            patched.suInputStream().use { it.copyTo(os); os.close() }
+            SuFileInputStream(patched).use { it.copyTo(os); os.close() }
         } catch (e: IOException) {
             console.add("! Failed to output to $destFile")
             Timber.e(e)
@@ -338,10 +340,10 @@ abstract class MagiskInstallImpl : KoinComponent {
         return true
     }
 
-    private fun postOTA(): Boolean {
+    private suspend fun postOTA(): Boolean {
         val bootctl = SuFile("/data/adb/bootctl")
         try {
-            withStreams(service.fetchBootctl().blockingGet().byteStream(), bootctl.suOutputStream()) {
+            withStreams(service.fetchBootctl().byteStream(), SuFileOutputStream(bootctl)) {
                 input, out -> input.copyTo(out)
             }
         } catch (e: IOException) {
@@ -368,7 +370,7 @@ abstract class MagiskInstallImpl : KoinComponent {
 
     protected fun direct() = findImage() && extractZip() && patchBoot() && flashBoot()
 
-    protected fun secondSlot() =
+    protected suspend fun secondSlot() =
         findSecondaryImage() && extractZip() && patchBoot() && flashBoot() && postOTA()
 
     protected fun fixEnv(zip: File): Boolean {
@@ -379,7 +381,7 @@ abstract class MagiskInstallImpl : KoinComponent {
     }
 
     @WorkerThread
-    protected abstract fun operations(): Boolean
+    protected abstract suspend fun operations(): Boolean
 
     open suspend fun exec() = withContext(Dispatchers.IO) { operations() }
 }
@@ -407,7 +409,7 @@ sealed class MagiskInstaller(
         console: MutableList<String>,
         logs: MutableList<String>
     ) : MagiskInstaller(file, console, logs) {
-        override fun operations() = doPatchFile(uri)
+        override suspend fun operations() = doPatchFile(uri)
     }
 
     class SecondSlot(
@@ -415,7 +417,7 @@ sealed class MagiskInstaller(
         console: MutableList<String>,
         logs: MutableList<String>
     ) : MagiskInstaller(file, console, logs) {
-        override fun operations() = secondSlot()
+        override suspend fun operations() = secondSlot()
     }
 
     class Direct(
@@ -423,7 +425,7 @@ sealed class MagiskInstaller(
         console: MutableList<String>,
         logs: MutableList<String>
     ) : MagiskInstaller(file, console, logs) {
-        override fun operations() = direct()
+        override suspend fun operations() = direct()
     }
 
 }
@@ -431,7 +433,7 @@ sealed class MagiskInstaller(
 class EnvFixTask(
     private val zip: File
 ) : MagiskInstallImpl() {
-    override fun operations() = fixEnv(zip)
+    override suspend fun operations() = fixEnv(zip)
 
     override suspend fun exec(): Boolean {
         val success = super.exec()

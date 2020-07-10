@@ -13,16 +13,12 @@ import com.topjohnwu.magisk.core.tasks.EnvFixTask
 import com.topjohnwu.magisk.extensions.chooser
 import com.topjohnwu.magisk.extensions.exists
 import com.topjohnwu.magisk.extensions.provide
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.APKInstall
-import io.reactivex.Completable
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.koin.core.get
 import java.io.File
 import kotlin.random.Random.Default.nextInt
@@ -37,20 +33,20 @@ open class DownloadService : RemoteFileService() {
             .getMimeTypeFromExtension(extension)
             ?: "resource/folder"
 
-    override fun onFinished(subject: DownloadSubject, id: Int) = when (subject) {
-        is Magisk -> onFinishedInternal(subject, id)
-        is Module -> onFinishedInternal(subject, id)
-        is Manager -> onFinishedInternal(subject, id)
+    override suspend fun onFinished(subject: DownloadSubject, id: Int) = when (subject) {
+        is Magisk -> onFinished(subject, id)
+        is Module -> onFinished(subject, id)
+        is Manager -> onFinished(subject, id)
     }
 
-    private fun onFinishedInternal(
+    private suspend fun onFinished(
         subject: Magisk,
         id: Int
     ) = when (val conf = subject.configuration) {
         Uninstall -> FlashFragment.uninstall(subject.file, id)
         EnvFix -> {
             remove(id)
-            GlobalScope.launch { EnvFixTask(subject.file).exec() }
+            EnvFixTask(subject.file).exec()
             Unit
         }
         is Patch -> FlashFragment.patch(subject.file, conf.fileUri, id)
@@ -58,7 +54,7 @@ open class DownloadService : RemoteFileService() {
         else -> Unit
     }
 
-    private fun onFinishedInternal(
+    private fun onFinished(
         subject: Module,
         id: Int
     ) = when (subject.configuration) {
@@ -66,18 +62,15 @@ open class DownloadService : RemoteFileService() {
         else -> Unit
     }
 
-    private fun onFinishedInternal(
+    private suspend fun onFinished(
         subject: Manager,
         id: Int
     ) {
-        Completable.fromAction {
-            handleAPK(subject)
-        }.subscribeK {
-            remove(id)
-            when (subject.configuration)  {
-                is APK.Upgrade -> APKInstall.install(this, subject.file)
-                is APK.Restore -> Unit
-            }
+        handleAPK(subject)
+        remove(id)
+        when (subject.configuration)  {
+            is APK.Upgrade -> APKInstall.install(this, subject.file)
+            is APK.Restore -> Unit
         }
     }
 
@@ -85,14 +78,14 @@ open class DownloadService : RemoteFileService() {
 
     override fun Notification.Builder.addActions(subject: DownloadSubject)
     = when (subject) {
-        is Magisk -> addActionsInternal(subject)
-        is Module -> addActionsInternal(subject)
-        is Manager -> addActionsInternal(subject)
+        is Magisk -> addActions(subject)
+        is Module -> addActions(subject)
+        is Manager -> addActions(subject)
     }
 
-    private fun Notification.Builder.addActionsInternal(subject: Magisk)
+    private fun Notification.Builder.addActions(subject: Magisk)
     = when (val conf = subject.configuration) {
-        Download -> this.apply {
+        Download -> apply {
             fileIntent(subject.file.parentFile!!)
                 .takeIf { it.exists(get()) }
                 ?.let { addAction(0, R.string.download_open_parent, it.chooser()) }
@@ -101,18 +94,12 @@ open class DownloadService : RemoteFileService() {
                 ?.let { addAction(0, R.string.download_open_self, it.chooser()) }
         }
         Uninstall -> setContentIntent(FlashFragment.uninstallIntent(context, subject.file))
-        is Flash -> setContentIntent(
-            FlashFragment.flashIntent(
-                context,
-                subject.file,
-                conf is Secondary
-            )
-        )
+        is Flash -> setContentIntent(FlashFragment.flashIntent(context, subject.file, conf is Secondary))
         is Patch -> setContentIntent(FlashFragment.patchIntent(context, subject.file, conf.fileUri))
         else -> this
     }
 
-    private fun Notification.Builder.addActionsInternal(subject: Module)
+    private fun Notification.Builder.addActions(subject: Module)
     = when (subject.configuration) {
         Download -> this.apply {
             fileIntent(subject.file.parentFile!!)
@@ -126,7 +113,7 @@ open class DownloadService : RemoteFileService() {
         else -> this
     }
 
-    private fun Notification.Builder.addActionsInternal(subject: Manager)
+    private fun Notification.Builder.addActions(subject: Manager)
     = when (subject.configuration) {
         APK.Upgrade -> setContentIntent(APKInstall.installIntent(context, subject.file))
         else -> this

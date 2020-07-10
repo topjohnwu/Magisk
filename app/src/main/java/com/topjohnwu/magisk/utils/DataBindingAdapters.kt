@@ -22,11 +22,8 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
 import kotlin.math.roundToInt
 
 
@@ -42,14 +39,15 @@ fun setImageResource(view: AppCompatImageView, @DrawableRes resId: Int) {
 
 @BindingAdapter("movieBehavior", "movieBehaviorText")
 fun setMovieBehavior(view: TextView, isMovieBehavior: Boolean, text: String) {
-    (view.tag as? Disposable)?.dispose()
+    (view.tag as? Job)?.cancel()
+    view.tag = null
     if (isMovieBehavior) {
-        val observer = Observable
-            .interval(150, TimeUnit.MILLISECONDS)
-            .subscribeK {
+        view.tag = GlobalScope.launch(Dispatchers.Main.immediate) {
+            while (true) {
+                delay(150)
                 view.text = text.replaceRandomWithSpecial()
             }
-        view.tag = observer
+        }
     } else {
         view.text = text
     }

@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.extensions
 import androidx.collection.SparseArrayCompat
 import androidx.databinding.ObservableList
 import com.topjohnwu.magisk.utils.DiffObservableList
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.*
 
 fun <T> MutableList<T>.update(newList: List<T>) {
     clear()
@@ -25,8 +25,9 @@ fun List<String>.toShellCmd(): String {
 }
 
 fun <T1, T2> ObservableList<T1>.sendUpdatesTo(
-        target: DiffObservableList<T2>,
-        mapper: (List<T1>) -> List<T2>
+    target: DiffObservableList<T2>,
+    scope: CoroutineScope,
+    mapper: (List<T1>) -> List<T2>
 ) = addOnListChangedCallback(object :
     ObservableList.OnListChangedCallback<ObservableList<T1>>() {
     override fun onChanged(sender: ObservableList<T1>?) {
@@ -49,14 +50,17 @@ fun <T1, T2> ObservableList<T1>.sendUpdatesTo(
         updateAsync(sender ?: return)
     }
 
-    private var updater: Disposable? = null
+    private var updater: Job? = null
 
     private fun updateAsync(sender: List<T1>) {
-        updater?.dispose()
-        updater = sender.toSingle()
-            .map { mapper(it) }
-            .map { it to target.calculateDiff(it) }
-            .subscribeK { target.update(it.first, it.second) }
+        updater?.cancel()
+        updater = scope.launch {
+            val (list, diff) = withContext(Dispatchers.Default) {
+                val list = mapper(sender)
+                list to target.calculateDiff(list)
+            }
+            target.update(list, diff)
+        }
     }
 })
 

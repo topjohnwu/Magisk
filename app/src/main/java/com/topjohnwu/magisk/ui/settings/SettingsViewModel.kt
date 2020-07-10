@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.ui.settings
 
-import android.Manifest
 import android.os.Build
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
@@ -12,21 +12,18 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.database.RepoDao
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
 import com.topjohnwu.magisk.model.events.RecreateEvent
-import com.topjohnwu.magisk.model.events.RxPermissionEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.adapterOf
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.superuser.Shell
-import io.reactivex.Completable
-import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.launch
 import org.koin.core.get
 
 class SettingsViewModel(
@@ -47,6 +44,9 @@ class SettingsViewModel(
             // Pre 5.0 does not support getting colors from attributes,
             // making theming a pain in the ass. Just forget about it
             list.remove(Theme)
+        }
+        viewModelScope.launch {
+            Language.loadLanguages(this)
         }
 
         // Manager
@@ -125,8 +125,10 @@ class SettingsViewModel(
     }
 
     private fun clearRepoCache() {
-        Completable.fromAction { repositoryDao.clear() }
-            .subscribeK { Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT) }
+        viewModelScope.launch {
+            repositoryDao.clear()
+            Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
+        }
     }
 
     private fun createHosts() {
@@ -136,14 +138,7 @@ class SettingsViewModel(
     }
 
     private fun requireRWPermission() {
-        val callback = PublishSubject.create<Boolean>()
-        callback.subscribeK { if (!it) requireRWPermission() }
-        RxPermissionEvent(
-            listOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ), callback
-        ).publish()
+        withExternalRW { if (!it) requireRWPermission() }
     }
 
     private fun updateManager(hide: Boolean) {

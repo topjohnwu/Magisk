@@ -42,7 +42,7 @@ class FlashViewModel(
     private val logItems = Collections.synchronizedList(mutableListOf<String>())
 
     init {
-        outItems.sendUpdatesTo(items) { it.map { ConsoleItem(it) } }
+        outItems.sendUpdatesTo(items, viewModelScope) { it.map { ConsoleItem(it) } }
         outItems.copyNewInputInto(logItems)
 
         args.dismissId.takeIf { it != -1 }?.also {

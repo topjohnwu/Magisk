@@ -7,8 +7,11 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.BindingAdapter
-import com.topjohnwu.magisk.extensions.subscribeK
-import io.reactivex.Single
+import com.topjohnwu.magisk.extensions.get
+import io.noties.markwon.Markwon
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @BindingAdapter("gone")
 fun setGone(view: View, gone: Boolean) {
@@ -32,9 +35,16 @@ fun setInvisibleUnless(view: View, invisibleUnless: Boolean) {
 
 @BindingAdapter("precomputedText")
 fun setPrecomputedText(tv: TextView, text: CharSequence) {
-    Single.fromCallable {
-        PrecomputedTextCompat.create(text, TextViewCompat.getTextMetricsParams(tv))
-    }.subscribeK {
-        TextViewCompat.setPrecomputedText(tv, it);
+    GlobalScope.launch(Dispatchers.Default) {
+        val pre = PrecomputedTextCompat.create(text, TextViewCompat.getTextMetricsParams(tv))
+        tv.post {
+            TextViewCompat.setPrecomputedText(tv, pre);
+        }
     }
+}
+
+@BindingAdapter("markdownText")
+fun setMarkdownText(tv: TextView, text: CharSequence) {
+    val markwon = get<Markwon>()
+    markwon.setMarkdown(tv, text.toString())
 }

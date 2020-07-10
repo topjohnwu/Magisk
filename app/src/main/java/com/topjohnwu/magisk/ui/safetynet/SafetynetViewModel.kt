@@ -50,7 +50,7 @@ class SafetynetViewModel : BaseViewModel() {
 
     private fun attest() {
         currentState = LOADING
-        CheckSafetyNetEvent {
+        CheckSafetyNetEvent() {
             resolveResponse(it)
         }.publish()
     }

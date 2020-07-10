@@ -28,7 +28,7 @@ import com.topjohnwu.magisk.ui.base.itemBindingOf
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 
-class MagiskDialog @JvmOverloads constructor(
+class MagiskDialog(
     context: Context, theme: Int = 0
 ) : AppCompatDialog(context, theme) {
 

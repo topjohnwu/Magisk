@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.data.network
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.tasks.GithubRepoInfo
-import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -26,18 +25,15 @@ interface GithubRawServices {
 
     @GET("$MAGISK_FILES/{$REVISION}/snet.jar")
     @Streaming
-    fun fetchSafetynet(@Path(REVISION) revision: String = Const.SNET_REVISION): Single<ResponseBody>
+    suspend fun fetchSafetynet(@Path(REVISION) revision: String = Const.SNET_REVISION): ResponseBody
 
     @GET("$MAGISK_FILES/{$REVISION}/bootctl")
     @Streaming
-    fun fetchBootctl(@Path(REVISION) revision: String = Const.BOOTCTL_REVISION): Single<ResponseBody>
+    suspend fun fetchBootctl(@Path(REVISION) revision: String = Const.BOOTCTL_REVISION): ResponseBody
 
     @GET("$MAGISK_MASTER/scripts/module_installer.sh")
     @Streaming
-    fun fetchInstaller(): Single<ResponseBody>
-
-    @GET("$MAGISK_MODULES/{$MODULE}/master/{$FILE}")
-    fun fetchModuleInfo(@Path(MODULE) id: String, @Path(FILE) file: String): Single<String>
+    suspend fun fetchInstaller(): ResponseBody
 
     @GET("$MAGISK_MODULES/{$MODULE}/master/{$FILE}")
     suspend fun fetchModuleFile(@Path(MODULE) id: String, @Path(FILE) file: String): String
@@ -50,10 +46,10 @@ interface GithubRawServices {
      * */
     @GET
     @Streaming
-    fun fetchFile(@Url url: String): Single<ResponseBody>
+    suspend fun fetchFile(@Url url: String): ResponseBody
 
     @GET
-    fun fetchString(@Url url: String): Single<String>
+    suspend fun fetchString(@Url url: String): String
 
 
     companion object {
