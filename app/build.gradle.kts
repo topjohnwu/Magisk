@@ -77,10 +77,6 @@ dependencies {
     implementation("com.github.topjohnwu:jtar:1.0.0")
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    implementation("io.reactivex.rxjava2:rxjava:2.2.19")
-    implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
-    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
-
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${Deps.vKotlin}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Deps.vKotlin}")
 
@@ -108,7 +104,6 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:${vRetrofit}")
     implementation("com.squareup.retrofit2:converter-moshi:${vRetrofit}")
     implementation("com.squareup.retrofit2:converter-scalars:${vRetrofit}")
-    implementation("com.squareup.retrofit2:adapter-rxjava2:${vRetrofit}")
 
     val vOkHttp = "3.12.12"
     implementation("com.squareup.okhttp3:okhttp") {
@@ -132,7 +127,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:${Deps.vNav}")
 
     implementation("androidx.biometric:biometric:1.0.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.0-beta7")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.0-beta8")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.2.0")
     implementation("androidx.preference:preference:1.1.1")

@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.superuser.Shell
 import dalvik.system.DexFile
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import org.koin.core.KoinComponent
