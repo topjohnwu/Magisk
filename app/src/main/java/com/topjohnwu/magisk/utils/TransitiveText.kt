@@ -4,7 +4,7 @@ import android.content.res.Resources
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
-import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.ktx.get
 
 sealed class TransitiveText {
 

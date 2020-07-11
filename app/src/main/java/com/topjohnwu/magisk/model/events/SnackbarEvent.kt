@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.extensions.snackbar
+import com.topjohnwu.magisk.ktx.snackbar
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
 
 class SnackbarEvent private constructor(

@@ -16,9 +16,9 @@ import com.topjohnwu.magisk.core.model.toPolicy
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.startActivity
-import com.topjohnwu.magisk.extensions.startActivityWithRoot
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.startActivity
+import com.topjohnwu.magisk.ktx.startActivityWithRoot
 import com.topjohnwu.magisk.model.entity.toLog
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell

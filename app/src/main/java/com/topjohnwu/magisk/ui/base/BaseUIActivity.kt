@@ -18,9 +18,9 @@ import androidx.navigation.findNavController
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.extensions.snackbar
-import com.topjohnwu.magisk.extensions.startAnimations
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.snackbar
+import com.topjohnwu.magisk.ktx.startAnimations
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent

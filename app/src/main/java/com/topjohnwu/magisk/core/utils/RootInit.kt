@@ -5,7 +5,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.wrap
-import com.topjohnwu.magisk.extensions.rawResource
+import com.topjohnwu.magisk.ktx.rawResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 

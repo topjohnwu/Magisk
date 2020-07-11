@@ -11,8 +11,8 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.ResMgr
 import com.topjohnwu.magisk.core.addAssetPath
-import com.topjohnwu.magisk.extensions.langTagToLocale
-import com.topjohnwu.magisk.extensions.toLangTag
+import com.topjohnwu.magisk.ktx.langTagToLocale
+import com.topjohnwu.magisk.ktx.toLangTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*

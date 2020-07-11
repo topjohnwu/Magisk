@@ -12,10 +12,10 @@ import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.extensions.await
-import com.topjohnwu.magisk.extensions.packageName
-import com.topjohnwu.magisk.extensions.res
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.await
+import com.topjohnwu.magisk.ktx.packageName
+import com.topjohnwu.magisk.ktx.res
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem

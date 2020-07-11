@@ -9,8 +9,8 @@ import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.core.utils.SafetyNetHelper
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.DynamicClassLoader
-import com.topjohnwu.magisk.extensions.writeTo
+import com.topjohnwu.magisk.ktx.DynamicClassLoader
+import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetResult
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow

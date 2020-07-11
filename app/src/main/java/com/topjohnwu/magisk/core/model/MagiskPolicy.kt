@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.core.model
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.INTERACTIVE
-import com.topjohnwu.magisk.extensions.getLabel
+import com.topjohnwu.magisk.ktx.getLabel
 
 
 data class MagiskPolicy(

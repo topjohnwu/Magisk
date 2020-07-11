@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.model.toMap
 import com.topjohnwu.magisk.core.model.toPolicy
-import com.topjohnwu.magisk.extensions.now
+import com.topjohnwu.magisk.ktx.now
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.extensions
+package com.topjohnwu.magisk.ktx
 
 import org.koin.core.context.KoinContextHandler
 import org.koin.core.parameter.ParametersDefinition

@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.events.RequestFileEvent
 import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel

@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.model.toPolicy
-import com.topjohnwu.magisk.extensions.now
+import com.topjohnwu.magisk.ktx.now
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.*

@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.UpdateCheckService
-import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
 import java.util.concurrent.TimeUnit

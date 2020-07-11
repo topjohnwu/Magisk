@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.core.view.Shortcuts
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.superuser.Shell
 

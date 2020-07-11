@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.extensions
+package com.topjohnwu.magisk.ktx
 
 import android.os.Build
 import timber.log.Timber

@@ -21,7 +21,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
+import com.topjohnwu.magisk.ktx.replaceRandomWithSpecial
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.*
 import kotlin.math.roundToInt

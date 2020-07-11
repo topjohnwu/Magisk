@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.extensions
+package com.topjohnwu.magisk.ktx
 
 import android.view.View
 import android.view.ViewGroup

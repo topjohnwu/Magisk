@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.model.entity.ProcessHideApp

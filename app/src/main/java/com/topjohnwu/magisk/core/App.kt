@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.utils.RootInit
 import com.topjohnwu.magisk.core.utils.updateConfig
 import com.topjohnwu.magisk.di.koinModules
-import com.topjohnwu.magisk.extensions.unwrap
+import com.topjohnwu.magisk.ktx.unwrap
 import com.topjohnwu.superuser.Shell
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin

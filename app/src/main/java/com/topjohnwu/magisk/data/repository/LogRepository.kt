@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.data.repository
 
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.database.SuLogDao
-import com.topjohnwu.magisk.extensions.await
+import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.superuser.Shell
 

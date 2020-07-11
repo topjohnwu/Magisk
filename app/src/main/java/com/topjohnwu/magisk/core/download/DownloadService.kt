@@ -10,9 +10,9 @@ import android.webkit.MimeTypeMap
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.tasks.EnvFixTask
-import com.topjohnwu.magisk.extensions.chooser
-import com.topjohnwu.magisk.extensions.exists
-import com.topjohnwu.magisk.extensions.provide
+import com.topjohnwu.magisk.ktx.chooser
+import com.topjohnwu.magisk.ktx.exists
+import com.topjohnwu.magisk.ktx.provide
 import com.topjohnwu.magisk.model.entity.internal.Configuration.*
 import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject

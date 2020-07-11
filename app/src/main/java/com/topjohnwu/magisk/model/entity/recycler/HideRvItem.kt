@@ -5,10 +5,10 @@ import android.view.ViewGroup
 import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
-import com.topjohnwu.magisk.extensions.startAnimations
-import com.topjohnwu.magisk.extensions.toggle
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.ktx.startAnimations
+import com.topjohnwu.magisk.ktx.toggle
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.observer.Observer

@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.model.entity.recycler
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.extensions.timeDateFormat
-import com.topjohnwu.magisk.extensions.toTime
+import com.topjohnwu.magisk.ktx.timeDateFormat
+import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.model.entity.MagiskLog
 
 class LogItem(val item: MagiskLog) : ObservableItem<LogItem>() {

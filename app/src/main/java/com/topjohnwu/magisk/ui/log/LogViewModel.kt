@@ -7,7 +7,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent

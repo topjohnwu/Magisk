@@ -11,7 +11,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.core.wrap
-import com.topjohnwu.magisk.extensions.set
+import com.topjohnwu.magisk.ktx.set
 import com.topjohnwu.magisk.model.permissions.PermissionRequestBuilder
 import kotlin.random.Random
 

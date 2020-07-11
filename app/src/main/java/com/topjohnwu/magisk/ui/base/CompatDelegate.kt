@@ -5,7 +5,7 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.ContextExecutor
 import com.topjohnwu.magisk.model.events.FragmentExecutor

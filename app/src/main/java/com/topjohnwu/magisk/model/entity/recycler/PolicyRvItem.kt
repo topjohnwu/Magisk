@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.extensions.toggle
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.toggle
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 
 class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyItem>() {

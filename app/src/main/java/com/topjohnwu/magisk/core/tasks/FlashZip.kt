@@ -5,8 +5,8 @@ import android.net.Uri
 import androidx.core.os.postDelayed
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.unzip
-import com.topjohnwu.magisk.extensions.fileName
-import com.topjohnwu.magisk.extensions.readUri
+import com.topjohnwu.magisk.ktx.fileName
+import com.topjohnwu.magisk.ktx.readUri
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.Dispatchers

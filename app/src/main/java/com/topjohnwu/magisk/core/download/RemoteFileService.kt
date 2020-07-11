@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.writeTo
+import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module

@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.view.Notifications
-import com.topjohnwu.magisk.extensions.*
+import com.topjohnwu.magisk.ktx.*
 import com.topjohnwu.magisk.model.binding.BindingAdapter
 import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent

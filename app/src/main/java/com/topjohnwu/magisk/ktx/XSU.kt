@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.extensions
+package com.topjohnwu.magisk.ktx
 
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.superuser.Shell

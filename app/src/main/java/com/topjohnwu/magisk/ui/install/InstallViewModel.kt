@@ -10,8 +10,8 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.repository.StringRepository
-import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.RequestFileEvent

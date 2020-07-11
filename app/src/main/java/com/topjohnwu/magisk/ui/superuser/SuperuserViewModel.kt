@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.core.model.MagiskPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.extensions.toggle
+import com.topjohnwu.magisk.ktx.toggle
 import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
 import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem

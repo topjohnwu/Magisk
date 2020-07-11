@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.PatchAPK
-import com.topjohnwu.magisk.extensions.writeTo
+import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Restore
 import com.topjohnwu.magisk.model.entity.internal.Configuration.APK.Upgrade
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject

@@ -13,8 +13,8 @@ import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.inject
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.model.preference.PreferenceModel
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.superuser.Shell

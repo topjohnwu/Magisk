@@ -13,8 +13,8 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.Const.ID.PROGRESS_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.Const.ID.UPDATE_NOTIFICATION_CHANNEL
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.getBitmap
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.getBitmap
 
 object Notifications {
 

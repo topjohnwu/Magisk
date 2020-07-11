@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.core.download
 
-import com.topjohnwu.magisk.extensions.withStreams
+import com.topjohnwu.magisk.ktx.withStreams
 import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipEntry

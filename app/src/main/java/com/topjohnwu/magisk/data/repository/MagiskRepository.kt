@@ -4,9 +4,9 @@ import android.content.pm.PackageManager
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.await
-import com.topjohnwu.magisk.extensions.getLabel
-import com.topjohnwu.magisk.extensions.packageName
+import com.topjohnwu.magisk.ktx.await
+import com.topjohnwu.magisk.ktx.getLabel
+import com.topjohnwu.magisk.ktx.packageName
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.superuser.Shell

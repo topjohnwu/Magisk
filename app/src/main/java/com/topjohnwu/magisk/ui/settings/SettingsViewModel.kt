@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.database.RepoDao
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem

@@ -4,8 +4,8 @@ import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.net.NetworkObserver
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.utils.CachedValue
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd

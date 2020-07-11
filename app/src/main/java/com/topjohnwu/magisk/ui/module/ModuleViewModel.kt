@@ -14,9 +14,9 @@ import com.topjohnwu.magisk.core.tasks.RepoUpdater
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.extensions.addOnListChangedCallback
-import com.topjohnwu.magisk.extensions.reboot
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.addOnListChangedCallback
+import com.topjohnwu.magisk.ktx.reboot
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent

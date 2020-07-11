@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
-import com.topjohnwu.magisk.extensions.hideKeyboard
+import com.topjohnwu.magisk.ktx.hideKeyboard
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.MainActivity

@@ -7,7 +7,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.widget.TextViewCompat
 import androidx.databinding.BindingAdapter
-import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.ktx.get
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

@@ -23,7 +23,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
 import me.tatarka.bindingcollectionadapter2.ItemBinding

@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
-import com.topjohnwu.magisk.extensions.startAnimations
+import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
 import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior

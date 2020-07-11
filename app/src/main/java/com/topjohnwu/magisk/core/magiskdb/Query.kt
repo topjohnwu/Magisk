@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.core.magiskdb
 
 import androidx.annotation.StringDef
-import com.topjohnwu.magisk.extensions.await
+import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

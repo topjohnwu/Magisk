@@ -4,7 +4,7 @@ import androidx.databinding.Bindable
 import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.extensions.value
+import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.events.CheckSafetyNetEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*

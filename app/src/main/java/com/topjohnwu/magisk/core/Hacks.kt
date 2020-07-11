@@ -20,7 +20,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.core.utils.updateConfig
-import com.topjohnwu.magisk.extensions.forceGetDeclaredField
+import com.topjohnwu.magisk.ktx.forceGetDeclaredField
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 

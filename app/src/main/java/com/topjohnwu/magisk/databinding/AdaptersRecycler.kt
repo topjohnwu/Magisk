@@ -4,8 +4,8 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.InsetDrawable
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.topjohnwu.magisk.extensions.startEndToLeftRight
-import com.topjohnwu.magisk.extensions.toPx
+import com.topjohnwu.magisk.ktx.startEndToLeftRight
+import com.topjohnwu.magisk.ktx.toPx
 import com.topjohnwu.magisk.utils.KItemDecoration
 import kotlin.math.roundToInt
 

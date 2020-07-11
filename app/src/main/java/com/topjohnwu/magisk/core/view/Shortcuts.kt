@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.SplashActivity
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.utils.Utils
-import com.topjohnwu.magisk.extensions.getBitmap
+import com.topjohnwu.magisk.ktx.getBitmap
 
 object Shortcuts {
 
