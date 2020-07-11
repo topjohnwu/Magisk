@@ -77,8 +77,8 @@ dependencies {
     implementation("com.github.topjohnwu:jtar:1.0.0")
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${Deps.vKotlin}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Deps.vKotlin}")
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk7"))
 
     val vBAdapt = "4.0.0"
     val bindingAdapter = "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter"

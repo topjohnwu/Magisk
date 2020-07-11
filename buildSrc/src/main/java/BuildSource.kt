@@ -6,7 +6,6 @@ import java.io.File
 import java.util.*
 
 object Deps {
-    const val vKotlin = "1.3.72"
     const val vNav = "2.3.0"
 }
 

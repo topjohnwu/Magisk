@@ -15,10 +15,8 @@ import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.navigation.NavigationWrapper
-import com.topjohnwu.magisk.model.observer.Observer
 import kotlinx.coroutines.Job
 import org.koin.core.KoinComponent
 
@@ -34,7 +32,7 @@ abstract class BaseViewModel(
     val loaded @Bindable get() = state == State.LOADED
     val loadingFailed @Bindable get() = state == State.LOADING_FAILED
 
-    val isConnected = Observer(Info.isConnected) { Info.isConnected.value }
+    val isConnected get() = Info.isConnected
     val viewEvents: LiveData<ViewEvent> get() = _viewEvents
     val insets = ObservableField(Insets.NONE)
 
