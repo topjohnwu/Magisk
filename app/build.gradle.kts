@@ -76,7 +76,6 @@ dependencies {
 
     implementation("com.github.topjohnwu:jtar:1.0.0")
     implementation("com.jakewharton.timber:timber:4.7.1")
-    implementation("com.github.pwittchen:reactivenetwork-rx2:3.0.8")
 
     implementation("io.reactivex.rxjava2:rxjava:2.2.19")
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")

@@ -1,15 +1,15 @@
 package com.topjohnwu.magisk.core
 
 import androidx.databinding.ObservableField
-import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
+import com.topjohnwu.magisk.core.net.NetworkObserver
 import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.extensions.value
 import com.topjohnwu.magisk.utils.CachedValue
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.FileInputStream
 import java.io.IOException
 
@@ -37,10 +37,9 @@ object Info {
 
     val isConnected by lazy {
         ObservableField(false).also { field ->
-            ReactiveNetwork.observeNetworkConnectivity(get())
-                .subscribeK {
-                    field.value = it.available()
-                }
+            NetworkObserver.observe(get()) {
+                UiThreadHandler.run { field.value = it.isAvailable }
+            }
         }
     }
 
