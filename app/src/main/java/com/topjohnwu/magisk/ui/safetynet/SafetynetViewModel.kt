@@ -1,13 +1,12 @@
 package com.topjohnwu.magisk.ui.safetynet
 
 import androidx.databinding.Bindable
-import androidx.databinding.ObservableField
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.events.CheckSafetyNetEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
+import com.topjohnwu.magisk.utils.observable
 import org.json.JSONObject
 
 enum class SafetyNetState {
@@ -21,31 +20,28 @@ data class SafetyNetResult(
 
 class SafetynetViewModel : BaseViewModel() {
 
-    private var currentState = IDLE
-        set(value) {
-            field = value
-            notifyStateChanged()
-        }
-    val safetyNetTitle = ObservableField(R.string.empty)
-    val ctsState = ObservableField(false)
-    val basicIntegrityState = ObservableField(false)
-    val evalType = ObservableField("")
+    @get:Bindable
+    var safetyNetTitle by observable(R.string.empty, BR.safetyNetTitle)
+    @get:Bindable
+    var ctsState by observable(false, BR.ctsState)
+    @get:Bindable
+    var basicIntegrityState by observable(false, BR.basicIntegrityState)
+    @get:Bindable
+    var evalType by observable("")
 
-    val isChecking @Bindable get() = currentState == LOADING
-    val isFailed @Bindable get() = currentState == FAILED
-    val isSuccess @Bindable get() = currentState == PASS
+    @get:Bindable
+    val isChecking get() = currentState == LOADING
+    @get:Bindable
+    val isFailed get() = currentState == FAILED
+    @get:Bindable
+    val isSuccess get() = currentState == PASS
+
+    private var currentState by observable(IDLE, BR.checking, BR.failed, BR.success)
 
     init {
         cachedResult?.also {
             resolveResponse(SafetyNetResult(it))
         } ?: attest()
-    }
-
-    override fun notifyStateChanged() {
-        super.notifyStateChanged()
-        notifyPropertyChanged(BR.loading)
-        notifyPropertyChanged(BR.failed)
-        notifyPropertyChanged(BR.success)
     }
 
     private fun attest() {
@@ -70,26 +66,26 @@ class SafetynetViewModel : BaseViewModel() {
                 val eval = optString("evaluationType")
                 val result = cts && basic
                 cachedResult = this
-                ctsState.value = cts
-                basicIntegrityState.value = basic
-                evalType.value = if (eval.contains("HARDWARE")) "HARDWARE" else "BASIC"
+                ctsState = cts
+                basicIntegrityState = basic
+                evalType = if (eval.contains("HARDWARE")) "HARDWARE" else "BASIC"
                 currentState = if (result) PASS else FAILED
-                safetyNetTitle.value =
+                safetyNetTitle =
                     if (result) R.string.safetynet_attest_success
                     else R.string.safetynet_attest_failure
             }.onFailure {
                 currentState = FAILED
-                ctsState.value = false
-                basicIntegrityState.value = false
-                evalType.value = "N/A"
-                safetyNetTitle.value = R.string.safetynet_res_invalid
+                ctsState = false
+                basicIntegrityState = false
+                evalType = "N/A"
+                safetyNetTitle = R.string.safetynet_res_invalid
             }
         } ?: {
             currentState = FAILED
-            ctsState.value = false
-            basicIntegrityState.value = false
-            evalType.value = "N/A"
-            safetyNetTitle.value = R.string.safetynet_api_error
+            ctsState = false
+            basicIntegrityState = false
+            evalType = "N/A"
+            safetyNetTitle = R.string.safetynet_api_error
         }()
     }
 

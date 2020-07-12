@@ -132,7 +132,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.isConnected ? viewModel.stateMagiskRemoteVersion : @string/not_available}"
+                                android:text="@{viewModel.isConnected ? viewModel.magiskRemoteVersion : @string/not_available}"
                                 tools:text="20.1 (12345)" />
 
                         </LinearLayout>
@@ -149,7 +149,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.env.isActive ? viewModel.stateMagiskInstalledVersion : @string/not_available}"
+                                android:text="@{Info.env.isActive ? viewModel.magiskInstalledVersion : @string/not_available}"
                                 tools:text="20.1 (12345)" />
 
                         </LinearLayout>
@@ -166,7 +166,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.env.isActive ? viewModel.stateMagiskMode : @string/not_available}"
+                                android:text="@{Info.env.isActive ? viewModel.magiskMode : @string/not_available}"
                                 tools:text="Normal" />
 
                         </LinearLayout>

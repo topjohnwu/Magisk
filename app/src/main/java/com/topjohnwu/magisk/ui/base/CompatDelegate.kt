@@ -5,7 +5,6 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.ContextExecutor
 import com.topjohnwu.magisk.model.events.FragmentExecutor
@@ -44,7 +43,7 @@ class CompatDelegate internal constructor(
             insets.asInsets()
                 .also { view.peekSystemWindowInsets(it) }
                 .let { view.consumeSystemWindowInsets(it) }
-                ?.also { view.viewModel.insets.value = it }
+                ?.also { view.viewModel.insets = it }
                 ?.subtractBy(insets) ?: insets
         }
         if (ViewCompat.isAttachedToWindow(view.viewRoot)) {

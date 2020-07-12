@@ -11,6 +11,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.utils.TransitiveText
 import com.topjohnwu.magisk.view.MagiskDialog
 import org.koin.core.KoinComponent
@@ -37,7 +38,7 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
         // notify only after the callback invocation; callback can invalidate the backing data,
         // which wouldn't be recognized with reverse approach
-        notifyChange(BR.description)
+        notifyPropertyChanged(BR.description)
     }
 
     open fun refresh() {}
@@ -60,7 +61,7 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     ) = object : ObservableProperty<T>(initialValue) {
         override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
             setter(newValue)
-            notifyChange(fieldId)
+            notifyPropertyChanged(fieldId)
         }
     }
 
@@ -169,7 +170,7 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
                 }
                 .applyAdapter(entries) {
                     value = it
-                    notifyChange(BR.selectedEntry)
+                    notifyPropertyChanged(BR.selectedEntry)
                     super.onPressed(view, callback)
                 }
                 .reveal()

@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.ui.module
 
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
-import androidx.databinding.ObservableField
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -25,6 +24,7 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
+import com.topjohnwu.magisk.utils.observable
 import kotlinx.coroutines.*
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 import kotlin.math.roundToInt
@@ -53,18 +53,18 @@ class ModuleViewModel(
     private var queryJob: Job? = null
     private var remoteJob: Job? = null
 
-    var query = ""
-        @Bindable get
-        set(value) {
-            if (field == value) return
-            field = value
-            notifyPropertyChanged(BR.query)
-            submitQuery()
-            // Yes we do lie about the search being loaded
-            searchLoading.value = true
-        }
+    @get:Bindable
+    var isRemoteLoading by observable(false, BR.remoteLoading)
 
-    val searchLoading = ObservableField(false)
+    @get:Bindable
+    var query by observable("", BR.query) {
+        submitQuery()
+        // Yes we do lie about the search being loaded
+        searchLoading = true
+    }
+
+    @get:Bindable
+    var searchLoading by observable(false, BR.searchLoading)
     val itemsSearch = diffListOf<RepoItem>()
     val itemSearchBinding = itemBindingOf<RepoItem> {
         it.bindExtra(BR.viewModel, this)
@@ -79,13 +79,6 @@ class ModuleViewModel(
     private val itemsInstalled = diffListOf<ModuleItem>()
     private val itemsUpdatable = diffListOf<RepoItem.Update>()
     private val itemsRemote = diffListOf<RepoItem.Remote>()
-
-    var isRemoteLoading = false
-        @Bindable get
-        private set(value) {
-            field = value
-            notifyPropertyChanged(BR.remoteLoading)
-        }
 
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = MergeObservableList<ComparableRvItem<*>>()
@@ -261,7 +254,7 @@ class ModuleViewModel(
             val diff = withContext(Dispatchers.Default) {
                 itemsSearch.calculateDiff(searched)
             }
-            searchLoading.value = false
+            searchLoading = false
             itemsSearch.update(searched, diff)
         }
     }

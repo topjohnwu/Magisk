@@ -1,21 +1,23 @@
 package com.topjohnwu.magisk.ui.log
 
-import androidx.databinding.ObservableField
+import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.recycler.LogItem
 import com.topjohnwu.magisk.model.entity.recycler.TextItem
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.utils.observable
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -38,19 +40,15 @@ class LogViewModel(
     }
 
     // --- magisk log
-
-    val consoleText = ObservableField(" ")
+    @get:Bindable
+    var consoleText by observable(" ", BR.consoleText)
 
     override fun refresh() = viewModelScope.launch {
-        consoleText.value = repo.fetchMagiskLogs()
-        val deferred = withContext(Dispatchers.Default) {
-            async {
-                val suLogs = repo.fetchSuLogs().map { LogItem(it) }
-                suLogs to items.calculateDiff(suLogs)
-            }
+        consoleText = repo.fetchMagiskLogs()
+        val (suLogs, diff) = withContext(Dispatchers.Default) {
+            val suLogs = repo.fetchSuLogs().map { LogItem(it) }
+            suLogs to items.calculateDiff(suLogs)
         }
-        delay(500)
-        val (suLogs, diff) = deferred.await()
         items.firstOrNull()?.isTop = false
         items.lastOrNull()?.isBottom = false
         items.update(suLogs, diff)

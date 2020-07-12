@@ -46,7 +46,7 @@ object Language : SettingsItem.Selector() {
                 entryValues = values
                 val selectedLocale = currentLocale.getDisplayName(currentLocale)
                 value = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
-                notifyChange(BR.selectedEntry)
+                notifyPropertyChanged(BR.selectedEntry)
             }
         }
     }
@@ -79,8 +79,8 @@ object Hide : SettingsItem.Input() {
     override var value: String = resources.getString(R.string.re_app_name)
         set(value) {
             field = value
-            notifyChange(BR.value)
-            notifyChange(BR.error)
+            notifyPropertyChanged(BR.value)
+            notifyPropertyChanged(BR.error)
         }
 
     @get:Bindable
@@ -112,8 +112,8 @@ object DownloadPath : SettingsItem.Input() {
     var result = value
         set(value) {
             field = value
-            notifyChange(BR.result)
-            notifyChange(BR.path)
+            notifyPropertyChanged(BR.result)
+            notifyPropertyChanged(BR.path)
         }
 
     @get:Bindable
@@ -143,7 +143,7 @@ object UpdateChannelUrl : SettingsItem.Input() {
     var result = value
         set(value) {
             field = value
-            notifyChange(BR.result)
+            notifyPropertyChanged(BR.result)
         }
 
     override fun refresh() {

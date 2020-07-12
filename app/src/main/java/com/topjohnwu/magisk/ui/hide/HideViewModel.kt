@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.ui.hide
 
 import android.content.pm.ApplicationInfo
 import androidx.databinding.Bindable
-import androidx.databinding.ObservableField
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.utils.currentLocale
@@ -18,6 +17,7 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.Queryable
 import com.topjohnwu.magisk.ui.base.filterableListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.utils.observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,21 +28,16 @@ class HideViewModel(
 
     override val queryDelay = 1000L
 
-    var isShowSystem = false
-        @Bindable get
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.showSystem)
-            submitQuery()
-        }
+    @get:Bindable
+    var isShowSystem by observable(false, BR.showSystem) {
+        submitQuery()
+    }
 
-    var query = ""
-        @Bindable get
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.query)
-            submitQuery()
-        }
+    @get:Bindable
+    var query by observable("", BR.query) {
+        submitQuery()
+    }
+
     val items = filterableListOf<HideItem>()
     val itemBinding = itemBindingOf<HideItem> {
         it.bindExtra(BR.viewModel, this)
@@ -50,8 +45,6 @@ class HideViewModel(
     val itemInternalBinding = itemBindingOf<HideProcessItem> {
         it.bindExtra(BR.viewModel, this)
     }
-
-    val isFilterExpanded = ObservableField(false)
 
     override fun refresh() = viewModelScope.launch {
         state = State.LOADING
@@ -106,10 +99,5 @@ class HideViewModel(
     fun resetQuery() {
         query = ""
     }
-
-    fun hideFilter() {
-        isFilterExpanded.value = false
-    }
-
 }
 

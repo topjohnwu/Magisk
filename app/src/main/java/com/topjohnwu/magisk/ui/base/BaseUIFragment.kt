@@ -89,3 +89,9 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
     }
 
 }
+
+interface ReselectionTarget {
+
+    fun onReselected()
+
+}

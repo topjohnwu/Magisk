@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
-import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.events.RequestFileEvent
 import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -16,7 +15,7 @@ class InstallFragment : BaseUIFragment<InstallViewModel, FragmentInstallMd2Bindi
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.data.value = RequestFileEvent.resolve(requestCode, resultCode, data)
+        viewModel.data = RequestFileEvent.resolve(requestCode, resultCode, data)
     }
 
     override fun onStart() {

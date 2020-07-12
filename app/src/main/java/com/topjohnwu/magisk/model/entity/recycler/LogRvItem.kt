@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.model.entity.recycler
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.ktx.timeDateFormat
 import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.model.entity.MagiskLog
@@ -16,13 +17,13 @@ class LogItem(val item: MagiskLog) : ObservableItem<LogItem>() {
         @Bindable get
         set(value) {
             field = value
-            notifyChange(BR.top)
+            notifyPropertyChanged(BR.top)
         }
     var isBottom = false
         @Bindable get
         set(value) {
             field = value
-            notifyChange(BR.bottom)
+            notifyPropertyChanged(BR.bottom)
         }
 
     override fun itemSameAs(other: LogItem) = item.appName == other.item.appName

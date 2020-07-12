@@ -3,9 +3,10 @@ package com.topjohnwu.magisk.ui.flash
 import android.content.res.Resources
 import android.net.Uri
 import android.view.MenuItem
+import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
-import androidx.databinding.ObservableField
 import androidx.lifecycle.viewModelScope
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
@@ -19,6 +20,7 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.utils.observable
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,8 +33,10 @@ class FlashViewModel(
     private val resources: Resources
 ) : BaseViewModel() {
 
-    val showReboot = ObservableField(Shell.rootAccess())
-    val behaviorText = ObservableField(resources.getString(R.string.flashing))
+    @get:Bindable
+    var showReboot by observable(Shell.rootAccess(), BR.showReboot)
+    @get:Bindable
+    var behaviorText by observable(resources.getString(R.string.flashing), BR.behaviorText)
 
     val adapter = BindingAdapter<ConsoleItem>()
     val items = diffListOf<ConsoleItem>()
@@ -59,7 +63,7 @@ class FlashViewModel(
                     FlashZip(installer, outItems, logItems).exec()
                 }
                 Const.Value.UNINSTALL -> {
-                    showReboot.value = false
+                    showReboot = false
                     FlashZip.Uninstall(installer, outItems, logItems).exec()
                 }
                 Const.Value.FLASH_MAGISK -> {
@@ -70,7 +74,7 @@ class FlashViewModel(
                 }
                 Const.Value.PATCH_FILE -> {
                     uri ?: return@launch
-                    showReboot.value = false
+                    showReboot = false
                     MagiskInstaller.Patch(installer, uri, outItems, logItems).exec()
                 }
                 else -> {
@@ -84,7 +88,7 @@ class FlashViewModel(
 
     private fun onResult(success: Boolean) {
         state = if (success) State.LOADED else State.LOADING_FAILED
-        behaviorText.value = when {
+        behaviorText = when {
             success -> resources.getString(R.string.done)
             else -> resources.getString(R.string.failure)
         }

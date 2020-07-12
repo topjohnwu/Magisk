@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.ui.home
 
 import android.os.Build
-import androidx.databinding.ObservableField
+import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
@@ -27,6 +27,7 @@ import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.utils.observable
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BR
@@ -40,22 +41,26 @@ class HomeViewModel(
     private val repoMagisk: MagiskRepository
 ) : BaseViewModel() {
 
-    val isNoticeVisible = ObservableField(Config.safetyNotice)
-
-    val stateMagisk = ObservableField(MagiskState.LOADING)
-    val stateManager = ObservableField(MagiskState.LOADING)
-
-    val stateMagiskRemoteVersion = ObservableField(R.string.loading.res())
-    val stateMagiskInstalledVersion get() =
+    @get:Bindable
+    var isNoticeVisible by observable(Config.safetyNotice, BR.noticeVisible)
+    @get:Bindable
+    var stateMagisk by observable(MagiskState.LOADING, BR.stateMagisk)
+    @get:Bindable
+    var stateManager by observable(MagiskState.LOADING, BR.stateManager)
+    @get:Bindable
+    var magiskRemoteVersion by observable(R.string.loading.res(), BR.magiskRemoteVersion)
+    val magiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
-    val stateMagiskMode get() = R.string.home_status_normal.res()
+    val magiskMode get() = R.string.home_status_normal.res()
 
-    val stateManagerRemoteVersion = ObservableField(R.string.loading.res())
-    val stateManagerInstalledVersion = Info.stub?.let {
+    @get:Bindable
+    var managerRemoteVersion by observable(R.string.loading.res(), BR.managerRemoteVersion)
+    val managerInstalledVersion = Info.stub?.let {
         "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${it.version})"
     } ?: "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     val statePackageName = packageName
-    val stateManagerProgress = ObservableField(0)
+    @get:Bindable
+    var stateManagerProgress by observable(0, BR.stateManagerProgress)
 
     val items = listOf(DeveloperItem.Mainline, DeveloperItem.App, DeveloperItem.Project)
     val itemBinding = itemBindingOf<HomeItem> {
@@ -70,28 +75,28 @@ class HomeViewModel(
     init {
         RemoteFileService.progressBroadcast.observeForever {
             when (it?.second) {
-                is Manager -> stateManagerProgress.value = it.first.times(100f).roundToInt()
+                is Manager -> stateManagerProgress = it.first.times(100f).roundToInt()
             }
         }
     }
 
     override fun refresh() = viewModelScope.launch {
         repoMagisk.fetchUpdate()?.apply {
-            stateMagisk.value = when {
+            stateMagisk = when {
                 !Info.env.isActive -> MagiskState.NOT_INSTALLED
                 magisk.isObsolete -> MagiskState.OBSOLETE
                 else -> MagiskState.UP_TO_DATE
             }
 
-            stateManager.value = when {
+            stateManager = when {
                 !app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
                 app.isObsolete -> MagiskState.OBSOLETE
                 else -> MagiskState.UP_TO_DATE
             }
 
-            stateMagiskRemoteVersion.value =
+            magiskRemoteVersion =
                 "${magisk.version} (${magisk.versionCode})"
-            stateManagerRemoteVersion.value =
+            managerRemoteVersion =
                 "${app.version} (${app.versionCode}) (${stub.versionCode})"
 
             launch {
@@ -122,7 +127,7 @@ class HomeViewModel(
 
     fun hideNotice() {
         Config.safetyNotice = false
-        isNoticeVisible.value = false
+        isNoticeVisible = false
     }
 
     private suspend fun ensureEnv() {
@@ -133,7 +138,7 @@ class HomeViewModel(
 
         // Don't bother checking env when magisk is not installed, loading or already has been shown
         if (
-            invalidStates.any { it == stateMagisk.value } ||
+            invalidStates.any { it == stateMagisk } ||
             shownDialog ||
             // don't care for emulators either
             Build.DEVICE.orEmpty().contains("generic") ||
