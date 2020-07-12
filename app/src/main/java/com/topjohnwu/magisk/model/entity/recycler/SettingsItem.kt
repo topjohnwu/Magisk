@@ -13,11 +13,10 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.utils.TransitiveText
+import com.topjohnwu.magisk.utils.observable
 import com.topjohnwu.magisk.view.MagiskDialog
 import org.koin.core.KoinComponent
 import org.koin.core.get
-import kotlin.properties.ObservableProperty
-import kotlin.reflect.KProperty
 
 sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
@@ -28,17 +27,13 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     open val description: TransitiveText get() = TransitiveText.EMPTY
 
     @get:Bindable
-    var isEnabled by bindable(true, BR.enabled)
+    var isEnabled by observable(true, BR.enabled)
 
     protected open val isFullSpan get() = false
 
     @CallSuper
     open fun onPressed(view: View, callback: Callback) {
         callback.onItemChanged(view, this)
-
-        // notify only after the callback invocation; callback can invalidate the backing data,
-        // which wouldn't be recognized with reverse approach
-        notifyPropertyChanged(BR.description)
     }
 
     open fun refresh() {}
@@ -54,17 +49,6 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     override fun itemSameAs(other: SettingsItem) = this === other
     override fun contentSameAs(other: SettingsItem) = itemSameAs(other)
 
-    protected inline fun <T> bindable(
-        initialValue: T,
-        fieldId: Int,
-        crossinline setter: (T) -> Unit = {}
-    ) = object : ObservableProperty<T>(initialValue) {
-        override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) {
-            setter(newValue)
-            notifyPropertyChanged(fieldId)
-        }
-    }
-
     // ---
 
     interface Callback {
@@ -79,10 +63,11 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         @get:Bindable
         abstract var value: T
 
-        protected inline fun bindableValue(
+        protected inline fun <reified T> value(
             initialValue: T,
-            crossinline setter: (T) -> Unit
-        ) = bindable(initialValue, BR.value, setter)
+            vararg fieldIds: Int,
+            crossinline setter: (T) -> Unit = {}
+        ) = observable(initialValue, BR.value, *fieldIds, afterChanged = setter)
 
     }
 
@@ -156,6 +141,11 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         @get:Bindable
         val selectedEntry
             get() = entries.getOrNull(value)
+
+        /* override */ protected inline fun value(
+            initialValue: Int,
+            crossinline setter: (Int) -> Unit
+        ) = observable(initialValue, BR.value, BR.selectedEntry, BR.description, afterChanged = setter)
 
         private fun Resources.getArrayOrEmpty(id: Int): Array<String> =
             runCatching { getStringArray(id) }.getOrDefault(emptyArray())
