@@ -14,30 +14,29 @@ import kotlin.reflect.KProperty
  * */
 interface ObservableHost : Observable {
 
+    var callbacks: PropertyChangeRegistry?
+
     /**
      * Notifies all observers that something has changed. By default implementation this method is
      * synchronous, hence observers will never be notified in undefined order. Observers might
      * choose to refresh the view completely, which is beyond the scope of this function.
      * */
-    fun notifyChange(host: Observable = this)
+    fun notifyChange() {
+        synchronized(this) {
+            callbacks ?: return
+        }.notifyCallbacks(this, 0, null)
+    }
 
     /**
      * Notifies all observers about field with [fieldId] has been changed. This will happen
      * synchronously before or after [notifyChange] has been called. It will never be called during
      * the execution of aforementioned method.
      * */
-    fun notifyPropertyChanged(fieldId: Int, host: Observable = this)
-
-    companion object {
-
-        val impl: ObservableHost get() = ObservableHostImpl()
-
+    fun notifyPropertyChanged(fieldId: Int) {
+        synchronized(this) {
+            callbacks ?: return
+        }.notifyCallbacks(this, fieldId, null)
     }
-}
-
-private class ObservableHostImpl : ObservableHost {
-
-    private var callbacks: PropertyChangeRegistry? = null
 
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback) {
         synchronized(this) {
@@ -50,19 +49,6 @@ private class ObservableHostImpl : ObservableHost {
             callbacks ?: return
         }.remove(callback)
     }
-
-    override fun notifyChange(host: Observable) {
-        synchronized(this) {
-            callbacks ?: return
-        }.notifyCallbacks(host, 0, null)
-    }
-
-    override fun notifyPropertyChanged(fieldId: Int, host: Observable) {
-        synchronized(this) {
-            callbacks ?: return
-        }.notifyCallbacks(host, fieldId, null)
-    }
-
 }
 
 /**

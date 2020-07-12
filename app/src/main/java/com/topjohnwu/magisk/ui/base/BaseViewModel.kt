@@ -5,6 +5,7 @@ import androidx.annotation.CallSuper
 import androidx.core.graphics.Insets
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
+import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,7 +23,9 @@ import org.koin.core.KoinComponent
 
 abstract class BaseViewModel(
     initialState: State = State.LOADING
-) : ViewModel(), ObservableHost by ObservableHost.impl, KoinComponent {
+) : ViewModel(), ObservableHost, KoinComponent {
+
+    override var callbacks: PropertyChangeRegistry? = null
 
     enum class State {
         LOADED, LOADING, LOADING_FAILED

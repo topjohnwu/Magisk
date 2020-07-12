@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.databinding
 
 import androidx.annotation.CallSuper
+import androidx.databinding.PropertyChangeRegistry
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.utils.DiffObservableList
@@ -48,4 +49,6 @@ abstract class ComparableRvItem<in T> : RvItem() {
     }
 }
 
-abstract class ObservableItem<T> : ComparableRvItem<T>(), ObservableHost by ObservableHost.impl
+abstract class ObservableItem<T> : ComparableRvItem<T>(), ObservableHost {
+    override var callbacks: PropertyChangeRegistry? = null
+}
