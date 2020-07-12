@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.model.entity.recycler
 
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
-import androidx.databinding.ObservableField
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.BR
@@ -12,6 +11,7 @@ import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
+import com.topjohnwu.magisk.utils.observable
 
 object InstallModule : ComparableRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download
@@ -33,24 +33,12 @@ class SectionTitle(
 ) : ObservableItem<SectionTitle>() {
     override val layoutRes = R.layout.item_section_md2
 
-    var button = _button
-        @Bindable get
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.button)
-        }
-    var icon = _icon
-        @Bindable get
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.icon)
-        }
-    var hasButton = button != 0 || icon != 0
-        @Bindable get
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.hasButton)
-        }
+    @get:Bindable
+    var button by observable(_button, BR.button)
+    @get:Bindable
+    var icon by observable(_icon, BR.icon)
+    @get:Bindable
+    var hasButton by observable(_button != 0 && _icon != 0, BR.hasButton)
 
     override fun onBindingBound(binding: ViewDataBinding) {
         super.onBindingBound(binding)
@@ -65,13 +53,10 @@ class SectionTitle(
 sealed class RepoItem(val item: Repo) : ObservableItem<RepoItem>() {
     override val layoutRes: Int = R.layout.item_repo_md2
 
-    val progress = ObservableField(0)
-    var isUpdate = false
-        @Bindable get
-        protected set(value) {
-            field = value
-            notifyPropertyChanged(BR.update)
-        }
+    @get:Bindable
+    var progress by observable(0, BR.progress)
+    @get:Bindable
+    var isUpdate by observable(false, BR.update)
 
     override fun contentSameAs(other: RepoItem): Boolean = item == other.item
     override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id
@@ -90,11 +75,7 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
     override val layoutRes = R.layout.item_module_md2
 
     @get:Bindable
-    var repo: Repo? = null
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.repo)
-        }
+    var repo: Repo? by observable(null, BR.repo)
 
     @get:Bindable
     var isEnabled
