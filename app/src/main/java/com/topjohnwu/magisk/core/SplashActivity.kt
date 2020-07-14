@@ -12,6 +12,9 @@ import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 open class SplashActivity : Activity() {
 
@@ -22,7 +25,9 @@ open class SplashActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.SplashTheme)
         super.onCreate(savedInstanceState)
-        Shell.getShell { Shell.EXECUTOR.execute(this::initAndStart) }
+        GlobalScope.launch(Dispatchers.IO) {
+            initAndStart()
+        }
     }
 
     private fun handleRepackage() {
@@ -41,6 +46,9 @@ open class SplashActivity : Activity() {
     }
 
     private fun initAndStart() {
+        // Pre-initialize root shell
+        Shell.getShell()
+
         Config.initialize()
         handleRepackage()
         Notifications.setup(this)
