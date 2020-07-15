@@ -49,6 +49,22 @@ interface ObservableHost : Observable {
     }
 }
 
+fun ObservableHost.addOnPropertyChangedCallback(
+    fieldId: Int,
+    removeAfterChanged: Boolean = false,
+    callback: () -> Unit
+) {
+    addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
+        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+            if (fieldId == propertyId) {
+                callback()
+                if (removeAfterChanged)
+                    removeOnPropertyChangedCallback(this)
+            }
+        }
+    })
+}
+
 /**
  * Injects boilerplate implementation for {@literal @}[androidx.databinding.Bindable] field setters.
  *

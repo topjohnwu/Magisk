@@ -1,11 +1,10 @@
 package com.topjohnwu.magisk.core
 
-import androidx.databinding.ObservableField
+import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.net.NetworkObserver
 import com.topjohnwu.magisk.ktx.get
-import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.utils.CachedValue
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
@@ -36,9 +35,9 @@ object Info {
     @JvmStatic var ramdisk = false
 
     val isConnected by lazy {
-        ObservableField(false).also { field ->
+        ObservableBoolean(false).also { field ->
             NetworkObserver.observe(get()) {
-                UiThreadHandler.run { field.value = it.isAvailable }
+                UiThreadHandler.run { field.set(it.isAvailable) }
             }
         }
     }

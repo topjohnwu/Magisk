@@ -15,7 +15,6 @@ import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.ktx.packageName
 import com.topjohnwu.magisk.ktx.res
-import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem
 import com.topjohnwu.magisk.model.entity.recycler.HomeItem
@@ -101,7 +100,7 @@ class HomeViewModel(
             }
 
             stateManager = when {
-                !app.isUpdateChannelCorrect && isConnected.value -> MagiskState.NOT_INSTALLED
+                !app.isUpdateChannelCorrect && isConnected.get() -> MagiskState.NOT_INSTALLED
                 app.isObsolete -> MagiskState.OBSOLETE
                 else -> MagiskState.UP_TO_DATE
             }

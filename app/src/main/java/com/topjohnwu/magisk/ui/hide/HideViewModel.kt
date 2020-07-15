@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.model.entity.ProcessHideApp
@@ -71,7 +70,7 @@ class HideViewModel(
         return ProcessHideApp(a, processes)
     }
 
-    private fun List<HideItem>.sort() = compareByDescending<HideItem> { it.itemsChecked.value }
+    private fun List<HideItem>.sort() = compareByDescending<HideItem> { it.itemsChecked }
         .thenBy { it.item.info.name.toLowerCase(currentLocale) }
         .thenBy { it.item.info.info.packageName }
         .let { sortedWith(it) }
@@ -96,7 +95,7 @@ class HideViewModel(
     // ---
 
     fun toggleItem(item: HideProcessItem) = magiskRepo
-        .toggleHide(item.isHidden.value, item.item.packageName, item.item.name)
+        .toggleHide(item.isHidden, item.item.packageName, item.item.name)
 
     fun resetQuery() {
         query = ""

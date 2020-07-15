@@ -2,54 +2,57 @@ package com.topjohnwu.magisk.model.entity.recycler
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.ObservableField
+import androidx.databinding.Bindable
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.ktx.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.ktx.startAnimations
-import com.topjohnwu.magisk.ktx.toggle
-import com.topjohnwu.magisk.ktx.value
 import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
-import com.topjohnwu.magisk.model.observer.Observer
 import com.topjohnwu.magisk.ui.hide.HideViewModel
+import com.topjohnwu.magisk.utils.addOnPropertyChangedCallback
+import com.topjohnwu.magisk.utils.set
 import kotlin.math.roundToInt
 
-class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
+class HideItem(val item: ProcessHideApp) : ObservableItem<HideItem>() {
 
     override val layoutRes = R.layout.item_hide_md2
 
     val packageName = item.info.info.packageName.orEmpty()
     val items = item.processes.map { HideProcessItem(it) }
 
-    val isExpanded = ObservableField(false)
-    val itemsChecked = ObservableField(0)
-    val itemsCheckedPercent = Observer(itemsChecked) {
-        (itemsChecked.value.toFloat() / items.size * 100).roundToInt()
-    }
+    @get:Bindable
+    var isExpanded = false
+        set(value) = set(value, field, { field = it }, BR.expanded)
 
-    /** [toggle] depends on this functionality */
-    private val isHidden get() = itemsChecked.value == items.size
+    @get:Bindable
+    var itemsChecked = 0
+        set(value) = set(value, field, { field = it }, BR.itemsChecked, BR.itemsCheckedPercent)
+
+    @get:Bindable
+    val itemsCheckedPercent get() = (itemsChecked.toFloat() / items.size * 100).roundToInt()
+
+    private val isHidden get() = itemsChecked == items.size
 
     init {
-        items.forEach { it.isHidden.addOnPropertyChangedCallback { recalculateChecked() } }
+        items.forEach { it.addOnPropertyChangedCallback(BR.hidden) { recalculateChecked() } }
         recalculateChecked()
     }
 
     fun collapse(v: View) {
         (v.parent.parent as? ViewGroup)?.startAnimations()
-        isExpanded.value = false
+        isExpanded = false
     }
 
     fun toggle(v: View) {
         (v.parent as? ViewGroup)?.startAnimations()
-        isExpanded.toggle()
+        isExpanded = !isExpanded
     }
 
     fun toggle(viewModel: HideViewModel): Boolean {
         // contract implies that isHidden == all checked
         if (!isHidden) {
-            items.filterNot { it.isHidden.value }
+            items.filterNot { it.isHidden }
         } else {
             items
         }.forEach { it.toggle(viewModel) }
@@ -57,7 +60,7 @@ class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
     }
 
     private fun recalculateChecked() {
-        itemsChecked.value = items.count { it.isHidden.value }
+        itemsChecked = items.count { it.isHidden }
     }
 
     override fun contentSameAs(other: HideItem): Boolean = item == other.item
@@ -65,14 +68,17 @@ class HideItem(val item: ProcessHideApp) : ComparableRvItem<HideItem>() {
 
 }
 
-class HideProcessItem(val item: StatefulProcess) : ComparableRvItem<HideProcessItem>() {
+class HideProcessItem(val item: StatefulProcess) : ObservableItem<HideProcessItem>() {
 
     override val layoutRes = R.layout.item_hide_process_md2
 
-    val isHidden = ObservableField(item.isHidden)
+    @get:Bindable
+    var isHidden = item.isHidden
+        set(value) = set(value, field, { field = it }, BR.hidden)
+
 
     fun toggle(viewModel: HideViewModel) {
-        isHidden.toggle()
+        isHidden = !isHidden
         viewModel.toggleItem(this)
     }
 
