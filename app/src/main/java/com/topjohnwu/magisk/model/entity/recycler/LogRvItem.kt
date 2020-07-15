@@ -7,17 +7,21 @@ import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.ktx.timeDateFormat
 import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.model.entity.MagiskLog
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 
 class LogItem(val item: MagiskLog) : ObservableItem<LogItem>() {
 
     override val layoutRes = R.layout.item_log_access_md2
 
     val date = item.time.toTime(timeDateFormat)
+
     @get:Bindable
-    var isTop by observable(false, BR.top)
+    var isTop = false
+        set(value) = set(value, field, { field = it }, BR.top)
+
     @get:Bindable
-    var isBottom by observable(false, BR.bottom)
+    var isBottom = false
+        set(value) = set(value, field, { field = it }, BR.bottom)
 
     override fun itemSameAs(other: LogItem) = item.appName == other.item.appName
 

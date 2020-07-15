@@ -17,7 +17,7 @@ import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.model.events.*
 import com.topjohnwu.magisk.model.navigation.NavigationWrapper
 import com.topjohnwu.magisk.utils.ObservableHost
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.Job
 import org.koin.core.KoinComponent
 
@@ -42,9 +42,11 @@ abstract class BaseViewModel(
     val viewEvents: LiveData<ViewEvent> get() = _viewEvents
 
     @get:Bindable
-    var insets by observable(Insets.NONE, BR.insets)
+    var insets = Insets.NONE
+        set(value) = set(value, field, { field = it }, BR.insets)
 
-    var state by observable(initialState, BR.loading, BR.loaded, BR.loadFailed)
+    var state= initialState
+        set(value) = set(value, field, { field = it }, BR.loading, BR.loaded, BR.loadFailed)
 
     private val _viewEvents = MutableLiveData<ViewEvent>()
     private var runningJob: Job? = null

@@ -27,7 +27,7 @@ import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BR
@@ -42,25 +42,37 @@ class HomeViewModel(
 ) : BaseViewModel() {
 
     @get:Bindable
-    var isNoticeVisible by observable(Config.safetyNotice, BR.noticeVisible)
+    var isNoticeVisible = Config.safetyNotice
+        set(value) = set(value, field, { field = it }, BR.noticeVisible)
+
     @get:Bindable
-    var stateMagisk by observable(MagiskState.LOADING, BR.stateMagisk)
+    var stateMagisk = MagiskState.LOADING
+        set(value) = set(value, field, { field = it }, BR.stateMagisk)
+
     @get:Bindable
-    var stateManager by observable(MagiskState.LOADING, BR.stateManager)
+    var stateManager = MagiskState.LOADING
+        set(value) = set(value, field, { field = it }, BR.stateManager)
+
     @get:Bindable
-    var magiskRemoteVersion by observable(R.string.loading.res(), BR.magiskRemoteVersion)
+    var magiskRemoteVersion = R.string.loading.res()
+        set(value) = set(value, field, { field = it }, BR.magiskRemoteVersion)
+
     val magiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
     val magiskMode get() = R.string.home_status_normal.res()
 
     @get:Bindable
-    var managerRemoteVersion by observable(R.string.loading.res(), BR.managerRemoteVersion)
+    var managerRemoteVersion = R.string.loading.res()
+        set(value) = set(value, field, { field = it }, BR.managerRemoteVersion)
+
     val managerInstalledVersion = Info.stub?.let {
         "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${it.version})"
     } ?: "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     val statePackageName = packageName
+
     @get:Bindable
-    var stateManagerProgress by observable(0, BR.stateManagerProgress)
+    var stateManagerProgress = 0
+        set(value) = set(value, field, { field = it }, BR.stateManagerProgress)
 
     val items = listOf(DeveloperItem.Mainline, DeveloperItem.App, DeveloperItem.Project)
     val itemBinding = itemBindingOf<HomeItem> {

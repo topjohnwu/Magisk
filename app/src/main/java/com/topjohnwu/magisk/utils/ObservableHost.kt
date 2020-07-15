@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.utils
 
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 /**
  * Modified from https://github.com/skoumalcz/teanity/blob/1.2/core/src/main/java/com/skoumal/teanity/observable/Notifyable.kt
@@ -52,105 +50,32 @@ interface ObservableHost : Observable {
 }
 
 /**
- * Declares delegated property in [ObservableHost] parent. This property is available for DataBinding
- * to be observed as usual. The only caveat is that in order for binding to generate the [fieldId]
- * it has to be annotated accordingly.
- *
- * The annotation however give very strict control over your internal fields and overall reduce
- * overhead in notifying observers. (In comparison to [androidx.databinding.ObservableField])
- * It helps the kotlin code to feel more,... _native_, while respecting the original functionality.
+ * Injects boilerplate implementation for {@literal @}[androidx.databinding.Bindable] field setters.
  *
  * # Examples:
- *
- * ## The most basic usage would probably be:
  * ```kotlin
  * @get:Bindable
- * var myField by observable(defaultValue, BR.myField)
- *      private set
+ * var myField = defaultValue
+ *     set(value) = set(value, field, { field = it }, BR.myField) {
+ *         doSomething(it)
+ *     }
  * ```
- *
- * ## You can use the field as public read/write, of course:
- * ```kotlin
- * @get:Bindable
- * var myField by observable(defaultValue, BR.myField)
- * ```
- *
- * ## Please beware that delegated property instantiates one class per property
- * We discourage using simple getters via delegated properties. Instead you can do something like
- * this:
- *
- * ```kotlin
- * @get:Bindable
- * var myField by observable(defaultValue, BR.myField, BR.myTransformedField)
- *
- * var myTransformedField
- *      @Bindable get() {
- *          return myField.transform()
- *      }
- *      set(value) {
- *          myField = value.transform()
- *      }
- * ```
- *
  * */
 
-// Optimize for the most common use case
-// Generic type is reified to optimize primitive types
-inline fun <reified T> ObservableHost.observable(
-    initialValue: T,
-    fieldId: Int
-) = object : ReadWriteProperty<ObservableHost, T> {
-    private var field = initialValue
-
-    override fun getValue(thisRef: ObservableHost, property: KProperty<*>): T {
-        return field
-    }
-
-    @Synchronized
-    override fun setValue(thisRef: ObservableHost, property: KProperty<*>, value: T) {
-        if (field != value) {
-            field = value
-            notifyPropertyChanged(fieldId)
-        }
+inline fun <reified T> ObservableHost.set(
+    new: T, old: T, setter: (T) -> Unit, fieldId: Int, afterChanged: (T) -> Unit = {}) {
+    if (old != new) {
+        setter(new)
+        notifyPropertyChanged(fieldId)
+        afterChanged(new)
     }
 }
 
-inline fun <reified T> ObservableHost.observable(
-    initialValue: T,
-    vararg fieldIds: Int
-) = object : ReadWriteProperty<ObservableHost, T> {
-    private var field = initialValue
-
-    override fun getValue(thisRef: ObservableHost, property: KProperty<*>): T {
-        return field
-    }
-
-    @Synchronized
-    override fun setValue(thisRef: ObservableHost, property: KProperty<*>, value: T) {
-        if (field != value) {
-            field = value
-            fieldIds.forEach { notifyPropertyChanged(it) }
-        }
-    }
-}
-
-inline fun <reified T> ObservableHost.observable(
-    initialValue: T,
-    vararg fieldIds: Int,
-    crossinline afterChanged: (T) -> Unit
-) = object : ReadWriteProperty<ObservableHost, T> {
-    private var field = initialValue
-
-    override fun getValue(thisRef: ObservableHost, property: KProperty<*>): T {
-        return field
-    }
-
-    @Synchronized
-    override fun setValue(thisRef: ObservableHost, property: KProperty<*>, value: T) {
-        if (field != value) {
-            field = value
-            fieldIds.forEach { notifyPropertyChanged(it) }
-            afterChanged(value)
-        }
+inline fun <reified T> ObservableHost.set(
+    new: T, old: T, setter: (T) -> Unit, vararg fieldIds: Int, afterChanged: (T) -> Unit = {}) {
+    if (old != new) {
+        setter(new)
+        fieldIds.forEach { notifyPropertyChanged(it) }
+        afterChanged(new)
     }
 }

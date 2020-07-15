@@ -23,7 +23,7 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.*
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 import kotlin.math.roundToInt
@@ -53,17 +53,21 @@ class ModuleViewModel(
     private var remoteJob: Job? = null
 
     @get:Bindable
-    var isRemoteLoading by observable(false, BR.remoteLoading)
+    var isRemoteLoading = false
+        set(value) = set(value, field, { field = it }, BR.remoteLoading)
 
     @get:Bindable
-    var query by observable("", BR.query) {
-        submitQuery()
-        // Yes we do lie about the search being loaded
-        searchLoading = true
-    }
+    var query = ""
+        set(value) = set(value, field, { field = it }, BR.query) {
+            submitQuery()
+            // Yes we do lie about the search being loaded
+            searchLoading = true
+        }
 
     @get:Bindable
-    var searchLoading by observable(false, BR.searchLoading)
+    var searchLoading = false
+        set(value) = set(value, field, { field = it }, BR.searchLoading)
+
     val itemsSearch = diffListOf<RepoItem>()
     val itemSearchBinding = itemBindingOf<RepoItem> {
         it.bindExtra(BR.viewModel, this)

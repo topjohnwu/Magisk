@@ -20,7 +20,7 @@ import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,9 +34,12 @@ class FlashViewModel(
 ) : BaseViewModel() {
 
     @get:Bindable
-    var showReboot by observable(Shell.rootAccess(), BR.showReboot)
+    var showReboot = Shell.rootAccess()
+        set(value) = set(value, field, { field = it }, BR.showReboot)
+
     @get:Bindable
-    var behaviorText by observable(resources.getString(R.string.flashing), BR.behaviorText)
+    var behaviorText = resources.getString(R.string.flashing)
+        set(value) = set(value, field, { field = it }, BR.behaviorText)
 
     val adapter = BindingAdapter<ConsoleItem>()
     val items = diffListOf<ConsoleItem>()

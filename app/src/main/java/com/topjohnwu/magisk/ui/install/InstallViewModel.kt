@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.events.RequestFileEvent
 import com.topjohnwu.magisk.model.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import org.koin.core.get
@@ -30,25 +30,34 @@ class InstallViewModel(
     val isAB get() = Info.isAB
 
     @get:Bindable
-    var step by observable(0, BR.step)
+    var step = 0
+        set(value) = set(value, field, { field = it }, BR.step)
+
     @get:Bindable
-    var method by observable(-1, BR.method) {
-        when (it) {
-            R.id.method_patch -> {
-                Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
-                RequestFileEvent().publish()
-            }
-            R.id.method_inactive_slot -> {
-                SecondSlotWarningDialog().publish()
+    var method = -1
+        set(value) = set(value, field, { field = it }, BR.method) {
+            when (it) {
+                R.id.method_patch -> {
+                    Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
+                    RequestFileEvent().publish()
+                }
+                R.id.method_inactive_slot -> {
+                    SecondSlotWarningDialog().publish()
+                }
             }
         }
-    }
+
     @get:Bindable
-    var progress by observable(0, BR.progress)
+    var progress = 0
+        set(value) = set(value, field, { field = it }, BR.progress)
+
     @get:Bindable
-    var data by observable(null as Uri?, BR.data)
+    var data: Uri? = null
+        set(value) = set(value, field, { field = it }, BR.data)
+
     @get:Bindable
-    var notes by observable("", BR.notes)
+    var notes = ""
+        set(value) = set(value, field, { field = it }, BR.notes)
 
     init {
         RemoteFileService.reset()

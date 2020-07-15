@@ -19,7 +19,7 @@ import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
 import com.topjohnwu.magisk.model.events.DieEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
@@ -34,19 +34,32 @@ class SuRequestViewModel(
 ) : BaseViewModel() {
 
     @get:Bindable
-    var icon by observable(null as Drawable?, BR.icon)
+    var icon: Drawable? = null
+        set(value) = set(value, field, { field = it }, BR.icon)
+
     @get:Bindable
-    var title by observable("", BR.title)
+    var title = ""
+        set(value) = set(value, field, { field = it }, BR.title)
+
     @get:Bindable
-    var packageName by observable("", BR.packageName)
+    var packageName = ""
+        set(value) = set(value, field, { field = it }, BR.packageName)
+
     @get:Bindable
-    var denyText by observable(res.getString(R.string.deny), BR.denyText)
+    var denyText = res.getString(R.string.deny)
+        set(value) = set(value, field, { field = it }, BR.denyText)
+
     @get:Bindable
-    var warningText by observable(res.getString(R.string.su_warning), BR.warningText)
+    var warningText = res.getString(R.string.su_warning)
+        set(value) = set(value, field, { field = it }, BR.warningText)
+
     @get:Bindable
-    var selectedItemPosition by observable(0, BR.selectedItemPosition)
+    var selectedItemPosition = 0
+        set(value) = set(value, field, { field = it }, BR.selectedItemPosition)
+
     @get:Bindable
-    var grantEnabled by observable(false, BR.grantEnabled)
+    var grantEnabled = false
+        set(value) = set(value, field, { field = it }, BR.grantEnabled)
 
     private val items = res.getStringArray(R.array.allow_timeout).map { SpinnerRvItem(it) }
     val adapter = BindingListViewAdapter<SpinnerRvItem>(1).apply {

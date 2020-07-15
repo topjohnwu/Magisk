@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.model.events.CheckSafetyNetEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import org.json.JSONObject
 
 enum class SafetyNetState {
@@ -21,13 +21,20 @@ data class SafetyNetResult(
 class SafetynetViewModel : BaseViewModel() {
 
     @get:Bindable
-    var safetyNetTitle by observable(R.string.empty, BR.safetyNetTitle)
+    var safetyNetTitle = R.string.empty
+        set(value) = set(value, field, { field = it }, BR.safetyNetTitle)
+
     @get:Bindable
-    var ctsState by observable(false, BR.ctsState)
+    var ctsState = false
+        set(value) = set(value, field, { field = it }, BR.ctsState)
+
     @get:Bindable
-    var basicIntegrityState by observable(false, BR.basicIntegrityState)
+    var basicIntegrityState = false
+        set(value) = set(value, field, { field = it }, BR.basicIntegrityState)
+
     @get:Bindable
-    var evalType by observable("")
+    var evalType = ""
+        set(value) = set(value, field, { field = it }, BR.evalType)
 
     @get:Bindable
     val isChecking get() = currentState == LOADING
@@ -36,7 +43,8 @@ class SafetynetViewModel : BaseViewModel() {
     @get:Bindable
     val isSuccess get() = currentState == PASS
 
-    private var currentState by observable(IDLE, BR.checking, BR.failed, BR.success)
+    private var currentState = IDLE
+        set(value) = set(value, field, { field = it }, BR.checking, BR.failed, BR.success)
 
     init {
         cachedResult?.also {

@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 
 object InstallModule : ComparableRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download
@@ -34,11 +34,16 @@ class SectionTitle(
     override val layoutRes = R.layout.item_section_md2
 
     @get:Bindable
-    var button by observable(_button, BR.button)
+    var button = _button
+        set(value) = set(value, field, { field = it }, BR.button)
+
     @get:Bindable
-    var icon by observable(_icon, BR.icon)
+    var icon = _icon
+        set(value) = set(value, field, { field = it }, BR.icon)
+
     @get:Bindable
-    var hasButton by observable(_button != 0 && _icon != 0, BR.hasButton)
+    var hasButton = _button != 0 && _icon != 0
+        set(value) = set(value, field, { field = it }, BR.hasButton)
 
     override fun onBindingBound(binding: ViewDataBinding) {
         super.onBindingBound(binding)
@@ -54,9 +59,13 @@ sealed class RepoItem(val item: Repo) : ObservableItem<RepoItem>() {
     override val layoutRes: Int = R.layout.item_repo_md2
 
     @get:Bindable
-    var progress by observable(0, BR.progress)
+    var progress = 0
+        set(value) = set(value, field, { field = it }, BR.progress)
+
     @get:Bindable
-    var isUpdate by observable(false, BR.update)
+    var isUpdate = false
+        set(value) = set(value, field, { field = it }, BR.update)
+
 
     override fun contentSameAs(other: RepoItem): Boolean = item == other.item
     override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id
@@ -75,7 +84,8 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
     override val layoutRes = R.layout.item_module_md2
 
     @get:Bindable
-    var repo: Repo? by observable(null, BR.repo)
+    var repo: Repo? = null
+        set(value) = set(value, field, { field = it }, BR.repo)
 
     @get:Bindable
     var isEnabled

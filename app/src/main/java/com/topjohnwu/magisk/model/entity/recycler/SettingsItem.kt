@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.utils.TransitiveText
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.MagiskDialog
 import org.koin.core.KoinComponent
 import org.koin.core.get
@@ -27,7 +27,8 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     open val description: TransitiveText get() = TransitiveText.EMPTY
 
     @get:Bindable
-    var isEnabled by observable(true, BR.enabled)
+    var isEnabled = true
+        set(value) = set(value, field, { field = it }, BR.enabled)
 
     protected open val isFullSpan get() = false
 
@@ -63,12 +64,15 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         @get:Bindable
         abstract var value: T
 
-        protected inline fun <reified T> value(
-            initialValue: T,
-            vararg fieldIds: Int,
-            crossinline setter: (T) -> Unit = {}
-        ) = observable(initialValue, BR.value, *fieldIds, afterChanged = setter)
+        protected inline fun <reified T> setV(
+            new: T, old: T, setter: (T) -> Unit, vararg fieldIds: Int) {
+            set(new, old, setter, BR.value, *fieldIds)
+        }
 
+        protected inline fun <reified T> setV(
+            new: T, old: T, setter: (T) -> Unit, afterChanged: (T) -> Unit = {}) {
+            set(new, old, setter, BR.value, afterChanged = afterChanged)
+        }
     }
 
     abstract class Toggle : Value<Boolean>() {
@@ -142,10 +146,10 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         val selectedEntry
             get() = entries.getOrNull(value)
 
-        /* override */ protected inline fun value(
-            initialValue: Int,
-            crossinline setter: (Int) -> Unit
-        ) = observable(initialValue, BR.value, BR.selectedEntry, BR.description, afterChanged = setter)
+        protected inline fun <reified T> setS(
+            new: T, old: T, setter: (T) -> Unit, afterChanged: (T) -> Unit = {}) {
+            set(new, old, setter, BR.value, BR.selectedEntry, BR.description, afterChanged = afterChanged)
+        }
 
         private fun Resources.getArrayOrEmpty(id: Int): Array<String> =
             runCatching { getStringArray(id) }.getOrDefault(emptyArray())

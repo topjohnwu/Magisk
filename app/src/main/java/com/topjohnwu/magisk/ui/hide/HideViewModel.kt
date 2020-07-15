@@ -17,7 +17,7 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.Queryable
 import com.topjohnwu.magisk.ui.base.filterableListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,14 +29,16 @@ class HideViewModel(
     override val queryDelay = 1000L
 
     @get:Bindable
-    var isShowSystem by observable(false, BR.showSystem) {
-        submitQuery()
-    }
+    var isShowSystem = false
+        set(value) = set(value, field, { field = it }, BR.showSystem){
+            submitQuery()
+        }
 
     @get:Bindable
-    var query by observable("", BR.query) {
-        submitQuery()
-    }
+    var query = ""
+        set(value) = set(value, field, { field = it }, BR.query){
+            submitQuery()
+        }
 
     val items = filterableListOf<HideItem>()
     val itemBinding = itemBindingOf<HideItem> {
