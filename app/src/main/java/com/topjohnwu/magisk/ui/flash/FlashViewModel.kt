@@ -4,7 +4,6 @@ import android.content.res.Resources
 import android.net.Uri
 import android.view.MenuItem
 import androidx.databinding.Bindable
-import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -21,12 +20,12 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.*
 
 class FlashViewModel(
     args: FlashFragmentArgs,
@@ -45,13 +44,16 @@ class FlashViewModel(
     val items = diffListOf<ConsoleItem>()
     val itemBinding = itemBindingOf<ConsoleItem>()
 
-    private val outItems = ObservableArrayList<String>()
-    private val logItems = Collections.synchronizedList(mutableListOf<String>())
+    private val logItems = mutableListOf<String>().synchronized()
+    private val outItems = object : CallbackList<String>() {
+        override fun onAddElement(e: String?) {
+            e ?: return
+            items.add(ConsoleItem(e))
+            logItems.add(e)
+        }
+    }
 
     init {
-        outItems.sendUpdatesTo(items, viewModelScope) { it.map { ConsoleItem(it) } }
-        outItems.copyNewInputInto(logItems)
-
         args.dismissId.takeIf { it != -1 }?.also {
             Notifications.mgr.cancel(it)
         }
