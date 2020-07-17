@@ -51,9 +51,7 @@ class MagiskRepository(
     }
 
     suspend fun fetchHideTargets() =
-        Shell.su("\"magiskhide --ls\"").await().out.map {
-            HideTarget(it)
-        }
+        Shell.su("magiskhide --ls").await().out.map { HideTarget(it) }
 
     fun toggleHide(isEnabled: Boolean, packageName: String, process: String) =
         Shell.su("magiskhide --${isEnabled.state} $packageName $process").submit()
