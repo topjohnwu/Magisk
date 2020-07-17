@@ -69,6 +69,13 @@ androidExtensions {
     isExperimental = true
 }
 
+val copyUtils = tasks.register("copyUtils", Copy::class) {
+    from(rootProject.file("scripts/util_functions.sh"))
+    into("src/main/res/raw")
+}
+
+tasks["preBuild"]?.dependsOn(copyUtils)
+
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":app:shared"))

@@ -350,10 +350,6 @@ def build_apk(args, module):
 
 def build_app(args):
     header('* Building Magisk Manager')
-    source = op.join('scripts', 'util_functions.sh')
-    target = op.join('app', 'src', 'main',
-                     'res', 'raw', 'util_functions.sh')
-    cp(source, target)
     build_apk(args, 'app')
 
 
