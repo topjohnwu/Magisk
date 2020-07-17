@@ -4,6 +4,7 @@ import android.content.pm.ApplicationInfo
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.entity.HideAppInfo
@@ -28,8 +29,9 @@ class HideViewModel(
     override val queryDelay = 1000L
 
     @get:Bindable
-    var isShowSystem = false
+    var isShowSystem = Config.showSystemApp
         set(value) = set(value, field, { field = it }, BR.showSystem){
+            Config.showSystemApp = it
             submitQuery()
         }
 
