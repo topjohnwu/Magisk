@@ -131,9 +131,7 @@ class HomeViewModel(
     fun onManagerPressed() = ManagerInstallDialog().publish()
 
     fun onMagiskPressed() = withExternalRW {
-        if (it) {
-            HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
-        }
+        HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
     }
 
     fun hideNotice() {

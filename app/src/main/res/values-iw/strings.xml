@@ -137,7 +137,7 @@
     <string name="update_available">עדכונים זמינים</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">סדר מיון</string>
-    <string name="module_permission_declined">הענק הרשאה לאחסון כדי לאפשר פונקציונליות זו</string>
+    <string name="external_rw_permission_denied">הענק הרשאה לאחסון כדי לאפשר פונקציונליות זו</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">מצב עיצוב</string>

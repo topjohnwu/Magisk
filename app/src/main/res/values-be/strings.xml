@@ -128,7 +128,7 @@
     <string name="update_available">Даступныя абнаўленні</string>
     <string name="module_installed">Усталяваныя</string>
     <string name="sorting_order">Парадак сартавання</string>
-    <string name="module_permission_declined">Дайце доступ да сховішча, каб уключыць гэтую функцыю</string>
+    <string name="external_rw_permission_denied">Дайце доступ да сховішча, каб уключыць гэтую функцыю</string>
     <!--Settings -->
     <string name="settings_dark_mode_title">Рэжым афармлення</string>
     <string name="settings_dark_mode_message">Абярыце рэжым, які вам больш даспадобы!</string>

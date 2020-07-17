@@ -57,7 +57,7 @@ class LogViewModel(
         items.lastOrNull()?.isBottom = true
     }
 
-    fun saveMagiskLog() {
+    fun saveMagiskLog() = withExternalRW {
         val now = Calendar.getInstance()
         val filename = "magisk_log_%04d%02d%02d_%02d%02d%02d.log".format(
             now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
@@ -70,7 +70,7 @@ class LogViewModel(
             logFile.createNewFile()
         } catch (e: IOException) {
             Timber.e(e)
-            return
+            return@withExternalRW
         }
 
         Shell.su("cat ${Const.MAGISK_LOG} > $logFile").submit {

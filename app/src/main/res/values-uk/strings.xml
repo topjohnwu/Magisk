@@ -137,7 +137,7 @@
     <string name="update_available">Доступне оновлення</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Порядок сортування</string>
-    <string name="module_permission_declined">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
+    <string name="external_rw_permission_denied">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Режим теми</string>

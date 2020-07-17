@@ -137,7 +137,7 @@
     <string name="update_available">التحديث متوفر</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">تسلسل الترتيب</string>
-    <string name="module_permission_declined">امنحني إذن الولوج للذاكرة الداخلية</string>
+    <string name="external_rw_permission_denied">امنحني إذن الولوج للذاكرة الداخلية</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">وضـعية الِسمات</string>

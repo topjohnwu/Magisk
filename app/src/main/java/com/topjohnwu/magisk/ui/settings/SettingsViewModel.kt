@@ -87,9 +87,9 @@ class SettingsViewModel(
         return list
     }
 
-    override fun onItemPressed(view: View, item: SettingsItem) = when (item) {
-        is DownloadPath -> requireRWPermission()
-        else -> Unit
+    override fun onItemPressed(view: View, item: SettingsItem, method: () -> Unit) = when (item) {
+        is DownloadPath -> withExternalRW(method)
+        else -> method()
     }
 
     override fun onItemChanged(view: View, item: SettingsItem) = when (item) {
@@ -134,10 +134,6 @@ class SettingsViewModel(
         Shell.su("add_hosts_module").submit {
             Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
         }
-    }
-
-    private fun requireRWPermission() {
-        withExternalRW { if (!it) requireRWPermission() }
     }
 
     private fun updateManager(hide: Boolean) {

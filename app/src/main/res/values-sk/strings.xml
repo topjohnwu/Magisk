@@ -137,7 +137,7 @@
     <string name="update_available">Dostupná aktualizácia</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Zoradenie</string>
-    <string name="module_permission_declined">Udeľte povolenie pre povolenie tejto funkcie</string>
+    <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Režim motívu</string>

@@ -136,7 +136,7 @@
     <string name="update_available">Dostępna aktualizacja</string>
     <string name="module_installed">Zainstalowane</string>
     <string name="sorting_order">Kolejność sortowania</string>
-    <string name="module_permission_declined">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcjonalność.</string>
+    <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcjonalność.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Tryb motywu</string>

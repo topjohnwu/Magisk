@@ -53,7 +53,7 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     // ---
 
     interface Callback {
-        fun onItemPressed(view: View, item: SettingsItem)
+        fun onItemPressed(view: View, item: SettingsItem, method: () -> Unit)
         fun onItemChanged(view: View, item: SettingsItem)
     }
 
@@ -80,9 +80,10 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         override val layoutRes = R.layout.item_settings_toggle
 
         override fun onPressed(view: View, callback: Callback) {
-            callback.onItemPressed(view, this)
-            value = !value
-            super.onPressed(view, callback)
+            callback.onItemPressed(view, this) {
+                value = !value
+                super.onPressed(view, callback)
+            }
         }
 
         fun onTouched(view: View, callback: Callback, event: MotionEvent): Boolean {
@@ -103,27 +104,28 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         protected abstract val intermediate: String?
 
         override fun onPressed(view: View, callback: Callback) {
-            callback.onItemPressed(view, this)
-            MagiskDialog(view.context)
-                .applyTitle(title.getText(resources))
-                .applyView(getView(view.context))
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                    titleRes = android.R.string.ok
-                    onClick {
-                        intermediate?.let { result ->
-                            preventDismiss = false
-                            value = result
-                            it.dismiss()
-                            super.onPressed(view, callback)
-                            return@onClick
+            callback.onItemPressed(view, this) {
+                MagiskDialog(view.context)
+                    .applyTitle(title.getText(resources))
+                    .applyView(getView(view.context))
+                    .applyButton(MagiskDialog.ButtonType.POSITIVE) {
+                        titleRes = android.R.string.ok
+                        onClick {
+                            intermediate?.let { result ->
+                                preventDismiss = false
+                                value = result
+                                it.dismiss()
+                                super.onPressed(view, callback)
+                                return@onClick
+                            }
+                            preventDismiss = true
                         }
-                        preventDismiss = true
                     }
-                }
-                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                    titleRes = android.R.string.cancel
-                }
-                .reveal()
+                    .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
+                        titleRes = android.R.string.cancel
+                    }
+                    .reveal()
+            }
         }
 
         abstract fun getView(context: Context): View
@@ -156,18 +158,19 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
         override fun onPressed(view: View, callback: Callback) {
             if (entries.isEmpty() || entryValues.isEmpty()) return
-            callback.onItemPressed(view, this)
-            MagiskDialog(view.context)
-                .applyTitle(title.getText(resources))
-                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                    titleRes = android.R.string.cancel
-                }
-                .applyAdapter(entries) {
-                    value = it
-                    notifyPropertyChanged(BR.selectedEntry)
-                    super.onPressed(view, callback)
-                }
-                .reveal()
+            callback.onItemPressed(view, this) {
+                MagiskDialog(view.context)
+                    .applyTitle(title.getText(resources))
+                    .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
+                        titleRes = android.R.string.cancel
+                    }
+                    .applyAdapter(entries) {
+                        value = it
+                        notifyPropertyChanged(BR.selectedEntry)
+                        super.onPressed(view, callback)
+                    }
+                    .reveal()
+            }
         }
 
     }
@@ -177,8 +180,9 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         override val layoutRes = R.layout.item_settings_blank
 
         override fun onPressed(view: View, callback: Callback) {
-            callback.onItemPressed(view, this)
-            super.onPressed(view, callback)
+            callback.onItemPressed(view, this) {
+                super.onPressed(view, callback)
+            }
         }
 
     }

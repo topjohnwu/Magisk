@@ -137,7 +137,7 @@
     <string name="update_available">ხელმისაწვდომია განახლება</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">სორტირება</string>
-    <string name="module_permission_declined">დართეთ მეხსიერებასთან წვდომის ნებართვა ამ ფუნქციის გამოსაყნებლად</string>
+    <string name="external_rw_permission_denied">დართეთ მეხსიერებასთან წვდომის ნებართვა ამ ფუნქციის გამოსაყნებლად</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">თემების ჩამონათვალი</string>

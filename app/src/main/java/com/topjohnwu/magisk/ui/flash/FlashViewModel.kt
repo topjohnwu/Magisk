@@ -107,8 +107,6 @@ class FlashViewModel(
     }
 
     private fun savePressed() = withExternalRW {
-        if (!it)
-            return@withExternalRW
         viewModelScope.launch {
             val name = Const.MAGISK_INSTALL_LOG_FILENAME.format(now.toTime(timeFormatStandard))
             val file = File(Config.downloadDirectory, name)

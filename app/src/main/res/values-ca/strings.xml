@@ -137,7 +137,7 @@
     <string name="update_available">Actualització Disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Ordre de Classificació</string>
-    <string name="module_permission_declined">Garanteix permís d\'emmagatzematge per activar aquesta funcionalitat</string>
+    <string name="external_rw_permission_denied">Garanteix permís d\'emmagatzematge per activar aquesta funcionalitat</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode del tema</string>

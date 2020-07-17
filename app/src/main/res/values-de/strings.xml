@@ -136,7 +136,7 @@
     <string name="update_available">Update verfügbar</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sortierreihenfolge</string>
-    <string name="module_permission_declined">Gewähre den Speicher-Zugriff, um diese Funtion zu aktivieren.</string>
+    <string name="external_rw_permission_denied">Gewähre den Speicher-Zugriff, um diese Funtion zu aktivieren.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Themen-Modus</string>

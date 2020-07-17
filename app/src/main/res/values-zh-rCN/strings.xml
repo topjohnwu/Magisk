@@ -137,7 +137,7 @@
     <string name="update_available">可更新</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">排序方式</string>
-    <string name="module_permission_declined">请允许访问存储空间以使用此功能</string>
+    <string name="external_rw_permission_denied">请允许访问存储空间以使用此功能</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">主题模式</string>

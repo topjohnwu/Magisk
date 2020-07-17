@@ -136,7 +136,7 @@
     <string name="update_available">Actualizare disponibilă</string>
     <string name="module_installed">Instalate</string>
     <string name="sorting_order">Ordine de sortare</string>
-    <string name="module_permission_declined">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
+    <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mod pentru temă</string>

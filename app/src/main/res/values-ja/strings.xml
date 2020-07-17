@@ -251,7 +251,7 @@
     <string name="settings_grid_column_count_summary">リストの幅を設定します。アプリを再起動して変更を適用します。</string>
     <string name="settings_download_path_error">フォルダの作成エラー。ルートディレクトリからアクセスできなければならず、そしてファイルでない必要があります。</string>
     <string name="settings_dark_mode_message">自分のスタイルに合ったモードを選択！</string>
-    <string name="module_permission_declined">この機能を有効にするためにストレージの許可を付与</string>
+    <string name="external_rw_permission_denied">この機能を有効にするためにストレージの許可を付与</string>
     <string name="download_open_parent">"親フォルダに表示 "</string>
     <string name="download_open_self">ファイルを表示</string>
     <string name="unsupport_magisk_msg">このバージョンの Magisk Manager は、%1$s 以下の Magisk バージョンには対応していません。 アプリは Magisk がインストールされていないかのように動作しますので、できるだけ早く Magisk をアップグレードしてください。</string>

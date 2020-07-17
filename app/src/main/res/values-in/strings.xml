@@ -137,7 +137,7 @@
     <string name="update_available">Pembaruan Tersedia</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Urutkan Susunan</string>
-    <string name="module_permission_declined">Berikan izin penyimpanan untuk mengaktifkan fungsi ini</string>
+    <string name="external_rw_permission_denied">Berikan izin penyimpanan untuk mengaktifkan fungsi ini</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode Tema</string>

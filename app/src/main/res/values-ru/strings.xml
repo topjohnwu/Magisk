@@ -137,7 +137,7 @@
     <string name="update_available">Доступно обновление</string>
     <string name="module_installed">Установлены</string>
     <string name="sorting_order">Сортировка</string>
-    <string name="module_permission_declined">Пожалуйста, предоставьте доступ к хранилищу</string>
+    <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Оттенок</string>

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.model.events.*
@@ -85,8 +86,14 @@ abstract class BaseViewModel(
         PermissionEvent(permissions.toList(), callback).publish()
     }
 
-    fun withExternalRW(callback: (Boolean) -> Unit) {
-        withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, callback = callback)
+    fun withExternalRW(callback: () -> Unit) {
+        withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+            if (!it) {
+                SnackbarEvent(R.string.external_rw_permission_denied).publish()
+            } else {
+                callback()
+            }
+        }
     }
 
     fun back() = BackPressEvent().publish()

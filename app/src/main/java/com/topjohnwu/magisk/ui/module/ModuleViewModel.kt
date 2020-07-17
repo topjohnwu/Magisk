@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.*
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.OpenChangelogEvent
-import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
@@ -323,26 +322,15 @@ class ModuleViewModel(
     }
 
     fun downloadPressed(item: RepoItem) = withExternalRW {
-        if (it)
-            ModuleInstallDialog(item.item).publish()
-        else
-            permissionDenied()
+        ModuleInstallDialog(item.item).publish()
     }
 
     fun installPressed() = withExternalRW {
-        if (it)
-            InstallExternalModuleEvent().publish()
-        else
-            permissionDenied()
+        InstallExternalModuleEvent().publish()
     }
 
     fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
     fun infoPressed(item: ModuleItem) {
         OpenChangelogEvent(item.repo ?: return).publish()
     }
-
-    private fun permissionDenied() {
-        SnackbarEvent(R.string.module_permission_declined).publish()
-    }
-
 }
