@@ -33,6 +33,12 @@ class SettingsViewModel(
     val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
     val items = diffListOf(createItems())
 
+    init {
+        viewModelScope.launch {
+            Language.loadLanguages(this)
+        }
+    }
+
     private fun createItems(): List<SettingsItem> {
         // Customization
         val list = mutableListOf(
@@ -43,9 +49,6 @@ class SettingsViewModel(
             // Pre 5.0 does not support getting colors from attributes,
             // making theming a pain in the ass. Just forget about it
             list.remove(Theme)
-        }
-        viewModelScope.launch {
-            Language.loadLanguages(this)
         }
 
         // Manager
@@ -87,39 +90,34 @@ class SettingsViewModel(
         return list
     }
 
-    override fun onItemPressed(view: View, item: SettingsItem, method: () -> Unit) = when (item) {
-        is DownloadPath -> withExternalRW(method)
-        else -> method()
+    override fun onItemPressed(view: View, item: SettingsItem, callback: () -> Unit) = when (item) {
+        is DownloadPath -> withExternalRW(callback)
+        is Biometrics -> authenticate(callback)
+        is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
+        is ClearRepoCache -> clearRepoCache()
+        is SystemlessHosts -> createHosts()
+        is Restore -> restoreManager()
+        else -> callback()
     }
 
     override fun onItemChanged(view: View, item: SettingsItem) = when (item) {
-        // use only instances you want, don't declare everything
-        is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
         is Language -> RecreateEvent().publish()
-
         is UpdateChannel -> openUrlIfNecessary(view)
-        is Biometrics -> authenticateOrRevert()
-        is ClearRepoCache -> clearRepoCache()
-        is SystemlessHosts -> createHosts()
-        is Hide -> updateManager(hide = true)
-        is Restore -> updateManager(hide = false)
-
+        is Hide -> PatchAPK.hideManager(view.context, item.value)
         else -> Unit
     }
 
     private fun openUrlIfNecessary(view: View) {
         UpdateChannelUrl.refresh()
         if (UpdateChannelUrl.isEnabled && UpdateChannelUrl.value.isBlank()) {
-            UpdateChannelUrl.onPressed(view, this@SettingsViewModel)
+            UpdateChannelUrl.onPressed(view, this)
         }
     }
 
-    private fun authenticateOrRevert() {
-        // immediately revert the preference
-        Biometrics.value = !Biometrics.value
+    private fun authenticate(callback: () -> Unit) {
         BiometricDialog {
             // allow the change on success
-            onSuccess { Biometrics.value = !Biometrics.value }
+            onSuccess { callback() }
         }.publish()
     }
 
@@ -136,13 +134,9 @@ class SettingsViewModel(
         }
     }
 
-    private fun updateManager(hide: Boolean) {
-        if (hide) {
-            PatchAPK.hideManager(get(), Hide.value)
-        } else {
-            DownloadService(get()) {
-                subject = DownloadSubject.Manager(Configuration.APK.Restore)
-            }
+    private fun restoreManager() {
+        DownloadService(get()) {
+            subject = DownloadSubject.Manager(Configuration.APK.Restore)
         }
     }
 
