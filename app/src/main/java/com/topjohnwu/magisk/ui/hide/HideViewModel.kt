@@ -53,11 +53,11 @@ class HideViewModel(
         state = State.LOADING
         val apps = magiskRepo.fetchApps()
         val hides = magiskRepo.fetchHideTargets()
-        val (hidden, diff) = withContext(Dispatchers.Default) {
-            val hidden = apps.map { mergeAppTargets(it, hides) }.map { HideItem(it) }.sort()
-            hidden to items.calculateDiff(hidden)
+        val (appList, diff) = withContext(Dispatchers.Default) {
+            val list = apps.map { mergeAppTargets(it, hides) }.map { HideItem(it) }.sort()
+            list to items.calculateDiff(list)
         }
-        items.update(hidden, diff)
+        items.update(appList, diff)
         submitQuery()
         state = State.LOADED
     }
@@ -72,7 +72,7 @@ class HideViewModel(
         return ProcessHideApp(a, processes)
     }
 
-    private fun List<HideItem>.sort() = compareByDescending<HideItem> { it.itemsChecked }
+    private fun List<HideItem>.sort() = compareByDescending<HideItem> { it.itemsChecked != 0 }
         .thenBy { it.item.info.name.toLowerCase(currentLocale) }
         .thenBy { it.item.info.info.packageName }
         .let { sortedWith(it) }
@@ -80,24 +80,27 @@ class HideViewModel(
     // ---
 
     override fun query() = items.filter {
+        fun showHidden()= it.itemsChecked != 0
+
         fun filterSystem(): Boolean {
             return isShowSystem || it.item.info.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
         }
 
         fun filterQuery(): Boolean {
-            val inName = it.item.info.name.contains(query, true)
-            val inPackage = it.item.info.info.packageName.contains(query, true)
-            val inProcesses = it.item.processes.any { it.name.contains(query, true) }
-            return inName || inPackage || inProcesses
+            fun inName() = it.item.info.name.contains(query, true)
+            fun inPackage() = it.item.info.info.packageName.contains(query, true)
+            fun inProcesses() = it.item.processes.any { it.name.contains(query, true) }
+            return inName() || inPackage() || inProcesses()
         }
 
-        filterSystem() && filterQuery()
+        showHidden() || (filterSystem() && filterQuery())
     }
 
     // ---
 
-    fun toggleItem(item: HideProcessItem) = magiskRepo
-        .toggleHide(item.isHidden, item.item.packageName, item.item.name)
+    fun toggleItem(item: HideProcessItem) {
+        magiskRepo.toggleHide(item.isHidden, item.item.packageName, item.item.name)
+    }
 
     fun resetQuery() {
         query = ""
