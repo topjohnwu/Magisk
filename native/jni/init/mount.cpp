@@ -243,12 +243,12 @@ void SARBase::backup_files() {
 
 void SARBase::mount_system_root() {
 	LOGD("Early mount system_root\n");
-	sprintf(blk_info.partname, "system%s", cmd->slot);
+	// Try NVIDIA naming scheme
+	strcpy(blk_info.partname, "APP");
 	strcpy(blk_info.block_dev, "/dev/root");
 	auto dev = setup_block(false);
 	if (dev < 0) {
-		// Try NVIDIA naming scheme
-		strcpy(blk_info.partname, "APP");
+		sprintf(blk_info.partname, "system%s", cmd->slot);
 		dev = setup_block(false);
 		if (dev < 0) {
 			// We don't really know what to do at this point...
