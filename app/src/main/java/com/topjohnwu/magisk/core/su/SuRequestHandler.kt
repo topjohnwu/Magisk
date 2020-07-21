@@ -68,8 +68,13 @@ abstract class SuRequestHandler(
     private suspend fun init(name: String) = withContext(Dispatchers.IO) {
         try {
             if (Const.Version.atLeastCanary()) {
-                LocalServerSocket(name).use {
-                    socket = async { it.accept() }.timedAwait() ?: throw SocketError()
+                val server = LocalServerSocket(name)
+                // Do NOT use Closable?.use(block) here as LocalServerSocket does
+                // not implement Closable on older Android platforms
+                try {
+                    socket = async { server.accept() }.timedAwait() ?: throw SocketError()
+                } finally {
+                    server.close()
                 }
             } else {
                 socket = LocalSocket()
