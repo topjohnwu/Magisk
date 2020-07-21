@@ -9,11 +9,11 @@ import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.ktx.checkSum
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Magisk
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Module
-import com.topjohnwu.superuser.ShellUtils
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import org.koin.android.ext.android.inject
@@ -48,7 +48,7 @@ abstract class RemoteFileService : NotificationService() {
     private suspend fun start(subject: DownloadSubject) {
         if (subject !is Magisk ||
             !subject.file.exists() ||
-            !ShellUtils.checkSum("MD5", subject.file, subject.magisk.md5)) {
+            !subject.file.checkSum("MD5", subject.magisk.md5)) {
             val stream = service.fetchFile(subject.url).toProgressStream(subject)
             when (subject) {
                 is Module ->

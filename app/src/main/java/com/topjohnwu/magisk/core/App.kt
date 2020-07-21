@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.FileProvider
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
+import com.topjohnwu.magisk.core.utils.IODispatcherExecutor
 import com.topjohnwu.magisk.core.utils.RootInit
 import com.topjohnwu.magisk.core.utils.updateConfig
 import com.topjohnwu.magisk.di.koinModules
@@ -31,8 +32,9 @@ open class App() : Application() {
     init {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER)
-        Shell.Config.addInitializers(RootInit::class.java)
+        Shell.Config.setInitializers(RootInit::class.java)
         Shell.Config.setTimeout(2)
+        Shell.EXECUTOR = IODispatcherExecutor()
         FileProvider.callHandler = SuCallbackHandler
 
         // Always log full stack trace with Timber
