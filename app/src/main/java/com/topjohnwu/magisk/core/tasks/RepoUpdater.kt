@@ -5,6 +5,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.data.network.GithubApiServices
+import com.topjohnwu.magisk.ktx.synchronized
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.HttpURLConnection
@@ -64,33 +65,39 @@ class RepoUpdater(
         page: Int = 1,
         etag: String = ""
     ): PageResult = coroutineScope {
-        val result = api.fetchRepos(page, etag)
-        result.run {
-            if (code() == HttpURLConnection.HTTP_NOT_MODIFIED)
-                return@coroutineScope PageResult.CACHED
+        runCatching {
+            val result = api.fetchRepos(page, etag)
+            result.run {
+                if (code() == HttpURLConnection.HTTP_NOT_MODIFIED)
+                    return@coroutineScope PageResult.CACHED
 
-            if (!isSuccessful)
-                return@coroutineScope PageResult.ERROR
+                if (!isSuccessful)
+                    return@coroutineScope PageResult.ERROR
 
-            if (page == 1)
-                repoDB.etagKey = headers()[Const.Key.ETAG_KEY].orEmpty().trimEtag()
+                if (page == 1)
+                    repoDB.etagKey = headers()[Const.Key.ETAG_KEY].orEmpty().trimEtag()
 
-            val repoLoad = async { loadRepos(body()!!, cached) }
-            val next = if (headers()[Const.Key.LINK_KEY].orEmpty().contains("next")) {
-                async { loadPage(cached, page + 1) }
-            } else {
-                async { PageResult.SUCCESS }
+                val repoLoad = async { loadRepos(body()!!, cached) }
+                val next = if (headers()[Const.Key.LINK_KEY].orEmpty().contains("next")) {
+                    async { loadPage(cached, page + 1) }
+                } else {
+                    async { PageResult.SUCCESS }
+                }
+                repoLoad.await()
+                return@coroutineScope next.await()
             }
-            repoLoad.await()
-            return@coroutineScope next.await()
+        }.getOrElse {
+            Timber.e(it)
+            PageResult.ERROR
         }
     }
 
     suspend operator fun invoke(forced: Boolean) = withContext(Dispatchers.IO) {
-        val cached = Collections.synchronizedSet(HashSet(repoDB.repoIDList))
+        val cached = HashSet(repoDB.repoIDList).synchronized()
         when (loadPage(cached, etag = repoDB.etagKey)) {
             PageResult.CACHED -> if (forced) forcedReload(cached)
             PageResult.SUCCESS -> repoDB.removeRepos(cached)
+            PageResult.ERROR -> Unit
         }
     }
 }
