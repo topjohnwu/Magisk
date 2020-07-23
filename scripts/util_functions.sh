@@ -309,12 +309,14 @@ mount_apex() {
     if [ -f $APEX ]; then
       # APEX APKs, extract and loop mount
       unzip -qo $APEX apex_payload.img -d /apex
-      loop_setup apex_payload.img
+      loop_setup /apex/apex_payload.img
       if [ ! -z $LOOPDEV ]; then
         ui_print "- Mounting $DEST"
         mount -t ext4 -o ro,noatime $LOOPDEV $DEST
+      else
+        ui_print "- Failed to mount: $DEST"
       fi
-      rm -f apex_payload.img
+      rm -f /apex/apex_payload.img
     elif [ -d $APEX ]; then
       # APEX folders, bind mount directory
       ui_print "- Mounting $DEST"
