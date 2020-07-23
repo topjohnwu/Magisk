@@ -95,6 +95,7 @@ static bool magisk_env() {
 		if (0) {}
 		mount_mirror(system, MS_RDONLY)
 		mount_mirror(vendor, MS_RDONLY)
+		mount_mirror(apex, MS_RDONLY)
 		mount_mirror(product, MS_RDONLY)
 		mount_mirror(system_ext, MS_RDONLY)
 		mount_mirror(data, 0)
@@ -110,6 +111,7 @@ static bool magisk_env() {
 		LOGI("link: %s\n", buf1);
 	}
 	link_mirror(vendor);
+	link_mirror(apex);
 	link_mirror(product);
 	link_mirror(system_ext);
 
