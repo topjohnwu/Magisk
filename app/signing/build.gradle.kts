@@ -30,6 +30,6 @@ repositories {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    api("org.bouncycastle:bcprov-jdk15on:1.65.01")
-    api("org.bouncycastle:bcpkix-jdk15on:1.65")
+    api("org.bouncycastle:bcprov-jdk15on:1.66")
+    api("org.bouncycastle:bcpkix-jdk15on:1.66")
 }

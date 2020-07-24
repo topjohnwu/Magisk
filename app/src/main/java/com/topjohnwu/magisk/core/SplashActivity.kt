@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.core.view.Shortcuts
 import com.topjohnwu.magisk.data.network.GithubRawServices
@@ -52,7 +51,7 @@ open class SplashActivity : Activity() {
         Config.initialize()
         handleRepackage()
         Notifications.setup(this)
-        Utils.scheduleUpdateCheck(this)
+        UpdateCheckService.schedule(this)
         Shortcuts.setup(this)
 
         // Pre-fetch network stuffs

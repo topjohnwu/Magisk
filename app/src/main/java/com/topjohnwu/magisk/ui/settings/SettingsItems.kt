@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.UpdateCheckService
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.utils.availableLocales
@@ -154,7 +155,7 @@ object UpdateChecker : SettingsItem.Toggle() {
     override var value = Config.checkUpdate
         set(value) = setV(value, field, { field = it }) {
             Config.checkUpdate = it
-            Utils.scheduleUpdateCheck(get())
+            UpdateCheckService.schedule(get())
         }
 }
 

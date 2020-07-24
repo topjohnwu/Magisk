@@ -1,8 +1,7 @@
 package com.topjohnwu.magisk.core
 
 import android.content.Context
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.repository.MagiskRepository
@@ -11,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import java.util.concurrent.TimeUnit
 
 class UpdateCheckService(context: Context, workerParams: WorkerParameters)
     : CoroutineWorker(context, workerParams), KoinComponent {
@@ -29,5 +29,25 @@ class UpdateCheckService(context: Context, workerParams: WorkerParameters)
                 Notifications.magiskUpdate(applicationContext)
             Result.success()
         } ?: Result.failure()
+    }
+
+    companion object {
+        fun schedule(context: Context) {
+            if (Config.checkUpdate) {
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiresDeviceIdle(true)
+                    .build()
+                val request = PeriodicWorkRequestBuilder<UpdateCheckService>(12, TimeUnit.HOURS)
+                    .setConstraints(constraints)
+                    .build()
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                    Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID,
+                    ExistingPeriodicWorkPolicy.REPLACE, request)
+            } else {
+                WorkManager.getInstance(context)
+                    .cancelUniqueWork(Const.ID.CHECK_MAGISK_UPDATE_WORKER_ID)
+            }
+        }
     }
 }
