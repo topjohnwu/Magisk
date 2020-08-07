@@ -618,7 +618,12 @@ static void prepare_modules() {
 			if (entry->d_type == DT_DIR) {
 				// Cleanup old module if exists
 				if (faccessat(mfd, entry->d_name, F_OK, 0) == 0) {
-					frm_rf(xopenat(mfd, entry->d_name, O_RDONLY | O_CLOEXEC));
+					int modfd = xopenat(mfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+					if (faccessat(modfd, "disable", F_OK, 0) == 0) {
+						auto disable = entry->d_name + "/disable"s;
+						close(xopenat(ufd, disable.data(), O_RDONLY | O_CREAT | O_CLOEXEC, 0));
+					}
+					frm_rf(modfd);
 					unlinkat(mfd, entry->d_name, AT_REMOVEDIR);
 				}
 				LOGI("Upgrade / New module: %s\n", entry->d_name);
