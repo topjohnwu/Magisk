@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -28,20 +27,20 @@ public class ZipSigner {
         System.exit(2);
     }
 
-    private static void sign(JarMap input, OutputStream output) throws Exception {
-        sign(SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem"),
-                SignAPK.class.getResourceAsStream("/keys/testkey.pk8"), input, output);
+    private static void sign(JarMap input, FileOutputStream output) throws Exception {
+        sign(SignApk.class.getResourceAsStream("/keys/testkey.x509.pem"),
+                SignApk.class.getResourceAsStream("/keys/testkey.pk8"), input, output);
     }
 
     private static void sign(InputStream certIs, InputStream keyIs,
-                             JarMap input, OutputStream output) throws Exception {
+                             JarMap input, FileOutputStream output) throws Exception {
         X509Certificate cert = CryptoUtils.readCertificate(certIs);
         PrivateKey key = CryptoUtils.readPrivateKey(keyIs);
-        SignAPK.signAndAdjust(cert, key, input, output);
+        SignApk.sign(cert, key, input, output);
     }
 
     private static void sign(String keyStore, String keyStorePass, String alias, String keyPass,
-                             JarMap in, OutputStream out) throws Exception {
+                             JarMap in, FileOutputStream out) throws Exception {
         KeyStore ks;
         try {
             ks = KeyStore.getInstance("JKS");
@@ -56,7 +55,7 @@ public class ZipSigner {
         }
         X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
         PrivateKey key = (PrivateKey) ks.getKey(alias, keyPass.toCharArray());
-        SignAPK.signAndAdjust(cert, key, in, out);
+        SignApk.sign(cert, key, in, out);
     }
 
     public static void main(String[] args) throws Exception {
@@ -66,7 +65,7 @@ public class ZipSigner {
         Security.insertProviderAt(new BouncyCastleProvider(), 1);
 
         try (JarMap in = JarMap.open(args[args.length - 2], false);
-             OutputStream out = new FileOutputStream(args[args.length - 1])) {
+             FileOutputStream out = new FileOutputStream(args[args.length - 1])) {
             if (args.length == 2) {
                 sign(in, out);
             } else if (args.length == 4) {

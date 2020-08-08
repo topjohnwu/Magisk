@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.signing.JarMap
-import com.topjohnwu.signing.SignAPK
+import com.topjohnwu.signing.SignApk
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -29,10 +29,8 @@ import java.security.SecureRandom
 
 object PatchAPK {
 
-    private const val ALPHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    private const val DIGITS = "0123456789"
-    const val ALPHANUM = ALPHA + DIGITS
-    private const val ALPHANUMDOTS = "$ALPHANUM............"
+    private const val ALPHA = "abcdefghijklmnopqrstuvwxyz"
+    private const val ALPHADOTS = "$ALPHA....."
 
     private const val APP_ID = "com.topjohnwu.magisk"
     private const val APP_NAME = "Magisk Manager"
@@ -48,7 +46,7 @@ object PatchAPK {
             next = if (prev == '.' || i == len - 1) {
                 ALPHA[random.nextInt(ALPHA.length)]
             } else {
-                ALPHANUMDOTS[random.nextInt(ALPHANUMDOTS.length)]
+                ALPHADOTS[random.nextInt(ALPHADOTS.length)]
             }
             builder.append(next)
             prev = next
@@ -96,7 +94,7 @@ object PatchAPK {
             // Write apk changes
             jar.getOutputStream(je).write(xml)
             val keys = Keygen(get())
-            SignAPK.sign(keys.cert, keys.key, jar, FileOutputStream(out).buffered())
+            SignApk.sign(keys.cert, keys.key, jar, FileOutputStream(out))
         } catch (e: Exception) {
             Timber.e(e)
             return false
