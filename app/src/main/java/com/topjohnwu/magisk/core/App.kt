@@ -31,9 +31,10 @@ open class App() : Application() {
 
     init {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
-        Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER)
-        Shell.Config.setInitializers(RootInit::class.java)
-        Shell.Config.setTimeout(2)
+        Shell.setDefaultBuilder(Shell.Builder.create()
+            .setFlags(Shell.FLAG_MOUNT_MASTER)
+            .setInitializers(RootInit::class.java)
+            .setTimeout(2))
         Shell.EXECUTOR = IODispatcherExecutor()
         FileProvider.callHandler = SuCallbackHandler
 
