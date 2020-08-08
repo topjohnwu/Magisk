@@ -20,7 +20,7 @@ val jar by tasks.getting(Jar::class) {
 val shadowJar by tasks.getting(ShadowJar::class) {
     baseName = "zipsigner"
     classifier = null
-    version = "3.0"
+    version = "4.0"
 }
 
 repositories {

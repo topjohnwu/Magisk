@@ -199,7 +199,7 @@ def sign_zip(unsigned, output, release):
         mv(unsigned, output)
         return
 
-    signer_name = 'zipsigner-3.0.jar'
+    signer_name = 'zipsigner-4.0.jar'
     zipsigner = op.join('app', 'signing', 'build', 'libs', signer_name)
 
     if not op.exists(zipsigner):
