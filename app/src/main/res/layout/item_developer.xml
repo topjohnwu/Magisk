@@ -33,6 +33,7 @@
             itemBinding="@{viewModel.itemBinding}"
             items="@{item.items}"
             nestedScrollingEnabled="@{false}"
+            android:overScrollMode="never"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
