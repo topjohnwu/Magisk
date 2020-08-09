@@ -30,7 +30,7 @@
         tools:layout_marginBottom="@dimen/l1"
         tools:layout_marginEnd="@dimen/l1">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/module_state_icon"
             gone="@{!item.removed &amp;&amp; !item.updated}"
             srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : (item.updated ? R.drawable.ic_update_md2 : 0)}"
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/module_title"
                 strikeThrough="@{item.removed}"
                 android:layout_width="0dp"
@@ -67,7 +67,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/lorem" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/module_version_author"
                 strikeThrough="@{item.removed}"
                 android:layout_width="0dp"
@@ -79,10 +79,11 @@
                 app:layout_constraintTop_toBottomOf="@+id/module_title"
                 tools:text="v1 by topjohnwu" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/module_indicator"
-                style="@style/WidgetFoundation.Switch"
-                isSelected="@{item.enabled}"
+                android:checked="@={item.enabled}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/l_50"
                 app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -90,7 +91,7 @@
                 app:layout_constraintStart_toEndOf="@+id/module_info"
                 app:layout_constraintTop_toTopOf="@+id/module_title" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/module_description"
                 gone="@{item.item.description.empty}"
                 strikeThrough="@{item.removed}"
@@ -110,11 +111,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="@dimen/l1"
-                android:layout_marginRight="6dp"
-                android:background="?colorSurfaceVariant"
+                android:background="?colorSurfaceSurfaceVariant"
                 app:layout_constraintTop_toBottomOf="@+id/module_description" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/module_info"
                 style="@style/WidgetFoundation.Icon"
                 gone="@{item.repo == null}"

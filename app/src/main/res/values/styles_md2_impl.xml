@@ -33,8 +33,7 @@
     </style>
 
     <style name="WidgetFoundation.Card.Variant">
-        <item name="cardBackgroundColor">?colorSurface</item>
-        <item name="strokeColor">?colorSurfaceVariant</item>
+        <item name="strokeColor">?colorSurfaceSurfaceVariant</item>
         <item name="strokeWidth">1.5dp</item>
     </style>
 

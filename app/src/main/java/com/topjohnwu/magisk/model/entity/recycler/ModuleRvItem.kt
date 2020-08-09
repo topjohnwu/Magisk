@@ -48,21 +48,18 @@ sealed class RepoItem(val item: Repo) : ObservableItem<RepoItem>() {
     var progress = 0
         set(value) = set(value, field, { field = it }, BR.progress)
 
-    @get:Bindable
-    var isUpdate = false
-        set(value) = set(value, field, { field = it }, BR.update)
-
+    abstract val isUpdate: Boolean
 
     override fun contentSameAs(other: RepoItem): Boolean = item == other.item
     override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id
 
     class Update(item: Repo) : RepoItem(item) {
-        init {
-            isUpdate = true
-        }
+        override val isUpdate get() = true
     }
 
-    class Remote(item: Repo) : RepoItem(item)
+    class Remote(item: Repo) : RepoItem(item) {
+        override val isUpdate get() = false
+    }
 }
 
 class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {

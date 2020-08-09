@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/module_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@tools:sample/lorem" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/module_version_author"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/module_title"
                 tools:text="v1 by topjohnwu" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/module_description"
                 gone="@{item.item.description.empty}"
                 android:layout_width="match_parent"
@@ -74,10 +74,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="@dimen/l1"
-                android:background="?colorSurfaceVariant"
+                android:background="?colorSurfaceSurfaceVariant"
                 app:layout_constraintTop_toBottomOf="@+id/module_description" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
@@ -91,7 +91,7 @@
                 tools:ignore="SmallSp"
                 tools:text="@tools:sample/date/ddmmyy" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/module_info"
                 style="@style/WidgetFoundation.Icon"
                 android:layout_width="wrap_content"
@@ -103,7 +103,7 @@
                 app:layout_constraintTop_toTopOf="@+id/module_download"
                 app:srcCompat="@drawable/ic_info" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/module_download"
                 android:layout_width="wrap_content"
                 style="@style/WidgetFoundation.Icon.Primary"
