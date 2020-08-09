@@ -134,6 +134,9 @@ class HomeViewModel(
         HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
     }
 
+    fun onSafetyNetPressed() =
+        HomeFragmentDirections.actionHomeFragmentToSafetynetFragment().publish()
+
     fun hideNotice() {
         Config.safetyNotice = false
         isNoticeVisible = false

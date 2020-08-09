@@ -43,6 +43,7 @@
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
+    <string name="home_check_safetynet">Check SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Preserve force encryption</string>

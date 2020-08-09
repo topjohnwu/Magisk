@@ -31,11 +31,6 @@ sealed class TappableHeadlineItem : ComparableRvItem<TappableHeadlineItem>() {
         override val icon = R.drawable.ic_hide_md2
     }
 
-    object Safetynet : TappableHeadlineItem() {
-        override val title = R.string.safetynet
-        override val icon = R.drawable.ic_safetynet_md2
-    }
-
     object ThemeMode : TappableHeadlineItem() {
         override val title = R.string.settings_dark_mode_title
         override val icon = R.drawable.ic_day_night

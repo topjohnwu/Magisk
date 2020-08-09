@@ -48,7 +48,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/headline_icon_pointer"
                 app:layout_constraintStart_toEndOf="@+id/tappable_icon"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="@string/magisk_hide_md2" />
+                tools:text="@string/magiskhide" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/headline_icon_pointer"

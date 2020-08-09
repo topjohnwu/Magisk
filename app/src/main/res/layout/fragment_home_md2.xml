@@ -5,6 +5,10 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.core.Info" />
+
+        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -98,6 +102,35 @@
                 android:layout_marginEnd="@dimen/l1"
                 android:layout_marginTop="@dimen/l1"
                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/WidgetFoundation.Button.Outlined"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home_check_safetynet"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                android:onClick="@{() -> viewModel.onSafetyNetPressed()}"
+                app:cornerRadius="@dimen/r1"
+                app:icon="@drawable/ic_safetynet_md2" />
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/WidgetFoundation.Button.Outlined.Error"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:layout_marginTop="@dimen/l_125"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/uninstall_magisk_title"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                android:onClick="@{() -> viewModel.onDeletePressed()}"
+                gone="@{Info.env.magiskVersionCode &lt; 0 || viewModel.stateMagisk == MagiskState.LOADING || !viewModel.isConnected}"
+                app:cornerRadius="@dimen/r1"
+                app:icon="@drawable/ic_delete_md2" />
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card"

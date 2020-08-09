@@ -42,7 +42,6 @@ class SuperuserViewModel(
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = MergeObservableList<ComparableRvItem<*>>()
         .insertItem(TappableHeadlineItem.Hide)
-        .insertItem(TappableHeadlineItem.Safetynet)
         .insertList(itemsHelpers)
         .insertList(itemsPolicies)
     val itemBinding = itemBindingOf<ComparableRvItem<*>> {
@@ -75,12 +74,8 @@ class SuperuserViewModel(
     @Suppress("REDUNDANT_ELSE_IN_WHEN")
     override fun onItemPressed(item: TappableHeadlineItem) = when (item) {
         TappableHeadlineItem.Hide -> hidePressed()
-        TappableHeadlineItem.Safetynet -> safetynetPressed()
         else -> Unit
     }
-
-    private fun safetynetPressed() =
-        SuperuserFragmentDirections.actionSuperuserFragmentToSafetynetFragment().publish()
 
     private fun hidePressed() =
         SuperuserFragmentDirections.actionSuperuserFragmentToHideFragment().publish()
