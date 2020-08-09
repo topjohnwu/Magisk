@@ -15,9 +15,8 @@ import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.ktx.packageName
 import com.topjohnwu.magisk.ktx.res
+import com.topjohnwu.magisk.model.entity.IconLink
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
-import com.topjohnwu.magisk.model.entity.recycler.DeveloperItem
-import com.topjohnwu.magisk.model.entity.recycler.HomeItem
 import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
@@ -77,11 +76,7 @@ class HomeViewModel(
     val showUninstall get() =
         Info.env.magiskVersionCode > 0 && stateMagisk != MagiskState.LOADING && isConnected.get()
 
-    val items = listOf(DeveloperItem.Mainline, DeveloperItem.App, DeveloperItem.Project)
-    val itemBinding = itemBindingOf<HomeItem> {
-        it.bindExtra(BR.viewModel, this)
-    }
-    val itemDeveloperBinding = itemBindingOf<DeveloperItem> {
+    val itemBinding = itemBindingOf<IconLink> {
         it.bindExtra(BR.viewModel, this)
     }
 

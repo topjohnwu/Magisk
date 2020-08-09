@@ -6,11 +6,11 @@ import android.graphics.drawable.Drawable
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.DrawableRes
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
@@ -33,7 +33,7 @@ fun setOnNavigationClickedListener(view: Toolbar, listener: View.OnClickListener
 }
 
 @BindingAdapter("srcCompat")
-fun setImageResource(view: AppCompatImageView, @DrawableRes resId: Int) {
+fun setImageResource(view: ImageView, @DrawableRes resId: Int) {
     view.setImageResource(resId)
 }
 

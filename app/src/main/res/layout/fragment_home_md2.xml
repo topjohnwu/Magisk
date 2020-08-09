@@ -9,6 +9,8 @@
 
         <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
 
+        <import type="com.topjohnwu.magisk.model.entity.DeveloperItem"/>
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -166,23 +168,21 @@
                         android:text="@string/home_support_content"
                         android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        dividerHorizontal="@{@drawable/divider_l1}"
-                        dividerVertical="@{@drawable/divider_l1}"
-                        itemBinding="@{viewModel.itemDeveloperBinding}"
-                        items="@{viewModel.items}"
-                        android:layout_width="match_parent"
+                    <include
+                        layout="@layout/item_developer"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/l1"
-                        android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
-                        android:orientation="horizontal"
-                        android:overScrollMode="ifContentScrolls"
-                        android:paddingStart="@dimen/l1"
-                        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-                        app:spanCount="2"
-                        tools:itemCount="3"
-                        tools:listitem="@layout/item_developer" />
+                        android:layout_marginTop="@dimen/l_50"
+                        viewModel="@{viewModel}"
+                        item="@{DeveloperItem.Main.INSTANCE}" />
+
+                    <include
+                        layout="@layout/item_developer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/l_50"
+                        viewModel="@{viewModel}"
+                        item="@{DeveloperItem.App.INSTANCE}" />
 
                 </LinearLayout>
 

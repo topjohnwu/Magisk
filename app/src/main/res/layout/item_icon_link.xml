@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.HomeItem" />
+            type="com.topjohnwu.magisk.model.entity.IconLink" />
 
         <variable
             name="viewModel"
@@ -24,12 +24,12 @@
         android:padding="@dimen/l_50"
         tools:layout_gravity="center">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/developer_link"
             style="@style/WidgetFoundation.Image.Small"
             android:layout_gravity="center"
             app:srcCompat="@{item.icon}"
-            app:tint="?colorOnPrimary"
+            app:tint="?colorOnSurface"
             tools:srcCompat="@drawable/ic_paypal" />
 
     </FrameLayout>
