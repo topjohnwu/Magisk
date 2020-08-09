@@ -46,7 +46,7 @@ class HomeViewModel(
 
     @get:Bindable
     var stateMagisk = MagiskState.LOADING
-        set(value) = set(value, field, { field = it }, BR.stateMagisk)
+        set(value) = set(value, field, { field = it }, BR.stateMagisk, BR.showUninstall)
 
     @get:Bindable
     var stateManager = MagiskState.LOADING
@@ -73,6 +73,10 @@ class HomeViewModel(
     var stateManagerProgress = 0
         set(value) = set(value, field, { field = it }, BR.stateManagerProgress)
 
+    @get:Bindable
+    val showUninstall get() =
+        Info.env.magiskVersionCode > 0 && stateMagisk != MagiskState.LOADING && isConnected.get()
+
     val items = listOf(DeveloperItem.Mainline, DeveloperItem.App, DeveloperItem.Project)
     val itemBinding = itemBindingOf<HomeItem> {
         it.bindExtra(BR.viewModel, this)
@@ -92,6 +96,7 @@ class HomeViewModel(
     }
 
     override fun refresh() = viewModelScope.launch {
+        notifyPropertyChanged(BR.showUninstall)
         repoMagisk.fetchUpdate()?.apply {
             stateMagisk = when {
                 !Info.env.isActive -> MagiskState.NOT_INSTALLED

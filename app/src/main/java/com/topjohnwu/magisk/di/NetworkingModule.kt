@@ -1,8 +1,10 @@
 package com.topjohnwu.magisk.di
 
 import android.content.Context
+import android.os.Build
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.net.Networking
@@ -40,7 +42,9 @@ fun createOkHttpClient(context: Context): OkHttpClient {
 //    builder.addInterceptor(httpLoggingInterceptor)
 
     if (!Networking.init(context)) {
-        builder.sslSocketFactory(NoSSLv3SocketFactory())
+        Info.hasGMS = false
+        if (Build.VERSION.SDK_INT < 21)
+            builder.sslSocketFactory(NoSSLv3SocketFactory())
     }
 
     val doh = DnsOverHttps.Builder().client(builder.build())

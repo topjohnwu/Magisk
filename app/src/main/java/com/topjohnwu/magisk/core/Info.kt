@@ -18,11 +18,9 @@ object Info {
 
     val envRef = CachedValue { loadState() }
 
-    @JvmStatic
-    val env by envRef              // Local
+    @JvmStatic val env by envRef              // Local
+    @JvmStatic var stub: DynAPK.Data? = null  // Stub
     var remote = UpdateInfo()      // Remote
-    @JvmStatic
-    var stub: DynAPK.Data? = null  // Stub
 
     // Toggle-able options
     @JvmStatic var keepVerity = false
@@ -33,6 +31,7 @@ object Info {
     @JvmStatic var isSAR = false
     @JvmStatic var isAB = false
     @JvmStatic var ramdisk = false
+    @JvmStatic var hasGMS = true
 
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->
