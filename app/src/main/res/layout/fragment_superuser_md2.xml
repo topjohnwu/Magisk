@@ -32,7 +32,7 @@
             android:paddingStart="@dimen/l1"
             android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
             android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
-            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:spanCount="2"
             tools:layout_marginTop="24dp"
             tools:listitem="@layout/item_policy_md2"

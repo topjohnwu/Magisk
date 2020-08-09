@@ -8,15 +8,14 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.ktx.hideKeyboard
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.base.ReselectionTarget
 import com.topjohnwu.magisk.ui.base.BaseUIFragment
+import com.topjohnwu.magisk.ui.base.ReselectionTarget
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -112,12 +111,7 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
 
     override fun onReselected() {
         binding.moduleList
-            .takeIf {
-                (it.layoutManager as? StaggeredGridLayoutManager)?.let {
-                    it.findFirstVisibleItemPositions(IntArray(it.spanCount)).min()
-                } ?: 0 > 10
-            }
-            ?.also { it.scrollToPosition(10) }
+            .also { it.scrollToPosition(10) }
             .let { binding.moduleList }
             .also { it.post { it.smoothScrollToPosition(0) } }
     }

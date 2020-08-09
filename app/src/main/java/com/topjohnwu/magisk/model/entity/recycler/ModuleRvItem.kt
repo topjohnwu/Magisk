@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.model.entity.recycler
 
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
-import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.module.Module
@@ -15,12 +13,6 @@ import com.topjohnwu.magisk.utils.set
 
 object InstallModule : ComparableRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download
-
-    override fun onBindingBound(binding: ViewDataBinding) {
-        super.onBindingBound(binding)
-        val params = binding.root.layoutParams as? StaggeredGridLayoutManager.LayoutParams
-        params?.isFullSpan = true
-    }
 
     override fun contentSameAs(other: InstallModule) = this == other
     override fun itemSameAs(other: InstallModule) = this === other
@@ -44,12 +36,6 @@ class SectionTitle(
     @get:Bindable
     var hasButton = _button != 0 && _icon != 0
         set(value) = set(value, field, { field = it }, BR.hasButton)
-
-    override fun onBindingBound(binding: ViewDataBinding) {
-        super.onBindingBound(binding)
-        val params = binding.root.layoutParams as? StaggeredGridLayoutManager.LayoutParams
-        params?.isFullSpan = true
-    }
 
     override fun itemSameAs(other: SectionTitle): Boolean = this === other
     override fun contentSameAs(other: SectionTitle): Boolean = this === other
