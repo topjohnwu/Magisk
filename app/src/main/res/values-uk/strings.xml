@@ -43,6 +43,7 @@
     <string name="invalid_update_channel">Невірний канал оновлення</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до вимкнення/видалення всіх модулів! Рут буде повністю видалено!\nВаші дані можуть зашифруватися, якщо вони не зашифровані!\nВпевнені, що бажаєте продовжити?</string>
+    <string name="home_check_safetynet">Тест SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
@@ -137,7 +138,6 @@
     <string name="update_available">Доступне оновлення</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Порядок сортування</string>
-    <string name="external_rw_permission_denied">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Режим теми</string>
@@ -255,5 +255,6 @@
     <string name="authenticate">Автентифікувати</string>
     <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
     <string name="unsupport_magisk_msg">Ця версія Magisk Manager не підтримує версію Magisk нижчу, ніж %1$s.\n\nЗастосунок буде працювати, ніби Magisk не встановлено. Будь ласка, оновіть Magisk якомога швидше.</string>
+    <string name="external_rw_permission_denied">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
 
 </resources>
