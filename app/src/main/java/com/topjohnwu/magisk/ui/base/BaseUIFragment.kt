@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.base
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.extensions.startAnimations
+import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.events.ViewEvent
 
@@ -51,6 +52,10 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
         delegate.onEventExecute(event, this)
     }
 
+    open fun onKeyEvent(event: KeyEvent): Boolean {
+        return false
+    }
+
     open fun onBackPressed(): Boolean = false
 
 
@@ -82,5 +87,11 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
     fun NavDirections.navigate() {
         navigation?.navigate(this)
     }
+
+}
+
+interface ReselectionTarget {
+
+    fun onReselected()
 
 }

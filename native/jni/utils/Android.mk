@@ -2,11 +2,12 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libutils
-LOCAL_C_INCLUDES := jni/include $(LIBUTILS)
+LOCAL_C_INCLUDES := jni/include $(LOCAL_PATH)/include
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/include
 LOCAL_SRC_FILES := \
 	missing.cpp \
 	new.cpp \
-	file.cpp \
+	files.cpp \
 	misc.cpp \
 	selinux.cpp \
 	logging.cpp \

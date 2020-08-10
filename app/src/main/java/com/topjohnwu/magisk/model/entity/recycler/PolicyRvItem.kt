@@ -1,58 +1,61 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import android.graphics.drawable.Drawable
-import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.databinding.Bindable
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.MagiskPolicy
-import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.extensions.toggle
-import com.topjohnwu.magisk.model.events.PolicyUpdateEvent
+import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.magisk.utils.set
 
-class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ComparableRvItem<PolicyItem>() {
+class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ObservableItem<PolicyItem>() {
     override val layoutRes = R.layout.item_policy_md2
 
-    val isExpanded = KObservableField(false)
-    val isEnabled = KObservableField(item.policy == MagiskPolicy.ALLOW)
-    val shouldNotify = KObservableField(item.notification)
-    val shouldLog = KObservableField(item.logging)
+    @get:Bindable
+    var isExpanded = false
+        set(value) = set(value, field, { field = it }, BR.expanded)
+
+    @get:Bindable
+    var isEnabled = item.policy == MagiskPolicy.ALLOW
+        set(value) = set(value, field, { field = it }, BR.enabled)
+
+    @get:Bindable
+    var shouldNotify = item.notification
+        set(value) = set(value, field, { field = it }, BR.shouldNotify)
+
+    @get:Bindable
+    var shouldLog = item.logging
+        set(value) = set(value, field, { field = it }, BR.shouldLog)
 
     private val updatedPolicy
         get() = item.copy(
-            policy = if (isEnabled.value) MagiskPolicy.ALLOW else MagiskPolicy.DENY,
-            notification = shouldNotify.value,
-            logging = shouldLog.value
+            policy = if (isEnabled) MagiskPolicy.ALLOW else MagiskPolicy.DENY,
+            notification = shouldNotify,
+            logging = shouldLog
         )
 
     fun toggle(viewModel: SuperuserViewModel) {
-        if (isExpanded.value) {
+        if (isExpanded) {
             toggle()
             return
         }
-        isEnabled.toggle()
-        viewModel.togglePolicy(this, isEnabled.value)
+        isEnabled = !isEnabled
+        viewModel.togglePolicy(this, isEnabled)
     }
 
     fun toggle() {
-        isExpanded.toggle()
+        isExpanded = !isExpanded
     }
 
     fun toggleNotify(viewModel: SuperuserViewModel) {
-        shouldNotify.toggle()
-        viewModel.updatePolicy(PolicyUpdateEvent.Notification(updatedPolicy))
+        shouldNotify = !shouldNotify
+        viewModel.updatePolicy(updatedPolicy, isLogging = false)
     }
 
     fun toggleLog(viewModel: SuperuserViewModel) {
-        shouldLog.toggle()
-        viewModel.updatePolicy(PolicyUpdateEvent.Log(updatedPolicy))
-    }
-
-    override fun onBindingBound(binding: ViewDataBinding) {
-        super.onBindingBound(binding)
-        val params = binding.root.layoutParams as? StaggeredGridLayoutManager.LayoutParams
-        params?.isFullSpan = true
+        shouldLog = !shouldLog
+        viewModel.updatePolicy(updatedPolicy, isLogging = true)
     }
 
     override fun contentSameAs(other: PolicyItem) = itemSameAs(other)

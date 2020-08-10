@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.model.entity
 
 import android.content.pm.ApplicationInfo
 import android.graphics.drawable.Drawable
-import com.topjohnwu.magisk.extensions.packageInfo
-import com.topjohnwu.magisk.extensions.processes
+import com.topjohnwu.magisk.ktx.packageInfo
+import com.topjohnwu.magisk.ktx.processes
 
 class HideAppInfo(
     val info: ApplicationInfo,

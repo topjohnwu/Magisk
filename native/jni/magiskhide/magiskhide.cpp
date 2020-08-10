@@ -10,17 +10,14 @@
 
 #include <daemon.hpp>
 #include <utils.hpp>
-#include <flags.h>
 
 #include "magiskhide.hpp"
 
 using namespace std::literals;
 
-bool hide_enabled = false;
-
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-		NAME_WITH_VER(MagiskHide) "\n\n"
+		"MagiskHide - Hide Config CLI\n\n"
 		"Usage: %s [action [arguments...] ]\n\n"
 		"Actions:\n"
   		"   status          Return the status of magiskhide\n"
@@ -47,7 +44,7 @@ void magiskhide_handler(int client) {
 	case ADD_HIDELIST:
 	case RM_HIDELIST:
 	case LS_HIDELIST:
-		if (!hide_enabled) {
+		if (!hide_enabled()) {
 			write_int(client, HIDE_NOT_ENABLED);
 			close(client);
 			return;
@@ -56,8 +53,8 @@ void magiskhide_handler(int client) {
 
 	switch (req) {
 	case LAUNCH_MAGISKHIDE:
-		launch_magiskhide(client);
-		return;
+		res = launch_magiskhide();
+		break;
 	case STOP_MAGISKHIDE:
 		res = stop_magiskhide();
 		break;
@@ -69,10 +66,9 @@ void magiskhide_handler(int client) {
 		break;
 	case LS_HIDELIST:
 		ls_list(client);
-		client = -1;
-		break;
+		return;
 	case HIDE_STATUS:
-		res = hide_enabled ? HIDE_IS_ENABLED : HIDE_NOT_ENABLED;
+		res = hide_enabled() ? HIDE_IS_ENABLED : HIDE_NOT_ENABLED;
 		break;
 	}
 
@@ -109,7 +105,7 @@ int magiskhide_main(int argc, char *argv[]) {
 		execvp(argv[2], argv + 2);
 		exit(1);
 	}
-#ifdef MAGISK_DEBUG
+#if 0
 	else if (opt == "test"sv)
 		test_proc_monitor();
 #endif

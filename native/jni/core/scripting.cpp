@@ -10,16 +10,22 @@
 
 using namespace std;
 
-#define BBEXEC_CMD DATABIN "/busybox", "sh", "-o", "standalone"
+#define BBEXEC_CMD DATABIN "/busybox", "sh"
+
+static void set_standalone() {
+	setenv("ASH_STANDALONE", "1", 1);
+};
 
 void exec_script(const char *script) {
 	exec_t exec {
+		.pre_exec = set_standalone,
 		.fork = fork_no_zombie
 	};
 	exec_command_sync(exec, BBEXEC_CMD, script);
 }
 
-void exec_common_script(const char *stage) {
+void exec_common_scripts(const char *stage) {
+	LOGI("* Running %s.d scripts\n", stage);
 	char path[4096];
 	char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage);
 	auto dir = xopen_dir(path);
@@ -37,6 +43,7 @@ void exec_common_script(const char *stage) {
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			strcpy(name, entry->d_name);
 			exec_t exec {
+				.pre_exec = set_standalone,
 				.fork = pfs ? fork_no_zombie : fork_dont_care
 			};
 			if (pfs)
@@ -47,7 +54,8 @@ void exec_common_script(const char *stage) {
 	}
 }
 
-void exec_module_script(const char *stage, const vector<string> &module_list) {
+void exec_module_scripts(const char *stage, const vector<string> &module_list) {
+	LOGI("* Running module %s scripts\n", stage);
 	char path[4096];
 	bool pfs = stage == "post-fs-data"sv;
 	for (auto &m : module_list) {
@@ -57,6 +65,7 @@ void exec_module_script(const char *stage, const vector<string> &module_list) {
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		exec_t exec {
+			.pre_exec = set_standalone,
 			.fork = pfs ? fork_no_zombie : fork_dont_care
 		};
 		if (pfs)
@@ -74,8 +83,9 @@ rm -f $APK
 )EOF";
 
 void install_apk(const char *apk) {
-	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon(apk, "u:object_r:" SEPOL_FILE_TYPE ":s0");
 	exec_t exec {
+		.pre_exec = set_standalone,
 		.fork = fork_no_zombie
 	};
 	char cmds[sizeof(install_script) + 4096];

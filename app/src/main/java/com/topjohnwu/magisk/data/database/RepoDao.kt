@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.data.database
 import androidx.room.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.model.module.Repo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Database(version = 6, entities = [Repo::class, RepoEtag::class], exportSchema = false)
 abstract class RepoDatabase : RoomDatabase() {
@@ -26,7 +28,7 @@ abstract class RepoDao(private val db: RepoDatabase) {
         set(value) = addEtagRaw(RepoEtag(0, value))
         get() = etagRaw()?.key.orEmpty()
 
-    fun clear() = db.clearAllTables()
+    suspend fun clear() = withContext(Dispatchers.IO) { db.clearAllTables() }
 
     @Query("SELECT * FROM repos ORDER BY last_update DESC")
     protected abstract fun getReposDateOrder(): List<Repo>

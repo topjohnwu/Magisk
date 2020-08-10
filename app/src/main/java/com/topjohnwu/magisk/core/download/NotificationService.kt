@@ -5,6 +5,9 @@ import android.content.Intent
 import android.os.IBinder
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.view.Notifications
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import org.koin.core.KoinComponent
 import java.util.*
 import kotlin.collections.HashMap
@@ -16,10 +19,17 @@ abstract class NotificationService : BaseService(), KoinComponent {
 
     private val notifications = Collections.synchronizedMap(HashMap<Int, Notification.Builder>())
 
+    val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         notifications.forEach { cancel(it.key) }
         notifications.clear()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        coroutineScope.cancel()
     }
 
     abstract fun createNotification(): Notification.Builder

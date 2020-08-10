@@ -2,10 +2,12 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <vector>
+#include <libgen.h>
 
 #include <magisk.hpp>
 #include <magiskpolicy.hpp>
 #include <utils.hpp>
+#include <socket.hpp>
 
 #include "init.hpp"
 #include "magiskrc.inc"
@@ -18,23 +20,11 @@
 
 using namespace std;
 
-static void patch_socket_name(const char *path) {
-	char *buf;
-	size_t size;
-	mmap_rw(path, buf, size);
-	for (int i = 0; i < size; ++i) {
-		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
-			gen_rand_str(buf + i, 16);
-			i += sizeof(MAIN_SOCKET);
-		}
-	}
-	munmap(buf, size);
-}
+static vector<string> rc_list;
 
-static vector<raw_data> rc_list;
-
-static void patch_init_rc(FILE *rc) {
-	file_readline("/init.rc", [=](string_view line) -> bool {
+static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir) {
+	FILE *rc = xfopen(dest, "we");
+	file_readline(src, [=](string_view line) -> bool {
 		// Do not start vaultkeeper
 		if (str_contains(line, "start vaultkeeper")) {
 			LOGD("Remove vaultkeeper\n");
@@ -54,8 +44,11 @@ static void patch_init_rc(FILE *rc) {
 	fprintf(rc, "\n");
 
 	// Inject custom rc scripts
-	for (auto &d : rc_list)
-		fprintf(rc, "\n%s\n", d.buf);
+	for (auto &script : rc_list) {
+		// Replace template arguments of rc scripts with dynamic paths
+		replace_all(script, "${MAGISKTMP}", tmp_dir);
+		fprintf(rc, "\n%s\n", script.data());
+	}
 	rc_list.clear();
 
 	// Inject Magisk rc scripts
@@ -64,114 +57,115 @@ static void patch_init_rc(FILE *rc) {
 	gen_rand_str(ls_svc, sizeof(ls_svc));
 	gen_rand_str(bc_svc, sizeof(bc_svc));
 	LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
-	fprintf(rc, magiskrc, pfd_svc, pfd_svc, ls_svc, bc_svc, bc_svc);
+	fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc, bc_svc);
+
+	fclose(rc);
+	clone_attr(src, dest);
 }
 
-static void load_overlay_rc(int dirfd) {
+static void load_overlay_rc(const char *overlay) {
+	auto dir = open_dir(overlay);
+	if (!dir) return;
+
+	int dfd = dirfd(dir.get());
 	// Do not allow overwrite init.rc
-	unlinkat(dirfd, "init.rc", 0);
-	DIR *dir = fdopendir(dirfd);
-	for (dirent *entry; (entry = readdir(dir));) {
+	unlinkat(dfd, "init.rc", 0);
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (strend(entry->d_name, ".rc") == 0) {
 			LOGD("Found rc script [%s]\n", entry->d_name);
-			int rc = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			raw_data data;
-			fd_full_read(rc, data.buf, data.sz);
+			int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			rc_list.push_back(fd_full_read(rc));
 			close(rc);
-			rc_list.push_back(std::move(data));
-			unlinkat(dirfd, entry->d_name, 0);
+			unlinkat(dfd, entry->d_name, 0);
 		}
 	}
-	rewinddir(dir);
+}
+
+int raw_data_patch(void *addr, size_t sz, str_pairs list) {
+	int count = 0;
+	for (uint8_t *p = (uint8_t *)addr, *eof = (uint8_t *)addr + sz; p < eof; ++p) {
+		for (auto &[from, to] : list) {
+			if (memcmp(p, from.data(), from.length() + 1) == 0) {
+				LOGD("Replace [%s] -> [%s]\n", from.data(), to.data());
+				memset(p, 0, from.length());
+				memcpy(p, to.data(), to.length());
+				++count;
+				p += from.length();
+			}
+		}
+	}
+	return count;
 }
 
 void RootFSInit::setup_rootfs() {
-	if (patch_sepolicy()) {
+	if (patch_sepolicy("/sepolicy")) {
 		char *addr;
 		size_t size;
 		mmap_rw("/init", addr, size);
-		for (char *p = addr; p < addr + size; ++p) {
-			if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
-				// Force init to load /sepolicy
-				LOGD("Remove from init: " SPLIT_PLAT_CIL "\n");
-				memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
-				break;
-			}
-		}
+		raw_data_patch(addr, size, {make_pair(SPLIT_PLAT_CIL, "xxx")});
 		munmap(addr, size);
 	}
 
 	// Handle overlays
-	int fd = open("/overlay.d", O_RDONLY | O_CLOEXEC);
-	if (fd >= 0) {
+	if (access("/overlay.d", F_OK) == 0) {
 		LOGD("Merge overlay.d\n");
-		load_overlay_rc(fd);
-		mv_dir(fd, root);
-		close(fd);
-		rmdir("/overlay.d");
+		load_overlay_rc("/overlay.d");
+		mv_path("/overlay.d", "/");
 	}
 
-	// Patch init.rc
-	FILE *rc = xfopen("/init.p.rc", "we");
-	patch_init_rc(rc);
-	fclose(rc);
-	clone_attr("/init.rc", "/init.p.rc");
+	patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
 	rename("/init.p.rc", "/init.rc");
 
 	// Create hardlink mirror of /sbin to /root
 	mkdir("/root", 0750);
 	clone_attr("/sbin", "/root");
-	int rootdir = xopen("/root", O_RDONLY | O_CLOEXEC);
-	int sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	link_dir(sbin, rootdir);
-	close(sbin);
+	link_path("/sbin", "/root");
 
 	// Dump magiskinit as magisk
-	fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+	int fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
 	write(fd, self.buf, self.sz);
 	close(fd);
 }
 
 bool MagiskInit::patch_sepolicy(const char *file) {
 	bool patch_init = false;
+	sepolicy *sepol = nullptr;
 
 	if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
 		LOGD("sepol: split policy\n");
 		patch_init = true;
 	} else if (access("/sepolicy", R_OK) == 0) {
 		LOGD("sepol: monolithic policy\n");
-		load_policydb("/sepolicy");
+		sepol = sepolicy::from_file("/sepolicy");
 	} else {
 		LOGD("sepol: no selinux\n");
 		return false;
 	}
 
-	// Mount selinuxfs to communicate with kernel
-	xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
-	mount_list.emplace_back(SELINUX_MNT);
+	if (access(SELINUX_VERSION, F_OK) != 0) {
+		// Mount selinuxfs to communicate with kernel
+		xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+		mount_list.emplace_back(SELINUX_MNT);
+	}
 
 	if (patch_init)
-		load_split_cil();
+		sepol = sepolicy::from_split();
 
-	sepol_magisk_rules();
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
+	sepol->magisk_rules();
 
 	// Custom rules
-	if (auto dir = xopen_dir(persist_dir); dir) {
-		char path[4096];
+	if (auto dir = open_dir(persist_dir.data()); dir) {
 		for (dirent *entry; (entry = xreaddir(dir.get()));) {
-			if (entry->d_name == "."sv || entry->d_name == ".."sv)
-				continue;
-			snprintf(path, sizeof(path), "%s/%s/sepolicy.rule", persist_dir, entry->d_name);
-			if (access(path, R_OK) == 0) {
-				LOGD("Loading custom sepolicy patch: %s\n", path);
-				load_rule_file(path);
+			auto rule = persist_dir + "/" + entry->d_name + "/sepolicy.rule";
+			if (access(rule.data(), R_OK) == 0) {
+				LOGD("Loading custom sepolicy patch: %s\n", rule.data());
+				sepol->load_rule_file(rule.data());
 			}
 		}
 	}
 
-	dump_policydb(file);
-	destroy_policydb();
+	sepol->to_file(file);
+	delete sepol;
 
 	// Remove OnePlus stupid debug sepolicy and use our own
 	if (access("/sepolicy_debug", F_OK) == 0) {
@@ -182,37 +176,11 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 	return patch_init;
 }
 
-static void sbin_overlay(const raw_data &self, const raw_data &config) {
-	mount_sbin();
-
-	// Dump binaries
-	xmkdir(MAGISKTMP, 0755);
-	int fd = xopen(MAGISKTMP "/config", O_WRONLY | O_CREAT, 0000);
-	xwrite(fd, config.buf, config.sz);
-	close(fd);
-	fd = xopen("/sbin/magiskinit", O_WRONLY | O_CREAT, 0755);
-	xwrite(fd, self.buf, self.sz);
-	close(fd);
-	dump_magisk("/sbin/magisk", 0755);
-	patch_socket_name("/sbin/magisk");
-
-	// Create applet symlinks
-	char path[64];
-	for (int i = 0; applet_names[i]; ++i) {
-		sprintf(path, "/sbin/%s", applet_names[i]);
-		xsymlink("./magisk", path);
-	}
-	xsymlink("./magiskinit", "/sbin/magiskpolicy");
-	xsymlink("./magiskinit", "/sbin/supolicy");
-}
-
 static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 	auto dp = xopen_dir(mirror);
 	int src = dirfd(dp.get());
 	char buf[4096];
 	for (dirent *entry; (entry = xreaddir(dp.get()));) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
 		string sbin_path = "/sbin/"s + entry->d_name;
 		struct stat st;
 		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
@@ -237,19 +205,11 @@ static void recreate_sbin(const char *mirror, bool use_bind_mount) {
 	}
 }
 
-#define ROOTMIR MIRRDIR "/system_root"
-#define ROOTBLK BLOCKDIR "/system_root"
-#define MONOPOLICY  "/sepolicy"
-#define PATCHPOLICY "/sbin/.se"
-#define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
-
 static string magic_mount_list;
 
 static void magic_mount(const string &sdir, const string &ddir = "") {
 	auto dir = xopen_dir(sdir.data());
-	for (dirent *entry; (entry = readdir(dir.get()));) {
-		if (entry->d_name == "."sv || entry->d_name == ".."sv)
-			continue;
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		string src = sdir + "/" + entry->d_name;
 		string dest = ddir + "/" + entry->d_name;
 		if (access(dest.data(), F_OK) == 0) {
@@ -266,186 +226,116 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 	}
 }
 
+#define ROOTMIR     MIRRDIR "/system_root"
+#define ROOTBLK     BLOCKDIR "/system_root"
+#define MONOPOLICY  "/sepolicy"
+#define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
+#define NEW_INITRC  "/system/etc/init/hw/init.rc"
+
 void SARBase::patch_rootdir() {
-	sbin_overlay(self, config);
+	char tmp_dir[16];
+	const char *sepol;
+
+	char *p;
+	if (access("/sbin", F_OK) == 0) {
+		p = tmp_dir + sprintf(tmp_dir, "%s", "/sbin");
+		sepol = "/sbin/.se";
+	} else {
+		p = tmp_dir + sprintf(tmp_dir, "%s", "/dev/");
+		p += gen_rand_str(p, 8);
+		xmkdir(tmp_dir, 0);
+		sepol = "/dev/.se";
+	}
+
+	setup_tmp(tmp_dir, self, config);
+	persist_dir = MIRRDIR "/persist/magisk";
+
+	chdir(tmp_dir);
 
 	// Mount system_root mirror
+	struct stat st;
+	xstat("/", &st);
 	xmkdir(ROOTMIR, 0755);
-	mknod(ROOTBLK, S_IFBLK | 0600, system_dev);
-	if (xmount(ROOTBLK, ROOTMIR, "ext4", MS_RDONLY, nullptr))
-		xmount(ROOTBLK, ROOTMIR, "erofs", MS_RDONLY, nullptr);
+	mknod(ROOTBLK, S_IFBLK | 0600, st.st_dev);
+	strcpy(p, "/" ROOTBLK);
+	if (xmount(tmp_dir, ROOTMIR, "ext4", MS_RDONLY, nullptr))
+		xmount(tmp_dir, ROOTMIR, "erofs", MS_RDONLY, nullptr);
+	*p = '\0';
 
-	// Recreate original sbin structure
-	recreate_sbin(ROOTMIR "/sbin", true);
+	// Recreate original sbin structure if necessary
+	if (tmp_dir == "/sbin"sv)
+		recreate_sbin(ROOTMIR "/sbin", true);
 
 	// Patch init
 	raw_data init;
-	file_attr attr;
-	bool redirect = false;
 	int src = xopen("/init", O_RDONLY | O_CLOEXEC);
 	fd_full_read(src, init.buf, init.sz);
-	fgetattr(src, &attr);
-	close(src);
-	uint8_t *eof = init.buf + init.sz;
-	for (uint8_t *p = init.buf; p < eof; ++p) {
-		if (memcmp(p, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL)) == 0) {
-			// Force init to load monolithic policy
-			LOGD("Remove from init: " SPLIT_PLAT_CIL "\n");
-			memset(p, 'x', sizeof(SPLIT_PLAT_CIL) - 1);
-			p += sizeof(SPLIT_PLAT_CIL) - 1;
-		} else if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
-			// Redirect /sepolicy to tmpfs
-			LOGD("Patch init [" MONOPOLICY "] -> [" PATCHPOLICY "]\n");
-			memcpy(p, PATCHPOLICY, sizeof(PATCHPOLICY));
-			redirect = true;
-			p += sizeof(MONOPOLICY) - 1;
-		}
-	}
+	int patch_count = raw_data_patch(init.buf, init.sz, {
+		make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
+		make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
+	});
 	xmkdir(ROOTOVL, 0);
-	int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC);
+	int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC, 0);
 	xwrite(dest, init.buf, init.sz);
-	fsetattr(dest, &attr);
+	fclone_attr(src, dest);
+	close(src);
 	close(dest);
 
-	// Patch libselinux
-	if (!redirect) {
-		raw_data lib;
+	if (patch_count != 2 && access(LIBSELINUX, F_OK) == 0) {
 		// init is dynamically linked, need to patch libselinux
+		raw_data lib;
 		full_read(LIBSELINUX, lib.buf, lib.sz);
-		getattr(LIBSELINUX, &attr);
-		eof = lib.buf + lib.sz;
-		for (uint8_t *p = lib.buf; p < eof; ++p) {
-			if (memcmp(p, MONOPOLICY, sizeof(MONOPOLICY)) == 0) {
-				// Redirect /sepolicy to tmpfs
-				LOGD("Patch libselinux.so [" MONOPOLICY "] -> [" PATCHPOLICY "]\n");
-				memcpy(p, PATCHPOLICY, sizeof(PATCHPOLICY));
-				break;
-			}
-		}
-		xmkdir(ROOTOVL "/system", 0755);
-		xmkdir(ROOTOVL "/system/" LIBNAME, 0755);
-		dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC);
+		raw_data_patch(lib.buf, lib.sz, {make_pair(MONOPOLICY, sepol)});
+		xmkdirs(dirname(ROOTOVL LIBSELINUX), 0755);
+		dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
 		xwrite(dest, lib.buf, lib.sz);
-		fsetattr(dest, &attr);
 		close(dest);
+		clone_attr(LIBSELINUX, ROOTOVL LIBSELINUX);
 	}
 
 	// sepolicy
-	patch_sepolicy(PATCHPOLICY);
+	patch_sepolicy(sepol);
 
-	// Handle overlay
-	if ((src = xopen("/dev/overlay.d", O_RDONLY | O_CLOEXEC)) >= 0) {
-		load_overlay_rc(src);
-		if (int fd = xopen("/dev/overlay.d/sbin", O_RDONLY | O_CLOEXEC); fd >= 0) {
-			dest = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-			clone_dir(fd, dest);
-			close(fd);
-			close(dest);
-			xmkdir(ROOTOVL "/sbin", 0);  // Prevent copying
-		}
-		dest = xopen(ROOTOVL, O_RDONLY | O_CLOEXEC);
-		clone_dir(src, dest, false);
-		rmdir(ROOTOVL "/sbin");
-		close(src);
-		close(dest);
-		rm_rf("/dev/overlay.d");
+	// Restore backup files
+	struct sockaddr_un sun;
+	int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	if (connect(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET)) == 0) {
+		LOGD("ACK init daemon to write backup files\n");
+		// Let daemon know where tmp_dir is
+		write_string(sockfd, tmp_dir);
+		// Wait for daemon to finish restoring files
+		int ack;
+		read(sockfd, &ack, sizeof(ack));
+	} else {
+		LOGD("Restore backup files locally\n");
+		restore_folder(ROOTOVL, overlays);
+		overlays.clear();
+	}
+	close(sockfd);
+
+	// Handle overlay.d
+	load_overlay_rc(ROOTOVL);
+	if (access(ROOTOVL "/sbin", F_OK) == 0) {
+		// Move files in overlay.d/sbin into tmp_dir
+		mv_path(ROOTOVL "/sbin", ".");
 	}
 
 	// Patch init.rc
-	FILE *rc = xfopen(ROOTOVL "/init.rc", "we");
-	patch_init_rc(rc);
-	fclose(rc);
-	clone_attr("/init.rc", ROOTOVL "/init.rc");
+	if (access("/init.rc", F_OK) == 0) {
+		patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir);
+	} else {
+		// Android 11's new init.rc
+		xmkdirs(dirname(ROOTOVL NEW_INITRC), 0755);
+		patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir);
+	}
 
 	// Mount rootdir
 	magic_mount(ROOTOVL);
-	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC);
+	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC, 0);
 	write(dest, magic_mount_list.data(), magic_mount_list.length());
 	close(dest);
-}
 
-static void patch_fstab(const string &fstab) {
-	string patched = fstab + ".p";
-	FILE *fp = xfopen(patched.data(), "we");
-	file_readline(fstab.data(), [=](string_view l) -> bool {
-		if (l[0] == '#' || l.length() == 1)
-			return true;
-		char *line = (char *) l.data();
-		int src0, src1, mnt0, mnt1, type0, type1, opt0, opt1, flag0, flag1;
-		sscanf(line, "%n%*s%n %n%*s%n %n%*s%n %n%*s%n %n%*s%n",
-			   &src0, &src1, &mnt0, &mnt1, &type0, &type1, &opt0, &opt1, &flag0, &flag1);
-		const char *src, *mnt, *type, *opt, *flag;
-		src = &line[src0];
-		line[src1] = '\0';
-		mnt = &line[mnt0];
-		line[mnt1] = '\0';
-		type = &line[type0];
-		line[type1] = '\0';
-		opt = &line[opt0];
-		line[opt1] = '\0';
-		flag = &line[flag0];
-		line[flag1] = '\0';
-
-		// Redirect system to system_root
-		if (mnt == "/system"sv)
-			mnt = "/system_root";
-
-		fprintf(fp, "%s %s %s %s %s\n", src, mnt, type, opt, flag);
-		return true;
-	});
-	fclose(fp);
-
-	// Replace old fstab
-	clone_attr(fstab.data(), patched.data());
-	rename(patched.data(), fstab.data());
-}
-
-#define FSR "/first_stage_ramdisk"
-
-void ABFirstStageInit::prepare() {
-	// It is actually possible to NOT have FSR, create it just in case
-	xmkdir(FSR, 0755);
-
-	if (auto dir = xopen_dir(FSR); dir) {
-		string fstab(FSR "/");
-		for (dirent *de; (de = xreaddir(dir.get()));) {
-			if (strstr(de->d_name, "fstab")) {
-				fstab += de->d_name;
-				break;
-			}
-		}
-		if (fstab.length() == sizeof(FSR))
-			return;
-
-		patch_fstab(fstab);
-	} else {
-		return;
-	}
-
-	// Move stuffs for next stage
-	xmkdir(FSR "/system", 0755);
-	xmkdir(FSR "/system/bin", 0755);
-	rename("/init", FSR "/system/bin/init");
-	symlink("/system/bin/init", FSR "/init");
-	xmkdir(FSR "/.backup", 0);
-	rename("/.backup/.magisk", FSR "/.backup/.magisk");
-	rename("/overlay.d", FSR "/overlay.d");
-}
-
-void AFirstStageInit::prepare() {
-	auto dir = xopen_dir("/");
-	for (dirent *de; (de = xreaddir(dir.get()));) {
-		if (strstr(de->d_name, "fstab")) {
-			patch_fstab(de->d_name);
-			break;
-		}
-	}
-
-	// Move stuffs for next stage
-	xmkdir("/system", 0755);
-	xmkdir("/system/bin", 0755);
-	rename("/init", "/system/bin/init");
-	rename("/.backup/init", "/init");
+	chdir("/");
 }
 
 int magisk_proxy_main(int argc, char *argv[]) {
@@ -462,7 +352,7 @@ int magisk_proxy_main(int argc, char *argv[]) {
 	unlink("/sbin/magisk");
 	rm_rf("/.backup");
 
-	sbin_overlay(self, config);
+	setup_tmp("/sbin", self, config);
 
 	// Create symlinks pointing back to /root
 	recreate_sbin("/root", false);

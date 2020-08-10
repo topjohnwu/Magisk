@@ -1,30 +1,26 @@
 package com.topjohnwu.magisk.core
 
-import com.github.pwittchen.reactivenetwork.library.rx2.ReactiveNetwork
-import com.topjohnwu.magisk.BuildConfig
+import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.core.net.NetworkObserver
+import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.utils.CachedValue
-import com.topjohnwu.magisk.utils.KObservableField
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.FileInputStream
 import java.io.IOException
 
 val isRunningAsStub get() = Info.stub != null
-val isCanaryVersion = !BuildConfig.VERSION_NAME.contains(".")
 
 object Info {
 
     val envRef = CachedValue { loadState() }
 
-    @JvmStatic
-    val env by envRef              // Local
+    @JvmStatic val env by envRef              // Local
+    @JvmStatic var stub: DynAPK.Data? = null  // Stub
     var remote = UpdateInfo()      // Remote
-    @JvmStatic
-    var stub: DynAPK.Data? = null  // Stub
 
     // Toggle-able options
     @JvmStatic var keepVerity = false
@@ -35,13 +31,13 @@ object Info {
     @JvmStatic var isSAR = false
     @JvmStatic var isAB = false
     @JvmStatic var ramdisk = false
+    @JvmStatic var hasGMS = true
 
     val isConnected by lazy {
-        KObservableField(false).also { field ->
-            ReactiveNetwork.observeNetworkConnectivity(get())
-                .subscribeK {
-                    field.value = it.available()
-                }
+        ObservableBoolean(false).also { field ->
+            NetworkObserver.observe(get()) {
+                UiThreadHandler.run { field.set(it.isAvailable) }
+            }
         }
     }
 

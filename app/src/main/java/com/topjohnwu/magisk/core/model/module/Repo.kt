@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.StringRepository
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.legalFilename
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.legalFilename
 import kotlinx.android.parcel.Parcelize
 import java.text.DateFormat
 import java.util.*
@@ -31,22 +31,15 @@ data class Repo(
 
     val downloadFilename: String get() = "$name-$version($versionCode).zip".legalFilename()
 
-    val readme get() = stringRepo.getReadme(this)
+    suspend fun readme() = stringRepo.getReadme(this)
 
     val zipUrl: String get() = Const.Url.ZIP_URL.format(id)
 
     constructor(id: String) : this(id, "", "", "", -1, "", 0)
 
     @Throws(IllegalRepoException::class)
-    fun update() {
-        val props = runCatching {
-            stringRepo.getMetadata(this).blockingGet()
-                    .orEmpty().split("\\n".toRegex()).dropLastWhile { it.isEmpty() }
-        }.getOrElse {
-            throw IllegalRepoException("Repo [$id] module.prop download error: " + it.message)
-        }
-
-        props.runCatching {
+    private fun loadProps(props: String) {
+        props.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }.runCatching {
             parseProps(this)
         }.onFailure {
             throw IllegalRepoException("Repo [$id] parse error: " + it.message)
@@ -58,9 +51,9 @@ data class Repo(
     }
 
     @Throws(IllegalRepoException::class)
-    fun update(lastUpdate: Date) {
-        last_update = lastUpdate.time
-        update()
+    suspend fun update(lastUpdate: Date? = null) {
+        lastUpdate?.let { last_update = it.time }
+        loadProps(stringRepo.getMetadata(this))
     }
 
     class IllegalRepoException(message: String) : Exception(message)

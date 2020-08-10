@@ -7,9 +7,10 @@ class StringRepository(
     private val api: GithubRawServices
 ) {
 
-    fun getString(url: String) = api.fetchString(url)
+    suspend fun getString(url: String) = api.fetchString(url)
 
-    fun getMetadata(repo: Repo) = api.fetchModuleInfo(repo.id, "module.prop")
+    suspend fun getMetadata(repo: Repo) = api.fetchModuleFile(repo.id, "module.prop")
 
-    fun getReadme(repo: Repo) = api.fetchModuleInfo(repo.id, "README.md")
+    suspend fun getReadme(repo: Repo) = api.fetchModuleFile(repo.id, "README.md")
+
 }

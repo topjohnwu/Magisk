@@ -68,5 +68,5 @@ struct su_context {
 
 void app_log(const su_context &ctx);
 void app_notify(const su_context &ctx);
-void app_socket(const char *socket, const std::shared_ptr<su_info> &info);
+int app_socket(const char *name, const std::shared_ptr<su_info> &info);
 void socket_send_request(int fd, const std::shared_ptr<su_info> &info);

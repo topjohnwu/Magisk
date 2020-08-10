@@ -57,9 +57,9 @@ static void (*android_update_LD_LIBRARY_PATH)(const char *ld_library_path);
 }
 
 #ifdef __LP64__
-constexpr char apex_path[] = "/apex/com.android.runtime/lib64:";
+constexpr char apex_path[] = "/apex/com.android.runtime/lib64:/apex/com.android.art/lib64:";
 #else
-constexpr char apex_path[] = "/apex/com.android.runtime/lib:";
+constexpr char apex_path[] = "/apex/com.android.runtime/lib:/apex/com.android.art/lib:";
 #endif
 
 static int dl_init = 0;

@@ -6,11 +6,11 @@ import android.graphics.drawable.Drawable
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.DrawableRes
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
@@ -21,12 +21,9 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.extensions.replaceRandomWithSpecial
-import com.topjohnwu.magisk.extensions.subscribeK
+import com.topjohnwu.magisk.ktx.replaceRandomWithSpecial
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
 import kotlin.math.roundToInt
 
 
@@ -36,20 +33,21 @@ fun setOnNavigationClickedListener(view: Toolbar, listener: View.OnClickListener
 }
 
 @BindingAdapter("srcCompat")
-fun setImageResource(view: AppCompatImageView, @DrawableRes resId: Int) {
+fun setImageResource(view: ImageView, @DrawableRes resId: Int) {
     view.setImageResource(resId)
 }
 
 @BindingAdapter("movieBehavior", "movieBehaviorText")
 fun setMovieBehavior(view: TextView, isMovieBehavior: Boolean, text: String) {
-    (view.tag as? Disposable)?.dispose()
+    (view.tag as? Job)?.cancel()
+    view.tag = null
     if (isMovieBehavior) {
-        val observer = Observable
-            .interval(150, TimeUnit.MILLISECONDS)
-            .subscribeK {
+        view.tag = GlobalScope.launch(Dispatchers.Main.immediate) {
+            while (true) {
+                delay(150)
                 view.text = text.replaceRandomWithSpecial()
             }
-        view.tag = observer
+        }
     } else {
         view.text = text
     }

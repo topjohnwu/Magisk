@@ -13,7 +13,6 @@
 #include <lz4frame.h>
 #include <lz4hc.h>
 
-#include <logging.hpp>
 #include <utils.hpp>
 
 #include "magiskboot.hpp"

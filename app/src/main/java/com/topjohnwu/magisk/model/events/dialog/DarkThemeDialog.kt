@@ -42,7 +42,7 @@ class DarkThemeDialog : DialogEvent(), ActivityExecutor {
     }
 
     private fun selectTheme(mode: Int) {
-        Config.darkThemeExtended = mode
+        Config.darkTheme = mode
         activity?.get()?.recreate()
     }
 

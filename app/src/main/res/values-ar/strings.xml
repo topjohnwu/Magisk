@@ -1,121 +1,180 @@
-<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <resources>
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">الإضافات</string>
-    <string name="superuser">المستخدم المتميز</string>
-    <string name="logs">السجل</string>
+    <string name="superuser">صلاحية الروت</string>
+    <string name="logs">السجلات</string>
     <string name="settings">الإعدادات</string>
-    <string name="install">التثبيت</string>
-    <string name="unsupport_magisk_title">إصدار Magisk غير مدعوم</string>
+    <string name="refresh">تحديث البيانات المحلية</string>
+    <string name="install">تثبيت</string>
+    <string name="section_home">الأساسي</string>
+    <string name="section_theme">السِمات</string>
+    <string name="safetynet">SafetyNet</string>
 
-    <!--Status Fragment-->
-    <string name="invalid_update_channel">قناة تحديث غير صالحة</string>
-    <string name="safetynet_api_error">خطأ SafetyNet API</string>
-    <string name="safetynet_res_invalid">رد غير صالح</string>
-    <string name="keep_force_encryption">إبقاء التشفير بقوة</string>
-    <string name="keep_dm_verity">إبقاء AVB 2.0/dm-verity</string>
-    <string name="recovery_mode">نمط الاستعادة</string>
+    <!--Home-->
+    <string name="no_connection">لا يوجد إتصال</string>
+    <string name="app_changelog">تفاصيل التحديث</string>
+    <string name="manager">المدير</string>
+    <string name="loading">جارٍ التحميل...</string>
+    <string name="info">معلومات</string>
     <string name="uninstall">إلغاء التثبيت</string>
-    <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
-    <string name="uninstall_magisk_msg">ستُعطل/ستُحذف جميع الإضافات. سيُحذف الروت ، وربما ستشفر بياناتك إذا لم تكن غير مشفرة حالياً.</string>
     <string name="update">تحديث</string>
+    <string name="not_available">غير/متوفر</string>
+    <string name="hide">إخفاء</string>
+    <string name="status">الحالة</string>
+    <string name="home_package">الحزمة</string>
+    <string name="details">التفاصيل</string>
+
+    <string name="home_notice_content">تأكد دوما أنك تستعمل إصدار ماجسيك رسمي، التطبيقات المثبتة من الجهات الخارجية ستسبب لك أضراراً</string>
+    <string name="home_support_title">تبرع لنا</string>
+    <string name="home_links_project">روابط المشروع</string>
+    <string name="home_item_source">الكود المصدري للتطبيق</string>
+    <string name="home_support_content">مـاجـيسك هي، وستظل دوماً، مجانيةً و مفتوحة المصدر، اظهر اهتمامك لنا لكي نبقيها هكذا بدعم مالي صغير</string>
+    <string name="home_device_title">الجهاز</string>
+    <string name="home_device_extra_manufacturer">الشركة</string>
+    <string name="home_device_extra_model">الموديل</string>
+    <string name="home_device_extra_board">اللوحة</string>
+    <string name="home_device_system">النظـام</string>
+    <string name="home_status_normal"> الوضـع الطبيعي</string>
+    <string name="home_status_safe">الوضـع الآمن</string>
+    <string name="home_status_stub"> وضـع STUB</string>
+    <string name="home_installed_version">تم التثبيت</string>
+    <string name="home_latest_version">آخر إصدار</string>
+    <string name="invalid_update_channel">مصدر التحديث غير صالح</string>
+    <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
+    <string name="uninstall_magisk_msg">ستُعطل/ستُحذف جميع الإضافات. سيُحذف الروت، وربما ستشفر بياناتك إذا لم تكن غير مشفرة حالياً.</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">فرض التشفير الإجباري</string>
+    <string name="keep_dm_verity">فرض تشفيرات AVB2.0/dm-verity</string>
+    <string name="recovery_mode">وضـع الريكفري</string>
+    <string name="install_options_title">الخيارات</string>
+    <string name="install_method_title">الطريقة</string>
+    <string name="install_next">التالي</string>
+    <string name="install_start">هيا، بنا</string>
+    <string name="manager_download_install">اضغط للتنزيل و التثبيت</string>
+    <string name="download_zip_only">تحميل Zip فقط</string>
+    <string name="direct_install">تثبيت مباشر (موصى بها)</string>
+    <string name="install_inactive_slot">التثبيت على المنطقة الغير نشطة (بعد OTA)</string>
+    <string name="install_inactive_slot_msg">سيُجبر جهازك للاقلاع على المنطقة الغير النشطة بعد إعادة التشغيل!\n استخدم هذا الخيار فقط بعد الانتهاء من OTA. استمرار؟</string>
+    <string name="setup_title">إعدادات إضافية</string>
+    <string name="select_patch_file">حدد و عدل ملفاً</string>
+    <string name="patch_file_msg">اختر ملف (*.img) أو ملف odin (*.tar)</string>
+    <string name="reboot_delay_toast">إعادة التشغيل بعد ٥ ثواني…</string>
+    <string name="flash_screen_title">التثبيت</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">طلبات صلاحية الروت</string>
+    <string name="deny">رفض</string>
+    <string name="prompt">طلب</string>
+    <string name="grant">سماح</string>
+    <string name="su_warning">يمنح حق الوصول الكامل إلى جهازك. ارفض إذا كنت غير متأكد!</string>
+    <string name="forever">للأبد</string>
+    <string name="once">مرة واحدة</string>
+    <string name="tenmin">10 دقائق</string>
+    <string name="twentymin">20 دقيقة</string>
+    <string name="thirtymin">30 دقيقة</string>
+    <string name="sixtymin">60 دقيقة</string>
+    <string name="su_allow_toast">تم منح صلاحيات الروت لـ%1$s</string>
+    <string name="su_deny_toast">تم رفض صلاحيات الروت لـ%1$s </string>
+    <string name="no_apps_found">لا توجد تطبيقات</string>
+    <string name="su_snack_grant">تم منح صلاحيات الروت لـ%1$s</string>
+    <string name="su_snack_deny">تم رفض صلاحيات الروت لـ%1$s</string>
+    <string name="su_snack_notif_on">تم تفعيل الإشعارات لـ%1$s</string>
+    <string name="su_snack_notif_off">تم تعطيل الإشعارات لـ%1$s</string>
+    <string name="su_snack_log_on">تم تفعيل السجلات لـ%1$s</string>
+    <string name="su_snack_log_off">تم تعطيل السجلات لـ%1$s</string>
+    <string name="su_revoke_title">منع؟</string>
+    <string name="su_revoke_msg">هل تريد منع صلاحية %1$s?</string>
+    <string name="toast">اشعار</string>
+    <string name="none">بدون</string>
+
+    <string name="superuser_toggle_notification">الإشعارات</string>
+    <string name="superuser_toggle_revoke">منع</string>
+    <string name="superuser_policy_none">لم يسأل آية تطبيق لصلاحيات الروت</string>
+
+    <!--Logs-->
+    <string name="log_data_none">لا يوجد أية سجلات هنا :-:، حاول استعمال تطبيقات روت اكثر</string>
+    <string name="log_data_magisk_none">لا توجد أيةَ سجلات ⊙_⊙</string>
+    <string name="menuSaveLog">حفظ السجلات</string>
+    <string name="menuClearLog">حذف السجلات</string>
+    <string name="logs_cleared">تم الحذف بنجاح</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">UID: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetynet_api_error">خطأ في API الـSafetyNet</string>
+    <string name="safetynet_res_invalid">الرد غير صالح</string>
+    <string name="safetynet_attest_success">نجح الأمر!</string>
+    <string name="safetynet_attest_failure">فشل التوثيق</string>
+    <string name="safetynet_attest_loading">أعطني ثانية...</string>
+    <string name="safetynet_attest_restart">حاول من جديد</string>
+    <string name="safetynet_system">النظام</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">إظهار برامج النظام</string>
+    <string name="hide_filter_hint">البحث بالإسم</string>
+    <string name="hide_scroll_up">الذهاب للأعلى</string>
+    <string name="hide_filters">فلترة</string>
+    <string name="hide_search">ابحث</string>
 
     <!--Module Fragment-->
-    <string name="no_info_provided">(لم يتم توفير أي معلومات)</string>
-    <string name="no_modules_found">لم يعثر على أي إضافات</string>
-    <string name="reboot_recovery">إعادة التشغيل إلى نمط الاستعادة</string>
-    <string name="reboot_bootloader">إعادة التشغيل إلى نمط Bootloader</string>
-    <string name="reboot_download">إعادة التشغيل إلى نمط التحميل</string>
-    <string name="reboot_edl">إعادة التشغيل إلى نمط EDL</string>
+    <string name="no_info_provided">(لم توفر معلومات)</string>
+    <string name="no_modules_found">لا توجد أية إضافات</string>
+    <string name="reboot_recovery">إعادة التشغيل إلى Recovery</string>
+    <string name="reboot_bootloader">إعادة التشغيل إلى Bootloader</string>
+    <string name="reboot_download">إعادة التشغيل إلى وضـع Odin</string>
+    <string name="reboot_edl">إعادة التشغيل إلى وضـعية EDL</string>
+    <string name="module_safe_mode_message">لقد دخلت الوضـع الأمن.\nسيختفي الرسالة هذا عند إطفاء الوضـع الأمن</string>
+    <string name="module_version_author">%1$sبواسطة%2$s</string>
+    <string name="module_section_pending">التحديثات</string>
+    <string name="module_section_pending_action">تحديث الكل</string>
+    <string name="module_section_remote">السيرفر</string>
+    <string name="module_state_remove">إزالة </string>
+    <string name="module_state_restore">إسترجاع</string>
+    <string name="module_action_install_external">اختر من الذاكرة الداخلية</string>
+    <string name="module_update_none">الاضافات محدثة</string>
+    <string name="update_available">التحديث متوفر</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="sorting_order">تسلسل الترتيب</string>
+    <string name="external_rw_permission_denied">امنحني إذن الولوج للذاكرة الداخلية</string>
 
-    <!--Repo Fragment-->
-    <string name="update_available">يتوفر على تحديث</string>
-    <string name="home_installed_version">مثبت</string>
-    <string name="sorting_order">ترتيب الفرز</string>
-
-    <!--Log Fragment-->
-    <string name="menuSaveLog">حفظ السجل</string>
-    <string name="menuClearLog">حذف السجل الآن</string>
-    <string name="logs_cleared">حُذف السجل بنجاح</string>
-
-    <!--About Activity-->
-    <string name="app_changelog">تغييرات التطبيق</string>
-
-    <!-- System Components, Notifications -->
-    <string name="update_channel">تحديثات Magisk</string>
-    <string name="progress_channel">إشعارات التقدم</string>
-    <string name="download_complete">التنزيل انتهى</string>
-    <string name="download_file_error">خطأ تنزيل الملف</string>
-    <string name="download_open_parent">أظهر والد المجلد</string>
-    <string name="download_open_self">أظهر الملف</string>
-    <string name="magisk_update_title">تحديث Magisk جديد متوفر!</string>
-    <string name="manager_update_title">تحديث Magisk Manager جديد متوفر!</string>
-
-    <!-- Installation -->
-    <string name="manager_download_install">اضغط للتنزيل و التثبيت</string>
-    <string name="download_zip_only">تحميل ملف Zip فقط</string>
-    <string name="direct_install">تثبيت مباشر (موصى بها)</string>
-    <string name="install_inactive_slot">التثبيت على فتحة غير نشطة (بعد OTA)</string>
-    <string name="install_inactive_slot_msg">"سيُجبر جهازك للتشغيل على الفتحة غير النشطة الحالية بعد إعادة التشغيل! استخدم فقط هذا الخيار بعد الانتهاء من OTA. استمرار؟"</string>
-    <string name="setup_title">إعداد إضافي</string>
-    <string name="select_patch_file">اختر و رقع ملفا</string>
-    <string name="patch_file_msg">اختر ملفا خاما (*.img) أو ملف ODIN tarfile (*.tar)</string>
-    <string name="reboot_delay_toast">إعادة التشغيل خلال خمس ثواني…</string>
-
-    <!--Toasts, Dialogs-->
-    <string name="repo_install_title">تثبيت %1$s</string>
-    <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
-    <string name="download">التنزيل</string>
-    <string name="reboot">إعادة التشغيل</string>
-    <string name="settings_reboot_toast">إعادة التشغيل لتطبيق الإعدادات</string>
-    <string name="release_notes">ملاحظات الإصدار</string>
-    <string name="repo_cache_cleared">مُسحت الذاكرة المؤقتة للإضافة</string>
-
-    <string name="dtbo_patched_title">رُقع DTBO!</string>
-    <string name="dtbo_patched_reboot">رقع Magisk Manager الملف dtbo.img. يرجى إعادة التشغيل</string>
-    <string name="flashing">…تثبيت</string>
-    <string name="done">تم!</string>
-    <string name="failure">فشل</string>
-    <string name="hide_manager_title">إخفاء Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">فشل إخفاء Magisk Manager…</string>
-    <string name="open_link_failed_toast">لم يُعثر على تطبيق لفتح الرابط …</string>
-    <string name="complete_uninstall">إلغاء التثبيت بالكامل</string>
-    <string name="restore_img">استعادة الصور</string>
-    <string name="restore_img_msg">استعادة…</string>
-    <string name="restore_done">استُعيدت!</string>
-    <string name="restore_fail">النسخة الاحتياطية الأصلية غير موجودة!</string>
-    <string name="proprietary_title">تحميل شفرة المسجلة الملكية</string>
-    <string name="proprietary_notice">لا Magisk Manager برنامج FOSS ،و لا يحتوي على شفرة SafetyNet API الخاصة بشركة Google.\n\nهل تسمح لـ Magisk Manager بتحميل ملحق (يحتوي على GoogleApiClient) للفحص SafetyNet؟</string>
-    <string name="setup_fail">فشل الإعداد</string>
-    <string name="env_fix_title">يتطلب إعدادا إضافيا</string>
-    <string name="env_fix_msg">يحتاج جهازك إلى إعداد إضافي ليتسنى لـ Magisk بشكل صحيح. سينزل ملف Zip لتثبيت Magisk ، هل تريد المتابعة الآن؟</string>
-    <string name="setup_msg">تشغيل إعداد البيئة…</string>
-
-    <!--Settings Activity -->
+    <!--Settings -->
+    <string name="settings_dark_mode_title">وضـعية الِسمات</string>
+    <string name="settings_dark_mode_message">حدد الوضـع الذي يناسب ذوقك</string>
+    <string name="settings_dark_mode_light">الوضـع المضيء</string>
+    <string name="settings_dark_mode_system">اتبّع النظام</string>
+    <string name="settings_dark_mode_dark">وضـع الظلام</string>
+    <string name="settings_safe_mode_title">وضـع الآمن</string>
+    <string name="settings_core_only_summary" deprecated="true">تمكين الميزات الأساسية فقط، سيُشغل الإضافات روت ماجـيسك و اخفاء ماجـيسك فقط و لا غيرها.</string>
+    <string name="settings_grid_column_count_title">شكل فقاعات الأعدادات</string>
+    <string name="settings_grid_column_count_summary">ضبط توسعة الأزرار في اللوائح، أغلق التطبيق و افتحه لكي ينطبق التغييرات</string>
+    <string name="settings_grid_column_count_1">الافتراضي</string>
+    <string name="settings_grid_column_count_2">مُصَغَّر</string>
     <string name="settings_download_path_title">مسار التحميل</string>
     <string name="settings_download_path_message">ستحمل الملفات إلى %1$s</string>
     <string name="settings_clear_cache_title">حذف الذاكرة المؤقتة للإضافات</string>
-    <string name="settings_clear_cache_summary">حذف المعلومات المخزنة مؤقتا للإضافات المباشرة، هذا سيجبر التطبيق على التحديث عبر الانترنت</string>
-    <string name="settings_hide_manager_title">إخفاء Magisk Manager</string>
-    <string name="settings_hide_manager_summary">أعد حزم Magisk Manager مع اسم حزمة عشوائي</string>
-    <string name="settings_restore_manager_title">استعادة Magisk Manager</string>
-    <string name="settings_restore_manager_summary">استعادة Magisk Manager مع اسم الحزمة الأصلي</string>
+    <string name="settings_clear_cache_summary">حذف المعلومات المخزنة محليا، هذا سيجبر التطبيق على التحديث الإضافات عبر الانترنت</string>
+    <string name="settings_hide_manager_title">إخفاء مـاجـيسك Manager</string>
+    <string name="settings_hide_manager_summary">تغيير اسم حزمة التطبيق لتجنب الكشف</string>
+    <string name="settings_restore_manager_title">استعادة مـاجـيسك Manager</string>
+    <string name="settings_restore_manager_summary">استعادة مـاجـيسك Manager مع اسم الحزمة الأصلي</string>
     <string name="language">اللغة</string>
-    <string name="system_default">(النظام المبدئي)</string>
-    <string name="settings_check_update_title">تفقد التحديثات</string>
+    <string name="system_default">(الأفتراضي)</string>
+    <string name="settings_check_update_title">تحقق من التحديثات</string>
     <string name="settings_check_update_summary">التحقق من التحديثات في الخلفية بشكل دوري</string>
-    <string name="settings_update_channel_title">قناة التحديث</string>
+    <string name="settings_update_channel_title">مصدر التحديثات</string>
     <string name="settings_update_stable">مستقر</string>
-    <string name="settings_update_beta">بيتا</string>
+    <string name="settings_update_beta">تجريبي</string>
     <string name="settings_update_custom">مخصص</string>
-    <string name="settings_update_custom_msg">أدخل عنوانا URL مخصصا</string>
-    <string name="settings_core_only_summary">تمكين الميزات الأساسية فقط، سيُشغل الإضافات MagiskSU و MagiskHide فقط و لا غيرها.</string>
-    <string name="settings_magiskhide_summary">إخفاء Magisk من شتى طرق الاكتشاف</string>
-    <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless hosts يدعم تطبيقات حجب الإعلانات</string>
-    <string name="settings_hosts_toast">مُكنت إضافة Systemless hosts</string>
-
+    <string name="settings_update_custom_msg">أدخل الرابط لمصدرك المخصص</string>
+    <string name="settings_magiskhide_summary">إخفاء مـاجـيسك من معظم طرق الاكتشاف</string>
+    <string name="settings_hosts_title">موانع الاعلانات</string>
+    <string name="settings_hosts_summary">حجب الاعلانات دون تعديل النظام</string>
+    <string name="settings_hosts_toast">تم تمكين خاصية حجب الاعلانات</string>
+    <string name="settings_app_name_hint">الإسم الجديد</string>
+    <string name="settings_app_name_helper">التطبيق الجديد سوف يملك هذا الإسم</string>
+    <string name="settings_app_name_error">الصيغة غير مقبولة</string>
     <string name="settings_su_app_adb">التطبيقات و ADB</string>
     <string name="settings_su_app">التطبيقات فقط</string>
     <string name="settings_su_adb">ADB فقط</string>
@@ -126,61 +185,75 @@
     <string name="settings_su_request_30">30 ثانية</string>
     <string name="settings_su_request_45">45 ثانية</string>
     <string name="settings_su_request_60">60 ثانية</string>
-    <string name="superuser_access">صلاحيات المستخدم المتميز</string>
-    <string name="auto_response">رد تلقائي</string>
-    <string name="request_timeout">مهلة الطلب</string>
-    <string name="superuser_notification">إشعارات المستخدم المتميز</string>
+    <string name="superuser_access">صلاحيات الروت</string>
+    <string name="auto_response">الفعل التلقائي</string>
+    <string name="request_timeout">المهلة قبل الفعل التلقائي</string>
+    <string name="superuser_notification">إشعارات طلبات الروت</string>
     <string name="settings_su_reauth_title">إعادة المصادقة بعد الترقية</string>
-    <string name="settings_su_reauth_summary">أعد المصادقة على صلاحيات المستخدم المتميز بعد إجراء ترقيات للتطبيق</string>
+    <string name="settings_su_reauth_summary">أعد مصادقة صلاحيات الروت بعد إجراء ترقيات للتطبيق</string>
+    <string name="settings_su_biometric_title">تفعيل التحقق بالبصمة</string>
+    <string name="settings_su_biometric_summary">تحقق إضافي بالبصمة لطلبات الروت </string>
+    <string name="no_biometric">جهازك غير مدعوم، أو أنك لم تضبّط البصماتَ بجهازك</string>
+    <string name="settings_customization">تخصيص</string>
 
-    <string name="multiuser_mode">نمط تعدد المستخدمين</string>
+    <string name="multiuser_mode">نمط مستخدمين متعددين</string>
     <string name="settings_owner_only">مالك الجهاز فقط</string>
-    <string name="settings_owner_manage">إدارة مالك الجهاز</string>
-    <string name="settings_user_independent">مستقل عن المستخدم</string>
-    <string name="owner_only_summary">للمالك فقط صلاحيات الروت</string>
-    <string name="owner_manage_summary">يمكن للمالك فقط إدارة صلاحيات الروت وتلقي مطالبات الطلب</string>
-    <string name="user_indepenent_summary">لكل مستخدم قواعد روت منفصلة خاصة به</string>
+    <string name="settings_owner_manage">المالك هو من يحدد</string>
+    <string name="settings_user_independent">مستقل </string>
+    <string name="owner_only_summary">للمالك فقط له صلاحيات الروت</string>
+    <string name="owner_manage_summary">فقط المالك من يرفض و يمنح صلاحيات الروت</string>
+    <string name="user_indepenent_summary">كل مستخدم له قواعد روت خاصة به</string>
 
-    <string name="mount_namespace_mode">نمط تحميل مساحة الاسم</string>
-    <string name="settings_ns_global">مساحة الاسم العامة</string>
-    <string name="settings_ns_requester">وراثة مساحة الاسم</string>
-    <string name="settings_ns_isolate">مساحة الاسم المعزولة</string>
-    <string name="global_summary">تستخدم كافة جلسات العمل للروت مساحة الاسم ذات التركيب العامة</string>
-    <string name="requester_summary">سترث جلسات العمل للروت مساحة الأسماء لطالبيها</string>
-    <string name="isolate_summary">سيكون لكل جلسة عمل للروت مساحة اسم معزولة خاصة بها </string>
-    <string name="settings_download_path_error">خطأ عند إنشاء مجلد. عليه أن يكون سهلا الوصول إليه من خلال مجلد التخزين للروت و ألا يكون ملفا.</string>
+    <string name="mount_namespace_mode">نمط Mount Namespace</string>
+    <string name="settings_ns_global">نمط Namespace العام</string>
+    <string name="settings_ns_requester">نمط NameSpace المتوارث</string>
+    <string name="settings_ns_isolate">نمط NameSpace المعزول</string>
+    <string name="global_summary">جميع الجلسات الروت تستخدم NameSpace العام</string>
+    <string name="requester_summary">جميع الجلسات الروت تستخدم NameSpace المتوارث</string>
+    <string name="isolate_summary">جميع الجلسات الروت تستخدم NameSpace المعزول</string>
+    <string name="settings_download_path_error">خطأ عند إنشاء مجلد. يجب أن يكون قابلا للولوج من المسار الاساسي للذاكرة..و ألا يكون ملفا.</string>
 
-    <!--Superuser-->
-    <string name="su_request_title">طلبات المستخدم المتميز</string>
-    <string name="deny">رفض</string>
-    <string name="prompt">طلب</string>
-    <string name="grant">سماح</string>
-    <string name="su_warning">"منح حق الوصول الكامل إلى جهازك. ارفض إذا كنت غير متأكد!"</string>
-    <string name="forever">للأبد</string>
-    <string name="once">مرة</string>
-    <string name="tenmin">10 دقائق</string>
-    <string name="twentymin">20 دقائق</string>
-    <string name="thirtymin">30 دقائق</string>
-    <string name="sixtymin">60 دقائق</string>
-    <string name="su_allow_toast">%1$s يتم منح صلاحيات </string>
-    <string name="su_deny_toast">%1$s يتم رفض صلاحيات المستخدم المتميز</string>
-    <string name="no_apps_found">لا توجد تطبيقات</string>
-    <string name="su_snack_grant">المستخدم المتميز الصلاحيات لـ %1$s تم منحها</string>
-    <string name="su_snack_deny">المستخدم المتميز الصلاحيات لـ %1$s تم رفضها</string>
-    <string name="su_snack_notif_on">الإشعارات لـ %1$s تم تفعيلها</string>
-    <string name="su_snack_notif_off">الإشعارات لـ %1$s تم تعطيلها</string>
-    <string name="su_snack_log_on">السجلات لـ %1$s تم تفعيلها</string>
-    <string name="su_snack_log_off">السجلات لـ %1$s تم تعطيلها</string>
-    <string name="su_revoke_title">سحب؟</string>
-    <string name="su_revoke_msg">تأكيد لسحب صلاحيات %1$s ?</string>
-    <string name="toast">ملاحظة منبثقة</string>
-    <string name="none">بدون</string>
+    <!--Notifications-->
+    <string name="update_channel">تحديثات Magisk</string>
+    <string name="progress_channel">إشعارات التقدم</string>
+    <string name="download_complete">اكتمل التنزيل</string>
+    <string name="download_file_error">فشل تنزيل الملف</string>
+    <string name="download_open_parent">أظهر المجلد الرئيسي</string>
+    <string name="download_open_self">أظهر الملف</string>
+    <string name="magisk_update_title">تحديث مـاجـيسك متوفر!</string>
+    <string name="manager_update_title">تحديث مـاجـيسك Manager متوفر!</string>
 
-    <!--Superuser logs-->
-    <string name="pid">PID: %1$d</string>
-    <string name="target_uid">Target UID: %1$d</string>
-
-    <!-- MagiskHide -->
-    <string name="show_system_app">اظهار برامج النظام</string>
+    <!--Toasts, Dialogs-->
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+    <string name="repo_install_title">تثبيت %1$s</string>
+    <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
+    <string name="download">تنزيل</string>
+    <string name="reboot">إعادة التشغيل</string>
+    <string name="settings_reboot_toast">إعادة التشغيل لتطبيق الإعدادات</string>
+    <string name="release_notes">معلومات الأصدار الجديد</string>
+    <string name="repo_cache_cleared">تم مسح الذاكرة المؤقتة للإضافات</string>
+    <string name="dtbo_patched_title">تم تعديل DTBO!</string>
+    <string name="dtbo_patched_reboot">لقد عدل مـاجـيسك الملف dtbo.img. يرجى إعادة التشغيل</string>
+    <string name="flashing">يتم الحرق...</string>
+    <string name="done">تم!</string>
+    <string name="failure">فشل!</string>
+    <string name="hide_manager_title">جار إخفاء مـاجـيسك Manager…</string>
+    <string name="hide_manager_fail_toast">فشل إخفاء مـاجـيسك Manager…</string>
+    <string name="open_link_failed_toast">لم يُعثر على تطبيق لفتح الرابط …</string>
+    <string name="complete_uninstall">إلغاء التثبيت بالكامل</string>
+    <string name="restore_img">استعادة الصور</string>
+    <string name="restore_img_msg">جار الأستعادة…</string>
+    <string name="restore_done">تم الأستعادة</string>
+    <string name="restore_fail">النسخة الاحتياطية الأصلية غير موجودة!</string>
+    <string name="proprietary_title">تنزيل شفرة الملكية</string>
+    <string name="proprietary_notice">مـاجـيسك برنامج FOSS(السرعة والأمان)،ولا يحتوي على شفرة SafetyNet الخاصة بكوكل.\n\nهل تسمح لـمـاجـيسك بتحميل ملحق GoogleApiClient لفحص SafetyNet?</string>
+    <string name="setup_fail">فشل التضبيط</string>
+    <string name="env_fix_title"> الإعداد الأضافي مطلوب</string>
+    <string name="env_fix_msg">يحتاج جهازك إلى إعداد إضافي ليتسنى لـمـاجـيسك العمل بشكل صحيح. سيتم تنزيل ملف مضغوط لتثبيت مـاجـيسك هل تريد المتابعة؟</string>
+    <string name="setup_msg">جار تضبيت البيئة</string>
+    <string name="authenticate">تصديق</string>
+    <string name="unsupport_magisk_title">إصدار مـاجـيسك غير مدعوم</string>
+    <string name="unsupport_magisk_msg">إصدار الملف أصغر من %1$s.مـاجـيسك لا يدعمها..\n\nسيتصرف التطبيق كأنك لا تملك روت بجهازك.فضلاًً حدث المعجبين باسرع وقت.</string>
 
 </resources>

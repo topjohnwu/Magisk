@@ -13,8 +13,8 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.Const.ID.PROGRESS_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.Const.ID.UPDATE_NOTIFICATION_CHANNEL
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.getBitmap
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.getBitmap
 
 object Notifications {
 
@@ -83,32 +83,6 @@ object Notifications {
             .setContentIntent(pendingIntent)
 
         mgr.notify(Const.ID.APK_UPDATE_NOTIFICATION_ID, builder.build())
-    }
-
-    fun dtboPatched(context: Context) {
-        val intent = context.intent<GeneralReceiver>()
-                .setAction(Const.Key.BROADCAST_REBOOT)
-        val pendingIntent = PendingIntent.getBroadcast(context,
-                Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val builder = updateBuilder(
-            context
-        )
-            .setContentTitle(context.getString(R.string.dtbo_patched_title))
-            .setContentText(context.getString(R.string.dtbo_patched_reboot))
-
-        if (SDK_INT >= 23) {
-            val action = Notification.Action.Builder(
-                context.getBitmap(R.drawable.ic_refresh).toIcon(),
-                context.getString(R.string.reboot), pendingIntent).build()
-            builder.addAction(action)
-        } else {
-            builder.addAction(
-                R.drawable.ic_refresh,
-                context.getString(R.string.reboot), pendingIntent)
-        }
-
-        mgr.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build())
     }
 
     fun progress(context: Context, title: CharSequence): Notification.Builder {

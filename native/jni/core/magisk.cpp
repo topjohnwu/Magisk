@@ -1,21 +1,17 @@
 #include <sys/mount.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <libgen.h>
-#include <string.h>
 
 #include <utils.hpp>
 #include <magisk.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
-#include <flags.h>
+#include <flags.hpp>
 
-using namespace std::literals;
+using namespace std;
 
 [[noreturn]] static void usage() {
 	fprintf(stderr,
-NAME_WITH_VER(Magisk) R"EOF( multi-call binary
+R"EOF(Magisk - Multi-purpose Utility
 
 Usage: magisk [applet [arguments]...]
    or: magisk [options]...
@@ -37,7 +33,7 @@ Advanced Options (Internal APIs):
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
-   --path                    print internal tmpfs mount path
+   --path                    print Magisk tmpfs mount path
 
 Available applets:
 )EOF");
@@ -74,7 +70,6 @@ int magisk_main(int argc, char *argv[]) {
 		unlock_blocks();
 		return 0;
 	} else if (argv[1] == "--restorecon"sv) {
-		restore_rootcon();
 		restorecon();
 		return 0;
 	} else if (argc >= 4 && argv[1] == "--clone-attr"sv) {;
@@ -116,8 +111,10 @@ int magisk_main(int argc, char *argv[]) {
 		write_int(fd, REMOVE_MODULES);
 		return read_int(fd);
 	} else if (argv[1] == "--path"sv) {
-		// TODO: hardcode /sbin for now, actual logic will be used for Android 11
-		printf("/sbin\n");
+		int fd = connect_daemon();
+		write_int(fd, GET_PATH);
+		char *path = read_string(fd);
+		printf("%s\n", path);
 		return 0;
 	}
 #if 0

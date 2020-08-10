@@ -87,6 +87,13 @@
         <item name="iconTint">?colorOnPrimary</item>
     </style>
 
+    <style name="WidgetFoundation.Button.Outlined.Error">
+        <item name="strokeColor">@color/color_error_transient</item>
+        <item name="rippleColor">@color/color_error_transient</item>
+        <item name="android:textColor">@color/color_error_transient</item>
+        <item name="iconTint">@color/color_error_transient</item>
+    </style>
+
     <style name="WidgetFoundation.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:textStyle">bold</item>
         <item name="iconGravity">textStart</item>

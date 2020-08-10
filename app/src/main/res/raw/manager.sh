@@ -11,12 +11,9 @@ env_check() {
 
 fix_env() {
   cd $MAGISKBIN
-  PATH=/sbin:/system/bin sh update-binary -x
-  ./busybox rm -f $MAGISKTMP/busybox/*
-  cp -af busybox $MAGISKTMP/busybox/busybox
-  $MAGISKTMP/busybox/busybox --install -s $MAGISKTMP/busybox
-  rm -f update-binary magisk.apk
-  chmod -R 755 .
+  PATH=/system/bin /system/bin/sh update-binary -x
+  ./busybox rm -f update-binary magisk.apk
+  ./busybox chmod -R 755 .
   ./magiskinit -x magisk magisk
   cd /
 }
@@ -35,29 +32,6 @@ direct_install() {
   fi
   rm -rf $1
   return 0
-}
-
-mm_patch_dtb() {
-  (local result=1
-  local PATCHED=$TMPDIR/dt.patched
-  for name in dtb dtbo; do
-    local IMAGE=`find_block $name$SLOT`
-    if [ ! -z $IMAGE ]; then
-      if $MAGISKBIN/magiskboot dtb $IMAGE patch $PATCHED; then
-        result=0
-        if [ ! -z $SHA1 ]; then
-          # Backup stuffs
-          mkdir /data/magisk_backup_${SHA1} 2>/dev/null
-          cat $IMAGE | gzip -9 > /data/magisk_backup_${SHA1}/${name}.img.gz
-        fi
-        cat $PATCHED /dev/zero > $IMAGE
-        rm -f $PATCHED
-      fi
-    fi
-  done
-  # Run broadcast command passed from app
-  eval $1
-  )& >/dev/null 2>&1
 }
 
 restore_imgs() {
@@ -95,8 +69,8 @@ EOF
 
 add_hosts_module() {
   # Do not touch existing hosts module
-  [ -d /sbin/.magisk/modules/hosts ] && return
-  cd /sbin/.magisk/modules
+  [ -d $MAGISKTMP/modules/hosts ] && return
+  cd $MAGISKTMP/modules
   mkdir -p hosts/system/etc
   cat << EOF > hosts/module.prop
 id=hosts
@@ -106,20 +80,9 @@ versionCode=1
 author=Magisk Manager
 description=Magisk Manager built-in systemless hosts module
 EOF
-  cp -f /system/etc/hosts hosts/system/etc/hosts
-  magisk --clone-attr /system/etc/hosts hosts/system/etc/hosts
+  magisk --clone /system/etc/hosts hosts/system/etc/hosts
   touch hosts/update
   cd /
-}
-
-force_pm_install() {
-  local APK=$1
-  local VERIFY=`settings get global package_verifier_enable`
-  [ "$VERIFY" -eq 1 ] && settings put global package_verifier_enable 0
-  pm install -r $APK
-  local res=$?
-  [ "$VERIFY" -eq 1 ] && settings put global package_verifier_enable 1
-  return $res
 }
 
 check_boot_ramdisk() {
@@ -159,3 +122,18 @@ get_flags() {
 }
 
 run_migrations() { return; }
+
+grep_prop() { return; }
+
+#############
+# Initialize
+#############
+
+mm_init() {
+  export BOOTMODE=true
+  mount_partitions
+  get_flags
+  run_migrations
+  SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
+  check_boot_ramdisk && RAMDISKEXIST=true || RAMDISKEXIST=false
+}

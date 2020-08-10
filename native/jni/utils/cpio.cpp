@@ -5,7 +5,6 @@
 #include <algorithm>
 
 #include <utils.hpp>
-#include <logging.hpp>
 #include <cpio.hpp>
 
 using namespace std;

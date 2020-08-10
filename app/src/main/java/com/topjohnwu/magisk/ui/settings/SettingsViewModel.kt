@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.ui.settings
 
-import android.Manifest
 import android.os.Build
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
@@ -12,11 +12,9 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.database.RepoDao
-import com.topjohnwu.magisk.extensions.subscribeK
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
-import com.topjohnwu.magisk.model.events.PermissionEvent
 import com.topjohnwu.magisk.model.events.RecreateEvent
 import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.ui.base.BaseViewModel
@@ -24,8 +22,7 @@ import com.topjohnwu.magisk.ui.base.adapterOf
 import com.topjohnwu.magisk.ui.base.diffListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.superuser.Shell
-import io.reactivex.Completable
-import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.launch
 import org.koin.core.get
 
 class SettingsViewModel(
@@ -36,11 +33,17 @@ class SettingsViewModel(
     val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
     val items = diffListOf(createItems())
 
+    init {
+        viewModelScope.launch {
+            Language.loadLanguages(this)
+        }
+    }
+
     private fun createItems(): List<SettingsItem> {
         // Customization
         val list = mutableListOf(
             Customization,
-            Theme, Language, GridSize
+            Theme, Language
         )
         if (Build.VERSION.SDK_INT < 21) {
             // Pre 5.0 does not support getting colors from attributes,
@@ -55,7 +58,7 @@ class SettingsViewModel(
         ))
         if (Info.env.isActive) {
             list.add(ClearRepoCache)
-            if (Const.USER_ID == 0 && Info.isConnected.value)
+            if (Const.USER_ID == 0 && Info.isConnected.get())
                 list.add(HideOrRestore())
         }
 
@@ -63,7 +66,7 @@ class SettingsViewModel(
         if (Info.env.isActive) {
             list.addAll(listOf(
                 Magisk,
-                MagiskHide, SystemlessHosts, SafeMode
+                MagiskHide, SystemlessHosts
             ))
         }
 
@@ -87,45 +90,42 @@ class SettingsViewModel(
         return list
     }
 
-    override fun onItemPressed(view: View, item: SettingsItem) = when (item) {
-        is DownloadPath -> requireRWPermission()
-        else -> Unit
+    override fun onItemPressed(view: View, item: SettingsItem, callback: () -> Unit) = when (item) {
+        is DownloadPath -> withExternalRW(callback)
+        is Biometrics -> authenticate(callback)
+        is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
+        is ClearRepoCache -> clearRepoCache()
+        is SystemlessHosts -> createHosts()
+        is Restore -> restoreManager()
+        else -> callback()
     }
 
     override fun onItemChanged(view: View, item: SettingsItem) = when (item) {
-        // use only instances you want, don't declare everything
-        is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
         is Language -> RecreateEvent().publish()
-
         is UpdateChannel -> openUrlIfNecessary(view)
-        is Biometrics -> authenticateOrRevert()
-        is ClearRepoCache -> clearRepoCache()
-        is SystemlessHosts -> createHosts()
-        is Hide -> updateManager(hide = true)
-        is Restore -> updateManager(hide = false)
-
+        is Hide -> PatchAPK.hideManager(view.context, item.value)
         else -> Unit
     }
 
     private fun openUrlIfNecessary(view: View) {
         UpdateChannelUrl.refresh()
         if (UpdateChannelUrl.isEnabled && UpdateChannelUrl.value.isBlank()) {
-            UpdateChannelUrl.onPressed(view, this@SettingsViewModel)
+            UpdateChannelUrl.onPressed(view, this)
         }
     }
 
-    private fun authenticateOrRevert() {
-        // immediately revert the preference
-        Biometrics.value = !Biometrics.value
+    private fun authenticate(callback: () -> Unit) {
         BiometricDialog {
             // allow the change on success
-            onSuccess { Biometrics.value = !Biometrics.value }
+            onSuccess { callback() }
         }.publish()
     }
 
     private fun clearRepoCache() {
-        Completable.fromAction { repositoryDao.clear() }
-            .subscribeK { Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT) }
+        viewModelScope.launch {
+            repositoryDao.clear()
+            Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
+        }
     }
 
     private fun createHosts() {
@@ -134,24 +134,9 @@ class SettingsViewModel(
         }
     }
 
-    private fun requireRWPermission() {
-        val callback = PublishSubject.create<Boolean>()
-        callback.subscribeK { if (!it) requireRWPermission() }
-        PermissionEvent(
-            listOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ), callback
-        ).publish()
-    }
-
-    private fun updateManager(hide: Boolean) {
-        if (hide) {
-            PatchAPK.hideManager(get(), Hide.value)
-        } else {
-            DownloadService(get()) {
-                subject = DownloadSubject.Manager(Configuration.APK.Restore)
-            }
+    private fun restoreManager() {
+        DownloadService(get()) {
+            subject = DownloadSubject.Manager(Configuration.APK.Restore)
         }
     }
 

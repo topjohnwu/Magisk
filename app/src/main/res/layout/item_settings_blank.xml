@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:alpha="@{item.enabled ? 1f : .5f}"
-        android:onClick="@{(view) -> callback.onItemChanged(view, item)}"
+        android:onClick="@{(view) -> item.onPressed(view, callback)}"
         tools:layout_gravity="center">
 
         <androidx.constraintlayout.widget.ConstraintLayout

@@ -10,6 +10,7 @@ FILE *xfdopen(int fd, const char *mode);
 int xopen(const char *pathname, int flags);
 int xopen(const char *pathname, int flags, mode_t mode);
 int xopenat(int dirfd, const char *pathname, int flags);
+int xopenat(int dirfd, const char *pathname, int flags, mode_t mode);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xxread(int fd, void *buf, size_t count);
@@ -35,6 +36,7 @@ int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
 int xfstat(int fd, struct stat *buf);
+int xdup(int fd);
 int xdup2(int oldfd, int newfd);
 int xdup3(int oldfd, int newfd, int flags);
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz);
@@ -56,4 +58,6 @@ ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
 int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 int xinotify_init1(int flags);
+char *xrealpath(const char *path, char *resolved_path);
+int xmknod(const char *pathname, mode_t mode, dev_t dev);
 

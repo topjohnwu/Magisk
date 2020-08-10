@@ -3,11 +3,14 @@ package com.topjohnwu.magisk.model.events.dialog
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.extensions.res
+import com.topjohnwu.magisk.ktx.res
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ManagerInstallDialog : DialogEvent() {
 
@@ -28,7 +31,11 @@ class ManagerInstallDialog : DialogEvent() {
             if (Info.remote.app.note.isEmpty()) return
             applyButton(MagiskDialog.ButtonType.NEGATIVE) {
                 titleRes = R.string.app_changelog
-                onClick { MarkDownWindow.show(context, null, Info.remote.app.note) }
+                onClick {
+                    GlobalScope.launch(Dispatchers.Main.immediate) {
+                        MarkDownWindow.show(context, null, Info.remote.app.note)
+                    }
+                }
             }
         }
     }

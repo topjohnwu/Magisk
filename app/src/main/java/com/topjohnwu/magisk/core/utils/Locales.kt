@@ -11,9 +11,10 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.ResMgr
 import com.topjohnwu.magisk.core.addAssetPath
-import com.topjohnwu.magisk.extensions.langTagToLocale
-import com.topjohnwu.magisk.extensions.toLangTag
-import io.reactivex.Single
+import com.topjohnwu.magisk.ktx.langTagToLocale
+import com.topjohnwu.magisk.ktx.toLangTag
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
@@ -23,7 +24,10 @@ var currentLocale: Locale = Locale.getDefault()
 @SuppressLint("ConstantLocale")
 val defaultLocale: Locale = Locale.getDefault()
 
-val availableLocales = Single.fromCallable {
+private var cachedLocales: Pair<Array<String>, Array<String>>? = null
+
+suspend fun availableLocales() = cachedLocales ?:
+withContext(Dispatchers.Default) {
     val compareId = R.string.app_changelog
 
     // Create a completely new resource to prevent cross talk over app's configs
@@ -56,8 +60,6 @@ val availableLocales = Single.fromCallable {
     res.updateConfiguration(config, metrics)
     val defName = res.getString(R.string.system_default)
 
-    Pair(locales, defName)
-}.map { (locales, defName) ->
     val names = ArrayList<String>(locales.size + 1)
     val values = ArrayList<String>(locales.size + 1)
 
@@ -69,8 +71,8 @@ val availableLocales = Single.fromCallable {
         values.add(locale.toLangTag())
     }
 
-    Pair(names.toTypedArray(), values.toTypedArray())
-}.cache()!!
+    (names.toTypedArray() to values.toTypedArray()).also { cachedLocales = it }
+}
 
 fun Resources.updateConfig(config: Configuration = configuration) {
     config.setLocale(currentLocale)

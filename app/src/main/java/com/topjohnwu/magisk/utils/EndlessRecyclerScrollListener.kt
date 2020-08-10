@@ -54,8 +54,8 @@ class EndlessRecyclerScrollListener(
 
         val visibleItemPosition = if (direction == Direction.BOTTOM) {
             when (layoutManager) {
-                is StaggeredGridLayoutManager -> layoutManager.findLastVisibleItemPositions(null).max()
-                    ?: 0
+                is StaggeredGridLayoutManager ->
+                    layoutManager.findLastVisibleItemPositions(null).max() ?: 0
                 is GridLayoutManager -> layoutManager.findLastVisibleItemPosition()
                 is LinearLayoutManager -> layoutManager.findLastVisibleItemPosition()
                 else -> throw IllegalArgumentException("Only LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager are supported")

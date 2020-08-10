@@ -136,7 +136,7 @@
     <string name="update_available">Dostępna aktualizacja</string>
     <string name="module_installed">Zainstalowane</string>
     <string name="sorting_order">Kolejność sortowania</string>
-    <string name="module_permission_declined">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcjonalność.</string>
+    <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcjonalność.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Tryb motywu</string>
@@ -240,7 +240,7 @@
     <string name="hide_manager_title">Ukrywanie Magisk Managera…</string>
     <string name="hide_manager_fail_toast">Błąd ukrycia Magisk Managera.</string>
     <string name="open_link_failed_toast">Nie znaleziono aplikacji do otwarcia linku</string>
-    <string name="complete_uninstall">Odinstalowywanie zakończone</string>
+    <string name="complete_uninstall">Odinstaluj całkowicie</string>
     <string name="restore_img">Przywróć obrazy</string>
     <string name="restore_img_msg">Przywracanie…</string>
     <string name="restore_done">Przywracanie zakończone!</string>

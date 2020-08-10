@@ -1,9 +1,11 @@
 package com.topjohnwu.magisk.databinding
 
 import androidx.annotation.CallSuper
+import androidx.databinding.PropertyChangeRegistry
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.utils.DiffObservableList
+import com.topjohnwu.magisk.utils.ObservableHost
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 
 abstract class RvItem {
@@ -45,4 +47,8 @@ abstract class ComparableRvItem<in T> : RvItem() {
             ) = oldItem.genericContentSameAs(newItem)
         }
     }
+}
+
+abstract class ObservableItem<T> : ComparableRvItem<T>(), ObservableHost {
+    override var callbacks: PropertyChangeRegistry? = null
 }

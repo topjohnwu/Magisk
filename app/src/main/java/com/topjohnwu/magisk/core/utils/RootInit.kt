@@ -5,10 +5,9 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.wrap
-import com.topjohnwu.magisk.extensions.rawResource
+import com.topjohnwu.magisk.ktx.rawResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
-import com.topjohnwu.superuser.io.SuFile
 
 class RootInit : Shell.Initializer() {
 
@@ -17,29 +16,35 @@ class RootInit : Shell.Initializer() {
     }
 
     fun init(context: Context, shell: Shell): Boolean {
-        val job = shell.newJob()
-        job.add(context.rawResource(R.raw.manager))
-        if (shell.isRoot) {
-            job.add(context.rawResource(R.raw.util_functions))
-                .add("SHA1=`grep_prop SHA1 /sbin/.magisk/config`")
-            Const.MAGISK_DISABLE_FILE = SuFile("/cache/.disable_magisk")
-        }
+        shell.newJob().apply {
+            if (Const.Version.atLeast_20_4()) {
+                add("export MAGISKTMP=$(magisk --path)/.magisk")
+            } else {
+                add("export MAGISKTMP=/sbin/.magisk")
+            }
+            if (Const.Version.atLeastCanary()) {
+                add("export ASH_STANDALONE=1")
+                add("[ -x /data/adb/magisk/busybox ] && exec /data/adb/magisk/busybox sh")
+            } else {
+                add("export PATH=\"\$MAGISKTMP/busybox:\$PATH\"")
+            }
+            add(context.rawResource(R.raw.manager))
+            if (shell.isRoot) {
+                add(context.rawResource(R.raw.util_functions))
+            }
+            add("mm_init")
+        }.exec()
 
-        job.add(
-            "export BOOTMODE=true",
-            "mount_partitions",
-            "get_flags",
-            "run_migrations"
-        ).exec()
+        fun getvar(name: String) = ShellUtils.fastCmd(shell, "echo \$$name")
+        fun getBool(name: String) = getvar(name).toBoolean()
 
-        fun getvar(name: String) = ShellUtils.fastCmd(shell, "echo \$$name").toBoolean()
-
-        Info.keepVerity = getvar("KEEPVERITY")
-        Info.keepEnc = getvar("KEEPFORCEENCRYPT")
-        Info.isSAR = getvar("SYSTEM_ROOT")
-        Info.ramdisk = shell.newJob().add("check_boot_ramdisk").exec().isSuccess
-        Info.recovery = getvar("RECOVERYMODE")
-        Info.isAB = getvar("ISAB")
+        Const.MAGISKTMP = getvar("MAGISKTMP")
+        Info.keepVerity = getBool("KEEPVERITY")
+        Info.keepEnc = getBool("KEEPFORCEENCRYPT")
+        Info.isSAR = getBool("SYSTEM_ROOT")
+        Info.ramdisk = getBool("RAMDISKEXIST")
+        Info.recovery = getBool("RECOVERYMODE")
+        Info.isAB = getBool("ISAB")
 
         return true
     }

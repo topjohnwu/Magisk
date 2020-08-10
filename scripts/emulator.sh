@@ -43,25 +43,37 @@ fi
 cd /data/local/tmp
 chmod 777 busybox
 chmod 777 magiskinit
+./magiskinit -x magisk magisk
 
-if [ `./busybox id -u` -ne 0 ]; then
-  # Re-exec script with root
-  exec /system/xbin/su 0 ./busybox sh -o standalone $0
+if [ -z "$FIRST_STAGE" ]; then
+  export FIRST_STAGE=1
+  export ASH_STANDALONE=1
+  if [ `./busybox id -u` -ne 0 ]; then
+    # Re-exec script with root
+    exec /system/xbin/su 0 ./busybox sh $0
+  else
+    # Re-exec script with busybox
+    exec ./busybox sh $0
+  fi
 fi
 
 # Remove previous setup if exist
 pgrep magiskd >/dev/null && pkill -9 magiskd
 [ -f /sbin/magisk ] && umount -l /sbin
+[ -f /system/bin/magisk ] && umount -l /system/bin
 
 # SELinux stuffs
 [ -e /sys/fs/selinux ] && SELINUX=true || SELINUX=false
 if $SELINUX; then
   ln -sf ./magiskinit magiskpolicy
-  ./magiskpolicy --live --magisk 'allow magisk * * *'
+  ./magiskpolicy --live --magisk
 fi
 
-# Setup sbin overlay
+BINDIR=/sbin
+
+# Setup bin overlay
 if mount | grep -q rootfs; then
+  # Legacy rootfs
   mount -o rw,remount /
   rm -rf /root
   mkdir /root
@@ -70,12 +82,15 @@ if mount | grep -q rootfs; then
   mount -o ro,remount /
   mount_sbin
   ln -s /root/* /sbin
-else
+elif [ -e /sbin ]; then
+  # Legacy SAR
   mount_sbin
-  mkdir -p /sbin/.magisk/mirror/system_root
-  block=`mount | grep ' / ' | awk '{ print $1 }'`
-  [ $block = "/dev/root" ] && block=/dev/block/dm-0
-  mount -o ro $block /sbin/.magisk/mirror/system_root
+  if ! grep -q '/sbin/.magisk/mirror/system_root' /proc/mounts; then
+    mkdir -p /sbin/.magisk/mirror/system_root
+    block=`mount | grep ' / ' | awk '{ print $1 }'`
+    [ $block = "/dev/root" ] && block=/dev/block/dm-0
+    mount -o ro $block /sbin/.magisk/mirror/system_root
+  fi
   for file in /sbin/.magisk/mirror/system_root/sbin/*; do
     [ ! -e $file ] && break
     if [ -L $file ]; then
@@ -86,18 +101,23 @@ else
       mount -o bind $file $sfile
     fi
   done
+else
+  # Android Q+ without sbin, use overlayfs
+  BINDIR=/system/bin
+  rm -rf /dev/magisk
+  mkdir -p /dev/magisk/upper
+  mkdir /dev/magisk/work
+  ./magisk --clone-attr /system/bin /dev/magisk/upper
+  mount -t overlay overlay -olowerdir=/system/bin,upperdir=/dev/magisk/upper,workdir=/dev/magisk/work /system/bin
 fi
 
 # Magisk stuffs
-./magiskinit -x magisk /sbin/magisk
-chmod 755 /sbin/magisk
-ln -s ./magisk /sbin/su
-ln -s ./magisk /sbin/resetprop
-ln -s ./magisk /sbin/magiskhide
-mkdir -p /sbin/.magisk/busybox
-cp -af ./busybox /sbin/.magisk/busybox/busybox
-/sbin/.magisk/busybox/busybox --install -s /sbin/.magisk/busybox
+./magiskinit -x magisk $BINDIR/magisk
+chmod 755 $BINDIR/magisk
+ln -s ./magisk $BINDIR/su
+ln -s ./magisk $BINDIR/resetprop
+ln -s ./magisk $BINDIR/magiskhide
 mkdir -p /data/adb/modules 2>/dev/null
 mkdir /data/adb/post-fs-data.d 2>/dev/null
 mkdir /data/adb/services.d 2>/dev/null
-/sbin/magisk --daemon
+$BINDIR/magisk --daemon

@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.base
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
@@ -17,8 +18,8 @@ import androidx.navigation.findNavController
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.extensions.snackbar
-import com.topjohnwu.magisk.extensions.startAnimations
+import com.topjohnwu.magisk.ktx.snackbar
+import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.model.events.EventHandler
 import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.model.events.ViewEvent
@@ -46,7 +47,7 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     open val snackbarView get() = binding.root
 
     init {
-        val theme = Config.darkThemeExtended
+        val theme = Config.darkTheme
         AppCompatDelegate.setDefaultNightMode(theme)
     }
 
@@ -96,6 +97,10 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
         delegate.onResume()
     }
 
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        return currentFragment?.onKeyEvent(event) == true || super.dispatchKeyEvent(event)
+    }
+
     override fun onEventDispatched(event: ViewEvent) {
         delegate.onEventExecute(event, this)
         when (event) {
@@ -110,7 +115,7 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     }
 
     override fun peekSystemWindowInsets(insets: Insets) {
-        viewModel.insets.value = insets
+        viewModel.insets = insets
     }
 
     protected fun ViewEvent.dispatchOnSelf() = onEventDispatched(this)

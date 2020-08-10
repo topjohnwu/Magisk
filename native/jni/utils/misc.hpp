@@ -29,16 +29,13 @@ private:
 	pthread_mutex_t *mutex;
 };
 
+template <class Func>
 class run_finally {
 public:
-	explicit run_finally(std::function<void()> &&fn): fn(std::move(fn)) {}
-
-	void disable() { fn = nullptr; }
-
-	~run_finally() { if (fn) fn(); }
-
+	explicit run_finally(const Func &fn) : fn(fn) {}
+	~run_finally() { fn(); }
 private:
-	std::function<void()> fn;
+	const Func &fn;
 };
 
 template <typename T>
@@ -64,9 +61,9 @@ int parse_int(const char *s);
 static inline int parse_int(std::string s) { return parse_int(s.data()); }
 static inline int parse_int(std::string_view s) { return parse_int(s.data()); }
 
-int new_daemon_thread(void *(*start_routine) (void *), void *arg = nullptr,
-					  const pthread_attr_t *attr = nullptr);
-int new_daemon_thread(std::function<void()> &&fn);
+using thread_entry = void *(*)(void *);
+int new_daemon_thread(thread_entry entry, void *arg = nullptr, const pthread_attr_t *attr = nullptr);
+int new_daemon_thread(std::function<void()> &&entry);
 
 struct exec_t {
 	bool err = false;
@@ -100,9 +97,9 @@ bool ends_with(const std::string_view &s1, const std::string_view &s2);
 int fork_dont_care();
 int fork_no_zombie();
 int strend(const char *s1, const char *s2);
-char *rtrim(char *str);
 void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
 uint32_t binary_gcd(uint32_t u, uint32_t v);
 int switch_mnt_ns(int pid);
-void gen_rand_str(char *buf, int len, bool varlen = true);
+int gen_rand_str(char *buf, int len, bool varlen = true);
+std::string &replace_all(std::string &str, std::string_view from, std::string_view to);

@@ -1,10 +1,10 @@
 #include <sys/sysmacros.h>
 #include <string.h>
 #include <stdio.h>
+#include <libgen.h>
 #include <vector>
 
 #include <utils.hpp>
-#include <logging.hpp>
 #include <selinux.hpp>
 #include <magisk.hpp>
 
@@ -20,10 +20,6 @@ struct devinfo {
 };
 
 static vector<devinfo> dev_list;
-
-static char partname[32];
-static char fstype[32];
-static char block_dev[64];
 
 static void parse_device(devinfo *dev, const char *uevent) {
 	dev->partname[0] = '\0';
@@ -55,6 +51,11 @@ static void collect_devices() {
 	}
 }
 
+static struct {
+	char partname[32];
+	char block_dev[64];
+} blk_info;
+
 static int64_t setup_block(bool write_block = true) {
 	if (dev_list.empty())
 		collect_devices();
@@ -63,13 +64,13 @@ static int64_t setup_block(bool write_block = true) {
 
 	for (int tries = 0; tries < 3; ++tries) {
 		for (auto &dev : dev_list) {
-			if (strcasecmp(dev.partname, partname) == 0) {
+			if (strcasecmp(dev.partname, blk_info.partname) == 0) {
 				if (write_block) {
-					sprintf(block_dev, "/dev/block/%s", dev.devname);
+					sprintf(blk_info.block_dev, "/dev/block/%s", dev.devname);
 				}
-				LOGD("Found %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
+				LOGD("Setup %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
 				dev_t rdev = makedev(dev.major, dev.minor);
-				mknod(block_dev, S_IFBLK | 0600, rdev);
+				mknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
 				return rdev;
 			}
 		}
@@ -90,37 +91,84 @@ static bool is_lnk(const char *name) {
 	return S_ISLNK(st.st_mode);
 }
 
-static bool read_dt_fstab(cmdline *cmd, const char *name) {
-	char path[128];
-	int fd;
-	sprintf(path, "%s/fstab/%s/dev", cmd->dt_dir, name);
-	if ((fd = open(path, O_RDONLY | O_CLOEXEC)) >= 0) {
-		read(fd, path, sizeof(path));
-		close(fd);
-		// Some custom treble use different names, so use what we read
-		char *part = rtrim(strrchr(path, '/') + 1);
-		sprintf(partname, "%s%s", part, strend(part, cmd->slot) ? cmd->slot : "");
-		sprintf(path, "%s/fstab/%s/type", cmd->dt_dir, name);
-		if ((fd = xopen(path, O_RDONLY | O_CLOEXEC)) >= 0) {
-			read(fd, fstype, 32);
-			close(fd);
-			return true;
-		}
-	}
-	return false;
+static string rtrim(string &&str) {
+	// Trim space, newline, and null byte from end of string
+	while (memchr(" \n\r", str[str.length() - 1], 4))
+		str.pop_back();
+	return std::move(str);
 }
 
-#define mount_root(name) \
-if (!is_lnk("/" #name) && read_dt_fstab(cmd, #name)) { \
-	LOGD("Early mount " #name "\n"); \
-	setup_block(); \
-	xmkdir("/" #name, 0755); \
-	xmount(block_dev, "/" #name, fstype, MS_RDONLY, nullptr); \
-	mount_list.emplace_back("/" #name); \
+#define read_info(val) \
+if (access(#val, F_OK) == 0) {\
+	entry.val = rtrim(full_read(#val)); \
+}
+
+void BaseInit::read_dt_fstab(vector<fstab_entry> &fstab) {
+	if (access(cmd->dt_dir, F_OK) != 0)
+		return;
+
+	char cwd[128];
+	getcwd(cwd, sizeof(cwd));
+	chdir(cmd->dt_dir);
+	run_finally cd([&]{ chdir(cwd); });
+
+	if (access("fstab", F_OK) != 0)
+		return;
+	chdir("fstab");
+
+	// Make sure dt fstab is enabled
+	if (access("status", F_OK) == 0) {
+		auto status = rtrim(full_read("status"));
+		if (status != "okay" && status != "ok")
+			return;
+	}
+
+	auto dir = xopen_dir(".");
+	for (dirent *dp; (dp = xreaddir(dir.get()));) {
+		if (dp->d_type != DT_DIR)
+			continue;
+		chdir(dp->d_name);
+		run_finally f([]{ chdir(".."); });
+
+		if (access("status", F_OK) == 0) {
+			auto status = rtrim(full_read("status"));
+			if (status != "okay" && status != "ok")
+				continue;
+		}
+
+		fstab_entry entry;
+
+		read_info(dev);
+		read_info(mnt_point) else {
+			entry.mnt_point = "/";
+			entry.mnt_point += dp->d_name;
+		}
+		read_info(type);
+		read_info(mnt_flags);
+		read_info(fsmgr_flags);
+
+		fstab.emplace_back(std::move(entry));
+	}
+}
+
+void BaseInit::dt_early_mount() {
+	vector<fstab_entry> fstab;
+	read_dt_fstab(fstab);
+	for (const auto &entry : fstab) {
+		if (is_lnk(entry.mnt_point.data()))
+			continue;
+		// Derive partname from dev
+		sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), cmd->slot);
+		setup_block();
+		xmkdir(entry.mnt_point.data(), 0755);
+		xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
+		mount_list.push_back(entry.mnt_point);
+	}
 }
 
 static void switch_root(const string &path) {
 	LOGD("Switch root to %s\n", path.data());
+	int root = xopen("/", O_RDONLY);
 	vector<string> mounts;
 	parse_mnt("/proc/mounts", [&](mntent *me) {
 		// Skip root and self
@@ -142,19 +190,24 @@ static void switch_root(const string &path) {
 	chdir(path.data());
 	xmount(path.data(), "/", nullptr, MS_MOVE, nullptr);
 	chroot(".");
+
+	LOGD("Cleaning rootfs\n");
+	frm_rf(root);
 }
 
 static void mount_persist(const char *dev_base, const char *mnt_base) {
 	string mnt_point = mnt_base + "/persist"s;
-	strcpy(partname, "persist");
-	sprintf(block_dev, "%s/persist", dev_base);
+	strcpy(blk_info.partname, "persist");
+	xrealpath(dev_base, blk_info.block_dev);
+	char *s = blk_info.block_dev + strlen(blk_info.block_dev);
+	strcpy(s, "/persist");
 	if (setup_block(false) < 0) {
 		// Fallback to cache
-		strcpy(partname, "cache");
-		sprintf(block_dev, "%s/cache", dev_base);
+		strcpy(blk_info.partname, "cache");
+		strcpy(s, "/cache");
 		if (setup_block(false) < 0) {
 			// Try NVIDIA's BS
-			strcpy(partname, "CAC");
+			strcpy(blk_info.partname, "CAC");
 			if (setup_block(false) < 0)
 				return;
 		}
@@ -162,33 +215,50 @@ static void mount_persist(const char *dev_base, const char *mnt_base) {
 		mnt_point = mnt_base + "/cache"s;
 	}
 	xmkdir(mnt_point.data(), 0755);
-	xmount(block_dev, mnt_point.data(), "ext4", 0, nullptr);
+	xmount(blk_info.block_dev, mnt_point.data(), "ext4", 0, nullptr);
 }
 
 void RootFSInit::early_mount() {
 	full_read("/init", self.buf, self.sz);
 
-	LOGD("Reverting /init\n");
-	root = xopen("/", O_RDONLY | O_CLOEXEC);
+	LOGD("Restoring /init\n");
 	rename("/.backup/init", "/init");
 
-	mount_root(system);
-	mount_root(vendor);
-	mount_root(product);
-	mount_root(odm);
+	dt_early_mount();
 
 	xmkdir("/dev/mnt", 0755);
 	mount_persist("/dev/block", "/dev/mnt");
 	mount_list.emplace_back("/dev/mnt/persist");
-	mount_list.emplace_back("/dev/mnt/cache");
+	persist_dir = "/dev/mnt/persist/magisk";
 }
 
-void SARBase::backup_files(const char *self_path) {
+void SARBase::backup_files() {
 	if (access("/overlay.d", F_OK) == 0)
-		cp_afc("/overlay.d", "/dev/overlay.d");
+		backup_folder("/overlay.d", overlays);
 
-	full_read(self_path, self.buf, self.sz);
-	full_read("/.backup/.magisk", config.buf, config.sz);
+	full_read("/proc/self/exe", self.buf, self.sz);
+	if (access("/.backup/.magisk", R_OK) == 0)
+		full_read("/.backup/.magisk", config.buf, config.sz);
+}
+
+void SARBase::mount_system_root() {
+	LOGD("Early mount system_root\n");
+	// Try NVIDIA naming scheme
+	strcpy(blk_info.partname, "APP");
+	strcpy(blk_info.block_dev, "/dev/root");
+	auto dev = setup_block(false);
+	if (dev < 0) {
+		sprintf(blk_info.partname, "system%s", cmd->slot);
+		dev = setup_block(false);
+		if (dev < 0) {
+			// We don't really know what to do at this point...
+			LOGE("Cannot find root partition, abort\n");
+			exit(1);
+		}
+	}
+	xmkdir("/system_root", 0755);
+	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
+		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
 }
 
 void SARInit::early_mount() {
@@ -197,58 +267,28 @@ void SARInit::early_mount() {
 	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
 	mount_list.emplace_back("/dev");
 
-	backup_files("/init");
+	backup_files();
 
-	LOGD("Cleaning rootfs\n");
-	int root = xopen("/", O_RDONLY | O_CLOEXEC);
-	frm_rf(root, { "proc", "sys", "dev" });
-	close(root);
-
-	LOGD("Early mount system_root\n");
-	sprintf(partname, "system%s", cmd->slot);
-	strcpy(block_dev, "/dev/root");
-	auto dev = setup_block(false);
-	if (dev < 0) {
-		// Try NVIDIA naming scheme
-		strcpy(partname, "APP");
-		dev = setup_block(false);
-		if (dev < 0) {
-			// We don't really know what to do at this point...
-			LOGE("Cannot find root partition, abort\n");
-			exit(1);
-		}
-	}
-	system_dev = dev;
-	xmkdir("/system_root", 0755);
-	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
-		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
+	mount_system_root();
 	switch_root("/system_root");
 
-	mount_root(vendor);
-	mount_root(product);
-	mount_root(odm);
+	dt_early_mount();
+}
+
+void SARFirstStageInit::early_mount() {
+	backup_files();
+	mount_system_root();
+	switch_root("/system_root");
 }
 
 void SecondStageInit::early_mount() {
-	// Early mounts should already be done by first stage init
+	backup_files();
 
-	backup_files("/system/bin/init");
-	rm_rf("/system");
-	rm_rf("/.backup");
-	rm_rf("/overlay.d");
+	umount2("/init", MNT_DETACH);
+	umount2("/proc/self/exe", MNT_DETACH);
 
-	// Find system_dev
-	parse_mnt("/proc/mounts", [&](mntent *me) -> bool {
-		if (me->mnt_dir == "/system_root"sv) {
-			struct stat st;
-			stat(me->mnt_fsname, &st);
-			system_dev = st.st_rdev;
-			return false;
-		}
-		return true;
-	});
-
-	switch_root("/system_root");
+	if (access("/system_root", F_OK) == 0)
+		switch_root("/system_root");
 }
 
 void BaseInit::cleanup() {
@@ -261,13 +301,42 @@ void BaseInit::cleanup() {
 	mount_list.shrink_to_fit();
 }
 
-void mount_sbin() {
-	LOGD("Mount /sbin tmpfs overlay\n");
-	xmount("tmpfs", "/sbin", "tmpfs", 0, "mode=755");
+static void patch_socket_name(const char *path) {
+	char rstr[16];
+	gen_rand_str(rstr, sizeof(rstr));
+	char *buf;
+	size_t size;
+	mmap_rw(path, buf, size);
+	raw_data_patch(buf, size, { make_pair(MAIN_SOCKET, rstr) });
+	munmap(buf, size);
+}
 
-	xmkdir(MAGISKTMP, 0755);
+void setup_tmp(const char *path, const raw_data &self, const raw_data &config) {
+	LOGD("Setup Magisk tmp at %s\n", path);
+	xmount("tmpfs", path, "tmpfs", 0, "mode=755");
+
+	chdir(path);
+
+	xmkdir(INTLROOT, 0755);
 	xmkdir(MIRRDIR, 0);
 	xmkdir(BLOCKDIR, 0);
 
 	mount_persist(BLOCKDIR, MIRRDIR);
+
+	int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
+	xwrite(fd, config.buf, config.sz);
+	close(fd);
+	fd = xopen("magiskinit", O_WRONLY | O_CREAT, 0755);
+	xwrite(fd, self.buf, self.sz);
+	close(fd);
+	dump_magisk("magisk", 0755);
+	patch_socket_name("magisk");
+
+	// Create applet symlinks
+	for (int i = 0; applet_names[i]; ++i)
+		xsymlink("./magisk", applet_names[i]);
+	xsymlink("./magiskinit", "magiskpolicy");
+	xsymlink("./magiskinit", "supolicy");
+
+	chdir("/");
 }

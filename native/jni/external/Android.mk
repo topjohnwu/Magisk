@@ -3,7 +3,8 @@ LOCAL_PATH := $(call my-dir)
 # libxz.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libxz
-LOCAL_C_INCLUDES := $(LIBXZ)
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/xz-embedded
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_SRC_FILES := \
 	xz-embedded/xz_crc32.c \
 	xz-embedded/xz_dec_lzma2.c \
@@ -13,7 +14,8 @@ include $(BUILD_STATIC_LIBRARY)
 # libnanopb.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libnanopb
-LOCAL_C_INCLUDES := $(LIBNANOPB)
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/nanopb
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_SRC_FILES := \
 	nanopb/pb_common.c \
 	nanopb/pb_decode.c \
@@ -23,7 +25,8 @@ include $(BUILD_STATIC_LIBRARY)
 # libfdt.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libfdt
-LOCAL_C_INCLUDES := $(LIBFDT)
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/dtc/libfdt
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_SRC_FILES := \
 	dtc/libfdt/fdt.c \
 	dtc/libfdt/fdt_addresses.c \
@@ -39,7 +42,8 @@ include $(BUILD_STATIC_LIBRARY)
 # liblz4.a
 include $(CLEAR_VARS)
 LOCAL_MODULE := liblz4
-LOCAL_C_INCLUDES += $(LIBLZ4)
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/lz4/lib
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_SRC_FILES := \
 	lz4/lib/lz4.c \
 	lz4/lib/lz4frame.c \
@@ -50,7 +54,8 @@ include $(BUILD_STATIC_LIBRARY)
 # libbz2.a
 include $(CLEAR_VARS)
 LOCAL_MODULE := libbz2
-LOCAL_C_INCLUDES += $(LIBBZ2)
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/bzip2
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_SRC_FILES := \
 	bzip2/blocksort.c  \
 	bzip2/huffman.c    \
@@ -64,18 +69,19 @@ include $(BUILD_STATIC_LIBRARY)
 # liblzma.a
 include $(CLEAR_VARS)
 LOCAL_MODULE := liblzma
-LOCAL_C_INCLUDES += \
-	$(EXT_PATH)/xz_config \
-	$(EXT_PATH)/xz/src/common \
-	$(EXT_PATH)/xz/src/liblzma/api \
-	$(EXT_PATH)/xz/src/liblzma/check \
-	$(EXT_PATH)/xz/src/liblzma/common \
-	$(EXT_PATH)/xz/src/liblzma/delta \
-	$(EXT_PATH)/xz/src/liblzma/lz \
-	$(EXT_PATH)/xz/src/liblzma/lzma \
-	$(EXT_PATH)/xz/src/liblzma/rangecoder \
-	$(EXT_PATH)/xz/src/liblzma/simple \
-	$(EXT_PATH)/xz/src/liblzma
+LOCAL_C_INCLUDES := \
+	$(LOCAL_PATH)/xz_config \
+	$(LOCAL_PATH)/xz/src/common \
+	$(LOCAL_PATH)/xz/src/liblzma/api \
+	$(LOCAL_PATH)/xz/src/liblzma/check \
+	$(LOCAL_PATH)/xz/src/liblzma/common \
+	$(LOCAL_PATH)/xz/src/liblzma/delta \
+	$(LOCAL_PATH)/xz/src/liblzma/lz \
+	$(LOCAL_PATH)/xz/src/liblzma/lzma \
+	$(LOCAL_PATH)/xz/src/liblzma/rangecoder \
+	$(LOCAL_PATH)/xz/src/liblzma/simple \
+	$(LOCAL_PATH)/xz/src/liblzma
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/xz/src/liblzma/api
 LOCAL_SRC_FILES := \
 	xz/src/common/tuklib_cpucores.c \
 	xz/src/common/tuklib_exit.c \
@@ -157,13 +163,17 @@ LOCAL_SRC_FILES := \
 	xz/src/liblzma/simple/simple_encoder.c \
 	xz/src/liblzma/simple/sparc.c \
 	xz/src/liblzma/simple/x86.c
-LOCAL_CFLAGS += -DHAVE_CONFIG_H -Wno-implicit-function-declaration
+LOCAL_CFLAGS := -DHAVE_CONFIG_H -Wno-implicit-function-declaration
 include $(BUILD_STATIC_LIBRARY)
+
+SE_PATH := $(LOCAL_PATH)/selinux
 
 # libsepol.a
 include $(CLEAR_VARS)
+LIBSEPOL := $(SE_PATH)/libsepol/include $(SE_PATH)/libsepol/cil/include
 LOCAL_MODULE := libsepol
-LOCAL_C_INCLUDES := $(LIBSEPOL) $(EXT_PATH)/selinux/libsepol/src
+LOCAL_C_INCLUDES := $(LIBSEPOL) $(LOCAL_PATH)/selinux/libsepol/src
+LOCAL_EXPORT_C_INCLUDES := $(LIBSEPOL)
 LOCAL_SRC_FILES := \
 	selinux/libsepol/src/assertion.c \
 	selinux/libsepol/src/avrule_block.c \
@@ -231,49 +241,15 @@ LOCAL_SRC_FILES := \
 	selinux/libsepol/cil/src/cil_symtab.c \
 	selinux/libsepol/cil/src/cil_tree.c \
 	selinux/libsepol/cil/src/cil_verify.c
-LOCAL_CFLAGS += -Dgetline=__getline -Wno-implicit-function-declaration
-include $(BUILD_STATIC_LIBRARY)
-
-# libpcre2.a
-include $(CLEAR_VARS)
-LOCAL_MODULE:= libpcre2
-LOCAL_CFLAGS := -DHAVE_CONFIG_H
-LOCAL_C_INCLUDES := $(LIBPCRE2) $(LIBPCRE2)_internal
-LOCAL_SRC_FILES := \
-	pcre/dist2/src/pcre2_auto_possess.c \
-	pcre/dist2/src/pcre2_chartables.c \
-	pcre/dist2/src/pcre2_compile.c \
-	pcre/dist2/src/pcre2_config.c \
-	pcre/dist2/src/pcre2_context.c \
-	pcre/dist2/src/pcre2_convert.c \
-	pcre/dist2/src/pcre2_dfa_match.c \
-	pcre/dist2/src/pcre2_error.c \
-	pcre/dist2/src/pcre2_extuni.c \
-	pcre/dist2/src/pcre2_find_bracket.c \
-	pcre/dist2/src/pcre2_fuzzsupport.c \
-	pcre/dist2/src/pcre2_jit_compile.c \
-	pcre/dist2/src/pcre2_maketables.c \
-	pcre/dist2/src/pcre2_match.c \
-	pcre/dist2/src/pcre2_match_data.c \
-	pcre/dist2/src/pcre2_newline.c \
-	pcre/dist2/src/pcre2_ord2utf.c \
-	pcre/dist2/src/pcre2_pattern_info.c \
-	pcre/dist2/src/pcre2_script_run.c \
-	pcre/dist2/src/pcre2_serialize.c \
-	pcre/dist2/src/pcre2_string_utils.c \
-	pcre/dist2/src/pcre2_study.c \
-	pcre/dist2/src/pcre2_substitute.c \
-	pcre/dist2/src/pcre2_substring.c \
-	pcre/dist2/src/pcre2_tables.c \
-	pcre/dist2/src/pcre2_ucd.c \
-	pcre/dist2/src/pcre2_valid_utf.c \
-	pcre/dist2/src/pcre2_xclass.c
+LOCAL_CFLAGS := -Dgetline=__getline -Wno-implicit-function-declaration
 include $(BUILD_STATIC_LIBRARY)
 
 # libselinux.a
 include $(CLEAR_VARS)
+LIBSELINUX := $(SE_PATH)/libselinux/include
 LOCAL_MODULE:= libselinux
-LOCAL_C_INCLUDES := $(LIBSELINUX) $(LIBPCRE2)
+LOCAL_C_INCLUDES := $(LIBSELINUX)
+LOCAL_EXPORT_C_INCLUDES := $(LIBSELINUX)
 LOCAL_STATIC_LIBRARIES := libpcre2
 LOCAL_CFLAGS := \
 	-Wno-implicit-function-declaration -Wno-int-conversion -Wno-unused-function \
@@ -339,4 +315,42 @@ LOCAL_SRC_FILES := \
 	selinux/libselinux/src/validatetrans.c
 include $(BUILD_STATIC_LIBRARY)
 
-include $(EXT_PATH)/mincrypt/Android.mk
+# libpcre2.a
+include $(CLEAR_VARS)
+LIBPCRE2 := $(LOCAL_PATH)/pcre/include
+LOCAL_MODULE:= libpcre2
+LOCAL_CFLAGS := -DHAVE_CONFIG_H
+LOCAL_C_INCLUDES := $(LIBPCRE2) $(LIBPCRE2)_internal
+LOCAL_EXPORT_C_INCLUDES := $(LIBPCRE2)
+LOCAL_SRC_FILES := \
+	pcre/dist2/src/pcre2_auto_possess.c \
+	pcre/dist2/src/pcre2_chartables.c \
+	pcre/dist2/src/pcre2_compile.c \
+	pcre/dist2/src/pcre2_config.c \
+	pcre/dist2/src/pcre2_context.c \
+	pcre/dist2/src/pcre2_convert.c \
+	pcre/dist2/src/pcre2_dfa_match.c \
+	pcre/dist2/src/pcre2_error.c \
+	pcre/dist2/src/pcre2_extuni.c \
+	pcre/dist2/src/pcre2_find_bracket.c \
+	pcre/dist2/src/pcre2_fuzzsupport.c \
+	pcre/dist2/src/pcre2_jit_compile.c \
+	pcre/dist2/src/pcre2_maketables.c \
+	pcre/dist2/src/pcre2_match.c \
+	pcre/dist2/src/pcre2_match_data.c \
+	pcre/dist2/src/pcre2_newline.c \
+	pcre/dist2/src/pcre2_ord2utf.c \
+	pcre/dist2/src/pcre2_pattern_info.c \
+	pcre/dist2/src/pcre2_script_run.c \
+	pcre/dist2/src/pcre2_serialize.c \
+	pcre/dist2/src/pcre2_string_utils.c \
+	pcre/dist2/src/pcre2_study.c \
+	pcre/dist2/src/pcre2_substitute.c \
+	pcre/dist2/src/pcre2_substring.c \
+	pcre/dist2/src/pcre2_tables.c \
+	pcre/dist2/src/pcre2_ucd.c \
+	pcre/dist2/src/pcre2_valid_utf.c \
+	pcre/dist2/src/pcre2_xclass.c
+include $(BUILD_STATIC_LIBRARY)
+
+include $(LOCAL_PATH)/mincrypt/Android.mk

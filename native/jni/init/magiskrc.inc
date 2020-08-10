@@ -1,24 +1,24 @@
 #include <magisk.hpp>
 #include <selinux.hpp>
 
-constexpr char magiskrc[] =
+constexpr char MAGISK_RC[] =
 "\n"
 
 "on post-fs-data\n"
 "    start logd\n"
 "    rm " UNBLOCKFILE "\n"
-"    start %s\n"
-"    wait " UNBLOCKFILE " 10\n"
+"    start %2$s\n"
+"    wait " UNBLOCKFILE " 40\n"
 "    rm " UNBLOCKFILE "\n"
 "\n"
 
-"service %s /sbin/magisk --post-fs-data\n"
+"service %2$s %1$s/magisk --post-fs-data\n"
 "    user root\n"
 "    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
 "    oneshot\n"
 "\n"
 
-"service %s /sbin/magisk --service\n"
+"service %3$s %1$s/magisk --service\n"
 "    class late_start\n"
 "    user root\n"
 "    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
@@ -26,10 +26,10 @@ constexpr char magiskrc[] =
 "\n"
 
 "on property:sys.boot_completed=1\n"
-"    start %s\n"
+"    start %4$s\n"
 "\n"
 
-"service %s /sbin/magisk --boot-complete\n"
+"service %4$s %1$s/magisk --boot-complete\n"
 "    user root\n"
 "    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
 "    oneshot\n"

@@ -17,6 +17,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!--
+        The list is reverted to use LinearLayoutManager only. The issue of random crashes lies in
+        the way StaggeredGridLayoutManager invalidates view in LazySpanLookup. Since we're adding
+        items in between full-span items the array is not yet invalidated and consecutively crashes
+        due to index of -end- being out of bounds of the current array.
+
+        If you'd like to use StaggeredGridLayoutManager, do so without adding single span items in
+        between of full-span items.
+        https://issuetracker.google.com/issues/37034096
+        -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_list"
             adapter="@{viewModel.adapter}"
@@ -25,7 +36,6 @@
             gone="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
-            spanCount="@{Config.listSpanCount}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -34,8 +44,7 @@
             android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
             android:paddingEnd="0dp"
             android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
-            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-            app:spanCount="2"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_module_md2" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

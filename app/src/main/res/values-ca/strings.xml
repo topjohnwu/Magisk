@@ -25,7 +25,7 @@
     <string name="home_package">Paquet</string>
     <string name="details">Detalls</string>
 
-    <string name="home_notice_content">Asseguris sempre que està utilitzant un Magisk Manager de codi lliure. Managers de fonts desconegudes podrien causar accions malicioses.</string>
+    <string name="home_notice_content">Asseguris sempre que està utilitzant un Magisk Manager de codi lliure. Mànagers de fonts desconegudes podrien causar accions malicioses.</string>
     <string name="home_support_title">Doni\'ns suport</string>
     <string name="home_links_project">Enllaços del projecte</string>
     <string name="home_item_source">Codi font</string>
@@ -42,7 +42,7 @@
     <string name="home_latest_version">Última</string>
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
-    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Arrel s\'eliminarà i, possiblement, xifrarà totes les dades (si no estan ja xifrades).</string>
+    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés arrel s\'eliminarà i, possiblement, xifrarà totes les dades (si no estan ja xifrades).</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
@@ -61,6 +61,7 @@
     <string name="select_patch_file">Selecciona i arranja un arxiu</string>
     <string name="patch_file_msg">Selecciona una imatge crua (*.img) o un ODIN tarfile (*.tar)</string>
     <string name="reboot_delay_toast">Reinici en 5 segons…</string>
+    <string name="flash_screen_title">Instal·lació</string>
 
     <!--Superuser-->
     <string name="su_request_title">Petició de superusuari</string>
@@ -93,7 +94,7 @@
     <string name="superuser_policy_none">Cap aplicació ha demanat permisos de superusuari.</string>
 
     <!--Logs-->
-    <string name="log_data_none">No hi ha cap registre. Provi a utilitzar aplicacions que requereixen permisos SU.</string>
+    <string name="log_data_none">No hi ha cap registre. Provi d\'utilitzar aplicacions que requereixen permisos de superusuari.</string>
     <string name="log_data_magisk_none">Els registre de Magisk estan buits. Això és estrany.</string>
     <string name="menuSaveLog">Desar registre</string>
     <string name="menuClearLog">Netejar registre ara</string>
@@ -136,7 +137,7 @@
     <string name="update_available">Actualització Disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Ordre de Classificació</string>
-    <string name="module_permission_declined">Garanteix permís d\'emmagatzematge per activar aquesta funcionalitat</string>
+    <string name="external_rw_permission_denied">Garanteix permís d\'emmagatzematge per activar aquesta funcionalitat</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode del tema</string>
@@ -153,7 +154,7 @@
     <string name="settings_download_path_title">Directori de baixades</string>
     <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
-    <string name="settings_clear_cache_summary">Neteja l\'informació en memòria cau per als repositoris en línia. Força a l\'aplicació a actualitzar-se en línia.</string>
+    <string name="settings_clear_cache_summary">Neteja la informació en memòria cau per als repositoris en línia. Força a l\'aplicació a actualitzar-se en línia.</string>
     <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
     <string name="settings_hide_manager_summary">Torna a empaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
     <string name="settings_restore_manager_title">Restaurar Magisk Manager</string>
@@ -166,15 +167,15 @@
     <string name="settings_update_stable">Estable</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalitzat</string>
-    <string name="settings_update_custom_msg">Inserta una URL personalitzada</string>
-    <string name="settings_magiskhide_summary">Ocultar Magisk de varies deteccions</string>
+    <string name="settings_update_custom_msg">Inserta un URL personalitzada</string>
+    <string name="settings_magiskhide_summary">Ocultar Magisk de vàries deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
     <string name="settings_app_name_hint">Nou nom</string>
     <string name="settings_app_name_helper">Es refarà l\'aplicació amb aquest nom</string>
     <string name="settings_app_name_error">Format invàlid</string>
-    <string name="settings_su_app_adb">Aplicacions y ADB</string>
+    <string name="settings_su_app_adb">Aplicacions i ADB</string>
     <string name="settings_su_app">Només aplicacions</string>
     <string name="settings_su_adb">Només ADB</string>
     <string name="settings_su_disable">Deshabilitat</string>
@@ -210,7 +211,7 @@
     <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
     <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
     <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
-    <string name="settings_download_path_error">Error al crear la carpeta. El directori ha de ser accessible des de el directori arrel i no pot ser un arxiu.</string>
+    <string name="settings_download_path_error">Error en crear la carpeta. El directori ha de ser accessible des del directori arrel i no pot ser un arxiu.</string>
 
     <!--Notifications-->
     <string name="update_channel">Actualització de Magisk</string>
@@ -249,10 +250,10 @@
     <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nVol permetre que Magisk Manager baixi una extensió que conté la GoogleApiClient per poder fer la comprovació de SafetyNet?</string>
     <string name="setup_fail">Instal·lació fallida.</string>
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
-    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk , vol procedir a l\'instal·lació ara?</string>
+    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk , vol procedir a la instal·lació ara?</string>
     <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
-    <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk el més aviat possible.</string>
+    <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk com més aviat millor..</string>
 
 </resources>

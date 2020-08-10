@@ -61,6 +61,7 @@
     <string name="select_patch_file">ფაილის დაპატჩვა</string>
     <string name="patch_file_msg">აირჩიეთ (*.img) ფაილი ან ODIN tarfile-ი (*.tar)</string>
     <string name="reboot_delay_toast">გადატვირთვა 5 წამში…</string>
+    <string name="flash_screen_title">ინსტალაცია</string>
 
     <!--Superuser-->
     <string name="su_request_title">სუპერმომხმარებლის ნებართვის მოთხოვნა</string>
@@ -134,7 +135,9 @@
     <string name="module_action_install_external">მახსოვრობიდან დაინსტალირება</string>
     <string name="module_update_none">თქვენი მოდულები განახლებულია!</string>
     <string name="update_available">ხელმისაწვდომია განახლება</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">სორტირება</string>
+    <string name="external_rw_permission_denied">დართეთ მეხსიერებასთან წვდომის ნებართვა ამ ფუნქციის გამოსაყნებლად</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">თემების ჩამონათვალი</string>
@@ -246,8 +249,8 @@
     <string name="proprietary_title">კუთვნილი კოდის გადმოწერა</string>
     <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და კოდ-გახსნილი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
     <string name="setup_fail">ინსტალაცია ჩაიშალა</string>
-    <string name="env_fix_title">სჭირდება დამატებითი ინსტალაცია</string>
-    <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი ინსტალაცია იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
+    <string name="env_fix_title">სჭირდება დამატებითი გამართვა</string>
+    <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი გამართვა იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
     <string name="setup_msg">მიმდინარეობს ინტერფეისის ინსტალაცია…</string>
     <string name="authenticate">აუტენთიფიკაცია</string>
     <string name="unsupport_magisk_title">შეუთავსებელი Magisk-ის ვერსია</string>

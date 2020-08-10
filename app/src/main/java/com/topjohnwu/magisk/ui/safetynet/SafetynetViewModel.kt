@@ -3,94 +3,102 @@ package com.topjohnwu.magisk.ui.safetynet
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.utils.SafetyNetHelper
-import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.model.events.SafetyNetResult
-import com.topjohnwu.magisk.model.events.UpdateSafetyNetEvent
+import com.topjohnwu.magisk.model.events.CheckSafetyNetEvent
 import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
-import com.topjohnwu.magisk.utils.KObservableField
-import com.topjohnwu.magisk.utils.RxBus
+import com.topjohnwu.magisk.utils.set
+import org.json.JSONObject
 
 enum class SafetyNetState {
     LOADING, PASS, FAILED, IDLE
 }
 
-class SafetynetViewModel(
-    rxBus: RxBus
-) : BaseViewModel() {
+data class SafetyNetResult(
+    val response: JSONObject? = null,
+    val dismiss: Boolean = false
+)
+
+class SafetynetViewModel : BaseViewModel() {
+
+    @get:Bindable
+    var safetyNetTitle = R.string.empty
+        set(value) = set(value, field, { field = it }, BR.safetyNetTitle)
+
+    @get:Bindable
+    var ctsState = false
+        set(value) = set(value, field, { field = it }, BR.ctsState)
+
+    @get:Bindable
+    var basicIntegrityState = false
+        set(value) = set(value, field, { field = it }, BR.basicIntegrityState)
+
+    @get:Bindable
+    var evalType = ""
+        set(value) = set(value, field, { field = it }, BR.evalType)
+
+    @get:Bindable
+    val isChecking get() = currentState == LOADING
+    @get:Bindable
+    val isFailed get() = currentState == FAILED
+    @get:Bindable
+    val isSuccess get() = currentState == PASS
 
     private var currentState = IDLE
-        set(value) {
-            field = value
-            notifyStateChanged()
-        }
-    val safetyNetTitle = KObservableField(R.string.empty)
-    val ctsState = KObservableField(false)
-    val basicIntegrityState = KObservableField(false)
-
-    val isChecking @Bindable get() = currentState == LOADING
-    val isFailed @Bindable get() = currentState == FAILED
-    val isSuccess @Bindable get() = currentState == PASS
+        set(value) = set(value, field, { field = it }, BR.checking, BR.failed, BR.success)
 
     init {
-        rxBus.register<SafetyNetResult>()
-            .subscribeK { resolveResponse(it.responseCode) }
-            .add()
-
-        if (safetyNetResult >= 0) {
-            resolveResponse(safetyNetResult)
-        } else {
-            attest()
-        }
-    }
-
-    override fun notifyStateChanged() {
-        super.notifyStateChanged()
-        notifyPropertyChanged(BR.loading)
-        notifyPropertyChanged(BR.failed)
-        notifyPropertyChanged(BR.success)
+        cachedResult?.also {
+            resolveResponse(SafetyNetResult(it))
+        } ?: attest()
     }
 
     private fun attest() {
         currentState = LOADING
-        UpdateSafetyNetEvent().publish()
+        CheckSafetyNetEvent() {
+            resolveResponse(it)
+        }.publish()
     }
 
     fun reset() = attest()
 
-    private fun resolveResponse(response: Int) = when {
-        response and 0x0F == 0 -> {
-            val hasCtsPassed = response and SafetyNetHelper.CTS_PASS != 0
-            val hasBasicIntegrityPassed = response and SafetyNetHelper.BASIC_PASS != 0
-            val result = hasCtsPassed && hasBasicIntegrityPassed
-            safetyNetResult = response
-            ctsState.value = hasCtsPassed
-            basicIntegrityState.value = hasBasicIntegrityPassed
-            currentState = if (result) PASS else FAILED
-            safetyNetTitle.value =
-                if (result) R.string.safetynet_attest_success
-                else R.string.safetynet_attest_failure
-        }
-        response == -2 -> {
-            currentState = FAILED
-            ctsState.value = false
-            basicIntegrityState.value = false
+    private fun resolveResponse(response: SafetyNetResult) {
+        if (response.dismiss) {
             back()
+            return
         }
-        else -> {
-            currentState = FAILED
-            ctsState.value = false
-            basicIntegrityState.value = false
-            safetyNetTitle.value = when (response) {
-                SafetyNetHelper.RESPONSE_ERR -> R.string.safetynet_res_invalid
-                else -> R.string.safetynet_api_error
+
+        response.response?.apply {
+            runCatching {
+                val cts = getBoolean("ctsProfileMatch")
+                val basic = getBoolean("basicIntegrity")
+                val eval = optString("evaluationType")
+                val result = cts && basic
+                cachedResult = this
+                ctsState = cts
+                basicIntegrityState = basic
+                evalType = if (eval.contains("HARDWARE")) "HARDWARE" else "BASIC"
+                currentState = if (result) PASS else FAILED
+                safetyNetTitle =
+                    if (result) R.string.safetynet_attest_success
+                    else R.string.safetynet_attest_failure
+            }.onFailure {
+                currentState = FAILED
+                ctsState = false
+                basicIntegrityState = false
+                evalType = "N/A"
+                safetyNetTitle = R.string.safetynet_res_invalid
             }
-        }
+        } ?: {
+            currentState = FAILED
+            ctsState = false
+            basicIntegrityState = false
+            evalType = "N/A"
+            safetyNetTitle = R.string.safetynet_api_error
+        }()
     }
 
     companion object {
-        private var safetyNetResult = -1
+        private var cachedResult: JSONObject? = null
     }
 
 }

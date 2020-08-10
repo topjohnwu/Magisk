@@ -16,13 +16,14 @@ import com.topjohnwu.magisk.core.model.toPolicy
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.startActivity
-import com.topjohnwu.magisk.extensions.startActivityWithRoot
-import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.legacy.surequest.SuRequestActivity
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.startActivity
+import com.topjohnwu.magisk.ktx.startActivityWithRoot
 import com.topjohnwu.magisk.model.entity.toLog
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 object SuCallbackHandler : ProviderCallHandler {
@@ -51,20 +52,8 @@ object SuCallbackHandler : ProviderCallHandler {
         }
 
         when (action) {
-            REQUEST -> {
-                val intent = context.intent<SuRequestActivity>()
-                    .setAction(action)
-                    .putExtras(data)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-                if (Build.VERSION.SDK_INT >= 29) {
-                    // Android Q does not allow starting activity from background
-                    intent.startActivityWithRoot()
-                } else {
-                    intent.startActivity(context)
-                }
-            }
-            LOG -> handleLogs(context, data)
+            REQUEST -> handleRequest(context, data)
+            LOG -> handleLogging(context, data)
             NOTIFY -> handleNotify(context, data)
             TEST -> {
                 val mode = data.getInt("mode", 2)
@@ -78,13 +67,26 @@ object SuCallbackHandler : ProviderCallHandler {
 
     private fun Any?.toInt(): Int? {
         return when (this) {
-            is Int -> this
-            is Long -> this.toInt()
+            is Number -> this.toInt()
             else -> null
         }
     }
 
-    private fun handleLogs(context: Context, data: Bundle) {
+    private fun handleRequest(context: Context, data: Bundle) {
+        val intent = context.intent<SuRequestActivity>()
+            .setAction(REQUEST)
+            .putExtras(data)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+        if (Build.VERSION.SDK_INT >= 29) {
+            // Android Q does not allow starting activity from background
+            intent.startActivityWithRoot()
+        } else {
+            intent.startActivity(context)
+        }
+    }
+
+    private fun handleLogging(context: Context, data: Bundle) {
         val fromUid = data["from.uid"].toInt() ?: return
         if (fromUid == Process.myUid())
             return
@@ -110,7 +112,9 @@ object SuCallbackHandler : ProviderCallHandler {
         )
 
         val logRepo = get<LogRepository>()
-        logRepo.insert(log).subscribeK(onError = { Timber.e(it) })
+        GlobalScope.launch {
+            logRepo.insert(log)
+        }
     }
 
     private fun handleNotify(context: Context, data: Bundle) {

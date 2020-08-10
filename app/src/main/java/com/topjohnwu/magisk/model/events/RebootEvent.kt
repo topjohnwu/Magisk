@@ -6,7 +6,7 @@ import android.widget.PopupMenu
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.magisk.extensions.reboot as systemReboot
+import com.topjohnwu.magisk.ktx.reboot as systemReboot
 
 object RebootEvent {
 

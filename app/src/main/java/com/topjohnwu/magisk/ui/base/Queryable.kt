@@ -1,23 +1,17 @@
 package com.topjohnwu.magisk.ui.base
 
 import android.os.Handler
-import android.os.Looper
+import androidx.core.os.postDelayed
+import com.topjohnwu.superuser.internal.UiThreadHandler
 
 interface Queryable {
 
     val queryDelay: Long
-    val queryHandler: Handler
-    val queryRunnable: Runnable
+    val queryHandler: Handler get() = UiThreadHandler.handler
 
-    fun submitQuery()
-
-    companion object {
-        fun impl(delay: Long = 1000L) = object : Queryable {
-            override val queryDelay = delay
-            override val queryHandler = Handler(Looper.getMainLooper())
-            override val queryRunnable = Runnable { TODO() }
-
-            override fun submitQuery() {}
-        }
+    fun submitQuery() {
+        queryHandler.postDelayed(queryDelay) { query() }
     }
+
+    fun query()
 }

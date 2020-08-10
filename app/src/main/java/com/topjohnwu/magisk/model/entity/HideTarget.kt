@@ -2,9 +2,13 @@ package com.topjohnwu.magisk.model.entity
 
 class HideTarget(line: String) {
 
-    private val split = line.split(Regex("\\|"), 2)
+    val packageName: String
+    val process: String
 
-    val packageName = split[0]
-    val process = split.getOrElse(1) { packageName }
+    init {
+        val split = line.split(Regex("\\|"), 2)
+        packageName = split[0]
+        process = split.getOrElse(1) { packageName }
+    }
 
 }

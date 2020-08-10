@@ -121,7 +121,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.isConnected ? viewModel.stateManagerRemoteVersion : @string/not_available}"
+                                android:text="@{viewModel.isConnected ? viewModel.managerRemoteVersion : @string/not_available}"
                                 tools:text="8.0.0 (123) (10)" />
 
                         </LinearLayout>
@@ -138,7 +138,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.stateManagerInstalledVersion}"
+                                android:text="@{viewModel.managerInstalledVersion}"
                                 tools:text="8.0.0 (123) (10)" />
 
                         </LinearLayout>

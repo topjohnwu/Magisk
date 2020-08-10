@@ -2,11 +2,11 @@ package com.topjohnwu.magisk.ui.hide
 
 import android.content.pm.ApplicationInfo
 import androidx.databinding.Bindable
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.extensions.toggle
 import com.topjohnwu.magisk.model.entity.HideAppInfo
 import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.model.entity.ProcessHideApp
@@ -17,29 +17,30 @@ import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.base.Queryable
 import com.topjohnwu.magisk.ui.base.filterableListOf
 import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.magisk.utils.set
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class HideViewModel(
     private val magiskRepo: MagiskRepository
-) : BaseViewModel(), Queryable by Queryable.impl(1000) {
+) : BaseViewModel(), Queryable {
 
-    override val queryRunnable = Runnable { query() }
+    override val queryDelay = 1000L
 
-    var isShowSystem = false
-        @Bindable get
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.showSystem)
-            query()
-        }
-
-    var query = ""
-        @Bindable get
-        set(value) {
-            field = value
-            notifyPropertyChanged(BR.query)
+    @get:Bindable
+    var isShowSystem = Config.showSystemApp
+        set(value) = set(value, field, { field = it }, BR.showSystem){
+            Config.showSystemApp = it
             submitQuery()
         }
+
+    @get:Bindable
+    var query = ""
+        set(value) = set(value, field, { field = it }, BR.query){
+            submitQuery()
+        }
+
     val items = filterableListOf<HideItem>()
     val itemBinding = itemBindingOf<HideItem> {
         it.bindExtra(BR.viewModel, this)
@@ -48,21 +49,18 @@ class HideViewModel(
         it.bindExtra(BR.viewModel, this)
     }
 
-    val isFilterExpanded = KObservableField(false)
-
-    override fun refresh() = magiskRepo.fetchApps()
-        .map { it to magiskRepo.fetchHideTargets().blockingGet() }
-        .map { pair -> pair.first.map { mergeAppTargets(it, pair.second) } }
-        .flattenAsFlowable { it }
-        .map { HideItem(it) }
-        .toList()
-        .map { it.sort() }
-        .map { it to items.calculateDiff(it) }
-        .applyViewModel(this)
-        .subscribeK {
-            items.update(it.first, it.second)
-            submitQuery()
+    override fun refresh() = viewModelScope.launch {
+        state = State.LOADING
+        val apps = magiskRepo.fetchApps()
+        val hides = magiskRepo.fetchHideTargets()
+        val (appList, diff) = withContext(Dispatchers.Default) {
+            val list = apps.map { mergeAppTargets(it, hides) }.map { HideItem(it) }.sort()
+            list to items.calculateDiff(list)
         }
+        items.update(appList, diff)
+        submitQuery()
+        state = State.LOADED
+    }
 
     // ---
 
@@ -74,50 +72,38 @@ class HideViewModel(
         return ProcessHideApp(a, processes)
     }
 
-    private fun List<HideItem>.sort() = compareByDescending<HideItem> { it.itemsChecked.value }
+    private fun List<HideItem>.sort() = compareByDescending<HideItem> { it.itemsChecked != 0 }
         .thenBy { it.item.info.name.toLowerCase(currentLocale) }
         .thenBy { it.item.info.info.packageName }
         .let { sortedWith(it) }
 
     // ---
 
-    override fun submitQuery() {
-        queryHandler.removeCallbacks(queryRunnable)
-        queryHandler.postDelayed(queryRunnable, queryDelay)
-    }
+    override fun query() = items.filter {
+        fun showHidden()= it.itemsChecked != 0
 
-    private fun query(
-        query: String = this.query,
-        showSystem: Boolean = isShowSystem
-    ) = items.filter {
         fun filterSystem(): Boolean {
-            return showSystem || it.item.info.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
+            return isShowSystem || it.item.info.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
         }
 
         fun filterQuery(): Boolean {
-            val inName = it.item.info.name.contains(query, true)
-            val inPackage = it.item.info.info.packageName.contains(query, true)
-            val inProcesses = it.item.processes.any { it.name.contains(query, true) }
-            return inName || inPackage || inProcesses
+            fun inName() = it.item.info.name.contains(query, true)
+            fun inPackage() = it.item.info.info.packageName.contains(query, true)
+            fun inProcesses() = it.item.processes.any { it.name.contains(query, true) }
+            return inName() || inPackage() || inProcesses()
         }
 
-        filterSystem() && filterQuery()
+        showHidden() || (filterSystem() && filterQuery())
     }
 
     // ---
 
-    fun toggleItem(item: HideProcessItem) = magiskRepo
-        .toggleHide(item.isHidden.value, item.item.packageName, item.item.name)
-
-    fun toggle(item: KObservableField<Boolean>) = item.toggle()
+    fun toggleItem(item: HideProcessItem) {
+        magiskRepo.toggleHide(item.isHidden, item.item.packageName, item.item.name)
+    }
 
     fun resetQuery() {
         query = ""
     }
-
-    fun hideFilter() {
-        isFilterExpanded.value = false
-    }
-
 }
 

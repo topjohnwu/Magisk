@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -15,28 +14,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <HorizontalScrollView
+        <androidx.core.widget.NestedScrollView
+            gone="@{viewModel.consoleText.empty}"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
-            <androidx.recyclerview.widget.RecyclerView
-                adapter="@{viewModel.consoleAdapter}"
-                itemBinding="@{viewModel.itemConsoleBinding}"
-                items="@{viewModel.itemsConsole}"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:orientation="vertical"
-                android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-                android:paddingBottom="@{viewModel.insets.bottom}"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_console_md2"
-                tools:paddingTop="24dp" />
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        </HorizontalScrollView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    precomputedText="@{viewModel.consoleText}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption"
+                    android:textSize="10sp"
+                    android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
+                    android:paddingBottom="@{viewModel.insets.bottom}"
+                    tools:text="@tools:sample/lorem/random" />
+
+            </HorizontalScrollView>
+
+        </androidx.core.widget.NestedScrollView>
 
         <FrameLayout
-            gone="@{!viewModel.itemsConsole.empty}"
+            gone="@{!viewModel.consoleText.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center">

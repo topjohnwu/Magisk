@@ -19,9 +19,9 @@
     <string name="info">Инфо</string>
     <string name="uninstall">Удаление</string>
     <string name="update">Обновить</string>
-    <string name="not_available">N/A</string> <!--Do not translate-->
+    <string name="not_available">Н/Д</string>
     <string name="hide">Скрыть</string>
-    <string name="status">Статус</string>
+    <string name="status">Режим</string>
     <string name="home_package">Имя пакета</string>
     <string name="details">Подробно</string>
 
@@ -36,8 +36,8 @@
     <string name="home_device_extra_board">Платформа</string>
     <string name="home_device_system">Android</string> <!--Do not translate-->
     <string name="home_status_normal">Обычный</string>
-    <string name="home_status_safe">Безопасный режим</string>
-    <string name="home_status_stub">Stub</string> <!--Do not translate-->
+    <string name="home_status_safe">Безопасный</string>
+    <string name="home_status_stub">Скрытие</string>
     <string name="home_installed_version">Установлен</string>
     <string name="home_latest_version">Доступен</string>
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
@@ -61,6 +61,7 @@
     <string name="select_patch_file">Пропатчить образ</string>
     <string name="patch_file_msg">Выберите файл образа (*.img) или архив ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Перезагрузка через 5 секунд…</string>
+    <string name="flash_screen_title">Установка</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав суперпользователя</string>
@@ -136,7 +137,7 @@
     <string name="update_available">Доступно обновление</string>
     <string name="module_installed">Установлены</string>
     <string name="sorting_order">Сортировка</string>
-    <string name="module_permission_declined">Пожалуйста, предоставьте доступ к хранилищу</string>
+    <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Оттенок</string>
@@ -148,8 +149,8 @@
     <string name="settings_core_only_summary" deprecated="true">Задействовать только основной функционал (MagiskSU и MagiskHide). Модули не будут активированы</string>
     <string name="settings_grid_column_count_title">Расположение элементов</string>
     <string name="settings_grid_column_count_summary">Выберите компановку элементов в списке. Перезапустите приложение для применения изменений</string>
-    <string name="settings_grid_column_count_1">Обычная</string>
-    <string name="settings_grid_column_count_2">Компактная</string>
+    <string name="settings_grid_column_count_1">Обычное</string>
+    <string name="settings_grid_column_count_2">Компактное</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>

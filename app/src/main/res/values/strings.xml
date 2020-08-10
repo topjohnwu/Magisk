@@ -43,6 +43,7 @@
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
+    <string name="home_check_safetynet">Check SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Preserve force encryption</string>
@@ -137,7 +138,6 @@
     <string name="update_available">Update Available</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sorting Order</string>
-    <string name="module_permission_declined">Grant storage permission to enable this functionality</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Theme Mode</string>
@@ -255,5 +255,6 @@
     <string name="authenticate">Authenticate</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
     <string name="unsupport_magisk_msg">This version of Magisk Manager does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
+    <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
 
 </resources>

@@ -303,9 +303,10 @@ struct boot_img {
 	// Flags to indicate the state of current boot image
 	uint16_t flags = 0;
 
-	// The format of kernel and ramdisk
+	// The format of kernel, ramdisk and extra
 	format_t k_fmt;
 	format_t r_fmt;
+	format_t e_fmt;
 
 	/***************************************************
 	 * Following pointers points within the mmap region

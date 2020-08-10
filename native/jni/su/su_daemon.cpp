@@ -12,7 +12,6 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 
-#include <logging.hpp>
 #include <daemon.hpp>
 #include <utils.hpp>
 #include <selinux.hpp>
@@ -140,12 +139,9 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 	}
 
 	// If still not determined, ask manager
-	struct sockaddr_un addr;
-	int sockfd = create_rand_socket(&addr);
-
-	// Connect manager
-	app_socket(addr.sun_path + 1, info);
-	int fd = socket_accept(sockfd, 60);
+	char socket_name[32];
+	gen_rand_str(socket_name, sizeof(socket_name));
+	int fd = app_socket(socket_name, info);
 	if (fd < 0) {
 		info->access.policy = DENY;
 	} else {
@@ -154,7 +150,6 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 		info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
 		close(fd);
 	}
-	close(sockfd);
 
 	return info;
 }
@@ -275,9 +270,9 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	xdup2(errfd, STDERR_FILENO);
 
 	// Unleash all streams from SELinux hell
-	setfilecon("/proc/self/fd/0", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	setfilecon("/proc/self/fd/1", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
-	setfilecon("/proc/self/fd/2", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/proc/self/fd/0", "u:object_r:" SEPOL_FILE_TYPE ":s0");
+	setfilecon("/proc/self/fd/1", "u:object_r:" SEPOL_FILE_TYPE ":s0");
+	setfilecon("/proc/self/fd/2", "u:object_r:" SEPOL_FILE_TYPE ":s0");
 
 	close(infd);
 	close(outfd);
@@ -298,6 +293,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 			break;
 		case NAMESPACE_MODE_ISOLATE:
 			LOGD("su: use new isolated namespace\n");
+			switch_mnt_ns(ctx.pid);
 			xunshare(CLONE_NEWNS);
 			xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
 			break;

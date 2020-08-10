@@ -10,26 +10,27 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.extensions.writeTo
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.signing.JarMap
-import com.topjohnwu.signing.SignAPK
+import com.topjohnwu.signing.SignApk
 import com.topjohnwu.superuser.Shell
-import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.SecureRandom
 
 object PatchAPK {
 
-    private const val ALPHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    private const val DIGITS = "0123456789"
-    const val ALPHANUM = ALPHA + DIGITS
-    private const val ALPHANUMDOTS = "$ALPHANUM............"
+    private const val ALPHA = "abcdefghijklmnopqrstuvwxyz"
+    private const val ALPHADOTS = "$ALPHA....."
 
     private const val APP_ID = "com.topjohnwu.magisk"
     private const val APP_NAME = "Magisk Manager"
@@ -45,7 +46,7 @@ object PatchAPK {
             next = if (prev == '.' || i == len - 1) {
                 ALPHA[random.nextInt(ALPHA.length)]
             } else {
-                ALPHANUMDOTS[random.nextInt(ALPHANUMDOTS.length)]
+                ALPHADOTS[random.nextInt(ALPHADOTS.length)]
             }
             builder.append(next)
             prev = next
@@ -93,7 +94,7 @@ object PatchAPK {
             // Write apk changes
             jar.getOutputStream(je).write(xml)
             val keys = Keygen(get())
-            SignAPK.sign(keys.cert, keys.key, jar, FileOutputStream(out).buffered())
+            SignApk.sign(keys.cert, keys.key, jar, FileOutputStream(out))
         } catch (e: Exception) {
             Timber.e(e)
             return false
@@ -102,17 +103,16 @@ object PatchAPK {
         return true
     }
 
-    private fun patchAndHide(context: Context, label: String): Boolean {
-        val dlStub = !isRunningAsStub && SDK_INT >= 28 &&
-                Info.env.magiskVersionCode >= Const.Version.PROVIDER_CONNECT
+    private suspend fun patchAndHide(context: Context, label: String): Boolean {
+        val dlStub = !isRunningAsStub && SDK_INT >= 28 && Const.Version.atLeast_20_2()
         val src = if (dlStub) {
             val stub = File(context.cacheDir, "stub.apk")
             val svc = get<GithubRawServices>()
             try {
-                svc.fetchFile(Info.remote.stub.link).blockingGet().byteStream().use {
+                svc.fetchFile(Info.remote.stub.link).byteStream().use {
                     it.writeTo(stub)
                 }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 Timber.e(e)
                 return false
             }
@@ -131,7 +131,7 @@ object PatchAPK {
 
         // Install the application
         repack.setReadable(true, false)
-        if (!Shell.su("force_pm_install $repack").exec().isSuccess)
+        if (!Shell.su("pm install $repack").exec().isSuccess)
             return false
 
         Config.suManager = pkg.toString()
@@ -144,10 +144,11 @@ object PatchAPK {
     fun hideManager(context: Context, label: String) {
         val progress = Notifications.progress(context, context.getString(R.string.hide_manager_title))
         Notifications.mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build())
-        Single.fromCallable {
-            patchAndHide(context, label)
-        }.subscribeK {
-            if (!it)
+        GlobalScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                patchAndHide(context, label)
+            }
+            if (!result)
                 Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG)
             Notifications.mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID)
         }

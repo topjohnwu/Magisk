@@ -43,7 +43,7 @@ class CompatDelegate internal constructor(
             insets.asInsets()
                 .also { view.peekSystemWindowInsets(it) }
                 .let { view.consumeSystemWindowInsets(it) }
-                ?.also { view.viewModel.insets.value = it }
+                ?.also { view.viewModel.insets = it }
                 ?.subtractBy(insets) ?: insets
         }
         if (ViewCompat.isAttachedToWindow(view.viewRoot)) {

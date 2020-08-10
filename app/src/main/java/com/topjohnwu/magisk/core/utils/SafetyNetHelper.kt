@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.core.utils
 
+import org.json.JSONObject
+
 interface SafetyNetHelper {
 
     val version: Int
@@ -7,15 +9,6 @@ interface SafetyNetHelper {
     fun attest()
 
     interface Callback {
-        fun onResponse(responseCode: Int)
-    }
-
-    companion object {
-
-        const val RESPONSE_ERR = 0x01
-        const val CONNECTION_FAIL = 0x02
-
-        const val BASIC_PASS = 0x10
-        const val CTS_PASS = 0x20
+        fun onResponse(response: JSONObject?)
     }
 }

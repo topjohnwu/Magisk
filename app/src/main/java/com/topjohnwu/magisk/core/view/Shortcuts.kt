@@ -11,9 +11,12 @@ import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toAdaptiveIcon
 import androidx.core.graphics.drawable.toIcon
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.SplashActivity
+import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.utils.Utils
-import com.topjohnwu.magisk.extensions.getBitmap
+import com.topjohnwu.magisk.ktx.getBitmap
 
 object Shortcuts {
 
@@ -67,7 +70,7 @@ object Shortcuts {
                     .build()
             )
         }
-        if (!Config.coreOnly && Info.env.isActive) {
+        if (Info.env.isActive) {
             shortCuts.add(
                 ShortcutInfo.Builder(context, "modules")
                     .setShortLabel(context.getString(R.string.modules))

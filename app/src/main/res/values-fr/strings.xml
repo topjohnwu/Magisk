@@ -137,7 +137,7 @@
     <string name="update_available">Mise à jour disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Classement</string>
-   <string name="module_permission_declined">Autorisez l’accès au stockage pour activer cette fonctionnalité</string>
+   <string name="external_rw_permission_denied">Autorisez l’accès au stockage pour activer cette fonctionnalité</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode du thème</string>

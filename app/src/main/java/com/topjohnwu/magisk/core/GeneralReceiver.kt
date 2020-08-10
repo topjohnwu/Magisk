@@ -8,10 +8,12 @@ import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.view.Shortcuts
-import com.topjohnwu.magisk.extensions.reboot
+import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.model.entity.internal.Configuration
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.koin.core.inject
 
 open class GeneralReceiver : BaseReceiver() {
@@ -25,6 +27,10 @@ open class GeneralReceiver : BaseReceiver() {
     override fun onReceive(context: ContextWrapper, intent: Intent?) {
         intent ?: return
 
+        fun rmPolicy(pkg: String) = GlobalScope.launch {
+            policyDB.delete(pkg)
+        }
+
         when (intent.action ?: return) {
             Intent.ACTION_REBOOT -> {
                 SuCallbackHandler(context, intent.getStringExtra("action"), intent.extras)
@@ -32,11 +38,11 @@ open class GeneralReceiver : BaseReceiver() {
             Intent.ACTION_PACKAGE_REPLACED -> {
                 // This will only work pre-O
                 if (Config.suReAuth)
-                    policyDB.delete(getPkg(intent)).blockingGet()
+                    rmPolicy(getPkg(intent))
             }
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
                 val pkg = getPkg(intent)
-                policyDB.delete(pkg).blockingGet()
+                rmPolicy(pkg)
                 Shell.su("magiskhide --rm $pkg").submit()
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)

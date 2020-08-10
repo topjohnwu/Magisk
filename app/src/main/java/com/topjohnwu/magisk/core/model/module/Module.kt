@@ -1,9 +1,10 @@
 package com.topjohnwu.magisk.core.model.module
 
-import androidx.annotation.WorkerThread
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class Module(path: String) : BaseModule() {
     override var id: String = ""
@@ -62,20 +63,15 @@ class Module(path: String) : BaseModule() {
 
     companion object {
 
-        private const val PERSIST = "/sbin/.magisk/mirror/persist/magisk"
+        private val PERSIST get() = "${Const.MAGISKTMP}/mirror/persist/magisk"
 
-        @WorkerThread
-        fun loadModules(): List<Module> {
-            val moduleList = mutableListOf<Module>()
-            val path = SuFile(Const.MAGISK_PATH)
-            val modules =
-                path.listFiles { _, name -> name != "lost+found" && name != ".core" }.orEmpty()
-            for (file in modules) {
-                if (file.isFile) continue
-                val module = Module(Const.MAGISK_PATH + "/" + file.name)
-                moduleList.add(module)
-            }
-            return moduleList.sortedBy { it.name.toLowerCase() }
+        suspend fun installed() = withContext(Dispatchers.IO) {
+            SuFile(Const.MAGISK_PATH)
+                .listFiles { _, name -> name != "lost+found" && name != ".core" }
+                .orEmpty()
+                .filter { !it.isFile }
+                .map { Module("${Const.MAGISK_PATH}/${it.name}") }
+                .sortedBy { it.name.toLowerCase() }
         }
     }
 }

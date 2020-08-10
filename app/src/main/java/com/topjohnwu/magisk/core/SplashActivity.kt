@@ -4,14 +4,16 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.core.tasks.patchDTB
-import com.topjohnwu.magisk.core.utils.Utils
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.core.view.Shortcuts
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.get
+import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.model.navigation.Navigation
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 open class SplashActivity : Activity() {
 
@@ -20,8 +22,11 @@ open class SplashActivity : Activity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.SplashTheme)
         super.onCreate(savedInstanceState)
-        Shell.getShell { Shell.EXECUTOR.execute(this::initAndStart) }
+        GlobalScope.launch(Dispatchers.IO) {
+            initAndStart()
+        }
     }
 
     private fun handleRepackage() {
@@ -40,14 +45,14 @@ open class SplashActivity : Activity() {
     }
 
     private fun initAndStart() {
+        // Pre-initialize root shell
+        Shell.getShell()
+
         Config.initialize()
         handleRepackage()
         Notifications.setup(this)
-        Utils.scheduleUpdateCheck(this)
+        UpdateCheckService.schedule(this)
         Shortcuts.setup(this)
-
-        // Patch DTB partitions if needed
-        patchDTB(this)
 
         // Pre-fetch network stuffs
         get<GithubRawServices>()

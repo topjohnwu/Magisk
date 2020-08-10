@@ -1,18 +1,13 @@
-#include <stdio.h>
-#include <limits.h>
-
-#include <logging.hpp>
 #include <utils.hpp>
-#include <flags.h>
 #include <magiskpolicy.hpp>
 
-#include "sepolicy.h"
+#include "sepolicy.hpp"
 
 using namespace std::literals;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
-NAME_WITH_VER(MagiskPolicy) R"EOF(
+R"EOF(MagiskPolicy - Sepolicy Patch Tool
 
 Usage: %s [--options...] [policy statements...]
 
@@ -40,6 +35,7 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	cmdline_logging();
 	const char *out_file = nullptr;
 	const char *rule_file = nullptr;
+	sepolicy *sepol = nullptr;
 	bool magisk = false;
 	bool live = false;
 
@@ -56,18 +52,21 @@ int magiskpolicy_main(int argc, char *argv[]) {
 			else if (option == "load"sv) {
 				if (argv[i + 1] == nullptr)
 					usage(argv[0]);
-				if (load_policydb(argv[i + 1])) {
+				sepol = sepolicy::from_file(argv[i + 1]);
+				if (!sepol) {
 					fprintf(stderr, "Cannot load policy from %s\n", argv[i + 1]);
 					return 1;
 				}
 				++i;
 			} else if (option == "load-split"sv) {
-				if (load_split_cil()) {
+				sepol = sepolicy::from_split();
+				if (!sepol) {
 					fprintf(stderr, "Cannot load split cil\n");
 					return 1;
 				}
 			} else if (option == "compile-split"sv) {
-				if (compile_split_cil()) {
+				sepol = sepolicy::compile_split();
+				if (!sepol) {
 					fprintf(stderr, "Cannot compile split cil\n");
 					return 1;
 				}
@@ -92,30 +91,30 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	}
 
 	// Use current policy if nothing is loaded
-	if (magisk_policydb == nullptr && load_policydb(SELINUX_POLICY)) {
+	if (sepol == nullptr && !(sepol = sepolicy::from_file(SELINUX_POLICY))) {
 		fprintf(stderr, "Cannot load policy from " SELINUX_POLICY "\n");
 		return 1;
 	}
 
 	if (magisk)
-		sepol_magisk_rules();
+		sepol->magisk_rules();
 
 	if (rule_file)
-		load_rule_file(rule_file);
+		sepol->load_rule_file(rule_file);
 
 	for (; i < argc; ++i)
-		parse_statement(argv[i]);
+		sepol->parse_statement(argv[i]);
 
-	if (live && dump_policydb(SELINUX_LOAD)) {
+	if (live && !sepol->to_file(SELINUX_LOAD)) {
 		fprintf(stderr, "Cannot apply policy\n");
 		return 1;
 	}
 
-	if (out_file && dump_policydb(out_file)) {
+	if (out_file && !sepol->to_file(out_file)) {
 		fprintf(stderr, "Cannot dump policy to %s\n", out_file);
 		return 1;
 	}
 
-	destroy_policydb();
+	delete sepol;
 	return 0;
 }

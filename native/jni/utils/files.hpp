@@ -5,6 +5,8 @@
 #include <mntent.h>
 #include <functional>
 #include <string_view>
+#include <string>
+#include <vector>
 
 #include "xwrap.hpp"
 
@@ -16,24 +18,48 @@ struct file_attr {
 	char con[128];
 };
 
+struct raw_file {
+	std::string path;
+	file_attr attr;
+	uint8_t *buf = nullptr;
+	size_t sz = 0;
+
+	raw_file() = default;
+	raw_file(const raw_file&) = delete;
+	raw_file(raw_file &&d) {
+		path = std::move(d.path);
+		attr = d.attr;
+		buf = d.buf;
+		sz = d.sz;
+		d.buf = nullptr;
+		d.sz = 0;
+	}
+	~raw_file() {
+		free(buf);
+	}
+};
+
 ssize_t fd_path(int fd, char *path, size_t size);
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
-int mkdirs(const char *pathname, mode_t mode);
+int mkdirs(std::string path, mode_t mode);
 void rm_rf(const char *path);
-void mv_f(const char *source, const char *destination);
+void mv_path(const char *src, const char *dest);
 void mv_dir(int src, int dest);
-void cp_afc(const char *source, const char *destination);
+void cp_afc(const char *src, const char *dest);
+void link_path(const char *src, const char *dest);
 void link_dir(int src, int dest);
-int getattr(const char *path, struct file_attr *a);
-int getattrat(int dirfd, const char *name, struct file_attr *a);
-int fgetattr(int fd, struct file_attr *a);
-int setattr(const char *path, struct file_attr *a);
-int setattrat(int dirfd, const char *name, struct file_attr *a);
-int fsetattr(int fd, struct file_attr *a);
-void fclone_attr(int sourcefd, int targetfd);
-void clone_attr(const char *source, const char *target);
+int getattr(const char *path, file_attr *a);
+int getattrat(int dirfd, const char *name, file_attr *a);
+int fgetattr(int fd, file_attr *a);
+int setattr(const char *path, file_attr *a);
+int setattrat(int dirfd, const char *name, file_attr *a);
+int fsetattr(int fd, file_attr *a);
+void fclone_attr(int src, int dest);
+void clone_attr(const char *src, const char *dest);
 void fd_full_read(int fd, void **buf, size_t *size);
 void full_read(const char *filename, void **buf, size_t *size);
+std::string fd_full_read(int fd);
+std::string full_read(const char *filename);
 void write_zero(int fd, size_t size);
 void file_readline(bool trim, const char *file, const std::function<bool(std::string_view)> &fn);
 static inline void file_readline(const char *file,
@@ -41,11 +67,13 @@ static inline void file_readline(const char *file,
 	file_readline(false, file, fn);
 }
 void parse_prop_file(const char *file,
-		const std::function<bool(std::string_view, std::string_view)> &fn);
+		const std::function<bool(std::string_view, std::string_view)> &&fn);
 void *__mmap(const char *filename, size_t *size, bool rw);
-void frm_rf(int dirfd, std::initializer_list<const char *> excl = {});
-void clone_dir(int src, int dest, bool overwrite = true);
+void frm_rf(int dirfd);
+void clone_dir(int src, int dest);
 void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
+void backup_folder(const char *dir, std::vector<raw_file> &files);
+void restore_folder(const char *dir, std::vector<raw_file> &files);
 
 template <typename T>
 void full_read(const char *filename, T &buf, size_t &size) {
@@ -94,10 +122,18 @@ static inline sDIR xopen_dir(const char *path) {
 	return sDIR(xopendir(path), closedir);
 }
 
+static inline sDIR xopen_dir(int dirfd) {
+	return sDIR(xfdopendir(dirfd), closedir);
+}
+
 static inline sFILE open_file(const char *path, const char *mode) {
 	return sFILE(fopen(path, mode), fclose);
 }
 
 static inline sFILE xopen_file(const char *path, const char *mode) {
 	return sFILE(xfopen(path, mode), fclose);
+}
+
+static inline sFILE xopen_file(int fd, const char *mode) {
+	return sFILE(xfdopen(fd, mode), fclose);
 }

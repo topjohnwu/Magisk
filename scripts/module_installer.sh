@@ -11,7 +11,7 @@ ui_print() { echo "$1"; }
 
 require_new_magisk() {
   ui_print "*******************************"
-  ui_print " Please install Magisk v19.0+! "
+  ui_print " Please install Magisk v20.0+! "
   ui_print "*******************************"
   exit 1
 }
@@ -27,7 +27,7 @@ mount /data 2>/dev/null
 
 [ -f /data/adb/magisk/util_functions.sh ] || require_new_magisk
 . /data/adb/magisk/util_functions.sh
-[ $MAGISK_VER_CODE -lt 19000 ] && require_new_magisk
+[ $MAGISK_VER_CODE -lt 20000 ] && require_new_magisk
 
 if [ $MAGISK_VER_CODE -ge 20400 ]; then
   # New Magisk have complete installation logic within util_functions.sh
@@ -48,12 +48,15 @@ is_legacy_script() {
 }
 
 print_modname() {
-  local len
-  len=`echo -n $MODNAME | wc -c`
+  local authlen len namelen pounds
+  namelen=`echo -n $MODNAME | wc -c`
+  authlen=$((`echo -n $MODAUTH | wc -c` + 3))
+  [ $namelen -gt $authlen ] && len=$namelen || len=$authlen
   len=$((len + 2))
-  local pounds=`printf "%${len}s" | tr ' ' '*'`
+  pounds=$(printf "%${len}s" | tr ' ' '*')
   ui_print "$pounds"
   ui_print " $MODNAME "
+  ui_print " by $MODAUTH "
   ui_print "$pounds"
   ui_print "*******************"
   ui_print " Powered by Magisk "
@@ -95,8 +98,9 @@ unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
 $BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
 MODULEROOT=$NVBASE/$MODDIRNAME
 MODID=`grep_prop id $TMPDIR/module.prop`
-MODPATH=$MODULEROOT/$MODID
 MODNAME=`grep_prop name $TMPDIR/module.prop`
+MODAUTH=`grep_prop author $TMPDIR/module.prop`
+MODPATH=$MODULEROOT/$MODID
 
 # Create mod paths
 rm -rf $MODPATH 2>/dev/null
@@ -168,9 +172,11 @@ fi
 # Copy over custom sepolicy rules
 if [ -f $MODPATH/sepolicy.rule -a -e $PERSISTDIR ]; then
   ui_print "- Installing custom sepolicy patch"
+  # Remove old recovery logs (which may be filling partition) to make room
+  rm -f $PERSISTDIR/cache/recovery/*
   PERSISTMOD=$PERSISTDIR/magisk/$MODID
   mkdir -p $PERSISTMOD
-  cp -af $MODPATH/sepolicy.rule $PERSISTMOD/sepolicy.rule
+  cp -af $MODPATH/sepolicy.rule $PERSISTMOD/sepolicy.rule || abort "! Insufficient partition size"
 fi
 
 # Remove stuffs that don't belong to modules

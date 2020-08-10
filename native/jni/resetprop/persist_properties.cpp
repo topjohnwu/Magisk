@@ -88,8 +88,24 @@ const pb_field_t PersistentProperties_fields[2] = {
  * End of auto generated code
  * ***************************/
 
+bool use_pb = false;
+
+#ifdef APPLET_STUB_MAIN
+struct {
+	void push_back(...){};
+} allocs;
+void persist_cleanup(){}
+#else
+static thread_local vector<void *> allocs;
+void persist_cleanup() {
+	std::for_each(allocs.begin(), allocs.end(), [](auto p){ free(p); });
+	allocs.clear();
+}
+#endif
+
 static bool name_decode(pb_istream_t *stream, const pb_field_t *field, void **arg) {
-	auto name = new pb_byte_t[stream->bytes_left + 1];
+	auto name = (pb_byte_t *) malloc(stream->bytes_left + 1);
+	allocs.push_back(name);  /* Record all mallocs to cleanup */
 	name[stream->bytes_left] = '\0';
 	if (!pb_read(stream, name, stream->bytes_left))
 		return false;
@@ -107,8 +123,7 @@ static bool prop_decode(pb_istream_t *stream, const pb_field_t *field, void **ar
 	prop.name.funcs.decode = name_decode;
 	if (!pb_decode(stream, PersistentProperties_PersistentPropertyRecord_fields, &prop))
 		return false;
-	((read_cb_t *) *arg)->exec((const char *) prop.name.arg, prop.value);
-	delete[] (pb_byte_t *) prop.name.arg;
+	reinterpret_cast<prop_cb*>(*arg)->exec((const char *) prop.name.arg, prop.value);
 	return true;
 }
 
@@ -116,12 +131,12 @@ static bool prop_encode(pb_ostream_t *stream, const pb_field_t *field, void * co
 	PersistentProperties_PersistentPropertyRecord prop = {};
 	prop.name.funcs.encode = name_encode;
 	prop.has_value = true;
-	auto &prop_list = *(vector<prop_t> *) *arg;
-	for (auto &p : prop_list) {
+	auto &list = *(prop_list *) *arg;
+	for (auto &p : list) {
 		if (!pb_encode_tag_for_field(stream, field))
 			return false;
-		prop.name.arg = p.name;
-		strcpy(prop.value, p.value);
+		prop.name.arg = (void *) p.first.data();
+		strcpy(prop.value, p.second.data());
 		if (!pb_encode_submessage(stream, PersistentProperties_PersistentPropertyRecord_fields, &prop))
 			return false;
 	}
@@ -144,17 +159,11 @@ static pb_ostream_t create_ostream(const char *filename) {
 	return o;
 }
 
-static void pb_getprop_cb(const char *name, const char *value, void *v) {
-	struct prop_t *prop = static_cast<prop_t *>(v);
-	if (prop->name && strcmp(name, prop->name) == 0)
-		strcpy(prop->value, value);
-}
-
-static void pb_getprop(read_cb_t *read_cb) {
+static void pb_getprop(prop_cb *prop_cb) {
 	LOGD("resetprop: decode with protobuf [" PERSISTENT_PROPERTY_DIR "/persistent_properties]\n");
 	PersistentProperties props = {};
 	props.properties.funcs.decode = prop_decode;
-	props.properties.arg = read_cb;
+	props.properties.arg = prop_cb;
 	pb_byte_t *buf;
 	size_t size;
 	mmap_ro(PERSISTENT_PROPERTY_DIR "/persistent_properties", buf, size);
@@ -175,9 +184,9 @@ static bool file_getprop(const char *name, char *value) {
 	return value[0] != '\0';
 }
 
-void persist_getprop(read_cb_t *read_cb) {
+void persist_getprops(prop_cb *prop_cb) {
 	if (use_pb) {
-		pb_getprop(read_cb);
+		pb_getprop(prop_cb);
 	} else {
 		DIR *dir = opendir(PERSISTENT_PROPERTY_DIR);
 		struct dirent *entry;
@@ -186,16 +195,25 @@ void persist_getprop(read_cb_t *read_cb) {
 				continue;
 			char value[PROP_VALUE_MAX];
 			if (file_getprop(entry->d_name, value))
-				read_cb->exec(entry->d_name, value);
+				prop_cb->exec(entry->d_name, value);
 		}
 	}
 }
 
 string persist_getprop(const char *name) {
-	prop_t prop(name);
 	if (use_pb) {
-		read_cb_t read_cb(pb_getprop_cb, &prop);
-		pb_getprop(&read_cb);
+		run_finally f([]{ persist_cleanup(); });
+		struct {
+			const char *name;
+			char value[PROP_VALUE_MAX];
+		} prop;
+		prop.name = name;
+		prop.value[0] = '\0';
+		auto reader = make_prop_cb(prop, [](auto name, auto value, auto prop) {
+			if (strcmp(name, prop.name) == 0)
+				strcpy(prop.value, value);
+		});
+		pb_getprop(&reader);
 		if (prop.value[0])
 			return prop.value;
 	} else {
@@ -209,19 +227,20 @@ string persist_getprop(const char *name) {
 
 bool persist_deleteprop(const char *name) {
 	if (use_pb) {
-		vector<prop_t> prop_list;
-		read_cb_t read_cb(collect_props, &prop_list);
-		persist_getprop(&read_cb);
+		run_finally f([]{ persist_cleanup(); });
+		prop_list list;
+		prop_collector collector(list);
+		persist_getprops(&collector);
 
-		for (auto it = prop_list.begin(); it != prop_list.end(); ++it) {
-			if (strcmp(it->name, name) == 0) {
-				prop_list.erase(it);
+		for (auto it = list.begin(); it != list.end(); ++it) {
+			if (it->first == name) {
+				list.erase(it);
 				// Dump the props back
 				PersistentProperties props = PersistentProperties_init_zero;
 				pb_ostream_t ostream = create_ostream(PERSISTENT_PROPERTY_DIR
 						"/persistent_properties.tmp");
 				props.properties.funcs.encode = prop_encode;
-				props.properties.arg = &prop_list;
+				props.properties.arg = &list;
 				LOGD("resetprop: encode with protobuf [" PERSISTENT_PROPERTY_DIR
 							 "/persistent_properties.tmp]\n");
 				if (!pb_encode(&ostream, PersistentProperties_fields, &props))
@@ -233,7 +252,6 @@ bool persist_deleteprop(const char *name) {
 				return true;
 			}
 		}
-
 		return false;
 	} else {
 		char path[PATH_MAX];

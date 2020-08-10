@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="marquee"
-        android:background="?colorSurfaceVariant"
+        android:background="?colorSurfaceSurfaceVariant"
         android:textAppearance="@style/AppearanceFoundation.Caption"
         android:gravity="center_vertical"
         android:minHeight="?attr/listPreferredItemHeightSmall"
