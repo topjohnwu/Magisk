@@ -84,10 +84,6 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>() {
     val isUpdated get() = item.updated
     val isModified get() = isRemoved || isUpdated
 
-    fun toggle() {
-        isEnabled = !isEnabled
-    }
-
     fun delete(viewModel: ModuleViewModel) {
         isRemoved = !isRemoved
         viewModel.updateActiveState()

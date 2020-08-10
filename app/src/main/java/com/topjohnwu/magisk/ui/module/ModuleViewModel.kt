@@ -179,9 +179,11 @@ class ModuleViewModel(
 
     override fun refresh(): Job {
         return viewModelScope.launch {
+            state = State.LOADING
             loadInstalled()
             if (itemsRemote.isEmpty())
                 loadRemote()
+            state = State.LOADED
         }
     }
 

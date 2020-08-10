@@ -29,7 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="@{item.enabled ? 1f : .5f}"
-            android:onClick="@{() -> item.toggle()}"
             tools:layout_gravity="center"
             tools:layout_margin="@dimen/l1">
 
