@@ -43,6 +43,7 @@
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené!\nRoot bude odstránený!\nMôže dôjsť k zašifrovaniu vašich dát, ak už nie sú zašifrované!</string>
+	<string name="home_check_safetynet">Skontrolovať SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Ponechať vynútené šifrovanie</string>
@@ -61,7 +62,7 @@
     <string name="select_patch_file">Vybrať a zaplátať súbor</string>
     <string name="patch_file_msg">Vyberte raw súbor (*.img) alebo tar súbor ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reštart o 5 sekúnd…</string>
-    <string name="flash_screen_title">Inštalácia</string>
+	<string name="flash_screen_title">Inštalácia</string>
 
     <!--Superuser-->
     <string name="su_request_title">Požiadavka superužívateľa</string>
@@ -137,7 +138,7 @@
     <string name="update_available">Dostupná aktualizácia</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Zoradenie</string>
-    <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
+    <string name="module_permission_declined">Udeľte povolenie pre povolenie tejto funkcie</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Režim motívu</string>
