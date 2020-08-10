@@ -37,6 +37,11 @@ fun setImageResource(view: ImageView, @DrawableRes resId: Int) {
     view.setImageResource(resId)
 }
 
+@BindingAdapter("srcCompat")
+fun setImageResource(view: ImageView, drawable: Drawable) {
+    view.setImageDrawable(drawable)
+}
+
 @BindingAdapter("movieBehavior", "movieBehaviorText")
 fun setMovieBehavior(view: TextView, isMovieBehavior: Boolean, text: String) {
     (view.tag as? Job)?.cancel()

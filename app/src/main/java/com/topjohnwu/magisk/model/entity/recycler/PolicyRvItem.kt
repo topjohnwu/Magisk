@@ -9,53 +9,60 @@ import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.utils.set
 
-class PolicyItem(val item: MagiskPolicy, val icon: Drawable) : ObservableItem<PolicyItem>() {
+class PolicyItem(
+    val item: MagiskPolicy,
+    val icon: Drawable,
+    val viewModel: SuperuserViewModel
+) : ObservableItem<PolicyItem>() {
     override val layoutRes = R.layout.item_policy_md2
 
     @get:Bindable
     var isExpanded = false
         set(value) = set(value, field, { field = it }, BR.expanded)
 
-    @get:Bindable
-    var isEnabled = item.policy == MagiskPolicy.ALLOW
+    // This property hosts the policy state
+    var policyState = item.policy == MagiskPolicy.ALLOW
         set(value) = set(value, field, { field = it }, BR.enabled)
+
+    // This property binds with the UI state
+    @get:Bindable
+    var isEnabled
+        get() = policyState
+        set(value) = set(value, policyState, { viewModel.togglePolicy(this, it) }, BR.enabled)
 
     @get:Bindable
     var shouldNotify = item.notification
-        set(value) = set(value, field, { field = it }, BR.shouldNotify)
+        set(value) = set(value, field, { field = it }, BR.shouldNotify) {
+            viewModel.updatePolicy(updatedPolicy, isLogging = false)
+        }
 
     @get:Bindable
     var shouldLog = item.logging
-        set(value) = set(value, field, { field = it }, BR.shouldLog)
+        set(value) = set(value, field, { field = it }, BR.shouldLog) {
+            viewModel.updatePolicy(updatedPolicy, isLogging = true)
+        }
 
     private val updatedPolicy
         get() = item.copy(
-            policy = if (isEnabled) MagiskPolicy.ALLOW else MagiskPolicy.DENY,
+            policy = if (policyState) MagiskPolicy.ALLOW else MagiskPolicy.DENY,
             notification = shouldNotify,
             logging = shouldLog
         )
 
-    fun toggle(viewModel: SuperuserViewModel) {
-        if (isExpanded) {
-            toggle()
-            return
-        }
-        isEnabled = !isEnabled
-        viewModel.togglePolicy(this, isEnabled)
-    }
-
-    fun toggle() {
+    fun toggleExpand() {
         isExpanded = !isExpanded
     }
 
-    fun toggleNotify(viewModel: SuperuserViewModel) {
+    fun toggleNotify() {
         shouldNotify = !shouldNotify
-        viewModel.updatePolicy(updatedPolicy, isLogging = false)
     }
 
-    fun toggleLog(viewModel: SuperuserViewModel) {
+    fun toggleLog() {
         shouldLog = !shouldLog
-        viewModel.updatePolicy(updatedPolicy, isLogging = true)
+    }
+
+    fun revoke() {
+        viewModel.deletePressed(this)
     }
 
     override fun contentSameAs(other: PolicyItem) = itemSameAs(other)
