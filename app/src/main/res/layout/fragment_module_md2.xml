@@ -32,7 +32,7 @@
             android:id="@+id/module_list"
             adapter="@{viewModel.adapter}"
             dividerHorizontal="@{@drawable/divider_l1}"
-            dividerVertical="@{@drawable/divider_l1}"
+            dividerVertical="@{@drawable/divider_l_50}"
             gone="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"

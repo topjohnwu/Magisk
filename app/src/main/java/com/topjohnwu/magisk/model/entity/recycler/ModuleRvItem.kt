@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.model.entity.recycler
 
 import androidx.databinding.Bindable
-import androidx.databinding.Observable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.module.Module
@@ -62,7 +61,7 @@ sealed class RepoItem(val item: Repo) : ObservableItem<RepoItem>() {
     }
 }
 
-class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
+class ModuleItem(val item: Module) : ObservableItem<ModuleItem>() {
 
     override val layoutRes = R.layout.item_module_md2
 
@@ -71,19 +70,15 @@ class ModuleItem(val item: Module) : ObservableItem<ModuleItem>(), Observable {
         set(value) = set(value, field, { field = it }, BR.repo)
 
     @get:Bindable
-    var isEnabled
-        get() = item.enable
-        set(value) {
+    var isEnabled = item.enable
+        set(value) = set(value, field, { field = it }, BR.enabled) {
             item.enable = value
-            notifyPropertyChanged(BR.enabled)
         }
 
     @get:Bindable
-    var isRemoved
-        get() = item.remove
-        set(value) {
+    var isRemoved = item.remove
+        set(value) = set(value, field, { field = it }, BR.removed) {
             item.remove = value
-            notifyPropertyChanged(BR.removed)
         }
 
     val isUpdated get() = item.updated

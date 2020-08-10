@@ -2,19 +2,19 @@
 <resources>
 
     <!--region Display-->
-    <style name="AppearanceFoundation.Display" parent="TextAppearance.AppCompat.Display1">
+    <style name="AppearanceFoundation.Large" parent="TextAppearance.AppCompat.Large">
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="AppearanceFoundation.Display.Secondary">
+    <style name="AppearanceFoundation.Large.Secondary">
         <item name="android:textColor">?colorSecondary</item>
     </style>
 
-    <style name="AppearanceFoundation.Display.Variant">
+    <style name="AppearanceFoundation.Large.Variant">
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="AppearanceFoundation.Display.OnPrimary">
+    <style name="AppearanceFoundation.Display.OnPrimary" parent="TextAppearance.AppCompat.Display1">
         <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 

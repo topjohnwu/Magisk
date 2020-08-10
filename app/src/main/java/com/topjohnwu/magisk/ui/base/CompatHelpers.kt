@@ -27,7 +27,7 @@ inline fun <T : ComparableRvItem<*>> filterableListOf(
     override fun areContentsTheSame(oldItem: T, newItem: T) = oldItem.genericContentSameAs(newItem)
 }).also { it.update(newItems.toList()) }
 
-fun <T : ComparableRvItem<*>> adapterOf() = object : BindingRecyclerViewAdapter<T>() {
+fun <T : RvItem> adapterOf() = object : BindingRecyclerViewAdapter<T>() {
     override fun onBindBinding(
         binding: ViewDataBinding,
         variableId: Int,

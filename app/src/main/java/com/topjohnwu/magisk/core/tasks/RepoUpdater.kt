@@ -92,7 +92,7 @@ class RepoUpdater(
         }
     }
 
-    suspend operator fun invoke(forced: Boolean) = withContext(Dispatchers.IO) {
+    suspend fun run(forced: Boolean) = withContext(Dispatchers.IO) {
         val cached = HashSet(repoDB.repoIDList).synchronized()
         when (loadPage(cached, etag = repoDB.etagKey)) {
             PageResult.CACHED -> if (forced) forcedReload(cached)
