@@ -82,6 +82,7 @@ dependencies {
     implementation(project(":app:signing"))
 
     implementation("com.github.topjohnwu:jtar:1.0.0")
+    implementation("com.github.topjohnwu:indeterminate-checkbox:1.0.6")
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     implementation(kotlin("stdlib"))

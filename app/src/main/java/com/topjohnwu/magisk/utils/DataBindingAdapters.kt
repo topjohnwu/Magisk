@@ -14,6 +14,8 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
+import androidx.databinding.InverseBindingListener
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.*
 import com.google.android.material.button.MaterialButton
@@ -23,6 +25,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.ktx.replaceRandomWithSpecial
 import com.topjohnwu.superuser.internal.UiThreadHandler
+import com.topjohnwu.widget.IndeterminateCheckBox
 import kotlinx.coroutines.*
 import kotlin.math.roundToInt
 
@@ -244,5 +247,25 @@ fun RecyclerView.setSpanCount(count: Int) {
     when (val lama = layoutManager) {
         is GridLayoutManager -> lama.spanCount = count
         is StaggeredGridLayoutManager -> lama.spanCount = count
+    }
+}
+
+@BindingAdapter("state")
+fun setState(view: IndeterminateCheckBox, state: Boolean?) {
+    if (view.state != state)
+        view.state = state
+}
+
+@InverseBindingAdapter(attribute = "state")
+fun getState(view: IndeterminateCheckBox) = view.state
+
+
+@BindingAdapter("stateAttrChanged")
+fun setListeners(
+    view: IndeterminateCheckBox,
+    attrChange: InverseBindingListener
+) {
+    view.setOnStateChangedListener { _, _ ->
+        attrChange.onChange()
     }
 }

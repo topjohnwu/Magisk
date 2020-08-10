@@ -33,13 +33,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?selectableItemBackground"
-                android:onClick="@{(v) -> item.toggle(v)}">
+                android:onClick="@{item::toggleExpand}">
 
-                <androidx.appcompat.widget.AppCompatImageView
+                <ImageView
                     android:id="@+id/hide_icon"
                     style="@style/WidgetFoundation.Image"
                     android:layout_margin="@dimen/l1"
-                    android:alpha="@{item.isExpanded ? 0.1f : 1f}"
                     android:src="@{item.item.info.icon}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -47,22 +46,7 @@
                     app:layout_constraintVertical_bias="0"
                     tools:src="@drawable/ic_magisk" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/hide_action"
-                    style="@style/WidgetFoundation.Image"
-                    isSelected="@{item.itemsCheckedPercent == 100}"
-                    goneUnless="@{item.isExpanded}"
-                    android:layout_margin="@dimen/l1"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:onClick="@{() -> item.toggle(viewModel)}"
-                    android:padding="@dimen/l_25"
-                    app:layout_constraintBottom_toBottomOf="@+id/hide_icon"
-                    app:layout_constraintEnd_toEndOf="@+id/hide_icon"
-                    app:layout_constraintStart_toStartOf="@+id/hide_icon"
-                    app:layout_constraintTop_toTopOf="@+id/hide_icon"
-                    app:srcCompat="@drawable/ic_hide_select_md2" />
-
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:id="@+id/hide_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -79,7 +63,7 @@
                     app:layout_constraintVertical_chainStyle="packed"
                     tools:text="@string/app_name" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:id="@+id/hide_package"
                     gone="@{item.item.info.info.packageName.empty}"
                     android:layout_width="0dp"
@@ -92,18 +76,14 @@
                     app:layout_constraintTop_toBottomOf="@+id/hide_name"
                     tools:text="com.topjohnwu.magisk" />
 
-                <androidx.appcompat.widget.AppCompatImageView
+                <com.topjohnwu.widget.IndeterminateCheckBox
                     android:id="@+id/hide_expand_icon"
-                    style="@style/WidgetFoundation.Icon"
-                    invisible="@{item.item.processes.empty}"
-                    srcCompat="@{item.isExpanded ? R.drawable.ic_close_md2 : R.drawable.ic_back_md2}"
-                    android:background="@null"
-                    android:rotation="180"
-                    android:rotationX="@{item.isExpanded ? 180 : 0}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:srcCompat="@drawable/ic_back_md2" />
+                    state="@={item.hiddenState}"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

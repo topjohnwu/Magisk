@@ -5,14 +5,12 @@ import android.graphics.drawable.Drawable
 import com.topjohnwu.magisk.ktx.packageInfo
 import com.topjohnwu.magisk.ktx.processes
 
-class HideAppInfo(
+data class HideAppInfo(
     val info: ApplicationInfo,
     val name: String,
     val icon: Drawable
 ) {
-
     val processes = info.packageInfo?.processes?.distinct() ?: listOf(info.packageName)
-
 }
 
 data class StatefulProcess(
@@ -21,7 +19,7 @@ data class StatefulProcess(
     val isHidden: Boolean
 )
 
-class ProcessHideApp(
+data class HideAppTarget(
     val info: HideAppInfo,
     val processes: List<StatefulProcess>
 )

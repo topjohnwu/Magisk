@@ -8,8 +8,8 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.model.entity.HideAppInfo
+import com.topjohnwu.magisk.model.entity.HideAppTarget
 import com.topjohnwu.magisk.model.entity.HideTarget
-import com.topjohnwu.magisk.model.entity.ProcessHideApp
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.entity.recycler.HideItem
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessItem
@@ -54,7 +54,10 @@ class HideViewModel(
         val apps = magiskRepo.fetchApps()
         val hides = magiskRepo.fetchHideTargets()
         val (appList, diff) = withContext(Dispatchers.Default) {
-            val list = apps.map { mergeAppTargets(it, hides) }.map { HideItem(it) }.sort()
+            val list = apps
+                .map { createTarget(it, hides) }
+                .map { HideItem(it, this@HideViewModel) }
+                .sort()
             list to items.calculateDiff(list)
         }
         items.update(appList, diff)
@@ -64,12 +67,13 @@ class HideViewModel(
 
     // ---
 
-    private fun mergeAppTargets(a: HideAppInfo, ts: List<HideTarget>): ProcessHideApp {
-        val relevantTargets = ts.filter { it.packageName == a.info.packageName }
-        val packageName = a.info.packageName
-        val processes = a.processes
-            .map { StatefulProcess(it, packageName, relevantTargets.any { i -> it == i.process }) }
-        return ProcessHideApp(a, processes)
+    private fun createTarget(app: HideAppInfo, hideList: List<HideTarget>): HideAppTarget {
+        val hidden = hideList.filter { it.packageName == app.info.packageName }
+        val packageName = app.info.packageName
+        val processes = app.processes.map { name ->
+            StatefulProcess(name, packageName, hidden.any { name == it.process })
+        }
+        return HideAppTarget(app, processes)
     }
 
     private fun List<HideItem>.sort() = compareByDescending<HideItem> { it.itemsChecked != 0 }
