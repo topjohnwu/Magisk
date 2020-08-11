@@ -79,15 +79,15 @@ object ClearRepoCache : SettingsItem.Blank() {
 object Hide : SettingsItem.Input() {
     override val title = R.string.settings_hide_manager_title.asTransitive()
     override val description = R.string.settings_hide_manager_summary.asTransitive()
-    override val showStrip = false
-    override var value = resources.getString(R.string.re_app_name)
+
+    @get:Bindable
+    override var value = "Manager"
         set(value) = setV(value, field, { field = it }, BR.error)
 
     @get:Bindable
     val isError get() = value.length > 14 || value.isBlank()
 
-    override val intermediate: String?
-        get() = if (isError) null else value
+    override val inputResult get() = if (isError) null else value
 
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
@@ -105,8 +105,11 @@ fun HideOrRestore() =
 object DownloadPath : SettingsItem.Input() {
     override var value = Config.downloadPath
         set(value) = setV(value, field, { field = it }) { Config.downloadPath = it }
+
     override val title = R.string.settings_download_path_title.asTransitive()
-    override val intermediate: String?
+    override val description get() = path.asTransitive()
+
+    override val inputResult: String?
         get() = if (Utils.ensureDownloadPath(result) != null) result else null
 
     @get:Bindable
@@ -135,7 +138,8 @@ object UpdateChannelUrl : SettingsItem.Input() {
     override val title = R.string.settings_update_custom.asTransitive()
     override var value = Config.customChannelUrl
         set(value) = setV(value, field, { field = it }) { Config.customChannelUrl = it }
-    override val intermediate: String? get() = result
+
+    override val inputResult get() = result
 
     @get:Bindable
     var result = value

@@ -29,25 +29,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/input_icon"
                 style="@style/WidgetFoundation.Icon"
                 gone="@{item.icon == 0}"
                 android:background="@null"
                 android:rotation="180"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/input_divider"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@{item.icon}"
                 tools:srcCompat="@drawable/ic_fingerprint" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/input_indicator"
                 style="@style/WidgetFoundation.Icon"
                 android:background="@null"
                 android:rotation="180"
-                app:layout_constraintBottom_toTopOf="@+id/input_divider"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_back_md2" />
@@ -61,12 +60,12 @@
                 android:orientation="vertical"
                 android:paddingTop="@dimen/l1"
                 android:paddingBottom="@dimen/l1"
-                app:layout_constraintBottom_toTopOf="@+id/input_divider"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/input_indicator"
                 app:layout_constraintStart_toEndOf="@+id/input_icon"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:id="@+id/input_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -78,7 +77,7 @@
                     tools:lines="1"
                     tools:text="@tools:sample/lorem/random" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:id="@+id/input_description"
                     gone="@{item.description.empty}"
                     android:layout_width="match_parent"
@@ -89,32 +88,6 @@
                     tools:text="@tools:sample/lorem/random" />
 
             </LinearLayout>
-
-            <View
-                android:id="@+id/input_divider"
-                gone="@{item.value.empty || !item.showStrip}"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:alpha=".5"
-                android:background="?colorSurface"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/input_text" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/input_selection"
-                gone="@{item.value.empty || !item.showStrip}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/l1"
-                android:paddingTop="@dimen/l_75"
-                android:paddingEnd="@dimen/l1"
-                android:paddingBottom="@dimen/l_75"
-                android:text="@{item.value}"
-                android:textAppearance="@style/AppearanceFoundation.Tiny.Variant"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/input_text"
-                app:layout_constraintTop_toTopOf="@+id/input_divider"
-                tools:text="@tools:sample/lorem" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

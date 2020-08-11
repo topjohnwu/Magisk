@@ -259,7 +259,6 @@ fun setState(view: IndeterminateCheckBox, state: Boolean?) {
 @InverseBindingAdapter(attribute = "state")
 fun getState(view: IndeterminateCheckBox) = view.state
 
-
 @BindingAdapter("stateAttrChanged")
 fun setListeners(
     view: IndeterminateCheckBox,

@@ -17,7 +17,7 @@
         android:paddingTop="@dimen/l1"
         android:paddingBottom="@dimen/l_50">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             gone="@{item.title.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
             android:textStyle="bold"
             tools:text="@tools:sample/lorem" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             gone="@{item.description.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

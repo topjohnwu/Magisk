@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/toggle_icon"
                 style="@style/WidgetFoundation.Icon"
                 gone="@{item.icon == 0}"
@@ -42,11 +42,10 @@
                 app:srcCompat="@{item.icon}"
                 tools:srcCompat="@drawable/ic_fingerprint" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/toggle_indicator"
-                style="@style/WidgetFoundation.Switch"
+                android:checked="@={item.value}"
                 isEnabled="@{item.enabled}"
-                isSelected="@{item.value}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/l_25"
@@ -68,7 +67,7 @@
                 app:layout_constraintStart_toEndOf="@+id/toggle_icon"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:id="@+id/toggle_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -80,7 +79,7 @@
                     tools:lines="1"
                     tools:text="@tools:sample/lorem/random" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:id="@+id/toggle_description"
                     gone="@{item.description.empty}"
                     android:layout_width="match_parent"

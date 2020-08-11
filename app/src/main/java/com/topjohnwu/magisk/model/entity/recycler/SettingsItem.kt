@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.utils.TransitiveText
+import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.MagiskDialog
 import org.koin.core.KoinComponent
@@ -94,22 +95,20 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         }
     }
 
-    abstract class Input : Value<String>(), KoinComponent {
+    abstract class Input : Value<String>() {
 
         override val layoutRes = R.layout.item_settings_input
-        open val showStrip = true
 
-        protected val resources get() = get<Resources>()
-        protected abstract val intermediate: String?
+        protected abstract val inputResult: String?
 
         override fun onPressed(view: View) {
             MagiskDialog(view.context)
-                .applyTitle(title.getText(resources))
+                .applyTitle(title.getText(view.resources))
                 .applyView(getView(view.context))
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) {
                     titleRes = android.R.string.ok
                     onClick {
-                        intermediate?.let { result ->
+                        inputResult?.let { result ->
                             preventDismiss = false
                             value = result
                             it.dismiss()
@@ -125,7 +124,6 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         }
 
         abstract fun getView(context: Context): View
-
     }
 
     abstract class Selector : Value<Int>(), KoinComponent {
@@ -141,12 +139,12 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         open val entryValues get() = resources.getArrayOrEmpty(entryValRes)
 
         @get:Bindable
-        val selectedEntry
-            get() = entries.getOrNull(value)
+        override val description: TransitiveText
+            get() = entries.getOrNull(value)?.asTransitive() ?: TransitiveText.EMPTY
 
         protected inline fun <reified T> setS(
             new: T, old: T, setter: (T) -> Unit, afterChanged: (T) -> Unit = {}) {
-            setV(new, old, setter, BR.selectedEntry, BR.description, afterChanged = afterChanged)
+            setV(new, old, setter, BR.description, afterChanged = afterChanged)
         }
 
         private fun Resources.getArrayOrEmpty(id: Int): Array<String> =

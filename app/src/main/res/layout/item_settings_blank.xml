@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/blank_icon"
                 style="@style/WidgetFoundation.Icon"
                 gone="@{item.icon == 0}"
@@ -41,7 +41,7 @@
                 app:srcCompat="@{item.icon}"
                 tools:srcCompat="@drawable/ic_fingerprint" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/blank_indicator"
                 style="@style/WidgetFoundation.Icon"
                 android:background="@null"
@@ -65,7 +65,7 @@
                 app:layout_constraintStart_toEndOf="@+id/blank_icon"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:id="@+id/blank_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                     tools:lines="2"
                     tools:text="@tools:sample/lorem/random" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:id="@+id/blank_description"
                     gone="@{item.description.empty}"
                     android:layout_width="match_parent"
