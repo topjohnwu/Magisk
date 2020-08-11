@@ -119,7 +119,7 @@
     <string name="hide_filters">Filters</string>
     <string name="hide_search">Search</string>
 
-    <!--Module Fragment-->
+    <!--Module -->
     <string name="no_info_provided">(No info provided)</string>
     <string name="no_modules_found">No modules found</string>
     <string name="reboot_recovery">Reboot to Recovery</string>
@@ -137,6 +137,7 @@
     <string name="module_update_none">Your modules are up to date!</string>
     <string name="update_available">Update Available</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Sorting Order</string>
 
     <!--Settings -->

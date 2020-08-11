@@ -83,7 +83,7 @@ class ModuleViewModel(
 
     private val itemsInstalled = diffListOf<ModuleItem>()
     private val itemsUpdatable = diffListOf<RepoItem.Update>()
-    private val itemsRemote = diffListOf<RepoItem.Remote>()
+    private val itemsOnline = diffListOf<RepoItem.Remote>()
 
     private val sectionUpdate = SectionTitle(
         R.string.module_section_pending,
@@ -98,8 +98,8 @@ class ModuleViewModel(
         R.drawable.ic_restart
     ).also { it.hasButton = false }
 
-    private val sectionRemote = SectionTitle(
-        R.string.module_section_remote,
+    private val sectionOnline = SectionTitle(
+        R.string.module_section_online,
         R.string.sorting_order
     ).apply { updateOrderIcon() }
 
@@ -110,8 +110,8 @@ class ModuleViewModel(
         .insertList(itemsUpdatable)
         .insertList(installSectionList)
         .insertList(itemsInstalled)
-        .insertItem(sectionRemote)
-        .insertList(itemsRemote)!!
+        .insertItem(sectionOnline)
+        .insertList(itemsOnline)
     val itemBinding = itemBindingOf<RvItem> {
         it.bindExtra(BR.viewModel, this)
     }
@@ -170,7 +170,7 @@ class ModuleViewModel(
             val items = withContext(Dispatchers.Default) {
                 val predicate = { it: RepoItem -> it.item.id == subject.module.id }
                 itemsUpdatable.filter(predicate) +
-                        itemsRemote.filter(predicate) +
+                        itemsOnline.filter(predicate) +
                         itemsSearch.filter(predicate)
             }
             items.forEach { it.progress = progress.times(100).roundToInt() }
@@ -181,7 +181,7 @@ class ModuleViewModel(
         return viewModelScope.launch {
             state = State.LOADING
             loadInstalled()
-            if (itemsRemote.isEmpty())
+            if (itemsOnline.isEmpty())
                 loadRemote()
             state = State.LOADED
         }
@@ -225,7 +225,7 @@ class ModuleViewModel(
         if (remoteJob?.isActive == true)
             return
 
-        if (itemsRemote.isEmpty())
+        if (itemsOnline.isEmpty())
             EndlessRecyclerScrollListener.ResetState().publish()
 
         remoteJob = viewModelScope.launch {
@@ -234,21 +234,21 @@ class ModuleViewModel(
             }
 
             isRemoteLoading = true
-            val repos = if (itemsRemote.isEmpty()) {
+            val repos = if (itemsOnline.isEmpty()) {
                 repoUpdater.run(refetch)
                 loadUpdatable()
                 loadRemoteDB(0)
             } else {
-                loadRemoteDB(itemsRemote.size)
+                loadRemoteDB(itemsOnline.size)
             }
             isRemoteLoading = false
             refetch = false
-            queryHandler.post { itemsRemote.addAll(repos) }
+            queryHandler.post { itemsOnline.addAll(repos) }
         }
     }
 
     fun forceRefresh() {
-        itemsRemote.clear()
+        itemsOnline.clear()
         itemsUpdatable.clear()
         itemsSearch.clear()
         refetch = true
@@ -299,15 +299,15 @@ class ModuleViewModel(
 
     fun sectionPressed(item: SectionTitle) = when (item) {
         sectionInstalled -> reboot() // TODO add reboot picker, regular reboot is not always preferred
-        sectionRemote -> {
+        sectionOnline -> {
             Config.repoOrder = when (Config.repoOrder) {
                 Config.Value.ORDER_NAME -> Config.Value.ORDER_DATE
                 Config.Value.ORDER_DATE -> Config.Value.ORDER_NAME
                 else -> Config.Value.ORDER_NAME
             }
-            sectionRemote.updateOrderIcon()
+            sectionOnline.updateOrderIcon()
             queryHandler.post {
-                itemsRemote.clear()
+                itemsOnline.clear()
                 loadRemote()
             }
             Unit
