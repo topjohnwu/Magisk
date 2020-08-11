@@ -23,7 +23,7 @@
     <string name="hide">Сховати</string>
     <string name="status">Стан</string>
     <string name="home_package">Пакунок</string>
-    <string name="details">Деталі</string>
+    <string name="details">Детально</string>
 
     <string name="home_notice_content">Завжди впевнюйтеся, що користуєтеся офіційним Magisk Manager. Manager з невідомих джерел може виконувати шкідливі дії.</string>
     <string name="home_support_title">Підтримати нас</string>
@@ -43,6 +43,7 @@
     <string name="invalid_update_channel">Невірний канал оновлення</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до вимкнення/видалення всіх модулів! Рут буде повністю видалено!\nВаші дані можуть зашифруватися, якщо вони не зашифровані!\nВпевнені, що бажаєте продовжити?</string>
+    <string name="home_check_safetynet">Тест SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
@@ -51,7 +52,7 @@
     <string name="install_options_title">Параметри</string>
     <string name="install_method_title">Спосіб</string>
     <string name="install_next">Далі</string>
-    <string name="install_start">Почати</string>
+    <string name="install_start">Встановити</string>
     <string name="manager_download_install">Натисніть, щоб завантажити і встановити</string>
     <string name="download_zip_only">Тільки завантажити</string>
     <string name="direct_install">Пряме встановлення (рекомендовано)</string>
@@ -87,7 +88,7 @@
     <string name="su_revoke_title">Відкликати?</string>
     <string name="su_revoke_msg">Підтвердити відкликання прав для %1$s?</string>
     <string name="toast">Спливаюче сповіщення</string>
-    <string name="none">Ні</string>
+    <string name="none">Нічого</string>
 
     <string name="superuser_toggle_notification">Сповіщення</string>
     <string name="superuser_toggle_revoke">Відкликати</string>
@@ -137,7 +138,6 @@
     <string name="update_available">Доступне оновлення</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Порядок сортування</string>
-    <string name="external_rw_permission_denied">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Режим теми</string>
@@ -147,14 +147,14 @@
     <string name="settings_dark_mode_dark">Завжди темний</string>
     <string name="settings_safe_mode_title">Безпечний режим</string>
     <string name="settings_core_only_summary" deprecated="true">Увімкнути тільки можливості ядра. MagiskSU i Magisk Hide залишуться увімкненими, проте ніякі модулі не будуть завантажені</string>
-    <string name="settings_grid_column_count_title">Упорядкування списку</string>
-    <string name="settings_grid_column_count_summary">Встановлює ширину списку. Перезавантажте застосунок, щоб застосувати зміни.</string>
-    <string name="settings_grid_column_count_1">Стандартний</string>
-    <string name="settings_grid_column_count_2">Сплющений</string>
+    <string name="settings_grid_column_count_title">Розташування елементів</string>
+    <string name="settings_grid_column_count_summary">Виберіть компонування елементів в списку. Перезавантажте застосунок, щоб застосувати зміни.</string>
+    <string name="settings_grid_column_count_1">Звичайне</string>
+    <string name="settings_grid_column_count_2">Компактне</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
     <string name="settings_clear_cache_title">Очистити кеш</string>
-    <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії. Це змусить застосунок примусово оновлюватися через Інтернет</string>
+    <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії. Кеш заново завантажиться через Інтернет</string>
     <string name="settings_hide_manager_title">Сховати Magisk Manager</string>
     <string name="settings_hide_manager_summary">Перезібрати Magisk Manager з випадковими іменами застосунку та пакунку</string>
     <string name="settings_restore_manager_title">Відновити Magisk Manager</string>
@@ -255,5 +255,6 @@
     <string name="authenticate">Автентифікувати</string>
     <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
     <string name="unsupport_magisk_msg">Ця версія Magisk Manager не підтримує версію Magisk нижчу, ніж %1$s.\n\nЗастосунок буде працювати, ніби Magisk не встановлено. Будь ласка, оновіть Magisk якомога швидше.</string>
+    <string name="external_rw_permission_denied">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
 
 </resources>
