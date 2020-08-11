@@ -43,6 +43,7 @@
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené!\nRoot bude odstránený!\nMôže dôjsť k zašifrovaniu vašich dát, ak už nie sú zašifrované!</string>
+    <string name="home_check_safetynet">Skontrolovať SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Ponechať vynútené šifrovanie</string>
