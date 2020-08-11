@@ -83,9 +83,4 @@
         <item>@string/settings_update_custom</item>
     </string-array>
 
-    <string-array name="span_count">
-        <item>@string/settings_grid_column_count_1</item>
-        <item>@string/settings_grid_column_count_2</item>
-    </string-array>
-
 </resources>

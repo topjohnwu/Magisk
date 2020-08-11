@@ -16,27 +16,17 @@
     <string name="app_changelog">Registre de canvis</string>
     <string name="manager">Manager</string>
     <string name="loading">Carregant…</string>
-    <string name="info">Informació</string>
-    <string name="uninstall">Desinstal·lar</string>
     <string name="update">Actualització</string>
     <string name="not_available">N/A</string>
     <string name="hide">Amagar</string>
     <string name="status">Estat</string>
     <string name="home_package">Paquet</string>
-    <string name="details">Detalls</string>
 
     <string name="home_notice_content">Asseguris sempre que està utilitzant un Magisk Manager de codi lliure. Mànagers de fonts desconegudes podrien causar accions malicioses.</string>
     <string name="home_support_title">Doni\'ns suport</string>
-    <string name="home_links_project">Enllaços del projecte</string>
     <string name="home_item_source">Codi font</string>
     <string name="home_support_content">Magisk és, i sempre serà, gratis i codi lliure. De totes maneres, pot mostrar el seu interès fent una petita donació.</string>
-    <string name="home_device_title">Dispositiu</string>
-    <string name="home_device_extra_manufacturer">Fabricant</string>
-    <string name="home_device_extra_model">Model</string>
-    <string name="home_device_extra_board">Placa</string>
-    <string name="home_device_system">Sistema</string>
     <string name="home_status_normal">Normal</string>
-    <string name="home_status_safe">Mode segur</string>
     <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Instal·lat</string>
     <string name="home_latest_version">Última</string>
@@ -77,7 +67,6 @@
     <string name="sixtymin">60 mins</string>
     <string name="su_allow_toast">Permesos els drets de superusuari de %1$s</string>
     <string name="su_deny_toast">Denegats els drets de superusuari de %1$s</string>
-    <string name="no_apps_found">No s\'han trobat aplicacions</string>
     <string name="su_snack_grant">Drets de superusuari de %1$s permesos</string>
     <string name="su_snack_deny">Drets de superusuari de %1$s denegats</string>
     <string name="su_snack_notif_on">Notificacions de %1$s habilitades</string>
@@ -109,7 +98,6 @@
     <string name="safetynet_attest_failure">Certificació fallida!</string>
     <string name="safetynet_attest_loading">Només un segon…</string>
     <string name="safetynet_attest_restart">Intenta de nou</string>
-    <string name="safetynet_system">Sistema</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostra aplicacions del sistema</string>
@@ -120,20 +108,16 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hi ha informació)</string>
-    <string name="no_modules_found">No s\'han trobat mòduls</string>
     <string name="reboot_recovery">Reiniciar en Mode Recuperació</string>
     <string name="reboot_bootloader">Reiniciar en Mode Bootloader</string>
     <string name="reboot_download">Reiniciar en Mode Download</string>
     <string name="reboot_edl">Reiniciar a EDL</string>
-    <string name="module_safe_mode_message">Està en mode segur. Cap dels mòduls instal·lats funcionarà.\nAquest missatge desapareixerà quan el mode segur es desactivi.</string>
     <string name="module_version_author">%1$s per %2$s</string>
     <string name="module_section_pending">Actualitzacions</string>
     <string name="module_section_pending_action">Actualitza tot</string>
-    <string name="module_section_remote">Remot</string>
     <string name="module_state_remove">Eliminar</string>
     <string name="module_state_restore">Recuperar</string>
     <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
-    <string name="module_update_none">Els seus mòduls estan actualitzats!</string>
     <string name="update_available">Actualització Disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Ordre de Classificació</string>
@@ -145,12 +129,6 @@
     <string name="settings_dark_mode_light">Sempre clar</string>
     <string name="settings_dark_mode_system">Seguir al sistema</string>
     <string name="settings_dark_mode_dark">Sempre fosc</string>
-    <string name="settings_safe_mode_title">Mode segur</string>
-    <string name="settings_core_only_summary">Només habilita les funcionalitats bàsiques. MagiskSU i MagiskHide seguiran activats, però cap mòdul es carregarà</string>
-    <string name="settings_grid_column_count_title">Organització de les llistes</string>
-    <string name="settings_grid_column_count_summary">Estableix l\'amplitud dels elements de la llista. S\'ha de reiniciar l\'aplicació per aplicar els canvis.</string>
-    <string name="settings_grid_column_count_1">Estàndard</string>
-    <string name="settings_grid_column_count_2">Compacte</string>
     <string name="settings_download_path_title">Directori de baixades</string>
     <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
@@ -211,7 +189,6 @@
     <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
     <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
     <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
-    <string name="settings_download_path_error">Error en crear la carpeta. El directori ha de ser accessible des del directori arrel i no pot ser un arxiu.</string>
 
     <!--Notifications-->
     <string name="update_channel">Actualització de Magisk</string>
@@ -230,11 +207,8 @@
     <string name="repo_install_msg">Vol instal·lar %1$s ara?</string>
     <string name="download">Baixar</string>
     <string name="reboot">Reiniciar</string>
-    <string name="settings_reboot_toast">Reiniciï per aplicar els canvis</string>
     <string name="release_notes">Notes de llançament</string>
     <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
-    <string name="dtbo_patched_title">S\'ha arranjat DTBO</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img. Si us plau, reiniciï el telèfon.</string>
     <string name="flashing">Arranjament…</string>
     <string name="done">Fet!</string>
     <string name="failure">Fallit</string>

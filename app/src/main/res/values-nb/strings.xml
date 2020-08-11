@@ -15,14 +15,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Preserver tvunget kryptering</string>
     <string name="keep_dm_verity">Preserver AVB 2.0/dm-verity</string>
-    <string name="uninstall">Avinstaller</string>
     <string name="uninstall_magisk_title">Avinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Alle moduler vil bli avskrudd/fjernet. Root vil bli fjernet, og dataene dine blir kanskje kryptert dersom de ikke allerede er det.</string>
     <string name="update">Oppdater</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Ingen info er oppgitt)</string>
-    <string name="no_modules_found">Ingen moduler ble funnet</string>
     <string name="reboot_recovery">Omstart til gjenoppretting</string>
     <string name="reboot_bootloader">Omstart til oppstartslaster</string>
     <string name="reboot_download">Omstart til nedlasting</string>
@@ -53,12 +51,9 @@
     <string name="repo_install_msg">Vil du installere %1$s nå?</string>
     <string name="download">Last ned</string>
     <string name="reboot">Omstart</string>
-    <string name="settings_reboot_toast">Start på nytt for å benytte innstillingene.</string>
     <string name="release_notes">Lanseringsnyheter</string>
     <string name="repo_cache_cleared">Repomellomlageret ble tømt</string>
     <string name="manager_download_install">Trykk for å laste ned og installere.</string>
-    <string name="dtbo_patched_title">DTBO ble patchet!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager har patchet dtbo.img. Vennligst start på nytt.</string>
     <string name="flashing">Flashing</string>
     <string name="hide_manager_title">Skjuler Magisk Manager …</string>
     <string name="hide_manager_fail_toast">Skjulingen av Magisk Manager mislyktes.</string>
@@ -96,7 +91,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Tilpasset</string>
     <string name="settings_update_custom_msg">Skriv inn en egendefinert URL</string>
-    <string name="settings_core_only_summary">Bare aktiver kjernefunksjonene. MagiskSU og MagiskHide vil fortsatt være skrudd på, men ingen moduler vil bli lastet inn</string>
     <string name="settings_magiskhide_summary">Skjul Magisk fra diverse måter å bli oppdaget på.</string>
     <string name="settings_hosts_title">Systemløs «hosts»-fil</string>
     <string name="settings_hosts_summary">Systemløs «hosts»-filstøtte for reklameblokkeringsapper.</string>
@@ -149,7 +143,6 @@
     <string name="sixtymin">60min</string>
     <string name="su_allow_toast">%1$s ble tildelt superbruker-rettigheter</string>
     <string name="su_deny_toast">%1$s ble nektet superbruker-rettigheter</string>
-    <string name="no_apps_found">Ingen apper ble funnet</string>
     <string name="su_snack_grant">Superbruker-rettigheter for %1$s har blitt tildelt</string>
     <string name="su_snack_deny">Superbruker-rettigheter for %1$s har blitt avslått</string>
     <string name="su_snack_notif_on">Notifikasjoner for %1$s har blitt skrudd på</string>

@@ -18,16 +18,13 @@
     <string name="manager">Gerenciador</string>
 
     <string name="home_support_title">Contribua com o Projeto</string>
-    <string name="home_links_project">Links do projeto</string>
     <string name="home_item_source">Origem</string>
     <string name="home_support_content">Magisk é, e sempre será, gratuito e de código aberto. No entanto, você pode nos mostrar que se importa enviando uma pequena doação.</string>
-    <string name="home_device_system">Sistema</string>
     <string name="home_package">Pacote</string>
     <string name="home_status_normal">Normal</string>
     <string name="invalid_update_channel">Canal de atualização inválido</string>
     <string name="safetynet_api_error">Erro do API SafetyNet</string>
     <string name="safetynet_res_invalid">A resposta é inválida</string>
-    <string name="uninstall">Desinstalar</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="uninstall_magisk_msg">Todos os módulos serão desativados/removidos!\nA raiz será removida!\nSeus dados potencialmente criptografados, se ainda não estiverem!</string>
     <string name="update">Atualização</string>
@@ -64,7 +61,6 @@
     <string name="sixtymin">60 mins</string>
     <string name="su_allow_toast">%1$s foi concedido Acesso superusuário</string>
     <string name="su_deny_toast">%1$s foi negado Acesso superusuário</string>
-    <string name="no_apps_found">Nenhum aplicativo encontrado</string>
     <string name="su_snack_grant">Acesso de superusuário de  %1$s são concedidos</string>
     <string name="su_snack_deny">Os Acesso de superusuário de  %1$s são negados</string>
     <string name="su_snack_notif_on">As notificações de  %1$s são habilitadas</string>
@@ -94,7 +90,6 @@
     <string name="safetynet_attest_failure">O certificado falhou!</string>
     <string name="safetynet_attest_loading">Aguarde…</string>
     <string name="safetynet_attest_restart">Tente novamente</string>
-    <string name="safetynet_system">Sistema</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostrar aplicativos do sistema</string>
@@ -105,20 +100,16 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
-    <string name="no_modules_found">Nenhum módulo encontrado</string>
     <string name="reboot_recovery">Reiniciar em Recovery</string>
     <string name="reboot_bootloader">Reiniciar em Bootloader</string>
     <string name="reboot_download">Reiniciar em Download</string>
     <string name="reboot_edl">Reiniciar para EDL</string>
-    <string name="module_safe_mode_message">Você está em modo seguro. Nenhum dos módulos de usuário funcionará.\nEsta mensagem desaparecerá assim que o modo seguro estiver desativado.</string>
     <string name="module_version_author">%1$s por %2$s</string>
     <string name="module_section_pending">Atualizações</string>
     <string name="module_section_pending_action">Atualizar tudo</string>
-    <string name="module_section_remote">Remoto</string>
     <string name="module_state_remove">Remover</string>
     <string name="module_state_restore">Restaurar</string>
     <string name="module_action_install_external">Instale a partir do armazenamento</string>
-    <string name="module_update_none">Seus módulos estão atualizados!</string>
     <string name="update_available">Atualização disponível</string>
     <string name="home_installed_version">Instalado</string>
     <string name="sorting_order">Ordem de classificação</string>
@@ -128,11 +119,10 @@
     <string name="settings_dark_mode_message">Selecione o modo mais adequado ao seu estilo!</string>
     <string name="settings_dark_mode_light">Sempre Claro</string>
     <string name="settings_dark_mode_system">Baseado no Sistema</string>
-    <string name="settings_dark_mode_dark">Sempre Escuro</string>
-    <string name="settings_safe_mode_title">Modo de segurança</string>
-    <string name="settings_core_only_summary" obsoleto="true">Ative apenas os principais recursos. O MagiskSU e o MagiskHide ainda estarão ativados, mas nenhum módulo será carregado</string>
-    <![CDATA[
+    <string name="settings_dark_mode_dark">Sempre Escuro</string><![CDATA[
+
         
+
 
 
     ]]>
@@ -196,7 +186,6 @@
     <string name="global_summary">Todas as sessões raiz usam o namespace de montagem global</string>
     <string name="requester_summary">As sessões raiz herdarão o namespace do solicitante</string>
     <string name="isolate_summary">Cada sessão raiz terá seu próprio namespace isolado</string>
-    <string name="settings_download_path_error">Erro ao criar a pasta. Ele deve estar acessível no diretório raiz do armazenamento e não deve ser um arquivo.</string>
 
     <!--Notifications-->
     <string name="update_channel">Atualizações do Magisk</string>
@@ -215,11 +204,8 @@
     <string name="repo_install_msg">Deseja instalar %1$s agora?</string>
     <string name="download">Download</string>
     <string name="reboot">Reinicializar</string>
-    <string name="settings_reboot_toast">Reinicie para aplicar as configurações</string>
     <string name="release_notes">Notas da versão</string>
     <string name="repo_cache_cleared">Cache do repositório limpo</string>
-    <string name="dtbo_patched_title">O DTBO foi corrigido!</string>
-    <string name="dtbo_patched_reboot">O Magisk Manager corrigiu o dtbo.img. Reinicie.</string>
     <string name="flashing">Flechando…</string>
     <string name="done">Concluído!</string>
     <string name="failure">Falha</string>

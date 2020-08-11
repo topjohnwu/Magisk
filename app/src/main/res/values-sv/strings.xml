@@ -15,13 +15,11 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Fortsätt tvinga kryptering</string>
     <string name="keep_dm_verity">Behåll AVB 2.0/dm-verity</string>
-    <string name="uninstall">Avinstallera</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
     <string name="update">Uppdatera</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Ingen information tillhandahållen)</string>
-    <string name="no_modules_found">Hittade inga moduler</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Uppdatering tillgänglig</string>
@@ -41,7 +39,6 @@
     <string name="download">Ladda ner</string>
     <string name="reboot">Starta om</string>
     <string name="magisk_update_title">En uppdatering av Magisk finns tillgänglig!</string>
-    <string name="settings_reboot_toast">Starta om för att tillämpa inställningar</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo-cache rensad</string>
     <string name="manager_update_title">En uppdatering av Magisk Manager finns tillgänglig!</string>
@@ -53,7 +50,6 @@
     <string name="settings_clear_cache_title">Rensa repo-cache</string>
     <string name="settings_clear_cache_summary">Rensa den lagrade information för online-repos, tvingar appen att uppdatera online</string>
 
-    <string name="settings_core_only_summary">Aktiverar endast kärnfunktioner, alla moduler laddas inte. MagiskSU och MagiskHide kommer fortfarande att vara aktiverade</string>
     <string name="settings_magiskhide_summary">Dölj Magisk från att bli upptäckt</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts-stöd för Adblock-appar</string>
@@ -105,7 +101,6 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s är beviljad Superuser-rättigheter</string>
     <string name="su_deny_toast">%1$s är nekad Superuser-rättigheter</string>
-    <string name="no_apps_found">Hittade inga appar</string>
     <string name="su_snack_grant">Superuser-rättigheter av %1$s är beviljad</string>
     <string name="su_snack_deny">Superuser-rättigheter av %1$s är nekad</string>
     <string name="su_snack_notif_on">Aviseringar från %1$s är aktiverad</string>

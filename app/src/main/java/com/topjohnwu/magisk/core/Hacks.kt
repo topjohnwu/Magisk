@@ -154,15 +154,17 @@ private object ClassMap {
     operator fun get(c: Class<*>) = map.getOrElse(c) { c }
 }
 
-/*
-* Keep a reference to these resources to prevent it from
-* being removed when running "remove unused resources" */
+// Keep a reference to these resources to prevent it from
+// being removed when running "remove unused resources"
 val shouldKeepResources = listOf(
-    /* TODO: The following strings should be used somewhere */
-    R.string.no_apps_found,
     R.string.no_info_provided,
     R.string.release_notes,
-    R.string.settings_download_path_error,
     R.string.invalid_update_channel,
-    R.string.update_available
+    R.string.update_available,
+    R.string.safetynet_api_error,
+    R.raw.changelog,
+    R.drawable.ic_device,
+    R.drawable.ic_hide_select_md2,
+    R.drawable.ic_more,
+    R.drawable.ic_magisk_delete
 )

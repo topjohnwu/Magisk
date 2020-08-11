@@ -15,14 +15,12 @@
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
     <string name="keep_dm_verity">Säilita AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Taastusrežiim</string>
-    <string name="uninstall">Eemalda</string>
     <string name="uninstall_magisk_title">Eemalda Magisk</string>
     <string name="uninstall_magisk_msg">Kõik moodulid keelatakse/eemaldatakse. Juurkasutaja eemaldatakse ning su andmed potensiaalselt krüpteeritakse, kui need ei ole juba krüpteeritud.</string>
     <string name="update">Uuenda</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Info puudub)</string>
-    <string name="no_modules_found">Mooduleid ei leitud.</string>
     <string name="reboot_recovery">Taaskäivita taastusesse</string>
     <string name="reboot_bootloader">Taaskäivita käivitushaldurisse</string>
     <string name="reboot_download">Taaskäivita allalaadimisrežiimi</string>
@@ -67,12 +65,9 @@
     <string name="repo_install_msg">Kas soovid kohe installida %1$s?</string>
     <string name="download">Allalaadimine</string>
     <string name="reboot">Taaskäivita</string>
-    <string name="settings_reboot_toast">Taaskäivita seadete rakendamiseks.</string>
     <string name="release_notes">Väljalaske märkmed</string>
     <string name="repo_cache_cleared">Hoidla vahemälu tühjendatud</string>
 
-    <string name="dtbo_patched_title">DTBO sai paigatud!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img. Palun taaskäivita.</string>
     <string name="flashing">Välgutamine</string>
     <string name="done">Valmis!</string>
     <string name="failure">Ebaõnnestus</string>
@@ -109,7 +104,6 @@
     <string name="settings_update_beta">Beeta</string>
     <string name="settings_update_custom">Kohandatud</string>
     <string name="settings_update_custom_msg">Sisesta kohandatud URL</string>
-    <string name="settings_core_only_summary">Luba ainult põhifunktsioonid. MagiskSU ja MagiskHide siiski lubatakse, ent mooduleid ei laadita.</string>
     <string name="settings_magiskhide_summary">Peida Magisk erinevate tuvastuste eest</string>
     <string name="settings_hosts_title">Süsteemivaba hosts</string>
     <string name="settings_hosts_summary">Süsteemivaba hosts-tugi reklaamiblokeerijatest rakendustele</string>
@@ -147,7 +141,6 @@
     <string name="global_summary">Kõik juurkasutaja sessioonid kasutavad globaalset monteerimise nimeruumi.</string>
     <string name="requester_summary">Juurkasutaja sessioonid võtavad üle selle taotleja nimeruumi.</string>
     <string name="isolate_summary">Iga juurkasutaja sessioon saab oma isoleeritud nimeruumi.</string>
-    <string name="settings_download_path_error">Faili loomisel esines viga.  See peab olema ligipääsetav mäluruumi juurkaustast ning ei tohi olla fail.</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superkasutaja taotlus</string>
@@ -163,7 +156,6 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">Rakendusele %1$s anti superkasutaja õigused</string>
     <string name="su_deny_toast">Rakendusel %1$s keelati superkasutaja õigused</string>
-    <string name="no_apps_found">Rakendusi ei leitud</string>
     <string name="su_snack_grant">Superkasutaja õigused antud rakendusele %1$s</string>
     <string name="su_snack_deny">Superkasutaja õigused keelatud rakendusele %1$s</string>
     <string name="su_snack_notif_on">Teated lubatud rakendusele %1$s</string>

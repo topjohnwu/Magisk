@@ -16,27 +16,17 @@
     <string name="app_changelog">Log pembaruan</string>
     <string name="manager">Manajer</string>
     <string name="loading">Memuat…</string>
-    <string name="info">Info</string>
-    <string name="uninstall">Copot</string>
     <string name="update">Perbarui</string>
     <string name="not_available">T/A</string>
     <string name="hide">Sembunyikan</string>
     <string name="status">Status</string>
     <string name="home_package">Paket</string>
-    <string name="details">Rincian</string>
 
     <string name="home_notice_content">Selalu pastikan Anda menggunakan Magisk Manager yang bersumber terbuka. Manager dari sumber tidak dikenal dapat melakukan tindakan jahat.</string>
     <string name="home_support_title">Dukung Kami</string>
-    <string name="home_links_project">Tautan proyek</string>
     <string name="home_item_source">Sumber</string>
     <string name="home_support_content">Magisk adalah, dan akan selalu gratis dan bersumber terbuka. Namun Anda dapat menunjukkan kepada kami bahwa Anda peduli dengan mengirimkan sejumlah kecil donasi.</string>
-    <string name="home_device_title">Perangkat</string>
-    <string name="home_device_extra_manufacturer">Pabrikan</string>
-    <string name="home_device_extra_model">Model</string>
-    <string name="home_device_extra_board">Papan</string>
-    <string name="home_device_system">Sistem</string>
     <string name="home_status_normal">Normal</string>
-    <string name="home_status_safe">Mode Aman</string>
     <string name="home_status_stub">Rintisan</string>
     <string name="home_installed_version">Terpasang</string>
     <string name="home_latest_version">Terbaru</string>
@@ -77,7 +67,6 @@
     <string name="sixtymin">60 mnt</string>
     <string name="su_allow_toast">%1$s diberikan hak Superuser</string>
     <string name="su_deny_toast">%1$s ditolak hak Superuser</string>
-    <string name="no_apps_found">Tidak ada apl ditemukan</string>
     <string name="su_snack_grant">Hak Superuser dari %1$s diberikan</string>
     <string name="su_snack_deny">Hak Superuser dari %1$s ditolak</string>
     <string name="su_snack_notif_on">Notifikasi dari %1$s diaktifkan</string>
@@ -109,7 +98,6 @@
     <string name="safetynet_attest_failure">Pengesahan gagal!</string>
     <string name="safetynet_attest_loading">Tunggu sebentar…</string>
     <string name="safetynet_attest_restart">Coba lagi</string>
-    <string name="safetynet_system">@string/home_device_system</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Tampilkan apl sistem</string>
@@ -120,20 +108,17 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Tidak ada info disediakan)</string>
-    <string name="no_modules_found">Tidak ada modul ditemukan</string>
     <string name="reboot_recovery">Mulai ulang ke Recovery</string>
     <string name="reboot_bootloader">Mulai ulang ke Bootloader</string>
     <string name="reboot_download">Mulai ulang ke Download</string>
     <string name="reboot_edl">Mulai ulang ke EDL</string>
-    <string name="module_safe_mode_message">Anda dalam mode aman. Tidak ada modul pengguna yang akan bekerja.\nPesan ini akan menghilang setelah mode aman dinonaktifkan.</string>
     <string name="module_version_author">%1$s oleh %2$s</string>
     <string name="module_section_pending">Pembaruan</string>
     <string name="module_section_pending_action">Perbarui semua</string>
-    <string name="module_section_remote">Remote</string> <!-- do not translate -->
+    <!-- do not translate -->
     <string name="module_state_remove">Hapus</string>
     <string name="module_state_restore">Pulihkan</string>
     <string name="module_action_install_external">Pasang dari penyimpanan</string>
-    <string name="module_update_none">Modul Anda dalam versi terbaru!</string>
     <string name="update_available">Pembaruan Tersedia</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Urutkan Susunan</string>
@@ -145,12 +130,6 @@
     <string name="settings_dark_mode_light">Selalu Terang</string>
     <string name="settings_dark_mode_system">Ikuti Sistem</string>
     <string name="settings_dark_mode_dark">Selalu Gelap</string>
-    <string name="settings_safe_mode_title">Mode Aman</string>
-    <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU dan MagiskHide akan tetap diaktifkan</string>
-    <string name="settings_grid_column_count_title">Pengaturan daftar</string>
-    <string name="settings_grid_column_count_summary">Mengatur lebar item dalam sebuah daftar. Jalankan ulang apl untuk menerapkan perubahan.</string>
-    <string name="settings_grid_column_count_1">Standar</string>
-    <string name="settings_grid_column_count_2">Terjepit</string>
     <string name="settings_download_path_title">Lokasi unduhan</string>
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
     <string name="settings_clear_cache_title">Bersihkan Cache Repo</string>
@@ -211,7 +190,6 @@
     <string name="global_summary">Semua sesi root menggunakan mount ruang nama global</string>
     <string name="requester_summary">Sesi root akan mewarisi ruang nama peminta mereka</string>
     <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri</string>
-    <string name="settings_download_path_error">Kesalahan membuat folder. Folder harus dapat diakses dari direktori penyimpanan root dan bukan merupakan file.</string>
 
     <!--Notifications-->
     <string name="update_channel">Pembaruan Magisk</string>
@@ -230,11 +208,8 @@
     <string name="repo_install_msg">Apakah Anda ingin memasang %1$s sekarang?</string>
     <string name="download">Unduh</string>
     <string name="reboot">Mulai ulang</string>
-    <string name="settings_reboot_toast">Mulai ulang untuk menerapkan perubahan</string>
     <string name="release_notes">Catatan rilis</string>
     <string name="repo_cache_cleared">Cache repo dibersihkan</string>
-    <string name="dtbo_patched_title">DTBO telah ditambal!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silakan mulai ulang.</string>
     <string name="flashing">Flashing…</string> <!-- do not translate -->
     <string name="done">Selesai!</string>
     <string name="failure">Gagal</string>

@@ -16,27 +16,18 @@
     <string name="app_changelog">Изменения</string>
     <string name="manager">Manager</string> <!--Do not translate-->
     <string name="loading">Загрузка…</string>
-    <string name="info">Инфо</string>
-    <string name="uninstall">Удаление</string>
     <string name="update">Обновить</string>
     <string name="not_available">Н/Д</string>
     <string name="hide">Скрыть</string>
     <string name="status">Режим</string>
     <string name="home_package">Имя пакета</string>
-    <string name="details">Подробно</string>
 
     <string name="home_notice_content">Убедитесь, что Вы скачали и установили Magisk (Manager) из официальных источников. Установочные файлы, загруженные из сторонних источников, могут содержать вредоносный код.</string>
     <string name="home_support_title">Поддержите нас</string>
-    <string name="home_links_project">О проекте</string>
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете проявить заботу, отправив небольшое пожертвование.</string>
-    <string name="home_device_title">Устройство</string>
-    <string name="home_device_extra_manufacturer">Производитель</string>
-    <string name="home_device_extra_model">Модель</string>
-    <string name="home_device_extra_board">Платформа</string>
-    <string name="home_device_system">Android</string> <!--Do not translate-->
+    <!--Do not translate-->
     <string name="home_status_normal">Обычный</string>
-    <string name="home_status_safe">Безопасный</string>
     <string name="home_status_stub">Скрытие</string>
     <string name="home_installed_version">Установлен</string>
     <string name="home_latest_version">Доступен</string>
@@ -77,7 +68,6 @@
     <string name="sixtymin">60 мин.</string>
     <string name="su_allow_toast">%1$s предоставлены права суперпользователя</string>
     <string name="su_deny_toast">%1$s отказано в правах суперпользователя</string>
-    <string name="no_apps_found">Приложения не обнаружены</string>
     <string name="su_snack_grant">%1$s предоставлены права суперпользователя</string>
     <string name="su_snack_deny">%1$s отказано в правах суперпользователя</string>
     <string name="su_snack_notif_on">Уведомления для %1$s включены</string>
@@ -109,7 +99,7 @@
     <string name="safetynet_attest_failure">Не пройден!</string>
     <string name="safetynet_attest_loading">Подождите…</string>
     <string name="safetynet_attest_restart">Повторить</string>
-    <string name="safetynet_system">Android</string> <!--Do not translate-->
+    <!--Do not translate-->
 
     <!-- MagiskHide -->
     <string name="show_system_app">Системные приложения</string>
@@ -120,20 +110,16 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет информации)</string>
-    <string name="no_modules_found">Модули не найдены</string>
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
     <string name="reboot_download">Перезагрузка в Download</string>
     <string name="reboot_edl">Перезагрузка в EDL</string>
-    <string name="module_safe_mode_message">Активирован безопасный режим. Все модули отключены.\nЭто предупреждение исчезнет при отключении безопасного режима.</string>
     <string name="module_version_author">Версия: %1$s\nАвтор: %2$s</string>
     <string name="module_section_pending">Обновления</string>
     <string name="module_section_pending_action">Обновить всё</string>
-    <string name="module_section_remote">Не установлены</string>
     <string name="module_state_remove">Удалить</string>
     <string name="module_state_restore">Восстановить</string>
     <string name="module_action_install_external">Установить из хранилища</string>
-    <string name="module_update_none">Ваши модули обновлены!</string>
     <string name="update_available">Доступно обновление</string>
     <string name="module_installed">Установлены</string>
     <string name="sorting_order">Сортировка</string>
@@ -145,12 +131,6 @@
     <string name="settings_dark_mode_light">Всегда светлый</string>
     <string name="settings_dark_mode_system">Системный</string>
     <string name="settings_dark_mode_dark">Всегда тёмный</string>
-    <string name="settings_safe_mode_title">Безопасный режим</string>
-    <string name="settings_core_only_summary" deprecated="true">Задействовать только основной функционал (MagiskSU и MagiskHide). Модули не будут активированы</string>
-    <string name="settings_grid_column_count_title">Расположение элементов</string>
-    <string name="settings_grid_column_count_summary">Выберите компановку элементов в списке. Перезапустите приложение для применения изменений</string>
-    <string name="settings_grid_column_count_1">Обычное</string>
-    <string name="settings_grid_column_count_2">Компактное</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
@@ -211,7 +191,6 @@
     <string name="global_summary">Сессии суперпользователя используют общее пространство имён</string>
     <string name="requester_summary">Сессии суперпользователя наследуют пространство имён запрашивающего</string>
     <string name="isolate_summary">Сессии суперпользователя используют изолированные пространства имён</string>
-    <string name="settings_download_path_error">Ошибка создания папки. Она должна быть доступна из корневой директории хранилища и не должна быть файлом</string>
 
     <!--Notifications-->
     <string name="update_channel">Обновления Magisk</string>
@@ -230,11 +209,8 @@
     <string name="repo_install_msg">Установить %1$s ?</string>
     <string name="download">Скачать</string>
     <string name="reboot">Перезагрузка</string>
-    <string name="settings_reboot_toast">Для применения настроек перезагрузите устройство</string>
     <string name="release_notes">О версии</string>
     <string name="repo_cache_cleared">Кэш репозитория модулей очищен</string>
-    <string name="dtbo_patched_title">DTBO пропатчен!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
     <string name="flashing">Установка…</string>
     <string name="done">Завершено!</string>
     <string name="failure">Ошибка</string>

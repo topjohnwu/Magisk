@@ -16,14 +16,12 @@
     <string name="keep_force_encryption">강제 암호화 유지</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity 유지</string>
     <string name="recovery_mode">리커버리 모드</string>
-    <string name="uninstall">제거</string>
     <string name="uninstall_magisk_title">Magisk 제거</string>
     <string name="uninstall_magisk_msg">모든 모듈이 비활성화/제거됩니다. 루팅도 제거될 것이며, 데이터도 이미 되어있지 않으면 암호화될 수도 있습니다.</string>
     <string name="update">업데이트</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(제공된 정보 없음)</string>
-    <string name="no_modules_found">검색된 모듈 없음</string>
     <string name="reboot_recovery">리커버리로 다시 시작</string>
     <string name="reboot_bootloader">부트로더로 다시 시작</string>
     <string name="reboot_download">다운로드 모드로 다시 시작</string>
@@ -68,11 +66,8 @@
     <string name="repo_install_msg">정말 %1$s을(를) 설치하시겠습니까?</string>
     <string name="download">다운로드</string>
     <string name="reboot">다시 시작</string>
-    <string name="settings_reboot_toast">기기를 다시 시작하면 설정이 적용됩니다.</string>
     <string name="release_notes">릴리즈 노트</string>
     <string name="repo_cache_cleared">저장소 캐시 비워짐</string>
-    <string name="dtbo_patched_title">DTBO가 패치되었습니다!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager가 dtbo.img를 패치했습니다. 기기를 다시 시작해주십시오.</string>
     <string name="flashing">플래싱 중...</string>
     <string name="done">완료!</string>
     <string name="failure">실패</string>
@@ -99,8 +94,6 @@
     <string name="settings_dark_mode_system">시스템 설정값</string>
     <string name="settings_dark_mode_dark">다크 모드</string>
 
-    <string name="settings_safe_mode_title">안전 모드</string>
-
     <string name="settings_download_path_title">다운로드 경로</string>
     <string name="settings_download_path_message">파일이 %1$s에 저장됩니다.</string>
     <string name="settings_clear_cache_title">저장소 캐시 비우기</string>
@@ -119,7 +112,6 @@
     <string name="settings_update_beta">베타</string>
     <string name="settings_update_custom">사용자 지정</string>
     <string name="settings_update_custom_msg">사용자 지정 URL 입력</string>
-    <string name="settings_core_only_summary">핵심 기능만 사용합니다. 모든 모듈을 로드하지 않지만, MagiskSU 및 MagiskHide는 계속 사용할 수 있습니다.</string>
     <string name="settings_magiskhide_summary">다양한 감지로부터 Magisk를 숨깁니다.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">광고 차단 앱에서 사용하는 systemless hosts를 지원합니다.</string>
@@ -163,7 +155,6 @@
     <string name="global_summary">모든 루트 세션이 전역 마운트 이름공간을 사용합니다.</string>
     <string name="requester_summary">루트 세션은 요청자의 이름공간을 상속합니다.</string>
     <string name="isolate_summary">각각의 루트 세션은 자신만의 독립된 이름공간을 사용합니다.</string>
-    <string name="settings_download_path_error">폴더 생성 오류. 저장소 루트 경로에서 접근할 수 있어야 하며 파일이 아니어야 합니다.</string>
 
     <!--Superuser-->
     <string name="su_request_title">슈퍼유저 요청</string>
@@ -179,7 +170,6 @@
     <string name="sixtymin">60분</string>
     <string name="su_allow_toast">%1$s에 슈퍼유저 권한이 허용됨</string>
     <string name="su_deny_toast">%1$s에 슈퍼유저 권한이 거부됨</string>
-    <string name="no_apps_found">검색된 앱 없음</string>
     <string name="su_snack_grant">%1$s의 슈퍼유저 권한이 허용됨</string>
     <string name="su_snack_deny">%1$s의 슈퍼유저 권한이 거부됨</string>
     <string name="su_snack_notif_on">%1$s의 알림이 활성화됨</string>

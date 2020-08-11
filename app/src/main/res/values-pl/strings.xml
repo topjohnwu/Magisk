@@ -16,27 +16,17 @@
     <string name="app_changelog">Dziennik zmian</string>
     <string name="manager">Manager</string>
     <string name="loading">Ładowanie…</string>
-    <string name="info">Informacje</string>
-    <string name="uninstall">Odinstaluj</string>
     <string name="update">Zaktualizuj</string>
     <string name="not_available">N/D</string>
     <string name="hide">Ukryj</string>
     <string name="status">Status</string>
     <string name="home_package">Pakiet</string>
-    <string name="details">Szczegóły</string>
 
     <string name="home_notice_content">Zawsze upewnij się, że używasz otwartoźródłowego Magisk Managera. Manager z nieznanego źródła może wykonywać złośliwe działania.</string>
     <string name="home_support_title">Wesprzyj nas</string>
-    <string name="home_links_project">Linki do projektu</string>
     <string name="home_item_source">Źródło</string>
     <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwarty. Niemniej możesz nam pokazać, że Ci zależy, wysyłając drobną darowiznę.</string>
-    <string name="home_device_title">Urządzenie</string>
-    <string name="home_device_extra_manufacturer">Producent</string>
-    <string name="home_device_extra_model">Model</string>
-    <string name="home_device_extra_board">Platforma</string>
-    <string name="home_device_system">System</string>
     <string name="home_status_normal">Normalny</string>
-    <string name="home_status_safe">Awaryjny</string>
     <string name="home_status_stub">Ukryty</string>
     <string name="home_installed_version">Zainstalowany</string>
     <string name="home_latest_version">Ostatni</string>
@@ -76,7 +66,6 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s otrzymał uprawnienia Superusera</string>
     <string name="su_deny_toast">%1$s odmówiono uprawnień Superusera</string>
-    <string name="no_apps_found">Nie znaleziono aplikacji</string>
     <string name="su_snack_grant">Przyznano uprawnienia Superusera dla %1$s</string>
     <string name="su_snack_deny">Odmówiono uprawnień Superusera dla %1$s</string>
     <string name="su_snack_notif_on">Włączono powiadomienia dla %1$s</string>
@@ -108,7 +97,6 @@
     <string name="safetynet_attest_failure">Zaświadczenie nieprawidłowe!</string>
     <string name="safetynet_attest_loading">Jeszcze chwila…</string>
     <string name="safetynet_attest_restart">Spróbuj ponownie</string>
-    <string name="safetynet_system">System</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Pokaż aplikacje systemowe</string>
@@ -119,20 +107,16 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
-    <string name="no_modules_found">Nie znaleziono modułów</string>
     <string name="reboot_recovery">Reboot do Recovery</string>
     <string name="reboot_bootloader">Reboot do Bootloadera</string>
     <string name="reboot_download">Reboot do Download</string>
     <string name="reboot_edl">Reboot do EDL</string>
-    <string name="module_safe_mode_message">Jesteś w trybie awaryjnym. Żaden moduł użytkownika nie będzie działał.\nTen komunikat zniknie po wyłączeniu trybu awaryjnego.</string>
     <string name="module_version_author">%1$s by %2$s</string>
     <string name="module_section_pending">Aktualizacje</string>
     <string name="module_section_pending_action">Zaktualizuj wszystkie</string>
-    <string name="module_section_remote">Dostępne</string>
     <string name="module_state_remove">Usuń</string>
     <string name="module_state_restore">Przywróć</string>
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
-    <string name="module_update_none">Twoje moduły są aktualne!</string>
     <string name="update_available">Dostępna aktualizacja</string>
     <string name="module_installed">Zainstalowane</string>
     <string name="sorting_order">Kolejność sortowania</string>
@@ -144,12 +128,6 @@
     <string name="settings_dark_mode_light">Zawsze jasny</string>
     <string name="settings_dark_mode_system">Ustawienie systemowe</string>
     <string name="settings_dark_mode_dark">Zawsze ciemny</string>
-    <string name="settings_safe_mode_title">Tryb awaryjny (Safe Mode)</string>
-    <string name="settings_core_only_summary" deprecated="true">Włącza tylko podstawowe funkcje. MagiskSU i MagiskHide będą nadal aktywne, ale nie zostaną załadowane żadne dodatkowe moduły</string>
-    <string name="settings_grid_column_count_title">Układ listy</string>
-    <string name="settings_grid_column_count_summary">Ustawia szerokość elementu na liście. Zrestartuj aplikację, aby zastosować zmiany.</string>
-    <string name="settings_grid_column_count_1">Standardowy</string>
-    <string name="settings_grid_column_count_2">Ściśnięty</string>
     <string name="settings_download_path_title">Ścieżka pobierania plików</string>
     <string name="settings_download_path_message">Pliki pobrane przez Managera będą zapisywane do %1$s</string>
     <string name="settings_clear_cache_title">Wyczyść pamięć cache repozytorium</string>
@@ -210,7 +188,6 @@
     <string name="global_summary">Wszystkie sesje roota będą używać globalnej przestrzeni nazw montowania</string>
     <string name="requester_summary">Sesje roota odziedziczą przestrzeń nazw od wywołującego</string>
     <string name="isolate_summary">Każda sesja roota dostanie własną, izolowaną przestrzeń nazw</string>
-    <string name="settings_download_path_error">Błąd tworzenia folderu. Podana ścieżka musi być dostępna z głównego katalogu pamięci i nie może być plikiem.</string>
 
     <!--Notifications-->
     <string name="update_channel">Aktualizacja Magiska</string>
@@ -229,11 +206,8 @@
     <string name="repo_install_msg">Czy chcesz zainstalować %1$s ?</string>
     <string name="download">Pobierz</string>
     <string name="reboot">Reboot</string>
-    <string name="settings_reboot_toast">Uruchom ponownie urządzenie, aby zastosować ustawienia</string>
     <string name="release_notes">Lista zmian</string>
     <string name="repo_cache_cleared">Pamięć cache repozytorium została wyczyszczona</string>
-    <string name="dtbo_patched_title">DTBO zostało zmodyfikowane!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager zmodyfikował dtbo.img. Uruchom ponownie urządzenie.</string>
     <string name="flashing">Flashowanie…</string>
     <string name="done">Gotowe!</string>
     <string name="failure">Błąd</string>

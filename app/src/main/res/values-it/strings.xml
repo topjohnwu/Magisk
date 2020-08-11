@@ -19,11 +19,8 @@
     <string name="manager">Manager</string>
 
     <string name="home_support_title">Supportaci</string>
-    <string name="home_links_project">Link del progetto</string>
     <string name="home_item_source">Codice sorgente</string>
     <string name="home_support_content">Magisk è e sempre sarà gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento inviando una piccola donazione.</string>
-
-    <string name="home_device_system">Sistema</string>
 
     <string name="home_package">Pacchetto</string>
 
@@ -32,7 +29,6 @@
     <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
     <string name="safetynet_api_error">Errore API SafetyNet</string>
     <string name="safetynet_res_invalid">La risposta non è valida</string>
-    <string name="uninstall">Disinstalla</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso e i tuoi dati potrebbero essere criptati, nel caso non lo siano già.</string>
     <string name="update">Aggiorna</string>
@@ -69,7 +65,6 @@
     <string name="sixtymin">60 minuti</string>
     <string name="su_allow_toast">%1$s ha ottenuto i permessi Superuser</string>
     <string name="su_deny_toast">%1$s non ha ottenuto i permessi Superuser</string>
-    <string name="no_apps_found">Nessuna app trovata</string>
     <string name="su_snack_grant"> %1$s ha ottenuto i permessi Superuser</string>
     <string name="su_snack_deny"> %1$s non ha ottenuto i permessi Superuser</string>
     <string name="su_snack_notif_on">Notifiche per %1$s abilitate</string>
@@ -99,7 +94,6 @@
     <string name="safetynet_attest_failure">Attestazione fallita!</string>
     <string name="safetynet_attest_loading">Solo un secondo…</string>
     <string name="safetynet_attest_restart">Prova di nuovo</string>
-    <string name="safetynet_system">Sistema</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostra app di sistema</string>
@@ -110,20 +104,16 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nessuna informazione)</string>
-    <string name="no_modules_found">Nessun modulo trovato</string>
     <string name="reboot_recovery">Riavvia in Recovery</string>
     <string name="reboot_bootloader">Riavvia in Bootloader</string>
     <string name="reboot_download">Riavvia in Download Mode</string>
     <string name="reboot_edl">Riavvia in EDL</string>
-    <string name="module_safe_mode_message">È stata attivata la modalità sicura. I moduli dell\'utente non funzioneranno.\nQuesto messaggio scomprarirà quando la modalità verrà disabilitata.</string>
     <string name="module_version_author">%1$s di %2$s</string>
     <string name="module_section_pending">Aggiornamenti</string>
     <string name="module_section_pending_action">Aggiorna tutto</string>
-    <string name="module_section_remote">Remoto</string>
     <string name="module_state_remove">Rimuovi</string>
     <string name="module_state_restore">Ripristina</string>
     <string name="module_action_install_external">Installa dalla memoria</string>
-    <string name="module_update_none">I tuoi moduli sono aggiornati!</string>
     <string name="update_available">Aggiornamento disponibile</string>
     <string name="home_installed_version">Installato</string>
     <string name="sorting_order">Ordina per</string>
@@ -134,8 +124,6 @@
     <string name="settings_dark_mode_light">Chiaro</string>
     <string name="settings_dark_mode_system">Adatta al sistema</string>
     <string name="settings_dark_mode_dark">Scuro</string>
-    <string name="settings_safe_mode_title">Modalità sicura</string>
-    <string name="settings_core_only_summary" deprecated="true">Abilita solo le funzioni principali. Nessun modulo verrà caricato. MagiskSU e MagiskHide rimarranno abilitati</string>
     <string name="settings_download_path_title">Percorso di download</string>
     <string name="settings_download_path_message">I file verranno salvati in %1$s</string>
     <string name="settings_clear_cache_title">Svuota cache repository</string>
@@ -196,7 +184,6 @@
     <string name="global_summary">Tutte le sessioni di root erediteranno il namespace globale</string>
     <string name="requester_summary">Le sessioni di root erediteranno il namespace del loro richiedente</string>
     <string name="isolate_summary">Ogni sessione di root avrà il suo namespace isolato</string>
-    <string name="settings_download_path_error">Errore durante la creazione della cartella. Deve essere accessibile dalla radice della memoria di archiviazione e non essere un file.</string>
 
     <!--Notifications-->
     <string name="update_channel">Aggiornamenti Magisk</string>
@@ -215,11 +202,8 @@
     <string name="repo_install_msg">Vuoi installare %1$s?</string>
     <string name="download">Download</string>
     <string name="reboot">Riavvia</string>
-    <string name="settings_reboot_toast">Riavvia per applicare i cambiamenti</string>
     <string name="release_notes">Note di rilascio</string>
     <string name="repo_cache_cleared">La cache delle repository è stata svuotata</string>
-    <string name="dtbo_patched_title">DTBO è stato aggiornato!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ha aggiornato dtbo.img. Riavvia per completare.</string>
     <string name="flashing">Flash in corso…</string>
     <string name="done">Completato!</string>
     <string name="failure">Fallito</string>

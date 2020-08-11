@@ -15,26 +15,16 @@
     <string name="app_changelog">Спіс змен</string>
     <string name="manager">Кіраўнік</string>
     <string name="loading">Загрузка…</string>
-    <string name="info">Інфармацыя</string>
-    <string name="uninstall">Выдаліць</string>
     <string name="update">Абнавіць</string>
     <string name="not_available">Н/Д</string>
     <string name="hide">Схаваць</string>
     <string name="status">Статус</string>
     <string name="home_package">Пакунак</string>
-    <string name="details">Падрабязнасці</string>
     <string name="home_notice_content">Заўсёды правярайце адкуль вы спампоўваеце Magisk Manager. Пакункі, спампаваныя з невядомых крыніц, могуць змяшчаць шкоднасны код.</string>
     <string name="home_support_title">Падтрымайце нас</string>
-    <string name="home_links_project">Пра праект</string>
     <string name="home_item_source">Зыходны код</string>
     <string name="home_support_content">Magisk ёсць і заўсёды будзе бясплатным праектам з адкрытым зыходным кодам. Але вы заўсёды можаце ахвяраваць нам на распрацоўку.</string>
-    <string name="home_device_title">Прылада</string>
-    <string name="home_device_extra_manufacturer">Вытворца</string>
-    <string name="home_device_extra_model">Мадэль</string>
-    <string name="home_device_extra_board">Платформа</string>
-    <string name="home_device_system">Сістэма</string>
     <string name="home_status_normal">Звычайны</string>
-    <string name="home_status_safe">Бяспечны рэжым</string>
     <string name="home_status_stub">Хаванне</string>
     <string name="home_installed_version">Усталяваны</string>
     <string name="home_latest_version">Апошні</string>
@@ -73,7 +63,6 @@
     <string name="sixtymin">60 хвіл</string>
     <string name="su_allow_toast">Праграме \"%1$s\" дадзеныя правы суперкарыстальніка</string>
     <string name="su_deny_toast">Праграме \"%1$s\" было адмоўлена ў правах суперкарыстальніка</string>
-    <string name="no_apps_found">Праграм не знойдзена</string>
     <string name="su_snack_grant">Праграме \"%1$s\" дадзеныя правы суперкарыстальніка</string>
     <string name="su_snack_deny">Праграме \"%1$s\" адмоўлена ў правах суперкарыстальніка</string>
     <string name="su_snack_notif_on">Апавяшчэнні для \"%1$s\" уключаныя</string>
@@ -102,7 +91,6 @@
     <string name="safetynet_attest_failure">Не атрымалася!</string>
     <string name="safetynet_attest_loading">Хвілінку…</string>
     <string name="safetynet_attest_restart">Паспрабаваць зноў</string>
-    <string name="safetynet_system">Сістэмныя праграмы</string>
     <!-- MagiskHide -->
     <string name="show_system_app">Паказваць сістэмныя праграмы</string>
     <string name="hide_filter_hint">Фільтраваць па назве</string>
@@ -111,20 +99,16 @@
     <string name="hide_search">Пошук</string>
     <!--Module Fragment-->
     <string name="no_info_provided">(Няма інфармацыі)</string>
-    <string name="no_modules_found">Модуляў не знойдзена</string>
     <string name="reboot_recovery">Перазапуск у Recovery</string>
     <string name="reboot_bootloader">Перазапуск у Bootloader</string>
     <string name="reboot_download">Перазапуск у Download</string>
     <string name="reboot_edl">Перазапуск у EDL</string>
-    <string name="module_safe_mode_message">Вы ў бяспечным рэжыме. Усе карыстальніцкія модулі адключаныя.\nПаведамленне знікне пасля выключэння бяспечнага рэжыму.</string>
     <string name="module_version_author">%1$s ад %2$s</string>
     <string name="module_section_pending">Абнаўленні</string>
     <string name="module_section_pending_action">Абнавіць усё</string>
-    <string name="module_section_remote">Не ўсталявана</string>
     <string name="module_state_remove">Выдаліць</string>
     <string name="module_state_restore">Аднавіць</string>
     <string name="module_action_install_external">Усталяваць са сховішча</string>
-    <string name="module_update_none">Вашыя модулі абноўленыя!</string>
     <string name="update_available">Даступныя абнаўленні</string>
     <string name="module_installed">Усталяваныя</string>
     <string name="sorting_order">Парадак сартавання</string>
@@ -135,12 +119,6 @@
     <string name="settings_dark_mode_light">Заўсёды светлы</string>
     <string name="settings_dark_mode_system">Сістэмны</string>
     <string name="settings_dark_mode_dark">Заўсёды цёмны</string>
-    <string name="settings_safe_mode_title">Бяспечны рэжым</string>
-    <string name="settings_core_only_summary" deprecated="true">Уключыць толькі асноўныя магчымасці. MagiskSU і MagiskHide будуць уключаныя, але не будуць загружаныя</string>
-    <string name="settings_grid_column_count_title">Размяшчэнне элементаў</string>
-    <string name="settings_grid_column_count_summary">Вызначце парадак размяшчэння элементаў у спісе. Перазапусціце праграму, каб ужыць змены.</string>
-    <string name="settings_grid_column_count_1">Звычайна</string>
-    <string name="settings_grid_column_count_2">Сцісла</string>
     <string name="settings_download_path_title">Каталог спамповак</string>
     <string name="settings_download_path_message">Файлы будуць спампоўвацца ў %1$s</string>
     <string name="settings_clear_cache_title">Ачыстка кэшу рэпазіторыя</string>
@@ -199,7 +177,6 @@
     <string name="global_summary">Сеансы суперкарыстальніка выкарыстоўваюць агульную прастору назваў</string>
     <string name="requester_summary">Сеансы суперкарыстальніка выкарыстоўваюць спадкаемную прастору назваў</string>
     <string name="isolate_summary">Сеансы суперкарыстальніка выкарыстоўваюць ізаляваную прастору назваў</string>
-    <string name="settings_download_path_error">Не атрымалася стварыць каталог. Ён мусіць быць даступным з каранёвага каталога і не можа быць файлам.</string>
     <!--Notifications-->
     <string name="update_channel">Абнаўленні Magisk</string>
     <string name="progress_channel">Апавяшчэнні пра ход выканання</string>
@@ -216,11 +193,8 @@
     <string name="repo_install_msg">Усталяваць %1$s?</string>
     <string name="download">Спампаваць</string>
     <string name="reboot">Перазапуск</string>
-    <string name="settings_reboot_toast">Перазапусціце, каб налады ўжыліся</string>
     <string name="release_notes">Пра выпуск</string>
     <string name="repo_cache_cleared">Кэш рэпазіторыя ачышчаны</string>
-    <string name="dtbo_patched_title">DTBO прапатчаны!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager прапатчыў dtbo.img. Перазапусціце прыладу.</string>
     <string name="flashing">Усталёўка…</string>
     <string name="done">Завершана!</string>
     <string name="failure">Не атрымалася</string>

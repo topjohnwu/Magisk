@@ -16,27 +16,17 @@
     <string name="app_changelog">更新日志</string>
     <string name="manager">管理器</string>
     <string name="loading">加载中…</string>
-    <string name="info">信息</string>
-    <string name="uninstall">卸载</string>
     <string name="update">更新</string>
     <string name="not_available">N/A</string>
     <string name="hide">隐藏</string>
     <string name="status">状态</string>
     <string name="home_package">包名</string>
-    <string name="details">详细信息</string>
 
     <string name="home_notice_content">确保您使用的是开源的 Magisk Manager。未知来源的 Manager 可能执行恶意操作。</string>
     <string name="home_support_title">支持我们</string>
-    <string name="home_links_project">项目链接</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk 现在是，将来也永远是免费且开源的。但您可以向我们小额捐赠表示支持。</string>
-    <string name="home_device_title">设备</string>
-    <string name="home_device_extra_manufacturer">制造商</string>
-    <string name="home_device_extra_model">机型</string>
-    <string name="home_device_extra_board">主板</string>
-    <string name="home_device_system">系统版本</string>
     <string name="home_status_normal">常规</string>
-    <string name="home_status_safe">安全模式</string>
     <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">已安装</string>
     <string name="home_latest_version">最新</string>
@@ -77,7 +67,6 @@
     <string name="sixtymin">60 分钟</string>
     <string name="su_allow_toast">%1$s 已被授予超级用户权限</string>
     <string name="su_deny_toast">%1$s 已被拒绝超级用户权限</string>
-    <string name="no_apps_found">未找到应用</string>
     <string name="su_snack_grant">已授予 %1$s 超级用户权限</string>
     <string name="su_snack_deny">已拒绝 %1$s 超级用户权限</string>
     <string name="su_snack_notif_on">已启用 %1$s 的通知</string>
@@ -109,7 +98,6 @@
     <string name="safetynet_attest_failure">认证失败！</string>
     <string name="safetynet_attest_loading">请稍候…</string>
     <string name="safetynet_attest_restart">重试</string>
-    <string name="safetynet_system">System</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">显示系统应用</string>
@@ -120,20 +108,16 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
-    <string name="no_modules_found">未找到模块</string>
     <string name="reboot_recovery">重启到 Recovery</string>
     <string name="reboot_bootloader">重启到 Bootloader</string>
     <string name="reboot_download">重启到 Download</string>
     <string name="reboot_edl">重启到 EDL</string>
-    <string name="module_safe_mode_message">您正处于安全模式。用户模块均不会生效。\n此消息在非安全模式下不会出现。</string>
     <string name="module_version_author">%1$s，作者 %2$s</string>
     <string name="module_section_pending">更新</string>
     <string name="module_section_pending_action">全部更新</string>
-    <string name="module_section_remote">云端</string>
     <string name="module_state_remove">移除</string>
     <string name="module_state_restore">还原</string>
     <string name="module_action_install_external">从本地存储安装</string>
-    <string name="module_update_none">您的模块是最新的！</string>
     <string name="update_available">可更新</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">排序方式</string>
@@ -145,12 +129,6 @@
     <string name="settings_dark_mode_light">明亮模式</string>
     <string name="settings_dark_mode_system">跟随系统</string>
     <string name="settings_dark_mode_dark">深色模式</string>
-    <string name="settings_safe_mode_title">安全模式</string>
-    <string name="settings_core_only_summary" deprecated="true">仅启用核心功能。不加载任何模块，MagiskSU 和 MagiskHide 仍正常启用</string>
-    <string name="settings_grid_column_count_title">列表排列</string>
-    <string name="settings_grid_column_count_summary">设置列表中的项目宽度。更改在应用重启后生效。</string>
-    <string name="settings_grid_column_count_1">标准</string>
-    <string name="settings_grid_column_count_2">混排</string>
     <string name="settings_download_path_title">下载路径</string>
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
@@ -211,7 +189,6 @@
     <string name="global_summary">所有 ROOT 会话使用全局挂载命名空间</string>
     <string name="requester_summary">ROOT 会话继承原程序的命名空间</string>
     <string name="isolate_summary">每个 ROOT 会话使用自身的独立命名空间</string>
-    <string name="settings_download_path_error">创建文件夹出错。路径必须可从根目录访问，且不能有同名文件。</string>
 
     <!--Notifications-->
     <string name="update_channel">Magisk 更新提示</string>
@@ -230,11 +207,8 @@
     <string name="repo_install_msg">确认安装 %1$s？</string>
     <string name="download">下载</string>
     <string name="reboot">重启</string>
-    <string name="settings_reboot_toast">重启设备以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
-    <string name="dtbo_patched_title">已修补 DTBO ！</string>
-    <string name="dtbo_patched_reboot">Magisk Manager 已修补 dtbo.img。请重启设备。</string>
     <string name="flashing">正在刷入</string>
     <string name="done">完成！</string>
     <string name="failure">失败</string>

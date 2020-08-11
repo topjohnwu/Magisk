@@ -15,14 +15,12 @@
     <string name="keep_force_encryption">बल एन्क्रिप्शन को बनाये रखें</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity को बनाये रखें</string>
     <string name="recovery_mode">रिकवरी मोड</string>
-    <string name="uninstall">स्थापना रद्द करें</string>
     <string name="uninstall_magisk_title">Magisk की स्थापना रद्द करें</string>
     <string name="uninstall_magisk_msg">सभी मॉड्यूल अक्षम/हटा दिए जाएंगे. रुट और आपका संभावित रूप से एन्क्रिप्ट डाटा हटा दिया जाएगा.</string>
     <string name="update">अपडेट करें</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(कोई जानकारी प्रदान नहीं की गई)</string>
-    <string name="no_modules_found">कोई मॉड्यूल नहीं मिला</string>
     <string name="reboot_recovery">रिकवरी मोड में रिबूट करें</string>
     <string name="reboot_bootloader">बूटलोडर में रिबूट करें</string>
     <string name="reboot_download">डाउनलोड में रिबूट करें</string>
@@ -67,12 +65,9 @@
     <string name="repo_install_msg">क्या आप %1$s को स्थापित करना चाहते हैं ?</string>
     <string name="download">डाउनलोड</string>
     <string name="reboot">रिबूट</string>
-    <string name="settings_reboot_toast">सेटिंग्स लागू करने के लिए रिबूट करें.</string>
     <string name="release_notes">रिलीज नोट्स</string>
     <string name="repo_cache_cleared">Repo cache साफ़ हो गया</string>
 
-    <string name="dtbo_patched_title">DTBO पैच कर दिया गया!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ने dtbo.img को पैच कर दिया. कृपया रिबूट करें.</string>
     <string name="flashing">फ़्लैश हो रहा है…</string>
     <string name="done">हो गया!</string>
     <string name="failure">विफल हुआ</string>
@@ -109,7 +104,6 @@
     <string name="settings_update_beta">बीटा</string>
     <string name="settings_update_custom">कस्टम</string>
     <string name="settings_update_custom_msg">एक कस्टम URL डालें</string>
-    <string name="settings_core_only_summary">केवल मुख्य विशेषताएं सक्षम करें. MagiskSU और MagiskHide अभी भी सक्षम रहेंगे, लेकिन कोई मॉड्यूल लोड नहीं किया जाएगा.</string>
     <string name="settings_magiskhide_summary">पता लगाने के विभिन्न रूपों से Magisk को छुपाएं.</string>
     <string name="settings_hosts_title">सिस्टमलेस होस्ट्स</string>
     <string name="settings_hosts_summary">एडब्लॉक ऍप्लिकेशन्स के लिए सिस्टमलेस होस्ट्स का समर्थन</string>
@@ -147,7 +141,6 @@
     <string name="global_summary">सभी रूट सत्र वैश्विक माउंट नेमस्पेस का उपयोग करते हैं.</string>
     <string name="requester_summary">रूट सत्रों को उनके अनुरोधकर्ताओं के नेमस्पेस विरासत में मिलेंगे.</string>
     <string name="isolate_summary">प्रत्येक रूट सत्र का अपना अलग नेमस्पेस होगा.</string>
-    <string name="settings_download_path_error">फोल्डर बनाने में त्रुटि. यह स्टोरेज रूट डायरेक्टरी से एक्सेस होना चाहिए और फाइल नहीं होना चाहिए.</string>
 
     <!--Superuser-->
     <string name="su_request_title">उत्तम उपयोगकर्ता का अनुरोध</string>
@@ -163,7 +156,6 @@
     <string name="sixtymin">60 मिनट</string>
     <string name="su_allow_toast">%1$s को उत्तम उपयोगकर्ता के अधिकार की अनुमति दी गई</string>
     <string name="su_deny_toast">%1$s को उत्तम उपयोगकर्ता के अधिकार से इनकार किया गया</string>
-    <string name="no_apps_found">कोई एप्लीकेशन नहीं मिला</string>
     <string name="su_snack_grant">%1$s को उत्तम उपयोगकर्ता के अधिकार की अनुमति है</string>
     <string name="su_snack_deny">%1$s को उत्तम उपयोगकर्ता के अधिकार की अनुमति नहीं है</string>
     <string name="su_snack_notif_on">%1$s की सूचनाएं सक्षम हैं</string>
