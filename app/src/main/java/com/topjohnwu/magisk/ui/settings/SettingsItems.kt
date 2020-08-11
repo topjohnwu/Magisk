@@ -36,7 +36,7 @@ object Customization : SettingsItem.Section() {
 
 object Language : SettingsItem.Selector() {
     override var value = -1
-        set(value) = setS(value, field, { field = it }) {
+        set(value) = setV(value, field, { field = it }) {
             Config.locale = entryValues[it]
         }
 
@@ -82,7 +82,9 @@ object Hide : SettingsItem.Input() {
 
     @get:Bindable
     override var value = "Manager"
-        set(value) = setV(value, field, { field = it }, BR.error)
+        set(value) = setV(value, field, { field = it }) {
+            notifyPropertyChanged(BR.error)
+        }
 
     @get:Bindable
     val isError get() = value.length > 14 || value.isBlank()
@@ -125,7 +127,7 @@ object DownloadPath : SettingsItem.Input() {
 
 object UpdateChannel : SettingsItem.Selector() {
     override var value  = Config.updateChannel
-        set(value) = setS(value, field, { field = it }) { Config.updateChannel = it }
+        set(value) = setV(value, field, { field = it }) { Config.updateChannel = it }
 
     override val title = R.string.settings_update_channel_title.asTransitive()
     override val entries get() = resources.getStringArray(R.array.update_channel).let {
@@ -138,6 +140,7 @@ object UpdateChannelUrl : SettingsItem.Input() {
     override val title = R.string.settings_update_custom.asTransitive()
     override var value = Config.customChannelUrl
         set(value) = setV(value, field, { field = it }) { Config.customChannelUrl = it }
+    override val description get() = value.asTransitive()
 
     override val inputResult get() = result
 
@@ -226,7 +229,7 @@ object AccessMode : SettingsItem.Selector() {
     override val entryValRes = R.array.value_array
 
     override var value = Config.rootMode
-        set(value) = setS(value, field, { field = it }) {
+        set(value) = setV(value, field, { field = it }) {
             Config.rootMode = entryValues[it].toInt()
         }
 }
@@ -237,7 +240,7 @@ object MultiuserMode : SettingsItem.Selector() {
     override val entryValRes = R.array.value_array
 
     override var value = Config.suMultiuserMode
-        set(value) = setS(value, field, { field = it }) {
+        set(value) = setV(value, field, { field = it }) {
             Config.suMultiuserMode = entryValues[it].toInt()
         }
 
@@ -255,7 +258,7 @@ object MountNamespaceMode : SettingsItem.Selector() {
     override val entryValRes = R.array.value_array
 
     override var value = Config.suMntNamespaceMode
-        set(value) = setS(value, field, { field = it }) {
+        set(value) = setV(value, field, { field = it }) {
             Config.suMntNamespaceMode = entryValues[it].toInt()
         }
 
@@ -269,7 +272,7 @@ object AutomaticResponse : SettingsItem.Selector() {
     override val entryValRes = R.array.value_array
 
     override var value = Config.suAutoReponse
-        set(value) = setS(value, field, { field = it }) {
+        set(value) = setV(value, field, { field = it }) {
             Config.suAutoReponse = entryValues[it].toInt()
         }
 }
@@ -280,7 +283,7 @@ object RequestTimeout : SettingsItem.Selector() {
     override val entryValRes = R.array.request_timeout_value
 
     override var value = selected
-        set(value) = setS(value, field, { field = it }) {
+        set(value) = setV(value, field, { field = it }) {
             Config.suDefaultTimeout = entryValues[it].toInt()
         }
 
@@ -294,7 +297,7 @@ object SUNotification : SettingsItem.Selector() {
     override val entryValRes = R.array.value_array
 
     override var value = Config.suNotification
-        set(value) = setS(value, field, { field = it }) {
+        set(value) = setV(value, field, { field = it }) {
             Config.suNotification = entryValues[it].toInt()
         }
 }

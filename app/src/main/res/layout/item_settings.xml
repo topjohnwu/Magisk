@@ -5,11 +5,9 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.R" />
-
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem.Toggle" />
+            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem" />
 
         <variable
             name="callback"
@@ -26,49 +24,32 @@
         android:onClick="@{(view) -> item.onPressed(view, callback)}"
         tools:layout_gravity="center">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="@{item.icon == 0 ? @dimen/l1 : 0}"
+            android:paddingEnd="@dimen/l1">
 
             <ImageView
-                android:id="@+id/toggle_icon"
+                android:id="@+id/icon"
                 style="@style/WidgetFoundation.Icon"
                 gone="@{item.icon == 0}"
                 android:background="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@{item.icon}"
                 tools:srcCompat="@drawable/ic_fingerprint" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/toggle_indicator"
-                android:checked="@={item.value}"
-                isEnabled="@{item.enabled}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/l_25"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <LinearLayout
+                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@{item.icon == 0 ? (int) @dimen/l1 : 0}"
-                android:layout_marginEnd="@dimen/l_50"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
                 android:paddingTop="@dimen/l1"
-                android:paddingBottom="@dimen/l1"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/toggle_indicator"
-                app:layout_constraintStart_toEndOf="@+id/toggle_icon"
-                app:layout_constraintTop_toTopOf="parent">
+                android:paddingBottom="@dimen/l1">
 
                 <TextView
-                    android:id="@+id/toggle_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -80,7 +61,6 @@
                     tools:text="@tools:sample/lorem/random" />
 
                 <TextView
-                    android:id="@+id/toggle_description"
                     gone="@{item.description.empty}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -91,7 +71,16 @@
 
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/selector_indicator"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:checked="@{item.checked}"
+                android:onCheckedChanged="@{(v, c) -> item.onToggle(v, callback, c)}"
+                goneUnless="@{item.showSwitch}"
+                isEnabled="@{item.enabled}"/>
+
+        </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
 

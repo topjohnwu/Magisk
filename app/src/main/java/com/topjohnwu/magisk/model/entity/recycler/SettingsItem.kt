@@ -18,11 +18,23 @@ import org.koin.core.get
 
 sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
+    override val layoutRes get() = R.layout.item_settings
+
     open val icon: Int get() = 0
     open val title: TransitiveText get() = TransitiveText.EMPTY
-
     @get:Bindable
     open val description: TransitiveText get() = TransitiveText.EMPTY
+
+    // ---
+
+    open val showSwitch get() = false
+
+    @get:Bindable
+    open val isChecked get() = false
+
+    open fun onToggle(view: View, callback: Callback, checked: Boolean) {}
+
+    // ---
 
     @get:Bindable
     var isEnabled = true
@@ -48,7 +60,6 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
     abstract class Value<T> : SettingsItem() {
 
-        @get:Bindable
         abstract var value: T
 
         protected var callbackVars: Pair<View, Callback>? = null
@@ -64,23 +75,12 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         abstract fun onPressed(view: View)
 
         protected inline fun <reified T> setV(
-            new: T, old: T, setter: (T) -> Unit, vararg fieldIds: Int, afterChanged: (T) -> Unit = {}) {
-            set(new, old, setter, BR.value, *fieldIds) {
-                afterChanged(it)
-                callbackVars?.let { pair ->
-                    callbackVars = null
-                    pair.second.onItemChanged(pair.first, this)
-                }
-            }
-        }
-
-        protected inline fun <reified T> setV(
             new: T, old: T, setter: (T) -> Unit, afterChanged: (T) -> Unit = {}) {
-            set(new, old, setter, BR.value) {
+            set(new, old, setter, BR.value, BR.description, BR.checked) {
                 afterChanged(it)
-                callbackVars?.let { pair ->
+                callbackVars?.let { (view, callback) ->
                     callbackVars = null
-                    pair.second.onItemChanged(pair.first, this)
+                    callback.onItemChanged(view, this)
                 }
             }
         }
@@ -88,7 +88,11 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
     abstract class Toggle : Value<Boolean>() {
 
-        override val layoutRes = R.layout.item_settings_toggle
+        override val showSwitch get() = true
+        override val isChecked get() = value
+
+        override fun onToggle(view: View, callback: Callback, checked: Boolean) =
+            set(checked, value, { onPressed(view, callback) }, BR.checked)
 
         override fun onPressed(view: View) {
             value = !value
@@ -96,8 +100,6 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
     }
 
     abstract class Input : Value<String>() {
-
-        override val layoutRes = R.layout.item_settings_input
 
         protected abstract val inputResult: String?
 
@@ -128,8 +130,6 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
     abstract class Selector : Value<Int>(), KoinComponent {
 
-        override val layoutRes = R.layout.item_settings_selector
-
         protected val resources get() = get<Resources>()
 
         @ArrayRes open val entryRes = -1
@@ -138,14 +138,8 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
         open val entries get() = resources.getArrayOrEmpty(entryRes)
         open val entryValues get() = resources.getArrayOrEmpty(entryValRes)
 
-        @get:Bindable
         override val description: TransitiveText
             get() = entries.getOrNull(value)?.asTransitive() ?: TransitiveText.EMPTY
-
-        protected inline fun <reified T> setS(
-            new: T, old: T, setter: (T) -> Unit, afterChanged: (T) -> Unit = {}) {
-            setV(new, old, setter, BR.description, afterChanged = afterChanged)
-        }
 
         private fun Resources.getArrayOrEmpty(id: Int): Array<String> =
             runCatching { getStringArray(id) }.getOrDefault(emptyArray())
@@ -169,9 +163,7 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
     }
 
-    abstract class Blank : SettingsItem() {
-        override val layoutRes = R.layout.item_settings_blank
-    }
+    abstract class Blank : SettingsItem()
 
     abstract class Section : SettingsItem() {
         override val layoutRes = R.layout.item_settings_section
