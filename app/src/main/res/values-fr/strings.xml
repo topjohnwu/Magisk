@@ -33,6 +33,7 @@
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
+    <string name="home_check_safetynet">Vérifier SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
@@ -120,8 +121,8 @@
     <string name="module_action_install_external">Installer depuis le stockage</string>
     <string name="update_available">Mise à jour disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">En ligne</string>
     <string name="sorting_order">Classement</string>
-   <string name="external_rw_permission_denied">Autorisez l’accès au stockage pour activer cette fonctionnalité</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode du thème</string>
@@ -229,5 +230,6 @@
     <string name="authenticate">Authentification</string>
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
     <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
+    <string name="external_rw_permission_denied">Permettre l'accès au stockage pour activer cette fonctionnalité</string>
 
 </resources>
