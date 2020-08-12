@@ -6,10 +6,7 @@ import android.graphics.drawable.Drawable
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.updateLayoutParams
@@ -166,8 +163,8 @@ fun RecyclerView.setDividers(dividerVertical: Drawable?, dividerHorizontal: Draw
 }
 
 @BindingAdapter("app:icon")
-fun MaterialButton.setIconRes(res: Int) {
-    setIconResource(res)
+fun Button.setIconRes(res: Int) {
+    (this as MaterialButton).setIconResource(res)
 }
 
 @BindingAdapter("strokeWidth")

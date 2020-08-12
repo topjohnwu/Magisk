@@ -13,6 +13,7 @@ import android.view.WindowManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.ViewCompat
 import androidx.core.view.updatePadding
 import androidx.databinding.Bindable
@@ -77,12 +78,8 @@ class MagiskDialog(
         override var callbacks: PropertyChangeRegistry? = null
 
         @get:Bindable
-        var icon = 0
+        var icon: Drawable? = null
             set(value) = set(value, field, { field = it }, BR.icon)
-
-        @get:Bindable
-        var iconRaw: Drawable? = null
-            set(value) = set(value, field, { field = it }, BR.iconRaw)
 
         @get:Bindable
         var title: CharSequence = ""
@@ -185,10 +182,12 @@ class MagiskDialog(
         apply { data.message = message }
 
     fun applyIcon(@DrawableRes drawableRes: Int) =
-        apply { data.icon = drawableRes }
+        apply {
+            data.icon = AppCompatResources.getDrawable(context, drawableRes)
+        }
 
     fun applyIcon(drawable: Drawable) =
-        apply { data.iconRaw = drawable }
+        apply { data.icon = drawable }
 
     fun applyButton(buttonType: ButtonType, builder: ButtonBuilder.() -> Unit) = apply {
         val button = when (buttonType) {
@@ -269,7 +268,7 @@ class MagiskDialog(
 
     fun resetTitle() = applyTitle("")
     fun resetMessage() = applyMessage("")
-    fun resetIcon() = applyIcon(0)
+    fun resetIcon() = apply { data.icon = null }
 
     fun resetButtons() = apply {
         ButtonType.values().forEach {
