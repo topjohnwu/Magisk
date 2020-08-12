@@ -60,7 +60,20 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
     abstract class Value<T> : SettingsItem() {
 
+        /**
+         * Represents last agreed-upon value by the validation process and the user for current
+         * child. Be very aware that this shouldn't be **set** unless both sides agreed that _that_
+         * is the new value.
+         *
+         * Annotating [value] as [Bindable] property should raise red flags immediately. If you
+         * need a [Bindable] property create another one. Seriously.
+         * */
         abstract var value: T
+            /**
+             * We don't want this to be accessible to be set from outside the instances. It will
+             * introduce unwanted bugs!
+             * */
+            protected set
 
         protected var callbackVars: Pair<View, Callback>? = null
 
@@ -76,7 +89,7 @@ sealed class SettingsItem : ObservableItem<SettingsItem>() {
 
         protected inline fun <reified T> setV(
             new: T, old: T, setter: (T) -> Unit, afterChanged: (T) -> Unit = {}) {
-            set(new, old, setter, BR.value, BR.description, BR.checked) {
+            set(new, old, setter, BR.description, BR.checked) {
                 afterChanged(it)
                 callbackVars?.let { (view, callback) ->
                     callbackVars = null

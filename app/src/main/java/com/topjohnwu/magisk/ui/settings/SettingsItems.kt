@@ -80,19 +80,23 @@ object Hide : SettingsItem.Input() {
     override val title = R.string.settings_hide_manager_title.asTransitive()
     override val description = R.string.settings_hide_manager_summary.asTransitive()
 
-    @get:Bindable
     override var value = "Manager"
-        set(value) = setV(value, field, { field = it }) {
-            notifyPropertyChanged(BR.error)
-        }
+        set(value) = setV(value, field, { field = it })
+
+    override val inputResult
+        get() = if (isError) null else result
 
     @get:Bindable
-    val isError get() = value.length > 14 || value.isBlank()
+    var result = value
+        set(value) = set(value, field, { field = it }, BR.result, BR.error)
 
-    override val inputResult get() = if (isError) null else value
+    @get:Bindable
+    val isError
+        get() = value.length > 14 || value.isBlank()
 
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
+
 }
 
 object Restore : SettingsItem.Blank() {
@@ -119,20 +123,22 @@ object DownloadPath : SettingsItem.Input() {
         set(value) = set(value, field, { field = it }, BR.result, BR.path)
 
     @get:Bindable
-    val path get() = File(Environment.getExternalStorageDirectory(), result).absolutePath.orEmpty()
+    val path
+        get() = File(Environment.getExternalStorageDirectory(), result).absolutePath.orEmpty()
 
     override fun getView(context: Context) = DialogSettingsDownloadPathBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
 }
 
 object UpdateChannel : SettingsItem.Selector() {
-    override var value  = Config.updateChannel
+    override var value = Config.updateChannel
         set(value) = setV(value, field, { field = it }) { Config.updateChannel = it }
 
     override val title = R.string.settings_update_channel_title.asTransitive()
-    override val entries get() = resources.getStringArray(R.array.update_channel).let {
-        if (BuildConfig.DEBUG) it.toMutableList().apply { add("Canary") }.toTypedArray() else it
-    }
+    override val entries
+        get() = resources.getStringArray(R.array.update_channel).let {
+            if (BuildConfig.DEBUG) it.toMutableList().apply { add("Canary") }.toTypedArray() else it
+        }
     override val entryValRes = R.array.value_array
 }
 
