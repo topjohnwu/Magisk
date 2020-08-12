@@ -28,9 +28,12 @@
     <string name="home_support_content">Magisk özgür ve açık kaynaklıdır ve her zaman öyle olacaktır. Ancak küçük bir bağış göndererek bize önem verdiğinizi gösterebilirsiniz.</string>
     <string name="home_status_normal">Normal</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Yüklendi</string>
+    <string name="home_latest_version">Güncel</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacaktır ve verileriniz zaten şifrelenmemişse potansiyel olarak verileriniz şifrelenecektir.</string>
+    <string name="home_check_safetynet">SafetyNet\'i kontrol et</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
@@ -49,6 +52,7 @@
     <string name="select_patch_file">Dosya seçin ve yamalayın</string>
     <string name="patch_file_msg">Bir işlenmemiş görüntü (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
+    <string name="flash_screen_title">Kurulum</string>
 
     <!--Superuser-->
     <string name="su_request_title">Yetkili Kullanıcı İsteği</string>
@@ -116,7 +120,8 @@
     <string name="module_state_restore">Geri yükle</string>
     <string name="module_action_install_external">Depolama alanından yükle</string>
     <string name="update_available">Güncelleme mevcut</string>
-    <string name="home_installed_version">Yüklendi</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Sıralama Düzeni</string>
 
     <!--Settings -->
@@ -225,5 +230,6 @@
     <string name="authenticate">Kimlik doğrulaması</string>
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
     <string name="unsupport_magisk_msg">Magisk Manager\'ın bu sürümü, %1$s daha düşük Magisk versiyonlarını desteklememektedir.\n\nUygulama hiçbir Magisk kurulu değil gibi davranacak, lütfen en kısa zamanda Magisk\'i yükseltin.</string>
+    <string name="external_rw_permission_denied">Bu işlevi etkinleştirmek için depolama izni verin</string>
 
 </resources>
