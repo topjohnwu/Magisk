@@ -1,7 +1,10 @@
 package com.topjohnwu.magisk.ui.settings
 
+import android.os.Bundle
+import android.view.View
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.FragmentSettingsMd2Binding
+import com.topjohnwu.magisk.ktx.setOnViewReadyListener
 import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -14,6 +17,13 @@ class SettingsFragment : BaseUIFragment<SettingsViewModel, FragmentSettingsMd2Bi
         super.onStart()
 
         activity.title = resources.getString(R.string.settings)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.settingsList.setOnViewReadyListener {
+            binding.settingsList.scrollToPosition(0)
+        }
     }
 
     override fun onResume() {
