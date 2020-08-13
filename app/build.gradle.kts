@@ -24,11 +24,9 @@ android {
         versionCode = Config["appVersionCode"]?.toInt()
         buildConfigField("int", "LATEST_MAGISK", Config["versionCode"] ?: "Integer.MAX_VALUE")
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = mapOf("room.incremental" to "true")
-            }
-        }
+        javaCompileOptions.annotationProcessorOptions.arguments(
+                mapOf("room.incremental" to "true")
+        )
     }
 
     buildTypes {
@@ -86,7 +84,6 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     implementation(kotlin("stdlib"))
-    implementation(kotlin("stdlib-jdk7"))
 
     val vBAdapt = "4.0.0"
     val bindingAdapter = "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter"

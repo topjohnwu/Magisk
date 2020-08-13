@@ -18,9 +18,9 @@ val jar by tasks.getting(Jar::class) {
 }
 
 val shadowJar by tasks.getting(ShadowJar::class) {
-    baseName = "zipsigner"
-    classifier = null
-    version = "4.0"
+    archiveBaseName.set("zipsigner")
+    archiveClassifier.set(null as String?)
+    archiveVersion.set("4.0")
 }
 
 repositories {

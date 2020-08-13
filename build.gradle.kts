@@ -11,7 +11,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url = uri("http://storage.googleapis.com/r8-releases/raw") }
         maven { url = uri("https://kotlin.bintray.com/kotlinx") }
     }
 
@@ -95,7 +94,7 @@ subprojects {
                 signingConfigs {
                     create("config") {
                         Config["keyStore"]?.also {
-                            storeFile = File(it)
+                            storeFile = rootProject.file(it)
                             storePassword = Config["keyStorePass"]
                             keyAlias = Config["keyAlias"]
                             keyPassword = Config["keyPass"]
