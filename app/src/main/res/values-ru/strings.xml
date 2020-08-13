@@ -9,7 +9,7 @@
     <string name="install">Установка</string>
     <string name="section_home">Главная</string>
     <string name="section_theme">Темы</string>
-    <string name="safetynet">SafetyNet тест</string>
+    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Нет подключения к сети</string>
