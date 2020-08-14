@@ -47,7 +47,7 @@ object MarkDownWindow : KoinComponent {
                 if (e is CancellationException)
                     throw e
                 Timber.e(e)
-                tv.setText(R.string.download_file_error)
+                tv.post { tv.setText(R.string.download_file_error) }
             }
         }
     }

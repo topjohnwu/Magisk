@@ -11,11 +11,8 @@ import android.graphics.drawable.ShapeDrawable
 import android.net.Uri
 import android.text.Spanned
 import android.text.style.DynamicDrawableSpan
-import android.view.View
 import android.widget.TextView
 import androidx.annotation.WorkerThread
-import androidx.core.view.marginLeft
-import androidx.core.view.marginRight
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
 import com.topjohnwu.magisk.core.ResMgr
@@ -25,8 +22,7 @@ import io.noties.markwon.image.*
 import io.noties.markwon.image.data.DataUriSchemeHandler
 import io.noties.markwon.image.network.OkHttpNetworkSchemeHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.commonmark.node.Image
@@ -59,24 +55,17 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
         if (spans == null || spans.isEmpty())
             return
 
-        // Download and create all drawables in parallel
+        // Get TextView sizes before setText() to resize all images
+        val wr = WaitRunnable {
+            val width = tv.width - tv.paddingLeft - tv.paddingRight
+            spans.forEach { it.canvasWidth = width }
+        }
+        tv.post(wr)
+
         runBlocking(Dispatchers.IO) {
             // Download and decode all drawables in parallel
-            val defers = spans.map { async { it.load() } }
-
-            // Get TextView sizes beforehand to resize all images
-            // We get its parent here as the TextView itself might be hidden
-            val parent = tv.parent as View
-            parent.post(WaitRunnable{
-                // Make sure it is rendered
-                val width = parent.width -
-                        tv.paddingLeft - tv.paddingRight -
-                        tv.marginLeft - tv.marginRight
-                spans.forEach { it.canvasWidth = width }
-            })
-
-            // Make sure all is done before returning
-            defers.awaitAll()
+            spans.forEach { launch { it.load() } }
+            wr.waitUntilDone()
         }
     }
 
@@ -157,8 +146,8 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
     ) : DynamicDrawableSpan(ALIGN_BOTTOM) {
 
         var canvasWidth = 0
-        var measured = false
-        lateinit var draw: Drawable
+        private var measured = false
+        private lateinit var draw: Drawable
 
         fun load() {
             draw = loadDrawable(dest) ?: ShapeDrawable()
@@ -179,9 +168,7 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
         }
 
         private fun measure(paint: Paint) {
-            if (measured)
-                return
-            if (canvasWidth == 0)
+            if (measured || canvasWidth == 0)
                 return
             measured = true
             val bound = SizeResolver.resolveImageSize(size, defaultBounds(), canvasWidth, paint.textSize)
@@ -212,8 +199,7 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
         override fun supportedTypes() = listOf("image/svg+xml")
 
         override fun decode(contentType: String?, inputStream: InputStream): Drawable {
-            val svg: SVG
-            svg = try {
+            val svg = try {
                 SVG.getFromInputStream(inputStream)
             } catch (e: SVGParseException) {
                 throw IllegalStateException("Exception decoding SVG", e)
@@ -222,7 +208,7 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
             val w = svg.documentWidth
             val h = svg.documentHeight
 
-            if (w == 0f || h == 0f) {
+            if (w <= 0 || h <= 0) {
                 val picture = svg.renderToPicture()
                 return PictureDrawable(picture)
             }

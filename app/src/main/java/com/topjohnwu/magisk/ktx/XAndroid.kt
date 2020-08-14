@@ -388,7 +388,7 @@ var TextView.precomputedText: CharSequence
 
         coroutineScope.launch(Dispatchers.IO) {
             if (SDK_INT >= 29) {
-                // Internally PrecomputedTextCompat will platform API on API 29+
+                // Internally PrecomputedTextCompat will use platform API on API 29+
                 // Due to some stupid crap OEM (Samsung) implementation, this can actually
                 // crash our app. Directly use platform APIs with some workarounds
                 val pre = PrecomputedText.create(value, textMetricsParams)
