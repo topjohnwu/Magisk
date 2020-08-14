@@ -9,7 +9,7 @@
     <string name="install">Установка</string>
     <string name="section_home">Главная</string>
     <string name="section_theme">Темы</string>
-    <string name="safetynet">SafetyNet</string> <!--Do not translate-->
+    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Нет подключения к сети</string>
@@ -26,7 +26,6 @@
     <string name="home_support_title">Поддержите нас</string>
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете проявить заботу, отправив небольшое пожертвование.</string>
-    <!--Do not translate-->
     <string name="home_status_normal">Обычный</string>
     <string name="home_status_stub">Скрытие</string>
     <string name="home_installed_version">Установлен</string>
@@ -34,6 +33,7 @@
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
     <string name="uninstall_magisk_msg">Все модули будут отключены/удалены!\nRoot-права будут удалены!\nШифрование будет активировано!</string>
+    <string name="home_check_safetynet">Проверка SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Не отключать шифрование /data</string>
@@ -48,7 +48,7 @@
     <string name="direct_install">Прямая установка (Рекомендуется)</string>
     <string name="install_inactive_slot">Установка во второй слот (OTA)</string>
     <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции после OTA!\nПродолжить?</string>
-    <string name="setup_title">Дополнительная установка</string>
+    <string name="setup_title">Расширенная установка</string>
     <string name="select_patch_file">Пропатчить образ</string>
     <string name="patch_file_msg">Выберите файл образа (*.img) или архив ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Перезагрузка через 5 секунд…</string>
@@ -99,16 +99,15 @@
     <string name="safetynet_attest_failure">Не пройден!</string>
     <string name="safetynet_attest_loading">Подождите…</string>
     <string name="safetynet_attest_restart">Повторить</string>
-    <!--Do not translate-->
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Системные приложения</string>
     <string name="hide_filter_hint">Введите имя</string>
     <string name="hide_scroll_up">Вверх</string>
     <string name="hide_filters">Сортировка</string>
     <string name="hide_search">Поиск</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(Нет информации)</string>
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
@@ -122,10 +121,10 @@
     <string name="module_action_install_external">Установить из хранилища</string>
     <string name="update_available">Доступно обновление</string>
     <string name="module_installed">Установлены</string>
+    <string name="module_section_online">Репозиторий</string>
     <string name="sorting_order">Сортировка</string>
-    <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Оттенок</string>
     <string name="settings_dark_mode_message">Настройте оформление под себя!</string>
     <string name="settings_dark_mode_light">Всегда светлый</string>
@@ -213,23 +212,24 @@
     <string name="repo_cache_cleared">Кэш репозитория модулей очищен</string>
     <string name="flashing">Установка…</string>
     <string name="done">Завершено!</string>
-    <string name="failure">Ошибка</string>
+    <string name="failure">Ошибка!</string>
     <string name="hide_manager_title">Скрытие Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Не удалось пересобрать Magisk Manager</string>
-    <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки</string>
+    <string name="open_link_failed_toast">Приложения для открытия ссылки не найдены</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
     <string name="restore_img_msg">Восстановление…</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
-    <string name="proprietary_title">Загрузка SafetyNet</string>
+    <string name="proprietary_title">Загрузка расширения SafetyNet</string>
     <string name="proprietary_notice">Magisk Manager — проект с открытым исходным кодом и не содержит проприетарный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение для проверки SafetyNet? (содержит GoogleApiClient)</string>
     <string name="setup_fail">Ошибка установки</string>
-    <string name="env_fix_title">Требуется дополнительная установка</string>
-    <string name="env_fix_msg">Вашему устройству требуется дополнительная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
+    <string name="env_fix_title">Требуется расширенная установка</string>
+    <string name="env_fix_msg">Требуется расширенная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
     <string name="setup_msg">Настройка рабочей среды…</string>
     <string name="authenticate">Аутентификация</string>
     <string name="unsupport_magisk_title">Неподдерживаемая версия Magisk</string>
     <string name="unsupport_magisk_msg">Эта версия Magisk Manager не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, как будто Magisk не установлен, пожалуйста, обновите Magisk как можно быстрее.</string>
+    <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу!</string>
 
 </resources>
