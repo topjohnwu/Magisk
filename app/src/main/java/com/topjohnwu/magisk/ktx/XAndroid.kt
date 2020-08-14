@@ -22,8 +22,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.provider.OpenableColumns
+import android.text.PrecomputedText
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -31,13 +35,26 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.net.toFile
 import androidx.core.net.toUri
+import androidx.core.text.PrecomputedTextCompat
+import androidx.core.view.isGone
+import androidx.core.widget.TextViewCompat
+import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.FileProvider
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.ResMgr
 import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
 import java.lang.reflect.Array as JArray
@@ -327,4 +344,79 @@ fun Activity.hideKeyboard() {
 
 fun Fragment.hideKeyboard() {
     activity?.hideKeyboard()
+}
+
+fun View.setOnViewReadyListener(callback: () -> Unit) = addOnGlobalLayoutListener(true, callback)
+
+fun View.addOnGlobalLayoutListener(oneShot: Boolean = false, callback: () -> Unit) =
+    viewTreeObserver.addOnGlobalLayoutListener(object :
+        ViewTreeObserver.OnGlobalLayoutListener {
+        override fun onGlobalLayout() {
+            if (oneShot) viewTreeObserver.removeOnGlobalLayoutListener(this)
+            callback()
+        }
+    })
+
+fun ViewGroup.startAnimations() {
+    val transition = AutoTransition()
+        .setInterpolator(FastOutSlowInInterpolator()).setDuration(400)
+    TransitionManager.beginDelayedTransition(
+        this,
+        transition
+    )
+}
+
+var View.coroutineScope: CoroutineScope
+    get() = getTag(R.id.coroutineScope) as? CoroutineScope ?: GlobalScope
+    set(value) = setTag(R.id.coroutineScope, value)
+
+@set:BindingAdapter("precomputedText")
+var TextView.precomputedText: CharSequence
+    get() = text
+    set(value) {
+        val callback = tag as? Runnable
+
+        // Don't even bother pre 21
+        if (SDK_INT < 21) {
+            post {
+                text = value
+                isGone = false
+                callback?.run()
+            }
+            return
+        }
+
+        coroutineScope.launch(Dispatchers.IO) {
+            if (SDK_INT >= 29) {
+                // Internally PrecomputedTextCompat will platform API on API 29+
+                // Due to some stupid crap OEM (Samsung) implementation, this can actually
+                // crash our app. Directly use platform APIs with some workarounds
+                val pre = PrecomputedText.create(value, textMetricsParams)
+                post {
+                    try {
+                        text = pre
+                    } catch (e: IllegalArgumentException) {
+                        // Override to computed params to workaround crashes
+                        textMetricsParams = pre.params
+                        text = pre
+                    }
+                    isGone = false
+                    callback?.run()
+                }
+            } else {
+                val tv = this@precomputedText
+                val params = TextViewCompat.getTextMetricsParams(tv)
+                val pre = PrecomputedTextCompat.create(value, params)
+                post {
+                    TextViewCompat.setPrecomputedText(tv, pre)
+                    isGone = false
+                    callback?.run()
+                }
+            }
+        }
+    }
+
+fun Int.dpInPx(): Int {
+    val scale = ResMgr.resource.displayMetrics.density
+    return (this * scale + 0.5).toInt()
 }

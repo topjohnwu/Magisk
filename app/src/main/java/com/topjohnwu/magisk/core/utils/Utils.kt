@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.core.utils
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
@@ -22,11 +21,6 @@ object Utils {
 
     fun toast(resId: Int, duration: Int) {
         UiThreadHandler.run { Toast.makeText(get(), resId, duration).show() }
-    }
-
-    fun dpInPx(dp: Int): Int {
-        val scale = get<Resources>().displayMetrics.density
-        return (dp * scale + 0.5).toInt()
     }
 
     fun showSuperUser(): Boolean {

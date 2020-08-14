@@ -233,6 +233,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
                         android:textAppearance="@style/AppearanceFoundation.Caption"
+                        android:visibility="gone"
                         markdownText="@{viewModel.notes}"/>
 
                 </com.google.android.material.card.MaterialCardView>
