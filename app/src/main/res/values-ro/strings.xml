@@ -33,6 +33,7 @@
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
     <string name="uninstall_magisk_title">Dezinstalează Magisk</string>
     <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate!\nRootul va fi eliminat!\nPotențial ți se vor cripta datele dacă nu sunt criptate deja!</string>
+    <string name="home_check_safetynet">Verifică SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Păstrează criptarea forțată</string>
@@ -51,6 +52,7 @@
     <string name="select_patch_file">Selectează și patchuiește un fișier</string>
     <string name="patch_file_msg">Selectează o imagine brută (*.img) sau un fișier tar ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Repornire în 5 secunde…</string>
+    <string name="flash_screen_title">Instalare</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitare de superutilizator</string>
@@ -105,7 +107,7 @@
     <string name="hide_filters">Filtre</string>
     <string name="hide_search">Căutare</string>
 
-    <!--Module Fragment-->
+    <!--Module -->
     <string name="no_info_provided">(Nu sunt furnizate informații)</string>
     <string name="reboot_recovery">Repornește în modul recovery</string>
     <string name="reboot_bootloader">Repornește în modul bootloader</string>
@@ -119,15 +121,15 @@
     <string name="module_action_install_external">Instalează din stocare</string>
     <string name="update_available">Actualizare disponibilă</string>
     <string name="module_installed">Instalate</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Ordine de sortare</string>
-    <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mod pentru temă</string>
     <string name="settings_dark_mode_message">Selectează modul care ți se pliază cel mai bine stilului!</string>
-    <string name="settings_dark_mode_light">Mereu mod deschis</string>
-    <string name="settings_dark_mode_system">Urmărește modul sistemului</string>
-    <string name="settings_dark_mode_dark">Mereu mod întunecat</string>
+    <string name="settings_dark_mode_light">Mereu deschis</string>
+    <string name="settings_dark_mode_system">Urmează modul sistemului</string>
+    <string name="settings_dark_mode_dark">Mereu întunecat</string>
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
@@ -137,7 +139,7 @@
     <string name="settings_restore_manager_title">Restaurează Magisk Manager</string>
     <string name="settings_restore_manager_summary">Restaurează Magisk Manager cu numele originale pentru pachet și aplicație</string>
     <string name="language">Limbă</string>
-    <string name="system_default">(Limba implicită a sistemului)</string>
+    <string name="system_default">(Implicită a sistemului)</string>
     <string name="settings_check_update_title">Caută actualizări</string>
     <string name="settings_check_update_summary">Caută periodic actualizări în fundal</string>
     <string name="settings_update_channel_title">Canal de actualizare</string>
@@ -228,5 +230,6 @@
     <string name="authenticate">Autentificare</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
     <string name="unsupport_magisk_msg">Această versiune de Magisk Manager nu suportă versiunea Magisk mai mică de %1$s.\n\nAplicația se va comporta ca și cum nu este instalat Magisk, te rugăm să actualizezi Magisk cât mai curând posibil.</string>
+    <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
 
 </resources>
