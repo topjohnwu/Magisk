@@ -33,6 +33,7 @@
     <string name="invalid_update_channel">無效的更新頻道</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
     <string name="uninstall_magisk_msg">所有模組將會被停用並移除！\nRoot 將會被移除且若有還沒被加密過的資料將可能被加密！</string>
+    <string name="home_check_safetynet">檢查 SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">保持強制加密</string>
@@ -51,6 +52,7 @@
     <string name="select_patch_file">選擇並修補檔案</string>
     <string name="patch_file_msg">請選取未修改過的映像檔（*.img）或 Odin 的 TAR 檔案 (*.tar)</string>
     <string name="reboot_delay_toast">將在 5 秒後重新啟動……</string>
+    <string name="flash_screen_title">安裝</string>
 
     <!--Superuser-->
     <string name="su_request_title">超級使用者請求</string>
@@ -228,5 +230,6 @@
     <string name="authenticate">認證</string>
     <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>
     <string name="unsupport_magisk_msg">此 Magisk Manager 的版本不支援 Magisk %1$s 版或更低的版本。\n\nMagisk 將顯示為未安裝的狀態。不過您仍然可以升級功能，請盡快升級。</string>
+    <string name="external_rw_permission_denied">授予儲存權限以啟用此功能</string>
 
 </resources>
