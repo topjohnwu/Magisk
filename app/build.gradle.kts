@@ -76,6 +76,7 @@ tasks["preBuild"]?.dependsOn(copyUtils)
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(kotlin("stdlib"))
     implementation(project(":app:shared"))
     implementation(project(":app:signing"))
 
@@ -83,20 +84,18 @@ dependencies {
     implementation("com.github.topjohnwu:indeterminate-checkbox:1.0.7")
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    implementation(kotlin("stdlib"))
-
     val vBAdapt = "4.0.0"
     val bindingAdapter = "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter"
     implementation("${bindingAdapter}:${vBAdapt}")
     implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
 
-    val vMarkwon = "4.4.0"
+    val vMarkwon = "4.5.1"
     implementation("io.noties.markwon:core:${vMarkwon}")
     implementation("io.noties.markwon:html:${vMarkwon}")
     implementation("io.noties.markwon:image:${vMarkwon}")
     implementation("com.caverock:androidsvg:1.4")
 
-    val vLibsu = "3.0.1"
+    val vLibsu = "3.0.2"
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:io:${vLibsu}")
 
@@ -128,8 +127,9 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    implementation("androidx.navigation:navigation-fragment-ktx:${Deps.vNav}")
-    implementation("androidx.navigation:navigation-ui-ktx:${Deps.vNav}")
+    val vNav: String by rootProject.extra
+    implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
+    implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
     implementation("androidx.biometric:biometric:1.0.1")
     implementation("androidx.constraintlayout:constraintlayout:2.0.0-rc1")
