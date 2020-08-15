@@ -130,8 +130,7 @@ object PatchAPK {
             return false
 
         // Install the application
-        repack.setReadable(true, false)
-        if (!Shell.su("pm install $repack").exec().isSuccess)
+        if (!Shell.su("adb_pm_install $repack").exec().isSuccess)
             return false
 
         Config.suManager = pkg.toString()
