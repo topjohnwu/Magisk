@@ -17,13 +17,12 @@ import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
 import com.topjohnwu.magisk.core.ResMgr
 import com.topjohnwu.superuser.internal.WaitRunnable
-import io.noties.markwon.*
+import io.noties.markwon.AbstractMarkwonPlugin
+import io.noties.markwon.MarkwonSpansFactory
 import io.noties.markwon.image.*
 import io.noties.markwon.image.data.DataUriSchemeHandler
 import io.noties.markwon.image.network.OkHttpNetworkSchemeHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import org.commonmark.node.Image
 import timber.log.Timber
@@ -43,7 +42,11 @@ import java.io.InputStream
 class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
 
     override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
-        builder.setFactory(Image::class.java, ImageSpanFactory())
+        builder.setFactory(Image::class.java) { _, props ->
+            val dest = ImageProps.DESTINATION.require(props)
+            val size = ImageProps.IMAGE_SIZE.get(props)
+            ImageSpan(dest, size)
+        }
     }
 
     @WorkerThread
@@ -62,9 +65,10 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
         }
         tv.post(wr)
 
-        runBlocking(Dispatchers.IO) {
-            // Download and decode all drawables in parallel
-            spans.forEach { launch { it.load() } }
+        runBlocking {
+            // Wait for drawable to be set
+            spans.forEach { it.await() }
+            // Wait for canvasWidth to be set
             wr.waitUntilDone()
         }
     }
@@ -132,26 +136,24 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
         return drawable
     }
 
-    inner class ImageSpanFactory : SpanFactory {
-        override fun getSpans(configuration: MarkwonConfiguration, props: RenderProps): Any? {
-            val dest = ImageProps.DESTINATION.require(props)
-            val size = ImageProps.IMAGE_SIZE.get(props)
-            return ImageSpan(dest, size)
-        }
-    }
-
     inner class ImageSpan(
-        private val dest: String,
+        dest: String,
         private val size: ImageSize?
     ) : DynamicDrawableSpan(ALIGN_BOTTOM) {
 
         var canvasWidth = 0
         private var measured = false
         private lateinit var draw: Drawable
+        private val job: Job
 
-        fun load() {
-            draw = loadDrawable(dest) ?: ShapeDrawable()
+        init {
+            // Asynchronously download/decode images in the background
+            job = GlobalScope.launch(Dispatchers.IO) {
+                draw = loadDrawable(dest) ?: ShapeDrawable()
+            }
         }
+
+        suspend fun await() = job.join()
 
         override fun getDrawable() = draw
 
