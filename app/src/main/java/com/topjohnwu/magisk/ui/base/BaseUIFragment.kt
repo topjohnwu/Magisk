@@ -13,25 +13,26 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.ktx.startAnimations
-import com.topjohnwu.magisk.model.events.EventHandler
+import com.topjohnwu.magisk.model.events.ActivityExecutor
+import com.topjohnwu.magisk.model.events.ContextExecutor
+import com.topjohnwu.magisk.model.events.FragmentExecutor
 import com.topjohnwu.magisk.model.events.ViewEvent
 
-abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBinding> :
-    Fragment(), CompatView<ViewModel>, EventHandler {
+abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
+    Fragment(), BaseUIComponent<VM> {
 
     protected val activity get() = requireActivity() as BaseUIActivity<*, *>
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
 
     override val viewRoot: View get() = binding.root
-    override val navigation get() = activity.navigation
-    private val delegate by lazy { CompatDelegate(this) }
+    private val navigation get() = activity.navigation
 
     override fun consumeSystemWindowInsets(insets: Insets) = insets
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.viewEvents.observe(this, viewEventObserver)
+        startObserveEvents()
     }
 
     override fun onCreateView(
@@ -39,17 +40,17 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate<Binding>(inflater, layoutRes, container, false).apply {
-            setVariable(BR.viewModel, viewModel)
-            lifecycleOwner = this@BaseUIFragment
+        binding = DataBindingUtil.inflate<Binding>(inflater, layoutRes, container, false).also {
+            it.setVariable(BR.viewModel, viewModel)
+            it.lifecycleOwner = this
         }
-
         return binding.root
     }
 
     override fun onEventDispatched(event: ViewEvent) {
-        super.onEventDispatched(event)
-        delegate.onEventExecute(event, this)
+        (event as? ContextExecutor)?.invoke(requireContext())
+        (event as? FragmentExecutor)?.invoke(this)
+        (event as? ActivityExecutor)?.invoke(activity)
     }
 
     open fun onKeyEvent(event: KeyEvent): Boolean {
@@ -61,28 +62,23 @@ abstract class BaseUIFragment<ViewModel : BaseViewModel, Binding : ViewDataBindi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
             override fun onPreBind(binding: Binding): Boolean {
                 this@BaseUIFragment.onPreBind(binding)
                 return true
             }
         })
-
-        delegate.onCreate()
+        ensureInsets()
     }
 
     override fun onResume() {
         super.onResume()
-
-        delegate.onResume()
+        viewModel.requestRefresh()
     }
 
     protected open fun onPreBind(binding: Binding) {
         (binding.root as? ViewGroup)?.startAnimations()
     }
-
-    protected fun ViewEvent.dispatchOnSelf() = delegate.onEventExecute(this, this@BaseUIFragment)
 
     fun NavDirections.navigate() {
         navigation?.navigate(this)

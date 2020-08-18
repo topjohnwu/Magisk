@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.model.events
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
@@ -32,12 +33,23 @@ import java.lang.reflect.InvocationHandler
  * Use [ViewEventObserver] for observing these events
  */
 abstract class ViewEvent {
-
     var handled = false
 }
 
 abstract class ViewEventsWithScope: ViewEvent() {
     lateinit var scope: CoroutineScope
+}
+
+interface ContextExecutor {
+    operator fun invoke(context: Context)
+}
+
+interface ActivityExecutor {
+    operator fun invoke(activity: BaseActivity)
+}
+
+interface FragmentExecutor {
+    operator fun invoke(fragment: Fragment)
 }
 
 class CheckSafetyNetEvent(
@@ -146,7 +158,7 @@ class CheckSafetyNetEvent(
 }
 
 class ViewActionEvent(val action: BaseActivity.() -> Unit) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity) = activity.run(action)
+    override fun invoke(activity: BaseActivity) = action(activity)
 }
 
 class OpenChangelogEvent(val item: Repo) : ViewEventsWithScope(), ContextExecutor {

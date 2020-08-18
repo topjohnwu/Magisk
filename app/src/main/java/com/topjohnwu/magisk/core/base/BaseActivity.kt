@@ -66,7 +66,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
         resultCallbacks[requestCode]?.also {
             resultCallbacks.remove(requestCode)
-            it(this@BaseActivity, if (success) 1 else -1, null)
+            it(this, if (success) 1 else -1, null)
         }
 
     }
@@ -75,7 +75,7 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         resultCallbacks[requestCode]?.also {
             resultCallbacks.remove(requestCode)
-            it(this@BaseActivity, resultCode, data)
+            it(this, resultCode, data)
         }
     }
 

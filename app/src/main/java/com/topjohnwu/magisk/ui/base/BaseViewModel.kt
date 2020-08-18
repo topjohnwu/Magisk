@@ -107,10 +107,6 @@ abstract class BaseViewModel(
         _viewEvents.postValue(this)
     }
 
-    fun Int.publish() {
-        _viewEvents.postValue(SimpleViewEvent(this))
-    }
-
     fun NavDirections.publish() {
         _viewEvents.postValue(NavigationWrapper(this))
     }

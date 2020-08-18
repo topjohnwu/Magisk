@@ -7,26 +7,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
-import androidx.core.graphics.Insets
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.ktx.snackbar
 import com.topjohnwu.magisk.ktx.startAnimations
-import com.topjohnwu.magisk.model.events.EventHandler
-import com.topjohnwu.magisk.model.events.SnackbarEvent
+import com.topjohnwu.magisk.model.events.ActivityExecutor
+import com.topjohnwu.magisk.model.events.ContextExecutor
 import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.theme.Theme
 
-abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBinding> :
-    BaseActivity(), CompatView<ViewModel>, EventHandler {
+abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
+    BaseActivity(), BaseUIComponent<VM> {
 
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
@@ -37,11 +34,9 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     protected val currentFragment get() = topFragment as? BaseUIFragment<*, *>
 
     override val viewRoot: View get() = binding.root
-    override val navigation by lazy {
-        kotlin.runCatching { findNavController(navHost) }.getOrNull()
+    open val navigation by lazy {
+        runCatching { findNavController(navHost) }.getOrNull()
     }
-
-    private val delegate by lazy { CompatDelegate(this) }
 
     open val navHost: Int = 0
     open val snackbarView get() = binding.root
@@ -66,35 +61,33 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
             .also { window.setBackgroundDrawable(it) }
 
         super.onCreate(savedInstanceState)
+        startObserveEvents()
 
-        viewModel.viewEvents.observe(this, viewEventObserver)
-
-        binding = DataBindingUtil.setContentView<Binding>(this, layoutRes).apply {
-            setVariable(BR.viewModel, viewModel)
-            lifecycleOwner = this@BaseUIActivity
+        binding = DataBindingUtil.setContentView<Binding>(this, layoutRes).also {
+            it.setVariable(BR.viewModel, viewModel)
+            it.lifecycleOwner = this
+            it.addOnRebindCallback(object : OnRebindCallback<Binding>() {
+                override fun onPreBind(binding: Binding): Boolean {
+                    (binding.root as? ViewGroup)?.startAnimations()
+                    return super.onPreBind(binding)
+                }
+            })
         }
 
-        binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
-            override fun onPreBind(binding: Binding): Boolean {
-                (binding.root as? ViewGroup)?.startAnimations()
-                return super.onPreBind(binding)
-            }
-        })
+        ensureInsets()
 
-        delegate.onCreate()
-
-        directionsDispatcher.observe(this, Observer {
+        directionsDispatcher.observe(this) {
             it?.navigate()
             // we don't want the directions to be re-dispatched, so we preemptively set them to null
             if (it != null) {
                 directionsDispatcher.value = null
             }
-        })
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        delegate.onResume()
+        viewModel.requestRefresh()
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
@@ -102,10 +95,8 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
     }
 
     override fun onEventDispatched(event: ViewEvent) {
-        delegate.onEventExecute(event, this)
-        when (event) {
-            is SnackbarEvent -> snackbar(snackbarView, event.message(this), event.length, event.f)
-        }
+        (event as? ContextExecutor)?.invoke(this)
+        (event as? ActivityExecutor)?.invoke(this)
     }
 
     override fun onBackPressed() {
@@ -113,12 +104,6 @@ abstract class BaseUIActivity<ViewModel : BaseViewModel, Binding : ViewDataBindi
             super.onBackPressed()
         }
     }
-
-    override fun peekSystemWindowInsets(insets: Insets) {
-        viewModel.insets = insets
-    }
-
-    protected fun ViewEvent.dispatchOnSelf() = onEventDispatched(this)
 
     fun NavDirections.navigate() {
         navigation?.navigate(this)
