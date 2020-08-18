@@ -4,7 +4,7 @@ import android.app.Notification
 import android.content.Intent
 import android.os.IBinder
 import com.topjohnwu.magisk.core.base.BaseService
-import com.topjohnwu.magisk.core.view.Notifications
+import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel

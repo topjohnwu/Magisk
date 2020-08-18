@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.ui.settings
 import android.os.Bundle
 import android.view.View
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentSettingsMd2Binding
 import com.topjohnwu.magisk.ktx.setOnViewReadyListener
-import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : BaseUIFragment<SettingsViewModel, FragmentSettingsMd2Binding>() {

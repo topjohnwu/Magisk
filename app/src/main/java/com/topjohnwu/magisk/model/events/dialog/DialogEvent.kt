@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.model.events.dialog
 
 import android.content.Context
-import com.topjohnwu.magisk.ui.base.ContextExecutor
-import com.topjohnwu.magisk.ui.base.ViewEvent
+import com.topjohnwu.magisk.arch.ContextExecutor
+import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.view.MagiskDialog
 
 abstract class DialogEvent : ViewEvent(), ContextExecutor {

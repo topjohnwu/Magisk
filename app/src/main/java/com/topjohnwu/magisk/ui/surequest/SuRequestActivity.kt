@@ -9,10 +9,10 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.navigation.NavController
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import com.topjohnwu.magisk.ui.base.BaseUIActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {

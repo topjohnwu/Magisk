@@ -4,6 +4,10 @@ import android.content.pm.ApplicationInfo
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.Queryable
+import com.topjohnwu.magisk.arch.filterableListOf
+import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
@@ -13,10 +17,6 @@ import com.topjohnwu.magisk.model.entity.HideTarget
 import com.topjohnwu.magisk.model.entity.StatefulProcess
 import com.topjohnwu.magisk.model.entity.recycler.HideItem
 import com.topjohnwu.magisk.model.entity.recycler.HideProcessItem
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.ui.base.Queryable
-import com.topjohnwu.magisk.ui.base.filterableListOf
-import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

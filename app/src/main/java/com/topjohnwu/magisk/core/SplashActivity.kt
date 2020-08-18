@@ -5,11 +5,11 @@ import android.content.Context
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.view.Notifications
-import com.topjohnwu.magisk.core.view.Shortcuts
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.model.navigation.Navigation
+import com.topjohnwu.magisk.view.Notifications
+import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

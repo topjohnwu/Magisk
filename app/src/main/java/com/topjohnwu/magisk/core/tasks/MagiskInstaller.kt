@@ -12,13 +12,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.ktx.readUri
 import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils

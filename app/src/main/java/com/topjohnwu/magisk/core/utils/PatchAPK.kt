@@ -8,10 +8,11 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.signing.JarMap
 import com.topjohnwu.signing.SignApk
 import com.topjohnwu.superuser.Shell

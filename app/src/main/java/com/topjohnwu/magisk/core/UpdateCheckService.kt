@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.core
 import android.content.Context
 import androidx.work.*
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.core.view.Notifications
 import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

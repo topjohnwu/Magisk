@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.ui.safetynet
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.model.events.CheckSafetyNetEvent
-import com.topjohnwu.magisk.ui.base.BaseViewModel
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
 import com.topjohnwu.magisk.utils.set
 import org.json.JSONObject

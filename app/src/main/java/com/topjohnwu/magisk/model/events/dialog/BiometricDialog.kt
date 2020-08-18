@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.model.events.dialog
 
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.ui.base.ActivityExecutor
-import com.topjohnwu.magisk.ui.base.ViewEvent
 
 class BiometricDialog(
     builder: Builder.() -> Unit

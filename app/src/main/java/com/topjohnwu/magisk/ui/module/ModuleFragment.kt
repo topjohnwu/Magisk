@@ -9,13 +9,13 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIFragment
+import com.topjohnwu.magisk.arch.ReselectionTarget
+import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.ktx.hideKeyboard
 import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.base.BaseUIFragment
-import com.topjohnwu.magisk.ui.base.ReselectionTarget
-import com.topjohnwu.magisk.ui.base.ViewEvent
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel

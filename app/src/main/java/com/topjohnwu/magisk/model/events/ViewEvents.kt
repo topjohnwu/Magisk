@@ -4,6 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.ContextExecutor
+import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.arch.ViewEventWithScope
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.model.module.Repo
@@ -11,10 +15,6 @@ import com.topjohnwu.magisk.core.utils.SafetyNetHelper
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.DynamicClassLoader
 import com.topjohnwu.magisk.ktx.writeTo
-import com.topjohnwu.magisk.ui.base.ActivityExecutor
-import com.topjohnwu.magisk.ui.base.ContextExecutor
-import com.topjohnwu.magisk.ui.base.ViewEvent
-import com.topjohnwu.magisk.ui.base.ViewEventWithScope
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetResult
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow

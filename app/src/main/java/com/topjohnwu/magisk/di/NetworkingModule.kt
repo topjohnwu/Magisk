@@ -5,12 +5,12 @@ import android.os.Build
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.utils.MarkwonImagePlugin
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.precomputedText
 import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.magisk.net.NoSSLv3SocketFactory
+import com.topjohnwu.magisk.utils.MarkwonImagePlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.html.HtmlPlugin
 import okhttp3.Dns
