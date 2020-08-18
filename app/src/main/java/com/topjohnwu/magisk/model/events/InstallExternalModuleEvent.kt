@@ -8,6 +8,8 @@ import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.ui.base.ActivityExecutor
+import com.topjohnwu.magisk.ui.base.ViewEvent
 
 class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
 

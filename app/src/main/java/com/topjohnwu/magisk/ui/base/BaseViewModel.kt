@@ -15,7 +15,10 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.model.events.*
+import com.topjohnwu.magisk.model.events.BackPressEvent
+import com.topjohnwu.magisk.model.events.PermissionEvent
+import com.topjohnwu.magisk.model.events.SnackbarEvent
+import com.topjohnwu.magisk.model.events.ViewActionEvent
 import com.topjohnwu.magisk.model.navigation.NavigationWrapper
 import com.topjohnwu.magisk.utils.ObservableHost
 import com.topjohnwu.magisk.utils.set
@@ -102,7 +105,7 @@ abstract class BaseViewModel(
         _viewEvents.postValue(this)
     }
 
-    fun <Event : ViewEventsWithScope> Event.publish() {
+    fun <Event : ViewEventWithScope> Event.publish() {
         scope = viewModelScope
         _viewEvents.postValue(this)
     }

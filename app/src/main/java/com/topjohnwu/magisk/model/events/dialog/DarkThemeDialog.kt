@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.model.events.ActivityExecutor
+import com.topjohnwu.magisk.ui.base.ActivityExecutor
 import com.topjohnwu.magisk.view.MagiskDialog
 import java.lang.ref.WeakReference
 

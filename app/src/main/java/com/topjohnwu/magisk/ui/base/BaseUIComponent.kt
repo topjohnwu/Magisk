@@ -5,7 +5,6 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.LifecycleOwner
-import com.topjohnwu.magisk.model.events.ViewEvent
 
 interface BaseUIComponent<VM : BaseViewModel>: LifecycleOwner {
 

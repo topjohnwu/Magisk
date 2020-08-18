@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.topjohnwu.magisk.model.events.ViewEvent
+import com.topjohnwu.magisk.ui.base.ViewEvent
 
 class EndlessRecyclerScrollListener(
     private val layoutManager: RecyclerView.LayoutManager,

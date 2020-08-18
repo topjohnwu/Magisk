@@ -17,13 +17,13 @@ import com.topjohnwu.magisk.ktx.packageName
 import com.topjohnwu.magisk.ktx.res
 import com.topjohnwu.magisk.model.entity.IconLink
 import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
-import com.topjohnwu.magisk.model.events.ActivityExecutor
 import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
-import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
+import com.topjohnwu.magisk.ui.base.ActivityExecutor
 import com.topjohnwu.magisk.ui.base.BaseViewModel
+import com.topjohnwu.magisk.ui.base.ViewEvent
 import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell

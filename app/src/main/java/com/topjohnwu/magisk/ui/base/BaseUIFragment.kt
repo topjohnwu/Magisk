@@ -13,10 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.ktx.startAnimations
-import com.topjohnwu.magisk.model.events.ActivityExecutor
-import com.topjohnwu.magisk.model.events.ContextExecutor
-import com.topjohnwu.magisk.model.events.FragmentExecutor
-import com.topjohnwu.magisk.model.events.ViewEvent
 
 abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
     Fragment(), BaseUIComponent<VM> {
@@ -47,10 +43,11 @@ abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
         return binding.root
     }
 
-    override fun onEventDispatched(event: ViewEvent) {
-        (event as? ContextExecutor)?.invoke(requireContext())
-        (event as? FragmentExecutor)?.invoke(this)
-        (event as? ActivityExecutor)?.invoke(activity)
+    override fun onEventDispatched(event: ViewEvent) = when(event) {
+        is ContextExecutor -> event(requireContext())
+        is ActivityExecutor -> event(activity)
+        is FragmentExecutor -> event(this)
+        else -> Unit
     }
 
     open fun onKeyEvent(event: KeyEvent): Boolean {

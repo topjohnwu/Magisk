@@ -7,6 +7,8 @@ import androidx.annotation.AttrRes
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.ui.base.ContextExecutor
+import com.topjohnwu.magisk.ui.base.ViewEvent
 
 data class OpenInappLinkEvent(
     private val link: String

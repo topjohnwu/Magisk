@@ -5,7 +5,9 @@ import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.ktx.snackbar
+import com.topjohnwu.magisk.ui.base.ActivityExecutor
 import com.topjohnwu.magisk.ui.base.BaseUIActivity
+import com.topjohnwu.magisk.ui.base.ViewEvent
 
 class SnackbarEvent private constructor(
     @StringRes private val messageRes: Int,

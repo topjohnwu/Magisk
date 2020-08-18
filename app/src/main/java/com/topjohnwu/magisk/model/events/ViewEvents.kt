@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.model.events
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.Fragment
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
@@ -12,12 +11,19 @@ import com.topjohnwu.magisk.core.utils.SafetyNetHelper
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.DynamicClassLoader
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.ui.base.ActivityExecutor
+import com.topjohnwu.magisk.ui.base.ContextExecutor
+import com.topjohnwu.magisk.ui.base.ViewEvent
+import com.topjohnwu.magisk.ui.base.ViewEventWithScope
 import com.topjohnwu.magisk.ui.safetynet.SafetyNetResult
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.superuser.Shell
 import dalvik.system.DexFile
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -26,35 +32,9 @@ import java.io.File
 import java.io.IOException
 import java.lang.reflect.InvocationHandler
 
-/**
- * Class for passing events from ViewModels to Activities/Fragments
- * Variable [handled] used so each event is handled only once
- * (see https://medium.com/google-developers/livedata-with-snackbar-navigation-and-other-events-the-singleliveevent-case-ac2622673150)
- * Use [ViewEventObserver] for observing these events
- */
-abstract class ViewEvent {
-    var handled = false
-}
-
-abstract class ViewEventsWithScope: ViewEvent() {
-    lateinit var scope: CoroutineScope
-}
-
-interface ContextExecutor {
-    operator fun invoke(context: Context)
-}
-
-interface ActivityExecutor {
-    operator fun invoke(activity: BaseActivity)
-}
-
-interface FragmentExecutor {
-    operator fun invoke(fragment: Fragment)
-}
-
 class CheckSafetyNetEvent(
     private val callback: (SafetyNetResult) -> Unit = {}
-) : ViewEventsWithScope(), ContextExecutor, KoinComponent, SafetyNetHelper.Callback {
+) : ViewEventWithScope(), ContextExecutor, KoinComponent, SafetyNetHelper.Callback {
 
     private val svc by inject<GithubRawServices>()
 
@@ -161,7 +141,7 @@ class ViewActionEvent(val action: BaseActivity.() -> Unit) : ViewEvent(), Activi
     override fun invoke(activity: BaseActivity) = action(activity)
 }
 
-class OpenChangelogEvent(val item: Repo) : ViewEventsWithScope(), ContextExecutor {
+class OpenChangelogEvent(val item: Repo) : ViewEventWithScope(), ContextExecutor {
     override fun invoke(context: Context) {
         scope.launch {
             MarkDownWindow.show(context, null, item::readme)

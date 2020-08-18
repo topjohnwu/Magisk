@@ -17,9 +17,6 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.ktx.startAnimations
-import com.topjohnwu.magisk.model.events.ActivityExecutor
-import com.topjohnwu.magisk.model.events.ContextExecutor
-import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.theme.Theme
 
 abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
@@ -94,9 +91,10 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         return currentFragment?.onKeyEvent(event) == true || super.dispatchKeyEvent(event)
     }
 
-    override fun onEventDispatched(event: ViewEvent) {
-        (event as? ContextExecutor)?.invoke(this)
-        (event as? ActivityExecutor)?.invoke(this)
+    override fun onEventDispatched(event: ViewEvent) = when(event) {
+        is ContextExecutor -> event(this)
+        is ActivityExecutor -> event(this)
+        else -> Unit
     }
 
     override fun onBackPressed() {
