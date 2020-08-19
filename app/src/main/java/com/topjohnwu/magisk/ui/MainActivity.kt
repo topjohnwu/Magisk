@@ -44,8 +44,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
         binding.mainNavigation.setPadding(0)
     }
 
-    protected var isRoot = true
-        private set
+    private var isRootFragment = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +60,8 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-        navigation?.addOnDestinationChangedListener { controller, destination, arguments ->
-            isRoot = when (destination.id) {
+        navigation?.addOnDestinationChangedListener { _, destination, _ ->
+            isRootFragment = when (destination.id) {
                 R.id.homeFragment,
                 R.id.modulesFragment,
                 R.id.superuserFragment,
@@ -70,8 +69,8 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 else -> false
             }
 
-            setDisplayHomeAsUpEnabled(!isRoot)
-            requestNavigationHidden(!isRoot)
+            setDisplayHomeAsUpEnabled(!isRootFragment)
+            requestNavigationHidden(!isRootFragment)
 
             binding.mainNavigation.menu.forEach {
                 if (it.itemId == destination.id) {
@@ -89,13 +88,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             behavior = HideBottomViewOnScrollBehavior<MaterialCardView>()
         }
         binding.mainNavigation.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.homeFragment -> MainDirections.actionHomeFragment()
-                R.id.modulesFragment -> MainDirections.actionModuleFragment()
-                R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
-                R.id.logFragment -> MainDirections.actionLogFragment()
-                else -> throw NotImplementedError("Id ${it.itemId} is not defined as selectable")
-            }.navigate()
+            getScreen(it.itemId)?.navigate()
             true
         }
         binding.mainNavigation.setOnNavigationItemReselectedListener {
@@ -104,16 +97,11 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         binding.mainNavigation.viewTreeObserver.addOnGlobalLayoutListener(navObserver)
 
-        when {
-            intent.hasExtra(Const.Key.OPEN_SECTION) ->
-                getScreen(intent.getStringExtra(Const.Key.OPEN_SECTION))?.navigate()
-            intent.getBooleanExtra(Const.Key.OPEN_SETTINGS, false) ->
-                HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
-        }
-
+        if (intent.hasExtra(Const.Key.OPEN_SECTION))
+            getScreen(intent.getStringExtra(Const.Key.OPEN_SECTION))?.navigate()
 
         if (savedInstanceState != null) {
-            if (!isRoot) {
+            if (!isRootFragment) {
                 requestNavigationHidden()
             }
         }
@@ -171,11 +159,21 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     private fun getScreen(name: String?): NavDirections? {
         return when (name) {
-            "superuser" -> HomeFragmentDirections.actionSuperuserFragment()
-            "magiskhide" -> HomeFragmentDirections.actionHideFragment()
-            "modules" -> HomeFragmentDirections.actionModuleFragment()
-            null -> null
-            else -> TODO("Implement screen shortcut \"$name\"")
+            Const.Nav.SUPERUSER -> HomeFragmentDirections.actionSuperuserFragment()
+            Const.Nav.HIDE -> HomeFragmentDirections.actionHideFragment()
+            Const.Nav.MODULES -> HomeFragmentDirections.actionModuleFragment()
+            Const.Nav.SETTINGS -> HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
+            else -> null
+        }
+    }
+
+    private fun getScreen(id: Int): NavDirections? {
+        return when (id) {
+            R.id.homeFragment -> MainDirections.actionHomeFragment()
+            R.id.modulesFragment -> MainDirections.actionModuleFragment()
+            R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
+            R.id.logFragment -> MainDirections.actionLogFragment()
+            else -> null
         }
     }
 

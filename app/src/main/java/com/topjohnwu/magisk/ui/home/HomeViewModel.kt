@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.core.download.DownloadSubject.Manager
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
@@ -23,7 +24,6 @@ import com.topjohnwu.magisk.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.ktx.packageName
 import com.topjohnwu.magisk.ktx.res
-import com.topjohnwu.magisk.model.internal.DownloadSubject.Manager
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch

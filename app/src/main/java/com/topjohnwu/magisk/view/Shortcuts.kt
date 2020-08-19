@@ -42,11 +42,11 @@ object Shortcuts {
 
         if (Utils.showSuperUser()) {
             shortCuts.add(
-                ShortcutInfo.Builder(context, "superuser")
+                ShortcutInfo.Builder(context, Const.Nav.SUPERUSER)
                     .setShortLabel(context.getString(R.string.superuser))
                     .setIntent(
                         Intent(intent)
-                            .putExtra(Const.Key.OPEN_SECTION, "superuser")
+                            .putExtra(Const.Key.OPEN_SECTION, Const.Nav.SUPERUSER)
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     )
@@ -57,11 +57,11 @@ object Shortcuts {
         }
         if (Info.env.magiskHide) {
             shortCuts.add(
-                ShortcutInfo.Builder(context, "magiskhide")
+                ShortcutInfo.Builder(context, Const.Nav.HIDE)
                     .setShortLabel(context.getString(R.string.magiskhide))
                     .setIntent(
                         Intent(intent)
-                            .putExtra(Const.Key.OPEN_SECTION, "magiskhide")
+                            .putExtra(Const.Key.OPEN_SECTION, Const.Nav.HIDE)
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     )
@@ -72,11 +72,11 @@ object Shortcuts {
         }
         if (Info.env.isActive) {
             shortCuts.add(
-                ShortcutInfo.Builder(context, "modules")
+                ShortcutInfo.Builder(context, Const.Nav.MODULES)
                     .setShortLabel(context.getString(R.string.modules))
                     .setIntent(
                         Intent(intent)
-                            .putExtra(Const.Key.OPEN_SECTION, "modules")
+                            .putExtra(Const.Key.OPEN_SECTION, Const.Nav.MODULES)
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     )

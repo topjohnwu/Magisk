@@ -82,4 +82,10 @@ object Const {
         const val UNINSTALL = "uninstall"
     }
 
+    object Nav {
+        const val SETTINGS = "settings"
+        const val HIDE = "hide"
+        const val MODULES = "modules"
+        const val SUPERUSER = "superuser"
+    }
 }

@@ -3,13 +3,13 @@ package com.topjohnwu.magisk.core
 import android.content.ContextWrapper
 import android.content.Intent
 import com.topjohnwu.magisk.core.base.BaseReceiver
+import com.topjohnwu.magisk.core.download.Configuration
 import com.topjohnwu.magisk.core.download.DownloadService
+import com.topjohnwu.magisk.core.download.DownloadSubject
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.model.internal.Configuration
-import com.topjohnwu.magisk.model.internal.DownloadSubject
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.GlobalScope

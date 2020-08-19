@@ -3,10 +3,8 @@ package com.topjohnwu.magisk.events
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import com.topjohnwu.magisk.arch.ActivityExecutor
-import com.topjohnwu.magisk.arch.ContextExecutor
-import com.topjohnwu.magisk.arch.ViewEvent
-import com.topjohnwu.magisk.arch.ViewEventWithScope
+import androidx.navigation.NavDirections
+import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.view.MarkDownWindow
@@ -72,5 +70,15 @@ class RequestFileEvent : ViewEvent(), ActivityExecutor {
             ?.takeIf { resultCode == Activity.RESULT_OK }
             ?.takeIf { requestCode == REQUEST_CODE }
             ?.data
+    }
+}
+
+class NavigationEvent(
+    private val directions: NavDirections
+) : ViewEvent(), ActivityExecutor {
+    override fun invoke(activity: BaseActivity) {
+        (activity as? BaseUIActivity<*, *>)?.apply {
+            directions.navigate()
+        }
     }
 }

@@ -8,6 +8,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.download.DownloadSubject
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.module.Module
 import com.topjohnwu.magisk.core.tasks.RepoUpdater
@@ -19,7 +20,6 @@ import com.topjohnwu.magisk.events.OpenChangelogEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ktx.addOnListChangedCallback
 import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.model.internal.DownloadSubject
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.Dispatchers

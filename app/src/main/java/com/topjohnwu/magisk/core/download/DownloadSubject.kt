@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.model.internal
+package com.topjohnwu.magisk.core.download
 
 import android.content.Context
 import android.os.Parcelable

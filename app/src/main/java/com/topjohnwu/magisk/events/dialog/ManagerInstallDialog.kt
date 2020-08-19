@@ -2,10 +2,10 @@ package com.topjohnwu.magisk.events.dialog
 
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.download.Configuration
 import com.topjohnwu.magisk.core.download.DownloadService
+import com.topjohnwu.magisk.core.download.DownloadSubject
 import com.topjohnwu.magisk.ktx.res
-import com.topjohnwu.magisk.model.internal.Configuration
-import com.topjohnwu.magisk.model.internal.DownloadSubject
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.MarkDownWindow
 import kotlinx.coroutines.Dispatchers

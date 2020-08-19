@@ -6,13 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.ForegroundTracker
+import com.topjohnwu.magisk.core.download.DownloadSubject.Magisk
+import com.topjohnwu.magisk.core.download.DownloadSubject.Module
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.checkSum
 import com.topjohnwu.magisk.ktx.writeTo
-import com.topjohnwu.magisk.model.internal.DownloadSubject
-import com.topjohnwu.magisk.model.internal.DownloadSubject.Magisk
-import com.topjohnwu.magisk.model.internal.DownloadSubject.Module
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody

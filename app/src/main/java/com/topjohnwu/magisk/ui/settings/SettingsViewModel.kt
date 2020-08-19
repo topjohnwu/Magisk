@@ -12,13 +12,13 @@ import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.download.Configuration
 import com.topjohnwu.magisk.core.download.DownloadService
+import com.topjohnwu.magisk.core.download.DownloadSubject
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.events.RecreateEvent
 import com.topjohnwu.magisk.events.dialog.BiometricDialog
-import com.topjohnwu.magisk.model.internal.Configuration
-import com.topjohnwu.magisk.model.internal.DownloadSubject
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch

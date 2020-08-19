@@ -15,11 +15,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.events.BackPressEvent
-import com.topjohnwu.magisk.events.PermissionEvent
-import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.ViewActionEvent
-import com.topjohnwu.magisk.model.navigation.NavigationWrapper
+import com.topjohnwu.magisk.events.*
 import com.topjohnwu.magisk.utils.ObservableHost
 import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.Job
@@ -111,7 +107,7 @@ abstract class BaseViewModel(
     }
 
     fun NavDirections.publish() {
-        _viewEvents.postValue(NavigationWrapper(this))
+        _viewEvents.postValue(NavigationEvent(this))
     }
 
 }

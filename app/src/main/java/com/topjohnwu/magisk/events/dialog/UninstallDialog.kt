@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.events.dialog
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.download.Configuration
 import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.model.internal.Configuration
-import com.topjohnwu.magisk.model.internal.DownloadSubject
+import com.topjohnwu.magisk.core.download.DownloadSubject
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell

@@ -6,13 +6,12 @@ import com.topjohnwu.magisk.ProcessPhoenix
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.download.Configuration.APK.Restore
+import com.topjohnwu.magisk.core.download.Configuration.APK.Upgrade
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.ktx.writeTo
-import com.topjohnwu.magisk.model.internal.Configuration.APK.Restore
-import com.topjohnwu.magisk.model.internal.Configuration.APK.Upgrade
-import com.topjohnwu.magisk.model.internal.DownloadSubject
 import com.topjohnwu.superuser.Shell
 import java.io.File
 
