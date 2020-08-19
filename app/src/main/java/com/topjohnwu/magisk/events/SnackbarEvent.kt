@@ -6,7 +6,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
-import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.utils.TransitiveText
 
 class SnackbarEvent private constructor(
@@ -35,7 +34,7 @@ class SnackbarEvent private constructor(
         builder: Snackbar.() -> Unit = {}
     ) = Snackbar.make(view, message, length).apply(builder).show()
 
-    override fun invoke(activity: BaseActivity) {
+    override fun invoke(activity: BaseUIActivity<*, *>) {
         if (activity is BaseUIActivity<*, *>) {
             snackbar(activity.snackbarView,
                 msg.getText(activity.resources).toString(),

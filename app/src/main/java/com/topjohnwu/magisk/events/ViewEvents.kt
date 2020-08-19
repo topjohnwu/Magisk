@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.view.MarkDownWindow
 import kotlinx.coroutines.launch
 
 class ViewActionEvent(val action: BaseActivity.() -> Unit) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity) = action(activity)
+    override fun invoke(activity: BaseUIActivity<*, *>) = action(activity)
 }
 
 class OpenChangelogEvent(val item: Repo) : ViewEventWithScope(), ContextExecutor {
@@ -27,7 +27,7 @@ class PermissionEvent(
     private val callback: (Boolean) -> Unit
 ) : ViewEvent(), ActivityExecutor {
 
-    override fun invoke(activity: BaseActivity) =
+    override fun invoke(activity: BaseUIActivity<*, *>) =
         activity.withPermissions(*permissions.toTypedArray()) {
             onSuccess {
                 callback(true)
@@ -39,25 +39,25 @@ class PermissionEvent(
 }
 
 class BackPressEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity) {
+    override fun invoke(activity: BaseUIActivity<*, *>) {
         activity.onBackPressed()
     }
 }
 
 class DieEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity) {
+    override fun invoke(activity: BaseUIActivity<*, *>) {
         activity.finish()
     }
 }
 
 class RecreateEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity) {
+    override fun invoke(activity: BaseUIActivity<*, *>) {
         activity.recreate()
     }
 }
 
 class RequestFileEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity) {
+    override fun invoke(activity: BaseUIActivity<*, *>) {
         Intent(Intent.ACTION_GET_CONTENT)
             .setType("*/*")
             .addCategory(Intent.CATEGORY_OPENABLE)
@@ -76,7 +76,7 @@ class RequestFileEvent : ViewEvent(), ActivityExecutor {
 class NavigationEvent(
     private val directions: NavDirections
 ) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseActivity) {
+    override fun invoke(activity: BaseUIActivity<*, *>) {
         (activity as? BaseUIActivity<*, *>)?.apply {
             directions.navigate()
         }

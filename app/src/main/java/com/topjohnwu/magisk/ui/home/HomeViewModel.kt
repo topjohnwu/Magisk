@@ -5,13 +5,9 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.ActivityExecutor
-import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.ViewEvent
-import com.topjohnwu.magisk.arch.itemBindingOf
+import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.download.DownloadSubject.Manager
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.MagiskJson
@@ -118,7 +114,7 @@ class HomeViewModel(
     val showTest = false
 
     fun onTestPressed() = object : ViewEvent(), ActivityExecutor {
-        override fun invoke(activity: BaseActivity) {
+        override fun invoke(activity: BaseUIActivity<*, *>) {
             /* Entry point to trigger test events within the app */
         }
     }.publish()
