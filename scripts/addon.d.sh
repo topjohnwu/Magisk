@@ -70,6 +70,7 @@ main() {
   fi
 
   # Ensure we aren't in /tmp/addon.d anymore (since it's been deleted by addon.d)
+  mkdir -p $TMPDIR
   cd $TMPDIR
 
   $BOOTMODE || recovery_actions
