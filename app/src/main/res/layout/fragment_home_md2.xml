@@ -9,7 +9,7 @@
 
         <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
 
-        <import type="com.topjohnwu.magisk.model.entity.DeveloperItem"/>
+        <import type="com.topjohnwu.magisk.ui.home.DeveloperItem"/>
 
         <variable
             name="viewModel"

@@ -10,8 +10,8 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
-import com.topjohnwu.magisk.core.model.MagiskPolicy
-import com.topjohnwu.magisk.core.model.toPolicy
+import com.topjohnwu.magisk.core.model.su.SuPolicy
+import com.topjohnwu.magisk.core.model.su.toPolicy
 import com.topjohnwu.magisk.ktx.now
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -27,7 +27,7 @@ abstract class SuRequestHandler(
     private lateinit var output: DataOutputStream
     private lateinit var input: DataInputStream
 
-    protected lateinit var policy: MagiskPolicy
+    protected lateinit var policy: SuPolicy
         private set
 
     abstract fun onStart()
@@ -44,11 +44,11 @@ abstract class SuRequestHandler(
 
         when (Config.suAutoReponse) {
             Config.Value.SU_AUTO_DENY -> {
-                respond(MagiskPolicy.DENY, 0)
+                respond(SuPolicy.DENY, 0)
                 return true
             }
             Config.Value.SU_AUTO_ALLOW -> {
-                respond(MagiskPolicy.ALLOW, 0)
+                respond(SuPolicy.ALLOW, 0)
                 return true
             }
         }

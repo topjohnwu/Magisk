@@ -14,10 +14,10 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.Protected
+import com.topjohnwu.magisk.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.ktx.readUri
 import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.ktx.withStreams
-import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
@@ -100,6 +100,7 @@ abstract class MagiskInstallImpl : KoinComponent {
         return true
     }
 
+    @Suppress("DEPRECATION")
     private fun extractZip(): Boolean {
         val arch: String
         arch = if (Build.VERSION.SDK_INT >= 21) {
@@ -130,14 +131,14 @@ abstract class MagiskInstallImpl : KoinComponent {
                     }
                     if (name == null && ze.name.startsWith("chromeos/"))
                         name = ze.name
-                    if (name == null)
-                        continue
-                    val dest = if (installDir is SuFile)
-                        SuFile(installDir, name)
-                    else
-                        File(installDir, name)
-                    dest.parentFile!!.mkdirs()
-                    SuFileOutputStream(dest).use { zi.copyTo(it) }
+                    name?.also {
+                        val dest = if (installDir is SuFile)
+                            SuFile(installDir, it)
+                        else
+                            File(installDir, it)
+                        dest.parentFile!!.mkdirs()
+                        SuFileOutputStream(dest).use { s -> zi.copyTo(s) }
+                    } ?: continue
                 }
             }
         } catch (e: IOException) {

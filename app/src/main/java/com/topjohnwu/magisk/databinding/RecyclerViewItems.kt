@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.databinding
 import androidx.annotation.CallSuper
 import androidx.databinding.PropertyChangeRegistry
 import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.utils.DiffObservableList
 import com.topjohnwu.magisk.utils.ObservableHost
@@ -51,4 +52,14 @@ abstract class ComparableRvItem<in T> : RvItem() {
 
 abstract class ObservableItem<T> : ComparableRvItem<T>(), ObservableHost {
     override var callbacks: PropertyChangeRegistry? = null
+}
+
+/**
+ * This item addresses issues where enclosing recycler has to be invalidated or generally
+ * manipulated with. This shouldn't be however necessary for 99.9% of use-cases. Refrain from using
+ * this item as it provides virtually no additional functionality. Stick with ComparableRvItem.
+ * */
+
+interface LenientRvItem {
+    fun onBindingBound(binding: ViewDataBinding, recyclerView: RecyclerView)
 }

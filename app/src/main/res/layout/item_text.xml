@@ -6,7 +6,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.TextItem" />
+            type="com.topjohnwu.magisk.view.TextItem" />
 
     </data>
 

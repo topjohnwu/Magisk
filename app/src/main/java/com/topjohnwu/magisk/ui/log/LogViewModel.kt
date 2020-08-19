@@ -10,10 +10,9 @@ import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.model.entity.recycler.LogItem
-import com.topjohnwu.magisk.model.entity.recycler.TextItem
-import com.topjohnwu.magisk.model.events.SnackbarEvent
+import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.view.TextItem
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,8 +33,8 @@ class LogViewModel(
 
     // --- su log
 
-    val items = diffListOf<LogItem>()
-    val itemBinding = itemBindingOf<LogItem> {
+    val items = diffListOf<LogRvItem>()
+    val itemBinding = itemBindingOf<LogRvItem> {
         it.bindExtra(BR.viewModel, this)
     }
 
@@ -47,7 +46,7 @@ class LogViewModel(
     override fun refresh() = viewModelScope.launch {
         consoleText = repo.fetchMagiskLogs()
         val (suLogs, diff) = withContext(Dispatchers.Default) {
-            val suLogs = repo.fetchSuLogs().map { LogItem(it) }
+            val suLogs = repo.fetchSuLogs().map { LogRvItem(it) }
             suLogs to items.calculateDiff(suLogs)
         }
         items.firstOrNull()?.isTop = false

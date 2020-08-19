@@ -7,11 +7,11 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem" />
+            type="com.topjohnwu.magisk.ui.settings.BaseSettingsItem" />
 
         <variable
             name="callback"
-            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem.Callback" />
+            type="com.topjohnwu.magisk.ui.settings.BaseSettingsItem.Callback" />
 
     </data>
 

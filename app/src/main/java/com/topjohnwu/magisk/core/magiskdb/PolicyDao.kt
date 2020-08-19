@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.core.magiskdb
 import android.content.Context
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.model.MagiskPolicy
-import com.topjohnwu.magisk.core.model.toMap
-import com.topjohnwu.magisk.core.model.toPolicy
+import com.topjohnwu.magisk.core.model.su.SuPolicy
+import com.topjohnwu.magisk.core.model.su.toMap
+import com.topjohnwu.magisk.core.model.su.toPolicy
 import com.topjohnwu.magisk.ktx.now
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -49,11 +49,11 @@ class PolicyDao(
         }
     }.query().first().toPolicyOrNull()
 
-    suspend fun update(policy: MagiskPolicy) = buildQuery<Replace> {
+    suspend fun update(policy: SuPolicy) = buildQuery<Replace> {
         values(policy.toMap())
     }.commit()
 
-    suspend fun <R: Any> fetchAll(mapper: (MagiskPolicy) -> R) = buildQuery<Select> {
+    suspend fun <R: Any> fetchAll(mapper: (SuPolicy) -> R) = buildQuery<Select> {
         condition {
             equals("uid/100000", Const.USER_ID)
         }
@@ -61,7 +61,7 @@ class PolicyDao(
         it.toPolicyOrNull()?.let(mapper)
     }
 
-    private fun Map<String, String>.toPolicyOrNull(): MagiskPolicy? {
+    private fun Map<String, String>.toPolicyOrNull(): SuPolicy? {
         return runCatching { toPolicy(context.packageManager) }.getOrElse {
             Timber.e(it)
             if (it is PackageManager.NameNotFoundException) {

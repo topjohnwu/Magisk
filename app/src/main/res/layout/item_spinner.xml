@@ -6,7 +6,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem" />
+            type="com.topjohnwu.magisk.ui.superuser.SpinnerRvItem" />
 
     </data>
 

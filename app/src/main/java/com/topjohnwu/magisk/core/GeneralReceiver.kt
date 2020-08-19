@@ -8,8 +8,8 @@ import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.model.entity.internal.Configuration
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
+import com.topjohnwu.magisk.model.internal.Configuration
+import com.topjohnwu.magisk.model.internal.DownloadSubject
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.GlobalScope

@@ -11,10 +11,10 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.data.repository.StringRepository
-import com.topjohnwu.magisk.model.entity.internal.Configuration
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.events.RequestFileEvent
-import com.topjohnwu.magisk.model.events.dialog.SecondSlotWarningDialog
+import com.topjohnwu.magisk.events.RequestFileEvent
+import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
+import com.topjohnwu.magisk.model.internal.Configuration
+import com.topjohnwu.magisk.model.internal.DownloadSubject
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell

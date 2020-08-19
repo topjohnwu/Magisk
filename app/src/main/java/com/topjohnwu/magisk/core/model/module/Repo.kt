@@ -59,6 +59,6 @@ data class Repo(
     class IllegalRepoException(message: String) : Exception(message)
 
     companion object {
-        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)!!
+        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
     }
 }

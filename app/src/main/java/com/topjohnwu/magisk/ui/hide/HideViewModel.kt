@@ -11,12 +11,6 @@ import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.model.entity.HideAppInfo
-import com.topjohnwu.magisk.model.entity.HideAppTarget
-import com.topjohnwu.magisk.model.entity.HideTarget
-import com.topjohnwu.magisk.model.entity.StatefulProcess
-import com.topjohnwu.magisk.model.entity.recycler.HideItem
-import com.topjohnwu.magisk.model.entity.recycler.HideProcessItem
 import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

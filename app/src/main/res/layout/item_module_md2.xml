@@ -11,7 +11,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.ModuleItem" />
+            type="com.topjohnwu.magisk.ui.module.ModuleItem" />
 
         <variable
             name="viewModel"

@@ -15,9 +15,8 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.databinding.RvBindingAdapter
+import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.*
-import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
-import com.topjohnwu.magisk.model.events.SnackbarEvent
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.CallbackList

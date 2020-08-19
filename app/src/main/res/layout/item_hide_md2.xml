@@ -9,7 +9,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.HideItem" />
+            type="com.topjohnwu.magisk.ui.hide.HideItem" />
 
         <variable
             name="viewModel"

@@ -9,7 +9,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.RepoItem" />
+            type="com.topjohnwu.magisk.ui.module.RepoItem" />
 
         <variable
             name="viewModel"

@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.DeveloperItem" />
+            type="com.topjohnwu.magisk.ui.home.DeveloperItem" />
 
         <variable
             name="viewModel"

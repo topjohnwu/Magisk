@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.PolicyItem" />
+            type="com.topjohnwu.magisk.ui.superuser.PolicyRvItem" />
 
     </data>
 

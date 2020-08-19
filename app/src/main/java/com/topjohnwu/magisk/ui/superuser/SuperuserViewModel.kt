@@ -11,16 +11,15 @@ import com.topjohnwu.magisk.arch.adapterOf
 import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
-import com.topjohnwu.magisk.core.model.MagiskPolicy
+import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.model.entity.recycler.PolicyItem
-import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
-import com.topjohnwu.magisk.model.entity.recycler.TextItem
-import com.topjohnwu.magisk.model.events.SnackbarEvent
-import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
-import com.topjohnwu.magisk.model.events.dialog.SuperuserRevokeDialog
+import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.events.dialog.BiometricDialog
+import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
+import com.topjohnwu.magisk.view.TappableHeadlineItem
+import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,7 +33,7 @@ class SuperuserViewModel(
 
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 
-    private val itemsPolicies = diffListOf<PolicyItem>()
+    private val itemsPolicies = diffListOf<PolicyRvItem>()
     private val itemsHelpers = ObservableArrayList<TextItem>()
 
     val adapter = adapterOf<ComparableRvItem<*>>()
@@ -52,7 +51,7 @@ class SuperuserViewModel(
         state = State.LOADING
         val (policies, diff) = withContext(Dispatchers.Default) {
             val policies = db.fetchAll {
-                PolicyItem(it, it.applicationInfo.loadIcon(packageManager), this@SuperuserViewModel)
+                PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager), this@SuperuserViewModel)
             }.sortedWith(compareBy(
                 { it.item.appName.toLowerCase(currentLocale) },
                 { it.item.packageName }
@@ -77,7 +76,7 @@ class SuperuserViewModel(
     private fun hidePressed() =
         SuperuserFragmentDirections.actionSuperuserFragmentToHideFragment().publish()
 
-    fun deletePressed(item: PolicyItem) {
+    fun deletePressed(item: PolicyRvItem) {
         fun updateState() = viewModelScope.launch {
             db.delete(item.item.uid)
             itemsPolicies.removeAll { it.genericItemSameAs(item) }
@@ -100,7 +99,7 @@ class SuperuserViewModel(
 
     //---
 
-    fun updatePolicy(policy: MagiskPolicy, isLogging: Boolean) = viewModelScope.launch {
+    fun updatePolicy(policy: SuPolicy, isLogging: Boolean) = viewModelScope.launch {
         db.update(policy)
         val str = when {
             isLogging -> when {
@@ -115,16 +114,16 @@ class SuperuserViewModel(
         SnackbarEvent(resources.getString(str, policy.appName)).publish()
     }
 
-    fun togglePolicy(item: PolicyItem, enable: Boolean) {
+    fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
         fun updateState() {
             item.policyState = enable
 
-            val policy = if (enable) MagiskPolicy.ALLOW else MagiskPolicy.DENY
+            val policy = if (enable) SuPolicy.ALLOW else SuPolicy.DENY
             val app = item.item.copy(policy = policy)
 
             viewModelScope.launch {
                 db.update(app)
-                val res = if (app.policy == MagiskPolicy.ALLOW) R.string.su_snack_grant
+                val res = if (app.policy == SuPolicy.ALLOW) R.string.su_snack_grant
                 else R.string.su_snack_deny
                 SnackbarEvent(resources.getString(res).format(item.item.appName)).publish()
             }

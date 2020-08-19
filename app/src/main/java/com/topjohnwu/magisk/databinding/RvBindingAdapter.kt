@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.databinding
 
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import com.topjohnwu.magisk.model.entity.recycler.LenientRvItem
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 
 class RvBindingAdapter<T : RvItem> : BindingRecyclerViewAdapter<T>() {
@@ -19,7 +18,7 @@ class RvBindingAdapter<T : RvItem> : BindingRecyclerViewAdapter<T>() {
         super.onBindBinding(binding, variableId, layoutRes, position, item)
 
         when (item) {
-            is LenientRvItem<*> -> {
+            is LenientRvItem -> {
                 val recycler = recyclerView ?: return
                 item.onBindingBound(binding)
                 item.onBindingBound(binding, recycler)

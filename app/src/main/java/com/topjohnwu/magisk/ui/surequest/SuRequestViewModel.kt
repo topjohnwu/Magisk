@@ -13,12 +13,12 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
-import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.ALLOW
-import com.topjohnwu.magisk.core.model.MagiskPolicy.Companion.DENY
+import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
+import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem
-import com.topjohnwu.magisk.model.events.DieEvent
+import com.topjohnwu.magisk.events.DieEvent
+import com.topjohnwu.magisk.ui.superuser.SpinnerRvItem
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.launch

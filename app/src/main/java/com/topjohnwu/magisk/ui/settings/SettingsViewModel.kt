@@ -15,11 +15,10 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.data.database.RepoDao
-import com.topjohnwu.magisk.model.entity.internal.Configuration
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
-import com.topjohnwu.magisk.model.events.RecreateEvent
-import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
+import com.topjohnwu.magisk.events.RecreateEvent
+import com.topjohnwu.magisk.events.dialog.BiometricDialog
+import com.topjohnwu.magisk.model.internal.Configuration
+import com.topjohnwu.magisk.model.internal.DownloadSubject
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
@@ -27,10 +26,10 @@ import org.koin.core.get
 
 class SettingsViewModel(
     private val repositoryDao: RepoDao
-) : BaseViewModel(), SettingsItem.Callback {
+) : BaseViewModel(), BaseSettingsItem.Callback {
 
-    val adapter = adapterOf<SettingsItem>()
-    val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
+    val adapter = adapterOf<BaseSettingsItem>()
+    val itemBinding = itemBindingOf<BaseSettingsItem> { it.bindExtra(BR.callback, this) }
     val items = diffListOf(createItems())
 
     init {
@@ -39,7 +38,7 @@ class SettingsViewModel(
         }
     }
 
-    private fun createItems(): List<SettingsItem> {
+    private fun createItems(): List<BaseSettingsItem> {
         // Customization
         val list = mutableListOf(
             Customization,
@@ -90,7 +89,7 @@ class SettingsViewModel(
         return list
     }
 
-    override fun onItemPressed(view: View, item: SettingsItem, callback: () -> Unit) = when (item) {
+    override fun onItemPressed(view: View, item: BaseSettingsItem, callback: () -> Unit) = when (item) {
         is DownloadPath -> withExternalRW(callback)
         is Biometrics -> authenticate(callback)
         is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
@@ -100,7 +99,7 @@ class SettingsViewModel(
         else -> callback()
     }
 
-    override fun onItemChanged(view: View, item: SettingsItem) = when (item) {
+    override fun onItemChanged(view: View, item: BaseSettingsItem) = when (item) {
         is Language -> RecreateEvent().publish()
         is UpdateChannel -> openUrlIfNecessary(view)
         is Hide -> PatchAPK.hideManager(view.context, item.value)

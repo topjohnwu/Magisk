@@ -29,9 +29,9 @@
 -keep class a.* { *; }
 
 # Snet
--keepclassmembers class com.topjohnwu.magisk.core.utils.SafetyNetHelper { *; }
--keep,allowobfuscation interface com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback
--keepclassmembers class * implements com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback {
+-keepclassmembers class com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper { *; }
+-keep,allowobfuscation interface com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback
+-keepclassmembers class * implements com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback {
   void onResponse(int);
 }
 

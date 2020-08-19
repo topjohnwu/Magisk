@@ -7,8 +7,8 @@ import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.ktx.packageName
-import com.topjohnwu.magisk.model.entity.HideAppInfo
-import com.topjohnwu.magisk.model.entity.HideTarget
+import com.topjohnwu.magisk.ui.hide.HideAppInfo
+import com.topjohnwu.magisk.ui.hide.HideTarget
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

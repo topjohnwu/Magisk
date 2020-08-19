@@ -13,10 +13,10 @@ import com.topjohnwu.magisk.core.tasks.EnvFixTask
 import com.topjohnwu.magisk.ktx.chooser
 import com.topjohnwu.magisk.ktx.exists
 import com.topjohnwu.magisk.ktx.provide
-import com.topjohnwu.magisk.model.entity.internal.Configuration.*
-import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
+import com.topjohnwu.magisk.model.internal.Configuration.*
+import com.topjohnwu.magisk.model.internal.Configuration.Flash.Secondary
+import com.topjohnwu.magisk.model.internal.DownloadSubject
+import com.topjohnwu.magisk.model.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.APKInstall
 import org.koin.core.get
