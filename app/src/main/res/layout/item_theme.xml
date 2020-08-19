@@ -114,7 +114,7 @@
                 android:padding="@dimen/l1"
                 app:layout_constraintTop_toBottomOf="@+id/theme_card_bottom">
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     android:layout_width="125dp"
                     android:layout_height="wrap_content"
                     android:text="@{theme.themeName}"
@@ -168,7 +168,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             style="@style/WidgetFoundation.Icon.OnPrimary"
             gone="@{!theme.isSelected}"
             android:layout_gravity="end|top"

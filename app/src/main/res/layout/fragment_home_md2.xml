@@ -33,7 +33,7 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/l1">
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:layout_gravity="center"
                 style="@style/WidgetFoundation.Button"
                 gone="@{!viewModel.showTest}"
@@ -68,7 +68,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/home_notice_hide"
                         style="@style/WidgetFoundation.Button.Text.OnPrimary"
                         android:layout_width="wrap_content"
@@ -110,7 +110,7 @@
                 android:layout_height="@dimen/l1"
                 gone="@{!Info.hasGMS &amp;&amp; !viewModel.showUninstall}" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 style="@style/WidgetFoundation.Button.Outlined"
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
@@ -124,7 +124,7 @@
                 app:cornerRadius="@dimen/r1"
                 app:icon="@drawable/ic_safetynet_md2" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 style="@style/WidgetFoundation.Button.Outlined.Error"
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"

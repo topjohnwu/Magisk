@@ -32,7 +32,7 @@
             android:textStyle="bold"
             tools:text="Installed" />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/module_button"
             style="@style/WidgetFoundation.Button.Text.Secondary"
             invisible="@{!item.hasButton}"

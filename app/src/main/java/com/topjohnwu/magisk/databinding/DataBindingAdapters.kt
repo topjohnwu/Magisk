@@ -199,6 +199,11 @@ fun Button.setIconRes(res: Int) {
     (this as MaterialButton).setIconResource(res)
 }
 
+@BindingAdapter("app:icon")
+fun Button.setIcon(drawable: Drawable) {
+    (this as MaterialButton).icon = drawable
+}
+
 @BindingAdapter("strokeWidth")
 fun MaterialCardView.setCardStrokeWidthBound(stroke: Float) {
     strokeWidth = stroke.roundToInt()

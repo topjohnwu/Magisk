@@ -214,7 +214,7 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     style="@style/WidgetFoundation.Button.Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

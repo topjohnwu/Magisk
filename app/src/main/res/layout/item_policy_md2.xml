@@ -103,7 +103,7 @@
                     android:background="?colorSurfaceVariant"
                     tools:visibility="visible">
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/policy_notify"
                         style="@style/WidgetFoundation.Button.Text"
                         isSelected="@{item.shouldNotify}"
@@ -127,7 +127,7 @@
                         android:layout_marginBottom="@dimen/l_50"
                         android:background="?colorSurfaceSurfaceVariant" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/policy_log"
                         style="@style/WidgetFoundation.Button.Text"
                         isSelected="@{item.shouldLog}"
@@ -151,7 +151,7 @@
                         android:layout_marginBottom="@dimen/l_50"
                         android:background="?colorSurfaceSurfaceVariant" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/policy_delete"
                         style="@style/WidgetFoundation.Button.Text"
                         android:layout_weight="1"

@@ -10,7 +10,7 @@
 
     </data>
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <TextView
         android:id="@android:id/text1"
         style="?android:attr/spinnerItemStyle"
         android:layout_width="match_parent"

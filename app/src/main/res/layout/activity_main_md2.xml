@@ -19,7 +19,7 @@
         android:paddingRight="@{viewModel.insets.right}"
         tools:ignore="RtlHardcoded">
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/main_nav_host"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
@@ -89,7 +89,7 @@
                     app:labelVisibilityMode="unlabeled"
                     app:menu="@menu/menu_bottom_nav" />
 
-                <androidx.appcompat.widget.AppCompatTextView
+                <TextView
                     gone="@{viewModel.isConnected}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

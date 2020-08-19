@@ -62,7 +62,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/home_manager_title">
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     style="@style/WidgetFoundation.Button"
                     gone="@{viewModel.stateManager != MagiskState.OBSOLETE}"
                     android:layout_width="wrap_content"
@@ -72,7 +72,7 @@
                     android:textAllCaps="false"
                     app:icon="@drawable/ic_update_md2" />
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     style="@style/WidgetFoundation.Button.Text"
                     gone="@{viewModel.stateManager == MagiskState.OBSOLETE}"
                     android:layout_width="wrap_content"

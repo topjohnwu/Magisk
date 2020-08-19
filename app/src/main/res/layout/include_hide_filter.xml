@@ -25,7 +25,7 @@
         tools:layout_gravity="bottom"
         tools:paddingBottom="64dp">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             android:id="@+id/hide_filter_title_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
 
         </com.google.android.material.chip.ChipGroup>
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             android:id="@+id/hide_filter_title_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/hide_filter_title_search">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 style="@style/WidgetFoundation.Icon"
                 android:layout_width="48dp"
                 android:layout_height="36dp"
@@ -105,7 +105,7 @@
                 app:srcCompat="@drawable/ic_search_md2"
                 app:tint="?colorDisabled" />
 
-            <androidx.appcompat.widget.AppCompatEditText
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="48dp"

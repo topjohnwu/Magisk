@@ -11,8 +11,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.NavController
 import androidx.navigation.NavDirections
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
@@ -26,14 +27,14 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     protected abstract val layoutRes: Int
     protected open val themeRes: Int = Theme.selected.themeRes
 
-    private val navHostFragment get() = supportFragmentManager.findFragmentById(navHost)
+    private val navHostFragment by lazy {
+        supportFragmentManager.findFragmentById(navHost) as? NavHostFragment
+    }
     private val topFragment get() = navHostFragment?.childFragmentManager?.fragments?.getOrNull(0)
     protected val currentFragment get() = topFragment as? BaseUIFragment<*, *>
 
     override val viewRoot: View get() = binding.root
-    open val navigation by lazy {
-        runCatching { findNavController(navHost) }.getOrNull()
-    }
+    open val navigation: NavController? get() = navHostFragment?.navController
 
     open val navHost: Int = 0
     open val snackbarView get() = binding.root

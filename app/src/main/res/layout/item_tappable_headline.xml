@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/tappable_icon"
                 style="@style/WidgetFoundation.Icon"
                 android:background="@null"
@@ -36,7 +36,7 @@
                 app:srcCompat="@{item.icon}"
                 tools:srcCompat="@drawable/ic_hide_md2" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:requiresFadingEdge="horizontal"
@@ -50,7 +50,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@string/magiskhide" />
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 android:id="@+id/headline_icon_pointer"
                 style="@style/WidgetFoundation.Icon"
                 android:background="@null"

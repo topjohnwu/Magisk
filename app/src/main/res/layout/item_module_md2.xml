@@ -129,7 +129,7 @@
                     app:layout_constraintTop_toTopOf="@+id/module_remove"
                     app:srcCompat="@drawable/ic_info" />
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/module_remove"
                     style="@style/WidgetFoundation.Button.Text"
                     android:layout_width="wrap_content"
