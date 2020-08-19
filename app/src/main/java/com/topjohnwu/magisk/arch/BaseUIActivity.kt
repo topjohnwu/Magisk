@@ -4,11 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
@@ -17,7 +15,6 @@ import androidx.navigation.fragment.NavHostFragment
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.theme.Theme
 
 abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
@@ -64,12 +61,6 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         binding = DataBindingUtil.setContentView<Binding>(this, layoutRes).also {
             it.setVariable(BR.viewModel, viewModel)
             it.lifecycleOwner = this
-            it.addOnRebindCallback(object : OnRebindCallback<Binding>() {
-                override fun onPreBind(binding: Binding): Boolean {
-                    (binding.root as? ViewGroup)?.startAnimations()
-                    return super.onPreBind(binding)
-                }
-            })
         }
 
         ensureInsets()
