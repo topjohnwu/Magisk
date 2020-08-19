@@ -3,6 +3,7 @@
 package com.topjohnwu.magisk.core
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.app.job.JobWorkItem
@@ -52,6 +53,10 @@ fun Class<*>.cmp(pkg: String): ComponentName {
     val name = ClassMap[this].name
     return ComponentName(pkg, Info.stub?.classToComponent?.get(name) ?: name)
 }
+
+inline fun <reified T> Activity.redirect() = Intent(intent)
+    .setComponent(T::class.java.cmp(packageName))
+    .setFlags(0)
 
 inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
 

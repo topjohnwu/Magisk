@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.core
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
@@ -61,21 +59,11 @@ open class SplashActivity : Activity() {
 
         DONE = true
 
-        val section = if (intent.action == ACTION_APPLICATION_PREFERENCES) Const.Nav.SETTINGS
-        else intent.getStringExtra(Const.Key.OPEN_SECTION)
-
-        intent<MainActivity>()
-            .putExtra(Const.Key.OPEN_SECTION, section)
-            .also { startActivity(it) }
-
+        redirect<MainActivity>().also { startActivity(it) }
         finish()
     }
 
     companion object {
-        private val ACTION_APPLICATION_PREFERENCES get() =
-            if (Build.VERSION.SDK_INT >= 24) Intent.ACTION_APPLICATION_PREFERENCES
-            else "???"
-
         var DONE = false
     }
 }

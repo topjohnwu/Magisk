@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.ui
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -18,6 +20,8 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.SplashActivity
+import com.topjohnwu.magisk.core.redirect
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
@@ -48,6 +52,13 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Make sure Splash is always ran before us
+        if (!SplashActivity.DONE) {
+            redirect<SplashActivity>().also { startActivity(it) }
+            finish()
+            return
+        }
 
         if (Info.env.isUnsupported) {
             MagiskDialog(this)
@@ -97,8 +108,9 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         binding.mainNavigation.viewTreeObserver.addOnGlobalLayoutListener(navObserver)
 
-        if (intent.hasExtra(Const.Key.OPEN_SECTION))
-            getScreen(intent.getStringExtra(Const.Key.OPEN_SECTION))?.navigate()
+        val section = if (intent.action == ACTION_APPLICATION_PREFERENCES) Const.Nav.SETTINGS
+        else intent.getStringExtra(Const.Key.OPEN_SECTION)
+        getScreen(section)?.navigate()
 
         if (savedInstanceState != null) {
             if (!isRootFragment) {
@@ -175,6 +187,12 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             R.id.logFragment -> MainDirections.actionLogFragment()
             else -> null
         }
+    }
+
+    companion object {
+        private val ACTION_APPLICATION_PREFERENCES get() =
+            if (Build.VERSION.SDK_INT >= 24) Intent.ACTION_APPLICATION_PREFERENCES
+            else "???"
     }
 
 }
