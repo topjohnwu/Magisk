@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:icon="@drawable/ic_launcher"
         android:label="Magisk Manager"
         android:installLocation="internalOnly"
         android:usesCleartextTraffic="true"

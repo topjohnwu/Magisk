@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
+        android:icon="@drawable/ic_launcher"
         android:name="a.e"
         android:allowBackup="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
