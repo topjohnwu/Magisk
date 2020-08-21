@@ -6,18 +6,18 @@ import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.WorkerThread
-import androidx.core.net.toUri
 import androidx.core.os.postDelayed
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
-import com.topjohnwu.magisk.ktx.readUri
 import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.ktx.withStreams
+import com.topjohnwu.magisk.utils.MediaStoreUtils
+import com.topjohnwu.magisk.utils.MediaStoreUtils.inputStream
+import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
@@ -49,7 +49,7 @@ abstract class MagiskInstallImpl : KoinComponent {
 
     protected lateinit var installDir: File
     private lateinit var srcBoot: String
-    private lateinit var destFile: File
+    private lateinit var destFile: MediaStoreUtils.MediaStoreFile
     private lateinit var zipUri: Uri
 
     protected val console: MutableList<String>
@@ -113,7 +113,7 @@ abstract class MagiskInstallImpl : KoinComponent {
         console.add("- Device platform: " + Build.CPU_ABI)
 
         try {
-            ZipInputStream(context.readUri(zipUri).buffered()).use { zi ->
+            ZipInputStream(zipUri.inputStream().buffered()).use { zi ->
                 lateinit var ze: ZipEntry
                 while (zi.nextEntry?.let { ze = it } != null) {
                     if (ze.isDirectory)
@@ -166,7 +166,7 @@ abstract class MagiskInstallImpl : KoinComponent {
     private fun handleTar(input: InputStream) {
         console.add("- Processing tar file")
         var vbmeta = false
-        val tarOut = TarOutputStream(destFile)
+        val tarOut = TarOutputStream(destFile.uri.outputStream())
         this.tarOut = tarOut
         TarInputStream(input).use { tarIn ->
             lateinit var entry: TarEntry
@@ -224,7 +224,7 @@ abstract class MagiskInstallImpl : KoinComponent {
 
     private fun handleFile(uri: Uri): Boolean {
         try {
-            context.readUri(uri).buffered().use {
+            uri.inputStream().buffered().use {
                 it.mark(500)
                 val magic = ByteArray(5)
                 if (it.skip(257) != 257L || it.read(magic) != magic.size) {
@@ -233,12 +233,12 @@ abstract class MagiskInstallImpl : KoinComponent {
                 }
                 it.reset()
                 if (magic.contentEquals("ustar".toByteArray())) {
-                    destFile = File(Config.downloadDirectory, "magisk_patched.tar")
+                    destFile = MediaStoreUtils.newFile("magisk_patched.tar")
                     handleTar(it)
                 } else {
                     // Raw image
                     srcBoot = File(installDir, "boot.img").path
-                    destFile = File(Config.downloadDirectory, "magisk_patched.img")
+                    destFile = MediaStoreUtils.newFile("magisk_patched.img")
                     console.add("- Copying image to cache")
                     FileOutputStream(srcBoot).use { out -> it.copyTo(out) }
                 }
@@ -324,7 +324,7 @@ abstract class MagiskInstallImpl : KoinComponent {
                     patched.length()))
                 tarOut = null
                 it
-            } ?: destFile.outputStream()
+            } ?: destFile.uri.outputStream()
             SuFileInputStream(patched).use { it.copyTo(os); os.close() }
         } catch (e: IOException) {
             console.add("! Failed to output to $destFile")
@@ -344,9 +344,7 @@ abstract class MagiskInstallImpl : KoinComponent {
     private suspend fun postOTA(): Boolean {
         val bootctl = SuFile("/data/adb/bootctl")
         try {
-            withStreams(service.fetchBootctl().byteStream(), SuFileOutputStream(bootctl)) {
-                input, out -> input.copyTo(out)
-            }
+            service.fetchBootctl().byteStream().copyTo(SuFileOutputStream(bootctl))
         } catch (e: IOException) {
             console.add("! Unable to download bootctl")
             Timber.e(e)
@@ -374,10 +372,10 @@ abstract class MagiskInstallImpl : KoinComponent {
     protected suspend fun secondSlot() =
         findSecondaryImage() && extractZip() && patchBoot() && flashBoot() && postOTA()
 
-    protected fun fixEnv(zip: File): Boolean {
+    protected fun fixEnv(zip: Uri): Boolean {
         installDir = SuFile("/data/adb/magisk")
         Shell.su("rm -rf /data/adb/magisk/*").exec()
-        zipUri = zip.toUri()
+        zipUri = zip
         return extractZip() && Shell.su("fix_env").exec().isSuccess
     }
 
@@ -432,7 +430,7 @@ sealed class MagiskInstaller(
 }
 
 class EnvFixTask(
-    private val zip: File
+    private val zip: Uri
 ) : MagiskInstallImpl() {
     override suspend fun operations() = fixEnv(zip)
 

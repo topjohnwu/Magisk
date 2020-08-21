@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.arch
 
 import android.Manifest
+import android.os.Build
 import androidx.annotation.CallSuper
 import androidx.core.graphics.Insets
 import androidx.databinding.Bindable
@@ -86,6 +87,10 @@ abstract class BaseViewModel(
     }
 
     fun withExternalRW(callback: () -> Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            callback()
+            return
+        }
         withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
             if (!it) {
                 SnackbarEvent(R.string.external_rw_permission_denied).publish()

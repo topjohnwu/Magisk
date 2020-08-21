@@ -1,13 +1,14 @@
 package com.topjohnwu.magisk.core.download
 
+import android.net.Uri
 import com.topjohnwu.magisk.ktx.withStreams
-import java.io.File
+import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-fun InputStream.toModule(file: File, installer: InputStream) {
+fun InputStream.toModule(file: Uri, installer: InputStream) {
 
     val input = ZipInputStream(buffered())
     val output = ZipOutputStream(file.outputStream().buffered())
