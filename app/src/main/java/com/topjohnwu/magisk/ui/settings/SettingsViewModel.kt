@@ -1,10 +1,13 @@
 package com.topjohnwu.magisk.ui.settings
 
+import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.adapterOf
@@ -17,6 +20,7 @@ import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.DownloadSubject
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.data.database.RepoDao
+import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
 import com.topjohnwu.magisk.events.dialog.BiometricDialog
 import com.topjohnwu.magisk.utils.Utils
@@ -39,6 +43,9 @@ class SettingsViewModel(
     }
 
     private fun createItems(): List<BaseSettingsItem> {
+        val context = get<Context>()
+        val hidden = context.packageName != BuildConfig.APPLICATION_ID
+
         // Customization
         val list = mutableListOf(
             Customization,
@@ -49,6 +56,8 @@ class SettingsViewModel(
             // making theming a pain in the ass. Just forget about it
             list.remove(Theme)
         }
+        if (hidden && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
+            list.add(AddShortcut)
 
         // Manager
         list.addAll(listOf(
@@ -58,7 +67,7 @@ class SettingsViewModel(
         if (Info.env.isActive) {
             list.add(ClearRepoCache)
             if (Const.USER_ID == 0 && Info.isConnected.get())
-                list.add(HideOrRestore())
+                list.add(if (hidden) Restore else Hide)
         }
 
         // Magisk
@@ -96,6 +105,7 @@ class SettingsViewModel(
         is ClearRepoCache -> clearRepoCache()
         is SystemlessHosts -> createHosts()
         is Restore -> restoreManager()
+        is AddShortcut -> AddHomeIconEvent().publish()
         else -> callback()
     }
 

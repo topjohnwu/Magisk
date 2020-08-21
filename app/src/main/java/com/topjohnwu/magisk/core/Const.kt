@@ -83,6 +83,7 @@ object Const {
     }
 
     object Nav {
+        const val HOME = "home"
         const val SETTINGS = "settings"
         const val HIDE = "hide"
         const val MODULES = "modules"

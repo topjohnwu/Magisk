@@ -8,6 +8,7 @@ import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.view.MarkDownWindow
+import com.topjohnwu.magisk.view.Shortcuts
 import kotlinx.coroutines.launch
 
 class ViewActionEvent(val action: BaseActivity.() -> Unit) : ViewEvent(), ActivityExecutor {
@@ -80,5 +81,11 @@ class NavigationEvent(
         (activity as? BaseUIActivity<*, *>)?.apply {
             directions.navigate()
         }
+    }
+}
+
+class AddHomeIconEvent : ViewEvent(), ContextExecutor {
+    override fun invoke(context: Context) {
+        Shortcuts.addHomeIcon(context)
     }
 }

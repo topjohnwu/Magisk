@@ -45,7 +45,7 @@ open class GeneralReceiver : BaseReceiver() {
                 rmPolicy(pkg)
                 Shell.su("magiskhide --rm $pkg").submit()
             }
-            Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
+            Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setupDynamic(context)
             Const.Key.BROADCAST_MANAGER_UPDATE -> {
                 intent.getParcelableExtra<ManagerJson>(Const.Key.INTENT_SET_APP)?.let {
                     Info.remote = Info.remote.copy(app = it)

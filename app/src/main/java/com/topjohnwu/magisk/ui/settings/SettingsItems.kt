@@ -103,9 +103,10 @@ object Restore : BaseSettingsItem.Blank() {
     override val description = R.string.settings_restore_manager_summary.asTransitive()
 }
 
-@Suppress("FunctionName")
-fun HideOrRestore() =
-    if (get<Context>().packageName == BuildConfig.APPLICATION_ID) Hide else Restore
+object AddShortcut : BaseSettingsItem.Blank() {
+    override val title = R.string.add_shortcut_title.asTransitive()
+    override val description = R.string.setting_add_shortcut_summary.asTransitive()
+}
 
 object DownloadPath : BaseSettingsItem.Input() {
     override var value = Config.downloadPath

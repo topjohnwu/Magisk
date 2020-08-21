@@ -52,7 +52,7 @@ open class SplashActivity : Activity() {
         handleRepackage()
         Notifications.setup(this)
         UpdateCheckService.schedule(this)
-        Shortcuts.setup(this)
+        Shortcuts.setupDynamic(this)
 
         // Pre-fetch network stuffs
         get<GithubRawServices>()

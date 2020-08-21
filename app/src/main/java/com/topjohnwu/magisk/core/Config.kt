@@ -55,6 +55,7 @@ object Config : PreferenceModel, DBConfig {
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
+        const val ASKED_HOME = "asked_home"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -108,6 +109,7 @@ object Config : PreferenceModel, DBConfig {
             Value.DEFAULT_CHANNEL
 
     var bootId by preference(Key.BOOT_ID, "")
+    var askedHome by preference(Key.ASKED_HOME, false)
 
     var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
@@ -223,7 +225,9 @@ object Config : PreferenceModel, DBConfig {
 
     fun export() {
         // Flush prefs to disk
-        prefs.edit().commit()
+        prefs.edit().apply {
+            remove(Key.ASKED_HOME)
+        }.commit()
         val context = get<Context>(Protected)
         val xml = File(
             "${context.filesDir.parent}/shared_prefs",

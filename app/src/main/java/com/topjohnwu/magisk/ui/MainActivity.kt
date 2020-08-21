@@ -8,20 +8,19 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.NavDirections
 import com.google.android.material.card.MaterialCardView
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.ReselectionTarget
-import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.SplashActivity
-import com.topjohnwu.magisk.core.redirect
+import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
@@ -29,6 +28,7 @@ import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideableBehavior
 import com.topjohnwu.magisk.view.MagiskDialog
+import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -60,14 +60,8 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             return
         }
 
-        if (Info.env.isUnsupported) {
-            MagiskDialog(this)
-                .applyTitle(R.string.unsupport_magisk_title)
-                .applyMessage(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
-                .cancellable(true)
-                .reveal()
-        }
+        showUnsupportedMessage()
+        askForHomeShortcut()
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
@@ -186,6 +180,40 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
             R.id.logFragment -> MainDirections.actionLogFragment()
             else -> null
+        }
+    }
+
+    private fun showUnsupportedMessage() {
+        if (Info.env.isUnsupported) {
+            MagiskDialog(this)
+                .applyTitle(R.string.unsupport_magisk_title)
+                .applyMessage(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
+                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
+                .cancellable(true)
+                .reveal()
+        }
+    }
+
+    private fun askForHomeShortcut() {
+        // Don't bother if we are not hidden
+        if (packageName == BuildConfig.APPLICATION_ID)
+            return
+
+        if (!Config.askedHome && ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
+            // Ask and show dialog
+            Config.askedHome = true
+            MagiskDialog(this)
+                .applyTitle(R.string.add_shortcut_title)
+                .applyMessage(R.string.add_shortcut_msg)
+                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    titleRes = R.string.no
+                }.applyButton(MagiskDialog.ButtonType.POSITIVE) {
+                    titleRes = R.string.yes
+                    onClick {
+                        Shortcuts.addHomeIcon(this@MainActivity)
+                    }
+                }.cancellable(true)
+                .reveal()
         }
     }
 
