@@ -2,14 +2,12 @@ package com.topjohnwu.magisk.ui.module
 
 import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.download.DownloadSubject
-import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.module.Module
 import com.topjohnwu.magisk.core.tasks.RepoUpdater
 import com.topjohnwu.magisk.data.database.RepoByNameDao
@@ -47,7 +45,7 @@ class ModuleViewModel(
     private val repoName: RepoByNameDao,
     private val repoUpdated: RepoByUpdatedDao,
     private val repoUpdater: RepoUpdater
-) : BaseViewModel(), Queryable, Observer<Pair<Float, DownloadSubject>> {
+) : BaseViewModel(), Queryable {
 
     override val queryDelay = 1000L
     private var queryJob: Job? = null
@@ -125,9 +123,6 @@ class ModuleViewModel(
     // ---
 
     init {
-        RemoteFileService.reset()
-        RemoteFileService.progressBroadcast.observeForever(this)
-
         itemsInstalled.addOnListChangedCallback(
             onItemRangeInserted = { _, _, _ ->
                 if (installSectionList.isEmpty())
@@ -152,13 +147,7 @@ class ModuleViewModel(
 
     // ---
 
-    override fun onCleared() {
-        super.onCleared()
-        RemoteFileService.progressBroadcast.removeObserver(this)
-    }
-
-    override fun onChanged(it: Pair<Float, DownloadSubject>?) {
-        val (progress, subject) = it ?: return
+    fun onProgressUpdate(progress: Float, subject: DownloadSubject) {
         if (subject !is DownloadSubject.Module)
             return
 

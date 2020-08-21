@@ -11,7 +11,6 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Configuration
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.DownloadSubject
-import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.data.repository.StringRepository
 import com.topjohnwu.magisk.events.RequestFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
@@ -60,19 +59,18 @@ class InstallViewModel(
         set(value) = set(value, field, { field = it }, BR.notes)
 
     init {
-        RemoteFileService.reset()
-        RemoteFileService.progressBroadcast.observeForever {
-            val (progress, subject) = it ?: return@observeForever
-            if (subject !is DownloadSubject.Magisk) {
-                return@observeForever
-            }
-            this.progress = progress.times(100).roundToInt()
-            if (this.progress >= 100) {
-                state = State.LOADED
-            }
-        }
         viewModelScope.launch {
             notes = stringRepo.getString(Info.remote.magisk.note)
+        }
+    }
+
+    fun onProgressUpdate(progress: Float, subject: DownloadSubject) {
+        if (subject !is DownloadSubject.Magisk) {
+            return
+        }
+        this.progress = progress.times(100).roundToInt()
+        if (this.progress >= 100) {
+            state = State.LOADED
         }
     }
 

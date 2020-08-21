@@ -12,10 +12,11 @@ import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.Shell
 import java.io.File
 
-private fun RemoteFileService.patch(apk: File, id: Int) {
+private fun DownloadService.patch(apk: File, id: Int) {
     if (packageName == BuildConfig.APPLICATION_ID)
         return
 
@@ -31,7 +32,7 @@ private fun RemoteFileService.patch(apk: File, id: Int) {
     patched.renameTo(apk)
 }
 
-private suspend fun RemoteFileService.upgrade(apk: File, id: Int) {
+private suspend fun DownloadService.upgrade(apk: File, id: Int) {
     if (isRunningAsStub) {
         // Move to upgrade location
         apk.copyTo(DynAPK.update(this), overwrite = true)
@@ -49,9 +50,10 @@ private suspend fun RemoteFileService.upgrade(apk: File, id: Int) {
     } else {
         patch(apk, id)
     }
+    APKInstall.install(this, apk)
 }
 
-private fun RemoteFileService.restore(apk: File, id: Int) {
+private fun DownloadService.restore(apk: File, id: Int) {
     update(id) {
         it.setProgress(0, 0, true)
             .setProgress(0, 0, true)
@@ -64,8 +66,8 @@ private fun RemoteFileService.restore(apk: File, id: Int) {
     Shell.su("pm install $apk && pm uninstall $packageName").exec()
 }
 
-suspend fun RemoteFileService.handleAPK(subject: DownloadSubject.Manager) =
+suspend fun DownloadService.handleAPK(subject: DownloadSubject.Manager) =
     when (subject.configuration) {
-        is Upgrade -> upgrade(subject.file, subject.hashCode())
-        is Restore -> restore(subject.file, subject.hashCode())
+        is Upgrade -> upgrade(subject.file, subject.notifyID())
+        is Restore -> restore(subject.file, subject.notifyID())
     }

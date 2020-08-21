@@ -8,8 +8,8 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.download.DownloadSubject
 import com.topjohnwu.magisk.core.download.DownloadSubject.Manager
-import com.topjohnwu.magisk.core.download.RemoteFileService
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.data.repository.MagiskRepository
@@ -77,14 +77,6 @@ class HomeViewModel(
 
     private var shownDialog = false
 
-    init {
-        RemoteFileService.progressBroadcast.observeForever {
-            when (it?.second) {
-                is Manager -> stateManagerProgress = it.first.times(100f).roundToInt()
-            }
-        }
-    }
-
     override fun refresh() = viewModelScope.launch {
         notifyPropertyChanged(BR.showUninstall)
         repoMagisk.fetchUpdate()?.apply {
@@ -118,6 +110,12 @@ class HomeViewModel(
             /* Entry point to trigger test events within the app */
         }
     }.publish()
+
+    fun onProgressUpdate(progress: Float, subject: DownloadSubject) {
+        when (subject) {
+            is Manager -> stateManagerProgress = progress.times(100f).roundToInt()
+        }
+    }
 
     fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
 
