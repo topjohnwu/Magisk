@@ -5,8 +5,8 @@ import android.net.Uri
 import androidx.core.os.postDelayed
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.unzip
-import com.topjohnwu.magisk.ktx.fileName
-import com.topjohnwu.magisk.ktx.readUri
+import com.topjohnwu.magisk.utils.MediaStoreUtils.getDisplayName
+import com.topjohnwu.magisk.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +47,7 @@ open class FlashZip(
         console.add("- Copying zip to temp directory")
 
         runCatching {
-            context.readUri(mUri).use { input ->
+            mUri.inputStream().use { input ->
                 tmpFile.outputStream().use { out -> input.copyTo(out) }
             }
         }.getOrElse {
@@ -70,7 +70,7 @@ open class FlashZip(
             return false
         }
 
-        console.add("- Installing ${mUri.fileName}")
+        console.add("- Installing ${mUri.getDisplayName()}")
 
         val parentFile = tmpFile.parent ?: return false
 

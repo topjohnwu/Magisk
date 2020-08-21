@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.core
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Environment
 import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
@@ -17,7 +16,6 @@ import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.ui.theme.Theme
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import com.topjohnwu.superuser.io.SuFileInputStream
@@ -111,7 +109,7 @@ object Config : PreferenceModel, DBConfig {
     var bootId by preference(Key.BOOT_ID, "")
     var askedHome by preference(Key.ASKED_HOME, false)
 
-    var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
+    var downloadPath by preference(Key.DOWNLOAD_PATH, "Magisk Manager")
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
@@ -142,10 +140,6 @@ object Config : PreferenceModel, DBConfig {
     var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
-
-    // Always return a path in external storage where we can write
-    val downloadDirectory get() =
-        Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 

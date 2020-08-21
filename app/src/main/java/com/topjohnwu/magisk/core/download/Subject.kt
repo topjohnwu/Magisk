@@ -1,24 +1,25 @@
 package com.topjohnwu.magisk.core.download
 
 import android.content.Context
+import android.net.Uri
 import android.os.Parcelable
-import com.topjohnwu.magisk.core.Config
+import androidx.core.net.toUri
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.utils.MediaStoreUtils
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
-import java.io.File
 
 sealed class Subject : Parcelable {
 
     abstract val url: String
-    abstract val file: File
+    abstract val file: Uri
     abstract val action: Action
-    open val title: String get() = file.name
+    abstract val title: String
 
     @Parcelize
     class Module(
@@ -26,10 +27,11 @@ sealed class Subject : Parcelable {
         override val action: Action
     ) : Subject() {
         override val url: String get() = module.zipUrl
+        override val title: String get() = module.downloadFilename
 
         @IgnoredOnParcel
         override val file by lazy {
-            File(Config.downloadDirectory, module.downloadFilename)
+            MediaStoreUtils.newFile(title).uri
         }
     }
 
@@ -49,7 +51,7 @@ sealed class Subject : Parcelable {
 
         @IgnoredOnParcel
         override val file by lazy {
-            get<Context>().cachedFile("manager.apk")
+            get<Context>().cachedFile("manager.apk").toUri()
         }
 
     }
@@ -67,7 +69,7 @@ sealed class Subject : Parcelable {
 
             @IgnoredOnParcel
             override val file by lazy {
-                get<Context>().cachedFile("magisk.zip")
+                get<Context>().cachedFile("magisk.zip").toUri()
             }
         }
 
@@ -75,21 +77,24 @@ sealed class Subject : Parcelable {
         private class Uninstall : Magisk() {
             override val action get() = Action.Uninstall
             override val url: String get() = Info.remote.uninstaller.link
+            override val title: String get() = "uninstall.zip"
 
             @IgnoredOnParcel
             override val file by lazy {
-                get<Context>().cachedFile("uninstall.zip")
+                get<Context>().cachedFile(title).toUri()
             }
+
         }
 
         @Parcelize
         private class Download : Magisk() {
             override val action get() = Action.Download
             override val url: String get() = magisk.link
+            override val title: String get() = "Magisk-${magisk.version}(${magisk.versionCode}).zip"
 
             @IgnoredOnParcel
             override val file by lazy {
-                File(Config.downloadDirectory, "Magisk-${magisk.version}(${magisk.versionCode}).zip")
+                MediaStoreUtils.getFile(title).uri
             }
         }
 

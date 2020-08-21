@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Environment
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
@@ -11,7 +10,6 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import java.io.File
 
 object Utils {
 
@@ -40,10 +38,4 @@ object Utils {
             )
         }
     }
-
-    fun ensureDownloadPath(path: String) =
-        File(Environment.getExternalStorageDirectory(), path).run {
-            if ((exists() && isDirectory) || mkdirs()) this else null
-        }
-
 }

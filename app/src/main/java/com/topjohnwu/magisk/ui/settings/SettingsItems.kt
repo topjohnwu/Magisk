@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.ui.settings
 
 import android.content.Context
 import android.os.Build
-import android.os.Environment
 import android.view.LayoutInflater
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
@@ -19,13 +18,13 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.utils.MediaStoreUtils
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.io.File
 
 // --- Customization
 
@@ -115,8 +114,7 @@ object DownloadPath : BaseSettingsItem.Input() {
     override val title = R.string.settings_download_path_title.asTransitive()
     override val description get() = path.asTransitive()
 
-    override val inputResult: String?
-        get() = if (Utils.ensureDownloadPath(result) != null) result else null
+    override val inputResult: String get() = result
 
     @get:Bindable
     var result = value
@@ -124,7 +122,7 @@ object DownloadPath : BaseSettingsItem.Input() {
 
     @get:Bindable
     val path
-        get() = File(Environment.getExternalStorageDirectory(), result).absolutePath.orEmpty()
+        get() = MediaStoreUtils.relativePath(result)
 
     override fun getView(context: Context) = DialogSettingsDownloadPathBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root

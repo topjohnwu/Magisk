@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.core.download
 
+import androidx.core.net.toFile
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.ProcessPhoenix
@@ -61,13 +62,11 @@ private fun DownloadService.restore(apk: File, id: Int) {
             .setContentText("")
     }
     Config.export()
-    // Make it world readable
-    apk.setReadable(true, false)
     Shell.su("pm install $apk && pm uninstall $packageName").exec()
 }
 
 suspend fun DownloadService.handleAPK(subject: Subject.Manager) =
     when (subject.action) {
-        is Upgrade -> upgrade(subject.file, subject.notifyID())
-        is Restore -> restore(subject.file, subject.notifyID())
+        is Upgrade -> upgrade(subject.file.toFile(), subject.notifyID())
+        is Restore -> restore(subject.file.toFile(), subject.notifyID())
     }

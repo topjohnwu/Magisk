@@ -21,7 +21,6 @@ import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
-import android.provider.OpenableColumns
 import android.text.PrecomputedText
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +32,6 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.core.text.PrecomputedTextCompat
 import androidx.core.view.isGone
@@ -43,7 +41,6 @@ import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
-import com.topjohnwu.magisk.FileProvider
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.ResMgr
@@ -56,7 +53,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileNotFoundException
 import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
@@ -92,23 +88,6 @@ val ApplicationInfo.packageInfo: PackageInfo?
         }
     }
 
-val Uri.fileName: String
-    get() {
-        var name: String? = null
-        get<Context>().contentResolver.query(this, null, null, null, null)?.use { c ->
-            val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            if (nameIndex != -1) {
-                c.moveToFirst()
-                name = c.getString(nameIndex)
-            }
-        }
-        if (name == null && path != null) {
-            val idx = path!!.lastIndexOf('/')
-            name = path!!.substring(idx + 1)
-        }
-        return name.orEmpty()
-    }
-
 fun PackageManager.activities(packageName: String) =
     getPackageInfo(packageName, GET_ACTIVITIES)
 
@@ -122,9 +101,6 @@ fun PackageManager.providers(packageName: String) =
     getPackageInfo(packageName, GET_PROVIDERS).providers
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
-
-fun Context.readUri(uri: Uri) =
-    contentResolver.openInputStream(uri) ?: throw FileNotFoundException()
 
 fun Context.getBitmap(id: Int): Bitmap {
     var drawable = AppCompatResources.getDrawable(this, id)!!
@@ -249,17 +225,6 @@ fun Intent.toCommand(args: MutableList<String> = mutableListOf()): MutableList<S
     return args
 }
 
-fun File.provide(context: Context = get()): Uri {
-    return FileProvider.getUriForFile(context, context.packageName + ".provider", this)
-}
-
-fun File.mv(destination: File) {
-    inputStream().writeTo(destination)
-    deleteRecursively()
-}
-
-fun String.toFile() = File(this)
-
 fun Intent.chooser(title: String = "Pick an app") = Intent.createChooser(this, title)
 
 fun Context.cachedFile(name: String) = File(cacheDir, name)
@@ -328,8 +293,6 @@ fun Context.unwrap(): Context {
     }
     return context
 }
-
-fun Uri.writeTo(file: File) = toFile().copyTo(file)
 
 fun Context.hasPermissions(vararg permissions: String) = permissions.all {
     ContextCompat.checkSelfPermission(this, it) == PERMISSION_GRANTED

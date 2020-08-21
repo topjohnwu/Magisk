@@ -7,19 +7,15 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
-import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.utils.MediaStoreUtils
+import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.TextItem
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
-import java.io.File
-import java.io.IOException
 import java.util.*
 
 class LogViewModel(
@@ -40,7 +36,7 @@ class LogViewModel(
 
     // --- magisk log
     @get:Bindable
-    var consoleText= " "
+    var consoleText = " "
         set(value) = set(value, field, { field = it }, BR.consoleText)
 
     override fun refresh() = viewModelScope.launch {
@@ -57,23 +53,18 @@ class LogViewModel(
     }
 
     fun saveMagiskLog() = withExternalRW {
-        val now = Calendar.getInstance()
-        val filename = "magisk_log_%04d%02d%02d_%02d%02d%02d.log".format(
-            now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
-            now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
-            now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
-        )
-
-        val logFile = File(Config.downloadDirectory, filename)
-        try {
-            logFile.createNewFile()
-        } catch (e: IOException) {
-            Timber.e(e)
-            return@withExternalRW
-        }
-
-        Shell.su("cat ${Const.MAGISK_LOG} > $logFile").submit {
-            SnackbarEvent(logFile.path).publish()
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val now = Calendar.getInstance()
+                val filename = "magisk_log_%04d%02d%02d_%02d%02d%02d.log".format(
+                    now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
+                    now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
+                    now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
+                )
+                val logFile = MediaStoreUtils.newFile(filename)
+                logFile.uri.outputStream().writer().use { it.write(consoleText) }
+                SnackbarEvent(logFile.toString()).publish()
+            }
         }
     }
 

@@ -10,8 +10,9 @@ import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.ktx.checkSum
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.utils.MediaStoreUtils.checkSum
+import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,14 +69,14 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
     // -- Download logic
 
     private suspend fun Subject.startDownload() {
-        val skip = this is Subject.Magisk && file.exists() && file.checkSum("MD5", magisk.md5)
+        val skip = this is Subject.Magisk && file.checkSum("MD5", magisk.md5)
         if (!skip) {
             val stream = service.fetchFile(url).toProgressStream(this)
             when (this) {
                 is Subject.Module ->  // Download and process on-the-fly
                     stream.toModule(file, service.fetchInstaller().byteStream())
                 else ->
-                    stream.writeTo(file)
+                    stream.copyTo(file.outputStream())
             }
         }
         val newId = notifyFinish(this)
