@@ -6,8 +6,8 @@ import com.topjohnwu.magisk.ProcessPhoenix
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.Configuration.APK.Restore
-import com.topjohnwu.magisk.core.download.Configuration.APK.Upgrade
+import com.topjohnwu.magisk.core.download.Action.APK.Restore
+import com.topjohnwu.magisk.core.download.Action.APK.Upgrade
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.PatchAPK
@@ -66,8 +66,8 @@ private fun DownloadService.restore(apk: File, id: Int) {
     Shell.su("pm install $apk && pm uninstall $packageName").exec()
 }
 
-suspend fun DownloadService.handleAPK(subject: DownloadSubject.Manager) =
-    when (subject.configuration) {
+suspend fun DownloadService.handleAPK(subject: Subject.Manager) =
+    when (subject.action) {
         is Upgrade -> upgrade(subject.file, subject.notifyID())
         is Restore -> restore(subject.file, subject.notifyID())
     }

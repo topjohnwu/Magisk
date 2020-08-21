@@ -6,9 +6,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.download.Configuration.EnvFix
+import com.topjohnwu.magisk.core.download.Action.EnvFix
 import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.download.DownloadSubject.Magisk
+import com.topjohnwu.magisk.core.download.Subject.Magisk
 import com.topjohnwu.magisk.view.MagiskDialog
 
 class EnvFixDialog : DialogEvent() {

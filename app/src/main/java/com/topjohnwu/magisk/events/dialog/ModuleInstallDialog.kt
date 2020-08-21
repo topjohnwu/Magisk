@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.events.dialog
 
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.download.Configuration
+import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.download.DownloadSubject
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.view.MagiskDialog
 
@@ -13,8 +13,8 @@ class ModuleInstallDialog(private val item: Repo) : DialogEvent() {
         with(dialog) {
 
             fun download(install: Boolean) = DownloadService(context) {
-                val config = if (install) Configuration.Flash.Primary else Configuration.Download
-                subject = DownloadSubject.Module(item, config)
+                val config = if (install) Action.Flash.Primary else Action.Download
+                subject = Subject.Module(item, config)
             }
 
             applyTitle(context.getString(R.string.repo_install_title, item.name))

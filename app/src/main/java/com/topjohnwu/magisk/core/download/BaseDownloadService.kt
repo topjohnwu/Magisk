@@ -40,7 +40,7 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getParcelableExtra<DownloadSubject>(ARG_URL)?.let { subject ->
+        intent?.getParcelableExtra<Subject>(ARG_URL)?.let { subject ->
             update(subject.notifyID())
             coroutineScope.launch {
                 try {
@@ -67,12 +67,12 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
 
     // -- Download logic
 
-    private suspend fun DownloadSubject.startDownload() {
-        val skip = this is DownloadSubject.Magisk && file.exists() && file.checkSum("MD5", magisk.md5)
+    private suspend fun Subject.startDownload() {
+        val skip = this is Subject.Magisk && file.exists() && file.checkSum("MD5", magisk.md5)
         if (!skip) {
             val stream = service.fetchFile(url).toProgressStream(this)
             when (this) {
-                is DownloadSubject.Module ->  // Download and process on-the-fly
+                is Subject.Module ->  // Download and process on-the-fly
                     stream.toModule(file, service.fetchInstaller().byteStream())
                 else ->
                     stream.writeTo(file)
@@ -85,7 +85,7 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
             stopSelf()
     }
 
-    private fun ResponseBody.toProgressStream(subject: DownloadSubject): InputStream {
+    private fun ResponseBody.toProgressStream(subject: Subject): InputStream {
         val max = contentLength()
         val total = max.toFloat() / 1048576
         val id = subject.notifyID()
@@ -110,16 +110,16 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
 
     // --- Notification managements
 
-    fun DownloadSubject.notifyID() = hashCode()
+    fun Subject.notifyID() = hashCode()
 
-    private fun notifyFail(subject: DownloadSubject) = lastNotify(subject.notifyID()) {
+    private fun notifyFail(subject: Subject) = lastNotify(subject.notifyID()) {
         broadcast(-1f, subject)
         it.setContentText(getString(R.string.download_file_error))
             .setSmallIcon(android.R.drawable.stat_notify_error)
             .setOngoing(false)
     }
 
-    private fun notifyFinish(subject: DownloadSubject) = lastNotify(subject.notifyID()) {
+    private fun notifyFinish(subject: Subject) = lastNotify(subject.notifyID()) {
         broadcast(1f, subject)
         it.setIntent(subject)
             .setContentText(getString(R.string.download_complete))
@@ -174,9 +174,9 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
 
     // --- Implement custom logic
 
-    protected abstract suspend fun onFinish(subject: DownloadSubject, id: Int)
+    protected abstract suspend fun onFinish(subject: Subject, id: Int)
 
-    protected abstract fun Notification.Builder.setIntent(subject: DownloadSubject)
+    protected abstract fun Notification.Builder.setIntent(subject: Subject)
             : Notification.Builder
 
     // ---
@@ -184,9 +184,9 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
     companion object : KoinComponent {
         const val ARG_URL = "arg_url"
 
-        private val progressBroadcast = MutableLiveData<Pair<Float, DownloadSubject>>()
+        private val progressBroadcast = MutableLiveData<Pair<Float, Subject>>()
 
-        fun observeProgress(owner: LifecycleOwner, callback: (Float, DownloadSubject) -> Unit) {
+        fun observeProgress(owner: LifecycleOwner, callback: (Float, Subject) -> Unit) {
             progressBroadcast.value = null
             progressBroadcast.observe(owner) {
                 val (progress, subject) = it ?: return@observe
@@ -194,7 +194,7 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
             }
         }
 
-        private fun broadcast(progress: Float, subject: DownloadSubject) {
+        private fun broadcast(progress: Float, subject: Subject) {
             progressBroadcast.postValue(progress to subject)
         }
     }

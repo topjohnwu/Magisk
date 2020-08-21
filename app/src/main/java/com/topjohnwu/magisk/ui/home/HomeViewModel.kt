@@ -8,8 +8,8 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.DownloadSubject
-import com.topjohnwu.magisk.core.download.DownloadSubject.Manager
+import com.topjohnwu.magisk.core.download.Subject
+import com.topjohnwu.magisk.core.download.Subject.Manager
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.data.repository.MagiskRepository
@@ -111,7 +111,7 @@ class HomeViewModel(
         }
     }.publish()
 
-    fun onProgressUpdate(progress: Float, subject: DownloadSubject) {
+    fun onProgressUpdate(progress: Float, subject: Subject) {
         when (subject) {
             is Manager -> stateManagerProgress = progress.times(100f).roundToInt()
         }

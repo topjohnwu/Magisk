@@ -8,9 +8,9 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.Configuration
+import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.download.DownloadSubject
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.data.repository.StringRepository
 import com.topjohnwu.magisk.events.RequestFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
@@ -64,8 +64,8 @@ class InstallViewModel(
         }
     }
 
-    fun onProgressUpdate(progress: Float, subject: DownloadSubject) {
-        if (subject !is DownloadSubject.Magisk) {
+    fun onProgressUpdate(progress: Float, subject: Subject) {
+        if (subject !is Subject.Magisk) {
             return
         }
         this.progress = progress.times(100).roundToInt()
@@ -79,16 +79,16 @@ class InstallViewModel(
     }
 
     fun install() = DownloadService(get()) {
-        subject = DownloadSubject.Magisk(resolveConfiguration())
+        subject = Subject.Magisk(resolveConfiguration())
     }.also { state = State.LOADING }
 
     // ---
 
     private fun resolveConfiguration() = when (method) {
-        R.id.method_download -> Configuration.Download
-        R.id.method_patch -> Configuration.Patch(data!!)
-        R.id.method_direct -> Configuration.Flash.Primary
-        R.id.method_inactive_slot -> Configuration.Flash.Secondary
+        R.id.method_download -> Action.Download
+        R.id.method_patch -> Action.Patch(data!!)
+        R.id.method_direct -> Action.Flash.Primary
+        R.id.method_inactive_slot -> Action.Flash.Secondary
         else -> throw IllegalArgumentException("Unknown value")
     }
 }

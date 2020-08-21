@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.events.dialog
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.Configuration
+import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.download.DownloadSubject
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
@@ -48,7 +48,7 @@ class UninstallDialog : DialogEvent() {
 
     private fun completeUninstall() {
         DownloadService(dialog.context) {
-            subject = DownloadSubject.Magisk(Configuration.Uninstall)
+            subject = Subject.Magisk(Action.Uninstall)
         }
     }
 

@@ -7,7 +7,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.download.DownloadSubject
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.Module
 import com.topjohnwu.magisk.core.tasks.RepoUpdater
 import com.topjohnwu.magisk.data.database.RepoByNameDao
@@ -147,8 +147,8 @@ class ModuleViewModel(
 
     // ---
 
-    fun onProgressUpdate(progress: Float, subject: DownloadSubject) {
-        if (subject !is DownloadSubject.Module)
+    fun onProgressUpdate(progress: Float, subject: Subject) {
+        if (subject !is Subject.Module)
             return
 
         viewModelScope.launch {

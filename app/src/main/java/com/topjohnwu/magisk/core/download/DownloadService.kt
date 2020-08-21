@@ -6,9 +6,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.topjohnwu.magisk.core.download.Configuration.*
-import com.topjohnwu.magisk.core.download.Configuration.Flash.Secondary
-import com.topjohnwu.magisk.core.download.DownloadSubject.*
+import com.topjohnwu.magisk.core.download.Action.*
+import com.topjohnwu.magisk.core.download.Action.Flash.Secondary
+import com.topjohnwu.magisk.core.download.Subject.*
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.tasks.EnvFixTask
 import com.topjohnwu.magisk.ui.flash.FlashFragment
@@ -20,25 +20,25 @@ open class DownloadService : BaseDownloadService() {
 
     private val context get() = this
 
-    override suspend fun onFinish(subject: DownloadSubject, id: Int) = when (subject) {
+    override suspend fun onFinish(subject: Subject, id: Int) = when (subject) {
         is Magisk -> subject.onFinish(id)
         is Module -> subject.onFinish(id)
         is Manager -> subject.onFinish(id)
     }
 
-    private suspend fun Magisk.onFinish(id: Int) = when (val conf = configuration) {
+    private suspend fun Magisk.onFinish(id: Int) = when (val action = action) {
         Uninstall -> FlashFragment.uninstall(file, id)
         EnvFix -> {
             cancel(id)
             EnvFixTask(file).exec()
             Unit
         }
-        is Patch -> FlashFragment.patch(file, conf.fileUri, id)
-        is Flash -> FlashFragment.flash(file, conf is Secondary, id)
+        is Patch -> FlashFragment.patch(file, action.fileUri, id)
+        is Flash -> FlashFragment.flash(file, action is Secondary, id)
         else -> Unit
     }
 
-    private fun Module.onFinish(id: Int) = when (configuration) {
+    private fun Module.onFinish(id: Int) = when (action) {
         is Flash -> FlashFragment.install(file, id)
         else -> Unit
     }
@@ -50,7 +50,7 @@ open class DownloadService : BaseDownloadService() {
 
     // --- Customize finish notification
 
-    override fun Notification.Builder.setIntent(subject: DownloadSubject)
+    override fun Notification.Builder.setIntent(subject: Subject)
     = when (subject) {
         is Magisk -> setIntent(subject)
         is Module -> setIntent(subject)
@@ -58,21 +58,21 @@ open class DownloadService : BaseDownloadService() {
     }
 
     private fun Notification.Builder.setIntent(subject: Magisk)
-    = when (val conf = subject.configuration) {
+    = when (val action = subject.action) {
         Uninstall -> setContentIntent(FlashFragment.uninstallIntent(context, subject.file))
-        is Flash -> setContentIntent(FlashFragment.flashIntent(context, subject.file, conf is Secondary))
-        is Patch -> setContentIntent(FlashFragment.patchIntent(context, subject.file, conf.fileUri))
+        is Flash -> setContentIntent(FlashFragment.flashIntent(context, subject.file, action is Secondary))
+        is Patch -> setContentIntent(FlashFragment.patchIntent(context, subject.file, action.fileUri))
         else -> setContentIntent(Intent())
     }
 
     private fun Notification.Builder.setIntent(subject: Module)
-    = when (subject.configuration) {
+    = when (subject.action) {
         is Flash -> setContentIntent(FlashFragment.installIntent(context, subject.file))
         else -> setContentIntent(Intent())
     }
 
     private fun Notification.Builder.setIntent(subject: Manager)
-    = when (subject.configuration) {
+    = when (subject.action) {
         APK.Upgrade -> setContentIntent(APKInstall.installIntent(context, subject.file))
         else -> setContentIntent(Intent())
     }
@@ -85,7 +85,7 @@ open class DownloadService : BaseDownloadService() {
     // ---
 
     class Builder {
-        lateinit var subject: DownloadSubject
+        lateinit var subject: Subject
     }
 
     companion object {

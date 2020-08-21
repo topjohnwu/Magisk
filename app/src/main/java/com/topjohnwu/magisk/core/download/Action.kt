@@ -4,9 +4,9 @@ import android.net.Uri
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
-sealed class Configuration : Parcelable {
+sealed class Action : Parcelable {
 
-    sealed class Flash : Configuration() {
+    sealed class Flash : Action() {
 
         @Parcelize
         object Primary : Flash()
@@ -16,7 +16,7 @@ sealed class Configuration : Parcelable {
 
     }
 
-    sealed class APK : Configuration() {
+    sealed class APK : Action() {
 
         @Parcelize
         object Upgrade : APK()
@@ -26,15 +26,15 @@ sealed class Configuration : Parcelable {
     }
 
     @Parcelize
-    object Download : Configuration()
+    object Download : Action()
 
     @Parcelize
-    object Uninstall : Configuration()
+    object Uninstall : Action()
 
     @Parcelize
-    object EnvFix : Configuration()
+    object EnvFix : Action()
 
     @Parcelize
-    data class Patch(val fileUri: Uri) : Configuration()
+    data class Patch(val fileUri: Uri) : Action()
 
 }

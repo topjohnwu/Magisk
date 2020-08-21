@@ -13,17 +13,18 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 
-sealed class DownloadSubject : Parcelable {
+sealed class Subject : Parcelable {
 
     abstract val url: String
     abstract val file: File
+    abstract val action: Action
     open val title: String get() = file.name
 
     @Parcelize
     class Module(
         val module: Repo,
-        val configuration: Configuration
-    ) : DownloadSubject() {
+        override val action: Action
+    ) : Subject() {
         override val url: String get() = module.zipUrl
 
         @IgnoredOnParcel
@@ -34,8 +35,8 @@ sealed class DownloadSubject : Parcelable {
 
     @Parcelize
     class Manager(
-        val configuration: Configuration.APK
-    ) : DownloadSubject() {
+        override val action: Action.APK
+    ) : Subject() {
 
         @IgnoredOnParcel
         val manager: ManagerJson = Info.remote.app
@@ -53,14 +54,13 @@ sealed class DownloadSubject : Parcelable {
 
     }
 
-    abstract class Magisk : DownloadSubject() {
+    abstract class Magisk : Subject() {
 
-        abstract val configuration: Configuration
         val magisk: MagiskJson = Info.remote.magisk
 
         @Parcelize
-        private class DownloadInternal(
-            override val configuration: Configuration
+        private class Internal(
+            override val action: Action
         ) : Magisk() {
             override val url: String get() = magisk.link
             override val title: String get() = "Magisk-${magisk.version}(${magisk.versionCode})"
@@ -73,7 +73,7 @@ sealed class DownloadSubject : Parcelable {
 
         @Parcelize
         private class Uninstall : Magisk() {
-            override val configuration get() = Configuration.Uninstall
+            override val action get() = Action.Uninstall
             override val url: String get() = Info.remote.uninstaller.link
 
             @IgnoredOnParcel
@@ -84,7 +84,7 @@ sealed class DownloadSubject : Parcelable {
 
         @Parcelize
         private class Download : Magisk() {
-            override val configuration get() = Configuration.Download
+            override val action get() = Action.Download
             override val url: String get() = magisk.link
 
             @IgnoredOnParcel
@@ -94,10 +94,10 @@ sealed class DownloadSubject : Parcelable {
         }
 
         companion object {
-            operator fun invoke(configuration: Configuration) = when (configuration) {
-                Configuration.Download -> Download()
-                Configuration.Uninstall -> Uninstall()
-                Configuration.EnvFix, is Configuration.Flash, is Configuration.Patch -> DownloadInternal(configuration)
+            operator fun invoke(config: Action) = when (config) {
+                Action.Download -> Download()
+                Action.Uninstall -> Uninstall()
+                Action.EnvFix, is Action.Flash, is Action.Patch -> Internal(config)
                 else -> throw IllegalArgumentException()
             }
         }
