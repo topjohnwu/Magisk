@@ -18,9 +18,13 @@ object Info {
 
     val envRef = CachedValue { loadState() }
 
-    @JvmStatic val env by envRef              // Local
-    @JvmStatic var stub: DynAPK.Data? = null  // Stub
-    var remote = UpdateInfo()      // Remote
+    @JvmStatic val env by envRef
+
+    var stub: DynAPK.Data? = null
+    val stubChk: DynAPK.Data
+        get() = stub as DynAPK.Data
+
+    var remote = UpdateInfo()
 
     // Toggle-able options
     @JvmStatic var keepVerity = false

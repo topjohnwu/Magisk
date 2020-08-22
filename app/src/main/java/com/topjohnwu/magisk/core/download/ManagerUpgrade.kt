@@ -38,7 +38,7 @@ private suspend fun DownloadService.upgrade(apk: File, id: Int) {
         // Move to upgrade location
         apk.copyTo(DynAPK.update(this), overwrite = true)
         apk.delete()
-        if (Info.stub!!.version < Info.remote.stub.versionCode) {
+        if (Info.stubChk.version < Info.remote.stub.versionCode) {
             // We also want to upgrade stub
             service.fetchFile(Info.remote.stub.link).byteStream().use {
                 it.writeTo(apk)

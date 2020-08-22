@@ -195,11 +195,8 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     }
 
     private fun askForHomeShortcut() {
-        // Don't bother if we are not hidden
-        if (packageName == BuildConfig.APPLICATION_ID)
-            return
-
-        if (!Config.askedHome && ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
+        if (isRunningAsStub && !Config.askedHome &&
+            ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
             // Ask and show dialog
             Config.askedHome = true
             MagiskDialog(this)

@@ -136,7 +136,7 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
         val name = service.className
         val component = ComponentName(
             service.packageName,
-            Info.stub!!.classToComponent[name] ?: name
+            Info.stubChk.classToComponent[name] ?: name
         )
 
         javaClass.forceGetDeclaredField("service")?.set(this, component)

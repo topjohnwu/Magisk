@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
+import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.PatchAPK
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.events.AddHomeIconEvent
@@ -56,7 +57,7 @@ class SettingsViewModel(
             // making theming a pain in the ass. Just forget about it
             list.remove(Theme)
         }
-        if (hidden && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
+        if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
             list.add(AddShortcut)
 
         // Manager
