@@ -49,7 +49,7 @@ object Config : PreferenceModel, DBConfig {
         const val DARK_THEME = "dark_theme_extended"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
-        const val DOWNLOAD_PATH = "download_path"
+        const val DOWNLOAD_DIR = "download_dir"
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
@@ -109,7 +109,7 @@ object Config : PreferenceModel, DBConfig {
     var bootId by preference(Key.BOOT_ID, "")
     var askedHome by preference(Key.ASKED_HOME, false)
 
-    var downloadPath by preference(Key.DOWNLOAD_PATH, "Magisk Manager")
+    var downloadDir by preference(Key.DOWNLOAD_DIR, "")
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)

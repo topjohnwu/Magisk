@@ -12,13 +12,13 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.UpdateCheckService
 import com.topjohnwu.magisk.core.utils.BiometricHelper
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.availableLocales
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.ktx.get
-import com.topjohnwu.magisk.utils.MediaStoreUtils
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.magisk.utils.set
@@ -108,8 +108,8 @@ object AddShortcut : BaseSettingsItem.Blank() {
 }
 
 object DownloadPath : BaseSettingsItem.Input() {
-    override var value = Config.downloadPath
-        set(value) = setV(value, field, { field = it }) { Config.downloadPath = it }
+    override var value = Config.downloadDir
+        set(value) = setV(value, field, { field = it }) { Config.downloadDir = it }
 
     override val title = R.string.settings_download_path_title.asTransitive()
     override val description get() = path.asTransitive()
@@ -122,7 +122,7 @@ object DownloadPath : BaseSettingsItem.Input() {
 
     @get:Bindable
     val path
-        get() = MediaStoreUtils.relativePath(result)
+        get() = MediaStoreUtils.fullPath(result)
 
     override fun getView(context: Context) = DialogSettingsDownloadPathBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root

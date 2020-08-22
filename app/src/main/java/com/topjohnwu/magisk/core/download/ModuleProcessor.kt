@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.core.download
 
 import android.net.Uri
 import com.topjohnwu.magisk.ktx.withStreams
-import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream

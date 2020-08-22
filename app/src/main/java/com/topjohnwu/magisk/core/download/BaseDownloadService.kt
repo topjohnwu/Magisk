@@ -8,11 +8,12 @@ import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.base.BaseService
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.checkSum
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.ktx.writeTo
-import com.topjohnwu.magisk.utils.MediaStoreUtils.checkSum
-import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +77,7 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
                 is Subject.Module ->  // Download and process on-the-fly
                     stream.toModule(file, service.fetchInstaller().byteStream())
                 else ->
-                    stream.copyTo(file.outputStream())
+                    withStreams(stream, file.outputStream()) { it, out -> it.copyTo(out) }
             }
         }
         val newId = notifyFinish(this)

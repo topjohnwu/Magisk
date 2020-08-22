@@ -16,8 +16,8 @@ import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.databinding.RvBindingAdapter
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.*
-import com.topjohnwu.magisk.utils.MediaStoreUtils
-import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.CallbackList
@@ -109,7 +109,7 @@ class FlashViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val name = Const.MAGISK_INSTALL_LOG_FILENAME.format(now.toTime(timeFormatStandard))
-                val file = MediaStoreUtils.newFile(name)
+                val file = MediaStoreUtils.getFile(name)
                 file.uri.outputStream().bufferedWriter().use { writer ->
                     logItems.forEach {
                         writer.write(it)
