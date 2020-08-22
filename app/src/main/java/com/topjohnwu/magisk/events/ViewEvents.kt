@@ -24,12 +24,12 @@ class OpenChangelogEvent(val item: Repo) : ViewEventWithScope(), ContextExecutor
 }
 
 class PermissionEvent(
-    private val permissions: List<String>,
+    private val permission: String,
     private val callback: (Boolean) -> Unit
 ) : ViewEvent(), ActivityExecutor {
 
     override fun invoke(activity: BaseUIActivity<*, *>) =
-        activity.withPermissions(*permissions.toTypedArray()) {
+        activity.withPermission(permission) {
             onSuccess {
                 callback(true)
             }

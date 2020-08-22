@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.SparseArrayCompat
 import androidx.core.app.ActivityCompat
@@ -30,13 +31,17 @@ abstract class BaseActivity : AppCompatActivity() {
         super.attachBaseContext(base.wrap(false))
     }
 
-    fun withPermissions(vararg permissions: String, builder: PermissionRequestBuilder.() -> Unit) {
+    fun withPermission(permission: String, builder: PermissionRequestBuilder.() -> Unit) {
         val request = PermissionRequestBuilder().apply(builder).build()
-        val ungranted = permissions.filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+
+        if (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE &&
+            Build.VERSION.SDK_INT >= 29) {
+            // We do not need external rw on 29+
+            request.onSuccess()
+            return
         }
 
-        if (ungranted.isEmpty()) {
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             request.onSuccess()
         } else {
             val requestCode = Random.nextInt(256, 512)
@@ -46,12 +51,12 @@ abstract class BaseActivity : AppCompatActivity() {
                 else
                     request.onFailure()
             }
-            ActivityCompat.requestPermissions(this, ungranted.toTypedArray(), requestCode)
+            ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
         }
     }
 
     fun withExternalRW(builder: PermissionRequestBuilder.() -> Unit) {
-        withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE, builder = builder)
+        withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, builder = builder)
     }
 
     override fun onRequestPermissionsResult(

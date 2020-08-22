@@ -82,16 +82,12 @@ abstract class BaseViewModel(
         ViewActionEvent(action).publish()
     }
 
-    fun withPermissions(vararg permissions: String, callback: (Boolean) -> Unit) {
-        PermissionEvent(permissions.toList(), callback).publish()
+    fun withPermission(permission: String, callback: (Boolean) -> Unit) {
+        PermissionEvent(permission, callback).publish()
     }
 
     fun withExternalRW(callback: () -> Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            callback()
-            return
-        }
-        withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+        withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
             if (!it) {
                 SnackbarEvent(R.string.external_rw_permission_denied).publish()
             } else {
