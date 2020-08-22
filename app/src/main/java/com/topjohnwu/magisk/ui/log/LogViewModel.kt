@@ -9,8 +9,8 @@ import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.utils.MediaStoreUtils
-import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
@@ -53,18 +53,16 @@ class LogViewModel(
     }
 
     fun saveMagiskLog() = withExternalRW {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val now = Calendar.getInstance()
-                val filename = "magisk_log_%04d%02d%02d_%02d%02d%02d.log".format(
-                    now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
-                    now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
-                    now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
-                )
-                val logFile = MediaStoreUtils.newFile(filename)
-                logFile.uri.outputStream().writer().use { it.write(consoleText) }
-                SnackbarEvent(logFile.toString()).publish()
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            val now = Calendar.getInstance()
+            val filename = "magisk_log_%04d%02d%02d_%02d%02d%02d.log".format(
+                now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
+                now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
+                now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
+            )
+            val logFile = MediaStoreUtils.getFile(filename)
+            logFile.uri.outputStream().writer().use { it.write(consoleText) }
+            SnackbarEvent(logFile.toString()).publish()
         }
     }
 

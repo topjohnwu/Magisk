@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.core.utils
 
 import android.annotation.SuppressLint
 import android.content.ContentResolver
@@ -10,6 +10,9 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import androidx.annotation.RequiresApi
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.ktx.get
 import java.io.File
@@ -24,32 +27,24 @@ object MediaStoreUtils {
 
     private val cr: ContentResolver by lazy { get<Context>().contentResolver }
 
-    @SuppressLint("InlinedApi")
-    private val tableUri: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        MediaStore.Downloads.EXTERNAL_CONTENT_URI
-    } else {
-        MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
-    }
+    @get:RequiresApi(api = 29)
+    private val tableUri
+        get() = MediaStore.Downloads.EXTERNAL_CONTENT_URI
 
-    fun relativePath(appName: String): String {
-        var path = Environment.DIRECTORY_DOWNLOADS
-        if (appName.isNotEmpty()) {
-            path += File.separator + appName
-        }
-        return path
-    }
+    private fun relativePath(name: String) =
+        if (name.isEmpty()) Environment.DIRECTORY_DOWNLOADS
+        else Environment.DIRECTORY_DOWNLOADS + File.separator + name
 
+    fun fullPath(name: String): String =
+        File(Environment.getExternalStorageDirectory(), relativePath(name)).canonicalPath
+
+    private val relativePath get() = relativePath(Config.downloadDir)
+
+    @RequiresApi(api = 29)
     @Throws(IOException::class)
     private fun insertFile(displayName: String): MediaStoreFile {
         val values = ContentValues()
-        val relativePath = relativePath(Config.downloadPath)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
-        } else {
-            val parent = File(Environment.getExternalStorageDirectory(), relativePath)
-            values.put(MediaStore.MediaColumns.DATA, File(parent, displayName).path)
-            parent.mkdirs()
-        }
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
 
         // before Android 11, MediaStore can not rename new file when file exists,
@@ -70,7 +65,14 @@ object MediaStoreUtils {
         throw IOException("Can't insert $displayName.")
     }
 
-    private fun queryFile(displayName: String): MediaStoreFile? {
+    private fun queryFile(displayName: String): UriFile? {
+        if (Build.VERSION.SDK_INT < 29) {
+            // Before official general purpose MediaStore API exists, fallback to file based I/O
+            val parent = File(Environment.getExternalStorageDirectory(), relativePath)
+            parent.mkdirs()
+            return LegacyUriFile(File(parent, displayName))
+        }
+
         val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA)
         // Before Android 10, we wrote the DISPLAY_NAME field when insert, so it can be used.
         val selection = "${MediaStore.MediaColumns.DISPLAY_NAME} == ?"
@@ -82,7 +84,6 @@ object MediaStoreUtils {
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val data = cursor.getString(dataColumn)
-                val relativePath = relativePath(Config.downloadPath)
                 if (data.endsWith(relativePath + File.separator + displayName)) {
                     return MediaStoreFile(id, data)
                 }
@@ -91,26 +92,22 @@ object MediaStoreUtils {
         return null
     }
 
+    @SuppressLint("NewApi")
     @Throws(IOException::class)
-    fun newFile(displayName: String): MediaStoreFile {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            insertFile(displayName)
-        } else {
-            queryFile(displayName)?.delete()
-            insertFile(displayName)
-        }
-    }
-
-    @Throws(IOException::class)
-    fun getFile(displayName: String): MediaStoreFile {
-        return queryFile(displayName) ?: insertFile(displayName)
+    fun getFile(displayName: String): UriFile {
+        return queryFile(displayName) ?:
+        /* this code path will never happen pre 29 */ insertFile(displayName)
     }
 
     fun Uri.inputStream() = cr.openInputStream(this) ?: throw FileNotFoundException()
 
     fun Uri.outputStream() = cr.openOutputStream(this) ?: throw FileNotFoundException()
 
-    fun Uri.getDisplayName(): String {
+    val Uri.displayName: String get() {
+        if (scheme == "file") {
+            // Simple uri wrapper over file, directly get file name
+            return toFile().name
+        }
         require(scheme == "content") { "Uri lacks 'content' scheme: $this" }
         val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
         cr.query(this, projection, null, null, null)?.use { cursor ->
@@ -140,11 +137,22 @@ object MediaStoreUtils {
         }
     }.getOrElse { false }
 
-    data class MediaStoreFile(val id: Long, private val data: String) {
-        val uri: Uri = ContentUris.withAppendedId(tableUri, id)
-        override fun toString() = data
+    interface UriFile {
+        val uri: Uri
+        fun delete(): Boolean
+    }
 
-        fun delete(): Boolean {
+    private class LegacyUriFile(private val file: File) : UriFile {
+        override val uri = file.toUri()
+        override fun delete() = file.delete()
+        override fun toString() = file.toString()
+    }
+
+    @RequiresApi(api = 29)
+    private class MediaStoreFile(private val id: Long, private val data: String) : UriFile {
+        override val uri = ContentUris.withAppendedId(tableUri, id)
+        override fun toString() = data
+        override fun delete(): Boolean {
             val selection = "${MediaStore.MediaColumns._ID} == ?"
             val selectionArgs = arrayOf(id.toString())
             return cr.delete(uri, selection, selectionArgs) == 1

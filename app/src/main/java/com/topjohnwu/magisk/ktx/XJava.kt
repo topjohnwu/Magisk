@@ -21,7 +21,8 @@ fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
     }
 }
 
-fun InputStream.writeTo(file: File) = this.copyTo(file.outputStream())
+fun InputStream.writeTo(file: File) =
+    withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
 
 inline fun <In : InputStream, Out : OutputStream> withStreams(
     inStream: In,

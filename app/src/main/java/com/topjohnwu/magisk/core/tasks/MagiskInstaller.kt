@@ -15,9 +15,9 @@ import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.ktx.withStreams
-import com.topjohnwu.magisk.utils.MediaStoreUtils
-import com.topjohnwu.magisk.utils.MediaStoreUtils.inputStream
-import com.topjohnwu.magisk.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
@@ -49,7 +49,7 @@ abstract class MagiskInstallImpl : KoinComponent {
 
     protected lateinit var installDir: File
     private lateinit var srcBoot: String
-    private lateinit var destFile: MediaStoreUtils.MediaStoreFile
+    private lateinit var destFile: MediaStoreUtils.UriFile
     private lateinit var zipUri: Uri
 
     protected val console: MutableList<String>
@@ -233,12 +233,12 @@ abstract class MagiskInstallImpl : KoinComponent {
                 }
                 it.reset()
                 if (magic.contentEquals("ustar".toByteArray())) {
-                    destFile = MediaStoreUtils.newFile("magisk_patched.tar")
+                    destFile = MediaStoreUtils.getFile("magisk_patched.tar")
                     handleTar(it)
                 } else {
                     // Raw image
                     srcBoot = File(installDir, "boot.img").path
-                    destFile = MediaStoreUtils.newFile("magisk_patched.img")
+                    destFile = MediaStoreUtils.getFile("magisk_patched.img")
                     console.add("- Copying image to cache")
                     FileOutputStream(srcBoot).use { out -> it.copyTo(out) }
                 }

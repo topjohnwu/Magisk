@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ktx.get
-import com.topjohnwu.magisk.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
@@ -31,7 +31,7 @@ sealed class Subject : Parcelable {
 
         @IgnoredOnParcel
         override val file by lazy {
-            MediaStoreUtils.newFile(title).uri
+            MediaStoreUtils.getFile(title).uri
         }
     }
 
