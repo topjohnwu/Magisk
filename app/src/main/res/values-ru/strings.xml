@@ -174,6 +174,7 @@
     <string name="settings_su_biometric_summary">Использовать биометрическую аутентификацию для запросов прав суперпользователя</string>
     <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
     <string name="settings_customization">Персонализация</string>
+    <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после скрытия</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только владелец</string>
@@ -231,5 +232,7 @@
     <string name="unsupport_magisk_title">Неподдерживаемая версия Magisk</string>
     <string name="unsupport_magisk_msg">Эта версия Magisk Manager не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, как будто Magisk не установлен, пожалуйста, обновите Magisk как можно быстрее.</string>
     <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу!</string>
+    <string name="add_shortcut_title">Создание ярлыка</string>
+    <string name="add_shortcut_msg">После скрытия Magisk Manager его имя и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
 
 </resources>
