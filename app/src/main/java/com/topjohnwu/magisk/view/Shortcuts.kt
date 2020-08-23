@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.view
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
@@ -7,8 +8,6 @@ import android.content.pm.ShortcutManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
-import androidx.core.content.pm.ShortcutInfoCompat
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
@@ -25,14 +24,16 @@ object Shortcuts {
         }
     }
 
+    @TargetApi(26)
     fun addHomeIcon(context: Context) {
+        val manager = context.getSystemService<ShortcutManager>() ?: return
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return
-        val info = ShortcutInfoCompat.Builder(context, Const.Nav.HOME)
+        val info = ShortcutInfo.Builder(context, Const.Nav.HOME)
             .setShortLabel(context.getString(R.string.app_name))
             .setIntent(intent)
-            .setIcon(context.getIconCompat(R.drawable.ic_launcher))
+            .setIcon(context.getIcon(R.drawable.ic_launcher))
             .build()
-        ShortcutManagerCompat.requestPinShortcut(context, info, null)
+        manager.requestPinShortcut(info, null)
     }
 
     private fun Context.getIconCompat(id: Int): IconCompat {
