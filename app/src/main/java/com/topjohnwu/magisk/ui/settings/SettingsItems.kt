@@ -78,19 +78,19 @@ object Hide : BaseSettingsItem.Input() {
     override val title = R.string.settings_hide_manager_title.asTransitive()
     override val description = R.string.settings_hide_manager_summary.asTransitive()
 
-    override var value = "Manager"
+    override var value = ""
         set(value) = setV(value, field, { field = it })
 
     override val inputResult
         get() = if (isError) null else result
 
     @get:Bindable
-    var result = value
+    var result = "Manager"
         set(value) = set(value, field, { field = it }, BR.result, BR.error)
 
     @get:Bindable
     val isError
-        get() = value.length > 14 || value.isBlank()
+        get() = result.length > 14 || result.isBlank()
 
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
