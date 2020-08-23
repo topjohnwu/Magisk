@@ -123,6 +123,8 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Zoradenie</string>
     <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
+    <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
+    <string name="add_shortcut_msg">Po skrytí Magisk Managera sa môžu jeho názov a ikona ťažko rozpoznať. Chcete pridať odkaz na domovskú obrazovku?</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Režim motívu</string>
@@ -174,6 +176,7 @@
     <string name="settings_su_biometric_summary">Použije biometrickú autentifikáciu na povolenie žiadostí Superužívateľa</string>
     <string name="no_biometric">Nepodporované zariadenie alebo žiadne biometrické nastavenia nie sú povolené</string>
     <string name="settings_customization">Prispôsobenie</string>
+    <string name="setting_add_shortcut_summary">V prípade, že sa po skrytí apky názov a ikona ťažko rozpoznávajú, pridať na domovskú obrazovku odkaz</string>
 
     <string name="multiuser_mode">Režim viacerých používateľov</string>
     <string name="settings_owner_only">Iba majiteľ zariadenia</string>
