@@ -10,18 +10,12 @@
         android:allowBackup="true"
         tools:ignore="AllowBackup">
 
-        <activity
-            android:name="a.a"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        <activity android:name="a.a">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="a.r"
-            tools:node="remove"/>
 
     </application>
 

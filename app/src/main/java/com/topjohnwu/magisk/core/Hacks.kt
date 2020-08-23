@@ -16,7 +16,6 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.DynAPK
-import com.topjohnwu.magisk.ProcessPhoenix
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
@@ -152,8 +151,7 @@ private object ClassMap {
         SplashActivity::class.java to a.c::class.java,
         GeneralReceiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
-        SuRequestActivity::class.java to a.m::class.java,
-        ProcessPhoenix::class.java to a.r::class.java
+        SuRequestActivity::class.java to a.m::class.java
     )
 
     operator fun get(c: Class<*>) = map.getOrElse(c) { c }

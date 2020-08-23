@@ -2,6 +2,10 @@
 # Magisk Manager internal scripts
 ##################################
 
+run_delay() {
+  (sleep $1; $2)&
+}
+
 env_check() {
   for file in busybox magisk magiskboot magiskinit util_functions.sh boot_patch.sh; do
     [ -f $MAGISKBIN/$file ] || return 1

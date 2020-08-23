@@ -3,15 +3,14 @@ package com.topjohnwu.magisk.core.download
 import androidx.core.net.toFile
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.DynAPK
-import com.topjohnwu.magisk.ProcessPhoenix
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Action.APK.Restore
 import com.topjohnwu.magisk.core.download.Action.APK.Upgrade
-import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.PatchAPK
+import com.topjohnwu.magisk.ktx.relaunchApp
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.Shell
@@ -46,7 +45,7 @@ private suspend fun DownloadService.upgrade(apk: File, id: Int) {
             patch(apk, id)
         } else {
             // Simply relaunch the app
-            ProcessPhoenix.triggerRebirth(this, intent<ProcessPhoenix>())
+            relaunchApp(this)
         }
     } else {
         patch(apk, id)
