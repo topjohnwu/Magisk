@@ -344,7 +344,9 @@ abstract class MagiskInstallImpl : KoinComponent {
     private suspend fun postOTA(): Boolean {
         val bootctl = SuFile("/data/adb/bootctl")
         try {
-            service.fetchBootctl().byteStream().copyTo(SuFileOutputStream(bootctl))
+            withStreams(service.fetchBootctl().byteStream(), SuFileOutputStream(bootctl)) {
+                it, out -> it.copyTo(out)
+            }
         } catch (e: IOException) {
             console.add("! Unable to download bootctl")
             Timber.e(e)
