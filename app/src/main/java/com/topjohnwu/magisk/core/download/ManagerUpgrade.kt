@@ -45,6 +45,7 @@ private suspend fun DownloadService.upgrade(apk: File, id: Int) {
             patch(apk, id)
         } else {
             // Simply relaunch the app
+            stopSelf()
             relaunchApp(this)
         }
     } else {
