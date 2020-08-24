@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.core.Info" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.install.InstallViewModel" />
@@ -45,66 +47,81 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:minHeight="?listPreferredItemHeightSmall">
+                            android:orientation="horizontal">
 
                             <ImageView
-                                android:id="@+id/install_step_options_icon"
                                 style="@style/WidgetFoundation.Icon"
                                 isSelected="@{viewModel.step > 0}"
                                 android:layout_marginStart="@dimen/l_25"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
                                 app:srcCompat="@drawable/ic_check_circle_md2" />
 
                             <TextView
-                                android:id="@+id/install_step_options_title"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:layout_marginStart="@dimen/l1"
-                                android:gravity="start"
                                 android:text="@string/install_options_title"
                                 android:textAppearance="@style/AppearanceFoundation.Body"
                                 android:textStyle="bold"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/install_step_options_button"
-                                app:layout_constraintStart_toEndOf="@+id/install_step_options_icon"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:gravity="center_vertical"
+                                android:layout_weight="1"/>
 
                             <Button
-                                android:id="@+id/install_step_options_button"
                                 style="@style/WidgetFoundation.Button.Text"
                                 gone="@{viewModel.step != 0}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:onClick="@{() -> viewModel.step(1)}"
-                                android:text="@string/install_next"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:text="@string/install_next" />
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                        </LinearLayout>
 
-                        <FrameLayout
+                        <LinearLayout
                             gone="@{viewModel.step != 0}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:orientation="vertical"
                             android:paddingStart="3dp"
-                            android:paddingEnd="3dp">
+                            android:paddingEnd="3dp"
+                            android:layout_marginStart="@dimen/l1"
+                            android:layout_marginTop="@dimen/l_50"
+                            android:layout_marginEnd="@dimen/l1"
+                            android:layout_marginBottom="@dimen/l_50"
+                            tools:layout_gravity="center">
 
-                            <include
-                                layout="@layout/include_install_options"
-                                android:layout_width="match_parent"
+                            <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/l1"
-                                android:layout_marginTop="@dimen/l_50"
-                                android:layout_marginEnd="@dimen/l1"
-                                android:layout_marginBottom="@dimen/l_50" />
+                                android:layout_gravity="start|center_vertical"
+                                android:checked="@={Info.keepVerity}"
+                                android:gravity="center"
+                                android:text="@string/keep_dm_verity"
+                                tools:checked="true" />
 
-                        </FrameLayout>
+                            <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="start|center_vertical"
+                                android:checked="@={Info.keepEnc}"
+                                android:gravity="center"
+                                android:text="@string/keep_force_encryption"
+                                app:tint="?colorPrimary" />
+
+                            <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="start|center_vertical"
+                                android:checked="@={Info.recovery}"
+                                android:gravity="center"
+                                android:text="@string/recovery_mode"
+                                app:tint="?colorPrimary" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -124,49 +141,37 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:minHeight="?listPreferredItemHeightSmall">
+                            android:orientation="horizontal">
 
                             <ImageView
-                                android:id="@+id/install_step_method_icon"
                                 style="@style/WidgetFoundation.Icon"
                                 isSelected="@{viewModel.step > 1}"
                                 android:layout_marginStart="@dimen/l_25"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
                                 app:srcCompat="@drawable/ic_check_circle_md2" />
 
                             <TextView
-                                android:id="@+id/install_step_method_title"
                                 android:layout_width="0dp"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:layout_marginStart="@dimen/l1"
-                                android:gravity="start"
                                 android:text="@string/install_method_title"
                                 android:textAppearance="@style/AppearanceFoundation.Body"
                                 android:textStyle="bold"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/install_step_method_button"
-                                app:layout_constraintStart_toEndOf="@+id/install_step_method_icon"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:gravity="center_vertical"
+                                android:layout_weight="1"/>
 
                             <Button
-                                android:id="@+id/install_step_method_button"
                                 style="@style/WidgetFoundation.Button.Text"
                                 gone="@{viewModel.step != 1}"
                                 isEnabled="@{viewModel.method == @id/method_patch ? viewModel.data != null : viewModel.method != -1}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:onClick="@{() -> viewModel.step(2)}"
-                                android:text="@string/install_next"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:text="@string/install_next" />
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                        </LinearLayout>
 
                         <RadioGroup
                             gone="@{viewModel.step != 1}"
@@ -180,7 +185,7 @@
                             android:paddingStart="3dp"
                             android:paddingEnd="3dp">
 
-                            <com.google.android.material.radiobutton.MaterialRadioButton
+                            <RadioButton
                                 android:id="@+id/method_download"
                                 style="@style/WidgetFoundation.RadioButton"
                                 android:layout_width="match_parent"
@@ -188,14 +193,14 @@
                                 android:text="@string/download_zip_only"
                                 tools:checked="true" />
 
-                            <com.google.android.material.radiobutton.MaterialRadioButton
+                            <RadioButton
                                 android:id="@+id/method_patch"
                                 style="@style/WidgetFoundation.RadioButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/select_patch_file" />
 
-                            <com.google.android.material.radiobutton.MaterialRadioButton
+                            <RadioButton
                                 android:id="@+id/method_direct"
                                 style="@style/WidgetFoundation.RadioButton"
                                 gone="@{!viewModel.rooted}"
@@ -203,7 +208,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="@string/direct_install" />
 
-                            <com.google.android.material.radiobutton.MaterialRadioButton
+                            <RadioButton
                                 android:id="@+id/method_inactive_slot"
                                 style="@style/WidgetFoundation.RadioButton"
                                 gone="@{!viewModel.isRooted || !viewModel.isAB}"

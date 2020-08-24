@@ -174,7 +174,6 @@
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
         <item name="tint">?colorPrimary</item>
-        <item name="buttonCompat">@drawable/ic_compound_checkbox</item>
     </style>
 
     <style name="WidgetFoundation.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
@@ -183,7 +182,6 @@
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
         <item name="tint">?colorPrimary</item>
-        <item name="buttonCompat">@drawable/ic_compound_checkbox</item>
     </style>
 
     <style name="WidgetFoundation.ProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
