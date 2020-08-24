@@ -6,6 +6,7 @@
     <data>
 
         <import type="com.topjohnwu.magisk.core.Info" />
+        <import type="com.topjohnwu.magisk.core.Config" />
 
         <variable
             name="viewModel"
@@ -35,6 +36,7 @@
                 android:paddingTop="@dimen/l1">
 
                 <com.google.android.material.card.MaterialCardView
+                    gone="@{viewModel.skipOptions}"
                     style="@style/WidgetFoundation.Card.Variant"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -92,31 +94,34 @@
                             tools:layout_gravity="center">
 
                             <CheckBox
+                                gone="@{Info.isSAR}"
                                 style="@style/WidgetFoundation.Checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="start|center_vertical"
-                                android:checked="@={Info.keepVerity}"
+                                android:checked="@={Config.keepVerity}"
                                 android:gravity="center"
                                 android:text="@string/keep_dm_verity"
                                 tools:checked="true" />
 
                             <CheckBox
+                                gone="@{Info.isFBE}"
                                 style="@style/WidgetFoundation.Checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="start|center_vertical"
-                                android:checked="@={Info.keepEnc}"
+                                android:checked="@={Config.keepEnc}"
                                 android:gravity="center"
                                 android:text="@string/keep_force_encryption"
                                 app:tint="?colorPrimary" />
 
                             <CheckBox
+                                gone="@{Info.ramdisk}"
                                 style="@style/WidgetFoundation.Checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="start|center_vertical"
-                                android:checked="@={Info.recovery}"
+                                android:checked="@={Config.recovery}"
                                 android:gravity="center"
                                 android:text="@string/recovery_mode"
                                 app:tint="?colorPrimary" />
@@ -168,8 +173,10 @@
                                 isEnabled="@{viewModel.method == @id/method_patch ? viewModel.data != null : viewModel.method != -1}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:onClick="@{() -> viewModel.step(2)}"
-                                android:text="@string/install_next" />
+                                android:onClick="@{() -> viewModel.install()}"
+                                android:text="@string/install_start"
+                                app:icon="@drawable/ic_forth_md2"
+                                app:iconGravity="textEnd"/>
 
                         </LinearLayout>
 
@@ -211,7 +218,7 @@
                             <RadioButton
                                 android:id="@+id/method_inactive_slot"
                                 style="@style/WidgetFoundation.RadioButton"
-                                gone="@{!viewModel.isRooted || !viewModel.isAB}"
+                                gone="@{!viewModel.isRooted || !Info.isAB}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/install_inactive_slot" />
@@ -224,7 +231,6 @@
 
                 <com.google.android.material.card.MaterialCardView
                     style="@style/WidgetFoundation.Card.Variant"
-                    gone="@{viewModel.step != 0}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/l1"
@@ -242,18 +248,6 @@
                         markdownText="@{viewModel.notes}"/>
 
                 </com.google.android.material.card.MaterialCardView>
-
-                <Button
-                    style="@style/WidgetFoundation.Button.Text"
-                    gone="@{viewModel.step != 2}"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_margin="@dimen/l1"
-                    android:onClick="@{() -> viewModel.install()}"
-                    android:text="@string/install_start"
-                    app:icon="@drawable/ic_forth_md2"
-                    app:iconGravity="textEnd" />
 
             </LinearLayout>
 

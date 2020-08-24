@@ -26,14 +26,10 @@ object Info {
 
     var remote = UpdateInfo()
 
-    // Toggle-able options
-    @JvmStatic var keepVerity = false
-    @JvmStatic var keepEnc = false
-    @JvmStatic var recovery = false
-
-    // Immutable device state
+    // Device state
     @JvmStatic var isSAR = false
     @JvmStatic var isAB = false
+    @JvmStatic var isFBE = false
     @JvmStatic var ramdisk = false
     @JvmStatic var hasGMS = true
 

@@ -1,13 +1,13 @@
 package com.topjohnwu.magisk.ktx
 
 import android.content.Context
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-fun reboot(reason: String = if (Info.recovery) "recovery" else "") {
+fun reboot(reason: String = if (Config.recovery) "recovery" else "") {
     Shell.su("/system/bin/svc power reboot $reason || /system/bin/reboot $reason").submit()
 }
 

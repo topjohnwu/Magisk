@@ -25,11 +25,11 @@ class InstallViewModel(
     stringRepo: StringRepository
 ) : BaseViewModel(State.LOADED) {
 
-    val isRooted get() = Shell.rootAccess()
-    val isAB get() = Info.isAB
+    val isRooted = Shell.rootAccess()
+    val skipOptions = Info.ramdisk && Info.isFBE && Info.isSAR
 
     @get:Bindable
-    var step = 0
+    var step = if (skipOptions) 1 else 0
         set(value) = set(value, field, { field = it }, BR.step)
 
     @get:Bindable

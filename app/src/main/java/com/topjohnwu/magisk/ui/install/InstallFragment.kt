@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.core.download.BaseDownloadService
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
 import com.topjohnwu.magisk.events.RequestFileEvent
+import com.topjohnwu.magisk.ktx.coroutineScope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class InstallFragment : BaseUIFragment<InstallViewModel, FragmentInstallMd2Binding>() {
@@ -24,7 +25,7 @@ class InstallFragment : BaseUIFragment<InstallViewModel, FragmentInstallMd2Bindi
         requireActivity().setTitle(R.string.install)
 
         // Allow markwon to run in viewmodel scope
-        binding.releaseNotes.tag = viewModel.viewModelScope
+        binding.releaseNotes.coroutineScope = viewModel.viewModelScope
         BaseDownloadService.observeProgress(this, viewModel::onProgressUpdate)
     }
 

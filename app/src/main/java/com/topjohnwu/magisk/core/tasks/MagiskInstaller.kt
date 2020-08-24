@@ -9,15 +9,15 @@ import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.ktx.withStreams
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
@@ -272,8 +272,8 @@ abstract class MagiskInstallImpl : KoinComponent {
             return false
         }
 
-        if (!("KEEPFORCEENCRYPT=${Info.keepEnc} KEEPVERITY=${Info.keepVerity} " +
-                "RECOVERYMODE=${Info.recovery} sh update-binary " +
+        if (!("KEEPFORCEENCRYPT=${Config.keepEnc} KEEPVERITY=${Config.keepVerity} " +
+                "RECOVERYMODE=${Config.recovery} sh update-binary " +
                 "sh boot_patch.sh $srcBoot").sh().isSuccess) {
             return false
         }
