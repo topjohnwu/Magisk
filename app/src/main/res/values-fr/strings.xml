@@ -174,7 +174,7 @@
     <string name="settings_su_biometric_summary">Utiliser l’authentification biométrique pour autoriser les accès en super‑utilisateur</string>
     <string name="no_biometric">L’appareil n’est pas pris en charge ou alors aucun paramètre biométrique n’est activé</string>
     <string name="settings_customization">Personnalisation</string>
-    <string name="setting_add_shortcut_summary">Ajouter un joli raccourci dans l'écran d'accueil au cas où le nom et l'icône seraient difficiles à reconnaître après avoir masqué l'application</string>
+    <string name="setting_add_shortcut_summary">Ajouter un joli raccourci dans l’écran d’accueil au cas où le nom et l’icône seraient difficiles à reconnaître après avoir masqué l’application</string>
 
     <string name="multiuser_mode">Mode multi‑utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
@@ -231,8 +231,8 @@
     <string name="authenticate">Authentification</string>
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
     <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
-    <string name="external_rw_permission_denied">Permettre l\'accès au stockage pour activer cette fonctionnalité</string>
-    <string name="add_shortcut_title">Ajouter un raccourcis à l'écran d'accueil</string>
-    <string name="add_shortcut_msg">Après avoir caché Magisk Manager, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez-vous ajouter un joli raccourci vers l'écran d'accueil ?</string>
+    <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
+    <string name="add_shortcut_title">Ajouter un raccourcis à l’écran d’accueil</string>
+    <string name="add_shortcut_msg">Après avoir caché Magisk Manager, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez-vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
 
 </resources>
