@@ -358,8 +358,9 @@ def build_stub(args):
     build_apk(args, 'stub')
 
 
-# Bind mount snet package on top of the stub folder
 def build_snet(args):
+    if not op.exists(op.join('snet', 'src', 'main', 'java', 'com', 'topjohnwu', 'snet')):
+        error('snet sources have to be bind mounted on top of the stub folder')
     header('* Building snet extension')
     proc = execv([gradlew, 'stub:assembleRelease'])
     if proc.returncode != 0:
@@ -593,6 +594,12 @@ app_parser.set_defaults(func=build_app)
 stub_parser = subparsers.add_parser(
     'stub', help='build stub Magisk Manager')
 stub_parser.set_defaults(func=build_stub)
+
+# Need to bind mount snet sources on top of stub folder
+# Note: source code for the snet extension is *NOT* public
+snet_parser = subparsers.add_parser(
+    'snet', help='build snet extension')
+snet_parser.set_defaults(func=build_snet)
 
 zip_parser = subparsers.add_parser(
     'zip', help='zip Magisk into a flashable zip')
