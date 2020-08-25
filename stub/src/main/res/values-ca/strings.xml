@@ -3,4 +3,5 @@
     <string name="upgrade_msg">Fes una actualització total de Magisk Manager per finalitzar l\'instal·lació. Descarregar i instal·lar?</string>
     <string name="no_internet_msg">Si us plau, connecta\'t a internet! Es necessari fer una actualització total de Magisk Manager.</string>
     <string name="dling">Baixant</string>
+    <string name="relaunch_app">Torni a obrir l\'aplicació manualment, si us plau</string>
 </resources>
