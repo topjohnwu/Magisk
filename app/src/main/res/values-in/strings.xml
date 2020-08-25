@@ -230,7 +230,7 @@
     <string name="setup_msg">Memproses penyiapan lingkungan…</string>
     <string name="authenticate">Autentikasi</string>
     <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
-    <string name="unsupport_magisk_msg">Versi Magisk Manager ini tidak mendukung Magisk dibawah versi %1$s.\n\nAplikasi akan berperilaku seolah-olah Magisk tidak terinstal, harap meningkatkan Magisk sesegera mungkin.</string>
+    <string name="unsupport_magisk_msg">Versi Magisk Manager ini tidak mendukung Magisk di bawah versi %1$s.\n\nAplikasi akan berperilaku seolah-olah Magisk tidak terinstal, harap meningkatkan Magisk sesegera mungkin.</string>
     <string name="external_rw_permission_denied">Izinkan akses penyimpanan untuk mengaktifkan fungsi ini</string>
     <string name="add_shortcut_title">Tambahkan pintasan ke layar utama</string>
     <string name="add_shortcut_msg">Setelah menyembunyikan Magisk Manager, nama dan ikonnya mungkin menjadi sulit untuk dikenali. Apakah Anda ingin menambahkan pintasan yang menarik pada layar utama?</string>
