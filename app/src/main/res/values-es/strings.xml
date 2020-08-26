@@ -22,16 +22,17 @@
     <string name="status">Estado</string>
     <string name="home_package">Paquete</string>
 
-    <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto. Una versión de origen desconocido podría realizar acciones maliciosas.</string>
+    <string name="home_notice_content">Siempre asegúrate de que estás usando el software de código abierto Magisk Manager. Un Manager de fuente desconocida puede realizar acciones maliciosas.</string>
     <string name="home_support_title">Apóyenos</string>
     <string name="home_item_source">Código fuente</string>
-    <string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
+    <string name="home_support_content">Magisk es, y siempre será gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
     <string name="home_status_normal">Normal</string>
+    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Instalado</string>
     <string name="home_latest_version">Última</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados/eliminados. El acceso root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
+    <string name="uninstall_magisk_msg">¡Todos los módulos serán desactivados/eliminados!\nSe eliminará la raíz!\n¡Sus datos serán potencialmente encriptados si no lo están ya!</string>
     <string name="home_check_safetynet">Revisar SafetyNet</string>
 
     <!--Install-->
@@ -46,7 +47,7 @@
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
     <string name="direct_install">Instalación directa (recomendado)</string>
     <string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
-    <string name="install_inactive_slot_msg">¡Su dispositivo será forzado a arrancar en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\n¿Continuar?</string>
+    <string name="install_inactive_slot_msg">¡Su dispositivo será forzado a arrancar en la ranura inactiva actual después de un reinicio!\nSólo use esta opción después de que OTA haya terminado.\n¿Continuar?</string>
     <string name="setup_title">Configuración adicional</string>
     <string name="select_patch_file">Seleccionar y parchar un archivo</string>
     <string name="patch_file_msg">Seleccione una imagen raw (*.img) o un archivo tar de ODIN (*.tar)</string>
@@ -119,7 +120,7 @@
     <string name="module_state_restore">Restaurar</string>
     <string name="module_action_install_external">Instalar desde almacenamiento</string>
     <string name="update_available">Actualización disponible</string>
-    <string name="home_installed_version">Instalado</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">En línea</string>
     <string name="sorting_order">Clasificar por</string>
 
