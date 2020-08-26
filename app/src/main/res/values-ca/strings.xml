@@ -32,7 +32,8 @@
     <string name="home_latest_version">Última</string>
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
-    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés arrel s\'eliminarà i, possiblement, xifrarà totes les dades (si no estan ja xifrades).</string>
+    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats i eliminats! L\'accés d\'arrel s\'eliminarà i, possiblement, xifrarà totes les dades (si no estan ja xifrades).</string>
+    <string name="home_check_safetynet">Comprova SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
@@ -42,7 +43,7 @@
     <string name="install_method_title">Mètode</string>
     <string name="install_next">Següent</string>
     <string name="install_start">Endavant</string>
-    <string name="manager_download_install">Premi per baixar i instal·lar.</string>
+    <string name="manager_download_install">Premi per baixar i instal·lar</string>
     <string name="download_zip_only">Únicament baixa el ZIP</string>
     <string name="direct_install">Instal·lació directa (Recomanat)</string>
     <string name="install_inactive_slot">Instal·la a la ranura inactiva (Després d\'una OTA)</string>
@@ -73,7 +74,7 @@
     <string name="su_snack_notif_off">Notificacions de %1$s deshabilitades</string>
     <string name="su_snack_log_on">Registres de %1$s habilitats</string>
     <string name="su_snack_log_off">Registres de %1$s deshabilitats</string>
-    <string name="su_revoke_title">¿Revocar?</string>
+    <string name="su_revoke_title">Revocar?</string>
     <string name="su_revoke_msg">Confirmi per revocar drets de %1$s</string>
     <string name="toast">Avís</string>
     <string name="none">Cap</string>
@@ -87,7 +88,7 @@
     <string name="log_data_magisk_none">Els registre de Magisk estan buits. Això és estrany.</string>
     <string name="menuSaveLog">Desar registre</string>
     <string name="menuClearLog">Netejar registre ara</string>
-    <string name="logs_cleared">Registre netejat correctament</string>
+    <string name="logs_cleared">Registre netejat correctament.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID de l\'objectiu: %1$d</string>
 
@@ -120,8 +121,8 @@
     <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="update_available">Actualització Disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">En línia</string>
     <string name="sorting_order">Ordre de Classificació</string>
-    <string name="external_rw_permission_denied">Garanteix permís d\'emmagatzematge per activar aquesta funcionalitat</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode del tema</string>
@@ -133,7 +134,7 @@
     <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
     <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
     <string name="settings_clear_cache_summary">Neteja la informació en memòria cau per als repositoris en línia. Força a l\'aplicació a actualitzar-se en línia.</string>
-    <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
+    <string name="settings_hide_manager_title">Amagar Magisk Manager</string>
     <string name="settings_hide_manager_summary">Torna a empaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
     <string name="settings_restore_manager_title">Restaurar Magisk Manager</string>
     <string name="settings_restore_manager_summary">Restaura Magisk Manager amb el nom de paquet original</string>
@@ -146,7 +147,7 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalitzat</string>
     <string name="settings_update_custom_msg">Inserta un URL personalitzada</string>
-    <string name="settings_magiskhide_summary">Ocultar Magisk de vàries deteccions</string>
+    <string name="settings_magiskhide_summary">Amagar Magisk de diverses deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
@@ -173,21 +174,22 @@
     <string name="settings_su_biometric_summary">Utilitza l\'autenticació biomètrica per permetre sol·licituds de superusuari</string>
     <string name="no_biometric">El dispositiu no suporta o no té establerta configuració biomètrica</string>
     <string name="settings_customization">Personalització</string>
+    <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d'amagar l\'aplicació.</string>
 
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
     <string name="settings_owner_manage">Administrador del Dispositiu</string>
     <string name="settings_user_independent">Usuari Independent</string>
     <string name="owner_only_summary">Només l\'administrador té accés d\'arrel</string>
-    <string name="owner_manage_summary">Només l\'administrador pot supervisar l\'acces d\'arrel y rebre sol·licituds d\'altres usuaris</string>
-    <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel </string>
+    <string name="owner_manage_summary">Només l\'administrador pot supervisar l\'accés d\'arrel i rebre sol·licituds d\'altres usuaris</string>
+    <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel</string>
 
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>
     <string name="settings_ns_requester">Heretar Namespace</string>
     <string name="settings_ns_isolate">Aïllar Namespace</string>
     <string name="global_summary">Totes les sessions d\'arrel utilitzen el suport Namespace Global</string>
-    <string name="requester_summary">Les sessions d\'arrel heretaran les peticiones Namespace</string>
+    <string name="requester_summary">Les sessions d\'arrel heretaran les peticions Namespace</string>
     <string name="isolate_summary">Totes les sessions d\'arrel tindran la seva pròpia Namespace</string>
 
     <!--Notifications-->
@@ -212,22 +214,25 @@
     <string name="flashing">Arranjament…</string>
     <string name="done">Fet!</string>
     <string name="failure">Fallit</string>
-    <string name="hide_manager_title">Ocultant Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">L\'ocultació de Magisk Manager ha fallat.</string>
-    <string name="open_link_failed_toast">No s\'ha trobat una aplicació per obrir l\'enllaç.</string>
+    <string name="hide_manager_title">Amagant Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">No s\'ha pogut amagar Magisk Manager.</string>
+    <string name="open_link_failed_toast">No s\'ha trobat una aplicació per obrir l\'enllaç</string>
     <string name="complete_uninstall">Desinstal·lació completa</string>
     <string name="restore_img">Restaura imatges</string>
     <string name="restore_img_msg">Restaurant…</string>
     <string name="restore_done">Restauració feta!</string>
-    <string name="restore_fail">La còpia de seguretat de Stock no existeix!</string>
+    <string name="restore_fail">La còpia de seguretat de Estock no existeix!</string>
     <string name="proprietary_title">Baixar codi propietari</string>
-    <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nVol permetre que Magisk Manager baixi una extensió que conté la GoogleApiClient per poder fer la comprovació de SafetyNet?</string>
-    <string name="setup_fail">Instal·lació fallida.</string>
+    <string name="proprietary_notice">Magisk Manager és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nVol permetre que Magisk Manager baixi una extensió (que conté la GoogleApiClient) per poder fer la comprovació de SafetyNet?</string>
+    <string name="setup_fail">Instal·lació fallida</string>
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
-    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk , vol procedir a la instal·lació ara?</string>
+    <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk, vol procedir a la instal·lació ara?</string>
     <string name="setup_msg">S\'està executant la configuració de l\'entorn…</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
-    <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk com més aviat millor..</string>
+    <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk com més aviat millor.</string>
+    <string name="external_rw_permission_denied">Ha de donar permís d\'emmagatzematge per activar aquesta funcionalitat</string>
+    <string name="add_shortcut_title">Afegeix una drecera a la pantalla d\'inici</string>
+    <string name="add_shortcut_msg">Després d\'amagar Magisk Manager, el seu nom i icona poden ser difícils de reconèixer. Vols afegir una bonica drecera a la teva pantalla d\'inici?</string>
 
 </resources>
