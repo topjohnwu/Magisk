@@ -55,10 +55,12 @@ class MagiskDialog(
             )
         }
 
+        val paddingTop = binding.root.paddingTop
+        val paddingBottom = binding.root.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             view.updatePadding(
-                top = view.paddingTop + insets.systemWindowInsetTop,
-                bottom = view.paddingBottom + insets.systemWindowInsetBottom
+                top = paddingTop + insets.systemWindowInsetTop,
+                bottom = paddingBottom + insets.systemWindowInsetBottom
             )
             insets
         }
