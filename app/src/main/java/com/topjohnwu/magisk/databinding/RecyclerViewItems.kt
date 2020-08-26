@@ -28,10 +28,17 @@ abstract class RvItem {
 
 abstract class ComparableRvItem<in T> : RvItem() {
 
-    abstract fun itemSameAs(other: T): Boolean
-    abstract fun contentSameAs(other: T): Boolean
+    // Use Any.equals by default
+    open fun itemSameAs(other: T) = this == other
+
+    // Use compareTo if this is Comparable or assume not same
+    @Suppress("UNCHECKED_CAST")
+    open fun contentSameAs(other: T) =
+        (this as? Comparable<T>)?.run { compareTo(other) == 0 } ?: false
+
     @Suppress("UNCHECKED_CAST")
     open fun genericItemSameAs(other: Any): Boolean = other::class == this::class && itemSameAs(other as T)
+
     @Suppress("UNCHECKED_CAST")
     open fun genericContentSameAs(other: Any): Boolean = other::class == this::class && contentSameAs(other as T)
 

@@ -17,7 +17,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModules = module {
-    viewModel { HideViewModel(get()) }
+    viewModel { HideViewModel() }
     viewModel { HomeViewModel(get()) }
     viewModel { LogViewModel(get()) }
     viewModel { ModuleViewModel(get(), get(), get()) }

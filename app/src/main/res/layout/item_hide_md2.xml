@@ -39,12 +39,12 @@
                     android:id="@+id/hide_icon"
                     style="@style/WidgetFoundation.Image"
                     android:layout_margin="@dimen/l1"
-                    android:src="@{item.item.info.icon}"
+                    android:src="@{item.info.iconImage}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0"
-                    tools:src="@drawable/ic_magisk" />
+                    tools:src="@drawable/ic_launcher" />
 
                 <TextView
                     android:id="@+id/hide_name"
@@ -53,7 +53,7 @@
                     android:layout_marginStart="@dimen/l1"
                     android:ellipsize="middle"
                     android:singleLine="true"
-                    android:text="@{item.item.info.name}"
+                    android:text="@{item.info.label}"
                     android:textAppearance="@style/AppearanceFoundation.Body"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@+id/hide_package"
@@ -65,10 +65,9 @@
 
                 <TextView
                     android:id="@+id/hide_package"
-                    gone="@{item.item.info.info.packageName.empty}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@{item.item.info.info.packageName}"
+                    android:text="@{item.info.packageName}"
                     android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/hide_name"
@@ -90,7 +89,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 goneUnless="@{item.isExpanded}"
                 itemBinding="@{viewModel.itemInternalBinding}"
-                items="@{item.items}"
+                items="@{item.processes}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?colorSurfaceVariant"
@@ -105,7 +104,7 @@
             style="@style/WidgetFoundation.ProgressBar"
             android:layout_width="match_parent"
             android:layout_gravity="top"
-            android:progress="@{item.itemsCheckedPercent}" />
+            android:progress="@{item.checkedPercent}" />
 
     </com.google.android.material.card.MaterialCardView>
 

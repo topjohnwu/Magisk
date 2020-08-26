@@ -65,40 +65,22 @@ val PackageInfo.processes
 
 val Array<out ComponentInfo>.processNames get() = mapNotNull { it.processName }
 
-val ApplicationInfo.packageInfo: PackageInfo?
-    get() {
-        val pm: PackageManager by inject()
+val ApplicationInfo.packageInfo: PackageInfo get() {
+    val pm = get<PackageManager>()
 
-        return try {
-            val request = GET_ACTIVITIES or
-                    GET_SERVICES or
-                    GET_RECEIVERS or
-                    GET_PROVIDERS
-            pm.getPackageInfo(packageName, request)
-        } catch (e1: Exception) {
-            try {
-                pm.activities(packageName).apply {
-                    services = pm.services(packageName)
-                    receivers = pm.receivers(packageName)
-                    providers = pm.providers(packageName)
-                }
-            } catch (e2: Exception) {
-                null
-            }
+    return try {
+        val request = GET_ACTIVITIES or GET_SERVICES or GET_RECEIVERS or GET_PROVIDERS
+        pm.getPackageInfo(packageName, request)
+    } catch (e: Exception) {
+        // Exceed binder data transfer limit, fetch each component type separately
+        pm.getPackageInfo(packageName, 0).apply {
+            runCatching { activities = pm.getPackageInfo(packageName, GET_ACTIVITIES).activities }
+            runCatching { services = pm.getPackageInfo(packageName, GET_SERVICES).services }
+            runCatching { receivers = pm.getPackageInfo(packageName, GET_RECEIVERS).receivers }
+            runCatching { providers = pm.getPackageInfo(packageName, GET_PROVIDERS).providers }
         }
     }
-
-fun PackageManager.activities(packageName: String) =
-    getPackageInfo(packageName, GET_ACTIVITIES)
-
-fun PackageManager.services(packageName: String) =
-    getPackageInfo(packageName, GET_SERVICES).services
-
-fun PackageManager.receivers(packageName: String) =
-    getPackageInfo(packageName, GET_RECEIVERS).receivers
-
-fun PackageManager.providers(packageName: String) =
-    getPackageInfo(packageName, GET_PROVIDERS).providers
+}
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
 

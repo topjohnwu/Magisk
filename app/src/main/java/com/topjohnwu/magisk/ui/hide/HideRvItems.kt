@@ -9,27 +9,27 @@ import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.utils.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.superuser.Shell
 import kotlin.math.roundToInt
 
 class HideItem(
-    val item: HideAppTarget,
-    viewModel: HideViewModel
-) : ObservableItem<HideItem>() {
+    app: HideAppTarget
+) : ObservableItem<HideItem>(), Comparable<HideItem> {
 
     override val layoutRes = R.layout.item_hide_md2
 
-    val packageName = item.info.info.packageName.orEmpty()
-    val items = item.processes.map { HideProcessItem(it, viewModel) }
+    val info = app.info
+    val processes = app.processes.map { HideProcessItem(it) }
 
     @get:Bindable
     var isExpanded = false
         set(value) = set(value, field, { field = it }, BR.expanded)
 
     var itemsChecked = 0
-        set(value) = set(value, field, { field = it }, BR.itemsCheckedPercent)
+        set(value) = set(value, field, { field = it }, BR.checkedPercent)
 
     @get:Bindable
-    val itemsCheckedPercent get() = (itemsChecked.toFloat() / items.size * 100).roundToInt()
+    val checkedPercent get() = (itemsChecked.toFloat() / processes.size * 100).roundToInt()
 
     private var state: Boolean? = false
         set(value) = set(value, field, { field = it }, BR.hiddenState)
@@ -39,14 +39,14 @@ class HideItem(
         get() = state
         set(value) = set(value, state, { state = it }, BR.hiddenState) {
             if (value == true) {
-                items.filterNot { it.isHidden }
+                processes.filterNot { it.isHidden }
             } else {
-                items
+                processes
             }.forEach { it.toggle() }
         }
 
     init {
-        items.forEach { it.addOnPropertyChangedCallback(BR.hidden) { recalculateChecked() } }
+        processes.forEach { it.addOnPropertyChangedCallback(BR.hidden) { recalculateChecked() } }
         recalculateChecked()
     }
 
@@ -56,37 +56,44 @@ class HideItem(
     }
 
     private fun recalculateChecked() {
-        itemsChecked = items.count { it.isHidden }
+        itemsChecked = processes.count { it.isHidden }
         state = when (itemsChecked) {
             0 -> false
-            items.size -> true
+            processes.size -> true
             else -> null
         }
     }
 
-    override fun contentSameAs(other: HideItem): Boolean = item == other.item
-    override fun itemSameAs(other: HideItem): Boolean = item.info == other.item.info
+    override fun compareTo(other: HideItem) = comparator.compare(this, other)
+
+    companion object {
+        private val comparator = compareBy<HideItem>(
+            { it.itemsChecked == 0 },
+            { it.info }
+        )
+    }
 
 }
 
 class HideProcessItem(
-    val item: StatefulProcess,
-    val viewModel: HideViewModel
+    val process: HideProcessInfo
 ) : ObservableItem<HideProcessItem>() {
 
     override val layoutRes = R.layout.item_hide_process_md2
 
     @get:Bindable
-    var isHidden = item.isHidden
+    var isHidden = process.isHidden
         set(value) = set(value, field, { field = it }, BR.hidden) {
-            viewModel.toggleItem(this)
+            val arg = if (isHidden) "add" else "rm"
+            val (name, pkg) = process
+            Shell.su("magiskhide --$arg $pkg $name").submit()
         }
 
     fun toggle() {
         isHidden = !isHidden
     }
 
-    override fun contentSameAs(other: HideProcessItem) = item == other.item
-    override fun itemSameAs(other: HideProcessItem) = item.name == other.item.name
+    override fun contentSameAs(other: HideProcessItem) = process == other.process
+    override fun itemSameAs(other: HideProcessItem) = process.name == other.process.name
 
 }

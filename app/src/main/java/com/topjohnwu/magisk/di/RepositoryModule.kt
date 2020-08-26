@@ -7,7 +7,7 @@ import org.koin.dsl.module
 
 
 val repositoryModule = module {
-    single { MagiskRepository(get(), get()) }
+    single { MagiskRepository(get()) }
     single { LogRepository(get()) }
     single { StringRepository(get()) }
 }
