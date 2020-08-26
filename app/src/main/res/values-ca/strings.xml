@@ -215,7 +215,7 @@
     <string name="done">Fet!</string>
     <string name="failure">Fallit</string>
     <string name="hide_manager_title">Amagant Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">No s'ha pogut amagar Magisk Manager.</string>
+    <string name="hide_manager_fail_toast">No s\'ha pogut amagar Magisk Manager.</string>
     <string name="open_link_failed_toast">No s\'ha trobat una aplicació per obrir l\'enllaç</string>
     <string name="complete_uninstall">Desinstal·lació completa</string>
     <string name="restore_img">Restaura imatges</string>
