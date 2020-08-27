@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.utils.set
 import org.json.JSONObject
 
 enum class SafetyNetState {
-    LOADING, PASS, FAILED, IDLE
+    LOADING, PASS, FAILED
 }
 
 data class SafetyNetResult(
@@ -42,7 +42,7 @@ class SafetynetViewModel : BaseViewModel() {
     @get:Bindable
     val isSuccess get() = currentState == PASS
 
-    private var currentState = IDLE
+    private var currentState = LOADING
         set(value) = set(value, field, { field = it }, BR.checking, BR.failed, BR.success)
 
     init {
