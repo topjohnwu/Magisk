@@ -24,6 +24,7 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.card.MaterialCardView
+            android:nextFocusRight="@id/module_indicator"
             style="@style/WidgetFoundation.Card.Variant"
             isEnabled="@{!item.removed}"
             android:layout_width="match_parent"
@@ -118,6 +119,8 @@
 
                 <ImageView
                     android:id="@+id/module_info"
+                    android:clickable="true"
+                    android:focusable="true"
                     style="@style/WidgetFoundation.Icon"
                     gone="@{item.repo == null}"
                     android:layout_width="wrap_content"
@@ -131,6 +134,8 @@
 
                 <Button
                     android:id="@+id/module_remove"
+                    android:clickable="true"
+                    android:focusable="true"
                     style="@style/WidgetFoundation.Button.Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

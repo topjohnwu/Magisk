@@ -18,6 +18,8 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
+        android:clickable="true"
+        android:onClick="@{() -> viewModel.downloadPressed(item)}"
         style="@style/WidgetFoundation.Card.Variant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

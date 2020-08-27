@@ -34,7 +34,7 @@
 
     <style name="Foundation.PopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:textColor">?colorOnSurface</item>
-        <item name="android:itemBackground">?colorSurfaceVariant</item>
+        <item name="android:itemBackground">@drawable/bg_popup_menu</item>
         <item name="android:itemTextAppearance">@style/AppearanceFoundation.Caption</item>
         <item name="android:textStyle">bold</item>
     </style>

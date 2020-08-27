@@ -18,6 +18,8 @@
     <com.google.android.material.card.MaterialCardView
         style="@style/WidgetFoundation.Card"
         isEnabled="@{item.enabled}"
+        android:clickable="@{item.enabled}"
+        android:focusable="@{item.enabled}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:alpha="@{item.enabled ? 1f : .5f}"
@@ -76,6 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:checked="@{item.checked}"
+                android:focusable="@{item.enabled}"
                 android:onCheckedChanged="@{(v, c) -> item.onToggle(v, callback, c)}"
                 goneUnless="@{item.showSwitch}"
                 isEnabled="@{item.enabled}"/>
