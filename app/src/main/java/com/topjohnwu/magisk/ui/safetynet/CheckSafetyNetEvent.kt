@@ -123,7 +123,7 @@ class CheckSafetyNetEvent(
                 titleRes = android.R.string.cancel
                 onClick { callback(SafetyNetResult(dismiss = true)) }
             }
-            .onDismiss {
+            .onCancel {
                 callback(SafetyNetResult(dismiss = true))
             }
             .reveal()
