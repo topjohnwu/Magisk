@@ -52,7 +52,6 @@ class HomeViewModel(
 
     val magiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
-    val magiskMode get() = R.string.home_status_normal.res()
 
     @get:Bindable
     var managerRemoteVersion = R.string.loading.res()
