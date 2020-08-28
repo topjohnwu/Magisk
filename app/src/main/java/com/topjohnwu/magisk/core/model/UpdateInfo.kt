@@ -35,8 +35,9 @@ data class ManagerJson(
     val note: String = ""
 ) : Parcelable
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class StubJson(
     val versionCode: Int = -1,
     val link: String = ""
-)
+) : Parcelable

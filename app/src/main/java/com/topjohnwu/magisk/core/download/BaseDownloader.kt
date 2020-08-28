@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.ktx.withStreams
-import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +28,7 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.random.Random.Default.nextInt
 
-abstract class BaseDownloadService : BaseService(), KoinComponent {
+abstract class BaseDownloader : BaseService(), KoinComponent {
 
     private val hasNotifications get() = notifications.isNotEmpty()
     private val notifications = Collections.synchronizedMap(HashMap<Int, Notification.Builder>())
@@ -41,8 +40,8 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.getParcelableExtra<Subject>(ARG_URL)?.let { subject ->
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        intent.getParcelableExtra<Subject>(ACTION_KEY)?.let { subject ->
             update(subject.notifyID())
             coroutineScope.launch {
                 try {
@@ -76,8 +75,11 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
             when (this) {
                 is Subject.Module ->  // Download and process on-the-fly
                     stream.toModule(file, service.fetchInstaller().byteStream())
-                else ->
+                else -> {
                     withStreams(stream, file.outputStream()) { it, out -> it.copyTo(out) }
+                    if (this is Subject.Manager)
+                        handleAPK(this)
+                }
             }
         }
         val newId = notifyFinish(this)
@@ -124,6 +126,7 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
     private fun notifyFinish(subject: Subject) = lastNotify(subject.notifyID()) {
         broadcast(1f, subject)
         it.setIntent(subject)
+            .setContentTitle(subject.title)
             .setContentText(getString(R.string.download_complete))
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setProgress(0, 0, false)
@@ -152,16 +155,15 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
         return newId
     }
 
-    private fun remove(id: Int) = notifications.remove(id)?.also {
-        updateForeground()
-        cancel(id)
-    }
+    protected fun remove(id: Int) = notifications.remove(id)
+        ?.also { updateForeground(); cancel(id) }
+        ?: { cancel(id); null }()
 
     private fun notify(id: Int, notification: Notification) {
         Notifications.mgr.notify(id, notification)
     }
 
-    protected fun cancel(id: Int) {
+    private fun cancel(id: Int) {
         Notifications.mgr.cancel(id)
     }
 
@@ -178,13 +180,12 @@ abstract class BaseDownloadService : BaseService(), KoinComponent {
 
     protected abstract suspend fun onFinish(subject: Subject, id: Int)
 
-    protected abstract fun Notification.Builder.setIntent(subject: Subject)
-            : Notification.Builder
+    protected abstract fun Notification.Builder.setIntent(subject: Subject): Notification.Builder
 
     // ---
 
     companion object : KoinComponent {
-        const val ARG_URL = "arg_url"
+        const val ACTION_KEY = "download_action"
 
         private val progressBroadcast = MutableLiveData<Pair<Float, Subject>>()
 

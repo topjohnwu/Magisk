@@ -78,17 +78,16 @@ class InstallViewModel(
         step = nextStep
     }
 
-    fun install() = DownloadService(get()) {
-        subject = Subject.Magisk(resolveConfiguration())
-    }.also { state = State.LOADING }
+    fun install() =
+        DownloadService(get(), Subject.Magisk(resolveAction())).also { state = State.LOADING }
 
     // ---
 
-    private fun resolveConfiguration() = when (method) {
+    private fun resolveAction() = when (method) {
         R.id.method_download -> Action.Download
         R.id.method_patch -> Action.Patch(data!!)
         R.id.method_direct -> Action.Flash.Primary
         R.id.method_inactive_slot -> Action.Flash.Secondary
-        else -> throw IllegalArgumentException("Unknown value")
+        else -> error("Unknown value")
     }
 }
