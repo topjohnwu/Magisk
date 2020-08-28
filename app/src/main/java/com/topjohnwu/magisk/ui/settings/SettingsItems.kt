@@ -11,10 +11,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.UpdateCheckService
-import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.core.utils.availableLocales
-import com.topjohnwu.magisk.core.utils.currentLocale
+import com.topjohnwu.magisk.core.utils.*
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
@@ -89,8 +86,12 @@ object Hide : BaseSettingsItem.Input() {
         set(value) = set(value, field, { field = it }, BR.result, BR.error)
 
     @get:Bindable
+    val maxLength
+        get() = PatchAPK.MAX_LABEL_LENGTH
+
+    @get:Bindable
     val isError
-        get() = result.length > 14 || result.isBlank()
+        get() = result.length > maxLength || result.isBlank()
 
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root

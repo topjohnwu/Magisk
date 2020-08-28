@@ -36,6 +36,8 @@ object PatchAPK {
     private const val APP_ID = "com.topjohnwu.magisk"
     private const val APP_NAME = "Magisk Manager"
 
+    const val MAX_LABEL_LENGTH = 32
+
     private fun genPackageName(prefix: String, length: Int): CharSequence {
         val builder = StringBuilder(length)
         builder.append(prefix)
@@ -55,45 +57,18 @@ object PatchAPK {
         return builder
     }
 
-    private fun findAndPatch(xml: ByteArray, from: CharSequence, to: CharSequence): Boolean {
-        if (to.length > from.length)
-            return false
-        val buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asCharBuffer()
-        val offList = mutableListOf<Int>()
-        var i = 0
-        loop@ while (i < buf.length - from.length) {
-            for (j in from.indices) {
-                if (buf.get(i + j) != from[j]) {
-                    ++i
-                    continue@loop
-                }
-            }
-            offList.add(i)
-            i += from.length
-        }
-        if (offList.isEmpty())
-            return false
-
-        val toBuf = to.toString().toCharArray().copyOf(from.length)
-        for (off in offList) {
-            buf.position(off)
-            buf.put(toBuf)
-        }
-        return true
-    }
-
     fun patch(apk: String, out: String, pkg: CharSequence, label: CharSequence): Boolean {
         try {
             val jar = JarMap.open(apk)
             val je = jar.getJarEntry(Const.ANDROID_MANIFEST)
-            val xml = jar.getRawData(je)
+            val xml = ByteArrayPtr(jar.getRawData(je))
 
-            if (!findAndPatch(xml, APP_ID, pkg) ||
-                !findAndPatch(xml, APP_NAME, label))
+            if (!findAndPatchAXML(xml, APP_ID, pkg, 9) ||
+                !findAndPatchAXML(xml, APP_NAME, label))
                 return false
 
             // Write apk changes
-            jar.getOutputStream(je).write(xml)
+            jar.getOutputStream(je).write(xml.ptr)
             val keys = Keygen(get())
             SignApk.sign(keys.cert, keys.key, jar, FileOutputStream(out))
         } catch (e: Exception) {
@@ -124,7 +99,7 @@ object PatchAPK {
 
         // Generate a new random package name and signature
         val repack = File(context.cacheDir, "patched.apk")
-        val pkg = genPackageName("com.", APP_ID.length)
+        val pkg = genPackageName("com.", 15 + SecureRandom().nextInt(10))
         Config.keyStoreRaw = ""
 
         if (!patch(src, repack.path, pkg, label))
