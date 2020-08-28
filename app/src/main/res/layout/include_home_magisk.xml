@@ -152,7 +152,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.env.isActive ? viewModel.magiskMode : @string/not_available}"
+                                android:text="@{Info.env.isActive ? @string/home_status_normal : @string/not_available}"
                                 tools:text="Normal" />
 
                         </LinearLayout>

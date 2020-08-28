@@ -203,9 +203,9 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 .applyTitle(R.string.add_shortcut_title)
                 .applyMessage(R.string.add_shortcut_msg)
                 .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                    titleRes = R.string.no
+                    titleRes = android.R.string.cancel
                 }.applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                    titleRes = R.string.yes
+                    titleRes = android.R.string.ok
                     onClick {
                         Shortcuts.addHomeIcon(this@MainActivity)
                     }
