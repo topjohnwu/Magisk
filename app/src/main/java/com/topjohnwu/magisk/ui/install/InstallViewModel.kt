@@ -78,8 +78,10 @@ class InstallViewModel(
         step = nextStep
     }
 
-    fun install() =
-        DownloadService(get(), Subject.Magisk(resolveAction())).also { state = State.LOADING }
+    fun install() {
+        DownloadService.start(get(), Subject.Magisk(resolveAction()))
+        state = State.LOADING
+    }
 
     // ---
 

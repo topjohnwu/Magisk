@@ -100,7 +100,7 @@ open class DownloadService : BaseDownloader() {
             }
         }
 
-        operator fun invoke(context: Context, subject: Subject) {
+        fun start(context: Context, subject: Subject) {
             val app = context.applicationContext
             if (Build.VERSION.SDK_INT >= 26) {
                 app.startForegroundService(intent(app, subject))

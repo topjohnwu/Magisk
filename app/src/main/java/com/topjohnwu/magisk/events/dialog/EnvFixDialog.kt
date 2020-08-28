@@ -31,7 +31,7 @@ class EnvFixDialog : DialogEvent() {
                         lbm.unregisterReceiver(this)
                     }
                 }, IntentFilter(DISMISS))
-                DownloadService(dialog.context, Magisk(EnvFix))
+                DownloadService.start(dialog.context, Magisk(EnvFix))
             }
         }
         .applyButton(MagiskDialog.ButtonType.NEGATIVE) {

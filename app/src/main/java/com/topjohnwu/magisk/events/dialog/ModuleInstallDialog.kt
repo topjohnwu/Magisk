@@ -15,7 +15,7 @@ class ModuleInstallDialog(private val item: Repo) : DialogEvent() {
             fun download(install: Boolean) {
                 val config = if (install) Action.Flash.Primary else Action.Download
                 val subject = Subject.Module(item, config)
-                DownloadService(context, subject)
+                DownloadService.start(context, subject)
             }
 
             applyTitle(context.getString(R.string.repo_install_title, item.name))
