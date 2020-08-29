@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">برای به پایان رساندن تنظیمات ، به نسخه کامل Magisk Manager ارتقا دهید. دانلود و نصب بشه؟</string>
+    <string name="no_internet_msg">لطفاً به اینترنت متصل شوید! برای ارتقا به نسخه کامل Magisk Manager لازم است.</string>
+    <string name="dling">درحال دانلود</string>
+    <string name="relaunch_app">لطفاً به صورت دستی برنامه را دوباره راه اندازی کنید</string>
+</resources>
