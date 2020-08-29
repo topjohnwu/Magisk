@@ -5,10 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.ComponentInfo
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
+import android.content.pm.*
 import android.content.pm.PackageManager.*
 import android.content.res.Configuration
 import android.content.res.Resources
@@ -63,7 +60,11 @@ val PackageInfo.processes
             receivers?.processNames.orEmpty() +
             providers?.processNames.orEmpty()
 
-val Array<out ComponentInfo>.processNames get() = mapNotNull { it.processName }
+val Array<out ComponentInfo>.processNames
+    get() = mapNotNull {
+        if (it is ServiceInfo && it.flags and ServiceInfo.FLAG_ISOLATED_PROCESS != 0) null
+        else it.processName
+    }
 
 val ApplicationInfo.packageInfo: PackageInfo get() {
     val pm = get<PackageManager>()

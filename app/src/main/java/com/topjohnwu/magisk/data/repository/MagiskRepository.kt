@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.data.repository
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
@@ -26,6 +27,9 @@ class MagiskRepository(
         Info.remote = info
         info
     } catch (e: IOException) {
+        Timber.e(e)
+        null
+    } catch (e: HttpException) {
         Timber.e(e)
         null
     }
