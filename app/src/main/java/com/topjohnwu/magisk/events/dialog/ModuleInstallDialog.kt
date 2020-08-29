@@ -12,9 +12,10 @@ class ModuleInstallDialog(private val item: Repo) : DialogEvent() {
     override fun build(dialog: MagiskDialog) {
         with(dialog) {
 
-            fun download(install: Boolean) = DownloadService(context) {
+            fun download(install: Boolean) {
                 val config = if (install) Action.Flash.Primary else Action.Download
-                subject = Subject.Module(item, config)
+                val subject = Subject.Module(item, config)
+                DownloadService.start(context, subject)
             }
 
             applyTitle(context.getString(R.string.repo_install_title, item.name))

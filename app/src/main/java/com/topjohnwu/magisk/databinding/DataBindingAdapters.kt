@@ -3,12 +3,14 @@ package com.topjohnwu.magisk.databinding
 import android.animation.ValueAnimator
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.updateLayoutParams
@@ -301,4 +303,11 @@ fun setListeners(
     view.setOnStateChangedListener { _, _ ->
         attrChange.onChange()
     }
+}
+
+@BindingAdapter("cardBackgroundColorAttr")
+fun CardView.setCardBackgroundColorAttr(attr: Int) {
+    val tv = TypedValue()
+    context.theme.resolveAttribute(attr, tv, true)
+    setCardBackgroundColor(tv.data)
 }

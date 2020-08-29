@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.arch.ViewEvent
-import com.topjohnwu.magisk.core.download.BaseDownloadService
+import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.ktx.hideKeyboard
@@ -51,7 +51,7 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
         super.onStart()
         setHasOptionsMenu(true)
         activity.title = resources.getString(R.string.modules)
-        BaseDownloadService.observeProgress(this, viewModel::onProgressUpdate)
+        BaseDownloader.observeProgress(this, viewModel::onProgressUpdate)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

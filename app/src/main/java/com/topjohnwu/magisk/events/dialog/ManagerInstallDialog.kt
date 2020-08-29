@@ -25,7 +25,7 @@ class ManagerInstallDialog : DialogEvent() {
 
             applyButton(MagiskDialog.ButtonType.POSITIVE) {
                 titleRes = R.string.install
-                onClick { DownloadService(context) { this.subject = subject } }
+                onClick { DownloadService.start(context, subject) }
             }
 
             if (Info.remote.app.note.isEmpty()) return

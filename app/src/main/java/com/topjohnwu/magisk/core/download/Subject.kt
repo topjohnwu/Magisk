@@ -7,12 +7,15 @@ import androidx.core.net.toUri
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
+import com.topjohnwu.magisk.core.model.StubJson
 import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ktx.get
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
+
+private fun cachedFile(name: String) = get<Context>().cachedFile(name).apply { delete() }.toUri()
 
 sealed class Subject : Parcelable {
 
@@ -37,21 +40,20 @@ sealed class Subject : Parcelable {
 
     @Parcelize
     class Manager(
-        override val action: Action.APK
+        override val action: Action.APK,
+        private val app: ManagerJson = Info.remote.app,
+        val stub: StubJson = Info.remote.stub
     ) : Subject() {
 
-        @IgnoredOnParcel
-        val manager: ManagerJson = Info.remote.app
-
         override val title: String
-            get() = "MagiskManager-${manager.version}(${manager.versionCode})"
+            get() = "MagiskManager-${app.version}(${app.versionCode})"
 
         override val url: String
-            get() = manager.link
+            get() = app.link
 
         @IgnoredOnParcel
         override val file by lazy {
-            get<Context>().cachedFile("manager.apk").toUri()
+            cachedFile("manager.apk")
         }
 
     }
@@ -69,7 +71,7 @@ sealed class Subject : Parcelable {
 
             @IgnoredOnParcel
             override val file by lazy {
-                get<Context>().cachedFile("magisk.zip").toUri()
+                cachedFile("magisk.zip")
             }
         }
 
@@ -81,7 +83,7 @@ sealed class Subject : Parcelable {
 
             @IgnoredOnParcel
             override val file by lazy {
-                get<Context>().cachedFile(title).toUri()
+                cachedFile(title)
             }
 
         }

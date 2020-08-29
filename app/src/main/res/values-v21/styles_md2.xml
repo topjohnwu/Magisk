@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="SplashTheme" parent="SplashThemeBase">
-        <item name="android:windowTranslucentStatus">true</item>
+    <style name="Foundation.Compat">
         <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 </resources>

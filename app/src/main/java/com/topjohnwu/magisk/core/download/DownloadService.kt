@@ -17,7 +17,7 @@ import com.topjohnwu.magisk.utils.APKInstall
 import kotlin.random.Random.Default.nextInt
 
 @SuppressLint("Registered")
-open class DownloadService : BaseDownloadService() {
+open class DownloadService : BaseDownloader() {
 
     private val context get() = this
 
@@ -30,7 +30,7 @@ open class DownloadService : BaseDownloadService() {
     private suspend fun Magisk.onFinish(id: Int) = when (val action = action) {
         Uninstall -> FlashFragment.uninstall(file, id)
         EnvFix -> {
-            cancel(id)
+            remove(id)
             EnvFixTask(file).exec()
             Unit
         }
@@ -44,9 +44,9 @@ open class DownloadService : BaseDownloadService() {
         else -> Unit
     }
 
-    private suspend fun Manager.onFinish(id: Int) {
-        handleAPK(this)
-        cancel(id)
+    private fun Manager.onFinish(id: Int) {
+        remove(id)
+        APKInstall.install(context, file.toFile())
     }
 
     // --- Customize finish notification
@@ -85,24 +85,29 @@ open class DownloadService : BaseDownloadService() {
 
     // ---
 
-    class Builder {
-        lateinit var subject: Subject
-    }
-
     companion object {
 
-        inline operator fun invoke(context: Context, argBuilder: Builder.() -> Unit) {
-            val app = context.applicationContext
-            val builder = Builder().apply(argBuilder)
-            val intent = app.intent<DownloadService>().putExtra(ARG_URL, builder.subject)
+        private fun intent(context: Context, subject: Subject) =
+            context.intent<DownloadService>().putExtra(ACTION_KEY, subject)
 
-            if (Build.VERSION.SDK_INT >= 26) {
-                app.startForegroundService(intent)
+        fun pendingIntent(context: Context, subject: Subject): PendingIntent {
+            return if (Build.VERSION.SDK_INT >= 26) {
+                PendingIntent.getForegroundService(context, nextInt(),
+                    intent(context, subject), PendingIntent.FLAG_UPDATE_CURRENT)
             } else {
-                app.startService(intent)
+                PendingIntent.getService(context, nextInt(),
+                    intent(context, subject), PendingIntent.FLAG_UPDATE_CURRENT)
             }
         }
 
+        fun start(context: Context, subject: Subject) {
+            val app = context.applicationContext
+            if (Build.VERSION.SDK_INT >= 26) {
+                app.startForegroundService(intent(app, subject))
+            } else {
+                app.startService(intent(app, subject))
+            }
+        }
     }
 
 }

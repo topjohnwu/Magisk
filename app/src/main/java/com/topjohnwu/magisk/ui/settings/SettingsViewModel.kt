@@ -145,9 +145,7 @@ class SettingsViewModel(
     }
 
     private fun restoreManager() {
-        DownloadService(get()) {
-            subject = Subject.Manager(Action.APK.Restore)
-        }
+        DownloadService.start(get(), Subject.Manager(Action.APK.Restore))
     }
 
 }

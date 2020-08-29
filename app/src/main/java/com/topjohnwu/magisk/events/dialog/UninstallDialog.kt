@@ -47,9 +47,7 @@ class UninstallDialog : DialogEvent() {
     }
 
     private fun completeUninstall() {
-        DownloadService(dialog.context) {
-            subject = Subject.Magisk(Action.Uninstall)
-        }
+        DownloadService.start(dialog.context, Subject.Magisk(Action.Uninstall))
     }
 
 }

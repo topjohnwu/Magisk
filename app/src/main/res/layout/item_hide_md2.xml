@@ -77,8 +77,11 @@
 
                 <com.topjohnwu.widget.IndeterminateCheckBox
                     android:id="@+id/hide_expand_icon"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:layout_marginEnd="@dimen/l1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"

@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
-import com.topjohnwu.magisk.core.download.BaseDownloadService
+import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
 import com.topjohnwu.magisk.events.RequestFileEvent
 import com.topjohnwu.magisk.ktx.coroutineScope
@@ -26,7 +26,7 @@ class InstallFragment : BaseUIFragment<InstallViewModel, FragmentInstallMd2Bindi
 
         // Allow markwon to run in viewmodel scope
         binding.releaseNotes.coroutineScope = viewModel.viewModelScope
-        BaseDownloadService.observeProgress(this, viewModel::onProgressUpdate)
+        BaseDownloader.observeProgress(this, viewModel::onProgressUpdate)
     }
 
 }

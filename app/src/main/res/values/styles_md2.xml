@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <style name="SplashThemeBase" parent="android:Theme.DeviceDefault.NoActionBar">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>
-    </style>
-
-    <style name="SplashThemeBase.V19" parent="SplashThemeBase">
-        <item name="android:windowTranslucentStatus" tools:targetApi="19">true</item>
-        <item name="android:windowTranslucentNavigation" tools:targetApi="19">true</item>
     </style>
 
     <style name="SplashTheme" parent="SplashThemeBase" />
@@ -16,16 +11,13 @@
         <item name="android:windowBackground">?colorSurface</item>
     </style>
 
-    <!--This should be overridden in v19 for transparency, etc-->
+    <!--This should be overridden in v21 for transparency, etc-->
     <style name="Foundation.Compat" />
 
     <!--region Do not remove-->
     <style name="Empty" />
 
     <style name="WidgetFoundation" parent="android:Widget" />
-
-    <!-- {@deprecated Use WidgetFoundation instead.} -->
-    <style name="Widget" parent="WidgetFoundation" />
 
     <style name="AppearanceFoundation">
         <item name="android:fontFamily">@font/exo</item>

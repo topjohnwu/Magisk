@@ -96,33 +96,27 @@
                             <CheckBox
                                 gone="@{Info.isSAR}"
                                 style="@style/WidgetFoundation.Checkbox"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
                                 android:checked="@={Config.keepVerity}"
-                                android:gravity="center"
                                 android:text="@string/keep_dm_verity"
                                 tools:checked="true" />
 
                             <CheckBox
                                 gone="@{Info.isFBE}"
                                 style="@style/WidgetFoundation.Checkbox"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
                                 android:checked="@={Config.keepEnc}"
-                                android:gravity="center"
                                 android:text="@string/keep_force_encryption"
                                 app:tint="?colorPrimary" />
 
                             <CheckBox
                                 gone="@{Info.ramdisk}"
                                 style="@style/WidgetFoundation.Checkbox"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="start|center_vertical"
                                 android:checked="@={Config.recovery}"
-                                android:gravity="center"
                                 android:text="@string/recovery_mode"
                                 app:tint="?colorPrimary" />
 

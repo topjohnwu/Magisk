@@ -10,9 +10,15 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toIcon
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Const.ID.PROGRESS_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.Const.ID.UPDATE_NOTIFICATION_CHANNEL
+import com.topjohnwu.magisk.core.SplashActivity
+import com.topjohnwu.magisk.core.cmp
+import com.topjohnwu.magisk.core.download.Action
+import com.topjohnwu.magisk.core.download.DownloadService
+import com.topjohnwu.magisk.core.download.Subject
+import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.getBitmap
 
@@ -52,12 +58,9 @@ object Notifications {
         stackBuilder.addParentStack(SplashActivity::class.java.cmp(context.packageName))
         stackBuilder.addNextIntent(intent)
         val pendingIntent = stackBuilder.getPendingIntent(
-            Const.ID.MAGISK_UPDATE_NOTIFICATION_ID,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+            Const.ID.MAGISK_UPDATE_NOTIFICATION_ID, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val builder = updateBuilder(
-            context
-        )
+        val builder = updateBuilder(context)
             .setContentTitle(context.getString(R.string.magisk_update_title))
             .setContentText(context.getString(R.string.manager_download_install))
             .setAutoCancel(true)
@@ -67,20 +70,13 @@ object Notifications {
     }
 
     fun managerUpdate(context: Context) {
-        val intent = context.intent<GeneralReceiver>()
-                .setAction(Const.Key.BROADCAST_MANAGER_UPDATE)
-                .putExtra(Const.Key.INTENT_SET_APP, Info.remote.app)
+        val intent = DownloadService.pendingIntent(context, Subject.Manager(Action.APK.Upgrade))
 
-        val pendingIntent = PendingIntent.getBroadcast(context,
-                Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val builder = updateBuilder(
-            context
-        )
+        val builder = updateBuilder(context)
             .setContentTitle(context.getString(R.string.manager_update_title))
             .setContentText(context.getString(R.string.manager_download_install))
             .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(intent)
 
         mgr.notify(Const.ID.APK_UPDATE_NOTIFICATION_ID, builder.build())
     }

@@ -7,8 +7,8 @@
 
         <import type="android.os.Build" />
         <import type="com.topjohnwu.magisk.core.Info" />
-
         <import type="com.topjohnwu.magisk.BuildConfig" />
+        <import type="com.topjohnwu.magisk.R" />
 
         <variable
             name="viewModel"
@@ -40,7 +40,7 @@
                 android:textAppearance="@style/AppearanceFoundation.Title" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                invisibleUnless="@{viewModel.success || viewModel.failed}"
+                invisible="@{viewModel.checking}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingTop="@dimen/l1"
@@ -49,6 +49,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/safetynet_attestation"
                     style="@style/WidgetFoundation.Card.Elevated"
+                    cardBackgroundColorAttr="@{viewModel.success ? R.attr.colorPrimary : R.attr.colorError}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
@@ -62,29 +63,12 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias=".35"
-                    app:layout_constraintWidth_max="300dp">
+                    app:layout_constraintWidth_max="300dp"
+                    tools:cardBackgroundColor="?colorPrimary">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-
-                        <View
-                            goneUnless="@{viewModel.failed}"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:alpha=".5"
-                            android:background="?colorError"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <View
-                            goneUnless="@{viewModel.success}"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:alpha=".5"
-                            android:background="?colorPrimary"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/safetynet_title"

@@ -13,11 +13,11 @@ class SuperuserRevokeDialog(
         dialog.applyTitle(R.string.su_revoke_title)
             .applyMessage(R.string.su_revoke_msg, callbacks.appName)
             .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                titleRes = R.string.yes
+                titleRes = android.R.string.ok
                 onClick { callbacks.listenerOnSuccess() }
             }
             .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                titleRes = android.R.string.no
+                titleRes = android.R.string.cancel
             }
     }
 

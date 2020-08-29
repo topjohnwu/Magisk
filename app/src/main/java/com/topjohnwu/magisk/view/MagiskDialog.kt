@@ -254,6 +254,9 @@ class MagiskDialog(
         )
     }
 
+    fun onCancel(callback: OnDialogButtonClickListener) =
+        apply { setOnCancelListener(callback) }
+
     fun onDismiss(callback: OnDialogButtonClickListener) =
         apply { setOnDismissListener(callback) }
 

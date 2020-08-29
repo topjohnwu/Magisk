@@ -14,25 +14,26 @@
     <!--Home-->
     <string name="no_connection">无法连接</string>
     <string name="app_changelog">更新日志</string>
-    <string name="manager">管理器</string>
-    <string name="loading">加载中…</string>
+    <string name="manager">Manager</string>
+    <string name="loading">正在加载</string>
     <string name="update">更新</string>
-    <string name="not_available">N/A</string>
-    <string name="hide">隐藏</string>
+    <string name="not_available">不可用</string>
+    <string name="hide">不再显示</string>
     <string name="status">状态</string>
     <string name="home_package">包名</string>
 
-    <string name="home_notice_content">确保您使用的是开源的 Magisk Manager。未知来源的 Manager 可能执行恶意操作。</string>
-    <string name="home_support_title">支持我们</string>
-    <string name="home_item_source">Source</string>
-    <string name="home_support_content">Magisk 现在是，将来也永远是免费且开源的。但您可以向我们小额捐赠表示支持。</string>
-    <string name="home_status_normal">常规</string>
-    <string name="home_status_stub">Stub</string>
-    <string name="home_installed_version">已安装</string>
+    <string name="home_notice_content">请确认正在使用开源的 Magisk Manager。未知来源的 Manager 可能具有恶意行为。</string>
+    <string name="home_support_title">支持开发</string>
+    <string name="home_item_source">源代码</string>
+    <string name="home_support_content">Magisk 将一直保持免费且开源，向开发者捐赠以表示支持。</string>
+    <string name="home_status_normal">正常</string>
+    <string name="home_status_stub">动态加载(反检测)</string>
+    <string name="home_installed_version">当前</string>
     <string name="home_latest_version">最新</string>
     <string name="invalid_update_channel">无效的更新通道</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
-    <string name="uninstall_magisk_msg">所有模块将被停用或删除！\nRoot 将被解除！\n如果尚未加密，您的数据（data）可能被系统加密！</string>
+    <string name="uninstall_magisk_msg">所有模块将被停用或删除！超级用户权限丢失！\n如果设备尚未加密，用户数据可能被自动加密。</string>
+    <string name="home_check_safetynet">测试 SafetyNet 证明</string>
 
     <!--Install-->
     <string name="keep_force_encryption">保持强制加密</string>
@@ -41,16 +42,16 @@
     <string name="install_options_title">选项</string>
     <string name="install_method_title">方式</string>
     <string name="install_next">下一步</string>
-    <string name="install_start">开始执行</string>
-    <string name="manager_download_install">按此下载并安装</string>
-    <string name="download_zip_only">仅下载 Zip 包</string>
+    <string name="install_start">开始</string>
+    <string name="manager_download_install">立即安装</string>
+    <string name="download_zip_only">仅下载安装包</string>
     <string name="direct_install">直接安装（推荐）</string>
     <string name="install_inactive_slot">安装到未使用的槽位（OTA 后）</string>
-    <string name="install_inactive_slot_msg">您的设备将在重启后强制切换到另一个槽位！\n请仅在 OTA 更新完成后使用。\n是否继续？</string>
-    <string name="setup_title">安装运行环境</string>
+    <string name="install_inactive_slot_msg">将在重启后强制切换到另一个槽位！只能在 OTA 更新完成后使用。\n是否继续？</string>
+    <string name="setup_title">修复安装</string>
     <string name="select_patch_file">选择并修补一个文件</string>
-    <string name="patch_file_msg">选择一个原始镜像文件 (*.img) 或一个 ODIN tar 包 (*.tar)</string>
-    <string name="reboot_delay_toast">将在 5 秒后重启…</string>
+    <string name="patch_file_msg">选择一个原始映像文件（*.img）或一个 Odin 包（*.tar）</string>
+    <string name="reboot_delay_toast">设备将在 5 秒后重启</string>
     <string name="flash_screen_title">安装</string>
 
     <!--Superuser-->
@@ -58,7 +59,7 @@
     <string name="deny">拒绝</string>
     <string name="prompt">提示</string>
     <string name="grant">允许</string>
-    <string name="su_warning">授予对设备的完全访问权限。\n如果不确定，请拒绝！</string>
+    <string name="su_warning">将授予对该设备的最高权限。\n如果不确定，请拒绝！</string>
     <string name="forever">永久</string>
     <string name="once">仅此一次</string>
     <string name="tenmin">10 分钟</string>
@@ -80,23 +81,23 @@
 
     <string name="superuser_toggle_notification">通知</string>
     <string name="superuser_toggle_revoke">撤销</string>
-    <string name="superuser_policy_none">尚无应用程序请求超级用户权限。</string>
+    <string name="superuser_policy_none">尚无应用请求超级用户权限</string>
 
     <!--Logs-->
-    <string name="log_data_none">您的日志为空。尝试更多访问超级用户（su）的应用。</string>
-    <string name="log_data_magisk_none">Magisk 日志为空，这不太正常。</string>
+    <string name="log_data_none">没有超级用户权限使用日志</string>
+    <string name="log_data_magisk_none">没有 Magisk 日志</string>
     <string name="menuSaveLog">保存日志</string>
-    <string name="menuClearLog">立即清除日志</string>
-    <string name="logs_cleared">日志清除成功</string>
+    <string name="menuClearLog">清空日志</string>
+    <string name="logs_cleared">日志已清空</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">目标 UID: %1$d</string>
 
     <!--SafetyNet-->
     <string name="safetynet_api_error">SafetyNet API 错误</string>
-    <string name="safetynet_res_invalid">回传值无效</string>
-    <string name="safetynet_attest_success">成功！</string>
-    <string name="safetynet_attest_failure">认证失败！</string>
-    <string name="safetynet_attest_loading">请稍候…</string>
+    <string name="safetynet_res_invalid">无效响应</string>
+    <string name="safetynet_attest_success">通过证明</string>
+    <string name="safetynet_attest_failure">未通过证明</string>
+    <string name="safetynet_attest_loading">正在请求证明</string>
     <string name="safetynet_attest_restart">重试</string>
 
     <!-- MagiskHide -->
@@ -117,15 +118,15 @@
     <string name="module_section_pending_action">全部更新</string>
     <string name="module_state_remove">移除</string>
     <string name="module_state_restore">还原</string>
-    <string name="module_action_install_external">从本地存储安装</string>
+    <string name="module_action_install_external">从本地安装</string>
     <string name="update_available">可更新</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">在线</string>
     <string name="sorting_order">排序方式</string>
-    <string name="external_rw_permission_denied">请允许访问存储空间以使用此功能</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">主题模式</string>
-    <string name="settings_dark_mode_message">选择您喜欢的模式</string>
+    <string name="settings_dark_mode_message">选择一个模式</string>
     <string name="settings_dark_mode_light">明亮模式</string>
     <string name="settings_dark_mode_system">跟随系统</string>
     <string name="settings_dark_mode_dark">深色模式</string>
@@ -136,23 +137,23 @@
     <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>
     <string name="settings_hide_manager_summary">安装随机包名的 Magisk Manager</string>
     <string name="settings_restore_manager_title">还原 Magisk Manager</string>
-    <string name="settings_restore_manager_summary">安装官方包名的 Magisk Manager</string>
+    <string name="settings_restore_manager_summary">安装原始包名的 Magisk Manager</string>
     <string name="language">语言</string>
-    <string name="system_default">(系统默认)</string>
+    <string name="system_default">系统默认</string>
     <string name="settings_check_update_title">检查更新</string>
     <string name="settings_check_update_summary">定期在后台检查更新</string>
     <string name="settings_update_channel_title">更新通道</string>
     <string name="settings_update_stable">稳定版</string>
     <string name="settings_update_beta">测试版</string>
     <string name="settings_update_custom">自定义通道</string>
-    <string name="settings_update_custom_msg">请输入自定义网址</string>
-    <string name="settings_magiskhide_summary">隐藏 Magisk 以避免被检测</string>
+    <string name="settings_update_custom_msg">自定义通道网址</string>
+    <string name="settings_magiskhide_summary">隐藏 Magisk 避免被检测</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>
-    <string name="settings_app_name_hint">新的软件包名称</string>
-    <string name="settings_app_name_helper">将使用新名称重新封装本应用</string>
-    <string name="settings_app_name_error">输入值无效</string>
+    <string name="settings_app_name_hint">新的应用名称</string>
+    <string name="settings_app_name_helper">将使用新名称重新安装本应用</string>
+    <string name="settings_app_name_error">无效输入</string>
     <string name="settings_su_app_adb">应用和 ADB</string>
     <string name="settings_su_app">仅应用</string>
     <string name="settings_su_adb">仅 ADB</string>
@@ -169,17 +170,18 @@
     <string name="superuser_notification">超级用户通知</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
-    <string name="settings_su_biometric_title">启用生物特征识别</string>
-    <string name="settings_su_biometric_summary">使用生物特征识别来允许超级用户请求</string>
-    <string name="no_biometric">设备不支持或未启用生物特征识别</string>
+    <string name="settings_su_biometric_title">启用生物识别验证</string>
+    <string name="settings_su_biometric_summary">使用生物识别来允许超级用户请求</string>
+    <string name="no_biometric">设备不支持或未配置生物识别功能</string>
     <string name="settings_customization">个性化</string>
+    <string name="setting_add_shortcut_summary">在隐藏后难以识别名称和图标的情况下，添加快捷方式到桌面</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
     <string name="settings_owner_manage">由设备所有者管理</string>
     <string name="settings_user_independent">各用户独立</string>
-    <string name="owner_only_summary">仅设备所有者账户有超级用户权限</string>
-    <string name="owner_manage_summary">仅设备所有者账户能管理超级用户并接收权限请求提示</string>
+    <string name="owner_only_summary">仅设备所有者有超级用户权限</string>
+    <string name="owner_manage_summary">仅设备所有者能管理超级用户并接收权限请求提示</string>
     <string name="user_indepenent_summary">每个用户有独立的超级用户规则</string>
 
     <string name="mount_namespace_mode">挂载命名空间模式</string>
@@ -187,18 +189,18 @@
     <string name="settings_ns_requester">继承命名空间</string>
     <string name="settings_ns_isolate">独立命名空间</string>
     <string name="global_summary">所有 ROOT 会话使用全局挂载命名空间</string>
-    <string name="requester_summary">ROOT 会话继承原程序的命名空间</string>
-    <string name="isolate_summary">每个 ROOT 会话使用自身的独立命名空间</string>
+    <string name="requester_summary">ROOT 会话继承原进程的命名空间</string>
+    <string name="isolate_summary">每个 ROOT 会话使用独立的命名空间</string>
 
     <!--Notifications-->
-    <string name="update_channel">Magisk 更新提示</string>
+    <string name="update_channel">更新提示</string>
     <string name="progress_channel">下载进度</string>
     <string name="download_complete">下载完成</string>
-    <string name="download_file_error">下载文件时出错</string>
+    <string name="download_file_error">下载失败</string>
     <string name="download_open_parent">在文件夹中显示</string>
     <string name="download_open_self">打开文件</string>
-    <string name="magisk_update_title">Magisk 有更新可用！</string>
-    <string name="manager_update_title">Magisk Manager 有更新可用！</string>
+    <string name="magisk_update_title">Magisk 已发布新版本！</string>
+    <string name="manager_update_title">Magisk Manager 已发布新版本！</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">是</string>
@@ -212,22 +214,25 @@
     <string name="flashing">正在刷入</string>
     <string name="done">完成！</string>
     <string name="failure">失败</string>
-    <string name="hide_manager_title">正在隐藏 Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
+    <string name="hide_manager_title">正在隐藏 Magisk Manager</string>
+    <string name="hide_manager_fail_toast">隐藏失败</string>
     <string name="open_link_failed_toast">找不到能打开此链接的应用</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂映像</string>
-    <string name="restore_img_msg">正在还原…</string>
-    <string name="restore_done">还原完成！</string>
-    <string name="restore_fail">原厂 Boot 映像的备份不存在！</string>
+    <string name="restore_img_msg">正在还原</string>
+    <string name="restore_done">已还原</string>
+    <string name="restore_fail">原厂 Boot 映像的备份不存在</string>
     <string name="proprietary_title">下载专有代码</string>
-    <string name="proprietary_notice">Magisk Manager 是一个完全免费且开源的应用，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n是否允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查？</string>
+    <string name="proprietary_notice">Magisk Manager 是自由软件，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n是否允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查？</string>
     <string name="setup_fail">安装失败</string>
-    <string name="env_fix_title">缺少运行环境</string>
-    <string name="env_fix_msg">您的设备缺少 Magisk 正常工作所必需的文件。即将下载 Magisk zip 安装包以完成后续安装，完成后需要重启。是否继续？</string>
-    <string name="setup_msg">正在安装运行环境…</string>
+    <string name="env_fix_title">需要修复运行环境</string>
+    <string name="env_fix_msg">缺失 Magisk 正常工作所需的文件。 将下载 Magisk 安装包进行修复安装，完成后自动重启，是否继续？</string>
+    <string name="setup_msg">正在修复运行环境</string>
     <string name="authenticate">验证您的身份</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
-    <string name="unsupport_magisk_msg">此版本的 Magisk Manager 不支持低于 %1$s 版本的 Magisk。\n\n本应用将呈现为 Magisk 未安装的状态，请升级 Magisk。</string>
+    <string name="unsupport_magisk_msg">此版本的 Magisk Manager 不支持低于 %1$s 版本的 Magisk。\n\n应用表现为未安装状态，但升级功能可用，请尽快升级 Magisk。</string>
+    <string name="external_rw_permission_denied">允许访问存储空间以使用此功能</string>
+    <string name="add_shortcut_title">添加快捷方式到桌面</string>
+    <string name="add_shortcut_msg">隐藏 Magisk Manager 后，其名称和图标可能会变得难以识别。需要在桌面上添加快捷方式吗？</string>
 
 </resources>

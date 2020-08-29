@@ -17,7 +17,7 @@ class EnvFixDialog : DialogEvent() {
         .applyTitle(R.string.env_fix_title)
         .applyMessage(R.string.env_fix_msg)
         .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-            titleRes = R.string.yes
+            titleRes = android.R.string.ok
             preventDismiss = true
             onClick {
                 dialog.applyTitle(R.string.setup_title)
@@ -31,11 +31,11 @@ class EnvFixDialog : DialogEvent() {
                         lbm.unregisterReceiver(this)
                     }
                 }, IntentFilter(DISMISS))
-                DownloadService(dialog.context) { subject = Magisk(EnvFix) }
+                DownloadService.start(dialog.context, Magisk(EnvFix))
             }
         }
         .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-            titleRes = android.R.string.no
+            titleRes = android.R.string.cancel
         }
         .let { Unit }
 

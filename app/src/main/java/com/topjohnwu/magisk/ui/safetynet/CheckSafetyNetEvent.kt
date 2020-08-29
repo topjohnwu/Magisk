@@ -116,14 +116,14 @@ class CheckSafetyNetEvent(
             .applyMessage(R.string.proprietary_notice)
             .cancellable(false)
             .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                titleRes = R.string.yes
+                titleRes = android.R.string.ok
                 onClick { downloadInternal() }
             }
             .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
                 titleRes = android.R.string.cancel
                 onClick { callback(SafetyNetResult(dismiss = true)) }
             }
-            .onDismiss {
+            .onCancel {
                 callback(SafetyNetResult(dismiss = true))
             }
             .reveal()
