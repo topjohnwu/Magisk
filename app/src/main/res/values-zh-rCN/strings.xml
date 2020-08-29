@@ -97,7 +97,7 @@
     <string name="safetynet_res_invalid">无效响应</string>
     <string name="safetynet_attest_success">通过证明</string>
     <string name="safetynet_attest_failure">未通过证明</string>
-    <string name="safetynet_attest_loading">正在请求证明</string>
+    <string name="safetynet_attest_loading">稍候片刻</string>
     <string name="safetynet_attest_restart">重试</string>
 
     <!-- MagiskHide -->
