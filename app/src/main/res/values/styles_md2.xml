@@ -27,7 +27,6 @@
     <style name="Foundation.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
         <item name="android:itemTextAppearance">@style/AppearanceFoundation.Caption</item>
         <item name="android:textStyle">bold</item>
-        <!--item name="android:itemBackground">@drawable/bg_popup_menu</item-->
     </style>
 
     <style name="Foundation.Default" parent="Foundation.Compat">
