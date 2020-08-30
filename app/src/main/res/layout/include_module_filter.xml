@@ -25,7 +25,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_filter_list"
             dividerHorizontal="@{@drawable/divider_l1}"
-            dividerVertical="@{@drawable/divider_l1}"
+            dividerVertical="@{@drawable/divider_l_50}"
             itemBinding="@{viewModel.itemSearchBinding}"
             items="@{viewModel.itemsSearch}"
             android:layout_width="match_parent"
