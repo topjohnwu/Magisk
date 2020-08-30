@@ -18,7 +18,7 @@
 
 
     <style name="WidgetFoundation.Card" parent="Widget.MaterialComponents.CardView">
-        <item name="android:focusable">true</item>
+        <item name="android:focusable">auto</item>
         <item name="cardBackgroundColor">?colorSurfaceVariant</item>
         <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">0dp</item>

@@ -45,6 +45,7 @@
                 tools:visibility="gone"/>
 
             <com.google.android.material.card.MaterialCardView
+                android:focusable="false"
                 style="@style/WidgetFoundation.Card.Primary"
                 goneUnless="@{viewModel.noticeVisible}"
                 android:layout_width="match_parent"
@@ -139,6 +140,7 @@
                 app:icon="@drawable/ic_delete_md2" />
 
             <com.google.android.material.card.MaterialCardView
+                android:focusable="false"
                 style="@style/WidgetFoundation.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
