@@ -255,29 +255,6 @@ fun TextView.setStrikeThroughEnabled(useStrikeThrough: Boolean) {
     }
 }
 
-interface OnPopupMenuItemClickListener {
-    fun onMenuItemClick(itemId: Int)
-}
-
-@BindingAdapter("popupMenu", "popupMenuOnClickListener", requireAll = false)
-fun View.setPopupMenu(popupMenu: Int, listener: OnPopupMenuItemClickListener) {
-    val menu = tag as? PopupMenu ?: let {
-        val themeWrapper = ContextThemeWrapper(context, R.style.Foundation_PopupMenu)
-        PopupMenu(themeWrapper, this)
-    }
-    tag = menu.apply {
-        this.menu.clear()
-        menuInflater.inflate(popupMenu, this.menu)
-        setOnMenuItemClickListener {
-            listener.onMenuItemClick(it.itemId)
-            true
-        }
-    }
-    setOnClickListener {
-        (tag as PopupMenu).show()
-    }
-}
-
 @BindingAdapter("spanCount")
 fun RecyclerView.setSpanCount(count: Int) {
     when (val lama = layoutManager) {
