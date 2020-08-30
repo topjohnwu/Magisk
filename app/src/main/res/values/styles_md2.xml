@@ -7,7 +7,7 @@
 
     <style name="SplashTheme" parent="SplashThemeBase" />
 
-    <style name="Foundation" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Foundation" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
     </style>
 
@@ -24,27 +24,17 @@
     </style>
     <!--endregion-->
 
-    <style name="Foundation.PopupMenu" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">?colorOnSurface</item>
-        <item name="android:itemBackground">@drawable/bg_popup_menu</item>
+    <style name="Foundation.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
         <item name="android:itemTextAppearance">@style/AppearanceFoundation.Caption</item>
         <item name="android:textStyle">bold</item>
+        <!--item name="android:itemBackground">@drawable/bg_popup_menu</item-->
     </style>
 
-    <style name="Foundation.Base" parent="Foundation.Compat">
+    <style name="Foundation.Default" parent="Foundation.Compat">
         <item name="android:fontFamily">@font/exo</item>
         <item name="android:includeFontPadding">false</item>
-
-        <!--///-->
-
-        <item name="selectableItemBackground">@drawable/bg_selectable</item>
-        <item name="selectableItemBackgroundBorderless">@drawable/bg_selectable_borderless</item>
         <item name="actionBarSize">@dimen/internal_action_bar_size</item>
         <item name="popupMenuStyle">@style/Foundation.PopupMenu</item>
-    </style>
-
-    <style name="Foundation.Default" parent="Foundation.Base">
-        <item name="android:windowBackground">?colorSurface</item>
     </style>
 
     <style name="Foundation.Floating" parent="Empty">
