@@ -81,6 +81,7 @@ class AXML(b: ByteArray) {
         val baos = RawByteStream()
         baos.write(bytes, 0, dataOff)
 
+        // Write string data
         val strList = IntArray(count)
         for (i in 0 until count) {
             strList[i] = baos.size() - dataOff
@@ -102,9 +103,8 @@ class AXML(b: ByteArray) {
         newBuffer.putInt(start + CHUNK_SIZE_OFF, size + sizeDiff)
         // Patch index table
         newBuffer.position(start + STRING_INDICES_OFF)
-        val newStrList = newBuffer.asIntBuffer()
-        for (idx in strList)
-            newStrList.put(idx)
+        val newIntBuf = newBuffer.asIntBuffer()
+        strList.forEach { newIntBuf.put(it) }
 
         // Write the rest of the chunks
         val nextOff = start + size
@@ -121,7 +121,7 @@ class AXML(b: ByteArray) {
     }
 
     private class RawByteStream : ByteArrayOutputStream() {
-        val buf get() = buf
+        val buf: ByteArray get() = buf
 
         fun align(alignment: Int = 4) {
             val newCount = (count + alignment - 1) / alignment * alignment
