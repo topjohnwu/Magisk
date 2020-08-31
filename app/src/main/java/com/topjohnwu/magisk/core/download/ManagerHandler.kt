@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Action.APK.Restore
 import com.topjohnwu.magisk.core.download.Action.APK.Upgrade
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.utils.PatchAPK
+import com.topjohnwu.magisk.core.tasks.PatchAPK
 import com.topjohnwu.magisk.ktx.relaunchApp
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.superuser.Shell
@@ -18,7 +18,7 @@ import java.io.File
 
 private fun Context.patch(apk: File) {
     val patched = File(apk.parent, "patched.apk")
-    PatchAPK.patch(apk.path, patched.path, packageName, applicationInfo.nonLocalizedLabel)
+    PatchAPK.patch(this, apk.path, patched.path, packageName, applicationInfo.nonLocalizedLabel)
     apk.delete()
     patched.renameTo(apk)
 }
