@@ -28,6 +28,7 @@
             app:layout_constraintWidth_max="400dp">
 
             <com.google.android.material.card.MaterialCardView
+                android:focusable="false"
                 style="@style/WidgetFoundation.Card.Elevated"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -139,6 +140,8 @@
                         android:paddingBottom="4dp">
 
                         <Button
+                            android:clickable="@{data.buttonIDGAF.isEnabled()}"
+                            android:focusable="@{data.buttonIDGAF.isEnabled()}"
                             android:id="@+id/dialog_base_button_4"
                             style="@style/WidgetFoundation.Button.Text"
                             gone="@{data.buttonIDGAF.icon == 0 &amp;&amp; data.buttonIDGAF.title.length == 0}"
@@ -154,6 +157,8 @@
                             tools:text="Button 1" />
 
                         <Button
+                            android:clickable="@{data.buttonNeutral.isEnabled()}"
+                            android:focusable="@{data.buttonNeutral.isEnabled()}"
                             android:id="@+id/dialog_base_button_2"
                             style="@style/WidgetFoundation.Button.Text"
                             gone="@{data.buttonNeutral.icon == 0 &amp;&amp; data.buttonNeutral.title.length == 0}"
@@ -177,6 +182,8 @@
                             android:visibility="invisible" />
 
                         <Button
+                            android:clickable="@{data.buttonNegative.isEnabled()}"
+                            android:focusable="@{data.buttonNegative.isEnabled()}"
                             android:id="@+id/dialog_base_button_3"
                             style="@style/WidgetFoundation.Button.Text"
                             gone="@{data.buttonNegative.icon == 0 &amp;&amp; data.buttonNegative.title.length == 0}"
@@ -192,6 +199,8 @@
                             tools:text="Button 1" />
 
                         <Button
+                            android:clickable="@{data.buttonPositive.isEnabled()}"
+                            android:focusable="@{data.buttonPositive.isEnabled()}"
                             android:id="@+id/dialog_base_button_1"
                             style="@style/WidgetFoundation.Button.Text"
                             gone="@{data.buttonPositive.icon == 0 &amp;&amp; data.buttonPositive.title.length == 0}"
