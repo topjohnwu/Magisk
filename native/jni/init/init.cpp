@@ -24,6 +24,61 @@ using namespace std;
 constexpr int (*init_applet_main[])(int, char *[]) =
 		{ magiskpolicy_main, magiskpolicy_main, nullptr };
 
+int data_holder::patch(str_pairs list) {
+	int count = 0;
+	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
+		for (auto [from, to] : list) {
+			if (memcmp(p, from.data(), from.length() + 1) == 0) {
+				LOGD("Replace [%s] -> [%s]\n", from.data(), to.data());
+				memset(p, 0, from.length());
+				memcpy(p, to.data(), to.length());
+				++count;
+				p += from.length();
+			}
+		}
+	}
+	return count;
+}
+
+void data_holder::consume(data_holder &other) {
+	buf = other.buf;
+	sz = other.sz;
+	other.buf = nullptr;
+	other.sz = 0;
+}
+
+template <>
+auto_data<MMAP>::~auto_data<MMAP>() {
+	if (buf) munmap(buf, sz);
+}
+
+template <>
+auto_data<HEAP>::~auto_data<HEAP>() {
+	free(buf);
+}
+
+auto_data<HEAP> raw_data::read(int fd) {
+	auto_data<HEAP> data;
+	fd_full_read(fd, data.buf, data.sz);
+	return data;
+}
+
+auto_data<HEAP> raw_data::read(const char *name) {
+	auto_data<HEAP> data;
+	full_read(name, data.buf, data.sz);
+	return data;
+}
+
+auto_data<MMAP> raw_data::mmap_rw(const char *name) {
+	auto_data<MMAP> data;
+	::mmap_rw(name, data.buf, data.sz);
+	return data;
+}
+
+// Explicit instantiation
+template struct auto_data<HEAP>;
+template struct auto_data<MMAP>;
+
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
 	xz_crc32_init();

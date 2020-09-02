@@ -16,22 +16,31 @@ struct cmdline {
 	char hardware_plat[32];
 };
 
-struct raw_data {
+struct data_holder {
 	uint8_t *buf = nullptr;
 	size_t sz = 0;
-
-	raw_data() = default;
-	raw_data(const raw_data&) = delete;
-	raw_data(raw_data &&d) {
-		buf = d.buf;
-		sz = d.sz;
-		d.buf = nullptr;
-		d.sz = 0;
-	}
-	~raw_data() {
-		free(buf);
-	}
+	using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
+	int patch(str_pairs list);
+protected:
+	void consume(data_holder &other);
 };
+
+enum data_type { HEAP, MMAP };
+
+template <data_type T>
+struct auto_data : public data_holder {
+	auto_data<T>() = default;
+	auto_data<T>(const auto_data&) = delete;
+	auto_data<T>(auto_data<T> &&other) { consume(other); }
+	~auto_data<T>() {}
+	auto_data<T>& operator=(auto_data<T> &&other) { consume(other); return *this; }
+};
+
+namespace raw_data {
+	auto_data<HEAP> read(const char *name);
+	auto_data<HEAP> read(int fd);
+	auto_data<MMAP> mmap_rw(const char *name);
+}
 
 struct fstab_entry {
 	std::string dev;
@@ -41,7 +50,7 @@ struct fstab_entry {
 	std::string fsmgr_flags;
 
 	fstab_entry() = default;
-	fstab_entry(const fstab_entry &o) = delete;
+	fstab_entry(const fstab_entry &) = delete;
 	fstab_entry(fstab_entry &&o) = default;
 	void to_file(FILE *fp);
 };
@@ -53,10 +62,7 @@ void load_kernel_info(cmdline *cmd);
 int dump_magisk(const char *path, mode_t mode);
 int magisk_proxy_main(int argc, char *argv[]);
 void setup_klog();
-void setup_tmp(const char *path, const raw_data &self, const raw_data &config);
-
-using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
-int raw_data_patch(void *addr, size_t sz, str_pairs list);
+void setup_tmp(const char *path, const data_holder &self, const data_holder &config);
 
 /***************
  * Base classes
@@ -85,7 +91,7 @@ public:
 
 class MagiskInit : public BaseInit {
 protected:
-	raw_data self;
+	auto_data<HEAP> self;
 	std::string persist_dir;
 
 	virtual void early_mount() = 0;
@@ -96,7 +102,7 @@ public:
 
 class SARBase : public MagiskInit {
 protected:
-	raw_data config;
+	auto_data<HEAP> config;
 	std::vector<raw_file> overlays;
 
 	void backup_files();

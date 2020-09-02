@@ -108,14 +108,9 @@ void FirstStageInit::prepare() {
 			sprintf(fstab_file, "fstab.%s", hw);
 		}
 
-		// Patch init to force ignore dt fstab
-		uint8_t *addr;
-		size_t sz;
-		mmap_rw("/init", addr, sz);
-		raw_data_patch(addr, sz, {
-			make_pair("android,fstab", "xxx")  /* Force IsDtFstabCompatible() to return false */
-		});
-		munmap(addr, sz);
+		// Patch init to force IsDtFstabCompatible() return false
+		auto init = raw_data::mmap_rw("/init");
+		init.patch({ make_pair("android,fstab", "xxx") });
 	}
 
 	{
@@ -150,9 +145,8 @@ void SARFirstStageInit::prepare() {
 	int src = xopen("/init", O_RDONLY);
 	int dest = xopen("/dev/init", O_CREAT | O_WRONLY, 0);
 	{
-		raw_data init;
-		fd_full_read(src, init.buf, init.sz);
-		raw_data_patch(init.buf, init.sz, { make_pair(INIT_PATH, REDIR_PATH) });
+		auto init = raw_data::read(dest);
+		init.patch({ make_pair(INIT_PATH, REDIR_PATH) });
 		write(dest, init.buf, init.sz);
 		fclone_attr(src, dest);
 		close(dest);
