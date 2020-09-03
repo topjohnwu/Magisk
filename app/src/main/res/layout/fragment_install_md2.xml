@@ -190,31 +190,31 @@
                             android:paddingEnd="3dp">
 
                             <RadioButton
-                                style="@style/WidgetFoundation.RadioButton"
                                 android:id="@+id/method_download"
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/download_zip_only"
                                 tools:checked="true" />
 
                             <RadioButton
-                                style="@style/WidgetFoundation.RadioButton"
                                 android:id="@+id/method_patch"
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/select_patch_file" />
 
                             <RadioButton
-                                style="@style/WidgetFoundation.RadioButton"
                                 android:id="@+id/method_direct"
+                                style="@style/WidgetFoundation.RadioButton"
                                 gone="@{!viewModel.rooted}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/direct_install" />
 
                             <RadioButton
-                                style="@style/WidgetFoundation.RadioButton"
                                 android:id="@+id/method_inactive_slot"
+                                style="@style/WidgetFoundation.RadioButton"
                                 gone="@{!viewModel.isRooted || !Info.isAB}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
