@@ -6,6 +6,7 @@
     <data>
 
         <import type="com.topjohnwu.magisk.core.Info" />
+
         <import type="com.topjohnwu.magisk.core.Config" />
 
         <variable
@@ -36,12 +37,13 @@
                 android:paddingTop="@dimen/l1">
 
                 <com.google.android.material.card.MaterialCardView
-                    gone="@{viewModel.skipOptions}"
                     style="@style/WidgetFoundation.Card.Variant"
+                    gone="@{viewModel.skipOptions}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
+                    android:focusable="false"
                     app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
 
                     <LinearLayout
@@ -64,11 +66,11 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="@dimen/l1"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
                                 android:text="@string/install_options_title"
                                 android:textAppearance="@style/AppearanceFoundation.Body"
-                                android:textStyle="bold"
-                                android:gravity="center_vertical"
-                                android:layout_weight="1"/>
+                                android:textStyle="bold" />
 
                             <Button
                                 style="@style/WidgetFoundation.Button.Text"
@@ -84,13 +86,13 @@
                             gone="@{viewModel.step != 0}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:paddingStart="3dp"
-                            android:paddingEnd="3dp"
                             android:layout_marginStart="@dimen/l1"
                             android:layout_marginTop="@dimen/l_50"
                             android:layout_marginEnd="@dimen/l1"
                             android:layout_marginBottom="@dimen/l_50"
+                            android:orientation="vertical"
+                            android:paddingStart="3dp"
+                            android:paddingEnd="3dp"
                             tools:layout_gravity="center">
 
                             <CheckBox
@@ -130,6 +132,7 @@
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
+                    android:focusable="false"
                     app:strokeWidth="@{viewModel.step != 1 ? 0f : @dimen/l_125}">
 
                     <LinearLayout
@@ -152,11 +155,11 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="@dimen/l1"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
                                 android:text="@string/install_method_title"
                                 android:textAppearance="@style/AppearanceFoundation.Body"
-                                android:textStyle="bold"
-                                android:gravity="center_vertical"
-                                android:layout_weight="1"/>
+                                android:textStyle="bold" />
 
                             <Button
                                 style="@style/WidgetFoundation.Button.Text"
@@ -167,7 +170,7 @@
                                 android:onClick="@{() -> viewModel.install()}"
                                 android:text="@string/install_start"
                                 app:icon="@drawable/ic_forth_md2"
-                                app:iconGravity="textEnd"/>
+                                app:iconGravity="textEnd" />
 
                         </LinearLayout>
 
@@ -220,19 +223,20 @@
                     style="@style/WidgetFoundation.Card.Variant"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/l1"
                     android:layout_marginStart="@dimen/l1"
+                    android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
+                    android:focusable="false"
                     app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
 
                     <TextView
                         android:id="@+id/release_notes"
+                        markdownText="@{viewModel.notes}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
                         android:textAppearance="@style/AppearanceFoundation.Caption"
-                        android:visibility="gone"
-                        markdownText="@{viewModel.notes}"/>
+                        android:visibility="gone" />
 
                 </com.google.android.material.card.MaterialCardView>
 
