@@ -9,27 +9,31 @@
     <string name="install">Instalar</string>
     <string name="section_home">Inicio</string>
     <string name="section_theme">Temas</string>
+    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Conexión no disponible</string>
     <string name="app_changelog">Registro de cambios</string>
-
+    <string name="manager">Manager</string>
     <string name="loading">Cargando…</string>
     <string name="update">Actualizar</string>
-
+    <string name="not_available">No disponible</string>
     <string name="hide">Ocultar</string>
     <string name="status">Estado</string>
     <string name="home_package">Paquete</string>
 
-    <string name="home_notice_content">Siempre asegúrese de estar utilizando la versión oficial de Magisk Manager que es de código abierto. Una versión de origen desconocido podria realizar acciones maliciosas.</string>
+    <string name="home_notice_content">Siempre asegúrate de que estás usando el software de código abierto Magisk Manager. Un Manager de fuente desconocida puede realizar acciones maliciosas.</string>
     <string name="home_support_title">Apóyenos</string>
     <string name="home_item_source">Código fuente</string>
-    <string name="home_support_content">Magisk es, y siempre será, gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
+    <string name="home_support_content">Magisk es, y siempre será gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
     <string name="home_status_normal">Normal</string>
-
+    <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Instalado</string>
+    <string name="home_latest_version">Última</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
+    <string name="uninstall_magisk_msg">¡Todos los módulos serán desactivados/eliminados!\nSe eliminará la raíz!\n¡Sus datos serán potencialmente encriptados si no lo están ya!</string>
+    <string name="home_check_safetynet">Revisar SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
@@ -43,10 +47,10 @@
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
     <string name="direct_install">Instalación directa (recomendado)</string>
     <string name="install_inactive_slot">Instalar en ranura inactiva (después de OTA)</string>
-    <string name="install_inactive_slot_msg">¡Su dispositivo será forzado a arrancar en la ranura inactiva actual después de un reinicio!\nUtilice esta opción solo después de que se haya completado la OTA.\n¿Continuar?</string>
+    <string name="install_inactive_slot_msg">¡Su dispositivo será forzado a arrancar en la ranura inactiva actual después de un reinicio!\nSólo use esta opción después de que OTA haya terminado.\n¿Continuar?</string>
     <string name="setup_title">Configuración adicional</string>
     <string name="select_patch_file">Seleccionar y parchar un archivo</string>
-    <string name="patch_file_msg">Seleccione una imagen raw (* .img) o un archivo tar de ODIN (* .tar)</string>
+    <string name="patch_file_msg">Seleccione una imagen raw (*.img) o un archivo tar de ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reiniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>
 
@@ -103,7 +107,7 @@
     <string name="hide_filters">Filtros</string>
     <string name="hide_search">Buscar</string>
 
-    <!--Module Fragment-->
+    <!--Module -->
     <string name="no_info_provided">(No hay información)</string>
     <string name="reboot_recovery">Reiniciar en modo recovery</string>
     <string name="reboot_bootloader">Reiniciar en modo bootloader</string>
@@ -116,9 +120,9 @@
     <string name="module_state_restore">Restaurar</string>
     <string name="module_action_install_external">Instalar desde almacenamiento</string>
     <string name="update_available">Actualización disponible</string>
-    <string name="home_installed_version">Instalado</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">En línea</string>
     <string name="sorting_order">Clasificar por</string>
-    <string name="external_rw_permission_denied">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Elegir modo</string>
@@ -170,6 +174,7 @@
     <string name="settings_su_biometric_summary">Usar autenticación biométrica para permitir solicitudes de superusuario</string>
     <string name="no_biometric">Dispositivo no compatible o las configuraciones biométricas no están habilitadas</string>
     <string name="settings_customization">Personalización</string>
+    <string name="setting_add_shortcut_summary">Añade un bonito atajo en la pantalla de inicio en caso de que el nombre y el icono sean difíciles de reconocer después de ocultar la aplicación</string>
 
     <string name="multiuser_mode">Modo multiusuario</string>
     <string name="settings_owner_only">Sólo administrador del dispositivo</string>
@@ -198,7 +203,7 @@
     <string name="manager_update_title">¡Actualización de Magisk Manager disponible!</string>
 
     <!--Toasts, Dialogs-->
-    <string name="yes">Si</string>
+    <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">¿Desea instalar %1$s ahora?</string>
@@ -214,7 +219,7 @@
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
-    <string name="restore_img_msg">Restaurando …</string>
+    <string name="restore_img_msg">Restaurando…</string>
     <string name="restore_done">¡Restauración Terminada!</string>
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="proprietary_title">Descargar código propietario</string>
@@ -222,9 +227,12 @@
     <string name="setup_fail">Instalación fallida</string>
     <string name="env_fix_title">Se requiere una instalación adicional</string>
     <string name="env_fix_msg">Su dispositivo requiere una instalación adicional para que Magisk funcione correctamente. Se descargará el zip de instalación de Magisk, ¿desea continuar ahora?</string>
-    <string name="setup_msg">Ejecutando configuración de entorno</string>
+    <string name="setup_msg">Ejecutando configuración de entorno…</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versión de Magisk no soportada</string>
     <string name="unsupport_magisk_msg">Esta versión de Magisk Manager no admite versiones de Magisk inferiores a %1$s.\n\nLa aplicación se comportará como si no estuviera instalado Magisk, actualícelo tan pronto como sea posible.</string>
+    <string name="external_rw_permission_denied">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
+    <string name="add_shortcut_title">Añadir un atajo a la pantalla de inicio</string>
+    <string name="add_shortcut_msg">Después de esconder el Magisk Manager, su nombre e icono podría ser difícil de reconocer. ¿Quieres añadir un bonito atajo a la pantalla de inicio?</string>
 
 </resources>

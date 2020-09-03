@@ -122,7 +122,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.isConnected ? viewModel.managerRemoteVersion : @string/not_available}"
+                                android:text="@{viewModel.loadFailed ? @string/not_available : viewModel.managerRemoteVersion}"
                                 tools:text="8.0.0 (123) (10)" />
 
                         </LinearLayout>

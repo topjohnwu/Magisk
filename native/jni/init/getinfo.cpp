@@ -178,3 +178,10 @@ void load_kernel_info(cmdline *cmd) {
 	LOGD("hardware=[%s]\n", cmd->hardware);
 	LOGD("hardware.platform=[%s]\n", cmd->hardware_plat);
 }
+
+bool check_two_stage() {
+	if (access("/apex", F_OK) == 0)
+		return true;
+	auto init = raw_data::mmap_ro("/init");
+	return init.find("selinux_setup");
+}

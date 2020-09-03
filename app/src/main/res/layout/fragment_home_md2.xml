@@ -109,7 +109,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/l1"
-                gone="@{!Info.hasGMS &amp;&amp; !viewModel.showUninstall}" />
+                gone="@{!viewModel.showSafetyNet &amp;&amp; !viewModel.showUninstall}" />
 
             <Button
                 style="@style/WidgetFoundation.Button.Outlined"
@@ -121,7 +121,7 @@
                 android:textAllCaps="false"
                 android:textSize="12sp"
                 android:onClick="@{() -> viewModel.onSafetyNetPressed()}"
-                gone="@{!Info.hasGMS}"
+                gone="@{!viewModel.showSafetyNet}"
                 app:cornerRadius="@dimen/r1"
                 app:icon="@drawable/ic_safetynet_md2" />
 

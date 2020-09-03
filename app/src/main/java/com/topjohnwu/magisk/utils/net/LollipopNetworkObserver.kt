@@ -32,7 +32,7 @@ open class LollipopNetworkObserver(
         }
 
         override fun onLost(network: Network) {
-            emit(Connectivity.create(manager, network))
+            emit(Connectivity())
         }
     }
 }

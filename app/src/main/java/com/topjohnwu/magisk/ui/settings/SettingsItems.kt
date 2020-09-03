@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.UpdateCheckService
+import com.topjohnwu.magisk.core.tasks.PatchAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.availableLocales
@@ -88,9 +89,12 @@ object Hide : BaseSettingsItem.Input() {
     var result = "Manager"
         set(value) = set(value, field, { field = it }, BR.result, BR.error)
 
+    val maxLength
+        get() = PatchAPK.MAX_LABEL_LENGTH
+
     @get:Bindable
     val isError
-        get() = result.length > 14 || result.isBlank()
+        get() = result.length > maxLength || result.isBlank()
 
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root

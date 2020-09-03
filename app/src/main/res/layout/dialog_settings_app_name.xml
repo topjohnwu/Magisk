@@ -25,7 +25,7 @@
             android:hint="@string/settings_app_name_hint"
             app:boxStrokeColor="?colorOnSurfaceVariant"
             app:counterEnabled="true"
-            app:counterMaxLength="14"
+            app:counterMaxLength="@{data.maxLength}"
             app:counterOverflowTextColor="?colorError"
             app:error="@{data.error ? @string/settings_app_name_error : @string/empty}"
             app:errorEnabled="true"

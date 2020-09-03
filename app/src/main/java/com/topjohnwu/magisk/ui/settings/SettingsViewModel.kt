@@ -19,7 +19,7 @@ import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.utils.PatchAPK
+import com.topjohnwu.magisk.core.tasks.PatchAPK
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
