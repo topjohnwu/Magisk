@@ -96,6 +96,7 @@
                             tools:layout_gravity="center">
 
                             <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
                                 gone="@{Info.isSAR}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -104,6 +105,7 @@
                                 tools:checked="true" />
 
                             <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
                                 gone="@{Info.isFBE}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -112,6 +114,7 @@
                                 app:tint="?colorPrimary" />
 
                             <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
                                 gone="@{Info.ramdisk}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -187,6 +190,7 @@
                             android:paddingEnd="3dp">
 
                             <RadioButton
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:id="@+id/method_download"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -194,12 +198,14 @@
                                 tools:checked="true" />
 
                             <RadioButton
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:id="@+id/method_patch"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/select_patch_file" />
 
                             <RadioButton
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:id="@+id/method_direct"
                                 gone="@{!viewModel.rooted}"
                                 android:layout_width="match_parent"
@@ -207,6 +213,7 @@
                                 android:text="@string/direct_install" />
 
                             <RadioButton
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:id="@+id/method_inactive_slot"
                                 gone="@{!viewModel.isRooted || !Info.isAB}"
                                 android:layout_width="match_parent"
