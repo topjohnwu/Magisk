@@ -40,21 +40,19 @@ int data_holder::patch(str_pairs list) {
 	return count;
 }
 
+bool data_holder::find(string_view pattern) {
+	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
+		if (memcmp(p, pattern.data(), pattern.length() + 1) == 0)
+			return true;
+	}
+	return false;
+}
+
 void data_holder::consume(data_holder &other) {
 	buf = other.buf;
 	sz = other.sz;
 	other.buf = nullptr;
 	other.sz = 0;
-}
-
-template <>
-auto_data<MMAP>::~auto_data<MMAP>() {
-	if (buf) munmap(buf, sz);
-}
-
-template <>
-auto_data<HEAP>::~auto_data<HEAP>() {
-	free(buf);
 }
 
 auto_data<HEAP> raw_data::read(int fd) {
@@ -75,9 +73,11 @@ auto_data<MMAP> raw_data::mmap_rw(const char *name) {
 	return data;
 }
 
-// Explicit instantiation
-template struct auto_data<HEAP>;
-template struct auto_data<MMAP>;
+auto_data<MMAP> raw_data::mmap_ro(const char *name) {
+	auto_data<MMAP> data;
+	::mmap_ro(name, data.buf, data.sz);
+	return data;
+}
 
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
 		// This will also mount /sys and /proc
 		load_kernel_info(&cmd);
 
-		bool two_stage = access("/apex", F_OK) == 0;
+		bool two_stage = check_two_stage();
 		if (cmd.skip_initramfs) {
 			if (two_stage)
 				init = new SARFirstStageInit(argv, &cmd);

@@ -21,12 +21,12 @@ struct data_holder {
 	size_t sz = 0;
 	using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
 	int patch(str_pairs list);
+	bool find(std::string_view pattern);
 protected:
 	void consume(data_holder &other);
 };
 
 enum data_type { HEAP, MMAP };
-
 template <data_type T>
 struct auto_data : public data_holder {
 	auto_data<T>() = default;
@@ -35,11 +35,14 @@ struct auto_data : public data_holder {
 	~auto_data<T>() {}
 	auto_data<T>& operator=(auto_data<T> &&other) { consume(other); return *this; }
 };
+template <> inline auto_data<MMAP>::~auto_data<MMAP>() { if (buf) munmap(buf, sz); }
+template <> inline auto_data<HEAP>::~auto_data<HEAP>() { free(buf); }
 
 namespace raw_data {
 	auto_data<HEAP> read(const char *name);
 	auto_data<HEAP> read(int fd);
 	auto_data<MMAP> mmap_rw(const char *name);
+	auto_data<MMAP> mmap_ro(const char *name);
 }
 
 struct fstab_entry {
@@ -59,6 +62,7 @@ struct fstab_entry {
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 
 void load_kernel_info(cmdline *cmd);
+bool check_two_stage();
 int dump_magisk(const char *path, mode_t mode);
 int magisk_proxy_main(int argc, char *argv[]);
 void setup_klog();
