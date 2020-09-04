@@ -72,6 +72,7 @@ void sepolicy::magisk_rules() {
 			allow(type, SEPOL_EXEC_TYPE, "file", "open");
 			allow(type, SEPOL_EXEC_TYPE, "file", "getattr");
 			allow(type, SEPOL_EXEC_TYPE, "file", "execute");
+			allow(SEPOL_CLIENT_DOMAIN, type, "process", "sigchld");
 
 			// Auto transit to client domain
 			allow(type, SEPOL_CLIENT_DOMAIN, "process", "transition");
