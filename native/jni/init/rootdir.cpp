@@ -320,8 +320,8 @@ void SARBase::patch_rootdir() {
 int magisk_proxy_main(int argc, char *argv[]) {
 	setup_klog();
 
-	auto config = raw_data::read("/sbin/magisk");
-	auto self = raw_data::read("/.backup/.magisk");
+	auto self = raw_data::read("/sbin/magisk");
+	auto config = raw_data::read("/.backup/.magisk");
 
 	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
