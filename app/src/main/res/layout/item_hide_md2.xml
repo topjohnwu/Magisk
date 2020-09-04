@@ -19,6 +19,7 @@
 
     <com.google.android.material.card.MaterialCardView
         style="@style/WidgetFoundation.Card.Variant"
+        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:layout_gravity="center"
