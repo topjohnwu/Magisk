@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="@={viewModel.showSystem}"
-                android:nextFocusRight="@id/hide_filter_done"
+                android:nextFocusRight="@id/hide_filter_chip_data"
                 android:nextFocusDown="@id/hide_filter_search_field"
                 android:text="@string/show_system_app"
                 android:textAppearance="@style/AppearanceFoundation.Caption"
@@ -61,12 +61,15 @@
                 tools:checked="true" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/hide_filter_chip_data"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 gone="@{viewModel.query.empty}"
                 onCloseClicked="@{() -> viewModel.resetQuery()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="false"
+                android:nextFocusRight="@id/hide_filter_done"
+                android:nextFocusDown="@id/hide_filter_search_field"
                 android:text="@{viewModel.query}"
                 android:textAppearance="@style/AppearanceFoundation.Caption"
                 app:chipBackgroundColor="?colorSurfaceVariant" />
