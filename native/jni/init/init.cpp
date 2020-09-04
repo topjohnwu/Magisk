@@ -40,7 +40,7 @@ int data_holder::patch(str_pairs list) {
 	return count;
 }
 
-bool data_holder::find(string_view pattern) {
+bool data_holder::contains(string_view pattern) {
 	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
 		if (memcmp(p, pattern.data(), pattern.length() + 1) == 0)
 			return true;

@@ -186,5 +186,5 @@ bool check_two_stage() {
 		return true;
 	// If we still have no indication, parse the original init and see what's up
 	auto init = raw_data::mmap_ro("/.backup/init");
-	return init.find("selinux_setup");
+	return init.contains("selinux_setup");
 }
