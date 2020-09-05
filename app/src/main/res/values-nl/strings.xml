@@ -22,7 +22,7 @@
     <string name="status">Status</string>
     <string name="home_package">Pakket</string>
 
-    <string name="home_notice_content">Zorg er voor dat je altijd de opensourceversie van Magisk Manager gebruikt. Magisk Manager van een onbekende bron kan schade veroorzaken.</string>
+    <string name="home_notice_content">Zorg ervoor dat je altijd de opensourceversie van Magisk Manager gebruikt. Magisk Manager van een onbekende bron kan schade veroorzaken.</string>
     <string name="home_support_title">Ondersteun ons</string>
     <string name="home_item_source">Broncode</string>
     <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt kun je een kleine donatie doen.</string>
@@ -126,7 +126,7 @@
     <string name="settings_dark_mode_title">Thema</string>
     <string name="settings_dark_mode_message">Kies het thema dat het best bij je past!</string>
     <string name="settings_dark_mode_light">Licht</string>
-    <string name="settings_dark_mode_system">Ingesteld door Batterijbesparing</string>
+    <string name="settings_dark_mode_system">Systeemstandaard</string>
     <string name="settings_dark_mode_dark">Donker</string>
     <string name="settings_download_path_title">Downloadpad</string>
     <string name="settings_download_path_message">Bestanden worden opgeslagen in %1$s</string>
