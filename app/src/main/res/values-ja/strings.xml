@@ -223,11 +223,17 @@
     <string name="flash_screen_title">インストレーション</string>
     <string name="reboot_delay_toast">5秒で再起動します…</string>
     <string name="superuser_toggle_revoke">取り消し</string>
-    <string name="module_installed">\@string/home_installed_version</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="settings_dark_mode_message">自分のスタイルに合ったモードを選択！</string>
     <string name="external_rw_permission_denied">この機能を有効にするためにストレージの許可を付与</string>
     <string name="download_open_parent">"親フォルダに表示 "</string>
     <string name="download_open_self">ファイルを表示</string>
     <string name="unsupport_magisk_msg">このバージョンの Magisk Manager は、%1$s 以下の Magisk バージョンには対応していません。 アプリは Magisk がインストールされていないかのように動作しますので、できるだけ早く Magisk をアップグレードしてください。</string>
+    <string name="home_check_safetynet">SafetyNet のチェック</string>
+    <string name="home_status_normal">ノーマル</string>
+    <string name="module_section_online">オンライン</string>
+    <string name="setting_add_shortcut_summary">アプリを隠した後に名前やアイコンが分かりづらい場合ホーム画面にショートカットを追加する</string>
+    <string name="add_shortcut_title">ホーム画面にショートカットを追加</string>
+    <string name="add_shortcut_msg">Magisk Manager を隠した後、名前やアイコンは分かりづらくなります。ホーム画面にショートカットを追加しますか？</string>
 
 </resources>
