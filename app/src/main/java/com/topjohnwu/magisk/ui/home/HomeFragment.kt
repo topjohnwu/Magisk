@@ -33,7 +33,7 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
         binding.homeMagiskWrapper.homeMagiskTitleBarrier.referencedIds =
             intArrayOf(R.id.home_magisk_action, R.id.home_magisk_title, R.id.home_magisk_icon)
         binding.homeMagiskWrapper.homeMagiskBarrier.referencedIds =
-            intArrayOf(R.id.home_magisk_latest_version, R.id.home_magisk_installed_version, R.id.home_magisk_mode)
+            intArrayOf(R.id.home_magisk_latest_version, R.id.home_magisk_installed_version)
         binding.homeManagerWrapper.homeManagerTitleBarrier.referencedIds =
             intArrayOf(R.id.home_manager_action, R.id.home_manager_title, R.id.home_manager_icon)
 

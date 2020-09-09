@@ -7,8 +7,6 @@
 
         <import type="com.topjohnwu.magisk.core.Info" />
 
-        <import type="com.topjohnwu.magisk.core.InfoKt" />
-
         <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
 
         <variable
@@ -28,7 +26,7 @@
             android:paddingTop="@dimen/l_50"
             android:paddingStart="@dimen/l1"
             android:paddingEnd="@dimen/l1"
-            android:paddingBottom="@dimen/l1"
+            android:paddingBottom="@dimen/l_50"
             tools:layout_gravity="center">
 
             <ImageView
@@ -95,7 +93,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fadingEdgeLength="@dimen/l1"
-                android:paddingTop="@dimen/l_50"
                 android:requiresFadingEdge="horizontal"
                 android:scrollbars="none"
                 app:layout_constraintTop_toBottomOf="@+id/home_manager_title_barrier">
@@ -144,27 +141,10 @@
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/home_manager_internal_mode"
-                            style="@style/W.Home.Item"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_installed_version">
-
-                            <TextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/status" />
-
-                            <TextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{InfoKt.isRunningAsStub ? @string/home_status_stub : @string/home_status_normal}"
-                                tools:text="Normal" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
                             android:id="@+id/home_manager_internal_connection"
                             style="@style/W.Home.Item.Bottom"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_manager_internal_mode">
+                            app:layout_constraintTop_toBottomOf="@+id/home_manager_installed_version">
 
                             <TextView
                                 style="@style/W.Home.ItemContent"
