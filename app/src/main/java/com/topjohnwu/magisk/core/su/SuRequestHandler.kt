@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.core.su
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.LocalServerSocket
 import android.net.LocalSocket
 import android.net.LocalSocketAddress
 import androidx.collection.ArrayMap
@@ -22,20 +21,16 @@ import java.util.concurrent.TimeUnit.SECONDS
 abstract class SuRequestHandler(
     private val packageManager: PackageManager,
     private val policyDB: PolicyDao
-) {
-    private lateinit var socket: LocalSocket
-    private lateinit var output: DataOutputStream
-    private lateinit var input: DataInputStream
+) : Closeable {
 
+    private lateinit var output: DataOutputStream
     protected lateinit var policy: SuPolicy
         private set
 
     abstract fun onStart()
 
     suspend fun start(intent: Intent): Boolean {
-        val name = intent.getStringExtra("socket") ?: return false
-
-        if (!init(name))
+        if (!init(intent))
             return false
 
         // Never allow com.topjohnwu.magisk (could be malware)
@@ -63,35 +58,37 @@ abstract class SuRequestHandler(
         }
     }
 
-    private class SocketError : IOException()
+    @Throws(IOException::class)
+    override fun close() {
+        if (::output.isInitialized)
+            output.close()
+    }
 
-    private suspend fun init(name: String) = withContext(Dispatchers.IO) {
+    private class SuRequestError : IOException()
+
+    private suspend fun init(intent: Intent) = withContext(Dispatchers.IO) {
         try {
+            val uid: Int
             if (Const.Version.atLeastCanary()) {
-                val server = LocalServerSocket(name)
-                // Do NOT use Closable?.use(block) here as LocalServerSocket does
-                // not implement Closable on older Android platforms
-                try {
-                    socket = async { server.accept() }.timedAwait() ?: throw SocketError()
-                } finally {
-                    server.close()
-                }
+                val name = intent.getStringExtra("fifo") ?: throw SuRequestError()
+                uid = intent.getIntExtra("uid", -1).also { if (it < 0) throw SuRequestError() }
+                output = DataOutputStream(FileOutputStream(name).buffered())
             } else {
-                socket = LocalSocket()
+                val name = intent.getStringExtra("socket") ?: throw SuRequestError()
+                val socket = LocalSocket()
                 socket.connect(LocalSocketAddress(name, LocalSocketAddress.Namespace.ABSTRACT))
+                output = DataOutputStream(BufferedOutputStream(socket.outputStream))
+                val input = DataInputStream(BufferedInputStream(socket.inputStream))
+                val map = async { input.readRequest() }.timedAwait() ?: throw SuRequestError()
+                uid = map["uid"]?.toIntOrNull() ?: throw SuRequestError()
             }
-            output = DataOutputStream(BufferedOutputStream(socket.outputStream))
-            input = DataInputStream(BufferedInputStream(socket.inputStream))
-            val map = async { readRequest() }.timedAwait() ?: throw SocketError()
-            val uid = map["uid"]?.toIntOrNull() ?: throw SocketError()
             policy = uid.toPolicy(packageManager)
             true
         } catch (e: Exception) {
             when (e) {
                 is IOException, is PackageManager.NameNotFoundException -> {
                     Timber.e(e)
-                    if (::socket.isInitialized)
-                        socket.close()
+                    runCatching { close() }
                     false
                 }
                 else -> throw e  // Unexpected error
@@ -116,11 +113,7 @@ abstract class SuRequestHandler(
             } catch (e: IOException) {
                 Timber.e(e)
             } finally {
-                runCatching {
-                    input.close()
-                    output.close()
-                    socket.close()
-                }
+                runCatching { close() }
                 if (until >= 0)
                     policyDB.update(policy)
             }
@@ -128,11 +121,11 @@ abstract class SuRequestHandler(
     }
 
     @Throws(IOException::class)
-    private fun readRequest(): Map<String, String> {
+    private fun DataInputStream.readRequest(): Map<String, String> {
         fun readString(): String {
-            val len = input.readInt()
+            val len = readInt()
             val buf = ByteArray(len)
-            input.readFully(buf)
+            readFully(buf)
             return String(buf, Charsets.UTF_8)
         }
         val ret = ArrayMap<String, String>()

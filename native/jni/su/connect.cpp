@@ -3,6 +3,7 @@
 
 #include <daemon.hpp>
 #include <utils.hpp>
+#include <selinux.hpp>
 
 #include "su.hpp"
 
@@ -179,34 +180,33 @@ void app_notify(const su_context &ctx) {
 	}
 }
 
-int app_socket(const char *name, const shared_ptr<su_info> &info) {
-	vector<Extra> extras;
-	extras.reserve(1);
-	extras.emplace_back("socket", name);
+int app_request(const shared_ptr<su_info> &info) {
+	// Create FIFO
+	char fifo[64];
+	strcpy(fifo, "/dev/socket/");
+	gen_rand_str(fifo + 12, 32, true);
+	mkfifo(fifo, 0600);
+	chown(fifo, info->mgr_st.st_uid, info->mgr_st.st_gid);
+	setfilecon(fifo, "u:object_r:" SEPOL_FILE_TYPE ":s0");
 
+	// Send request
+	vector<Extra> extras;
+	extras.reserve(2);
+	extras.emplace_back("fifo", fifo);
+	extras.emplace_back("uid", info->uid);
 	exec_cmd("request", extras, info, PKG_ACTIVITY);
 
-	sockaddr_un addr;
-	size_t len = setup_sockaddr(&addr, name);
-	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-	bool connected = false;
-	// Try at most 60 seconds
-	for (int i = 0; i < 600; ++i) {
-		if (connect(fd, reinterpret_cast<sockaddr *>(&addr), len) == 0) {
-			connected = true;
-			break;
-		}
-		usleep(100000);  // 100ms
-	}
-	if (connected) {
-		return fd;
-	} else {
+	// Wait for data input for at most 70 seconds
+	int fd = xopen(fifo, O_RDONLY | O_CLOEXEC);
+	struct pollfd pfd = {
+		.fd = fd,
+		.events = POLL_IN
+	};
+	if (xpoll(&pfd, 1, 70 * 1000) <= 0) {
 		close(fd);
-		return -1;
+		fd = -1;
 	}
-}
 
-void socket_send_request(int fd, const shared_ptr<su_info> &info) {
-	write_key_token(fd, "uid", info->uid);
-	write_string_be(fd, "eof");
+	unlink(fifo);
+	return fd;
 }
