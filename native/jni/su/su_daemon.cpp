@@ -330,9 +330,6 @@ void su_daemon_handler(int client, struct ucred *credential) {
 			setenv("SHELL", ctx.req.shell, 1);
 		}
 	}
-	const char *ld_path = getenv("LD_LIBRARY_PATH");
-	if (ld_path && strncmp(ld_path, ":/apex/com.android.runtime/lib", 30) == 0)
-		unsetenv("LD_LIBRARY_PATH");
 
 	// Unblock all signals
 	sigset_t block_set;
