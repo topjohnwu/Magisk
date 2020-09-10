@@ -21,7 +21,7 @@ struct data_holder {
 	size_t sz = 0;
 	using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
 	int patch(str_pairs list);
-	bool find(std::string_view pattern);
+	bool contains(std::string_view pattern);
 protected:
 	void consume(data_holder &other);
 };

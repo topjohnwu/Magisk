@@ -27,7 +27,7 @@
             android:paddingStart="@dimen/l1"
             android:paddingTop="@dimen/l_50"
             android:paddingEnd="@dimen/l1"
-            android:paddingBottom="@dimen/l1"
+            android:paddingBottom="@dimen/l_50"
             tools:layout_gravity="center">
 
             <ImageView
@@ -93,7 +93,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fadingEdgeLength="@dimen/l1"
-                android:paddingTop="@dimen/l_50"
                 android:requiresFadingEdge="horizontal"
                 android:scrollbars="none"
                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_title_barrier">
@@ -126,7 +125,7 @@
 
                         <LinearLayout
                             android:id="@+id/home_magisk_installed_version"
-                            style="@style/W.Home.Item"
+                            style="@style/W.Home.Item.Bottom"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_latest_version">
 
@@ -141,29 +140,12 @@
 
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/home_magisk_mode"
-                            style="@style/W.Home.Item.Bottom"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_installed_version">
-
-                            <TextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/status" />
-
-                            <TextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.env.isActive ? @string/home_status_normal : @string/not_available}"
-                                tools:text="Normal" />
-
-                        </LinearLayout>
-
                         <androidx.constraintlayout.widget.Barrier
                             android:id="@+id/home_magisk_barrier"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:barrierDirection="end"
-                            tools:constraint_referenced_ids="home_magisk_latest_version,home_magisk_installed_version,home_magisk_mode" />
+                            tools:constraint_referenced_ids="home_magisk_latest_version,home_magisk_installed_version"/>
 
                         <LinearLayout
                             android:id="@+id/home_device_details_ab"

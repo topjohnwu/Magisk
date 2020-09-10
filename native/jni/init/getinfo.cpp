@@ -182,6 +182,9 @@ void load_kernel_info(cmdline *cmd) {
 bool check_two_stage() {
 	if (access("/apex", F_OK) == 0)
 		return true;
-	auto init = raw_data::mmap_ro("/init");
-	return init.find("selinux_setup");
+	if (access("/system/bin/init", F_OK) == 0)
+		return true;
+	// If we still have no indication, parse the original init and see what's up
+	auto init = raw_data::mmap_ro("/.backup/init");
+	return init.contains("selinux_setup");
 }
