@@ -13,12 +13,14 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
+import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.events.DieEvent
 import com.topjohnwu.magisk.events.ShowUIEvent
+import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.ui.superuser.SpinnerRvItem
 import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.launch
@@ -28,7 +30,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 
 class SuRequestViewModel(
     private val pm: PackageManager,
-    private val policyDB: PolicyDao,
+    policyDB: PolicyDao,
     private val timeoutPrefs: SharedPreferences,
     private val res: Resources
 ) : BaseViewModel() {
@@ -57,89 +59,86 @@ class SuRequestViewModel(
         setItems(items)
     }
 
-    private val handler = Handler()
+    private val handler = SuRequestHandler(pm, policyDB)
+    private lateinit var timer: CountDownTimer
 
     fun grantPressed() {
-        handler.cancelTimer()
+        cancelTimer()
         if (BiometricHelper.isEnabled) {
-            withView {
-                BiometricHelper.authenticate(this) {
-                    handler.respond(ALLOW)
+            BiometricEvent {
+                onSuccess {
+                    respond(ALLOW)
                 }
-            }
+            }.publish()
         } else {
-            handler.respond(ALLOW)
+            respond(ALLOW)
         }
     }
 
     fun denyPressed() {
-        handler.respond(DENY)
+        respond(DENY)
     }
 
     fun spinnerTouched(): Boolean {
-        handler.cancelTimer()
+        cancelTimer()
         return false
     }
 
     fun handleRequest(intent: Intent) {
         viewModelScope.launch {
-            if (!handler.start(intent))
+            if (handler.start(intent))
+                showDialog(handler.policy)
+            else
                 DieEvent().publish()
         }
     }
 
-    private inner class Handler : SuRequestHandler(pm, policyDB) {
+    private fun showDialog(policy: SuPolicy) {
+        icon = policy.applicationInfo.loadIcon(pm)
+        title = policy.appName
+        packageName = policy.packageName
+        selectedItemPosition = timeoutPrefs.getInt(policy.packageName, 0)
 
-        private lateinit var timer: CountDownTimer
+        // Set timer
+        val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
+        timer = SuTimer(millis, 1000).apply { start() }
 
-        fun respond(action: Int) {
-            timer.cancel()
-
-            val pos = selectedItemPosition
-            timeoutPrefs.edit().putInt(policy.packageName, pos).apply()
-            respond(action, Config.Value.TIMEOUT_LIST[pos])
-
-            // Kill activity after response
-            DieEvent().publish()
-        }
-
-        fun cancelTimer() {
-            timer.cancel()
-            denyText = res.getString(R.string.deny)
-        }
-
-        override fun onStart() {
-            icon = policy.applicationInfo.loadIcon(pm)
-            title = policy.appName
-            packageName = policy.packageName
-            selectedItemPosition = timeoutPrefs.getInt(policy.packageName, 0)
-
-            // Set timer
-            val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
-            timer = SuTimer(millis, 1000).apply { start() }
-
-            // Actually show the UI
-            ShowUIEvent().publish()
-        }
-
-        private inner class SuTimer(
-            private val millis: Long,
-            interval: Long
-        ) : CountDownTimer(millis, interval) {
-
-            override fun onTick(remains: Long) {
-                if (!grantEnabled && remains <= millis - 1000) {
-                    grantEnabled = true
-                }
-                denyText = "${res.getString(R.string.deny)} (${(remains / 1000) + 1})"
-            }
-
-            override fun onFinish() {
-                denyText = res.getString(R.string.deny)
-                respond(DENY)
-            }
-
-        }
+        // Actually show the UI
+        ShowUIEvent().publish()
     }
 
+    private fun respond(action: Int) {
+        timer.cancel()
+
+        val pos = selectedItemPosition
+        timeoutPrefs.edit().putInt(handler.policy.packageName, pos).apply()
+        handler.respond(action, Config.Value.TIMEOUT_LIST[pos])
+
+        // Kill activity after response
+        DieEvent().publish()
+    }
+
+    private fun cancelTimer() {
+        timer.cancel()
+        denyText = res.getString(R.string.deny)
+    }
+
+    private inner class SuTimer(
+        private val millis: Long,
+        interval: Long
+    ) : CountDownTimer(millis, interval) {
+
+        override fun onTick(remains: Long) {
+            if (!grantEnabled && remains <= millis - 1000) {
+                grantEnabled = true
+            }
+            denyText = "${res.getString(R.string.deny)} (${(remains / 1000) + 1})"
+        }
+
+        override fun onFinish() {
+            denyText = res.getString(R.string.deny)
+            respond(DENY)
+        }
+
+    }
 }

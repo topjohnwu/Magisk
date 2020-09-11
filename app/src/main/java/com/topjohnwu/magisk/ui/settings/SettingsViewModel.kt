@@ -23,7 +23,7 @@ import com.topjohnwu.magisk.core.tasks.PatchAPK
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
-import com.topjohnwu.magisk.events.dialog.BiometricDialog
+import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
@@ -125,7 +125,7 @@ class SettingsViewModel(
     }
 
     private fun authenticate(callback: () -> Unit) {
-        BiometricDialog {
+        BiometricEvent {
             // allow the change on success
             onSuccess { callback() }
         }.publish()

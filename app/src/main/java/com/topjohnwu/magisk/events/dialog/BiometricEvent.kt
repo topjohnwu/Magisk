@@ -5,7 +5,7 @@ import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 
-class BiometricDialog(
+class BiometricEvent(
     builder: Builder.() -> Unit
 ) : ViewEvent(), ActivityExecutor {
 

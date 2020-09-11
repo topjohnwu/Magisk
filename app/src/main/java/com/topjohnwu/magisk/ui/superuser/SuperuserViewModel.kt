@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.dialog.BiometricDialog
+import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.view.TappableHeadlineItem
 import com.topjohnwu.magisk.view.TextItem
@@ -86,7 +86,7 @@ class SuperuserViewModel(
         }
 
         if (BiometricHelper.isEnabled) {
-            BiometricDialog {
+            BiometricEvent {
                 onSuccess { updateState() }
             }.publish()
         } else {
@@ -130,7 +130,7 @@ class SuperuserViewModel(
         }
 
         if (BiometricHelper.isEnabled) {
-            BiometricDialog {
+            BiometricEvent {
                 onSuccess { updateState() }
             }.publish()
         } else {
