@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.superuser
 
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
@@ -27,7 +26,6 @@ import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
 class SuperuserViewModel(
     private val db: PolicyDao,
-    private val packageManager: PackageManager,
     private val resources: Resources
 ) : BaseViewModel(), TappableHeadlineItem.Listener {
 
@@ -51,7 +49,7 @@ class SuperuserViewModel(
         state = State.LOADING
         val (policies, diff) = withContext(Dispatchers.Default) {
             val policies = db.fetchAll {
-                PolicyRvItem(it, it.applicationInfo.loadIcon(packageManager), this@SuperuserViewModel)
+                PolicyRvItem(it, it.icon, this@SuperuserViewModel)
             }.sortedWith(compareBy(
                 { it.item.appName.toLowerCase(currentLocale) },
                 { it.item.packageName }

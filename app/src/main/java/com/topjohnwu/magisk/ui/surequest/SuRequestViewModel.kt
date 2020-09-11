@@ -29,7 +29,7 @@ import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.util.concurrent.TimeUnit.SECONDS
 
 class SuRequestViewModel(
-    private val pm: PackageManager,
+    pm: PackageManager,
     policyDB: PolicyDao,
     private val timeoutPrefs: SharedPreferences,
     private val res: Resources
@@ -94,7 +94,7 @@ class SuRequestViewModel(
     }
 
     private fun showDialog(policy: SuPolicy) {
-        icon = policy.applicationInfo.loadIcon(pm)
+        icon = policy.icon
         title = policy.appName
         packageName = policy.packageName
         selectedItemPosition = timeoutPrefs.getInt(policy.packageName, 0)
