@@ -18,9 +18,9 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.events.DieEvent
+import com.topjohnwu.magisk.events.ShowUIEvent
 import com.topjohnwu.magisk.ui.superuser.SpinnerRvItem
 import com.topjohnwu.magisk.utils.set
-import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
 import me.tatarka.bindingcollectionadapter2.ItemBinding
@@ -33,25 +33,13 @@ class SuRequestViewModel(
     private val res: Resources
 ) : BaseViewModel() {
 
-    @get:Bindable
-    var icon: Drawable? = null
-        set(value) = set(value, field, { field = it }, BR.icon)
-
-    @get:Bindable
-    var title = ""
-        set(value) = set(value, field, { field = it }, BR.title)
-
-    @get:Bindable
-    var packageName = ""
-        set(value) = set(value, field, { field = it }, BR.packageName)
+    lateinit var icon: Drawable
+    lateinit var title: String
+    lateinit var packageName: String
 
     @get:Bindable
     var denyText = res.getString(R.string.deny)
         set(value) = set(value, field, { field = it }, BR.denyText)
-
-    @get:Bindable
-    var warningText = res.getString(R.string.su_warning)
-        set(value) = set(value, field, { field = it }, BR.warningText)
 
     @get:Bindable
     var selectedItemPosition = 0
@@ -124,14 +112,14 @@ class SuRequestViewModel(
             icon = policy.applicationInfo.loadIcon(pm)
             title = policy.appName
             packageName = policy.packageName
-            UiThreadHandler.handler.post {
-                // Delay is required to properly do selection
-                selectedItemPosition = timeoutPrefs.getInt(policy.packageName, 0)
-            }
+            selectedItemPosition = timeoutPrefs.getInt(policy.packageName, 0)
 
             // Set timer
             val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
             timer = SuTimer(millis, 1000).apply { start() }
+
+            // Actually show the UI
+            ShowUIEvent().publish()
         }
 
         private inner class SuTimer(

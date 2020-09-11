@@ -109,7 +109,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="@dimen/l1"
                 android:gravity="center"
-                android:text="@{viewModel.warningText}"
+                android:text="@string/su_warning"
                 android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textColor="?colorError"
                 android:textStyle="bold"

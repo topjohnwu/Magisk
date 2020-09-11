@@ -48,22 +48,15 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(themeRes)
+        super.onCreate(savedInstanceState)
+
+        startObserveEvents()
 
         // We need to set the window background explicitly since for whatever reason it's not
         // propagated upstream
         obtainStyledAttributes(intArrayOf(android.R.attr.windowBackground))
             .use { it.getDrawable(0) }
             .also { window.setBackgroundDrawable(it) }
-
-        super.onCreate(savedInstanceState)
-        startObserveEvents()
-
-        binding = DataBindingUtil.setContentView<Binding>(this, layoutRes).also {
-            it.setVariable(BR.viewModel, viewModel)
-            it.lifecycleOwner = this
-        }
-
-        ensureInsets()
 
         directionsDispatcher.observe(this) {
             it?.navigate()
@@ -72,6 +65,15 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
                 directionsDispatcher.value = null
             }
         }
+    }
+
+    fun setContentView() {
+        binding = DataBindingUtil.setContentView<Binding>(this, layoutRes).also {
+            it.setVariable(BR.viewModel, viewModel)
+            it.lifecycleOwner = this
+        }
+
+        ensureInsets()
     }
 
     override fun onResume() {

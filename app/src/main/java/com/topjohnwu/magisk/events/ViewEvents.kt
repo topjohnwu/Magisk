@@ -51,6 +51,12 @@ class DieEvent : ViewEvent(), ActivityExecutor {
     }
 }
 
+class ShowUIEvent : ViewEvent(), ActivityExecutor {
+    override fun invoke(activity: BaseUIActivity<*, *>) {
+        activity.setContentView()
+    }
+}
+
 class RecreateEvent : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: BaseUIActivity<*, *>) {
         activity.recreate()
