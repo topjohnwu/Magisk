@@ -35,11 +35,6 @@
             android:orientation="vertical"
             android:paddingStart="@dimen/l1"
             android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
-            app:fastScrollEnabled="true"
-            app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb"
-            app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_track"
-            app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb"
-            app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_track"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toTopOf="@+id/module_filter_title_search"
@@ -48,10 +43,11 @@
             app:spanCount="2"
             tools:listitem="@layout/item_repo_md2" />
 
-        <View
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="@dimen/l_50"
-            android:background="@drawable/bg_shadow"
+            app:srcCompat="@drawable/bg_shadow"
+            app:tint="?colorSurfaceVariant"
             app:layout_constraintBottom_toBottomOf="@+id/module_filter_list" />
 
         <TextView

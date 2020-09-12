@@ -43,6 +43,12 @@
                 tools:layout_marginTop="24dp"
                 tools:title="Home" />
 
+            <View
+                gone="@{android.os.Build.VERSION.SDK_INT >= 21}"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="?colorSurfaceVariant"/>
+
         </com.google.android.material.appbar.AppBarLayout>
 
         <!--

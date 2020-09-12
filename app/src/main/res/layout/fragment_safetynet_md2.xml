@@ -87,12 +87,13 @@
                             app:layout_constraintTop_toTopOf="parent"
                             tools:text="@string/safetynet_attest_success" />
 
-                        <View
+                        <ImageView
                             android:id="@+id/safetynet_divider"
                             android:layout_width="50dp"
                             android:layout_height="4dp"
                             android:layout_marginTop="@dimen/l2"
-                            android:background="@drawable/bg_divider_rounded_on_primary"
+                            app:srcCompat="@drawable/bg_divider_rounded_on_primary"
+                            app:tint="?colorOnPrimary"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/safetynet_title" />

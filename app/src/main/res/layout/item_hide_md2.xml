@@ -107,6 +107,7 @@
             style="@style/WidgetFoundation.ProgressBar"
             android:layout_width="match_parent"
             android:layout_gravity="top"
+            gone="@{item.checkedPercent == 0}"
             android:progress="@{item.checkedPercent}" />
 
     </com.google.android.material.card.MaterialCardView>
