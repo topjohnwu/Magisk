@@ -52,11 +52,6 @@ class SettingsViewModel(
             Customization,
             Theme, Language
         )
-        if (Build.VERSION.SDK_INT < 21) {
-            // Pre 5.0 does not support getting colors from attributes,
-            // making theming a pain in the ass. Just forget about it
-            list.remove(Theme)
-        }
         if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
             list.add(AddShortcut)
 

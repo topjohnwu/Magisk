@@ -22,9 +22,9 @@
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}">
 
         <LinearLayout
+            android:id="@+id/theme_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="2"
             android:orientation="vertical"
             android:useDefaultMargins="true">
 
@@ -33,118 +33,6 @@
                 item="@{viewModel.themeHeadline}"
                 layout="@layout/item_tappable_headline"
                 listener="@{viewModel}" />
-
-            <LinearLayout style="@style/W.Theme.Container">
-
-                <FrameLayout
-                    android:id="@+id/theme_default"
-                    style="@style/W.Theme.Left"
-                    android:theme="@style/ThemeFoundationMD2.Piplup">
-
-                    <include
-                        layout="@layout/item_theme"
-                        theme="@{Theme.Piplup}"
-                        viewModel="@{viewModel}" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/theme_amoled"
-                    style="@style/W.Theme.Right"
-                    android:theme="@style/ThemeFoundationMD2.Amoled">
-
-                    <include
-                        layout="@layout/item_theme"
-                        theme="@{Theme.PiplupAmoled}"
-                        viewModel="@{viewModel}" />
-
-                </FrameLayout>
-
-            </LinearLayout>
-
-            <LinearLayout style="@style/W.Theme.Container">
-
-                <FrameLayout
-                    android:id="@+id/theme_rayquaza"
-                    style="@style/W.Theme.Left"
-                    android:theme="@style/ThemeFoundationMD2.Rayquaza">
-
-                    <include
-                        layout="@layout/item_theme"
-                        theme="@{Theme.Rayquaza}"
-                        viewModel="@{viewModel}" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/theme_zapdos"
-                    style="@style/W.Theme.Right"
-                    android:theme="@style/ThemeFoundationMD2.Zapdos">
-
-                    <include
-                        layout="@layout/item_theme"
-                        theme="@{Theme.Zapdos}"
-                        viewModel="@{viewModel}" />
-
-                </FrameLayout>
-
-            </LinearLayout>
-
-            <LinearLayout style="@style/W.Theme.Container">
-
-                <FrameLayout
-                    android:id="@+id/theme_charmeleon"
-                    style="@style/W.Theme.Left"
-                    android:theme="@style/ThemeFoundationMD2.Charmeleon">
-
-                    <include
-                        layout="@layout/item_theme"
-                        theme="@{Theme.Charmeleon}"
-                        viewModel="@{viewModel}" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/theme_mew"
-                    style="@style/W.Theme.Right"
-                    android:theme="@style/ThemeFoundationMD2.Mew">
-
-                    <include
-                        layout="@layout/item_theme"
-                        theme="@{Theme.Mew}"
-                        viewModel="@{viewModel}" />
-
-                </FrameLayout>
-
-            </LinearLayout>
-
-            <LinearLayout style="@style/W.Theme.Container">
-
-                <FrameLayout
-                    android:id="@+id/theme_salamence"
-                    style="@style/W.Theme.Left"
-                    android:theme="@style/ThemeFoundationMD2.Salamence">
-
-                    <include
-                        layout="@layout/item_theme"
-                        theme="@{Theme.Salamence}"
-                        viewModel="@{viewModel}" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:id="@+id/theme_fraxure"
-                    style="@style/W.Theme.Right"
-                    android:theme="@style/ThemeFoundationMD2.Fraxure">
-
-                    <include
-                        layout="@layout/item_theme"
-                        theme="@{Theme.Fraxure}"
-                        viewModel="@{viewModel}" />
-
-                </FrameLayout>
-
-            </LinearLayout>
 
         </LinearLayout>
 
