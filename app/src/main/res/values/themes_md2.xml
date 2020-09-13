@@ -78,8 +78,8 @@
     </style>
 
     <style name="ThemeFoundationMD2.Zapdos" parent="ThemeFoundationMD2.Piplup">
-        <item name="colorPrimary">#FBD179</item>
-        <item name="colorPrimaryVariant">#80FBD179</item>
+        <item name="colorPrimary">#E8B343</item>
+        <item name="colorPrimaryVariant">#80E8B343</item>
         <item name="colorSecondary">#B29667</item>
         <item name="colorSecondaryVariant">#80B29667</item>
         <item name="colorOnPrimary">#000000</item>
