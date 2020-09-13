@@ -3,12 +3,14 @@
 
     <style name="SplashThemeBase" parent="android:Theme.DeviceDefault.NoActionBar">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="SplashTheme" parent="SplashThemeBase" />
 
     <style name="Foundation" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <!--This should be overridden in v21 for transparency, etc-->
