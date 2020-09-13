@@ -58,7 +58,7 @@ class SettingsViewModel(
         // Manager
         list.addAll(listOf(
             Manager,
-            UpdateChannel, UpdateChannelUrl, UpdateChecker, DownloadPath
+            UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
         if (Info.env.isActive) {
             list.add(ClearRepoCache)

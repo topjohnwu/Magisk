@@ -175,6 +175,8 @@
     <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>
     <string name="settings_customization">Customization</string>
     <string name="setting_add_shortcut_summary">Add a pretty shortcut in the home screen in case the name and icon are difficult to recognize after hiding the app</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>
