@@ -96,8 +96,8 @@
     </style>
 
     <style name="ThemeFoundationMD2.Mew" parent="ThemeFoundationMD2.Piplup">
-        <item name="colorPrimary">#D9ADB7</item>
-        <item name="colorPrimaryVariant">#80E9BBC5</item>
+        <item name="colorPrimary">#C38492</item>
+        <item name="colorPrimaryVariant">#80C38492</item>
         <item name="colorSecondary">#B5889B</item>
         <item name="colorSecondaryVariant">#80B5889B</item>
         <item name="colorOnPrimary">#000000</item>
