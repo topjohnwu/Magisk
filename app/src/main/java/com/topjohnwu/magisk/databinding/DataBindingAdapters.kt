@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -14,6 +13,8 @@ import androidx.cardview.widget.CardView
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.ImageViewCompat
+import androidx.core.widget.TextViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
@@ -287,4 +288,19 @@ fun CardView.setCardBackgroundColorAttr(attr: Int) {
     val tv = TypedValue()
     context.theme.resolveAttribute(attr, tv, true)
     setCardBackgroundColor(tv.data)
+}
+
+@BindingAdapter("imageViewTintAttr")
+fun ImageView.setImageViewTintAttr(attr: Int) {
+    val a = context.theme.obtainStyledAttributes(intArrayOf(attr))
+    val res = a.getColorStateList(0)
+    a.recycle()
+    ImageViewCompat.setImageTintList(this, res)
+}
+
+@BindingAdapter("textViewTextAppearance")
+fun TextView.textViewTextAppearance(style: Int) {
+    val typeface = typeface
+    TextViewCompat.setTextAppearance(this, style)
+    this.typeface = typeface
 }

@@ -14,12 +14,18 @@
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="AppearanceFoundation.Display.OnPrimary" parent="TextAppearance.AppCompat.Display1">
+    <style name="AppearanceFoundation.Display" parent="TextAppearance.AppCompat.Display1"/>
+
+    <style name="AppearanceFoundation.Display.OnPrimary">
         <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
     <style name="AppearanceFoundation.Display.OnPrimary.Variant">
         <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
+    </style>
+
+    <style name="AppearanceFoundation.Display.OnError">
+        <item name="android:textColor">?attr/colorOnError</item>
     </style>
     <!--endregion-->
 
@@ -66,6 +72,10 @@
 
     <style name="AppearanceFoundation.Body.OnPrimary.Variant">
         <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
+    </style>
+
+    <style name="AppearanceFoundation.Body.OnError">
+        <item name="android:textColor">?attr/colorOnError</item>
     </style>
     <!--endregion-->
 

@@ -57,9 +57,9 @@
                     android:layout_marginEnd="@dimen/l1"
                     app:cardCornerRadius="@dimen/l1"
                     app:cardElevation="@dimen/l1"
-                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias=".35"
@@ -72,6 +72,7 @@
 
                         <TextView
                             android:id="@+id/safetynet_title"
+                            textViewTextAppearance="@{viewModel.success ? R.style.AppearanceFoundation_Display_OnPrimary : R.style.AppearanceFoundation_Display_OnError}"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/l1"
@@ -79,7 +80,6 @@
                             android:layout_marginEnd="@dimen/l1"
                             android:gravity="center"
                             android:text="@{viewModel.safetyNetTitle}"
-                            android:textAppearance="@style/AppearanceFoundation.Display.OnPrimary"
                             android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_chainStyle="packed"
@@ -89,14 +89,14 @@
 
                         <ImageView
                             android:id="@+id/safetynet_divider"
+                            imageViewTintAttr="@{viewModel.success ? R.attr.colorOnPrimary : R.attr.colorOnError}"
                             android:layout_width="50dp"
                             android:layout_height="4dp"
                             android:layout_marginTop="@dimen/l2"
-                            app:srcCompat="@drawable/bg_divider_rounded_on_primary"
-                            app:tint="?colorOnPrimary"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/safetynet_title" />
+                            app:layout_constraintTop_toBottomOf="@+id/safetynet_title"
+                            app:srcCompat="@drawable/bg_divider_rounded_on_primary" />
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/checkbox_layout"
@@ -109,31 +109,31 @@
 
                             <TextView
                                 android:id="@+id/basic_text"
+                                textViewTextAppearance="@{viewModel.success ? R.style.AppearanceFoundation_Body_OnPrimary : R.style.AppearanceFoundation_Body_OnError}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
+                                android:layout_marginTop="@dimen/l2"
                                 android:gravity="start"
                                 android:text="basicIntegrity"
-                                android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
-                                android:layout_marginTop="@dimen/l2"
-                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/snet_barrier"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
                                 tools:ignore="HardcodedText" />
 
                             <TextView
                                 android:id="@+id/cts_text"
+                                textViewTextAppearance="@{viewModel.success ? R.style.AppearanceFoundation_Body_OnPrimary : R.style.AppearanceFoundation_Body_OnError}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
+                                android:layout_marginTop="@dimen/l2"
                                 android:gravity="start"
                                 android:text="ctsProfile"
-                                android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
-                                android:layout_marginTop="@dimen/l2"
-                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/snet_barrier"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toBottomOf="@id/basic_text"
                                 tools:ignore="HardcodedText" />
 
@@ -142,25 +142,27 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 app:barrierDirection="end"
-                                app:constraint_referenced_ids="basic_text,cts_text"/>
+                                app:constraint_referenced_ids="basic_text,cts_text" />
 
                             <ImageView
                                 style="@style/WidgetFoundation.Icon.OnPrimary"
+                                imageViewTintAttr="@{viewModel.success ? R.attr.colorOnPrimary : R.attr.colorOnError}"
                                 isSelected="@{viewModel.basicIntegrityState}"
                                 android:layout_gravity="center"
-                                app:srcCompat="@drawable/ic_check_circle_md2"
+                                app:layout_constraintBottom_toBottomOf="@id/basic_text"
                                 app:layout_constraintStart_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="@id/basic_text"
-                                app:layout_constraintBottom_toBottomOf="@id/basic_text"/>
+                                app:srcCompat="@drawable/ic_check_circle_md2" />
 
                             <ImageView
                                 style="@style/WidgetFoundation.Icon.OnPrimary"
+                                imageViewTintAttr="@{viewModel.success ? R.attr.colorOnPrimary : R.attr.colorOnError}"
                                 isSelected="@{viewModel.ctsState}"
                                 android:layout_gravity="center"
-                                app:srcCompat="@drawable/ic_check_circle_md2"
+                                app:layout_constraintBottom_toBottomOf="@id/cts_text"
                                 app:layout_constraintStart_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="@id/cts_text"
-                                app:layout_constraintBottom_toBottomOf="@id/cts_text"/>
+                                app:srcCompat="@drawable/ic_check_circle_md2" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -174,24 +176,24 @@
                             app:layout_constraintTop_toBottomOf="@+id/checkbox_layout">
 
                             <TextView
+                                textViewTextAppearance="@{viewModel.success ? R.style.AppearanceFoundation_Body_OnPrimary : R.style.AppearanceFoundation_Body_OnError}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
                                 android:gravity="start"
                                 android:text="evalType"
-                                android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
                                 tools:ignore="HardcodedText" />
 
                             <TextView
+                                textViewTextAppearance="@{viewModel.success ? R.style.AppearanceFoundation_Body_OnPrimary : R.style.AppearanceFoundation_Body_OnError}"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
-                                android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
-                                android:textStyle="bold"
                                 android:layout_marginStart="@dimen/l1"
                                 android:text="@{viewModel.evalType}"
-                                tools:text="HARDWARE"/>
+                                android:textStyle="bold"
+                                tools:text="HARDWARE" />
 
                         </LinearLayout>
 
