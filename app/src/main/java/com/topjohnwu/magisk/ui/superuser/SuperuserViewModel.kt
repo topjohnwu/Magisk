@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.superuser
 
 import android.content.res.Resources
+import android.os.Build
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -35,9 +36,10 @@ class SuperuserViewModel(
     private val itemsHelpers = ObservableArrayList<TextItem>()
 
     val adapter = adapterOf<ComparableRvItem<*>>()
-    val items = MergeObservableList<ComparableRvItem<*>>()
-        .insertItem(TappableHeadlineItem.Hide)
-        .insertList(itemsHelpers)
+    val items = MergeObservableList<ComparableRvItem<*>>().apply {
+        if (Build.VERSION.SDK_INT >= 19)
+            insertItem(TappableHeadlineItem.Hide)
+    }.insertList(itemsHelpers)
         .insertList(itemsPolicies)
     val itemBinding = itemBindingOf<ComparableRvItem<*>> {
         it.bindExtra(BR.listener, this)
