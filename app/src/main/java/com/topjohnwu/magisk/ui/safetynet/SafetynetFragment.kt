@@ -8,11 +8,14 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentSafetynetMd2Binding
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class SafetynetFragment : BaseUIFragment<SafetynetViewModel, FragmentSafetynetMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_safetynet_md2
-    override val viewModel by viewModel<SafetynetViewModel>()
+    override val viewModel by viewModel<SafetynetViewModel>() {
+        parametersOf(activity)
+    }
 
     override fun onStart() {
         super.onStart()

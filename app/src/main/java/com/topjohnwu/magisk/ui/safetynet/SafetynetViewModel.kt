@@ -1,23 +1,20 @@
 package com.topjohnwu.magisk.ui.safetynet
 
+import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
 import com.topjohnwu.magisk.utils.set
 import org.json.JSONObject
-
-enum class SafetyNetState {
-    LOADING, PASS, FAILED
-}
 
 data class SafetyNetResult(
     val response: JSONObject? = null,
     val dismiss: Boolean = false
 )
 
-class SafetynetViewModel : BaseViewModel() {
+class SafetynetViewModel(context: ContextThemeWrapper) : BaseViewModel() {
 
     @get:Bindable
     var safetyNetTitle = R.string.empty
@@ -36,23 +33,33 @@ class SafetynetViewModel : BaseViewModel() {
         set(value) = set(value, field, { field = it }, BR.evalType)
 
     @get:Bindable
-    val isChecking get() = currentState == LOADING
-    @get:Bindable
-    val isFailed get() = currentState == FAILED
-    @get:Bindable
-    val isSuccess get() = currentState == PASS
+    var isChecking = false
+        set(value) = set(value, field, { field = it }, BR.checking)
 
-    private var currentState = LOADING
-        set(value) = set(value, field, { field = it }, BR.checking, BR.failed, BR.success)
+    @get:Bindable
+    var isSuccess = false
+        set(value) = set(value, field, { field = it }, BR.success, BR.textColor)
+
+    @get:Bindable
+    val textColor get() = if (isSuccess) colorOnPrimary else colorOnError
+
+    private val colorOnPrimary: Int
+    private val colorOnError: Int
 
     init {
+        val tv = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorOnPrimary, tv, true)
+        colorOnPrimary = tv.data
+        context.theme.resolveAttribute(R.attr.colorOnError, tv, true)
+        colorOnError = tv.data
+
         cachedResult?.also {
             resolveResponse(SafetyNetResult(it))
         } ?: attest()
     }
 
     private fun attest() {
-        currentState = LOADING
+        isChecking = true
         CheckSafetyNetEvent {
             resolveResponse(it)
         }.publish()
@@ -61,6 +68,8 @@ class SafetynetViewModel : BaseViewModel() {
     fun reset() = attest()
 
     private fun resolveResponse(response: SafetyNetResult) {
+        isChecking = false
+
         if (response.dismiss) {
             back()
             return
@@ -76,19 +85,19 @@ class SafetynetViewModel : BaseViewModel() {
                 ctsState = cts
                 basicIntegrityState = basic
                 evalType = if (eval.contains("HARDWARE")) "HARDWARE" else "BASIC"
-                currentState = if (result) PASS else FAILED
+                isSuccess = result
                 safetyNetTitle =
                     if (result) R.string.safetynet_attest_success
                     else R.string.safetynet_attest_failure
             }.onFailure {
-                currentState = FAILED
+                isSuccess = false
                 ctsState = false
                 basicIntegrityState = false
                 evalType = "N/A"
                 safetyNetTitle = R.string.safetynet_res_invalid
             }
         } ?: {
-            currentState = FAILED
+            isSuccess = false
             ctsState = false
             basicIntegrityState = false
             evalType = "N/A"

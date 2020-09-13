@@ -80,6 +80,7 @@
                             android:gravity="center"
                             android:text="@{viewModel.safetyNetTitle}"
                             android:textAppearance="@style/AppearanceFoundation.Display.OnPrimary"
+                            android:textColor="@{viewModel.textColor}"
                             android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_chainStyle="packed"
@@ -93,7 +94,7 @@
                             android:layout_height="4dp"
                             android:layout_marginTop="@dimen/l2"
                             app:srcCompat="@drawable/bg_divider_rounded_on_primary"
-                            app:tint="?colorOnPrimary"
+                            app:tint="@{viewModel.textColor}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/safetynet_title" />
@@ -116,6 +117,7 @@
                                 android:text="basicIntegrity"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
+                                android:textColor="@{viewModel.textColor}"
                                 android:layout_marginTop="@dimen/l2"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/snet_barrier"
@@ -131,6 +133,7 @@
                                 android:text="ctsProfile"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
+                                android:textColor="@{viewModel.textColor}"
                                 android:layout_marginTop="@dimen/l2"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/snet_barrier"
@@ -149,6 +152,7 @@
                                 isSelected="@{viewModel.basicIntegrityState}"
                                 android:layout_gravity="center"
                                 app:srcCompat="@drawable/ic_check_circle_md2"
+                                app:tint="@{viewModel.textColor}"
                                 app:layout_constraintStart_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="@id/basic_text"
                                 app:layout_constraintBottom_toBottomOf="@id/basic_text"/>
@@ -158,6 +162,7 @@
                                 isSelected="@{viewModel.ctsState}"
                                 android:layout_gravity="center"
                                 app:srcCompat="@drawable/ic_check_circle_md2"
+                                app:tint="@{viewModel.textColor}"
                                 app:layout_constraintStart_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="@id/cts_text"
                                 app:layout_constraintBottom_toBottomOf="@id/cts_text"/>
@@ -181,6 +186,7 @@
                                 android:text="evalType"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
+                                android:textColor="@{viewModel.textColor}"
                                 tools:ignore="HardcodedText" />
 
                             <TextView
@@ -189,6 +195,7 @@
                                 android:layout_gravity="center_vertical"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
+                                android:textColor="@{viewModel.textColor}"
                                 android:layout_marginStart="@dimen/l1"
                                 android:text="@{viewModel.evalType}"
                                 tools:text="HARDWARE"/>
