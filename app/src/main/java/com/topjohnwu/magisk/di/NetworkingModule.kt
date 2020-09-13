@@ -22,6 +22,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.net.InetAddress
+import java.net.UnknownHostException
 
 val networkingModule = module {
     single { createOkHttpClient(get()) }
@@ -62,10 +63,16 @@ fun createOkHttpClient(context: Context): OkHttpClient {
         .resolvePrivateAddresses(true)  /* To make PublicSuffixDatabase never used */
         .build()
 
+    var skipDoH = false
     builder.dns { hostname ->
         // Only resolve via DoH for known DNS polluted hostnames
-        if (hostname == "raw.githubusercontent.com") {
-            doh.lookup(hostname)
+        if (!skipDoH && hostname == "raw.githubusercontent.com") {
+            try {
+                doh.lookup(hostname)
+            } catch (e: UnknownHostException) {
+                skipDoH = true
+                Dns.SYSTEM.lookup(hostname)
+            }
         } else {
             Dns.SYSTEM.lookup(hostname)
         }
