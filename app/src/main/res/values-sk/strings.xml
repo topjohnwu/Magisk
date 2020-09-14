@@ -125,6 +125,8 @@
     <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
     <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
     <string name="add_shortcut_msg">Po skrytí Magisk Managera sa môžu jeho názov a ikona ťažko rozpoznať. Chcete pridať odkaz na domovskú obrazovku?</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Riešenie otravy DNS v niektorých krajinách</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Režim motívu</string>
