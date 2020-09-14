@@ -175,6 +175,8 @@
     <string name="no_biometric">L’appareil n’est pas pris en charge ou alors aucun paramètre biométrique n’est activé</string>
     <string name="settings_customization">Personnalisation</string>
     <string name="setting_add_shortcut_summary">Ajouter un joli raccourci dans l’écran d’accueil au cas où le nom et l’icône seraient difficiles à reconnaître après avoir masqué l’application</string>
+    <string name="settings_doh_title">DNS sur HTTPS</string>
+    <string name="settings_doh_description">Contournement de la censure du DNS dans certains pays</string>
 
     <string name="multiuser_mode">Mode multi‑utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
