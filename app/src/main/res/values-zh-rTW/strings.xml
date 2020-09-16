@@ -50,7 +50,7 @@
     <string name="install_inactive_slot_msg">您的裝置將在下次重新啟動後強制切換到非使用中的槽位！\n這個選項僅在 OTA 更新完畢後使用。\n是否繼續？</string>
     <string name="setup_title">修復安裝</string>
     <string name="select_patch_file">選擇並修補檔案</string>
-    <string name="patch_file_msg">請選取未修改過的映像檔（*.img）或 Odin 的 TAR 檔案 (*.tar)</string>
+    <string name="patch_file_msg">請選取未修改過的映像檔（*.img）或 Odin 的 TAR 檔案 (*.tar）</string>
     <string name="reboot_delay_toast">將在 5 秒後重新啟動……</string>
     <string name="flash_screen_title">安裝</string>
 
@@ -107,7 +107,7 @@
     <string name="hide_filters">過濾器</string>
     <string name="hide_search">搜尋</string>
 
-    <!--Module Fragment-->
+    <!--Module -->
     <string name="no_info_provided">（未提供資訊）</string>
     <string name="reboot_recovery">重新啟動至 Recovery</string>
     <string name="reboot_bootloader">重新啟動至 Bootloader</string>
@@ -139,7 +139,7 @@
     <string name="settings_restore_manager_title">還原 Magisk Manager</string>
     <string name="settings_restore_manager_summary">以原始包裝名稱重新安裝 Magisk Manager</string>
     <string name="language">語言</string>
-    <string name="system_default">(系統預設值)</string>
+    <string name="system_default">（系統預設值) </string>
     <string name="settings_check_update_title">檢查更新</string>
     <string name="settings_check_update_summary">定期於背景檢查更新</string>
     <string name="settings_update_channel_title">更新頻道</string>
@@ -148,7 +148,7 @@
     <string name="settings_update_custom">自訂頻道</string>
     <string name="settings_update_custom_msg">輸入一個自訂的網址</string>
     <string name="settings_magiskhide_summary">隱藏 Magisk 以避免被偵測</string>
-    <string name="settings_hosts_title">主機(Hosts) 模組化</string>
+    <string name="settings_hosts_title">主機（Hosts）模組化</string>
     <string name="settings_hosts_summary">為廣告阻擋程式提供主機模組</string>
     <string name="settings_hosts_toast">已安裝主機模組</string>
     <string name="settings_app_name_hint">新的名稱</string>
@@ -175,6 +175,8 @@
     <string name="no_biometric">不支援的裝置或是未啟用生物特徵設定</string>
     <string name="settings_customization">客製化</string>
     <string name="setting_add_shortcut_summary">在隱藏應用程式後，名稱和圖示難以辨識的情況下，新增一個精緻的捷徑到首頁</string>
+    <string name="settings_doh_title">安全化的域名解析（DoH）</string>
+    <string name="settings_doh_description">解決某些地區的 DNS 汙染問題</string>
 
     <string name="multiuser_mode">多重使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
