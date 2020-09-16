@@ -25,7 +25,7 @@
     <string name="home_notice_content">Pastikan Anda selalu menggunakan Magisk Manager dari sumber terbuka. Manager dari sumber yang tidak dikenal dapat melakukan tindak kejahatan.</string>
     <string name="home_support_title">Dukung Kami</string>
     <string name="home_item_source">Sumber</string>
-    <string name="home_support_content">Magisk gratis dengan sumber terbuka, dan akan selalu seperti itu. Bagaimanapun juga Anda dapat menunjukan kepedulian Anda kepada kami dengan mengirimkan sedikit donasi.</string>
+    <string name="home_support_content">Magisk gratis dan bersumber terbuka, dan akan selalu seperti itu. Bagaimanapun juga Anda dapat menunjukan kepedulian Anda kepada kami dengan mengirimkan sedikit donasi.</string>
     <string name="home_status_normal">Normal</string>
     <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Terinstal</string>
@@ -45,13 +45,13 @@
     <string name="install_start">Mari mulai</string>
     <string name="manager_download_install">Tekan untuk download dan instal</string>
     <string name="download_zip_only">Download Zip Saja</string>
-    <string name="direct_install">Instal Lansung (Disarankan)</string>
+    <string name="direct_install">Langsung Instal (Disarankan)</string>
     <string name="install_inactive_slot">Instal pada Slot Nonaktif (Setelah OTA)</string>
     <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA boot ke slot yang saat ini tidak aktif setelah perangkat dinyalakan ulang!\nGunakan opsi ini hanya setelah proses OTA selesai.\nLanjutkan?</string>
     <string name="setup_title">Penyiapan Tambahan</string>
     <string name="select_patch_file">Pilih dan Tambal File</string>
-    <string name="patch_file_msg">Pilih mentahan file image (*.img) atau file tar ODIN (*.tar)</string>
-    <string name="reboot_delay_toast">Menyalakan kembali dalam 5 detik…</string>
+    <string name="patch_file_msg">Pilih mentahan image (*.img) atau file tar ODIN (*.tar)</string>
+    <string name="reboot_delay_toast">Memulai kembali dalam 5 detik…</string>
     <string name="flash_screen_title">Instalasi</string>
 
     <!--Superuser-->
@@ -59,19 +59,19 @@
     <string name="deny">Tolak</string>
     <string name="prompt">Ajukan</string>
     <string name="grant">Izinkan</string>
-    <string name="su_warning">Izinkan akses penuh ke perangkat Anda.\nTolak jika Anda tidak yakin!</string>
+    <string name="su_warning">Berikan akses penuh ke perangkat Anda.\nTolak jika Anda tidak yakin!</string>
     <string name="forever">Selamanya</string>
     <string name="once">Sekali</string>
     <string name="tenmin">10 mnt</string>
     <string name="twentymin">20 mnt</string>
     <string name="thirtymin">30 mnt</string>
     <string name="sixtymin">60 mnt</string>
-    <string name="su_allow_toast">%1$s diberikan hak Superuser</string>
-    <string name="su_deny_toast">%1$s ditolak hak Superuser</string>
-    <string name="su_snack_grant">Hak Superuser %1$s diberikan</string>
-    <string name="su_snack_deny">Hak Superuser %1$s ditolak</string>
-    <string name="su_snack_notif_on">Notifikasi %1$s diaktifkan</string>
-    <string name="su_snack_notif_off">Notifikasi %1$s dinonaktifkan</string>
+    <string name="su_allow_toast">%1$s mendapatkan hak Superuser</string>
+    <string name="su_deny_toast">%1$s ditolak atas hak Superuser</string>
+    <string name="su_snack_grant">Hak Superuser untuk %1$s diberikan</string>
+    <string name="su_snack_deny">Hak Superuser untuk %1$s ditolak</string>
+    <string name="su_snack_notif_on">Notifikasi untuk %1$s diaktifkan</string>
+    <string name="su_snack_notif_off">Notifikasi untuk %1$s dinonaktifkan</string>
     <string name="su_snack_log_on">Log untuk %1$s diaktifkan</string>
     <string name="su_snack_log_off">Log untuk %1$s dinonaktifkan</string>
     <string name="su_revoke_title">Cabut?</string>
@@ -175,6 +175,8 @@
     <string name="no_biometric">Perangkat tidak didukung atau setelan biometrik tidak diaktifkan</string>
     <string name="settings_customization">Penyesuaian</string>
     <string name="setting_add_shortcut_summary">Tambahkan pintasan yang menarik pada layar utama seandainya nama dan ikon sulit untuk dikenali setelah menyembunyikan aplikasi</string>
+    <string name="settings_doh_title">DNS melalui HTTPS</string>
+    <string name="settings_doh_description">Solusi untuk permasalahan DNS di beberapa negara</string>
 
     <string name="multiuser_mode">Mode Multi Pengguna</string>
     <string name="settings_owner_only">Pemilik Perangkat Saja</string>
@@ -184,11 +186,11 @@
     <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima pesan permintaan</string>
     <string name="user_indepenent_summary">Setiap pengguna memiliki aturan root mereka sendiri</string>
 
-    <string name="mount_namespace_mode">Mode Mount Ruang-nama</string>
+    <string name="mount_namespace_mode">Mode Ruang-nama Mount</string>
     <string name="settings_ns_global">Ruang-nama Global</string>
     <string name="settings_ns_requester">Ruang-nama Warisan</string>
     <string name="settings_ns_isolate">Ruang-nama Terpisah</string>
-    <string name="global_summary">Seluruh sesi root menggunakan mount ruang-nama global</string>
+    <string name="global_summary">Seluruh sesi root menggunakan ruang-nama mount global</string>
     <string name="requester_summary">Sesi root akan mewarisi ruang-nama peminta mereka</string>
     <string name="isolate_summary">Setiap sesi root akan memiliki ruang-nama tersendiri</string>
 
@@ -231,7 +233,7 @@
     <string name="authenticate">Autentikasi</string>
     <string name="unsupport_magisk_title">Versi Magisk Tidak Didukung</string>
     <string name="unsupport_magisk_msg">Versi Magisk Manager ini tidak mendukung Magisk di bawah versi %1$s.\n\nAplikasi akan berperilaku seolah-olah Magisk tidak terinstal, harap meningkatkan Magisk sesegera mungkin.</string>
-    <string name="external_rw_permission_denied">Izinkan akses penyimpanan untuk mengaktifkan fungsi ini</string>
+    <string name="external_rw_permission_denied">Berikan izin akses ke penyimpanan untuk mengaktifkan fungsi ini</string>
     <string name="add_shortcut_title">Tambahkan pintasan ke layar utama</string>
     <string name="add_shortcut_msg">Setelah menyembunyikan Magisk Manager, nama dan ikonnya mungkin menjadi sulit untuk dikenali. Apakah Anda ingin menambahkan pintasan yang menarik pada layar utama?</string>
 
