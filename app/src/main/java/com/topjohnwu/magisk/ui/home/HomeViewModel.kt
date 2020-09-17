@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.data.repository.MagiskRepository
 import com.topjohnwu.magisk.events.OpenInappLinkEvent
+import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.events.dialog.UninstallDialog
@@ -126,10 +127,14 @@ class HomeViewModel(
 
     fun onDeletePressed() = UninstallDialog().publish()
 
-    fun onManagerPressed() = ManagerInstallDialog().publish()
+    fun onManagerPressed() =
+        if (isConnected.get()) ManagerInstallDialog().publish()
+        else SnackbarEvent(R.string.no_connection).publish()
 
-    fun onMagiskPressed() = withExternalRW {
+    fun onMagiskPressed() = if (isConnected.get()) withExternalRW {
         HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
+    } else {
+        SnackbarEvent(R.string.no_connection).publish()
     }
 
     fun onSafetyNetPressed() =
