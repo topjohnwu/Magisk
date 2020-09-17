@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.ui.safetynet
 
-import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -14,7 +12,7 @@ data class SafetyNetResult(
     val dismiss: Boolean = false
 )
 
-class SafetynetViewModel(context: ContextThemeWrapper) : BaseViewModel() {
+class SafetynetViewModel : BaseViewModel() {
 
     @get:Bindable
     var safetyNetTitle = R.string.empty
@@ -38,21 +36,12 @@ class SafetynetViewModel(context: ContextThemeWrapper) : BaseViewModel() {
 
     @get:Bindable
     var isSuccess = false
-        set(value) = set(value, field, { field = it }, BR.success, BR.textColor)
+        set(value) = set(value, field, { field = it }, BR.success, BR.textColorAttr)
 
     @get:Bindable
-    val textColor get() = if (isSuccess) colorOnPrimary else colorOnError
-
-    private val colorOnPrimary: Int
-    private val colorOnError: Int
+    val textColorAttr get() = if (isSuccess) R.attr.colorOnPrimary else R.attr.colorOnError
 
     init {
-        val tv = TypedValue()
-        context.theme.resolveAttribute(R.attr.colorOnPrimary, tv, true)
-        colorOnPrimary = tv.data
-        context.theme.resolveAttribute(R.attr.colorOnError, tv, true)
-        colorOnError = tv.data
-
         cachedResult?.also {
             resolveResponse(SafetyNetResult(it))
         } ?: attest()

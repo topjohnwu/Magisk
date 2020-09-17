@@ -80,8 +80,8 @@
                             android:gravity="center"
                             android:text="@{viewModel.safetyNetTitle}"
                             android:textAppearance="@style/AppearanceFoundation.Display.OnPrimary"
-                            android:textColor="@{viewModel.textColor}"
                             android:textStyle="bold"
+                            app:textColorAttr="@{viewModel.textColorAttr}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
@@ -94,10 +94,11 @@
                             android:layout_height="4dp"
                             android:layout_marginTop="@dimen/l2"
                             app:srcCompat="@drawable/bg_divider_rounded_on_primary"
-                            app:tint="@{viewModel.textColor}"
+                            app:tintAttr="@{viewModel.textColorAttr}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/safetynet_title" />
+                            app:layout_constraintTop_toBottomOf="@+id/safetynet_title"
+                            tools:tint="?colorOnPrimary"/>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/checkbox_layout"
@@ -117,8 +118,8 @@
                                 android:text="basicIntegrity"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
-                                android:textColor="@{viewModel.textColor}"
                                 android:layout_marginTop="@dimen/l2"
+                                app:textColorAttr="@{viewModel.textColorAttr}"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -133,8 +134,8 @@
                                 android:text="ctsProfile"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
-                                android:textColor="@{viewModel.textColor}"
                                 android:layout_marginTop="@dimen/l2"
+                                app:textColorAttr="@{viewModel.textColorAttr}"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toBottomOf="@id/basic_text"
@@ -152,20 +153,22 @@
                                 isSelected="@{viewModel.basicIntegrityState}"
                                 android:layout_gravity="center"
                                 app:srcCompat="@drawable/ic_check_circle_md2"
-                                app:tint="@{viewModel.textColor}"
+                                app:tintAttr="@{viewModel.textColorAttr}"
                                 app:layout_constraintStart_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="@id/basic_text"
-                                app:layout_constraintBottom_toBottomOf="@id/basic_text"/>
+                                app:layout_constraintBottom_toBottomOf="@id/basic_text"
+                                tools:tint="?colorOnPrimary"/>
 
                             <ImageView
                                 style="@style/WidgetFoundation.Icon.OnPrimary"
                                 isSelected="@{viewModel.ctsState}"
                                 android:layout_gravity="center"
                                 app:srcCompat="@drawable/ic_check_circle_md2"
-                                app:tint="@{viewModel.textColor}"
+                                app:tintAttr="@{viewModel.textColorAttr}"
                                 app:layout_constraintStart_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="@id/cts_text"
-                                app:layout_constraintBottom_toBottomOf="@id/cts_text"/>
+                                app:layout_constraintBottom_toBottomOf="@id/cts_text"
+                                tools:tint="?colorOnPrimary"/>
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -186,7 +189,7 @@
                                 android:text="evalType"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
-                                android:textColor="@{viewModel.textColor}"
+                                app:textColorAttr="@{viewModel.textColorAttr}"
                                 tools:ignore="HardcodedText" />
 
                             <TextView
@@ -195,9 +198,9 @@
                                 android:layout_gravity="center_vertical"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
-                                android:textColor="@{viewModel.textColor}"
                                 android:layout_marginStart="@dimen/l1"
                                 android:text="@{viewModel.evalType}"
+                                app:textColorAttr="@{viewModel.textColorAttr}"
                                 tools:text="HARDWARE"/>
 
                         </LinearLayout>

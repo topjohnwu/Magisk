@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.di
 
-import android.view.ContextThemeWrapper
 import com.topjohnwu.magisk.ui.MainViewModel
 import com.topjohnwu.magisk.ui.flash.FlashFragmentArgs
 import com.topjohnwu.magisk.ui.flash.FlashViewModel
@@ -22,7 +21,7 @@ val viewModelModules = module {
     viewModel { HomeViewModel(get()) }
     viewModel { LogViewModel(get()) }
     viewModel { ModuleViewModel(get(), get(), get()) }
-    viewModel { (context: ContextThemeWrapper) -> SafetynetViewModel(context) }
+    viewModel { SafetynetViewModel() }
     viewModel { SettingsViewModel(get()) }
     viewModel { SuperuserViewModel(get(), get()) }
     viewModel { ThemeViewModel() }

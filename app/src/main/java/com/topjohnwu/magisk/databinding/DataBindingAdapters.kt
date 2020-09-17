@@ -297,3 +297,17 @@ fun CardView.setCardBackgroundColorAttr(attr: Int) {
 fun ImageView.setTint(color: Int) {
     ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(color))
 }
+
+@BindingAdapter("tintAttr")
+fun ImageView.setTintAttr(attr: Int) {
+    val tv = TypedValue()
+    context.theme.resolveAttribute(attr, tv, true)
+    ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(tv.data))
+}
+
+@BindingAdapter("textColorAttr")
+fun TextView.setTextColorAttr(attr: Int) {
+    val tv = TypedValue()
+    context.theme.resolveAttribute(attr, tv, true)
+    setTextColor(tv.data)
+}
