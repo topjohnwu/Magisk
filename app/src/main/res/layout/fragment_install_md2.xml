@@ -37,12 +37,11 @@
 
                 <com.google.android.material.card.MaterialCardView
                     gone="@{viewModel.skipOptions}"
-                    style="@style/WidgetFoundation.Card.Variant"
+                    style="@style/WidgetFoundation.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1"
-                    app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
+                    android:layout_marginEnd="@dimen/l1" >
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -124,13 +123,12 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/WidgetFoundation.Card.Variant"
+                    style="@style/WidgetFoundation.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1"
-                    app:strokeWidth="@{viewModel.step != 1 ? 0f : @dimen/l_125}">
+                    android:layout_marginEnd="@dimen/l1" >
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -217,13 +215,12 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/WidgetFoundation.Card.Variant"
+                    style="@style/WidgetFoundation.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/l1"
                     android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1"
-                    app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
+                    android:layout_marginEnd="@dimen/l1" >
 
                     <TextView
                         android:id="@+id/release_notes"
@@ -232,7 +229,10 @@
                         android:layout_margin="15dp"
                         android:textAppearance="@style/AppearanceFoundation.Caption"
                         android:visibility="gone"
-                        markdownText="@{viewModel.notes}"/>
+                        markdownText="@{viewModel.notes}"
+                        tools:visibility="visible"
+                        tools:text="@tools:sample/lorem/random"
+                        tools:maxLines="5" />
 
                 </com.google.android.material.card.MaterialCardView>
 
