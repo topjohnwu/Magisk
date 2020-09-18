@@ -17,7 +17,7 @@
         android:layout_gravity="center">
 
         <com.google.android.material.card.MaterialCardView
-            style="@style/WidgetFoundation.Card.Variant"
+            style="@style/WidgetFoundation.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="@{item.enabled ? 1f : .5f}"

@@ -16,12 +16,13 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="@style/WidgetFoundation.Card.Variant"
+        style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="@{() -> viewModel.saveTheme(theme)}"
         app:cardBackgroundColor="@android:color/transparent"
         app:strokeColor="?colorPrimaryVariant"
+        app:strokeWidth="1.5dp"
         tools:layout_gravity="center">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,7 +68,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/theme_card_bottom"
-                style="@style/WidgetFoundation.Card.Variant"
+                style="@style/WidgetFoundation.Card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"

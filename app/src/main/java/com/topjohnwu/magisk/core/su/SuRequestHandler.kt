@@ -18,17 +18,16 @@ import java.io.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 
-abstract class SuRequestHandler(
-    private val packageManager: PackageManager,
+class SuRequestHandler(
+    private val pm: PackageManager,
     private val policyDB: PolicyDao
 ) : Closeable {
 
     private lateinit var output: DataOutputStream
-    protected lateinit var policy: SuPolicy
+    lateinit var policy: SuPolicy
         private set
 
-    abstract fun onStart()
-
+    // Return true to indicate undetermined policy, require user interaction
     suspend fun start(intent: Intent): Boolean {
         if (!init(intent))
             return false
@@ -40,15 +39,14 @@ abstract class SuRequestHandler(
         when (Config.suAutoReponse) {
             Config.Value.SU_AUTO_DENY -> {
                 respond(SuPolicy.DENY, 0)
-                return true
+                return false
             }
             Config.Value.SU_AUTO_ALLOW -> {
                 respond(SuPolicy.ALLOW, 0)
-                return true
+                return false
             }
         }
 
-        onStart()
         return true
     }
 
@@ -82,7 +80,7 @@ abstract class SuRequestHandler(
                 val map = async { input.readRequest() }.timedAwait() ?: throw SuRequestError()
                 uid = map["uid"]?.toIntOrNull() ?: throw SuRequestError()
             }
-            policy = uid.toPolicy(packageManager)
+            policy = uid.toPolicy(pm)
             true
         } catch (e: Exception) {
             when (e) {

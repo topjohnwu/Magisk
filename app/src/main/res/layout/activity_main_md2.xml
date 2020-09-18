@@ -43,6 +43,12 @@
                 tools:layout_marginTop="24dp"
                 tools:title="Home" />
 
+            <View
+                gone="@{android.os.Build.VERSION.SDK_INT >= 21}"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="?colorSurfaceVariant"/>
+
         </com.google.android.material.appbar.AppBarLayout>
 
         <!--
@@ -67,41 +73,21 @@
             android:layout_marginBottom="@{(int) @dimen/l1 + viewModel.insets.bottom}"
             tools:layout_marginBottom="64dp">
 
-            <LinearLayout
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/main_navigation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:orientation="vertical">
-
-                <com.google.android.material.bottomnavigation.BottomNavigationView
-                    android:id="@+id/main_navigation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:textStyle="bold"
-                    app:elevation="0dp"
-                    app:itemHorizontalTranslationEnabled="false"
-                    app:itemIconTint="@color/color_menu_tint"
-                    app:itemRippleColor="?colorPrimary"
-                    app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
-                    app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
-                    app:itemTextColor="@color/color_menu_tint"
-                    app:labelVisibilityMode="unlabeled"
-                    app:menu="@menu/menu_bottom_nav" />
-
-                <TextView
-                    gone="@{viewModel.isConnected}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:paddingBottom="@dimen/l_50"
-                    android:text="@string/no_connection"
-                    android:textAppearance="@style/AppearanceFoundation.Caption"
-                    android:textColor="?colorError"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
-            </LinearLayout>
+                android:background="@android:color/transparent"
+                android:textStyle="bold"
+                app:elevation="0dp"
+                app:itemHorizontalTranslationEnabled="false"
+                app:itemIconTint="@color/color_menu_tint"
+                app:itemRippleColor="?colorPrimary"
+                app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
+                app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
+                app:itemTextColor="@color/color_menu_tint"
+                app:labelVisibilityMode="unlabeled"
+                app:menu="@menu/menu_bottom_nav" />
 
         </com.google.android.material.card.MaterialCardView>
 

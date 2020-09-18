@@ -19,7 +19,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/module_card"
-        style="@style/WidgetFoundation.Card.Variant"
+        style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"

@@ -15,6 +15,7 @@ import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.events.OpenChangelogEvent
+import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ktx.addOnListChangedCallback
 import com.topjohnwu.magisk.ktx.reboot
@@ -300,16 +301,27 @@ class ModuleViewModel(
         else -> Unit
     }
 
-    fun downloadPressed(item: RepoItem) = withExternalRW {
+    fun downloadPressed(item: RepoItem) = if (isConnected.get()) withExternalRW {
         ModuleInstallDialog(item.item).publish()
+    } else {
+        SnackbarEvent(R.string.no_connection).publish()
     }
 
     fun installPressed() = withExternalRW {
         InstallExternalModuleEvent().publish()
     }
 
-    fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
+    fun infoPressed(item: RepoItem) =
+        if (isConnected.get()) OpenChangelogEvent(item.item).publish()
+        else SnackbarEvent(R.string.no_connection).publish()
+
+
     fun infoPressed(item: ModuleItem) {
-        OpenChangelogEvent(item.repo ?: return).publish()
+        item.repo?.also {
+            if (isConnected.get())
+                OpenChangelogEvent(it).publish()
+            else
+                SnackbarEvent(R.string.no_connection).publish()
+        } ?: return
     }
 }

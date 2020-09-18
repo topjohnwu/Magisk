@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface">
-        <item name="elevation">0dp</item>
-        <item name="android:background">@drawable/bg_appbar</item>
-    </style>
+    <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface" />
 
     <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
         <item name="titleTextAppearance">@style/AppearanceFoundation.Title</item>
@@ -31,15 +28,6 @@
 
     <style name="WidgetFoundation.Card.Secondary">
         <item name="cardBackgroundColor">?colorSecondary</item>
-    </style>
-
-    <style name="WidgetFoundation.Card.Variant">
-        <item name="strokeColor">?colorSurfaceSurfaceVariant</item>
-        <item name="strokeWidth">1.5dp</item>
-    </style>
-
-    <style name="WidgetFoundation.Card.Variant.Primary">
-        <item name="strokeColor">?colorPrimary</item>
     </style>
 
     <style name="WidgetFoundation.Card.Elevated">
@@ -186,7 +174,6 @@
     <style name="WidgetFoundation.ProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:indeterminate">false</item>
         <item name="android:layout_height">4dp</item>
-        <item name="android:progressDrawable">@drawable/progress_determinate</item>
     </style>
 
     <style name="WidgetFoundation.ProgressBar.Indeterminate" parent="Widget.AppCompat.ProgressBar.Horizontal">

@@ -37,14 +37,13 @@
                 android:paddingTop="@dimen/l1">
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/WidgetFoundation.Card.Variant"
+                    style="@style/WidgetFoundation.Card"
                     gone="@{viewModel.skipOptions}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
-                    android:focusable="false"
-                    app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
+                    android:focusable="false">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -129,14 +128,13 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/WidgetFoundation.Card.Variant"
+                    style="@style/WidgetFoundation.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
-                    android:focusable="false"
-                    app:strokeWidth="@{viewModel.step != 1 ? 0f : @dimen/l_125}">
+                    android:focusable="false">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -227,23 +225,25 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    style="@style/WidgetFoundation.Card.Variant"
+                    style="@style/WidgetFoundation.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
-                    android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
-                    android:focusable="false"
-                    app:strokeWidth="@{viewModel.step != 0 ? 0f : @dimen/l_125}">
+                    android:focusable="false">
 
                     <TextView
                         android:id="@+id/release_notes"
+                        markdownText="@{viewModel.notes}"
                         markdownText="@{viewModel.notes}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
                         android:textAppearance="@style/AppearanceFoundation.Caption"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        tools:maxLines="5"
+                        tools:text="@tools:sample/lorem/random"
+                        tools:visibility="visible" />
 
                 </com.google.android.material.card.MaterialCardView>
 

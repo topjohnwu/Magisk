@@ -3,12 +3,14 @@
 
     <style name="SplashThemeBase" parent="android:Theme.DeviceDefault.NoActionBar">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="SplashTheme" parent="SplashThemeBase" />
 
     <style name="Foundation" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <!--This should be overridden in v21 for transparency, etc-->
@@ -19,9 +21,6 @@
 
     <style name="WidgetFoundation" parent="android:Widget" />
 
-    <style name="AppearanceFoundation">
-        <item name="android:fontFamily">@font/exo</item>
-    </style>
     <!--endregion-->
 
     <style name="Foundation.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
@@ -30,7 +29,6 @@
     </style>
 
     <style name="Foundation.Default" parent="Foundation.Compat">
-        <item name="android:fontFamily">@font/exo</item>
         <item name="android:includeFontPadding">false</item>
         <item name="actionBarSize">@dimen/internal_action_bar_size</item>
         <item name="popupMenuStyle">@style/Foundation.PopupMenu</item>

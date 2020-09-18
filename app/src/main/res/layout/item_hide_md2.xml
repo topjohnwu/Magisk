@@ -18,10 +18,10 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="@style/WidgetFoundation.Card.Variant"
-        android:focusable="false"
+        style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="false"
         tools:layout_gravity="center"
         tools:layout_marginBottom="@dimen/l1">
 
@@ -80,16 +80,16 @@
 
                 <com.topjohnwu.widget.IndeterminateCheckBox
                     android:id="@+id/hide_expand_icon"
+                    state="@={item.hiddenState}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/l1"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:nextFocusLeft="@id/hide_expand"
-                    android:layout_marginEnd="@dimen/l1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    state="@={item.hiddenState}"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -109,6 +109,7 @@
 
         <ProgressBar
             style="@style/WidgetFoundation.ProgressBar"
+            gone="@{item.checkedPercent == 0}"
             android:layout_width="match_parent"
             android:layout_gravity="top"
             android:progress="@{item.checkedPercent}" />

@@ -14,7 +14,6 @@ import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.NavDirections
 import com.google.android.material.card.MaterialCardView
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIActivity
@@ -60,6 +59,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             return
         }
 
+        setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
 

@@ -29,7 +29,7 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         lockOrientation()
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE,
-                WindowManager.LayoutParams.FLAG_SECURE)
+            WindowManager.LayoutParams.FLAG_SECURE)
         super.onCreate(savedInstanceState)
 
         fun showRequest() {

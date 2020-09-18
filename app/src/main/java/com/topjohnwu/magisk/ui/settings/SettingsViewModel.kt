@@ -23,7 +23,7 @@ import com.topjohnwu.magisk.core.tasks.PatchAPK
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
-import com.topjohnwu.magisk.events.dialog.BiometricDialog
+import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
@@ -52,18 +52,13 @@ class SettingsViewModel(
             Customization,
             Theme, Language
         )
-        if (Build.VERSION.SDK_INT < 21) {
-            // Pre 5.0 does not support getting colors from attributes,
-            // making theming a pain in the ass. Just forget about it
-            list.remove(Theme)
-        }
         if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
             list.add(AddShortcut)
 
         // Manager
         list.addAll(listOf(
             Manager,
-            UpdateChannel, UpdateChannelUrl, UpdateChecker, DownloadPath
+            UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
         if (Info.env.isActive) {
             list.add(ClearRepoCache)
@@ -77,6 +72,10 @@ class SettingsViewModel(
                 Magisk,
                 MagiskHide, SystemlessHosts
             ))
+            if (Build.VERSION.SDK_INT < 19) {
+                // MagiskHide is only available on 4.4+
+                list.remove(MagiskHide)
+            }
         }
 
         // Superuser
@@ -125,7 +124,7 @@ class SettingsViewModel(
     }
 
     private fun authenticate(callback: () -> Unit) {
-        BiometricDialog {
+        BiometricEvent {
             // allow the change on success
             onSuccess { callback() }
         }.publish()

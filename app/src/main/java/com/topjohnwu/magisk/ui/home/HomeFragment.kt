@@ -31,11 +31,11 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
 
         // Set barrier reference IDs in code, since resource IDs will be stripped in release mode
         binding.homeMagiskWrapper.homeMagiskTitleBarrier.referencedIds =
-            intArrayOf(R.id.home_magisk_action, R.id.home_magisk_title, R.id.home_magisk_icon)
+            intArrayOf(R.id.home_magisk_button, R.id.home_magisk_title, R.id.home_magisk_icon)
         binding.homeMagiskWrapper.homeMagiskBarrier.referencedIds =
             intArrayOf(R.id.home_magisk_latest_version, R.id.home_magisk_installed_version)
         binding.homeManagerWrapper.homeManagerTitleBarrier.referencedIds =
-            intArrayOf(R.id.home_manager_action, R.id.home_manager_title, R.id.home_manager_icon)
+            intArrayOf(R.id.home_manager_button, R.id.home_manager_title, R.id.home_manager_icon)
 
         return binding.root
     }
