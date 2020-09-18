@@ -235,7 +235,6 @@
                     <TextView
                         android:id="@+id/release_notes"
                         markdownText="@{viewModel.notes}"
-                        markdownText="@{viewModel.notes}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
