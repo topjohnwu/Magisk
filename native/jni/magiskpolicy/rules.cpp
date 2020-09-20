@@ -54,11 +54,15 @@ void sepolicy::magisk_rules() {
 		allow(SEPOL_CLIENT_DOMAIN, SEPOL_EXEC_TYPE, "file", ALL);
 		allow(SEPOL_CLIENT_DOMAIN, SEPOL_CLIENT_DOMAIN, ALL, ALL);
 
-		// Allow su client termios ioctl
 		const char *pts[] {
 			"devpts", "untrusted_app_devpts",
 			"untrusted_app_25_devpts", "untrusted_app_all_devpts" };
 		for (auto type : pts) {
+			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "open");
+			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "getattr");
+			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "read");
+			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "write");
+			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "ioctl");
 			allowxperm(SEPOL_CLIENT_DOMAIN, type, "chr_file", "0x5400-0x54FF");
 		}
 
