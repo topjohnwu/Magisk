@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.superuser
 
 import android.content.res.Resources
-import android.os.Build
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -10,6 +9,7 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.adapterOf
 import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
@@ -37,7 +37,7 @@ class SuperuserViewModel(
 
     val adapter = adapterOf<ComparableRvItem<*>>()
     val items = MergeObservableList<ComparableRvItem<*>>().apply {
-        if (Build.VERSION.SDK_INT >= 19)
+        if (Config.magiskHide)
             insertItem(TappableHeadlineItem.Hide)
     }.insertList(itemsHelpers)
         .insertList(itemsPolicies)
