@@ -6,6 +6,7 @@
     <data>
 
         <import type="com.topjohnwu.magisk.core.Info" />
+
         <import type="com.topjohnwu.magisk.core.Config" />
 
         <variable
@@ -36,12 +37,13 @@
                 android:paddingTop="@dimen/l1">
 
                 <com.google.android.material.card.MaterialCardView
-                    gone="@{viewModel.skipOptions}"
                     style="@style/WidgetFoundation.Card"
+                    gone="@{viewModel.skipOptions}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1" >
+                    android:layout_marginEnd="@dimen/l1"
+                    android:focusable="false">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -63,11 +65,11 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="@dimen/l1"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
                                 android:text="@string/install_options_title"
                                 android:textAppearance="@style/AppearanceFoundation.Body"
-                                android:textStyle="bold"
-                                android:gravity="center_vertical"
-                                android:layout_weight="1"/>
+                                android:textStyle="bold" />
 
                             <Button
                                 style="@style/WidgetFoundation.Button.Text"
@@ -83,16 +85,17 @@
                             gone="@{viewModel.step != 0}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:paddingStart="3dp"
-                            android:paddingEnd="3dp"
                             android:layout_marginStart="@dimen/l1"
                             android:layout_marginTop="@dimen/l_50"
                             android:layout_marginEnd="@dimen/l1"
                             android:layout_marginBottom="@dimen/l_50"
+                            android:orientation="vertical"
+                            android:paddingStart="3dp"
+                            android:paddingEnd="3dp"
                             tools:layout_gravity="center">
 
                             <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
                                 gone="@{Info.isSAR}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -101,6 +104,7 @@
                                 tools:checked="true" />
 
                             <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
                                 gone="@{Info.isFBE}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -109,6 +113,7 @@
                                 app:tint="?colorPrimary" />
 
                             <CheckBox
+                                style="@style/WidgetFoundation.Checkbox"
                                 gone="@{Info.ramdisk}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -128,7 +133,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1" >
+                    android:layout_marginEnd="@dimen/l1"
+                    android:focusable="false">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -150,11 +156,11 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="@dimen/l1"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
                                 android:text="@string/install_method_title"
                                 android:textAppearance="@style/AppearanceFoundation.Body"
-                                android:textStyle="bold"
-                                android:gravity="center_vertical"
-                                android:layout_weight="1"/>
+                                android:textStyle="bold" />
 
                             <Button
                                 style="@style/WidgetFoundation.Button.Text"
@@ -165,7 +171,7 @@
                                 android:onClick="@{() -> viewModel.install()}"
                                 android:text="@string/install_start"
                                 app:icon="@drawable/ic_forth_md2"
-                                app:iconGravity="textEnd"/>
+                                app:iconGravity="textEnd" />
 
                         </LinearLayout>
 
@@ -183,6 +189,7 @@
 
                             <RadioButton
                                 android:id="@+id/method_download"
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/download_zip_only"
@@ -190,12 +197,14 @@
 
                             <RadioButton
                                 android:id="@+id/method_patch"
+                                style="@style/WidgetFoundation.RadioButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/select_patch_file" />
 
                             <RadioButton
                                 android:id="@+id/method_direct"
+                                style="@style/WidgetFoundation.RadioButton"
                                 gone="@{!viewModel.rooted}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -203,6 +212,7 @@
 
                             <RadioButton
                                 android:id="@+id/method_inactive_slot"
+                                style="@style/WidgetFoundation.RadioButton"
                                 gone="@{!viewModel.isRooted || !Info.isAB}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -218,21 +228,21 @@
                     style="@style/WidgetFoundation.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/l1"
                     android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1" >
+                    android:layout_marginEnd="@dimen/l1"
+                    android:focusable="false">
 
                     <TextView
                         android:id="@+id/release_notes"
+                        markdownText="@{viewModel.notes}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
                         android:textAppearance="@style/AppearanceFoundation.Caption"
                         android:visibility="gone"
-                        markdownText="@{viewModel.notes}"
-                        tools:visibility="visible"
+                        tools:maxLines="5"
                         tools:text="@tools:sample/lorem/random"
-                        tools:maxLines="5" />
+                        tools:visibility="visible" />
 
                 </com.google.android.material.card.MaterialCardView>
 

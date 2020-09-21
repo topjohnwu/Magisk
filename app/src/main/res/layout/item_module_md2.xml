@@ -29,6 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="@{item.enabled ? 1f : .5f}"
+            android:nextFocusRight="@id/module_indicator"
             tools:layout_gravity="center"
             tools:layout_margin="@dimen/l1">
 
@@ -83,10 +84,10 @@
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/module_indicator"
-                    android:checked="@={item.enabled}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/l_50"
+                    android:checked="@={item.enabled}"
                     app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1"
@@ -122,6 +123,8 @@
                     gone="@{item.repo == null}"
                     android:layout_width="wrap_content"
                     android:alpha=".5"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:onClick="@{() -> viewModel.infoPressed(item)}"
                     android:paddingEnd="@dimen/l_50"
                     app:layout_constraintBottom_toBottomOf="@+id/module_remove"
@@ -134,6 +137,8 @@
                     style="@style/WidgetFoundation.Button.Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:onClick="@{() -> item.delete(viewModel)}"
                     android:text="@{item.removed ? @string/module_state_restore : @string/module_state_remove}"
                     android:textAllCaps="false"

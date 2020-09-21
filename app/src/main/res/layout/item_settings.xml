@@ -21,14 +21,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:alpha="@{item.enabled ? 1f : .5f}"
+        android:clickable="@{item.enabled}"
+        android:focusable="@{item.enabled}"
         android:onClick="@{(view) -> item.onPressed(view, callback)}"
         tools:layout_gravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingStart="@{item.icon == 0 ? @dimen/l1 : 0}"
             android:paddingEnd="@dimen/l1">
 
@@ -41,9 +43,9 @@
                 tools:srcCompat="@drawable/ic_fingerprint" />
 
             <LinearLayout
-                android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
                 android:paddingTop="@dimen/l1"
@@ -73,12 +75,13 @@
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/selector_indicator"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:checked="@{item.checked}"
-                android:onCheckedChanged="@{(v, c) -> item.onToggle(v, callback, c)}"
                 goneUnless="@{item.showSwitch}"
-                isEnabled="@{item.enabled}"/>
+                isEnabled="@{item.enabled}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@{item.checked}"
+                android:focusable="@{item.enabled}"
+                android:onCheckedChanged="@{(v, c) -> item.onToggle(v, callback, c)}" />
 
         </LinearLayout>
 

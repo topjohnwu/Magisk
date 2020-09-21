@@ -19,6 +19,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         android:onClick="@{() -> listener.onClick(item.position)}"
         android:paddingStart="@dimen/l1"
         android:paddingTop="@dimen/l_75"

@@ -47,10 +47,13 @@
             app:layout_constraintTop_toBottomOf="@+id/hide_filter_title_filter">
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/hide_filter_chip"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="@={viewModel.showSystem}"
+                android:nextFocusRight="@id/hide_filter_chip_data"
+                android:nextFocusDown="@id/hide_filter_search_field"
                 android:text="@string/show_system_app"
                 android:textAppearance="@style/AppearanceFoundation.Caption"
                 app:checkedIcon="@drawable/ic_check_md2"
@@ -58,12 +61,15 @@
                 tools:checked="true" />
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/hide_filter_chip_data"
                 style="@style/Widget.MaterialComponents.Chip.Entry"
                 gone="@{viewModel.query.empty}"
                 onCloseClicked="@{() -> viewModel.resetQuery()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="false"
+                android:nextFocusRight="@id/hide_filter_done"
+                android:nextFocusDown="@id/hide_filter_search_field"
                 android:text="@{viewModel.query}"
                 android:textAppearance="@style/AppearanceFoundation.Caption"
                 app:chipBackgroundColor="?colorSurfaceVariant" />
@@ -106,14 +112,16 @@
                 app:tint="?colorDisabled" />
 
             <EditText
+                android:id="@+id/hide_filter_search_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="48dp"
                 android:background="@null"
+                android:gravity="start|center_vertical"
                 android:hint="@string/hide_filter_hint"
                 android:inputType="textUri"
                 android:minHeight="36dp"
-                android:gravity="start|center_vertical"
+                android:nextFocusRight="@id/hide_filter_done"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/l1"
                 android:singleLine="true"
@@ -128,14 +136,15 @@
             android:id="@+id/hide_filter_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:nextFocusLeft="@id/hide_filter_chip"
             app:backgroundTint="?colorPrimary"
-            app:tint="?colorOnPrimary"
             app:elevation="0dp"
             app:fabSize="mini"
             app:layout_constraintBottom_toBottomOf="@+id/hide_filter_search"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/hide_filter_search"
-            app:srcCompat="@drawable/ic_check_md2" />
+            app:srcCompat="@drawable/ic_check_md2"
+            app:tint="?colorOnPrimary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

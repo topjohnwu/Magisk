@@ -21,6 +21,7 @@
         style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="false"
         tools:layout_gravity="center"
         tools:layout_marginBottom="@dimen/l1">
 
@@ -30,9 +31,11 @@
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/hide_expand"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?selectableItemBackground"
+                android:nextFocusRight="@id/hide_expand_icon"
                 android:onClick="@{item::toggleExpand}">
 
                 <ImageView
@@ -77,15 +80,16 @@
 
                 <com.topjohnwu.widget.IndeterminateCheckBox
                     android:id="@+id/hide_expand_icon"
+                    state="@={item.hiddenState}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/l1"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
-                    android:layout_marginEnd="@dimen/l1"
+                    android:nextFocusLeft="@id/hide_expand"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    state="@={item.hiddenState}"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -105,9 +109,9 @@
 
         <ProgressBar
             style="@style/WidgetFoundation.ProgressBar"
+            gone="@{item.checkedPercent == 0}"
             android:layout_width="match_parent"
             android:layout_gravity="top"
-            gone="@{item.checkedPercent == 0}"
             android:progress="@{item.checkedPercent}" />
 
     </com.google.android.material.card.MaterialCardView>

@@ -18,9 +18,14 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/module_card"
         style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:nextFocusRight="@id/module_info"
+        android:onClick="@{() -> viewModel.downloadPressed(item)}"
         tools:layout_gravity="center"
         tools:layout_marginBottom="@dimen/l1"
         tools:layout_marginEnd="@dimen/l1">
@@ -96,6 +101,7 @@
                 style="@style/WidgetFoundation.Icon"
                 android:layout_width="wrap_content"
                 android:alpha=".5"
+                android:nextFocusLeft="@id/module_card"
                 android:onClick="@{() -> viewModel.infoPressed(item)}"
                 android:paddingEnd="@dimen/l_50"
                 app:layout_constraintBottom_toBottomOf="@+id/module_download"
@@ -105,16 +111,17 @@
 
             <ImageView
                 android:id="@+id/module_download"
-                android:layout_width="wrap_content"
                 style="@style/WidgetFoundation.Icon.Primary"
-                android:paddingStart="@dimen/l_50"
                 isEnabled="@{!(item.progress == -100 || (item.progress > 0 &amp;&amp; item.progress &lt; 100))}"
-                android:contentDescription="@string/download"
                 srcCompat="@{item.isUpdate ? R.drawable.ic_update_md2 : R.drawable.ic_download_md2}"
+                android:layout_width="wrap_content"
+                android:contentDescription="@string/download"
+                android:nextFocusLeft="@id/module_info"
+                android:onClick="@{() -> viewModel.downloadPressed(item)}"
+                android:paddingStart="@dimen/l_50"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/module_divider"
-                android:onClick="@{() -> viewModel.downloadPressed(item)}"
                 tools:srcCompat="@drawable/ic_download_md2" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

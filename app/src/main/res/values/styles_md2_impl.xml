@@ -15,6 +15,7 @@
 
 
     <style name="WidgetFoundation.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="android:focusable">auto</item>
         <item name="cardBackgroundColor">?colorSurfaceVariant</item>
         <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">0dp</item>
@@ -152,6 +153,16 @@
 
     <style name="WidgetFoundation.Icon.Error">
         <item name="tint">@color/color_error_transient</item>
+    </style>
+
+    <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:paddingStart">@dimen/l1</item>
+        <item name="android:paddingEnd">@dimen/l1</item>
+    </style>
+
+    <style name="WidgetFoundation.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:paddingStart">@dimen/l1</item>
+        <item name="android:paddingEnd">@dimen/l1</item>
     </style>
 
     <style name="WidgetFoundation.ProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">

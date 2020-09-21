@@ -18,13 +18,14 @@
     <com.google.android.material.card.MaterialCardView
         style="@style/WidgetFoundation.Card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:focusable="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/l_50"
             android:paddingStart="@dimen/l1"
+            android:paddingTop="@dimen/l_50"
             android:paddingEnd="@dimen/l1"
             android:paddingBottom="@dimen/l_50"
             tools:layout_gravity="center">
@@ -106,7 +107,7 @@
                             android:id="@+id/home_manager_latest_version"
                             style="@style/W.Home.Item.Top"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" >
+                            app:layout_constraintTop_toTopOf="parent">
 
                             <TextView
                                 style="@style/W.Home.ItemContent"

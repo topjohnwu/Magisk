@@ -87,6 +87,7 @@
                 app:tint="?colorDisabled" />
 
             <EditText
+                android:id="@+id/module_filter_search_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="48dp"
@@ -94,6 +95,7 @@
                 android:hint="@string/hide_filter_hint"
                 android:inputType="textUri"
                 android:minHeight="36dp"
+                android:nextFocusRight="@id/module_filter_done"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/l1"
                 android:singleLine="true"
@@ -109,6 +111,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/l1"
+            android:nextFocusLeft="@id/module_filter_search_field"
             app:backgroundTint="?colorPrimary"
             app:elevation="0dp"
             app:fabSize="mini"

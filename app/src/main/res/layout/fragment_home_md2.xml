@@ -9,7 +9,7 @@
 
         <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
 
-        <import type="com.topjohnwu.magisk.ui.home.DeveloperItem"/>
+        <import type="com.topjohnwu.magisk.ui.home.DeveloperItem" />
 
         <variable
             name="viewModel"
@@ -34,15 +34,15 @@
             android:paddingTop="@dimen/l1">
 
             <Button
-                android:layout_gravity="center"
                 style="@style/WidgetFoundation.Button"
                 gone="@{!viewModel.showTest}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:onClick="@{() -> viewModel.onTestPressed()}"
                 android:text="TEST"
                 android:textAllCaps="false"
-                tools:visibility="gone"/>
+                tools:visibility="gone" />
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card.Primary"
@@ -51,7 +51,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
-                android:layout_marginBottom="@dimen/l1">
+                android:layout_marginBottom="@dimen/l1"
+                android:focusable="false">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -101,40 +102,40 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
                 android:layout_marginTop="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
 
             <Space
+                gone="@{!viewModel.showSafetyNet &amp;&amp; !viewModel.showUninstall}"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/l1"
-                gone="@{!viewModel.showSafetyNet &amp;&amp; !viewModel.showUninstall}" />
+                android:layout_height="@dimen/l1" />
 
             <Button
                 style="@style/WidgetFoundation.Button.Outlined"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
+                gone="@{!viewModel.showSafetyNet}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:onClick="@{() -> viewModel.onSafetyNetPressed()}"
                 android:text="@string/home_check_safetynet"
                 android:textAllCaps="false"
                 android:textSize="12sp"
-                android:onClick="@{() -> viewModel.onSafetyNetPressed()}"
-                gone="@{!viewModel.showSafetyNet}"
                 app:cornerRadius="@dimen/r1"
                 app:icon="@drawable/ic_safetynet_md2" />
 
             <Button
                 style="@style/WidgetFoundation.Button.Outlined.Error"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
+                gone="@{!viewModel.showUninstall}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:onClick="@{() -> viewModel.onDeletePressed()}"
                 android:text="@string/uninstall_magisk_title"
                 android:textAllCaps="false"
                 android:textSize="12sp"
-                android:onClick="@{() -> viewModel.onDeletePressed()}"
-                gone="@{!viewModel.showUninstall}"
                 app:cornerRadius="@dimen/r1"
                 app:icon="@drawable/ic_delete_md2" />
 
@@ -143,7 +144,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_margin="@dimen/l1">
+                android:layout_margin="@dimen/l1"
+                android:focusable="false">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -169,20 +171,20 @@
                         android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />
 
                     <include
+                        item="@{DeveloperItem.Main.INSTANCE}"
                         layout="@layout/item_developer"
+                        viewModel="@{viewModel}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/l_50"
-                        viewModel="@{viewModel}"
-                        item="@{DeveloperItem.Main.INSTANCE}" />
+                        android:layout_marginTop="@dimen/l_50" />
 
                     <include
+                        item="@{DeveloperItem.App.INSTANCE}"
                         layout="@layout/item_developer"
+                        viewModel="@{viewModel}"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/l_50"
-                        viewModel="@{viewModel}"
-                        item="@{DeveloperItem.App.INSTANCE}" />
+                        android:layout_marginTop="@dimen/l_50" />
 
                 </LinearLayout>
 

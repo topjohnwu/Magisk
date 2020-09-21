@@ -31,6 +31,7 @@
                 style="@style/WidgetFoundation.Card.Elevated"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:focusable="false"
                 app:cardElevation="@dimen/margin_generic"
                 app:cardUseCompatPadding="true">
 
@@ -53,9 +54,9 @@
                         app:layout_constraintGuide_end="16dp" />
 
                     <ImageView
+                        android:id="@+id/dialog_base_icon"
                         style="@style/WidgetFoundation.Image.Big"
                         gone="@{data.icon == null}"
-                        android:id="@+id/dialog_base_icon"
                         android:layout_gravity="center"
                         android:layout_marginTop="@dimen/l1"
                         android:src="@{data.icon}"
@@ -66,8 +67,8 @@
                         tools:src="@drawable/ic_delete_md2" />
 
                     <TextView
-                        gone="@{data.title.length == 0}"
                         android:id="@+id/dialog_base_title"
+                        gone="@{data.title.length == 0}"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l1"
@@ -96,8 +97,8 @@
                             android:layout_height="wrap_content">
 
                             <TextView
-                                gone="@{data.message.length == 0}"
                                 android:id="@+id/dialog_base_message"
+                                gone="@{data.message.length == 0}"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:text="@{data.message}"
@@ -127,16 +128,16 @@
                         android:id="@+id/dialog_base_buttons"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
                         android:gravity="bottom|center_horizontal"
                         android:layoutDirection="locale"
                         android:orientation="horizontal"
                         android:paddingStart="12dp"
                         android:paddingTop="4dp"
                         android:paddingEnd="12dp"
-                        android:paddingBottom="4dp">
+                        android:paddingBottom="4dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
 
                         <Button
                             android:id="@+id/dialog_base_button_4"
@@ -146,7 +147,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
+                            android:clickable="@{data.buttonIDGAF.isEnabled()}"
                             android:filterTouchesWhenObscured="true"
+                            android:focusable="@{data.buttonIDGAF.isEnabled()}"
                             android:onClick="@{() -> data.buttonIDGAF.clicked()}"
                             android:text="@{data.buttonIDGAF.title}"
                             app:icon="@{data.buttonIDGAF.icon}"
@@ -161,7 +164,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
+                            android:clickable="@{data.buttonNeutral.isEnabled()}"
                             android:filterTouchesWhenObscured="true"
+                            android:focusable="@{data.buttonNeutral.isEnabled()}"
                             android:onClick="@{() -> data.buttonNeutral.clicked()}"
                             android:text="@{data.buttonNeutral.title}"
                             app:icon="@{data.buttonNeutral.icon}"
@@ -184,7 +189,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
+                            android:clickable="@{data.buttonNegative.isEnabled()}"
                             android:filterTouchesWhenObscured="true"
+                            android:focusable="@{data.buttonNegative.isEnabled()}"
                             android:onClick="@{() -> data.buttonNegative.clicked()}"
                             android:text="@{data.buttonNegative.title}"
                             app:icon="@{data.buttonNegative.icon}"
@@ -199,7 +206,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
+                            android:clickable="@{data.buttonPositive.isEnabled()}"
                             android:filterTouchesWhenObscured="true"
+                            android:focusable="@{data.buttonPositive.isEnabled()}"
                             android:onClick="@{() -> data.buttonPositive.clicked()}"
                             android:text="@{data.buttonPositive.title}"
                             app:icon="@{data.buttonPositive.icon}"
