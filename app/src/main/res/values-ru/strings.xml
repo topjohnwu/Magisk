@@ -14,7 +14,7 @@
     <!--Home-->
     <string name="no_connection">Нет подключения к сети</string>
     <string name="app_changelog">Изменения</string>
-    <string name="manager">Manager</string> <!--Do not translate-->
+    <string name="manager">Manager</string>
     <string name="loading">Загрузка…</string>
     <string name="update">Обновить</string>
     <string name="not_available">Н/Д</string>
@@ -22,10 +22,10 @@
     <string name="status">Режим</string>
     <string name="home_package">Имя пакета</string>
 
-    <string name="home_notice_content">Убедитесь, что Вы скачали и установили Magisk (Manager) из официальных источников. Установочные файлы, загруженные из сторонних источников, могут содержать вредоносный код.</string>
+    <string name="home_notice_content">Убедитесь, что Вы скачали и установили Magisk (Manager) из официального источника. Файлы, загруженные из сторонних источников, могут содержать вредоносный код!</string>
     <string name="home_support_title">Поддержите нас</string>
     <string name="home_item_source">Исходный код</string>
-    <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете проявить заботу, отправив небольшое пожертвование.</string>
+    <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете поддержать нас, отправив небольшое пожертвование.</string>
     <string name="home_status_normal">Обычный</string>
     <string name="home_status_stub">Скрытие</string>
     <string name="home_installed_version">Установлен</string>
@@ -44,12 +44,12 @@
     <string name="install_next">Далее</string>
     <string name="install_start">Установить</string>
     <string name="manager_download_install">Нажмите, чтобы загрузить и установить</string>
-    <string name="download_zip_only">Только загрузка установочного ZIP</string>
-    <string name="direct_install">Прямая установка (Рекомендуется)</string>
+    <string name="download_zip_only"Скачать установочный ZIP</string>
+    <string name="direct_install">Автоматическая установка (рекомендуется)</string>
     <string name="install_inactive_slot">Установка во второй слот (OTA)</string>
-    <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции после OTA!\nПродолжить?</string>
+    <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции Magisk после OTA!\nПродолжить?</string>
     <string name="setup_title">Расширенная установка</string>
-    <string name="select_patch_file">Пропатчить образ</string>
+    <string name="select_patch_file">Пропатчить boot образ</string>
     <string name="patch_file_msg">Выберите файл образа (*.img) или архив ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Перезагрузка через 5 секунд…</string>
     <string name="flash_screen_title">Установка</string>
@@ -175,13 +175,15 @@
     <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
     <string name="settings_customization">Персонализация</string>
     <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после скрытия</string>
+    <string name="settings_doh_title">DNS поверх HTTPS</string>
+    <string name="settings_doh_description">Отключить DoH (при проблемах с подключением)</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
-    <string name="settings_owner_only">Только владелец</string>
-    <string name="settings_owner_manage">Регулировка владельцем</string>
+    <string name="settings_owner_only">Только администратор</string>
+    <string name="settings_owner_manage">Регулировка администратором</string>
     <string name="settings_user_independent">Правила пользователей</string>
-    <string name="owner_only_summary">Только владельцу доступен Root-доступ</string>
-    <string name="owner_manage_summary">Только владелец управляет Root-доступом и обрабатывает запросы</string>
+    <string name="owner_only_summary">Только администратору доступен Root-доступ</string>
+    <string name="owner_manage_summary">Администратор управляет Root-доступом пользователей и обрабатывает запросы</string>
     <string name="user_indepenent_summary">Каждый пользователь управляет собственными правилами Root-доступа</string>
 
     <string name="mount_namespace_mode">Настройка пространств имён</string>
@@ -193,7 +195,7 @@
     <string name="isolate_summary">Сессии суперпользователя используют изолированные пространства имён</string>
 
     <!--Notifications-->
-    <string name="update_channel">Обновления Magisk</string>
+    <string name="update_channel">Обновление Magisk</string>
     <string name="progress_channel">Уведомления о прогрессе</string>
     <string name="download_complete">Загрузка завершена</string>
     <string name="download_file_error">Ошибка загрузки файла</string>
