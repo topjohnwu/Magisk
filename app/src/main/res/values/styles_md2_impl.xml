@@ -156,19 +156,13 @@
     </style>
 
     <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
-        <item name="tint">?colorPrimary</item>
     </style>
 
     <style name="WidgetFoundation.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
-        <item name="tint">?colorPrimary</item>
     </style>
 
     <style name="WidgetFoundation.ProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
