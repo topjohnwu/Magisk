@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.packageInfo
 import com.topjohnwu.magisk.ktx.packageName
 import com.topjohnwu.magisk.ktx.processes
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +47,10 @@ class HideViewModel : BaseViewModel(), Queryable {
     }
 
     override fun refresh() = viewModelScope.launch {
+        if (!Utils.showSuperUser()) {
+            state = State.LOADING_FAILED
+            return@launch
+        }
         state = State.LOADING
         val (apps, diff) = withContext(Dispatchers.Default) {
             val pm = get<PackageManager>()
