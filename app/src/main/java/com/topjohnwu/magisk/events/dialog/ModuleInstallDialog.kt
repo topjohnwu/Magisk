@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.events.dialog
 
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
@@ -21,17 +22,21 @@ class ModuleInstallDialog(private val item: Repo) : DialogEvent() {
             applyTitle(context.getString(R.string.repo_install_title, item.name))
                 .applyMessage(context.getString(R.string.repo_install_msg, item.downloadFilename))
                 .cancellable(true)
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                    titleRes = R.string.install
-                    icon = R.drawable.ic_install
-                    onClick { download(true) }
-                }
                 .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
                     titleRes = R.string.download
                     icon = R.drawable.ic_download_md2
                     onClick { download(false) }
                 }
-                .reveal()
+
+            if (Info.env.isActive) {
+                applyButton(MagiskDialog.ButtonType.POSITIVE) {
+                    titleRes = R.string.install
+                    icon = R.drawable.ic_install
+                    onClick { download(true) }
+                }
+            }
+
+            reveal()
         }
     }
 
