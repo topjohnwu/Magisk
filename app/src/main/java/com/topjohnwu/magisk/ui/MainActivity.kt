@@ -116,9 +116,8 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     override fun onResume() {
         super.onResume()
         binding.mainNavigation.menu.apply {
-            val isRoot = Shell.rootAccess()
-            findItem(R.id.modulesFragment)?.isEnabled = isRoot
-            findItem(R.id.superuserFragment)?.isEnabled = isRoot
+            findItem(R.id.superuserFragment)?.isEnabled = Info.env.isActive
+            findItem(R.id.logFragment)?.isEnabled = Info.env.isActive
         }
     }
 

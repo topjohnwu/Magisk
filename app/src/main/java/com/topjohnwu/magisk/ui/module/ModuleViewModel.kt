@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.Module
 import com.topjohnwu.magisk.core.tasks.RepoUpdater
@@ -100,11 +101,13 @@ class ModuleViewModel(
 
     val adapter = adapterOf<RvItem>()
     val items = MergeObservableList<RvItem>()
-        .insertItem(InstallModule)
-        .insertList(updatableSectionList)
-        .insertList(itemsUpdatable)
-        .insertList(installSectionList)
-        .insertList(itemsInstalled)
+        .also { if (Info.env.isActive) {
+            it.insertItem(InstallModule)
+              .insertList(updatableSectionList)
+              .insertList(itemsUpdatable)
+              .insertList(installSectionList)
+              .insertList(itemsInstalled)
+        } }
         .insertItem(sectionOnline)
         .insertList(itemsOnline)
     val itemBinding = itemBindingOf<RvItem> {
