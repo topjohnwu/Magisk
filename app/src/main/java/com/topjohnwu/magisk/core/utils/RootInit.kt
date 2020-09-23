@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.rawResource
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
-import com.topjohnwu.superuser.io.SuFile
 
 class RootInit : Shell.Initializer() {
 
@@ -20,8 +19,9 @@ class RootInit : Shell.Initializer() {
 
     fun init(context: Context, shell: Shell): Boolean {
         shell.newJob().apply {
+            add("export SDK_INT=${Build.VERSION.SDK_INT}")
             if (Const.Version.atLeast_20_4()) {
-                add("export MAGISKTMP=$(magisk --path)/.magisk")
+                add("export MAGISKTMP=\$(magisk --path)/.magisk")
             } else {
                 add("export MAGISKTMP=/sbin/.magisk")
             }
@@ -45,10 +45,7 @@ class RootInit : Shell.Initializer() {
         Info.isSAR = getBool("SYSTEM_ROOT")
         Info.ramdisk = getBool("RAMDISKEXIST")
         Info.isAB = getBool("ISAB")
-
-        // FBE does not exist pre 7.0
-        if (Build.VERSION.SDK_INT >= 24)
-            Info.isFBE = SuFile("/data/unencrypted").exists()
+        Info.crypto = getvar("CRYPTOTYPE")
 
         // Default presets
         Config.recovery = getBool("RECOVERYMODE")

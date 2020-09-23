@@ -121,7 +121,7 @@
 
                         <LinearLayout
                             android:id="@+id/home_magisk_installed_version"
-                            style="@style/W.Home.Item.Bottom"
+                            style="@style/W.Home.Item"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_latest_version">
 
@@ -133,6 +133,23 @@
                                 style="@style/W.Home.ItemContent.Right"
                                 android:text="@{Info.env.isActive ? viewModel.magiskInstalledVersion : @string/not_available}"
                                 tools:text="20.1 (12345)" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/home_device_details_recovery"
+                            style="@style/W.Home.Item.Bottom"
+                            app:layout_constraintStart_toStartOf="@+id/home_magisk_installed_version"
+                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_installed_version">
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="Ramdisk" />
+
+                            <TextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{Info.ramdisk ? @string/yes : @string/no }"
+                                tools:text="Yes" />
 
                         </LinearLayout>
 
@@ -178,19 +195,19 @@
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/home_device_details_recovery"
+                            android:id="@+id/home_device_details_crypto"
                             style="@style/W.Home.Item.Bottom"
                             app:layout_constraintStart_toStartOf="@+id/home_device_details_sar"
                             app:layout_constraintTop_toBottomOf="@+id/home_device_details_sar">
 
                             <TextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="Ramdisk" />
+                                android:text="Crypto" />
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.ramdisk ? @string/yes : @string/no }"
-                                tools:text="Yes" />
+                                android:text="@{Info.crypto}"
+                                tools:text="N/A" />
 
                         </LinearLayout>
 

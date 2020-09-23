@@ -364,10 +364,11 @@ get_flags() {
     fi
   fi
   if [ -z $KEEPFORCEENCRYPT ]; then
-    grep ' /data ' /proc/mounts | grep -q 'dm-' && FDE=true || FDE=false
-    [ -d /data/unencrypted ] && FBE=true || FBE=false
+    ISENCRYPTED=false
+    grep ' /data ' /proc/mounts | grep -q 'dm-' && ISENCRYPTED=true
+    [ -d /data/unencrypted ] && ISENCRYPTED=true
     # No data access means unable to decrypt in recovery
-    if $FDE || $FBE || ! $DATA; then
+    if $ISENCRYPTED || ! $DATA; then
       KEEPFORCEENCRYPT=true
       ui_print "- Encrypted data, keep forceencrypt"
     else
