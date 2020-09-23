@@ -89,7 +89,7 @@ dependencies {
     implementation("${bindingAdapter}:${vBAdapt}")
     implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
 
-    val vMarkwon = "4.5.1"
+    val vMarkwon = "4.6.0"
     implementation("io.noties.markwon:core:${vMarkwon}")
     implementation("io.noties.markwon:html:${vMarkwon}")
     implementation("io.noties.markwon:image:${vMarkwon}")
@@ -118,7 +118,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:${vOkHttp}")
     implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:${vOkHttp}")
 
-    val vMoshi = "1.9.3"
+    val vMoshi = "1.10.0"
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
@@ -132,7 +132,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
     implementation("androidx.biometric:biometric:1.0.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.0-rc1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.2.0")
     implementation("androidx.preference:preference:1.1.1")
@@ -143,5 +143,5 @@ dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("androidx.core:core-ktx:1.3.1")
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.0.0")
-    implementation("com.google.android.material:material:1.2.0")
+    implementation("com.google.android.material:material:1.2.1")
 }
