@@ -12,11 +12,19 @@
 
 using namespace std;
 
+static string rtrim(string &&str) {
+	// Trim space, newline, and null byte from end of string
+	while (memchr(" \n\r", str[str.length() - 1], 4))
+		str.pop_back();
+	return std::move(str);
+}
+
 struct devinfo {
 	int major;
 	int minor;
 	char devname[32];
 	char partname[32];
+	char dmname[32];
 };
 
 static vector<devinfo> dev_list;
@@ -46,6 +54,12 @@ static void collect_devices() {
 				continue;
 			sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
 			parse_device(&dev, path);
+			dev.dmname[0] = '\0';
+			sprintf(path, "/sys/dev/block/%s/dm/name", entry->d_name);
+			if (access(path, F_OK) == 0) {
+				auto name = rtrim(full_read(path));
+				strcpy(dev.dmname, name.c_str());
+			}
 			dev_list.push_back(dev);
 		}
 	}
@@ -72,6 +86,11 @@ static int64_t setup_block(bool write_block = true) {
 				dev_t rdev = makedev(dev.major, dev.minor);
 				mknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
 				return rdev;
+			} else if (strcasecmp(dev.dmname, blk_info.partname) == 0) {
+				LOGD("Setup %s: [%s] (%d, %d)\n", dev.dmname, dev.devname, dev.major, dev.minor);
+				dev_t rdev = makedev(dev.major, dev.minor);
+				mknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
+				return rdev;
 			}
 		}
 		// Wait 10ms and try again
@@ -89,13 +108,6 @@ static bool is_lnk(const char *name) {
 	if (lstat(name, &st))
 		return false;
 	return S_ISLNK(st.st_mode);
-}
-
-static string rtrim(string &&str) {
-	// Trim space, newline, and null byte from end of string
-	while (memchr(" \n\r", str[str.length() - 1], 4))
-		str.pop_back();
-	return std::move(str);
 }
 
 #define read_info(val) \
@@ -243,19 +255,28 @@ void SARBase::backup_files() {
 
 void SARBase::mount_system_root() {
 	LOGD("Early mount system_root\n");
+	strcpy(blk_info.block_dev, "/dev/root");
+	// Try legacy SAR dm-verity
+	strcpy(blk_info.partname, "vroot");
+	auto dev = setup_block(false);
+	if (dev >= 0)
+		goto mount_root;
+
 	// Try NVIDIA naming scheme
 	strcpy(blk_info.partname, "APP");
-	strcpy(blk_info.block_dev, "/dev/root");
-	auto dev = setup_block(false);
-	if (dev < 0) {
-		sprintf(blk_info.partname, "system%s", cmd->slot);
-		dev = setup_block(false);
-		if (dev < 0) {
-			// We don't really know what to do at this point...
-			LOGE("Cannot find root partition, abort\n");
-			exit(1);
-		}
-	}
+	dev = setup_block(false);
+	if (dev >= 0)
+		goto mount_root;
+
+	sprintf(blk_info.partname, "system%s", cmd->slot);
+	dev = setup_block(false);
+	if (dev >= 0)
+		goto mount_root;
+
+	// We don't really know what to do at this point...
+	LOGE("Cannot find root partition, abort\n");
+	exit(1);
+mount_root:
 	xmkdir("/system_root", 0755);
 	if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
 		xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
