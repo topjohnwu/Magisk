@@ -57,7 +57,7 @@ class HideViewModel : BaseViewModel(), Queryable {
             val hides = Shell.su("magiskhide --ls").exec().out.map { HideTarget(it) }
             val apps = pm.getInstalledApplications(0)
                 .asSequence()
-                .filter { it.enabled && !blacklist.contains(it.packageName) }
+                .filter { it.enabled && it.uid >= 10000 && !blacklist.contains(it.packageName) }
                 .map { HideAppInfo(it, pm) }
                 .map { createTarget(it, hides) }
                 .filter { it.processes.isNotEmpty() }
@@ -112,7 +112,6 @@ class HideViewModel : BaseViewModel(), Queryable {
     companion object {
         private val blacklist by lazy { listOf(
             packageName,
-            "android",
             "com.android.chrome",
             "com.chrome.beta",
             "com.chrome.dev",
