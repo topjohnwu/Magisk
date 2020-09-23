@@ -23,7 +23,7 @@ object Utils {
 
     fun showSuperUser(): Boolean {
         return Info.env.isActive && (Const.USER_ID == 0
-                || Config.suMultiuserMode != Config.Value.MULTIUSER_MODE_OWNER_MANAGED)
+                || Config.suMultiuserMode == Config.Value.MULTIUSER_MODE_USER)
     }
 
     fun openLink(context: Context, link: Uri) {

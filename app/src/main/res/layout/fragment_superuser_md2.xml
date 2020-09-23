@@ -57,6 +57,24 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            goneUnless="@{viewModel.loadFailed}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_available"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
     </FrameLayout>
 
 </layout>

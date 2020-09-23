@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.TappableHeadlineItem
 import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +49,10 @@ class SuperuserViewModel(
     // ---
 
     override fun refresh() = viewModelScope.launch {
+        if (!Utils.showSuperUser()) {
+            state = State.LOADING_FAILED
+            return@launch
+        }
         state = State.LOADING
         val (policies, diff) = withContext(Dispatchers.Default) {
             val policies = db.fetchAll {
