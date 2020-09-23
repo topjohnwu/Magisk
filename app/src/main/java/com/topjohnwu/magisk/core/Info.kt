@@ -33,6 +33,7 @@ object Info {
     @JvmStatic var ramdisk = false
     @JvmStatic var hasGMS = true
     @JvmStatic var crypto = ""
+    @JvmStatic var isPixel = false
 
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->

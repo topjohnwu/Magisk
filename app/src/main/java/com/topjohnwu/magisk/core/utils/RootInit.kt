@@ -38,14 +38,16 @@ class RootInit : Shell.Initializer() {
             add("mm_init")
         }.exec()
 
-        fun getvar(name: String) = ShellUtils.fastCmd(shell, "echo \$$name")
-        fun getBool(name: String) = getvar(name).toBoolean()
+        fun fastCmd(cmd: String) = ShellUtils.fastCmd(shell, cmd)
+        fun getVar(name: String) = fastCmd("echo \$$name")
+        fun getBool(name: String) = getVar(name).toBoolean()
 
-        Const.MAGISKTMP = getvar("MAGISKTMP")
+        Const.MAGISKTMP = getVar("MAGISKTMP")
         Info.isSAR = getBool("SYSTEM_ROOT")
         Info.ramdisk = getBool("RAMDISKEXIST")
         Info.isAB = getBool("ISAB")
-        Info.crypto = getvar("CRYPTOTYPE")
+        Info.crypto = getVar("CRYPTOTYPE")
+        Info.isPixel = fastCmd("getprop ro.product.brand") == "google"
 
         // Default presets
         Config.recovery = getBool("RECOVERYMODE")
