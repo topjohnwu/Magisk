@@ -228,6 +228,7 @@
                     style="@style/WidgetFoundation.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/l1"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
                     android:focusable="false">
