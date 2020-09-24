@@ -67,7 +67,6 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/main_bottom_bar"
             style="@style/WidgetFoundation.Card.Elevated"
-            gone="@{!Info.env.isActive}"
             android:layout_width="224dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
