@@ -10,6 +10,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Info
 import kotlin.math.roundToInt
 
 class HideBottomViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(),
@@ -98,7 +99,7 @@ class HideBottomViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<
             this.lockState = lockState
         }
 
-        if (hide) {
+        if (hide || !Info.env.isActive) {
             // view is not laid out and drawn yet properly, so animation will not be attached
             // hence we just simply hide the view
             if (!isLaidOut) {
@@ -107,7 +108,7 @@ class HideBottomViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<
                 slideDown(view)
             }
         } else {
-            view.isVisible = true
+            view.isVisible = Info.env.isActive
             slideUp(view)
         }
 
