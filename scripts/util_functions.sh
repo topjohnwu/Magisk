@@ -447,13 +447,7 @@ install_magisk() {
 
   # Restore the original boot partition path
   [ "$BOOTNAND" ] && BOOTIMAGE=$BOOTNAND
-
-  if ! flash_image new-boot.img "$BOOTIMAGE"; then
-    ui_print "- Compressing ramdisk to fit in partition"
-    ./magiskboot cpio ramdisk.cpio compress
-    ./magiskboot repack "$BOOTIMAGE"
-    flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
-  fi
+  flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
 
   ./magiskboot cleanup
   rm -f new-boot.img

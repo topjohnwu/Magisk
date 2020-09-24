@@ -7,7 +7,6 @@
 
 #include <xz.h>
 #include <magisk.hpp>
-#include <cpio.hpp>
 #include <utils.hpp>
 
 #include "binaries.h"
@@ -100,25 +99,6 @@ static bool unxz(int fd, const uint8_t *buf, size_t size) {
 		b.out_pos = 0;
 	} while (b.in_pos != size);
 	return true;
-}
-
-static void decompress_ramdisk() {
-	constexpr char tmp[] = "tmp.cpio";
-	constexpr char ramdisk_xz[] = "ramdisk.cpio.xz";
-	if (access(ramdisk_xz, F_OK))
-		return;
-	LOGD("Decompressing ramdisk from %s\n", ramdisk_xz);
-	uint8_t *buf;
-	size_t sz;
-	mmap_ro(ramdisk_xz, buf, sz);
-	int fd = xopen(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
-	unxz(fd, buf, sz);
-	munmap(buf, sz);
-	close(fd);
-	cpio_mmap cpio(tmp);
-	cpio.extract();
-	unlink(tmp);
-	unlink(ramdisk_xz);
 }
 
 int dump_magisk(const char *path, mode_t mode) {
@@ -236,7 +216,6 @@ int main(int argc, char *argv[]) {
 			else
 				init = new SARInit(argv, &cmd);
 		} else {
-			decompress_ramdisk();
 			if (cmd.force_normal_boot)
 				init = new FirstStageInit(argv, &cmd);
 			else if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)

@@ -90,7 +90,8 @@ LOCAL_SRC_FILES := \
 	magiskboot/format.cpp \
 	magiskboot/dtb.cpp \
 	magiskboot/ramdisk.cpp \
-	magiskboot/pattern.cpp
+	magiskboot/pattern.cpp \
+	utils/cpio.cpp
 
 LOCAL_LDLIBS := -lz
 LOCAL_LDFLAGS := -static
