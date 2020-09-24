@@ -90,6 +90,8 @@
     <string name="target_uid">Target UID: %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">Errore nelle API SafetyNet</string>
+    <string name="safetynet_res_invalid">La risposta non è valida</string>
     <string name="safetynet_attest_success">Successo!</string>
     <string name="safetynet_attest_failure">Attestazione fallita!</string>
     <string name="safetynet_attest_loading">Solo un secondo…</string>
@@ -168,6 +170,9 @@
     <string name="settings_su_biometric_summary">Utilizza l\'autenticazione biometrica per accettare le richieste superuser</string>
     <string name="no_biometric">Il dispositivo non è supportato o le impostazioni biometriche sono disattivate</string>
     <string name="settings_customization">Personalizzazione</string>
+    <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l/'icona sono difficili da riconoscere dopo aver nascosto l/'App</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Soluzione alternativa al DNS poisoning in alcune nazioni</string>
 
     <string name="multiuser_mode">Modalità multiutente</string>
     <string name="settings_owner_only">Solo proprietario del dispositivo</string>
@@ -224,6 +229,8 @@
     <string name="authenticate">Autentica</string>
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
     <string name="unsupport_magisk_msg">Questa versione di Magisk Manager non supporta versioni di Magisk inferiori a %1$s.\n\nQuesta app si comporterà come se non fosse installato Magisk, che deve essere aggiornato per procedere all\'utilizzo.</string>
-
+    <string name="external_rw_permission_denied">Concedi i permessi alla memoria per abilitare questa opzione</string>
+    <string name="add_shortcut_title">Aggiungi collegamento alla schermata iniziale</string>
+    <string name="add_shortcut_msg">Dopo aver nascosto Magisk Manager, il suo nome e la sua icona potrebbero diventare difficili da riconoscere. Vuoi aggiungere una scorciatoia alla schermata principale?</string>
 
 </resources>
