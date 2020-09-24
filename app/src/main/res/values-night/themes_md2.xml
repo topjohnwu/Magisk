@@ -31,6 +31,18 @@
         <item name="colorOnError">#FFF</item>
     </style>
 
+    <style name="ThemeFoundationMD2.Zapdos" parent="ThemeFoundationMD2.Zapdos.Base">
+        <item name="colorPrimary">#FBD179</item>
+        <item name="colorPrimaryVariant">#80FBD179</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Mew" parent="ThemeFoundationMD2.Mew.Base">
+        <item name="colorPrimary">#D9ADB7</item>
+        <item name="colorPrimaryVariant">#80E9BBC5</item>
+        <item name="colorOnPrimary">#000000</item>
+        <item name="colorOnPrimaryVariant">#D9222222</item>
+    </style>
+
     <!--3rd party themes-->
 
 </resources>
