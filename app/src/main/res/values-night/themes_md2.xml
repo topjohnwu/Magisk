@@ -15,8 +15,8 @@
         <item name="colorOnPrimaryVariant">#D9E6E6E6</item>
         <item name="colorOnSecondary">#F9F9F9</item>
         <item name="colorOnBackground">?colorOnSurface</item>
-        <item name="colorError">#CC0047</item>
-        <item name="colorOnError">#F9F9F9</item>
+        <item name="colorError">#EF8282</item>
+        <item name="colorOnError">#0D0D0D</item>
         <item name="colorOnSurface">#D8D8D8</item>
         <item name="colorOnSurfaceVariant">#CCBABABA</item>
         <item name="colorDisabled">#808080</item>
