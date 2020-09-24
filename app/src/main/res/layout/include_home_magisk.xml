@@ -55,6 +55,7 @@
                 android:id="@+id/home_magisk_button"
                 style="@style/WidgetFoundation.Button"
                 invisible="@{viewModel.stateMagisk != MagiskState.OBSOLETE}"
+                android:enabled="@{viewModel.stateManager != MagiskState.OBSOLETE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="@{() -> viewModel.onMagiskPressed()}"
@@ -68,6 +69,7 @@
             <Button
                 style="@style/WidgetFoundation.Button.Text"
                 invisible="@{viewModel.stateMagisk == MagiskState.OBSOLETE}"
+                android:enabled="@{viewModel.stateManager != MagiskState.OBSOLETE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="@{() -> viewModel.onMagiskPressed()}"
