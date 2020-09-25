@@ -1,18 +1,22 @@
 package com.topjohnwu.magisk.core.base
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.SparseArrayCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.set
+import com.topjohnwu.magisk.utils.Utils
 import kotlin.random.Random
 
 typealias RequestCallback = BaseActivity.(Int, Intent?) -> Unit
@@ -85,7 +89,11 @@ abstract class BaseActivity : AppCompatActivity() {
 
     fun startActivityForResult(intent: Intent, requestCode: Int, listener: RequestCallback) {
         resultCallbacks[requestCode] = listener
-        startActivityForResult(intent, requestCode)
+        try {
+            startActivityForResult(intent, requestCode)
+        } catch (e: ActivityNotFoundException) {
+            Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
+        }
     }
 
     override fun recreate() {

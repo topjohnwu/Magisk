@@ -2,14 +2,18 @@ package com.topjohnwu.magisk.events
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.utils.Utils
 
 class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
 
@@ -17,7 +21,11 @@ class InstallExternalModuleEvent : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: BaseUIActivity<*, *>) {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "application/zip"
-        activity.startActivityForResult(intent, Const.ID.FETCH_ZIP)
+        try {
+            activity.startActivityForResult(intent, Const.ID.FETCH_ZIP)
+        } catch (e: ActivityNotFoundException) {
+            Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
+        }
     }
 
     companion object {
