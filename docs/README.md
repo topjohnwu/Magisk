@@ -1,5 +1,5 @@
 # Magisk Documentation
-(Updated on 2020.3.23)
+(Updated on 2020.9.26)
 
 - [Installation Instructions](install.md)
 - [OTA Upgrade Guides](ota.md)
