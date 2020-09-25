@@ -236,5 +236,6 @@
     <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
     <string name="add_shortcut_title">Add shortcut to home screen</string>
     <string name="add_shortcut_msg">After hiding Magisk Manager, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
+    <string name="app_not_found">No application found to handle this action</string>
 
 </resources>

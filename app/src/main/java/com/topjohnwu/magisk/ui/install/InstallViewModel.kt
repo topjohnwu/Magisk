@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -14,7 +13,6 @@ import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.data.repository.StringRepository
 import com.topjohnwu.magisk.events.RequestFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
@@ -37,7 +35,6 @@ class InstallViewModel(
         set(value) = set(value, field, { field = it }, BR.method) {
             when (it) {
                 R.id.method_patch -> {
-                    Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
                     RequestFileEvent().publish()
                 }
                 R.id.method_inactive_slot -> {

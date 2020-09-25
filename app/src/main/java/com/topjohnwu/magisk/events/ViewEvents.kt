@@ -1,12 +1,16 @@
 package com.topjohnwu.magisk.events
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.navigation.NavDirections
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.Shortcuts
 import kotlinx.coroutines.launch
@@ -68,7 +72,14 @@ class RequestFileEvent : ViewEvent(), ActivityExecutor {
         Intent(Intent.ACTION_GET_CONTENT)
             .setType("*/*")
             .addCategory(Intent.CATEGORY_OPENABLE)
-            .also { activity.startActivityForResult(it, REQUEST_CODE) }
+            .also {
+                try {
+                    activity.startActivityForResult(it, REQUEST_CODE)
+                    Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
+                } catch (e: ActivityNotFoundException) {
+                    Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
+                }
+            }
     }
 
     companion object {
