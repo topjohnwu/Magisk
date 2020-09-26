@@ -21,10 +21,11 @@ Options:
    -v                        print running daemon version
    -V                        print running daemon version code
    --list                    list all available applets
-   --daemon                  manually start magisk daemon
    --remove-modules          remove all modules and reboot
+   --install-module ZIP      install a module zip file
 
 Advanced Options (Internal APIs):
+   --daemon                  manually start magisk daemon
    --[init trigger]          start service for init trigger
                              Supported init triggers:
                              post-fs-data, service, boot-complete
@@ -116,6 +117,8 @@ int magisk_main(int argc, char *argv[]) {
 		char *path = read_string(fd);
 		printf("%s\n", path);
 		return 0;
+	} else if (argc >= 3 && argv[1] == "--install-module"sv) {
+		install_module(argv[2]);
 	}
 #if 0
 	/* Entry point for testing stuffs */
