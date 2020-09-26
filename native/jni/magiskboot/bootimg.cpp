@@ -524,6 +524,13 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 		restore_buf(fd, LG_BUMP_MAGIC, 16);
 	}
 
+	// Pad image to at least original size
+	auto current_sz = lseek(fd, 0, SEEK_CUR);
+	if (current_sz < boot.map_size) {
+		int padding = boot.map_size - current_sz;
+		write_zero(fd, padding);
+	}
+
 	close(fd);
 
 	/*********************
