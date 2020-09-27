@@ -27,8 +27,6 @@
     <string name="home_status_normal">Normale</string>
 
     <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
-    <string name="safetynet_api_error">Errore API SafetyNet</string>
-    <string name="safetynet_res_invalid">La risposta non è valida</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso e i tuoi dati potrebbero essere criptati, nel caso non lo siano già.</string>
     <string name="update">Aggiorna</string>
@@ -170,7 +168,7 @@
     <string name="settings_su_biometric_summary">Utilizza l\'autenticazione biometrica per accettare le richieste superuser</string>
     <string name="no_biometric">Il dispositivo non è supportato o le impostazioni biometriche sono disattivate</string>
     <string name="settings_customization">Personalizzazione</string>
-    <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l/'icona sono difficili da riconoscere dopo aver nascosto l/'App</string>
+    <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l\'icona sono difficili da riconoscere dopo aver nascosto l\'App</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Soluzione alternativa al DNS poisoning in alcune nazioni</string>
 
