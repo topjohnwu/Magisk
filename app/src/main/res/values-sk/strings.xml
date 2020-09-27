@@ -121,12 +121,10 @@
     <string name="module_action_install_external">Inštalácia z úložiska</string>
     <string name="update_available">Dostupná aktualizácia</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Zoradenie</string>
-    <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
-    <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
-    <string name="add_shortcut_msg">Po skrytí Magisk Managera sa môžu jeho názov a ikona ťažko rozpoznať. Chcete pridať odkaz na domovskú obrazovku?</string>
-    <string name="settings_doh_title">DNS over HTTPS</string>
-    <string name="settings_doh_description">Riešenie otravy DNS v niektorých krajinách</string>
+
+    
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Režim motívu</string>
@@ -179,6 +177,8 @@
     <string name="no_biometric">Nepodporované zariadenie alebo žiadne biometrické nastavenia nie sú povolené</string>
     <string name="settings_customization">Prispôsobenie</string>
     <string name="setting_add_shortcut_summary">V prípade, že sa po skrytí apky názov a ikona ťažko rozpoznávajú, pridať na domovskú obrazovku odkaz</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Riešenie otravy DNS v niektorých krajinách</string>
 
     <string name="multiuser_mode">Režim viacerých používateľov</string>
     <string name="settings_owner_only">Iba majiteľ zariadenia</string>
@@ -235,5 +235,9 @@
     <string name="authenticate">Autentifikovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
     <string name="unsupport_magisk_msg">Táto verzia aplikácie Magisk Managera nepodporuje verziu Magisku nižšiu ako %1$s.\n\nAplikácia sa bude správať, ako keby Magisk nebol nainštalovaný, upgradnite Magisk čo najskôr.</string>
+    <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
+    <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
+    <string name="add_shortcut_msg">Po skrytí Magisk Managera sa môžu jeho názov a ikona ťažko rozpoznať. Chcete pridať odkaz na domovskú obrazovku?</string>
+    <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>
 
 </resources>
