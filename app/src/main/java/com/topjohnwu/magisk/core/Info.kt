@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.core
 import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
+import com.topjohnwu.magisk.core.utils.net.NetworkObserver
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.utils.CachedValue
-import com.topjohnwu.magisk.utils.net.NetworkObserver
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
@@ -38,7 +38,7 @@ object Info {
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->
             NetworkObserver.observe(get()) {
-                UiThreadHandler.run { field.set(it.isAvailable) }
+                UiThreadHandler.run { field.set(it) }
             }
         }
     }

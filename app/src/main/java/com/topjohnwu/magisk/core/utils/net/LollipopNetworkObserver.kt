@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils.net
+package com.topjohnwu.magisk.core.utils.net
 
 import android.annotation.TargetApi
 import android.content.Context
@@ -6,11 +6,12 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import androidx.collection.ArraySet
 
 @TargetApi(21)
 open class LollipopNetworkObserver(
     context: Context,
-    callback: NetInfoCallback
+    callback: ConnectionCallback
 ): NetworkObserver(context, callback) {
 
     private val networkCallback = NetCallback()
@@ -22,17 +23,27 @@ open class LollipopNetworkObserver(
         manager.registerNetworkCallback(request, networkCallback)
     }
 
+    @Suppress("DEPRECATION")
+    override fun getCurrentState() {
+        callback(manager.activeNetworkInfo?.isConnected ?: false)
+    }
+
     override fun stopObserving() {
         manager.unregisterNetworkCallback(networkCallback)
     }
 
     private inner class NetCallback : ConnectivityManager.NetworkCallback() {
+
+        private val activeList = ArraySet<Network>()
+
         override fun onAvailable(network: Network) {
-            emit(Connectivity.create(manager, network))
+            activeList.add(network)
+            callback(true)
         }
 
         override fun onLost(network: Network) {
-            emit(Connectivity.create(manager, network))
+            activeList.remove(network)
+            callback(!activeList.isEmpty())
         }
     }
 }
