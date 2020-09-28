@@ -24,7 +24,7 @@ class InstallViewModel(
 ) : BaseViewModel(State.LOADED) {
 
     val isRooted = Shell.rootAccess()
-    val skipOptions = Info.ramdisk && Info.isFBE && Info.isSAR
+    val skipOptions = Info.ramdisk && !Info.isFDE && Info.isSAR
 
     @get:Bindable
     var step = if (skipOptions) 1 else 0

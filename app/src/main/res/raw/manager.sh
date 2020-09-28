@@ -123,8 +123,6 @@ check_encryption() {
   if $ISENCRYPTED; then
     if [ $SDK_INT -lt 24 ]; then
       CRYPTOTYPE="block"
-    elif [ -d /data/unencrypted ]; then
-      CRYPTOTYPE="file"
     else
       # First see what the system tells us
       CRYPTOTYPE=$(getprop ro.crypto.type)

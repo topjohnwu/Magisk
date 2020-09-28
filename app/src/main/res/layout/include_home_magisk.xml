@@ -208,7 +208,7 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.crypto}"
+                                android:text="@{Info.cryptoText}"
                                 tools:text="N/A" />
 
                         </LinearLayout>

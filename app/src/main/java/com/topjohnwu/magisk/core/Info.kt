@@ -11,6 +11,7 @@ import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.FileInputStream
 import java.io.IOException
+import java.util.*
 
 val isRunningAsStub get() = Info.stub != null
 
@@ -27,13 +28,14 @@ object Info {
     var remote = UpdateInfo()
 
     // Device state
+    var crypto = ""
     @JvmStatic var isSAR = false
     @JvmStatic var isAB = false
-    @JvmStatic val isFBE get() = crypto == "file"
+    @JvmStatic val isFDE get() = crypto == "block"
     @JvmStatic var ramdisk = false
     @JvmStatic var hasGMS = true
-    @JvmStatic var crypto = ""
     @JvmStatic var isPixel = false
+    @JvmStatic val cryptoText get() = crypto.capitalize(Locale.US)
 
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->

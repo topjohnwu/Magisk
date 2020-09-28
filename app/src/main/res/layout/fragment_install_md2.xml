@@ -105,7 +105,7 @@
 
                             <CheckBox
                                 style="@style/WidgetFoundation.Checkbox"
-                                gone="@{Info.isFBE}"
+                                goneUnless="@{Info.isFDE}"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:checked="@={Config.keepEnc}"

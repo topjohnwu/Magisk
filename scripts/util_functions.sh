@@ -363,10 +363,10 @@ get_flags() {
       KEEPVERITY=false
     fi
   fi
+  ISENCRYPTED=false
+  grep ' /data ' /proc/mounts | grep -q 'dm-' && ISENCRYPTED=true
+  [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true
   if [ -z $KEEPFORCEENCRYPT ]; then
-    ISENCRYPTED=false
-    grep ' /data ' /proc/mounts | grep -q 'dm-' && ISENCRYPTED=true
-    [ -d /data/unencrypted ] && ISENCRYPTED=true
     # No data access means unable to decrypt in recovery
     if $ISENCRYPTED || ! $DATA; then
       KEEPFORCEENCRYPT=true
