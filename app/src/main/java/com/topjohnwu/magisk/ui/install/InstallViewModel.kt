@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
+import androidx.annotation.IdRes
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -30,18 +31,7 @@ class InstallViewModel(
     var step = if (skipOptions) 1 else 0
         set(value) = set(value, field, { field = it }, BR.step)
 
-    @get:Bindable
     var method = -1
-        set(value) = set(value, field, { field = it }, BR.method) {
-            when (it) {
-                R.id.method_patch -> {
-                    RequestFileEvent().publish()
-                }
-                R.id.method_inactive_slot -> {
-                    SecondSlotWarningDialog().publish()
-                }
-            }
-        }
 
     @get:Bindable
     var progress = 0
@@ -58,6 +48,14 @@ class InstallViewModel(
     init {
         viewModelScope.launch {
             notes = stringRepo.getString(Info.remote.magisk.note)
+        }
+    }
+
+    fun onMethodChanged(newMethod: Int) {
+        method = newMethod
+        when (newMethod) {
+            R.id.method_patch -> RequestFileEvent().publish()
+            R.id.method_inactive_slot -> SecondSlotWarningDialog().publish()
         }
     }
 

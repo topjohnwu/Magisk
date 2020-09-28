@@ -181,9 +181,10 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/l1"
                             android:layout_marginTop="@dimen/l_50"
+                            android:id="@+id/method_container"
                             android:layout_marginEnd="@dimen/l1"
                             android:layout_marginBottom="@dimen/l_50"
-                            android:checkedButton="@={viewModel.method}"
+                            android:checkedButton="@{viewModel.method}"
                             android:paddingStart="3dp"
                             android:paddingEnd="3dp">
 
