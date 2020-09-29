@@ -67,7 +67,7 @@ class SuRequestHandler(
     private suspend fun init(intent: Intent) = withContext(Dispatchers.IO) {
         try {
             val uid: Int
-            if (Const.Version.atLeastCanary()) {
+            if (Const.Version.atLeast_21_0()) {
                 val name = intent.getStringExtra("fifo") ?: throw SuRequestError()
                 uid = intent.getIntExtra("uid", -1).also { if (it < 0) throw SuRequestError() }
                 output = DataOutputStream(FileOutputStream(name).buffered())

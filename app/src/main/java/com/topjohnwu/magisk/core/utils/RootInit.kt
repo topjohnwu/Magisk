@@ -25,7 +25,7 @@ class RootInit : Shell.Initializer() {
             } else {
                 add("export MAGISKTMP=/sbin/.magisk")
             }
-            if (Const.Version.atLeastCanary()) {
+            if (Const.Version.atLeast_21_0()) {
                 add("export ASH_STANDALONE=1")
                 add("[ -x /data/adb/magisk/busybox ] && exec /data/adb/magisk/busybox sh")
             } else {

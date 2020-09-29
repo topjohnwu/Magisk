@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.core
 
 import android.os.Process
-import com.topjohnwu.magisk.BuildConfig
 
 object Const {
 
@@ -26,9 +25,10 @@ object Const {
         const val MIN_VERSION = "v19.0"
         const val MIN_VERCODE = 19000
 
-        fun atLeast_20_2() = Info.env.magiskVersionCode >= 20200
-        fun atLeast_20_4() = Info.env.magiskVersionCode >= 20400
-        fun atLeastCanary() = Info.env.magiskVersionCode > BuildConfig.LATEST_MAGISK / 100 * 100
+        fun atLeast_20_2() = Info.env.magiskVersionCode >= 20200 || isCanary()
+        fun atLeast_20_4() = Info.env.magiskVersionCode >= 20400 || isCanary()
+        fun atLeast_21_0() = Info.env.magiskVersionCode >= 21000 || isCanary()
+        fun isCanary() = Info.env.magiskVersionCode % 100 != 0
     }
 
     object ID {
