@@ -1,108 +1,143 @@
 <resources>
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">모듈</string>
     <string name="superuser">슈퍼유저</string>
     <string name="logs">로그</string>
     <string name="settings">설정</string>
+    <string name="refresh">새로고침</string>
     <string name="install">설치</string>
-    <string name="unsupport_magisk_title">지원되지 않는 Magisk 버전</string>
-    <string name="unsupport_magisk_msg">이 버전의 Magisk Manager는 %1$s 미만 버전의 Magisk를 지원하지 않습니다.\n\n이 앱은 Magisk가 설치되지 않은 것처럼 동작하게 되니, Magisk를 가능한 빨리 업데이트하십시오.</string>
+    <string name="section_home">홈</string>
+    <string name="section_theme">테마</string>
+    <string name="safetynet">SafetyNet</string>
 
-    <!--Status Fragment-->
+    <!--Home-->
+    <string name="no_connection">사용 가능한 연걸 없음</string>
+    <string name="app_changelog">앱 변경 사항</string>
+    <string name="manager">Manager</string>
+    <string name="loading">로딩중…</string>
+    <string name="update">업데이트</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">숨기기</string>
+    <string name="status">상태</string>
+    <string name="home_package">패키지</string>
+
+    <string name="home_notice_content">항상 오픈 소스 Magisk Manager를 사용하고 있는지 확인하십시오. 출처를 알 수 없는 Manager는 악의적인 작업을 수행 할 수 있습니다.</string>
+    <string name="home_support_title">후원하기</string>
+    <string name="home_item_source">소스</string>
+    <string name="home_support_content">Magisk는 항상 무료일 것이며, 오픈소스일 것입니다. 그러나 소액의 후원을 통해 관심을 표할 수 있습니다.</string>
+    <string name="home_status_normal">정상</string>
+    <string name="home_status_stub">스텁</string>
+    <string name="home_installed_version">설치됨</string>
+    <string name="home_latest_version">최신</string>
     <string name="invalid_update_channel">올바르지 않은 업데이트 채널</string>
-    <string name="safetynet_api_error">SafetyNet API 오류</string>
-    <string name="safetynet_res_invalid">올바르지 않은 결괏값</string>
+    <string name="uninstall_magisk_title">Magisk 제거</string>
+    <string name="uninstall_magisk_msg">모든 모듈이 비활성화/제거됩니다. 루트도 제거될 것이며, 데이터도 암호화 되어있지 않으면 암호화될 수도 있습니다.</string>
+    <string name="home_check_safetynet">SafetyNet 확인</string>
+
+    <!--Install-->
     <string name="keep_force_encryption">강제 암호화 유지</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity 유지</string>
     <string name="recovery_mode">리커버리 모드</string>
-    <string name="uninstall_magisk_title">Magisk 제거</string>
-    <string name="uninstall_magisk_msg">모든 모듈이 비활성화/제거됩니다. 루팅도 제거될 것이며, 데이터도 이미 되어있지 않으면 암호화될 수도 있습니다.</string>
-    <string name="update">업데이트</string>
+    <string name="install_options_title">옵션</string>
+    <string name="install_method_title">설치 방법</string>
+    <string name="install_next">다음</string>
+    <string name="install_start">설치</string>
+    <string name="manager_download_install">눌러서 다운로드하고 설치</string>
+    <string name="download_zip_only">Zip만 다운로드</string>
+    <string name="direct_install">바로 설치 (권장됨)</string>
+    <string name="install_inactive_slot">비활성 슬롯에 설치 (OTA 이후)</string>
+    <string name="install_inactive_slot_msg">기기를 다시 시작한 후에는 현재 비활성 상태인 슬롯으로 강제로 부팅됩니다!\nOTA 업데이트 후에만 이 옵션을 사용하십시오.\n계속하시겠습니까?</string>
+    <string name="setup_title">추가 설정</string>
+    <string name="select_patch_file">파일 선택 및 패치</string>
+    <string name="patch_file_msg">raw 이미지 (*.img) 또는 ODIN tar 파일 (*.tar) 선택</string>
+    <string name="reboot_delay_toast">5초 후 다시 시작합니다…</string>
+    <string name="flash_screen_title">설치과정</string>
 
-    <!--Module Fragment-->
+    <!--Superuser-->
+    <string name="su_request_title">슈퍼유저 요청</string>
+    <string name="deny">일괄 거부</string>
+    <string name="prompt">수동 허가</string>
+    <string name="grant">일괄 허용</string>
+    <string name="su_warning">기기에 대한 전체 액세스 권한을 부여합니다.\n확실하지 않은 경우 거부하세요!</string>
+    <string name="forever">영구적으로</string>
+    <string name="once">한 번만</string>
+    <string name="tenmin">10분</string>
+    <string name="twentymin">20분</string>
+    <string name="thirtymin">30분</string>
+    <string name="sixtymin">60분</string>
+    <string name="su_allow_toast">%1$s에 슈퍼유저 권한이 허용됨</string>
+    <string name="su_deny_toast">%1$s에 슈퍼유저 권한이 거부됨</string>
+    <string name="su_snack_grant">%1$s의 슈퍼유저 권한이 허용됨</string>
+    <string name="su_snack_deny">%1$s의 슈퍼유저 권한이 거부됨</string>
+    <string name="su_snack_notif_on">%1$s의 알림이 활성화됨</string>
+    <string name="su_snack_notif_off">%1$s의 알림이 비활성화됨</string>
+    <string name="su_snack_log_on">%1$s의 로깅이 활성화됨</string>
+    <string name="su_snack_log_off">%1$s의 로깅이 비활성화됨</string>
+    <string name="su_revoke_title">취소하시겠습니까?</string>
+    <string name="su_revoke_msg">정말 %1$s의 권한을 취소하시겠습니까?</string>
+    <string name="toast">토스트</string>
+    <string name="none">없음</string>
+
+    <string name="superuser_toggle_notification">알림</string>
+    <string name="superuser_toggle_revoke">권한삭제</string>
+    <string name="superuser_policy_none">슈퍼유저 권한을 요청한 앱이 없습니다.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">로그가 없습니다. SU 권한을 필요로 하는 앱을 사용하십시오.</string>
+    <string name="log_data_magisk_none">로그가 없습니다.</string>
+    <string name="menuSaveLog">로그 저장</string>
+    <string name="menuClearLog">지금 로그 삭제</string>
+    <string name="logs_cleared">로그 삭제 완료.</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Target UID: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetynet_api_error">SafetyNet API 오류</string>
+    <string name="safetynet_res_invalid">올바르지 않은 결괏값</string>
+    <string name="safetynet_attest_success">성공!</string>
+    <string name="safetynet_attest_failure">증명 실패!</string>
+    <string name="safetynet_attest_loading">작업중…</string>
+    <string name="safetynet_attest_restart">다시 시도하십시오</string>
+
+    <!-- MagiskHide -->
+    <string name="show_system_app">시스템 앱 표시</string>
+    <string name="hide_filter_hint">이름 검색</string>
+    <string name="hide_scroll_up">최상단으로</string>
+    <string name="hide_filters">필터</string>
+    <string name="hide_search">검색</string>
+
+    <!--Module -->
     <string name="no_info_provided">(제공된 정보 없음)</string>
     <string name="reboot_recovery">리커버리로 다시 시작</string>
     <string name="reboot_bootloader">부트로더로 다시 시작</string>
     <string name="reboot_download">다운로드 모드로 다시 시작</string>
     <string name="reboot_edl">EDL로 다시 시작</string>
-
-    <!--Repo Fragment-->
+    <string name="module_version_author">%1$s by %2$s</string>
+    <string name="module_section_pending">업데이트</string>
+    <string name="module_section_pending_action">모두 업데이트</string>
+    <string name="module_state_remove">제거</string>
+    <string name="module_state_restore">복구</string>
+    <string name="module_action_install_external">저장소에서 설치</string>
     <string name="update_available">업데이트 가능</string>
-    <string name="home_installed_version">설치됨</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">온라인</string>
     <string name="sorting_order">정렬 방식</string>
 
-    <!--Log Fragment-->
-    <string name="menuSaveLog">로그 저장</string>
-    <string name="menuClearLog">지금 로그 비우기</string>
-    <string name="logs_cleared">로그가 성공적으로 비워짐</string>
-
-    <!--About Activity-->
-    <string name="app_changelog">앱 변경 사항</string>
-
-    <!-- System Components, Notifications -->
-    <string name="update_channel">Magisk 업데이트</string>
-    <string name="progress_channel">진행 알림</string>
-    <string name="download_complete">다운로드 완료</string>
-    <string name="download_file_error">파일 다운로드 오류</string>
-    <string name="download_open_parent">상위 폴더 보기</string>
-    <string name="download_open_self">파일 보기</string>
-    <string name="magisk_update_title">새 버전의 Magisk를 사용할 수 있습니다!</string>
-    <string name="manager_update_title">새 버전의 Magisk Manager를 사용할 수 있습니다!</string>
-
-    <!-- Installation -->
-    <string name="manager_download_install">눌러서 다운로드하고 설치하세요.</string>
-    <string name="download_zip_only">Zip만 다운로드</string>
-    <string name="direct_install">직접 설치 (권장)</string>
-    <string name="install_inactive_slot">비활성 슬롯에 설치 (OTA 후)</string>
-    <string name="install_inactive_slot_msg">기기를 다시 시작한 후에는 현재 비활성 상태인 슬롯으로의 부팅이 강제됩니다!\nOTA 업데이트 후에만 이 옵션을 사용하십시오.\n계속하시겠습니까?</string>
-    <string name="setup_title">추가 설정</string>
-    <string name="select_patch_file">파일 선택 및 패치</string>
-    <string name="patch_file_msg">raw 이미지 (*.img) 또는 ODIN tar 파일 (*.tar) 선택</string>
-    <string name="reboot_delay_toast">5초 후 다시 시작합니다…</string>
-
-    <!--Toasts, Dialogs-->
-    <string name="repo_install_title">%1$s 설치</string>
-    <string name="repo_install_msg">정말 %1$s을(를) 설치하시겠습니까?</string>
-    <string name="download">다운로드</string>
-    <string name="reboot">다시 시작</string>
-    <string name="release_notes">릴리즈 노트</string>
-    <string name="repo_cache_cleared">저장소 캐시 비워짐</string>
-    <string name="flashing">플래싱 중...</string>
-    <string name="done">완료!</string>
-    <string name="failure">실패</string>
-    <string name="hide_manager_title">Magisk Manager를 숨기는 중…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager를 숨기는 데 실패하였습니다.</string>
-    <string name="open_link_failed_toast">링크를 열 앱이 없습니다.</string>
-    <string name="complete_uninstall">완전히 제거</string>
-    <string name="restore_img">이미지 복구</string>
-    <string name="restore_img_msg">복구하는 중…</string>
-    <string name="restore_done">복구 완료!</string>
-    <string name="restore_fail">순정 백업이 존재하지 않습니다!</string>
-    <string name="proprietary_title">사유 코드 다운로드</string>
-    <string name="proprietary_notice">Magisk Manager는 자유 오픈 소스 소프트웨어이며, 구글의 사유 SafetyNet API 코드를 포함하지 않습니다.\n\nMagisk Manager가 SafetyNet 상태 확인을 위해 (GoogleApiClient를 포함하는) 확장 기능을 다운로드하도록 허가하시겠습니까?</string>
-    <string name="setup_fail">설치 실패</string>
-    <string name="env_fix_title">추가 설정 요구됨</string>
-    <string name="env_fix_msg">이 기기에서 Magisk가 제대로 작동하기 위해선 추가 설정이 필요합니다. Magisk 설치 zip이 다운로드 될 것인데, 계속 진행하시겠습니까?</string>
-    <string name="setup_msg">환경 설정 진행 중…</string>
-    <string name="authenticate">인증</string>
-
-    <!--Settings Activity -->
+    <!--Settings -->
     <string name="settings_dark_mode_title">테마 선택</string>
     <string name="settings_dark_mode_message">원하는 테마 모드를 선택하세요!</string>
     <string name="settings_dark_mode_light">기본</string>
     <string name="settings_dark_mode_system">시스템 설정값</string>
     <string name="settings_dark_mode_dark">다크 모드</string>
-
     <string name="settings_download_path_title">다운로드 경로</string>
-    <string name="settings_download_path_message">파일이 %1$s에 저장됩니다.</string>
+    <string name="settings_download_path_message">파일이 %1$s에 저장됩니다</string>
     <string name="settings_clear_cache_title">저장소 캐시 비우기</string>
     <string name="settings_clear_cache_summary">온라인 저장소에 대해 캐시된 정보를 지우고, 온라인에서 정보를 강제로 새로 고칩니다.</string>
     <string name="settings_hide_manager_title">Magisk Manager 숨기기</string>
     <string name="settings_hide_manager_summary">무작위 패키지 이름으로 Magisk Manager를 다시 패키징합니다.</string>
     <string name="settings_restore_manager_title">Magisk Manager 복구</string>
     <string name="settings_restore_manager_summary">기존 패키지 이름으로 Magisk Manager를 복원합니다.</string>
-
     <string name="language">언어</string>
     <string name="system_default">(시스템 기본값)</string>
     <string name="settings_check_update_title">업데이트 확인</string>
@@ -139,6 +174,10 @@
     <string name="settings_su_biometric_title">생체 인증 활성화</string>
     <string name="settings_su_biometric_summary">슈퍼유저 요청 허용에 생체 인증을 사용합니다.</string>
     <string name="no_biometric">지원되지 않는 기기이거나 등록된 생체 정보가 없습니다.</string>
+    <string name="settings_customization">커스터마이즈</string>
+    <string name="setting_add_shortcut_summary">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">일부 국가에 존재하는 DNS 포이즈닝을 해결합니다.</string>
 
     <string name="multiuser_mode">다중 사용자 모드</string>
     <string name="settings_owner_only">기기 소유자만</string>
@@ -148,44 +187,56 @@
     <string name="owner_manage_summary">소유자만 루트 액세스를 관리하고 요청 시도를 받을 수 있습니다.</string>
     <string name="user_indepenent_summary">각각의 사용자가 개별적인 루트 규칙을 갖습니다.</string>
 
-    <string name="mount_namespace_mode">이름공간 모드 마운트</string>
+    <string name="mount_namespace_mode">이름공간 마운트 모드</string>
     <string name="settings_ns_global">전역 이름공간</string>
-    <string name="settings_ns_requester">상속 이름공간</string>
-    <string name="settings_ns_isolate">고립 이름공간</string>
+    <string name="settings_ns_requester">이름공간 상속</string>
+    <string name="settings_ns_isolate">이름공간 고립</string>
     <string name="global_summary">모든 루트 세션이 전역 마운트 이름공간을 사용합니다.</string>
     <string name="requester_summary">루트 세션은 요청자의 이름공간을 상속합니다.</string>
     <string name="isolate_summary">각각의 루트 세션은 자신만의 독립된 이름공간을 사용합니다.</string>
 
-    <!--Superuser-->
-    <string name="su_request_title">슈퍼유저 요청</string>
-    <string name="deny">일괄 거부</string>
-    <string name="prompt">수동 허가</string>
-    <string name="grant">일괄 허용</string>
-    <string name="su_warning">기기에 대한 전체 액세스 권한을 부여합니다.\n확실하지 않은 경우 거부하세요!</string>
-    <string name="forever">영구적으로</string>
-    <string name="once">한 번만</string>
-    <string name="tenmin">10분</string>
-    <string name="twentymin">20분</string>
-    <string name="thirtymin">30분</string>
-    <string name="sixtymin">60분</string>
-    <string name="su_allow_toast">%1$s에 슈퍼유저 권한이 허용됨</string>
-    <string name="su_deny_toast">%1$s에 슈퍼유저 권한이 거부됨</string>
-    <string name="su_snack_grant">%1$s의 슈퍼유저 권한이 허용됨</string>
-    <string name="su_snack_deny">%1$s의 슈퍼유저 권한이 거부됨</string>
-    <string name="su_snack_notif_on">%1$s의 알림이 활성화됨</string>
-    <string name="su_snack_notif_off">%1$s의 알림이 비활성화됨</string>
-    <string name="su_snack_log_on">%1$s의 로깅이 활성화됨</string>
-    <string name="su_snack_log_off">%1$s의 로깅이 비활성화됨</string>
-    <string name="su_revoke_title">취소하시겠습니까?</string>
-    <string name="su_revoke_msg">정말 %1$s의 권한을 취소하시겠습니까?</string>
-    <string name="toast">토스트</string>
-    <string name="none">없음</string>
+    <!--Notifications-->
+    <string name="update_channel">Magisk 업데이트</string>
+    <string name="progress_channel">진행 상황</string>
+    <string name="download_complete">다운로드 완료</string>
+    <string name="download_file_error">파일 다운로드 오류</string>
+    <string name="download_open_parent">상위 폴더에서 보기</string>
+    <string name="download_open_self">파일 보기</string>
+    <string name="magisk_update_title">새 버전의 Magisk를 사용할 수 있습니다!</string>
+    <string name="manager_update_title">새 버전의 Magisk Manager를 사용할 수 있습니다!</string>
 
-    <!--Superuser logs-->
-    <string name="pid">PID: %1$d</string>
-    <string name="target_uid">대상 UID: %1$d</string>
-
-    <!-- MagiskHide -->
-    <string name="show_system_app">시스템 앱 표시</string>
+    <!--Toasts, Dialogs-->
+    <string name="yes">예</string>
+    <string name="no">아니오</string>
+    <string name="repo_install_title">%1$s 설치</string>
+    <string name="repo_install_msg">정말 %1$s을(를) 설치하시겠습니까?</string>
+    <string name="download">다운로드</string>
+    <string name="reboot">다시 시작</string>
+    <string name="release_notes">릴리즈 노트</string>
+    <string name="repo_cache_cleared">저장소 캐시 비워짐</string>
+    <string name="flashing">플래싱 중…</string>
+    <string name="done">완료!</string>
+    <string name="failure">실패</string>
+    <string name="hide_manager_title">Magisk Manager를 숨기는 중…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager를 숨기는 데 실패하였습니다.</string>
+    <string name="open_link_failed_toast">링크를 열 수 있는 앱이 없습니다.</string>
+    <string name="complete_uninstall">완전히 제거</string>
+    <string name="restore_img">이미지 복구</string>
+    <string name="restore_img_msg">복구하는 중…</string>
+    <string name="restore_done">복구 완료!</string>
+    <string name="restore_fail">순정 백업이 존재하지 않습니다!</string>
+    <string name="proprietary_title">사유 코드 다운로드</string>
+    <string name="proprietary_notice">Magisk Manager는 자유 오픈 소스 소프트웨어이며, 구글의 사유 SafetyNet API 코드를 포함하지 않습니다.\n\nMagisk Manager가 SafetyNet 상태 확인을 위해 (GoogleApiClient를 포함하는) 확장 기능을 다운로드하도록 허가하시겠습니까?</string>
+    <string name="setup_fail">설치 실패</string>
+    <string name="env_fix_title">추가 설정 필요</string>
+    <string name="env_fix_msg">이 기기에서 Magisk가 제대로 작동하기 위해선 추가 설정이 필요합니다. Magisk 설치 zip이 다운로드 될 것인데, 계속 진행하시겠습니까?</string>
+    <string name="setup_msg">환경 설정 진행 중…</string>
+    <string name="authenticate">인증</string>
+    <string name="unsupport_magisk_title">지원되지 않는 Magisk 버전</string>
+    <string name="unsupport_magisk_msg">이 버전의 Magisk Manager는 %1$s 미만 버전의 Magisk를 지원하지 않습니다.\n\n이 앱은 Magisk가 설치되지 않은 것처럼 동작하게 되니, Magisk를 가능한 빨리 업데이트하십시오.</string>
+    <string name="external_rw_permission_denied">해당 기능을 사용하려면 저장소 권한을 허용해 주십시오.</string>
+    <string name="add_shortcut_title">홈 화면에 바로가기 추가</string>
+    <string name="add_shortcut_msg">Magisk Manager를 숨긴 후, 아이콘과 이름을 알아보기 힘들 수도 있습니다. 홈 화면에 알아보기 쉬운 바로가기를 추가하시겠습니까?</string>
+    <string name="app_not_found">해당 작업을 처리할 어플리케이션이 없습니다.</string>
 
 </resources>
