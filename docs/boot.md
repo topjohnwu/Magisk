@@ -30,12 +30,12 @@ Method | Initial rootdir | Final rootdir
 	- Devices that does not fall in any of Method B and C's criteria
 - **Method B - Legacy SAR**: This method was first seen on Pixel 1. The kernel directly mounts the `system` partition as rootdir and exec `/init` to boot.
 	- Devices with `(LV = 28)`
-	- Google: Pixel 1 and 2. Pixel 3 and 3a with `(RV = 28)` only.
-	- OnePlus: 5T - 7
+	- Google: Pixel 1 and 2. Pixel 3 and 3a when `(RV = 28)`.
+	- OnePlus: 6 - 7
 	- Maybe some `(LV < 29)` Android Go devices?
 - **Method C - 2SI ramdisk SAR**: This method was first seen on Pixel 3 Android 10 developer preview. The kernel uses `initramfs` as rootdir and exec `/init` in `rootfs`. This `init` is responsible to mount the `system` partition and use it as the new rootdir, then finally exec `/system/bin/init` to boot.
 	- Devices with `(LV >= 29)`
-	- Devices with `(LV < 28, RV >= 29)`, excluding exceptions that were using Method B
+	- Devices with `(LV < 28, RV >= 29)`, excluding those that were already using Method B
 	- Google: Pixel 3 and 3a with `(RV >= 29)`
 
 ### Discussion
@@ -47,7 +47,7 @@ However for Magisk, the real difference lies in what the device ends up using wh
 The criteria for Method C is a little complicated, in layman's words: either your device is modern enough to launch with Android 10+, or you are running an Android 10+ custom ROM on a device that was using Method A.
 
 - Any Method A device running Android 10+ will automatically be using Method C
-- **Method B devices are stuck with Method B**, maybe only with the exception of Pixel 3 and 3a, which Google retrofitted the device to adapt the new method.
+- **Method B devices are stuck with Method B**, with the only exception being Pixel 3 and 3a, which Google retrofitted the device to adapt the new method.
 
 SAR is a very important part of [Project Treble](https://source.android.com/devices/architecture#hidl) as rootdir should be tied to the platform. This is also the reason why Method B and C comes with `(LV >= ver)` criterion as Google has enforced all OEMs to comply with updated requirements every year.
 
@@ -57,7 +57,9 @@ When Google released the first generation Pixel, it also introduced [A/B (Seamle
 
 Let's go back in time when Google is first designing A/B. If using SAR (only Boot Method B exists at that time), the kernel doesn't need `initramfs` to boot Android (because rootdir is in `system`). This mean we can be smart and just stuff the recovery ramdisk (containing the minimalist Linux environment) into `boot`, remove `recovery`, and let the kernel pick whichever rootdir to use (ramdisk or `system`) based on information from the bootloader.
 
-As time passed from Android 7.1 to Android 10, Google introduced [Dynamic Partitions](https://source.android.com/devices/tech/ota/dynamic_partitions/implement). This is bad news for SAR, because the Linux kernel cannot understand this new partition format, thus unable to directly use `system` as rootdir. This is when they came up with Boot Method C: always boot into `initramfs`, and let userspace handle the rest of booting.
+As time passed from Android 7.1 to Android 10, Google introduced [Dynamic Partitions](https://source.android.com/devices/tech/ota/dynamic_partitions/implement). This is bad news for SAR, because the Linux kernel cannot directly understand this new partition format, thus unable to directly mount `system` as rootdir. This is when they came up with Boot Method C: always boot into `initramfs`, and let userspace handle the rest of booting. This includes deciding whether to boot into Android or recovery, or as they officially call: `USES_RECOVERY_AS_BOOT`.
+
+Some modern devices using A/B with 2SI also comes with `recovery_a/_b` partitions. This is officially supported with Google's standard. These devices will then only use the boot ramdisk to boot into Android as recovery is stored on a separate partition.
 
 ## Piecing Things Together
 
@@ -66,10 +68,9 @@ With all the knowledge above, now we can categorize all Android devices into the
 Type | Boot Method | Partition | 2SI | Ramdisk in `boot`
 :---: | :---: | :---: | :---: | :---:
 **I** | A | A-only | No | `boot` ramdisk
-**II** | B | A/B | No | `recovery` ramdisk
-**III** | B | A-only | No | ***N/A***
+**II** | B | A/B | Any | `recovery` ramdisk
+**III** | B | A-only | Any | ***N/A***
 **IV** | C | Any | Yes | Hybrid ramdisk
-**II\* / III\*** | B | II / III | Yes | II / III
 
 These types are ordered chronologically by the time they were first available.
 
@@ -77,8 +78,7 @@ These types are ordered chronologically by the time they were first available.
 - **Type II**: Legacy A/B devices. Pixel 1 is the first device of this type, being both the first A/B and SAR device
 - **Type III**: Late 2018 - 2019 devices that are A-only. **The worst type of device to ever exist as far as Magisk is concerned.**
 - **Type IV**: All devices using Boot Method C are Type IV. A/B Type IV ramdisk can boot into either Android or recovery based on info from bootloader; A-only Type IV ramdisk can only boot into Android.
-- **Type \***: Type II* and III* are Boot Method B devices running on Android 10+ (2SI). **They are NOT new device types**. In Magisk the code treat them drastically different due to complicated reasons, hence mentioning them here.
 
 Further details on Type III devices: Magisk is always installed in the ramdisk of a boot image. For all other device types, because their `boot` partition have ramdisk included, Magisk can be easily installed by patching boot image through Magisk Manager or flash zip in custom recovery. However for Type III devices, they are **limited to install Magisk into the `recovery` partition**. Magisk will not function when booted normally; instead Type III device owners have to always reboot to recovery to maintain Magisk access.
 
-Some Type III devices' bootloader will still accept and provide `initramfs` manually added to `boot` image to the kernel (e.g. some Xiaomi phones), but many device don't (e.g. Samsung S10, Note 10). It solely depends on how the OEM implements its bootloader.
+Some Type III devices' bootloader will still accept and provide `initramfs` that was manually added to the `boot` image to the kernel (e.g. some Xiaomi phones), but many device don't (e.g. Samsung S10, Note 10). It solely depends on how the OEM implements its bootloader.

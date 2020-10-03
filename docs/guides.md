@@ -1,5 +1,18 @@
 # Developer Guides
 
+## BusyBox
+Magisk ships with a feature complete BusyBox binary (including full SELinux support). The executable is located at `/data/adb/magisk/busybox`. Magisk's BusyBox supports runtime toggle-able "ASH Standalone Shell Mode". What this standalone mode means is that when running in the `ash` shell of BusyBox, every single command will directly use the applet within BusyBox, regardless of what is set as `PATH`. For example, commands like `ls`, `rm`, `chmod` will **NOT** use what is in `PATH` (in the case of Android by default it will be `/system/bin/ls`, `/system/bin/rm`, and `/system/bin/chmod` respectively), but will instead directly call internal BusyBox applets. This makes sure that scripts always run in a predictable environment and always have the full suite of commands no matter which Android version it is running on. To force a command *not* to use BusyBox, you have to call the executable with full paths.
+
+Every single shell script running in the context of Magisk will be executed in BusyBox's `ash` shell with standalone mode enabled. For what is relevant to 3rd party developers, this includes all boot scripts and module installation scripts.
+
+For those who want to use this "Standalone Mode" feature outside of Magisk, there are 2 ways to enable it:
+
+1. Set environment variable `ASH_STANDALONE` to `1`<br>Example: `ASH_STANDALONE=1 /data/adb/magisk/busybox sh <script>`
+2. Toggle with command-line options:<br>`/data/adb/magisk/busybox sh -o standalone <script>`
+
+To make sure all subsequent `sh` shell executed also runs in standalone mode, option 1 is the preferred method (and this is what Magisk and Magisk Manager internally uses) as environment variables are inherited down to child processes.
+
+
 ## Magisk Modules
 A Magisk module is a folder placed in `/data/adb/modules` with the structure below:
 
@@ -111,7 +124,7 @@ module.zip
 │                                           This script will be sourced by update-binary
 ├── ...
 ├── ...  /* The rest of module's files */
-|
+│
 ```
 
 #### Customization
@@ -122,7 +135,7 @@ If you need even more customization and prefer to do everything on your own, dec
 
 #### `customize.sh` Environment
 
-Magisk's internal busybox's path `$BBPATH` is added in the front of `PATH`. The following variables and shell functions are available for convenience:
+This script will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled. The following variables and shell functions are available for convenience:
 
 ##### Variables
 - `MAGISK_VER` (string): the version string of current installed Magisk (e.g. `v20.0`)
@@ -215,25 +228,61 @@ In Magisk, there are also 2 kinds of scripts: **general scripts** and **module s
     - Placed in `/data/adb/post-fs-data.d` or `/data/adb/service.d`
     - Only executed if the script is executable (execution permissions, `chmod +x script.sh`)
     - Scripts in `post-fs-data.d` runs in post-fs-data mode, and scripts in `service.d` runs in late_start service mode.
-    - Will still be executed when **Core-Only** mode is enabled.
     - Modules should **NOT** add general scripts since it violates encapsulation
 - Module Scripts
     - Placed in the folder of the module
     - Only executed if the module is enabled
     - `post-fs-data.sh` runs in post-fs-data mode, and `service.sh` runs in late_start service mode.
-    - Will NOT be executed when **Core-Only** mode is enabled (all modules are disabled)
     - Modules require boot scripts should **ONLY** use module scripts instead of general scripts
 
-Magisk's internal busybox's path `$BBPATH` is added in the front of `PATH`. This means all commands you call in scripts are always using busybox unless the applet is not included. This makes sure that your script always run in a predictable environment and always have the full suite of commands regardless of which Android version it is running on.
+These scripts will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled.
 
 ## Root Directory Overlay System
 
-Since `/` is read-only in system-as-root devices, Magisk provides an overlay system, allowing developers to patch files / add new rc scripts. Additional files shall be placed in the `overlay.d` folder in the ramdisk, and they will have the following restrictions:
+Since `/` is read-only on system-as-root devices, Magisk provides an overlay system to enable developers to replace files in rootdir or add new `*.rc` scripts. This feature is designed mostly for custom kernel developers.
 
-- All `*.rc` files in `overlay.d` will be read and concatenated *AFTER* `init.rc`
-- Replacing existing files are allowed.<br>
-e.g. you can replace `/res/random.png` by adding the file `overlay.d/res/random.png`
-- Non-existing files will be ignored (with exceptions detailed in the next point).<br>
-e.g. `overlay.d/new_file` will be ignored if `/new_file` does not exist
-- Additional files in `overlay.d/sbin` is allowed as they will be copied into Magisk's sbin overlay.<br>
-e.g. `overlay.d/sbin/libfoo.ko` will be copied to `/sbin/libfoo.ko`.
+Overlay files shall be placed in the `overlay.d` folder in boot image ramdisk, and they follow these rules:
+
+1. All `*.rc` files in `overlay.d` will be read and concatenated **AFTER** `init.rc`
+2. Existing files can be replaced by files located at the same relative path
+3. Files that correspond to a non-existing file will be ignored
+
+In order to have additional files which you want to reference in your custom `*.rc` scripts, add them in `overlay.d/sbin`. The 3 rules above does not apply to everything in this specific folder, as they will directly be copied to Magisk's internal `tmpfs` directory (which used to always be located at `/sbin`).
+
+Due to changes in Android 11, the `/sbin` folder is no longer guaranteed to exist. In that case, Magisk randomly generates the `tmpfs` folder. Every occurrence of the pattern `${MAGISKTMP}` in your `*.rc` scripts will be replaced with the Magisk `tmpfs` folder when `magiskinit` injects it into `init.rc`. This also works on pre Android 11 devices as `${MAGISKTMP}` will simply be replaced with `/sbin` in this case, so the best practice is to **NEVER** hardcode `/sbin` in your `*.rc` scripts when referencing additional files.
+
+Here is an example of how to setup `overlay.d` with custom `*.rc` script:
+
+```
+ramdisk
+│
+├── overlay.d
+│   ├── sbin
+│   │   ├── libfoo.ko      <--- These 2 files will be copied
+│   │   └── myscript.sh    <--- to Magisk's tmpfs directory
+│   ├── custom.rc          <--- This file will be injected into init.rc
+│   ├── res
+│   │   └── random.png     <--- This file will replace /res/random.png
+│   └── new_file           <--- This file will be ignored because
+│                               /new_file does not exist
+├── res
+│   └── random.png         <--- This file will be replaced by
+│                               /overlay.d/res/random.png
+├── ...
+├── ...  /* The rest of initramfs files */
+│
+```
+
+Here is an example of the `custom.rc`:
+
+```
+# Use ${MAGISKTMP} to refer to Magisk's tmpfs directory
+
+on early-init
+    setprop sys.example.foo bar
+    insmod ${MAGISKTMP}/libfoo.ko
+    start myservice
+
+service myservice ${MAGISKTMP}/myscript.sh
+    oneshot
+```

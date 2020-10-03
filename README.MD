@@ -24,7 +24,7 @@ Here are some feature highlights:
 ## Useful Links
 
 - [Installation Instruction](https://topjohnwu.github.io/Magisk/install.html)
-- [OTA Upgrade Guide](https://topjohnwu.github.io/Magisk/ota.html)
+- [Frequently Asked Questions](https://topjohnwu.github.io/Magisk/faq.html)
 - [Full Official Docs](https://topjohnwu.github.io/Magisk/)
 - [Magisk Troubleshoot Wiki](https://www.didgeridoohan.com/magisk/HomePage) (by [@Didgeridoohan](https://github.com/Didgeridoohan))
 
