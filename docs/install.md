@@ -28,7 +28,7 @@ If you are using a Huawei device and the **SAR** result is **Yes**, please check
 Otherwise, continue to [Patching Images](#patching-images).
 
 (P.S.1 If your device have boot ramdisk, you can also install with [Custom Recovery](#custom-recovery))<br>
-(P.S.2 If you are interested in how Android boots and how it affects Magisk, check out [this document](#boot.md))
+(P.S.2 If you are interested in how Android boots and how it affects Magisk, check out [this document](boot.md))
 
 ## Patching Images
 
