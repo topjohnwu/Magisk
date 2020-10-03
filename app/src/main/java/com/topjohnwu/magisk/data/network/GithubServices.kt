@@ -7,6 +7,15 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
+interface GithubPageServices {
+
+    @GET("stable.json")
+    suspend fun fetchStableUpdate(): UpdateInfo
+
+    @GET("beta.json")
+    suspend fun fetchBetaUpdate(): UpdateInfo
+}
+
 interface GithubRawServices {
 
     //region topjohnwu/magisk_files

@@ -47,14 +47,12 @@ object Const {
 
     object Url {
         const val ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip"
-        const val PAYPAL_URL = "https://www.paypal.me/topjohnwu"
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
-        const val TWITTER_URL = "https://twitter.com/topjohnwu"
-        const val XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382"
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
 
         const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
         const val GITHUB_API_URL = "https://api.github.com/users/Magisk-Modules-Repo/"
+        const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/magisk_files/"
     }
 
     object Key {
