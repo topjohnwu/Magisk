@@ -12,7 +12,7 @@
     <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
-    <string name="no_connection">사용 가능한 연걸 없음</string>
+    <string name="no_connection">사용 가능한 연결 없음</string>
     <string name="app_changelog">앱 변경 사항</string>
     <string name="manager">Manager</string>
     <string name="loading">로딩중…</string>
