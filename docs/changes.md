@@ -19,8 +19,6 @@
 - [MagiskBoot] Support compressed `extra` blobs
 - [MagiskBoot] Pad boot images to original size with zeros
 - [MagiskHide] Manipulate additional vendor properties
-- [BusyBox] Add SELinux support
-- [BusyBox] Support runtime toggle "ASH Standalone Mode" feature
 
 ### v20.4
 
