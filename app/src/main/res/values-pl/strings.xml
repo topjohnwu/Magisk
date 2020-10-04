@@ -33,6 +33,7 @@
     <string name="invalid_update_channel">Nieprawidłowy kanał aktualizacji</string>
     <string name="uninstall_magisk_title">Odinstaluj Magiska</string>
     <string name="uninstall_magisk_msg">Wszystkie moduły zostaną wyłączone/usunięte!\nRoot zostanie usunięty!\nTwoje dane zostaną potencjalnie zaszyfrowane, jeżeli obecnie nie są!</string>
+    <string name="home_check_safetynet">Sprawdź SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
@@ -51,6 +52,7 @@
     <string name="select_patch_file">Wybierz i zmodyfikuj plik</string>
     <string name="patch_file_msg">Wybierz obraz raw (*.img) lub plik tar ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Ponowne uruchomienie za 5 sekund…</string>
+    <string name="flash_screen_title">Instalacja</string>
 
     <!--Superuser-->
     <string name="su_request_title">Żądanie dostępu do Superusera</string>
@@ -119,8 +121,8 @@
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
     <string name="update_available">Dostępna aktualizacja</string>
     <string name="module_installed">Zainstalowane</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Kolejność sortowania</string>
-    <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcjonalność.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Tryb motywu</string>
@@ -172,6 +174,9 @@
     <string name="settings_su_biometric_summary">Używaj uwierzytelniania biometrycznego (np. odcisku palca) aby przyznać uprawnienia Superusera</string>
     <string name="no_biometric">Urządzenie jest nieobsługiwane lub ustawienia biometryczne nie są włączone</string>
     <string name="settings_customization">Personalizacja</string>
+    <string name="setting_add_shortcut_summary">Dodaj ładny skrót na ekranie głównym na wypadek, gdyby nazwa i ikona były trudne do rozpoznania po ukryciu aplikacji</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Zapobiegaj zatruciu DNS (DNS poisoning) w części krajów</string>
 
     <string name="multiuser_mode">Tryb wielu użytkowników (Multiuser)</string>
     <string name="settings_owner_only">Tylko właściciel urządzenia</string>
@@ -228,5 +233,9 @@
     <string name="authenticate">Uwierzytelnianie</string>
     <string name="unsupport_magisk_title">Nieobsługiwana wersja Magiska</string>
     <string name="unsupport_magisk_msg">Ta wersja Magisk Managera nie obsługuje wersji Magiska poniżej %1$s.\n\nAplikacja będzie działać tak, jakby Magisk nie był zainstalowany. Zaktualizuj Magiska jak najszybciej.</string>
+    <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcjonalność.</string>
+    <string name="add_shortcut_title">Utwórz skrót na ekranie głównym</string>
+    <string name="add_shortcut_msg">Po ukryciu Magisk Managera, jego nazwa i ikona mogą stać się trudne do rozpoznania. Czy chcesz dodać ładny skrót na ekranie głównym?</string>
+    <string name="app_not_found">Nie znaleziono aplikacji do wykonania tej czynności</string>
 
 </resources>
