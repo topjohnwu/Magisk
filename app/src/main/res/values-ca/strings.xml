@@ -174,7 +174,7 @@
     <string name="settings_su_biometric_summary">Utilitza l\'autenticació biomètrica per permetre sol·licituds de superusuari</string>
     <string name="no_biometric">El dispositiu no suporta o no té establerta configuració biomètrica</string>
     <string name="settings_customization">Personalització</string>
-    <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d'amagar l\'aplicació.</string>
+    <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d\'amagar l\'aplicació.</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Solució per enverinament de DNS en algunes nacions</string>
     
