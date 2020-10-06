@@ -1,5 +1,5 @@
 # Magisk Documentation
-(Updated on 2020.10.2)
+(Updated on 2020.10.6)
 
 - [Installation Instructions](install.md)
 - [Frequently Asked Questions](faq.md)
