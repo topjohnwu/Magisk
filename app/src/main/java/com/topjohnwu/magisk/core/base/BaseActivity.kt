@@ -8,22 +8,24 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.widget.Toast
+import androidx.annotation.CallSuper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.SparseArrayCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.set
 import com.topjohnwu.magisk.utils.Utils
 import kotlin.random.Random
 
-typealias RequestCallback = BaseActivity.(Int, Intent?) -> Unit
+typealias ActivityResultCallback = BaseActivity.(Int, Intent?) -> Unit
 
 abstract class BaseActivity : AppCompatActivity() {
 
-    private val resultCallbacks by lazy { SparseArrayCompat<RequestCallback>() }
+    private val resultCallbacks by lazy { SparseArrayCompat<ActivityResultCallback>() }
 
     override fun applyOverrideConfiguration(config: Configuration?) {
         // Force applying our preferred local
@@ -38,8 +40,7 @@ abstract class BaseActivity : AppCompatActivity() {
     fun withPermission(permission: String, builder: PermissionRequestBuilder.() -> Unit) {
         val request = PermissionRequestBuilder().apply(builder).build()
 
-        if (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE &&
-            Build.VERSION.SDK_INT >= 29) {
+        if (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE && Build.VERSION.SDK_INT >= 29) {
             // We do not need external rw on 29+
             request.onSuccess()
             return
@@ -48,8 +49,11 @@ abstract class BaseActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             request.onSuccess()
         } else {
-            val requestCode = Random.nextInt(256, 512)
-            resultCallbacks[requestCode] =  { result, _ ->
+            var requestCode: Int
+            do {
+                requestCode = Random.nextInt(Const.ID.MAX_ACTIVITY_RESULT + 1, 1 shl 15)
+            } while (!resultCallbacks.containsKey(requestCode))
+            resultCallbacks[requestCode] = { result, _ ->
                 if (result > 0)
                     request.onSuccess()
                 else
@@ -79,16 +83,17 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
+    @CallSuper
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        resultCallbacks[requestCode]?.also {
+        resultCallbacks[requestCode]?.also { callback ->
             resultCallbacks.remove(requestCode)
-            it(this, resultCode, data)
+            callback(this, resultCode, data)
         }
     }
 
-    fun startActivityForResult(intent: Intent, requestCode: Int, listener: RequestCallback) {
-        resultCallbacks[requestCode] = listener
+    fun startActivityForResult(intent: Intent, requestCode: Int, callback: ActivityResultCallback) {
+        resultCallbacks[requestCode] = callback
         try {
             startActivityForResult(intent, requestCode)
         } catch (e: ActivityNotFoundException) {

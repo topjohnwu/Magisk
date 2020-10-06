@@ -17,7 +17,7 @@ import com.topjohnwu.magisk.ktx.startAnimations
 abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
     Fragment(), BaseUIComponent<VM> {
 
-    protected val activity get() = requireActivity() as BaseUIActivity<*, *>
+    val activity get() = requireActivity() as BaseUIActivity<*, *>
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
 

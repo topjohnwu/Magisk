@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.arch
 
 import android.content.Context
-import androidx.fragment.app.Fragment
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -23,5 +22,5 @@ interface ActivityExecutor {
 }
 
 interface FragmentExecutor {
-    operator fun invoke(fragment: Fragment)
+    operator fun invoke(fragment: BaseUIFragment<*, *>)
 }

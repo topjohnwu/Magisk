@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.module
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -14,7 +13,6 @@ import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
-import com.topjohnwu.magisk.events.InstallExternalModuleEvent
 import com.topjohnwu.magisk.ktx.hideKeyboard
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
@@ -39,13 +37,6 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
                 setDisplayHomeAsUpEnabled(value)
             }
         }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        InstallExternalModuleEvent.onActivityResult(requestCode, resultCode, data)?.also {
-            it.navigate()
-        }
-    }
 
     override fun onStart() {
         super.onStart()

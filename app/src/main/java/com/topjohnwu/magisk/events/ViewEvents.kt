@@ -6,8 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.navigation.NavDirections
+import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.base.ActivityResultCallback
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.utils.Utils
@@ -67,27 +70,16 @@ class RecreateEvent : ViewEvent(), ActivityExecutor {
     }
 }
 
-class RequestFileEvent : ViewEvent(), ActivityExecutor {
+class MagiskInstallFileEvent(private val callback: ActivityResultCallback)
+    : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: BaseUIActivity<*, *>) {
-        Intent(Intent.ACTION_GET_CONTENT)
-            .setType("*/*")
-            .addCategory(Intent.CATEGORY_OPENABLE)
-            .also {
-                try {
-                    activity.startActivityForResult(it, REQUEST_CODE)
-                    Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
-                } catch (e: ActivityNotFoundException) {
-                    Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
-                }
-            }
-    }
-
-    companion object {
-        private const val REQUEST_CODE = 10
-        fun resolve(requestCode: Int, resultCode: Int, data: Intent?) = data
-            ?.takeIf { resultCode == Activity.RESULT_OK }
-            ?.takeIf { requestCode == REQUEST_CODE }
-            ?.data
+        val intent = Intent(Intent.ACTION_GET_CONTENT).setType("*/*")
+        try {
+            activity.startActivityForResult(intent, Const.ID.SELECT_FILE, callback)
+            Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
+        } catch (e: ActivityNotFoundException) {
+            Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
+        }
     }
 }
 
@@ -104,5 +96,24 @@ class NavigationEvent(
 class AddHomeIconEvent : ViewEvent(), ContextExecutor {
     override fun invoke(context: Context) {
         Shortcuts.addHomeIcon(context)
+    }
+}
+
+class SelectModuleEvent : ViewEvent(), FragmentExecutor {
+    override fun invoke(fragment: BaseUIFragment<*, *>) {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).setType("application/zip")
+        try {
+            fragment.apply {
+                activity.startActivityForResult(intent, Const.ID.FETCH_ZIP) { code, intent ->
+                    if (code == Activity.RESULT_OK && intent != null) {
+                        intent.data?.also {
+                            MainDirections.actionFlashFragment(it, Const.Value.FLASH_ZIP).navigate()
+                        }
+                    }
+                }
+            }
+        } catch (e: ActivityNotFoundException) {
+            Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
+        }
     }
 }

@@ -33,12 +33,12 @@ object Const {
 
     object ID {
         const val FETCH_ZIP = 2
-        const val SELECT_BOOT = 3
+        const val SELECT_FILE = 3
+        const val MAX_ACTIVITY_RESULT = 10
 
         // notifications
         const val MAGISK_UPDATE_NOTIFICATION_ID = 4
         const val APK_UPDATE_NOTIFICATION_ID = 5
-        const val DTBO_NOTIFICATION_ID = 7
         const val HIDE_MANAGER_NOTIFICATION_ID = 8
         const val UPDATE_NOTIFICATION_CHANNEL = "update"
         const val PROGRESS_NOTIFICATION_CHANNEL = "progress"

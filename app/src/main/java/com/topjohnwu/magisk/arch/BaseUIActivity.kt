@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.arch
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -39,11 +38,6 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     init {
         val theme = Config.darkTheme
         AppCompatDelegate.setDefaultNightMode(theme)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        currentFragment?.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -14,7 +14,7 @@ import com.topjohnwu.magisk.core.tasks.RepoUpdater
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.RvItem
-import com.topjohnwu.magisk.events.InstallExternalModuleEvent
+import com.topjohnwu.magisk.events.SelectModuleEvent
 import com.topjohnwu.magisk.events.OpenChangelogEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
@@ -311,7 +311,7 @@ class ModuleViewModel(
     }
 
     fun installPressed() = withExternalRW {
-        InstallExternalModuleEvent().publish()
+        SelectModuleEvent().publish()
     }
 
     fun infoPressed(item: RepoItem) =
