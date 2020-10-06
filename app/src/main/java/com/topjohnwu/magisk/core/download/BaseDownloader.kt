@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.checkSum
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
-import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +34,7 @@ abstract class BaseDownloader : BaseService(), KoinComponent {
     private val notifications = Collections.synchronizedMap(HashMap<Int, Notification.Builder>())
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    val service: GithubRawServices by inject()
+    val service: NetworkService by inject()
 
     // -- Service overrides
 

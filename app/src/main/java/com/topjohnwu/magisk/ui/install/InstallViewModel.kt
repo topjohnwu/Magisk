@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
-import com.topjohnwu.magisk.data.repository.StringRepository
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.utils.set
@@ -21,7 +21,7 @@ import org.koin.core.get
 import kotlin.math.roundToInt
 
 class InstallViewModel(
-    stringRepo: StringRepository
+    svc: NetworkService
 ) : BaseViewModel(State.LOADED) {
 
     val isRooted = Shell.rootAccess()
@@ -64,7 +64,7 @@ class InstallViewModel(
 
     init {
         viewModelScope.launch {
-            notes = stringRepo.getString(Info.remote.magisk.note)
+            notes = svc.fetchString(Info.remote.magisk.note)
         }
     }
 

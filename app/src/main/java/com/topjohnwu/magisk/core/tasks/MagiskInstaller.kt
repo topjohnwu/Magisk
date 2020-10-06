@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.ktx.reboot
@@ -53,7 +53,7 @@ abstract class MagiskInstallImpl : KoinComponent {
     private val logs: MutableList<String>
     private var tarOut: TarOutputStream? = null
 
-    private val service: GithubRawServices by inject()
+    private val service: NetworkService by inject()
     protected val context: Context by inject()
 
     protected constructor() {

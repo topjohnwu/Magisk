@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.TextView
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.repository.StringRepository
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.coroutineScope
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.CancellationException
@@ -18,12 +18,12 @@ import kotlin.coroutines.coroutineContext
 
 object MarkDownWindow : KoinComponent {
 
-    private val repo: StringRepository by inject()
+    private val svc: NetworkService by inject()
     private val markwon: Markwon by inject()
 
     suspend fun show(activity: Context, title: String?, url: String) {
         show(activity, title) {
-            repo.getString(url)
+            svc.fetchString(url)
         }
     }
 

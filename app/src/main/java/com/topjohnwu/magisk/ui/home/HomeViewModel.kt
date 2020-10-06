@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.download.Subject.Manager
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
-import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
@@ -32,7 +32,7 @@ enum class MagiskState {
 }
 
 class HomeViewModel(
-    private val repoMagisk: MagiskRepository
+    private val svc: NetworkService
 ) : BaseViewModel() {
 
     @get:Bindable
@@ -84,7 +84,7 @@ class HomeViewModel(
         state = State.LOADING
         notifyPropertyChanged(BR.showUninstall)
         notifyPropertyChanged(BR.showSafetyNet)
-        repoMagisk.fetchUpdate()?.apply {
+        svc.fetchUpdate()?.apply {
             state = State.LOADED
             stateMagisk = when {
                 !Info.env.isActive -> MagiskState.NOT_INSTALLED

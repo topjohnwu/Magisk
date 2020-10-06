@@ -4,7 +4,7 @@ import com.squareup.moshi.JsonClass
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.data.database.RepoDao
-import com.topjohnwu.magisk.data.network.GithubApiServices
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.synchronized
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -14,7 +14,7 @@ import java.util.*
 import kotlin.collections.HashSet
 
 class RepoUpdater(
-    private val api: GithubApiServices,
+    private val svc: NetworkService,
     private val repoDB: RepoDao
 ) {
 
@@ -66,7 +66,7 @@ class RepoUpdater(
         etag: String = ""
     ): PageResult = coroutineScope {
         runCatching {
-            val result = api.fetchRepos(page, etag)
+            val result = svc.fetchRepos(page, etag)
             result.run {
                 if (code() == HttpURLConnection.HTTP_NOT_MODIFIED)
                     return@coroutineScope PageResult.CACHED

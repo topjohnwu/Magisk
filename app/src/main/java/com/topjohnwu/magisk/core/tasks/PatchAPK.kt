@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
-import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.utils.Utils
@@ -91,7 +91,7 @@ object PatchAPK {
         val dlStub = !isRunningAsStub && SDK_INT >= 28 && Const.Version.atLeast_20_2()
         val src = if (dlStub) {
             val stub = File(context.cacheDir, "stub.apk")
-            val svc = get<GithubRawServices>()
+            val svc = get<NetworkService>()
             try {
                 svc.fetchFile(Info.remote.stub.link).byteStream().use {
                     it.writeTo(stub)

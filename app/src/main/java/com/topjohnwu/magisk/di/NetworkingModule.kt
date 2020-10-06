@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubPageServices
 import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.data.network.JSDelivrServices
 import com.topjohnwu.magisk.ktx.precomputedText
 import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.magisk.net.NoSSLv3SocketFactory
@@ -19,6 +20,7 @@ import okhttp3.Dns
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -32,6 +34,7 @@ val networkingModule = module {
     single { createApiService<GithubRawServices>(get(), Const.Url.GITHUB_RAW_URL) }
     single { createApiService<GithubApiServices>(get(), Const.Url.GITHUB_API_URL) }
     single { createApiService<GithubPageServices>(get(), Const.Url.GITHUB_PAGE_URL) }
+    single { createApiService<JSDelivrServices>(get(), Const.Url.JS_DELIVR_URL) }
     single { createMarkwon(get(), get()) }
 }
 
@@ -75,10 +78,10 @@ private class DnsResolver(client: OkHttpClient) : Dns {
 fun createOkHttpClient(context: Context): OkHttpClient {
     val builder = OkHttpClient.Builder()
 
-//    val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
-//        level = HttpLoggingInterceptor.Level.HEADERS
-//    }
-//    builder.addInterceptor(httpLoggingInterceptor)
+    val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.HEADERS
+    }
+    builder.addInterceptor(httpLoggingInterceptor)
 
     if (!Networking.init(context)) {
         Info.hasGMS = false

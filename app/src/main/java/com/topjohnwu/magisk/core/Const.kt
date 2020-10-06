@@ -12,8 +12,8 @@ object Const {
 
     // Versions
     const val SNET_EXT_VER = 15
-    const val SNET_REVISION = "d494bc726e86166913a13629e3b1336728ec5d7f"
-    const val BOOTCTL_REVISION = "a6c47f86f10b310358afa9dbe837037dd5d561df"
+    const val SNET_REVISION = "18ab78817087c337ae0edd1ecac38aec49217880"
+    const val BOOTCTL_REVISION = "18ab78817087c337ae0edd1ecac38aec49217880"
 
     // Misc
     const val ANDROID_MANIFEST = "AndroidManifest.xml"
@@ -51,14 +51,14 @@ object Const {
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
 
         const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
-        const val GITHUB_API_URL = "https://api.github.com/users/Magisk-Modules-Repo/"
+        const val GITHUB_API_URL = "https://api.github.com/"
         const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/magisk_files/"
+        const val JS_DELIVR_URL = "https://cdn.jsdelivr.net/gh/"
     }
 
     object Key {
         // others
         const val LINK_KEY = "Link"
-        const val IF_NONE_MATCH = "If-None-Match"
         const val ETAG_KEY = "ETag"
         // intents
         const val OPEN_SECTION = "section"
