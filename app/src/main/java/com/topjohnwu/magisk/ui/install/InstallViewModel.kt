@@ -31,13 +31,16 @@ class InstallViewModel(
     var step = if (skipOptions) 1 else 0
         set(value) = set(value, field, { field = it }, BR.step)
 
+    var _method = -1
+
     @get:Bindable
-    var method = -1
-        set(value) = set(value, field, { field = it }, BR.method) {
+    var method
+        get() = _method
+        set(value) = set(value, _method, { _method = it }, BR.method) {
             when (it) {
                 R.id.method_patch -> {
                     MagiskInstallFileEvent { code, intent ->
-                        if (code ==  Activity.RESULT_OK)
+                        if (code == Activity.RESULT_OK)
                             data = intent?.data
                     }.publish()
                 }
