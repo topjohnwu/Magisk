@@ -29,6 +29,7 @@ import com.topjohnwu.superuser.io.SuFileInputStream
 import com.topjohnwu.superuser.io.SuFileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.jpountz.lz4.LZ4FrameInputStream
 import org.kamranzafar.jtar.TarEntry
 import org.kamranzafar.jtar.TarHeader
 import org.kamranzafar.jtar.TarInputStream
@@ -38,6 +39,7 @@ import org.koin.core.get
 import org.koin.core.inject
 import timber.log.Timber
 import java.io.*
+import java.nio.ByteBuffer
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -97,8 +99,7 @@ abstract class MagiskInstallImpl : KoinComponent {
 
     @Suppress("DEPRECATION")
     private fun extractZip(): Boolean {
-        val arch: String
-        arch = if (Build.VERSION.SDK_INT >= 21) {
+        val arch = if (Build.VERSION.SDK_INT >= 21) {
             val abis = listOf(*Build.SUPPORTED_ABIS)
             if (abis.contains("x86")) "x86" else "arm"
         } else {
@@ -163,21 +164,36 @@ abstract class MagiskInstallImpl : KoinComponent {
         val tarOut = TarOutputStream(output)
         TarInputStream(input).use { tarIn ->
             lateinit var entry: TarEntry
+
+            fun decompressedStream() =
+                if (entry.name.contains(".lz4")) LZ4FrameInputStream(tarIn) else tarIn
+
             while (tarIn.nextEntry?.let { entry = it } != null) {
                 if (entry.name.contains("boot.img") ||
                     (Config.recovery && entry.name.contains("recovery.img"))) {
-                    val name = entry.name
+                    val name = entry.name.replace(".lz4", "")
                     console.add("-- Extracting: $name")
+
                     val extract = File(installDir, name)
-                    FileOutputStream(extract).use { tarIn.copyTo(it) }
-                    if (name.contains(".lz4")) {
-                        console.add("-- Decompressing: $name")
-                        "./magiskboot decompress $extract".sh()
+                    FileOutputStream(extract).use { decompressedStream().copyTo(it) }
+                } else if (entry.name.contains("vbmeta.img")) {
+                    val rawData = ByteArrayOutputStream().let {
+                        decompressedStream().copyTo(it)
+                        it.toByteArray()
                     }
+                    // Valid vbmeta.img should be at least 256 bytes
+                    if (rawData.size < 256)
+                        continue
+
+                    // Patch flags to AVB_VBMETA_IMAGE_FLAGS_VERIFICATION_DISABLED
+                    console.add("-- Patching: vbmeta.img")
+                    ByteBuffer.wrap(rawData).putInt(120, 2)
+                    tarOut.putNextEntry(newEntry("vbmeta.img", rawData.size.toLong()))
+                    tarOut.write(rawData)
                 } else {
-                    console.add("-- Copying: " + entry.name)
+                    console.add("-- Copying: ${entry.name}")
                     tarOut.putNextEntry(entry)
-                    tarIn.copyTo(tarOut)
+                    tarIn.copyTo(tarOut, bufferSize = 1024 * 1024)
                 }
             }
             val boot = SuFile.open(installDir, "boot.img")
