@@ -175,7 +175,9 @@
     <string name="no_biometric">El dispositiu no suporta o no té establerta configuració biomètrica</string>
     <string name="settings_customization">Personalització</string>
     <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d\'amagar l\'aplicació.</string>
-
+    <string name="settings_doh_title">DNS sobre HTTPS</string>
+    <string name="settings_doh_description">Solució per enverinament de DNS en algunes nacions</string>
+    
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
     <string name="settings_owner_manage">Administrador del Dispositiu</string>
@@ -234,5 +236,6 @@
     <string name="external_rw_permission_denied">Ha de donar permís d\'emmagatzematge per activar aquesta funcionalitat</string>
     <string name="add_shortcut_title">Afegeix una drecera a la pantalla d\'inici</string>
     <string name="add_shortcut_msg">Després d\'amagar Magisk Manager, el seu nom i icona poden ser difícils de reconèixer. Vols afegir una bonica drecera a la teva pantalla d\'inici?</string>
+    <string name="app_not_found">No s\'ha trobat una aplicació per emprar aquesta acció</string>
 
 </resources>
