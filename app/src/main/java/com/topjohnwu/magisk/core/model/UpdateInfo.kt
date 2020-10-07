@@ -41,3 +41,13 @@ data class StubJson(
     val versionCode: Int = -1,
     val link: String = ""
 ) : Parcelable
+
+@JsonClass(generateAdapter = true)
+data class CommitInfo(
+    val sha: String
+)
+
+@JsonClass(generateAdapter = true)
+data class BranchInfo(
+    val commit: CommitInfo
+)
