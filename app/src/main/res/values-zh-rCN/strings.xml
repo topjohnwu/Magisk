@@ -17,7 +17,7 @@
     <string name="manager">Manager</string>
     <string name="loading">正在加载</string>
     <string name="update">更新</string>
-    <string name="not_available">不可用</string>
+    <string name="not_available">无法获取</string>
     <string name="hide">不再显示</string>
     <string name="status">状态</string>
     <string name="home_package">包名</string>
@@ -235,6 +235,7 @@
     <string name="unsupport_magisk_msg">此版本的 Magisk Manager 不支持低于 %1$s 版本的 Magisk。\n\n应用表现为未安装状态，但升级功能可用，请尽快升级 Magisk。</string>
     <string name="external_rw_permission_denied">允许访问存储空间以使用此功能</string>
     <string name="add_shortcut_title">添加快捷方式到桌面</string>
-    <string name="add_shortcut_msg">隐藏 Magisk Manager 后，其名称和图标可能会变得难以识别。需要在桌面上添加快捷方式吗？</string>
+    <string name="add_shortcut_msg">隐藏 Magisk Manager 后，其名称和图标会变得难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
+    <string name="app_not_found">找不到可处理此操作的应用</string>
 
 </resources>
