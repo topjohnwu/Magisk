@@ -119,6 +119,8 @@ object PatchAPK {
 
         Config.suManager = pkg.toString()
         Config.export()
+        if (dlStub)
+            Shell.su("cp -f ${context.packageCodePath} /data/adb/magisk.apk").exec()
         Shell.su("pm uninstall $APP_ID").submit()
 
         return true

@@ -13,11 +13,16 @@ import com.topjohnwu.magisk.net.ErrorHandler;
 import com.topjohnwu.magisk.net.Networking;
 import com.topjohnwu.magisk.net.ResponseListener;
 import com.topjohnwu.magisk.utils.APKInstall;
+import com.topjohnwu.shared.BuildConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import static android.R.string.no;
 import static android.R.string.ok;
@@ -79,6 +84,21 @@ public class MainActivity extends Activity {
                     .setMessage(getString(R.string.no_internet_msg))
                     .setNegativeButton(ok, (d, w) -> finish())
                     .show();
+        }
+    }
+
+    void copyApk() {
+        try (OutputStream outputStream = new FileOutputStream(DynAPK.current(this));
+             InputStream inputStream = new ProcessBuilder()
+                     .command("su", "-c", "cat /data/adb/magisk.apk; rm /data/adb/magisk.apk")
+                     .start()
+                     .getInputStream()) {
+            byte[] buffer = new byte[8 * 1024];
+            int bytes;
+            while ((bytes = inputStream.read(buffer)) >= 0)
+                outputStream.write(buffer, 0, bytes);
+        } catch (IOException e) {
+            Log.e(getClass().getSimpleName(), "", e);
         }
     }
 
