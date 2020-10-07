@@ -20,7 +20,6 @@ import okhttp3.Dns
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
-import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -78,10 +77,10 @@ private class DnsResolver(client: OkHttpClient) : Dns {
 fun createOkHttpClient(context: Context): OkHttpClient {
     val builder = OkHttpClient.Builder()
 
-    val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.HEADERS
-    }
-    builder.addInterceptor(httpLoggingInterceptor)
+//    val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
+//        level = HttpLoggingInterceptor.Level.HEADERS
+//    }
+//    builder.addInterceptor(httpLoggingInterceptor)
 
     if (!Networking.init(context)) {
         Info.hasGMS = false
