@@ -34,6 +34,9 @@ class UninstallDialog : DialogEvent() {
             .applyButton(MagiskDialog.ButtonType.POSITIVE) {
                 title = ""
             }
+            .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
+                title = ""
+            }
             .cancellable(false)
 
         Shell.su("restore_imgs").submit { result ->
