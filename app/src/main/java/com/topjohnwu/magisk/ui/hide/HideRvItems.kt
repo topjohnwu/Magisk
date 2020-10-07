@@ -39,14 +39,19 @@ class HideItem(
         get() = state
         set(value) = set(value, state, { state = it }, BR.hiddenState) {
             if (value == true) {
-                processes.filterNot { it.isHidden }
+                processes
+                    .filterNot { it.isHidden }
+                    .filter { isExpanded || it.process.name == it.process.packageName }
             } else {
                 processes
+                    .filter { it.isHidden }
+                    .filter { isExpanded || it.process.name == it.process.packageName }
             }.forEach { it.toggle() }
         }
 
     init {
         processes.forEach { it.addOnPropertyChangedCallback(BR.hidden) { recalculateChecked() } }
+        addOnPropertyChangedCallback(BR.expanded) { recalculateChecked() }
         recalculateChecked()
     }
 
@@ -57,10 +62,14 @@ class HideItem(
 
     private fun recalculateChecked() {
         itemsChecked = processes.count { it.isHidden }
-        state = when (itemsChecked) {
-            0 -> false
-            processes.size -> true
-            else -> null
+        state = if (isExpanded) {
+            when (itemsChecked) {
+                0 -> false
+                processes.size -> true
+                else -> null
+            }
+        } else {
+            processes.find { it.isHidden && it.process.name == it.process.packageName } != null
         }
     }
 
