@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.events.dialog
 
+import android.app.ProgressDialog
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
@@ -17,8 +18,7 @@ class UninstallDialog : DialogEvent() {
             .applyMessage(R.string.uninstall_magisk_msg)
             .applyButton(MagiskDialog.ButtonType.POSITIVE) {
                 titleRes = R.string.restore_img
-                preventDismiss = true
-                onClick { restore(dialog) }
+                onClick { restore() }
             }
         if (Info.remote.uninstaller.link.isNotEmpty()) {
             dialog.applyButton(MagiskDialog.ButtonType.NEGATIVE) {
@@ -28,13 +28,12 @@ class UninstallDialog : DialogEvent() {
         }
     }
 
-    private fun restore(dialog: MagiskDialog) {
-        dialog.applyTitle(R.string.restore_img)
-            .applyMessage(R.string.restore_img_msg)
-            .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                title = ""
-            }
-            .cancellable(false)
+    @Suppress("DEPRECATION")
+    private fun restore() {
+        val dialog = ProgressDialog(dialog.context).apply {
+            setMessage(dialog.context.getString(R.string.restore_img_msg))
+            show()
+        }
 
         Shell.su("restore_imgs").submit { result ->
             dialog.dismiss()
