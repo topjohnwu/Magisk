@@ -1,5 +1,10 @@
 # Magisk Manager Changelog
 
+## v8.0.2
+
+- Fix an issue with requesting permission on devices older than Android 10
+- Make more files download through CDN
+
 ### v8.0.1
 
 - Fix `vbmeta.img` patching for Samsung `AP.tar` files. This fixes bootloops on devices like Galaxy S10 after flashing updated AP files.
