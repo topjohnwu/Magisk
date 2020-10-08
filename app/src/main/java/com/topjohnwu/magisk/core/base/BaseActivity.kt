@@ -52,7 +52,7 @@ abstract class BaseActivity : AppCompatActivity() {
             var requestCode: Int
             do {
                 requestCode = Random.nextInt(Const.ID.MAX_ACTIVITY_RESULT + 1, 1 shl 15)
-            } while (!resultCallbacks.containsKey(requestCode))
+            } while (resultCallbacks.containsKey(requestCode))
             resultCallbacks[requestCode] = { result, _ ->
                 if (result > 0)
                     request.onSuccess()
