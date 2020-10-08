@@ -17,7 +17,7 @@ private const val REPO = "repo"
 
 const val MAGISK_FILES = "topjohnwu/magisk_files"
 const val MAGISK_MAIN = "topjohnwu/Magisk"
-private const val MAGISK_MODULES = "Magick-Modules-Repo"
+private const val MAGISK_MODULES = "Magisk-Modules-Repo"
 
 interface GithubPageServices {
 
