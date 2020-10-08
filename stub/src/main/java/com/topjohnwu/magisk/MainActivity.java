@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
         if (BuildConfig.DEV_CHANNEL != null)
             return BuildConfig.DEV_CHANNEL;
         else if (BuildConfig.CANARY)
-            return "https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/release.json";
+            return "https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/canary.json";
         else
             return "https://topjohnwu.github.io/magisk_files/stable.json";
     }
