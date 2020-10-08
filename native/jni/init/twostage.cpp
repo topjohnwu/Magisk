@@ -44,7 +44,7 @@ void FirstStageInit::prepare() {
 	fstab_file[0] = '\0';
 
 	// Find existing fstab file
-	for (const char *hw : { cmd->hardware, cmd->hardware_plat }) {
+	for (const char *hw : { cmd->fstab_suffix, cmd->hardware, cmd->hardware_plat }) {
 		if (hw[0] == '\0')
 			continue;
 		sprintf(fstab_file, "fstab.%s", hw);
@@ -98,14 +98,17 @@ void FirstStageInit::prepare() {
 			}
 		}
 
+		// Dump dt fstab to fstab file in rootfs
 		if (fstab_file[0] == '\0') {
-			const char *hw = cmd->hardware[0] ? cmd->hardware :
-					(cmd->hardware_plat[0] ? cmd->hardware_plat : nullptr);
-			if (hw == nullptr) {
-				LOGE("Cannot determine hardware name!\n");
+			const char *suffix =
+				cmd->fstab_suffix[0] ? cmd->fstab_suffix :
+				(cmd->hardware[0] ? cmd->hardware :
+				(cmd->hardware_plat[0] ? cmd->hardware_plat : nullptr));
+			if (suffix == nullptr) {
+				LOGE("Cannot determine fstab suffix!\n");
 				return;
 			}
-			sprintf(fstab_file, "fstab.%s", hw);
+			sprintf(fstab_file, "fstab.%s", suffix);
 		}
 
 		// Patch init to force IsDtFstabCompatible() return false

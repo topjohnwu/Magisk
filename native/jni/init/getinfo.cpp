@@ -155,6 +155,8 @@ void load_kernel_info(cmdline *cmd) {
 			strcpy(cmd->hardware, value);
 		} else if (key == "androidboot.hardware.platform") {
 			strcpy(cmd->hardware_plat, value);
+		} else if (key == "androidboot.fstab_suffix") {
+			strcpy(cmd->fstab_suffix, value);
 		}
 	});
 

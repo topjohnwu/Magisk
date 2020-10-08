@@ -12,6 +12,7 @@ struct cmdline {
 	bool force_normal_boot;
 	char slot[3];
 	char dt_dir[64];
+	char fstab_suffix[32];
 	char hardware[32];
 	char hardware_plat[32];
 };
