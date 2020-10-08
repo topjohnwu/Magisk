@@ -5,6 +5,7 @@
     <string name="superuser">Superusuário</string>
     <string name="logs">Registros</string>
     <string name="settings">Configurações</string>
+    <string name="refresh">Atualizar Dados Locais</string>
     <string name="install">Instalar</string>
     <string name="section_home">Início</string>
     <string name="section_theme">Temas</string>
@@ -46,6 +47,7 @@
     <string name="select_patch_file">Selecione e corrija um arquivo</string>
     <string name="patch_file_msg">Selecione uma imagem bruta (*.img) ou um arquivo tarin ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reiniciando em 5 segundos…</string>
+    <string name="flash_screen_title">Instalação</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitação de Superusuário</string>
@@ -86,6 +88,8 @@
     <string name="target_uid">Alvo UID: %1$d</string>
 
     <!--SafetyNet-->
+    <string name="safetynet_api_error">Erro API SafetyNet</string>
+    <string name="safetynet_res_invalid">A resposta é inválida</string>
     <string name="safetynet_attest_success">Sucesso!</string>
     <string name="safetynet_attest_failure">O certificado falhou!</string>
     <string name="safetynet_attest_loading">Aguarde…</string>
@@ -113,6 +117,7 @@
     <string name="update_available">Atualização disponível</string>
     <string name="home_installed_version">Instalado</string>
     <string name="sorting_order">Ordem de classificação</string>
+  
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Modo de tema</string>
@@ -120,6 +125,7 @@
     <string name="settings_dark_mode_light">Sempre Claro</string>
     <string name="settings_dark_mode_system">Baseado no Sistema</string>
     <string name="settings_dark_mode_dark">Sempre Escuro</string><![CDATA[
+
 
         
 
@@ -170,7 +176,10 @@
     <string name="settings_su_biometric_summary">Use a autenticação biométrica para permitir solicitações de superusuário</string>
     <string name="no_biometric">Dispositivo não suportado ou nenhuma configuração biométrica está ativada</string>
     <string name="settings_customization">Personalizações</string>
-
+    <string name="setting_add_shortcut_summary">Adicione um atalho na tela inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o aplicativo</string>
+    <string name="settings_doh_title">DNS sobre HTTPS</string>
+    <string name="settings_doh_description">Solução alternativa para envenenamento de DNS em alguns países</string>
+    
     <string name="multiuser_mode">Modo multiusuário</string>
     <string name="settings_owner_only">Somente proprietário do dispositivo</string>
     <string name="settings_owner_manage">Gerenciado pelo proprietário do dispositivo</string>
@@ -227,4 +236,8 @@
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versão Magisk não suportada</string>
     <string name="unsupport_magisk_msg">Esta versão do Magisk Manager não suporta a versão Magisk inferior a %1$s. \n\nO aplicativo se comportará como se não houvesse Magisk instalado, atualize o Magisk o mais rápido possível.</string>
+    <string name="add_shortcut_title">Adicionar atalho à tela inicial</string>
+    <string name="add_shortcut_msg">Depois de ocultar o Magisk Manager, seu nome e ícone podem se tornar difíceis de reconhecer. Você quer adicionar um atalho bonito para a tela inicial?</string>
+    <string name="app_not_found">Nenhum aplicativo encontrado para realizar esta ação</string>
+    
 </resources>
